@@ -1,0 +1,73 @@
+using System.Windows;
+using CommunityToolkit.Mvvm.ComponentModel;
+using DialogEditor.Core.Models;
+using DialogEditor.WPF.Services;
+
+namespace DialogEditor.WPF.ViewModels;
+
+public partial class NodeViewModel : ObservableObject
+{
+    public int NodeId { get; }
+    public bool IsPlayerChoice { get; }
+    public string SpeakerGuid { get; }
+    public string ListenerGuid { get; }
+    public string SpeakerName { get; }
+    public string ListenerName { get; }
+    public string Title { get; }
+    public string TextPreview { get; }
+    public string DefaultText { get; }
+    public string FemaleText { get; }
+    public string FooterText { get; }
+    public string DisplayType { get; }
+    public string Persistence { get; }
+    public IReadOnlyList<string> ConditionStrings { get; }
+    public int ScriptCount { get; }
+    public IReadOnlyList<NodeLink> Links { get; }
+
+    public ConnectorViewModel Input { get; } = new();
+    public ConnectorViewModel Output { get; } = new();
+    public IReadOnlyList<ConnectorViewModel> Inputs { get; }
+    public IReadOnlyList<ConnectorViewModel> Outputs { get; }
+
+    [ObservableProperty]
+    private Point _location;
+
+    [ObservableProperty]
+    private bool _isSelected;
+
+    internal Action<NodeViewModel>? OnSelected { get; set; }
+
+    partial void OnIsSelectedChanged(bool value)
+    {
+        if (value) OnSelected?.Invoke(this);
+    }
+
+    public NodeViewModel(ConversationNode node, StringEntry? entry)
+    {
+        NodeId = node.NodeId;
+        IsPlayerChoice = node.IsPlayerChoice;
+        SpeakerGuid = node.SpeakerGuid;
+        ListenerGuid = node.ListenerGuid;
+        SpeakerName = SpeakerNameService.Resolve(node.SpeakerGuid);
+        ListenerName = SpeakerNameService.Resolve(node.ListenerGuid);
+        ConditionStrings = node.ConditionStrings;
+        ScriptCount = node.ScriptCount;
+        DisplayType = node.DisplayType;
+        Persistence = node.Persistence;
+        Links = node.Links;
+
+        var suffix = node.IsPlayerChoice ? " \u2746" : string.Empty;
+        Title = $"Node {node.NodeId} \u00b7 {SpeakerName}{suffix}";
+
+        DefaultText = entry?.DefaultText ?? "[text unavailable \u2014 stringtable not found]";
+        FemaleText = entry?.FemaleText ?? string.Empty;
+        TextPreview = DefaultText.Length > 80 ? DefaultText[..80] + "\u2026" : DefaultText;
+
+        FooterText = node.ConditionStrings.Count > 0
+            ? $"\u2699 {node.ConditionStrings.Count} condition{(node.ConditionStrings.Count == 1 ? "" : "s")}"
+            : "[ No conditions ]";
+
+        Inputs = [Input];
+        Outputs = [Output];
+    }
+}
