@@ -1,0 +1,31 @@
+<Window x:Class="DialogEditor.WPF.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:DialogEditor.WPF.Views"
+        Title="Pillars Dialog Editor"
+        Width="1400" Height="850"
+        Background="#1e1e1e">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220" MinWidth="150"/>
+            <ColumnDefinition Width="4"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="4"/>
+            <ColumnDefinition Width="240" MinWidth="180"/>
+        </Grid.ColumnDefinitions>
+
+        <views:GameBrowserView Grid.Column="0"
+                               DataContext="{Binding Browser}"/>
+
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="#333"/>
+
+        <views:ConversationView Grid.Column="2"
+                                DataContext="{Binding Canvas}"/>
+
+        <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" Background="#333"/>
+
+        <views:NodeDetailView Grid.Column="4"
+                              DataContext="{Binding Detail}"/>
+    </Grid>
+</Window>
