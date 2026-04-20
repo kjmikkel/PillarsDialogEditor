@@ -26,3 +26,6 @@ Desktop.ini
 
 # Brainstorming mockups (visual companion session files)
 .superpowers/
+
+# Git worktrees
+.worktrees/
