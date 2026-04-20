@@ -1,7 +1,7 @@
 using System.Xml.Linq;
 using DialogEditor.Core.Models;
 
-namespace DialogEditor.Core.Services;
+namespace DialogEditor.Core.Parsing;
 
 public static class StringTableParser
 {
