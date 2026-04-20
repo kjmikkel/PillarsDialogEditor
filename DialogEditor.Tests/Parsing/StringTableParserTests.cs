@@ -1,4 +1,4 @@
-using DialogEditor.Core.Services;
+using DialogEditor.Core.Parsing;
 
 namespace DialogEditor.Tests.Parsing;
 
