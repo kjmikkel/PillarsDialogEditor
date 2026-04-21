@@ -36,7 +36,9 @@ public static class Poe1ConversationParser
         return new ConversationNode(
             NodeId: (int)node.Element("NodeID")!,
             IsPlayerChoice: nodeType == "PlayerResponseNode",
-            SpeakerCategory: SpeakerCategory.Npc,
+            SpeakerCategory: ClassifySpeaker(
+                nodeType,
+                (string?)node.Element("SpeakerGuid") ?? string.Empty),
             SpeakerGuid: (string?)node.Element("SpeakerGuid") ?? string.Empty,
             ListenerGuid: (string?)node.Element("ListenerGuid") ?? string.Empty,
             Links: links,
@@ -63,6 +65,16 @@ public static class Poe1ConversationParser
                 : FlattenConditions(c.Element("Components")))
             .ToList();
     }
+
+    private static SpeakerCategory ClassifySpeaker(string nodeType, string speakerGuid) =>
+        nodeType switch
+        {
+            "PlayerResponseNode" => SpeakerCategory.Player,
+            "ScriptNode" or "BankNode" or "TriggerConversationNode" => SpeakerCategory.Script,
+            _ => speakerGuid == "00000000-0000-0000-0000-000000000000"
+                ? SpeakerCategory.Narrator
+                : SpeakerCategory.Npc
+        };
 
     private static string ParseCondition(XElement component)
     {

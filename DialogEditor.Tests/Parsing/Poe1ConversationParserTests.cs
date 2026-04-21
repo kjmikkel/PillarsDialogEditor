@@ -1,3 +1,4 @@
+using DialogEditor.Core.Models;
 using DialogEditor.Core.Parsing;
 
 namespace DialogEditor.Tests.Parsing;
@@ -187,5 +188,76 @@ public class Poe1ConversationParserTests
         var nodes = Poe1ConversationParser.ParseXml(NestedConditionXml);
         Assert.Single(nodes[0].ConditionStrings);
         Assert.Equal("IsGlobalValue(flag_a, EqualTo, 1)", nodes[0].ConditionStrings[0]);
+    }
+
+    private const string ScriptNodeXml = """
+        <?xml version="1.0" encoding="utf-8"?>
+        <ConversationData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                          xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+          <Nodes>
+            <FlowChartNode xsi:type="TalkNode">
+              <NodeID>0</NodeID>
+              <Links>
+                <FlowChartLink xsi:type="DialogueLink">
+                  <FromNodeID>0</FromNodeID><ToNodeID>1</ToNodeID>
+                  <PointsToGhost>false</PointsToGhost>
+                  <ClassExtender><ExtendedProperties /></ClassExtender>
+                  <RandomWeight>1</RandomWeight>
+                  <PlayQuestionNodeVO>true</PlayQuestionNodeVO>
+                  <QuestionNodeTextDisplay>ShowOnce</QuestionNodeTextDisplay>
+                </FlowChartLink>
+              </Links>
+              <ClassExtender><ExtendedProperties /></ClassExtender>
+              <Conditionals><Operator>And</Operator><Components /></Conditionals>
+              <OnEnterScripts /><OnExitScripts /><OnUpdateScripts />
+              <IsQuestionNode>false</IsQuestionNode>
+              <Persistence>None</Persistence><DisplayType>Conversation</DisplayType>
+              <SpeakerGuid>00000000-0000-0000-0000-000000000000</SpeakerGuid>
+              <ListenerGuid>00000000-0000-0000-0000-000000000000</ListenerGuid>
+            </FlowChartNode>
+            <FlowChartNode xsi:type="ScriptNode">
+              <NodeID>1</NodeID>
+              <Links />
+              <ClassExtender><ExtendedProperties /></ClassExtender>
+              <Conditionals><Operator>And</Operator><Components /></Conditionals>
+              <OnEnterScripts /><OnExitScripts /><OnUpdateScripts />
+            </FlowChartNode>
+          </Nodes>
+        </ConversationData>
+        """;
+
+    [Fact]
+    public void Parse_ScriptNode_IsIncluded()
+    {
+        var nodes = Poe1ConversationParser.ParseXml(ScriptNodeXml);
+        Assert.Equal(2, nodes.Count);
+    }
+
+    [Fact]
+    public void Parse_PlayerResponseNode_HasSpeakerCategoryPlayer()
+    {
+        var nodes = Poe1ConversationParser.ParseXml(TwoNodeXml);
+        Assert.Equal(SpeakerCategory.Player, nodes[1].SpeakerCategory);
+    }
+
+    [Fact]
+    public void Parse_NpcTalkNode_HasSpeakerCategoryNpc()
+    {
+        var nodes = Poe1ConversationParser.ParseXml(TwoNodeXml);
+        Assert.Equal(SpeakerCategory.Npc, nodes[0].SpeakerCategory);
+    }
+
+    [Fact]
+    public void Parse_NarratorTalkNode_HasSpeakerCategoryNarrator()
+    {
+        var nodes = Poe1ConversationParser.ParseXml(NestedConditionXml);
+        Assert.Equal(SpeakerCategory.Narrator, nodes[0].SpeakerCategory);
+    }
+
+    [Fact]
+    public void Parse_Poe1ScriptNode_HasSpeakerCategoryScript()
+    {
+        var nodes = Poe1ConversationParser.ParseXml(ScriptNodeXml);
+        Assert.Equal(SpeakerCategory.Script, nodes[1].SpeakerCategory);
     }
 }

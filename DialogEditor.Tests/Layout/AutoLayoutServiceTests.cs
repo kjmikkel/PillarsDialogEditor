@@ -11,7 +11,7 @@ public class AutoLayoutServiceTests
     private const double VGap = 20;
 
     private static ConversationNode Node(int id, params int[] toIds) =>
-        new(id, false, "", "", toIds.Select(t => new NodeLink(id, t, false)).ToList(),
+        new(id, false, SpeakerCategory.Npc, "", "", toIds.Select(t => new NodeLink(id, t, false)).ToList(),
             [], 0, "", "");
 
     [Fact]
