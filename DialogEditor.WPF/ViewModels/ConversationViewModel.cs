@@ -14,6 +14,15 @@ public partial class ConversationViewModel : ObservableObject
     [ObservableProperty]
     private NodeViewModel? _selectedNode;
 
+    partial void OnSelectedNodeChanged(NodeViewModel? value)
+    {
+        foreach (var connection in Connections)
+        {
+            connection.IsHighlighted = value is not null &&
+                (connection.Source == value.Output || connection.Target == value.Input);
+        }
+    }
+
     public void Load(Conversation conversation)
     {
         Nodes.Clear();
