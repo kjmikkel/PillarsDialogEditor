@@ -1,0 +1,45 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+
+namespace DialogEditor.WPF.ViewModels;
+
+public partial class NodeDetailViewModel : ObservableObject
+{
+    [ObservableProperty] private bool _hasContent;
+    [ObservableProperty] private int _nodeId;
+    [ObservableProperty] private string _nodeType = string.Empty;
+    [ObservableProperty] private string _speakerName = string.Empty;
+    [ObservableProperty] private string _speakerGuid = string.Empty;
+    [ObservableProperty] private string _listenerName = string.Empty;
+    [ObservableProperty] private string _defaultText = string.Empty;
+    [ObservableProperty] private string _femaleText = string.Empty;
+    [ObservableProperty] private string _conditionsText = string.Empty;
+    [ObservableProperty] private string _displayType = string.Empty;
+    [ObservableProperty] private string _persistence = string.Empty;
+    [ObservableProperty] private string _linksTo = string.Empty;
+    [ObservableProperty] private int _scriptCount;
+
+    public void Load(NodeViewModel? node)
+    {
+        if (node is null) { HasContent = false; return; }
+
+        NodeId = node.NodeId;
+        NodeType = node.IsPlayerChoice ? "Player Choice" : "NPC Line";
+        SpeakerName = node.SpeakerName;
+        SpeakerGuid = node.SpeakerGuid;
+        ListenerName = node.ListenerName;
+        DefaultText = node.DefaultText;
+        FemaleText = node.FemaleText;
+        ConditionsText = node.ConditionStrings.Count > 0
+            ? string.Join(Environment.NewLine, node.ConditionStrings)
+            : "(none)";
+        DisplayType = node.DisplayType;
+        Persistence = node.Persistence;
+        LinksTo = node.Links.Count > 0
+            ? string.Join(", ", node.Links.Select(l => $"\u2192 {l.ToNodeId}"))
+            : "(none)";
+        ScriptCount = node.ScriptCount;
+        HasContent = true;
+    }
+
+    public void Clear() => HasContent = false;
+}
