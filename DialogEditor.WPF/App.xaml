@@ -4,7 +4,7 @@
              xmlns:converters="clr-namespace:DialogEditor.WPF.Converters"
              StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
-        <converters:BoolToHeaderBrushConverter x:Key="BoolToHeaderBrush"/>
+        <converters:SpeakerCategoryToBrushConverter x:Key="SpeakerCategoryToBrush"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVis"/>
         <converters:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVis"/>
