@@ -26,9 +26,7 @@ public static class Poe2ConversationParser
             .Select(ParseLink)
             .ToList() ?? [];
 
-        var conditions = node["Conditionals"]?["Components"]?.AsArray()
-            .Select(ParseCondition)
-            .ToList() ?? [];
+        var conditions = FlattenConditions(node["Conditionals"]?["Components"]?.AsArray());
 
         var scriptCount =
             (node["OnEnterScripts"]?.AsArray().Count > 0 ? 1 : 0) +
@@ -54,6 +52,16 @@ public static class Poe2ConversationParser
             ToNodeId: link["ToNodeID"]!.GetValue<int>(),
             HasConditions: link["Conditionals"]?["Components"]?.AsArray().Count > 0
         );
+
+    private static List<string> FlattenConditions(JsonArray? components)
+    {
+        if (components is null) return [];
+        return components
+            .SelectMany(c => c?["Data"] is not null
+                ? (IEnumerable<string>)[ParseCondition(c)]
+                : FlattenConditions(c?["Components"]?.AsArray()))
+            .ToList();
+    }
 
     private static string ParseCondition(JsonNode? component)
     {

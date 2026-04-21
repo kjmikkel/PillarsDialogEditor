@@ -24,7 +24,7 @@ public partial class ConversationViewModel : ObservableObject
 
         foreach (var node in conversation.Nodes)
         {
-            var entry = conversation.Strings.Get(node.NodeId);
+            var entry = conversation.Strings.Get(node.NodeId + 1);
             var vm = new NodeViewModel(node, entry);
             vm.OnSelected = n => SelectedNode = n;
             nodeMap[node.NodeId] = vm;
