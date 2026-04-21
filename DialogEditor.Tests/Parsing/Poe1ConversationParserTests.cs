@@ -46,7 +46,7 @@ public class Poe1ConversationParserTests
               <SpeakerGuid>fb6a7cbb-80b6-4b9c-8a99-41c8a031f380</SpeakerGuid>
               <ListenerGuid>b1a8e901-0000-0000-0000-000000000000</ListenerGuid>
             </FlowChartNode>
-            <FlowChartNode xsi:type="TalkNode">
+            <FlowChartNode xsi:type="PlayerResponseNode">
               <NodeID>1</NodeID>
               <Comments />
               <PackageID>1</PackageID>
@@ -74,7 +74,7 @@ public class Poe1ConversationParserTests
               <OnExitScripts />
               <OnUpdateScripts />
               <NotSkippable>false</NotSkippable>
-              <IsQuestionNode>true</IsQuestionNode>
+              <IsQuestionNode>false</IsQuestionNode>
               <IsTempText>false</IsTempText>
               <PlayVOAs3DSound>false</PlayVOAs3DSound>
               <PlayType>Normal</PlayType>
@@ -143,5 +143,49 @@ public class Poe1ConversationParserTests
     {
         var nodes = Poe1ConversationParser.ParseXml(TwoNodeXml);
         Assert.Equal("fb6a7cbb-80b6-4b9c-8a99-41c8a031f380", nodes[0].SpeakerGuid);
+    }
+
+    private const string NestedConditionXml = """
+        <?xml version="1.0" encoding="utf-8"?>
+        <ConversationData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                          xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+          <Nodes>
+            <FlowChartNode xsi:type="TalkNode">
+              <NodeID>0</NodeID>
+              <Links />
+              <ClassExtender><ExtendedProperties /></ClassExtender>
+              <Conditionals>
+                <Operator>And</Operator>
+                <Components>
+                  <ExpressionComponent xsi:type="ConditionalExpression">
+                    <Operator>And</Operator>
+                    <Components>
+                      <ExpressionComponent xsi:type="ConditionalCall">
+                        <Data>
+                          <FullName>Boolean IsGlobalValue(String, Operator, Int32)</FullName>
+                          <Parameters><string>flag_a</string><string>EqualTo</string><string>1</string></Parameters>
+                        </Data>
+                        <Not>false</Not><Operator>And</Operator>
+                      </ExpressionComponent>
+                    </Components>
+                  </ExpressionComponent>
+                </Components>
+              </Conditionals>
+              <OnEnterScripts /><OnExitScripts /><OnUpdateScripts />
+              <IsQuestionNode>false</IsQuestionNode>
+              <Persistence>None</Persistence><DisplayType>Conversation</DisplayType>
+              <SpeakerGuid>00000000-0000-0000-0000-000000000000</SpeakerGuid>
+              <ListenerGuid>00000000-0000-0000-0000-000000000000</ListenerGuid>
+            </FlowChartNode>
+          </Nodes>
+        </ConversationData>
+        """;
+
+    [Fact]
+    public void Parse_NestedConditionalExpression_FlattensLeafConditions()
+    {
+        var nodes = Poe1ConversationParser.ParseXml(NestedConditionXml);
+        Assert.Single(nodes[0].ConditionStrings);
+        Assert.Equal("IsGlobalValue(flag_a, EqualTo, 1)", nodes[0].ConditionStrings[0]);
     }
 }
