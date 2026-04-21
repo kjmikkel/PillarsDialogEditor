@@ -35,7 +35,8 @@ public static class Poe2ConversationParser
 
         return new ConversationNode(
             NodeId: node["NodeID"]!.GetValue<int>(),
-            IsPlayerChoice: node["IsQuestionNode"]?.GetValue<bool>() ?? false,
+            IsPlayerChoice: node["$type"]?.GetValue<string>()?.Contains("PlayerResponseNode") ?? false,
+            SpeakerCategory: SpeakerCategory.Npc,
             SpeakerGuid: node["SpeakerGuid"]?.GetValue<string>() ?? string.Empty,
             ListenerGuid: node["ListenerGuid"]?.GetValue<string>() ?? string.Empty,
             Links: links,
