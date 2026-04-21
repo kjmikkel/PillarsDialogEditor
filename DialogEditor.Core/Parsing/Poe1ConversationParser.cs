@@ -9,14 +9,11 @@ public static class Poe1ConversationParser
         => ParseXml(File.ReadAllText(path));
 
     private static readonly XNamespace Xsi = "http://www.w3.org/2001/XMLSchema-instance";
-    private static readonly HashSet<string> DialogNodeTypes =
-        ["TalkNode", "PlayerResponseNode"];
 
     public static IReadOnlyList<ConversationNode> ParseXml(string xml)
     {
         var doc = XDocument.Parse(xml);
         return doc.Descendants("FlowChartNode")
-            .Where(n => DialogNodeTypes.Contains((string?)n.Attribute(Xsi + "type") ?? ""))
             .Select(ParseNode)
             .ToList();
     }
@@ -39,6 +36,7 @@ public static class Poe1ConversationParser
         return new ConversationNode(
             NodeId: (int)node.Element("NodeID")!,
             IsPlayerChoice: nodeType == "PlayerResponseNode",
+            SpeakerCategory: SpeakerCategory.Npc,
             SpeakerGuid: (string?)node.Element("SpeakerGuid") ?? string.Empty,
             ListenerGuid: (string?)node.Element("ListenerGuid") ?? string.Empty,
             Links: links,
