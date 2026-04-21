@@ -120,7 +120,20 @@
                 <nodify:NodifyEditor.ConnectionTemplate>
                     <DataTemplate DataType="{x:Type vm:ConnectionViewModel}">
                         <nodify:Connection Source="{Binding Source.Anchor}"
-                                           Target="{Binding Target.Anchor}"/>
+                                           Target="{Binding Target.Anchor}">
+                            <nodify:Connection.Style>
+                                <Style TargetType="nodify:Connection">
+                                    <Setter Property="Stroke" Value="#666"/>
+                                    <Setter Property="StrokeThickness" Value="1.5"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsHighlighted}" Value="True">
+                                            <Setter Property="Stroke" Value="White"/>
+                                            <Setter Property="StrokeThickness" Value="2.5"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </nodify:Connection.Style>
+                        </nodify:Connection>
                     </DataTemplate>
                 </nodify:NodifyEditor.ConnectionTemplate>
 
