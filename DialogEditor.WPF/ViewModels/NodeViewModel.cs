@@ -9,6 +9,7 @@ public partial class NodeViewModel : ObservableObject
 {
     public int NodeId { get; }
     public bool IsPlayerChoice { get; }
+    public SpeakerCategory SpeakerCategory { get; }
     public string SpeakerGuid { get; }
     public string ListenerGuid { get; }
     public string SpeakerName { get; }
@@ -46,9 +47,19 @@ public partial class NodeViewModel : ObservableObject
     {
         NodeId = node.NodeId;
         IsPlayerChoice = node.IsPlayerChoice;
+        SpeakerCategory = node.SpeakerCategory;
         SpeakerGuid = node.SpeakerGuid;
         ListenerGuid = node.ListenerGuid;
-        SpeakerName = SpeakerNameService.Resolve(node.SpeakerGuid);
+        var resolved = SpeakerNameService.Resolve(node.SpeakerGuid);
+        SpeakerName = resolved == "Unknown"
+            ? node.SpeakerCategory switch
+            {
+                SpeakerCategory.Player   => "Player",
+                SpeakerCategory.Narrator => "Narrator",
+                SpeakerCategory.Script   => "Script",
+                _                        => "Unknown"
+            }
+            : resolved;
         ListenerName = SpeakerNameService.Resolve(node.ListenerGuid);
         ConditionStrings = node.ConditionStrings;
         ScriptCount = node.ScriptCount;
