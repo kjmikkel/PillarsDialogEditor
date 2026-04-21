@@ -1,6 +1,19 @@
-﻿<Application x:Class="DialogEditor.WPF.App"
+<Application x:Class="DialogEditor.WPF.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:DialogEditor.WPF.Converters"
              StartupUri="Views/MainWindow.xaml">
-    <Application.Resources />
+    <Application.Resources>
+        <converters:BoolToHeaderBrushConverter x:Key="BoolToHeaderBrush"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVis"/>
+        <converters:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVis"/>
+
+        <Style x:Key="LabelStyle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#888"/>
+            <Setter Property="FontSize" Value="8"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,0,0,2"/>
+        </Style>
+    </Application.Resources>
 </Application>
