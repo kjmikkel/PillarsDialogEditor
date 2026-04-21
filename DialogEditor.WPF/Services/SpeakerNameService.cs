@@ -5,7 +5,6 @@ public static class SpeakerNameService
     private static readonly Dictionary<string, string> KnownGuids = new(StringComparer.OrdinalIgnoreCase)
     {
         { "b1a8e901-0000-0000-0000-000000000000", "Player" },
-        { "6a99a109-0000-0000-0000-000000000000", "Player" },
         { "00000000-0000-0000-0000-000000000000", "Narrator" },
 
         // PoE1 companions

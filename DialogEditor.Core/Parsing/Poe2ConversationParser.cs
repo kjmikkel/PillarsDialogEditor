@@ -5,7 +5,6 @@ namespace DialogEditor.Core.Parsing;
 
 public static class Poe2ConversationParser
 {
-    private const string PlayerSpeakerGuid = "6a99a109-0000-0000-0000-000000000000";
     private const string NullGuid = "00000000-0000-0000-0000-000000000000";
 
     private static SpeakerCategory ClassifySpeaker(string? type, string speakerGuid)
@@ -14,7 +13,6 @@ public static class Poe2ConversationParser
         if (type.Contains("PlayerResponseNode")) return SpeakerCategory.Player;
         if (type.Contains("ScriptNode") || type.Contains("BankNode") || type.Contains("TriggerConversationNode"))
             return SpeakerCategory.Script;
-        if (speakerGuid == PlayerSpeakerGuid) return SpeakerCategory.Player;
         if (speakerGuid == NullGuid) return SpeakerCategory.Narrator;
         return SpeakerCategory.Npc;
     }

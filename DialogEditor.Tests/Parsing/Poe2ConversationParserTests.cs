@@ -221,10 +221,11 @@ public class Poe2ConversationParserTests
     }
 
     [Fact]
-    public void Parse_Poe2PlayerTalkNode_HasSpeakerCategoryPlayer()
+    public void Parse_Poe2CompanionSlotGuidTalkNode_HasSpeakerCategoryNpc()
     {
+        // 6a99a109-... is a generic runtime companion slot, not the player
         var nodes = Poe2ConversationParser.ParseJson(PlayerTalkNodeJson);
-        Assert.Equal(SpeakerCategory.Player, nodes[0].SpeakerCategory);
+        Assert.Equal(SpeakerCategory.Npc, nodes[0].SpeakerCategory);
     }
 
     [Fact]
