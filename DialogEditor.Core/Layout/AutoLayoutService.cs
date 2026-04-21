@@ -6,7 +6,7 @@ public static class AutoLayoutService
 {
     private const double NodeWidth = 220;
     private const double NodeHeight = 110;
-    private const double HorizontalGap = 60;
+    private const double HorizontalGap = 200;
     private const double VerticalGap = 20;
 
     public static void Apply(
