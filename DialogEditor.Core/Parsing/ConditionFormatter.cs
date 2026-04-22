@@ -2,6 +2,13 @@ namespace DialogEditor.Core.Parsing;
 
 public static class ConditionFormatter
 {
+    public static string FormatScript(string fullName, IReadOnlyList<string> parameters)
+    {
+        var funcName = ExtractFunctionName(fullName);
+        var paramStr = string.Join(", ", parameters);
+        return $"{funcName}({paramStr})";
+    }
+
     public static string Format(string fullName, IReadOnlyList<string> parameters, bool not)
     {
         var funcName = ExtractFunctionName(fullName);

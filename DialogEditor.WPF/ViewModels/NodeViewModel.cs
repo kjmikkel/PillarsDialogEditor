@@ -22,7 +22,7 @@ public partial class NodeViewModel : ObservableObject
     public string DisplayType { get; }
     public string Persistence { get; }
     public IReadOnlyList<string> ConditionStrings { get; }
-    public int ScriptCount { get; }
+    public IReadOnlyList<string> Scripts { get; }
     public IReadOnlyList<NodeLink> Links { get; }
 
     public ConnectorViewModel Input { get; } = new();
@@ -62,7 +62,7 @@ public partial class NodeViewModel : ObservableObject
             : resolved;
         ListenerName = SpeakerNameService.Resolve(node.ListenerGuid);
         ConditionStrings = node.ConditionStrings;
-        ScriptCount = node.ScriptCount;
+        Scripts = node.Scripts;
         DisplayType = node.DisplayType;
         Persistence = node.Persistence;
         Links = node.Links;

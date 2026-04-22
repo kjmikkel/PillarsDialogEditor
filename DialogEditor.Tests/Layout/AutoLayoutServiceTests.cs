@@ -12,7 +12,7 @@ public class AutoLayoutServiceTests
 
     private static ConversationNode Node(int id, params int[] toIds) =>
         new(id, false, SpeakerCategory.Npc, "", "", toIds.Select(t => new NodeLink(id, t, false)).ToList(),
-            [], 0, "", "");
+            [], [], "", "");
 
     [Fact]
     public void Apply_SingleNode_PlacedAtOrigin()

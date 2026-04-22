@@ -27,10 +27,7 @@ public static class Poe1ConversationParser
         var conditions = FlattenConditions(
             node.Element("Conditionals")?.Element("Components"));
 
-        var scriptCount =
-            (node.Element("OnEnterScripts")?.HasElements == true ? 1 : 0) +
-            (node.Element("OnExitScripts")?.HasElements == true ? 1 : 0) +
-            (node.Element("OnUpdateScripts")?.HasElements == true ? 1 : 0);
+        var scripts = ParseScripts(node);
 
         var nodeType = (string?)node.Attribute(Xsi + "type") ?? "";
         return new ConversationNode(
@@ -43,7 +40,7 @@ public static class Poe1ConversationParser
             ListenerGuid: (string?)node.Element("ListenerGuid") ?? string.Empty,
             Links: links,
             ConditionStrings: conditions,
-            ScriptCount: scriptCount,
+            Scripts: scripts,
             DisplayType: (string?)node.Element("DisplayType") ?? string.Empty,
             Persistence: (string?)node.Element("Persistence") ?? string.Empty
         );
@@ -55,6 +52,30 @@ public static class Poe1ConversationParser
             ToNodeId: (int)link.Element("ToNodeID")!,
             HasConditions: link.Element("Conditionals")?.Element("Components")?.HasElements == true
         );
+
+    private static List<string> ParseScripts(XElement node)
+    {
+        var result = new List<string>();
+        AppendScripts(result, node.Element("OnEnterScripts"), "[Enter]");
+        AppendScripts(result, node.Element("OnExitScripts"), "[Exit]");
+        AppendScripts(result, node.Element("OnUpdateScripts"), "[Update]");
+        return result;
+    }
+
+    private static void AppendScripts(List<string> result, XElement? scriptList, string prefix)
+    {
+        if (scriptList is null) return;
+        foreach (var entry in scriptList.Elements())
+        {
+            var data = entry.Element("Data");
+            if (data is null) continue;
+            var fullName = (string?)data.Element("FullName") ?? string.Empty;
+            var parameters = data.Element("Parameters")?.Elements("string")
+                .Select(e => (string)e)
+                .ToList() ?? [];
+            result.Add($"{prefix} {ConditionFormatter.FormatScript(fullName, parameters)}");
+        }
+    }
 
     private static List<string> FlattenConditions(XElement? components)
     {

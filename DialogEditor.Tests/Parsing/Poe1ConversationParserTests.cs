@@ -260,4 +260,46 @@ public class Poe1ConversationParserTests
         var nodes = Poe1ConversationParser.ParseXml(ScriptNodeXml);
         Assert.Equal(SpeakerCategory.Script, nodes[1].SpeakerCategory);
     }
+
+    private const string ScriptedNodeXml = """
+        <?xml version="1.0" encoding="utf-8"?>
+        <ConversationData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                          xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+          <Nodes>
+            <FlowChartNode xsi:type="TalkNode">
+              <NodeID>0</NodeID>
+              <Links />
+              <ClassExtender><ExtendedProperties /></ClassExtender>
+              <Conditionals><Operator>And</Operator><Components /></Conditionals>
+              <OnEnterScripts>
+                <ConditionalScriptData>
+                  <Data>
+                    <FullName>Void ActivateObject(Guid, Boolean)</FullName>
+                    <Parameters>
+                      <string>546e5d97-760e-4d7d-b03a-cc01c0f3ce43</string>
+                      <string>False</string>
+                    </Parameters>
+                  </Data>
+                  <Conditional><Operator>And</Operator><Components /></Conditional>
+                </ConditionalScriptData>
+              </OnEnterScripts>
+              <OnExitScripts />
+              <OnUpdateScripts />
+              <IsQuestionNode>false</IsQuestionNode>
+              <Persistence>None</Persistence><DisplayType>Conversation</DisplayType>
+              <SpeakerGuid>00000000-0000-0000-0000-000000000000</SpeakerGuid>
+              <ListenerGuid>00000000-0000-0000-0000-000000000000</ListenerGuid>
+            </FlowChartNode>
+          </Nodes>
+        </ConversationData>
+        """;
+
+    [Fact]
+    public void Parse_Poe1Node_WithOnEnterScript_HasScriptString()
+    {
+        var nodes = Poe1ConversationParser.ParseXml(ScriptedNodeXml);
+        Assert.Single(nodes[0].Scripts);
+        Assert.Contains("[Enter]", nodes[0].Scripts[0]);
+        Assert.Contains("ActivateObject", nodes[0].Scripts[0]);
+    }
 }

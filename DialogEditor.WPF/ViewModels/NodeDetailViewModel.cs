@@ -16,7 +16,7 @@ public partial class NodeDetailViewModel : ObservableObject
     [ObservableProperty] private string _displayType = string.Empty;
     [ObservableProperty] private string _persistence = string.Empty;
     [ObservableProperty] private string _linksTo = string.Empty;
-    [ObservableProperty] private int _scriptCount;
+    [ObservableProperty] private string _scriptsText = string.Empty;
 
     public void Load(NodeViewModel? node)
     {
@@ -37,7 +37,9 @@ public partial class NodeDetailViewModel : ObservableObject
         LinksTo = node.Links.Count > 0
             ? string.Join(", ", node.Links.Select(l => $"\u2192 {l.ToNodeId}"))
             : "(none)";
-        ScriptCount = node.ScriptCount;
+        ScriptsText = node.Scripts.Count > 0
+            ? string.Join(Environment.NewLine, node.Scripts)
+            : "(none)";
         HasContent = true;
     }
 

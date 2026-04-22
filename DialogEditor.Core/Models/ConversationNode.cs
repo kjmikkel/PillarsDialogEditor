@@ -8,11 +8,11 @@ public record ConversationNode(
     string ListenerGuid,
     IReadOnlyList<NodeLink> Links,
     IReadOnlyList<string> ConditionStrings,
-    int ScriptCount,
+    IReadOnlyList<string> Scripts,
     string DisplayType,
     string Persistence
 )
 {
     public bool HasConditions => ConditionStrings.Count > 0;
-    public bool HasScripts => ScriptCount > 0;
+    public bool HasScripts => Scripts.Count > 0;
 }

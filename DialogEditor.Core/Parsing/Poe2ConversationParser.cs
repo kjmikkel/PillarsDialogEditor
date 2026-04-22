@@ -39,11 +39,7 @@ public static class Poe2ConversationParser
             .ToList() ?? [];
 
         var conditions = FlattenConditions(node["Conditionals"]?["Components"]?.AsArray());
-
-        var scriptCount =
-            (node["OnEnterScripts"]?.AsArray().Count > 0 ? 1 : 0) +
-            (node["OnExitScripts"]?.AsArray().Count > 0 ? 1 : 0) +
-            (node["OnUpdateScripts"]?.AsArray().Count > 0 ? 1 : 0);
+        var scripts = ParseScripts(node);
 
         return new ConversationNode(
             NodeId: node["NodeID"]!.GetValue<int>(),
@@ -55,10 +51,32 @@ public static class Poe2ConversationParser
             ListenerGuid: node["ListenerGuid"]?.GetValue<string>() ?? string.Empty,
             Links: links,
             ConditionStrings: conditions,
-            ScriptCount: scriptCount,
+            Scripts: scripts,
             DisplayType: MapDisplayType(node["DisplayType"]?.GetValue<int>() ?? 0),
             Persistence: MapPersistence(node["Persistence"]?.GetValue<int>() ?? 0)
         );
+    }
+
+    private static List<string> ParseScripts(JsonNode? node)
+    {
+        var result = new List<string>();
+        AppendScripts(result, node?["OnEnterScripts"]?.AsArray(), "[Enter]");
+        AppendScripts(result, node?["OnExitScripts"]?.AsArray(), "[Exit]");
+        AppendScripts(result, node?["OnUpdateScripts"]?.AsArray(), "[Update]");
+        return result;
+    }
+
+    private static void AppendScripts(List<string> result, JsonArray? scripts, string prefix)
+    {
+        if (scripts is null) return;
+        foreach (var s in scripts)
+        {
+            var fullName = s?["Data"]?["FullName"]?.GetValue<string>() ?? string.Empty;
+            var parameters = s?["Data"]?["Parameters"]?.AsArray()
+                .Select(p => p!.GetValue<string>())
+                .ToList() ?? [];
+            result.Add($"{prefix} {ConditionFormatter.FormatScript(fullName, parameters)}");
+        }
     }
 
     private static NodeLink ParseLink(JsonNode? link)
