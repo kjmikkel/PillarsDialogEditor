@@ -33,6 +33,7 @@ public partial class MainWindowViewModel : ObservableObject
     {
         if (_provider is null || string.IsNullOrEmpty(value)) return;
         _provider.Language = value;
+        AppSettings.LastLanguage = value;
         if (_currentFile is not null)
             OnConversationSelected(_currentFile);
     }
@@ -53,7 +54,7 @@ public partial class MainWindowViewModel : ObservableObject
         _provider = provider;
         SpeakerNameService.Register(provider.LoadSpeakerNames());
         AvailableLanguages = provider.AvailableLanguages;
-        SelectedLanguage = AvailableLanguages.Contains("en") ? "en" : AvailableLanguages[0];
+        SelectedLanguage = AppSettings.PickLanguage(AvailableLanguages, AppSettings.LastLanguage);
         Browser.Load(provider);
         StatusText = $"{provider.GameName} — {dialog.FolderName}";
     }
