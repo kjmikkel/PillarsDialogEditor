@@ -6,10 +6,17 @@ namespace DialogEditor.Core.GameData;
 public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
 {
     public string GameName => "Pillars of Eternity";
+    public string Language { get; set; } = "en";
 
-    private string DataRoot => Path.Combine(rootPath, "PillarsOfEternity_Data", "data");
+    private string DataRoot        => Path.Combine(rootPath, "PillarsOfEternity_Data", "data");
+    private string LocalizedRoot   => Path.Combine(DataRoot, "localized");
     private string ConversationsRoot => Path.Combine(DataRoot, "conversations");
-    private string StringTablesRoot => Path.Combine(DataRoot, "localized", "en", "text", "conversations");
+    private string StringTablesRoot  => Path.Combine(LocalizedRoot, Language, "text", "conversations");
+
+    public IReadOnlyList<string> AvailableLanguages =>
+        Directory.Exists(LocalizedRoot)
+            ? [.. Directory.GetDirectories(LocalizedRoot).Select(Path.GetFileName).Order()!]
+            : ["en"];
 
     public IReadOnlyList<ConversationFile> EnumerateConversations()
     {
@@ -26,23 +33,29 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
     private ConversationFile BuildConversationFile(string convPath)
     {
         var relative = Path.GetRelativePath(ConversationsRoot, convPath);
-        var withoutExt = Path.ChangeExtension(relative, null);
-        var stPath = Path.Combine(StringTablesRoot, withoutExt + ".stringtable");
         return new ConversationFile(
             Name: Path.GetFileNameWithoutExtension(convPath),
             FolderPath: Path.GetDirectoryName(relative) ?? string.Empty,
             ConversationPath: convPath,
-            StringTablePath: stPath
+            StringTablePath: string.Empty
         );
     }
 
     public Conversation LoadConversation(ConversationFile file)
     {
         var nodes = Poe1ConversationParser.ParseFile(file.ConversationPath);
-        var strings = File.Exists(file.StringTablePath)
-            ? StringTableParser.ParseFile(file.StringTablePath)
+        var stPath = StringTablePathFor(file.ConversationPath);
+        var strings = File.Exists(stPath)
+            ? StringTableParser.ParseFile(stPath)
             : StringTable.Empty;
         return new Conversation(file.Name, nodes, strings);
+    }
+
+    private string StringTablePathFor(string convPath)
+    {
+        var relative = Path.GetRelativePath(ConversationsRoot, convPath);
+        var withoutExt = Path.ChangeExtension(relative, null);
+        return Path.Combine(StringTablesRoot, withoutExt + ".stringtable");
     }
 
     public IReadOnlyDictionary<string, string> LoadSpeakerNames() =>
