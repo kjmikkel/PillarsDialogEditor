@@ -42,7 +42,8 @@ public static class Poe1ConversationParser
             ConditionStrings: conditions,
             Scripts: scripts,
             DisplayType: (string?)node.Element("DisplayType") ?? string.Empty,
-            Persistence: (string?)node.Element("Persistence") ?? string.Empty
+            Persistence: (string?)node.Element("Persistence") ?? string.Empty,
+            ActorDirection: (string?)node.Element("ActorDirection") ?? string.Empty
         );
     }
 
