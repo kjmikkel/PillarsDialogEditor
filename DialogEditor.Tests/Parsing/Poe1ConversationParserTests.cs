@@ -301,4 +301,51 @@ public class Poe1ConversationParserTests
         Assert.Contains("[Enter]", nodes[0].Scripts[0]);
         Assert.Contains("ActivateObject", nodes[0].Scripts[0]);
     }
+
+    private const string ActorDirectionXml = """
+        <?xml version="1.0" encoding="utf-8"?>
+        <ConversationData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                          xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+          <Nodes>
+            <FlowChartNode xsi:type="TalkNode">
+              <NodeID>0</NodeID>
+              <Links />
+              <ClassExtender><ExtendedProperties /></ClassExtender>
+              <Conditionals><Operator>And</Operator><Components /></Conditionals>
+              <OnEnterScripts /><OnExitScripts /><OnUpdateScripts />
+              <IsQuestionNode>false</IsQuestionNode>
+              <Persistence>None</Persistence><DisplayType>Conversation</DisplayType>
+              <SpeakerGuid>00000000-0000-0000-0000-000000000000</SpeakerGuid>
+              <ListenerGuid>00000000-0000-0000-0000-000000000000</ListenerGuid>
+              <ActorDirection>anxious and guilty</ActorDirection>
+            </FlowChartNode>
+            <FlowChartNode xsi:type="TalkNode">
+              <NodeID>1</NodeID>
+              <Links />
+              <ClassExtender><ExtendedProperties /></ClassExtender>
+              <Conditionals><Operator>And</Operator><Components /></Conditionals>
+              <OnEnterScripts /><OnExitScripts /><OnUpdateScripts />
+              <IsQuestionNode>false</IsQuestionNode>
+              <Persistence>None</Persistence><DisplayType>Conversation</DisplayType>
+              <SpeakerGuid>00000000-0000-0000-0000-000000000000</SpeakerGuid>
+              <ListenerGuid>00000000-0000-0000-0000-000000000000</ListenerGuid>
+              <ActorDirection />
+            </FlowChartNode>
+          </Nodes>
+        </ConversationData>
+        """;
+
+    [Fact]
+    public void Parse_Poe1Node_WithActorDirection_HasActorDirection()
+    {
+        var nodes = Poe1ConversationParser.ParseXml(ActorDirectionXml);
+        Assert.Equal("anxious and guilty", nodes[0].ActorDirection);
+    }
+
+    [Fact]
+    public void Parse_Poe1Node_WithEmptyActorDirection_HasEmptyString()
+    {
+        var nodes = Poe1ConversationParser.ParseXml(ActorDirectionXml);
+        Assert.Equal(string.Empty, nodes[1].ActorDirection);
+    }
 }

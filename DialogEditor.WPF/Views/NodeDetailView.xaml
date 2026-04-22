@@ -79,6 +79,16 @@
                     </TextBlock>
                 </StackPanel>
 
+                <StackPanel Margin="0,0,0,10"
+                            Visibility="{Binding HasActorDirection, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="ACTOR DIRECTION" Style="{StaticResource LabelStyle}"/>
+                    <Border Background="#1a1a1a" Padding="6" CornerRadius="3">
+                        <TextBlock Text="{Binding ActorDirection}"
+                                   Foreground="#c9a84c" FontSize="10"
+                                   TextWrapping="Wrap" LineHeight="16" FontStyle="Italic"/>
+                    </Border>
+                </StackPanel>
+
                 <StackPanel Margin="0,0,0,10">
                     <TextBlock Text="SCRIPTS" Style="{StaticResource LabelStyle}"/>
                     <Border Background="#1a1a1a" Padding="6" CornerRadius="3">

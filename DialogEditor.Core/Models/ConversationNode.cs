@@ -10,7 +10,8 @@ public record ConversationNode(
     IReadOnlyList<string> ConditionStrings,
     IReadOnlyList<string> Scripts,
     string DisplayType,
-    string Persistence
+    string Persistence,
+    string ActorDirection = ""
 )
 {
     public bool HasConditions => ConditionStrings.Count > 0;

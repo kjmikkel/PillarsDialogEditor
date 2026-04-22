@@ -22,6 +22,7 @@ public partial class NodeViewModel : ObservableObject
     public string FooterText { get; }
     public string DisplayType { get; }
     public string Persistence { get; }
+    public string ActorDirection { get; }
     public IReadOnlyList<string> ConditionStrings { get; }
     public IReadOnlyList<string> Scripts { get; }
     public IReadOnlyList<NodeLink> Links { get; }
@@ -66,6 +67,7 @@ public partial class NodeViewModel : ObservableObject
         Scripts = node.Scripts;
         DisplayType = node.DisplayType;
         Persistence = node.Persistence;
+        ActorDirection = node.ActorDirection;
         Links = node.Links;
 
         var suffix = node.IsPlayerChoice ? " \u2746" : string.Empty;
