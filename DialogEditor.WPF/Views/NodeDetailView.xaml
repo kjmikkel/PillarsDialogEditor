@@ -43,7 +43,7 @@
                 </StackPanel>
 
                 <StackPanel Margin="0,0,0,10">
-                    <TextBlock Text="DEFAULT TEXT" Style="{StaticResource LabelStyle}"/>
+                    <TextBlock Text="DEFAULT / MALE TEXT" Style="{StaticResource LabelStyle}"/>
                     <Border Background="#1a1a1a" Padding="6" CornerRadius="3">
                         <TextBlock Text="{Binding DefaultText}"
                                    Foreground="#e8e8e8" FontSize="10"
@@ -51,12 +51,12 @@
                     </Border>
                 </StackPanel>
 
-                <StackPanel Margin="0,0,0,10"
-                            Visibility="{Binding FemaleText, Converter={StaticResource NullOrEmptyToVis}}">
+                <StackPanel Margin="0,0,0,10">
                     <TextBlock Text="FEMALE TEXT" Style="{StaticResource LabelStyle}"/>
                     <Border Background="#1a1a1a" Padding="6" CornerRadius="3">
-                        <TextBlock Text="{Binding FemaleText}"
-                                   Foreground="#e8e8e8" FontSize="10"
+                        <TextBlock Text="{Binding FemaleTextDisplay}"
+                                   Foreground="{Binding HasFemaleText, Converter={StaticResource BoolToFemaleTextBrush}}"
+                                   FontSize="10"
                                    TextWrapping="Wrap" LineHeight="16"/>
                     </Border>
                 </StackPanel>

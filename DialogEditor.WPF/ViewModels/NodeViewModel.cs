@@ -18,6 +18,7 @@ public partial class NodeViewModel : ObservableObject
     public string TextPreview { get; }
     public string DefaultText { get; }
     public string FemaleText { get; }
+    public bool HasFemaleText { get; }
     public string FooterText { get; }
     public string DisplayType { get; }
     public string Persistence { get; }
@@ -72,11 +73,13 @@ public partial class NodeViewModel : ObservableObject
 
         DefaultText = entry?.DefaultText ?? "[text unavailable \u2014 stringtable not found]";
         FemaleText = entry?.FemaleText ?? string.Empty;
+        HasFemaleText = !string.IsNullOrEmpty(FemaleText);
         TextPreview = DefaultText.Length > 80 ? DefaultText[..80] + "\u2026" : DefaultText;
 
-        FooterText = node.ConditionStrings.Count > 0
+        var condPart = node.ConditionStrings.Count > 0
             ? $"\u2699 {node.ConditionStrings.Count} condition{(node.ConditionStrings.Count == 1 ? "" : "s")}"
             : "[ No conditions ]";
+        FooterText = HasFemaleText ? condPart + "  \u2640" : condPart;
 
         Inputs = [Input];
         Outputs = [Output];
