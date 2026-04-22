@@ -20,17 +20,13 @@ public static class SpeakerNameService
         { "b1a7e80a-0000-0000-0000-000000000000", "Devil of Caroc" },
         { "b1a7e80b-0000-0000-0000-000000000000", "Zahua" },
         { "b1a7e80c-0000-0000-0000-000000000000", "Maneha" },
-
-        // PoE2 companions
-        { "fbeeeff7-ec6a-4a40-a47f-1843eaffc6ae", "Vela" },
-        { "5529e4b7-42dc-4895-b9f8-23375a945413", "Aloth (PoE2)" },
-        { "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", "Eder (PoE2)" },
-        { "f1504d00-eb4f-423a-9c9b-e71b5b23adcc", "Xoti" },
-        { "4d0750be-85ea-4838-8e52-666448927e83", "Serafen" },
-        { "e41c506b-abcc-45f8-98ab-bba00a0ebc16", "Pallegina (PoE2)" },
-        { "09b41c25-ce0a-4568-8f6b-2263f8a7493c", "Maia Rua" },
-        { "688aa86c-fbe6-4a7f-9dd0-7ef3f8c943f4", "Tekehu" },
     };
+
+    public static void Register(IReadOnlyDictionary<string, string> names)
+    {
+        foreach (var (guid, name) in names)
+            KnownGuids[guid] = name;
+    }
 
     public static string Resolve(string guid)
     {

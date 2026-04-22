@@ -7,4 +7,5 @@ public interface IGameDataProvider
     string GameName { get; }
     IReadOnlyList<ConversationFile> EnumerateConversations();
     Conversation LoadConversation(ConversationFile file);
+    IReadOnlyDictionary<string, string> LoadSpeakerNames();
 }

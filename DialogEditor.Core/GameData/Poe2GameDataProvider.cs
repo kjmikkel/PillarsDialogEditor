@@ -10,6 +10,7 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
     private string ExportedRoot => Path.Combine(rootPath, "PillarsOfEternityII_Data", "exported");
     private string ConversationsRoot => Path.Combine(ExportedRoot, "design", "conversations");
     private string StringTablesRoot => Path.Combine(ExportedRoot, "localized", "en", "text", "conversations");
+    private string SpeakersBundle => Path.Combine(ExportedRoot, "design", "gamedata", "speakers.gamedatabundle");
 
     public IReadOnlyList<ConversationFile> EnumerateConversations()
     {
@@ -44,4 +45,9 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
             : StringTable.Empty;
         return new Conversation(file.Name, nodes, strings);
     }
+
+    public IReadOnlyDictionary<string, string> LoadSpeakerNames() =>
+        File.Exists(SpeakersBundle)
+            ? Poe2SpeakerNameParser.ParseFile(SpeakersBundle)
+            : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 }

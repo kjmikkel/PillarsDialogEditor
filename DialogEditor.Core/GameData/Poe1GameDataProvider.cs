@@ -44,4 +44,7 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
             : StringTable.Empty;
         return new Conversation(file.Name, nodes, strings);
     }
+
+    public IReadOnlyDictionary<string, string> LoadSpeakerNames() =>
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 }
