@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.GameData;
+using DialogEditor.WPF.Services;
 using Microsoft.Win32;
 
 namespace DialogEditor.WPF.ViewModels;
@@ -40,6 +41,7 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         _provider = provider;
+        SpeakerNameService.Register(provider.LoadSpeakerNames());
         Browser.Load(provider);
         StatusText = $"{provider.GameName} \u2014 {dialog.FolderName}";
     }
