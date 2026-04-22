@@ -13,9 +13,11 @@ public partial class MainWindowViewModel : ObservableObject
     public NodeDetailViewModel Detail { get; } = new();
 
     private IGameDataProvider? _provider;
+    private ConversationFile? _currentFile;
 
-    [ObservableProperty]
-    private string _statusText = "Open a game folder to begin.";
+    [ObservableProperty] private string _statusText = "Open a game folder to begin.";
+    [ObservableProperty] private IReadOnlyList<string> _availableLanguages = [];
+    [ObservableProperty] private string _selectedLanguage = string.Empty;
 
     public MainWindowViewModel()
     {
@@ -25,6 +27,14 @@ public partial class MainWindowViewModel : ObservableObject
             if (e.PropertyName == nameof(ConversationViewModel.SelectedNode))
                 Detail.Load(Canvas.SelectedNode);
         };
+    }
+
+    partial void OnSelectedLanguageChanged(string value)
+    {
+        if (_provider is null || string.IsNullOrEmpty(value)) return;
+        _provider.Language = value;
+        if (_currentFile is not null)
+            OnConversationSelected(_currentFile);
     }
 
     [RelayCommand]
@@ -42,8 +52,10 @@ public partial class MainWindowViewModel : ObservableObject
 
         _provider = provider;
         SpeakerNameService.Register(provider.LoadSpeakerNames());
+        AvailableLanguages = provider.AvailableLanguages;
+        SelectedLanguage = AvailableLanguages.Contains("en") ? "en" : AvailableLanguages[0];
         Browser.Load(provider);
-        StatusText = $"{provider.GameName} \u2014 {dialog.FolderName}";
+        StatusText = $"{provider.GameName} — {dialog.FolderName}";
     }
 
     private void OnConversationSelected(ConversationFile file)
@@ -51,10 +63,11 @@ public partial class MainWindowViewModel : ObservableObject
         if (_provider is null) return;
         try
         {
+            _currentFile = file;
             var conversation = _provider.LoadConversation(file);
             Canvas.Load(conversation);
             Detail.Clear();
-            StatusText = $"{file.Name} \u2014 {conversation.Nodes.Count} nodes";
+            StatusText = $"{file.Name} — {conversation.Nodes.Count} nodes";
         }
         catch (Exception ex)
         {

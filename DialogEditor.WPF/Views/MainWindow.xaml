@@ -17,6 +17,14 @@
             <Button Command="{Binding OpenFolderCommand}"
                     Background="#444" Foreground="White" Padding="8,3"
                     BorderBrush="#666" Content="Open Game Folder&#x2026;"/>
+            <Separator Background="#444" Margin="4,0"/>
+            <TextBlock Text="Language:" Foreground="#888" FontSize="11"
+                       VerticalAlignment="Center" Margin="0,0,6,0"
+                       Visibility="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}"/>
+            <ComboBox ItemsSource="{Binding AvailableLanguages}"
+                      SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
+                      MinWidth="60" Foreground="White" Background="#444"
+                      Visibility="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}"/>
         </ToolBar>
 
         <Grid Grid.Row="1">
