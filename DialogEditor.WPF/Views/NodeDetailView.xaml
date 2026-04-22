@@ -81,8 +81,11 @@
 
                 <StackPanel Margin="0,0,0,10">
                     <TextBlock Text="SCRIPTS" Style="{StaticResource LabelStyle}"/>
-                    <TextBlock Text="{Binding ScriptCount, StringFormat='{}{0} script(s)'}"
-                               Foreground="#aaa" FontSize="11"/>
+                    <Border Background="#1a1a1a" Padding="6" CornerRadius="3">
+                        <TextBlock Text="{Binding ScriptsText}"
+                                   Foreground="#7dcea0" FontSize="10"
+                                   TextWrapping="Wrap" LineHeight="16"/>
+                    </Border>
                 </StackPanel>
 
                 <StackPanel>

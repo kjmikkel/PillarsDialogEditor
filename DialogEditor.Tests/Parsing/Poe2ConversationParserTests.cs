@@ -234,4 +234,53 @@ public class Poe2ConversationParserTests
         var nodes = Poe2ConversationParser.ParseJson(ScriptNodePoe2Json);
         Assert.Equal(SpeakerCategory.Script, nodes[0].SpeakerCategory);
     }
+
+    private const string ScriptedTalkNodeJson = """
+        {"Conversations": [{"ID": "00000000-0000-0000-0000-000000000000",
+          "ConversationScriptNode": {"NodeID": -200, "Links": [], "ClassExtender": {"ExtendedProperties": []},
+            "Conditionals": {"Operator": 0, "Components": []},
+            "OnEnterScripts": [], "OnExitScripts": [], "OnUpdateScripts": [],
+            "IsQuestionNode": false, "DisplayType": 0, "Persistence": 0,
+            "NotSkippable": false, "HideSpeaker": false, "IsTempText": false,
+            "PlayVOAs3DSound": false, "PlayType": 0, "NoPlayRandomWeight": 0, "VOPositioning": 0},
+          "ConversationType": 0, "CharacterMappings": [],
+          "Nodes": [{
+            "$type": "OEIFormats.FlowCharts.Conversations.TalkNode, OEIFormats",
+            "SpeakerGuid": "00000000-0000-0000-0000-000000000000",
+            "ListenerGuid": "00000000-0000-0000-0000-000000000000",
+            "IsQuestionNode": false, "DisplayType": 0, "Persistence": 0,
+            "NodeID": 0, "ContainerNodeID": -1, "Links": [],
+            "ClassExtender": {"ExtendedProperties": []},
+            "Conditionals": {"Operator": 0, "Components": []},
+            "OnEnterScripts": [{
+              "Data": {
+                "FullName": "Void ActivateObject(Guid, Boolean)",
+                "Parameters": ["546e5d97-760e-4d7d-b03a-cc01c0f3ce43", "False"]
+              },
+              "Conditional": {"Operator": 0, "Components": []}
+            }],
+            "OnExitScripts": [{
+              "Data": {
+                "FullName": "Void DeactivateObject(Guid)",
+                "Parameters": ["546e5d97-760e-4d7d-b03a-cc01c0f3ce43"]
+              },
+              "Conditional": {"Operator": 0, "Components": []}
+            }],
+            "OnUpdateScripts": [],
+            "NotSkippable": false, "HideSpeaker": false, "IsTempText": false,
+            "PlayVOAs3DSound": false, "PlayType": 0, "NoPlayRandomWeight": 0, "VOPositioning": 0
+          }]
+        }]}
+        """;
+
+    [Fact]
+    public void Parse_Poe2Node_WithOnEnterAndExitScripts_HasTwoScriptStrings()
+    {
+        var nodes = Poe2ConversationParser.ParseJson(ScriptedTalkNodeJson);
+        Assert.Equal(2, nodes[0].Scripts.Count);
+        Assert.Contains("[Enter]", nodes[0].Scripts[0]);
+        Assert.Contains("ActivateObject", nodes[0].Scripts[0]);
+        Assert.Contains("[Exit]", nodes[0].Scripts[1]);
+        Assert.Contains("DeactivateObject", nodes[0].Scripts[1]);
+    }
 }
