@@ -272,7 +272,7 @@ public class Poe1ConversationParserTests
               <ClassExtender><ExtendedProperties /></ClassExtender>
               <Conditionals><Operator>And</Operator><Components /></Conditionals>
               <OnEnterScripts>
-                <ConditionalScriptData>
+                <ScriptCall>
                   <Data>
                     <FullName>Void ActivateObject(Guid, Boolean)</FullName>
                     <Parameters>
@@ -280,8 +280,7 @@ public class Poe1ConversationParserTests
                       <string>False</string>
                     </Parameters>
                   </Data>
-                  <Conditional><Operator>And</Operator><Components /></Conditional>
-                </ConditionalScriptData>
+                </ScriptCall>
               </OnEnterScripts>
               <OnExitScripts />
               <OnUpdateScripts />
