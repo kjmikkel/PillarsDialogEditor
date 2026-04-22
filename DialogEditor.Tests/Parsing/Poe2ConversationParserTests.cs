@@ -153,7 +153,8 @@ public class Poe2ConversationParserTests
         Assert.False(nodes[0].IsPlayerChoice);
     }
 
-    private const string PlayerTalkNodeJson = """
+    // SpeakerGuid = 6a99a109-... (SPK_Narrator in speakers.gamedatabundle)
+    private const string NarratorTalkNodeJson = """
         {"Conversations": [{"ID": "00000000-0000-0000-0000-000000000000",
           "ConversationScriptNode": {"NodeID": -200, "Links": [], "ClassExtender": {"ExtendedProperties": []},
             "Conditionals": {"Operator": 0, "Components": []},
@@ -214,18 +215,19 @@ public class Poe2ConversationParserTests
     }
 
     [Fact]
-    public void Parse_Poe2NarratorTalkNode_HasSpeakerCategoryNarrator()
+    public void Parse_Poe2NullGuidTalkNode_HasSpeakerCategoryNpc()
     {
+        // 00000000-... in PoE2 means "unset speaker", not the narrator
         var nodes = Poe2ConversationParser.ParseJson(TalkNodeQuestionJson);
-        Assert.Equal(SpeakerCategory.Narrator, nodes[0].SpeakerCategory);
+        Assert.Equal(SpeakerCategory.Npc, nodes[0].SpeakerCategory);
     }
 
     [Fact]
-    public void Parse_Poe2CompanionSlotGuidTalkNode_HasSpeakerCategoryNpc()
+    public void Parse_Poe2NarratorGuidTalkNode_HasSpeakerCategoryNarrator()
     {
-        // 6a99a109-... is a generic runtime companion slot, not the player
-        var nodes = Poe2ConversationParser.ParseJson(PlayerTalkNodeJson);
-        Assert.Equal(SpeakerCategory.Npc, nodes[0].SpeakerCategory);
+        // 6a99a109-... is the PoE2 narrator (SPK_Narrator in speakers.gamedatabundle)
+        var nodes = Poe2ConversationParser.ParseJson(NarratorTalkNodeJson);
+        Assert.Equal(SpeakerCategory.Narrator, nodes[0].SpeakerCategory);
     }
 
     [Fact]
