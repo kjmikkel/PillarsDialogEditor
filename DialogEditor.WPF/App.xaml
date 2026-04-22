@@ -5,6 +5,7 @@
              StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
         <converters:SpeakerCategoryToBrushConverter x:Key="SpeakerCategoryToBrush"/>
+        <converters:BoolToFemaleTextBrushConverter x:Key="BoolToFemaleTextBrush"/>
         <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVis"/>
         <converters:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVis"/>

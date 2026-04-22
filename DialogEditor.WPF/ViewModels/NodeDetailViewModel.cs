@@ -12,6 +12,8 @@ public partial class NodeDetailViewModel : ObservableObject
     [ObservableProperty] private string _listenerName = string.Empty;
     [ObservableProperty] private string _defaultText = string.Empty;
     [ObservableProperty] private string _femaleText = string.Empty;
+    [ObservableProperty] private string _femaleTextDisplay = string.Empty;
+    [ObservableProperty] private bool _hasFemaleText;
     [ObservableProperty] private string _conditionsText = string.Empty;
     [ObservableProperty] private string _displayType = string.Empty;
     [ObservableProperty] private string _persistence = string.Empty;
@@ -29,6 +31,8 @@ public partial class NodeDetailViewModel : ObservableObject
         ListenerName = node.ListenerName;
         DefaultText = node.DefaultText;
         FemaleText = node.FemaleText;
+        HasFemaleText = !string.IsNullOrEmpty(node.FemaleText);
+        FemaleTextDisplay = HasFemaleText ? node.FemaleText : "(same as default)";
         ConditionsText = node.ConditionStrings.Count > 0
             ? string.Join(Environment.NewLine, node.ConditionStrings)
             : "(none)";
