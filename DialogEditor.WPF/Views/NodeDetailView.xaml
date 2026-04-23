@@ -22,6 +22,7 @@
         <ScrollViewer Grid.Row="1" Background="#2d2d2d"
                       Visibility="{Binding HasContent, Converter={StaticResource BoolToVis}}">
             <StackPanel Margin="8">
+
                 <StackPanel Margin="0,0,0,10">
                     <TextBlock Text="NODE" Style="{StaticResource LabelStyle}"/>
                     <TextBlock Foreground="White" FontSize="11">
@@ -57,6 +58,17 @@
                         <TextBlock Text="{Binding FemaleTextDisplay}"
                                    Foreground="{Binding HasFemaleText, Converter={StaticResource BoolToFemaleTextBrush}}"
                                    FontSize="10"
+                                   TextWrapping="Wrap" LineHeight="16"/>
+                    </Border>
+                </StackPanel>
+
+                <!-- Comments: PoE1 editorial notes, shown only when non-empty -->
+                <StackPanel Margin="0,0,0,10"
+                            Visibility="{Binding HasComments, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="COMMENTS" Style="{StaticResource LabelStyle}"/>
+                    <Border Background="#1a1a1a" Padding="6" CornerRadius="3">
+                        <TextBlock Text="{Binding Comments}"
+                                   Foreground="#c9a84c" FontSize="10" FontStyle="Italic"
                                    TextWrapping="Wrap" LineHeight="16"/>
                     </Border>
                 </StackPanel>
@@ -98,11 +110,52 @@
                     </Border>
                 </StackPanel>
 
-                <StackPanel>
+                <StackPanel Margin="0,0,0,10">
                     <TextBlock Text="LINKS TO" Style="{StaticResource LabelStyle}"/>
                     <TextBlock Text="{Binding LinksTo}"
                                Foreground="#5dade2" FontSize="11" TextWrapping="Wrap"/>
                 </StackPanel>
+
+                <!-- Voice section: PoE2 only, collapsed when no voice data -->
+                <StackPanel Margin="0,0,0,0"
+                            Visibility="{Binding HasVoiceSection, Converter={StaticResource BoolToVis}}">
+                    <Border Background="#1e2a1e" BorderBrush="#2a3a2a" BorderThickness="1"
+                            CornerRadius="3" Padding="8,6">
+                        <StackPanel>
+                            <TextBlock Text="VOICE (PoE2)" Style="{StaticResource LabelStyle}"
+                                       Margin="0,0,0,6"/>
+                            <Grid Margin="0,0,0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="File" Foreground="#666" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Text="{Binding ExternalVO}"
+                                           Foreground="#e8e8e8" FontSize="9" TextWrapping="Wrap"
+                                           FontFamily="Consolas"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Has VO" Foreground="#666" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Text="{Binding HasVO}"
+                                           Foreground="#7dcea0" FontSize="10"/>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Hide Speaker" Foreground="#666" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Text="{Binding HideSpeaker}"
+                                           Foreground="#e8a020" FontSize="10"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
             </StackPanel>
         </ScrollViewer>
     </Grid>

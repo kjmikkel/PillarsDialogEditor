@@ -11,7 +11,11 @@ public record ConversationNode(
     IReadOnlyList<string> Scripts,
     string DisplayType,
     string Persistence,
-    string ActorDirection = ""
+    string ActorDirection = "",
+    string Comments = "",
+    string ExternalVO = "",
+    bool HasVO = false,
+    bool HideSpeaker = false
 )
 {
     public bool HasConditions => ConditionStrings.Count > 0;

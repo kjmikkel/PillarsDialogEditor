@@ -285,4 +285,62 @@ public class Poe2ConversationParserTests
         Assert.Contains("[Exit]", nodes[0].Scripts[1]);
         Assert.Contains("DeactivateObject", nodes[0].Scripts[1]);
     }
+
+    private const string VoiceFieldsJson = """
+        {"Conversations": [{"ID": "00000000-0000-0000-0000-000000000000",
+          "ConversationScriptNode": {"NodeID": -200, "Links": [], "ClassExtender": {"ExtendedProperties": []},
+            "Conditionals": {"Operator": 0, "Components": []},
+            "OnEnterScripts": [], "OnExitScripts": [], "OnUpdateScripts": [],
+            "IsQuestionNode": false, "DisplayType": 0, "Persistence": 0,
+            "NotSkippable": false, "HideSpeaker": false, "IsTempText": false,
+            "PlayVOAs3DSound": false, "PlayType": 0, "NoPlayRandomWeight": 0, "VOPositioning": 0},
+          "ConversationType": 0, "CharacterMappings": [],
+          "Nodes": [
+            {
+              "$type": "OEIFormats.FlowCharts.Conversations.TalkNode, OEIFormats",
+              "SpeakerGuid": "fbeeeff7-ec6a-4a40-a47f-1843eaffc6ae",
+              "ListenerGuid": "b1a8e901-0000-0000-0000-000000000000",
+              "IsQuestionNode": false, "DisplayType": 0, "Persistence": 0,
+              "NodeID": 0, "ContainerNodeID": -1,
+              "Links": [],
+              "ClassExtender": {"ExtendedProperties": []},
+              "Conditionals": {"Operator": 0, "Components": []},
+              "OnEnterScripts": [], "OnExitScripts": [], "OnUpdateScripts": [],
+              "NotSkippable": false, "HideSpeaker": true, "IsTempText": false,
+              "PlayVOAs3DSound": false, "PlayType": 0, "NoPlayRandomWeight": 0,
+              "VOPositioning": 0, "EmotionType": "", "EmotionStrength": 0.5,
+              "PersistEmotion": true, "EmotionDelay": 0.0,
+              "ExternalVO": "npc_aloth/prologue_awakens_0001", "HasVO": true
+            }
+          ]
+        }]}
+        """;
+
+    [Fact]
+    public void Parse_Poe2Node_WithExternalVO_HasExternalVO()
+    {
+        var nodes = Poe2ConversationParser.ParseJson(VoiceFieldsJson);
+        Assert.Equal("npc_aloth/prologue_awakens_0001", nodes[0].ExternalVO);
+    }
+
+    [Fact]
+    public void Parse_Poe2Node_WithHasVOTrue_HasVOIsTrue()
+    {
+        var nodes = Poe2ConversationParser.ParseJson(VoiceFieldsJson);
+        Assert.True(nodes[0].HasVO);
+    }
+
+    [Fact]
+    public void Parse_Poe2Node_WithHideSpeakerTrue_HideSpeakerIsTrue()
+    {
+        var nodes = Poe2ConversationParser.ParseJson(VoiceFieldsJson);
+        Assert.True(nodes[0].HideSpeaker);
+    }
+
+    [Fact]
+    public void Parse_Poe2Link_HasRandomWeight()
+    {
+        var nodes = Poe2ConversationParser.ParseJson(TwoNodeJson);
+        Assert.Equal(1f, nodes[0].Links[0].RandomWeight);
+    }
 }
