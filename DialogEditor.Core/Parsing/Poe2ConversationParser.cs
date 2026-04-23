@@ -53,7 +53,10 @@ public static class Poe2ConversationParser
             ConditionStrings: conditions,
             Scripts: scripts,
             DisplayType: MapDisplayType(node["DisplayType"]?.GetValue<int>() ?? 0),
-            Persistence: MapPersistence(node["Persistence"]?.GetValue<int>() ?? 0)
+            Persistence: MapPersistence(node["Persistence"]?.GetValue<int>() ?? 0),
+            ExternalVO: node["ExternalVO"]?.GetValue<string>() ?? string.Empty,
+            HasVO: node["HasVO"]?.GetValue<bool>() ?? false,
+            HideSpeaker: node["HideSpeaker"]?.GetValue<bool>() ?? false
         );
     }
 
@@ -83,7 +86,9 @@ public static class Poe2ConversationParser
         => new(
             FromNodeId: link!["FromNodeID"]!.GetValue<int>(),
             ToNodeId: link["ToNodeID"]!.GetValue<int>(),
-            HasConditions: link["Conditionals"]?["Components"]?.AsArray().Count > 0
+            HasConditions: link["Conditionals"]?["Components"]?.AsArray().Count > 0,
+            RandomWeight: link["RandomWeight"]?.GetValue<float>() ?? 1f,
+            QuestionNodeTextDisplay: MapQuestionNodeTextDisplay(link["QuestionNodeTextDisplay"]?.GetValue<int>() ?? 0)
         );
 
     private static List<string> FlattenConditions(JsonArray? components)
@@ -106,6 +111,14 @@ public static class Poe2ConversationParser
         var not = component["Not"]?.GetValue<bool>() ?? false;
         return ConditionFormatter.Format(fullName, parameters, not);
     }
+
+    private static string MapQuestionNodeTextDisplay(int value) => value switch
+    {
+        0 => "ShowOnce",
+        1 => "Always",
+        2 => "Never",
+        _ => $"Unknown({value})"
+    };
 
     private static string MapDisplayType(int value) => value switch
     {

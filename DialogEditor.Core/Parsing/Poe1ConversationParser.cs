@@ -43,7 +43,8 @@ public static class Poe1ConversationParser
             Scripts: scripts,
             DisplayType: (string?)node.Element("DisplayType") ?? string.Empty,
             Persistence: (string?)node.Element("Persistence") ?? string.Empty,
-            ActorDirection: (string?)node.Element("ActorDirection") ?? string.Empty
+            ActorDirection: (string?)node.Element("ActorDirection") ?? string.Empty,
+            Comments: (string?)node.Element("Comments") ?? string.Empty
         );
     }
 
@@ -51,7 +52,9 @@ public static class Poe1ConversationParser
         => new(
             FromNodeId: (int)link.Element("FromNodeID")!,
             ToNodeId: (int)link.Element("ToNodeID")!,
-            HasConditions: link.Element("Conditionals")?.Element("Components")?.HasElements == true
+            HasConditions: link.Element("Conditionals")?.Element("Components")?.HasElements == true,
+            RandomWeight: (float?)link.Element("RandomWeight") ?? 1f,
+            QuestionNodeTextDisplay: (string?)link.Element("QuestionNodeTextDisplay") ?? string.Empty
         );
 
     private static List<string> ParseScripts(XElement node)

@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using DialogEditor.Core.Models;
 
 namespace DialogEditor.WPF.ViewModels;
 
@@ -22,6 +23,16 @@ public partial class NodeDetailViewModel : ObservableObject
     [ObservableProperty] private string _linksTo = string.Empty;
     [ObservableProperty] private string _scriptsText = string.Empty;
 
+    // Comments (PoE1)
+    [ObservableProperty] private string _comments = string.Empty;
+    [ObservableProperty] private bool _hasComments;
+
+    // Voice (PoE2)
+    [ObservableProperty] private bool _hasVoiceSection;
+    [ObservableProperty] private string _externalVO = string.Empty;
+    [ObservableProperty] private bool _hasVO;
+    [ObservableProperty] private bool _hideSpeaker;
+
     public void Load(NodeViewModel? node)
     {
         if (node is null) { HasContent = false; return; }
@@ -43,12 +54,29 @@ public partial class NodeDetailViewModel : ObservableObject
         ActorDirection = node.ActorDirection;
         HasActorDirection = !string.IsNullOrEmpty(node.ActorDirection);
         LinksTo = node.Links.Count > 0
-            ? string.Join(", ", node.Links.Select(l => $"\u2192 {l.ToNodeId}"))
+            ? string.Join(", ", node.Links.Select(FormatLink))
             : "(none)";
         ScriptsText = node.Scripts.Count > 0
             ? string.Join(Environment.NewLine, node.Scripts)
             : "(none)";
+        Comments = node.Comments;
+        HasComments = !string.IsNullOrEmpty(node.Comments);
+        ExternalVO = node.ExternalVO;
+        HasVO = node.HasVO;
+        HideSpeaker = node.HideSpeaker;
+        HasVoiceSection = node.HasVO || !string.IsNullOrEmpty(node.ExternalVO) || node.HideSpeaker;
         HasContent = true;
+    }
+
+    private static string FormatLink(NodeLink link)
+    {
+        var extras = new List<string>();
+        if (link.RandomWeight != 1f)
+            extras.Add($"w:{link.RandomWeight:0.##}");
+        if (!string.IsNullOrEmpty(link.QuestionNodeTextDisplay) && link.QuestionNodeTextDisplay != "ShowOnce")
+            extras.Add(link.QuestionNodeTextDisplay);
+        var arrow = $"→ {link.ToNodeId}";
+        return extras.Count == 0 ? arrow : $"{arrow} [{string.Join(", ", extras)}]";
     }
 
     public void Clear() => HasContent = false;

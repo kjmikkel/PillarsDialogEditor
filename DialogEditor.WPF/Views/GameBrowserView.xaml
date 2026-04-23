@@ -20,6 +20,16 @@
                   ItemsSource="{Binding Folders}"
                   SelectedItemChanged="TreeView_SelectedItemChanged">
             <TreeView.Resources>
+                <!-- Keep selection colour identical whether the tree has focus or not -->
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                                 Color="#1a5276"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}"
+                                 Color="#1a5276"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}"
+                                 Color="White"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}"
+                                 Color="White"/>
+
                 <HierarchicalDataTemplate DataType="{x:Type vm:ConversationFolderViewModel}"
                                           ItemsSource="{Binding Items}">
                     <TextBlock Text="{Binding DisplayName}"
@@ -34,11 +44,6 @@
                 <Style TargetType="TreeViewItem">
                     <Setter Property="Background" Value="Transparent"/>
                     <Setter Property="Foreground" Value="#ccc"/>
-                    <Style.Triggers>
-                        <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="#1a5276"/>
-                        </Trigger>
-                    </Style.Triggers>
                 </Style>
             </TreeView.ItemContainerStyle>
         </TreeView>

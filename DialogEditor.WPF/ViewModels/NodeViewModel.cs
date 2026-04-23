@@ -23,6 +23,10 @@ public partial class NodeViewModel : ObservableObject
     public string DisplayType { get; }
     public string Persistence { get; }
     public string ActorDirection { get; }
+    public string Comments { get; }
+    public string ExternalVO { get; }
+    public bool HasVO { get; }
+    public bool HideSpeaker { get; }
     public IReadOnlyList<string> ConditionStrings { get; }
     public IReadOnlyList<string> Scripts { get; }
     public IReadOnlyList<NodeLink> Links { get; }
@@ -68,6 +72,10 @@ public partial class NodeViewModel : ObservableObject
         DisplayType = node.DisplayType;
         Persistence = node.Persistence;
         ActorDirection = node.ActorDirection;
+        Comments = node.Comments;
+        ExternalVO = node.ExternalVO;
+        HasVO = node.HasVO;
+        HideSpeaker = node.HideSpeaker;
         Links = node.Links;
 
         var suffix = node.IsPlayerChoice ? " \u2746" : string.Empty;

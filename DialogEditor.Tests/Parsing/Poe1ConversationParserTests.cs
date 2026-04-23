@@ -348,4 +348,65 @@ public class Poe1ConversationParserTests
         var nodes = Poe1ConversationParser.ParseXml(ActorDirectionXml);
         Assert.Equal(string.Empty, nodes[1].ActorDirection);
     }
+
+    private const string CommentsXml = """
+        <?xml version="1.0" encoding="utf-8"?>
+        <ConversationData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                          xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+          <Nodes>
+            <FlowChartNode xsi:type="TalkNode">
+              <NodeID>0</NodeID>
+              <Comments>Called after a beat for townsfolk to flee</Comments>
+              <Links />
+              <ClassExtender><ExtendedProperties /></ClassExtender>
+              <Conditionals><Operator>And</Operator><Components /></Conditionals>
+              <OnEnterScripts /><OnExitScripts /><OnUpdateScripts />
+              <IsQuestionNode>false</IsQuestionNode>
+              <Persistence>None</Persistence><DisplayType>Conversation</DisplayType>
+              <SpeakerGuid>00000000-0000-0000-0000-000000000000</SpeakerGuid>
+              <ListenerGuid>00000000-0000-0000-0000-000000000000</ListenerGuid>
+            </FlowChartNode>
+            <FlowChartNode xsi:type="TalkNode">
+              <NodeID>1</NodeID>
+              <Comments />
+              <Links />
+              <ClassExtender><ExtendedProperties /></ClassExtender>
+              <Conditionals><Operator>And</Operator><Components /></Conditionals>
+              <OnEnterScripts /><OnExitScripts /><OnUpdateScripts />
+              <IsQuestionNode>false</IsQuestionNode>
+              <Persistence>None</Persistence><DisplayType>Conversation</DisplayType>
+              <SpeakerGuid>00000000-0000-0000-0000-000000000000</SpeakerGuid>
+              <ListenerGuid>00000000-0000-0000-0000-000000000000</ListenerGuid>
+            </FlowChartNode>
+          </Nodes>
+        </ConversationData>
+        """;
+
+    [Fact]
+    public void Parse_Poe1Node_WithComments_HasComments()
+    {
+        var nodes = Poe1ConversationParser.ParseXml(CommentsXml);
+        Assert.Equal("Called after a beat for townsfolk to flee", nodes[0].Comments);
+    }
+
+    [Fact]
+    public void Parse_Poe1Node_WithEmptyComments_HasEmptyString()
+    {
+        var nodes = Poe1ConversationParser.ParseXml(CommentsXml);
+        Assert.Equal(string.Empty, nodes[1].Comments);
+    }
+
+    [Fact]
+    public void Parse_Poe1Link_HasRandomWeight()
+    {
+        var nodes = Poe1ConversationParser.ParseXml(TwoNodeXml);
+        Assert.Equal(1f, nodes[0].Links[0].RandomWeight);
+    }
+
+    [Fact]
+    public void Parse_Poe1Link_HasQuestionNodeTextDisplay()
+    {
+        var nodes = Poe1ConversationParser.ParseXml(TwoNodeXml);
+        Assert.Equal("ShowOnce", nodes[0].Links[0].QuestionNodeTextDisplay);
+    }
 }
