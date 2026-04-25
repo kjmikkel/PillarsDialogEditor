@@ -13,12 +13,19 @@ public static class AppSettings
     private sealed class SettingsData
     {
         public string? LastLanguage { get; set; }
+        public string? LastGameDirectory { get; set; }
     }
 
     public static string? LastLanguage
     {
         get => Load().LastLanguage;
         set { var s = Load(); s.LastLanguage = value; Save(s); }
+    }
+
+    public static string? LastGameDirectory
+    {
+        get => Load().LastGameDirectory;
+        set { var s = Load(); s.LastGameDirectory = value; Save(s); }
     }
 
     private static SettingsData Load()

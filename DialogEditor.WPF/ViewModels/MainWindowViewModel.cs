@@ -1,3 +1,4 @@
+using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.GameData;
@@ -27,6 +28,10 @@ public partial class MainWindowViewModel : ObservableObject
             if (e.PropertyName == nameof(ConversationViewModel.SelectedNode))
                 Detail.Load(Canvas.SelectedNode);
         };
+
+        var last = AppSettings.LastGameDirectory;
+        if (!string.IsNullOrEmpty(last) && Directory.Exists(last))
+            LoadDirectory(last);
     }
 
     partial void OnSelectedLanguageChanged(string value)
@@ -43,20 +48,25 @@ public partial class MainWindowViewModel : ObservableObject
     {
         var dialog = new OpenFolderDialog { Title = "Select game root folder" };
         if (dialog.ShowDialog() != true) return;
+        LoadDirectory(dialog.FolderName);
+    }
 
-        var provider = GameDataProviderFactory.Detect(dialog.FolderName);
+    private void LoadDirectory(string path)
+    {
+        var provider = GameDataProviderFactory.Detect(path);
         if (provider is null)
         {
             StatusText = "Folder not recognized as PoE1 or PoE2 root.";
             return;
         }
 
+        AppSettings.LastGameDirectory = path;
         _provider = provider;
         SpeakerNameService.Register(provider.LoadSpeakerNames());
         AvailableLanguages = provider.AvailableLanguages;
         SelectedLanguage = AppSettings.PickLanguage(AvailableLanguages, AppSettings.LastLanguage);
         Browser.Load(provider);
-        StatusText = $"{provider.GameName} — {dialog.FolderName}";
+        StatusText = $"{provider.GameName} — {path}";
     }
 
     private void OnConversationSelected(ConversationFile file)
