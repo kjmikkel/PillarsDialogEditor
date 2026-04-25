@@ -116,15 +116,16 @@
                                Foreground="#5dade2" FontSize="11" TextWrapping="Wrap"/>
                 </StackPanel>
 
-                <!-- Voice section: PoE2 only, collapsed when no voice data -->
+                <!-- Voice section: PoE1 (VOFilename) and PoE2 (ExternalVO/HasVO/HideSpeaker), collapsed when no voice data -->
                 <StackPanel Margin="0,0,0,0"
                             Visibility="{Binding HasVoiceSection, Converter={StaticResource BoolToVis}}">
                     <Border Background="#1e2a1e" BorderBrush="#2a3a2a" BorderThickness="1"
                             CornerRadius="3" Padding="8,6">
                         <StackPanel>
-                            <TextBlock Text="VOICE (PoE2)" Style="{StaticResource LabelStyle}"
+                            <TextBlock Text="VOICE" Style="{StaticResource LabelStyle}"
                                        Margin="0,0,0,6"/>
-                            <Grid Margin="0,0,0,3">
+                            <Grid Margin="0,0,0,3"
+                                  Visibility="{Binding HasExternalVO, Converter={StaticResource BoolToVis}}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="80"/>
                                     <ColumnDefinition Width="*"/>

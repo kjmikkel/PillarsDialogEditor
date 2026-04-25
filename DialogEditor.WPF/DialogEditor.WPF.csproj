@@ -6,7 +6,7 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-    <PackageReference Include="Nodify" Version="6.1.0" />
+    <PackageReference Include="Nodify" Version="6.2.0" />
   </ItemGroup>
 
   <PropertyGroup>
