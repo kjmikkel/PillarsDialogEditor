@@ -82,6 +82,88 @@
             </Setter>
         </Style>
 
+        <!-- Dark scrollbar internals -->
+        <Style x:Key="ScrollThumb" TargetType="Thumb">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border x:Name="Bd" Background="#555" CornerRadius="3"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#777"/>
+                            </Trigger>
+                            <Trigger Property="IsDragging" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="#888"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ScrollTrackButton" TargetType="RepeatButton">
+            <Setter Property="Focusable" Value="False"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RepeatButton">
+                        <Border Background="{TemplateBinding Background}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <ControlTemplate x:Key="VerticalScrollBar" TargetType="ScrollBar">
+            <Border Background="#252525" Width="8">
+                <Track x:Name="PART_Track" IsDirectionReversed="True" Margin="2,2">
+                    <Track.DecreaseRepeatButton>
+                        <RepeatButton Command="ScrollBar.PageUpCommand"
+                                      Style="{StaticResource ScrollTrackButton}"/>
+                    </Track.DecreaseRepeatButton>
+                    <Track.Thumb>
+                        <Thumb Style="{StaticResource ScrollThumb}"/>
+                    </Track.Thumb>
+                    <Track.IncreaseRepeatButton>
+                        <RepeatButton Command="ScrollBar.PageDownCommand"
+                                      Style="{StaticResource ScrollTrackButton}"/>
+                    </Track.IncreaseRepeatButton>
+                </Track>
+            </Border>
+        </ControlTemplate>
+
+        <ControlTemplate x:Key="HorizontalScrollBar" TargetType="ScrollBar">
+            <Border Background="#252525" Height="8">
+                <Track x:Name="PART_Track" IsDirectionReversed="False" Margin="2,2">
+                    <Track.DecreaseRepeatButton>
+                        <RepeatButton Command="ScrollBar.PageLeftCommand"
+                                      Style="{StaticResource ScrollTrackButton}"/>
+                    </Track.DecreaseRepeatButton>
+                    <Track.Thumb>
+                        <Thumb Style="{StaticResource ScrollThumb}"/>
+                    </Track.Thumb>
+                    <Track.IncreaseRepeatButton>
+                        <RepeatButton Command="ScrollBar.PageRightCommand"
+                                      Style="{StaticResource ScrollTrackButton}"/>
+                    </Track.IncreaseRepeatButton>
+                </Track>
+            </Border>
+        </ControlTemplate>
+
+        <Style TargetType="ScrollBar">
+            <Setter Property="Template" Value="{StaticResource VerticalScrollBar}"/>
+            <Setter Property="Width" Value="8"/>
+            <Setter Property="MinWidth" Value="8"/>
+            <Style.Triggers>
+                <Trigger Property="Orientation" Value="Horizontal">
+                    <Setter Property="Template" Value="{StaticResource HorizontalScrollBar}"/>
+                    <Setter Property="Width" Value="Auto"/>
+                    <Setter Property="MinWidth" Value="0"/>
+                    <Setter Property="Height" Value="8"/>
+                    <Setter Property="MinHeight" Value="8"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
         <!-- Dark ComboBox -->
         <Style TargetType="{x:Type ComboBox}">
             <Setter Property="Background" Value="#3c3c3c"/>
