@@ -6,6 +6,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
@@ -15,9 +16,38 @@
                        FontSize="10" FontWeight="Bold"/>
         </Border>
 
-        <TreeView Grid.Row="1" Background="#2d2d2d"
+        <Border Grid.Row="1" Background="#252525" Padding="4,4,4,4" BorderBrush="#333" BorderThickness="0,0,0,1">
+            <Grid>
+                <TextBox Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
+                         Background="#333" Foreground="#ccc" CaretBrush="#ccc"
+                         BorderBrush="#555" BorderThickness="1"
+                         Padding="6,3,24,3" FontSize="10"/>
+                <!-- Placeholder -->
+                <TextBlock Text="Filter conversations…" Foreground="#555" FontSize="10"
+                           Padding="8,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding FilterText}" Value="">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+                <!-- Clear button -->
+                <Button Command="{Binding ClearFilterCommand}"
+                        HorizontalAlignment="Right" Width="20"
+                        Content="&#x2715;" VerticalAlignment="Center"
+                        Style="{StaticResource FlatIconButton}"
+                        ToolTip="Clear filter"/>
+            </Grid>
+        </Border>
+
+        <TreeView Grid.Row="2" Background="#2d2d2d"
                   BorderThickness="0"
-                  ItemsSource="{Binding Folders}"
+                  ItemsSource="{Binding FilteredFolders}"
                   SelectedItemChanged="TreeView_SelectedItemChanged">
             <TreeView.Resources>
                 <!-- Keep selection colour identical whether the tree has focus or not -->
@@ -44,11 +74,12 @@
                 <Style TargetType="TreeViewItem">
                     <Setter Property="Background" Value="Transparent"/>
                     <Setter Property="Foreground" Value="#ccc"/>
+                    <Setter Property="IsExpanded" Value="True"/>
                 </Style>
             </TreeView.ItemContainerStyle>
         </TreeView>
 
-        <Border Grid.Row="2" Background="#1a1a1a" Padding="8,5">
+        <Border Grid.Row="3" Background="#1a1a1a" Padding="8,5">
             <TextBlock Text="{Binding GameName}"
                        Foreground="#555" FontSize="9"/>
         </Border>

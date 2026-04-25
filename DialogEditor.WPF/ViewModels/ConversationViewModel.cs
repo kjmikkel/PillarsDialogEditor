@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Layout;
 using DialogEditor.Core.Models;
 
@@ -14,6 +15,10 @@ public partial class ConversationViewModel : ObservableObject
     [ObservableProperty]
     private NodeViewModel? _selectedNode;
 
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ClearSearchCommand))]
+    private string _searchQuery = string.Empty;
+
     partial void OnSelectedNodeChanged(NodeViewModel? value)
     {
         foreach (var connection in Connections)
@@ -23,11 +28,28 @@ public partial class ConversationViewModel : ObservableObject
         }
     }
 
+    partial void OnSearchQueryChanged(string value)
+    {
+        var q = value.Trim();
+        foreach (var node in Nodes)
+            node.IsSearchMatch = string.IsNullOrEmpty(q) || Matches(node, q);
+    }
+
+    [RelayCommand(CanExecute = nameof(HasSearchQuery))]
+    private void ClearSearch() => SearchQuery = string.Empty;
+    private bool HasSearchQuery() => !string.IsNullOrEmpty(SearchQuery);
+
+    private static bool Matches(NodeViewModel node, string q) =>
+        node.NodeId.ToString() == q ||
+        node.DefaultText.Contains(q, StringComparison.OrdinalIgnoreCase) ||
+        node.SpeakerName.Contains(q, StringComparison.OrdinalIgnoreCase);
+
     public void Load(Conversation conversation)
     {
         Nodes.Clear();
         Connections.Clear();
         SelectedNode = null;
+        SearchQuery = string.Empty;
 
         var nodeMap = new Dictionary<int, NodeViewModel>();
 

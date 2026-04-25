@@ -31,8 +31,47 @@
                             Style="{StaticResource CanvasToolButton}" Margin="8,0,0,0"
                             ToolTip="Go to node 0"/>
                 </StackPanel>
-                <TextBlock Text="{Binding Nodes.Count, StringFormat='{}{0} nodes'}"
-                           Foreground="#888" FontSize="10" VerticalAlignment="Center"/>
+                <TextBlock DockPanel.Dock="Left"
+                           Text="{Binding Nodes.Count, StringFormat='{}{0} nodes'}"
+                           Foreground="#888" FontSize="10" VerticalAlignment="Center"
+                           Margin="0,0,8,0"/>
+                <Grid VerticalAlignment="Center">
+                    <TextBox Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                             Background="#333" Foreground="#ccc" CaretBrush="#ccc"
+                             BorderBrush="#555" BorderThickness="1"
+                             Padding="6,2,24,2" FontSize="10"
+                             VerticalContentAlignment="Center">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox">
+                                <Style.Triggers>
+                                    <Trigger Property="Text" Value="">
+                                        <Setter Property="Background" Value="#2a2a2a"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <!-- Placeholder -->
+                    <TextBlock Text="Search nodes…" Foreground="#555" FontSize="10"
+                               Padding="8,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding SearchQuery}" Value="">
+                                        <Setter Property="Visibility" Value="Visible"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                    <!-- Clear button -->
+                    <Button Command="{Binding ClearSearchCommand}"
+                            HorizontalAlignment="Right" Width="20"
+                            Content="&#x2715;" VerticalAlignment="Center"
+                            Style="{StaticResource FlatIconButton}"
+                            ToolTip="Clear search"/>
+                </Grid>
             </DockPanel>
         </Border>
 
@@ -46,6 +85,11 @@
                     <Style TargetType="{x:Type nodify:ItemContainer}">
                         <Setter Property="Location" Value="{Binding Location, Mode=TwoWay}"/>
                         <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsSearchMatch}" Value="False">
+                                <Setter Property="Opacity" Value="0.2"/>
+                            </DataTrigger>
+                        </Style.Triggers>
                     </Style>
                 </nodify:NodifyEditor.ItemContainerStyle>
 

@@ -42,6 +42,9 @@ public partial class NodeViewModel : ObservableObject
     [ObservableProperty]
     private bool _isSelected;
 
+    [ObservableProperty]
+    private bool _isSearchMatch = true;
+
     internal Action<NodeViewModel>? OnSelected { get; set; }
 
     partial void OnIsSelectedChanged(bool value)
