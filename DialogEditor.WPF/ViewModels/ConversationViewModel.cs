@@ -111,7 +111,8 @@ public partial class ConversationViewModel : ObservableObject
                 if (nodeMap.TryGetValue(link.FromNodeId, out var src) &&
                     nodeMap.TryGetValue(link.ToNodeId, out var tgt))
                 {
-                    Connections.Add(new ConnectionViewModel(src.Output, tgt.Input));
+                    Connections.Add(new ConnectionViewModel(src.Output, tgt.Input,
+                        link.QuestionNodeTextDisplay));
                 }
             }
         }
