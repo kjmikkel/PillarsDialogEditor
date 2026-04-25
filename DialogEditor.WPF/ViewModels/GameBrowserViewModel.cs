@@ -13,9 +13,34 @@ public partial class GameBrowserViewModel : ObservableObject
     private string _gameName = string.Empty;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(FilteredFolders))]
     [NotifyCanExecuteChangedFor(nameof(ClearFilterCommand))]
     private string _filterText = string.Empty;
+
+    private CancellationTokenSource? _filterCts;
+
+    partial void OnFilterTextChanged(string value)
+    {
+        _filterCts?.Cancel();
+        var q = value.Trim();
+        if (string.IsNullOrEmpty(q))
+        {
+            // Clearing the filter: apply immediately, no debounce
+            OnPropertyChanged(nameof(FilteredFolders));
+            return;
+        }
+        _filterCts = new CancellationTokenSource();
+        _ = ApplyFilterAsync(_filterCts.Token);
+    }
+
+    private async Task ApplyFilterAsync(CancellationToken ct)
+    {
+        try
+        {
+            await Task.Delay(150, ct);
+            OnPropertyChanged(nameof(FilteredFolders));
+        }
+        catch (OperationCanceledException) { }
+    }
 
     public IEnumerable<ConversationFolderViewModel> FilteredFolders
     {
@@ -49,21 +74,32 @@ public partial class GameBrowserViewModel : ObservableObject
     private bool HasFilterText() => !string.IsNullOrEmpty(FilterText);
 
     [RelayCommand]
-    private void ExpandAll()
+    private async Task ExpandAll()
     {
-        foreach (var folder in Folders)
-            folder.IsExpanded = true;
+        var folders = Folders.ToList();
+        for (int i = 0; i < folders.Count; i++)
+        {
+            folders[i].IsExpanded = true;
+            if (i % 10 == 9)
+                await Task.Yield();
+        }
     }
 
     [RelayCommand]
-    private void CollapseAll()
+    private async Task CollapseAll()
     {
-        foreach (var folder in Folders)
-            folder.IsExpanded = false;
+        var folders = Folders.ToList();
+        for (int i = 0; i < folders.Count; i++)
+        {
+            folders[i].IsExpanded = false;
+            if (i % 10 == 9)
+                await Task.Yield();
+        }
     }
 
     public void Load(IGameDataProvider provider)
     {
+        _filterCts?.Cancel();
         GameName = provider.GameName;
         FilterText = string.Empty;
         Folders.Clear();
