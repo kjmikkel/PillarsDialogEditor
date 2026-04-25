@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Layout;
@@ -49,8 +50,22 @@ public partial class ConversationViewModel : ObservableObject
         try
         {
             await Task.Delay(150, ct);
-            foreach (var node in Nodes)
-                node.IsSearchMatch = Matches(node, q);
+
+            // Compute matches on a background thread — no UI access here
+            var nodes = Nodes.ToList();
+            var results = await Task.Run(
+                () => nodes.Select(n => (node: n, match: Matches(n, q))).ToList(),
+                ct);
+
+            // Apply back to UI in small batches, yielding below render priority
+            for (int i = 0; i < results.Count; i++)
+            {
+                ct.ThrowIfCancellationRequested();
+                results[i].node.IsSearchMatch = results[i].match;
+                if (i % 25 == 24)
+                    await Application.Current.Dispatcher.InvokeAsync(
+                        static () => { }, DispatcherPriority.Background);
+            }
         }
         catch (OperationCanceledException) { }
     }

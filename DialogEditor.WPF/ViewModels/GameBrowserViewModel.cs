@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.GameData;
@@ -21,10 +23,8 @@ public partial class GameBrowserViewModel : ObservableObject
     partial void OnFilterTextChanged(string value)
     {
         _filterCts?.Cancel();
-        var q = value.Trim();
-        if (string.IsNullOrEmpty(q))
+        if (string.IsNullOrWhiteSpace(value))
         {
-            // Clearing the filter: apply immediately, no debounce
             OnPropertyChanged(nameof(FilteredFolders));
             return;
         }
@@ -80,8 +80,9 @@ public partial class GameBrowserViewModel : ObservableObject
         for (int i = 0; i < folders.Count; i++)
         {
             folders[i].IsExpanded = true;
-            if (i % 10 == 9)
-                await Task.Yield();
+            if (i % 5 == 4)
+                await Application.Current.Dispatcher.InvokeAsync(
+                    static () => { }, DispatcherPriority.Background);
         }
     }
 
@@ -92,8 +93,9 @@ public partial class GameBrowserViewModel : ObservableObject
         for (int i = 0; i < folders.Count; i++)
         {
             folders[i].IsExpanded = false;
-            if (i % 10 == 9)
-                await Task.Yield();
+            if (i % 5 == 4)
+                await Application.Current.Dispatcher.InvokeAsync(
+                    static () => { }, DispatcherPriority.Background);
         }
     }
 

@@ -60,7 +60,10 @@
         <TreeView Grid.Row="2" Background="#2d2d2d"
                   BorderThickness="0"
                   ItemsSource="{Binding FilteredFolders}"
-                  SelectedItemChanged="TreeView_SelectedItemChanged">
+                  SelectedItemChanged="TreeView_SelectedItemChanged"
+                  VirtualizingPanel.IsVirtualizing="True"
+                  VirtualizingPanel.VirtualizationMode="Recycling"
+                  ScrollViewer.CanContentScroll="True">
             <TreeView.Resources>
                 <!-- Keep selection colour identical whether the tree has focus or not -->
                 <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
@@ -87,6 +90,8 @@
                     <Setter Property="Background" Value="Transparent"/>
                     <Setter Property="Foreground" Value="#ccc"/>
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                    <Setter Property="VirtualizingPanel.IsVirtualizing" Value="True"/>
+                    <Setter Property="VirtualizingPanel.VirtualizationMode" Value="Recycling"/>
                 </Style>
             </TreeView.ItemContainerStyle>
         </TreeView>
