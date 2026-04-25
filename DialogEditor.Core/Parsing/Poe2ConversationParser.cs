@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.Json.Nodes;
 using DialogEditor.Core.Models;
 
@@ -56,7 +57,9 @@ public static class Poe2ConversationParser
             Persistence: MapPersistence(node["Persistence"]?.GetValue<int>() ?? 0),
             ExternalVO: node["ExternalVO"]?.GetValue<string>() ?? string.Empty,
             HasVO: node["HasVO"]?.GetValue<bool>() ?? false,
-            HideSpeaker: node["HideSpeaker"]?.GetValue<bool>() ?? false
+            HideSpeaker: node["HideSpeaker"]?.GetValue<bool>() ?? false,
+            ConditionExpression: FormatConditionTree(
+                node["Conditionals"]?["Components"]?.AsArray())
         );
     }
 
@@ -110,6 +113,41 @@ public static class Poe2ConversationParser
             .ToList() ?? [];
         var not = component["Not"]?.GetValue<bool>() ?? false;
         return ConditionFormatter.Format(fullName, parameters, not);
+    }
+
+    private static string FormatConditionTree(JsonArray? components, int depth = 0)
+    {
+        if (components is null) return string.Empty;
+        var indent = new string(' ', depth * 2);
+        var sb = new StringBuilder();
+        var items = components.ToList();
+
+        for (int i = 0; i < items.Count; i++)
+        {
+            var comp = items[i]!;
+            var not = comp["Not"]?.GetValue<bool>() ?? false;
+            var notPrefix = not ? "NOT " : "";
+
+            if (i > 0)
+            {
+                var prevOpInt = items[i - 1]?["Operator"]?.GetValue<int>() ?? 0;
+                var prevOp = prevOpInt == 1 ? "OR" : "AND";
+                sb.Append($"{Environment.NewLine}{indent}{prevOp} ");
+            }
+
+            if (comp["Data"] is not null)
+            {
+                // ParseCondition already handles Not internally
+                sb.Append(ParseCondition(comp));
+            }
+            else
+            {
+                var inner = FormatConditionTree(comp["Components"]?.AsArray(), depth + 1);
+                if (string.IsNullOrEmpty(inner)) continue;
+                sb.Append($"{notPrefix}({Environment.NewLine}{indent}  {inner}{Environment.NewLine}{indent})");
+            }
+        }
+        return sb.ToString();
     }
 
     private static string MapQuestionNodeTextDisplay(int value) => value switch

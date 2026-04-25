@@ -1,3 +1,4 @@
+using System.Text;
 using System.Xml.Linq;
 using DialogEditor.Core.Models;
 
@@ -45,7 +46,9 @@ public static class Poe1ConversationParser
             Persistence: (string?)node.Element("Persistence") ?? string.Empty,
             ActorDirection: (string?)node.Element("ActorDirection") ?? string.Empty,
             Comments: (string?)node.Element("Comments") ?? string.Empty,
-            ExternalVO: (string?)node.Element("VOFilename") ?? string.Empty
+            ExternalVO: (string?)node.Element("VOFilename") ?? string.Empty,
+            ConditionExpression: FormatConditionTree(
+                node.Element("Conditionals")?.Element("Components"))
         );
     }
 
@@ -111,5 +114,39 @@ public static class Poe1ConversationParser
             .ToList() ?? [];
         var not = (bool?)component.Element("Not") ?? false;
         return ConditionFormatter.Format(fullName, parameters, not);
+    }
+
+    private static string FormatConditionTree(XElement? components, int depth = 0)
+    {
+        if (components is null) return string.Empty;
+        var indent = new string(' ', depth * 2);
+        var sb = new StringBuilder();
+        var items = components.Elements("ExpressionComponent").ToList();
+
+        for (int i = 0; i < items.Count; i++)
+        {
+            var comp = items[i];
+            var not = (bool?)comp.Element("Not") ?? false;
+            var notPrefix = not ? "NOT " : "";
+
+            if (i > 0)
+            {
+                var prevOp = ((string?)items[i - 1].Element("Operator") ?? "And").ToUpperInvariant();
+                sb.Append($"{Environment.NewLine}{indent}{prevOp} ");
+            }
+
+            if (comp.Element("Data") is not null)
+            {
+                // ParseCondition already handles Not internally
+                sb.Append(ParseCondition(comp));
+            }
+            else
+            {
+                var inner = FormatConditionTree(comp.Element("Components"), depth + 1);
+                if (string.IsNullOrEmpty(inner)) continue;
+                sb.Append($"{notPrefix}({Environment.NewLine}{indent}  {inner}{Environment.NewLine}{indent})");
+            }
+        }
+        return sb.ToString();
     }
 }
