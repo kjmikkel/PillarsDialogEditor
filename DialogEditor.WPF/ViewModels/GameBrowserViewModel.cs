@@ -29,7 +29,7 @@ public partial class GameBrowserViewModel : ObservableObject
                     .Where(i => i.Name.Contains(q, StringComparison.OrdinalIgnoreCase))
                     .ToList()))
                 .Where(t => t.matches.Count > 0)
-                .Select(t => new ConversationFolderViewModel(t.folder.FolderPath, t.matches));
+                .Select(t => new ConversationFolderViewModel(t.folder.FolderPath, t.matches, isExpanded: true));
         }
     }
 
@@ -47,6 +47,20 @@ public partial class GameBrowserViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(HasFilterText))]
     private void ClearFilter() => FilterText = string.Empty;
     private bool HasFilterText() => !string.IsNullOrEmpty(FilterText);
+
+    [RelayCommand]
+    private void ExpandAll()
+    {
+        foreach (var folder in Folders)
+            folder.IsExpanded = true;
+    }
+
+    [RelayCommand]
+    private void CollapseAll()
+    {
+        foreach (var folder in Folders)
+            folder.IsExpanded = false;
+    }
 
     public void Load(IGameDataProvider provider)
     {
