@@ -44,7 +44,8 @@ public static class Poe1ConversationParser
             DisplayType: (string?)node.Element("DisplayType") ?? string.Empty,
             Persistence: (string?)node.Element("Persistence") ?? string.Empty,
             ActorDirection: (string?)node.Element("ActorDirection") ?? string.Empty,
-            Comments: (string?)node.Element("Comments") ?? string.Empty
+            Comments: (string?)node.Element("Comments") ?? string.Empty,
+            ExternalVO: (string?)node.Element("VOFilename") ?? string.Empty
         );
     }
 

@@ -396,6 +396,55 @@ public class Poe1ConversationParserTests
         Assert.Equal(string.Empty, nodes[1].Comments);
     }
 
+    private const string VOFilenameXml = """
+        <?xml version="1.0" encoding="utf-8"?>
+        <ConversationData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                          xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+          <Nodes>
+            <FlowChartNode xsi:type="TalkNode">
+              <NodeID>0</NodeID>
+              <Comments />
+              <Links />
+              <ClassExtender><ExtendedProperties /></ClassExtender>
+              <Conditionals><Operator>And</Operator><Components /></Conditionals>
+              <OnEnterScripts /><OnExitScripts /><OnUpdateScripts />
+              <IsQuestionNode>false</IsQuestionNode>
+              <Persistence>None</Persistence><DisplayType>Conversation</DisplayType>
+              <VOFilename>vo/default/aloth_01_banter.ogg</VOFilename><VoiceType />
+              <SpeakerGuid>00000000-0000-0000-0000-000000000000</SpeakerGuid>
+              <ListenerGuid>00000000-0000-0000-0000-000000000000</ListenerGuid>
+            </FlowChartNode>
+            <FlowChartNode xsi:type="TalkNode">
+              <NodeID>1</NodeID>
+              <Comments />
+              <Links />
+              <ClassExtender><ExtendedProperties /></ClassExtender>
+              <Conditionals><Operator>And</Operator><Components /></Conditionals>
+              <OnEnterScripts /><OnExitScripts /><OnUpdateScripts />
+              <IsQuestionNode>false</IsQuestionNode>
+              <Persistence>None</Persistence><DisplayType>Conversation</DisplayType>
+              <VOFilename /><VoiceType />
+              <SpeakerGuid>00000000-0000-0000-0000-000000000000</SpeakerGuid>
+              <ListenerGuid>00000000-0000-0000-0000-000000000000</ListenerGuid>
+            </FlowChartNode>
+          </Nodes>
+        </ConversationData>
+        """;
+
+    [Fact]
+    public void Parse_Poe1Node_WithVOFilename_HasExternalVO()
+    {
+        var nodes = Poe1ConversationParser.ParseXml(VOFilenameXml);
+        Assert.Equal("vo/default/aloth_01_banter.ogg", nodes[0].ExternalVO);
+    }
+
+    [Fact]
+    public void Parse_Poe1Node_WithEmptyVOFilename_HasEmptyExternalVO()
+    {
+        var nodes = Poe1ConversationParser.ParseXml(VOFilenameXml);
+        Assert.Equal(string.Empty, nodes[1].ExternalVO);
+    }
+
     [Fact]
     public void Parse_Poe1Link_HasRandomWeight()
     {

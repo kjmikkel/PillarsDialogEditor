@@ -27,9 +27,10 @@ public partial class NodeDetailViewModel : ObservableObject
     [ObservableProperty] private string _comments = string.Empty;
     [ObservableProperty] private bool _hasComments;
 
-    // Voice (PoE2)
+    // Voice (PoE1 + PoE2)
     [ObservableProperty] private bool _hasVoiceSection;
     [ObservableProperty] private string _externalVO = string.Empty;
+    [ObservableProperty] private bool _hasExternalVO;
     [ObservableProperty] private bool _hasVO;
     [ObservableProperty] private bool _hideSpeaker;
 
@@ -62,6 +63,7 @@ public partial class NodeDetailViewModel : ObservableObject
         Comments = node.Comments;
         HasComments = !string.IsNullOrEmpty(node.Comments);
         ExternalVO = node.ExternalVO;
+        HasExternalVO = !string.IsNullOrEmpty(node.ExternalVO);
         HasVO = node.HasVO;
         HideSpeaker = node.HideSpeaker;
         HasVoiceSection = node.HasVO || !string.IsNullOrEmpty(node.ExternalVO) || node.HideSpeaker;
