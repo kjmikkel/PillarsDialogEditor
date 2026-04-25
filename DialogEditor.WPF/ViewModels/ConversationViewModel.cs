@@ -19,6 +19,8 @@ public partial class ConversationViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(ClearSearchCommand))]
     private string _searchQuery = string.Empty;
 
+    private CancellationTokenSource? _searchCts;
+
     partial void OnSelectedNodeChanged(NodeViewModel? value)
     {
         foreach (var connection in Connections)
@@ -30,9 +32,27 @@ public partial class ConversationViewModel : ObservableObject
 
     partial void OnSearchQueryChanged(string value)
     {
+        _searchCts?.Cancel();
         var q = value.Trim();
-        foreach (var node in Nodes)
-            node.IsSearchMatch = string.IsNullOrEmpty(q) || Matches(node, q);
+        if (string.IsNullOrEmpty(q))
+        {
+            foreach (var node in Nodes)
+                node.IsSearchMatch = true;
+            return;
+        }
+        _searchCts = new CancellationTokenSource();
+        _ = ApplySearchAsync(q, _searchCts.Token);
+    }
+
+    private async Task ApplySearchAsync(string q, CancellationToken ct)
+    {
+        try
+        {
+            await Task.Delay(150, ct);
+            foreach (var node in Nodes)
+                node.IsSearchMatch = Matches(node, q);
+        }
+        catch (OperationCanceledException) { }
     }
 
     [RelayCommand(CanExecute = nameof(HasSearchQuery))]
@@ -46,6 +66,7 @@ public partial class ConversationViewModel : ObservableObject
 
     public void Load(Conversation conversation)
     {
+        _searchCts?.Cancel();
         Nodes.Clear();
         Connections.Clear();
         SelectedNode = null;
