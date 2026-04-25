@@ -188,6 +188,13 @@
                                     <Setter Property="Stroke" Value="#666"/>
                                     <Setter Property="StrokeThickness" Value="1.5"/>
                                     <Style.Triggers>
+                                        <DataTrigger Binding="{Binding QuestionNodeTextDisplay}" Value="Never">
+                                            <Setter Property="Stroke" Value="#555"/>
+                                            <Setter Property="StrokeDashArray" Value="4,3"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding QuestionNodeTextDisplay}" Value="Always">
+                                            <Setter Property="Stroke" Value="#c8a050"/>
+                                        </DataTrigger>
                                         <DataTrigger Binding="{Binding IsHighlighted}" Value="True">
                                             <Setter Property="Stroke" Value="White"/>
                                             <Setter Property="StrokeThickness" Value="2.5"/>
