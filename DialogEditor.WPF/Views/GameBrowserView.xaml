@@ -74,7 +74,6 @@
                 <Style TargetType="TreeViewItem">
                     <Setter Property="Background" Value="Transparent"/>
                     <Setter Property="Foreground" Value="#ccc"/>
-                    <Setter Property="IsExpanded" Value="True"/>
                 </Style>
             </TreeView.ItemContainerStyle>
         </TreeView>
