@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.GameData;
 
 namespace DialogEditor.WPF.ViewModels;
@@ -10,6 +11,27 @@ public partial class GameBrowserViewModel : ObservableObject
 
     [ObservableProperty]
     private string _gameName = string.Empty;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(FilteredFolders))]
+    [NotifyCanExecuteChangedFor(nameof(ClearFilterCommand))]
+    private string _filterText = string.Empty;
+
+    public IEnumerable<ConversationFolderViewModel> FilteredFolders
+    {
+        get
+        {
+            var q = FilterText.Trim();
+            if (string.IsNullOrEmpty(q)) return Folders;
+
+            return Folders
+                .Select(f => (folder: f, matches: f.Items
+                    .Where(i => i.Name.Contains(q, StringComparison.OrdinalIgnoreCase))
+                    .ToList()))
+                .Where(t => t.matches.Count > 0)
+                .Select(t => new ConversationFolderViewModel(t.folder.FolderPath, t.matches));
+        }
+    }
 
     public event Action<ConversationFile>? ConversationSelected;
 
@@ -22,9 +44,14 @@ public partial class GameBrowserViewModel : ObservableObject
             ConversationSelected?.Invoke(value.File);
     }
 
+    [RelayCommand(CanExecute = nameof(HasFilterText))]
+    private void ClearFilter() => FilterText = string.Empty;
+    private bool HasFilterText() => !string.IsNullOrEmpty(FilterText);
+
     public void Load(IGameDataProvider provider)
     {
         GameName = provider.GameName;
+        FilterText = string.Empty;
         Folders.Clear();
 
         var byFolder = provider.EnumerateConversations()
