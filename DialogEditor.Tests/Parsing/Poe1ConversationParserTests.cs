@@ -458,4 +458,81 @@ public class Poe1ConversationParserTests
         var nodes = Poe1ConversationParser.ParseXml(TwoNodeXml);
         Assert.Equal("ShowOnce", nodes[0].Links[0].QuestionNodeTextDisplay);
     }
+
+    private const string GroupedConditionXml = """
+        <?xml version="1.0" encoding="utf-8"?>
+        <ConversationData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                          xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+          <Nodes>
+            <FlowChartNode xsi:type="TalkNode">
+              <NodeID>0</NodeID>
+              <Links />
+              <ClassExtender><ExtendedProperties /></ClassExtender>
+              <Conditionals>
+                <Operator>And</Operator>
+                <Components>
+                  <ExpressionComponent xsi:type="ConditionalCall">
+                    <Data>
+                      <FullName>Boolean IsGlobalValue(String, Operator, Int32)</FullName>
+                      <Parameters>
+                        <string>flag_a</string><string>EqualTo</string><string>1</string>
+                      </Parameters>
+                    </Data>
+                    <Not>false</Not>
+                    <Operator>And</Operator>
+                  </ExpressionComponent>
+                  <ExpressionComponent xsi:type="ConditionalExpression">
+                    <Operator>Or</Operator>
+                    <Components>
+                      <ExpressionComponent xsi:type="ConditionalCall">
+                        <Data>
+                          <FullName>Boolean IsCompanionInParty(Guid)</FullName>
+                          <Parameters><string>aloth-guid</string></Parameters>
+                        </Data>
+                        <Not>false</Not>
+                        <Operator>Or</Operator>
+                      </ExpressionComponent>
+                      <ExpressionComponent xsi:type="ConditionalCall">
+                        <Data>
+                          <FullName>Boolean HasItem(String)</FullName>
+                          <Parameters><string>sword</string></Parameters>
+                        </Data>
+                        <Not>true</Not>
+                        <Operator>And</Operator>
+                      </ExpressionComponent>
+                    </Components>
+                    <Not>false</Not>
+                    <Operator>And</Operator>
+                  </ExpressionComponent>
+                </Components>
+              </Conditionals>
+              <OnEnterScripts /><OnExitScripts /><OnUpdateScripts />
+              <IsQuestionNode>false</IsQuestionNode>
+              <Persistence>None</Persistence><DisplayType>Conversation</DisplayType>
+              <SpeakerGuid>00000000-0000-0000-0000-000000000000</SpeakerGuid>
+              <ListenerGuid>00000000-0000-0000-0000-000000000000</ListenerGuid>
+            </FlowChartNode>
+          </Nodes>
+        </ConversationData>
+        """;
+
+    [Fact]
+    public void Parse_Poe1FlatCondition_ConditionExpressionMatchesLeaf()
+    {
+        var nodes = Poe1ConversationParser.ParseXml(TwoNodeXml);
+        Assert.Equal("IsGlobalValue(some_flag, EqualTo, 1)", nodes[1].ConditionExpression);
+    }
+
+    [Fact]
+    public void Parse_Poe1NestedOrGroup_ConditionExpressionPreservesGrouping()
+    {
+        var nodes = Poe1ConversationParser.ParseXml(GroupedConditionXml);
+        var expected =
+            "IsGlobalValue(flag_a, EqualTo, 1)" + Environment.NewLine +
+            "AND (" + Environment.NewLine +
+            "  IsCompanionInParty(aloth-guid)" + Environment.NewLine +
+            "  OR NOT HasItem(sword)" + Environment.NewLine +
+            ")";
+        Assert.Equal(expected, nodes[0].ConditionExpression);
+    }
 }

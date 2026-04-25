@@ -343,4 +343,11 @@ public class Poe2ConversationParserTests
         var nodes = Poe2ConversationParser.ParseJson(TwoNodeJson);
         Assert.Equal(1f, nodes[0].Links[0].RandomWeight);
     }
+
+    [Fact]
+    public void Parse_Poe2FlatCondition_ConditionExpressionMatchesLeaf()
+    {
+        var nodes = Poe2ConversationParser.ParseJson(TwoNodeJson);
+        Assert.Equal("IsGlobalValue(some_flag, EqualTo, 1)", nodes[1].ConditionExpression);
+    }
 }

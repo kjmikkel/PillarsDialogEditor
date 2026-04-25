@@ -47,8 +47,8 @@ public partial class NodeDetailViewModel : ObservableObject
         FemaleText = node.FemaleText;
         HasFemaleText = !string.IsNullOrEmpty(node.FemaleText);
         FemaleTextDisplay = HasFemaleText ? node.FemaleText : "(same as default)";
-        ConditionsText = node.ConditionStrings.Count > 0
-            ? string.Join(Environment.NewLine, node.ConditionStrings)
+        ConditionsText = !string.IsNullOrEmpty(node.ConditionExpression)
+            ? node.ConditionExpression
             : "(none)";
         DisplayType = node.DisplayType;
         Persistence = node.Persistence;

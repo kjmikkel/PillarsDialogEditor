@@ -28,6 +28,7 @@ public partial class NodeViewModel : ObservableObject
     public bool HasVO { get; }
     public bool HideSpeaker { get; }
     public IReadOnlyList<string> ConditionStrings { get; }
+    public string ConditionExpression { get; }
     public IReadOnlyList<string> Scripts { get; }
     public IReadOnlyList<NodeLink> Links { get; }
 
@@ -71,6 +72,7 @@ public partial class NodeViewModel : ObservableObject
             : resolved;
         ListenerName = SpeakerNameService.Resolve(node.ListenerGuid);
         ConditionStrings = node.ConditionStrings;
+        ConditionExpression = node.ConditionExpression;
         Scripts = node.Scripts;
         DisplayType = node.DisplayType;
         Persistence = node.Persistence;
