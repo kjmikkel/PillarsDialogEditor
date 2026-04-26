@@ -107,14 +107,16 @@
 
                             <nodify:Node.InputConnectorTemplate>
                                 <DataTemplate DataType="{x:Type vm:ConnectorViewModel}">
-                                    <nodify:NodeInput Anchor="{Binding Anchor, Mode=OneWayToSource}"
+                                    <nodify:NodeInput Anchor="{Binding Anchor, Mode=OneWayToSource,
+                                                                  Converter={StaticResource LayoutPointConverter}}"
                                                       IsConnected="True"/>
                                 </DataTemplate>
                             </nodify:Node.InputConnectorTemplate>
 
                             <nodify:Node.OutputConnectorTemplate>
                                 <DataTemplate DataType="{x:Type vm:ConnectorViewModel}">
-                                    <nodify:NodeOutput Anchor="{Binding Anchor, Mode=OneWayToSource}"
+                                    <nodify:NodeOutput Anchor="{Binding Anchor, Mode=OneWayToSource,
+                                                                   Converter={StaticResource LayoutPointConverter}}"
                                                        IsConnected="True"/>
                                 </DataTemplate>
                             </nodify:Node.OutputConnectorTemplate>
@@ -188,8 +190,10 @@
 
                 <nodify:NodifyEditor.ConnectionTemplate>
                     <DataTemplate DataType="{x:Type vm:ConnectionViewModel}">
-                        <nodify:Connection Source="{Binding Source.Anchor}"
-                                           Target="{Binding Target.Anchor}">
+                        <nodify:Connection Source="{Binding Source.Anchor,
+                                                      Converter={StaticResource LayoutPointConverter}}"
+                                           Target="{Binding Target.Anchor,
+                                                    Converter={StaticResource LayoutPointConverter}}">
                             <nodify:Connection.Style>
                                 <Style TargetType="nodify:Connection">
                                     <Setter Property="Stroke" Value="#aaa"/>
