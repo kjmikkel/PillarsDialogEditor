@@ -14,6 +14,9 @@ public static class AppSettings
     {
         public string? LastLanguage { get; set; }
         public string? LastGameDirectory { get; set; }
+        public bool BrowserExpanded { get; set; } = true;
+        public bool BrowserPinned   { get; set; } = true;
+        public bool DetailExpanded  { get; set; } = true;
     }
 
     public static string? LastLanguage
@@ -26,6 +29,24 @@ public static class AppSettings
     {
         get => Load().LastGameDirectory;
         set { var s = Load(); s.LastGameDirectory = value; Save(s); }
+    }
+
+    public static bool BrowserExpanded
+    {
+        get => Load().BrowserExpanded;
+        set { var s = Load(); s.BrowserExpanded = value; Save(s); }
+    }
+
+    public static bool BrowserPinned
+    {
+        get => Load().BrowserPinned;
+        set { var s = Load(); s.BrowserPinned = value; Save(s); }
+    }
+
+    public static bool DetailExpanded
+    {
+        get => Load().DetailExpanded;
+        set { var s = Load(); s.DetailExpanded = value; Save(s); }
     }
 
     private static SettingsData Load()

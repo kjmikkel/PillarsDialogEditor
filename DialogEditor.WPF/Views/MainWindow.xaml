@@ -42,18 +42,129 @@
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="220" MinWidth="150"/>
+                <ColumnDefinition x:Name="BrowserColumn" Width="220" MinWidth="150"/>
                 <ColumnDefinition Width="4"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="4"/>
-                <ColumnDefinition Width="240" MinWidth="180"/>
+                <ColumnDefinition x:Name="DetailColumn" Width="240" MinWidth="180"/>
             </Grid.ColumnDefinitions>
 
-            <views:GameBrowserView Grid.Column="0" DataContext="{Binding Browser}"/>
+            <!-- Browser panel (Column 0) -->
+            <Grid Grid.Column="0">
+                <!-- Expanded state -->
+                <Grid Visibility="{Binding IsBrowserExpanded, Converter={StaticResource BoolToVis}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border Background="#252525" Padding="6,4">
+                        <DockPanel>
+                            <ToggleButton DockPanel.Dock="Right"
+                                          IsChecked="{Binding IsBrowserExpanded, Mode=TwoWay}"
+                                          Style="{StaticResource PanelCollapseButton}"
+                                          ToolTip="{StaticResource ToolTip_TogglePanel}"/>
+                            <ToggleButton DockPanel.Dock="Right" Margin="0,0,2,0"
+                                          IsChecked="{Binding IsBrowserPinned, Mode=TwoWay}"
+                                          Content="&#x1F4CC;"
+                                          Style="{StaticResource HelpToggleButton}"
+                                          ToolTip="{StaticResource ToolTip_PinPanel}"/>
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,6,0">
+                                <Button Command="{Binding Browser.ExpandAllCommand}" Content="⊞"
+                                        Style="{StaticResource FlatIconButton}"
+                                        ToolTip="{StaticResource ToolTip_ExpandAll}"/>
+                                <Button Command="{Binding Browser.CollapseAllCommand}" Content="⊟" Margin="2,0,0,0"
+                                        Style="{StaticResource FlatIconButton}"
+                                        ToolTip="{StaticResource ToolTip_CollapseAll}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="{StaticResource Browser_Header}"
+                                           Foreground="#888" FontSize="10" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding CurrentConversationName}"
+                                           Foreground="#555" FontSize="10" Margin="6,0,0,0"
+                                           Visibility="{Binding CurrentConversationName,
+                                                        Converter={StaticResource NullOrEmptyToVis}}"/>
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+                    <views:GameBrowserView Grid.Row="1" DataContext="{Binding Browser}"/>
+                </Grid>
+                <!-- Collapsed strip -->
+                <Grid Visibility="{Binding IsBrowserExpanded, Converter={StaticResource InverseBoolToVis}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <ToggleButton Grid.Row="0" Margin="4,4,4,0"
+                                  IsChecked="{Binding IsBrowserExpanded, Mode=TwoWay}"
+                                  Style="{StaticResource PanelCollapseButton}"
+                                  ToolTip="{StaticResource ToolTip_TogglePanel}"/>
+                    <ToggleButton Grid.Row="1" Margin="4,2,4,0"
+                                  IsChecked="{Binding IsBrowserPinned, Mode=TwoWay}"
+                                  Content="&#x1F4CC;"
+                                  Style="{StaticResource HelpToggleButton}"
+                                  ToolTip="{StaticResource ToolTip_PinPanel}"/>
+                    <TextBlock Grid.Row="2" Margin="0,10,0,0"
+                               Text="{StaticResource Browser_Header}"
+                               Foreground="#555" FontSize="10" FontWeight="Bold"
+                               HorizontalAlignment="Center" VerticalAlignment="Top">
+                        <TextBlock.LayoutTransform>
+                            <RotateTransform Angle="90"/>
+                        </TextBlock.LayoutTransform>
+                    </TextBlock>
+                </Grid>
+            </Grid>
+
             <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="#333"/>
             <views:ConversationView Grid.Column="2" DataContext="{Binding Canvas}"/>
             <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" Background="#333"/>
-            <views:NodeDetailView Grid.Column="4" DataContext="{Binding Detail}"/>
+
+            <!-- Detail panel (Column 4) -->
+            <Grid Grid.Column="4">
+                <!-- Expanded state -->
+                <Grid Visibility="{Binding IsDetailExpanded, Converter={StaticResource BoolToVis}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Border Background="#252525" Padding="6,4">
+                        <DockPanel>
+                            <ToggleButton DockPanel.Dock="Right"
+                                          IsChecked="{Binding IsDetailExpanded, Mode=TwoWay}"
+                                          Style="{StaticResource PanelCollapseButton}"
+                                          ToolTip="{StaticResource ToolTip_TogglePanel}"/>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="{StaticResource Label_NodeDetails}"
+                                           Foreground="#888" FontSize="10" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding CurrentConversationName}"
+                                           Foreground="#555" FontSize="10" Margin="6,0,0,0"
+                                           Visibility="{Binding CurrentConversationName,
+                                                        Converter={StaticResource NullOrEmptyToVis}}"/>
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+                    <views:NodeDetailView Grid.Row="1" DataContext="{Binding Detail}"/>
+                </Grid>
+                <!-- Collapsed strip -->
+                <Grid Visibility="{Binding IsDetailExpanded, Converter={StaticResource InverseBoolToVis}}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <ToggleButton Grid.Row="0" Margin="4,4,4,0"
+                                  IsChecked="{Binding IsDetailExpanded, Mode=TwoWay}"
+                                  Style="{StaticResource PanelCollapseButton}"
+                                  ToolTip="{StaticResource ToolTip_TogglePanel}"/>
+                    <TextBlock Grid.Row="1" Margin="0,10,0,0"
+                               Text="{StaticResource Label_NodeDetails}"
+                               Foreground="#555" FontSize="10" FontWeight="Bold"
+                               HorizontalAlignment="Center" VerticalAlignment="Top">
+                        <TextBlock.LayoutTransform>
+                            <RotateTransform Angle="90"/>
+                        </TextBlock.LayoutTransform>
+                    </TextBlock>
+                </Grid>
+            </Grid>
 
             <!-- Legend overlay -->
             <Border Grid.ColumnSpan="5"
