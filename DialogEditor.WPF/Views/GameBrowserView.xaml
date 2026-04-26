@@ -81,18 +81,8 @@
                                Foreground="#888" FontSize="10" Padding="2,2"/>
                 </HierarchicalDataTemplate>
                 <DataTemplate DataType="{x:Type vm:ConversationItemViewModel}">
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Ellipse Width="5" Height="5" Fill="#cd6155" Margin="0,0,3,0"
-                                 VerticalAlignment="Center"
-                                 Visibility="{Binding HasNeverLinks, Converter={StaticResource BoolToVis}}"
-                                 ToolTip="Has Never connections"/>
-                        <Ellipse Width="5" Height="5" Fill="#c8a050" Margin="0,0,4,0"
-                                 VerticalAlignment="Center"
-                                 Visibility="{Binding HasAlwaysLinks, Converter={StaticResource BoolToVis}}"
-                                 ToolTip="Has Always connections"/>
-                        <TextBlock Text="{Binding Name}"
-                                   Foreground="#ccc" FontSize="10" Padding="2,2"/>
-                    </StackPanel>
+                    <TextBlock Text="{Binding Name}"
+                               Foreground="#ccc" FontSize="10" Padding="2,2"/>
                 </DataTemplate>
             </TreeView.Resources>
             <TreeView.ItemContainerStyle>
