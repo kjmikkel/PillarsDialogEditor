@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using DialogEditor.WPF.Resources;
 using DialogEditor.WPF.Services;
 using DialogEditor.WPF.ViewModels;
 
@@ -16,6 +17,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        Loc.Configure(new WpfStringProvider());
         DataContext = new MainWindowViewModel(
             new WpfDispatcher(Dispatcher),
             new WpfFolderPicker());
