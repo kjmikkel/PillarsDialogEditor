@@ -2,24 +2,30 @@ namespace DialogEditor.WPF.Services;
 
 public static class SpeakerNameService
 {
-    private static readonly Dictionary<string, string> KnownGuids = new(StringComparer.OrdinalIgnoreCase)
-    {
-        { "b1a8e901-0000-0000-0000-000000000000", "Player" },
-        { "00000000-0000-0000-0000-000000000000", "Narrator" },
-    };
+    // Built-in GUIDs that are always available regardless of which game is loaded
+    private static readonly IReadOnlyDictionary<string, string> Defaults =
+        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "b1a8e901-0000-0000-0000-000000000000", "Player" },
+            { "00000000-0000-0000-0000-000000000000", "Narrator" },
+        };
 
+    // Game-specific names loaded via Register(); replaced entirely on each new game load
+    private static Dictionary<string, string> _registered =
+        new(StringComparer.OrdinalIgnoreCase);
+
+    // Replaces all previously registered names with those from the current game
     public static void Register(IReadOnlyDictionary<string, string> names)
     {
-        foreach (var (guid, name) in names)
-            KnownGuids[guid] = name;
+        _registered = new Dictionary<string, string>(names, StringComparer.OrdinalIgnoreCase);
     }
 
-    // Returns null when the GUID is empty/unset; callers apply the
-    // localised fallback rather than comparing against a hard-coded string.
+    // Returns null when the GUID is empty/unset; callers apply the localised fallback
     public static string? Resolve(string guid)
     {
         if (string.IsNullOrWhiteSpace(guid)) return null;
-        if (KnownGuids.TryGetValue(guid, out var name)) return name;
+        if (_registered.TryGetValue(guid, out var name)) return name;
+        if (Defaults.TryGetValue(guid, out name)) return name;
         return guid;
     }
 }

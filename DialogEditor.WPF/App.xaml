@@ -9,6 +9,7 @@
                 <ResourceDictionary Source="Resources/Strings.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
+            <converters:LayoutPointConverter x:Key="LayoutPointConverter"/>
             <converters:SpeakerCategoryToBrushConverter x:Key="SpeakerCategoryToBrush"/>
             <converters:BoolToFemaleTextBrushConverter x:Key="BoolToFemaleTextBrush"/>
             <converters:CountToVisibilityConverter x:Key="CountToVis"/>

@@ -89,7 +89,8 @@
 
                 <nodify:NodifyEditor.ItemContainerStyle>
                     <Style TargetType="{x:Type nodify:ItemContainer}">
-                        <Setter Property="Location" Value="{Binding Location, Mode=TwoWay}"/>
+                        <Setter Property="Location" Value="{Binding Location, Mode=TwoWay,
+                                                   Converter={StaticResource LayoutPointConverter}}"/>
                         <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
                         <Style.Triggers>
                             <DataTrigger Binding="{Binding IsSearchMatch}" Value="False">
@@ -241,7 +242,8 @@
                 ViewportSize="{Binding ViewportSize, ElementName=Editor}">
                 <nodify:Minimap.ItemContainerStyle>
                     <Style TargetType="nodify:MinimapItem">
-                        <Setter Property="Location" Value="{Binding Location}"/>
+                        <Setter Property="Location" Value="{Binding Location,
+                                           Converter={StaticResource LayoutPointConverter}}"/>
                         <Setter Property="Width" Value="200"/>
                         <Setter Property="Height" Value="80"/>
                         <Setter Property="Template">

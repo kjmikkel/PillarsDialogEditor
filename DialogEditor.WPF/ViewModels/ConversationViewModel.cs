@@ -1,25 +1,27 @@
 using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Layout;
 using DialogEditor.Core.Models;
 using DialogEditor.WPF.Resources;
+using DialogEditor.WPF.Services;
 
 namespace DialogEditor.WPF.ViewModels;
 
 public partial class ConversationViewModel : ObservableObject
 {
+    private readonly IDispatcher _dispatcher;
+
+    public ConversationViewModel(IDispatcher dispatcher)
+    {
+        _dispatcher = dispatcher;
+        Nodes.CollectionChanged += (_, _) => OnPropertyChanged(nameof(NodeCountText));
+    }
+
     public ObservableCollection<NodeViewModel> Nodes { get; } = [];
     public ObservableCollection<ConnectionViewModel> Connections { get; } = [];
 
     public string NodeCountText => Loc.Format("Node_CountFormat", Nodes.Count);
-
-    public ConversationViewModel()
-    {
-        Nodes.CollectionChanged += (_, _) => OnPropertyChanged(nameof(NodeCountText));
-    }
 
     [ObservableProperty]
     private NodeViewModel? _selectedNode;
@@ -59,20 +61,17 @@ public partial class ConversationViewModel : ObservableObject
         {
             await Task.Delay(150, ct);
 
-            // Compute matches on a background thread — no UI access here
             var nodes = Nodes.ToList();
             var results = await Task.Run(
                 () => nodes.Select(n => (node: n, match: Matches(n, q))).ToList(),
                 ct);
 
-            // Apply back to UI in small batches, yielding below render priority
             for (int i = 0; i < results.Count; i++)
             {
                 ct.ThrowIfCancellationRequested();
                 results[i].node.IsSearchMatch = results[i].match;
                 if (i % 25 == 24)
-                    await Application.Current.Dispatcher.InvokeAsync(
-                        static () => { }, DispatcherPriority.Background);
+                    await _dispatcher.YieldToBackground();
             }
         }
         catch (OperationCanceledException) { }
@@ -109,7 +108,7 @@ public partial class ConversationViewModel : ObservableObject
         AutoLayoutService.Apply(conversation.Nodes, (id, x, y) =>
         {
             if (nodeMap.TryGetValue(id, out var vm))
-                vm.Location = new Point(x, y);
+                vm.Location = new LayoutPoint(x, y);
         });
 
         foreach (var node in conversation.Nodes)
