@@ -207,6 +207,14 @@
                                             <Setter Property="Stroke" Value="#f0a830"/>
                                             <Setter Property="StrokeThickness" Value="2.5"/>
                                         </MultiDataTrigger>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding IsHighlighted}" Value="True"/>
+                                                <Condition Binding="{Binding QuestionNodeTextDisplay}" Value="Never"/>
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Stroke" Value="#bbb"/>
+                                            <Setter Property="StrokeThickness" Value="2.5"/>
+                                        </MultiDataTrigger>
                                     </Style.Triggers>
                                 </Style>
                             </nodify:Connection.Style>
