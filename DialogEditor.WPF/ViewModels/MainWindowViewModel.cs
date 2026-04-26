@@ -4,14 +4,15 @@ using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.GameData;
 using DialogEditor.WPF.Resources;
 using DialogEditor.WPF.Services;
-using Microsoft.Win32;
 
 namespace DialogEditor.WPF.ViewModels;
 
 public partial class MainWindowViewModel : ObservableObject
 {
-    public GameBrowserViewModel Browser { get; } = new();
-    public ConversationViewModel Canvas { get; } = new();
+    private readonly IFolderPicker _folderPicker;
+
+    public GameBrowserViewModel Browser { get; }
+    public ConversationViewModel Canvas { get; }
     public NodeDetailViewModel Detail { get; } = new();
 
     private IGameDataProvider? _provider;
@@ -23,7 +24,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsBrowserFlyoutOpen))]
-    private bool _isBrowserExpanded = AppSettings.BrowserPinned; // expanded iff pinned on startup
+    private bool _isBrowserExpanded = AppSettings.BrowserPinned;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsBrowserFlyoutOpen))]
@@ -32,18 +33,21 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty] private bool _isDetailExpanded  = AppSettings.DetailExpanded;
     [ObservableProperty] private string? _currentConversationName;
 
-    // True only when the panel is open as a temporary flyout (not pinned)
     public bool IsBrowserFlyoutOpen => IsBrowserExpanded && !IsBrowserPinned;
 
     partial void OnIsBrowserPinnedChanged(bool value)
     {
         AppSettings.BrowserPinned = value;
-        IsBrowserExpanded = value; // pin → open, unpin → collapse to strip
+        IsBrowserExpanded = value;
     }
-    partial void OnIsDetailExpandedChanged(bool value)  => AppSettings.DetailExpanded  = value;
+    partial void OnIsDetailExpandedChanged(bool value) => AppSettings.DetailExpanded = value;
 
-    public MainWindowViewModel()
+    public MainWindowViewModel(IDispatcher dispatcher, IFolderPicker folderPicker)
     {
+        _folderPicker = folderPicker;
+        Browser = new GameBrowserViewModel(dispatcher);
+        Canvas  = new ConversationViewModel(dispatcher);
+
         Browser.ConversationSelected += OnConversationSelected;
         Canvas.PropertyChanged += (_, e) =>
         {
@@ -66,11 +70,11 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void OpenFolder()
+    private async Task OpenFolder()
     {
-        var dialog = new OpenFolderDialog { Title = Loc.Get("Dialog_SelectFolder") };
-        if (dialog.ShowDialog() != true) return;
-        LoadDirectory(dialog.FolderName);
+        var path = await _folderPicker.PickFolderAsync(Loc.Get("Dialog_SelectFolder"));
+        if (path is null) return;
+        LoadDirectory(path);
     }
 
     private void LoadDirectory(string path)

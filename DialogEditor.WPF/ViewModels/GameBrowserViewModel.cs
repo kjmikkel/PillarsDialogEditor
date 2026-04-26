@@ -1,14 +1,20 @@
 using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.GameData;
+using DialogEditor.WPF.Services;
 
 namespace DialogEditor.WPF.ViewModels;
 
 public partial class GameBrowserViewModel : ObservableObject
 {
+    private readonly IDispatcher _dispatcher;
+
+    public GameBrowserViewModel(IDispatcher dispatcher)
+    {
+        _dispatcher = dispatcher;
+    }
+
     public ObservableCollection<ConversationFolderViewModel> Folders { get; } = [];
 
     [ObservableProperty]
@@ -81,8 +87,7 @@ public partial class GameBrowserViewModel : ObservableObject
         {
             folders[i].IsExpanded = true;
             if (i % 5 == 4)
-                await Application.Current.Dispatcher.InvokeAsync(
-                    static () => { }, DispatcherPriority.Background);
+                await _dispatcher.YieldToBackground();
         }
     }
 
@@ -94,8 +99,7 @@ public partial class GameBrowserViewModel : ObservableObject
         {
             folders[i].IsExpanded = false;
             if (i % 5 == 4)
-                await Application.Current.Dispatcher.InvokeAsync(
-                    static () => { }, DispatcherPriority.Background);
+                await _dispatcher.YieldToBackground();
         }
     }
 

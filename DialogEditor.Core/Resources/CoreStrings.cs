@@ -14,8 +14,11 @@ internal static class CoreStrings
 
     internal static CultureInfo? Culture { get; set; }
 
-    internal static string Script_Prefix_Enter  => Manager.GetString(nameof(Script_Prefix_Enter),  Culture)!;
-    internal static string Script_Prefix_Exit   => Manager.GetString(nameof(Script_Prefix_Exit),   Culture)!;
-    internal static string Script_Prefix_Update => Manager.GetString(nameof(Script_Prefix_Update), Culture)!;
-    internal static string Condition_Not        => Manager.GetString(nameof(Condition_Not),        Culture)!;
+    internal static string Script_Prefix_Enter  => GetOrFallback(nameof(Script_Prefix_Enter));
+    internal static string Script_Prefix_Exit   => GetOrFallback(nameof(Script_Prefix_Exit));
+    internal static string Script_Prefix_Update => GetOrFallback(nameof(Script_Prefix_Update));
+    internal static string Condition_Not        => GetOrFallback(nameof(Condition_Not));
+
+    private static string GetOrFallback(string key) =>
+        Manager.GetString(key, Culture) ?? $"[{key}]";
 }

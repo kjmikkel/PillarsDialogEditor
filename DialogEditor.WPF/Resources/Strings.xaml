@@ -90,6 +90,10 @@
     <!-- Placeholder text inside the node search box -->
     <sys:String x:Key="Placeholder_SearchNodes">Search nodes…</sys:String>
 
+    <!-- ─── Application ───────────────────────────────────────────────── -->
+    <!-- Title bar of the main window -->
+    <sys:String x:Key="App_Title">Pillars Dialog Editor</sys:String>
+
     <!-- ─── Toolbar ────────────────────────────────────────────────────── -->
     <!-- Label / content of the "open folder" button -->
     <sys:String x:Key="Button_OpenFolder">Open Game Folder…</sys:String>

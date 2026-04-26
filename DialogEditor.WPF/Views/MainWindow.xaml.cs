@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
+using DialogEditor.WPF.Services;
 using DialogEditor.WPF.ViewModels;
 
 namespace DialogEditor.WPF.Views;
@@ -15,7 +16,9 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        DataContext = new MainWindowViewModel();
+        DataContext = new MainWindowViewModel(
+            new WpfDispatcher(Dispatcher),
+            new WpfFolderPicker());
         var vm = (MainWindowViewModel)DataContext;
         vm.PropertyChanged += OnVmPropertyChanged;
 

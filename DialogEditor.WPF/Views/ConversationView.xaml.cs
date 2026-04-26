@@ -32,6 +32,6 @@ public partial class ConversationView : UserControl
         if (DataContext is not ConversationViewModel vm) return;
         var root = vm.Nodes.FirstOrDefault(n => n.NodeId == 0);
         if (root is not null)
-            Editor.BringIntoView(root.Location);
+            Editor.BringIntoView(new System.Windows.Point(root.Location.X, root.Location.Y));
     }
 }

@@ -1,4 +1,3 @@
-using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DialogEditor.Core.Models;
 using DialogEditor.WPF.Resources;
@@ -39,7 +38,7 @@ public partial class NodeViewModel : ObservableObject
     public IReadOnlyList<ConnectorViewModel> Outputs { get; }
 
     [ObservableProperty]
-    private Point _location;
+    private LayoutPoint _location;
 
     [ObservableProperty]
     private bool _isSelected;
