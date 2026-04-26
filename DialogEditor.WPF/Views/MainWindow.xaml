@@ -381,6 +381,24 @@
                                 <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Escape_Desc}"
                                            Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
                             </Grid>
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Browser_Pin}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Browser_Pin_Desc}"
+                                           Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Browser_Flyout}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Browser_Flyout_Desc}"
+                                           Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+                            </Grid>
 
                         </StackPanel>
                     </ScrollViewer>

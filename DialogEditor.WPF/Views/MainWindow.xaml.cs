@@ -95,9 +95,16 @@ public partial class MainWindow : Window
     protected override void OnPreviewKeyDown(KeyEventArgs e)
     {
         base.OnPreviewKeyDown(e);
+        var vm = (MainWindowViewModel)DataContext;
+
         if (e.Key == Key.F && (Keyboard.Modifiers & ModifierKeys.Control) != 0)
         {
             CanvasView.FocusSearch();
+            e.Handled = true;
+        }
+        else if (e.Key == Key.Escape && vm.IsBrowserFlyoutOpen)
+        {
+            vm.IsBrowserExpanded = false;
             e.Handled = true;
         }
     }
