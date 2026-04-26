@@ -59,7 +59,7 @@
             <Border Grid.ColumnSpan="5"
                     HorizontalAlignment="Right" VerticalAlignment="Top"
                     Panel.ZIndex="20"
-                    Width="280" Margin="0,6,12,0"
+                    Width="360" Margin="0,6,12,0"
                     Background="#1a1a2a" BorderBrush="#3a3a5a" BorderThickness="1"
                     CornerRadius="4"
                     Visibility="{Binding IsChecked, ElementName=HelpToggle,
@@ -83,163 +83,163 @@
                         <StackPanel>
 
                             <!-- Connections -->
-                            <TextBlock Text="{StaticResource Legend_Connections}" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
+                            <TextBlock Text="{StaticResource Legend_Connections}" Style="{StaticResource LabelStyle}" FontSize="10" Margin="0,0,0,6"/>
 
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                <Grid Width="30" Height="6" VerticalAlignment="Center" Margin="0,0,8,0">
-                                    <Line X1="0" Y1="3" X2="30" Y2="3" Stroke="#aaa" StrokeThickness="2"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <Grid Width="34" Height="8" VerticalAlignment="Center" Margin="0,0,10,0">
+                                    <Line X1="0" Y1="4" X2="34" Y2="4" Stroke="#aaa" StrokeThickness="2.5"/>
                                 </Grid>
-                                <TextBlock Foreground="#ccc" FontSize="10" VerticalAlignment="Center">
+                                <TextBlock Foreground="#ccc" FontSize="12" VerticalAlignment="Center">
                                     <Run FontWeight="Bold" Text="{StaticResource Legend_ShowOnce}"/>
                                     <Run Foreground="#888" Text="{StaticResource Legend_ShowOnce_Desc}"/>
                                 </TextBlock>
                             </StackPanel>
 
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                <Grid Width="30" Height="6" VerticalAlignment="Center" Margin="0,0,8,0">
-                                    <Line X1="0" Y1="3" X2="30" Y2="3" Stroke="#b8760a" StrokeThickness="2"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <Grid Width="34" Height="8" VerticalAlignment="Center" Margin="0,0,10,0">
+                                    <Line X1="0" Y1="4" X2="34" Y2="4" Stroke="#b8760a" StrokeThickness="2.5"/>
                                 </Grid>
-                                <TextBlock Foreground="#ccc" FontSize="10" VerticalAlignment="Center">
+                                <TextBlock Foreground="#ccc" FontSize="12" VerticalAlignment="Center">
                                     <Run FontWeight="Bold" Text="{StaticResource Legend_Always}"/>
                                     <Run Foreground="#888" Text="{StaticResource Legend_Always_Desc}"/>
                                 </TextBlock>
                             </StackPanel>
 
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                                <Grid Width="30" Height="6" VerticalAlignment="Center" Margin="0,0,8,0">
-                                    <Line X1="0" Y1="3" X2="30" Y2="3" Stroke="#555"
-                                          StrokeThickness="2" StrokeDashArray="4,2"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                <Grid Width="34" Height="8" VerticalAlignment="Center" Margin="0,0,10,0">
+                                    <Line X1="0" Y1="4" X2="34" Y2="4" Stroke="#555"
+                                          StrokeThickness="2.5" StrokeDashArray="4,2"/>
                                 </Grid>
-                                <TextBlock Foreground="#ccc" FontSize="10" VerticalAlignment="Center">
+                                <TextBlock Foreground="#ccc" FontSize="12" VerticalAlignment="Center">
                                     <Run FontWeight="Bold" Text="{StaticResource Legend_Never}"/>
                                     <Run Foreground="#888" Text="{StaticResource Legend_Never_Desc}"/>
                                 </TextBlock>
                             </StackPanel>
 
                             <!-- Node types -->
-                            <TextBlock Text="{StaticResource Legend_NodeTypes}" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
+                            <TextBlock Text="{StaticResource Legend_NodeTypes}" Style="{StaticResource LabelStyle}" FontSize="10" Margin="0,0,0,6"/>
 
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
-                                <Border Width="12" Height="12" Background="#F5F0D0"
-                                        CornerRadius="2" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <Border Width="14" Height="14" Background="#F5F0D0"
+                                        CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="{StaticResource Legend_NpcLine}"
-                                           Foreground="#ccc" FontSize="10" VerticalAlignment="Center"/>
+                                           Foreground="#ccc" FontSize="12" VerticalAlignment="Center"/>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
-                                <Border Width="12" Height="12" Background="#D5E8F5"
-                                        CornerRadius="2" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                <TextBlock Foreground="#ccc" FontSize="10" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <Border Width="14" Height="14" Background="#D5E8F5"
+                                        CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Foreground="#ccc" FontSize="12" VerticalAlignment="Center">
                                     <Run Text="{StaticResource Legend_PlayerChoice}"/>
                                     <Run Foreground="#aaa" Text="{StaticResource Legend_PlayerChoiceMark}"/>
                                 </TextBlock>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
-                                <Border Width="12" Height="12" Background="#D5F0E8"
-                                        CornerRadius="2" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <Border Width="14" Height="14" Background="#D5F0E8"
+                                        CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="{StaticResource Legend_Narrator}"
-                                           Foreground="#ccc" FontSize="10" VerticalAlignment="Center"/>
+                                           Foreground="#ccc" FontSize="12" VerticalAlignment="Center"/>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                                <Border Width="12" Height="12" Background="#E0E0E0"
-                                        CornerRadius="2" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                <Border Width="14" Height="14" Background="#E0E0E0"
+                                        CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"/>
                                 <TextBlock Text="{StaticResource Legend_ScriptAction}"
-                                           Foreground="#ccc" FontSize="10" VerticalAlignment="Center"/>
+                                           Foreground="#ccc" FontSize="12" VerticalAlignment="Center"/>
                             </StackPanel>
 
                             <!-- Symbols -->
-                            <TextBlock Text="{StaticResource Legend_Symbols}" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
+                            <TextBlock Text="{StaticResource Legend_Symbols}" Style="{StaticResource LabelStyle}" FontSize="10" Margin="0,0,0,6"/>
 
-                            <Grid Margin="0,0,0,3">
+                            <Grid Margin="0,0,0,4">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="36"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="⚙ N" Foreground="#e8a020" FontSize="10"/>
+                                <TextBlock Grid.Column="0" Text="⚙ N" Foreground="#e8a020" FontSize="12"/>
                                 <TextBlock Grid.Column="1" Text="{StaticResource Legend_Symbol_Conditions}"
-                                           Foreground="#888" FontSize="10" TextWrapping="Wrap"/>
-                            </Grid>
-                            <Grid Margin="0,0,0,3">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="28"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="♀" Foreground="#aaa" FontSize="10"/>
-                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Symbol_FemaleText}"
-                                           Foreground="#888" FontSize="10" TextWrapping="Wrap"/>
-                            </Grid>
-                            <Grid Margin="0,0,0,12">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="28"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="✦" Foreground="#aaa" FontSize="10"/>
-                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Symbol_PlayerChoice}"
-                                           Foreground="#888" FontSize="10" TextWrapping="Wrap"/>
-                            </Grid>
-
-                            <!-- Canvas controls -->
-                            <TextBlock Text="{StaticResource Legend_Canvas}" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
-
-                            <Grid Margin="0,0,0,3">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="56"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Fit}" Foreground="#ccc" FontSize="10"/>
-                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Fit_Desc}" Foreground="#888" FontSize="10"/>
-                            </Grid>
-                            <Grid Margin="0,0,0,3">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="56"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Zoom}" Foreground="#ccc" FontSize="10"/>
-                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Zoom_Desc}" Foreground="#888" FontSize="10"/>
-                            </Grid>
-                            <Grid Margin="0,0,0,3">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="56"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Root}" Foreground="#ccc" FontSize="10"/>
-                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Root_Desc}" Foreground="#888" FontSize="10"/>
-                            </Grid>
-                            <Grid Margin="0,0,0,3">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="56"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Scroll}" Foreground="#ccc" FontSize="10"/>
-                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Scroll_Desc}" Foreground="#888" FontSize="10"/>
-                            </Grid>
-                            <Grid Margin="0,0,0,12">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="56"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Drag}" Foreground="#ccc" FontSize="10"/>
-                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Drag_Desc}" Foreground="#888" FontSize="10"/>
-                            </Grid>
-
-                            <!-- Browser controls -->
-                            <TextBlock Text="{StaticResource Legend_Browser}" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
-
-                            <Grid Margin="0,0,0,3">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="56"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_ExpandCollapse}" Foreground="#ccc" FontSize="10"/>
-                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_ExpandCollapse_Desc}" Foreground="#888" FontSize="10"/>
+                                           Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
                             </Grid>
                             <Grid Margin="0,0,0,4">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="56"/>
+                                    <ColumnDefinition Width="36"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Filter}" Foreground="#ccc" FontSize="10"/>
+                                <TextBlock Grid.Column="0" Text="♀" Foreground="#aaa" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Symbol_FemaleText}"
+                                           Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="36"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="✦" Foreground="#aaa" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Symbol_PlayerChoice}"
+                                           Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+                            </Grid>
+
+                            <!-- Canvas controls -->
+                            <TextBlock Text="{StaticResource Legend_Canvas}" Style="{StaticResource LabelStyle}" FontSize="10" Margin="0,0,0,6"/>
+
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Fit}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Fit_Desc}" Foreground="#888" FontSize="12"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Zoom}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Zoom_Desc}" Foreground="#888" FontSize="12"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Root}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Root_Desc}" Foreground="#888" FontSize="12"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Scroll}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Scroll_Desc}" Foreground="#888" FontSize="12"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Drag}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Drag_Desc}" Foreground="#888" FontSize="12"/>
+                            </Grid>
+
+                            <!-- Browser controls -->
+                            <TextBlock Text="{StaticResource Legend_Browser}" Style="{StaticResource LabelStyle}" FontSize="10" Margin="0,0,0,6"/>
+
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_ExpandCollapse}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_ExpandCollapse_Desc}" Foreground="#888" FontSize="12"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Filter}" Foreground="#ccc" FontSize="12"/>
                                 <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Filter_Desc}"
-                                           Foreground="#888" FontSize="10" TextWrapping="Wrap"/>
+                                           Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
                             </Grid>
 
                         </StackPanel>
