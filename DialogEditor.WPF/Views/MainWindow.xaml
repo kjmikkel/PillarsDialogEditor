@@ -15,20 +15,29 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" Background="#252525" Padding="6,4">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <Button Command="{Binding OpenFolderCommand}"
-                        Content="Open Game Folder&#x2026;"
-                        Foreground="White"
-                        Style="{StaticResource CanvasToolButton}"/>
-                <Rectangle Width="1" Fill="#444" Margin="8,0" VerticalAlignment="Stretch"/>
-                <TextBlock Text="Language:" Foreground="#888" FontSize="11"
-                           VerticalAlignment="Center" Margin="0,0,6,0"
-                           Visibility="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}"/>
-                <ComboBox ItemsSource="{Binding AvailableLanguages}"
-                          SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
-                          MinWidth="60"
-                          Visibility="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}"/>
-            </StackPanel>
+            <DockPanel>
+                <ToggleButton x:Name="HelpToggle"
+                              DockPanel.Dock="Right"
+                              Content="?"
+                              Style="{StaticResource HelpToggleButton}"
+                              ToolTip="Show / hide the legend and keyboard reference"/>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Command="{Binding OpenFolderCommand}"
+                            Content="Open Game Folder&#x2026;"
+                            Foreground="White"
+                            Style="{StaticResource CanvasToolButton}"
+                            ToolTip="Open a PoE1 or PoE2 game root folder"/>
+                    <Rectangle Width="1" Fill="#444" Margin="8,0" VerticalAlignment="Stretch"/>
+                    <TextBlock Text="Language:" Foreground="#888" FontSize="11"
+                               VerticalAlignment="Center" Margin="0,0,6,0"
+                               Visibility="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}"/>
+                    <ComboBox ItemsSource="{Binding AvailableLanguages}"
+                              SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
+                              MinWidth="60"
+                              ToolTip="Switch the display language for dialogue text"
+                              Visibility="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}"/>
+                </StackPanel>
+            </DockPanel>
         </Border>
 
         <Grid Grid.Row="1">
@@ -45,6 +54,201 @@
             <views:ConversationView Grid.Column="2" DataContext="{Binding Canvas}"/>
             <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" Background="#333"/>
             <views:NodeDetailView Grid.Column="4" DataContext="{Binding Detail}"/>
+
+            <!-- Legend overlay — floats over the right side of the canvas -->
+            <Border Grid.ColumnSpan="5"
+                    HorizontalAlignment="Right" VerticalAlignment="Top"
+                    Panel.ZIndex="20"
+                    Width="280" Margin="0,6,12,0"
+                    Background="#1a1a2a" BorderBrush="#3a3a5a" BorderThickness="1"
+                    CornerRadius="4"
+                    Visibility="{Binding IsChecked, ElementName=HelpToggle,
+                                         Converter={StaticResource BoolToVis}}">
+                <DockPanel>
+
+                    <!-- Header -->
+                    <Border DockPanel.Dock="Top" Background="#252535"
+                            CornerRadius="4,4,0,0" Padding="10,6">
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="&#x2715;"
+                                    Style="{StaticResource FlatIconButton}"
+                                    Click="CloseHelp_Click"
+                                    ToolTip="Close legend"/>
+                            <TextBlock Text="LEGEND" Foreground="#888"
+                                       FontSize="10" FontWeight="Bold"
+                                       VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Border>
+
+                    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10,8">
+                        <StackPanel>
+
+                            <!-- Connections -->
+                            <TextBlock Text="CONNECTIONS" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <Grid Width="30" Height="6" VerticalAlignment="Center" Margin="0,0,8,0">
+                                    <Line X1="0" Y1="3" X2="30" Y2="3" Stroke="#aaa" StrokeThickness="2"/>
+                                </Grid>
+                                <TextBlock Foreground="#ccc" FontSize="10" VerticalAlignment="Center">
+                                    <Run FontWeight="Bold">ShowOnce</Run>
+                                    <Run Foreground="#888"> — shown once, hidden after selection</Run>
+                                </TextBlock>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <Grid Width="30" Height="6" VerticalAlignment="Center" Margin="0,0,8,0">
+                                    <Line X1="0" Y1="3" X2="30" Y2="3" Stroke="#b8760a" StrokeThickness="2"/>
+                                </Grid>
+                                <TextBlock Foreground="#ccc" FontSize="10" VerticalAlignment="Center">
+                                    <Run FontWeight="Bold">Always</Run>
+                                    <Run Foreground="#888"> — always available, even after selection</Run>
+                                </TextBlock>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <Grid Width="30" Height="6" VerticalAlignment="Center" Margin="0,0,8,0">
+                                    <Line X1="0" Y1="3" X2="30" Y2="3" Stroke="#555"
+                                          StrokeThickness="2" StrokeDashArray="4,2"/>
+                                </Grid>
+                                <TextBlock Foreground="#ccc" FontSize="10" VerticalAlignment="Center">
+                                    <Run FontWeight="Bold">Never</Run>
+                                    <Run Foreground="#888"> — never shown to the player</Run>
+                                </TextBlock>
+                            </StackPanel>
+
+                            <!-- Node types -->
+                            <TextBlock Text="NODE TYPES" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                                <Border Width="12" Height="12" Background="#F5F0D0"
+                                        CornerRadius="2" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Foreground="#ccc" FontSize="10" VerticalAlignment="Center">
+                                    NPC line
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                                <Border Width="12" Height="12" Background="#D5E8F5"
+                                        CornerRadius="2" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Foreground="#ccc" FontSize="10" VerticalAlignment="Center">
+                                    Player choice <Run Foreground="#aaa">(marked ✦)</Run>
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                                <Border Width="12" Height="12" Background="#D5F0E8"
+                                        CornerRadius="2" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Foreground="#ccc" FontSize="10" VerticalAlignment="Center">
+                                    Narrator
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                                <Border Width="12" Height="12" Background="#E0E0E0"
+                                        CornerRadius="2" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Foreground="#ccc" FontSize="10" VerticalAlignment="Center">
+                                    Script / automated action
+                                </TextBlock>
+                            </StackPanel>
+
+                            <!-- Symbols -->
+                            <TextBlock Text="SYMBOLS" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
+
+                            <Grid Margin="0,0,0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="⚙ N" Foreground="#e8a020" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10"
+                                           TextWrapping="Wrap">node has N visibility conditions</TextBlock>
+                            </Grid>
+                            <Grid Margin="0,0,0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="♀" Foreground="#aaa" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10"
+                                           TextWrapping="Wrap">female text variant exists</TextBlock>
+                            </Grid>
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="28"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="✦" Foreground="#aaa" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10"
+                                           TextWrapping="Wrap">player choice node (in title)</TextBlock>
+                            </Grid>
+
+                            <!-- Canvas controls -->
+                            <TextBlock Text="CANVAS" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
+
+                            <Grid Margin="0,0,0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="56"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Fit" Foreground="#ccc" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10">fit all nodes into view</TextBlock>
+                            </Grid>
+                            <Grid Margin="0,0,0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="56"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="+ / −" Foreground="#ccc" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10">zoom in / out</TextBlock>
+                            </Grid>
+                            <Grid Margin="0,0,0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="56"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="⌂" Foreground="#ccc" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10">jump to root node (ID 0)</TextBlock>
+                            </Grid>
+                            <Grid Margin="0,0,0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="56"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Scroll" Foreground="#ccc" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10">zoom</TextBlock>
+                            </Grid>
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="56"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Drag" Foreground="#ccc" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10">pan the canvas</TextBlock>
+                            </Grid>
+
+                            <!-- Browser controls -->
+                            <TextBlock Text="BROWSER" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
+
+                            <Grid Margin="0,0,0,3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="56"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="⊞ / ⊟" Foreground="#ccc" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10">expand / collapse all folders</TextBlock>
+                            </Grid>
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="56"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="Filter" Foreground="#ccc" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10"
+                                           TextWrapping="Wrap">type to filter conversations by name</TextBlock>
+                            </Grid>
+
+                        </StackPanel>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
         </Grid>
 
         <StatusBar Grid.Row="2" Background="#1a1a1a">

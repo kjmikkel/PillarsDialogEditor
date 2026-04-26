@@ -23,6 +23,9 @@ public partial class MainWindow : Window
         DwmSetWindowAttribute(hwnd, 19, ref dark, sizeof(int));
     }
 
+    private void CloseHelp_Click(object sender, RoutedEventArgs e)
+        => HelpToggle.IsChecked = false;
+
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int attrValue, int attrSize);
 }
