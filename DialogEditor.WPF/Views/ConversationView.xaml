@@ -193,7 +193,7 @@
                                             <Setter Property="StrokeDashArray" Value="4,3"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding QuestionNodeTextDisplay}" Value="Always">
-                                            <Setter Property="Stroke" Value="#c8a050"/>
+                                            <Setter Property="Stroke" Value="#b8760a"/>
                                         </DataTrigger>
                                         <DataTrigger Binding="{Binding IsHighlighted}" Value="True">
                                             <Setter Property="Stroke" Value="White"/>
