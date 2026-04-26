@@ -14,28 +14,28 @@
         <Border Grid.Row="0" Background="#252525" Padding="8,4">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Button Content="Fit"
+                    <Button Content="{StaticResource Legend_Control_Fit}"
                             Command="{x:Static nodify:EditorCommands.FitToScreen}"
                             CommandTarget="{Binding ElementName=Editor}"
                             Style="{StaticResource CanvasToolButton}"
-                            ToolTip="Fit all nodes into view"/>
+                            ToolTip="{StaticResource ToolTip_FitToScreen}"/>
                     <Button Content="+"
                             Command="{x:Static nodify:EditorCommands.ZoomIn}"
                             CommandTarget="{Binding ElementName=Editor}"
                             Style="{StaticResource CanvasToolButton}" Margin="4,0,0,0"
-                            ToolTip="Zoom in"/>
+                            ToolTip="{StaticResource ToolTip_ZoomIn}"/>
                     <Button Content="&#x2212;"
                             Command="{x:Static nodify:EditorCommands.ZoomOut}"
                             CommandTarget="{Binding ElementName=Editor}"
                             Style="{StaticResource CanvasToolButton}" Margin="2,0,0,0"
-                            ToolTip="Zoom out"/>
+                            ToolTip="{StaticResource ToolTip_ZoomOut}"/>
                     <Button Content="&#x2302;"
                             Click="CenterOnRoot_Click"
                             Style="{StaticResource CanvasToolButton}" Margin="8,0,0,0"
-                            ToolTip="Jump to root node (ID 0)"/>
+                            ToolTip="{StaticResource ToolTip_JumpToRoot}"/>
                 </StackPanel>
                 <TextBlock DockPanel.Dock="Left"
-                           Text="{Binding Nodes.Count, StringFormat='{}{0} nodes'}"
+                           Text="{Binding NodeCountText}"
                            Foreground="#888" FontSize="10" VerticalAlignment="Center"
                            Margin="0,0,8,0"/>
                 <Grid VerticalAlignment="Center">
@@ -44,7 +44,7 @@
                              BorderBrush="#555" BorderThickness="1"
                              Padding="6,2,24,2" FontSize="10"
                              VerticalContentAlignment="Center"
-                             ToolTip="Search nodes by ID, dialogue text, or speaker name">
+                             ToolTip="{StaticResource ToolTip_SearchNodes}">
                         <TextBox.Style>
                             <Style TargetType="TextBox">
                                 <Style.Triggers>
@@ -56,7 +56,7 @@
                         </TextBox.Style>
                     </TextBox>
                     <!-- Placeholder -->
-                    <TextBlock Text="Search nodes…" Foreground="#555" FontSize="10"
+                    <TextBlock Text="{StaticResource Placeholder_SearchNodes}" Foreground="#555" FontSize="10"
                                Padding="8,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False">
                         <TextBlock.Style>
                             <Style TargetType="TextBlock">
@@ -74,7 +74,7 @@
                             HorizontalAlignment="Right" Width="20"
                             Content="&#x2715;" VerticalAlignment="Center"
                             Style="{StaticResource FlatIconButton}"
-                            ToolTip="Clear search"/>
+                            ToolTip="{StaticResource ToolTip_ClearSearch}"/>
                 </Grid>
             </DockPanel>
         </Border>
@@ -233,7 +233,7 @@
                 Margin="8" Width="160" Height="110"
                 IsReadOnly="False"
                 Background="#1a1a2a"
-                ToolTip="Canvas overview — drag to pan"
+                ToolTip="{StaticResource ToolTip_Minimap}"
                 ItemsSource="{Binding Nodes}"
                 ViewportLocation="{Binding ViewportLocation, ElementName=Editor, Mode=TwoWay}"
                 ViewportSize="{Binding ViewportSize, ElementName=Editor}">
