@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json.Nodes;
 using DialogEditor.Core.Models;
+using DialogEditor.Core.Resources;
 
 namespace DialogEditor.Core.Parsing;
 
@@ -66,9 +67,9 @@ public static class Poe2ConversationParser
     private static List<string> ParseScripts(JsonNode? node)
     {
         var result = new List<string>();
-        AppendScripts(result, node?["OnEnterScripts"]?.AsArray(), "[Enter]");
-        AppendScripts(result, node?["OnExitScripts"]?.AsArray(), "[Exit]");
-        AppendScripts(result, node?["OnUpdateScripts"]?.AsArray(), "[Update]");
+        AppendScripts(result, node?["OnEnterScripts"]?.AsArray(), CoreStrings.Script_Prefix_Enter);
+        AppendScripts(result, node?["OnExitScripts"]?.AsArray(), CoreStrings.Script_Prefix_Exit);
+        AppendScripts(result, node?["OnUpdateScripts"]?.AsArray(), CoreStrings.Script_Prefix_Update);
         return result;
     }
 

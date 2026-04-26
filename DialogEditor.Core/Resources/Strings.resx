@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    TRANSLATOR NOTES
+    ════════════════
+    These strings appear in the Node Details panel of the dialog viewer.
+    Script prefixes label the trigger phase of each script call.
+    Condition_Not is prefixed to every negated condition expression.
+  -->
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- Prefix shown before each OnEnterScripts entry in the SCRIPTS section -->
+  <data name="Script_Prefix_Enter" xml:space="preserve">
+    <value>[Enter]</value>
+  </data>
+
+  <!-- Prefix shown before each OnExitScripts entry in the SCRIPTS section -->
+  <data name="Script_Prefix_Exit" xml:space="preserve">
+    <value>[Exit]</value>
+  </data>
+
+  <!-- Prefix shown before each OnUpdateScripts entry in the SCRIPTS section -->
+  <data name="Script_Prefix_Update" xml:space="preserve">
+    <value>[Update]</value>
+  </data>
+
+  <!-- Prefix for negated conditions in the CONDITIONS section.
+       Trailing space is intentional — it separates NOT from the function name. -->
+  <data name="Condition_Not" xml:space="preserve">
+    <value>NOT </value>
+  </data>
+
+</root>

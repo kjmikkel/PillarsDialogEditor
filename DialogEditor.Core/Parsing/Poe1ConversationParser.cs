@@ -1,6 +1,7 @@
 using System.Text;
 using System.Xml.Linq;
 using DialogEditor.Core.Models;
+using DialogEditor.Core.Resources;
 
 namespace DialogEditor.Core.Parsing;
 
@@ -64,9 +65,9 @@ public static class Poe1ConversationParser
     private static List<string> ParseScripts(XElement node)
     {
         var result = new List<string>();
-        AppendScripts(result, node.Element("OnEnterScripts"), "[Enter]");
-        AppendScripts(result, node.Element("OnExitScripts"), "[Exit]");
-        AppendScripts(result, node.Element("OnUpdateScripts"), "[Update]");
+        AppendScripts(result, node.Element("OnEnterScripts"), CoreStrings.Script_Prefix_Enter);
+        AppendScripts(result, node.Element("OnExitScripts"), CoreStrings.Script_Prefix_Exit);
+        AppendScripts(result, node.Element("OnUpdateScripts"), CoreStrings.Script_Prefix_Update);
         return result;
     }
 
