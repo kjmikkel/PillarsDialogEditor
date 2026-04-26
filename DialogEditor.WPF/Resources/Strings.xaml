@@ -183,6 +183,11 @@
     <sys:String x:Key="Legend_Control_CtrlF_Desc">focus node search</sys:String>
     <sys:String x:Key="Legend_Control_Escape">Escape</sys:String>
     <sys:String x:Key="Legend_Control_Escape_Desc">clear search or filter</sys:String>
+    <!-- Conversations panel auto-hide / flyout behaviour -->
+    <sys:String x:Key="Legend_Browser_Pin">📌 pinned</sys:String>
+    <sys:String x:Key="Legend_Browser_Pin_Desc">panel stays open; click 📌 to switch to flyout mode</sys:String>
+    <sys:String x:Key="Legend_Browser_Flyout">📌 unpinned</sys:String>
+    <sys:String x:Key="Legend_Browser_Flyout_Desc">click strip or title to open temporarily; closes on click-outside or selection</sys:String>
 
     <!-- ─── Tooltips — toolbar ─────────────────────────────────────────── -->
     <sys:String x:Key="ToolTip_OpenFolder">Open a PoE1 or PoE2 game root folder</sys:String>
@@ -216,7 +221,9 @@
     <!-- ─── Tooltips — collapsible side panels ────────────────────────── -->
     <!-- − button (collapse) and + button (expand) on both side panels -->
     <sys:String x:Key="ToolTip_TogglePanel">Expand / collapse panel</sys:String>
-    <!-- 📌 pin button on the Conversations panel only -->
-    <sys:String x:Key="ToolTip_PinPanel">Pin panel open — when unpinned, collapses after selecting a conversation</sys:String>
+    <!-- 📌 pin button on the Conversations panel only.
+         When unpinned the panel acts as a flyout: it closes when you click
+         outside it or select a conversation. -->
+    <sys:String x:Key="ToolTip_PinPanel">Pin panel open — when unpinned, acts as a flyout (closes on click-outside or conversation selection)</sys:String>
 
 </ResourceDictionary>

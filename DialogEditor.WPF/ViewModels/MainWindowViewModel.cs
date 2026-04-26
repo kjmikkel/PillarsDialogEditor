@@ -35,7 +35,6 @@ public partial class MainWindowViewModel : ObservableObject
     // True only when the panel is open as a temporary flyout (not pinned)
     public bool IsBrowserFlyoutOpen => IsBrowserExpanded && !IsBrowserPinned;
 
-    partial void OnIsBrowserExpandedChanged(bool value) { /* expansion is transient, not persisted */ }
     partial void OnIsBrowserPinnedChanged(bool value)
     {
         AppSettings.BrowserPinned = value;
