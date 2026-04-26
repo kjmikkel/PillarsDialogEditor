@@ -14,9 +14,11 @@ public static class SpeakerNameService
             KnownGuids[guid] = name;
     }
 
-    public static string Resolve(string guid)
+    // Returns null when the GUID is empty/unset; callers apply the
+    // localised fallback rather than comparing against a hard-coded string.
+    public static string? Resolve(string guid)
     {
-        if (string.IsNullOrWhiteSpace(guid)) return "Unknown";
+        if (string.IsNullOrWhiteSpace(guid)) return null;
         if (KnownGuids.TryGetValue(guid, out var name)) return name;
         return guid;
     }

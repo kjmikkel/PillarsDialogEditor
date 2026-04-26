@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
-using System.Windows.Media;
 using DialogEditor.WPF.ViewModels;
 
 namespace DialogEditor.WPF.Views;
@@ -85,12 +84,9 @@ public partial class MainWindow : Window
         }
     }
 
-    // Clicking the vertical title in the collapsed strip opens the browser as a flyout
-    private void CollapsedBrowserTitle_MouseDown(object sender, MouseButtonEventArgs e)
-    {
-        ((MainWindowViewModel)DataContext).IsBrowserExpanded = true;
-        e.Handled = true;
-    }
+    // Clicking anywhere in the collapsed strip (below the pin button) opens as flyout
+    private void CollapsedBrowserTitle_Click(object sender, RoutedEventArgs e)
+        => ((MainWindowViewModel)DataContext).IsBrowserExpanded = true;
 
     protected override void OnPreviewKeyDown(KeyEventArgs e)
     {
