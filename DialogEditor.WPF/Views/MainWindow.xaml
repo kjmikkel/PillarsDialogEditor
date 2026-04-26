@@ -116,7 +116,7 @@
             </Grid>
 
             <GridSplitter Grid.Column="1" HorizontalAlignment="Stretch" Background="#333"/>
-            <views:ConversationView Grid.Column="2" DataContext="{Binding Canvas}"/>
+            <views:ConversationView x:Name="CanvasView" Grid.Column="2" DataContext="{Binding Canvas}"/>
             <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" Background="#333"/>
 
             <!-- Detail panel (Column 4) -->
@@ -323,13 +323,21 @@
                                 <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Scroll}" Foreground="#ccc" FontSize="12"/>
                                 <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Scroll_Desc}" Foreground="#888" FontSize="12"/>
                             </Grid>
-                            <Grid Margin="0,0,0,14">
+                            <Grid Margin="0,0,0,4">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="72"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Drag}" Foreground="#ccc" FontSize="12"/>
                                 <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Drag_Desc}" Foreground="#888" FontSize="12"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,14">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_CtrlF}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_CtrlF_Desc}" Foreground="#888" FontSize="12"/>
                             </Grid>
 
                             <!-- Browser controls -->
@@ -350,6 +358,15 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Filter}" Foreground="#ccc" FontSize="12"/>
                                 <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Filter_Desc}"
+                                           Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+                            </Grid>
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="72"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Escape}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Escape_Desc}"
                                            Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
                             </Grid>
 

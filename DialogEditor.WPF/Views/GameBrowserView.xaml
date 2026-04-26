@@ -12,10 +12,12 @@
 
         <Border Grid.Row="0" Background="#252525" Padding="4,4,4,4" BorderBrush="#333" BorderThickness="0,0,0,1">
             <Grid>
-                <TextBox Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
+                <TextBox x:Name="FilterBox"
+                         Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
                          Background="#333" Foreground="#ccc" CaretBrush="#ccc"
                          BorderBrush="#555" BorderThickness="1"
                          Padding="6,3,24,3" FontSize="10"
+                         KeyDown="FilterBox_KeyDown"
                          ToolTip="{StaticResource ToolTip_FilterConversations}"/>
                 <!-- Placeholder -->
                 <TextBlock Text="{StaticResource Placeholder_FilterConversations}" Foreground="#555" FontSize="10"

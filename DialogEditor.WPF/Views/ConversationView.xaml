@@ -39,11 +39,13 @@
                            Foreground="#888" FontSize="10" VerticalAlignment="Center"
                            Margin="0,0,8,0"/>
                 <Grid VerticalAlignment="Center">
-                    <TextBox Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
+                    <TextBox x:Name="SearchBox"
+                             Text="{Binding SearchQuery, UpdateSourceTrigger=PropertyChanged}"
                              Background="#333" Foreground="#ccc" CaretBrush="#ccc"
                              BorderBrush="#555" BorderThickness="1"
                              Padding="6,2,24,2" FontSize="10"
                              VerticalContentAlignment="Center"
+                             KeyDown="SearchBox_KeyDown"
                              ToolTip="{StaticResource ToolTip_SearchNodes}">
                         <TextBox.Style>
                             <Style TargetType="TextBox">
