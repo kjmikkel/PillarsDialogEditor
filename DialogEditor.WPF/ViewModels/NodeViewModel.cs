@@ -62,16 +62,14 @@ public partial class NodeViewModel : ObservableObject
         SpeakerGuid = node.SpeakerGuid;
         ListenerGuid = node.ListenerGuid;
         var resolved = SpeakerNameService.Resolve(node.SpeakerGuid);
-        SpeakerName = resolved == Loc.Get("Speaker_Unknown")
-            ? node.SpeakerCategory switch
-            {
-                SpeakerCategory.Player   => Loc.Get("Speaker_Player"),
-                SpeakerCategory.Narrator => Loc.Get("Speaker_Narrator"),
-                SpeakerCategory.Script   => Loc.Get("Speaker_Script"),
-                _                        => Loc.Get("Speaker_Unknown")
-            }
-            : resolved;
-        ListenerName = SpeakerNameService.Resolve(node.ListenerGuid);
+        SpeakerName = resolved ?? node.SpeakerCategory switch
+        {
+            SpeakerCategory.Player   => Loc.Get("Speaker_Player"),
+            SpeakerCategory.Narrator => Loc.Get("Speaker_Narrator"),
+            SpeakerCategory.Script   => Loc.Get("Speaker_Script"),
+            _                        => Loc.Get("Speaker_Unknown")
+        };
+        ListenerName = SpeakerNameService.Resolve(node.ListenerGuid) ?? string.Empty;
         ConditionStrings = node.ConditionStrings;
         ConditionExpression = node.ConditionExpression;
         Scripts = node.Scripts;

@@ -113,17 +113,22 @@
                                   Content="&#x1F4CC;"
                                   Style="{StaticResource HelpToggleButton}"
                                   ToolTip="{StaticResource ToolTip_PinPanel}"/>
-                    <TextBlock Grid.Row="1" Margin="0,10,0,0"
-                               Text="{StaticResource Browser_Header}"
-                               Foreground="#555" FontSize="10" FontWeight="Bold"
-                               Cursor="Hand"
-                               HorizontalAlignment="Center" VerticalAlignment="Top"
-                               MouseDown="CollapsedBrowserTitle_MouseDown"
-                               ToolTip="{StaticResource ToolTip_TogglePanel}">
-                        <TextBlock.LayoutTransform>
-                            <RotateTransform Angle="90"/>
-                        </TextBlock.LayoutTransform>
-                    </TextBlock>
+                    <!-- Transparent button fills the full * row so the entire
+                         strip area (not just the text pixels) opens the flyout -->
+                    <Button Grid.Row="1"
+                            Background="Transparent" BorderThickness="0"
+                            Cursor="Hand"
+                            Click="CollapsedBrowserTitle_Click"
+                            ToolTip="{StaticResource ToolTip_TogglePanel}"
+                            Style="{StaticResource FlatIconButton}">
+                        <TextBlock Text="{StaticResource Browser_Header}"
+                                   Foreground="#555" FontSize="10" FontWeight="Bold"
+                                   Margin="0,10,0,0">
+                            <TextBlock.LayoutTransform>
+                                <RotateTransform Angle="90"/>
+                            </TextBlock.LayoutTransform>
+                        </TextBlock>
+                    </Button>
                 </Grid>
             </Grid>
 

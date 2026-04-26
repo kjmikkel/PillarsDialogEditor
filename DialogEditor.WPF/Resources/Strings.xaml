@@ -187,7 +187,7 @@
     <sys:String x:Key="Legend_Browser_Pin">📌 pinned</sys:String>
     <sys:String x:Key="Legend_Browser_Pin_Desc">panel stays open; click 📌 to switch to flyout mode</sys:String>
     <sys:String x:Key="Legend_Browser_Flyout">📌 unpinned</sys:String>
-    <sys:String x:Key="Legend_Browser_Flyout_Desc">click strip or title to open temporarily; closes on click-outside or selection</sys:String>
+    <sys:String x:Key="Legend_Browser_Flyout_Desc">click the strip to open temporarily; closes on click-outside or selection</sys:String>
 
     <!-- ─── Tooltips — toolbar ─────────────────────────────────────────── -->
     <sys:String x:Key="ToolTip_OpenFolder">Open a PoE1 or PoE2 game root folder</sys:String>
