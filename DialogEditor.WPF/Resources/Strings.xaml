@@ -113,5 +113,7 @@
     <sys:String x:Key="ToolTip_FilterConversations">Filter conversations by filename</sys:String>
     <sys:String x:Key="ToolTip_ClearFilter">Clear filter</sys:String>
     <sys:String x:Key="ToolTip_CloseLegend">Close legend</sys:String>
+    <sys:String x:Key="ToolTip_TogglePanel">Expand / collapse panel</sys:String>
+    <sys:String x:Key="ToolTip_PinPanel">Pin panel open — when unpinned, collapses after selecting a conversation</sys:String>
 
 </ResourceDictionary>

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
@@ -7,10 +8,62 @@ namespace DialogEditor.WPF.Views;
 
 public partial class MainWindow : Window
 {
+    private double _browserExpandedWidth = 220;
+    private double _detailExpandedWidth  = 240;
+
     public MainWindow()
     {
         InitializeComponent();
         DataContext = new MainWindowViewModel();
+        var vm = (MainWindowViewModel)DataContext;
+        vm.PropertyChanged += OnVmPropertyChanged;
+
+        // Sync initial column widths with persisted state
+        if (!vm.IsBrowserExpanded)
+        {
+            BrowserColumn.MinWidth = 34;
+            BrowserColumn.Width = new System.Windows.GridLength(34);
+        }
+        if (!vm.IsDetailExpanded)
+        {
+            DetailColumn.MinWidth = 34;
+            DetailColumn.Width = new System.Windows.GridLength(34);
+        }
+    }
+
+    private void OnVmPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        var vm = (MainWindowViewModel)DataContext;
+        switch (e.PropertyName)
+        {
+            case nameof(MainWindowViewModel.IsBrowserExpanded):
+                if (vm.IsBrowserExpanded)
+                {
+                    BrowserColumn.MinWidth = 150;
+                    BrowserColumn.Width = new System.Windows.GridLength(_browserExpandedWidth);
+                }
+                else
+                {
+                    _browserExpandedWidth = BrowserColumn.Width.Value;
+                    BrowserColumn.MinWidth = 34;
+                    BrowserColumn.Width = new System.Windows.GridLength(34);
+                }
+                break;
+
+            case nameof(MainWindowViewModel.IsDetailExpanded):
+                if (vm.IsDetailExpanded)
+                {
+                    DetailColumn.MinWidth = 180;
+                    DetailColumn.Width = new System.Windows.GridLength(_detailExpandedWidth);
+                }
+                else
+                {
+                    _detailExpandedWidth = DetailColumn.Width.Value;
+                    DetailColumn.MinWidth = 34;
+                    DetailColumn.Width = new System.Windows.GridLength(34);
+                }
+                break;
+        }
     }
 
     protected override void OnSourceInitialized(EventArgs e)
@@ -18,7 +71,6 @@ public partial class MainWindow : Window
         base.OnSourceInitialized(e);
         var hwnd = new WindowInteropHelper(this).Handle;
         int dark = 1;
-        // DWMWA_USE_IMMERSIVE_DARK_MODE (20 on Win10 20H1+, 19 on older builds)
         DwmSetWindowAttribute(hwnd, 20, ref dark, sizeof(int));
         DwmSetWindowAttribute(hwnd, 19, ref dark, sizeof(int));
     }

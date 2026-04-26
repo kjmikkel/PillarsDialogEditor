@@ -21,6 +21,15 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty] private IReadOnlyList<string> _availableLanguages = [];
     [ObservableProperty] private string _selectedLanguage = string.Empty;
 
+    [ObservableProperty] private bool _isBrowserExpanded = AppSettings.BrowserExpanded;
+    [ObservableProperty] private bool _isBrowserPinned   = AppSettings.BrowserPinned;
+    [ObservableProperty] private bool _isDetailExpanded  = AppSettings.DetailExpanded;
+    [ObservableProperty] private string? _currentConversationName;
+
+    partial void OnIsBrowserExpandedChanged(bool value) => AppSettings.BrowserExpanded = value;
+    partial void OnIsBrowserPinnedChanged(bool value)   => AppSettings.BrowserPinned   = value;
+    partial void OnIsDetailExpandedChanged(bool value)  => AppSettings.DetailExpanded  = value;
+
     public MainWindowViewModel()
     {
         Browser.ConversationSelected += OnConversationSelected;
@@ -63,6 +72,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         AppSettings.LastGameDirectory = path;
         _provider = provider;
+        CurrentConversationName = null;
         SpeakerNameService.Register(provider.LoadSpeakerNames());
         AvailableLanguages = provider.AvailableLanguages;
         SelectedLanguage = AppSettings.PickLanguage(AvailableLanguages, AppSettings.LastLanguage);
@@ -79,6 +89,8 @@ public partial class MainWindowViewModel : ObservableObject
             var conversation = _provider.LoadConversation(file);
             Canvas.Load(conversation);
             Detail.Clear();
+            CurrentConversationName = file.Name;
+            if (!IsBrowserPinned) IsBrowserExpanded = false;
             StatusText = Loc.Format("Status_ConversationLoaded", file.Name, conversation.Nodes.Count);
         }
         catch (Exception ex)
