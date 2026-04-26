@@ -178,6 +178,11 @@
     <sys:String x:Key="Legend_Control_ExpandCollapse_Desc">expand / collapse all folders</sys:String>
     <sys:String x:Key="Legend_Control_Filter">Filter</sys:String>
     <sys:String x:Key="Legend_Control_Filter_Desc">type to filter conversations by name</sys:String>
+    <!-- Keyboard shortcuts shown at the bottom of the canvas and browser control sections -->
+    <sys:String x:Key="Legend_Control_CtrlF">Ctrl+F</sys:String>
+    <sys:String x:Key="Legend_Control_CtrlF_Desc">focus node search</sys:String>
+    <sys:String x:Key="Legend_Control_Escape">Escape</sys:String>
+    <sys:String x:Key="Legend_Control_Escape_Desc">clear search or filter</sys:String>
 
     <!-- ─── Tooltips — toolbar ─────────────────────────────────────────── -->
     <sys:String x:Key="ToolTip_OpenFolder">Open a PoE1 or PoE2 game root folder</sys:String>
@@ -190,7 +195,8 @@
     <sys:String x:Key="ToolTip_ZoomOut">Zoom out</sys:String>
     <!-- ⌂ button: centres the viewport on the root node (ID 0) -->
     <sys:String x:Key="ToolTip_JumpToRoot">Jump to root node (ID 0)</sys:String>
-    <sys:String x:Key="ToolTip_SearchNodes">Search nodes by ID, dialogue text, or speaker name</sys:String>
+    <!-- Ctrl+F shortcut is mentioned here so it appears in the hover tooltip -->
+    <sys:String x:Key="ToolTip_SearchNodes">Search nodes by ID, dialogue text, or speaker name (Ctrl+F)</sys:String>
     <sys:String x:Key="ToolTip_ClearSearch">Clear search</sys:String>
     <!-- Minimap overlay in the bottom-right corner of the canvas -->
     <sys:String x:Key="ToolTip_Minimap">Canvas overview — drag to pan</sys:String>
