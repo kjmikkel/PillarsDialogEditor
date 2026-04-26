@@ -10,6 +10,10 @@ Follow strict red/green TDD for all non-trivial logic:
 
 Never write implementation code for a feature before a failing test exists for it. Tests live in a `DialogEditor.Tests` project mirroring the structure of `DialogEditor.Core`.
 
+## UI/UX Guidelines
+
+Every interactive control — buttons, icon-only actions, toolbar items, canvas controls — must carry a descriptive `ToolTip` property that explains its effect in plain language. One-word labels and symbols (⌂, ⊞, ?, +) are not self-explanatory to new users. Tooltips are mandatory; omitting them on new controls is a defect.
+
 ## Worktree Cleanup
 
 Before removing a worktree, always run `git -C <worktree-path> status --short` and inspect the output. If there are staged or unstaged changes, determine whether they represent work that should be preserved. If yes, commit them to the branch before removing the worktree.

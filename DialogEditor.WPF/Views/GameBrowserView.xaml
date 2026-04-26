@@ -33,7 +33,8 @@
                 <TextBox Text="{Binding FilterText, UpdateSourceTrigger=PropertyChanged}"
                          Background="#333" Foreground="#ccc" CaretBrush="#ccc"
                          BorderBrush="#555" BorderThickness="1"
-                         Padding="6,3,24,3" FontSize="10"/>
+                         Padding="6,3,24,3" FontSize="10"
+                         ToolTip="Filter conversations by filename"/>
                 <!-- Placeholder -->
                 <TextBlock Text="Filter conversations…" Foreground="#555" FontSize="10"
                            Padding="8,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False">
