@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -19,6 +20,7 @@ public partial class GameBrowserViewModel : ObservableObject
     private string _filterText = string.Empty;
 
     private CancellationTokenSource? _filterCts;
+    private CancellationTokenSource? _scanCts;
 
     partial void OnFilterTextChanged(string value)
     {
@@ -101,6 +103,7 @@ public partial class GameBrowserViewModel : ObservableObject
 
     public void Load(IGameDataProvider provider)
     {
+        _scanCts?.Cancel();
         _filterCts?.Cancel();
         GameName = provider.GameName;
         FilterText = string.Empty;
@@ -117,5 +120,59 @@ public partial class GameBrowserViewModel : ObservableObject
                 folder.Items.Add(new ConversationItemViewModel(file));
             Folders.Add(folder);
         }
+
+        _scanCts = new CancellationTokenSource();
+        _ = ScanLinksAsync(_scanCts.Token);
+    }
+
+    private async Task ScanLinksAsync(CancellationToken ct)
+    {
+        try
+        {
+            var allItems = Folders.SelectMany(f => f.Items).ToList();
+            await Task.Run(() =>
+            {
+                Parallel.ForEach(allItems,
+                    new ParallelOptions { MaxDegreeOfParallelism = 4, CancellationToken = ct },
+                    item =>
+                    {
+                        var (hasNever, hasAlways) = QuickScan(item.File.ConversationPath);
+                        if (hasNever || hasAlways)
+                        {
+                            Application.Current.Dispatcher.BeginInvoke(() =>
+                            {
+                                if (ct.IsCancellationRequested) return;
+                                item.HasNeverLinks  = hasNever;
+                                item.HasAlwaysLinks = hasAlways;
+                            });
+                        }
+                    });
+            }, ct);
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    private static (bool hasNever, bool hasAlways) QuickScan(string path)
+    {
+        try
+        {
+            var content = File.ReadAllText(path);
+            if (path.EndsWith(".conversationbundle", StringComparison.OrdinalIgnoreCase))
+            {
+                // PoE2 JSON: QuestionNodeTextDisplay 1=Always, 2=Never
+                return (
+                    hasNever:  content.Contains("\"QuestionNodeTextDisplay\":2") ||
+                               content.Contains("\"QuestionNodeTextDisplay\": 2"),
+                    hasAlways: content.Contains("\"QuestionNodeTextDisplay\":1") ||
+                               content.Contains("\"QuestionNodeTextDisplay\": 1")
+                );
+            }
+            // PoE1 XML
+            return (
+                hasNever:  content.Contains("<QuestionNodeTextDisplay>Never</QuestionNodeTextDisplay>"),
+                hasAlways: content.Contains("<QuestionNodeTextDisplay>Always</QuestionNodeTextDisplay>")
+            );
+        }
+        catch { return (false, false); }
     }
 }
