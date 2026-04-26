@@ -9,12 +9,12 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" Background="#252525" Padding="8,6">
-            <TextBlock Text="NODE DETAILS" Foreground="#888"
+            <TextBlock Text="{StaticResource Label_NodeDetails}" Foreground="#888"
                        FontSize="10" FontWeight="Bold"/>
         </Border>
 
         <TextBlock Grid.Row="1"
-                   Text="Select a node to view details."
+                   Text="{StaticResource Label_SelectNode}"
                    Foreground="#555" FontSize="11"
                    HorizontalAlignment="Center" VerticalAlignment="Center"
                    Visibility="{Binding HasContent, Converter={StaticResource InverseBoolToVis}}"/>
@@ -24,7 +24,7 @@
             <StackPanel Margin="8">
 
                 <StackPanel Margin="0,0,0,10">
-                    <TextBlock Text="NODE" Style="{StaticResource LabelStyle}"/>
+                    <TextBlock Text="{StaticResource Label_Node}" Style="{StaticResource LabelStyle}"/>
                     <TextBlock Foreground="White" FontSize="11">
                         <Run Text="{Binding NodeId}"/>
                         <Run Text=" &#x2014; "/>
@@ -33,18 +33,18 @@
                 </StackPanel>
 
                 <StackPanel Margin="0,0,0,10">
-                    <TextBlock Text="SPEAKER" Style="{StaticResource LabelStyle}"/>
+                    <TextBlock Text="{StaticResource Label_Speaker}" Style="{StaticResource LabelStyle}"/>
                     <TextBlock Text="{Binding SpeakerName}" Foreground="#5dade2" FontSize="11"/>
                     <TextBlock Text="{Binding SpeakerGuid}" Foreground="#555" FontSize="9"/>
                 </StackPanel>
 
                 <StackPanel Margin="0,0,0,10">
-                    <TextBlock Text="LISTENER" Style="{StaticResource LabelStyle}"/>
+                    <TextBlock Text="{StaticResource Label_Listener}" Style="{StaticResource LabelStyle}"/>
                     <TextBlock Text="{Binding ListenerName}" Foreground="#aaa" FontSize="11"/>
                 </StackPanel>
 
                 <StackPanel Margin="0,0,0,10">
-                    <TextBlock Text="DEFAULT / MALE TEXT" Style="{StaticResource LabelStyle}"/>
+                    <TextBlock Text="{StaticResource Label_DefaultMaleText}" Style="{StaticResource LabelStyle}"/>
                     <Border Background="#1a1a1a" Padding="6" CornerRadius="3">
                         <TextBlock Text="{Binding DefaultText}"
                                    Foreground="#e8e8e8" FontSize="10"
@@ -53,7 +53,7 @@
                 </StackPanel>
 
                 <StackPanel Margin="0,0,0,10">
-                    <TextBlock Text="FEMALE TEXT" Style="{StaticResource LabelStyle}"/>
+                    <TextBlock Text="{StaticResource Label_FemaleText}" Style="{StaticResource LabelStyle}"/>
                     <Border Background="#1a1a1a" Padding="6" CornerRadius="3">
                         <TextBlock Text="{Binding FemaleTextDisplay}"
                                    Foreground="{Binding HasFemaleText, Converter={StaticResource BoolToFemaleTextBrush}}"
@@ -62,10 +62,9 @@
                     </Border>
                 </StackPanel>
 
-                <!-- Comments: PoE1 editorial notes, shown only when non-empty -->
                 <StackPanel Margin="0,0,0,10"
                             Visibility="{Binding HasComments, Converter={StaticResource BoolToVis}}">
-                    <TextBlock Text="COMMENTS" Style="{StaticResource LabelStyle}"/>
+                    <TextBlock Text="{StaticResource Label_Comments}" Style="{StaticResource LabelStyle}"/>
                     <Border Background="#1a1a1a" Padding="6" CornerRadius="3">
                         <TextBlock Text="{Binding Comments}"
                                    Foreground="#c9a84c" FontSize="10" FontStyle="Italic"
@@ -74,7 +73,7 @@
                 </StackPanel>
 
                 <StackPanel Margin="0,0,0,10">
-                    <TextBlock Text="CONDITIONS" Style="{StaticResource LabelStyle}"/>
+                    <TextBlock Text="{StaticResource Label_Conditions}" Style="{StaticResource LabelStyle}"/>
                     <Border Background="#1a1a1a" Padding="6" CornerRadius="3">
                         <TextBlock Text="{Binding ConditionsText}"
                                    Foreground="#e8a020" FontSize="10"
@@ -83,7 +82,7 @@
                 </StackPanel>
 
                 <StackPanel Margin="0,0,0,10">
-                    <TextBlock Text="DISPLAY / PERSIST" Style="{StaticResource LabelStyle}"/>
+                    <TextBlock Text="{StaticResource Label_DisplayPersist}" Style="{StaticResource LabelStyle}"/>
                     <TextBlock Foreground="#aaa" FontSize="11">
                         <Run Text="{Binding DisplayType}"/>
                         <Run Text=" &#xB7; "/>
@@ -93,7 +92,7 @@
 
                 <StackPanel Margin="0,0,0,10"
                             Visibility="{Binding HasActorDirection, Converter={StaticResource BoolToVis}}">
-                    <TextBlock Text="ACTOR DIRECTION" Style="{StaticResource LabelStyle}"/>
+                    <TextBlock Text="{StaticResource Label_ActorDirection}" Style="{StaticResource LabelStyle}"/>
                     <Border Background="#1a1a1a" Padding="6" CornerRadius="3">
                         <TextBlock Text="{Binding ActorDirection}"
                                    Foreground="#c9a84c" FontSize="10"
@@ -102,7 +101,7 @@
                 </StackPanel>
 
                 <StackPanel Margin="0,0,0,10">
-                    <TextBlock Text="SCRIPTS" Style="{StaticResource LabelStyle}"/>
+                    <TextBlock Text="{StaticResource Label_Scripts}" Style="{StaticResource LabelStyle}"/>
                     <Border Background="#1a1a1a" Padding="6" CornerRadius="3">
                         <TextBlock Text="{Binding ScriptsText}"
                                    Foreground="#7dcea0" FontSize="10"
@@ -111,18 +110,17 @@
                 </StackPanel>
 
                 <StackPanel Margin="0,0,0,10">
-                    <TextBlock Text="LINKS TO" Style="{StaticResource LabelStyle}"/>
+                    <TextBlock Text="{StaticResource Label_LinksTo}" Style="{StaticResource LabelStyle}"/>
                     <TextBlock Text="{Binding LinksTo}"
                                Foreground="#5dade2" FontSize="11" TextWrapping="Wrap"/>
                 </StackPanel>
 
-                <!-- Voice section: PoE1 (VOFilename) and PoE2 (ExternalVO/HasVO/HideSpeaker), collapsed when no voice data -->
                 <StackPanel Margin="0,0,0,0"
                             Visibility="{Binding HasVoiceSection, Converter={StaticResource BoolToVis}}">
                     <Border Background="#1e2a1e" BorderBrush="#2a3a2a" BorderThickness="1"
                             CornerRadius="3" Padding="8,6">
                         <StackPanel>
-                            <TextBlock Text="VOICE" Style="{StaticResource LabelStyle}"
+                            <TextBlock Text="{StaticResource Label_Voice}" Style="{StaticResource LabelStyle}"
                                        Margin="0,0,0,6"/>
                             <Grid Margin="0,0,0,3"
                                   Visibility="{Binding HasExternalVO, Converter={StaticResource BoolToVis}}">
@@ -130,7 +128,7 @@
                                     <ColumnDefinition Width="80"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="File" Foreground="#666" FontSize="10"/>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Label_File}" Foreground="#666" FontSize="10"/>
                                 <TextBlock Grid.Column="1" Text="{Binding ExternalVO}"
                                            Foreground="#e8e8e8" FontSize="9" TextWrapping="Wrap"
                                            FontFamily="Consolas"/>
@@ -140,7 +138,7 @@
                                     <ColumnDefinition Width="80"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Has VO" Foreground="#666" FontSize="10"/>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Label_HasVO}" Foreground="#666" FontSize="10"/>
                                 <TextBlock Grid.Column="1" Text="{Binding HasVO}"
                                            Foreground="#7dcea0" FontSize="10"/>
                             </Grid>
@@ -149,7 +147,7 @@
                                     <ColumnDefinition Width="80"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Hide Speaker" Foreground="#666" FontSize="10"/>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Label_HideSpeaker}" Foreground="#666" FontSize="10"/>
                                 <TextBlock Grid.Column="1" Text="{Binding HideSpeaker}"
                                            Foreground="#e8a020" FontSize="10"/>
                             </Grid>

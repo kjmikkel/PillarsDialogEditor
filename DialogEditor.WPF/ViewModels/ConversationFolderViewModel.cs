@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using DialogEditor.WPF.Resources;
 
 namespace DialogEditor.WPF.ViewModels;
 
@@ -8,7 +9,7 @@ public partial class ConversationFolderViewModel(string folderPath,
     bool isExpanded = false) : ObservableObject
 {
     public string FolderPath { get; } = folderPath;
-    public string DisplayName { get; } = string.IsNullOrEmpty(folderPath) ? "(root)" : folderPath;
+    public string DisplayName { get; } = string.IsNullOrEmpty(folderPath) ? Loc.Get("Browser_RootFolder") : folderPath;
 
     [ObservableProperty]
     private bool _isExpanded = isExpanded;

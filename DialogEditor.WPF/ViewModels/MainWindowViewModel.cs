@@ -2,6 +2,7 @@ using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.GameData;
+using DialogEditor.WPF.Resources;
 using DialogEditor.WPF.Services;
 using Microsoft.Win32;
 
@@ -16,7 +17,7 @@ public partial class MainWindowViewModel : ObservableObject
     private IGameDataProvider? _provider;
     private ConversationFile? _currentFile;
 
-    [ObservableProperty] private string _statusText = "Open a game folder to begin.";
+    [ObservableProperty] private string _statusText = Loc.Get("Status_OpenFolder");
     [ObservableProperty] private IReadOnlyList<string> _availableLanguages = [];
     [ObservableProperty] private string _selectedLanguage = string.Empty;
 
@@ -46,7 +47,7 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void OpenFolder()
     {
-        var dialog = new OpenFolderDialog { Title = "Select game root folder" };
+        var dialog = new OpenFolderDialog { Title = Loc.Get("Button_OpenFolder") };
         if (dialog.ShowDialog() != true) return;
         LoadDirectory(dialog.FolderName);
     }
@@ -56,7 +57,7 @@ public partial class MainWindowViewModel : ObservableObject
         var provider = GameDataProviderFactory.Detect(path);
         if (provider is null)
         {
-            StatusText = "Folder not recognized as PoE1 or PoE2 root.";
+            StatusText = Loc.Get("Status_FolderNotRecognized");
             return;
         }
 
@@ -66,7 +67,7 @@ public partial class MainWindowViewModel : ObservableObject
         AvailableLanguages = provider.AvailableLanguages;
         SelectedLanguage = AppSettings.PickLanguage(AvailableLanguages, AppSettings.LastLanguage);
         Browser.Load(provider);
-        StatusText = $"{provider.GameName} — {path}";
+        StatusText = Loc.Format("Status_FolderLoaded", provider.GameName, path);
     }
 
     private void OnConversationSelected(ConversationFile file)
@@ -78,11 +79,11 @@ public partial class MainWindowViewModel : ObservableObject
             var conversation = _provider.LoadConversation(file);
             Canvas.Load(conversation);
             Detail.Clear();
-            StatusText = $"{file.Name} — {conversation.Nodes.Count} nodes";
+            StatusText = Loc.Format("Status_ConversationLoaded", file.Name, conversation.Nodes.Count);
         }
         catch (Exception ex)
         {
-            StatusText = $"Error loading {file.Name}: {ex.Message}";
+            StatusText = Loc.Format("Status_LoadError", file.Name, ex.Message);
         }
     }
 }

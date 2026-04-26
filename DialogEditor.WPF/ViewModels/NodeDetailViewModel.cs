@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using DialogEditor.Core.Models;
+using DialogEditor.WPF.Resources;
 
 namespace DialogEditor.WPF.ViewModels;
 
@@ -39,27 +40,27 @@ public partial class NodeDetailViewModel : ObservableObject
         if (node is null) { HasContent = false; return; }
 
         NodeId = node.NodeId;
-        NodeType = node.IsPlayerChoice ? "Player Choice" : "NPC Line";
+        NodeType = node.IsPlayerChoice ? Loc.Get("NodeDetail_PlayerChoice") : Loc.Get("NodeDetail_NpcLine");
         SpeakerName = node.SpeakerName;
         SpeakerGuid = node.SpeakerGuid;
         ListenerName = node.ListenerName;
         DefaultText = node.DefaultText;
         FemaleText = node.FemaleText;
         HasFemaleText = !string.IsNullOrEmpty(node.FemaleText);
-        FemaleTextDisplay = HasFemaleText ? node.FemaleText : "(same as default)";
+        FemaleTextDisplay = HasFemaleText ? node.FemaleText : Loc.Get("NodeDetail_SameAsDefault");
         ConditionsText = !string.IsNullOrEmpty(node.ConditionExpression)
             ? node.ConditionExpression
-            : "(none)";
+            : Loc.Get("NodeDetail_None");
         DisplayType = node.DisplayType;
         Persistence = node.Persistence;
         ActorDirection = node.ActorDirection;
         HasActorDirection = !string.IsNullOrEmpty(node.ActorDirection);
         LinksTo = node.Links.Count > 0
             ? string.Join(", ", node.Links.Select(FormatLink))
-            : "(none)";
+            : Loc.Get("NodeDetail_None");
         ScriptsText = node.Scripts.Count > 0
             ? string.Join(Environment.NewLine, node.Scripts)
-            : "(none)";
+            : Loc.Get("NodeDetail_None");
         Comments = node.Comments;
         HasComments = !string.IsNullOrEmpty(node.Comments);
         ExternalVO = node.ExternalVO;

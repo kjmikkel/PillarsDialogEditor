@@ -20,21 +20,21 @@
                               DockPanel.Dock="Right"
                               Content="?"
                               Style="{StaticResource HelpToggleButton}"
-                              ToolTip="Show / hide the legend and keyboard reference"/>
+                              ToolTip="{StaticResource ToolTip_HelpToggle}"/>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <Button Command="{Binding OpenFolderCommand}"
-                            Content="Open Game Folder&#x2026;"
+                            Content="{StaticResource Button_OpenFolder}"
                             Foreground="White"
                             Style="{StaticResource CanvasToolButton}"
-                            ToolTip="Open a PoE1 or PoE2 game root folder"/>
+                            ToolTip="{StaticResource ToolTip_OpenFolder}"/>
                     <Rectangle Width="1" Fill="#444" Margin="8,0" VerticalAlignment="Stretch"/>
-                    <TextBlock Text="Language:" Foreground="#888" FontSize="11"
+                    <TextBlock Text="{StaticResource Label_Language}" Foreground="#888" FontSize="11"
                                VerticalAlignment="Center" Margin="0,0,6,0"
                                Visibility="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}"/>
                     <ComboBox ItemsSource="{Binding AvailableLanguages}"
                               SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
                               MinWidth="60"
-                              ToolTip="Switch the display language for dialogue text"
+                              ToolTip="{StaticResource ToolTip_Language}"
                               Visibility="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}"/>
                 </StackPanel>
             </DockPanel>
@@ -55,7 +55,7 @@
             <GridSplitter Grid.Column="3" HorizontalAlignment="Stretch" Background="#333"/>
             <views:NodeDetailView Grid.Column="4" DataContext="{Binding Detail}"/>
 
-            <!-- Legend overlay — floats over the right side of the canvas -->
+            <!-- Legend overlay -->
             <Border Grid.ColumnSpan="5"
                     HorizontalAlignment="Right" VerticalAlignment="Top"
                     Panel.ZIndex="20"
@@ -66,15 +66,14 @@
                                          Converter={StaticResource BoolToVis}}">
                 <DockPanel>
 
-                    <!-- Header -->
                     <Border DockPanel.Dock="Top" Background="#252535"
                             CornerRadius="4,4,0,0" Padding="10,6">
                         <DockPanel>
                             <Button DockPanel.Dock="Right" Content="&#x2715;"
                                     Style="{StaticResource FlatIconButton}"
                                     Click="CloseHelp_Click"
-                                    ToolTip="Close legend"/>
-                            <TextBlock Text="LEGEND" Foreground="#888"
+                                    ToolTip="{StaticResource ToolTip_CloseLegend}"/>
+                            <TextBlock Text="{StaticResource Legend_Header}" Foreground="#888"
                                        FontSize="10" FontWeight="Bold"
                                        VerticalAlignment="Center"/>
                         </DockPanel>
@@ -84,15 +83,15 @@
                         <StackPanel>
 
                             <!-- Connections -->
-                            <TextBlock Text="CONNECTIONS" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
+                            <TextBlock Text="{StaticResource Legend_Connections}" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
 
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                 <Grid Width="30" Height="6" VerticalAlignment="Center" Margin="0,0,8,0">
                                     <Line X1="0" Y1="3" X2="30" Y2="3" Stroke="#aaa" StrokeThickness="2"/>
                                 </Grid>
                                 <TextBlock Foreground="#ccc" FontSize="10" VerticalAlignment="Center">
-                                    <Run FontWeight="Bold">ShowOnce</Run>
-                                    <Run Foreground="#888"> — shown once, hidden after selection</Run>
+                                    <Run FontWeight="Bold" Text="{StaticResource Legend_ShowOnce}"/>
+                                    <Run Foreground="#888" Text="{StaticResource Legend_ShowOnce_Desc}"/>
                                 </TextBlock>
                             </StackPanel>
 
@@ -101,8 +100,8 @@
                                     <Line X1="0" Y1="3" X2="30" Y2="3" Stroke="#b8760a" StrokeThickness="2"/>
                                 </Grid>
                                 <TextBlock Foreground="#ccc" FontSize="10" VerticalAlignment="Center">
-                                    <Run FontWeight="Bold">Always</Run>
-                                    <Run Foreground="#888"> — always available, even after selection</Run>
+                                    <Run FontWeight="Bold" Text="{StaticResource Legend_Always}"/>
+                                    <Run Foreground="#888" Text="{StaticResource Legend_Always_Desc}"/>
                                 </TextBlock>
                             </StackPanel>
 
@@ -112,45 +111,43 @@
                                           StrokeThickness="2" StrokeDashArray="4,2"/>
                                 </Grid>
                                 <TextBlock Foreground="#ccc" FontSize="10" VerticalAlignment="Center">
-                                    <Run FontWeight="Bold">Never</Run>
-                                    <Run Foreground="#888"> — never shown to the player</Run>
+                                    <Run FontWeight="Bold" Text="{StaticResource Legend_Never}"/>
+                                    <Run Foreground="#888" Text="{StaticResource Legend_Never_Desc}"/>
                                 </TextBlock>
                             </StackPanel>
 
                             <!-- Node types -->
-                            <TextBlock Text="NODE TYPES" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
+                            <TextBlock Text="{StaticResource Legend_NodeTypes}" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
 
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
                                 <Border Width="12" Height="12" Background="#F5F0D0"
                                         CornerRadius="2" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                <TextBlock Foreground="#ccc" FontSize="10" VerticalAlignment="Center">
-                                    NPC line
-                                </TextBlock>
+                                <TextBlock Text="{StaticResource Legend_NpcLine}"
+                                           Foreground="#ccc" FontSize="10" VerticalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
                                 <Border Width="12" Height="12" Background="#D5E8F5"
                                         CornerRadius="2" Margin="0,0,8,0" VerticalAlignment="Center"/>
                                 <TextBlock Foreground="#ccc" FontSize="10" VerticalAlignment="Center">
-                                    Player choice <Run Foreground="#aaa">(marked ✦)</Run>
+                                    <Run Text="{StaticResource Legend_PlayerChoice}"/>
+                                    <Run Foreground="#aaa" Text="{StaticResource Legend_PlayerChoiceMark}"/>
                                 </TextBlock>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
                                 <Border Width="12" Height="12" Background="#D5F0E8"
                                         CornerRadius="2" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                <TextBlock Foreground="#ccc" FontSize="10" VerticalAlignment="Center">
-                                    Narrator
-                                </TextBlock>
+                                <TextBlock Text="{StaticResource Legend_Narrator}"
+                                           Foreground="#ccc" FontSize="10" VerticalAlignment="Center"/>
                             </StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                                 <Border Width="12" Height="12" Background="#E0E0E0"
                                         CornerRadius="2" Margin="0,0,8,0" VerticalAlignment="Center"/>
-                                <TextBlock Foreground="#ccc" FontSize="10" VerticalAlignment="Center">
-                                    Script / automated action
-                                </TextBlock>
+                                <TextBlock Text="{StaticResource Legend_ScriptAction}"
+                                           Foreground="#ccc" FontSize="10" VerticalAlignment="Center"/>
                             </StackPanel>
 
                             <!-- Symbols -->
-                            <TextBlock Text="SYMBOLS" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
+                            <TextBlock Text="{StaticResource Legend_Symbols}" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
 
                             <Grid Margin="0,0,0,3">
                                 <Grid.ColumnDefinitions>
@@ -158,8 +155,8 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="⚙ N" Foreground="#e8a020" FontSize="10"/>
-                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10"
-                                           TextWrapping="Wrap">node has N visibility conditions</TextBlock>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Symbol_Conditions}"
+                                           Foreground="#888" FontSize="10" TextWrapping="Wrap"/>
                             </Grid>
                             <Grid Margin="0,0,0,3">
                                 <Grid.ColumnDefinitions>
@@ -167,8 +164,8 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="♀" Foreground="#aaa" FontSize="10"/>
-                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10"
-                                           TextWrapping="Wrap">female text variant exists</TextBlock>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Symbol_FemaleText}"
+                                           Foreground="#888" FontSize="10" TextWrapping="Wrap"/>
                             </Grid>
                             <Grid Margin="0,0,0,12">
                                 <Grid.ColumnDefinitions>
@@ -176,73 +173,73 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="✦" Foreground="#aaa" FontSize="10"/>
-                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10"
-                                           TextWrapping="Wrap">player choice node (in title)</TextBlock>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Symbol_PlayerChoice}"
+                                           Foreground="#888" FontSize="10" TextWrapping="Wrap"/>
                             </Grid>
 
                             <!-- Canvas controls -->
-                            <TextBlock Text="CANVAS" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
+                            <TextBlock Text="{StaticResource Legend_Canvas}" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
 
                             <Grid Margin="0,0,0,3">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="56"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Fit" Foreground="#ccc" FontSize="10"/>
-                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10">fit all nodes into view</TextBlock>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Fit}" Foreground="#ccc" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Fit_Desc}" Foreground="#888" FontSize="10"/>
                             </Grid>
                             <Grid Margin="0,0,0,3">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="56"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="+ / −" Foreground="#ccc" FontSize="10"/>
-                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10">zoom in / out</TextBlock>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Zoom}" Foreground="#ccc" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Zoom_Desc}" Foreground="#888" FontSize="10"/>
                             </Grid>
                             <Grid Margin="0,0,0,3">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="56"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="⌂" Foreground="#ccc" FontSize="10"/>
-                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10">jump to root node (ID 0)</TextBlock>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Root}" Foreground="#ccc" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Root_Desc}" Foreground="#888" FontSize="10"/>
                             </Grid>
                             <Grid Margin="0,0,0,3">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="56"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Scroll" Foreground="#ccc" FontSize="10"/>
-                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10">zoom</TextBlock>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Scroll}" Foreground="#ccc" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Scroll_Desc}" Foreground="#888" FontSize="10"/>
                             </Grid>
                             <Grid Margin="0,0,0,12">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="56"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Drag" Foreground="#ccc" FontSize="10"/>
-                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10">pan the canvas</TextBlock>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Drag}" Foreground="#ccc" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Drag_Desc}" Foreground="#888" FontSize="10"/>
                             </Grid>
 
                             <!-- Browser controls -->
-                            <TextBlock Text="BROWSER" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
+                            <TextBlock Text="{StaticResource Legend_Browser}" Style="{StaticResource LabelStyle}" Margin="0,0,0,5"/>
 
                             <Grid Margin="0,0,0,3">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="56"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="⊞ / ⊟" Foreground="#ccc" FontSize="10"/>
-                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10">expand / collapse all folders</TextBlock>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_ExpandCollapse}" Foreground="#ccc" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_ExpandCollapse_Desc}" Foreground="#888" FontSize="10"/>
                             </Grid>
                             <Grid Margin="0,0,0,4">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="56"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="Filter" Foreground="#ccc" FontSize="10"/>
-                                <TextBlock Grid.Column="1" Foreground="#888" FontSize="10"
-                                           TextWrapping="Wrap">type to filter conversations by name</TextBlock>
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Filter}" Foreground="#ccc" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Filter_Desc}"
+                                           Foreground="#888" FontSize="10" TextWrapping="Wrap"/>
                             </Grid>
 
                         </StackPanel>

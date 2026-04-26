@@ -4,10 +4,15 @@
              xmlns:converters="clr-namespace:DialogEditor.WPF.Converters"
              StartupUri="Views/MainWindow.xaml">
     <Application.Resources>
-        <converters:SpeakerCategoryToBrushConverter x:Key="SpeakerCategoryToBrush"/>
-        <converters:BoolToFemaleTextBrushConverter x:Key="BoolToFemaleTextBrush"/>
-        <converters:CountToVisibilityConverter x:Key="CountToVis"/>
-        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Strings.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <converters:SpeakerCategoryToBrushConverter x:Key="SpeakerCategoryToBrush"/>
+            <converters:BoolToFemaleTextBrushConverter x:Key="BoolToFemaleTextBrush"/>
+            <converters:CountToVisibilityConverter x:Key="CountToVis"/>
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVis"/>
         <converters:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVis"/>
 
@@ -310,5 +315,6 @@
             </Setter>
         </Style>
 
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Layout;
 using DialogEditor.Core.Models;
+using DialogEditor.WPF.Resources;
 
 namespace DialogEditor.WPF.ViewModels;
 
@@ -12,6 +13,13 @@ public partial class ConversationViewModel : ObservableObject
 {
     public ObservableCollection<NodeViewModel> Nodes { get; } = [];
     public ObservableCollection<ConnectionViewModel> Connections { get; } = [];
+
+    public string NodeCountText => Loc.Format("Node_CountFormat", Nodes.Count);
+
+    public ConversationViewModel()
+    {
+        Nodes.CollectionChanged += (_, _) => OnPropertyChanged(nameof(NodeCountText));
+    }
 
     [ObservableProperty]
     private NodeViewModel? _selectedNode;

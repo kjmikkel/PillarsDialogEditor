@@ -1,6 +1,7 @@
 using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DialogEditor.Core.Models;
+using DialogEditor.WPF.Resources;
 using DialogEditor.WPF.Services;
 
 namespace DialogEditor.WPF.ViewModels;
@@ -61,13 +62,13 @@ public partial class NodeViewModel : ObservableObject
         SpeakerGuid = node.SpeakerGuid;
         ListenerGuid = node.ListenerGuid;
         var resolved = SpeakerNameService.Resolve(node.SpeakerGuid);
-        SpeakerName = resolved == "Unknown"
+        SpeakerName = resolved == Loc.Get("Speaker_Unknown")
             ? node.SpeakerCategory switch
             {
-                SpeakerCategory.Player   => "Player",
-                SpeakerCategory.Narrator => "Narrator",
-                SpeakerCategory.Script   => "Script",
-                _                        => "Unknown"
+                SpeakerCategory.Player   => Loc.Get("Speaker_Player"),
+                SpeakerCategory.Narrator => Loc.Get("Speaker_Narrator"),
+                SpeakerCategory.Script   => Loc.Get("Speaker_Script"),
+                _                        => Loc.Get("Speaker_Unknown")
             }
             : resolved;
         ListenerName = SpeakerNameService.Resolve(node.ListenerGuid);
@@ -83,18 +84,19 @@ public partial class NodeViewModel : ObservableObject
         HideSpeaker = node.HideSpeaker;
         Links = node.Links;
 
-        var suffix = node.IsPlayerChoice ? " \u2746" : string.Empty;
-        Title = $"Node {node.NodeId} \u00b7 {SpeakerName}{suffix}";
+        var suffix = node.IsPlayerChoice ? Loc.Get("Node_PlayerChoiceSuffix") : string.Empty;
+        Title = Loc.Format("Node_Title", node.NodeId, SpeakerName, suffix);
 
-        DefaultText = entry?.DefaultText ?? "[text unavailable \u2014 stringtable not found]";
+        DefaultText = entry?.DefaultText ?? Loc.Get("Node_TextUnavailable");
         FemaleText = entry?.FemaleText ?? string.Empty;
         HasFemaleText = !string.IsNullOrEmpty(FemaleText);
-        TextPreview = DefaultText.Length > 80 ? DefaultText[..80] + "\u2026" : DefaultText;
+        TextPreview = DefaultText.Length > 80 ? DefaultText[..80] + "…" : DefaultText;
 
-        var condPart = node.ConditionStrings.Count > 0
-            ? $"\u2699 {node.ConditionStrings.Count} condition{(node.ConditionStrings.Count == 1 ? "" : "s")}"
-            : "[ No conditions ]";
-        FooterText = HasFemaleText ? condPart + "  \u2640" : condPart;
+        var count = node.ConditionStrings.Count;
+        var condPart = count > 0
+            ? Loc.Format(count == 1 ? "Node_ConditionSingular" : "Node_ConditionPlural", count)
+            : Loc.Get("Node_NoConditions");
+        FooterText = HasFemaleText ? condPart + "  ♀" : condPart;
 
         Inputs = [Input];
         Outputs = [Output];

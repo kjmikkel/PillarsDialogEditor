@@ -1,0 +1,117 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!-- Status bar -->
+    <sys:String x:Key="Status_OpenFolder">Open a game folder to begin.</sys:String>
+    <sys:String x:Key="Status_FolderNotRecognized">Folder not recognised as PoE1 or PoE2 root.</sys:String>
+    <sys:String x:Key="Status_FolderLoaded">{0} — {1}</sys:String>
+    <sys:String x:Key="Status_ConversationLoaded">{0} — {1} nodes</sys:String>
+    <sys:String x:Key="Status_LoadError">Error loading {0}: {1}</sys:String>
+
+    <!-- Speaker fallback names -->
+    <sys:String x:Key="Speaker_Player">Player</sys:String>
+    <sys:String x:Key="Speaker_Narrator">Narrator</sys:String>
+    <sys:String x:Key="Speaker_Script">Script</sys:String>
+    <sys:String x:Key="Speaker_Unknown">Unknown</sys:String>
+
+    <!-- Node card -->
+    <sys:String x:Key="Node_Title">Node {0} · {1}{2}</sys:String>
+    <sys:String x:Key="Node_TextUnavailable">[text unavailable — stringtable not found]</sys:String>
+    <sys:String x:Key="Node_PlayerChoiceSuffix"> ✦</sys:String>
+    <sys:String x:Key="Node_ConditionSingular">⚙ {0} condition</sys:String>
+    <sys:String x:Key="Node_ConditionPlural">⚙ {0} conditions</sys:String>
+    <sys:String x:Key="Node_NoConditions">[ No conditions ]</sys:String>
+    <sys:String x:Key="Node_CountFormat">{0} nodes</sys:String>
+
+    <!-- Detail panel -->
+    <sys:String x:Key="NodeDetail_PlayerChoice">Player Choice</sys:String>
+    <sys:String x:Key="NodeDetail_NpcLine">NPC Line</sys:String>
+    <sys:String x:Key="NodeDetail_SameAsDefault">(same as default)</sys:String>
+    <sys:String x:Key="NodeDetail_None">(none)</sys:String>
+
+    <!-- Browser -->
+    <sys:String x:Key="Browser_RootFolder">(root)</sys:String>
+    <sys:String x:Key="Browser_Header">CONVERSATIONS</sys:String>
+    <sys:String x:Key="Placeholder_FilterConversations">Filter conversations…</sys:String>
+
+    <!-- Canvas -->
+    <sys:String x:Key="Placeholder_SearchNodes">Search nodes…</sys:String>
+
+    <!-- Toolbar -->
+    <sys:String x:Key="Button_OpenFolder">Open Game Folder…</sys:String>
+    <sys:String x:Key="Label_Language">Language:</sys:String>
+
+    <!-- Detail panel section labels -->
+    <sys:String x:Key="Label_NodeDetails">NODE DETAILS</sys:String>
+    <sys:String x:Key="Label_SelectNode">Select a node to view details.</sys:String>
+    <sys:String x:Key="Label_Node">NODE</sys:String>
+    <sys:String x:Key="Label_Speaker">SPEAKER</sys:String>
+    <sys:String x:Key="Label_Listener">LISTENER</sys:String>
+    <sys:String x:Key="Label_DefaultMaleText">DEFAULT / MALE TEXT</sys:String>
+    <sys:String x:Key="Label_FemaleText">FEMALE TEXT</sys:String>
+    <sys:String x:Key="Label_Comments">COMMENTS</sys:String>
+    <sys:String x:Key="Label_Conditions">CONDITIONS</sys:String>
+    <sys:String x:Key="Label_DisplayPersist">DISPLAY / PERSIST</sys:String>
+    <sys:String x:Key="Label_ActorDirection">ACTOR DIRECTION</sys:String>
+    <sys:String x:Key="Label_Scripts">SCRIPTS</sys:String>
+    <sys:String x:Key="Label_LinksTo">LINKS TO</sys:String>
+    <sys:String x:Key="Label_Voice">VOICE</sys:String>
+    <sys:String x:Key="Label_File">File</sys:String>
+    <sys:String x:Key="Label_HasVO">Has VO</sys:String>
+    <sys:String x:Key="Label_HideSpeaker">Hide Speaker</sys:String>
+
+    <!-- Legend panel -->
+    <sys:String x:Key="Legend_Header">LEGEND</sys:String>
+    <sys:String x:Key="Legend_Connections">CONNECTIONS</sys:String>
+    <sys:String x:Key="Legend_NodeTypes">NODE TYPES</sys:String>
+    <sys:String x:Key="Legend_Symbols">SYMBOLS</sys:String>
+    <sys:String x:Key="Legend_Canvas">CANVAS</sys:String>
+    <sys:String x:Key="Legend_Browser">BROWSER</sys:String>
+    <sys:String x:Key="Legend_ShowOnce">ShowOnce</sys:String>
+    <sys:String x:Key="Legend_ShowOnce_Desc"> — shown once, hidden after selection</sys:String>
+    <sys:String x:Key="Legend_Always">Always</sys:String>
+    <sys:String x:Key="Legend_Always_Desc"> — always available, even after selection</sys:String>
+    <sys:String x:Key="Legend_Never">Never</sys:String>
+    <sys:String x:Key="Legend_Never_Desc"> — never shown to the player</sys:String>
+    <sys:String x:Key="Legend_NpcLine">NPC line</sys:String>
+    <sys:String x:Key="Legend_PlayerChoice">Player choice</sys:String>
+    <sys:String x:Key="Legend_PlayerChoiceMark">(marked ✦)</sys:String>
+    <sys:String x:Key="Legend_Narrator">Narrator</sys:String>
+    <sys:String x:Key="Legend_ScriptAction">Script / automated action</sys:String>
+    <sys:String x:Key="Legend_Symbol_Conditions">node has N visibility conditions</sys:String>
+    <sys:String x:Key="Legend_Symbol_FemaleText">female text variant exists</sys:String>
+    <sys:String x:Key="Legend_Symbol_PlayerChoice">player choice node (in title)</sys:String>
+    <sys:String x:Key="Legend_Control_Fit">Fit</sys:String>
+    <sys:String x:Key="Legend_Control_Fit_Desc">fit all nodes into view</sys:String>
+    <sys:String x:Key="Legend_Control_Zoom">+ / −</sys:String>
+    <sys:String x:Key="Legend_Control_Zoom_Desc">zoom in / out</sys:String>
+    <sys:String x:Key="Legend_Control_Root">⌂</sys:String>
+    <sys:String x:Key="Legend_Control_Root_Desc">jump to root node (ID 0)</sys:String>
+    <sys:String x:Key="Legend_Control_Scroll">Scroll</sys:String>
+    <sys:String x:Key="Legend_Control_Scroll_Desc">zoom</sys:String>
+    <sys:String x:Key="Legend_Control_Drag">Drag</sys:String>
+    <sys:String x:Key="Legend_Control_Drag_Desc">pan the canvas</sys:String>
+    <sys:String x:Key="Legend_Control_ExpandCollapse">⊞ / ⊟</sys:String>
+    <sys:String x:Key="Legend_Control_ExpandCollapse_Desc">expand / collapse all folders</sys:String>
+    <sys:String x:Key="Legend_Control_Filter">Filter</sys:String>
+    <sys:String x:Key="Legend_Control_Filter_Desc">type to filter conversations by name</sys:String>
+
+    <!-- Tooltips -->
+    <sys:String x:Key="ToolTip_OpenFolder">Open a PoE1 or PoE2 game root folder</sys:String>
+    <sys:String x:Key="ToolTip_Language">Switch the display language for dialogue text</sys:String>
+    <sys:String x:Key="ToolTip_HelpToggle">Show / hide the legend and keyboard reference</sys:String>
+    <sys:String x:Key="ToolTip_FitToScreen">Fit all nodes into view</sys:String>
+    <sys:String x:Key="ToolTip_ZoomIn">Zoom in</sys:String>
+    <sys:String x:Key="ToolTip_ZoomOut">Zoom out</sys:String>
+    <sys:String x:Key="ToolTip_JumpToRoot">Jump to root node (ID 0)</sys:String>
+    <sys:String x:Key="ToolTip_SearchNodes">Search nodes by ID, dialogue text, or speaker name</sys:String>
+    <sys:String x:Key="ToolTip_ClearSearch">Clear search</sys:String>
+    <sys:String x:Key="ToolTip_Minimap">Canvas overview — drag to pan</sys:String>
+    <sys:String x:Key="ToolTip_ExpandAll">Expand all</sys:String>
+    <sys:String x:Key="ToolTip_CollapseAll">Collapse all</sys:String>
+    <sys:String x:Key="ToolTip_FilterConversations">Filter conversations by filename</sys:String>
+    <sys:String x:Key="ToolTip_ClearFilter">Clear filter</sys:String>
+    <sys:String x:Key="ToolTip_CloseLegend">Close legend</sys:String>
+
+</ResourceDictionary>
