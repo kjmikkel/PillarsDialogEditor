@@ -56,7 +56,7 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand]
     private void OpenFolder()
     {
-        var dialog = new OpenFolderDialog { Title = Loc.Get("Button_OpenFolder") };
+        var dialog = new OpenFolderDialog { Title = Loc.Get("Dialog_SelectFolder") };
         if (dialog.ShowDialog() != true) return;
         LoadDirectory(dialog.FolderName);
     }

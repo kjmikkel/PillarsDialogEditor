@@ -75,10 +75,10 @@ public partial class NodeDetailViewModel : ObservableObject
     {
         var extras = new List<string>();
         if (link.RandomWeight != 1f)
-            extras.Add($"w:{link.RandomWeight:0.##}");
+            extras.Add($"{Loc.Get("Link_WeightPrefix")}{link.RandomWeight:0.##}");
         if (!string.IsNullOrEmpty(link.QuestionNodeTextDisplay) && link.QuestionNodeTextDisplay != "ShowOnce")
             extras.Add(link.QuestionNodeTextDisplay);
-        var arrow = $"→ {link.ToNodeId}";
+        var arrow = $"{Loc.Get("Link_Arrow")} {link.ToNodeId}";
         return extras.Count == 0 ? arrow : $"{arrow} [{string.Join(", ", extras)}]";
     }
 

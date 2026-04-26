@@ -2,118 +2,215 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <!-- Status bar -->
+    <!--
+        TRANSLATOR NOTES
+        ════════════════
+        • {0}, {1} … are positional placeholders — preserve them exactly.
+        • Symbols used as button icons (?, +, −, ⊞, ⊟, 📌, ✦, ♀, ⚙) are
+          universal UI glyphs and do not need translating.
+        • Game-data enum values that appear verbatim in files (ShowOnce, Always,
+          Never, Conversation, Bark, None, OnceEver) are intentionally NOT in
+          this file — they are technical identifiers, not UI copy.
+        • Script-prefix tokens ([Enter], [Exit], [Update]) and the condition
+          operator "NOT" originate in DialogEditor.Core, which has no UI
+          dependency. They are a known localisation gap.
+    -->
+
+    <!-- ─── Status bar ─────────────────────────────────────────────────── -->
+    <!-- Shown at app startup before any folder is opened -->
     <sys:String x:Key="Status_OpenFolder">Open a game folder to begin.</sys:String>
+    <!-- Shown when the selected folder is not a valid PoE1 or PoE2 install root -->
     <sys:String x:Key="Status_FolderNotRecognized">Folder not recognised as PoE1 or PoE2 root.</sys:String>
+    <!-- {0} = game name (e.g. "Pillars of Eternity"), {1} = full folder path -->
     <sys:String x:Key="Status_FolderLoaded">{0} — {1}</sys:String>
+    <!-- {0} = conversation file name, {1} = number of nodes in the conversation -->
     <sys:String x:Key="Status_ConversationLoaded">{0} — {1} nodes</sys:String>
+    <!-- {0} = conversation file name, {1} = exception message -->
     <sys:String x:Key="Status_LoadError">Error loading {0}: {1}</sys:String>
 
-    <!-- Speaker fallback names -->
+    <!-- ─── Speaker fallback names ─────────────────────────────────────── -->
+    <!-- Shown in the node title and detail panel when the speaker GUID is
+         not resolved to a named character. These are category labels, not
+         character names. -->
     <sys:String x:Key="Speaker_Player">Player</sys:String>
     <sys:String x:Key="Speaker_Narrator">Narrator</sys:String>
     <sys:String x:Key="Speaker_Script">Script</sys:String>
     <sys:String x:Key="Speaker_Unknown">Unknown</sys:String>
 
-    <!-- Node card -->
+    <!-- ─── Node canvas card ────────────────────────────────────────────── -->
+    <!-- Title line on each node card.
+         {0} = node ID (integer), {1} = speaker name, {2} = optional suffix
+         (Node_PlayerChoiceSuffix when the node is a player response, else empty) -->
     <sys:String x:Key="Node_Title">Node {0} · {1}{2}</sys:String>
+    <!-- Shown as the node body text when the stringtable file cannot be located -->
     <sys:String x:Key="Node_TextUnavailable">[text unavailable — stringtable not found]</sys:String>
+    <!-- Appended to the node title for player-choice nodes; includes a leading space -->
     <sys:String x:Key="Node_PlayerChoiceSuffix"> ✦</sys:String>
+    <!-- Footer text when the node has exactly one condition. {0} = 1 -->
     <sys:String x:Key="Node_ConditionSingular">⚙ {0} condition</sys:String>
+    <!-- Footer text when the node has two or more conditions. {0} = count -->
     <sys:String x:Key="Node_ConditionPlural">⚙ {0} conditions</sys:String>
+    <!-- Footer text when the node has no conditions -->
     <sys:String x:Key="Node_NoConditions">[ No conditions ]</sys:String>
+    <!-- Canvas toolbar: node count label. {0} = number of nodes loaded -->
     <sys:String x:Key="Node_CountFormat">{0} nodes</sys:String>
 
-    <!-- Detail panel -->
+    <!-- ─── Detail panel — values ──────────────────────────────────────── -->
+    <!-- Node type shown in the NODE row of the detail panel -->
     <sys:String x:Key="NodeDetail_PlayerChoice">Player Choice</sys:String>
     <sys:String x:Key="NodeDetail_NpcLine">NPC Line</sys:String>
+    <!-- Shown in the FEMALE TEXT row when the node has no separate female variant -->
     <sys:String x:Key="NodeDetail_SameAsDefault">(same as default)</sys:String>
+    <!-- Placeholder shown when a list is empty (conditions, scripts, links) -->
     <sys:String x:Key="NodeDetail_None">(none)</sys:String>
 
-    <!-- Browser -->
+    <!-- ─── Links formatting (LINKS TO section) ───────────────────────── -->
+    <!-- Arrow prefix before each target node ID, e.g. "→ 5" -->
+    <sys:String x:Key="Link_Arrow">→</sys:String>
+    <!-- Prefix for the random-weight annotation, e.g. "w:0.5" -->
+    <sys:String x:Key="Link_WeightPrefix">w:</sys:String>
+
+    <!-- ─── Dialogs ────────────────────────────────────────────────────── -->
+    <!-- Title bar of the OS folder-picker dialog -->
+    <sys:String x:Key="Dialog_SelectFolder">Select game root folder</sys:String>
+
+    <!-- ─── Conversation browser ──────────────────────────────────────── -->
+    <!-- Display name for the virtual root folder when a conversation file
+         sits directly in the root without a sub-folder -->
     <sys:String x:Key="Browser_RootFolder">(root)</sys:String>
+    <!-- Panel header label -->
     <sys:String x:Key="Browser_Header">CONVERSATIONS</sys:String>
+    <!-- Placeholder text inside the filter text box -->
     <sys:String x:Key="Placeholder_FilterConversations">Filter conversations…</sys:String>
 
-    <!-- Canvas -->
+    <!-- ─── Canvas search ──────────────────────────────────────────────── -->
+    <!-- Placeholder text inside the node search box -->
     <sys:String x:Key="Placeholder_SearchNodes">Search nodes…</sys:String>
 
-    <!-- Toolbar -->
+    <!-- ─── Toolbar ────────────────────────────────────────────────────── -->
+    <!-- Label / content of the "open folder" button -->
     <sys:String x:Key="Button_OpenFolder">Open Game Folder…</sys:String>
+    <!-- Label preceding the language selector drop-down -->
     <sys:String x:Key="Label_Language">Language:</sys:String>
 
-    <!-- Detail panel section labels -->
+    <!-- ─── Detail panel — section labels ─────────────────────────────── -->
+    <!-- Panel header shown above the detail pane -->
     <sys:String x:Key="Label_NodeDetails">NODE DETAILS</sys:String>
+    <!-- Prompt shown in the centre of the panel when no node is selected -->
     <sys:String x:Key="Label_SelectNode">Select a node to view details.</sys:String>
+    <!-- Section label for node ID / type row -->
     <sys:String x:Key="Label_Node">NODE</sys:String>
     <sys:String x:Key="Label_Speaker">SPEAKER</sys:String>
     <sys:String x:Key="Label_Listener">LISTENER</sys:String>
+    <!-- Section label for the default (male) dialogue text -->
     <sys:String x:Key="Label_DefaultMaleText">DEFAULT / MALE TEXT</sys:String>
     <sys:String x:Key="Label_FemaleText">FEMALE TEXT</sys:String>
+    <!-- PoE1 only: writer notes attached to a node -->
     <sys:String x:Key="Label_Comments">COMMENTS</sys:String>
     <sys:String x:Key="Label_Conditions">CONDITIONS</sys:String>
+    <!-- Shows both display type and persistence on one line, separated by · -->
     <sys:String x:Key="Label_DisplayPersist">DISPLAY / PERSIST</sys:String>
+    <!-- PoE1 only: voice-acting direction note -->
     <sys:String x:Key="Label_ActorDirection">ACTOR DIRECTION</sys:String>
     <sys:String x:Key="Label_Scripts">SCRIPTS</sys:String>
     <sys:String x:Key="Label_LinksTo">LINKS TO</sys:String>
+    <!-- Voice section: shown for PoE1 nodes with a VOFilename and PoE2 nodes -->
     <sys:String x:Key="Label_Voice">VOICE</sys:String>
+    <!-- Sub-label for the voice file path row -->
     <sys:String x:Key="Label_File">File</sys:String>
+    <!-- Sub-label for the HasVO boolean row -->
     <sys:String x:Key="Label_HasVO">Has VO</sys:String>
+    <!-- Sub-label for the HideSpeaker boolean row (PoE2 only) -->
     <sys:String x:Key="Label_HideSpeaker">Hide Speaker</sys:String>
 
-    <!-- Legend panel -->
+    <!-- ─── Legend panel — section headers ────────────────────────────── -->
+    <!-- Title bar of the legend overlay -->
     <sys:String x:Key="Legend_Header">LEGEND</sys:String>
     <sys:String x:Key="Legend_Connections">CONNECTIONS</sys:String>
     <sys:String x:Key="Legend_NodeTypes">NODE TYPES</sys:String>
     <sys:String x:Key="Legend_Symbols">SYMBOLS</sys:String>
+    <!-- Canvas controls section -->
     <sys:String x:Key="Legend_Canvas">CANVAS</sys:String>
+    <!-- Conversation browser controls section -->
     <sys:String x:Key="Legend_Browser">BROWSER</sys:String>
+
+    <!-- ─── Legend panel — connection type names and descriptions ──────── -->
+    <!-- These match the QuestionNodeTextDisplay enum values used in the game
+         files; keep the name identical to the game value for consistency. -->
     <sys:String x:Key="Legend_ShowOnce">ShowOnce</sys:String>
+    <!-- Leading space is intentional — it follows the bold name inline -->
     <sys:String x:Key="Legend_ShowOnce_Desc"> — shown once, hidden after selection</sys:String>
     <sys:String x:Key="Legend_Always">Always</sys:String>
     <sys:String x:Key="Legend_Always_Desc"> — always available, even after selection</sys:String>
     <sys:String x:Key="Legend_Never">Never</sys:String>
     <sys:String x:Key="Legend_Never_Desc"> — never shown to the player</sys:String>
+
+    <!-- ─── Legend panel — node type descriptions ─────────────────────── -->
     <sys:String x:Key="Legend_NpcLine">NPC line</sys:String>
     <sys:String x:Key="Legend_PlayerChoice">Player choice</sys:String>
+    <!-- Parenthetical note appended after "Player choice" -->
     <sys:String x:Key="Legend_PlayerChoiceMark">(marked ✦)</sys:String>
     <sys:String x:Key="Legend_Narrator">Narrator</sys:String>
     <sys:String x:Key="Legend_ScriptAction">Script / automated action</sys:String>
+
+    <!-- ─── Legend panel — symbol descriptions ────────────────────────── -->
+    <!-- "N" is a literal count, not a placeholder — leave it as-is -->
     <sys:String x:Key="Legend_Symbol_Conditions">node has N visibility conditions</sys:String>
     <sys:String x:Key="Legend_Symbol_FemaleText">female text variant exists</sys:String>
     <sys:String x:Key="Legend_Symbol_PlayerChoice">player choice node (in title)</sys:String>
+
+    <!-- ─── Legend panel — canvas control descriptions ─────────────────── -->
+    <!-- "Fit" is the button label as it appears on the toolbar -->
     <sys:String x:Key="Legend_Control_Fit">Fit</sys:String>
     <sys:String x:Key="Legend_Control_Fit_Desc">fit all nodes into view</sys:String>
+    <!-- Literal button labels, not translatable symbols -->
     <sys:String x:Key="Legend_Control_Zoom">+ / −</sys:String>
     <sys:String x:Key="Legend_Control_Zoom_Desc">zoom in / out</sys:String>
+    <!-- ⌂ is the house / home symbol used on the "go to root" button -->
     <sys:String x:Key="Legend_Control_Root">⌂</sys:String>
     <sys:String x:Key="Legend_Control_Root_Desc">jump to root node (ID 0)</sys:String>
     <sys:String x:Key="Legend_Control_Scroll">Scroll</sys:String>
     <sys:String x:Key="Legend_Control_Scroll_Desc">zoom</sys:String>
     <sys:String x:Key="Legend_Control_Drag">Drag</sys:String>
     <sys:String x:Key="Legend_Control_Drag_Desc">pan the canvas</sys:String>
+    <!-- ⊞ and ⊟ are the expand-all / collapse-all folder buttons -->
     <sys:String x:Key="Legend_Control_ExpandCollapse">⊞ / ⊟</sys:String>
     <sys:String x:Key="Legend_Control_ExpandCollapse_Desc">expand / collapse all folders</sys:String>
     <sys:String x:Key="Legend_Control_Filter">Filter</sys:String>
     <sys:String x:Key="Legend_Control_Filter_Desc">type to filter conversations by name</sys:String>
 
-    <!-- Tooltips -->
+    <!-- ─── Tooltips — toolbar ─────────────────────────────────────────── -->
     <sys:String x:Key="ToolTip_OpenFolder">Open a PoE1 or PoE2 game root folder</sys:String>
     <sys:String x:Key="ToolTip_Language">Switch the display language for dialogue text</sys:String>
     <sys:String x:Key="ToolTip_HelpToggle">Show / hide the legend and keyboard reference</sys:String>
+
+    <!-- ─── Tooltips — canvas ──────────────────────────────────────────── -->
     <sys:String x:Key="ToolTip_FitToScreen">Fit all nodes into view</sys:String>
     <sys:String x:Key="ToolTip_ZoomIn">Zoom in</sys:String>
     <sys:String x:Key="ToolTip_ZoomOut">Zoom out</sys:String>
+    <!-- ⌂ button: centres the viewport on the root node (ID 0) -->
     <sys:String x:Key="ToolTip_JumpToRoot">Jump to root node (ID 0)</sys:String>
     <sys:String x:Key="ToolTip_SearchNodes">Search nodes by ID, dialogue text, or speaker name</sys:String>
     <sys:String x:Key="ToolTip_ClearSearch">Clear search</sys:String>
+    <!-- Minimap overlay in the bottom-right corner of the canvas -->
     <sys:String x:Key="ToolTip_Minimap">Canvas overview — drag to pan</sys:String>
+
+    <!-- ─── Tooltips — browser ─────────────────────────────────────────── -->
+    <!-- ⊞ button: expands all conversation folders in the tree -->
     <sys:String x:Key="ToolTip_ExpandAll">Expand all</sys:String>
+    <!-- ⊟ button: collapses all conversation folders in the tree -->
     <sys:String x:Key="ToolTip_CollapseAll">Collapse all</sys:String>
     <sys:String x:Key="ToolTip_FilterConversations">Filter conversations by filename</sys:String>
     <sys:String x:Key="ToolTip_ClearFilter">Clear filter</sys:String>
+
+    <!-- ─── Tooltips — legend ──────────────────────────────────────────── -->
+    <!-- × button in the top-right corner of the legend panel -->
     <sys:String x:Key="ToolTip_CloseLegend">Close legend</sys:String>
+
+    <!-- ─── Tooltips — collapsible side panels ────────────────────────── -->
+    <!-- − button (collapse) and + button (expand) on both side panels -->
     <sys:String x:Key="ToolTip_TogglePanel">Expand / collapse panel</sys:String>
+    <!-- 📌 pin button on the Conversations panel only -->
     <sys:String x:Key="ToolTip_PinPanel">Pin panel open — when unpinned, collapses after selecting a conversation</sys:String>
 
 </ResourceDictionary>
