@@ -82,7 +82,7 @@
                 </HierarchicalDataTemplate>
                 <DataTemplate DataType="{x:Type vm:ConversationItemViewModel}">
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <Ellipse Width="5" Height="5" Fill="#888" Margin="0,0,3,0"
+                        <Ellipse Width="5" Height="5" Fill="#cd6155" Margin="0,0,3,0"
                                  VerticalAlignment="Center"
                                  Visibility="{Binding HasNeverLinks, Converter={StaticResource BoolToVis}}"
                                  ToolTip="Has Never connections"/>
