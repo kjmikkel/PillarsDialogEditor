@@ -185,7 +185,7 @@
                                            Target="{Binding Target.Anchor}">
                             <nodify:Connection.Style>
                                 <Style TargetType="nodify:Connection">
-                                    <Setter Property="Stroke" Value="#666"/>
+                                    <Setter Property="Stroke" Value="#aaa"/>
                                     <Setter Property="StrokeThickness" Value="1.5"/>
                                     <Style.Triggers>
                                         <DataTrigger Binding="{Binding QuestionNodeTextDisplay}" Value="Never">
