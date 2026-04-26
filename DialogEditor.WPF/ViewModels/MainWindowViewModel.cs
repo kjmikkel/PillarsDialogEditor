@@ -21,13 +21,26 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty] private IReadOnlyList<string> _availableLanguages = [];
     [ObservableProperty] private string _selectedLanguage = string.Empty;
 
-    [ObservableProperty] private bool _isBrowserExpanded = AppSettings.BrowserExpanded;
-    [ObservableProperty] private bool _isBrowserPinned   = AppSettings.BrowserPinned;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsBrowserFlyoutOpen))]
+    private bool _isBrowserExpanded = AppSettings.BrowserPinned; // expanded iff pinned on startup
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsBrowserFlyoutOpen))]
+    private bool _isBrowserPinned = AppSettings.BrowserPinned;
+
     [ObservableProperty] private bool _isDetailExpanded  = AppSettings.DetailExpanded;
     [ObservableProperty] private string? _currentConversationName;
 
-    partial void OnIsBrowserExpandedChanged(bool value) => AppSettings.BrowserExpanded = value;
-    partial void OnIsBrowserPinnedChanged(bool value)   => AppSettings.BrowserPinned   = value;
+    // True only when the panel is open as a temporary flyout (not pinned)
+    public bool IsBrowserFlyoutOpen => IsBrowserExpanded && !IsBrowserPinned;
+
+    partial void OnIsBrowserExpandedChanged(bool value) { /* expansion is transient, not persisted */ }
+    partial void OnIsBrowserPinnedChanged(bool value)
+    {
+        AppSettings.BrowserPinned = value;
+        IsBrowserExpanded = value; // pin → open, unpin → collapse to strip
+    }
     partial void OnIsDetailExpandedChanged(bool value)  => AppSettings.DetailExpanded  = value;
 
     public MainWindowViewModel()
