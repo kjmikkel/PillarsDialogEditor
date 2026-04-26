@@ -10,6 +10,10 @@ Follow strict red/green TDD for all non-trivial logic:
 
 Never write implementation code for a feature before a failing test exists for it. Tests live in a `DialogEditor.Tests` project mirroring the structure of `DialogEditor.Core`.
 
+## Localisation
+
+No user-visible text may be hard-coded inline in XAML or C#. All strings — labels, tooltips, status messages, error text, placeholder text, legend copy — must be defined in a resource dictionary or `.resx` file so the application can be translated without touching code or markup.
+
 ## UI/UX Guidelines
 
 Every interactive control — buttons, icon-only actions, toolbar items, canvas controls — must carry a descriptive `ToolTip` property that explains its effect in plain language. One-word labels and symbols (⌂, ⊞, ?, +) are not self-explanatory to new users. Tooltips are mandatory; omitting them on new controls is a defect.
