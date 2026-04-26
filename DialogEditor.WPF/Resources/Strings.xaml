@@ -46,6 +46,9 @@
     <sys:String x:Key="Node_TextUnavailable">[text unavailable — stringtable not found]</sys:String>
     <!-- Appended to the node title for player-choice nodes; includes a leading space -->
     <sys:String x:Key="Node_PlayerChoiceSuffix"> ✦</sys:String>
+    <!-- Appended to the node footer when a female text variant exists;
+         includes two leading spaces for visual separation from the condition count -->
+    <sys:String x:Key="Node_FemaleTextSuffix">  ♀</sys:String>
     <!-- Footer text when the node has exactly one condition. {0} = 1 -->
     <sys:String x:Key="Node_ConditionSingular">⚙ {0} condition</sys:String>
     <!-- Footer text when the node has two or more conditions. {0} = count -->

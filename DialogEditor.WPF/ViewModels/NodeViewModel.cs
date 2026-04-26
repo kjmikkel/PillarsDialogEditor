@@ -94,7 +94,7 @@ public partial class NodeViewModel : ObservableObject
         var condPart = count > 0
             ? Loc.Format(count == 1 ? "Node_ConditionSingular" : "Node_ConditionPlural", count)
             : Loc.Get("Node_NoConditions");
-        FooterText = HasFemaleText ? condPart + "  ♀" : condPart;
+        FooterText = HasFemaleText ? condPart + Loc.Get("Node_FemaleTextSuffix") : condPart;
 
         Inputs = [Input];
         Outputs = [Output];

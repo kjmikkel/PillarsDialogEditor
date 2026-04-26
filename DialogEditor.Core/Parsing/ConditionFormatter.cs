@@ -1,3 +1,5 @@
+using DialogEditor.Core.Resources;
+
 namespace DialogEditor.Core.Parsing;
 
 public static class ConditionFormatter
@@ -14,7 +16,7 @@ public static class ConditionFormatter
         var funcName = ExtractFunctionName(fullName);
         var paramStr = string.Join(", ", parameters);
         var condition = $"{funcName}({paramStr})";
-        return not ? $"NOT {condition}" : condition;
+        return not ? $"{CoreStrings.Condition_Not}{condition}" : condition;
     }
 
     private static string ExtractFunctionName(string fullName)
