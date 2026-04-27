@@ -31,6 +31,7 @@
         <TreeView Grid.Row="1" Background="#2d2d2d"
                   BorderThickness="0"
                   ItemsSource="{Binding FilteredFolders}"
+                  SelectedItem="{Binding SelectedTreeItem, Mode=TwoWay}"
                   SelectionChanged="TreeView_SelectionChanged">
 
             <TreeView.Styles>

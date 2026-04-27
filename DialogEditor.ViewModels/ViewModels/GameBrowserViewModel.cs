@@ -69,6 +69,21 @@ public partial class GameBrowserViewModel : ObservableObject
     [ObservableProperty]
     private ConversationItemViewModel? _selectedItem;
 
+    // Avalonia TreeView.SelectedItem is typed as object? and may contain folders;
+    // this coercing wrapper only fires ConversationSelected for the right type.
+    private object? _selectedTreeItem;
+    public object? SelectedTreeItem
+    {
+        get => _selectedTreeItem;
+        set
+        {
+            _selectedTreeItem = value;
+            OnPropertyChanged();
+            if (value is ConversationItemViewModel item)
+                SelectedItem = item;
+        }
+    }
+
     partial void OnSelectedItemChanged(ConversationItemViewModel? value)
     {
         if (value is not null)

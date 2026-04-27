@@ -10,9 +10,14 @@ public partial class GameBrowserView : UserControl
 
     private void TreeView_SelectionChanged(object? sender, SelectionChangedEventArgs e)
     {
-        if (DataContext is GameBrowserViewModel vm &&
-            e.AddedItems.Count > 0 &&
-            e.AddedItems[0] is ConversationItemViewModel item)
-            vm.SelectedItem = item;
+        if (DataContext is not GameBrowserViewModel vm) return;
+
+        // In Avalonia 11, AddedItems may be empty; fall back to SelectedItem on the tree.
+        foreach (var added in e.AddedItems)
+        {
+            if (added is ConversationItemViewModel item) { vm.SelectedItem = item; return; }
+        }
+        if (sender is TreeView tree && tree.SelectedItem is ConversationItemViewModel sel)
+            vm.SelectedItem = sel;
     }
 }
