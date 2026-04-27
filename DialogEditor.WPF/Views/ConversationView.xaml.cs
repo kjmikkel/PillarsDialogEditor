@@ -1,7 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using DialogEditor.WPF.ViewModels;
+using DialogEditor.ViewModels;
 
 namespace DialogEditor.WPF.Views;
 

@@ -1,7 +1,7 @@
 <UserControl x:Class="DialogEditor.WPF.Views.GameBrowserView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:vm="clr-namespace:DialogEditor.WPF.ViewModels">
+             xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels">
 
     <Grid>
         <Grid.RowDefinitions>

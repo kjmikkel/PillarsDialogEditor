@@ -1,4 +1,4 @@
-namespace DialogEditor.WPF.Services;
+namespace DialogEditor.ViewModels.Services;
 
 public static class SpeakerNameService
 {

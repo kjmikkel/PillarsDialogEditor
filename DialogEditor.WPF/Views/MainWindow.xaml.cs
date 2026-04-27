@@ -3,9 +3,10 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Interop;
-using DialogEditor.WPF.Resources;
+using DialogEditor.ViewModels.Resources;
+using DialogEditor.ViewModels.Services;
+using DialogEditor.ViewModels;
 using DialogEditor.WPF.Services;
-using DialogEditor.WPF.ViewModels;
 
 namespace DialogEditor.WPF.Views;
 

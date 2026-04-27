@@ -2,10 +2,10 @@ using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.GameData;
-using DialogEditor.WPF.Resources;
-using DialogEditor.WPF.Services;
+using DialogEditor.ViewModels.Resources;
+using DialogEditor.ViewModels.Services;
 
-namespace DialogEditor.WPF.ViewModels;
+namespace DialogEditor.ViewModels;
 
 public partial class MainWindowViewModel : ObservableObject
 {
