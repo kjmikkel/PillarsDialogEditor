@@ -97,55 +97,15 @@
                     </Style>
                 </nodify:NodifyEditor.Styles>
 
+                <!-- DIAGNOSTIC ItemTemplate: plain border instead of nodify:Node
+                     to test whether ItemTemplate is applied at all. -->
                 <nodify:NodifyEditor.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:NodeViewModel}">
-                        <nodify:Node Input="{Binding Inputs}" Output="{Binding Outputs}">
-
-                            <nodify:Node.InputConnectorTemplate>
-                                <DataTemplate DataType="{x:Type vm:ConnectorViewModel}">
-                                    <nodify:NodeInput Anchor="{Binding Anchor, Mode=OneWayToSource,
-                                                                  Converter={StaticResource LayoutPointConverter}}"
-                                                      IsConnected="True"/>
-                                </DataTemplate>
-                            </nodify:Node.InputConnectorTemplate>
-
-                            <nodify:Node.OutputConnectorTemplate>
-                                <DataTemplate DataType="{x:Type vm:ConnectorViewModel}">
-                                    <nodify:NodeOutput Anchor="{Binding Anchor, Mode=OneWayToSource,
-                                                                   Converter={StaticResource LayoutPointConverter}}"
-                                                       IsConnected="True"/>
-                                </DataTemplate>
-                            </nodify:Node.OutputConnectorTemplate>
-
-                            <Grid Width="200" RowDefinitions="Auto,Auto,Auto"
-                                  Opacity="{Binding IsSearchMatch, Converter={StaticResource SearchMatchOpacity}}">
-                                <!-- Header -->
-                                <Border Grid.Row="0"
-                                        Background="{Binding SpeakerCategory, Converter={StaticResource SpeakerCategoryToBrush}}"
-                                        CornerRadius="2,2,0,0">
-                                    <TextBlock Text="{Binding Title}"
-                                               Foreground="White" FontWeight="Bold"
-                                               FontSize="10" Padding="6,3"
-                                               TextTrimming="CharacterEllipsis"/>
-                                </Border>
-
-                                <!-- Body -->
-                                <TextBlock Grid.Row="1"
-                                           Text="{Binding TextPreview}"
-                                           TextWrapping="Wrap"
-                                           Padding="6,4"
-                                           FontSize="10"
-                                           Foreground="#333"
-                                           MaxHeight="70"
-                                           Background="#F5F0D0"/>
-
-                                <!-- Footer -->
-                                <Border Grid.Row="2" Padding="6,2" Background="#E8E0B0">
-                                    <TextBlock Text="{Binding FooterText}" FontSize="9" Foreground="#666"/>
-                                </Border>
-                            </Grid>
-
-                        </nodify:Node>
+                        <Border Width="180" Height="60" Background="Red" CornerRadius="4">
+                            <TextBlock Text="{Binding Title}" Foreground="White"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       FontSize="11"/>
+                        </Border>
                     </DataTemplate>
                 </nodify:NodifyEditor.ItemTemplate>
 
