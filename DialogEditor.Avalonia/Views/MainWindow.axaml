@@ -1,0 +1,289 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:DialogEditor.Avalonia.Views"
+        x:Class="DialogEditor.Avalonia.Views.MainWindow"
+        Title="{StaticResource App_Title}"
+        Icon="/Assets/app.ico"
+        Width="1400" Height="850"
+        Background="#1e1e1e" x:CompileBindings="False">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Top toolbar -->
+        <Border Grid.Row="0" Background="#252525" Padding="6,4">
+            <DockPanel>
+                <ToggleButton x:Name="HelpToggle"
+                              DockPanel.Dock="Right"
+                              Content="?"
+                              IsChecked="False"
+                              Background="#333" Foreground="#aaa" BorderThickness="0" Padding="8,2"
+                              ToolTip.Tip="{StaticResource ToolTip_HelpToggle}"/>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button Command="{Binding OpenFolderCommand}"
+                            Content="{StaticResource Button_OpenFolder}"
+                            Foreground="White"
+                            Background="#333" BorderThickness="0" Padding="8,2"
+                            ToolTip.Tip="{StaticResource ToolTip_OpenFolder}"/>
+                    <Rectangle Width="1" Fill="#444" Margin="8,0" VerticalAlignment="Stretch"/>
+                    <TextBlock Text="{StaticResource Label_Language}" Foreground="#888" FontSize="11"
+                               VerticalAlignment="Center" Margin="0,0,6,0"
+                               IsVisible="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}"/>
+                    <ComboBox ItemsSource="{Binding AvailableLanguages}"
+                              SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
+                              MinWidth="60"
+                              ToolTip.Tip="{StaticResource ToolTip_Language}"
+                              IsVisible="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
+        <!-- Main content area -->
+        <Grid Grid.Row="1" x:Name="ContentGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="220" MinWidth="150"/>
+                <ColumnDefinition Width="4"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="4"/>
+                <ColumnDefinition Width="240" MinWidth="180"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Browser panel -->
+            <Grid Grid.Column="0" x:Name="BrowserPanel">
+                <!-- Expanded state -->
+                <Grid IsVisible="{Binding IsBrowserExpanded}" RowDefinitions="Auto,*">
+                    <Border Background="#252525" Padding="6,4">
+                        <DockPanel>
+                            <ToggleButton DockPanel.Dock="Right"
+                                          IsChecked="{Binding IsBrowserPinned, Mode=TwoWay}"
+                                          Content="📌"
+                                          Background="#333" Foreground="#aaa" BorderThickness="0" Padding="6,2"
+                                          ToolTip.Tip="{StaticResource ToolTip_PinPanel}"/>
+                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,6,0">
+                                <Button Command="{Binding Browser.ExpandAllCommand}" Content="⊞"
+                                        Background="Transparent" BorderThickness="0" Foreground="#555"
+                                        FontSize="10" Cursor="Hand"
+                                        ToolTip.Tip="{StaticResource ToolTip_ExpandAll}"/>
+                                <Button Command="{Binding Browser.CollapseAllCommand}" Content="⊟" Margin="2,0,0,0"
+                                        Background="Transparent" BorderThickness="0" Foreground="#555"
+                                        FontSize="10" Cursor="Hand"
+                                        ToolTip.Tip="{StaticResource ToolTip_CollapseAll}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="{StaticResource Browser_Header}" Foreground="#888" FontSize="10" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding CurrentConversationName}"
+                                           Foreground="#555" FontSize="10" Margin="6,0,0,0"
+                                           IsVisible="{Binding CurrentConversationName, Converter={StaticResource NullOrEmptyToVis}}"/>
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+                    <views:GameBrowserView Grid.Row="1" DataContext="{Binding Browser}"/>
+                </Grid>
+
+                <!-- Collapsed strip -->
+                <Grid IsVisible="{Binding IsBrowserExpanded, Converter={StaticResource InverseBoolToVis}}"
+                      RowDefinitions="Auto,Auto,*">
+                    <ToggleButton Grid.Row="0" Margin="4,4,4,0"
+                                  IsChecked="{Binding IsBrowserPinned, Mode=TwoWay}"
+                                  Content="📌"
+                                  Background="#333" Foreground="#aaa" BorderThickness="0" Padding="6,2"
+                                  ToolTip.Tip="{StaticResource ToolTip_PinPanel}"/>
+                    <Button Grid.Row="1" Grid.RowSpan="2"
+                            Background="Transparent" BorderThickness="0"
+                            Cursor="Hand"
+                            Click="CollapsedBrowserTitle_Click"
+                            ToolTip.Tip="{StaticResource ToolTip_TogglePanel}">
+                        <LayoutTransformControl Margin="0,10,0,0">
+                            <LayoutTransformControl.LayoutTransform>
+                                <RotateTransform Angle="90"/>
+                            </LayoutTransformControl.LayoutTransform>
+                            <TextBlock Text="{StaticResource Browser_Header}"
+                                       Foreground="#555" FontSize="10" FontWeight="Bold"/>
+                        </LayoutTransformControl>
+                    </Button>
+                </Grid>
+            </Grid>
+
+            <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="#333"/>
+            <views:ConversationView x:Name="CanvasView" Grid.Column="2" DataContext="{Binding Canvas}"/>
+            <GridSplitter Grid.Column="3" ResizeDirection="Columns" Background="#333"/>
+
+            <!-- Detail panel -->
+            <Grid Grid.Column="4" x:Name="DetailPanel">
+                <!-- Expanded state -->
+                <Grid IsVisible="{Binding IsDetailExpanded}" RowDefinitions="Auto,*">
+                    <Border Background="#252525" Padding="6,4">
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right"
+                                    Content="−"
+                                    Click="ToggleDetail_Click"
+                                    Background="#333" Foreground="#aaa" BorderThickness="0" Padding="6,2"
+                                    ToolTip.Tip="{StaticResource ToolTip_TogglePanel}"/>
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="{StaticResource Label_NodeDetails}" Foreground="#888" FontSize="10" FontWeight="Bold"/>
+                                <TextBlock Text="{Binding CurrentConversationName}"
+                                           Foreground="#555" FontSize="10" Margin="6,0,0,0"
+                                           IsVisible="{Binding CurrentConversationName, Converter={StaticResource NullOrEmptyToVis}}"/>
+                            </StackPanel>
+                        </DockPanel>
+                    </Border>
+                    <views:NodeDetailView Grid.Row="1" DataContext="{Binding Detail}"/>
+                </Grid>
+
+                <!-- Collapsed strip -->
+                <Grid IsVisible="{Binding IsDetailExpanded, Converter={StaticResource InverseBoolToVis}}"
+                      RowDefinitions="Auto,*">
+                    <Button Grid.Row="0" Margin="4,4,4,0"
+                            Content="+"
+                            Click="ToggleDetail_Click"
+                            Background="#333" Foreground="#aaa" BorderThickness="0" Padding="6,2"
+                            ToolTip.Tip="{StaticResource ToolTip_TogglePanel}"/>
+                    <LayoutTransformControl Grid.Row="1" Margin="0,10,0,0"
+                                            HorizontalAlignment="Center" VerticalAlignment="Top">
+                        <LayoutTransformControl.LayoutTransform>
+                            <RotateTransform Angle="90"/>
+                        </LayoutTransformControl.LayoutTransform>
+                        <TextBlock Text="{StaticResource Label_NodeDetails}"
+                                   Foreground="#555" FontSize="10" FontWeight="Bold"/>
+                    </LayoutTransformControl>
+                </Grid>
+            </Grid>
+
+            <!-- Legend overlay -->
+            <Border Grid.ColumnSpan="5"
+                    HorizontalAlignment="Right" VerticalAlignment="Top"
+                    ZIndex="20"
+                    Width="360" Margin="0,6,12,0"
+                    Background="#1a1a2a" BorderBrush="#3a3a5a" BorderThickness="1"
+                    CornerRadius="4"
+                    IsVisible="{Binding #HelpToggle.IsChecked}">
+                <DockPanel>
+                    <Border DockPanel.Dock="Top" Background="#252535" CornerRadius="4,4,0,0" Padding="10,6">
+                        <DockPanel>
+                            <Button DockPanel.Dock="Right" Content="✕"
+                                    Click="CloseHelp_Click"
+                                    Background="Transparent" BorderThickness="0"
+                                    Foreground="#555" FontSize="10" Cursor="Hand"
+                                    ToolTip.Tip="{StaticResource ToolTip_CloseLegend}"/>
+                            <TextBlock Text="{StaticResource Legend_Header}" Foreground="#888"
+                                       FontSize="10" FontWeight="Bold" VerticalAlignment="Center"/>
+                        </DockPanel>
+                    </Border>
+                    <ScrollViewer Padding="10,8">
+                        <StackPanel>
+                            <TextBlock Text="{StaticResource Legend_Connections}" Foreground="#888" FontSize="10" FontWeight="Bold" Margin="0,0,0,6"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <Border Width="34" Height="2.5" Background="#aaa" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <TextBlock FontSize="12" VerticalAlignment="Center">
+                                    <Run FontWeight="Bold" Text="{StaticResource Legend_ShowOnce}" Foreground="#ccc"/>
+                                    <Run Text="{StaticResource Legend_ShowOnce_Desc}" Foreground="#888"/>
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <Border Width="34" Height="2.5" Background="#b8760a" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <TextBlock FontSize="12" VerticalAlignment="Center">
+                                    <Run FontWeight="Bold" Text="{StaticResource Legend_Always}" Foreground="#ccc"/>
+                                    <Run Text="{StaticResource Legend_Always_Desc}" Foreground="#888"/>
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                <Border Width="34" Height="2.5" Background="#555" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                <TextBlock FontSize="12" VerticalAlignment="Center">
+                                    <Run FontWeight="Bold" Text="{StaticResource Legend_Never}" Foreground="#ccc"/>
+                                    <Run Text="{StaticResource Legend_Never_Desc}" Foreground="#888"/>
+                                </TextBlock>
+                            </StackPanel>
+
+                            <TextBlock Text="{StaticResource Legend_NodeTypes}" Foreground="#888" FontSize="10" FontWeight="Bold" Margin="0,0,0,6"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <Border Width="14" Height="14" Background="#F5F0D0" CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{StaticResource Legend_NpcLine}" Foreground="#ccc" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <Border Width="14" Height="14" Background="#D5E8F5" CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock FontSize="12" VerticalAlignment="Center">
+                                    <Run Text="{StaticResource Legend_PlayerChoice}" Foreground="#ccc"/>
+                                    <Run Text="{StaticResource Legend_PlayerChoiceMark}" Foreground="#aaa"/>
+                                </TextBlock>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <Border Width="14" Height="14" Background="#D5F0E8" CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{StaticResource Legend_Narrator}" Foreground="#ccc" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                                <Border Width="14" Height="14" Background="#E0E0E0" CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{StaticResource Legend_ScriptAction}" Foreground="#ccc" FontSize="12" VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <TextBlock Text="{StaticResource Legend_Symbols}" Foreground="#888" FontSize="10" FontWeight="Bold" Margin="0,0,0,6"/>
+                            <Grid ColumnDefinitions="36,*" Margin="0,0,0,4">
+                                <TextBlock Grid.Column="0" Text="⚙ N" Foreground="#e8a020" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Symbol_Conditions}" Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="36,*" Margin="0,0,0,4">
+                                <TextBlock Grid.Column="0" Text="♀" Foreground="#aaa" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Symbol_FemaleText}" Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="36,*" Margin="0,0,0,14">
+                                <TextBlock Grid.Column="0" Text="✦" Foreground="#aaa" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Symbol_PlayerChoice}" Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+                            </Grid>
+
+                            <TextBlock Text="{StaticResource Legend_Canvas}" Foreground="#888" FontSize="10" FontWeight="Bold" Margin="0,0,0,6"/>
+                            <Grid ColumnDefinitions="72,*" Margin="0,0,0,4">
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Fit}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Fit_Desc}" Foreground="#888" FontSize="12"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="72,*" Margin="0,0,0,4">
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Zoom}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Zoom_Desc}" Foreground="#888" FontSize="12"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="72,*" Margin="0,0,0,4">
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Root}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Root_Desc}" Foreground="#888" FontSize="12"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="72,*" Margin="0,0,0,4">
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Scroll}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Scroll_Desc}" Foreground="#888" FontSize="12"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="72,*" Margin="0,0,0,4">
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Drag}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Drag_Desc}" Foreground="#888" FontSize="12"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="72,*" Margin="0,0,0,14">
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_CtrlF}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_CtrlF_Desc}" Foreground="#888" FontSize="12"/>
+                            </Grid>
+
+                            <TextBlock Text="{StaticResource Legend_Browser}" Foreground="#888" FontSize="10" FontWeight="Bold" Margin="0,0,0,6"/>
+                            <Grid ColumnDefinitions="72,*" Margin="0,0,0,4">
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_ExpandCollapse}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_ExpandCollapse_Desc}" Foreground="#888" FontSize="12"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="72,*" Margin="0,0,0,4">
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Filter}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Filter_Desc}" Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="72,*" Margin="0,0,0,4">
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Escape}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Escape_Desc}" Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="72,*" Margin="0,0,0,4">
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Browser_Pin}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Browser_Pin_Desc}" Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="72,*" Margin="0,0,0,4">
+                                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Browser_Flyout}" Foreground="#ccc" FontSize="12"/>
+                                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Browser_Flyout_Desc}" Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
+                </DockPanel>
+            </Border>
+        </Grid>
+
+        <!-- Status bar -->
+        <Border Grid.Row="2" Background="#1a1a1a" Padding="8,4">
+            <TextBlock Text="{Binding StatusText}" Foreground="#888" FontSize="11"/>
+        </Border>
+    </Grid>
+</Window>

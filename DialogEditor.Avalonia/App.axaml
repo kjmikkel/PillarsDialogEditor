@@ -1,0 +1,27 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:DialogEditor.Avalonia.Converters"
+             x:Class="DialogEditor.Avalonia.App"
+             RequestedThemeVariant="Dark">
+
+    <Application.Styles>
+        <FluentTheme/>
+    </Application.Styles>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://DialogEditor.Avalonia/Resources/Strings.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+
+            <converters:LayoutPointConverter             x:Key="LayoutPointConverter"/>
+            <converters:SpeakerCategoryToBrushConverter x:Key="SpeakerCategoryToBrush"/>
+            <converters:BoolToFemaleTextBrushConverter  x:Key="BoolToFemaleTextBrush"/>
+            <converters:InverseBoolConverter            x:Key="InverseBoolToVis"/>
+            <converters:NullOrEmptyToBoolConverter      x:Key="NullOrEmptyToVis"/>
+            <converters:CountToBoolConverter            x:Key="CountToVis"/>
+
+        </ResourceDictionary>
+    </Application.Resources>
+
+</Application>
