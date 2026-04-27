@@ -6,6 +6,7 @@
 
     <Application.Styles>
         <FluentTheme/>
+        <StyleInclude Source="avares://Nodify/Theme.axaml"/>
     </Application.Styles>
 
     <Application.Resources>
