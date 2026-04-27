@@ -87,16 +87,15 @@
                                  ItemsSource="{Binding Nodes}"
                                  Connections="{Binding Connections}">
 
-                <nodify:NodifyEditor.ItemContainerTheme>
-                    <!-- BasedOn omitted: NodifyAvalonia does not register its ControlTheme
-                         under the type key, so the lookup would fail. The property setters
-                         here act as an overlay on top of Nodify's internal template. -->
-                    <ControlTheme TargetType="nodify:ItemContainer">
-                        <Setter Property="Location" Value="{Binding Location, Mode=TwoWay,
-                                                   Converter={StaticResource LayoutPointConverter}}"/>
+                <!-- Style-based bindings sit on top of Nodify's own default ControlTheme
+                     without replacing it (unlike ItemContainerTheme + ControlTheme). -->
+                <nodify:NodifyEditor.Styles>
+                    <Style Selector="nodify|ItemContainer">
+                        <Setter Property="Location" Value="{Binding Location,
+                                           Converter={StaticResource LayoutPointConverter}}"/>
                         <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
-                    </ControlTheme>
-                </nodify:NodifyEditor.ItemContainerTheme>
+                    </Style>
+                </nodify:NodifyEditor.Styles>
 
                 <nodify:NodifyEditor.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:NodeViewModel}">
