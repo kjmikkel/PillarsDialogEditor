@@ -3,7 +3,7 @@
         xmlns:views="clr-namespace:DialogEditor.Avalonia.Views"
         x:Class="DialogEditor.Avalonia.Views.MainWindow"
         Title="{StaticResource App_Title}"
-        Icon="/Assets/app.ico"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="1400" Height="850"
         Background="#1e1e1e" x:CompileBindings="False">
 
