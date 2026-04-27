@@ -1,3 +1,4 @@
+using DialogEditor.ViewModels.Services;
 using System.Windows;
 
 namespace DialogEditor.WPF.Services;

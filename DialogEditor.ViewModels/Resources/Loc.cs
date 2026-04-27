@@ -1,20 +1,20 @@
-using DialogEditor.WPF.Services;
+using DialogEditor.ViewModels.Services;
 
-namespace DialogEditor.WPF.Resources;
+namespace DialogEditor.ViewModels.Resources;
 
 /// <summary>
 /// Static helper that delegates to an IStringProvider.
 /// Call Loc.Configure(provider) once at startup before any ViewModel is created.
-/// WPF default: WpfStringProvider (Application.Current.Resources).
-/// Avalonia: configure with an AvaloniaStringProvider.
+/// WPF: configure with WpfStringProvider (Application.Current.Resources).
+/// Avalonia: configure with AvaloniaStringProvider.
 /// </summary>
 public static class Loc
 {
     private static IStringProvider? _provider;
 
-    // Lazy default so Application.Current is always ready when first accessed
     private static IStringProvider Provider =>
-        _provider ??= new WpfStringProvider();
+        _provider ?? throw new InvalidOperationException(
+            "Loc.Configure(provider) must be called at startup before any string lookup.");
 
     public static void Configure(IStringProvider provider) => _provider = provider;
 

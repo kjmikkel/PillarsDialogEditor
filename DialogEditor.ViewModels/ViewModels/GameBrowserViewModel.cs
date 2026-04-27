@@ -2,9 +2,9 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.GameData;
-using DialogEditor.WPF.Services;
+using DialogEditor.ViewModels.Services;
 
-namespace DialogEditor.WPF.ViewModels;
+namespace DialogEditor.ViewModels;
 
 public partial class GameBrowserViewModel : ObservableObject
 {

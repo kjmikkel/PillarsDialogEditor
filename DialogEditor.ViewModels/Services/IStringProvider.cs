@@ -1,4 +1,4 @@
-namespace DialogEditor.WPF.Services;
+namespace DialogEditor.ViewModels.Services;
 
 /// <summary>
 /// Platform-agnostic string resource provider used by Loc.

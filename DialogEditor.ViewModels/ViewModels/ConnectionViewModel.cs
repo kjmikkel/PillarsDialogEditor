@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace DialogEditor.WPF.ViewModels;
+namespace DialogEditor.ViewModels;
 
 public partial class ConnectionViewModel(
     ConnectorViewModel source,

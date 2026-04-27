@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="DialogEditor.Core/DialogEditor.Core.csproj" />
   <Project Path="DialogEditor.Tests/DialogEditor.Tests.csproj" />
+  <Project Path="DialogEditor.ViewModels/DialogEditor.ViewModels.csproj" />
   <Project Path="DialogEditor.WPF/DialogEditor.WPF.csproj" />
 </Solution>

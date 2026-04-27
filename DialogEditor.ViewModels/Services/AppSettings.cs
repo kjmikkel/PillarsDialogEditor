@@ -2,7 +2,7 @@ using System.IO;
 using System.Text.Json;
 using DialogEditor.Core.GameData;
 
-namespace DialogEditor.WPF.Services;
+namespace DialogEditor.ViewModels.Services;
 
 public static class AppSettings
 {

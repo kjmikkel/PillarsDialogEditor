@@ -1,6 +1,6 @@
 using DialogEditor.Core.GameData;
 
-namespace DialogEditor.WPF.ViewModels;
+namespace DialogEditor.ViewModels;
 
 public class ConversationItemViewModel(ConversationFile file)
 {

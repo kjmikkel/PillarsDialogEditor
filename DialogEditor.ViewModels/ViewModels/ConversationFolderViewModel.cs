@@ -1,8 +1,8 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
-using DialogEditor.WPF.Resources;
+using DialogEditor.ViewModels.Resources;
 
-namespace DialogEditor.WPF.ViewModels;
+namespace DialogEditor.ViewModels;
 
 public partial class ConversationFolderViewModel(string folderPath,
     IEnumerable<ConversationItemViewModel>? items = null,

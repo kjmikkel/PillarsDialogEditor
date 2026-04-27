@@ -1,9 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using DialogEditor.Core.Models;
-using DialogEditor.WPF.Resources;
-using DialogEditor.WPF.Services;
+using DialogEditor.ViewModels.Resources;
+using DialogEditor.ViewModels.Services;
 
-namespace DialogEditor.WPF.ViewModels;
+namespace DialogEditor.ViewModels;
 
 public partial class NodeViewModel : ObservableObject
 {
