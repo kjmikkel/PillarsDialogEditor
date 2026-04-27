@@ -88,14 +88,13 @@
                                  Connections="{Binding Connections}">
 
                 <nodify:NodifyEditor.ItemContainerTheme>
-                    <ControlTheme TargetType="nodify:ItemContainer"
-                                  BasedOn="{StaticResource {x:Type nodify:ItemContainer}}">
+                    <!-- BasedOn omitted: NodifyAvalonia does not register its ControlTheme
+                         under the type key, so the lookup would fail. The property setters
+                         here act as an overlay on top of Nodify's internal template. -->
+                    <ControlTheme TargetType="nodify:ItemContainer">
                         <Setter Property="Location" Value="{Binding Location, Mode=TwoWay,
                                                    Converter={StaticResource LayoutPointConverter}}"/>
                         <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
-                        <Style Selector="^:not(.match)">
-                            <Setter Property="Opacity" Value="0.2"/>
-                        </Style>
                     </ControlTheme>
                 </nodify:NodifyEditor.ItemContainerTheme>
 
@@ -119,7 +118,8 @@
                                 </DataTemplate>
                             </nodify:Node.OutputConnectorTemplate>
 
-                            <Grid Width="200" RowDefinitions="Auto,Auto,Auto">
+                            <Grid Width="200" RowDefinitions="Auto,Auto,Auto"
+                                  Opacity="{Binding IsSearchMatch, Converter={StaticResource SearchMatchOpacity}}">
                                 <!-- Header -->
                                 <Border Grid.Row="0"
                                         Background="{Binding SpeakerCategory, Converter={StaticResource SpeakerCategoryToBrush}}"
@@ -174,8 +174,7 @@
                 ViewportSize="{Binding ViewportSize, ElementName=Editor}"
                 ToolTip.Tip="{StaticResource ToolTip_Minimap}">
                 <nodify:Minimap.ItemContainerTheme>
-                    <ControlTheme TargetType="nodify:MinimapItem"
-                                  BasedOn="{StaticResource {x:Type nodify:MinimapItem}}">
+                    <ControlTheme TargetType="nodify:MinimapItem">
                         <Setter Property="Location" Value="{Binding Location,
                                            Converter={StaticResource LayoutPointConverter}}"/>
                         <Setter Property="Width" Value="200"/>
