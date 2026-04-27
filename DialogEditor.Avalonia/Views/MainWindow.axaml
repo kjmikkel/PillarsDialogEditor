@@ -49,8 +49,16 @@
 
             <!-- Browser panel -->
             <Grid Grid.Column="0" x:Name="BrowserPanel">
-                <!-- Expanded state -->
-                <Grid IsVisible="{Binding IsBrowserExpanded}" RowDefinitions="Auto,*">
+                <!-- Expanded state — Border provides conditional drop shadow when open as flyout -->
+                <Border IsVisible="{Binding IsBrowserExpanded}"
+                        Classes.flyout="{Binding IsBrowserFlyoutOpen}">
+                    <Border.Styles>
+                        <Style Selector="Border.flyout">
+                            <Setter Property="BoxShadow" Value="0 0 18 0 #A0000000"/>
+                            <Setter Property="ZIndex" Value="5"/>
+                        </Style>
+                    </Border.Styles>
+                    <Grid RowDefinitions="Auto,*">
                     <Border Background="#252525" Padding="6,4">
                         <DockPanel>
                             <ToggleButton DockPanel.Dock="Right"
@@ -77,7 +85,8 @@
                         </DockPanel>
                     </Border>
                     <views:GameBrowserView Grid.Row="1" DataContext="{Binding Browser}"/>
-                </Grid>
+                    </Grid>
+                </Border>
 
                 <!-- Collapsed strip -->
                 <Grid IsVisible="{Binding IsBrowserExpanded, Converter={StaticResource InverseBoolToVis}}"
