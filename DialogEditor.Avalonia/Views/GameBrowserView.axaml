@@ -1,0 +1,68 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+             x:Class="DialogEditor.Avalonia.Views.GameBrowserView" x:CompileBindings="False">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Filter box -->
+        <Border Grid.Row="0" Background="#252525" Padding="4" BorderBrush="#333" BorderThickness="0,0,0,1">
+            <Grid>
+                <TextBox x:Name="FilterBox"
+                         Text="{Binding FilterText}"
+                         Background="#333" Foreground="#ccc" CaretBrush="#ccc"
+                         BorderBrush="#555" BorderThickness="1"
+                         Padding="6,3,24,3" FontSize="10"
+                         ToolTip.Tip="{StaticResource ToolTip_FilterConversations}"/>
+                <TextBlock Text="{StaticResource Placeholder_FilterConversations}"
+                           Foreground="#555" FontSize="10"
+                           Padding="8,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"
+                           IsVisible="{Binding FilterText, Converter={StaticResource NullOrEmptyToVis}}"/>
+                <Button Command="{Binding ClearFilterCommand}"
+                        HorizontalAlignment="Right" Width="20"
+                        Content="✕" VerticalAlignment="Center"
+                        Background="Transparent" BorderThickness="0"
+                        Foreground="#555" FontSize="10" Cursor="Hand"
+                        ToolTip.Tip="{StaticResource ToolTip_ClearFilter}"/>
+            </Grid>
+        </Border>
+
+        <!-- Conversation tree -->
+        <TreeView Grid.Row="1" Background="#2d2d2d"
+                  BorderThickness="0"
+                  ItemsSource="{Binding FilteredFolders}"
+                  SelectionChanged="TreeView_SelectionChanged">
+
+            <TreeView.Styles>
+                <!-- Selection highlight -->
+                <Style Selector="TreeViewItem:selected /template/ ContentPresenter#PART_HeaderPresenter">
+                    <Setter Property="Background" Value="#1a5276"/>
+                </Style>
+                <Style Selector="TreeViewItem:selected:focus /template/ ContentPresenter#PART_HeaderPresenter">
+                    <Setter Property="Background" Value="#1a5276"/>
+                </Style>
+            </TreeView.Styles>
+
+            <TreeView.DataTemplates>
+                <TreeDataTemplate DataType="{x:Type vm:ConversationFolderViewModel}" ItemsSource="{Binding Items}">
+                    <TextBlock Text="{Binding DisplayName}" Foreground="#888" FontSize="10" Padding="2"/>
+                </TreeDataTemplate>
+                <DataTemplate DataType="{x:Type vm:ConversationItemViewModel}">
+                    <TextBlock Text="{Binding Name}" Foreground="#ccc" FontSize="10" Padding="2"/>
+                </DataTemplate>
+            </TreeView.DataTemplates>
+
+            <TreeView.ItemContainerTheme>
+                <ControlTheme TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                </ControlTheme>
+            </TreeView.ItemContainerTheme>
+
+        </TreeView>
+
+        <!-- Game name footer -->
+        <Border Grid.Row="2" Background="#1a1a1a" Padding="8,5">
+            <TextBlock Text="{Binding GameName}" Foreground="#555" FontSize="9"/>
+        </Border>
+    </Grid>
+</UserControl>
