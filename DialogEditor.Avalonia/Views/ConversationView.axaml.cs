@@ -16,6 +16,10 @@ public partial class ConversationView : UserControl
         SearchBox.SelectAll();
     }
 
+    private void FitToScreen_Click(object? sender, RoutedEventArgs e) => Editor.FitToScreen();
+    private void ZoomIn_Click(object? sender, RoutedEventArgs e)      => Editor.ZoomIn();
+    private void ZoomOut_Click(object? sender, RoutedEventArgs e)     => Editor.ZoomOut();
+
     private void CenterOnRoot_Click(object? sender, RoutedEventArgs e)
     {
         if (DataContext is not ConversationViewModel vm) return;
