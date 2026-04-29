@@ -66,7 +66,10 @@
                                           Content="📌"
                                           Background="#333" Foreground="#aaa" BorderThickness="0" Padding="6,2"
                                           ToolTip.Tip="{StaticResource ToolTip_PinPanel}"/>
-                            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,6,0">
+                          <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="{StaticResource Browser_Header}" Foreground="#888" FontSize="10" FontWeight="Bold"/>
+                          </StackPanel>
+                          <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,6,0">
                                 <Button Command="{Binding Browser.ExpandAllCommand}" Content="⊞"
                                         Background="Transparent" BorderThickness="0" Foreground="#555"
                                         FontSize="10" Cursor="Hand"
@@ -75,12 +78,6 @@
                                         Background="Transparent" BorderThickness="0" Foreground="#555"
                                         FontSize="10" Cursor="Hand"
                                         ToolTip.Tip="{StaticResource ToolTip_CollapseAll}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="{StaticResource Browser_Header}" Foreground="#888" FontSize="10" FontWeight="Bold"/>
-                                <TextBlock Text="{Binding CurrentConversationName}"
-                                           Foreground="#555" FontSize="10" Margin="6,0,0,0"
-                                           IsVisible="{Binding CurrentConversationName, Converter={StaticResource NullOrEmptyToVis}}"/>
                             </StackPanel>
                         </DockPanel>
                     </Border>
