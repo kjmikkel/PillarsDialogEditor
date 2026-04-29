@@ -67,7 +67,7 @@
                     <TextBlock Text="{StaticResource Placeholder_SearchNodes}"
                                Foreground="#555" FontSize="10"
                                Padding="8,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"
-                               IsVisible="{Binding SearchQuery, Converter={StaticResource NullOrEmptyToVis}}"/>
+                               IsVisible="{Binding SearchQuery, Converter={StaticResource StringIsEmpty}}"/>
                     <Button Command="{Binding ClearSearchCommand}"
                             HorizontalAlignment="Right" Width="20"
                             Content="✕" VerticalAlignment="Center"
@@ -129,8 +129,13 @@
                                            TextWrapping="Wrap"
                                            Padding="6,4" FontSize="10"
                                            Foreground="#333" MaxHeight="70"
-                                           Background="#F5F0D0"/>
-                                <Border Grid.Row="2" Padding="6,2" Background="#E8E0B0">
+                                           Background="{Binding SpeakerCategory,
+                                               Converter={StaticResource SpeakerCategoryToBrush},
+                                               ConverterParameter=body}"/>
+                                <Border Grid.Row="2" Padding="6,2"
+                                        Background="{Binding SpeakerCategory,
+                                            Converter={StaticResource SpeakerCategoryToBrush},
+                                            ConverterParameter=footer}">
                                     <TextBlock Text="{Binding FooterText}" FontSize="9" Foreground="#666"/>
                                 </Border>
                             </Grid>
