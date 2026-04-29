@@ -18,7 +18,7 @@
                 <TextBlock Text="{StaticResource Placeholder_FilterConversations}"
                            Foreground="#555" FontSize="10"
                            Padding="8,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"
-                           IsVisible="{Binding FilterText, Converter={StaticResource NullOrEmptyToVis}}"/>
+                           IsVisible="{Binding FilterText, Converter={StaticResource StringIsEmpty}}"/>
                 <Button Command="{Binding ClearFilterCommand}"
                         HorizontalAlignment="Right" Width="20"
                         Content="✕" VerticalAlignment="Center"
