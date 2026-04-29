@@ -61,7 +61,8 @@
                              Text="{Binding SearchQuery}"
                              Background="#333" Foreground="#ccc" CaretBrush="#ccc"
                              BorderBrush="#555" BorderThickness="1"
-                             Padding="6,2,24,2" FontSize="10" Height="26"
+                             Padding="6,2,24,2" FontSize="12" Height="26"
+                             VerticalContentAlignment="Center"
                              ToolTip.Tip="{StaticResource ToolTip_SearchNodes}"/>
                     <TextBlock Text="{StaticResource Placeholder_SearchNodes}"
                                Foreground="#555" FontSize="10"
