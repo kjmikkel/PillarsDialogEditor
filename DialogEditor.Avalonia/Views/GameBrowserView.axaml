@@ -12,7 +12,8 @@
                          Text="{Binding FilterText}"
                          Background="#333" Foreground="#ccc" CaretBrush="#ccc"
                          BorderBrush="#555" BorderThickness="1"
-                         Padding="6,3,24,3" FontSize="10"
+                         Padding="6,3,24,3" FontSize="12" Height="26"
+                         VerticalContentAlignment="Center"
                          ToolTip.Tip="{StaticResource ToolTip_FilterConversations}"/>
                 <TextBlock Text="{StaticResource Placeholder_FilterConversations}"
                            Foreground="#555" FontSize="10"
