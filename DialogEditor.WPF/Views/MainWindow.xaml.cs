@@ -18,6 +18,14 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        AppLog.Info("DialogEditor.WPF started");
+        AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+            AppLog.Error("Unhandled exception", e.ExceptionObject as Exception);
+        Application.Current.DispatcherUnhandledException += (_, e) =>
+        {
+            AppLog.Error("Dispatcher unhandled exception", e.Exception);
+            e.Handled = true;
+        };
         Loc.Configure(new WpfStringProvider());
         DataContext = new MainWindowViewModel(
             new WpfDispatcher(Dispatcher),

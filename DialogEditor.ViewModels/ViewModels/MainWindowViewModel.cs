@@ -82,6 +82,7 @@ public partial class MainWindowViewModel : ObservableObject
         var provider = GameDataProviderFactory.Detect(path);
         if (provider is null)
         {
+            AppLog.Warn($"Folder not recognised as PoE1 or PoE2 root: {path}");
             StatusText = Loc.Get("Status_FolderNotRecognized");
             return;
         }
@@ -93,6 +94,7 @@ public partial class MainWindowViewModel : ObservableObject
         AvailableLanguages = provider.AvailableLanguages;
         SelectedLanguage = AppSettings.PickLanguage(AvailableLanguages, AppSettings.LastLanguage);
         Browser.Load(provider);
+        AppLog.Info($"Loaded {provider.GameName} from {path}");
         StatusText = Loc.Format("Status_FolderLoaded", provider.GameName, path);
     }
 
@@ -111,6 +113,7 @@ public partial class MainWindowViewModel : ObservableObject
         }
         catch (Exception ex)
         {
+            AppLog.Error($"Failed to load conversation '{file.Name}'", ex);
             StatusText = Loc.Format("Status_LoadError", file.Name, ex.Message);
         }
     }

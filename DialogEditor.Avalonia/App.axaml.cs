@@ -4,6 +4,7 @@ using Avalonia.Markup.Xaml;
 using DialogEditor.Avalonia.Services;
 using DialogEditor.Avalonia.Views;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Avalonia;
 
@@ -15,6 +16,9 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            AppLog.Info("DialogEditor.Avalonia started");
+            AppDomain.CurrentDomain.UnhandledException += (_, e) =>
+                AppLog.Error("Unhandled exception", e.ExceptionObject as Exception);
             Loc.Configure(new AvaloniaStringProvider());
             desktop.MainWindow = new MainWindow();
         }

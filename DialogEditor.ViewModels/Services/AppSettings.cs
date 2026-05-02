@@ -50,7 +50,11 @@ public static class AppSettings
             var json = File.ReadAllText(SettingsPath);
             return JsonSerializer.Deserialize<SettingsData>(json) ?? new();
         }
-        catch { return new(); }
+        catch (Exception ex)
+        {
+            AppLog.Warn($"Failed to load settings from {SettingsPath}: {ex.Message}");
+            return new();
+        }
     }
 
     private static void Save(SettingsData data)
@@ -60,7 +64,10 @@ public static class AppSettings
             Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath)!);
             File.WriteAllText(SettingsPath, JsonSerializer.Serialize(data));
         }
-        catch { }
+        catch (Exception ex)
+        {
+            AppLog.Warn($"Failed to save settings to {SettingsPath}: {ex.Message}");
+        }
     }
 
     public static string PickLanguage(IReadOnlyList<string> available, string? preferred)
