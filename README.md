@@ -157,6 +157,7 @@ DialogEditor.Tests/         net8.0 — xUnit tests (Core only)
 ## Notes
 
 - **Read-only** — no game files are ever modified
+- **Error log** — errors and warnings are written to `%LOCALAPPDATA%\PillarsDialogEditor\app.log` (rotates at 1 MB → `app.log.old`)
 - **PoE2 speaker names** — loaded from `speakers.gamedatabundle` at startup; replaced entirely when a new folder is opened
 - **Conditions** — both parsers preserve the full AND/OR/NOT tree structure rather than flattening to a plain list
 - **Connection types** — `QuestionNodeTextDisplay` values (`ShowOnce`, `Always`, `Never`) are rendered as distinct edge colours on the canvas

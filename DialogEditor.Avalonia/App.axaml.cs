@@ -19,6 +19,11 @@ public partial class App : Application
             AppLog.Info("DialogEditor.Avalonia started");
             AppDomain.CurrentDomain.UnhandledException += (_, e) =>
                 AppLog.Error("Unhandled exception", e.ExceptionObject as Exception);
+            TaskScheduler.UnobservedTaskException += (_, e) =>
+            {
+                AppLog.Error("Unobserved task exception", e.Exception);
+                e.SetObserved();
+            };
             Loc.Configure(new AvaloniaStringProvider());
             desktop.MainWindow = new MainWindow();
         }
