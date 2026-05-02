@@ -26,6 +26,11 @@ public partial class MainWindow : Window
             AppLog.Error("Dispatcher unhandled exception", e.Exception);
             e.Handled = true;
         };
+        TaskScheduler.UnobservedTaskException += (_, e) =>
+        {
+            AppLog.Error("Unobserved task exception", e.Exception);
+            e.SetObserved();
+        };
         Loc.Configure(new WpfStringProvider());
         DataContext = new MainWindowViewModel(
             new WpfDispatcher(Dispatcher),

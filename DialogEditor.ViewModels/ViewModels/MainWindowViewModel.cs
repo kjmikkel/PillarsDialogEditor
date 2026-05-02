@@ -87,15 +87,23 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        AppSettings.LastGameDirectory = path;
-        _provider = provider;
-        CurrentConversationName = null;
-        SpeakerNameService.Register(provider.LoadSpeakerNames());
-        AvailableLanguages = provider.AvailableLanguages;
-        SelectedLanguage = AppSettings.PickLanguage(AvailableLanguages, AppSettings.LastLanguage);
-        Browser.Load(provider);
-        AppLog.Info($"Loaded {provider.GameName} from {path}");
-        StatusText = Loc.Format("Status_FolderLoaded", provider.GameName, path);
+        try
+        {
+            AppSettings.LastGameDirectory = path;
+            _provider = provider;
+            CurrentConversationName = null;
+            SpeakerNameService.Register(provider.LoadSpeakerNames());
+            AvailableLanguages = provider.AvailableLanguages;
+            SelectedLanguage = AppSettings.PickLanguage(AvailableLanguages, AppSettings.LastLanguage);
+            Browser.Load(provider);
+            AppLog.Info($"Loaded {provider.GameName} from {path}");
+            StatusText = Loc.Format("Status_FolderLoaded", provider.GameName, path);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error($"Failed to initialise game data from {path}", ex);
+            StatusText = Loc.Format("Status_LoadError", path, ex.Message);
+        }
     }
 
     private void OnConversationSelected(ConversationFile file)
