@@ -18,6 +18,10 @@ No user-visible text may be hard-coded inline in XAML or C#. All strings — lab
 
 Every interactive control — buttons, icon-only actions, toolbar items, canvas controls — must carry a descriptive `ToolTip` property that explains its effect in plain language. One-word labels and symbols (⌂, ⊞, ?, +) are not self-explanatory to new users. Tooltips are mandatory; omitting them on new controls is a defect.
 
+## Error Handling
+
+Every caught exception must be logged via `AppLog.Error(...)` or `AppLog.Warn(...)` before or after any user-facing status update. The sole exception is `OperationCanceledException`, which represents deliberate cancellation and must be swallowed silently. Bare `catch { }` blocks are not permitted.
+
 ## Worktree Cleanup
 
 Before removing a worktree, always run `git -C <worktree-path> status --short` and inspect the output. If there are staged or unstaged changes, determine whether they represent work that should be preserved. If yes, commit them to the branch before removing the worktree.
