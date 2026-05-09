@@ -16,6 +16,16 @@ public partial class ConversationView : UserControl
         SearchBox.SelectAll();
     }
 
+    private void SearchBox_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape && DataContext is ConversationViewModel vm)
+        {
+            vm.SearchQuery = string.Empty;
+            Editor.Focus();
+            e.Handled = true;
+        }
+    }
+
     private void FitToScreen_Click(object? sender, RoutedEventArgs e) => Editor.FitToScreen();
     private void ZoomIn_Click(object? sender, RoutedEventArgs e)      => Editor.ZoomIn();
     private void ZoomOut_Click(object? sender, RoutedEventArgs e)     => Editor.ZoomOut();

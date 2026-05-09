@@ -2,12 +2,7 @@
 
 A read-only dialog graph viewer for *Pillars of Eternity* (PoE1) and *Pillars of Eternity II: Deadfire* (PoE2). Conversations are rendered as directed node graphs; inspect conditions, scripts, text variants, and voice data without modifying any game files.
 
-Two builds share the same core and ViewModels:
-
-| Build | Platform | Package |
-|---|---|---|
-| `DialogEditor.WPF` | Windows only | .NET 10, WPF + Nodify 6.2 |
-| `DialogEditor.Avalonia` | Windows · macOS · Linux | .NET 8, Avalonia 11 + NodifyAvalonia 6.6 |
+Built on Avalonia — runs on Windows, macOS, and Linux.
 
 ---
 
@@ -48,11 +43,6 @@ Two builds share the same core and ViewModels:
 
 ## Requirements
 
-### WPF (Windows)
-- Windows 10 or later
-- [.NET 10 SDK](https://dotnet.microsoft.com/download)
-
-### Avalonia (cross-platform)
 - [.NET 8 SDK](https://dotnet.microsoft.com/download)
 - **Linux only** — a few system libraries:
   ```bash
@@ -70,30 +60,23 @@ Two builds share the same core and ViewModels:
 # macOS / Linux
 ./run-avalonia.sh
 
-# Windows — WPF build
-run-wpf.bat
+# Windows
+dotnet run --project DialogEditor.Avalonia
 ```
 
 ### Via Make
 
 ```bash
-make                # run Avalonia (default)
-make run-avalonia   # same
-make run-wpf        # Windows only
-make test
+make        # run
 make build
+make test
 ```
 
 ### Via dotnet directly
 
 ```bash
-# Avalonia (cross-platform)
 dotnet run --project DialogEditor.Avalonia
 
-# WPF (Windows only)
-dotnet run --project DialogEditor.WPF
-
-# Tests
 dotnet test
 ```
 
@@ -123,16 +106,10 @@ DialogEditor.Core/          net8.0 — zero UI dependencies
   Layout/                   AutoLayoutService (BFS layered layout)
   Resources/                CoreStrings.resx — script prefixes, condition "NOT"
 
-DialogEditor.ViewModels/    net8.0 — shared across WPF and Avalonia
+DialogEditor.ViewModels/    net8.0 — shared view models and services
   ViewModels/               MVVM view models (CommunityToolkit.Mvvm)
   Services/                 IDispatcher, IFolderPicker, IStringProvider + platform adapters
   Resources/                Loc.cs — static string accessor
-
-DialogEditor.WPF/           net10.0-windows — Windows reference build
-  Views/                    XAML views, Nodify 6.2 canvas
-  Converters/               WPF value converters
-  Services/                 WpfDispatcher, WpfFolderPicker, WpfStringProvider
-  Resources/                Strings.xaml
 
 DialogEditor.Avalonia/      net8.0 — cross-platform build
   Views/                    AXAML views, NodifyAvalonia 6.6 canvas

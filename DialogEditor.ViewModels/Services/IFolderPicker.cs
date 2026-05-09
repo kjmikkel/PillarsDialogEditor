@@ -2,8 +2,7 @@ namespace DialogEditor.ViewModels.Services;
 
 /// <summary>
 /// Platform-agnostic folder picker abstraction.
-/// WPF: backed by Microsoft.Win32.OpenFolderDialog.
-/// Avalonia: backed by IStorageProvider.OpenFolderPickerAsync.
+/// Backed by IStorageProvider.OpenFolderPickerAsync.
 /// </summary>
 public interface IFolderPicker
 {

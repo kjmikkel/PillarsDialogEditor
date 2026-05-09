@@ -5,8 +5,6 @@ namespace DialogEditor.ViewModels.Resources;
 /// <summary>
 /// Static helper that delegates to an IStringProvider.
 /// Call Loc.Configure(provider) once at startup before any ViewModel is created.
-/// WPF: configure with WpfStringProvider (Application.Current.Resources).
-/// Avalonia: configure with AvaloniaStringProvider.
 /// </summary>
 public static class Loc
 {
