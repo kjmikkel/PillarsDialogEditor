@@ -9,6 +9,15 @@ public partial class GameBrowserView : UserControl
 {
     public GameBrowserView() => InitializeComponent();
 
+    private void FilterBox_KeyDown(object? sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Escape && DataContext is GameBrowserViewModel vm)
+        {
+            vm.FilterText = string.Empty;
+            e.Handled = true;
+        }
+    }
+
     // Direct tap on each conversation item — bypasses TreeView selection quirks.
     private void ConversationItem_Tapped(object? sender, TappedEventArgs e)
     {

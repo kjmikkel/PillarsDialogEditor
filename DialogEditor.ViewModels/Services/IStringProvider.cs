@@ -2,8 +2,7 @@ namespace DialogEditor.ViewModels.Services;
 
 /// <summary>
 /// Platform-agnostic string resource provider used by Loc.
-/// WPF: backed by Application.Current.Resources (ResourceDictionary / Strings.xaml).
-/// Avalonia: backed by Application.Current.FindResource or equivalent.
+/// Backed by Application.Current.FindResource (Strings.axaml).
 /// </summary>
 public interface IStringProvider
 {

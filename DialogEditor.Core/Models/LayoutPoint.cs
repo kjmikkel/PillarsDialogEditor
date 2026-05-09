@@ -2,8 +2,7 @@ namespace DialogEditor.Core.Models;
 
 /// <summary>
 /// Platform-agnostic 2-D point used for canvas node positions.
-/// WPF: converted to/from System.Windows.Point via LayoutPointConverter.
-/// Avalonia: converted to/from Avalonia.Point via the same converter pattern.
+/// Converted to/from Avalonia.Point via LayoutPointConverter.
 /// </summary>
 public readonly record struct LayoutPoint(double X, double Y)
 {

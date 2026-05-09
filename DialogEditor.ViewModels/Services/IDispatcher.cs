@@ -2,8 +2,7 @@ namespace DialogEditor.ViewModels.Services;
 
 /// <summary>
 /// Platform-agnostic dispatcher abstraction used by ViewModels.
-/// WPF: backed by System.Windows.Threading.Dispatcher at Background priority.
-/// Avalonia: back with Dispatcher.UIThread at Background priority.
+/// Backed by Dispatcher.UIThread at Background priority.
 /// </summary>
 public interface IDispatcher
 {

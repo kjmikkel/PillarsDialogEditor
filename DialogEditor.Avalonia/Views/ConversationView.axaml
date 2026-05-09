@@ -63,6 +63,7 @@
                              BorderBrush="#555" BorderThickness="1"
                              Padding="6,2,24,2" FontSize="12" Height="26"
                              VerticalContentAlignment="Center"
+                             KeyDown="SearchBox_KeyDown"
                              ToolTip.Tip="{StaticResource ToolTip_SearchNodes}"/>
                     <TextBlock Text="{StaticResource Placeholder_SearchNodes}"
                                Foreground="#555" FontSize="10"

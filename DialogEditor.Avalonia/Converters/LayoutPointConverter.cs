@@ -7,7 +7,6 @@ namespace DialogEditor.Avalonia.Converters;
 
 /// <summary>
 /// Converts between LayoutPoint (ViewModel) and Avalonia.Point (Nodify bindings).
-/// WPF port: swap Avalonia.Point for System.Windows.Point.
 /// </summary>
 public sealed class LayoutPointConverter : IValueConverter
 {
