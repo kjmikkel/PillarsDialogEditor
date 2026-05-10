@@ -137,6 +137,8 @@ Clear_DoesNotThrowWhenCalledBeforeLoad
 
 The "AlwaysContains…EvenWhenEmpty" tests directly encode the always-visible requirement.
 
+`NodeDetailViewModel` had no existing tests, so no existing tests become obsolete or require changes. The parser tests (`Poe1ConversationParserTests`, `Poe2ConversationParserTests`) assert on `ConversationNode` properties, which this change does not touch, and remain valid as-is.
+
 ## Files Changed
 
 | File | Change |
