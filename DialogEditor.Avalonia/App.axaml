@@ -22,7 +22,8 @@
             <converters:NullOrEmptyToBoolConverter      x:Key="NullOrEmptyToVis"/>
             <converters:CountToBoolConverter            x:Key="CountToVis"/>
             <converters:BoolToOpacityConverter          x:Key="SearchMatchOpacity"/>
-            <converters:StringIsEmptyConverter          x:Key="StringIsEmpty"/>
+            <converters:StringIsEmptyConverter              x:Key="StringIsEmpty"/>
+            <converters:PropertyValueStyleToBrushConverter x:Key="PropertyValueStyleToBrush"/>
 
         </ResourceDictionary>
     </Application.Resources>
