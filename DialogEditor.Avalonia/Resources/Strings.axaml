@@ -105,30 +105,9 @@
     <sys:String x:Key="Label_NodeDetails">NODE DETAILS</sys:String>
     <!-- Prompt shown in the centre of the panel when no node is selected -->
     <sys:String x:Key="Label_SelectNode">Select a node to view details.</sys:String>
-    <!-- Section label for node ID / type row -->
-    <sys:String x:Key="Label_Node">NODE</sys:String>
-    <sys:String x:Key="Label_Speaker">SPEAKER</sys:String>
-    <sys:String x:Key="Label_Listener">LISTENER</sys:String>
     <!-- Section label for the default (male) dialogue text -->
     <sys:String x:Key="Label_DefaultMaleText">DEFAULT / MALE TEXT</sys:String>
     <sys:String x:Key="Label_FemaleText">FEMALE TEXT</sys:String>
-    <!-- PoE1 only: writer notes attached to a node -->
-    <sys:String x:Key="Label_Comments">COMMENTS</sys:String>
-    <sys:String x:Key="Label_Conditions">CONDITIONS</sys:String>
-    <!-- Shows both display type and persistence on one line, separated by · -->
-    <sys:String x:Key="Label_DisplayPersist">DISPLAY / PERSIST</sys:String>
-    <!-- PoE1 only: voice-acting direction note -->
-    <sys:String x:Key="Label_ActorDirection">ACTOR DIRECTION</sys:String>
-    <sys:String x:Key="Label_Scripts">SCRIPTS</sys:String>
-    <sys:String x:Key="Label_LinksTo">LINKS TO</sys:String>
-    <!-- Voice section: shown for PoE1 nodes with a VOFilename and PoE2 nodes -->
-    <sys:String x:Key="Label_Voice">VOICE</sys:String>
-    <!-- Sub-label for the voice file path row -->
-    <sys:String x:Key="Label_File">File</sys:String>
-    <!-- Sub-label for the HasVO boolean row -->
-    <sys:String x:Key="Label_HasVO">Has VO</sys:String>
-    <!-- Sub-label for the HideSpeaker boolean row (PoE2 only) -->
-    <sys:String x:Key="Label_HideSpeaker">Hide Speaker</sys:String>
 
     <!-- ─── Detail panel — property group headers ────────────────────── -->
     <sys:String x:Key="Label_GroupIdentity">IDENTITY</sys:String>
