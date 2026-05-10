@@ -18,7 +18,7 @@
             <Grid ColumnDefinitions="110,*" Margin="0,1,0,1">
                 <TextBlock Grid.Column="0"
                            Text="{Binding Label}"
-                           Foreground="#666" FontSize="10"
+                           Foreground="#999" FontSize="10"
                            VerticalAlignment="Top"/>
                 <TextBlock Grid.Column="1"
                            Text="{Binding Value}"
