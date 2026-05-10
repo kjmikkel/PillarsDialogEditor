@@ -130,6 +130,29 @@
     <!-- Sub-label for the HideSpeaker boolean row (PoE2 only) -->
     <sys:String x:Key="Label_HideSpeaker">Hide Speaker</sys:String>
 
+    <!-- ─── Detail panel — property group headers ────────────────────── -->
+    <sys:String x:Key="Label_GroupIdentity">IDENTITY</sys:String>
+    <sys:String x:Key="Label_GroupDisplay">DISPLAY</sys:String>
+    <sys:String x:Key="Label_GroupLogic">LOGIC</sys:String>
+    <sys:String x:Key="Label_GroupVoice">VOICE</sys:String>
+    <sys:String x:Key="Label_GroupLinks">LINKS</sys:String>
+
+    <!-- ─── Detail panel — property row labels ───────────────────────── -->
+    <sys:String x:Key="PropertyRow_NodeId">Node ID</sys:String>
+    <sys:String x:Key="PropertyRow_Type">Type</sys:String>
+    <sys:String x:Key="PropertyRow_Speaker">Speaker</sys:String>
+    <sys:String x:Key="PropertyRow_SpeakerGuid">Speaker GUID</sys:String>
+    <sys:String x:Key="PropertyRow_Listener">Listener</sys:String>
+    <sys:String x:Key="PropertyRow_DisplayType">Display Type</sys:String>
+    <sys:String x:Key="PropertyRow_Persistence">Persistence</sys:String>
+    <sys:String x:Key="PropertyRow_ActorDirection">Actor Direction</sys:String>
+    <sys:String x:Key="PropertyRow_Conditions">Conditions</sys:String>
+    <sys:String x:Key="PropertyRow_Scripts">Scripts</sys:String>
+    <sys:String x:Key="PropertyRow_Comments">Comments</sys:String>
+    <sys:String x:Key="PropertyRow_ExternalVO">External VO</sys:String>
+    <sys:String x:Key="PropertyRow_HasVO">Has VO</sys:String>
+    <sys:String x:Key="PropertyRow_HideSpeaker">Hide Speaker</sys:String>
+
     <!-- ─── Legend panel — section headers ────────────────────────────── -->
     <!-- Title bar of the legend overlay -->
     <sys:String x:Key="Legend_Header">LEGEND</sys:String>
