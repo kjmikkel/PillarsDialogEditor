@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DialogEditor.Core\DialogEditor.Core.csproj" />
+    <ProjectReference Include="..\DialogEditor.ViewModels\DialogEditor.ViewModels.csproj" />
   </ItemGroup>
 
 </Project>
