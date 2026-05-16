@@ -1,94 +1,215 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:models="clr-namespace:DialogEditor.ViewModels.Models;assembly=DialogEditor.ViewModels"
              x:Class="DialogEditor.Avalonia.Views.NodeDetailView" x:CompileBindings="False">
 
     <UserControl.Styles>
         <Style Selector="TextBlock.group-header">
             <Setter Property="Foreground" Value="#888"/>
-            <Setter Property="FontSize" Value="8"/>
+            <Setter Property="FontSize"   Value="8"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Margin" Value="0,10,0,3"/>
+            <Setter Property="Margin"     Value="0,10,0,3"/>
+        </Style>
+        <Style Selector="TextBlock.field-label">
+            <Setter Property="Foreground"  Value="#999"/>
+            <Setter Property="FontSize"    Value="9"/>
+            <Setter Property="Margin"      Value="0,4,0,2"/>
+        </Style>
+        <Style Selector="TextBox.detail-field">
+            <Setter Property="Background"      Value="#1a1a1a"/>
+            <Setter Property="Foreground"      Value="#e8e8e8"/>
+            <Setter Property="BorderBrush"     Value="#444"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize"        Value="10"/>
+            <Setter Property="Padding"         Value="4,3"/>
+            <Setter Property="Margin"          Value="0,0,0,4"/>
+        </Style>
+        <Style Selector="ComboBox.detail-combo">
+            <Setter Property="Background"          Value="#1a1a1a"/>
+            <Setter Property="Foreground"          Value="#e8e8e8"/>
+            <Setter Property="BorderBrush"         Value="#444"/>
+            <Setter Property="FontSize"            Value="10"/>
+            <Setter Property="Padding"             Value="4,2"/>
+            <Setter Property="Margin"              Value="0,0,0,4"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
+        <Style Selector="CheckBox.detail-check">
+            <Setter Property="Foreground" Value="#ccc"/>
+            <Setter Property="FontSize"   Value="10"/>
+            <Setter Property="Margin"     Value="0,0,0,4"/>
         </Style>
     </UserControl.Styles>
 
     <UserControl.Resources>
-
-        <DataTemplate x:Key="PropertyRowTemplate" DataType="models:PropertyRow">
+        <DataTemplate x:Key="ReadOnlyRowTemplate" DataType="models:PropertyRow">
             <Grid ColumnDefinitions="110,*" Margin="0,1,0,1">
-                <TextBlock Grid.Column="0"
-                           Text="{Binding Label}"
-                           Foreground="#999" FontSize="10"
-                           VerticalAlignment="Top"/>
-                <TextBlock Grid.Column="1"
-                           Text="{Binding Value}"
+                <TextBlock Grid.Column="0" Text="{Binding Label}"
+                           Foreground="#999" FontSize="10" VerticalAlignment="Top"/>
+                <TextBlock Grid.Column="1" Text="{Binding Value}"
                            Foreground="{Binding Style, Converter={StaticResource PropertyValueStyleToBrush}}"
                            FontSize="10" TextWrapping="Wrap" LineHeight="15"/>
             </Grid>
         </DataTemplate>
-
-        <DataTemplate x:Key="LinkRowTemplate" DataType="models:LinkRow">
-            <Grid ColumnDefinitions="60,*" Margin="0,1,0,1">
-                <TextBlock Grid.Column="0"
-                           Text="{Binding Arrow}"
-                           Foreground="#5dade2" FontSize="10"/>
-                <TextBlock Grid.Column="1"
-                           Text="{Binding Detail}"
-                           Foreground="#666" FontSize="10"/>
-            </Grid>
-        </DataTemplate>
-
     </UserControl.Resources>
 
-    <Grid RowDefinitions="*">
-
-        <TextBlock Grid.Row="0"
-                   Text="{StaticResource Label_SelectNode}"
+    <Grid>
+        <TextBlock Text="{StaticResource Label_SelectNode}"
                    Foreground="#555" FontSize="11"
                    HorizontalAlignment="Center" VerticalAlignment="Center"
                    IsVisible="{Binding HasContent, Converter={StaticResource InverseBoolToVis}}"/>
 
-        <ScrollViewer Grid.Row="0" Background="#2d2d2d"
-                      IsVisible="{Binding HasContent}">
+        <ScrollViewer Background="#2d2d2d" IsVisible="{Binding HasContent}">
             <StackPanel Margin="8">
 
-                <!-- ── Text section ─────────────────────────────── -->
-                <TextBlock Classes="group-header" Margin="0,0,0,3"
-                           Text="{StaticResource Label_DefaultMaleText}"/>
-                <Border Background="#1a1a1a" Padding="6" CornerRadius="3" Margin="0,0,0,10">
-                    <TextBlock Text="{Binding DefaultText}"
-                               Foreground="#e8e8e8" FontSize="10"
-                               TextWrapping="Wrap" LineHeight="16"/>
-                </Border>
+                <!-- ── Default / Male text ─────────────────────────────── -->
+                <TextBlock Classes="group-header" Text="{StaticResource Label_DefaultMaleText}"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding DefaultText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         AcceptsReturn="True" TextWrapping="Wrap" MinHeight="52"
+                         ToolTip.Tip="Edit the default / male dialogue text"/>
 
-                <TextBlock Classes="group-header" Margin="0,0,0,3"
-                           Text="{StaticResource Label_FemaleText}"/>
-                <Border Background="#1a1a1a" Padding="6" CornerRadius="3" Margin="0,0,0,4">
-                    <TextBlock Text="{Binding FemaleTextDisplay}"
-                               Foreground="{Binding HasFemaleText, Converter={StaticResource BoolToFemaleTextBrush}}"
-                               FontSize="10" TextWrapping="Wrap" LineHeight="16"/>
-                </Border>
+                <!-- ── Female text ─────────────────────────────────────── -->
+                <TextBlock Classes="group-header" Text="{StaticResource Label_FemaleText}"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding FemaleText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         AcceptsReturn="True" TextWrapping="Wrap" MinHeight="36"
+                         Watermark="(same as default — leave blank)"
+                         ToolTip.Tip="Optional female-voice variant text"/>
 
-                <!-- ── Property groups ──────────────────────────── -->
+                <!-- ── Identity ────────────────────────────────────────── -->
+                <TextBlock Classes="group-header" Text="{StaticResource Label_GroupIdentity}"/>
+
+                <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_Type}"/>
+                <ComboBox Classes="detail-combo"
+                          SelectedItem="{Binding NodeTypeString, Mode=TwoWay}"
+                          ToolTip.Tip="Whether this is an NPC line or a player response choice">
+                    <ComboBox.Items>
+                        <sys:String>NPC Line</sys:String>
+                        <sys:String>Player Choice</sys:String>
+                    </ComboBox.Items>
+                </ComboBox>
+
+                <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_SpeakerGuid}"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding SpeakerGuid, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         FontFamily="Consolas,Courier New,monospace"
+                         ToolTip.Tip="GUID of the speaking character"/>
+
+                <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_ListenerGuid}"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding ListenerGuid, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         FontFamily="Consolas,Courier New,monospace"
+                         ToolTip.Tip="GUID of the listening character"/>
+
+                <!-- ── Display ─────────────────────────────────────────── -->
+                <TextBlock Classes="group-header" Text="{StaticResource Label_GroupDisplay}"/>
+
+                <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_DisplayType}"/>
+                <ComboBox Classes="detail-combo"
+                          SelectedItem="{Binding DisplayType, Mode=TwoWay}"
+                          ToolTip.Tip="How this node is presented to the player">
+                    <ComboBox.Items>
+                        <sys:String>Conversation</sys:String>
+                        <sys:String>Bark</sys:String>
+                    </ComboBox.Items>
+                </ComboBox>
+
+                <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_Persistence}"/>
+                <ComboBox Classes="detail-combo"
+                          SelectedItem="{Binding Persistence, Mode=TwoWay}"
+                          ToolTip.Tip="Whether the node is hidden after it has been shown once">
+                    <ComboBox.Items>
+                        <sys:String>None</sys:String>
+                        <sys:String>OnceEver</sys:String>
+                    </ComboBox.Items>
+                </ComboBox>
+
+                <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_ActorDirection}"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding ActorDirection, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         ToolTip.Tip="Optional actor direction note for the VO recording"/>
+
+                <!-- ── Voice ───────────────────────────────────────────── -->
+                <TextBlock Classes="group-header" Text="{StaticResource Label_GroupVoice}"/>
+
+                <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_ExternalVO}"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding ExternalVO, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         FontFamily="Consolas,Courier New,monospace"
+                         ToolTip.Tip="External voice-over file path or identifier"/>
+
+                <CheckBox Classes="detail-check"
+                          IsChecked="{Binding HasVO, Mode=TwoWay}"
+                          Content="{StaticResource PropertyRow_HasVO}"
+                          ToolTip.Tip="Whether a voice-over recording exists for this node"/>
+
+                <CheckBox Classes="detail-check"
+                          IsChecked="{Binding HideSpeaker, Mode=TwoWay}"
+                          Content="{StaticResource PropertyRow_HideSpeaker}"
+                          ToolTip.Tip="Whether the speaker name is hidden during playback"/>
+
+                <!-- ── Comments ────────────────────────────────────────── -->
+                <TextBlock Classes="group-header" Text="{StaticResource PropertyRow_Comments}"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding Comments, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30"
+                         ToolTip.Tip="Internal developer notes (not shown to players)"/>
+
+                <!-- ── Read-only groups (node ID, conditions, scripts) ─── -->
                 <ItemsControl ItemsSource="{Binding PropertyGroups}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel>
                                 <TextBlock Classes="group-header" Text="{Binding Name}"/>
                                 <ItemsControl ItemsSource="{Binding Rows}"
-                                              ItemTemplate="{StaticResource PropertyRowTemplate}"/>
+                                              ItemTemplate="{StaticResource ReadOnlyRowTemplate}"/>
                             </StackPanel>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <!-- ── Links section ────────────────────────────── -->
+                <!-- ── Links ──────────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_GroupLinks}"/>
-                <ItemsControl ItemsSource="{Binding Links}"
-                              ItemTemplate="{StaticResource LinkRowTemplate}"/>
+                <ItemsControl ItemsSource="{Binding Links}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="models:LinkRow">
+                            <Grid ColumnDefinitions="55,*,Auto" Margin="0,1,0,1">
+                                <TextBlock Grid.Column="0" Text="{Binding Arrow}"
+                                           Foreground="#5dade2" FontSize="10" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Detail}"
+                                           Foreground="#666" FontSize="10" VerticalAlignment="Center"/>
+                                <Button Grid.Column="2"
+                                        Content="{StaticResource Button_DeleteLink}"
+                                        Command="{Binding DataContext.DeleteLinkCommand,
+                                                  RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"
+                                        Background="Transparent" BorderThickness="0"
+                                        Foreground="#888" FontSize="9" Padding="4,1"
+                                        ToolTip.Tip="{StaticResource ToolTip_DeleteLink}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Add link row -->
+                <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                    <TextBox Grid.Column="0"
+                             Text="{Binding AddLinkTargetId, Mode=TwoWay}"
+                             Watermark="Target node ID…"
+                             Background="#1a1a1a" Foreground="#e8e8e8"
+                             BorderBrush="#444" BorderThickness="1"
+                             FontSize="10" Padding="4,3"
+                             ToolTip.Tip="Enter a node ID to link to, then click Add"/>
+                    <Button Grid.Column="1"
+                            Content="{StaticResource Button_AddLink}"
+                            Command="{Binding AddLinkCommand}"
+                            Background="#333" Foreground="#aaa" BorderThickness="0"
+                            Padding="6,2" Margin="4,0,0,0"
+                            ToolTip.Tip="{StaticResource ToolTip_AddLink}"/>
+                </Grid>
 
             </StackPanel>
         </ScrollViewer>
-
     </Grid>
 </UserControl>

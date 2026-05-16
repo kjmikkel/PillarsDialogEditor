@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Models;
 using DialogEditor.ViewModels.Models;
 using DialogEditor.ViewModels.Resources;
@@ -85,14 +86,44 @@ public partial class NodeDetailViewModel : ObservableObject
         set { if (_node != null) _node.HideSpeaker = value; }
     }
 
+    // ── NodeType proxy (bool ↔ string for ComboBox binding) ──────────────
+    public string NodeTypeString
+    {
+        get => IsPlayerChoice ? "Player Choice" : "NPC Line";
+        set { if (_node != null) _node.IsPlayerChoice = value == "Player Choice"; }
+    }
+
     // ── Read-only display ─────────────────────────────────────────────────
     public string FemaleTextDisplay =>
         (_node?.HasFemaleText ?? false) ? _node!.FemaleText : Loc.Get("NodeDetail_SameAsDefault");
 
     public bool HasFemaleText => _node?.HasFemaleText ?? false;
 
-    [ObservableProperty] private IReadOnlyList<PropertyGroup> _propertyGroups = [];
-    [ObservableProperty] private IReadOnlyList<LinkRow>       _links          = [];
+    [ObservableProperty] private IReadOnlyList<PropertyGroup> _propertyGroups  = [];
+    [ObservableProperty] private IReadOnlyList<LinkRow>       _links           = [];
+    [ObservableProperty] private string                       _addLinkTargetId = string.Empty;
+
+    // Raised when the user requests to add/delete a link — ConversationViewModel handles it
+    public event Action<int, int>? AddLinkRequested;    // (fromNodeId, toNodeId)
+    public event Action<int>?      DeleteLinkRequested; // (toNodeId)
+
+    [RelayCommand]
+    private void AddLink()
+    {
+        if (_node is null || !int.TryParse(AddLinkTargetId.Trim(), out var targetId)) return;
+        AddLinkRequested?.Invoke(_node.NodeId, targetId);
+        AddLinkTargetId = string.Empty;
+    }
+
+    [RelayCommand]
+    private void DeleteLink(LinkRow? row)
+    {
+        if (_node is null || row is null) return;
+        // Arrow format is "→ {toNodeId}" — parse the ID from it
+        var parts = row.Arrow.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 2 && int.TryParse(parts[^1], out var toId))
+            DeleteLinkRequested?.Invoke(toId);
+    }
 
     // ── Load / Clear ──────────────────────────────────────────────────────
     public void Load(NodeViewModel? node)
@@ -127,6 +158,7 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(FemaleTextDisplay));
         OnPropertyChanged(nameof(HasFemaleText));
         OnPropertyChanged(nameof(IsPlayerChoice));
+        OnPropertyChanged(nameof(NodeTypeString));
         OnPropertyChanged(nameof(SpeakerGuid));
         OnPropertyChanged(nameof(ListenerGuid));
         OnPropertyChanged(nameof(DisplayType));
