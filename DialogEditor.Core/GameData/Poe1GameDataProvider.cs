@@ -1,5 +1,7 @@
+using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Core.Parsing;
+using DialogEditor.Core.Serialization;
 
 namespace DialogEditor.Core.GameData;
 
@@ -10,8 +12,8 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
 
     private string DataRoot        => Path.Combine(rootPath, "PillarsOfEternity_Data", "data");
     private string LocalizedRoot   => Path.Combine(DataRoot, "localized");
-    private string ConversationsRoot => Path.Combine(DataRoot, "conversations");
-    private string StringTablesRoot  => Path.Combine(LocalizedRoot, Language, "text", "conversations");
+    internal string ConversationsRoot => Path.Combine(DataRoot, "conversations");
+    internal string StringTablesRoot  => Path.Combine(LocalizedRoot, Language, "text", "conversations");
 
     public IReadOnlyList<string> AvailableLanguages =>
         Directory.Exists(LocalizedRoot)
@@ -60,4 +62,12 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
 
     public IReadOnlyDictionary<string, string> LoadSpeakerNames() =>
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+    public void SaveConversation(ConversationFile file, ConversationEditSnapshot snapshot)
+    {
+        Poe1ConversationSerializer.SaveToFile(file.ConversationPath, snapshot);
+        var stPath = StringTablePathFor(file.ConversationPath);
+        Directory.CreateDirectory(Path.GetDirectoryName(stPath)!);
+        StringTableSerializer.SaveToFile(stPath, snapshot.Nodes);
+    }
 }

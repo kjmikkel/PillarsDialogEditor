@@ -1,5 +1,7 @@
+using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Core.Parsing;
+using DialogEditor.Core.Serialization;
 
 namespace DialogEditor.Core.GameData;
 
@@ -10,8 +12,8 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
 
     private string ExportedRoot    => Path.Combine(rootPath, "PillarsOfEternityII_Data", "exported");
     private string LocalizedRoot   => Path.Combine(ExportedRoot, "localized");
-    private string ConversationsRoot => Path.Combine(ExportedRoot, "design", "conversations");
-    private string StringTablesRoot  => Path.Combine(LocalizedRoot, Language, "text", "conversations");
+    internal string ConversationsRoot => Path.Combine(ExportedRoot, "design", "conversations");
+    internal string StringTablesRoot  => Path.Combine(LocalizedRoot, Language, "text", "conversations");
     private string SpeakersBundle  => Path.Combine(ExportedRoot, "design", "gamedata", "speakers.gamedatabundle");
 
     public IReadOnlyList<string> AvailableLanguages =>
@@ -63,4 +65,12 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
         File.Exists(SpeakersBundle)
             ? Poe2SpeakerNameParser.ParseFile(SpeakersBundle)
             : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+    public void SaveConversation(ConversationFile file, ConversationEditSnapshot snapshot)
+    {
+        Poe2ConversationSerializer.SaveToFile(file.ConversationPath, snapshot);
+        var stPath = StringTablePathFor(file.ConversationPath);
+        Directory.CreateDirectory(Path.GetDirectoryName(stPath)!);
+        StringTableSerializer.SaveToFile(stPath, snapshot.Nodes);
+    }
 }
