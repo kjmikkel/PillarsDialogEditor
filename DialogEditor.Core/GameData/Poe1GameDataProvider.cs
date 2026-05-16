@@ -63,6 +63,9 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
     public IReadOnlyDictionary<string, string> LoadSpeakerNames() =>
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
+    public (string ConversationsRoot, string StringTablesRoot) GetBackupRoots()
+        => (ConversationsRoot, StringTablesRoot);
+
     public void SaveConversation(ConversationFile file, ConversationEditSnapshot snapshot)
     {
         Poe1ConversationSerializer.SaveToFile(file.ConversationPath, snapshot);

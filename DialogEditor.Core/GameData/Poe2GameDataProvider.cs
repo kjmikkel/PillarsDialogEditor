@@ -66,6 +66,9 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
             ? Poe2SpeakerNameParser.ParseFile(SpeakersBundle)
             : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
+    public (string ConversationsRoot, string StringTablesRoot) GetBackupRoots()
+        => (ConversationsRoot, StringTablesRoot);
+
     public void SaveConversation(ConversationFile file, ConversationEditSnapshot snapshot)
     {
         Poe2ConversationSerializer.SaveToFile(file.ConversationPath, snapshot);
