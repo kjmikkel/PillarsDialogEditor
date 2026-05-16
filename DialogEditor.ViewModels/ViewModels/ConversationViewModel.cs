@@ -15,9 +15,12 @@ public partial class ConversationViewModel : ObservableObject
     private readonly IDispatcher    _dispatcher;
     private readonly UndoRedoStack  _undoStack = new();
 
+    public PendingConnectionViewModel PendingConnection { get; }
+
     public ConversationViewModel(IDispatcher dispatcher)
     {
-        _dispatcher = dispatcher;
+        _dispatcher       = dispatcher;
+        PendingConnection = new PendingConnectionViewModel(this);
         Nodes.CollectionChanged += (_, _) => OnPropertyChanged(nameof(NodeCountText));
     }
 
