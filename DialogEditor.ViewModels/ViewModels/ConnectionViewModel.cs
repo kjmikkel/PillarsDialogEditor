@@ -17,4 +17,6 @@ public partial class ConnectionViewModel(
 
     [ObservableProperty]
     private bool _isHighlighted;
+
+    public bool HasConditions => false;
 }
