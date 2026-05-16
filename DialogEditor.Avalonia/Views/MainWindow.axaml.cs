@@ -1,7 +1,10 @@
 using System.ComponentModel;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Layout;
+using Avalonia.Media;
 using DialogEditor.Avalonia.Services;
 using DialogEditor.ViewModels;
 
@@ -24,6 +27,7 @@ public partial class MainWindow : Window
 
         var vm = (MainWindowViewModel)DataContext;
         vm.PropertyChanged += OnVmPropertyChanged;
+        vm.UnsavedChangesRequested += () => _ = ShowUnsavedChangesDialogAsync(vm);
 
         if (!vm.IsBrowserExpanded)
         {
@@ -94,15 +98,37 @@ public partial class MainWindow : Window
     {
         var vm = (MainWindowViewModel)DataContext!;
 
-        if (e.Key == Key.F && e.KeyModifiers == KeyModifiers.Control)
+        switch (e.Key)
         {
-            CanvasView.FocusSearch();
-            e.Handled = true;
-        }
-        else if (e.Key == Key.Escape && vm.IsBrowserFlyoutOpen)
-        {
-            vm.IsBrowserExpanded = false;
-            e.Handled = true;
+            case Key.F when e.KeyModifiers == KeyModifiers.Control:
+                CanvasView.FocusSearch();
+                e.Handled = true;
+                break;
+
+            case Key.Z when e.KeyModifiers == KeyModifiers.Control:
+                vm.Canvas.UndoCommand.Execute(null);
+                e.Handled = true;
+                break;
+
+            case Key.Y when e.KeyModifiers == KeyModifiers.Control:
+                vm.Canvas.RedoCommand.Execute(null);
+                e.Handled = true;
+                break;
+
+            case Key.S when e.KeyModifiers == KeyModifiers.Control:
+                vm.SaveCommand.Execute(null);
+                e.Handled = true;
+                break;
+
+            case Key.Delete when vm.Canvas.SelectedNode is not null:
+                vm.Canvas.DeleteNodeCmdCommand.Execute(vm.Canvas.SelectedNode);
+                e.Handled = true;
+                break;
+
+            case Key.Escape when vm.IsBrowserFlyoutOpen:
+                vm.IsBrowserExpanded = false;
+                e.Handled = true;
+                break;
         }
     }
 
@@ -117,4 +143,64 @@ public partial class MainWindow : Window
 
     private void CloseHelp_Click(object? sender, RoutedEventArgs e)
         => HelpToggle.IsChecked = false;
+
+    private async Task ShowUnsavedChangesDialogAsync(MainWindowViewModel vm)
+    {
+        var tcs = new TaskCompletionSource<string>();
+
+        var dialog = new Window
+        {
+            Title  = "Unsaved Changes",
+            Width  = 380,
+            Height = 150,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            CanResize = false,
+            Background = new SolidColorBrush(Color.Parse("#2d2d2d")),
+            SystemDecorations = SystemDecorations.BorderOnly
+        };
+
+        var panel = new StackPanel { Margin = new Thickness(16) };
+
+        panel.Children.Add(new TextBlock
+        {
+            Text = "You have unsaved changes. Save before switching conversations?",
+            Foreground = Brushes.White,
+            TextWrapping = TextWrapping.Wrap,
+            Margin = new Thickness(0, 0, 0, 16)
+        });
+
+        var buttons = new StackPanel { Orientation = Orientation.Horizontal };
+
+        void MakeBtn(string label, string result)
+        {
+            var btn = new Button
+            {
+                Content = label,
+                Margin  = new Thickness(0, 0, 8, 0),
+                Padding = new Thickness(12, 4),
+                Background = new SolidColorBrush(Color.Parse("#444")),
+                Foreground = Brushes.White,
+                BorderThickness = new Thickness(0)
+            };
+            btn.Click += (_, _) => { tcs.TrySetResult(result); dialog.Close(); };
+            buttons.Children.Add(btn);
+        }
+
+        MakeBtn("Save",    "save");
+        MakeBtn("Discard", "discard");
+        MakeBtn("Cancel",  "cancel");
+
+        panel.Children.Add(buttons);
+        dialog.Content = panel;
+
+        await dialog.ShowDialog(this);
+
+        var choice = await tcs.Task;
+        switch (choice)
+        {
+            case "save":    vm.SaveAndProceed();          break;
+            case "discard": vm.DiscardAndProceed();       break;
+            default:        vm.CancelPendingNavigation(); break;
+        }
+    }
 }
