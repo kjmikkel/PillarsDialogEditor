@@ -90,6 +90,23 @@ public partial class MainWindowViewModel : ObservableObject
 
         Browser.ConversationSelected += OnConversationSelected;
 
+        Detail.AddLinkRequested += (fromId, toId) =>
+        {
+            var src = Canvas.Nodes.FirstOrDefault(n => n.NodeId == fromId);
+            var tgt = Canvas.Nodes.FirstOrDefault(n => n.NodeId == toId);
+            if (src is not null && tgt is not null)
+                Canvas.AddConnection(src.Output, tgt.Input);
+        };
+
+        Detail.DeleteLinkRequested += toId =>
+        {
+            var conn = Canvas.Connections.FirstOrDefault(c =>
+                c.Source.Owner == Canvas.SelectedNode &&
+                c.Target.Owner?.NodeId == toId);
+            if (conn is not null)
+                Canvas.DeleteConnection(conn);
+        };
+
         Canvas.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(ConversationViewModel.SelectedNode))
