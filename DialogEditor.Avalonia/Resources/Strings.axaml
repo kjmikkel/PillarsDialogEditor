@@ -235,4 +235,64 @@
          outside it or select a conversation. -->
     <sys:String x:Key="ToolTip_PinPanel">Pin panel open — when unpinned, acts as a flyout (closes on click-outside or conversation selection)</sys:String>
 
+    <!-- ─── Editing — toolbar buttons ───────────────────────────────────── -->
+    <sys:String x:Key="Button_Undo">↩</sys:String>
+    <sys:String x:Key="Button_Redo">↪</sys:String>
+    <sys:String x:Key="Button_Save">Save</sys:String>
+    <sys:String x:Key="Button_RestoreBackup">Restore Backup…</sys:String>
+    <!-- {0} = description of the action that will be undone -->
+    <sys:String x:Key="ToolTip_Undo_Format">Undo: {0} (Ctrl+Z)</sys:String>
+    <sys:String x:Key="ToolTip_Undo_NoHistory">Nothing to undo (Ctrl+Z)</sys:String>
+    <sys:String x:Key="ToolTip_Redo_Format">Redo: {0} (Ctrl+Y)</sys:String>
+    <sys:String x:Key="ToolTip_Redo_NoHistory">Nothing to redo (Ctrl+Y)</sys:String>
+    <sys:String x:Key="ToolTip_Save">Save conversation to disk (Ctrl+S)</sys:String>
+    <sys:String x:Key="ToolTip_RestoreBackup">Restore all conversation files from the original backup</sys:String>
+
+    <!-- ─── Editing — canvas context menus ──────────────────────────────── -->
+    <sys:String x:Key="Menu_DeleteNode">Delete node</sys:String>
+    <sys:String x:Key="Menu_AddConnectedNode">Add connected node</sys:String>
+    <sys:String x:Key="Menu_DeleteConnection">Delete connection</sys:String>
+
+    <!-- ─── Editing — status messages ───────────────────────────────────── -->
+    <!-- {0} = conversation name -->
+    <sys:String x:Key="Status_Saved">Saved: {0}</sys:String>
+    <!-- {0} = conversation name, {1} = error message -->
+    <sys:String x:Key="Status_SaveError">Save failed for {0}: {1}</sys:String>
+    <sys:String x:Key="Status_BackupInProgress">Backing up conversation files…</sys:String>
+    <!-- {0} = backup folder path -->
+    <sys:String x:Key="Status_BackupComplete">Backup complete — {0}</sys:String>
+    <!-- {0} = error message -->
+    <sys:String x:Key="Status_BackupError">Backup failed: {0}</sys:String>
+    <sys:String x:Key="Status_RestoreInProgress">Restoring from backup…</sys:String>
+    <sys:String x:Key="Status_RestoreComplete">Restore complete — reload to see changes.</sys:String>
+    <!-- {0} = error message -->
+    <sys:String x:Key="Status_RestoreError">Restore failed: {0}</sys:String>
+    <sys:String x:Key="Status_NoBackupFound">No backup found for this game folder.</sys:String>
+
+    <!-- ─── Editing — dialogs ────────────────────────────────────────────── -->
+    <sys:String x:Key="Dialog_SelectBackupFolder">Select backup destination folder</sys:String>
+
+    <!-- ─── Editing — unsaved-changes prompt ────────────────────────────── -->
+    <sys:String x:Key="UnsavedChanges_Message">You have unsaved changes. Save before switching conversations?</sys:String>
+    <sys:String x:Key="UnsavedChanges_Save">Save</sys:String>
+    <sys:String x:Key="UnsavedChanges_Discard">Discard</sys:String>
+    <sys:String x:Key="UnsavedChanges_Cancel">Cancel</sys:String>
+
+    <!-- ─── Detail panel — editable field labels ────────────────────────── -->
+    <sys:String x:Key="PropertyRow_ListenerGuid">Listener GUID</sys:String>
+
+    <!-- ─── Detail panel — combobox option values ───────────────────────── -->
+    <sys:String x:Key="Option_NpcLine">NPC Line</sys:String>
+    <sys:String x:Key="Option_PlayerChoice">Player Choice</sys:String>
+    <sys:String x:Key="Option_DisplayConversation">Conversation</sys:String>
+    <sys:String x:Key="Option_DisplayBark">Bark</sys:String>
+    <sys:String x:Key="Option_PersistenceNone">None</sys:String>
+    <sys:String x:Key="Option_PersistenceOnceEver">OnceEver</sys:String>
+
+    <!-- ─── Detail panel — link actions ─────────────────────────────────── -->
+    <sys:String x:Key="Button_DeleteLink">✕</sys:String>
+    <sys:String x:Key="ToolTip_DeleteLink">Remove this connection</sys:String>
+    <sys:String x:Key="Button_AddLink">Add link…</sys:String>
+    <sys:String x:Key="ToolTip_AddLink">Add a connection from this node to another node by ID</sys:String>
+
 </ResourceDictionary>
