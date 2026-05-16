@@ -1,3 +1,4 @@
+using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 
 namespace DialogEditor.Core.GameData;
@@ -10,4 +11,5 @@ public interface IGameDataProvider
     IReadOnlyList<ConversationFile> EnumerateConversations();
     Conversation LoadConversation(ConversationFile file);
     IReadOnlyDictionary<string, string> LoadSpeakerNames();
+    void SaveConversation(ConversationFile file, ConversationEditSnapshot snapshot);
 }
