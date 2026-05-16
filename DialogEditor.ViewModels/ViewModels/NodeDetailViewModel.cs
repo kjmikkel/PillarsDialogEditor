@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DialogEditor.Core.Models;
 using DialogEditor.ViewModels.Models;
@@ -7,58 +8,156 @@ namespace DialogEditor.ViewModels;
 
 public partial class NodeDetailViewModel : ObservableObject
 {
-    [ObservableProperty] private bool _hasContent;
-    [ObservableProperty] private string _defaultText = string.Empty;
-    [ObservableProperty] private string _femaleTextDisplay = string.Empty;
-    [ObservableProperty] private bool _hasFemaleText;
-    [ObservableProperty] private IReadOnlyList<PropertyGroup> _propertyGroups = [];
-    [ObservableProperty] private IReadOnlyList<LinkRow> _links = [];
+    private NodeViewModel? _node;
 
+    [ObservableProperty] private bool _hasContent;
+
+    // ── Editable proxy properties ─────────────────────────────────────────
+    public string DefaultText
+    {
+        get => _node?.DefaultText ?? string.Empty;
+        set { if (_node != null) _node.DefaultText = value; }
+    }
+
+    public string FemaleText
+    {
+        get => _node?.FemaleText ?? string.Empty;
+        set { if (_node != null) _node.FemaleText = value; }
+    }
+
+    public bool IsPlayerChoice
+    {
+        get => _node?.IsPlayerChoice ?? false;
+        set { if (_node != null) _node.IsPlayerChoice = value; }
+    }
+
+    public string SpeakerGuid
+    {
+        get => _node?.SpeakerGuid ?? string.Empty;
+        set { if (_node != null) _node.SpeakerGuid = value; }
+    }
+
+    public string ListenerGuid
+    {
+        get => _node?.ListenerGuid ?? string.Empty;
+        set { if (_node != null) _node.ListenerGuid = value; }
+    }
+
+    public string DisplayType
+    {
+        get => _node?.DisplayType ?? string.Empty;
+        set { if (_node != null) _node.DisplayType = value; }
+    }
+
+    public string Persistence
+    {
+        get => _node?.Persistence ?? string.Empty;
+        set { if (_node != null) _node.Persistence = value; }
+    }
+
+    public string ActorDirection
+    {
+        get => _node?.ActorDirection ?? string.Empty;
+        set { if (_node != null) _node.ActorDirection = value; }
+    }
+
+    public string Comments
+    {
+        get => _node?.Comments ?? string.Empty;
+        set { if (_node != null) _node.Comments = value; }
+    }
+
+    public string ExternalVO
+    {
+        get => _node?.ExternalVO ?? string.Empty;
+        set { if (_node != null) _node.ExternalVO = value; }
+    }
+
+    public bool HasVO
+    {
+        get => _node?.HasVO ?? false;
+        set { if (_node != null) _node.HasVO = value; }
+    }
+
+    public bool HideSpeaker
+    {
+        get => _node?.HideSpeaker ?? false;
+        set { if (_node != null) _node.HideSpeaker = value; }
+    }
+
+    // ── Read-only display ─────────────────────────────────────────────────
+    public string FemaleTextDisplay =>
+        (_node?.HasFemaleText ?? false) ? _node!.FemaleText : Loc.Get("NodeDetail_SameAsDefault");
+
+    public bool HasFemaleText => _node?.HasFemaleText ?? false;
+
+    [ObservableProperty] private IReadOnlyList<PropertyGroup> _propertyGroups = [];
+    [ObservableProperty] private IReadOnlyList<LinkRow>       _links          = [];
+
+    // ── Load / Clear ──────────────────────────────────────────────────────
     public void Load(NodeViewModel? node)
     {
+        if (_node is not null)
+            _node.PropertyChanged -= OnNodePropertyChanged;
+
+        _node = node;
+
         if (node is null) { HasContent = false; return; }
 
-        DefaultText = node.DefaultText;
-        HasFemaleText = !string.IsNullOrEmpty(node.FemaleText);
-        FemaleTextDisplay = HasFemaleText ? node.FemaleText : Loc.Get("NodeDetail_SameAsDefault");
+        node.PropertyChanged += OnNodePropertyChanged;
+        RefreshReadOnlyGroups(node);
+        Links      = node.Links.Select(BuildLinkRow).ToList();
+        HasContent = true;
+        NotifyAllProxies();
+    }
 
+    public void Clear() => Load(null);
+
+    private void OnNodePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        NotifyAllProxies();
+        if (_node is not null)
+            RefreshReadOnlyGroups(_node);
+    }
+
+    private void NotifyAllProxies()
+    {
+        OnPropertyChanged(nameof(DefaultText));
+        OnPropertyChanged(nameof(FemaleText));
+        OnPropertyChanged(nameof(FemaleTextDisplay));
+        OnPropertyChanged(nameof(HasFemaleText));
+        OnPropertyChanged(nameof(IsPlayerChoice));
+        OnPropertyChanged(nameof(SpeakerGuid));
+        OnPropertyChanged(nameof(ListenerGuid));
+        OnPropertyChanged(nameof(DisplayType));
+        OnPropertyChanged(nameof(Persistence));
+        OnPropertyChanged(nameof(ActorDirection));
+        OnPropertyChanged(nameof(Comments));
+        OnPropertyChanged(nameof(ExternalVO));
+        OnPropertyChanged(nameof(HasVO));
+        OnPropertyChanged(nameof(HideSpeaker));
+    }
+
+    private void RefreshReadOnlyGroups(NodeViewModel node)
+    {
         var none = Loc.Get("NodeDetail_None");
-
         PropertyGroups =
         [
             new PropertyGroup(Loc.Get("Label_GroupIdentity"),
             [
-                new PropertyRow(Loc.Get("PropertyRow_NodeId"),      node.NodeId.ToString()),
-                new PropertyRow(Loc.Get("PropertyRow_Type"),        node.IsPlayerChoice ? Loc.Get("NodeDetail_PlayerChoice") : Loc.Get("NodeDetail_NpcLine")),
-                new PropertyRow(Loc.Get("PropertyRow_Speaker"),     node.SpeakerName),
-                new PropertyRow(Loc.Get("PropertyRow_SpeakerGuid"), node.SpeakerGuid, PropertyValueStyle.Code),
-                new PropertyRow(Loc.Get("PropertyRow_Listener"),    node.ListenerName),
-            ]),
-            new PropertyGroup(Loc.Get("Label_GroupDisplay"),
-            [
-                new PropertyRow(Loc.Get("PropertyRow_DisplayType"),    node.DisplayType),
-                new PropertyRow(Loc.Get("PropertyRow_Persistence"),    node.Persistence),
-                new PropertyRow(Loc.Get("PropertyRow_ActorDirection"), string.IsNullOrEmpty(node.ActorDirection) ? none : node.ActorDirection),
+                new PropertyRow(Loc.Get("PropertyRow_NodeId"), node.NodeId.ToString()),
             ]),
             new PropertyGroup(Loc.Get("Label_GroupLogic"),
             [
-                new PropertyRow(Loc.Get("PropertyRow_Conditions"), string.IsNullOrEmpty(node.ConditionExpression) ? none : node.ConditionExpression, PropertyValueStyle.Condition),
-                new PropertyRow(Loc.Get("PropertyRow_Scripts"),    node.Scripts.Count == 0 ? none : string.Join(Environment.NewLine, node.Scripts), PropertyValueStyle.Script),
-                new PropertyRow(Loc.Get("PropertyRow_Comments"),   string.IsNullOrEmpty(node.Comments) ? none : node.Comments),
-            ]),
-            new PropertyGroup(Loc.Get("Label_GroupVoice"),
-            [
-                new PropertyRow(Loc.Get("PropertyRow_ExternalVO"),  string.IsNullOrEmpty(node.ExternalVO) ? none : node.ExternalVO, PropertyValueStyle.Code),
-                new PropertyRow(Loc.Get("PropertyRow_HasVO"),       node.HasVO.ToString()),
-                new PropertyRow(Loc.Get("PropertyRow_HideSpeaker"), node.HideSpeaker.ToString()),
+                new PropertyRow(Loc.Get("PropertyRow_Conditions"),
+                    string.IsNullOrEmpty(node.ConditionExpression) ? none : node.ConditionExpression,
+                    PropertyValueStyle.Condition),
+                new PropertyRow(Loc.Get("PropertyRow_Scripts"),
+                    node.Scripts.Count == 0 ? none : string.Join(Environment.NewLine, node.Scripts),
+                    PropertyValueStyle.Script),
             ]),
         ];
-
-        Links = node.Links.Select(BuildLinkRow).ToList();
-        HasContent = true;
     }
-
-    public void Clear() => HasContent = false;
 
     private static LinkRow BuildLinkRow(NodeLink link)
     {
@@ -67,7 +166,7 @@ public partial class NodeDetailViewModel : ObservableObject
             extras.Add($"{Loc.Get("Link_WeightPrefix")}{link.RandomWeight:0.##}");
         if (!string.IsNullOrEmpty(link.QuestionNodeTextDisplay) && link.QuestionNodeTextDisplay != "ShowOnce")
             extras.Add(link.QuestionNodeTextDisplay);
-        var arrow = $"{Loc.Get("Link_Arrow")} {link.ToNodeId}";
+        var arrow  = $"{Loc.Get("Link_Arrow")} {link.ToNodeId}";
         var detail = extras.Count == 0 ? Loc.Get("NodeDetail_None") : $"[{string.Join(", ", extras)}]";
         return new LinkRow(arrow, detail);
     }

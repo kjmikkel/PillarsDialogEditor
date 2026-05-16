@@ -55,6 +55,8 @@ public class NodeDetailViewModelTests
         return new NodeViewModel(node, entry);
     }
 
+    // ── HasContent ────────────────────────────────────────────────────────
+
     [Fact]
     public void Load_SetsHasContentTrue()
     {
@@ -63,44 +65,49 @@ public class NodeDetailViewModelTests
     }
 
     [Fact]
-    public void Load_WithAllProperties_PopulatesAllFourGroups()
+    public void Clear_SetsHasContentFalse()
     {
         _vm.Load(MakeNode());
-        Assert.Equal(4, _vm.PropertyGroups.Count);
+        _vm.Clear();
+        Assert.False(_vm.HasContent);
     }
 
     [Fact]
-    public void Load_IdentityGroup_ContainsFiveRows()
+    public void Clear_DoesNotThrowWhenCalledBeforeLoad()
+    {
+        var exception = Record.Exception(() => _vm.Clear());
+        Assert.Null(exception);
+    }
+
+    // ── Read-only property groups (Identity = NodeId; Logic = conditions/scripts) ──
+
+    [Fact]
+    public void Load_PropertyGroups_HasTwoGroups()
     {
         _vm.Load(MakeNode());
-        Assert.Equal(5, _vm.PropertyGroups[0].Rows.Count);
+        Assert.Equal(2, _vm.PropertyGroups.Count);
     }
 
     [Fact]
-    public void Load_DisplayGroup_AlwaysContainsActorDirectionRow_EvenWhenEmpty()
+    public void Load_IdentityGroup_ContainsNodeIdRow()
     {
-        _vm.Load(MakeNode(actorDirection: ""));
-        var displayGroup = _vm.PropertyGroups[1];
-        Assert.Equal(3, displayGroup.Rows.Count);
-        Assert.Contains(displayGroup.Rows, r => r.Label == "PropertyRow_ActorDirection");
+        _vm.Load(MakeNode(id: 42));
+        var identity = _vm.PropertyGroups[0];
+        Assert.Single(identity.Rows);
+        Assert.Equal("42", identity.Rows[0].Value);
     }
 
     [Fact]
-    public void Load_LogicGroup_AlwaysContainsCommentsRow_EvenWhenEmpty()
+    public void Load_LogicGroup_ContainsConditionsAndScriptsRows()
     {
-        _vm.Load(MakeNode(comments: ""));
-        var logicGroup = _vm.PropertyGroups[2];
-        Assert.Equal(3, logicGroup.Rows.Count);
-        Assert.Contains(logicGroup.Rows, r => r.Label == "PropertyRow_Comments");
+        _vm.Load(MakeNode());
+        var logic = _vm.PropertyGroups[1];
+        Assert.Equal(2, logic.Rows.Count);
+        Assert.Contains(logic.Rows, r => r.Label == "PropertyRow_Conditions");
+        Assert.Contains(logic.Rows, r => r.Label == "PropertyRow_Scripts");
     }
 
-    [Fact]
-    public void Load_VoiceGroup_AlwaysContainsAllThreeRows()
-    {
-        _vm.Load(MakeNode(externalVO: "", hasVO: false, hideSpeaker: false));
-        var voiceGroup = _vm.PropertyGroups[3];
-        Assert.Equal(3, voiceGroup.Rows.Count);
-    }
+    // ── Links ─────────────────────────────────────────────────────────────
 
     [Fact]
     public void Load_WithMultipleLinks_CreatesOneRowPerLink()
@@ -121,6 +128,8 @@ public class NodeDetailViewModelTests
         Assert.Empty(_vm.Links);
     }
 
+    // ── FemaleText display ────────────────────────────────────────────────
+
     [Fact]
     public void Load_FemaleTextDisplay_WhenEmpty_ShowsSameAsDefaultString()
     {
@@ -137,18 +146,46 @@ public class NodeDetailViewModelTests
         Assert.True(_vm.HasFemaleText);
     }
 
+    // ── Editable proxy properties ─────────────────────────────────────────
+
     [Fact]
-    public void Clear_SetsHasContentFalse()
+    public void Load_ExposesDefaultText()
     {
-        _vm.Load(MakeNode());
-        _vm.Clear();
-        Assert.False(_vm.HasContent);
+        _vm.Load(MakeNode(defaultText: "Hello world"));
+        Assert.Equal("Hello world", _vm.DefaultText);
     }
 
     [Fact]
-    public void Clear_DoesNotThrowWhenCalledBeforeLoad()
+    public void Load_ExposesSpeakerGuid()
     {
-        var exception = Record.Exception(() => _vm.Clear());
-        Assert.Null(exception);
+        _vm.Load(MakeNode(speakerGuid: "test-guid-123"));
+        Assert.Equal("test-guid-123", _vm.SpeakerGuid);
+    }
+
+    [Fact]
+    public void SetSpeakerGuid_UpdatesNodeViewModel()
+    {
+        var node = MakeNode(speakerGuid: "original");
+        _vm.Load(node);
+        _vm.SpeakerGuid = "updated";
+        Assert.Equal("updated", node.SpeakerGuid);
+    }
+
+    [Fact]
+    public void SetDefaultText_UpdatesNodeViewModel()
+    {
+        var node = MakeNode(defaultText: "old text");
+        _vm.Load(node);
+        _vm.DefaultText = "new text";
+        Assert.Equal("new text", node.DefaultText);
+    }
+
+    [Fact]
+    public void Clear_ResetsProxyProperties()
+    {
+        _vm.Load(MakeNode(speakerGuid: "abc"));
+        _vm.Clear();
+        Assert.Equal(string.Empty, _vm.SpeakerGuid);
+        Assert.False(_vm.HasContent);
     }
 }
