@@ -1412,3 +1412,1271 @@ git commit -m "feat: IGameDataProvider.SaveConversation — wire serializers int
 ```
 
 ---
+
+## Part C — ViewModel Layer
+
+---
+
+### Task 11: Mutable NodeViewModel
+
+`NodeViewModel` currently sets all properties once in the constructor and exposes them read-only. This task adds editable backing fields and command-generating setters for every property the user can change. Derived display strings (`Title`, `TextPreview`, `FooterText`, `SpeakerName`) become computed properties so they update automatically.
+
+The `_undoStack` field starts as `null`. During `Load()` in `ConversationViewModel`, after construction the stack is wired up. Setters called before wiring (i.e., during construction) write directly to the backing field without creating commands.
+
+**Files:**
+- Modify: `DialogEditor.ViewModels/ViewModels/NodeViewModel.cs`
+
+No new test file — `NodeDetailViewModelTests.cs` already exercises the display side. ViewModel edit tests will be added in Task 13 alongside `ConversationViewModel`.
+
+- [ ] **Step 1: Replace NodeViewModel with mutable version**
+
+Replace the entire file:
+
+```csharp
+// DialogEditor.ViewModels/ViewModels/NodeViewModel.cs
+using CommunityToolkit.Mvvm.ComponentModel;
+using DialogEditor.Core.Editing;
+using DialogEditor.Core.Models;
+using DialogEditor.ViewModels.Resources;
+using DialogEditor.ViewModels.Services;
+
+namespace DialogEditor.ViewModels;
+
+public partial class NodeViewModel : ObservableObject
+{
+    // ── Read-only identity ────────────────────────────────────────────────
+    public int NodeId { get; }
+
+    // ── Undo stack (wired after construction by ConversationViewModel) ───
+    internal UndoRedoStack? UndoStack { get; set; }
+
+    // ── Editable backing fields ───────────────────────────────────────────
+    private bool   _isPlayerChoice;
+    private SpeakerCategory _speakerCategory;
+    private string _speakerGuid     = string.Empty;
+    private string _listenerGuid    = string.Empty;
+    private string _defaultText     = string.Empty;
+    private string _femaleText      = string.Empty;
+    private string _displayType     = string.Empty;
+    private string _persistence     = string.Empty;
+    private string _actorDirection  = string.Empty;
+    private string _comments        = string.Empty;
+    private string _externalVO      = string.Empty;
+    private bool   _hasVO;
+    private bool   _hideSpeaker;
+
+    // ── Editable properties ───────────────────────────────────────────────
+    public bool IsPlayerChoice
+    {
+        get => _isPlayerChoice;
+        set => Push(ref _isPlayerChoice, value, "Edit node type",
+            () => { OnPropertyChanged(nameof(Title)); });
+    }
+
+    public SpeakerCategory SpeakerCategory
+    {
+        get => _speakerCategory;
+        set => Push(ref _speakerCategory, value, "Edit speaker category");
+    }
+
+    public string SpeakerGuid
+    {
+        get => _speakerGuid;
+        set => Push(ref _speakerGuid, value, "Edit speaker GUID",
+            () => OnPropertyChanged(nameof(SpeakerName)));
+    }
+
+    public string ListenerGuid
+    {
+        get => _listenerGuid;
+        set => Push(ref _listenerGuid, value, "Edit listener GUID",
+            () => OnPropertyChanged(nameof(ListenerName)));
+    }
+
+    public string DefaultText
+    {
+        get => _defaultText;
+        set => Push(ref _defaultText, value, "Edit dialog text",
+            () => OnPropertyChanged(nameof(TextPreview)));
+    }
+
+    public string FemaleText
+    {
+        get => _femaleText;
+        set => Push(ref _femaleText, value, "Edit female text",
+            () => { OnPropertyChanged(nameof(HasFemaleText)); OnPropertyChanged(nameof(FooterText)); });
+    }
+
+    public string DisplayType
+    {
+        get => _displayType;
+        set => Push(ref _displayType, value, "Edit display type");
+    }
+
+    public string Persistence
+    {
+        get => _persistence;
+        set => Push(ref _persistence, value, "Edit persistence");
+    }
+
+    public string ActorDirection
+    {
+        get => _actorDirection;
+        set => Push(ref _actorDirection, value, "Edit actor direction");
+    }
+
+    public string Comments
+    {
+        get => _comments;
+        set => Push(ref _comments, value, "Edit comments");
+    }
+
+    public string ExternalVO
+    {
+        get => _externalVO;
+        set => Push(ref _externalVO, value, "Edit external VO");
+    }
+
+    public bool HasVO
+    {
+        get => _hasVO;
+        set => Push(ref _hasVO, value, "Edit HasVO");
+    }
+
+    public bool HideSpeaker
+    {
+        get => _hideSpeaker;
+        set => Push(ref _hideSpeaker, value, "Edit HideSpeaker");
+    }
+
+    // ── Computed display properties ───────────────────────────────────────
+    public string SpeakerName =>
+        SpeakerNameService.Resolve(_speakerGuid) ?? _speakerCategory switch
+        {
+            SpeakerCategory.Player   => Loc.Get("Speaker_Player"),
+            SpeakerCategory.Narrator => Loc.Get("Speaker_Narrator"),
+            SpeakerCategory.Script   => Loc.Get("Speaker_Script"),
+            _                        => Loc.Get("Speaker_Unknown")
+        };
+
+    public string ListenerName =>
+        SpeakerNameService.Resolve(_listenerGuid) ?? string.Empty;
+
+    public string Title =>
+        Loc.Format("Node_Title", NodeId, SpeakerName,
+            _isPlayerChoice ? Loc.Get("Node_PlayerChoiceSuffix") : string.Empty);
+
+    public string TextPreview =>
+        _defaultText.Length > 80 ? _defaultText[..80] + "…" : _defaultText;
+
+    public bool HasFemaleText => !string.IsNullOrEmpty(_femaleText);
+
+    public string FooterText
+    {
+        get
+        {
+            var count = ConditionStrings.Count;
+            var condPart = count > 0
+                ? Loc.Format(count == 1 ? "Node_ConditionSingular" : "Node_ConditionPlural", count)
+                : Loc.Get("Node_NoConditions");
+            return HasFemaleText ? condPart + Loc.Get("Node_FemaleTextSuffix") : condPart;
+        }
+    }
+
+    // ── Read-only (Phase 1 — no editing of conditions/scripts) ───────────
+    public IReadOnlyList<string> ConditionStrings  { get; }
+    public string ConditionExpression              { get; }
+    public IReadOnlyList<string> Scripts           { get; }
+    public IReadOnlyList<NodeLink> Links           { get; }
+
+    // ── Nodify connector anchors ──────────────────────────────────────────
+    public ConnectorViewModel Input   { get; } = new();
+    public ConnectorViewModel Output  { get; } = new();
+    public IReadOnlyList<ConnectorViewModel> Inputs  { get; }
+    public IReadOnlyList<ConnectorViewModel> Outputs { get; }
+
+    // ── Canvas state ──────────────────────────────────────────────────────
+    [ObservableProperty] private LayoutPoint _location;
+    [ObservableProperty] private bool _isSelected;
+    [ObservableProperty] private bool _isSearchMatch = true;
+
+    internal Action<NodeViewModel>? OnSelected { get; set; }
+
+    partial void OnIsSelectedChanged(bool value)
+    {
+        if (value) OnSelected?.Invoke(this);
+    }
+
+    // ── Constructor ───────────────────────────────────────────────────────
+    public NodeViewModel(ConversationNode node, StringEntry? entry)
+    {
+        NodeId          = node.NodeId;
+        _isPlayerChoice = node.IsPlayerChoice;
+        _speakerCategory = node.SpeakerCategory;
+        _speakerGuid    = node.SpeakerGuid;
+        _listenerGuid   = node.ListenerGuid;
+        _displayType    = node.DisplayType;
+        _persistence    = node.Persistence;
+        _actorDirection = node.ActorDirection;
+        _comments       = node.Comments;
+        _externalVO     = node.ExternalVO;
+        _hasVO          = node.HasVO;
+        _hideSpeaker    = node.HideSpeaker;
+
+        _defaultText    = entry?.DefaultText ?? Loc.Get("Node_TextUnavailable");
+        _femaleText     = entry?.FemaleText  ?? string.Empty;
+
+        ConditionStrings  = node.ConditionStrings;
+        ConditionExpression = node.ConditionExpression;
+        Scripts           = node.Scripts;
+        Links             = node.Links;
+
+        Inputs  = [Input];
+        Outputs = [Output];
+    }
+
+    // ── Command-generating setter helper ──────────────────────────────────
+    private void Push<T>(ref T field, T value, string description, Action? onApplied = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return;
+
+        if (UndoStack is null)
+        {
+            field = value;
+            OnPropertyChanged(GetPropertyName<T>(description));
+            onApplied?.Invoke();
+            return;
+        }
+
+        var captured = field;  // capture current value before closure
+        var fieldRef = new ValueHolder<T>(captured, value);
+
+        UndoStack.Execute(new SetPropertyCommand<T>(
+            description,
+            apply: v =>
+            {
+                field = v;
+                OnPropertyChanged(GetPropertyName<T>(description));
+                onApplied?.Invoke();
+            },
+            oldValue: captured,
+            newValue: value));
+    }
+
+    // Maps description prefix to property name for OnPropertyChanged
+    private static string GetPropertyName<T>(string description) => description switch
+    {
+        "Edit dialog text"     => nameof(DefaultText),
+        "Edit female text"     => nameof(FemaleText),
+        "Edit node type"       => nameof(IsPlayerChoice),
+        "Edit speaker category"=> nameof(SpeakerCategory),
+        "Edit speaker GUID"    => nameof(SpeakerGuid),
+        "Edit listener GUID"   => nameof(ListenerGuid),
+        "Edit display type"    => nameof(DisplayType),
+        "Edit persistence"     => nameof(Persistence),
+        "Edit actor direction" => nameof(ActorDirection),
+        "Edit comments"        => nameof(Comments),
+        "Edit external VO"     => nameof(ExternalVO),
+        "Edit HasVO"           => nameof(HasVO),
+        "Edit HideSpeaker"     => nameof(HideSpeaker),
+        _                      => string.Empty
+    };
+
+    // ── Snapshot helper ───────────────────────────────────────────────────
+    public NodeEditSnapshot ToSnapshot(IReadOnlyList<LinkEditSnapshot> links) =>
+        new(NodeId, _isPlayerChoice, _speakerCategory,
+            _speakerGuid, _listenerGuid,
+            _defaultText, _femaleText,
+            _displayType, _persistence,
+            _actorDirection, _comments, _externalVO,
+            _hasVO, _hideSpeaker, links);
+}
+
+// Private helper — avoids closure-over-ref limitation
+file sealed class ValueHolder<T>(T old, T @new) { public T Old = old; public T New = @new; }
+```
+
+> **Note on Push\<T\>:** the `ref T field` trick works because all calls to `Push` are in the same class and the lambda captures by reference to the instance's field. The `GetPropertyName` mapping is verbose but avoids storing the property name separately or using `[CallerMemberName]` (which wouldn't work through the helper). If this feels brittle, an alternative is to pass `nameof(...)` explicitly as a fourth parameter.
+
+- [ ] **Step 2: Run all existing tests**
+
+```
+dotnet test DialogEditor.Tests
+```
+
+Expected: all pass. (The `NodeDetailViewModelTests` and `NodeDetailViewModel` code reads `NodeViewModel` properties — verify they still work.)
+
+- [ ] **Step 3: Commit**
+
+```
+git add DialogEditor.ViewModels/ViewModels/NodeViewModel.cs
+git commit -m "feat: NodeViewModel — mutable observable properties with undo stack wiring"
+```
+
+---
+
+### Task 12: Structural Edit Commands
+
+Four commands for adding/removing nodes and connections. These operate on `ConversationViewModel`'s observable collections.
+
+**Files:**
+- Create: `DialogEditor.ViewModels/Editing/AddNodeCommand.cs`
+- Create: `DialogEditor.ViewModels/Editing/DeleteNodeCommand.cs`
+- Create: `DialogEditor.ViewModels/Editing/AddConnectionCommand.cs`
+- Create: `DialogEditor.ViewModels/Editing/DeleteConnectionCommand.cs`
+
+No dedicated tests — these are exercised through `ConversationViewModelEditTests` in Task 13.
+
+- [ ] **Step 1: AddNodeCommand**
+
+```csharp
+// DialogEditor.ViewModels/Editing/AddNodeCommand.cs
+using DialogEditor.Core.Editing;
+
+namespace DialogEditor.ViewModels.Editing;
+
+internal sealed class AddNodeCommand(ConversationViewModel conversation, NodeViewModel node)
+    : IEditCommand
+{
+    public string Description => $"Add node {node.NodeId}";
+    public void Execute() => conversation.Nodes.Add(node);
+    public void Undo()    => conversation.Nodes.Remove(node);
+}
+```
+
+- [ ] **Step 2: DeleteNodeCommand**
+
+```csharp
+// DialogEditor.ViewModels/Editing/DeleteNodeCommand.cs
+using DialogEditor.Core.Editing;
+
+namespace DialogEditor.ViewModels.Editing;
+
+internal sealed class DeleteNodeCommand(
+    ConversationViewModel conversation,
+    NodeViewModel node,
+    IReadOnlyList<ConnectionViewModel> removedConnections) : IEditCommand
+{
+    public string Description => $"Delete node {node.NodeId}";
+
+    public void Execute()
+    {
+        foreach (var c in removedConnections)
+            conversation.Connections.Remove(c);
+        conversation.Nodes.Remove(node);
+        if (conversation.SelectedNode == node)
+            conversation.SelectedNode = null;
+    }
+
+    public void Undo()
+    {
+        conversation.Nodes.Add(node);
+        foreach (var c in removedConnections)
+            conversation.Connections.Add(c);
+    }
+}
+```
+
+- [ ] **Step 3: AddConnectionCommand**
+
+```csharp
+// DialogEditor.ViewModels/Editing/AddConnectionCommand.cs
+using DialogEditor.Core.Editing;
+
+namespace DialogEditor.ViewModels.Editing;
+
+internal sealed class AddConnectionCommand(
+    ConversationViewModel conversation,
+    ConnectionViewModel connection) : IEditCommand
+{
+    public string Description =>
+        $"Add connection {connection.Source.GetNodeId()} → {connection.Target.GetNodeId()}";
+
+    public void Execute() => conversation.Connections.Add(connection);
+    public void Undo()    => conversation.Connections.Remove(connection);
+}
+```
+
+- [ ] **Step 4: DeleteConnectionCommand**
+
+```csharp
+// DialogEditor.ViewModels/Editing/DeleteConnectionCommand.cs
+using DialogEditor.Core.Editing;
+
+namespace DialogEditor.ViewModels.Editing;
+
+internal sealed class DeleteConnectionCommand(
+    ConversationViewModel conversation,
+    ConnectionViewModel connection) : IEditCommand
+{
+    public string Description =>
+        $"Delete connection → {connection.Target.GetNodeId()}";
+
+    public void Execute() => conversation.Connections.Remove(connection);
+    public void Undo()    => conversation.Connections.Add(connection);
+}
+```
+
+> `ConnectorViewModel.GetNodeId()` does not yet exist — it will be added in Task 13 as a helper.
+
+- [ ] **Step 5: Commit**
+
+```
+git add DialogEditor.ViewModels/Editing/AddNodeCommand.cs
+git add DialogEditor.ViewModels/Editing/DeleteNodeCommand.cs
+git add DialogEditor.ViewModels/Editing/AddConnectionCommand.cs
+git add DialogEditor.ViewModels/Editing/DeleteConnectionCommand.cs
+git commit -m "feat: structural edit commands — add/delete node and connection"
+```
+
+---
+
+### Task 13: ConversationViewModel — edit operations
+
+Wires the undo stack into `ConversationViewModel`, adds commands for structural editing, exposes `IsModified`, and provides the `BuildSnapshot()` method used by the save path.
+
+**Files:**
+- Modify: `DialogEditor.ViewModels/ViewModels/ConversationViewModel.cs`
+- Modify: `DialogEditor.ViewModels/ViewModels/ConnectorViewModel.cs`
+- Create: `DialogEditor.Tests/ViewModels/ConversationViewModelEditTests.cs`
+
+- [ ] **Step 1: Write failing tests**
+
+```csharp
+// DialogEditor.Tests/ViewModels/ConversationViewModelEditTests.cs
+using DialogEditor.Core.Models;
+using DialogEditor.ViewModels;
+using DialogEditor.Tests.Helpers;
+
+namespace DialogEditor.Tests.ViewModels;
+
+public class ConversationViewModelEditTests
+{
+    private static ConversationViewModel MakeVm() =>
+        new(new StubDispatcher());
+
+    private static NodeViewModel MakeNode(int id) =>
+        new(new ConversationNode(id, false, SpeakerCategory.Npc, "", "", [],
+            [], [], "Conversation", "None"), null);
+
+    [Fact]
+    public void AddNode_AppearsInNodes()
+    {
+        var vm = MakeVm();
+        var node = MakeNode(5);
+        vm.AddNode(node, new Core.Models.LayoutPoint(0, 0));
+        Assert.Contains(node, vm.Nodes);
+    }
+
+    [Fact]
+    public void AddNode_SetsIsModified()
+    {
+        var vm = MakeVm();
+        vm.AddNode(MakeNode(1), new Core.Models.LayoutPoint(0, 0));
+        Assert.True(vm.IsModified);
+    }
+
+    [Fact]
+    public void UndoAddNode_RemovesNode()
+    {
+        var vm = MakeVm();
+        var node = MakeNode(1);
+        vm.AddNode(node, new Core.Models.LayoutPoint(0, 0));
+        vm.Undo();
+        Assert.DoesNotContain(node, vm.Nodes);
+    }
+
+    [Fact]
+    public void DeleteNode_RemovesNodeAndItsConnections()
+    {
+        var vm   = MakeVm();
+        var n1   = MakeNode(1);
+        var n2   = MakeNode(2);
+        vm.AddNode(n1, new Core.Models.LayoutPoint(0, 0));
+        vm.AddNode(n2, new Core.Models.LayoutPoint(200, 0));
+        vm.AddConnection(n1.Output, n2.Input);
+        vm.DeleteNode(n1);
+        Assert.DoesNotContain(n1, vm.Nodes);
+        Assert.Empty(vm.Connections);
+    }
+
+    [Fact]
+    public void UndoDeleteNode_RestoresNodeAndConnections()
+    {
+        var vm = MakeVm();
+        var n1 = MakeNode(1);
+        var n2 = MakeNode(2);
+        vm.AddNode(n1, new Core.Models.LayoutPoint(0, 0));
+        vm.AddNode(n2, new Core.Models.LayoutPoint(200, 0));
+        vm.AddConnection(n1.Output, n2.Input);
+        vm.DeleteNode(n1);
+        vm.Undo();
+        Assert.Contains(n1, vm.Nodes);
+        Assert.Single(vm.Connections);
+    }
+
+    [Fact]
+    public void Load_ClearsIsModified()
+    {
+        var vm = MakeVm();
+        vm.AddNode(MakeNode(1), new Core.Models.LayoutPoint(0, 0));
+        Assert.True(vm.IsModified);
+        vm.Load(new Conversation("test", [], Core.Models.StringTable.Empty));
+        Assert.False(vm.IsModified);
+    }
+}
+```
+
+- [ ] **Step 2: Run — confirm failure**
+
+```
+dotnet test DialogEditor.Tests --filter "FullyQualifiedName~ConversationViewModelEditTests"
+```
+
+- [ ] **Step 3: Add GetNodeId helper to ConnectorViewModel**
+
+```csharp
+// DialogEditor.ViewModels/ViewModels/ConnectorViewModel.cs
+using CommunityToolkit.Mvvm.ComponentModel;
+using DialogEditor.Core.Models;
+
+namespace DialogEditor.ViewModels;
+
+public partial class ConnectorViewModel : ObservableObject
+{
+    [ObservableProperty]
+    private LayoutPoint _anchor;
+
+    internal NodeViewModel? Owner { get; set; }
+    internal int GetNodeId() => Owner?.NodeId ?? -1;
+}
+```
+
+- [ ] **Step 4: Update ConversationViewModel**
+
+Add the following to `ConversationViewModel.cs`. Keep the existing search, `Load`, `Nodes`, `Connections`, `SelectedNode` members unchanged — add these new members:
+
+```csharp
+// At the top — new usings
+using DialogEditor.Core.Editing;
+using DialogEditor.ViewModels.Editing;
+
+// New fields
+private readonly UndoRedoStack _undoStack = new();
+private ConversationFile? _currentFile;
+
+// New properties
+[ObservableProperty]
+[NotifyPropertyChangedFor(nameof(CanUndo))]
+[NotifyPropertyChangedFor(nameof(UndoDescription))]
+[NotifyPropertyChangedFor(nameof(CanRedo))]
+[NotifyPropertyChangedFor(nameof(RedoDescription))]
+private bool _isModified;
+
+public bool CanUndo        => _undoStack.CanUndo;
+public bool CanRedo        => _undoStack.CanRedo;
+public string? UndoDescription => _undoStack.UndoDescription;
+public string? RedoDescription => _undoStack.RedoDescription;
+
+// Update Load() to wire the undo stack and clear IsModified
+// In the existing Load() method, after populating Nodes, add:
+//     foreach (var vm in Nodes) vm.UndoStack = _undoStack;
+// Also add at the start of Load():
+//     _undoStack.Clear();
+//     IsModified = false;
+// (Modify the existing Load method rather than duplicating it)
+
+// New relay commands
+[RelayCommand(CanExecute = nameof(CanUndo))]
+private void Undo()
+{
+    _undoStack.Undo();
+    IsModified = _undoStack.CanUndo;
+    OnPropertyChanged(nameof(CanUndo));
+    OnPropertyChanged(nameof(CanRedo));
+    OnPropertyChanged(nameof(UndoDescription));
+    OnPropertyChanged(nameof(RedoDescription));
+}
+
+[RelayCommand(CanExecute = nameof(CanRedo))]
+private void Redo()
+{
+    _undoStack.Redo();
+    IsModified = true;
+    OnPropertyChanged(nameof(CanUndo));
+    OnPropertyChanged(nameof(CanRedo));
+    OnPropertyChanged(nameof(UndoDescription));
+    OnPropertyChanged(nameof(RedoDescription));
+}
+
+// New structural edit methods
+public void AddNode(NodeViewModel node, LayoutPoint position)
+{
+    node.Location  = position;
+    node.UndoStack = _undoStack;
+    node.OnSelected = n => SelectedNode = n;
+    var cmd = new AddNodeCommand(this, node);
+    _undoStack.Execute(cmd);
+    IsModified = true;
+    RefreshUndoRedo();
+}
+
+public void DeleteNode(NodeViewModel node)
+{
+    var removed = Connections
+        .Where(c => c.Source.Owner == node || c.Target.Owner == node)
+        .ToList();
+    var cmd = new DeleteNodeCommand(this, node, removed);
+    _undoStack.Execute(cmd);
+    IsModified = true;
+    RefreshUndoRedo();
+}
+
+public void AddConnection(ConnectorViewModel source, ConnectorViewModel target)
+{
+    var conn = new ConnectionViewModel(source, target);
+    var cmd  = new AddConnectionCommand(this, conn);
+    _undoStack.Execute(cmd);
+    IsModified = true;
+    RefreshUndoRedo();
+}
+
+public void DeleteConnection(ConnectionViewModel connection)
+{
+    var cmd = new DeleteConnectionCommand(this, connection);
+    _undoStack.Execute(cmd);
+    IsModified = true;
+    RefreshUndoRedo();
+}
+
+public void AddConnectedNode(NodeViewModel parent, LayoutPoint position)
+{
+    var newId   = NodeIdAllocator.Next(Nodes.Select(n => n.NodeId));
+    var newNode = new ConversationNode(newId, false, SpeakerCategory.Npc,
+        parent.SpeakerGuid, parent.ListenerGuid, [], [], [],
+        parent.DisplayType, parent.Persistence);
+    var vm = new NodeViewModel(newNode, null) { Location = position };
+    vm.UndoStack  = _undoStack;
+    vm.OnSelected = n => SelectedNode = n;
+    _undoStack.Execute(new AddNodeCommand(this, vm));
+    _undoStack.Execute(new AddConnectionCommand(this, new ConnectionViewModel(parent.Output, vm.Input)));
+    IsModified = true;
+    RefreshUndoRedo();
+    SelectedNode = vm;
+}
+
+private void RefreshUndoRedo()
+{
+    OnPropertyChanged(nameof(CanUndo));
+    OnPropertyChanged(nameof(CanRedo));
+    OnPropertyChanged(nameof(UndoDescription));
+    OnPropertyChanged(nameof(RedoDescription));
+}
+
+// Snapshot for save
+public ConversationEditSnapshot BuildSnapshot() =>
+    new(Nodes.Select(n =>
+    {
+        var links = Connections
+            .Where(c => c.Source.Owner == n)
+            .Select(c => new LinkEditSnapshot(
+                n.NodeId,
+                c.Target.Owner!.NodeId,
+                1f,
+                c.QuestionNodeTextDisplay,
+                c.HasConditions))
+            .ToList();
+        return n.ToSnapshot(links);
+    }).ToList());
+```
+
+Also update `Load()` to:
+1. Add `_undoStack.Clear(); IsModified = false;` at the top.
+2. After `vm.OnSelected = n => SelectedNode = n;`, add `vm.UndoStack = _undoStack;`.
+3. After building `nodeMap`, set `vm.Input.Owner = vm; vm.Output.Owner = vm;` for each vm.
+
+And add `ConnectionViewModel.HasConditions` property (returns false for now — links added by the editor never have conditions):
+```csharp
+// In ConnectionViewModel.cs — add:
+public bool HasConditions => false;
+```
+
+- [ ] **Step 5: Run tests — confirm pass**
+
+```
+dotnet test DialogEditor.Tests --filter "FullyQualifiedName~ConversationViewModelEditTests"
+dotnet test DialogEditor.Tests
+```
+
+- [ ] **Step 6: Commit**
+
+```
+git add DialogEditor.ViewModels/ViewModels/ConversationViewModel.cs
+git add DialogEditor.ViewModels/ViewModels/ConnectorViewModel.cs
+git add DialogEditor.ViewModels/ViewModels/ConnectionViewModel.cs
+git add DialogEditor.Tests/ViewModels/ConversationViewModelEditTests.cs
+git commit -m "feat: ConversationViewModel — undo/redo, add/delete node and connection, BuildSnapshot"
+```
+
+---
+
+### Task 14: NodeDetailViewModel — editable proxy properties
+
+`NodeDetailViewModel` gains a reference to the current `NodeViewModel` and exposes proxy properties for editable fields. Changes in the UI write through to `NodeViewModel`'s setters (which fire commands into the undo stack). Undo/redo changes on `NodeViewModel` are forwarded back to the UI via `PropertyChanged` subscription.
+
+**Files:**
+- Modify: `DialogEditor.ViewModels/ViewModels/NodeDetailViewModel.cs`
+- Modify: `DialogEditor.Tests/ViewModels/NodeDetailViewModelTests.cs`
+
+- [ ] **Step 1: Write new failing tests**
+
+Add to `NodeDetailViewModelTests.cs`:
+
+```csharp
+[Fact]
+public void Load_ExposesSpeakerGuid()
+{
+    var vm   = new NodeDetailViewModel();
+    var node = MakeNode(0, speakerGuid: "test-guid-123");
+    vm.Load(node);
+    Assert.Equal("test-guid-123", vm.SpeakerGuid);
+}
+
+[Fact]
+public void SetSpeakerGuid_UpdatesNodeViewModel()
+{
+    var vm   = new NodeDetailViewModel();
+    var node = MakeNode(0, speakerGuid: "original");
+    vm.Load(node);
+    vm.SpeakerGuid = "updated";
+    Assert.Equal("updated", node.SpeakerGuid);
+}
+
+[Fact]
+public void Clear_NullifiesCurrentNode()
+{
+    var vm = new NodeDetailViewModel();
+    vm.Load(MakeNode(0));
+    vm.Clear();
+    Assert.Equal(string.Empty, vm.SpeakerGuid);
+    Assert.False(vm.HasContent);
+}
+```
+
+Where `MakeNode` is a helper in the test file:
+
+```csharp
+private static NodeViewModel MakeNode(int id, string speakerGuid = "") =>
+    new(new ConversationNode(id, false, SpeakerCategory.Npc, speakerGuid, "",
+        [], [], [], "Conversation", "None"), null);
+```
+
+- [ ] **Step 2: Run — confirm failure**
+
+```
+dotnet test DialogEditor.Tests --filter "FullyQualifiedName~NodeDetailViewModelTests"
+```
+
+- [ ] **Step 3: Update NodeDetailViewModel**
+
+Replace the file content:
+
+```csharp
+// DialogEditor.ViewModels/ViewModels/NodeDetailViewModel.cs
+using System.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using DialogEditor.Core.Models;
+using DialogEditor.ViewModels.Models;
+using DialogEditor.ViewModels.Resources;
+
+namespace DialogEditor.ViewModels;
+
+public partial class NodeDetailViewModel : ObservableObject
+{
+    private NodeViewModel? _node;
+
+    [ObservableProperty] private bool _hasContent;
+
+    // ── Editable proxy properties ─────────────────────────────────────────
+    public string DefaultText
+    {
+        get => _node?.DefaultText ?? string.Empty;
+        set { if (_node != null) _node.DefaultText = value; }
+    }
+
+    public string FemaleText
+    {
+        get => _node?.FemaleText ?? string.Empty;
+        set { if (_node != null) _node.FemaleText = value; }
+    }
+
+    public bool IsPlayerChoice
+    {
+        get => _node?.IsPlayerChoice ?? false;
+        set { if (_node != null) _node.IsPlayerChoice = value; }
+    }
+
+    public string SpeakerGuid
+    {
+        get => _node?.SpeakerGuid ?? string.Empty;
+        set { if (_node != null) _node.SpeakerGuid = value; }
+    }
+
+    public string ListenerGuid
+    {
+        get => _node?.ListenerGuid ?? string.Empty;
+        set { if (_node != null) _node.ListenerGuid = value; }
+    }
+
+    public string DisplayType
+    {
+        get => _node?.DisplayType ?? string.Empty;
+        set { if (_node != null) _node.DisplayType = value; }
+    }
+
+    public string Persistence
+    {
+        get => _node?.Persistence ?? string.Empty;
+        set { if (_node != null) _node.Persistence = value; }
+    }
+
+    public string ActorDirection
+    {
+        get => _node?.ActorDirection ?? string.Empty;
+        set { if (_node != null) _node.ActorDirection = value; }
+    }
+
+    public string Comments
+    {
+        get => _node?.Comments ?? string.Empty;
+        set { if (_node != null) _node.Comments = value; }
+    }
+
+    public string ExternalVO
+    {
+        get => _node?.ExternalVO ?? string.Empty;
+        set { if (_node != null) _node.ExternalVO = value; }
+    }
+
+    public bool HasVO
+    {
+        get => _node?.HasVO ?? false;
+        set { if (_node != null) _node.HasVO = value; }
+    }
+
+    public bool HideSpeaker
+    {
+        get => _node?.HideSpeaker ?? false;
+        set { if (_node != null) _node.HideSpeaker = value; }
+    }
+
+    // ── Read-only display ─────────────────────────────────────────────────
+    public string FemaleTextDisplay =>
+        (_node?.HasFemaleText ?? false)
+            ? (_node!.FemaleText)
+            : Loc.Get("NodeDetail_SameAsDefault");
+
+    public bool HasFemaleText => _node?.HasFemaleText ?? false;
+
+    [ObservableProperty] private IReadOnlyList<PropertyGroup> _propertyGroups = [];
+    [ObservableProperty] private IReadOnlyList<LinkRow> _links = [];
+
+    // ── Load / Clear ──────────────────────────────────────────────────────
+    public void Load(NodeViewModel? node)
+    {
+        if (_node is not null)
+            _node.PropertyChanged -= OnNodePropertyChanged;
+
+        _node = node;
+        if (node is null) { HasContent = false; return; }
+
+        node.PropertyChanged += OnNodePropertyChanged;
+
+        RefreshReadOnlyGroups(node);
+        Links      = node.Links.Select(BuildLinkRow).ToList();
+        HasContent = true;
+
+        // Notify all proxy properties
+        NotifyAllProxies();
+    }
+
+    public void Clear() => Load(null);
+
+    private void OnNodePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        // Forward every change on the node to this VM so the UI updates on undo/redo
+        NotifyAllProxies();
+        if (_node is not null)
+            RefreshReadOnlyGroups(_node);
+    }
+
+    private void NotifyAllProxies()
+    {
+        OnPropertyChanged(nameof(DefaultText));
+        OnPropertyChanged(nameof(FemaleText));
+        OnPropertyChanged(nameof(FemaleTextDisplay));
+        OnPropertyChanged(nameof(HasFemaleText));
+        OnPropertyChanged(nameof(IsPlayerChoice));
+        OnPropertyChanged(nameof(SpeakerGuid));
+        OnPropertyChanged(nameof(ListenerGuid));
+        OnPropertyChanged(nameof(DisplayType));
+        OnPropertyChanged(nameof(Persistence));
+        OnPropertyChanged(nameof(ActorDirection));
+        OnPropertyChanged(nameof(Comments));
+        OnPropertyChanged(nameof(ExternalVO));
+        OnPropertyChanged(nameof(HasVO));
+        OnPropertyChanged(nameof(HideSpeaker));
+    }
+
+    private void RefreshReadOnlyGroups(NodeViewModel node)
+    {
+        var none = Loc.Get("NodeDetail_None");
+        PropertyGroups =
+        [
+            new PropertyGroup(Loc.Get("Label_GroupIdentity"),
+            [
+                new PropertyRow(Loc.Get("PropertyRow_NodeId"), node.NodeId.ToString()),
+            ]),
+            new PropertyGroup(Loc.Get("Label_GroupLogic"),
+            [
+                new PropertyRow(Loc.Get("PropertyRow_Conditions"),
+                    string.IsNullOrEmpty(node.ConditionExpression) ? none : node.ConditionExpression,
+                    PropertyValueStyle.Condition),
+                new PropertyRow(Loc.Get("PropertyRow_Scripts"),
+                    node.Scripts.Count == 0 ? none : string.Join(Environment.NewLine, node.Scripts),
+                    PropertyValueStyle.Script),
+            ]),
+        ];
+    }
+
+    private static LinkRow BuildLinkRow(NodeLink link)
+    {
+        var extras = new List<string>();
+        if (link.RandomWeight != 1f)
+            extras.Add($"{Loc.Get("Link_WeightPrefix")}{link.RandomWeight:0.##}");
+        if (!string.IsNullOrEmpty(link.QuestionNodeTextDisplay) && link.QuestionNodeTextDisplay != "ShowOnce")
+            extras.Add(link.QuestionNodeTextDisplay);
+        var arrow  = $"{Loc.Get("Link_Arrow")} {link.ToNodeId}";
+        var detail = extras.Count == 0 ? Loc.Get("NodeDetail_None") : $"[{string.Join(", ", extras)}]";
+        return new LinkRow(arrow, detail);
+    }
+}
+```
+
+- [ ] **Step 4: Run tests**
+
+```
+dotnet test DialogEditor.Tests
+```
+
+Expected: all pass.
+
+- [ ] **Step 5: Commit**
+
+```
+git add DialogEditor.ViewModels/ViewModels/NodeDetailViewModel.cs
+git add DialogEditor.Tests/ViewModels/NodeDetailViewModelTests.cs
+git commit -m "feat: NodeDetailViewModel — editable proxy properties with undo-forwarding"
+```
+
+---
+
+### Task 15: MainWindowViewModel — save, backup, dirty title, unsaved-changes guard
+
+**Files:**
+- Modify: `DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs`
+
+No new tests — this is thin orchestration glue; the underlying pieces are all tested.
+
+- [ ] **Step 1: Add save command**
+
+In `MainWindowViewModel`, add:
+
+```csharp
+// New field
+private string _currentGameDirectory = string.Empty;
+
+// New observable properties
+[ObservableProperty] private bool _isModified;
+
+// Window title updates when conversation name or modified state changes
+public string WindowTitle =>
+    _isModified && CurrentConversationName is not null
+        ? $"● {CurrentConversationName}"
+        : (CurrentConversationName ?? Loc.Get("App_Title"));
+
+// Wire IsModified from Canvas
+// In the existing Canvas.PropertyChanged subscription, add:
+//   case nameof(ConversationViewModel.IsModified):
+//       IsModified = Canvas.IsModified;
+//       OnPropertyChanged(nameof(WindowTitle));
+//       break;
+
+[RelayCommand(CanExecute = nameof(CanSave))]
+private void Save()
+{
+    if (_provider is null || _currentFile is null) return;
+    try
+    {
+        var snapshot = Canvas.BuildSnapshot();
+        _provider.SaveConversation(_currentFile, snapshot);
+        Canvas.IsModified = false;
+        IsModified = false;
+        OnPropertyChanged(nameof(WindowTitle));
+        AppLog.Info($"Saved {_currentFile.Name}");
+        StatusText = Loc.Format("Status_Saved", _currentFile.Name);
+    }
+    catch (Exception ex)
+    {
+        AppLog.Error($"Failed to save '{_currentFile?.Name}'", ex);
+        StatusText = Loc.Format("Status_SaveError", _currentFile!.Name, ex.Message);
+    }
+}
+private bool CanSave() => _provider is not null && _currentFile is not null && IsModified;
+```
+
+- [ ] **Step 2: Add backup offer to LoadDirectory**
+
+In `LoadDirectory`, after the provider is set up and before calling `Browser.Load`, add:
+
+```csharp
+_currentGameDirectory = path;
+if (!AppSettings.IsKnownGameDirectory(path))
+    _ = OfferBackupAsync(path);
+AppSettings.MarkGameDirectoryKnown(path);
+```
+
+Add the async method:
+
+```csharp
+private async Task OfferBackupAsync(string gameDirectory)
+{
+    var pick = await _folderPicker.PickFolderAsync(Loc.Get("Dialog_SelectBackupFolder"));
+    if (pick is null) return;
+
+    var timestamp  = DateTime.Now.ToString("yyyy-MM-ddTHH-mm");
+    var backupRoot = Path.Combine(pick, timestamp);
+    AppSettings.SetBackupPath(gameDirectory, pick);
+
+    StatusText = Loc.Get("Status_BackupInProgress");
+    try
+    {
+        if (_provider is Poe2GameDataProvider p2)
+        {
+            await BackupService.BackupAsync(p2.ConversationsRoot, Path.Combine(backupRoot, "conversations"), default);
+            await BackupService.BackupAsync(p2.StringTablesRoot,  Path.Combine(backupRoot, "stringtables"),  default);
+        }
+        else if (_provider is Poe1GameDataProvider p1)
+        {
+            await BackupService.BackupAsync(p1.ConversationsRoot, Path.Combine(backupRoot, "conversations"), default);
+            await BackupService.BackupAsync(p1.StringTablesRoot,  Path.Combine(backupRoot, "stringtables"),  default);
+        }
+        AppLog.Info($"Backup written to {backupRoot}");
+        StatusText = Loc.Format("Status_BackupComplete", backupRoot);
+    }
+    catch (Exception ex)
+    {
+        AppLog.Error("Backup failed", ex);
+        StatusText = Loc.Format("Status_BackupError", ex.Message);
+    }
+}
+```
+
+> Note: `ConversationsRoot` and `StringTablesRoot` are currently private in both providers. Make them `internal` so `MainWindowViewModel` can access them, OR expose a `BackupRoots` tuple on the interface. The simpler path is making the properties `internal`.
+
+- [ ] **Step 3: Add restore command**
+
+```csharp
+[RelayCommand]
+private async Task RestoreBackup()
+{
+    var backupPath = AppSettings.GetBackupPath(_currentGameDirectory);
+    if (backupPath is null)
+    {
+        StatusText = Loc.Get("Status_NoBackupFound");
+        return;
+    }
+    // The unsaved-changes prompt is handled by the unsaved-changes guard (step 4)
+    StatusText = Loc.Get("Status_RestoreInProgress");
+    try
+    {
+        if (_provider is Poe2GameDataProvider p2)
+        {
+            await BackupService.RestoreAsync(
+                Path.Combine(backupPath, "conversations"), p2.ConversationsRoot, default);
+            await BackupService.RestoreAsync(
+                Path.Combine(backupPath, "stringtables"),  p2.StringTablesRoot,  default);
+        }
+        else if (_provider is Poe1GameDataProvider p1)
+        {
+            await BackupService.RestoreAsync(
+                Path.Combine(backupPath, "conversations"), p1.ConversationsRoot, default);
+            await BackupService.RestoreAsync(
+                Path.Combine(backupPath, "stringtables"),  p1.StringTablesRoot,  default);
+        }
+        AppLog.Info("Backup restored");
+        StatusText = Loc.Get("Status_RestoreComplete");
+        if (_currentFile is not null)
+            OnConversationSelected(_currentFile);
+    }
+    catch (Exception ex)
+    {
+        AppLog.Error("Restore failed", ex);
+        StatusText = Loc.Format("Status_RestoreError", ex.Message);
+    }
+}
+```
+
+- [ ] **Step 4: Unsaved-changes guard in OnConversationSelected**
+
+Before loading the new conversation in `OnConversationSelected`, check `IsModified` and prompt:
+
+```csharp
+private void OnConversationSelected(ConversationFile file)
+{
+    if (_provider is null) return;
+
+    if (IsModified && _currentFile is not null)
+    {
+        // Prompt is handled by the View layer via a pending action pattern.
+        // Store the pending file and raise a request for confirmation.
+        _pendingFile = file;
+        UnsavedChangesRequested?.Invoke();
+        return;
+    }
+
+    LoadConversation(file);
+}
+
+private ConversationFile? _pendingFile;
+public event Action? UnsavedChangesRequested;
+
+// Called by the View after the user chooses Save
+public void SaveAndProceed()
+{
+    Save();
+    if (_pendingFile is not null) LoadConversation(_pendingFile);
+    _pendingFile = null;
+}
+
+// Called by the View after the user chooses Discard
+public void DiscardAndProceed()
+{
+    if (_pendingFile is not null) LoadConversation(_pendingFile);
+    _pendingFile = null;
+}
+
+// Called by the View after the user chooses Cancel
+public void CancelPendingNavigation() => _pendingFile = null;
+
+private void LoadConversation(ConversationFile file)
+{
+    // Extract the body of the existing OnConversationSelected (the try/catch block)
+}
+```
+
+- [ ] **Step 5: Run all tests**
+
+```
+dotnet test DialogEditor.Tests
+```
+
+Expected: all pass.
+
+- [ ] **Step 6: Commit**
+
+```
+git add DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs
+git commit -m "feat: MainWindowViewModel — save, backup offer, restore, dirty title, unsaved-changes guard"
+```
+
+---
+
+### Task 16: Strings.axaml — all new localisation keys
+
+All user-visible strings for the editing features must be defined here before the UI tasks reference them.
+
+**Files:**
+- Modify: `DialogEditor.Avalonia/Resources/Strings.axaml`
+
+- [ ] **Step 1: Add new keys**
+
+Append the following sections inside the `<ResourceDictionary>` (before the closing tag):
+
+```xml
+    <!-- ─── Editing — toolbar buttons ───────────────────────────────────── -->
+    <sys:String x:Key="Button_Undo">↩</sys:String>
+    <sys:String x:Key="Button_Redo">↪</sys:String>
+    <sys:String x:Key="Button_Save">Save</sys:String>
+    <sys:String x:Key="Button_RestoreBackup">Restore Backup…</sys:String>
+    <!-- {0} = description of the action that will be undone -->
+    <sys:String x:Key="ToolTip_Undo">Undo: {0} (Ctrl+Z)</sys:String>
+    <sys:String x:Key="ToolTip_Undo_NoHistory">Nothing to undo (Ctrl+Z)</sys:String>
+    <sys:String x:Key="ToolTip_Redo">Redo: {0} (Ctrl+Y)</sys:String>
+    <sys:String x:Key="ToolTip_Redo_NoHistory">Nothing to redo (Ctrl+Y)</sys:String>
+    <sys:String x:Key="ToolTip_Save">Save conversation to disk (Ctrl+S)</sys:String>
+    <sys:String x:Key="ToolTip_RestoreBackup">Restore all conversation files from the original backup</sys:String>
+
+    <!-- ─── Editing — canvas context menus ──────────────────────────────── -->
+    <sys:String x:Key="Menu_DeleteNode">Delete node</sys:String>
+    <sys:String x:Key="Menu_AddConnectedNode">Add connected node</sys:String>
+    <sys:String x:Key="Menu_DeleteConnection">Delete connection</sys:String>
+
+    <!-- ─── Editing — status messages ───────────────────────────────────── -->
+    <!-- {0} = conversation name -->
+    <sys:String x:Key="Status_Saved">Saved: {0}</sys:String>
+    <!-- {0} = conversation name, {1} = error message -->
+    <sys:String x:Key="Status_SaveError">Save failed for {0}: {1}</sys:String>
+    <sys:String x:Key="Status_BackupInProgress">Backing up conversation files…</sys:String>
+    <!-- {0} = backup folder path -->
+    <sys:String x:Key="Status_BackupComplete">Backup complete — {0}</sys:String>
+    <!-- {0} = error message -->
+    <sys:String x:Key="Status_BackupError">Backup failed: {0}</sys:String>
+    <sys:String x:Key="Status_RestoreInProgress">Restoring from backup…</sys:String>
+    <sys:String x:Key="Status_RestoreComplete">Restore complete — reload to see changes.</sys:String>
+    <!-- {0} = error message -->
+    <sys:String x:Key="Status_RestoreError">Restore failed: {0}</sys:String>
+    <sys:String x:Key="Status_NoBackupFound">No backup found for this game folder.</sys:String>
+
+    <!-- ─── Editing — dialogs ────────────────────────────────────────────── -->
+    <sys:String x:Key="Dialog_SelectBackupFolder">Select backup destination folder</sys:String>
+
+    <!-- ─── Editing — unsaved-changes prompt ────────────────────────────── -->
+    <sys:String x:Key="UnsavedChanges_Message">You have unsaved changes. Save before switching conversations?</sys:String>
+    <sys:String x:Key="UnsavedChanges_Save">Save</sys:String>
+    <sys:String x:Key="UnsavedChanges_Discard">Discard</sys:String>
+    <sys:String x:Key="UnsavedChanges_Cancel">Cancel</sys:String>
+
+    <!-- ─── Detail panel — editable field labels (new rows) ─────────────── -->
+    <sys:String x:Key="PropertyRow_ListenerGuid">Listener GUID</sys:String>
+    <sys:String x:Key="Label_GroupEditable">PROPERTIES</sys:String>
+
+    <!-- ─── Detail panel — combobox option values ───────────────────────── -->
+    <sys:String x:Key="Option_NpcLine">NPC Line</sys:String>
+    <sys:String x:Key="Option_PlayerChoice">Player Choice</sys:String>
+    <sys:String x:Key="Option_DisplayConversation">Conversation</sys:String>
+    <sys:String x:Key="Option_DisplayBark">Bark</sys:String>
+    <sys:String x:Key="Option_PersistenceNone">None</sys:String>
+    <sys:String x:Key="Option_PersistenceOnceEver">OnceEver</sys:String>
+
+    <!-- ─── Detail panel — link actions ─────────────────────────────────── -->
+    <sys:String x:Key="Button_DeleteLink">✕</sys:String>
+    <sys:String x:Key="ToolTip_DeleteLink">Remove this connection</sys:String>
+    <sys:String x:Key="Button_AddLink">Add link…</sys:String>
+    <sys:String x:Key="ToolTip_AddLink">Add a connection from this node to another</sys:String>
+```
+
+- [ ] **Step 2: Build to confirm no typos**
+
+```
+dotnet build DialogEditor.Avalonia
+```
+
+- [ ] **Step 3: Commit**
+
+```
+git add DialogEditor.Avalonia/Resources/Strings.axaml
+git commit -m "feat: Strings.axaml — localisation keys for all editing UI"
+```
+
+---
