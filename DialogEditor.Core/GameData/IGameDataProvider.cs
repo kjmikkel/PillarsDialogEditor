@@ -12,4 +12,5 @@ public interface IGameDataProvider
     Conversation LoadConversation(ConversationFile file);
     IReadOnlyDictionary<string, string> LoadSpeakerNames();
     void SaveConversation(ConversationFile file, ConversationEditSnapshot snapshot);
+    (string ConversationsRoot, string StringTablesRoot) GetBackupRoots();
 }
