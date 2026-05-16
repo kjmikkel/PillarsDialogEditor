@@ -84,7 +84,16 @@
             <nodify:NodifyEditor x:Name="Editor"
                                  Background="#7a6a8e"
                                  ItemsSource="{Binding Nodes}"
-                                 Connections="{Binding Connections}">
+                                 Connections="{Binding Connections}"
+                                 DoubleTapped="Editor_DoubleTapped">
+
+                <!-- Drag-to-connect: PendingConnection handles the in-progress line -->
+                <nodify:NodifyEditor.PendingConnection>
+                    <nodify:PendingConnection
+                        StartedCommand="{Binding PendingConnection.StartCommand}"
+                        CompletedCommand="{Binding PendingConnection.CompleteCommand}"
+                        Stroke="#aaaaaa" StrokeThickness="2" StrokeDashArray="4,3"/>
+                </nodify:NodifyEditor.PendingConnection>
 
                 <nodify:NodifyEditor.ItemContainerTheme>
                     <ControlTheme TargetType="nodify:ItemContainer"
@@ -98,6 +107,19 @@
                 <nodify:NodifyEditor.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:NodeViewModel}">
                         <nodify:Node Input="{Binding Inputs}" Output="{Binding Outputs}">
+
+                            <nodify:Node.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="{StaticResource Menu_DeleteNode}"
+                                              Command="{Binding $parent[UserControl].DataContext.DeleteNodeCmdCommand}"
+                                              CommandParameter="{Binding}"
+                                              ToolTip.Tip="Remove this node and all its connections"/>
+                                    <MenuItem Header="{StaticResource Menu_AddConnectedNode}"
+                                              Command="{Binding $parent[UserControl].DataContext.AddConnectedNodeCmdCommand}"
+                                              CommandParameter="{Binding}"
+                                              ToolTip.Tip="Create a new node linked from this one"/>
+                                </ContextMenu>
+                            </nodify:Node.ContextMenu>
 
                             <nodify:Node.InputConnectorTemplate>
                                 <DataTemplate DataType="{x:Type vm:ConnectorViewModel}">
@@ -152,7 +174,16 @@
                             Target="{Binding Target.Anchor, Converter={StaticResource LayoutPointConverter}}"
                             Classes.always="{Binding IsAlways}"
                             Classes.never="{Binding IsNever}"
-                            Classes.highlighted="{Binding IsHighlighted}"/>
+                            Classes.highlighted="{Binding IsHighlighted}">
+                            <nodify:Connection.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="{StaticResource Menu_DeleteConnection}"
+                                              Command="{Binding $parent[UserControl].DataContext.DeleteConnectionCmdCommand}"
+                                              CommandParameter="{Binding}"
+                                              ToolTip.Tip="Remove this connection between nodes"/>
+                                </ContextMenu>
+                            </nodify:Connection.ContextMenu>
+                        </nodify:Connection>
                     </DataTemplate>
                 </nodify:NodifyEditor.ConnectionTemplate>
 
