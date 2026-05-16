@@ -16,6 +16,8 @@ public static class AppSettings
         public string? LastGameDirectory { get; set; }
         public bool BrowserPinned  { get; set; } = true;
         public bool DetailExpanded { get; set; } = true;
+        public HashSet<string> KnownGameDirectories { get; set; } = [];
+        public Dictionary<string, string> BackupPaths { get; set; } = [];
     }
 
     public static string? LastLanguage
@@ -68,6 +70,26 @@ public static class AppSettings
         {
             AppLog.Warn($"Failed to save settings to {SettingsPath}: {ex.Message}");
         }
+    }
+
+    public static bool IsKnownGameDirectory(string path)
+        => Load().KnownGameDirectories.Contains(path);
+
+    public static void MarkGameDirectoryKnown(string path)
+    {
+        var s = Load();
+        s.KnownGameDirectories.Add(path);
+        Save(s);
+    }
+
+    public static string? GetBackupPath(string gameDirectory)
+        => Load().BackupPaths.GetValueOrDefault(gameDirectory);
+
+    public static void SetBackupPath(string gameDirectory, string backupRoot)
+    {
+        var s = Load();
+        s.BackupPaths[gameDirectory] = backupRoot;
+        Save(s);
     }
 
     public static string PickLanguage(IReadOnlyList<string> available, string? preferred)
