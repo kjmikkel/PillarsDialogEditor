@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:views="clr-namespace:DialogEditor.Avalonia.Views"
         x:Class="DialogEditor.Avalonia.Views.MainWindow"
-        Title="{StaticResource App_Title}"
+        Title="{Binding WindowTitle}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="1400" Height="850"
         Background="#1e1e1e" x:CompileBindings="False">
@@ -24,6 +24,34 @@
                             Foreground="White"
                             Background="#333" BorderThickness="0" Padding="8,2"
                             ToolTip.Tip="{StaticResource ToolTip_OpenFolder}"/>
+                    <Rectangle Width="1" Fill="#444" Margin="8,0" VerticalAlignment="Stretch"/>
+
+                    <!-- Undo / Redo -->
+                    <Button Content="{StaticResource Button_Undo}"
+                            Command="{Binding Canvas.UndoCommand}"
+                            Background="#333" Foreground="#aaa" BorderThickness="0" Padding="8,2"
+                            ToolTip.Tip="{Binding Canvas.UndoDescription,
+                                         FallbackValue={StaticResource ToolTip_Undo_NoHistory},
+                                         StringFormat={}{0} (Ctrl+Z)}"/>
+                    <Button Content="{StaticResource Button_Redo}"
+                            Command="{Binding Canvas.RedoCommand}"
+                            Background="#333" Foreground="#aaa" BorderThickness="0" Padding="8,2" Margin="2,0,0,0"
+                            ToolTip.Tip="{Binding Canvas.RedoDescription,
+                                         FallbackValue={StaticResource ToolTip_Redo_NoHistory},
+                                         StringFormat={}{0} (Ctrl+Y)}"/>
+
+                    <Rectangle Width="1" Fill="#444" Margin="8,0" VerticalAlignment="Stretch"/>
+
+                    <!-- Save / Restore -->
+                    <Button Content="{StaticResource Button_Save}"
+                            Command="{Binding SaveCommand}"
+                            Background="#333" Foreground="#aaa" BorderThickness="0" Padding="8,2"
+                            ToolTip.Tip="{StaticResource ToolTip_Save}"/>
+                    <Button Content="{StaticResource Button_RestoreBackup}"
+                            Command="{Binding RestoreBackupCommand}"
+                            Background="#333" Foreground="#aaa" BorderThickness="0" Padding="8,2" Margin="2,0,0,0"
+                            ToolTip.Tip="{StaticResource ToolTip_RestoreBackup}"/>
+
                     <Rectangle Width="1" Fill="#444" Margin="8,0" VerticalAlignment="Stretch"/>
                     <TextBlock Text="{StaticResource Label_Language}" Foreground="#888" FontSize="11"
                                VerticalAlignment="Center" Margin="0,0,6,0"
