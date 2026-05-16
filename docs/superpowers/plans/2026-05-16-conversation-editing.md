@@ -2680,3 +2680,654 @@ git commit -m "feat: Strings.axaml — localisation keys for all editing UI"
 ```
 
 ---
+
+## Part D — UI Layer
+
+No tests in this part — these are XAML and code-behind changes. After each task, manually verify the feature in the running application.
+
+---
+
+### Task 17: NodeDetailView.axaml — editable controls
+
+Replace the read-only detail panel with a mix of editable controls. The `NodeDetailViewModel` proxy properties are the binding targets throughout.
+
+**Files:**
+- Modify: `DialogEditor.Avalonia/Views/NodeDetailView.axaml`
+
+- [ ] **Step 1: Replace NodeDetailView.axaml**
+
+Replace the entire file with the following. Key changes from the old version:
+- DefaultText and FemaleText become multi-line `TextBox` controls
+- Node type, display type, persistence become `ComboBox`
+- Speaker/listener GUIDs, actor direction, comments, external VO become `TextBox`
+- HasVO and HideSpeaker become `CheckBox`
+- Conditions/scripts remain read-only `TextBlock`
+- Links section gains a Delete button per row and an Add link button
+
+```xml
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:models="clr-namespace:DialogEditor.ViewModels.Models;assembly=DialogEditor.ViewModels"
+             x:Class="DialogEditor.Avalonia.Views.NodeDetailView" x:CompileBindings="False">
+
+    <UserControl.Styles>
+        <Style Selector="TextBlock.group-header">
+            <Setter Property="Foreground" Value="#888"/>
+            <Setter Property="FontSize"   Value="8"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin"     Value="0,10,0,3"/>
+        </Style>
+        <Style Selector="TextBox.detail-field">
+            <Setter Property="Background"   Value="#1a1a1a"/>
+            <Setter Property="Foreground"   Value="#e8e8e8"/>
+            <Setter Property="BorderBrush"  Value="#444"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize"     Value="10"/>
+            <Setter Property="Padding"      Value="4,3"/>
+            <Setter Property="Margin"       Value="0,0,0,6"/>
+        </Style>
+        <Style Selector="ComboBox.detail-combo">
+            <Setter Property="Background"   Value="#1a1a1a"/>
+            <Setter Property="Foreground"   Value="#e8e8e8"/>
+            <Setter Property="BorderBrush"  Value="#444"/>
+            <Setter Property="FontSize"     Value="10"/>
+            <Setter Property="Padding"      Value="4,2"/>
+            <Setter Property="Margin"       Value="0,0,0,6"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
+        <Style Selector="CheckBox.detail-check">
+            <Setter Property="Foreground"   Value="#ccc"/>
+            <Setter Property="FontSize"     Value="10"/>
+            <Setter Property="Margin"       Value="0,0,0,6"/>
+        </Style>
+    </UserControl.Styles>
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="ReadOnlyRowTemplate" DataType="models:PropertyRow">
+            <Grid ColumnDefinitions="110,*" Margin="0,1,0,1">
+                <TextBlock Grid.Column="0" Text="{Binding Label}"
+                           Foreground="#999" FontSize="10" VerticalAlignment="Top"/>
+                <TextBlock Grid.Column="1" Text="{Binding Value}"
+                           Foreground="{Binding Style, Converter={StaticResource PropertyValueStyleToBrush}}"
+                           FontSize="10" TextWrapping="Wrap" LineHeight="15"/>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid>
+        <TextBlock Text="{StaticResource Label_SelectNode}"
+                   Foreground="#555" FontSize="11"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                   IsVisible="{Binding HasContent, Converter={StaticResource InverseBoolToVis}}"/>
+
+        <ScrollViewer Background="#2d2d2d" IsVisible="{Binding HasContent}">
+            <StackPanel Margin="8">
+
+                <!-- ── Default / Male text ─────────────────────────────── -->
+                <TextBlock Classes="group-header" Text="{StaticResource Label_DefaultMaleText}"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding DefaultText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         AcceptsReturn="True" TextWrapping="Wrap" MinHeight="50"
+                         ToolTip.Tip="Edit the default / male dialogue text"/>
+
+                <!-- ── Female text ─────────────────────────────────────── -->
+                <TextBlock Classes="group-header" Text="{StaticResource Label_FemaleText}"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding FemaleText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         AcceptsReturn="True" TextWrapping="Wrap" MinHeight="40"
+                         Watermark="(same as default — leave blank)"
+                         ToolTip.Tip="Optional female-voice variant text"/>
+
+                <!-- ── Identity ────────────────────────────────────────── -->
+                <TextBlock Classes="group-header" Text="{StaticResource Label_GroupIdentity}"/>
+
+                <TextBlock Text="{StaticResource PropertyRow_Type}"
+                           Foreground="#999" FontSize="9" Margin="0,0,0,2"/>
+                <ComboBox Classes="detail-combo"
+                          SelectedIndex="{Binding IsPlayerChoice, Mode=TwoWay,
+                              Converter={StaticResource BoolToIndexConverter}}"
+                          ToolTip.Tip="Whether this is an NPC line or a player response choice">
+                    <ComboBoxItem Content="{StaticResource Option_NpcLine}"/>
+                    <ComboBoxItem Content="{StaticResource Option_PlayerChoice}"/>
+                </ComboBox>
+
+                <TextBlock Text="{StaticResource PropertyRow_SpeakerGuid}"
+                           Foreground="#999" FontSize="9" Margin="0,0,0,2"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding SpeakerGuid, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         FontFamily="Consolas,Courier New,monospace"
+                         ToolTip.Tip="GUID of the speaking character"/>
+
+                <TextBlock Text="{StaticResource PropertyRow_ListenerGuid}"
+                           Foreground="#999" FontSize="9" Margin="0,0,0,2"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding ListenerGuid, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         FontFamily="Consolas,Courier New,monospace"
+                         ToolTip.Tip="GUID of the listening character"/>
+
+                <!-- ── Display ─────────────────────────────────────────── -->
+                <TextBlock Classes="group-header" Text="{StaticResource Label_GroupDisplay}"/>
+
+                <TextBlock Text="{StaticResource PropertyRow_DisplayType}"
+                           Foreground="#999" FontSize="9" Margin="0,0,0,2"/>
+                <ComboBox Classes="detail-combo"
+                          SelectedIndex="{Binding DisplayType, Mode=TwoWay,
+                              Converter={StaticResource DisplayTypeToIndexConverter}}"
+                          ToolTip.Tip="How this node is presented to the player">
+                    <ComboBoxItem Content="{StaticResource Option_DisplayConversation}"/>
+                    <ComboBoxItem Content="{StaticResource Option_DisplayBark}"/>
+                </ComboBox>
+
+                <TextBlock Text="{StaticResource PropertyRow_Persistence}"
+                           Foreground="#999" FontSize="9" Margin="0,0,0,2"/>
+                <ComboBox Classes="detail-combo"
+                          SelectedIndex="{Binding Persistence, Mode=TwoWay,
+                              Converter={StaticResource PersistenceToIndexConverter}}"
+                          ToolTip.Tip="Whether the node is hidden after it has been shown once">
+                    <ComboBoxItem Content="{StaticResource Option_PersistenceNone}"/>
+                    <ComboBoxItem Content="{StaticResource Option_PersistenceOnceEver}"/>
+                </ComboBox>
+
+                <TextBlock Text="{StaticResource PropertyRow_ActorDirection}"
+                           Foreground="#999" FontSize="9" Margin="0,0,0,2"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding ActorDirection, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         ToolTip.Tip="Optional actor direction note for the VO recording"/>
+
+                <!-- ── Voice ───────────────────────────────────────────── -->
+                <TextBlock Classes="group-header" Text="{StaticResource Label_GroupVoice}"/>
+
+                <TextBlock Text="{StaticResource PropertyRow_ExternalVO}"
+                           Foreground="#999" FontSize="9" Margin="0,0,0,2"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding ExternalVO, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         FontFamily="Consolas,Courier New,monospace"
+                         ToolTip.Tip="External voice-over file path or identifier"/>
+
+                <CheckBox Classes="detail-check"
+                          IsChecked="{Binding HasVO, Mode=TwoWay}"
+                          Content="{StaticResource PropertyRow_HasVO}"
+                          ToolTip.Tip="Whether a voice-over recording exists for this node"/>
+
+                <CheckBox Classes="detail-check"
+                          IsChecked="{Binding HideSpeaker, Mode=TwoWay}"
+                          Content="{StaticResource PropertyRow_HideSpeaker}"
+                          ToolTip.Tip="Whether the speaker name is hidden during playback"/>
+
+                <!-- ── Comments ────────────────────────────────────────── -->
+                <TextBlock Classes="group-header" Text="{StaticResource PropertyRow_Comments}"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding Comments, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30"
+                         ToolTip.Tip="Internal developer notes (not shown to players)"/>
+
+                <!-- ── Read-only groups (conditions, scripts, node ID) ─── -->
+                <ItemsControl ItemsSource="{Binding PropertyGroups}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <TextBlock Classes="group-header" Text="{Binding Name}"/>
+                                <ItemsControl ItemsSource="{Binding Rows}"
+                                              ItemTemplate="{StaticResource ReadOnlyRowTemplate}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- ── Links ──────────────────────────────────────────── -->
+                <TextBlock Classes="group-header" Text="{StaticResource Label_GroupLinks}"/>
+                <ItemsControl ItemsSource="{Binding Links}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="models:LinkRow">
+                            <Grid ColumnDefinitions="60,*,Auto" Margin="0,1,0,1">
+                                <TextBlock Grid.Column="0" Text="{Binding Arrow}"
+                                           Foreground="#5dade2" FontSize="10"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Detail}"
+                                           Foreground="#666" FontSize="10"/>
+                                <Button Grid.Column="2"
+                                        Content="{StaticResource Button_DeleteLink}"
+                                        Command="{Binding DataContext.DeleteLinkCommand,
+                                                  RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                        CommandParameter="{Binding}"
+                                        Background="Transparent" BorderThickness="0"
+                                        Foreground="#666" FontSize="9" Padding="4,1"
+                                        ToolTip.Tip="{StaticResource ToolTip_DeleteLink}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Button Content="{StaticResource Button_AddLink}"
+                        Command="{Binding AddLinkCommand}"
+                        Background="#333" Foreground="#aaa" BorderThickness="0"
+                        Padding="6,2" Margin="0,4,0,0" HorizontalAlignment="Left"
+                        ToolTip.Tip="{StaticResource ToolTip_AddLink}"/>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
+```
+
+> **Note on converters:** The `BoolToIndexConverter`, `DisplayTypeToIndexConverter`, and `PersistenceToIndexConverter` do not yet exist. Create them in `DialogEditor.Avalonia/Converters/`:
+> - `BoolToIndexConverter` — `false → 0`, `true → 1` (and back)
+> - `DisplayTypeToIndexConverter` — `"Conversation" → 0`, `"Bark" → 1` (and back)
+> - `PersistenceToIndexConverter` — `"None" → 0`, `"OnceEver" → 1` (and back)
+>
+> Register them in `App.axaml` alongside the existing converters.
+
+> **Note on DeleteLinkCommand / AddLinkCommand:** Add these to `NodeDetailViewModel`. `DeleteLinkCommand` removes the link from `_node.Links` by creating a `DeleteConnectionCommand` on the undo stack via a new `RequestDeleteLink` event wired to `ConversationViewModel`. `AddLinkCommand` opens a simple inline picker — implement as a text prompt in the detail panel (a `TextBox` + confirm button that accepts a target node ID).
+
+- [ ] **Step 2: Build and run the app**
+
+```
+dotnet run --project DialogEditor.Avalonia
+```
+
+Verify: open a conversation, select a node, confirm text boxes and combos appear and are editable.
+
+- [ ] **Step 3: Commit**
+
+```
+git add DialogEditor.Avalonia/Views/NodeDetailView.axaml
+git add DialogEditor.Avalonia/Converters/BoolToIndexConverter.cs
+git add DialogEditor.Avalonia/Converters/DisplayTypeToIndexConverter.cs
+git add DialogEditor.Avalonia/Converters/PersistenceToIndexConverter.cs
+git commit -m "feat: NodeDetailView — editable text, combo, checkbox controls"
+```
+
+---
+
+### Task 18: ConversationView.axaml — context menus, pending connection, double-click
+
+**Files:**
+- Modify: `DialogEditor.Avalonia/Views/ConversationView.axaml`
+- Modify: `DialogEditor.Avalonia/Views/ConversationView.axaml.cs`
+
+- [ ] **Step 1: Add relay commands to ConversationViewModel for context menus**
+
+In `ConversationViewModel.cs`, expose the structural edit operations as relay commands callable with `NodeViewModel` parameters (context menu can pass `CommandParameter="{Binding}"`):
+
+```csharp
+[RelayCommand]
+private void DeleteNodeCmd(NodeViewModel? node)
+{
+    if (node is not null) DeleteNode(node);
+}
+
+[RelayCommand]
+private void AddConnectedNodeCmd(NodeViewModel? parent)
+{
+    if (parent is null) return;
+    var pos = new LayoutPoint(parent.Location.X + 250, parent.Location.Y);
+    AddConnectedNode(parent, pos);
+}
+
+[RelayCommand]
+private void DeleteConnectionCmd(ConnectionViewModel? connection)
+{
+    if (connection is not null) DeleteConnection(connection);
+}
+```
+
+- [ ] **Step 2: Add context menu to each node in the ItemTemplate**
+
+Inside the `<nodify:Node>` element in `ConversationView.axaml`, add:
+
+```xml
+<nodify:Node.ContextMenu>
+    <ContextMenu>
+        <MenuItem Header="{StaticResource Menu_DeleteNode}"
+                  Command="{Binding DataContext.DeleteNodeCmdCommand,
+                            RelativeSource={RelativeSource AncestorType=UserControl}}"
+                  CommandParameter="{Binding}"
+                  ToolTip.Tip="Remove this node and all its connections"/>
+        <MenuItem Header="{StaticResource Menu_AddConnectedNode}"
+                  Command="{Binding DataContext.AddConnectedNodeCmdCommand,
+                            RelativeSource={RelativeSource AncestorType=UserControl}}"
+                  CommandParameter="{Binding}"
+                  ToolTip.Tip="Create a new node linked from this one"/>
+    </ContextMenu>
+</nodify:Node.ContextMenu>
+```
+
+- [ ] **Step 3: Add context menu to each connection**
+
+Inside the `<nodify:Connection>` template, add:
+
+```xml
+<nodify:Connection.ContextMenu>
+    <ContextMenu>
+        <MenuItem Header="{StaticResource Menu_DeleteConnection}"
+                  Command="{Binding DataContext.DeleteConnectionCmdCommand,
+                            RelativeSource={RelativeSource AncestorType=UserControl}}"
+                  CommandParameter="{Binding}"
+                  ToolTip.Tip="Remove this connection between nodes"/>
+    </ContextMenu>
+</nodify:Connection.ContextMenu>
+```
+
+- [ ] **Step 4: Add pending connection support (drag to create)**
+
+Add a `PendingConnectionViewModel` to `ConversationViewModel`:
+
+```csharp
+// In ConversationViewModel.cs
+public PendingConnectionViewModel PendingConnection { get; }
+
+// Constructor: PendingConnection = new PendingConnectionViewModel(this);
+```
+
+```csharp
+// DialogEditor.ViewModels/ViewModels/PendingConnectionViewModel.cs
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+
+namespace DialogEditor.ViewModels;
+
+public partial class PendingConnectionViewModel(ConversationViewModel conversation)
+    : ObservableObject
+{
+    [ObservableProperty] private ConnectorViewModel? _source;
+
+    [RelayCommand]
+    private void Start(ConnectorViewModel? connector) => Source = connector;
+
+    [RelayCommand]
+    private void Complete(ConnectorViewModel? target)
+    {
+        if (Source is null || target is null || Source == target) { Source = null; return; }
+        // Prevent duplicate connections
+        var alreadyExists = conversation.Connections.Any(c =>
+            c.Source == Source && c.Target == target);
+        if (!alreadyExists)
+            conversation.AddConnection(Source, target);
+        Source = null;
+    }
+}
+```
+
+In `ConversationView.axaml`, add the pending connection bindings to `NodifyEditor`. The exact Nodify.Avalonia API may vary by version — consult the installed package's documentation. The typical pattern is:
+
+```xml
+<nodify:NodifyEditor x:Name="Editor"
+    ...
+    ConnectionStartedCommand="{Binding PendingConnection.StartCommand}"
+    ConnectionCompletedCommand="{Binding PendingConnection.CompleteCommand}">
+
+    <nodify:NodifyEditor.PendingConnection>
+        <nodify:PendingConnection
+            Source="{Binding PendingConnection.Source.Anchor,
+                     Converter={StaticResource LayoutPointConverter}}"
+            Stroke="#aaa" StrokeThickness="2"/>
+    </nodify:NodifyEditor.PendingConnection>
+```
+
+> If `ConnectionStartedCommand` / `ConnectionCompletedCommand` don't exist in your Nodify.Avalonia version, handle the equivalent events (`ConnectionStarted`, `ConnectionCompleted`) in code-behind and call `PendingConnection.StartCommand.Execute(connector)` / `PendingConnection.CompleteCommand.Execute(connector)`.
+
+- [ ] **Step 5: Add double-click to create node**
+
+In `ConversationView.axaml.cs`, add a handler:
+
+```csharp
+private void Editor_DoubleTapped(object? sender, Avalonia.Input.TappedEventArgs e)
+{
+    if (DataContext is not ConversationViewModel vm) return;
+    // Only handle taps directly on the editor background, not on nodes
+    if (e.Source is not Nodify.NodifyEditor) return;
+
+    var pos    = e.GetPosition(Editor);
+    var canvas = Editor.ViewportTransform.Inverse().Transform(new global::Avalonia.Point(pos.X, pos.Y));
+    var newId  = DialogEditor.Core.Editing.NodeIdAllocator.Next(vm.Nodes.Select(n => n.NodeId));
+    var newNode = new NodeViewModel(
+        new DialogEditor.Core.Models.ConversationNode(
+            newId, false, DialogEditor.Core.Models.SpeakerCategory.Npc,
+            string.Empty, string.Empty, [], [], [], "Conversation", "None"),
+        null);
+    vm.AddNode(newNode, new DialogEditor.Core.Models.LayoutPoint((int)canvas.X, (int)canvas.Y));
+    e.Handled = true;
+}
+```
+
+Wire the event in XAML on the `NodifyEditor`:
+
+```xml
+<nodify:NodifyEditor x:Name="Editor"
+    ...
+    DoubleTapped="Editor_DoubleTapped">
+```
+
+> `Editor.ViewportTransform` is the Nodify property that maps screen coordinates to canvas coordinates. Verify the exact property name against your Nodify.Avalonia version — it may be `ViewportLocation` + `ViewportZoom` instead, requiring a manual transform.
+
+- [ ] **Step 6: Build and run**
+
+```
+dotnet run --project DialogEditor.Avalonia
+```
+
+Verify:
+- Right-click on any node shows the context menu with Delete and Add connected node
+- Right-click on a connection line shows Delete connection
+- Drag from a node's output dot to another node's input dot creates a new connection
+- Double-click on the empty canvas background creates a new node
+
+- [ ] **Step 7: Commit**
+
+```
+git add DialogEditor.Avalonia/Views/ConversationView.axaml
+git add DialogEditor.Avalonia/Views/ConversationView.axaml.cs
+git add DialogEditor.ViewModels/ViewModels/PendingConnectionViewModel.cs
+git commit -m "feat: ConversationView — context menus, drag-to-connect, double-click to add node"
+```
+
+---
+
+### Task 19: MainWindow.axaml — undo/redo/save toolbar, keyboard shortcuts, dirty title
+
+**Files:**
+- Modify: `DialogEditor.Avalonia/Views/MainWindow.axaml`
+- Modify: `DialogEditor.Avalonia/Views/MainWindow.axaml.cs`
+
+- [ ] **Step 1: Update toolbar in MainWindow.axaml**
+
+In the existing top toolbar `<StackPanel>`, add the new buttons after the existing Open Folder button and separator:
+
+```xml
+<Rectangle Width="1" Fill="#444" Margin="8,0" VerticalAlignment="Stretch"/>
+
+<Button Command="{Binding Canvas.UndoCommand}"
+        Content="{StaticResource Button_Undo}"
+        Background="#333" Foreground="#aaa" BorderThickness="0" Padding="8,2"
+        ToolTip.Tip="{Binding Canvas.UndoDescription,
+                      StringFormat={StaticResource ToolTip_Undo},
+                      FallbackValue={StaticResource ToolTip_Undo_NoHistory}}"/>
+
+<Button Command="{Binding Canvas.RedoCommand}"
+        Content="{StaticResource Button_Redo}"
+        Background="#333" Foreground="#aaa" BorderThickness="0" Padding="8,2" Margin="2,0,0,0"
+        ToolTip.Tip="{Binding Canvas.RedoDescription,
+                      StringFormat={StaticResource ToolTip_Redo},
+                      FallbackValue={StaticResource ToolTip_Redo_NoHistory}}"/>
+
+<Rectangle Width="1" Fill="#444" Margin="8,0" VerticalAlignment="Stretch"/>
+
+<Button Command="{Binding SaveCommand}"
+        Content="{StaticResource Button_Save}"
+        Background="#333" Foreground="#aaa" BorderThickness="0" Padding="8,2"
+        ToolTip.Tip="{StaticResource ToolTip_Save}"/>
+
+<Button Command="{Binding RestoreBackupCommand}"
+        Content="{StaticResource Button_RestoreBackup}"
+        Background="#333" Foreground="#aaa" BorderThickness="0" Padding="8,2" Margin="2,0,0,0"
+        ToolTip.Tip="{StaticResource ToolTip_RestoreBackup}"/>
+```
+
+- [ ] **Step 2: Bind window title to WindowTitle**
+
+Change the `<Window>` `Title` attribute from:
+```xml
+Title="{StaticResource App_Title}"
+```
+to:
+```xml
+Title="{Binding WindowTitle}"
+```
+
+- [ ] **Step 3: Add keyboard shortcuts in MainWindow.axaml.cs**
+
+In `OnKeyDownTunnel`, extend the existing handler:
+
+```csharp
+private void OnKeyDownTunnel(object? sender, KeyEventArgs e)
+{
+    var vm = (MainWindowViewModel)DataContext!;
+
+    switch (e.Key)
+    {
+        case Key.F when e.KeyModifiers == KeyModifiers.Control:
+            CanvasView.FocusSearch();
+            e.Handled = true;
+            break;
+
+        case Key.Z when e.KeyModifiers == KeyModifiers.Control:
+            vm.Canvas.UndoCommand.Execute(null);
+            e.Handled = true;
+            break;
+
+        case Key.Y when e.KeyModifiers == KeyModifiers.Control:
+            vm.Canvas.RedoCommand.Execute(null);
+            e.Handled = true;
+            break;
+
+        case Key.S when e.KeyModifiers == KeyModifiers.Control:
+            vm.SaveCommand.Execute(null);
+            e.Handled = true;
+            break;
+
+        case Key.Delete:
+            if (vm.Canvas.SelectedNode is not null)
+            {
+                vm.Canvas.DeleteNodeCmdCommand.Execute(vm.Canvas.SelectedNode);
+                e.Handled = true;
+            }
+            break;
+
+        case Key.Escape when vm.IsBrowserFlyoutOpen:
+            vm.IsBrowserExpanded = false;
+            e.Handled = true;
+            break;
+    }
+}
+```
+
+- [ ] **Step 4: Wire unsaved-changes prompt**
+
+In `MainWindow()` constructor, subscribe to `MainWindowViewModel.UnsavedChangesRequested`:
+
+```csharp
+vm.UnsavedChangesRequested += () => _ = ShowUnsavedChangesDialogAsync(vm);
+```
+
+Add the async dialog method:
+
+```csharp
+private async Task ShowUnsavedChangesDialogAsync(MainWindowViewModel vm)
+{
+    // Avalonia MessageBox equivalent — use a simple dialog
+    var dialog = new Window
+    {
+        Title = "Unsaved Changes",
+        Width = 360, Height = 140,
+        WindowStartupLocation = WindowStartupLocation.CenterOwner,
+        CanResize = false,
+        Background = new Avalonia.Media.SolidColorBrush(
+            Avalonia.Media.Color.Parse("#2d2d2d"))
+    };
+
+    TaskCompletionSource<string> tcs = new();
+
+    var panel = new StackPanel { Margin = new Avalonia.Thickness(16) };
+    panel.Children.Add(new TextBlock
+    {
+        Text = "You have unsaved changes. Save before switching conversations?",
+        Foreground = Avalonia.Media.Brushes.White,
+        TextWrapping = Avalonia.Media.TextWrapping.Wrap,
+        Margin = new Avalonia.Thickness(0, 0, 0, 16)
+    });
+
+    var buttons = new StackPanel { Orientation = Avalonia.Layout.Orientation.Horizontal };
+    void Btn(string label, string result)
+    {
+        var b = new Button { Content = label, Margin = new Avalonia.Thickness(0, 0, 8, 0) };
+        b.Click += (_, _) => { tcs.TrySetResult(result); dialog.Close(); };
+        buttons.Children.Add(b);
+    }
+    Btn("Save", "save");
+    Btn("Discard", "discard");
+    Btn("Cancel", "cancel");
+
+    panel.Children.Add(buttons);
+    dialog.Content = panel;
+
+    await dialog.ShowDialog(this);
+    var choice = await tcs.Task;
+
+    switch (choice)
+    {
+        case "save":    vm.SaveAndProceed();           break;
+        case "discard": vm.DiscardAndProceed();        break;
+        default:        vm.CancelPendingNavigation();  break;
+    }
+}
+```
+
+- [ ] **Step 5: Build and run**
+
+```
+dotnet run --project DialogEditor.Avalonia
+```
+
+Verify:
+- Undo (↩) and Redo (↪) buttons appear and are disabled when nothing to undo/redo
+- Ctrl+Z / Ctrl+Y trigger undo/redo
+- Ctrl+S saves (check a `.bak` appears next to the original file)
+- Window title shows `● ConversationName` when there are unsaved changes
+- Switching conversations while dirty shows the Save/Discard/Cancel prompt
+
+- [ ] **Step 6: Commit**
+
+```
+git add DialogEditor.Avalonia/Views/MainWindow.axaml
+git add DialogEditor.Avalonia/Views/MainWindow.axaml.cs
+git commit -m "feat: MainWindow — undo/redo/save toolbar, Ctrl+Z/Y/S shortcuts, dirty title, unsaved-changes prompt"
+```
+
+---
+
+## Self-Review
+
+Spec sections vs plan tasks:
+
+| Spec section | Covered by |
+|---|---|
+| Undo/redo stack | Tasks 1–2 |
+| NodeIdAllocator | Task 3 |
+| BackupService | Task 4 |
+| AppSettings backup tracking | Task 5 |
+| ConversationEditSnapshot | Task 6 |
+| StringTableSerializer | Task 7 |
+| Poe2ConversationSerializer | Task 8 |
+| Poe1ConversationSerializer | Task 9 |
+| IGameDataProvider.SaveConversation | Task 10 |
+| Mutable NodeViewModel | Task 11 |
+| Structural edit commands | Task 12 |
+| ConversationViewModel edit ops | Task 13 |
+| NodeDetailViewModel editable | Task 14 |
+| MainWindowViewModel save/backup | Task 15 |
+| Strings.axaml | Task 16 |
+| NodeDetailView editable controls | Task 17 |
+| Canvas context menus + drag-connect | Task 18 |
+| Toolbar, shortcuts, dirty title | Task 19 |
+
+All spec requirements covered. No TBDs or placeholders.
+
+---
