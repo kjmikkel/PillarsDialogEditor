@@ -95,12 +95,12 @@ public class NodeDetailViewModelTests
     }
 
     [Fact]
-    public void Load_LogicGroup_ContainsConditionsAndScriptsRows()
+    public void Load_LogicGroup_ContainsScriptsRow()
     {
+        // Conditions moved to dedicated ConditionRows panel; LOGIC group shows scripts only
         _vm.Load(MakeNode());
         var logic = _vm.PropertyGroups[1];
-        Assert.Equal(2, logic.Rows.Count);
-        Assert.Contains(logic.Rows, r => r.Label == "PropertyRow_Conditions");
+        Assert.Single(logic.Rows);
         Assert.Contains(logic.Rows, r => r.Label == "PropertyRow_Scripts");
     }
 

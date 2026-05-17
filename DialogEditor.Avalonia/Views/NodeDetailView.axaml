@@ -3,6 +3,7 @@
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:models="clr-namespace:DialogEditor.ViewModels.Models;assembly=DialogEditor.ViewModels"
              xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+             xmlns:types="clr-namespace:DialogEditor.ViewModels.Services;assembly=DialogEditor.ViewModels"
              x:Class="DialogEditor.Avalonia.Views.NodeDetailView" x:CompileBindings="False">
 
     <UserControl.Styles>
@@ -157,7 +158,7 @@
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30"
                          ToolTip.Tip="Internal developer notes (not shown to players)"/>
 
-                <!-- ── Read-only groups (node ID, conditions, scripts) ─── -->
+                <!-- ── Read-only groups (node ID, scripts) ────────────── -->
                 <ItemsControl ItemsSource="{Binding PropertyGroups}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -169,6 +170,110 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
+
+                <!-- ── Conditions (editable) ──────────────────────────── -->
+                <TextBlock Classes="group-header" Text="{StaticResource Label_GroupConditions}"/>
+                <ItemsControl ItemsSource="{Binding ConditionRows}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="vm:ConditionRowViewModel">
+                            <Border Background="#1e1e2e" CornerRadius="3" Margin="0,1,0,1" Padding="6,4">
+                                <StackPanel Spacing="3">
+                                    <!-- Row header: And/Or | NOT | display name | ↑↓✕ -->
+                                    <Grid ColumnDefinitions="52,38,*,22,22,22" Margin="0,0,0,2">
+                                        <ComboBox Grid.Column="0"
+                                                  SelectedItem="{Binding Operator, Mode=TwoWay}"
+                                                  Background="#1a1a1a" BorderBrush="#444" BorderThickness="1"
+                                                  FontSize="10" Padding="3,1" Height="20">
+                                            <ComboBox.Items>
+                                                <sys:String>And</sys:String>
+                                                <sys:String>Or</sys:String>
+                                            </ComboBox.Items>
+                                        </ComboBox>
+                                        <CheckBox Grid.Column="1"
+                                                  IsChecked="{Binding Not, Mode=TwoWay}"
+                                                  Content="{StaticResource Label_Condition_NOT}"
+                                                  Foreground="#aaa" FontSize="10"
+                                                  Margin="4,0,0,0" VerticalAlignment="Center"/>
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding DisplayName}"
+                                                   Foreground="#ccc" FontSize="11"
+                                                   VerticalAlignment="Center" Margin="6,0,0,0"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <Button Grid.Column="3" Content="↑"
+                                                Command="{Binding DataContext.MoveConditionUpCmdCommand,
+                                                          RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                Background="Transparent" BorderThickness="0"
+                                                Foreground="#555" FontSize="10" Padding="2"
+                                                ToolTip.Tip="{StaticResource ToolTip_MoveConditionUp}"/>
+                                        <Button Grid.Column="4" Content="↓"
+                                                Command="{Binding DataContext.MoveConditionDownCmdCommand,
+                                                          RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                Background="Transparent" BorderThickness="0"
+                                                Foreground="#555" FontSize="10" Padding="2"
+                                                ToolTip.Tip="{StaticResource ToolTip_MoveConditionDown}"/>
+                                        <Button Grid.Column="5" Content="✕"
+                                                Command="{Binding DataContext.DeleteConditionRowCmdCommand,
+                                                          RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                CommandParameter="{Binding}"
+                                                Background="Transparent" BorderThickness="0"
+                                                Foreground="#666" FontSize="10" Padding="2"
+                                                ToolTip.Tip="{StaticResource ToolTip_DeleteCondition}"/>
+                                    </Grid>
+                                    <!-- Parameter inputs -->
+                                    <ItemsControl ItemsSource="{Binding Parameters}"
+                                                  IsVisible="{Binding Parameters.Count,
+                                                              Converter={StaticResource CountToVis}}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="vm:ParameterValueViewModel">
+                                                <Grid ColumnDefinitions="90,*" Margin="0,1,0,0">
+                                                    <TextBlock Grid.Column="0"
+                                                               Text="{Binding Name}"
+                                                               Foreground="#666" FontSize="10"
+                                                               VerticalAlignment="Center"/>
+                                                    <TextBox Grid.Column="1"
+                                                             Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                                             Background="#141414" Foreground="#ccc"
+                                                             BorderBrush="#333" BorderThickness="1"
+                                                             FontSize="10" Padding="3,1"
+                                                             ToolTip.Tip="{Binding Description}"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Add condition row -->
+                <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                    <ComboBox Grid.Column="0"
+                              ItemsSource="{Binding AvailableConditions}"
+                              SelectedItem="{Binding SelectedNewCondition, Mode=TwoWay}"
+                              PlaceholderText="{StaticResource Placeholder_PickCondition}"
+                              Background="#1a1a1a" Foreground="#ccc"
+                              BorderBrush="#444" BorderThickness="1"
+                              FontSize="10" Padding="4,2">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="types:ConditionEntry">
+                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                    <TextBlock Text="{Binding DisplayName}" Foreground="#ccc" FontSize="11"/>
+                                    <TextBlock Text="{Binding Category}" Foreground="#555" FontSize="10"
+                                               VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Button Grid.Column="1"
+                            Content="{StaticResource Button_AddCondition}"
+                            Command="{Binding AddSelectedConditionCommand}"
+                            Background="#333" Foreground="#aaa" BorderThickness="0"
+                            Padding="6,2" Margin="4,0,0,0" FontSize="10"
+                            ToolTip.Tip="{StaticResource ToolTip_AddCondition}"/>
+                </Grid>
 
                 <!-- ── Links ──────────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_GroupLinks}"/>

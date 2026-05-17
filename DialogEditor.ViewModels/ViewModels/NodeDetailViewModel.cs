@@ -1,9 +1,11 @@
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Models;
 using DialogEditor.ViewModels.Models;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.ViewModels;
 
@@ -130,10 +132,11 @@ public partial class NodeDetailViewModel : ObservableObject
 
         _node = node;
 
-        if (node is null) { HasContent = false; return; }
+        if (node is null) { HasContent = false; ConditionRows.Clear(); return; }
 
         node.PropertyChanged += OnNodePropertyChanged;
         RefreshReadOnlyGroups(node);
+        RebuildConditionRows(node);
         HasContent = true;
         NotifyAllProxies();
     }
@@ -175,11 +178,9 @@ public partial class NodeDetailViewModel : ObservableObject
             [
                 new PropertyRow(Loc.Get("PropertyRow_NodeId"), node.NodeId.ToString()),
             ]),
+            // Scripts only — conditions are now shown in the editable CONDITIONS panel
             new PropertyGroup(Loc.Get("Label_GroupLogic"),
             [
-                new PropertyRow(Loc.Get("PropertyRow_Conditions"),
-                    string.IsNullOrEmpty(node.ConditionExpression) ? none : node.ConditionExpression,
-                    PropertyValueStyle.Condition),
                 new PropertyRow(Loc.Get("PropertyRow_Scripts"),
                     node.Scripts.Count == 0 ? none : string.Join(Environment.NewLine, node.Scripts),
                     PropertyValueStyle.Script),
@@ -189,4 +190,108 @@ public partial class NodeDetailViewModel : ObservableObject
 
     public void RefreshLinks(IEnumerable<ConnectionViewModel> connections)
         => Links = connections.ToList();
+
+    // ── Condition editing ─────────────────────────────────────────────────
+
+    public ObservableCollection<ConditionRowViewModel> ConditionRows { get; } = [];
+
+    /// Conditions available to add — sourced from the embedded catalogue.
+    public IReadOnlyList<ConditionEntry> AvailableConditions
+        => ConditionCatalogue.Instance.All;
+
+    [ObservableProperty] private ConditionEntry? _selectedNewCondition;
+
+    [RelayCommand]
+    private void AddSelectedCondition()
+    {
+        if (SelectedNewCondition is { } entry)
+        {
+            AddCondition(entry);
+            SelectedNewCondition = null;
+        }
+    }
+
+    [RelayCommand]
+    private void DeleteConditionRowCmd(ConditionRowViewModel? row)
+    {
+        if (row is not null) DeleteConditionRow(row);
+    }
+
+    [RelayCommand]
+    private void MoveConditionUpCmd(ConditionRowViewModel? row)
+    {
+        if (row is not null) MoveConditionUp(row);
+    }
+
+    [RelayCommand]
+    private void MoveConditionDownCmd(ConditionRowViewModel? row)
+    {
+        if (row is not null) MoveConditionDown(row);
+    }
+
+    private void RebuildConditionRows(NodeViewModel node)
+    {
+        ConditionRows.Clear();
+        foreach (var c in node.Conditions)
+        {
+            if (c is ConditionLeaf leaf)
+            {
+                var entry = ConditionCatalogue.Instance.Find(
+                    leaf.FullName.Contains(' ')
+                        ? leaf.FullName[(leaf.FullName.IndexOf(' ') + 1)..]
+                            .Split('(')[0]
+                        : leaf.FullName);
+                var row = new ConditionRowViewModel(leaf, entry);
+                SubscribeRow(row);
+                ConditionRows.Add(row);
+            }
+            // ConditionBranch editing deferred to a future phase
+        }
+    }
+
+    private void SubscribeRow(ConditionRowViewModel row)
+    {
+        row.PropertyChanged += OnRowPropertyChanged;
+        foreach (var p in row.Parameters)
+            p.PropertyChanged += OnRowPropertyChanged;
+    }
+
+    private void OnRowPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        => CommitConditions();
+
+    public void AddCondition(ConditionEntry entry)
+    {
+        if (_node is null) return;
+        var defaults = entry.Parameters.Select(p => p.Default).ToList();
+        var leaf     = new ConditionLeaf(entry.MethodName, defaults, false, "And");
+        var row      = new ConditionRowViewModel(leaf, entry);
+        SubscribeRow(row);
+        ConditionRows.Add(row);
+        CommitConditions();
+    }
+
+    public void DeleteConditionRow(ConditionRowViewModel row)
+    {
+        if (ConditionRows.Remove(row))
+            CommitConditions();
+    }
+
+    public void MoveConditionUp(ConditionRowViewModel row)
+    {
+        var i = ConditionRows.IndexOf(row);
+        if (i > 0) { ConditionRows.Move(i, i - 1); CommitConditions(); }
+    }
+
+    public void MoveConditionDown(ConditionRowViewModel row)
+    {
+        var i = ConditionRows.IndexOf(row);
+        if (i >= 0 && i < ConditionRows.Count - 1) { ConditionRows.Move(i, i + 1); CommitConditions(); }
+    }
+
+    /// Builds the structured condition list from current rows and pushes it to NodeViewModel.
+    public void CommitConditions()
+    {
+        if (_node is null) return;
+        _node.Conditions = ConditionRows.Select(r => (ConditionNode)r.ToLeaf()).ToList();
+    }
 }
