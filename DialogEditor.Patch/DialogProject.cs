@@ -34,4 +34,34 @@ public record DialogProject(
 
     public IReadOnlyDictionary<int, LayoutPoint>? GetLayout(string conversationName) =>
         Layouts?.GetValueOrDefault(conversationName);
+
+    /// <summary>
+    /// Merges <paramref name="incoming"/> positions into the existing layout for
+    /// <paramref name="conversationName"/>. The incoming value wins for any node
+    /// present in both; nodes present only in the existing layout are preserved.
+    /// </summary>
+    /// <remarks>
+    /// Use this when combining two projects so that positions from both are kept.
+    /// Contrast with <see cref="WithLayout"/>, which replaces the entire entry —
+    /// the correct choice when saving from the canvas (where the caller supplies
+    /// the complete current layout and stale deleted-node entries should be purged).
+    /// </remarks>
+    public DialogProject MergeLayout(
+        string conversationName,
+        IReadOnlyDictionary<int, LayoutPoint> incoming)
+    {
+        var allLayouts  = Layouts ?? new Dictionary<string, IReadOnlyDictionary<int, LayoutPoint>>();
+        var existing    = allLayouts.GetValueOrDefault(conversationName)
+                          ?? new Dictionary<int, LayoutPoint>();
+
+        var merged = new Dictionary<int, LayoutPoint>(existing);
+        foreach (var (id, pos) in incoming)
+            merged[id] = pos;   // incoming wins on overlap
+
+        return this with
+        {
+            Layouts = new Dictionary<string, IReadOnlyDictionary<int, LayoutPoint>>(allLayouts)
+                { [conversationName] = merged }
+        };
+    }
 }
