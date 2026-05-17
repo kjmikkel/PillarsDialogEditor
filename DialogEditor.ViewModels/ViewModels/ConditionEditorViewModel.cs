@@ -15,17 +15,22 @@ public partial class ConditionEditorViewModel : ObservableObject
 
     public ObservableCollection<ConditionRowViewModel> Rows { get; } = [];
 
+    private readonly string _gameId;
+
     public IReadOnlyList<ConditionEntry> AvailableConditions
-        => ConditionCatalogue.Instance.All;
+        => string.IsNullOrEmpty(_gameId)
+            ? ConditionCatalogue.Instance.All
+            : ConditionCatalogue.Instance.ForGame(_gameId);
 
     [ObservableProperty] private ConditionEntry? _selectedNewCondition;
 
     public event Action? Confirmed;
     public event Action? Cancelled;
 
-    public ConditionEditorViewModel(NodeViewModel node)
+    public ConditionEditorViewModel(NodeViewModel node, string gameId = "")
     {
         _node    = node;
+        _gameId  = gameId;
         _original = node.Conditions.ToList();
         NodeTitle = $"Node {node.NodeId}";
 

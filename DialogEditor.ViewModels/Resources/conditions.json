@@ -217,8 +217,8 @@
     "fullName": "Boolean IsPlayerSkillValue(CharacterStats+SkillType, Operator, Int32)",
     "displayName": "Is Player Skill Value",
     "category": "RPG",
-    "games": ["poe1", "poe2"],
-    "description": "Tests the player character's skill score against a value.",
+    "games": ["poe1"],
+    "description": "Tests the player character's skill score against a value. (PoE1 enum-based; use Is Skill Value for PoE2.)",
     "parameters": [
       { "name": "Skill Type", "type": "Enum:CharacterStats+SkillType", "description": "Skill to test.", "default": "Stealth",
         "options": ["Stealth","Athletics","Lore","Mechanics","Survival","Crafting"] },
@@ -229,16 +229,32 @@
   {
     "methodName": "IsSkillValue",
     "fullName": "Boolean IsSkillValue(Guid, CharacterStats+SkillType, Operator, Int32)",
-    "displayName": "Is Skill Value",
+    "displayName": "Is Skill Value (PoE1)",
     "category": "RPG",
-    "games": ["poe1", "poe2"],
-    "description": "Tests a character's skill score against a value.",
+    "games": ["poe1"],
+    "description": "Tests a character's skill score against a value using an enum skill type. PoE1 only.",
     "parameters": [
       { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
       { "name": "Skill Type", "type": "Enum:CharacterStats+SkillType", "description": "Skill to test.", "default": "Stealth",
         "options": ["Stealth","Athletics","Lore","Mechanics","Survival","Crafting"] },
       { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
       { "name": "Value", "type": "Int32", "description": "Skill value to compare against.", "default": "0" }
+    ]
+  },
+  {
+    "methodName": "IsSkillValue",
+    "fullName": "Boolean IsSkillValue(Guid, Guid, Operator, Int32, Boolean, Boolean)",
+    "displayName": "Is Skill Value (PoE2)",
+    "category": "RPG",
+    "games": ["poe2"],
+    "description": "Tests a character's skill score against a value. PoE2 uses a GameData GUID to identify the skill.",
+    "parameters": [
+      { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "b1a8e901-0000-0000-0000-000000000000" },
+      { "name": "Skill Type", "type": "GameData", "description": "Skill GameData GUID (e.g. 90b913bb-960f-4f6c-8394-d01796148367 for Athletics).", "default": "90b913bb-960f-4f6c-8394-d01796148367" },
+      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "GreaterThanOrEqualTo" },
+      { "name": "Value", "type": "Int32", "description": "Skill value to compare against.", "default": "0" },
+      { "name": "Is Assisted", "type": "Boolean", "description": "If true, includes assistance from other party members.", "default": "true" },
+      { "name": "Hide Notification If Failure", "type": "Boolean", "description": "Suppresses failure notification in scripted interactions.", "default": "false" }
     ]
   },
   {
@@ -500,7 +516,7 @@
   {
     "methodName": "IsPartySkillValueCount",
     "fullName": "Boolean IsPartySkillValueCount(CharacterStats+SkillType, Operator, Int32, Operator, Int32)",
-    "displayName": "Is Party Skill Value Count",
+    "displayName": "Is Party Skill Value Count (PoE1)",
     "category": "RPG",
     "games": ["poe1"],
     "description": "Tests how many party members meet a skill threshold.",

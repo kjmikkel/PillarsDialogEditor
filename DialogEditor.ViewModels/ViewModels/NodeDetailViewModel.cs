@@ -14,6 +14,9 @@ public partial class NodeDetailViewModel : ObservableObject
     private NodeViewModel? _node;
     public  NodeViewModel? Node => _node;
 
+    /// Set by MainWindowViewModel when a game folder is opened.
+    public string ActiveGameId { get; set; } = string.Empty;
+
     [ObservableProperty] private bool _hasContent;
 
     // ── Editable proxy properties ─────────────────────────────────────────

@@ -309,6 +309,7 @@ public partial class MainWindowViewModel : ObservableObject
             CurrentConversationName = null;
             SpeakerNameService.Register(provider.LoadSpeakerNames());
             _activeGameId = provider.GameId;
+            Detail.ActiveGameId = provider.GameId;
             AvailableLanguages = provider.AvailableLanguages;
             SelectedLanguage   = AppSettings.PickLanguage(AvailableLanguages, AppSettings.LastLanguage);
             Browser.Load(provider);
