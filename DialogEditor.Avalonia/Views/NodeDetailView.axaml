@@ -93,16 +93,32 @@
                 </ComboBox>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_SpeakerGuid}"/>
+                <!-- Name picker — visible when speaker data is loaded (PoE2) -->
+                <AutoCompleteBox Classes="detail-field"
+                                 ItemsSource="{Binding AvailableSpeakers}"
+                                 SelectedItem="{Binding SelectedSpeakerEntry, Mode=TwoWay}"
+                                 Watermark="{StaticResource Placeholder_SpeakerSearch}"
+                                 FilterMode="ContainsOrdinalIgnoreCase"
+                                 IsVisible="{Binding HasSpeakerData}"
+                                 ToolTip.Tip="{StaticResource ToolTip_SpeakerPicker}"/>
                 <TextBox Classes="detail-field"
                          Text="{Binding SpeakerGuid, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          FontFamily="Consolas,Courier New,monospace"
-                         ToolTip.Tip="GUID of the speaking character"/>
+                         ToolTip.Tip="GUID of the speaking character (edit directly or use the name picker above)"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_ListenerGuid}"/>
+                <!-- Name picker — visible when speaker data is loaded (PoE2) -->
+                <AutoCompleteBox Classes="detail-field"
+                                 ItemsSource="{Binding AvailableSpeakers}"
+                                 SelectedItem="{Binding SelectedListenerEntry, Mode=TwoWay}"
+                                 Watermark="{StaticResource Placeholder_SpeakerSearch}"
+                                 FilterMode="ContainsOrdinalIgnoreCase"
+                                 IsVisible="{Binding HasSpeakerData}"
+                                 ToolTip.Tip="{StaticResource ToolTip_SpeakerPicker}"/>
                 <TextBox Classes="detail-field"
                          Text="{Binding ListenerGuid, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          FontFamily="Consolas,Courier New,monospace"
-                         ToolTip.Tip="GUID of the listening character"/>
+                         ToolTip.Tip="GUID of the listening character (edit directly or use the name picker above)"/>
 
                 <!-- ── Display ─────────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_GroupDisplay}"/>

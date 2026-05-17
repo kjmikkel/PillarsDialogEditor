@@ -173,6 +173,43 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(ExternalVO));
         OnPropertyChanged(nameof(HasVO));
         OnPropertyChanged(nameof(HideSpeaker));
+
+        // Keep AutoCompleteBox selections in sync whenever any proxy changes
+        _selectedSpeakerEntry  = SpeakerNameService.FindByGuid(_node?.SpeakerGuid);
+        _selectedListenerEntry = SpeakerNameService.FindByGuid(_node?.ListenerGuid);
+        OnPropertyChanged(nameof(SelectedSpeakerEntry));
+        OnPropertyChanged(nameof(SelectedListenerEntry));
+    }
+
+    // ── Speaker / Listener name picker ───────────────────────────────────
+
+    /// True when the loaded game has speaker name data (PoE2); hides picker for PoE1.
+    public bool HasSpeakerData => SpeakerNameService.HasNames;
+
+    /// All known speakers from the loaded game, sorted by name.
+    public IReadOnlyList<SpeakerEntry> AvailableSpeakers => SpeakerNameService.All;
+
+    private SpeakerEntry? _selectedSpeakerEntry;
+    private SpeakerEntry? _selectedListenerEntry;
+
+    public SpeakerEntry? SelectedSpeakerEntry
+    {
+        get => _selectedSpeakerEntry;
+        set
+        {
+            if (SetProperty(ref _selectedSpeakerEntry, value) && value is not null)
+                SpeakerGuid = value.Guid;
+        }
+    }
+
+    public SpeakerEntry? SelectedListenerEntry
+    {
+        get => _selectedListenerEntry;
+        set
+        {
+            if (SetProperty(ref _selectedListenerEntry, value) && value is not null)
+                ListenerGuid = value.Guid;
+        }
     }
 
     private void RefreshReadOnlyGroups(NodeViewModel node)

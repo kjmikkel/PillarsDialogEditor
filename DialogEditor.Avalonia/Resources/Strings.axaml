@@ -321,6 +321,10 @@
     <sys:String x:Key="Label_Condition_NOT">NOT</sys:String>
     <sys:String x:Key="Placeholder_PickCondition">Pick a condition…</sys:String>
 
+    <!-- ─── Detail panel — speaker/listener name picker ────────────────── -->
+    <sys:String x:Key="Placeholder_SpeakerSearch">Search by name…</sys:String>
+    <sys:String x:Key="ToolTip_SpeakerPicker">Pick a character by name — sets the GUID below automatically</sys:String>
+
     <!-- ─── Detail panel — link property labels and tooltips ───────────── -->
     <sys:String x:Key="Label_LinkWeight">w</sys:String>
     <sys:String x:Key="ToolTip_LinkQTD">Controls whether this player choice reappears after selection (ShowOnce / Always / Never)</sys:String>
