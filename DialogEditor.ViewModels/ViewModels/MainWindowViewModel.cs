@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Backup;
 using DialogEditor.Core.GameData;
+using DialogEditor.Core.Models;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
 
@@ -110,13 +111,18 @@ public partial class MainWindowViewModel : ObservableObject
         Canvas.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(ConversationViewModel.SelectedNode))
+            {
                 Detail.Load(Canvas.SelectedNode);
+                RefreshDetailLinks();
+            }
             if (e.PropertyName == nameof(ConversationViewModel.IsModified))
             {
                 IsModified = Canvas.IsModified;
                 SaveCommand.NotifyCanExecuteChanged();
             }
         };
+
+        Canvas.Connections.CollectionChanged += (_, _) => RefreshDetailLinks();
 
         var last = AppSettings.LastGameDirectory;
         if (!string.IsNullOrEmpty(last) && Directory.Exists(last))
@@ -130,6 +136,21 @@ public partial class MainWindowViewModel : ObservableObject
         AppSettings.LastLanguage = value;
         if (_currentFile is not null)
             OnConversationSelected(_currentFile);
+    }
+
+    // ── Link list sync ────────────────────────────────────────────────────
+    private void RefreshDetailLinks()
+    {
+        if (Canvas.SelectedNode is null) return;
+        Detail.RefreshLinks(
+            Canvas.Connections
+                .Where(c => c.Source.Owner == Canvas.SelectedNode)
+                .Select(c => new NodeLink(
+                    Canvas.SelectedNode.NodeId,
+                    c.Target.Owner!.NodeId,
+                    c.HasConditions,
+                    1f,
+                    c.QuestionNodeTextDisplay)));
     }
 
     // ── Open folder ───────────────────────────────────────────────────────

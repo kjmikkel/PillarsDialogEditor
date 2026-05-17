@@ -191,6 +191,9 @@ public partial class NodeDetailViewModel : ObservableObject
         ];
     }
 
+    public void RefreshLinks(IEnumerable<NodeLink> links)
+        => Links = links.Select(BuildLinkRow).ToList();
+
     private static LinkRow BuildLinkRow(NodeLink link)
     {
         var extras = new List<string>();

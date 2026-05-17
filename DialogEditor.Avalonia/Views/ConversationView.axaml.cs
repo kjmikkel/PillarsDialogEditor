@@ -18,6 +18,8 @@ public partial class ConversationView : UserControl
         SearchBox.SelectAll();
     }
 
+    public void FocusEditor() => Editor.Focus();
+
     private void SearchBox_KeyDown(object? sender, KeyEventArgs e)
     {
         if (e.Key == Key.Escape && DataContext is ConversationViewModel vm)
@@ -59,7 +61,7 @@ public partial class ConversationView : UserControl
         var newNode = new NodeViewModel(
             new ConversationNode(newId, false, SpeakerCategory.Npc,
                 string.Empty, string.Empty, [], [], [], "Conversation", "None"),
-            null);
+            new StringEntry(newId, string.Empty, string.Empty));
 
         vm.AddNode(newNode, new LayoutPoint((int)canvasPos.X, (int)canvasPos.Y));
         e.Handled = true;
