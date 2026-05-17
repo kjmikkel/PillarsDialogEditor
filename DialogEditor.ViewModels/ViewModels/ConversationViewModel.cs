@@ -265,6 +265,17 @@ public partial class ConversationViewModel : ObservableObject
         if (connection is not null) DeleteConnection(connection);
     }
 
+    // ── Layout helpers ────────────────────────────────────────────────────
+    public IReadOnlyDictionary<int, LayoutPoint> GetCurrentLayout() =>
+        Nodes.ToDictionary(n => n.NodeId, n => n.Location);
+
+    public void RestoreLayout(IReadOnlyDictionary<int, LayoutPoint> positions)
+    {
+        foreach (var node in Nodes)
+            if (positions.TryGetValue(node.NodeId, out var pos))
+                node.Location = pos;
+    }
+
     // ── Snapshot for save ─────────────────────────────────────────────────
     public ConversationEditSnapshot BuildSnapshot() =>
         new(Nodes.Select(n =>
