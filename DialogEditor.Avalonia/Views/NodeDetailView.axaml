@@ -98,7 +98,7 @@
                                  ItemsSource="{Binding AvailableSpeakers}"
                                  SelectedItem="{Binding SelectedSpeakerEntry, Mode=TwoWay}"
                                  Watermark="{StaticResource Placeholder_SpeakerSearch}"
-                                 FilterMode="ContainsOrdinalIgnoreCase"
+                                 FilterMode="Contains"
                                  IsVisible="{Binding HasSpeakerData}"
                                  ToolTip.Tip="{StaticResource ToolTip_SpeakerPicker}"/>
                 <TextBox Classes="detail-field"
@@ -112,7 +112,7 @@
                                  ItemsSource="{Binding AvailableSpeakers}"
                                  SelectedItem="{Binding SelectedListenerEntry, Mode=TwoWay}"
                                  Watermark="{StaticResource Placeholder_SpeakerSearch}"
-                                 FilterMode="ContainsOrdinalIgnoreCase"
+                                 FilterMode="Contains"
                                  IsVisible="{Binding HasSpeakerData}"
                                  ToolTip.Tip="{StaticResource ToolTip_SpeakerPicker}"/>
                 <TextBox Classes="detail-field"
