@@ -204,7 +204,6 @@
                                               FontSize="10" Padding="3,1" Height="22"
                                               ToolTip.Tip="{StaticResource ToolTip_LinkQTD}">
                                         <ComboBox.Items>
-                                            <sys:String></sys:String>
                                             <sys:String>ShowOnce</sys:String>
                                             <sys:String>Always</sys:String>
                                             <sys:String>Never</sys:String>
@@ -214,12 +213,16 @@
                                                Text="{StaticResource Label_LinkWeight}"
                                                Foreground="#666" FontSize="10"
                                                VerticalAlignment="Center" Margin="6,0,4,0"/>
-                                    <TextBox Grid.Column="2"
-                                             Text="{Binding RandomWeight, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                                             Background="#1a1a1a" Foreground="#ccc"
-                                             BorderBrush="#444" BorderThickness="1"
-                                             FontSize="10" Padding="3,1" Width="40"
-                                             ToolTip.Tip="{StaticResource ToolTip_LinkWeight}"/>
+                                    <NumericUpDown Grid.Column="2"
+                                                   Value="{Binding RandomWeight, Mode=TwoWay, Converter={StaticResource FloatDecimal}}"
+                                                   Minimum="0" Maximum="100"
+                                                   Increment="0.1" FormatString="0.##"
+                                                   Background="#1a1a1a" Foreground="#ccc"
+                                                   BorderBrush="#444" BorderThickness="1"
+                                                   FontSize="10" Padding="2,0" Width="72"
+                                                   ShowButtonSpinner="False"
+                                                   ClipValueToMinMax="True"
+                                                   ToolTip.Tip="{StaticResource ToolTip_LinkWeight}"/>
                                 </Grid>
                             </Grid>
                         </DataTemplate>
