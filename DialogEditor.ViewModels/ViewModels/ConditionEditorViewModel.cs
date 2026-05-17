@@ -51,7 +51,7 @@ public partial class ConditionEditorViewModel : ObservableObject
     {
         if (SelectedNewCondition is not { } entry) return;
         var defaults = entry.Parameters.Select(p => p.Default).ToList();
-        var leaf     = new ConditionLeaf(entry.MethodName, defaults, false, "And");
+        var leaf     = new ConditionLeaf(entry.ReflectionFullName, defaults, false, "And");
         Rows.Add(BuildRow(leaf));
         SelectedNewCondition = null;
     }

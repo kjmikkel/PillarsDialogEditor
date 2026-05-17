@@ -17,7 +17,14 @@ public record ConditionEntry(
     string Category,
     IReadOnlyList<string> Games,
     string Description,
-    IReadOnlyList<ConditionParameter> Parameters);
+    IReadOnlyList<ConditionParameter> Parameters,
+    string? FullName = null)
+{
+    /// The complete C# reflection-format name written into condition XML/JSON,
+    /// e.g. "Boolean IsGlobalValue(String, Operator, Int32)".
+    /// Falls back to MethodName if not set (allows forward-compat).
+    public string ReflectionFullName => !string.IsNullOrEmpty(FullName) ? FullName : MethodName;
+}
 
 public sealed class ConditionCatalogue
 {

@@ -1,6 +1,7 @@
 [
   {
     "methodName": "IsGlobalValue",
+    "fullName": "Boolean IsGlobalValue(String, Operator, Int32)",
     "displayName": "Is Global Value",
     "category": "Globals",
     "games": ["poe1", "poe2"],
@@ -13,6 +14,7 @@
   },
   {
     "methodName": "CompareGlobals",
+    "fullName": "Boolean CompareGlobals(String, Operator, String)",
     "displayName": "Compare Globals",
     "category": "Globals",
     "games": ["poe1", "poe2"],
@@ -25,6 +27,7 @@
   },
   {
     "methodName": "HasConversationNodeBeenPlayed",
+    "fullName": "Boolean HasConversationNodeBeenPlayed(String, Int32)",
     "displayName": "Has Conversation Node Been Played",
     "category": "Conversation",
     "games": ["poe1", "poe2"],
@@ -36,6 +39,7 @@
   },
   {
     "methodName": "IsQuestOnNode",
+    "fullName": "Boolean IsQuestOnNode(String, Int32)",
     "displayName": "Is Quest On Node",
     "category": "Quest",
     "games": ["poe1", "poe2"],
@@ -47,6 +51,7 @@
   },
   {
     "methodName": "IsQuestEventTriggered",
+    "fullName": "Boolean IsQuestEventTriggered(String, Int32)",
     "displayName": "Is Quest Event Triggered",
     "category": "Quest",
     "games": ["poe1", "poe2"],
@@ -58,6 +63,7 @@
   },
   {
     "methodName": "IsQuestAddendumTriggered",
+    "fullName": "Boolean IsQuestAddendumTriggered(String, Int32)",
     "displayName": "Is Quest Addendum Triggered",
     "category": "Quest",
     "games": ["poe1", "poe2"],
@@ -69,6 +75,7 @@
   },
   {
     "methodName": "IsQuestEndStateTriggered",
+    "fullName": "Boolean IsQuestEndStateTriggered(String, Int32)",
     "displayName": "Is Quest End State Triggered",
     "category": "Quest",
     "games": ["poe1", "poe2"],
@@ -80,6 +87,7 @@
   },
   {
     "methodName": "IsQuestFailed",
+    "fullName": "Boolean IsQuestFailed(String)",
     "displayName": "Is Quest Failed",
     "category": "Quest",
     "games": ["poe1", "poe2"],
@@ -90,6 +98,7 @@
   },
   {
     "methodName": "IsCompanionActiveInParty",
+    "fullName": "Boolean IsCompanionActiveInParty(Guid)",
     "displayName": "Is Companion Active In Party",
     "category": "General",
     "games": ["poe1", "poe2"],
@@ -100,6 +109,7 @@
   },
   {
     "methodName": "IsAnyCompanionActiveInParty",
+    "fullName": "Boolean IsAnyCompanionActiveInParty()",
     "displayName": "Is Any Companion Active In Party",
     "category": "General",
     "games": ["poe1", "poe2"],
@@ -108,6 +118,7 @@
   },
   {
     "methodName": "IsActive",
+    "fullName": "Boolean IsActive(Guid)",
     "displayName": "Is Active",
     "category": "General",
     "games": ["poe1", "poe2"],
@@ -118,6 +129,7 @@
   },
   {
     "methodName": "IsPlayerClass",
+    "fullName": "Boolean IsPlayerClass(CharacterStats+Class)",
     "displayName": "Is Player Class",
     "category": "RPG",
     "games": ["poe1", "poe2"],
@@ -129,6 +141,7 @@
   },
   {
     "methodName": "IsClass",
+    "fullName": "Boolean IsClass(Guid, CharacterStats+Class)",
     "displayName": "Is Class",
     "category": "RPG",
     "games": ["poe1", "poe2"],
@@ -141,6 +154,7 @@
   },
   {
     "methodName": "IsPlayerRace",
+    "fullName": "Boolean IsPlayerRace(CharacterStats+Race)",
     "displayName": "Is Player Race",
     "category": "RPG",
     "games": ["poe1", "poe2"],
@@ -152,6 +166,7 @@
   },
   {
     "methodName": "IsPlayerSubrace",
+    "fullName": "Boolean IsPlayerSubrace(CharacterStats+Subrace)",
     "displayName": "Is Player Subrace",
     "category": "RPG",
     "games": ["poe1", "poe2"],
@@ -163,6 +178,7 @@
   },
   {
     "methodName": "IsPlayerGender",
+    "fullName": "Boolean IsPlayerGender(Gender)",
     "displayName": "Is Player Gender",
     "category": "RPG",
     "games": ["poe1", "poe2"],
@@ -174,6 +190,7 @@
   },
   {
     "methodName": "IsPlayerBackground",
+    "fullName": "Boolean IsPlayerBackground(CharacterStats+Background)",
     "displayName": "Is Player Background",
     "category": "RPG",
     "games": ["poe1", "poe2"],
@@ -185,6 +202,7 @@
   },
   {
     "methodName": "IsPlayerCulture",
+    "fullName": "Boolean IsPlayerCulture(CharacterStats+Culture)",
     "displayName": "Is Player Culture",
     "category": "RPG",
     "games": ["poe1", "poe2"],
@@ -196,6 +214,7 @@
   },
   {
     "methodName": "IsPlayerSkillValue",
+    "fullName": "Boolean IsPlayerSkillValue(CharacterStats+SkillType, Operator, Int32)",
     "displayName": "Is Player Skill Value",
     "category": "RPG",
     "games": ["poe1", "poe2"],
@@ -209,6 +228,7 @@
   },
   {
     "methodName": "IsSkillValue",
+    "fullName": "Boolean IsSkillValue(Guid, CharacterStats+SkillType, Operator, Int32)",
     "displayName": "Is Skill Value",
     "category": "RPG",
     "games": ["poe1", "poe2"],
@@ -223,6 +243,7 @@
   },
   {
     "methodName": "IsPlayerAttributeScoreValue",
+    "fullName": "Boolean IsPlayerAttributeScoreValue(CharacterStats+AttributeScoreType, Operator, Int32)",
     "displayName": "Is Player Attribute Score Value",
     "category": "RPG",
     "games": ["poe1", "poe2"],
@@ -236,6 +257,7 @@
   },
   {
     "methodName": "IsPlayerLevel",
+    "fullName": "Boolean IsPlayerLevel(Operator, Int32)",
     "displayName": "Is Player Level",
     "category": "RPG",
     "games": ["poe1"],
@@ -247,6 +269,7 @@
   },
   {
     "methodName": "IsLevel",
+    "fullName": "Boolean IsLevel(Guid, Operator, Int32)",
     "displayName": "Is Level",
     "category": "RPG",
     "games": ["poe2"],
@@ -259,6 +282,7 @@
   },
   {
     "methodName": "HasTalentOrAbility",
+    "fullName": "Boolean HasTalentOrAbility(Guid, String)",
     "displayName": "Has Talent or Ability",
     "category": "RPG",
     "games": ["poe1"],
@@ -270,6 +294,7 @@
   },
   {
     "methodName": "IsDeity",
+    "fullName": "Boolean IsDeity(Guid, Religion+Deity)",
     "displayName": "Is Deity",
     "category": "RPG",
     "games": ["poe1", "poe2"],
@@ -282,6 +307,7 @@
   },
   {
     "methodName": "IsPaladinOrder",
+    "fullName": "Boolean IsPaladinOrder(Guid, Religion+PaladinOrder)",
     "displayName": "Is Paladin Order",
     "category": "RPG",
     "games": ["poe1", "poe2"],
@@ -294,6 +320,7 @@
   },
   {
     "methodName": "DispositionGreaterOrEqual",
+    "fullName": "Boolean DispositionGreaterOrEqual(Disposition+Axis, Disposition+Rank)",
     "displayName": "Disposition Greater or Equal",
     "category": "Faction",
     "games": ["poe1", "poe2"],
@@ -307,6 +334,7 @@
   },
   {
     "methodName": "DispositionEqual",
+    "fullName": "Boolean DispositionEqual(Disposition+Axis, Disposition+Rank)",
     "displayName": "Disposition Equal",
     "category": "Faction",
     "games": ["poe1", "poe2"],
@@ -320,6 +348,7 @@
   },
   {
     "methodName": "ReputationRankByTagEquals",
+    "fullName": "Boolean ReputationRankByTagEquals(FactionName, Reputation+Axis, Int32)",
     "displayName": "Tagged Reputation Rank Equals",
     "category": "Faction",
     "games": ["poe1", "poe2"],
@@ -334,6 +363,7 @@
   },
   {
     "methodName": "ReputationTagRankGreater",
+    "fullName": "Boolean ReputationTagRankGreater(FactionName, Reputation+Axis, Int32)",
     "displayName": "Tagged Reputation Rank Greater or Equal",
     "category": "Faction",
     "games": ["poe1", "poe2"],
@@ -348,6 +378,7 @@
   },
   {
     "methodName": "IsItemCount",
+    "fullName": "Boolean IsItemCount(String, Operator, Int32)",
     "displayName": "Is Item Count",
     "category": "Items",
     "games": ["poe1", "poe2"],
@@ -360,6 +391,7 @@
   },
   {
     "methodName": "IsItemEquipped",
+    "fullName": "Boolean IsItemEquipped(Guid, String)",
     "displayName": "Is Item Equipped",
     "category": "Items",
     "games": ["poe1", "poe2"],
@@ -371,6 +403,7 @@
   },
   {
     "methodName": "HasMoney",
+    "fullName": "Boolean HasMoney(Operator, Int32)",
     "displayName": "Has Money",
     "category": "Items",
     "games": ["poe1", "poe2"],
@@ -382,6 +415,7 @@
   },
   {
     "methodName": "IsInCombat",
+    "fullName": "Boolean IsInCombat()",
     "displayName": "Is In Combat",
     "category": "General",
     "games": ["poe1", "poe2"],
@@ -390,6 +424,7 @@
   },
   {
     "methodName": "IsCurrentlyDaytime",
+    "fullName": "Boolean IsCurrentlyDaytime()",
     "displayName": "Is Currently Daytime",
     "category": "Time",
     "games": ["poe1", "poe2"],
@@ -398,6 +433,7 @@
   },
   {
     "methodName": "IsCurrentlyNighttime",
+    "fullName": "Boolean IsCurrentlyNighttime()",
     "displayName": "Is Currently Nighttime",
     "category": "Time",
     "games": ["poe1", "poe2"],
@@ -406,6 +442,7 @@
   },
   {
     "methodName": "IsCurrentTime",
+    "fullName": "Boolean IsCurrentTime(Operator, Single)",
     "displayName": "Is Current Time of Day",
     "category": "Time",
     "games": ["poe2"],
@@ -417,6 +454,7 @@
   },
   {
     "methodName": "IsEasy",
+    "fullName": "Boolean IsEasy()",
     "displayName": "Is Easy",
     "category": "Difficulty",
     "games": ["poe1", "poe2"],
@@ -425,6 +463,7 @@
   },
   {
     "methodName": "IsNormal",
+    "fullName": "Boolean IsNormal()",
     "displayName": "Is Normal",
     "category": "Difficulty",
     "games": ["poe1", "poe2"],
@@ -433,6 +472,7 @@
   },
   {
     "methodName": "IsHard",
+    "fullName": "Boolean IsHard()",
     "displayName": "Is Hard",
     "category": "Difficulty",
     "games": ["poe1", "poe2"],
@@ -441,6 +481,7 @@
   },
   {
     "methodName": "IsStoryTime",
+    "fullName": "Boolean IsStoryTime()",
     "displayName": "Is Story Time",
     "category": "Difficulty",
     "games": ["poe1", "poe2"],
@@ -449,6 +490,7 @@
   },
   {
     "methodName": "IsUserInStealth",
+    "fullName": "Boolean IsUserInStealth()",
     "displayName": "Is User In Stealth",
     "category": "General",
     "games": ["poe1", "poe2"],
@@ -457,6 +499,7 @@
   },
   {
     "methodName": "IsPartySkillValueCount",
+    "fullName": "Boolean IsPartySkillValueCount(CharacterStats+SkillType, Operator, Int32, Operator, Int32)",
     "displayName": "Is Party Skill Value Count",
     "category": "RPG",
     "games": ["poe1"],
@@ -472,6 +515,7 @@
   },
   {
     "methodName": "IsMoraleStatus",
+    "fullName": "Boolean IsMoraleStatus(MoraleStateType)",
     "displayName": "Is Morale Status",
     "category": "Ship Crew",
     "games": ["poe2"],
@@ -483,6 +527,7 @@
   },
   {
     "methodName": "IsPlayerShipAttribute",
+    "fullName": "Boolean IsPlayerShipAttribute(ShipAttributeType, Operator, Int32)",
     "displayName": "Is Player Ship Attribute",
     "category": "Ships",
     "games": ["poe2"],
@@ -496,28 +541,31 @@
   },
   {
     "methodName": "HasKeyword",
+    "fullName": "Boolean HasKeyword(Guid, Guid)",
     "displayName": "Has Keyword",
     "category": "RPG",
     "games": ["poe2"],
     "description": "True if the specified character has the given keyword.",
     "parameters": [
       { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
-      { "name": "Keyword", "type": "GameData", "description": "Keyword to compare with.", "default": "" }
+      { "name": "Keyword", "type": "GameData", "description": "Keyword GUID.", "default": "" }
     ]
   },
   {
     "methodName": "HasStatusEffect",
+    "fullName": "Boolean HasStatusEffect(Guid, Guid)",
     "displayName": "Has Status Effect",
     "category": "Targeting Filter",
     "games": ["poe2"],
     "description": "True if the specified character currently has the given status effect.",
     "parameters": [
       { "name": "Object", "type": "ObjectGuid", "description": "Character to check.", "default": "" },
-      { "name": "Status Effect", "type": "GameData", "description": "Status effect to check for.", "default": "" }
+      { "name": "Status Effect", "type": "GameData", "description": "Status effect GUID.", "default": "" }
     ]
   },
   {
     "methodName": "IsMapVisibility",
+    "fullName": "Boolean IsMapVisibility(MapType, MapVisibilityType)",
     "displayName": "Is Map Visibility",
     "category": "World Map",
     "games": ["poe2"],

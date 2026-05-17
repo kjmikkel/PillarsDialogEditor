@@ -289,7 +289,7 @@ public partial class NodeDetailViewModel : ObservableObject
     {
         if (_node is null) return;
         var defaults = entry.Parameters.Select(p => p.Default).ToList();
-        var leaf     = new ConditionLeaf(entry.MethodName, defaults, false, "And");
+        var leaf     = new ConditionLeaf(entry.ReflectionFullName, defaults, false, "And");
         var row      = new ConditionRowViewModel(leaf, entry);
         SubscribeRow(row);
         ConditionRows.Add(row);
