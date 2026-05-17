@@ -94,6 +94,47 @@ public class ConditionEditingTests
         Assert.Empty(_vm.ConditionRows);
     }
 
+    // ── ConditionBranch round-trip ────────────────────────────────────────
+
+    [Fact]
+    public void ConditionBranch_IsShownAsReadOnlyRow()
+    {
+        var branch = new ConditionBranch(
+            [new ConditionLeaf("Boolean B()", [], false, "Or")],
+            false, "And");
+        var node = new ConversationNode(
+            1, false, SpeakerCategory.Npc, "", "", [],
+            [new ConditionLeaf("Boolean A()", [], false, "And"), branch],
+            [], "Conversation", "None");
+        var nodeVm = new NodeViewModel(node, new StringEntry(1, "text", ""));
+        _vm.Load(nodeVm);
+
+        Assert.Equal(2, _vm.ConditionRows.Count);
+        Assert.True(_vm.ConditionRows[0].IsLeaf);
+        Assert.True(_vm.ConditionRows[1].IsBranch);
+    }
+
+    [Fact]
+    public void ConditionBranch_PreservedAfterEditConfirm()
+    {
+        var leaf   = new ConditionLeaf("Boolean A()", [], false, "And");
+        var branch = new ConditionBranch(
+            [new ConditionLeaf("Boolean B()", [], false, "Or")],
+            false, "And");
+        var node = new ConversationNode(
+            1, false, SpeakerCategory.Npc, "", "", [],
+            [leaf, branch], [], "Conversation", "None");
+        var nodeVm = new NodeViewModel(node, new StringEntry(1, "text", ""));
+        nodeVm.UndoStack = new DialogEditor.Core.Editing.UndoRedoStack();
+
+        var editorVm = new ConditionEditorViewModel(nodeVm);
+        editorVm.ConfirmCommand.Execute(null);
+
+        Assert.Equal(2, nodeVm.Conditions.Count);
+        Assert.IsType<ConditionLeaf>(nodeVm.Conditions[0]);
+        Assert.IsType<ConditionBranch>(nodeVm.Conditions[1]);
+    }
+
     // ── CommitConditions ──────────────────────────────────────────────────
 
     [Fact]

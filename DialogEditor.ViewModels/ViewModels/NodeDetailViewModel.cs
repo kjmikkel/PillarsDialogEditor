@@ -224,39 +224,6 @@ public partial class NodeDetailViewModel : ObservableObject
         }
     }
 
-    /// Conditions available to add — sourced from the embedded catalogue.
-    public IReadOnlyList<ConditionEntry> AvailableConditions
-        => ConditionCatalogue.Instance.All;
-
-    [ObservableProperty] private ConditionEntry? _selectedNewCondition;
-
-    [RelayCommand]
-    private void AddSelectedCondition()
-    {
-        if (SelectedNewCondition is { } entry)
-        {
-            AddCondition(entry);
-            SelectedNewCondition = null;
-        }
-    }
-
-    [RelayCommand]
-    private void DeleteConditionRowCmd(ConditionRowViewModel? row)
-    {
-        if (row is not null) DeleteConditionRow(row);
-    }
-
-    [RelayCommand]
-    private void MoveConditionUpCmd(ConditionRowViewModel? row)
-    {
-        if (row is not null) MoveConditionUp(row);
-    }
-
-    [RelayCommand]
-    private void MoveConditionDownCmd(ConditionRowViewModel? row)
-    {
-        if (row is not null) MoveConditionDown(row);
-    }
 
     private void RebuildConditionRows(NodeViewModel node)
     {
@@ -274,7 +241,11 @@ public partial class NodeDetailViewModel : ObservableObject
                 SubscribeRow(row);
                 ConditionRows.Add(row);
             }
-            // ConditionBranch editing deferred to a future phase
+            else if (c is ConditionBranch branch)
+            {
+                // Branch rows are read-only pass-throughs — no subscription needed
+                ConditionRows.Add(new ConditionRowViewModel(branch));
+            }
         }
     }
 
