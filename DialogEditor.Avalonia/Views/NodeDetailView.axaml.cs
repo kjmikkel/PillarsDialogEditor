@@ -13,7 +13,7 @@ public partial class NodeDetailView : UserControl
         if (DataContext is not NodeDetailViewModel detailVm) return;
         if (detailVm.Node is null) return;
 
-        var editorVm = new ConditionEditorViewModel(detailVm.Node);
+        var editorVm = new ConditionEditorViewModel(detailVm.Node, detailVm.ActiveGameId);
         var window   = new ConditionEditorWindow(editorVm);
 
         // Show as modal dialog parented to the owning window
