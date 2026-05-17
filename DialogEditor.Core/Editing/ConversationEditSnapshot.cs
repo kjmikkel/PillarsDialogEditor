@@ -25,7 +25,8 @@ public record NodeEditSnapshot(
     string ExternalVO,
     bool HasVO,
     bool HideSpeaker,
-    IReadOnlyList<LinkEditSnapshot> Links
+    IReadOnlyList<LinkEditSnapshot> Links,
+    IReadOnlyList<ConditionNode> Conditions
 );
 
 public record ConversationEditSnapshot(IReadOnlyList<NodeEditSnapshot> Nodes);

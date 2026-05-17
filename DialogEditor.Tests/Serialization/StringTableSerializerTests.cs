@@ -9,7 +9,7 @@ public class StringTableSerializerTests
 {
     private static NodeEditSnapshot Node(int id, string def, string fem = "") =>
         new(id, false, SpeakerCategory.Npc, "", "", def, fem,
-            "Conversation", "None", "", "", "", false, false, []);
+            "Conversation", "None", "", "", "", false, false, [], []);
 
     private const string TwoEntryXml = """
         <StringTableFile>

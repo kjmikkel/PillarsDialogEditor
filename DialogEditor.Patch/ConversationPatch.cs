@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
+#pragma warning disable CS8618 // non-nullable property set in [JsonConstructor]
 
 namespace DialogEditor.Patch;
 
@@ -38,6 +39,9 @@ public sealed class NodeModification
         IReadOnlyList<LinkEditSnapshot> AddedLinks,
         IReadOnlyList<DeletedLink> DeletedLinks)
         : this(NodeId, FieldChanges, AddedLinks, DeletedLinks, []) { }
+
+    // Conditions changed — store the full new list (replace-all semantics)
+    public IReadOnlyList<ConditionNode>? UpdatedConditions { get; init; }
 
     public int                                      NodeId        { get; }
     public IReadOnlyDictionary<string, FieldChange> FieldChanges  { get; }

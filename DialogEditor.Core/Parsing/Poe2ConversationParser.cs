@@ -40,8 +40,8 @@ public static class Poe2ConversationParser
             .Select(ParseLink)
             .ToList() ?? [];
 
-        var conditions = FlattenConditions(node["Conditionals"]?["Components"]?.AsArray());
-        var scripts = ParseScripts(node);
+        var conditions = ParseConditionTree(node["Conditionals"]?["Components"]?.AsArray());
+        var scripts    = ParseScripts(node);
 
         return new ConversationNode(
             NodeId: node["NodeID"]!.GetValue<int>(),
@@ -52,15 +52,13 @@ public static class Poe2ConversationParser
             SpeakerGuid: node["SpeakerGuid"]?.GetValue<string>() ?? string.Empty,
             ListenerGuid: node["ListenerGuid"]?.GetValue<string>() ?? string.Empty,
             Links: links,
-            ConditionStrings: conditions,
+            Conditions: conditions,
             Scripts: scripts,
             DisplayType: MapDisplayType(node["DisplayType"]?.GetValue<int>() ?? 0),
             Persistence: MapPersistence(node["Persistence"]?.GetValue<int>() ?? 0),
             ExternalVO: node["ExternalVO"]?.GetValue<string>() ?? string.Empty,
             HasVO: node["HasVO"]?.GetValue<bool>() ?? false,
-            HideSpeaker: node["HideSpeaker"]?.GetValue<bool>() ?? false,
-            ConditionExpression: FormatConditionTree(
-                node["Conditionals"]?["Components"]?.AsArray())
+            HideSpeaker: node["HideSpeaker"]?.GetValue<bool>() ?? false
         );
     }
 
@@ -89,66 +87,37 @@ public static class Poe2ConversationParser
     private static NodeLink ParseLink(JsonNode? link)
         => new(
             FromNodeId: link!["FromNodeID"]!.GetValue<int>(),
-            ToNodeId: link["ToNodeID"]!.GetValue<int>(),
-            HasConditions: link["Conditionals"]?["Components"]?.AsArray().Count > 0,
+            ToNodeId:   link["ToNodeID"]!.GetValue<int>(),
+            Conditions: ParseConditionTree(link["Conditionals"]?["Components"]?.AsArray()),
             RandomWeight: link["RandomWeight"]?.GetValue<float>() ?? 1f,
-            QuestionNodeTextDisplay: MapQuestionNodeTextDisplay(link["QuestionNodeTextDisplay"]?.GetValue<int>() ?? 0)
+            QuestionNodeTextDisplay: MapQuestionNodeTextDisplay(
+                link["QuestionNodeTextDisplay"]?.GetValue<int>() ?? 0)
         );
 
-    private static List<string> FlattenConditions(JsonArray? components)
+    internal static IReadOnlyList<ConditionNode> ParseConditionTree(JsonArray? components)
     {
         if (components is null) return [];
-        return components
-            .SelectMany(c => c?["Data"] is not null
-                ? (IEnumerable<string>)[ParseCondition(c)]
-                : FlattenConditions(c?["Components"]?.AsArray()))
-            .ToList();
+        return components.Select(ParseConditionComponent).ToList();
     }
 
-    private static string ParseCondition(JsonNode? component)
+    private static ConditionNode ParseConditionComponent(JsonNode? comp)
     {
-        var data = component!["Data"]!;
-        var fullName = data["FullName"]!.GetValue<string>();
-        var parameters = data["Parameters"]?.AsArray()
-            .Select(p => p!.GetValue<string>())
-            .ToList() ?? [];
-        var not = component["Not"]?.GetValue<bool>() ?? false;
-        return ConditionFormatter.Format(fullName, parameters, not);
-    }
+        var not  = comp?["Not"]?.GetValue<bool>() ?? false;
+        var opRaw = comp?["Operator"]?.GetValue<int>() ?? 0;
+        var op   = opRaw == 1 ? "Or" : "And";
+        var data = comp?["Data"];
 
-    private static string FormatConditionTree(JsonArray? components, int depth = 0)
-    {
-        if (components is null) return string.Empty;
-        var indent = new string(' ', depth * 2);
-        var sb = new StringBuilder();
-        var items = components.ToList();
-
-        for (int i = 0; i < items.Count; i++)
+        if (data is not null)
         {
-            var comp = items[i]!;
-            var not = comp["Not"]?.GetValue<bool>() ?? false;
-            var notPrefix = not ? "NOT " : "";
-
-            if (i > 0)
-            {
-                var prevOpInt = items[i - 1]?["Operator"]?.GetValue<int>() ?? 0;
-                var prevOp = prevOpInt == 1 ? "OR" : "AND";
-                sb.Append($"{Environment.NewLine}{indent}{prevOp} ");
-            }
-
-            if (comp["Data"] is not null)
-            {
-                // ParseCondition already handles Not internally
-                sb.Append(ParseCondition(comp));
-            }
-            else
-            {
-                var inner = FormatConditionTree(comp["Components"]?.AsArray(), depth + 1);
-                if (string.IsNullOrEmpty(inner)) continue;
-                sb.Append($"{notPrefix}({Environment.NewLine}{indent}  {inner}{Environment.NewLine}{indent})");
-            }
+            var fullName   = data["FullName"]!.GetValue<string>();
+            var parameters = data["Parameters"]?.AsArray()
+                .Select(p => p!.GetValue<string>())
+                .ToList() ?? [];
+            return new ConditionLeaf(fullName, parameters, not, op);
         }
-        return sb.ToString();
+
+        var children = ParseConditionTree(comp?["Components"]?.AsArray());
+        return new ConditionBranch(children, not, op);
     }
 
     private static string MapQuestionNodeTextDisplay(int value) => value switch

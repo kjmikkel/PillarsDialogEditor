@@ -15,7 +15,7 @@ public class DiffEngineTests
         IReadOnlyList<LinkEditSnapshot>? links = null) =>
         new(id, false, SpeakerCategory.Npc, "", "", defaultText, femaleText,
             "Conversation", "None", "", "", "", false, false,
-            links ?? []);
+            links ?? [], []);
 
     private static ConversationEditSnapshot Snap(params NodeEditSnapshot[] nodes) =>
         new(nodes);
