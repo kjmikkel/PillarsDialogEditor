@@ -117,17 +117,6 @@ use case (one author, one project) doesn't need it.
 
 ## UI / UX
 
-### Canvas layout persistence
-**What:** Node positions on the canvas are recomputed by `AutoLayoutService`
-every time a conversation is loaded. Any manual arrangement is lost on reload.  
-**Why:** Layout is not part of the game files. It would need to be stored either
-in the `.dialogproject` file (as non-diff metadata) or in a separate sidecar.
-The layout algorithm works well enough that many users won't notice.  
-**Where to start:** `ConversationViewModel.Load()` applies AutoLayout after
-loading. Adding a `Dictionary<int, LayoutPoint> NodePositions` field to
-`DialogProject` (outside the patch diff) would let positions be saved/restored
-per-project per-conversation.
-
 ### Speaker / Listener GUID lookup
 **What:** `SpeakerGuid` and `ListenerGuid` are free-text fields. Users must
 know the GUID for the character they want. There is no browse / autocomplete.  

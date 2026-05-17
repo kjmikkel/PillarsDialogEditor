@@ -262,7 +262,8 @@ public partial class MainWindowViewModel : ObservableObject
         try
         {
             var patch    = DiffEngine.Diff(_currentFile.Name, Canvas.BaseSnapshot, Canvas.BuildSnapshot());
-            SetProject(_project!.WithPatch(patch));
+            var layout   = Canvas.GetCurrentLayout();
+            SetProject(_project!.WithPatch(patch).WithLayout(_currentFile.Name, layout));
             DialogProjectSerializer.SaveToFile(_projectPath, _project);
             Canvas.IsModified = false;
             IsModified = false;
@@ -543,6 +544,13 @@ public partial class MainWindowViewModel : ObservableObject
             _currentFile = file;
             var conversation = _provider.LoadConversation(file);
             Canvas.Load(conversation);
+
+            // Restore saved layout if the project has positions for this conversation.
+            // Runs after AutoLayout so it always wins over the algorithmic positions.
+            var savedLayout = _project?.GetLayout(file.Name);
+            if (savedLayout is not null)
+                Canvas.RestoreLayout(savedLayout);
+
             Detail.Clear();
             IsModified = false;
             CurrentConversationName = file.Name;
