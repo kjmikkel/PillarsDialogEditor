@@ -219,59 +219,90 @@ public partial class MainWindow : Window
         return _legendWindow;
     }
 
+    // ── App-close guard ───────────────────────────────────────────────────
+    protected override void OnClosing(WindowClosingEventArgs e)
+    {
+        var vm = (MainWindowViewModel)DataContext!;
+        if (vm.IsModified && vm.CurrentConversationName is not null)
+        {
+            e.Cancel = true;
+            vm.GuardDirtyThen(Close);   // "proceed" = close the window
+            _ = ShowUnsavedChangesDialogAsync(vm);
+        }
+        else
+        {
+            base.OnClosing(e);
+        }
+    }
+
+    // ── Unsaved-changes dialog ────────────────────────────────────────────
     private async Task ShowUnsavedChangesDialogAsync(MainWindowViewModel vm)
     {
         var tcs = new TaskCompletionSource<string>();
 
+        // Resolve localised strings
+        var title   = (string)(this.FindResource("UnsavedChanges_Title") ?? "Unsaved Changes");
+        var message = string.Format(
+            (string)(this.FindResource("UnsavedChanges_Message") ?? "{0} has unsaved changes."),
+            vm.CurrentConversationName ?? "This conversation");
+        var lblSave    = (string)(this.FindResource("UnsavedChanges_Save")    ?? "Save to Project");
+        var lblDiscard = (string)(this.FindResource("UnsavedChanges_Discard") ?? "Discard Changes");
+        var lblCancel  = (string)(this.FindResource("UnsavedChanges_Cancel")  ?? "Stay Here");
+
         var dialog = new Window
         {
-            Title  = "Unsaved Changes",
-            Width  = 380,
-            Height = 150,
+            Title  = title,
+            Icon   = Icon,
+            Width  = 420,
+            SizeToContent = SizeToContent.Height,
             WindowStartupLocation = WindowStartupLocation.CenterOwner,
             CanResize = false,
-            Background = new SolidColorBrush(Color.Parse("#2d2d2d")),
-            SystemDecorations = SystemDecorations.BorderOnly
+            Background = new SolidColorBrush(Color.Parse("#252525")),
         };
 
-        var panel = new StackPanel { Margin = new Thickness(16) };
+        var panel = new StackPanel { Margin = new Thickness(20) };
 
         panel.Children.Add(new TextBlock
         {
-            Text = "You have unsaved changes. Save before switching conversations?",
-            Foreground = Brushes.White,
+            Text         = message,
+            Foreground   = new SolidColorBrush(Color.Parse("#e8e8e8")),
+            FontSize     = 13,
             TextWrapping = TextWrapping.Wrap,
-            Margin = new Thickness(0, 0, 0, 16)
+            Margin       = new Thickness(0, 0, 0, 20),
         });
 
-        var buttons = new StackPanel { Orientation = Orientation.Horizontal };
+        var buttons = new StackPanel
+        {
+            Orientation = Orientation.Horizontal,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            Spacing = 8,
+        };
 
-        void MakeBtn(string label, string result)
+        Button MakeBtn(string label, string result, string bg = "#333")
         {
             var btn = new Button
             {
-                Content = label,
-                Margin  = new Thickness(0, 0, 8, 0),
-                Padding = new Thickness(12, 4),
-                Background = new SolidColorBrush(Color.Parse("#444")),
-                Foreground = Brushes.White,
-                BorderThickness = new Thickness(0)
+                Content         = label,
+                Padding         = new Thickness(16, 6),
+                Background      = new SolidColorBrush(Color.Parse(bg)),
+                Foreground      = Brushes.White,
+                BorderThickness = new Thickness(0),
+                FontSize        = 12,
             };
             btn.Click += (_, _) => { tcs.TrySetResult(result); dialog.Close(); };
-            buttons.Children.Add(btn);
+            return btn;
         }
 
-        MakeBtn("Save",    "save");
-        MakeBtn("Discard", "discard");
-        MakeBtn("Cancel",  "cancel");
+        buttons.Children.Add(MakeBtn(lblCancel,  "cancel"));
+        buttons.Children.Add(MakeBtn(lblDiscard, "discard"));
+        buttons.Children.Add(MakeBtn(lblSave,    "save", "#1a5276"));
 
         panel.Children.Add(buttons);
         dialog.Content = panel;
 
         await dialog.ShowDialog(this);
 
-        var choice = await tcs.Task;
-        switch (choice)
+        switch (await tcs.Task)
         {
             case "save":    vm.SaveAndProceed();          break;
             case "discard": vm.DiscardAndProceed();       break;

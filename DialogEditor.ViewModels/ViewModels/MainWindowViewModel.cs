@@ -74,22 +74,46 @@ public partial class MainWindowViewModel : ObservableObject
 
     // ── Unsaved-changes navigation guard ──────────────────────────────────
     private ConversationFile? _pendingFile;
+    private Action?           _pendingAction;   // for close/project-switch continuations
     public event Action? UnsavedChangesRequested;
+
+    /// Guard that fires UnsavedChangesRequested if dirty, otherwise runs action immediately.
+    public void GuardDirtyThen(Action proceed)
+    {
+        if (IsModified && CurrentConversationName is not null)
+        {
+            _pendingAction = proceed;
+            UnsavedChangesRequested?.Invoke();
+        }
+        else
+        {
+            proceed();
+        }
+    }
 
     public void SaveAndProceed()
     {
         SaveCommand.Execute(null);
-        if (_pendingFile is not null) LoadConversationFile(_pendingFile);
-        _pendingFile = null;
+        Proceed();
     }
 
-    public void DiscardAndProceed()
+    public void DiscardAndProceed() => Proceed();
+
+    public void CancelPendingNavigation()
     {
-        if (_pendingFile is not null) LoadConversationFile(_pendingFile);
-        _pendingFile = null;
+        _pendingFile   = null;
+        _pendingAction = null;
     }
 
-    public void CancelPendingNavigation() => _pendingFile = null;
+    private void Proceed()
+    {
+        var file   = _pendingFile;
+        var action = _pendingAction;
+        _pendingFile   = null;
+        _pendingAction = null;
+        if (file   is not null) LoadConversationFile(file);
+        action?.Invoke();
+    }
 
     // ── Project open state ────────────────────────────────────────────────
     public bool IsProjectOpen => _project is not null;
@@ -207,7 +231,10 @@ public partial class MainWindowViewModel : ObservableObject
 
     // ── Project — New / Open / Save ───────────────────────────────────────
     [RelayCommand]
-    private async Task NewProject()
+    private void NewProject()
+        => GuardDirtyThen(() => _ = DoNewProject());
+
+    private async Task DoNewProject()
     {
         var path = await _filePicker.PickSaveFileAsync(
             Loc.Get("Dialog_NewProject"),
@@ -226,7 +253,10 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private async Task OpenProject()
+    private void OpenProject()
+        => GuardDirtyThen(() => _ = DoOpenProject());
+
+    private async Task DoOpenProject()
     {
         var path = await _filePicker.PickOpenFileAsync(
             Loc.Get("Dialog_OpenProject"),

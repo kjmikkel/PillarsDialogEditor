@@ -293,10 +293,14 @@
     <sys:String x:Key="Dialog_SelectBackupFolder">Select backup destination folder</sys:String>
 
     <!-- ─── Editing — unsaved-changes prompt ────────────────────────────── -->
-    <sys:String x:Key="UnsavedChanges_Message">You have unsaved changes. Save before switching conversations?</sys:String>
-    <sys:String x:Key="UnsavedChanges_Save">Save</sys:String>
-    <sys:String x:Key="UnsavedChanges_Discard">Discard</sys:String>
-    <sys:String x:Key="UnsavedChanges_Cancel">Cancel</sys:String>
+    <!-- {0} = conversation name -->
+    <sys:String x:Key="UnsavedChanges_Title">Unsaved Changes</sys:String>
+    <sys:String x:Key="UnsavedChanges_Message">'{0}' has unsaved changes.
+
+Saving records your edits to the open project — game files are not touched until you run Test Patch (F5).</sys:String>
+    <sys:String x:Key="UnsavedChanges_Save">Save to Project</sys:String>
+    <sys:String x:Key="UnsavedChanges_Discard">Discard Changes</sys:String>
+    <sys:String x:Key="UnsavedChanges_Cancel">Stay Here</sys:String>
 
     <!-- ─── Detail panel — editable field labels ────────────────────────── -->
     <sys:String x:Key="PropertyRow_ListenerGuid">Listener GUID</sys:String>
