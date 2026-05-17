@@ -10,22 +10,30 @@ public partial class ParameterValueViewModel : ObservableObject
     public string Name        { get; init; } = string.Empty;
     public string Description { get; init; } = string.Empty;
     public string Type        { get; init; } = string.Empty;
+    public IReadOnlyList<string>? Options { get; init; }
 
     [ObservableProperty] private string _value = string.Empty;
 
     // For the condition editor window
-    public bool   IsEnum      => Type.StartsWith("Enum:") || Type == "Operator" || Type == "Boolean";
+    public bool IsEnum
+        => (Options is { Count: > 0 }) || Type == "Operator" || Type == "Boolean";
     public bool   IsText      => !IsEnum;
     public bool   HasTypeHint => !string.IsNullOrEmpty(TypeHint);
 
-    public IReadOnlyList<string> EnumOptions => Type switch
+    public IReadOnlyList<string> EnumOptions
     {
-        "Operator"   => ["EqualTo", "NotEqualTo", "GreaterThan", "LessThan",
-                         "GreaterThanOrEqualTo", "LessThanOrEqualTo"],
-        "Boolean"    => ["true", "false"],
-        _ when Type.StartsWith("Enum:") => [],   // unknown enum — fall back to text
-        _ => []
-    };
+        get
+        {
+            if (Options is { Count: > 0 }) return Options;
+            return Type switch
+            {
+                "Operator" => ["EqualTo", "NotEqualTo", "GreaterThan", "LessThan",
+                               "GreaterThanOrEqualTo", "LessThanOrEqualTo"],
+                "Boolean"  => ["true", "false"],
+                _ => []
+            };
+        }
+    }
 
     public string TypeHint => Type switch
     {
@@ -75,6 +83,7 @@ public partial class ConditionRowViewModel : ObservableObject
                     Name        = p.Name,
                     Description = p.Description,
                     Type        = p.Type,
+                    Options     = p.Options,
                     Value       = i < leaf.Parameters.Count ? leaf.Parameters[i] : p.Default,
                 }));
         }

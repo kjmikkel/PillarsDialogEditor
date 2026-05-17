@@ -123,7 +123,8 @@
     "games": ["poe1", "poe2"],
     "description": "True if the player character is the specified class.",
     "parameters": [
-      { "name": "Class", "type": "Enum:CharacterStats+Class", "description": "Class to test.", "default": "Fighter" }
+      { "name": "Class", "type": "Enum:CharacterStats+Class", "description": "Class to test.", "default": "Fighter",
+        "options": ["Fighter","Rogue","Priest","Wizard","Barbarian","Ranger","Druid","Paladin","Monk","Cipher","Chanter"] }
     ]
   },
   {
@@ -134,7 +135,8 @@
     "description": "True if the specified character is the given class.",
     "parameters": [
       { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
-      { "name": "Class", "type": "Enum:CharacterStats+Class", "description": "Class to test.", "default": "Fighter" }
+      { "name": "Class", "type": "Enum:CharacterStats+Class", "description": "Class to test.", "default": "Fighter",
+        "options": ["Fighter","Rogue","Priest","Wizard","Barbarian","Ranger","Druid","Paladin","Monk","Cipher","Chanter"] }
     ]
   },
   {
@@ -144,7 +146,8 @@
     "games": ["poe1", "poe2"],
     "description": "True if the player character is the specified race.",
     "parameters": [
-      { "name": "Race", "type": "Enum:CharacterStats+Race", "description": "Race to test.", "default": "Human" }
+      { "name": "Race", "type": "Enum:CharacterStats+Race", "description": "Race to test.", "default": "Human",
+        "options": ["Human","Elf","Dwarf","Godlike","Orlan","Aumaua","Beast","Primordial","Spirit","Vessel","Wilder"] }
     ]
   },
   {
@@ -154,7 +157,8 @@
     "games": ["poe1", "poe2"],
     "description": "True if the player character is the specified subrace.",
     "parameters": [
-      { "name": "Subrace", "type": "Enum:CharacterStats+Subrace", "description": "Subrace to test.", "default": "Meadow_Human" }
+      { "name": "Subrace", "type": "Enum:CharacterStats+Subrace", "description": "Subrace to test.", "default": "Meadow_Human",
+        "options": ["Meadow_Human","Ocean_Human","Savannah_Human","Wood_Elf","Snow_Elf","Mountain_Dwarf","Boreal_Dwarf","Death_Godlike","Fire_Godlike","Nature_Godlike","Moon_Godlike","Hearth_Orlan","Wild_Orlan","Coastal_Aumaua","Island_Aumaua","Avian_Godlike","Advanced_Construct"] }
     ]
   },
   {
@@ -164,7 +168,8 @@
     "games": ["poe1", "poe2"],
     "description": "True if the player character is the specified gender.",
     "parameters": [
-      { "name": "Gender", "type": "Enum:Gender", "description": "Gender to test.", "default": "Male" }
+      { "name": "Gender", "type": "Enum:Gender", "description": "Gender to test.", "default": "Male",
+        "options": ["Male","Female","Neuter"] }
     ]
   },
   {
@@ -174,7 +179,8 @@
     "games": ["poe1", "poe2"],
     "description": "True if the player character has the specified background.",
     "parameters": [
-      { "name": "Background", "type": "Enum:CharacterStats+Background", "description": "Background to test.", "default": "0" }
+      { "name": "Background", "type": "Enum:CharacterStats+Background", "description": "Background to test.", "default": "Aristocrat",
+        "options": ["Aristocrat","Artist","Colonist","Dissident","Drifter","Explorer","Hunter","Laborer","Mercenary","Merchant","Mystic","Philosopher","Priest","Raider","Slave","Scholar","Scientist","Farmer","Soldier","Midwife","Gentry","Trapper"] }
     ]
   },
   {
@@ -184,7 +190,8 @@
     "games": ["poe1", "poe2"],
     "description": "True if the player character is from the specified culture.",
     "parameters": [
-      { "name": "Culture", "type": "Enum:CharacterStats+Culture", "description": "Culture to test.", "default": "Aedyr" }
+      { "name": "Culture", "type": "Enum:CharacterStats+Culture", "description": "Culture to test.", "default": "Aedyr",
+        "options": ["Aedyr","DeadfireArchipelago","IxamitlPlains","OldVailia","Ruatai","TheLivingLands","TheWhiteThatWends","TheDyrwood","TheVailianRepublics","Nassitaq","EirGlanfath"] }
     ]
   },
   {
@@ -194,7 +201,8 @@
     "games": ["poe1", "poe2"],
     "description": "Tests the player character's skill score against a value.",
     "parameters": [
-      { "name": "Skill Type", "type": "Enum:CharacterStats+SkillType", "description": "Skill to test.", "default": "Stealth" },
+      { "name": "Skill Type", "type": "Enum:CharacterStats+SkillType", "description": "Skill to test.", "default": "Stealth",
+        "options": ["Stealth","Athletics","Lore","Mechanics","Survival","Crafting"] },
       { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
       { "name": "Value", "type": "Int32", "description": "Skill value to compare against.", "default": "0" }
     ]
@@ -207,7 +215,8 @@
     "description": "Tests a character's skill score against a value.",
     "parameters": [
       { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
-      { "name": "Skill Type", "type": "Enum:CharacterStats+SkillType", "description": "Skill to test.", "default": "Stealth" },
+      { "name": "Skill Type", "type": "Enum:CharacterStats+SkillType", "description": "Skill to test.", "default": "Stealth",
+        "options": ["Stealth","Athletics","Lore","Mechanics","Survival","Crafting"] },
       { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
       { "name": "Value", "type": "Int32", "description": "Skill value to compare against.", "default": "0" }
     ]
@@ -219,7 +228,8 @@
     "games": ["poe1", "poe2"],
     "description": "Tests the player character's attribute score (Might, Resolve, etc.) against a value.",
     "parameters": [
-      { "name": "Attribute", "type": "Enum:CharacterStats+AttributeScoreType", "description": "Attribute to test.", "default": "Resolve" },
+      { "name": "Attribute", "type": "Enum:CharacterStats+AttributeScoreType", "description": "Attribute to test.", "default": "Resolve",
+        "options": ["Resolve","Might","Dexterity","Intellect","Constitution","Perception"] },
       { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
       { "name": "Value", "type": "Int32", "description": "Attribute value to compare against.", "default": "0" }
     ]
@@ -266,7 +276,8 @@
     "description": "True if the specified character worships the given deity.",
     "parameters": [
       { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
-      { "name": "Deity", "type": "Enum:Religion+Deity", "description": "Deity to test.", "default": "Berath" }
+      { "name": "Deity", "type": "Enum:Religion+Deity", "description": "Deity to test.", "default": "Berath",
+        "options": ["Berath","Eothas","Magran","Skaen","Wael"] }
     ]
   },
   {
@@ -277,7 +288,8 @@
     "description": "True if the specified character belongs to the given Paladin order.",
     "parameters": [
       { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
-      { "name": "Order", "type": "Enum:Religion+PaladinOrder", "description": "Paladin order to test.", "default": "BleakWalkers" }
+      { "name": "Order", "type": "Enum:Religion+PaladinOrder", "description": "Paladin order to test.", "default": "BleakWalkers",
+        "options": ["BleakWalkers","DarcozziPaladini","GoldpactKnights","KindWayfarers","ShieldbearersOfStElcga","FrermasMesCancSuolias"] }
     ]
   },
   {
@@ -287,8 +299,10 @@
     "games": ["poe1", "poe2"],
     "description": "True if the player's disposition on the given axis meets or exceeds the specified rank.",
     "parameters": [
-      { "name": "Axis", "type": "Enum:Disposition+Axis", "description": "Disposition type (e.g. Benevolent, Aggressive).", "default": "Benevolent" },
-      { "name": "Rank", "type": "Enum:Disposition+Rank", "description": "Minimum rank required.", "default": "None" }
+      { "name": "Axis", "type": "Enum:Disposition+Axis", "description": "Disposition type.", "default": "Benevolent",
+        "options": ["Benevolent","Cruel","Clever","Stoic","Aggressive","Diplomatic","Passionate","Rational","Honest","Deceptive"] },
+      { "name": "Rank", "type": "Enum:Disposition+Rank", "description": "Minimum rank required.", "default": "Rank1",
+        "options": ["None","Rank1","Rank2","Rank3"] }
     ]
   },
   {
@@ -298,8 +312,10 @@
     "games": ["poe1", "poe2"],
     "description": "True if the player's disposition on the given axis equals the specified rank exactly.",
     "parameters": [
-      { "name": "Axis", "type": "Enum:Disposition+Axis", "description": "Disposition type.", "default": "Benevolent" },
-      { "name": "Rank", "type": "Enum:Disposition+Rank", "description": "Required rank.", "default": "None" }
+      { "name": "Axis", "type": "Enum:Disposition+Axis", "description": "Disposition type.", "default": "Benevolent",
+        "options": ["Benevolent","Cruel","Clever","Stoic","Aggressive","Diplomatic","Passionate","Rational","Honest","Deceptive"] },
+      { "name": "Rank", "type": "Enum:Disposition+Rank", "description": "Required rank.", "default": "Rank1",
+        "options": ["None","Rank1","Rank2","Rank3"] }
     ]
   },
   {
@@ -309,8 +325,10 @@
     "games": ["poe1", "poe2"],
     "description": "True if the player's reputation rank with a named faction exactly matches the given rank.",
     "parameters": [
-      { "name": "Faction Name", "type": "Enum:FactionName", "description": "Faction to check.", "default": "None" },
-      { "name": "Axis", "type": "Enum:Reputation+Axis", "description": "Positive or Negative axis.", "default": "Positive" },
+      { "name": "Faction Name", "type": "Enum:FactionName", "description": "Faction to check.", "default": "GildedVale",
+        "options": ["GildedVale","DefianceBay","Dyrford","TwinElms","KightsOfTheCrucible","TheDozens","DunrydRow","HouseDoemenel","EthikNol","OvatesOfTheGoldenGrove","TheFangs","Stalwart"] },
+      { "name": "Axis", "type": "Enum:Reputation+Axis", "description": "Positive or Negative axis.", "default": "Positive",
+        "options": ["Positive","Negative"] },
       { "name": "Rank", "type": "Int32", "description": "Rank to compare.", "default": "0" }
     ]
   },
@@ -321,8 +339,10 @@
     "games": ["poe1", "poe2"],
     "description": "True if the player's reputation rank with a named faction meets or exceeds the given rank.",
     "parameters": [
-      { "name": "Faction Name", "type": "Enum:FactionName", "description": "Faction to check.", "default": "None" },
-      { "name": "Axis", "type": "Enum:Reputation+Axis", "description": "Positive or Negative axis.", "default": "Positive" },
+      { "name": "Faction Name", "type": "Enum:FactionName", "description": "Faction to check.", "default": "GildedVale",
+        "options": ["GildedVale","DefianceBay","Dyrford","TwinElms","KightsOfTheCrucible","TheDozens","DunrydRow","HouseDoemenel","EthikNol","OvatesOfTheGoldenGrove","TheFangs","Stalwart"] },
+      { "name": "Axis", "type": "Enum:Reputation+Axis", "description": "Positive or Negative axis.", "default": "Positive",
+        "options": ["Positive","Negative"] },
       { "name": "Rank", "type": "Int32", "description": "Minimum rank required.", "default": "0" }
     ]
   },
@@ -442,7 +462,8 @@
     "games": ["poe1"],
     "description": "Tests how many party members meet a skill threshold.",
     "parameters": [
-      { "name": "Skill Type", "type": "Enum:CharacterStats+SkillType", "description": "Skill to test.", "default": "Stealth" },
+      { "name": "Skill Type", "type": "Enum:CharacterStats+SkillType", "description": "Skill to test.", "default": "Stealth",
+        "options": ["Stealth","Athletics","Lore","Mechanics","Survival","Crafting"] },
       { "name": "Skill Operator", "type": "Operator", "description": "Skill comparison operator.", "default": "EqualTo" },
       { "name": "Skill Value", "type": "Int32", "description": "Skill threshold.", "default": "0" },
       { "name": "Party Operator", "type": "Operator", "description": "Operator for the party member count.", "default": "EqualTo" },
@@ -456,7 +477,8 @@
     "games": ["poe2"],
     "description": "True if the crew's morale is at the specified state.",
     "parameters": [
-      { "name": "Morale State", "type": "Enum:MoraleStateType", "description": "Morale state to check.", "default": "Lively" }
+      { "name": "Morale State", "type": "Enum:MoraleStateType", "description": "Morale state to check.", "default": "Lively",
+        "options": ["Lively","Content","Concerned","Angry","Mutinous"] }
     ]
   },
   {
@@ -466,7 +488,8 @@
     "games": ["poe2"],
     "description": "Tests a player ship attribute (speed, armour, etc.) against a value.",
     "parameters": [
-      { "name": "Attribute", "type": "Enum:ShipAttributeType", "description": "Ship attribute to test.", "default": "CombatSpeed" },
+      { "name": "Attribute", "type": "Enum:ShipAttributeType", "description": "Ship attribute to test.", "default": "CombatSpeed",
+        "options": ["CombatSpeed","SailHealth","HullHealth","TravelSpeed"] },
       { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "GreaterThanOrEqualTo" },
       { "name": "Value", "type": "Int32", "description": "Attribute value to compare against.", "default": "0" }
     ]
@@ -500,8 +523,9 @@
     "games": ["poe2"],
     "description": "Tests whether a world map location has a specified visibility state.",
     "parameters": [
-      { "name": "Map Type", "type": "Enum:MapType", "description": "Map location to check.", "default": "None" },
-      { "name": "Visibility", "type": "Enum:MapVisibilityType", "description": "Visibility state to test.", "default": "Unlocked" }
+      { "name": "Map Type", "type": "String", "description": "Map type enum value (e.g. Global, DesignGlobal, or a specific area name).", "default": "Global" },
+      { "name": "Visibility", "type": "Enum:MapVisibilityType", "description": "Visibility state to test.", "default": "Unlocked",
+        "options": ["Locked","Unlocked","Hidden","DeveloperOnly","Unidentified"] }
     ]
   }
 ]

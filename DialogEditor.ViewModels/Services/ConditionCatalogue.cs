@@ -8,7 +8,8 @@ public record ConditionParameter(
     string Name,
     string Type,
     string Description,
-    string Default);
+    string Default,
+    IReadOnlyList<string>? Options = null);
 
 public record ConditionEntry(
     string MethodName,
