@@ -1,0 +1,507 @@
+[
+  {
+    "methodName": "IsGlobalValue",
+    "displayName": "Is Global Value",
+    "category": "Globals",
+    "games": ["poe1", "poe2"],
+    "description": "Tests a named global integer flag against a value.",
+    "parameters": [
+      { "name": "Tag", "type": "GlobalVariable", "description": "Name of the global variable to query.", "default": "GlobalTag" },
+      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
+      { "name": "Value", "type": "Int32", "description": "Integer value to compare against.", "default": "0" }
+    ]
+  },
+  {
+    "methodName": "CompareGlobals",
+    "displayName": "Compare Globals",
+    "category": "Globals",
+    "games": ["poe1", "poe2"],
+    "description": "Compares two named global variables against each other.",
+    "parameters": [
+      { "name": "Global 1", "type": "GlobalVariable", "description": "First global variable.", "default": "GlobalTag1" },
+      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
+      { "name": "Global 2", "type": "GlobalVariable", "description": "Second global variable.", "default": "GlobalTag2" }
+    ]
+  },
+  {
+    "methodName": "HasConversationNodeBeenPlayed",
+    "displayName": "Has Conversation Node Been Played",
+    "category": "Conversation",
+    "games": ["poe1", "poe2"],
+    "description": "True if the specified node in a conversation has already been shown to the player.",
+    "parameters": [
+      { "name": "Conversation", "type": "Conversation", "description": "Name of the conversation file.", "default": "" },
+      { "name": "Node ID", "type": "Int32", "description": "Integer node ID within that conversation.", "default": "0" }
+    ]
+  },
+  {
+    "methodName": "IsQuestOnNode",
+    "displayName": "Is Quest On Node",
+    "category": "Quest",
+    "games": ["poe1", "poe2"],
+    "description": "True if the specified quest is currently on the given node.",
+    "parameters": [
+      { "name": "Quest Name", "type": "Quest", "description": "Name of the quest.", "default": "" },
+      { "name": "Node ID", "type": "Int32", "description": "Quest node ID.", "default": "0" }
+    ]
+  },
+  {
+    "methodName": "IsQuestEventTriggered",
+    "displayName": "Is Quest Event Triggered",
+    "category": "Quest",
+    "games": ["poe1", "poe2"],
+    "description": "True if the specified quest event has been triggered.",
+    "parameters": [
+      { "name": "Quest Name", "type": "Quest", "description": "Name of the quest.", "default": "" },
+      { "name": "Event ID", "type": "Int32", "description": "Quest event ID.", "default": "-1" }
+    ]
+  },
+  {
+    "methodName": "IsQuestAddendumTriggered",
+    "displayName": "Is Quest Addendum Triggered",
+    "category": "Quest",
+    "games": ["poe1", "poe2"],
+    "description": "True if the specified quest addendum has been triggered.",
+    "parameters": [
+      { "name": "Quest Name", "type": "Quest", "description": "Name of the quest.", "default": "" },
+      { "name": "Addendum ID", "type": "Int32", "description": "Addendum ID.", "default": "0" }
+    ]
+  },
+  {
+    "methodName": "IsQuestEndStateTriggered",
+    "displayName": "Is Quest End State Triggered",
+    "category": "Quest",
+    "games": ["poe1", "poe2"],
+    "description": "True if the specified quest end state has been triggered.",
+    "parameters": [
+      { "name": "Quest Name", "type": "Quest", "description": "Name of the quest.", "default": "" },
+      { "name": "End State ID", "type": "Int32", "description": "End state ID.", "default": "0" }
+    ]
+  },
+  {
+    "methodName": "IsQuestFailed",
+    "displayName": "Is Quest Failed",
+    "category": "Quest",
+    "games": ["poe1", "poe2"],
+    "description": "True if the specified quest has been failed.",
+    "parameters": [
+      { "name": "Quest Name", "type": "Quest", "description": "Name of the quest.", "default": "" }
+    ]
+  },
+  {
+    "methodName": "IsCompanionActiveInParty",
+    "displayName": "Is Companion Active In Party",
+    "category": "General",
+    "games": ["poe1", "poe2"],
+    "description": "True if the specified companion is currently active in the party.",
+    "parameters": [
+      { "name": "Companion", "type": "ObjectGuid", "description": "GUID of the companion object.", "default": "" }
+    ]
+  },
+  {
+    "methodName": "IsAnyCompanionActiveInParty",
+    "displayName": "Is Any Companion Active In Party",
+    "category": "General",
+    "games": ["poe1", "poe2"],
+    "description": "True if any companion is currently active in the party.",
+    "parameters": []
+  },
+  {
+    "methodName": "IsActive",
+    "displayName": "Is Active",
+    "category": "General",
+    "games": ["poe1", "poe2"],
+    "description": "True if the specified game object is active.",
+    "parameters": [
+      { "name": "Object", "type": "ObjectGuid", "description": "GUID of the object to check.", "default": "" }
+    ]
+  },
+  {
+    "methodName": "IsPlayerClass",
+    "displayName": "Is Player Class",
+    "category": "RPG",
+    "games": ["poe1", "poe2"],
+    "description": "True if the player character is the specified class.",
+    "parameters": [
+      { "name": "Class", "type": "Enum:CharacterStats+Class", "description": "Class to test.", "default": "Fighter" }
+    ]
+  },
+  {
+    "methodName": "IsClass",
+    "displayName": "Is Class",
+    "category": "RPG",
+    "games": ["poe1", "poe2"],
+    "description": "True if the specified character is the given class.",
+    "parameters": [
+      { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
+      { "name": "Class", "type": "Enum:CharacterStats+Class", "description": "Class to test.", "default": "Fighter" }
+    ]
+  },
+  {
+    "methodName": "IsPlayerRace",
+    "displayName": "Is Player Race",
+    "category": "RPG",
+    "games": ["poe1", "poe2"],
+    "description": "True if the player character is the specified race.",
+    "parameters": [
+      { "name": "Race", "type": "Enum:CharacterStats+Race", "description": "Race to test.", "default": "Human" }
+    ]
+  },
+  {
+    "methodName": "IsPlayerSubrace",
+    "displayName": "Is Player Subrace",
+    "category": "RPG",
+    "games": ["poe1", "poe2"],
+    "description": "True if the player character is the specified subrace.",
+    "parameters": [
+      { "name": "Subrace", "type": "Enum:CharacterStats+Subrace", "description": "Subrace to test.", "default": "Meadow_Human" }
+    ]
+  },
+  {
+    "methodName": "IsPlayerGender",
+    "displayName": "Is Player Gender",
+    "category": "RPG",
+    "games": ["poe1", "poe2"],
+    "description": "True if the player character is the specified gender.",
+    "parameters": [
+      { "name": "Gender", "type": "Enum:Gender", "description": "Gender to test.", "default": "Male" }
+    ]
+  },
+  {
+    "methodName": "IsPlayerBackground",
+    "displayName": "Is Player Background",
+    "category": "RPG",
+    "games": ["poe1", "poe2"],
+    "description": "True if the player character has the specified background.",
+    "parameters": [
+      { "name": "Background", "type": "Enum:CharacterStats+Background", "description": "Background to test.", "default": "0" }
+    ]
+  },
+  {
+    "methodName": "IsPlayerCulture",
+    "displayName": "Is Player Culture",
+    "category": "RPG",
+    "games": ["poe1", "poe2"],
+    "description": "True if the player character is from the specified culture.",
+    "parameters": [
+      { "name": "Culture", "type": "Enum:CharacterStats+Culture", "description": "Culture to test.", "default": "Aedyr" }
+    ]
+  },
+  {
+    "methodName": "IsPlayerSkillValue",
+    "displayName": "Is Player Skill Value",
+    "category": "RPG",
+    "games": ["poe1", "poe2"],
+    "description": "Tests the player character's skill score against a value.",
+    "parameters": [
+      { "name": "Skill Type", "type": "Enum:CharacterStats+SkillType", "description": "Skill to test.", "default": "Stealth" },
+      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
+      { "name": "Value", "type": "Int32", "description": "Skill value to compare against.", "default": "0" }
+    ]
+  },
+  {
+    "methodName": "IsSkillValue",
+    "displayName": "Is Skill Value",
+    "category": "RPG",
+    "games": ["poe1", "poe2"],
+    "description": "Tests a character's skill score against a value.",
+    "parameters": [
+      { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
+      { "name": "Skill Type", "type": "Enum:CharacterStats+SkillType", "description": "Skill to test.", "default": "Stealth" },
+      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
+      { "name": "Value", "type": "Int32", "description": "Skill value to compare against.", "default": "0" }
+    ]
+  },
+  {
+    "methodName": "IsPlayerAttributeScoreValue",
+    "displayName": "Is Player Attribute Score Value",
+    "category": "RPG",
+    "games": ["poe1", "poe2"],
+    "description": "Tests the player character's attribute score (Might, Resolve, etc.) against a value.",
+    "parameters": [
+      { "name": "Attribute", "type": "Enum:CharacterStats+AttributeScoreType", "description": "Attribute to test.", "default": "Resolve" },
+      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
+      { "name": "Value", "type": "Int32", "description": "Attribute value to compare against.", "default": "0" }
+    ]
+  },
+  {
+    "methodName": "IsPlayerLevel",
+    "displayName": "Is Player Level",
+    "category": "RPG",
+    "games": ["poe1"],
+    "description": "Tests the player character's level against a value.",
+    "parameters": [
+      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
+      { "name": "Target Level", "type": "Int32", "description": "Level number to compare against.", "default": "1" }
+    ]
+  },
+  {
+    "methodName": "IsLevel",
+    "displayName": "Is Level",
+    "category": "RPG",
+    "games": ["poe2"],
+    "description": "Tests a character's level against a value.",
+    "parameters": [
+      { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
+      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
+      { "name": "Target Level", "type": "Int32", "description": "Level number to compare against.", "default": "1" }
+    ]
+  },
+  {
+    "methodName": "HasTalentOrAbility",
+    "displayName": "Has Talent or Ability",
+    "category": "RPG",
+    "games": ["poe1"],
+    "description": "True if the specified character has a talent or ability by name.",
+    "parameters": [
+      { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
+      { "name": "Ability Name", "type": "String", "description": "Name of the ability or talent.", "default": "AbilityName" }
+    ]
+  },
+  {
+    "methodName": "IsDeity",
+    "displayName": "Is Deity",
+    "category": "RPG",
+    "games": ["poe1", "poe2"],
+    "description": "True if the specified character worships the given deity.",
+    "parameters": [
+      { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
+      { "name": "Deity", "type": "Enum:Religion+Deity", "description": "Deity to test.", "default": "Berath" }
+    ]
+  },
+  {
+    "methodName": "IsPaladinOrder",
+    "displayName": "Is Paladin Order",
+    "category": "RPG",
+    "games": ["poe1", "poe2"],
+    "description": "True if the specified character belongs to the given Paladin order.",
+    "parameters": [
+      { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
+      { "name": "Order", "type": "Enum:Religion+PaladinOrder", "description": "Paladin order to test.", "default": "BleakWalkers" }
+    ]
+  },
+  {
+    "methodName": "DispositionGreaterOrEqual",
+    "displayName": "Disposition Greater or Equal",
+    "category": "Faction",
+    "games": ["poe1", "poe2"],
+    "description": "True if the player's disposition on the given axis meets or exceeds the specified rank.",
+    "parameters": [
+      { "name": "Axis", "type": "Enum:Disposition+Axis", "description": "Disposition type (e.g. Benevolent, Aggressive).", "default": "Benevolent" },
+      { "name": "Rank", "type": "Enum:Disposition+Rank", "description": "Minimum rank required.", "default": "None" }
+    ]
+  },
+  {
+    "methodName": "DispositionEqual",
+    "displayName": "Disposition Equal",
+    "category": "Faction",
+    "games": ["poe1", "poe2"],
+    "description": "True if the player's disposition on the given axis equals the specified rank exactly.",
+    "parameters": [
+      { "name": "Axis", "type": "Enum:Disposition+Axis", "description": "Disposition type.", "default": "Benevolent" },
+      { "name": "Rank", "type": "Enum:Disposition+Rank", "description": "Required rank.", "default": "None" }
+    ]
+  },
+  {
+    "methodName": "ReputationRankByTagEquals",
+    "displayName": "Tagged Reputation Rank Equals",
+    "category": "Faction",
+    "games": ["poe1", "poe2"],
+    "description": "True if the player's reputation rank with a named faction exactly matches the given rank.",
+    "parameters": [
+      { "name": "Faction Name", "type": "Enum:FactionName", "description": "Faction to check.", "default": "None" },
+      { "name": "Axis", "type": "Enum:Reputation+Axis", "description": "Positive or Negative axis.", "default": "Positive" },
+      { "name": "Rank", "type": "Int32", "description": "Rank to compare.", "default": "0" }
+    ]
+  },
+  {
+    "methodName": "ReputationTagRankGreater",
+    "displayName": "Tagged Reputation Rank Greater or Equal",
+    "category": "Faction",
+    "games": ["poe1", "poe2"],
+    "description": "True if the player's reputation rank with a named faction meets or exceeds the given rank.",
+    "parameters": [
+      { "name": "Faction Name", "type": "Enum:FactionName", "description": "Faction to check.", "default": "None" },
+      { "name": "Axis", "type": "Enum:Reputation+Axis", "description": "Positive or Negative axis.", "default": "Positive" },
+      { "name": "Rank", "type": "Int32", "description": "Minimum rank required.", "default": "0" }
+    ]
+  },
+  {
+    "methodName": "IsItemCount",
+    "displayName": "Is Item Count",
+    "category": "Items",
+    "games": ["poe1", "poe2"],
+    "description": "Tests how many of a named item the party has.",
+    "parameters": [
+      { "name": "Item Name", "type": "String", "description": "Name of the item.", "default": "ItemName" },
+      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
+      { "name": "Count", "type": "Int32", "description": "Item count to compare against.", "default": "0" }
+    ]
+  },
+  {
+    "methodName": "IsItemEquipped",
+    "displayName": "Is Item Equipped",
+    "category": "Items",
+    "games": ["poe1", "poe2"],
+    "description": "True if the specified character has a named item equipped.",
+    "parameters": [
+      { "name": "Object", "type": "ObjectGuid", "description": "Character to check.", "default": "" },
+      { "name": "Item Name", "type": "String", "description": "Name of the item.", "default": "ItemName" }
+    ]
+  },
+  {
+    "methodName": "HasMoney",
+    "displayName": "Has Money",
+    "category": "Items",
+    "games": ["poe1", "poe2"],
+    "description": "Tests how much gold the party has.",
+    "parameters": [
+      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
+      { "name": "Amount", "type": "Int32", "description": "Gold amount to compare against.", "default": "0" }
+    ]
+  },
+  {
+    "methodName": "IsInCombat",
+    "displayName": "Is In Combat",
+    "category": "General",
+    "games": ["poe1", "poe2"],
+    "description": "True if the party is currently in combat.",
+    "parameters": []
+  },
+  {
+    "methodName": "IsCurrentlyDaytime",
+    "displayName": "Is Currently Daytime",
+    "category": "Time",
+    "games": ["poe1", "poe2"],
+    "description": "True if the current in-game time is daytime.",
+    "parameters": []
+  },
+  {
+    "methodName": "IsCurrentlyNighttime",
+    "displayName": "Is Currently Nighttime",
+    "category": "Time",
+    "games": ["poe1", "poe2"],
+    "description": "True if the current in-game time is nighttime.",
+    "parameters": []
+  },
+  {
+    "methodName": "IsCurrentTime",
+    "displayName": "Is Current Time of Day",
+    "category": "Time",
+    "games": ["poe2"],
+    "description": "Compares the current time of day (in hours) against a value.",
+    "parameters": [
+      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "GreaterThan" },
+      { "name": "Time (Hours)", "type": "Single", "description": "Hour value to compare against (0–24).", "default": "0" }
+    ]
+  },
+  {
+    "methodName": "IsEasy",
+    "displayName": "Is Easy",
+    "category": "Difficulty",
+    "games": ["poe1", "poe2"],
+    "description": "True if the current difficulty setting is Easy.",
+    "parameters": []
+  },
+  {
+    "methodName": "IsNormal",
+    "displayName": "Is Normal",
+    "category": "Difficulty",
+    "games": ["poe1", "poe2"],
+    "description": "True if the current difficulty setting is Normal.",
+    "parameters": []
+  },
+  {
+    "methodName": "IsHard",
+    "displayName": "Is Hard",
+    "category": "Difficulty",
+    "games": ["poe1", "poe2"],
+    "description": "True if the current difficulty setting is Hard.",
+    "parameters": []
+  },
+  {
+    "methodName": "IsStoryTime",
+    "displayName": "Is Story Time",
+    "category": "Difficulty",
+    "games": ["poe1", "poe2"],
+    "description": "True if the current difficulty setting is Story Time.",
+    "parameters": []
+  },
+  {
+    "methodName": "IsUserInStealth",
+    "displayName": "Is User In Stealth",
+    "category": "General",
+    "games": ["poe1", "poe2"],
+    "description": "True if the conversation's owner object is currently in stealth mode.",
+    "parameters": []
+  },
+  {
+    "methodName": "IsPartySkillValueCount",
+    "displayName": "Is Party Skill Value Count",
+    "category": "RPG",
+    "games": ["poe1"],
+    "description": "Tests how many party members meet a skill threshold.",
+    "parameters": [
+      { "name": "Skill Type", "type": "Enum:CharacterStats+SkillType", "description": "Skill to test.", "default": "Stealth" },
+      { "name": "Skill Operator", "type": "Operator", "description": "Skill comparison operator.", "default": "EqualTo" },
+      { "name": "Skill Value", "type": "Int32", "description": "Skill threshold.", "default": "0" },
+      { "name": "Party Operator", "type": "Operator", "description": "Operator for the party member count.", "default": "EqualTo" },
+      { "name": "Party Value", "type": "Int32", "description": "Number of party members who must pass.", "default": "0" }
+    ]
+  },
+  {
+    "methodName": "IsMoraleStatus",
+    "displayName": "Is Morale Status",
+    "category": "Ship Crew",
+    "games": ["poe2"],
+    "description": "True if the crew's morale is at the specified state.",
+    "parameters": [
+      { "name": "Morale State", "type": "Enum:MoraleStateType", "description": "Morale state to check.", "default": "Lively" }
+    ]
+  },
+  {
+    "methodName": "IsPlayerShipAttribute",
+    "displayName": "Is Player Ship Attribute",
+    "category": "Ships",
+    "games": ["poe2"],
+    "description": "Tests a player ship attribute (speed, armour, etc.) against a value.",
+    "parameters": [
+      { "name": "Attribute", "type": "Enum:ShipAttributeType", "description": "Ship attribute to test.", "default": "CombatSpeed" },
+      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "GreaterThanOrEqualTo" },
+      { "name": "Value", "type": "Int32", "description": "Attribute value to compare against.", "default": "0" }
+    ]
+  },
+  {
+    "methodName": "HasKeyword",
+    "displayName": "Has Keyword",
+    "category": "RPG",
+    "games": ["poe2"],
+    "description": "True if the specified character has the given keyword.",
+    "parameters": [
+      { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
+      { "name": "Keyword", "type": "GameData", "description": "Keyword to compare with.", "default": "" }
+    ]
+  },
+  {
+    "methodName": "HasStatusEffect",
+    "displayName": "Has Status Effect",
+    "category": "Targeting Filter",
+    "games": ["poe2"],
+    "description": "True if the specified character currently has the given status effect.",
+    "parameters": [
+      { "name": "Object", "type": "ObjectGuid", "description": "Character to check.", "default": "" },
+      { "name": "Status Effect", "type": "GameData", "description": "Status effect to check for.", "default": "" }
+    ]
+  },
+  {
+    "methodName": "IsMapVisibility",
+    "displayName": "Is Map Visibility",
+    "category": "World Map",
+    "games": ["poe2"],
+    "description": "Tests whether a world map location has a specified visibility state.",
+    "parameters": [
+      { "name": "Map Type", "type": "Enum:MapType", "description": "Map location to check.", "default": "None" },
+      { "name": "Visibility", "type": "Enum:MapVisibilityType", "description": "Visibility state to test.", "default": "Unlocked" }
+    ]
+  }
+]

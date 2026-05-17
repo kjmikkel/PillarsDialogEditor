@@ -8,6 +8,7 @@ namespace DialogEditor.Core.GameData;
 public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
 {
     public string GameName => "Pillars of Eternity II: Deadfire";
+    public string GameId   => "poe2";
     public string Language { get; set; } = "en";
 
     private string ExportedRoot    => Path.Combine(rootPath, "PillarsOfEternityII_Data", "exported");
