@@ -19,12 +19,19 @@
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="MinWidth"          Value="110"/>
         </Style>
-        <Style Selector="TextBlock.type-hint">
-            <Setter Property="Foreground"        Value="#555"/>
-            <Setter Property="FontSize"          Value="10"/>
+        <Style Selector="Button.type-hint">
+            <Setter Property="Background"        Value="Transparent"/>
+            <Setter Property="BorderThickness"   Value="0"/>
+            <Setter Property="Foreground"        Value="#888"/>
+            <Setter Property="FontSize"          Value="11"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Margin"            Value="4,0,0,0"/>
+            <Setter Property="Padding"           Value="2,0"/>
             <Setter Property="Cursor"            Value="Help"/>
+            <Setter Property="Focusable"         Value="False"/>
+        </Style>
+        <Style Selector="Button.type-hint:pointerover">
+            <Setter Property="Foreground" Value="#ccc"/>
         </Style>
         <Style Selector="TextBox.param-input">
             <Setter Property="Background"       Value="#141414"/>
@@ -72,7 +79,7 @@
                                 <StackPanel Spacing="6">
 
                                     <!-- Row header -->
-                                    <Grid ColumnDefinitions="64,50,*,28,28,28">
+                                    <Grid ColumnDefinitions="70,Auto,*,28,28,28">
                                         <!-- And / Or -->
                                         <ComboBox Grid.Column="0"
                                                   SelectedItem="{Binding Operator, Mode=TwoWay}"
@@ -83,27 +90,26 @@
                                                 <sys:String>Or</sys:String>
                                             </ComboBox.Items>
                                         </ComboBox>
-                                        <!-- NOT toggle -->
+                                        <!-- NOT toggle — Auto column so label never wraps -->
                                         <CheckBox Grid.Column="1"
                                                   IsChecked="{Binding Not, Mode=TwoWay}"
                                                   Content="NOT"
                                                   Foreground="#aaa" FontSize="11"
-                                                  Margin="6,0,0,0" VerticalAlignment="Center"
+                                                  Margin="8,0,8,0" VerticalAlignment="Center"
                                                   ToolTip.Tip="Negate — the condition must be FALSE"/>
                                         <!-- Display name -->
                                         <TextBlock Grid.Column="2"
                                                    Text="{Binding DisplayName}"
                                                    Foreground="#e8e8e8" FontSize="13"
                                                    FontWeight="SemiBold"
-                                                   VerticalAlignment="Center"
-                                                   Margin="10,0,0,0"/>
+                                                   VerticalAlignment="Center"/>
                                         <!-- Move up -->
                                         <Button Grid.Column="3" Content="↑"
                                                 Command="{Binding DataContext.MoveUpCommand,
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
-                                                Foreground="#555" FontSize="12" Padding="4"
+                                                Foreground="#aaa" FontSize="13" Padding="4"
                                                 ToolTip.Tip="Move condition up"/>
                                         <!-- Move down -->
                                         <Button Grid.Column="4" Content="↓"
@@ -111,7 +117,7 @@
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
-                                                Foreground="#555" FontSize="12" Padding="4"
+                                                Foreground="#aaa" FontSize="13" Padding="4"
                                                 ToolTip.Tip="Move condition down"/>
                                         <!-- Delete -->
                                         <Button Grid.Column="5" Content="✕"
@@ -119,7 +125,7 @@
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
-                                                Foreground="#666" FontSize="12" Padding="4"
+                                                Foreground="#c0392b" FontSize="13" Padding="4"
                                                 ToolTip.Tip="Remove this condition"/>
                                     </Grid>
 
@@ -146,12 +152,12 @@
                                                               SelectedItem="{Binding Value, Mode=TwoWay}"
                                                               IsVisible="{Binding IsEnum}"
                                                               ToolTip.Tip="{Binding TypeHint}"/>
-                                                    <!-- Type hint (?) -->
-                                                    <TextBlock Grid.Column="2"
-                                                               Classes="type-hint"
-                                                               Text="(?)"
-                                                               ToolTip.Tip="{Binding TypeHint}"
-                                                               IsVisible="{Binding HasTypeHint}"/>
+                                                    <!-- Type hint (?) — Button for reliable tooltip on hover -->
+                                                    <Button Grid.Column="2"
+                                                            Classes="type-hint"
+                                                            Content="(?)"
+                                                            ToolTip.Tip="{Binding TypeHint}"
+                                                            IsVisible="{Binding HasTypeHint}"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
