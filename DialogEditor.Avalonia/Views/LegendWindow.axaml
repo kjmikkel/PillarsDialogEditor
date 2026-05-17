@@ -1,0 +1,166 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DialogEditor.Avalonia.Views.LegendWindow"
+        Title="{StaticResource Legend_WindowTitle}"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="360" Height="640" MinHeight="300" MaxHeight="840"
+        CanResize="True"
+        ShowInTaskbar="False"
+        Background="#1a1a2a">
+
+    <ScrollViewer>
+        <StackPanel Margin="12,10,12,16">
+            <TextBlock Text="{StaticResource Legend_Connections}" Foreground="#888" FontSize="10" FontWeight="Bold" Margin="0,0,0,6"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <Border Width="34" Height="2.5" Background="#aaa" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock FontSize="12" VerticalAlignment="Center">
+                    <Run FontWeight="Bold" Text="{StaticResource Legend_ShowOnce}" Foreground="#ccc"/>
+                    <Run Text="{StaticResource Legend_ShowOnce_Desc}" Foreground="#888"/>
+                </TextBlock>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                <Border Width="34" Height="2.5" Background="#b8760a" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock FontSize="12" VerticalAlignment="Center">
+                    <Run FontWeight="Bold" Text="{StaticResource Legend_Always}" Foreground="#ccc"/>
+                    <Run Text="{StaticResource Legend_Always_Desc}" Foreground="#888"/>
+                </TextBlock>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                <Border Width="34" Height="2.5" Background="#555" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock FontSize="12" VerticalAlignment="Center">
+                    <Run FontWeight="Bold" Text="{StaticResource Legend_Never}" Foreground="#ccc"/>
+                    <Run Text="{StaticResource Legend_Never_Desc}" Foreground="#888"/>
+                </TextBlock>
+            </StackPanel>
+
+            <TextBlock Text="{StaticResource Legend_NodeTypes}" Foreground="#888" FontSize="10" FontWeight="Bold" Margin="0,0,0,6"/>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                <Border Width="14" Height="14" Background="#F5F0D0" CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                <TextBlock Text="{StaticResource Legend_NpcLine}" Foreground="#ccc" FontSize="12" VerticalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                <Border Width="14" Height="14" Background="#D5E8F5" CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                <TextBlock FontSize="12" VerticalAlignment="Center">
+                    <Run Text="{StaticResource Legend_PlayerChoice}" Foreground="#ccc"/>
+                    <Run Text="{StaticResource Legend_PlayerChoiceMark}" Foreground="#aaa"/>
+                </TextBlock>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                <Border Width="14" Height="14" Background="#D5F0E8" CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                <TextBlock Text="{StaticResource Legend_Narrator}" Foreground="#ccc" FontSize="12" VerticalAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,0,0,14">
+                <Border Width="14" Height="14" Background="#E0E0E0" CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                <TextBlock Text="{StaticResource Legend_ScriptAction}" Foreground="#ccc" FontSize="12" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <TextBlock Text="{StaticResource Legend_Symbols}" Foreground="#888" FontSize="10" FontWeight="Bold" Margin="0,0,0,6"/>
+            <Grid ColumnDefinitions="36,*" Margin="0,0,0,4">
+                <TextBlock Grid.Column="0" Text="⚙ N" Foreground="#e8a020" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Symbol_Conditions}" Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+            </Grid>
+            <Grid ColumnDefinitions="36,*" Margin="0,0,0,4">
+                <TextBlock Grid.Column="0" Text="♀" Foreground="#aaa" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Symbol_FemaleText}" Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+            </Grid>
+            <Grid ColumnDefinitions="36,*" Margin="0,0,0,14">
+                <TextBlock Grid.Column="0" Text="✦" Foreground="#aaa" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Symbol_PlayerChoice}" Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+            </Grid>
+
+            <TextBlock Text="{StaticResource Legend_Canvas}" Foreground="#888" FontSize="10" FontWeight="Bold" Margin="0,0,0,6"/>
+            <Grid ColumnDefinitions="72,*" Margin="0,0,0,4">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Fit}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Fit_Desc}" Foreground="#888" FontSize="12"/>
+            </Grid>
+            <Grid ColumnDefinitions="72,*" Margin="0,0,0,4">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Zoom}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Zoom_Desc}" Foreground="#888" FontSize="12"/>
+            </Grid>
+            <Grid ColumnDefinitions="72,*" Margin="0,0,0,4">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Root}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Root_Desc}" Foreground="#888" FontSize="12"/>
+            </Grid>
+            <Grid ColumnDefinitions="72,*" Margin="0,0,0,4">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Scroll}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Scroll_Desc}" Foreground="#888" FontSize="12"/>
+            </Grid>
+            <Grid ColumnDefinitions="72,*" Margin="0,0,0,14">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Drag}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Drag_Desc}" Foreground="#888" FontSize="12"/>
+            </Grid>
+
+            <TextBlock Text="{StaticResource Legend_Browser}" Foreground="#888" FontSize="10" FontWeight="Bold" Margin="0,0,0,6"/>
+            <Grid ColumnDefinitions="72,*" Margin="0,0,0,4">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_ExpandCollapse}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_ExpandCollapse_Desc}" Foreground="#888" FontSize="12"/>
+            </Grid>
+            <Grid ColumnDefinitions="72,*" Margin="0,0,0,4">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Filter}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Filter_Desc}" Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+            </Grid>
+            <Grid ColumnDefinitions="72,*" Margin="0,0,0,4">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Browser_Pin}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Browser_Pin_Desc}" Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+            </Grid>
+            <Grid ColumnDefinitions="72,*" Margin="0,0,0,14">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Browser_Flyout}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Browser_Flyout_Desc}" Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+            </Grid>
+
+            <TextBlock Text="{StaticResource Legend_Shortcuts}" Foreground="#888" FontSize="10" FontWeight="Bold" Margin="0,0,0,6"/>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Shortcut_CtrlN}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Shortcut_CtrlN_Desc}" Foreground="#888" FontSize="12"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Shortcut_CtrlO}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Shortcut_CtrlO_Desc}" Foreground="#888" FontSize="12"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Shortcut_CtrlS}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Shortcut_CtrlS_Desc}" Foreground="#888" FontSize="12"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Shortcut_CtrlShiftO}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Shortcut_CtrlShiftO_Desc}" Foreground="#888" FontSize="12"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,8">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Shortcut_CtrlComma}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Shortcut_CtrlComma_Desc}" Foreground="#888" FontSize="12"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Shortcut_CtrlZ}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Shortcut_CtrlZ_Desc}" Foreground="#888" FontSize="12"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Shortcut_CtrlY}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Shortcut_CtrlY_Desc}" Foreground="#888" FontSize="12"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_CtrlF}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_CtrlF_Desc}" Foreground="#888" FontSize="12"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,8">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Shortcut_Del}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Shortcut_Del_Desc}" Foreground="#888" FontSize="12"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Shortcut_F5}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Shortcut_F5_Desc}" Foreground="#888" FontSize="12"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Shortcut_F6}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Shortcut_F6_Desc}" Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Shortcut_CtrlShiftB}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Shortcut_CtrlShiftB_Desc}" Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Escape}" Foreground="#ccc" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Escape_Desc}" Foreground="#888" FontSize="12" TextWrapping="Wrap"/>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</Window>

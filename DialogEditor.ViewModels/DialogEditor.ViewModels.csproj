@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DialogEditor.Core\DialogEditor.Core.csproj" />
+    <ProjectReference Include="..\DialogEditor.Patch\DialogEditor.Patch.csproj" />
   </ItemGroup>
 
 </Project>

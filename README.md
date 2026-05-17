@@ -1,140 +1,157 @@
 # Pillars Dialog Editor
 
-A read-only dialog graph viewer for *Pillars of Eternity* (PoE1) and *Pillars of Eternity II: Deadfire* (PoE2). Conversations are rendered as directed node graphs; inspect conditions, scripts, text variants, and voice data without modifying any game files.
-
-Built on Avalonia — runs on Windows, macOS, and Linux.
-
----
-
-## Features
-
-### Canvas
-- **Node graph** — BFS layered auto-layout; pan with right-click drag, zoom with scroll wheel
-- **Fit / Zoom** — toolbar buttons; **Ctrl+F** focuses the search box
-- **Minimap** — bottom-right overlay; drag to pan the main view
-- **Node cards** — colour-coded header by speaker category (NPC · Player · Narrator · Script); body shows first 80 characters; footer shows condition count and ♀ badge when a female variant exists
-- **Search** — filters nodes by ID, dialogue text, or speaker name; non-matching nodes are dimmed; **Escape** clears
-- **Connection colours** — ShowOnce (grey solid), Always (amber), Never (grey dashed); each highlighted distinctly when the connected node is selected
-- **⌂ button** — jump to the root node (ID 0)
-
-### Browser
-- **Conversation tree** — grouped by folder; filter by filename (Escape clears)
-- **Expand / collapse all** — ⊞ / ⊟ buttons
-- **Pin / flyout** — 📌 pin keeps the panel open; unpinned = flyout mode (closes on click-outside or after selecting a conversation)
-- Remembers the last opened game folder across sessions
-
-### Detail panel
-- Speaker, listener, full dialogue text (default and female variant)
-- Conditions formatted as an indented AND/OR tree (logical grouping preserved)
-- Scripts (OnEnter / OnExit / OnUpdate) with full parameters
-- Display type, persistence, actor direction (PoE1), comments (PoE1)
-- Voice data: file path (PoE1 `VOFilename`, PoE2 `ExternalVO`), Has VO, Hide Speaker
-- Links to other nodes with random weight and QuestionNodeTextDisplay annotations
-
-### General
-- **Multi-language** — all localised languages discovered automatically; last-used language remembered
-- **Speaker names** — PoE2 loads all names from `speakers.gamedatabundle`; PoE1 uses companion GUIDs
-- **Dark theme** throughout, OS title bar included
-- **Legend panel** — click **?** in the toolbar for an in-app reference of all colours, symbols, and keyboard shortcuts
-- **Localised UI** — all strings in resource files (`Strings.xaml` / `Strings.axaml`); ready for translation
-- **Settings** persisted in `%LOCALAPPDATA%\PillarsDialogEditor\settings.json`
+A dialogue editing tool for *Pillars of Eternity* and *Pillars of Eternity II: Deadfire*.
+Edits are stored as semantic diff files (`.dialogproject`) rather than modifying the
+original game files directly, making the workflow safe, reversible, and shareable.
 
 ---
 
-## Requirements
+## Prerequisites
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/download)
-- **Linux only** — a few system libraries:
-  ```bash
-  # Debian / Ubuntu
-  sudo apt install libice6 libsm6 libfontconfig1
-  ```
+- [.NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)
+- A PoE1 or PoE2 installation
 
 ---
 
-## Running
+## Workflow
 
-### Quickest way
+### 1 — Open your game folder
 
-```bash
-# macOS / Linux
-./run-avalonia.sh
+**File › Open Game Folder** (`Ctrl+Shift+O`)
 
-# Windows
-dotnet run --project DialogEditor.Avalonia
-```
+Select the root directory of your PoE1 or PoE2 installation. The conversation
+browser populates in the left panel. This choice is remembered between sessions.
 
-### Via Make
-
-```bash
-make        # run
-make build
-make test
-```
-
-### Via dotnet directly
-
-```bash
-dotnet run --project DialogEditor.Avalonia
-
-dotnet test
-```
+**First-time setup:** The first time you open a game folder, the editor will ask
+you to choose a backup destination. It then copies the original conversation and
+string-table files to that location. This backup is the safety net for
+**Test › Restore Backup** and does not need to be repeated unless you want to
+update it.
 
 ---
 
-## Usage
+### 2 — Open or create a project
 
-1. Launch the application
-2. Click **Open Game Folder…** and select the game's root directory
-   - PoE1: folder containing `PillarsOfEternity_Data/`
-   - PoE2: folder containing `PillarsOfEternityII_Data/`
-3. The last-opened folder is remembered; it loads automatically on next launch
-4. Browse conversations in the left panel — click a conversation to open it on the canvas
-5. Select a language from the toolbar dropdown (reloads the open conversation immediately)
-6. Click a node on the canvas to see full details in the right panel
-7. Press **?** in the top-right toolbar for the in-app legend
+**File › New Project** (`Ctrl+N`) or **File › Open Project** (`Ctrl+O`)
 
----
+A project file (`.dialogproject`) is the home for all your changes. It stores your
+edits as a compact JSON diff against the original game files — nothing in the game
+directory is touched until you explicitly test or apply the project.
 
-## Project structure
+A project can contain patches for **any number of conversations**. Work on as many
+as you like; they are all saved into the same file and applied together at test time.
 
-```
-DialogEditor.Core/          net8.0 — zero UI dependencies
-  GameData/                 IGameDataProvider, PoE1/PoE2 providers, LanguagePicker
-  Models/                   ConversationNode, NodeLink, StringEntry, LayoutPoint, …
-  Parsing/                  PoE1 XML parser, PoE2 JSON parser, ConditionFormatter
-  Layout/                   AutoLayoutService (BFS layered layout)
-  Resources/                CoreStrings.resx — script prefixes, condition "NOT"
-
-DialogEditor.ViewModels/    net8.0 — shared view models and services
-  ViewModels/               MVVM view models (CommunityToolkit.Mvvm)
-  Services/                 IDispatcher, IFolderPicker, IStringProvider + platform adapters
-  Resources/                Loc.cs — static string accessor
-
-DialogEditor.Avalonia/      net8.0 — cross-platform build
-  Views/                    AXAML views, NodifyAvalonia 6.6 canvas
-  Converters/               Avalonia value converters
-  Services/                 AvaloniaDispatcher, AvaloniaFolderPicker, AvaloniaStringProvider
-  Resources/                Strings.axaml
-
-DialogEditor.Tests/         net8.0 — xUnit tests (Core only)
-```
+> **Browsing works without a project open.** You can navigate and read any
+> conversation freely. Editing — changing text, adding nodes, modifying links —
+> requires an open project. The status bar will remind you when you are in
+> read-only mode.
 
 ---
 
-## Game data paths
+### 3 — Browse and edit
 
-| Game | Conversations | String tables |
-|---|---|---|
-| PoE1 | `PillarsOfEternity_Data/data/conversations/**/*.conversation` | `…/data/localized/{lang}/text/conversations/` |
-| PoE2 | `PillarsOfEternityII_Data/exported/design/conversations/**/*.conversationbundle` | `…/exported/localized/{lang}/text/conversations/` |
+Click any conversation in the browser to open it on the canvas.
+
+| Action | How |
+|--------|-----|
+| Select a node | Click it on the canvas |
+| Edit text, identity, voice, links | Use the detail panel on the right |
+| Add a node | Double-click the canvas background |
+| Connect two nodes | Drag from a node's output port to another node's input port |
+| Delete a node | Select it, press `Delete`; or right-click › Delete node |
+| Add a connected node | Right-click › Add connected node |
+| Delete a connection | Right-click the connection line › Delete connection |
+| Search nodes | `Ctrl+F`, or type in the search box above the canvas |
+| Undo / Redo | `Ctrl+Z` / `Ctrl+Y` — all edits are fully undoable within a session |
+
+Use the **`?`** button to open the floating Legend window for a full reference of
+node colours, connection types, symbols, and keyboard shortcuts. It can be moved
+to a second monitor and left open while you work.
 
 ---
 
-## Notes
+### 4 — Save to project
 
-- **Read-only** — no game files are ever modified
-- **Error log** — errors and warnings are written to `%LOCALAPPDATA%\PillarsDialogEditor\app.log` (rotates at 1 MB → `app.log.old`)
-- **PoE2 speaker names** — loaded from `speakers.gamedatabundle` at startup; replaced entirely when a new folder is opened
-- **Conditions** — both parsers preserve the full AND/OR/NOT tree structure rather than flattening to a plain list
-- **Connection types** — `QuestionNodeTextDisplay` values (`ShowOnce`, `Always`, `Never`) are rendered as distinct edge colours on the canvas
+**File › Save Project** (`Ctrl+S`)
+
+Records the current conversation's changes as a diff inside the open project file.
+The diff captures only what changed — adding, removing, or editing nodes and links.
+If you add a node and then delete it before saving, no trace of it appears in the
+diff. Game files are not modified. The project file is plain JSON and can be
+version-controlled or shared freely.
+
+---
+
+### 5 — Test in-game
+
+**Test › Test Patch** (`F5`)
+
+Applies **every conversation patch in the project** to the live game files so you
+can launch the game and verify dialogue in context. Before writing anything, the
+editor makes a lightweight per-file backup of the affected conversations so they
+can be precisely restored afterwards.
+
+While the game files are patched, a modal dialog blocks the editor — this is
+intentional to prevent inconsistent edits during testing.
+
+---
+
+### 6 — Restore after testing
+
+**Test › Restore Conversation** (`F6`)
+
+Reverts the patched game files to their pre-test state and unlocks the editor.
+The project file is unchanged; your edits are still there, ready for the next
+test cycle or final save.
+
+If the editor crashes or is force-quit while in test mode, the next launch detects
+the incomplete state and shows the modal automatically so you can restore before
+editing.
+
+---
+
+### 7 — Distribute
+
+Share your `.dialogproject` file. Recipients apply it by:
+
+1. Installing this editor (or the planned standalone patch utility)
+2. Opening the matching game folder
+3. Opening the project file
+4. Running **Test › Test Patch** — or, once the standalone utility ships,
+   running it directly without the full editor
+
+Multiple projects can be **stacked in load order**: each patch is applied on top
+of the previous, with conflict detection if two patches modify the same field.
+
+---
+
+## Settings
+
+**File › Settings** (`Ctrl+,`)
+
+| Setting | Purpose |
+|---------|---------|
+| Backup directory | The folder chosen during first-time setup where the original game files are stored. Used for full disaster recovery via **Test › Restore Backup** (`Ctrl+Shift+B`). Can be changed here if you want to move the backup to a different location. |
+
+---
+
+## Keyboard Shortcuts
+
+Press **`?`** in the editor to open the floating Legend window, which lists all
+shortcuts alongside connection types, node colours, and canvas controls.
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+N` | New project |
+| `Ctrl+O` | Open project |
+| `Ctrl+S` | Save project |
+| `Ctrl+Shift+O` | Open game folder |
+| `Ctrl+,` | Settings |
+| `Ctrl+Z` | Undo |
+| `Ctrl+Y` | Redo |
+| `Ctrl+F` | Focus node search |
+| `Delete` | Delete selected node |
+| `F5` | Test Patch |
+| `F6` | Restore Conversation |
+| `Ctrl+Shift+B` | Restore Backup (all conversations) |
+| `Escape` | Clear search / close browser flyout |

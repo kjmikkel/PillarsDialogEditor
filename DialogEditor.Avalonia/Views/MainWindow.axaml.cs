@@ -7,6 +7,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using DialogEditor.Avalonia.Services;
 using DialogEditor.ViewModels;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Avalonia.Views;
 
@@ -14,6 +15,7 @@ public partial class MainWindow : Window
 {
     private double _browserExpandedWidth = 220;
     private double _detailExpandedWidth  = 240;
+    private LegendWindow? _legendWindow;
 
     private ColumnDefinition BrowserColumn => ContentGrid.ColumnDefinitions[0];
     private ColumnDefinition DetailColumn  => ContentGrid.ColumnDefinitions[4];
@@ -23,11 +25,14 @@ public partial class MainWindow : Window
         InitializeComponent();
         DataContext = new MainWindowViewModel(
             new AvaloniaDispatcher(),
-            new AvaloniaFolderPicker(this));
+            new AvaloniaFolderPicker(this),
+            new AvaloniaFilePicker(this));
 
         var vm = (MainWindowViewModel)DataContext;
         vm.PropertyChanged += OnVmPropertyChanged;
         vm.UnsavedChangesRequested += () => _ = ShowUnsavedChangesDialogAsync(vm);
+        vm.TestModeEntered += () => TestOverlay.IsVisible = true;
+        vm.TestModeExited  += () => TestOverlay.IsVisible = false;
 
         if (!vm.IsBrowserExpanded)
         {
@@ -105,6 +110,21 @@ public partial class MainWindow : Window
                 e.Handled = true;
                 break;
 
+            case Key.N when e.KeyModifiers == KeyModifiers.Control:
+                vm.NewProjectCommand.Execute(null);
+                e.Handled = true;
+                break;
+
+            case Key.O when e.KeyModifiers == KeyModifiers.Control:
+                vm.OpenProjectCommand.Execute(null);
+                e.Handled = true;
+                break;
+
+            case Key.O when e.KeyModifiers == (KeyModifiers.Control | KeyModifiers.Shift):
+                vm.OpenFolderCommand.Execute(null);
+                e.Handled = true;
+                break;
+
             case Key.Z when e.KeyModifiers == KeyModifiers.Control:
                 vm.Canvas.UndoCommand.Execute(null);
                 e.Handled = true;
@@ -115,6 +135,26 @@ public partial class MainWindow : Window
                 e.Handled = true;
                 break;
 
+            case Key.F5 when e.KeyModifiers == KeyModifiers.None:
+                vm.TestPatchCommand.Execute(null);
+                e.Handled = true;
+                break;
+
+            case Key.F6 when e.KeyModifiers == KeyModifiers.None:
+                vm.RestoreConversationCommand.Execute(null);
+                e.Handled = true;
+                break;
+
+            case Key.OemComma when e.KeyModifiers == KeyModifiers.Control:
+                _ = OpenSettingsAsync();
+                e.Handled = true;
+                break;
+
+            case Key.B when e.KeyModifiers == (KeyModifiers.Control | KeyModifiers.Shift):
+                vm.RestoreBackupCommand.Execute(null);
+                e.Handled = true;
+                break;
+
             case Key.S when e.KeyModifiers == KeyModifiers.Control:
                 if (TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() is TextBox)
                     CanvasView.FocusEditor();
@@ -122,7 +162,9 @@ public partial class MainWindow : Window
                 e.Handled = true;
                 break;
 
-            case Key.Delete when vm.Canvas.SelectedNode is not null && e.Source is not TextBox:
+            case Key.Delete when vm.Canvas.SelectedNode is not null
+                             && e.Source is not TextBox
+                             && vm.Canvas.IsEditable:
                 vm.Canvas.DeleteNodeCmdCommand.Execute(vm.Canvas.SelectedNode);
                 e.Handled = true;
                 break;
@@ -134,6 +176,19 @@ public partial class MainWindow : Window
         }
     }
 
+    private async void SettingsButton_Click(object? sender, RoutedEventArgs e)
+        => await OpenSettingsAsync();
+
+    private async Task OpenSettingsAsync()
+    {
+        var vm = (MainWindowViewModel)DataContext!;
+        var settings = new SettingsWindow
+        {
+            DataContext = vm.CreateSettingsViewModel()
+        };
+        await settings.ShowDialog(this);
+    }
+
     private void CollapsedBrowserTitle_Click(object? sender, RoutedEventArgs e)
         => ((MainWindowViewModel)DataContext!).IsBrowserExpanded = true;
 
@@ -143,8 +198,26 @@ public partial class MainWindow : Window
         vm.IsDetailExpanded = !vm.IsDetailExpanded;
     }
 
-    private void CloseHelp_Click(object? sender, RoutedEventArgs e)
-        => HelpToggle.IsChecked = false;
+    private void HelpToggle_IsCheckedChanged(object? sender, RoutedEventArgs e)
+    {
+        if (HelpToggle.IsChecked == true)
+            GetOrCreateLegend().ShowAndRestore(this);
+        else
+            GetOrCreateLegend().HideAndSave();
+    }
+
+    private LegendWindow GetOrCreateLegend()
+    {
+        if (_legendWindow is not null) return _legendWindow;
+        _legendWindow = new LegendWindow();
+        _legendWindow.OnHidden = () => HelpToggle.IsChecked = false;
+        _legendWindow.PositionChanged += (_, _) =>
+        {
+            if (_legendWindow.IsVisible)
+                AppSettings.SetLegendPosition(_legendWindow.Position.X, _legendWindow.Position.Y);
+        };
+        return _legendWindow;
+    }
 
     private async Task ShowUnsavedChangesDialogAsync(MainWindowViewModel vm)
     {

@@ -12,7 +12,7 @@ public partial class PendingConnectionViewModel(ConversationViewModel conversati
     [RelayCommand]
     private void Start(ConnectorViewModel? connector) => Source = connector;
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanComplete))]
     private void Complete(ConnectorViewModel? target)
     {
         if (Source is null || target is null || Source == target)
@@ -29,4 +29,6 @@ public partial class PendingConnectionViewModel(ConversationViewModel conversati
 
         Source = null;
     }
+
+    private bool CanComplete(ConnectorViewModel? target) => conversation.IsEditable;
 }

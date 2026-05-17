@@ -10,7 +10,11 @@ public interface IGameDataProvider
     string Language { get; set; }
     IReadOnlyList<ConversationFile> EnumerateConversations();
     Conversation LoadConversation(ConversationFile file);
+
+    ConversationFile? FindConversation(string name) =>
+        EnumerateConversations().FirstOrDefault(f => f.Name == name);
     IReadOnlyDictionary<string, string> LoadSpeakerNames();
-    void SaveConversation(ConversationFile file, ConversationEditSnapshot snapshot);
+    void   SaveConversation(ConversationFile file, ConversationEditSnapshot snapshot);
+    string GetStringTablePath(ConversationFile file);
     (string ConversationsRoot, string StringTablesRoot) GetBackupRoots();
 }
