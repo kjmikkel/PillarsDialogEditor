@@ -59,11 +59,16 @@ public static class DiffEngine
             .Where(l => !currentLinks.ContainsKey(l.ToNodeId))
             .Select(l => new DeletedLink(l.ToNodeId, l.HasConditions))
             .ToList();
+        var modifiedLinks = current.Links
+            .Where(l => baseLinks.TryGetValue(l.ToNodeId, out var b) &&
+                        (b.RandomWeight != l.RandomWeight || b.QuestionNodeTextDisplay != l.QuestionNodeTextDisplay))
+            .Select(l => new ModifiedLink(l.ToNodeId, l.RandomWeight, l.QuestionNodeTextDisplay))
+            .ToList();
 
-        if (changes.Count == 0 && addedLinks.Count == 0 && deletedLinks.Count == 0)
+        if (changes.Count == 0 && addedLinks.Count == 0 && deletedLinks.Count == 0 && modifiedLinks.Count == 0)
             return null;
 
-        return new NodeModification(current.NodeId, changes, addedLinks, deletedLinks);
+        return new NodeModification(current.NodeId, changes, addedLinks, deletedLinks, modifiedLinks);
     }
 
     private static void TryAddChange<T>(

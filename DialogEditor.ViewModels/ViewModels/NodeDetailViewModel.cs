@@ -99,9 +99,9 @@ public partial class NodeDetailViewModel : ObservableObject
 
     public bool HasFemaleText => _node?.HasFemaleText ?? false;
 
-    [ObservableProperty] private IReadOnlyList<PropertyGroup> _propertyGroups  = [];
-    [ObservableProperty] private IReadOnlyList<LinkRow>       _links           = [];
-    [ObservableProperty] private string                       _addLinkTargetId = string.Empty;
+    [ObservableProperty] private IReadOnlyList<PropertyGroup>      _propertyGroups  = [];
+    [ObservableProperty] private IReadOnlyList<ConnectionViewModel> _links           = [];
+    [ObservableProperty] private string                             _addLinkTargetId = string.Empty;
 
     // Raised when the user requests to add/delete a link — ConversationViewModel handles it
     public event Action<int, int>? AddLinkRequested;    // (fromNodeId, toNodeId)
@@ -116,13 +116,10 @@ public partial class NodeDetailViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void DeleteLink(LinkRow? row)
+    private void DeleteLink(ConnectionViewModel? conn)
     {
-        if (_node is null || row is null) return;
-        // Arrow format is "→ {toNodeId}" — parse the ID from it
-        var parts = row.Arrow.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length >= 2 && int.TryParse(parts[^1], out var toId))
-            DeleteLinkRequested?.Invoke(toId);
+        if (conn?.Target.Owner is { } target)
+            DeleteLinkRequested?.Invoke(target.NodeId);
     }
 
     // ── Load / Clear ──────────────────────────────────────────────────────
@@ -137,7 +134,6 @@ public partial class NodeDetailViewModel : ObservableObject
 
         node.PropertyChanged += OnNodePropertyChanged;
         RefreshReadOnlyGroups(node);
-        Links      = node.Links.Select(BuildLinkRow).ToList();
         HasContent = true;
         NotifyAllProxies();
     }
@@ -191,18 +187,6 @@ public partial class NodeDetailViewModel : ObservableObject
         ];
     }
 
-    public void RefreshLinks(IEnumerable<NodeLink> links)
-        => Links = links.Select(BuildLinkRow).ToList();
-
-    private static LinkRow BuildLinkRow(NodeLink link)
-    {
-        var extras = new List<string>();
-        if (link.RandomWeight != 1f)
-            extras.Add($"{Loc.Get("Link_WeightPrefix")}{link.RandomWeight:0.##}");
-        if (!string.IsNullOrEmpty(link.QuestionNodeTextDisplay) && link.QuestionNodeTextDisplay != "ShowOnce")
-            extras.Add(link.QuestionNodeTextDisplay);
-        var arrow  = $"{Loc.Get("Link_Arrow")} {link.ToNodeId}";
-        var detail = extras.Count == 0 ? Loc.Get("NodeDetail_None") : $"[{string.Join(", ", extras)}]";
-        return new LinkRow(arrow, detail);
-    }
+    public void RefreshLinks(IEnumerable<ConnectionViewModel> connections)
+        => Links = connections.ToList();
 }

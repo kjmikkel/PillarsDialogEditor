@@ -175,8 +175,10 @@ public partial class ConversationViewModel : ObservableObject
                 if (nodeMap.TryGetValue(link.FromNodeId, out var src) &&
                     nodeMap.TryGetValue(link.ToNodeId,   out var tgt))
                 {
-                    Connections.Add(new ConnectionViewModel(src.Output, tgt.Input,
-                        link.QuestionNodeTextDisplay));
+                    var conn = new ConnectionViewModel(src.Output, tgt.Input,
+                        link.QuestionNodeTextDisplay, link.RandomWeight)
+                        { UndoStack = _undoStack };
+                    Connections.Add(conn);
                 }
             }
         }
@@ -208,7 +210,7 @@ public partial class ConversationViewModel : ObservableObject
 
     public void AddConnection(ConnectorViewModel source, ConnectorViewModel target)
     {
-        var conn = new ConnectionViewModel(source, target);
+        var conn = new ConnectionViewModel(source, target) { UndoStack = _undoStack };
         _undoStack.Execute(new AddConnectionCommand(this, conn));
         IsModified = true;
         RefreshUndoRedo();
@@ -272,7 +274,7 @@ public partial class ConversationViewModel : ObservableObject
                 .Select(c => new LinkEditSnapshot(
                     n.NodeId,
                     c.Target.Owner!.NodeId,
-                    1f,
+                    c.RandomWeight,
                     c.QuestionNodeTextDisplay,
                     c.HasConditions))
                 .ToList();
