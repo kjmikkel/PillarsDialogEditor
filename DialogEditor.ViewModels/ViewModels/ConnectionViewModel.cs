@@ -5,7 +5,11 @@ namespace DialogEditor.ViewModels;
 
 public partial class ConnectionViewModel : ObservableObject
 {
-    internal UndoRedoStack? UndoStack { get; set; }
+    /// All valid QTD values in display order; "" is the engine default.
+    public static IReadOnlyList<string> QTDOptions { get; } =
+        ["", "ShowOnce", "Always", "Never"];
+
+    public UndoRedoStack? UndoStack { get; set; }
 
     public ConnectorViewModel Source { get; }
     public ConnectorViewModel Target { get; }

@@ -43,16 +43,6 @@ support them fully; only the UI and diff/patch layers need extending.
 (similar to `QuestionNodeTextDisplay`). `LinkEditSnapshot` would need a
 `Conditions` field. The condition editor window can likely be reused or adapted.
 
-### QTD ComboBox has no "clear to default" option
-**What:** Once `QuestionNodeTextDisplay` is set to `ShowOnce` / `Always` / `Never`,
-there is no way to clear it back to the default empty string via the ComboBox.
-The ComboBox shows nothing selected for `""` but you cannot *select* nothing.  
-**Why:** Avalonia's XAML compiler cannot construct an empty `sys:String` element
-in an inline `Items` list, so the empty option was removed.  
-**Where to start:** Add a `"(default)"` display item that maps to `""` via a
-value converter, or switch to `ItemsSource` bound to a list property that
-includes an explicit blank entry.
-
 ---
 
 ## Condition Editor
