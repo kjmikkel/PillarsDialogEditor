@@ -306,6 +306,7 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="PropertyRow_ListenerGuid">Listener GUID</sys:String>
 
     <!-- ─── Detail panel — combobox option values ───────────────────────── -->
+    <sys:String x:Key="Option_QTD_Default">(default)</sys:String>
     <sys:String x:Key="Option_NpcLine">NPC Line</sys:String>
     <sys:String x:Key="Option_PlayerChoice">Player Choice</sys:String>
     <sys:String x:Key="Option_DisplayConversation">Conversation</sys:String>

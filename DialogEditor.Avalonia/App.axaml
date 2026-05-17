@@ -83,6 +83,7 @@
             </ControlTheme>
 
             <converters:FloatDecimalConverter           x:Key="FloatDecimal"/>
+            <converters:QTDDisplayConverter             x:Key="QTDDisplay"/>
             <converters:LayoutPointConverter             x:Key="LayoutPointConverter"/>
             <converters:SpeakerCategoryToBrushConverter x:Key="SpeakerCategoryToBrush"/>
             <converters:BoolToFemaleTextBrushConverter  x:Key="BoolToFemaleTextBrush"/>
