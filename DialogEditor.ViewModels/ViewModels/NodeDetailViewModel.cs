@@ -12,6 +12,7 @@ namespace DialogEditor.ViewModels;
 public partial class NodeDetailViewModel : ObservableObject
 {
     private NodeViewModel? _node;
+    public  NodeViewModel? Node => _node;
 
     [ObservableProperty] private bool _hasContent;
 
@@ -148,6 +149,8 @@ public partial class NodeDetailViewModel : ObservableObject
         NotifyAllProxies();
         if (_node is not null)
             RefreshReadOnlyGroups(_node);
+        if (e.PropertyName == nameof(NodeViewModel.Conditions))
+            OnPropertyChanged(nameof(ConditionSummary));
     }
 
     private void NotifyAllProxies()
@@ -191,9 +194,32 @@ public partial class NodeDetailViewModel : ObservableObject
     public void RefreshLinks(IEnumerable<ConnectionViewModel> connections)
         => Links = connections.ToList();
 
+    public void NotifyConditionSummary()
+        => OnPropertyChanged(nameof(ConditionSummary));
+
     // ── Condition editing ─────────────────────────────────────────────────
 
     public ObservableCollection<ConditionRowViewModel> ConditionRows { get; } = [];
+
+    /// Brief summary shown in the detail panel (replaces the old inline editor).
+    public string ConditionSummary
+    {
+        get
+        {
+            if (_node is null || _node.Conditions.Count == 0)
+                return Loc.Get("NodeDetail_None");
+            var names = _node.Conditions
+                .OfType<ConditionLeaf>()
+                .Select(l =>
+                {
+                    var mn = l.FullName.Contains(' ')
+                        ? l.FullName[(l.FullName.IndexOf(' ') + 1)..].Split('(')[0]
+                        : l.FullName;
+                    return ConditionCatalogue.Instance.Find(mn)?.DisplayName ?? mn;
+                });
+            return string.Join(", ", names);
+        }
+    }
 
     /// Conditions available to add — sourced from the embedded catalogue.
     public IReadOnlyList<ConditionEntry> AvailableConditions
