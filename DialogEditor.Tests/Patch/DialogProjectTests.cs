@@ -9,7 +9,7 @@ public class DialogProjectTests
     private static ConversationPatch MakePatch(string name) =>
         new(name, ConversationPatch.CurrentSchemaVersion,
             [new NodeEditSnapshot(1, false, SpeakerCategory.Npc, "", "", "text", "",
-                "Conversation", "None", "", "", "", false, false, [])],
+                "Conversation", "None", "", "", "", false, false, [], [])],
             [2],
             []);
 

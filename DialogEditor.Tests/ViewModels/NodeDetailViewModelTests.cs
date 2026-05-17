@@ -22,13 +22,11 @@ public class NodeDetailViewModelTests
         string displayType = "Conversation",
         string persistence = "None",
         string actorDirection = "",
-        string conditionExpression = "",
         string comments = "",
         string externalVO = "",
         bool hasVO = false,
         bool hideSpeaker = false,
         IReadOnlyList<string>? scripts = null,
-        IReadOnlyList<string>? conditionStrings = null,
         IReadOnlyList<NodeLink>? links = null,
         string defaultText = "Hello",
         string femaleText = "")
@@ -40,7 +38,7 @@ public class NodeDetailViewModelTests
             SpeakerGuid: speakerGuid,
             ListenerGuid: listenerGuid,
             Links: links ?? [],
-            ConditionStrings: conditionStrings ?? [],
+            Conditions: [],
             Scripts: scripts ?? [],
             DisplayType: displayType,
             Persistence: persistence,
@@ -48,8 +46,7 @@ public class NodeDetailViewModelTests
             Comments: comments,
             ExternalVO: externalVO,
             HasVO: hasVO,
-            HideSpeaker: hideSpeaker,
-            ConditionExpression: conditionExpression);
+            HideSpeaker: hideSpeaker);
 
         var entry = new StringEntry(id, defaultText, femaleText);
         return new NodeViewModel(node, entry);
@@ -195,7 +192,7 @@ public class NodeDetailViewModelTests
     {
         var node = new ConversationNode(
             NodeId: 99, IsPlayerChoice: false, SpeakerCategory: SpeakerCategory.Npc,
-            SpeakerGuid: "", ListenerGuid: "", Links: [], ConditionStrings: [],
+            SpeakerGuid: "", ListenerGuid: "", Links: [], Conditions: [],
             Scripts: [], DisplayType: "Conversation", Persistence: "None");
         var vm = new NodeViewModel(node, new StringEntry(99, string.Empty, string.Empty));
         _vm.Load(vm);

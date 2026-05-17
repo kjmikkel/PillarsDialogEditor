@@ -109,6 +109,9 @@ public static class PatchApplier
             .Concat(mod.AddedLinks)
             .ToList();
 
+        // Apply condition replacement (full-list replace semantics)
+        var conditions = mod.UpdatedConditions ?? node.Conditions;
+
         return node with
         {
             IsPlayerChoice = isPlayerChoice,
@@ -124,6 +127,7 @@ public static class PatchApplier
             HasVO          = hasVO,
             HideSpeaker    = hideSpeaker,
             Links          = links,
+            Conditions     = conditions,
         };
     }
 }

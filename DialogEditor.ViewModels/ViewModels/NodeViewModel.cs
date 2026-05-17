@@ -155,11 +155,14 @@ public partial class NodeViewModel : ObservableObject
         }
     }
 
-    // ── Read-only (conditions/scripts not editable in Phase 1) ───────────
-    public IReadOnlyList<string> ConditionStrings   { get; }
-    public string               ConditionExpression { get; }
-    public IReadOnlyList<string> Scripts            { get; }
-    public IReadOnlyList<NodeLink> Links            { get; }
+    // ── Read-only (conditions/scripts not editable until Phase 5) ───────────
+    public IReadOnlyList<ConditionNode> Conditions   { get; }
+    public IReadOnlyList<string> Scripts             { get; }
+    public IReadOnlyList<NodeLink> Links             { get; }
+
+    // Backward-compat display helpers
+    public IReadOnlyList<string> ConditionStrings   => Conditions.SelectMany(c => c.Leaves()).Select(c => c.Format()).ToList();
+    public string               ConditionExpression => Conditions.FormatTree();
 
     // ── Nodify connector anchors ──────────────────────────────────────────
     public ConnectorViewModel Input   { get; } = new();
@@ -197,10 +200,9 @@ public partial class NodeViewModel : ObservableObject
         _defaultText     = entry?.DefaultText ?? Loc.Get("Node_TextUnavailable");
         _femaleText      = entry?.FemaleText  ?? string.Empty;
 
-        ConditionStrings    = node.ConditionStrings;
-        ConditionExpression = node.ConditionExpression;
-        Scripts             = node.Scripts;
-        Links               = node.Links;
+        Conditions = node.Conditions;
+        Scripts    = node.Scripts;
+        Links      = node.Links;
 
         Inputs  = [Input];
         Outputs = [Output];
@@ -221,5 +223,5 @@ public partial class NodeViewModel : ObservableObject
             _defaultText, _femaleText,
             _displayType, _persistence,
             _actorDirection, _comments, _externalVO,
-            _hasVO, _hideSpeaker, links);
+            _hasVO, _hideSpeaker, links, Conditions);
 }

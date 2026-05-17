@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using DialogEditor.Core.Editing;
+using DialogEditor.Core.Models;
 
 namespace DialogEditor.Core.Serialization;
 
@@ -52,6 +53,7 @@ public static class Poe2ConversationSerializer
         node["HasVO"]        = snap.HasVO;
         node["ExternalVO"]   = snap.ExternalVO;
         node["Links"]        = BuildLinks(snap.Links, original["Links"]?.AsArray());
+        node["Conditionals"] = BuildConditionJson(snap.Conditions);
     }
 
     private static JsonArray BuildLinks(IReadOnlyList<LinkEditSnapshot> links, JsonArray? originalLinks)
@@ -78,7 +80,14 @@ public static class Poe2ConversationSerializer
         return arr;
     }
 
-    private static JsonNode BuildNewNode(NodeEditSnapshot snap) => JsonNode.Parse($$"""
+    private static JsonNode BuildNewNode(NodeEditSnapshot snap)
+    {
+        var node = BuildNewNodeBase(snap);
+        node["Conditionals"] = BuildConditionJson(snap.Conditions);
+        return node;
+    }
+
+    private static JsonNode BuildNewNodeBase(NodeEditSnapshot snap) => JsonNode.Parse($$"""
         {
           "$type": "{{(snap.IsPlayerChoice ? PlayerNodeType : TalkNodeType)}}",
           "SpeakerGuid":  "{{snap.SpeakerGuid}}",
@@ -113,6 +122,44 @@ public static class Poe2ConversationSerializer
           "QuestionNodeTextDisplay": {{MapQuestionDisplay(link.QuestionNodeTextDisplay)}}
         }
         """)!;
+
+    private static JsonNode BuildConditionJson(IReadOnlyList<ConditionNode> conditions)
+    {
+        var components = new JsonArray();
+        foreach (var c in conditions)
+            components.Add(BuildConditionComponentJson(c));
+        return new JsonObject { ["Operator"] = 0, ["Components"] = components };
+    }
+
+    private static JsonNode BuildConditionComponentJson(ConditionNode node)
+    {
+        if (node is ConditionLeaf leaf)
+        {
+            var parameters = new JsonArray();
+            foreach (var p in leaf.Parameters) parameters.Add(JsonValue.Create(p));
+            return new JsonObject
+            {
+                ["$type"] = "OEIFormats.FlowCharts.ConditionalCall, OEIFormats",
+                ["Data"]  = new JsonObject
+                {
+                    ["FullName"]   = leaf.FullName,
+                    ["Parameters"] = parameters,
+                },
+                ["Not"]      = leaf.Not,
+                ["Operator"] = leaf.Operator == "Or" ? 1 : 0,
+            };
+        }
+        var branch     = (ConditionBranch)node;
+        var childComps = new JsonArray();
+        foreach (var c in branch.Components) childComps.Add(BuildConditionComponentJson(c));
+        return new JsonObject
+        {
+            ["$type"]      = "OEIFormats.FlowCharts.ConditionalExpression, OEIFormats",
+            ["Components"] = childComps,
+            ["Not"]        = branch.Not,
+            ["Operator"]   = branch.Operator == "Or" ? 1 : 0,
+        };
+    }
 
     private static int MapDisplayType(string s)     => s == "Bark"     ? 1 : 0;
     private static int MapPersistence(string s)     => s == "OnceEver" ? 1 : 0;

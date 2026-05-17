@@ -12,7 +12,7 @@ public class PatchApplierTests
         IReadOnlyList<LinkEditSnapshot>? links = null) =>
         new(id, false, SpeakerCategory.Npc, "", "", defaultText, "",
             "Conversation", "None", "", "", "", false, false,
-            links ?? []);
+            links ?? [], []);
 
     private static ConversationEditSnapshot Snap(params NodeEditSnapshot[] nodes) =>
         new(nodes);

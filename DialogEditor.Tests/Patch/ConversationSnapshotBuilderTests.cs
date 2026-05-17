@@ -10,7 +10,7 @@ public class ConversationSnapshotBuilderTests
         IReadOnlyList<NodeLink>? links = null) =>
         new(id, false, SpeakerCategory.Npc, "spkrGuid", "lstnrGuid",
             links ?? [],
-            ConditionStrings: [],
+            Conditions: [],
             Scripts: [],
             DisplayType: "Conversation",
             Persistence: "None",
@@ -62,7 +62,7 @@ public class ConversationSnapshotBuilderTests
     [Fact]
     public void Build_PreservesLinks()
     {
-        var link = new NodeLink(1, 5, HasConditions: true, RandomWeight: 2f, QuestionNodeTextDisplay: "Always");
+        var link = new NodeLink(1, 5, Conditions: [new ConditionLeaf("Boolean A()", [], false, "And")], RandomWeight: 2f, QuestionNodeTextDisplay: "Always");
         var snap = ConversationSnapshotBuilder.Build(
             new Conversation("c", [MakeNode(1, [link])], StringTable.Empty));
 

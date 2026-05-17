@@ -50,7 +50,7 @@ public class Poe2ConversationSerializerTests
         IReadOnlyList<LinkEditSnapshot>? links = null) =>
         new(id, false, SpeakerCategory.Npc, speakerGuid, "bbbb-0000",
             "text", "", "Conversation", "None", "", "", "", false, false,
-            links ?? []);
+            links ?? [], []);
 
     [Fact]
     public void Serialize_UpdatesSpeakerGuid()
@@ -62,9 +62,12 @@ public class Poe2ConversationSerializerTests
     }
 
     [Fact]
-    public void Serialize_PreservesOriginalConditions()
+    public void Serialize_RoundTripsConditions()
     {
-        var snapshot = new ConversationEditSnapshot([Node(0), Node(1)]);
+        // Parse → snapshot with parsed conditions → serialize → parse again
+        var parsedNodes = Poe2ConversationParser.ParseJson(TwoNodeJson);
+        var snap0 = Node(0) with { Conditions = parsedNodes[0].Conditions };
+        var snapshot = new ConversationEditSnapshot([snap0, Node(1)]);
         var result = Poe2ConversationSerializer.Serialize(TwoNodeJson, snapshot);
         var root = JsonNode.Parse(result)!;
         var condComponents = root["Conversations"]![0]!["Nodes"]![0]!

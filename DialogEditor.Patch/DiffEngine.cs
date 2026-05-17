@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 
@@ -65,10 +66,19 @@ public static class DiffEngine
             .Select(l => new ModifiedLink(l.ToNodeId, l.RandomWeight, l.QuestionNodeTextDisplay))
             .ToList();
 
-        if (changes.Count == 0 && addedLinks.Count == 0 && deletedLinks.Count == 0 && modifiedLinks.Count == 0)
+        // Condition change: compare serialised JSON; store full new list if different
+        var baseCondJson    = JsonSerializer.Serialize(@base.Conditions);
+        var currentCondJson = JsonSerializer.Serialize(current.Conditions);
+        IReadOnlyList<ConditionNode>? updatedConditions =
+            baseCondJson != currentCondJson ? current.Conditions : null;
+
+        if (changes.Count == 0 && addedLinks.Count == 0 && deletedLinks.Count == 0
+            && modifiedLinks.Count == 0 && updatedConditions is null)
             return null;
 
-        return new NodeModification(current.NodeId, changes, addedLinks, deletedLinks, modifiedLinks);
+        return new NodeModification(current.NodeId, changes, addedLinks, deletedLinks, modifiedLinks)
+            { UpdatedConditions = updatedConditions };
+
     }
 
     private static void TryAddChange<T>(

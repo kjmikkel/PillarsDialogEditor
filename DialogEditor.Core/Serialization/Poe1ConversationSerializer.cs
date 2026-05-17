@@ -1,6 +1,7 @@
 using System.Text;
 using System.Xml.Linq;
 using DialogEditor.Core.Editing;
+using DialogEditor.Core.Models;
 
 namespace DialogEditor.Core.Serialization;
 
@@ -43,6 +44,14 @@ public static class Poe1ConversationSerializer
         SetOrAdd(node, "Comments",       snap.Comments);
         SetOrAdd(node, "VOFilename",     snap.ExternalVO);
 
+        // Update condition tree from snapshot
+        var condElem = node.Element("Conditionals") ?? new XElement("Conditionals");
+        if (node.Element("Conditionals") is null) node.Add(condElem);
+        var compElem = condElem.Element("Components") ?? new XElement("Components");
+        if (condElem.Element("Components") is null) condElem.Add(compElem);
+        compElem.RemoveAll();
+        foreach (var c in snap.Conditions) compElem.Add(BuildConditionXml(c));
+
         var linksElem = node.Element("Links") ?? new XElement("Links");
         if (node.Element("Links") is null) node.Add(linksElem);
         var origLinks = linksElem.Elements("FlowChartLink").ToList();
@@ -73,7 +82,9 @@ public static class Poe1ConversationSerializer
         new XElement("SpeakerGuid",  snap.SpeakerGuid),
         new XElement("ListenerGuid", snap.ListenerGuid),
         new XElement("Links"),
-        new XElement("Conditionals", new XElement("Components")),
+        new XElement("Conditionals",
+            new XElement("Components",
+                snap.Conditions.Select(c => BuildConditionXml(c)))),
         new XElement("OnEnterScripts"),
         new XElement("OnExitScripts"),
         new XElement("OnUpdateScripts"),
@@ -82,6 +93,29 @@ public static class Poe1ConversationSerializer
         new XElement("ActorDirection", snap.ActorDirection),
         new XElement("Comments",       snap.Comments),
         new XElement("VOFilename",     snap.ExternalVO));
+
+    private static XElement BuildConditionXml(ConditionNode node)
+    {
+        if (node is ConditionLeaf leaf)
+        {
+            return new XElement("ExpressionComponent",
+                new XAttribute(Xsi + "type", "ConditionalCall"),
+                new XElement("Data",
+                    new XElement("FullName", leaf.FullName),
+                    new XElement("Parameters",
+                        leaf.Parameters.Select(p => new XElement("string", p)))),
+                new XElement("Not",      leaf.Not),
+                new XElement("Operator", leaf.Operator));
+        }
+
+        var branch = (ConditionBranch)node;
+        return new XElement("ExpressionComponent",
+            new XAttribute(Xsi + "type", "ConditionalExpression"),
+            new XElement("Components",
+                branch.Components.Select(c => BuildConditionXml(c))),
+            new XElement("Not",      branch.Not),
+            new XElement("Operator", branch.Operator));
+    }
 
     private static XElement BuildNewLink(LinkEditSnapshot link) => new("FlowChartLink",
         new XElement("FromNodeID",              link.FromNodeId),

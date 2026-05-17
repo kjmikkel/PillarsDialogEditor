@@ -7,7 +7,7 @@ public record ConversationNode(
     string SpeakerGuid,
     string ListenerGuid,
     IReadOnlyList<NodeLink> Links,
-    IReadOnlyList<string> ConditionStrings,
+    IReadOnlyList<ConditionNode> Conditions,
     IReadOnlyList<string> Scripts,
     string DisplayType,
     string Persistence,
@@ -15,10 +15,15 @@ public record ConversationNode(
     string Comments = "",
     string ExternalVO = "",
     bool HasVO = false,
-    bool HideSpeaker = false,
-    string ConditionExpression = ""
+    bool HideSpeaker = false
 )
 {
-    public bool HasConditions => ConditionStrings.Count > 0;
-    public bool HasScripts => Scripts.Count > 0;
+    public bool HasConditions     => Conditions.Count > 0;
+    public bool HasScripts        => Scripts.Count > 0;
+
+    // Backward-compat display properties — derived from structured tree
+    public IReadOnlyList<string> ConditionStrings
+        => Conditions.SelectMany(c => c.Leaves()).Select(c => c.Format()).ToList();
+
+    public string ConditionExpression => Conditions.FormatTree();
 }
