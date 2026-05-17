@@ -239,7 +239,7 @@ public partial class ConversationViewModel : ObservableObject
 
         _undoStack.Execute(new AddNodeCommand(this, newNode));
         _undoStack.Execute(new AddConnectionCommand(this,
-            new ConnectionViewModel(parent.Output, newNode.Input)));
+            new ConnectionViewModel(parent.Output, newNode.Input) { UndoStack = _undoStack }));
         IsModified   = true;
         SelectedNode = newNode;
         RefreshUndoRedo();
