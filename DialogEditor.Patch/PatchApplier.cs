@@ -99,9 +99,13 @@ public static class PatchApplier
         }
 
         // Apply link changes
-        var deletedToIds = mod.DeletedLinks.Select(d => d.ToNodeId).ToHashSet();
+        var deletedToIds  = mod.DeletedLinks.Select(d => d.ToNodeId).ToHashSet();
+        var modifiedById  = mod.ModifiedLinks.ToDictionary(m => m.ToNodeId);
         var links = node.Links
             .Where(l => !deletedToIds.Contains(l.ToNodeId))
+            .Select(l => modifiedById.TryGetValue(l.ToNodeId, out var m)
+                ? l with { RandomWeight = m.RandomWeight, QuestionNodeTextDisplay = m.QuestionNodeTextDisplay }
+                : l)
             .Concat(mod.AddedLinks)
             .ToList();
 

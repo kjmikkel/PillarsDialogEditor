@@ -103,6 +103,40 @@ public class PatchApplierTests
         Assert.Empty(result.Nodes[0].Links);
     }
 
+    // ── Modified links ────────────────────────────────────────────────────
+
+    [Fact]
+    public void Apply_ModifiedLink_UpdatesProperties()
+    {
+        var link = new LinkEditSnapshot(1, 5, 1f, "ShowOnce", false);
+        var snap = Snap(MakeNode(1, links: [link]));
+        var mod  = new NodeModification(1, new Dictionary<string, FieldChange>(),
+            [], [],
+            [new ModifiedLink(5, 2f, "Always")]);
+        var patch  = new ConversationPatch("conv", 1, [], [], [mod]);
+        var result = PatchApplier.Apply(snap, patch);
+        Assert.Single(result.Nodes[0].Links);
+        Assert.Equal(2f,      result.Nodes[0].Links[0].RandomWeight);
+        Assert.Equal("Always",result.Nodes[0].Links[0].QuestionNodeTextDisplay);
+    }
+
+    [Fact]
+    public void Apply_ModifiedLink_PreservesOtherLinks()
+    {
+        var link1 = new LinkEditSnapshot(1, 5, 1f, "ShowOnce", false);
+        var link2 = new LinkEditSnapshot(1, 9, 1f, "ShowOnce", false);
+        var snap = Snap(MakeNode(1, links: [link1, link2]));
+        var mod  = new NodeModification(1, new Dictionary<string, FieldChange>(),
+            [], [],
+            [new ModifiedLink(5, 0.5f, "Always")]);
+        var patch  = new ConversationPatch("conv", 1, [], [], [mod]);
+        var result = PatchApplier.Apply(snap, patch);
+        Assert.Equal(2, result.Nodes[0].Links.Count);
+        // link to 9 unchanged
+        Assert.Equal(1f,         result.Nodes[0].Links.First(l => l.ToNodeId == 9).RandomWeight);
+        Assert.Equal("ShowOnce", result.Nodes[0].Links.First(l => l.ToNodeId == 9).QuestionNodeTextDisplay);
+    }
+
     // ── Multi-patch stacking ──────────────────────────────────────────────
 
     [Fact]

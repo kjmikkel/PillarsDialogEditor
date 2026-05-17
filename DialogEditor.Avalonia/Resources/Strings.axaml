@@ -309,6 +309,11 @@
     <sys:String x:Key="Option_PersistenceNone">None</sys:String>
     <sys:String x:Key="Option_PersistenceOnceEver">OnceEver</sys:String>
 
+    <!-- ─── Detail panel — link property labels and tooltips ───────────── -->
+    <sys:String x:Key="Label_LinkWeight">w</sys:String>
+    <sys:String x:Key="ToolTip_LinkQTD">Controls whether this player choice reappears after selection (ShowOnce / Always / Never)</sys:String>
+    <sys:String x:Key="ToolTip_LinkWeight">Relative probability weight when multiple links compete (default: 1)</sys:String>
+
     <!-- ─── Detail panel — link actions ─────────────────────────────────── -->
     <sys:String x:Key="Button_DeleteLink">✕</sys:String>
     <sys:String x:Key="ToolTip_DeleteLink">Remove this connection</sys:String>

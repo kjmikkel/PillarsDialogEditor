@@ -152,7 +152,15 @@ public partial class MainWindowViewModel : ObservableObject
             }
         };
 
-        Canvas.Connections.CollectionChanged += (_, _) => RefreshDetailLinks();
+        Canvas.Connections.CollectionChanged += (_, args) =>
+        {
+            RefreshDetailLinks();
+            // Subscribe to property changes on newly added connections so edits
+            // (QuestionNodeTextDisplay, RandomWeight) mark the canvas as modified.
+            if (args.NewItems is not null)
+                foreach (ConnectionViewModel conn in args.NewItems)
+                    conn.PropertyChanged += (_, _) => Canvas.IsModified = true;
+        };
 
         var last = AppSettings.LastGameDirectory;
         if (!string.IsNullOrEmpty(last) && Directory.Exists(last))
@@ -183,13 +191,7 @@ public partial class MainWindowViewModel : ObservableObject
         if (Canvas.SelectedNode is null) return;
         Detail.RefreshLinks(
             Canvas.Connections
-                .Where(c => c.Source.Owner == Canvas.SelectedNode)
-                .Select(c => new NodeLink(
-                    Canvas.SelectedNode.NodeId,
-                    c.Target.Owner!.NodeId,
-                    c.HasConditions,
-                    1f,
-                    c.QuestionNodeTextDisplay)));
+                .Where(c => c.Source.Owner == Canvas.SelectedNode));
     }
 
     // ── Settings ──────────────────────────────────────────────────────────

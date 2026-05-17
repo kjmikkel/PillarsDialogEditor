@@ -110,21 +110,20 @@ public class NodeDetailViewModelTests
     // ── Links ─────────────────────────────────────────────────────────────
 
     [Fact]
-    public void Load_WithMultipleLinks_CreatesOneRowPerLink()
+    public void RefreshLinks_AfterLoad_ShowsCorrectCount()
     {
-        var links = new[]
-        {
-            new NodeLink(1, 10, false, 1f, "ShowOnce"),
-            new NodeLink(1, 20, false, 2f, "Always"),
-        };
-        _vm.Load(MakeNode(links: links));
+        _vm.Load(MakeNode());
+        _vm.RefreshLinks([MakeConn(), MakeConn()]);
         Assert.Equal(2, _vm.Links.Count);
     }
 
     [Fact]
-    public void Load_WithNoLinks_ProducesEmptyLinksList()
+    public void Load_ClearsLinksFromPreviousNode()
     {
-        _vm.Load(MakeNode(links: []));
+        _vm.Load(MakeNode());
+        _vm.RefreshLinks([MakeConn()]);
+        _vm.Load(MakeNode(id: 2));   // loading a new node doesn't keep old links
+        _vm.RefreshLinks([]);
         Assert.Empty(_vm.Links);
     }
 
@@ -205,20 +204,27 @@ public class NodeDetailViewModelTests
 
     // ── RefreshLinks (Fix C) ──────────────────────────────────────────────
 
+    private static ConnectionViewModel MakeConn()
+    {
+        var src = new ConnectorViewModel();
+        var tgt = new ConnectorViewModel();
+        return new ConnectionViewModel(src, tgt);
+    }
+
     [Fact]
     public void RefreshLinks_UpdatesLinksList()
     {
         _vm.Load(MakeNode(links: []));
-        _vm.RefreshLinks([new NodeLink(1, 5, false)]);
+        _vm.RefreshLinks([MakeConn()]);
         Assert.Single(_vm.Links);
     }
 
     [Fact]
     public void RefreshLinks_WhenCalledTwice_ReplacesNotAppends()
     {
-        var initial = new[] { new NodeLink(1, 10, false), new NodeLink(1, 20, false) };
-        _vm.Load(MakeNode(links: initial));
-        _vm.RefreshLinks([new NodeLink(1, 30, false)]);
+        _vm.Load(MakeNode());
+        _vm.RefreshLinks([MakeConn(), MakeConn()]);
+        _vm.RefreshLinks([MakeConn()]);
         Assert.Single(_vm.Links);
     }
 }

@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:models="clr-namespace:DialogEditor.ViewModels.Models;assembly=DialogEditor.ViewModels"
+             xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
              x:Class="DialogEditor.Avalonia.Views.NodeDetailView" x:CompileBindings="False">
 
     <UserControl.Styles>
@@ -173,20 +174,53 @@
                 <TextBlock Classes="group-header" Text="{StaticResource Label_GroupLinks}"/>
                 <ItemsControl ItemsSource="{Binding Links}">
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="models:LinkRow">
-                            <Grid ColumnDefinitions="55,*,Auto" Margin="0,1,0,1">
-                                <TextBlock Grid.Column="0" Text="{Binding Arrow}"
-                                           Foreground="#5dade2" FontSize="10" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="{Binding Detail}"
-                                           Foreground="#666" FontSize="10" VerticalAlignment="Center"/>
-                                <Button Grid.Column="2"
-                                        Content="{StaticResource Button_DeleteLink}"
-                                        Command="{Binding DataContext.DeleteLinkCommand,
-                                                  RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                        CommandParameter="{Binding}"
-                                        Background="Transparent" BorderThickness="0"
-                                        Foreground="#888" FontSize="9" Padding="4,1"
-                                        ToolTip.Tip="{StaticResource ToolTip_DeleteLink}"/>
+                        <DataTemplate DataType="vm:ConnectionViewModel">
+                            <Grid RowDefinitions="Auto,Auto" Margin="0,2,0,2">
+                                <!-- Row 0: target + delete -->
+                                <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto">
+                                    <TextBlock Grid.Column="0"
+                                               Text="{StaticResource Link_Arrow}"
+                                               Foreground="#5dade2" FontSize="10"
+                                               VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding Target.Owner.NodeId}"
+                                               Foreground="#5dade2" FontSize="10"
+                                               VerticalAlignment="Center"/>
+                                    <Button Grid.Column="2"
+                                            Content="{StaticResource Button_DeleteLink}"
+                                            Command="{Binding DataContext.DeleteLinkCommand,
+                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            Background="Transparent" BorderThickness="0"
+                                            Foreground="#888" FontSize="9" Padding="4,1"
+                                            ToolTip.Tip="{StaticResource ToolTip_DeleteLink}"/>
+                                </Grid>
+                                <!-- Row 1: editable properties -->
+                                <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" Margin="12,2,0,0">
+                                    <ComboBox Grid.Column="0"
+                                              SelectedItem="{Binding QuestionNodeTextDisplay, Mode=TwoWay}"
+                                              Background="#1a1a1a" Foreground="#ccc"
+                                              BorderBrush="#444" BorderThickness="1"
+                                              FontSize="10" Padding="3,1" Height="22"
+                                              ToolTip.Tip="{StaticResource ToolTip_LinkQTD}">
+                                        <ComboBox.Items>
+                                            <sys:String></sys:String>
+                                            <sys:String>ShowOnce</sys:String>
+                                            <sys:String>Always</sys:String>
+                                            <sys:String>Never</sys:String>
+                                        </ComboBox.Items>
+                                    </ComboBox>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{StaticResource Label_LinkWeight}"
+                                               Foreground="#666" FontSize="10"
+                                               VerticalAlignment="Center" Margin="6,0,4,0"/>
+                                    <TextBox Grid.Column="2"
+                                             Text="{Binding RandomWeight, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                             Background="#1a1a1a" Foreground="#ccc"
+                                             BorderBrush="#444" BorderThickness="1"
+                                             FontSize="10" Padding="3,1" Width="40"
+                                             ToolTip.Tip="{StaticResource ToolTip_LinkWeight}"/>
+                                </Grid>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
