@@ -39,6 +39,12 @@ public partial class ConversationViewModel : ObservableObject
     [ObservableProperty]
     private bool _isModified;
 
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(DeleteNodeCmdCommand))]
+    [NotifyCanExecuteChangedFor(nameof(AddConnectedNodeCmdCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DeleteConnectionCmdCommand))]
+    private bool _isEditable;
+
     // ── Undo/Redo state ───────────────────────────────────────────────────
     public bool    CanUndo         => _undoStack.CanUndo;
     public bool    CanRedo         => _undoStack.CanRedo;
@@ -125,6 +131,9 @@ public partial class ConversationViewModel : ObservableObject
         node.DefaultText.Contains(q, StringComparison.OrdinalIgnoreCase) ||
         node.SpeakerName.Contains(q, StringComparison.OrdinalIgnoreCase);
 
+    // ── Base snapshot (used for patch diffing) ────────────────────────────
+    internal ConversationEditSnapshot? BaseSnapshot { get; private set; }
+
     // ── Load ──────────────────────────────────────────────────────────────
     public void Load(Conversation conversation)
     {
@@ -135,6 +144,7 @@ public partial class ConversationViewModel : ObservableObject
         Connections.Clear();
         SelectedNode = null;
         SearchQuery  = string.Empty;
+        BaseSnapshot = null;
         RefreshUndoRedo();
 
         var nodeMap = new Dictionary<int, NodeViewModel>();
@@ -170,6 +180,7 @@ public partial class ConversationViewModel : ObservableObject
                 }
             }
         }
+        BaseSnapshot = BuildSnapshot();
     }
 
     // ── Structural edit methods ───────────────────────────────────────────
@@ -233,20 +244,20 @@ public partial class ConversationViewModel : ObservableObject
     }
 
     // ── Relay commands for UI binding (context menus, keyboard) ───────────
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditable))]
     private void DeleteNodeCmd(NodeViewModel? node)
     {
         if (node is not null) DeleteNode(node);
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditable))]
     private void AddConnectedNodeCmd(NodeViewModel? parent)
     {
         if (parent is null) return;
         AddConnectedNode(parent, new LayoutPoint(parent.Location.X + 250, parent.Location.Y));
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditable))]
     private void DeleteConnectionCmd(ConnectionViewModel? connection)
     {
         if (connection is not null) DeleteConnection(connection);

@@ -53,6 +53,9 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
         return new Conversation(file.Name, nodes, strings);
     }
 
+    public string GetStringTablePath(ConversationFile file)
+        => StringTablePathFor(file.ConversationPath);
+
     private string StringTablePathFor(string convPath)
     {
         var relative = Path.GetRelativePath(ConversationsRoot, convPath);

@@ -1,0 +1,66 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DialogEditor.Avalonia.Views.SettingsWindow"
+        Title="{StaticResource Settings_Title}"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="500" Height="130"
+        CanResize="False"
+        Background="#1e1e1e"
+        WindowStartupLocation="CenterOwner"
+        x:CompileBindings="False">
+
+    <Window.Styles>
+        <Style Selector="TextBlock.label">
+            <Setter Property="Foreground"       Value="#aaa"/>
+            <Setter Property="FontSize"         Value="11"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Width"            Value="140"/>
+        </Style>
+        <Style Selector="TextBox.path">
+            <Setter Property="Background"   Value="#1a1a1a"/>
+            <Setter Property="Foreground"   Value="#e8e8e8"/>
+            <Setter Property="BorderBrush"  Value="#444"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize"     Value="11"/>
+            <Setter Property="IsReadOnly"   Value="True"/>
+            <Setter Property="Padding"      Value="4,3"/>
+        </Style>
+        <Style Selector="Button.browse">
+            <Setter Property="Background"   Value="#333"/>
+            <Setter Property="Foreground"   Value="#ccc"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"      Value="10,4"/>
+            <Setter Property="Margin"       Value="6,0,0,0"/>
+            <Setter Property="FontSize"     Value="11"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="*,Auto" Margin="16">
+
+        <StackPanel Grid.Row="0" Spacing="12">
+
+            <!-- Backup directory -->
+            <DockPanel ToolTip.Tip="{StaticResource Settings_BackupDirectoryTooltip}">
+                <TextBlock Classes="label" Text="{StaticResource Settings_BackupDirectory}"/>
+                <Button Classes="browse"
+                        DockPanel.Dock="Right"
+                        Content="{StaticResource Settings_Browse}"
+                        Command="{Binding BrowseBackupDirectoryCommand}"
+                        ToolTip.Tip="{StaticResource Settings_BackupDirectoryTooltip}"/>
+                <TextBox Classes="path"
+                         Text="{Binding BackupDirectory}"
+                         Watermark="(not set)"/>
+            </DockPanel>
+
+        </StackPanel>
+
+        <!-- Close button -->
+        <Button Grid.Row="1"
+                Content="{StaticResource Settings_Close}"
+                HorizontalAlignment="Right"
+                Background="#333" Foreground="#ccc" BorderThickness="0"
+                Padding="16,5" Margin="0,12,0,0"
+                Click="Close_Click"/>
+
+    </Grid>
+</Window>

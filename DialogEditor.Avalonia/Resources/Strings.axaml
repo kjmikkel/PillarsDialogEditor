@@ -133,8 +133,10 @@
     <sys:String x:Key="PropertyRow_HideSpeaker">Hide Speaker</sys:String>
 
     <!-- ─── Legend panel — section headers ────────────────────────────── -->
-    <!-- Title bar of the legend overlay -->
+    <!-- Title bar of the legend overlay (all-caps panel header) -->
     <sys:String x:Key="Legend_Header">LEGEND</sys:String>
+    <!-- Window title bar — sentence/title case -->
+    <sys:String x:Key="Legend_WindowTitle">Legend</sys:String>
     <sys:String x:Key="Legend_Connections">CONNECTIONS</sys:String>
     <sys:String x:Key="Legend_NodeTypes">NODE TYPES</sys:String>
     <sys:String x:Key="Legend_Symbols">SYMBOLS</sys:String>
@@ -167,6 +169,24 @@
     <sys:String x:Key="Legend_Symbol_Conditions">node has N visibility conditions</sys:String>
     <sys:String x:Key="Legend_Symbol_FemaleText">female text variant exists</sys:String>
     <sys:String x:Key="Legend_Symbol_PlayerChoice">player choice node (in title)</sys:String>
+
+    <!-- ─── Legend panel — keyboard shortcuts section ───────────────────── -->
+    <sys:String x:Key="Legend_Shortcuts">KEYBOARD SHORTCUTS</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlN_Desc">new project</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlO_Desc">open project</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlS_Desc">save project</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlShiftO">Ctrl+Shift+O</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlShiftO_Desc">open game folder</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlComma">Ctrl+,</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlComma_Desc">settings</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlZ_Desc">undo</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlY_Desc">redo</sys:String>
+    <sys:String x:Key="Legend_Shortcut_Del">Delete</sys:String>
+    <sys:String x:Key="Legend_Shortcut_Del_Desc">delete selected node</sys:String>
+    <sys:String x:Key="Legend_Shortcut_F5_Desc">test patch</sys:String>
+    <sys:String x:Key="Legend_Shortcut_F6_Desc">restore conversation after testing</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlShiftB">Ctrl+Shift+B</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlShiftB_Desc">restore backup (all conversations)</sys:String>
 
     <!-- ─── Legend panel — canvas control descriptions ─────────────────── -->
     <!-- "Fit" is the button label as it appears on the toolbar -->
@@ -294,5 +314,81 @@
     <sys:String x:Key="ToolTip_DeleteLink">Remove this connection</sys:String>
     <sys:String x:Key="Button_AddLink">Add link…</sys:String>
     <sys:String x:Key="ToolTip_AddLink">Add a connection from this node to another node by ID</sys:String>
+
+    <!-- ─── Settings window ──────────────────────────────────────────────── -->
+    <sys:String x:Key="Settings_Title">Settings</sys:String>
+    <sys:String x:Key="Settings_BackupDirectory">Backup directory</sys:String>
+    <sys:String x:Key="Settings_BackupDirectoryTooltip">Folder where the original game files are backed up for restoration after applying patches</sys:String>
+    <sys:String x:Key="Settings_PatchDirectory">Patch output directory</sys:String>
+    <sys:String x:Key="Settings_PatchDirectoryTooltip">Folder where .patch files are written when you save a conversation</sys:String>
+    <sys:String x:Key="Settings_Browse">Browse…</sys:String>
+    <sys:String x:Key="Settings_Close">Close</sys:String>
+    <sys:String x:Key="Settings_BackupDirectoryTitle">Select backup destination folder</sys:String>
+    <sys:String x:Key="Settings_PatchDirectoryTitle">Select patch output folder</sys:String>
+    <sys:String x:Key="ToolTip_Settings">Open settings (backup directory, patch output directory)</sys:String>
+
+    <!-- ─── Keyboard shortcut display labels ────────────────────────────── -->
+    <!-- These appear next to toolbar button labels in a secondary (muted) colour. -->
+    <sys:String x:Key="Shortcut_CtrlN">Ctrl+N</sys:String>
+    <sys:String x:Key="Shortcut_CtrlO">Ctrl+O</sys:String>
+    <sys:String x:Key="Shortcut_CtrlS">Ctrl+S</sys:String>
+    <sys:String x:Key="Shortcut_CtrlZ">Ctrl+Z</sys:String>
+    <sys:String x:Key="Shortcut_CtrlY">Ctrl+Y</sys:String>
+    <sys:String x:Key="Shortcut_F5">F5</sys:String>
+    <sys:String x:Key="Shortcut_F6">F6</sys:String>
+
+    <!-- ─── Menu bar ─────────────────────────────────────────────────────── -->
+    <sys:String x:Key="Menu_File">File</sys:String>
+    <sys:String x:Key="Menu_Edit">Edit</sys:String>
+    <sys:String x:Key="Menu_Test">Test</sys:String>
+    <sys:String x:Key="Menu_NewProject">New Project…</sys:String>
+    <sys:String x:Key="Menu_OpenProject">Open Project…</sys:String>
+    <sys:String x:Key="Menu_SaveProject">Save Project</sys:String>
+    <sys:String x:Key="Menu_Settings">Settings…</sys:String>
+
+    <!-- ─── Patch — toolbar buttons ──────────────────────────────────────── -->
+    <sys:String x:Key="Button_TestPatch">Test Patch</sys:String>
+    <sys:String x:Key="ToolTip_TestPatch">Apply all patches in the project to game files for testing</sys:String>
+
+    <!-- ─── Test mode overlay ─────────────────────────────────────────────── -->
+    <sys:String x:Key="TestMode_Message">Game files have been patched for testing. Launch the game and test your changes, then press Restore when you are done.</sys:String>
+    <sys:String x:Key="TestMode_Restore">Restore Conversation</sys:String>
+    <sys:String x:Key="ToolTip_TestMode_Restore">Revert the game files to their pre-test state and resume editing</sys:String>
+
+    <!-- ─── Patch — status messages ──────────────────────────────────────── -->
+    <!-- {0} = conversation name -->
+    <sys:String x:Key="Status_PatchSaved">Patch saved: {0}</sys:String>
+    <!-- Shown in the status bar when a conversation is loaded but no project is open -->
+    <sys:String x:Key="Status_NoProjectReadOnly">Viewing only — open or create a project (File › New Project) to start editing.</sys:String>
+    <!-- Shown when trying to save/test but no patch directory is configured -->
+    <sys:String x:Key="Status_NoPatchDirectory">Set a patch output directory in Settings before saving.</sys:String>
+    <!-- {0} = conversation name -->
+    <sys:String x:Key="Status_PatchNotFound">No patch file found for {0} — save first.</sys:String>
+    <!-- {0} = node ID, {1} = field name, {2} = expected value, {3} = actual value -->
+    <sys:String x:Key="Status_PatchConflict">Patch conflict on node {0} field '{1}': expected '{2}' but found '{3}'.</sys:String>
+    <!-- {0} = conversation name, {1} = error message -->
+    <sys:String x:Key="Status_TestApplyError">Test apply failed for {0}: {1}</sys:String>
+    <!-- Shown after successful Restore Conversation -->
+    <sys:String x:Key="Status_RestoreComplete2">Conversation restored — ready to edit.</sys:String>
+
+    <!-- ─── Project — status messages ────────────────────────────────────── -->
+    <!-- {0} = project name -->
+    <sys:String x:Key="Status_ProjectNew">New project: {0}</sys:String>
+    <!-- {0} = project name, {1} = patch count -->
+    <sys:String x:Key="Status_ProjectOpened">Opened project '{0}' ({1} patch(es))</sys:String>
+    <!-- {0} = project name -->
+    <sys:String x:Key="Status_ProjectSaved">Project saved: {0}</sys:String>
+    <!-- Shown when Ctrl+S is pressed with no project open -->
+    <sys:String x:Key="Status_NoProjectOpen">No project is open — use File &gt; New Project or Open Project.</sys:String>
+    <!-- Shown when Test Patch is pressed but project has no patches -->
+    <sys:String x:Key="Status_ProjectNoPatch">The project has no patches yet — save a conversation first.</sys:String>
+    <!-- {0} = path, {1} = error message -->
+    <sys:String x:Key="Status_ProjectOpenError">Could not open project '{0}': {1}</sys:String>
+
+    <!-- ─── Project — file picker dialogs ────────────────────────────────── -->
+    <sys:String x:Key="Dialog_NewProject">Create new project</sys:String>
+    <sys:String x:Key="Dialog_NewProjectDefault">MyMod</sys:String>
+    <sys:String x:Key="Dialog_OpenProject">Open project</sys:String>
+    <sys:String x:Key="FileType_DialogProject">Dialog Project (*.dialogproject)</sys:String>
 
 </ResourceDictionary>

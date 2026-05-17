@@ -15,6 +15,73 @@
                 <ResourceInclude Source="avares://DialogEditor.Avalonia/Resources/Strings.axaml"/>
             </ResourceDictionary.MergedDictionaries>
 
+            <!-- ToolbarPlainButton / ToolbarPlainToggleButton
+                 Minimal control themes for icon-only toolbar buttons.
+                 Only Background changes on hover/press — no border, no padding
+                 change, no size change. TargetType is required so TemplateBinding
+                 resolves Padding correctly. -->
+            <ControlTheme x:Key="ToolbarPlainButton" TargetType="Button">
+                <Setter Property="Background" Value="#333"/>
+                <Setter Property="Foreground" Value="#aaa"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Padding" Value="8,4"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <ContentPresenter x:Name="PART_ContentPresenter"
+                                          Background="{TemplateBinding Background}"
+                                          BorderThickness="0"
+                                          Padding="{TemplateBinding Padding}"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Foreground="{TemplateBinding Foreground}"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </ControlTemplate>
+                </Setter>
+                <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="#444"/>
+                </Style>
+                <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="#4a4a4a"/>
+                </Style>
+            </ControlTheme>
+
+            <ControlTheme x:Key="ToolbarPlainToggleButton" TargetType="ToggleButton">
+                <Setter Property="Background" Value="#333"/>
+                <Setter Property="Foreground" Value="#aaa"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Padding" Value="8,4"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <ContentPresenter x:Name="PART_ContentPresenter"
+                                          Background="{TemplateBinding Background}"
+                                          BorderThickness="0"
+                                          Padding="{TemplateBinding Padding}"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Foreground="{TemplateBinding Foreground}"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </ControlTemplate>
+                </Setter>
+                <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="#444"/>
+                </Style>
+                <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="#4a4a4a"/>
+                </Style>
+                <Style Selector="^:checked /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="#3a3a3a"/>
+                </Style>
+                <Style Selector="^:checked:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+                    <Setter Property="Background" Value="#444"/>
+                </Style>
+            </ControlTheme>
+
             <converters:LayoutPointConverter             x:Key="LayoutPointConverter"/>
             <converters:SpeakerCategoryToBrushConverter x:Key="SpeakerCategoryToBrush"/>
             <converters:BoolToFemaleTextBrushConverter  x:Key="BoolToFemaleTextBrush"/>

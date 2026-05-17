@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Backup;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
+using DialogEditor.Patch;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
 
@@ -15,10 +16,19 @@ namespace DialogEditor.ViewModels;
 public partial class MainWindowViewModel : ObservableObject
 {
     private readonly IFolderPicker _folderPicker;
+    private readonly IFilePicker   _filePicker;
 
     public GameBrowserViewModel  Browser { get; }
     public ConversationViewModel Canvas  { get; }
     public NodeDetailViewModel   Detail  { get; } = new();
+
+    // ── Active project ────────────────────────────────────────────────────
+    private DialogProject? _project;
+    private string?        _projectPath;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(WindowTitle))]
+    private string? _currentProjectName;
 
     private IGameDataProvider? _provider;
     private ConversationFile?  _currentFile;
@@ -43,10 +53,17 @@ public partial class MainWindowViewModel : ObservableObject
     public bool IsBrowserFlyoutOpen => IsBrowserExpanded && !IsBrowserPinned;
 
     // ── Window title reflects dirty state ─────────────────────────────────
-    public string WindowTitle =>
-        IsModified && CurrentConversationName is not null
-            ? $"● {CurrentConversationName}"
-            : Loc.Get("App_Title");
+    public string WindowTitle
+    {
+        get
+        {
+            var project = CurrentProjectName is not null ? $" [{CurrentProjectName}]" : string.Empty;
+            var dirty   = IsModified && CurrentConversationName is not null ? "● " : string.Empty;
+            return CurrentConversationName is not null
+                ? $"{dirty}{CurrentConversationName}{project}"
+                : Loc.Get("App_Title") + project;
+        }
+    }
 
     // ── Unsaved-changes navigation guard ──────────────────────────────────
     private ConversationFile? _pendingFile;
@@ -67,6 +84,17 @@ public partial class MainWindowViewModel : ObservableObject
 
     public void CancelPendingNavigation() => _pendingFile = null;
 
+    // ── Project open state ────────────────────────────────────────────────
+    public bool IsProjectOpen => _project is not null;
+
+    private void SetProject(DialogProject? project)
+    {
+        _project = project;
+        Canvas.IsEditable = project is not null;
+        OnPropertyChanged(nameof(IsProjectOpen));
+        SaveProjectCommand.NotifyCanExecuteChanged();
+    }
+
     // ── Partial hooks ─────────────────────────────────────────────────────
     partial void OnIsBrowserPinnedChanged(bool value)
     {
@@ -83,9 +111,10 @@ public partial class MainWindowViewModel : ObservableObject
         => OnPropertyChanged(nameof(WindowTitle));
 
     // ── Constructor ───────────────────────────────────────────────────────
-    public MainWindowViewModel(IDispatcher dispatcher, IFolderPicker folderPicker)
+    public MainWindowViewModel(IDispatcher dispatcher, IFolderPicker folderPicker, IFilePicker filePicker)
     {
         _folderPicker = folderPicker;
+        _filePicker   = filePicker;
         Browser = new GameBrowserViewModel(dispatcher);
         Canvas  = new ConversationViewModel(dispatcher);
 
@@ -119,6 +148,7 @@ public partial class MainWindowViewModel : ObservableObject
             {
                 IsModified = Canvas.IsModified;
                 SaveCommand.NotifyCanExecuteChanged();
+                SaveProjectCommand.NotifyCanExecuteChanged();
             }
         };
 
@@ -127,6 +157,15 @@ public partial class MainWindowViewModel : ObservableObject
         var last = AppSettings.LastGameDirectory;
         if (!string.IsNullOrEmpty(last) && Directory.Exists(last))
             LoadDirectory(last);
+
+        // Crash recovery: if a test was in progress when the app closed, re-enter test mode
+        if (AppSettings.GetPendingRestores() is not null)
+            TestModeEntered?.Invoke();
+
+        // Re-open last project if one was open
+        var lastProject = AppSettings.LastProjectPath;
+        if (!string.IsNullOrEmpty(lastProject) && File.Exists(lastProject))
+            LoadProject(lastProject);
     }
 
     partial void OnSelectedLanguageChanged(string value)
@@ -152,6 +191,87 @@ public partial class MainWindowViewModel : ObservableObject
                     1f,
                     c.QuestionNodeTextDisplay)));
     }
+
+    // ── Settings ──────────────────────────────────────────────────────────
+    public SettingsViewModel CreateSettingsViewModel()
+        => new(_currentGameDirectory, _folderPicker);
+
+    // ── Project — New / Open / Save ───────────────────────────────────────
+    [RelayCommand]
+    private async Task NewProject()
+    {
+        var path = await _filePicker.PickSaveFileAsync(
+            Loc.Get("Dialog_NewProject"),
+            Loc.Get("Dialog_NewProjectDefault"),
+            ".dialogproject",
+            Loc.Get("FileType_DialogProject"));
+        if (path is null) return;
+        var name = Path.GetFileNameWithoutExtension(path);
+        SetProject(DialogProject.Empty(name));
+        _projectPath = path;
+        DialogProjectSerializer.SaveToFile(path, _project!);
+        AppSettings.LastProjectPath = path;
+        CurrentProjectName = name;
+        AppLog.Info($"New project: {path}");
+        StatusText = Loc.Format("Status_ProjectNew", name);
+    }
+
+    [RelayCommand]
+    private async Task OpenProject()
+    {
+        var path = await _filePicker.PickOpenFileAsync(
+            Loc.Get("Dialog_OpenProject"),
+            ".dialogproject",
+            Loc.Get("FileType_DialogProject"));
+        if (path is null) return;
+        LoadProject(path);
+    }
+
+    private void LoadProject(string path)
+    {
+        try
+        {
+            var loaded = DialogProjectSerializer.LoadFromFile(path);
+            SetProject(loaded);
+            _projectPath = path;
+            AppSettings.LastProjectPath = path;
+            CurrentProjectName = loaded.Name;
+            AppLog.Info($"Opened project: {path}");
+            StatusText = Loc.Format("Status_ProjectOpened", loaded.Name, loaded.Patches.Count);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error($"Failed to open project '{path}'", ex);
+            StatusText = Loc.Format("Status_ProjectOpenError", path, ex.Message);
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanSaveProject))]
+    private void SaveProject()
+    {
+        if (_project is null || _projectPath is null || _currentFile is null || Canvas.BaseSnapshot is null) return;
+        try
+        {
+            var patch    = DiffEngine.Diff(_currentFile.Name, Canvas.BaseSnapshot, Canvas.BuildSnapshot());
+            SetProject(_project!.WithPatch(patch));
+            DialogProjectSerializer.SaveToFile(_projectPath, _project);
+            Canvas.IsModified = false;
+            IsModified = false;
+            SaveCommand.NotifyCanExecuteChanged();
+            SaveProjectCommand.NotifyCanExecuteChanged();
+            AppLog.Info($"Project saved: {_projectPath}");
+            StatusText = Loc.Format("Status_ProjectSaved", _project.Name);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error($"Failed to save project", ex);
+            StatusText = Loc.Format("Status_SaveError", _project?.Name ?? "?", ex.Message);
+        }
+    }
+
+    private bool CanSaveProject() =>
+        _project is not null && _projectPath is not null &&
+        _currentFile is not null && IsModified;
 
     // ── Open folder ───────────────────────────────────────────────────────
     [RelayCommand]
@@ -265,29 +385,129 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    // ── Save ──────────────────────────────────────────────────────────────
+    // ── Save — delegates to SaveProject (Ctrl+S) ─────────────────────────
     [RelayCommand(CanExecute = nameof(CanSave))]
     private void Save()
     {
-        if (_provider is null || _currentFile is null) return;
-        try
+        if (_project is null)
         {
-            var snapshot = Canvas.BuildSnapshot();
-            _provider.SaveConversation(_currentFile, snapshot);
-            Canvas.IsModified = false;
-            IsModified = false;
-            SaveCommand.NotifyCanExecuteChanged();
-            AppLog.Info($"Saved {_currentFile.Name}");
-            StatusText = Loc.Format("Status_Saved", _currentFile.Name);
+            StatusText = Loc.Get("Status_NoProjectOpen");
+            return;
         }
-        catch (Exception ex)
-        {
-            AppLog.Error($"Failed to save '{_currentFile?.Name}'", ex);
-            StatusText = Loc.Format("Status_SaveError", _currentFile!.Name, ex.Message);
-        }
+        SaveProject();
     }
 
     private bool CanSave() => _provider is not null && _currentFile is not null && IsModified;
+
+    // ── Test / Restore events (listened to by the View) ───────────────────
+    public event Action? TestModeEntered;
+    public event Action? TestModeExited;
+
+    // ── Test Patch (applies every patch in the project) ───────────────────
+    [RelayCommand(CanExecute = nameof(CanTestPatch))]
+    private void TestPatch()
+    {
+        if (_provider is null || _project is null) return;
+
+        if (_project.Patches.Count == 0)
+        {
+            StatusText = Loc.Get("Status_ProjectNoPatch");
+            return;
+        }
+
+        var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(tempDir);
+        var restoreEntries = new List<PendingRestoreEntry>();
+
+        try
+        {
+            foreach (var (convName, patch) in _project.Patches)
+            {
+                var file = _provider.FindConversation(convName);
+                if (file is null)
+                {
+                    AppLog.Warn($"Conversation not found for patch: {convName}");
+                    continue;
+                }
+
+                var origConv   = file.ConversationPath;
+                var origSt     = _provider.GetStringTablePath(file);
+                var backupConv = Path.Combine(tempDir, convName + ".conversation.bak");
+                var backupSt   = Path.Combine(tempDir, convName + ".stringtable.bak");
+
+                File.Copy(origConv, backupConv);
+                if (File.Exists(origSt)) File.Copy(origSt, backupSt);
+                restoreEntries.Add(new PendingRestoreEntry(backupConv, backupSt, origConv, origSt));
+            }
+
+            // Persist restore info before writing game files (crash safety)
+            AppSettings.SetPendingRestores(restoreEntries);
+
+            foreach (var (convName, patch) in _project.Patches)
+            {
+                var file = _provider.FindConversation(convName);
+                if (file is null) continue;
+
+                var conversation = _provider.LoadConversation(file);
+                var baseSnap     = ConversationSnapshotBuilder.Build(conversation);
+                var merged       = PatchApplier.Apply(baseSnap, patch);
+                _provider.SaveConversation(file, merged);
+            }
+
+            AppLog.Info($"Test: applied {_project.Patches.Count} patch(es) from project '{_project.Name}'");
+            TestModeEntered?.Invoke();
+        }
+        catch (PatchConflictException ex)
+        {
+            AppSettings.ClearPendingRestores();
+            AppLog.Error($"Patch conflict testing project '{_project.Name}'", ex);
+            StatusText = Loc.Format("Status_PatchConflict",
+                ex.NodeId, ex.FieldName, ex.ExpectedFrom, ex.ActualValue);
+        }
+        catch (Exception ex)
+        {
+            AppSettings.ClearPendingRestores();
+            AppLog.Error($"Failed to test project '{_project?.Name}'", ex);
+            StatusText = Loc.Format("Status_TestApplyError", _project!.Name, ex.Message);
+        }
+    }
+
+    private bool CanTestPatch() => _provider is not null && _project is not null;
+
+    // ── Restore Conversations (all entries in project) ────────────────────
+    [RelayCommand]
+    private void RestoreConversation()
+    {
+        var entries = AppSettings.GetPendingRestores();
+        if (entries is null || entries.Count == 0) return;
+        try
+        {
+            var tempDirsToDelete = new HashSet<string>();
+            foreach (var r in entries)
+            {
+                File.Copy(r.BackupConvPath, r.OriginalConvPath, overwrite: true);
+                if (File.Exists(r.BackupStPath))
+                    File.Copy(r.BackupStPath, r.OriginalStPath, overwrite: true);
+                tempDirsToDelete.Add(Path.GetDirectoryName(r.BackupConvPath)!);
+            }
+
+            foreach (var dir in tempDirsToDelete)
+                try { Directory.Delete(dir, recursive: true); }
+                catch (Exception ex) { AppLog.Warn($"Could not delete temp backup folder: {ex.Message}"); }
+
+            AppSettings.ClearPendingRestores();
+            AppLog.Info($"Restored {entries.Count} conversation(s)");
+            StatusText = Loc.Get("Status_RestoreComplete2");
+
+            if (_currentFile is not null) LoadConversationFile(_currentFile);
+            TestModeExited?.Invoke();
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error("Failed to restore conversations", ex);
+            StatusText = Loc.Format("Status_SaveError", _project?.Name ?? "?", ex.Message);
+        }
+    }
 
     // ── Conversation selection ────────────────────────────────────────────
     private void OnConversationSelected(ConversationFile file)
@@ -316,7 +536,10 @@ public partial class MainWindowViewModel : ObservableObject
             IsModified = false;
             CurrentConversationName = file.Name;
             if (!IsBrowserPinned) IsBrowserExpanded = false;
-            StatusText = Loc.Format("Status_ConversationLoaded", file.Name, conversation.Nodes.Count);
+            if (_project is null)
+                StatusText = Loc.Get("Status_NoProjectReadOnly");
+            else
+                StatusText = Loc.Format("Status_ConversationLoaded", file.Name, conversation.Nodes.Count);
         }
         catch (Exception ex)
         {
