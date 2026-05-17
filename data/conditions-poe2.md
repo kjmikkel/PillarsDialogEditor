@@ -109,7 +109,9 @@ Extracted from `Assembly-CSharp/Game/Conditionals.cs` (decompiled game assembly)
 | Is Player Attribute Score Value | `IsPlayerAttributeScoreValue` | Attribute (CharacterStats+AttributeScoreType), Operator (Operator), Value (Int32) |
 | Is Defense Value | `IsDefenseValue` | Object (Guid), Defense Type (CharacterStats+DefenseType), Operator (Operator), Value (Int32) |
 | Is Player Defense Value | `IsPlayerDefenseValue` | Defense Type (CharacterStats+DefenseType), Operator (Operator), Value (Int32) |
-| Is Skill Value | `IsSkillValue` | Object (Guid), Skill Type (CharacterStats+SkillType), Operator (Operator), Value (Int32) |
+| Is Party Skill Value Count *(PoE2 — Guid-based)* | `IsPartySkillValueCount` | Skill Type (GameData Guid), Skill Op (Operator), Skill Value (Int32), Party Op (Operator), Party Value (Int32), Hide Notification (Boolean) |
+| Is Skill Value *(PoE2 — Guid-based)* | `IsSkillValue` | Object (Guid), Skill Type **(GameData Guid)**, Operator (Operator), Value (Int32), Is Assisted (Boolean), Hide Notification If Failure (Boolean) |
+| Is Skill Value (Scaled) *(PoE2 — Guid-based)* | `IsSkillValueScaled` | Object (Guid), Skill Type (GameData Guid), Operator (Operator), Value (Int32), Is Assisted (Boolean), Scaler, Hide Notification |
 | Is Player Skill Value | `IsPlayerSkillValue` | Skill Type (CharacterStats+SkillType), Operator (Operator), Value (Int32) |
 | Is Level | `IsLevel` | Object (Guid), Operator (Operator), Target Level (Int32) |
 | Is Scaled Level | `IsScaledLevel` | Object (Guid), Operator (Operator), Target Level (Int32) |

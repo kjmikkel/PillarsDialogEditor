@@ -135,9 +135,9 @@ Extracted from `Assembly-CSharp/Conditionals.cs` (decompiled game assembly).
 | Is Slot Attribute Score Value | `IsSlotAttributeScoreValue` | Slot (Int32), Attribute (CharacterStats+AttributeScoreType), Operator (Operator), Value (Int32) |
 | Is Defense Value | `IsDefenseValue` | Object (Guid), Defense Type (CharacterStats+DefenseType), Operator (Operator), Value (Int32) |
 | Is Player Defense Value | `IsPlayerDefenseValue` | Defense Type (CharacterStats+DefenseType), Operator (Operator), Value (Int32) |
-| Is Skill Value | `IsSkillValue` | Object (Guid), Skill Type (CharacterStats+SkillType), Operator (Operator), Value (Int32) |
+| Is Skill Value *(PoE1 only)* | `IsSkillValue` | Object (Guid), Skill Type (CharacterStats+SkillType), Operator (Operator), Value (Int32) |
 | Is Skill Value (Scaled) | `IsSkillValueScaled` | Object (Guid), Skill (CharacterStats+SkillType), Operator (Operator), Value (Int32), Scaler (DifficultyScaling+Scaler) |
-| Is Party Skill Value Count | `IsPartySkillValueCount` | Skill (CharacterStats+SkillType), Skill Op (Operator), Skill Value (Int32), Party Op (Operator), Party Value (Int32) |
+| Is Party Skill Value Count *(PoE1 only)* | `IsPartySkillValueCount` | Skill (CharacterStats+SkillType), Skill Op (Operator), Skill Value (Int32), Party Op (Operator), Party Value (Int32) |
 | Is Player Skill Value | `IsPlayerSkillValue` | Skill Type (CharacterStats+SkillType), Operator (Operator), Value (Int32) |
 | Is Slot Skill Value | `IsSlotSkillValue` | Slot (Int32), Skill Type (CharacterStats+SkillType), Operator (Operator), Value (Int32) |
 | Is Player Character Using S.I. | `IsPlayerCharacterUsingSI` | — |
