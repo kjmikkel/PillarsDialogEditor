@@ -530,6 +530,22 @@
     ]
   },
   {
+    "methodName": "IsPartySkillValueCount",
+    "fullName": "Boolean IsPartySkillValueCount(Guid, Operator, Int32, Operator, Int32, Boolean)",
+    "displayName": "Is Party Skill Value Count (PoE2)",
+    "category": "RPG",
+    "games": ["poe2"],
+    "description": "Tests how many party members meet a skill threshold. PoE2 uses a GameData GUID to identify the skill.",
+    "parameters": [
+      { "name": "Skill Type", "type": "GameData", "description": "Skill GameData GUID (e.g. 90b913bb-960f-4f6c-8394-d01796148367 for Athletics).", "default": "90b913bb-960f-4f6c-8394-d01796148367" },
+      { "name": "Skill Operator", "type": "Operator", "description": "Skill comparison operator.", "default": "EqualTo" },
+      { "name": "Skill Value", "type": "Int32", "description": "Skill threshold.", "default": "0" },
+      { "name": "Party Operator", "type": "Operator", "description": "Operator for the party member count.", "default": "EqualTo" },
+      { "name": "Party Value", "type": "Int32", "description": "Number of party members who must pass.", "default": "0" },
+      { "name": "Hide Notification If Failure", "type": "Boolean", "description": "Suppresses failure notification in scripted interactions.", "default": "false" }
+    ]
+  },
+  {
     "methodName": "IsMoraleStatus",
     "fullName": "Boolean IsMoraleStatus(MoraleStateType)",
     "displayName": "Is Morale Status",

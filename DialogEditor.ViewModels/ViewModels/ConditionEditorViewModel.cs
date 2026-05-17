@@ -38,6 +38,8 @@ public partial class ConditionEditorViewModel : ObservableObject
         {
             if (c is ConditionLeaf leaf)
                 Rows.Add(BuildRow(leaf));
+            else if (c is ConditionBranch branch)
+                Rows.Add(new ConditionRowViewModel(branch));
         }
     }
 
@@ -84,7 +86,7 @@ public partial class ConditionEditorViewModel : ObservableObject
     [RelayCommand]
     private void Confirm()
     {
-        _node.Conditions = Rows.Select(r => (ConditionNode)r.ToLeaf()).ToList();
+        _node.Conditions = Rows.Select(r => r.ToNode()).ToList();
         Confirmed?.Invoke();
     }
 

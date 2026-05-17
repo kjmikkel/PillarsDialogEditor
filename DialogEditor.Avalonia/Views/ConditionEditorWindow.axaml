@@ -80,29 +80,42 @@
 
                                     <!-- Row header -->
                                     <Grid ColumnDefinitions="70,Auto,*,28,28,28">
-                                        <!-- And / Or -->
+                                        <!-- And / Or (hidden for branch rows — branch controls its own operator) -->
                                         <ComboBox Grid.Column="0"
                                                   SelectedItem="{Binding Operator, Mode=TwoWay}"
                                                   Background="#1a1a1a" BorderBrush="#555"
-                                                  BorderThickness="1" FontSize="11" Padding="4,2">
+                                                  BorderThickness="1" FontSize="11" Padding="4,2"
+                                                  IsVisible="{Binding IsLeaf}">
                                             <ComboBox.Items>
                                                 <sys:String>And</sys:String>
                                                 <sys:String>Or</sys:String>
                                             </ComboBox.Items>
                                         </ComboBox>
-                                        <!-- NOT toggle — Auto column so label never wraps -->
+                                        <!-- NOT toggle -->
                                         <CheckBox Grid.Column="1"
                                                   IsChecked="{Binding Not, Mode=TwoWay}"
                                                   Content="NOT"
                                                   Foreground="#aaa" FontSize="11"
                                                   Margin="8,0,8,0" VerticalAlignment="Center"
+                                                  IsVisible="{Binding IsLeaf}"
                                                   ToolTip.Tip="Negate — the condition must be FALSE"/>
-                                        <!-- Display name -->
+                                        <!-- Display name (leaves) -->
                                         <TextBlock Grid.Column="2"
                                                    Text="{Binding DisplayName}"
                                                    Foreground="#e8e8e8" FontSize="13"
                                                    FontWeight="SemiBold"
-                                                   VerticalAlignment="Center"/>
+                                                   VerticalAlignment="Center"
+                                                   IsVisible="{Binding IsLeaf}"/>
+                                        <!-- Branch read-only indicator -->
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal"
+                                                    VerticalAlignment="Center" Spacing="6"
+                                                    IsVisible="{Binding IsBranch}">
+                                            <TextBlock Text="⚙" Foreground="#f0a830" FontSize="13"/>
+                                            <TextBlock Text="{Binding DisplayName}"
+                                                       Foreground="#888" FontSize="12"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       ToolTip.Tip="Grouped condition — structure preserved but not editable here"/>
+                                        </StackPanel>
                                         <!-- Move up -->
                                         <Button Grid.Column="3" Content="↑"
                                                 Command="{Binding DataContext.MoveUpCommand,
@@ -129,8 +142,9 @@
                                                 ToolTip.Tip="Remove this condition"/>
                                     </Grid>
 
-                                    <!-- Parameters -->
-                                    <ItemsControl ItemsSource="{Binding Parameters}">
+                                    <!-- Parameters (hidden for branch rows) -->
+                                    <ItemsControl ItemsSource="{Binding Parameters}"
+                                                  IsVisible="{Binding IsLeaf}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate DataType="vm:ParameterValueViewModel">
                                                 <Grid ColumnDefinitions="110,*,Auto"

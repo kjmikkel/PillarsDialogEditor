@@ -321,6 +321,6 @@ public partial class NodeDetailViewModel : ObservableObject
     public void CommitConditions()
     {
         if (_node is null) return;
-        _node.Conditions = ConditionRows.Select(r => (ConditionNode)r.ToLeaf()).ToList();
+        _node.Conditions = ConditionRows.Select(r => r.ToNode()).ToList();
     }
 }

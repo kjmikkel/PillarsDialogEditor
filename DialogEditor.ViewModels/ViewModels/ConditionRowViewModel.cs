@@ -65,10 +65,34 @@ public partial class ConditionRowViewModel : ObservableObject
     public string FullName    { get; }
     public string DisplayName { get; }
 
+    /// True when this row wraps a ConditionBranch — editing is disabled,
+    /// but the row can be moved or deleted and its node is committed unchanged.
+    public bool IsLeaf   { get; }
+    public bool IsBranch => !IsLeaf;
+
+    private readonly ConditionBranch? _branch;
+
     public ObservableCollection<ParameterValueViewModel> Parameters { get; }
+
+    /// Constructor for ConditionBranch pass-through rows.
+    public ConditionRowViewModel(ConditionBranch branch)
+    {
+        IsLeaf      = false;
+        _branch     = branch;
+        _not        = branch.Not;
+        _operator   = branch.Operator;
+        FullName    = "(grouped)";
+        DisplayName = branch.Format();
+        Parameters  = [];
+    }
+
+    /// Returns the condition node this row represents (leaf or original branch).
+    public ConditionNode ToNode() =>
+        IsLeaf ? ToLeaf() : (ConditionNode)_branch! with { Not = Not, Operator = Operator };
 
     public ConditionRowViewModel(ConditionLeaf leaf, ConditionEntry? catalogueEntry)
     {
+        IsLeaf      = true;
         FullName    = leaf.FullName;
         DisplayName = catalogueEntry?.DisplayName ?? StripReturnType(leaf.FullName);
         _not        = leaf.Not;
