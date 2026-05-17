@@ -309,6 +309,16 @@
     <sys:String x:Key="Option_PersistenceNone">None</sys:String>
     <sys:String x:Key="Option_PersistenceOnceEver">OnceEver</sys:String>
 
+    <!-- ─── Detail panel — condition editor ─────────────────────────────── -->
+    <sys:String x:Key="Label_GroupConditions">CONDITIONS</sys:String>
+    <sys:String x:Key="Button_AddCondition">+ Add…</sys:String>
+    <sys:String x:Key="ToolTip_AddCondition">Add a condition from the catalogue</sys:String>
+    <sys:String x:Key="ToolTip_DeleteCondition">Remove this condition</sys:String>
+    <sys:String x:Key="ToolTip_MoveConditionUp">Move condition up</sys:String>
+    <sys:String x:Key="ToolTip_MoveConditionDown">Move condition down</sys:String>
+    <sys:String x:Key="Label_Condition_NOT">NOT</sys:String>
+    <sys:String x:Key="Placeholder_PickCondition">Pick a condition…</sys:String>
+
     <!-- ─── Detail panel — link property labels and tooltips ───────────── -->
     <sys:String x:Key="Label_LinkWeight">w</sys:String>
     <sys:String x:Key="ToolTip_LinkQTD">Controls whether this player choice reappears after selection (ShowOnce / Always / Never)</sys:String>
