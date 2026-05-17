@@ -12,6 +12,41 @@ public partial class ParameterValueViewModel : ObservableObject
     public string Type        { get; init; } = string.Empty;
 
     [ObservableProperty] private string _value = string.Empty;
+
+    // For the condition editor window
+    public bool   IsEnum      => Type.StartsWith("Enum:") || Type == "Operator" || Type == "Boolean";
+    public bool   IsText      => !IsEnum;
+    public bool   HasTypeHint => !string.IsNullOrEmpty(TypeHint);
+
+    public IReadOnlyList<string> EnumOptions => Type switch
+    {
+        "Operator"   => ["EqualTo", "NotEqualTo", "GreaterThan", "LessThan",
+                         "GreaterThanOrEqualTo", "LessThanOrEqualTo"],
+        "Boolean"    => ["true", "false"],
+        _ when Type.StartsWith("Enum:") => [],   // unknown enum — fall back to text
+        _ => []
+    };
+
+    public string TypeHint => Type switch
+    {
+        "String"         => "Text string (e.g. a flag name, conversation name, or item name)",
+        "Int32"          => "Integer number (whole number, no decimals)",
+        "Single"         => "Decimal number (e.g. 1.5)",
+        "Boolean"        => "true or false",
+        "Operator"       => "Comparison operator: EqualTo, NotEqualTo, GreaterThan, LessThan, "
+                          + "GreaterThanOrEqualTo, LessThanOrEqualTo",
+        "GlobalVariable" => "Name of a global integer flag (e.g. npc_met_edér). "
+                          + "Check GlobalVariables.csv for valid names.",
+        "ObjectGuid"     => "GUID of an in-scene game object "
+                          + "(e.g. 7d150000-0000-0000-0000-000000000000). "
+                          + "Use the default companion GUIDs or an in-scene object GUID.",
+        "Conversation"   => "Conversation filename without extension (e.g. edér)",
+        "Quest"          => "Quest filename without extension",
+        "GameData"       => "Asset GUID — check the game data files for the correct value",
+        _ when Type.StartsWith("Enum:") =>
+            $"Enum value — type: {Type["Enum:".Length..].Replace('+', '.')}",
+        _ => string.IsNullOrEmpty(Type) ? string.Empty : $"Type: {Type}"
+    };
 }
 
 public partial class ConditionRowViewModel : ObservableObject

@@ -311,8 +311,10 @@
 
     <!-- ─── Detail panel — condition editor ─────────────────────────────── -->
     <sys:String x:Key="Label_GroupConditions">CONDITIONS</sys:String>
-    <sys:String x:Key="Button_AddCondition">+ Add…</sys:String>
-    <sys:String x:Key="ToolTip_AddCondition">Add a condition from the catalogue</sys:String>
+    <sys:String x:Key="Button_EditConditions">Edit…</sys:String>
+    <sys:String x:Key="ToolTip_EditConditions">Open the condition editor to add, edit, or remove conditions</sys:String>
+    <sys:String x:Key="Button_AddCondition">+ Add</sys:String>
+    <sys:String x:Key="ToolTip_AddCondition">Add selected condition to the list</sys:String>
     <sys:String x:Key="ToolTip_DeleteCondition">Remove this condition</sys:String>
     <sys:String x:Key="ToolTip_MoveConditionUp">Move condition up</sys:String>
     <sys:String x:Key="ToolTip_MoveConditionDown">Move condition down</sys:String>
