@@ -8,6 +8,7 @@ namespace DialogEditor.Core.GameData;
 public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
 {
     public string GameName => "Pillars of Eternity";
+    public string GameId   => "poe1";
     public string Language { get; set; } = "en";
 
     private string DataRoot        => Path.Combine(rootPath, "PillarsOfEternity_Data", "data");

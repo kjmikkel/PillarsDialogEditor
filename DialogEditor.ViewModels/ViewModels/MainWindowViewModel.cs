@@ -33,6 +33,13 @@ public partial class MainWindowViewModel : ObservableObject
     private IGameDataProvider? _provider;
     private ConversationFile?  _currentFile;
     private string             _currentGameDirectory = string.Empty;
+    private string             _activeGameId         = string.Empty;
+
+    /// Conditions from the catalogue filtered to the currently loaded game.
+    public IReadOnlyList<ConditionEntry> ActiveConditions
+        => string.IsNullOrEmpty(_activeGameId)
+            ? []
+            : ConditionCatalogue.Instance.ForGame(_activeGameId);
 
     [ObservableProperty] private string              _statusText          = Loc.Get("Status_OpenFolder");
     [ObservableProperty] private IReadOnlyList<string> _availableLanguages = [];
@@ -301,6 +308,7 @@ public partial class MainWindowViewModel : ObservableObject
             _provider = provider;
             CurrentConversationName = null;
             SpeakerNameService.Register(provider.LoadSpeakerNames());
+            _activeGameId = provider.GameId;
             AvailableLanguages = provider.AvailableLanguages;
             SelectedLanguage   = AppSettings.PickLanguage(AvailableLanguages, AppSettings.LastLanguage);
             Browser.Load(provider);
