@@ -116,11 +116,13 @@ public partial class MainWindow : Window
                 break;
 
             case Key.S when e.KeyModifiers == KeyModifiers.Control:
+                if (TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() is TextBox)
+                    CanvasView.FocusEditor();
                 vm.SaveCommand.Execute(null);
                 e.Handled = true;
                 break;
 
-            case Key.Delete when vm.Canvas.SelectedNode is not null:
+            case Key.Delete when vm.Canvas.SelectedNode is not null && e.Source is not TextBox:
                 vm.Canvas.DeleteNodeCmdCommand.Execute(vm.Canvas.SelectedNode);
                 e.Handled = true;
                 break;

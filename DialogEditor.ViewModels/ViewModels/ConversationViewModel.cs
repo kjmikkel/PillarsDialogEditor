@@ -217,7 +217,7 @@ public partial class ConversationViewModel : ObservableObject
             new ConversationNode(newId, false, SpeakerCategory.Npc,
                 parent.SpeakerGuid, parent.ListenerGuid, [], [], [],
                 parent.DisplayType, parent.Persistence),
-            null);
+            new StringEntry(newId, string.Empty, string.Empty));
         newNode.UndoStack  = _undoStack;
         newNode.OnSelected = n => SelectedNode = n;
         newNode.Input.Owner  = newNode;

@@ -188,4 +188,37 @@ public class NodeDetailViewModelTests
         Assert.Equal(string.Empty, _vm.SpeakerGuid);
         Assert.False(_vm.HasContent);
     }
+
+    // ── New-node empty text (Fix B) ───────────────────────────────────────
+
+    [Fact]
+    public void NewNode_WithEmptyStringEntry_ShowsEmptyDefaultText()
+    {
+        var node = new ConversationNode(
+            NodeId: 99, IsPlayerChoice: false, SpeakerCategory: SpeakerCategory.Npc,
+            SpeakerGuid: "", ListenerGuid: "", Links: [], ConditionStrings: [],
+            Scripts: [], DisplayType: "Conversation", Persistence: "None");
+        var vm = new NodeViewModel(node, new StringEntry(99, string.Empty, string.Empty));
+        _vm.Load(vm);
+        Assert.Equal(string.Empty, _vm.DefaultText);
+    }
+
+    // ── RefreshLinks (Fix C) ──────────────────────────────────────────────
+
+    [Fact]
+    public void RefreshLinks_UpdatesLinksList()
+    {
+        _vm.Load(MakeNode(links: []));
+        _vm.RefreshLinks([new NodeLink(1, 5, false)]);
+        Assert.Single(_vm.Links);
+    }
+
+    [Fact]
+    public void RefreshLinks_WhenCalledTwice_ReplacesNotAppends()
+    {
+        var initial = new[] { new NodeLink(1, 10, false), new NodeLink(1, 20, false) };
+        _vm.Load(MakeNode(links: initial));
+        _vm.RefreshLinks([new NodeLink(1, 30, false)]);
+        Assert.Single(_vm.Links);
+    }
 }
