@@ -62,25 +62,25 @@ public static class Poe2ConversationParser
         );
     }
 
-    private static List<string> ParseScripts(JsonNode? node)
+    private static List<ScriptCall> ParseScripts(JsonNode? node)
     {
-        var result = new List<string>();
-        AppendScripts(result, node?["OnEnterScripts"]?.AsArray(), CoreStrings.Script_Prefix_Enter);
-        AppendScripts(result, node?["OnExitScripts"]?.AsArray(), CoreStrings.Script_Prefix_Exit);
-        AppendScripts(result, node?["OnUpdateScripts"]?.AsArray(), CoreStrings.Script_Prefix_Update);
+        var result = new List<ScriptCall>();
+        ReadScripts(result, node?["OnEnterScripts"]?.AsArray(),  ScriptCategory.Enter);
+        ReadScripts(result, node?["OnExitScripts"]?.AsArray(),   ScriptCategory.Exit);
+        ReadScripts(result, node?["OnUpdateScripts"]?.AsArray(), ScriptCategory.Update);
         return result;
     }
 
-    private static void AppendScripts(List<string> result, JsonArray? scripts, string prefix)
+    private static void ReadScripts(List<ScriptCall> result, JsonArray? scripts, ScriptCategory category)
     {
         if (scripts is null) return;
         foreach (var s in scripts)
         {
-            var fullName = s?["Data"]?["FullName"]?.GetValue<string>() ?? string.Empty;
+            var fullName   = s?["Data"]?["FullName"]?.GetValue<string>() ?? string.Empty;
             var parameters = s?["Data"]?["Parameters"]?.AsArray()
                 .Select(p => p!.GetValue<string>())
                 .ToList() ?? [];
-            result.Add($"{prefix} {ConditionFormatter.FormatScript(fullName, parameters)}");
+            result.Add(new ScriptCall(fullName, parameters, category));
         }
     }
 

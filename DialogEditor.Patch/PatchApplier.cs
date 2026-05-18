@@ -114,8 +114,8 @@ public static class PatchApplier
             .Concat(mod.AddedLinks)
             .ToList();
 
-        // Apply condition replacement (full-list replace semantics)
         var conditions = mod.UpdatedConditions ?? node.Conditions;
+        var scripts    = mod.UpdatedScripts    ?? node.Scripts;
 
         return node with
         {
@@ -133,6 +133,7 @@ public static class PatchApplier
             HideSpeaker    = hideSpeaker,
             Links          = links,
             Conditions     = conditions,
+            Scripts        = scripts,
         };
     }
 }

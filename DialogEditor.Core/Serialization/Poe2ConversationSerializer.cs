@@ -52,8 +52,11 @@ public static class Poe2ConversationSerializer
         node["HideSpeaker"]  = snap.HideSpeaker;
         node["HasVO"]        = snap.HasVO;
         node["ExternalVO"]   = snap.ExternalVO;
-        node["Links"]        = BuildLinks(snap.Links, original["Links"]?.AsArray());
-        node["Conditionals"] = BuildConditionJson(snap.Conditions);
+        node["Links"]            = BuildLinks(snap.Links, original["Links"]?.AsArray());
+        node["Conditionals"]     = BuildConditionJson(snap.Conditions);
+        node["OnEnterScripts"]   = BuildScriptListJson(snap.Scripts, ScriptCategory.Enter);
+        node["OnExitScripts"]    = BuildScriptListJson(snap.Scripts, ScriptCategory.Exit);
+        node["OnUpdateScripts"]  = BuildScriptListJson(snap.Scripts, ScriptCategory.Update);
     }
 
     private static JsonArray BuildLinks(IReadOnlyList<LinkEditSnapshot> links, JsonArray? originalLinks)
@@ -86,8 +89,32 @@ public static class Poe2ConversationSerializer
     private static JsonNode BuildNewNode(NodeEditSnapshot snap)
     {
         var node = BuildNewNodeBase(snap);
-        node["Conditionals"] = BuildConditionJson(snap.Conditions);
+        node["Conditionals"]    = BuildConditionJson(snap.Conditions);
+        node["OnEnterScripts"]  = BuildScriptListJson(snap.Scripts, ScriptCategory.Enter);
+        node["OnExitScripts"]   = BuildScriptListJson(snap.Scripts, ScriptCategory.Exit);
+        node["OnUpdateScripts"] = BuildScriptListJson(snap.Scripts, ScriptCategory.Update);
         return node;
+    }
+
+    private static JsonArray BuildScriptListJson(
+        IReadOnlyList<ScriptCall> scripts,
+        ScriptCategory category)
+    {
+        var arr = new JsonArray();
+        foreach (var s in scripts.Where(sc => sc.Category == category))
+        {
+            var parameters = new JsonArray();
+            foreach (var p in s.Parameters) parameters.Add(JsonValue.Create(p));
+            arr.Add(new JsonObject
+            {
+                ["Data"] = new JsonObject
+                {
+                    ["FullName"]   = s.FullName,
+                    ["Parameters"] = parameters,
+                },
+            });
+        }
+        return arr;
     }
 
     private static JsonNode BuildNewNodeBase(NodeEditSnapshot snap) => JsonNode.Parse($$"""

@@ -75,18 +75,24 @@ public static class DiffEngine
             })
             .ToList();
 
-        // Condition change: compare serialised JSON; store full new list if different
+        // Condition change
         var baseCondJson    = JsonSerializer.Serialize(@base.Conditions);
         var currentCondJson = JsonSerializer.Serialize(current.Conditions);
         IReadOnlyList<ConditionNode>? updatedConditions =
             baseCondJson != currentCondJson ? current.Conditions : null;
 
+        // Script change
+        var baseScriptJson    = JsonSerializer.Serialize(@base.Scripts);
+        var currentScriptJson = JsonSerializer.Serialize(current.Scripts);
+        IReadOnlyList<ScriptCall>? updatedScripts =
+            baseScriptJson != currentScriptJson ? current.Scripts : null;
+
         if (changes.Count == 0 && addedLinks.Count == 0 && deletedLinks.Count == 0
-            && modifiedLinks.Count == 0 && updatedConditions is null)
+            && modifiedLinks.Count == 0 && updatedConditions is null && updatedScripts is null)
             return null;
 
         return new NodeModification(current.NodeId, changes, addedLinks, deletedLinks, modifiedLinks)
-            { UpdatedConditions = updatedConditions };
+            { UpdatedConditions = updatedConditions, UpdatedScripts = updatedScripts };
 
     }
 

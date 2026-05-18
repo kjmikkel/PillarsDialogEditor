@@ -17,7 +17,7 @@ public class LinkConditionTests
         IReadOnlyList<LinkEditSnapshot>? links = null) =>
         new(id, false, SpeakerCategory.Npc, "", "", "text", "",
             "Conversation", "None", "", "", "", false, false,
-            links ?? [], []);
+            links ?? [], [], []);
 
     private static ConversationEditSnapshot Snap(params NodeEditSnapshot[] nodes) =>
         new(nodes);

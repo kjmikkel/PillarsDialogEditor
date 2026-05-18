@@ -44,8 +44,9 @@ public sealed class NodeModification
         IReadOnlyList<DeletedLink> DeletedLinks)
         : this(NodeId, FieldChanges, AddedLinks, DeletedLinks, []) { }
 
-    // Conditions changed — store the full new list (replace-all semantics)
+    // Conditions / Scripts changed — store full new lists (replace-all semantics)
     public IReadOnlyList<ConditionNode>? UpdatedConditions { get; init; }
+    public IReadOnlyList<ScriptCall>?    UpdatedScripts    { get; init; }
 
     public int                                      NodeId        { get; }
     public IReadOnlyDictionary<string, FieldChange> FieldChanges  { get; }

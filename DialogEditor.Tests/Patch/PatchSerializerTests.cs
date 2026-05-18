@@ -12,7 +12,7 @@ public class PatchSerializerTests
             99, true, SpeakerCategory.Player, "spkr", "lstnr",
             "Added text", "Female text", "Bark", "OnceEver",
             "direction", "comment", "vo.wav", true, false,
-            [new LinkEditSnapshot(99, 100, 1.5f, "Always", true)], []);
+            [new LinkEditSnapshot(99, 100, 1.5f, "Always", true)], [], []);
 
         var mod = new NodeModification(7,
             new Dictionary<string, FieldChange>

@@ -29,7 +29,8 @@ public record NodeEditSnapshot(
     bool HasVO,
     bool HideSpeaker,
     IReadOnlyList<LinkEditSnapshot> Links,
-    IReadOnlyList<ConditionNode> Conditions
+    IReadOnlyList<ConditionNode> Conditions,
+    IReadOnlyList<ScriptCall> Scripts
 );
 
 public record ConversationEditSnapshot(IReadOnlyList<NodeEditSnapshot> Nodes);

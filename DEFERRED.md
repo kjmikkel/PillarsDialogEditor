@@ -8,18 +8,6 @@ re-reading history.
 
 ## Editing — Node Properties
 
-### Script editing
-**What:** `OnEnterScripts`, `OnExitScripts`, `OnUpdateScripts` on dialogue nodes
-are read-only. You can see existing scripts in the detail panel but cannot
-add, remove, or edit them.  
-**Why:** Scripts are structured calls with their own function catalogue (separate
-from conditions), parameter types, and serialisation rules. Deferred as
-"Phase 2" of node editing after conditions were complete.  
-**Where to start:** `NodeViewModel.Scripts` is `IReadOnlyList<string>` (display
-strings). The real data is in `ConversationNode.Scripts`. Both parsers already
-read scripts into `Scripts`; serialisers write them back unchanged. The pattern
-to follow is the condition editor (Phases 3–5 in the condition editor work).
-
 ### SpeakerCategory for new nodes
 **What:** Newly created nodes can only be "NPC Line" or "Player Choice".
 Narrator and Script node types cannot be created from the editor.  

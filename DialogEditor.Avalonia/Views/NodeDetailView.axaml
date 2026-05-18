@@ -174,7 +174,23 @@
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30"
                          ToolTip.Tip="Internal developer notes (not shown to players)"/>
 
-                <!-- ── Read-only groups (node ID, scripts) ────────────── -->
+                <!-- ── Scripts (edit in separate window) ─────────────── -->
+                <TextBlock Classes="group-header" Text="{StaticResource Label_GroupLogic}"/>
+                <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding ScriptSummary}"
+                               Foreground="#888" FontSize="10"
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"/>
+                    <Button Grid.Column="1"
+                            Content="{StaticResource Button_EditScripts}"
+                            Click="EditScripts_Click"
+                            Background="#333" Foreground="#aaa" BorderThickness="0"
+                            Padding="8,3" FontSize="10"
+                            ToolTip.Tip="{StaticResource ToolTip_EditScripts}"/>
+                </Grid>
+
+                <!-- ── Read-only groups (node ID) ─────────────────────── -->
                 <ItemsControl ItemsSource="{Binding PropertyGroups}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
