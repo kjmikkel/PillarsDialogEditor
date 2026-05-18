@@ -44,6 +44,11 @@ public static class Poe1ConversationSerializer
         SetOrAdd(node, "Comments",       snap.Comments);
         SetOrAdd(node, "VOFilename",     snap.ExternalVO);
 
+        // Update script lists from snapshot
+        ReplaceScripts(node, "OnEnterScripts",  snap.Scripts, ScriptCategory.Enter);
+        ReplaceScripts(node, "OnExitScripts",   snap.Scripts, ScriptCategory.Exit);
+        ReplaceScripts(node, "OnUpdateScripts", snap.Scripts, ScriptCategory.Update);
+
         // Update condition tree from snapshot
         var condElem = node.Element("Conditionals") ?? new XElement("Conditionals");
         if (node.Element("Conditionals") is null) node.Add(condElem);
@@ -95,9 +100,9 @@ public static class Poe1ConversationSerializer
         new XElement("Conditionals",
             new XElement("Components",
                 snap.Conditions.Select(c => BuildConditionXml(c)))),
-        new XElement("OnEnterScripts"),
-        new XElement("OnExitScripts"),
-        new XElement("OnUpdateScripts"),
+        BuildScriptListXml("OnEnterScripts",  snap.Scripts, ScriptCategory.Enter),
+        BuildScriptListXml("OnExitScripts",   snap.Scripts, ScriptCategory.Exit),
+        BuildScriptListXml("OnUpdateScripts", snap.Scripts, ScriptCategory.Update),
         new XElement("DisplayType",    snap.DisplayType),
         new XElement("Persistence",    snap.Persistence),
         new XElement("ActorDirection", snap.ActorDirection),
@@ -135,6 +140,39 @@ public static class Poe1ConversationSerializer
         new XElement("Conditionals",
             new XElement("Components",
                 (link.Conditions ?? []).Select(c => BuildConditionXml(c)))));
+
+    private static XElement BuildScriptListXml(
+        string elementName,
+        IReadOnlyList<ScriptCall> scripts,
+        ScriptCategory category)
+    {
+        var calls = scripts.Where(s => s.Category == category)
+            .Select(s => new XElement("ScriptCall",
+                new XAttribute(Xsi + "type", "ConditionalCall"),
+                new XElement("Data",
+                    new XElement("FullName", s.FullName),
+                    new XElement("Parameters",
+                        s.Parameters.Select(p => new XElement("string", p))))));
+        return new XElement(elementName, calls);
+    }
+
+    private static void ReplaceScripts(
+        XElement node,
+        string elementName,
+        IReadOnlyList<ScriptCall> scripts,
+        ScriptCategory category)
+    {
+        var elem = node.Element(elementName);
+        if (elem is null) { node.Add(BuildScriptListXml(elementName, scripts, category)); return; }
+        elem.RemoveAll();
+        foreach (var s in scripts.Where(sc => sc.Category == category))
+            elem.Add(new XElement("ScriptCall",
+                new XAttribute(Xsi + "type", "ConditionalCall"),
+                new XElement("Data",
+                    new XElement("FullName", s.FullName),
+                    new XElement("Parameters",
+                        s.Parameters.Select(p => new XElement("string", p))))));
+    }
 
     private static void SetOrAdd(XElement parent, string name, string value)
     {

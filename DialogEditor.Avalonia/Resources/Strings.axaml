@@ -314,6 +314,10 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Option_PersistenceNone">None</sys:String>
     <sys:String x:Key="Option_PersistenceOnceEver">OnceEver</sys:String>
 
+    <!-- ─── Detail panel — script editor ───────────────────────────────── -->
+    <sys:String x:Key="Button_EditScripts">Edit…</sys:String>
+    <sys:String x:Key="ToolTip_EditScripts">Open the script editor to add, edit, or remove scripts fired when this node is shown, exited, or updated</sys:String>
+
     <!-- ─── Detail panel — condition editor ─────────────────────────────── -->
     <sys:String x:Key="Label_GroupConditions">CONDITIONS</sys:String>
     <sys:String x:Key="Button_EditConditions">Edit…</sys:String>

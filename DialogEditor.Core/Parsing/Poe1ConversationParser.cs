@@ -60,27 +60,27 @@ public static class Poe1ConversationParser
             QuestionNodeTextDisplay: (string?)link.Element("QuestionNodeTextDisplay") ?? string.Empty
         );
 
-    private static List<string> ParseScripts(XElement node)
+    private static List<ScriptCall> ParseScripts(XElement node)
     {
-        var result = new List<string>();
-        AppendScripts(result, node.Element("OnEnterScripts"), CoreStrings.Script_Prefix_Enter);
-        AppendScripts(result, node.Element("OnExitScripts"), CoreStrings.Script_Prefix_Exit);
-        AppendScripts(result, node.Element("OnUpdateScripts"), CoreStrings.Script_Prefix_Update);
+        var result = new List<ScriptCall>();
+        ReadScripts(result, node.Element("OnEnterScripts"),  ScriptCategory.Enter);
+        ReadScripts(result, node.Element("OnExitScripts"),   ScriptCategory.Exit);
+        ReadScripts(result, node.Element("OnUpdateScripts"), ScriptCategory.Update);
         return result;
     }
 
-    private static void AppendScripts(List<string> result, XElement? scriptList, string prefix)
+    private static void ReadScripts(List<ScriptCall> result, XElement? scriptList, ScriptCategory category)
     {
         if (scriptList is null) return;
         foreach (var entry in scriptList.Elements())
         {
             var data = entry.Element("Data");
             if (data is null) continue;
-            var fullName = (string?)data.Element("FullName") ?? string.Empty;
+            var fullName   = (string?)data.Element("FullName") ?? string.Empty;
             var parameters = data.Element("Parameters")?.Elements("string")
                 .Select(e => (string)e)
                 .ToList() ?? [];
-            result.Add($"{prefix} {ConditionFormatter.FormatScript(fullName, parameters)}");
+            result.Add(new ScriptCall(fullName, parameters, category));
         }
     }
 

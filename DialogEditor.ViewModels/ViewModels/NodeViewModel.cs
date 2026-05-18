@@ -174,8 +174,33 @@ public partial class NodeViewModel : ObservableObject
 
     public bool HasConditions => _conditions.Count > 0;
 
-    // ── Read-only (scripts not editable yet) ─────────────────────────────────
-    public IReadOnlyList<string> Scripts             { get; }
+    // ── Scripts (editable via Push/undo) ─────────────────────────────────────
+    private IReadOnlyList<ScriptCall> _scripts = [];
+
+    public IReadOnlyList<ScriptCall> Scripts
+    {
+        get => _scripts;
+        set => Push(_scripts, value, "Edit scripts",
+            v => { _scripts = v; OnPropertyChanged(nameof(Scripts));
+                   OnPropertyChanged(nameof(HasScripts));
+                   OnPropertyChanged(nameof(ScriptDisplayStrings)); });
+    }
+
+    public bool HasScripts => _scripts.Count > 0;
+
+    public IReadOnlyList<string> ScriptDisplayStrings
+        => _scripts.Select(s =>
+        {
+            var prefix = s.Category switch
+            {
+                ScriptCategory.Enter  => "[Enter]",
+                ScriptCategory.Exit   => "[Exit]",
+                ScriptCategory.Update => "[Update]",
+                _                     => "[Script]",
+            };
+            return $"{prefix} {s.Format()}";
+        }).ToList();
+
     public IReadOnlyList<NodeLink> Links             { get; }
 
     // Backward-compat display helpers
@@ -219,7 +244,7 @@ public partial class NodeViewModel : ObservableObject
         _femaleText      = entry?.FemaleText  ?? string.Empty;
 
         _conditions = node.Conditions;
-        Scripts     = node.Scripts;
+        _scripts    = node.Scripts;
         Links       = node.Links;
 
         Inputs  = [Input];
@@ -241,5 +266,5 @@ public partial class NodeViewModel : ObservableObject
             _defaultText, _femaleText,
             _displayType, _persistence,
             _actorDirection, _comments, _externalVO,
-            _hasVO, _hideSpeaker, links, _conditions);
+            _hasVO, _hideSpeaker, links, _conditions, _scripts);
 }

@@ -65,7 +65,9 @@
       "Skill(commit-commands:commit)",
       "Bash(Get-ChildItem -Recurse -Directory)",
       "Bash(Select-Object -First 20 FullName)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(sed -i 's/links ?? \\\\[\\\\], \\\\[\\\\]\\);$/links ?? [], [], []\\);/' DialogEditor.Tests/Serialization/Poe1ConversationSerializerTests.cs DialogEditor.Tests/Serialization/Poe2ConversationSerializerTests.cs)",
+      "Bash(sed -i 's/, \\\\[\\\\]\\)\\\\]$/, [], []\\)]/' DialogEditor.Tests/Patch/DialogProjectTests.cs)"
     ]
   }
 }

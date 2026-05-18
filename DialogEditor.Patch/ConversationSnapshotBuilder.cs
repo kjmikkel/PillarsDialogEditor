@@ -28,7 +28,9 @@ public static class ConversationSnapshotBuilder
             node.HideSpeaker,
             node.Links.Select(l => new LinkEditSnapshot(
                 l.FromNodeId, l.ToNodeId, l.RandomWeight,
-                l.QuestionNodeTextDisplay, l.HasConditions)).ToList(),
-            node.Conditions);
+                l.QuestionNodeTextDisplay, l.HasConditions)
+                { Conditions = l.Conditions }).ToList(),
+            node.Conditions,
+            node.Scripts);
     }
 }

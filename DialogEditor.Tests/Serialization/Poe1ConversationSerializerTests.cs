@@ -46,7 +46,7 @@ public class Poe1ConversationSerializerTests
         IReadOnlyList<LinkEditSnapshot>? links = null) =>
         new(id, false, SpeakerCategory.Npc, speaker, "bbbb",
             "text", "", "Conversation", "None", "", "", "", false, false,
-            links ?? [], []);
+            links ?? [], [], []);
 
     [Fact]
     public void Serialize_UpdatesSpeakerGuid()

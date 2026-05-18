@@ -26,7 +26,7 @@ public class NodeDetailViewModelTests
         string externalVO = "",
         bool hasVO = false,
         bool hideSpeaker = false,
-        IReadOnlyList<string>? scripts = null,
+        IReadOnlyList<ScriptCall>? scripts = null,
         IReadOnlyList<NodeLink>? links = null,
         string defaultText = "Hello",
         string femaleText = "")
@@ -79,10 +79,10 @@ public class NodeDetailViewModelTests
     // ── Read-only property groups (Identity = NodeId; Logic = conditions/scripts) ──
 
     [Fact]
-    public void Load_PropertyGroups_HasTwoGroups()
+    public void Load_PropertyGroups_HasIdentityGroup()
     {
         _vm.Load(MakeNode());
-        Assert.Equal(2, _vm.PropertyGroups.Count);
+        Assert.Single(_vm.PropertyGroups);   // Scripts/Conditions now have dedicated panels
     }
 
     [Fact]
@@ -95,13 +95,11 @@ public class NodeDetailViewModelTests
     }
 
     [Fact]
-    public void Load_LogicGroup_ContainsScriptsRow()
+    public void Load_ScriptSummary_EmptyWhenNoScripts()
     {
-        // Conditions moved to dedicated ConditionRows panel; LOGIC group shows scripts only
+        // Scripts now have their own panel — verified via ScriptSummary property
         _vm.Load(MakeNode());
-        var logic = _vm.PropertyGroups[1];
-        Assert.Single(logic.Rows);
-        Assert.Contains(logic.Rows, r => r.Label == "PropertyRow_Scripts");
+        Assert.Equal("NodeDetail_None", _vm.ScriptSummary);
     }
 
     // ── Links ─────────────────────────────────────────────────────────────

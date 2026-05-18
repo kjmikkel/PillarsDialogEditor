@@ -27,6 +27,22 @@ public partial class NodeDetailView : UserControl
         detailVm.NotifyConditionSummary();
     }
 
+    private async void EditScripts_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not NodeDetailViewModel detailVm) return;
+        if (detailVm.Node is null) return;
+
+        var editorVm = new ScriptEditorViewModel(detailVm.Node);
+        var window   = new ScriptEditorWindow(editorVm);
+        var owner    = TopLevel.GetTopLevel(this) as Window;
+        if (owner is not null)
+            await window.ShowDialog(owner);
+        else
+            window.Show();
+
+        detailVm.NotifyScriptSummary();
+    }
+
     private async void LinkConditions_Click(object? sender, RoutedEventArgs e)
     {
         if (sender is not Button btn) return;

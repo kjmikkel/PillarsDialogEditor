@@ -154,6 +154,11 @@ public partial class NodeDetailViewModel : ObservableObject
             RefreshReadOnlyGroups(_node);
         if (e.PropertyName == nameof(NodeViewModel.Conditions))
             OnPropertyChanged(nameof(ConditionSummary));
+        if (e.PropertyName == nameof(NodeViewModel.Scripts))
+        {
+            if (_node is not null) RefreshReadOnlyGroups(_node);
+            OnPropertyChanged(nameof(ScriptSummary));
+        }
     }
 
     private void NotifyAllProxies()
@@ -221,13 +226,7 @@ public partial class NodeDetailViewModel : ObservableObject
             [
                 new PropertyRow(Loc.Get("PropertyRow_NodeId"), node.NodeId.ToString()),
             ]),
-            // Scripts only — conditions are now shown in the editable CONDITIONS panel
-            new PropertyGroup(Loc.Get("Label_GroupLogic"),
-            [
-                new PropertyRow(Loc.Get("PropertyRow_Scripts"),
-                    node.Scripts.Count == 0 ? none : string.Join(Environment.NewLine, node.Scripts),
-                    PropertyValueStyle.Script),
-            ]),
+            // Scripts and Conditions each have their own editable panel sections.
         ];
     }
 
@@ -236,6 +235,19 @@ public partial class NodeDetailViewModel : ObservableObject
 
     public void NotifyConditionSummary()
         => OnPropertyChanged(nameof(ConditionSummary));
+
+    public void NotifyScriptSummary()
+        => OnPropertyChanged(nameof(ScriptSummary));
+
+    public string ScriptSummary
+    {
+        get
+        {
+            if (_node is null || _node.Scripts.Count == 0)
+                return Loc.Get("NodeDetail_None");
+            return string.Join(", ", _node.Scripts.Select(s => s.DisplayName));
+        }
+    }
 
     // ── Condition editing ─────────────────────────────────────────────────
 
