@@ -98,6 +98,30 @@ public partial class ScriptEditorViewModel : ObservableObject
         _                     => EnterRows,
     };
 
+    // ── Add script by FullName ────────────────────────────────────────────
+
+    [ObservableProperty] private string _newEnterFullName  = string.Empty;
+    [ObservableProperty] private string _newExitFullName   = string.Empty;
+    [ObservableProperty] private string _newUpdateFullName = string.Empty;
+
+    [RelayCommand]
+    private void AddEnterScript()  => AddByName(NewEnterFullName,  ScriptCategory.Enter,
+        n => NewEnterFullName  = n);
+    [RelayCommand]
+    private void AddExitScript()   => AddByName(NewExitFullName,   ScriptCategory.Exit,
+        n => NewExitFullName   = n);
+    [RelayCommand]
+    private void AddUpdateScript() => AddByName(NewUpdateFullName, ScriptCategory.Update,
+        n => NewUpdateFullName = n);
+
+    private void AddByName(string raw, ScriptCategory category, Action<string> clearField)
+    {
+        var name = raw.Trim();
+        if (string.IsNullOrEmpty(name)) return;
+        RowsFor(category).Add(new ScriptRowViewModel(new ScriptCall(name, [], category), null));
+        clearField(string.Empty);
+    }
+
     [RelayCommand]
     private void DeleteRow(ScriptRowViewModel? row)
     {
