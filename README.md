@@ -42,9 +42,8 @@ A project can contain patches for **any number of conversations**. Work on as ma
 as you like; they are all saved into the same file and applied together at test time.
 
 > **Browsing works without a project open.** You can navigate and read any
-> conversation freely. Editing — changing text, adding nodes, modifying links —
-> requires an open project. The status bar will remind you when you are in
-> read-only mode.
+> conversation freely. Editing requires an open project. The status bar will
+> remind you when you are in read-only mode.
 
 ---
 
@@ -55,18 +54,62 @@ Click any conversation in the browser to open it on the canvas.
 | Action | How |
 |--------|-----|
 | Select a node | Click it on the canvas |
-| Edit text, identity, voice, links | Use the detail panel on the right |
 | Add a node | Double-click the canvas background |
+| Add a connected node | Right-click a node › Add connected node |
 | Connect two nodes | Drag from a node's output port to another node's input port |
 | Delete a node | Select it, press `Delete`; or right-click › Delete node |
-| Add a connected node | Right-click › Add connected node |
 | Delete a connection | Right-click the connection line › Delete connection |
 | Search nodes | `Ctrl+F`, or type in the search box above the canvas |
 | Undo / Redo | `Ctrl+Z` / `Ctrl+Y` — all edits are fully undoable within a session |
 
-Use the **`?`** button to open the floating Legend window for a full reference of
-node colours, connection types, symbols, and keyboard shortcuts. It can be moved
-to a second monitor and left open while you work.
+#### Node detail panel
+
+Selecting a node opens the detail panel on the right. Fields available for editing:
+
+| Field | Description |
+|-------|-------------|
+| Default / Male text | The dialogue line shown to all players, or the male variant in gendered games |
+| Female text | Optional female-voice override; leave blank to use the default text for both genders |
+| Type | NPC Line or Player Choice |
+| Speaker / Listener GUID | The characters involved; in PoE2 a name picker is available |
+| Display type | Conversation (full portrait) or Bark (floating text) |
+| Persistence | OnceEver hides this node after it has been shown once |
+| Actor direction | Internal note for the voice actor |
+| External VO | Voice-over file path or identifier |
+| Comments | Internal developer notes — not shown to players |
+
+#### Conditions
+
+Each node can carry a list of conditions that the engine evaluates at runtime.
+Click **Edit…** next to the CONDITIONS header to open the Condition Editor.
+
+- Pick from a searchable catalogue of known conditions (shared for PoE1 and PoE2,
+  with game-appropriate filtering when a game folder is loaded).
+- Each condition shows its parameters as labelled fields; enum parameters use
+  dropdowns populated from the game source.
+- Toggle **NOT** to negate a condition; choose **And / Or** to combine them.
+- Use the ↑ ↓ buttons to reorder; ✕ to remove.
+
+**Link conditions:** Individual connections between nodes can also carry conditions.
+Click the **⚙** button on any link row in the detail panel to open the Condition
+Editor for that specific link.
+
+#### Scripts
+
+Nodes can fire scripts at three points in their lifecycle. Click **Edit…** next
+to the LOGIC header to open the Script Editor.
+
+Three sections are shown — **On Enter** (when the node is shown), **On Exit**
+(when the player leaves), and **On Update** (each tick while the node is active).
+
+- Search the catalogue by typing in the picker, or press the down arrow to browse
+  the full list. Selecting a known script pre-populates all parameters with named
+  fields and correct types (enum dropdowns, text boxes).
+- Unknown scripts can still be added by typing their C# reflection FullName
+  directly, e.g. `Void SetGlobalValue(String, Int32)`.
+- PoE1 and PoE2 scripts with the same name but different signatures (quest scripts,
+  item scripts, etc.) are kept separate and shown only for the loaded game.
+- Use ↑ ↓ and ✕ to reorder and remove rows within each section.
 
 ---
 
@@ -75,10 +118,10 @@ to a second monitor and left open while you work.
 **File › Save Project** (`Ctrl+S`)
 
 Records the current conversation's changes as a diff inside the open project file.
-The diff captures only what changed — adding, removing, or editing nodes and links.
-If you add a node and then delete it before saving, no trace of it appears in the
-diff. Game files are not modified. The project file is plain JSON and can be
-version-controlled or shared freely.
+The diff captures only what changed — text edits, node additions/removals, link
+changes, condition and script modifications. If you add a node and then delete it
+before saving, no trace of it appears in the diff. Game files are not modified.
+The project file is plain JSON and can be version-controlled or shared freely.
 
 ---
 
@@ -138,7 +181,8 @@ of the previous, with conflict detection if two patches modify the same field.
 ## Keyboard Shortcuts
 
 Press **`?`** in the editor to open the floating Legend window, which lists all
-shortcuts alongside connection types, node colours, and canvas controls.
+shortcuts alongside connection types, node colours, and canvas controls. The
+Legend window can be moved outside the editor (useful on a second monitor).
 
 | Key | Action |
 |-----|--------|
