@@ -17,6 +17,10 @@ public partial class MainWindow : Window
     private double _detailExpandedWidth  = 240;
     private LegendWindow? _legendWindow;
 
+    // Set to true immediately before a programmatic Close() call so that
+    // the re-entrant OnClosing doesn't show the dirty-close dialog again.
+    private bool _closingConfirmed = false;
+
     private ColumnDefinition BrowserColumn => ContentGrid.ColumnDefinitions[0];
     private ColumnDefinition DetailColumn  => ContentGrid.ColumnDefinitions[4];
 
@@ -223,10 +227,12 @@ public partial class MainWindow : Window
     protected override void OnClosing(WindowClosingEventArgs e)
     {
         var vm = (MainWindowViewModel)DataContext!;
-        if (vm.IsModified && vm.CurrentConversationName is not null)
+        if (!_closingConfirmed && vm.IsModified && vm.CurrentConversationName is not null)
         {
             e.Cancel = true;
-            vm.GuardDirtyThen(Close);   // "proceed" = close the window
+            // The continuation must set _closingConfirmed before calling Close()
+            // so the re-entrant OnClosing doesn't trigger the dialog again.
+            vm.GuardDirtyThen(() => { _closingConfirmed = true; Close(); });
             _ = ShowUnsavedChangesDialogAsync(vm);
         }
         else
@@ -306,7 +312,10 @@ public partial class MainWindow : Window
         {
             case "save":    vm.SaveAndProceed();          break;
             case "discard": vm.DiscardAndProceed();       break;
-            default:        vm.CancelPendingNavigation(); break;
+            default:
+                _closingConfirmed = false;   // user chose Stay Here — reset so next close attempt works
+                vm.CancelPendingNavigation();
+                break;
         }
     }
 }

@@ -128,16 +128,55 @@
                 <TextBlock Classes="section-header" Text="ON ENTER  (fires when the node is shown)"/>
                 <ItemsControl ItemsSource="{Binding EnterRows}"
                               ItemTemplate="{StaticResource ScriptRowTemplate}"/>
+                <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                    <TextBox Grid.Column="0"
+                             Text="{Binding NewEnterFullName, Mode=TwoWay}"
+                             Watermark="Script FullName  e.g. Void SetGlobalValue(String, Int32)"
+                             Background="#141414" Foreground="#ccc" BorderBrush="#444" BorderThickness="1"
+                             FontSize="11" Padding="6,4"
+                             ToolTip.Tip="Enter the exact C# reflection FullName of the script to add"/>
+                    <Button Grid.Column="1" Content="+ Add"
+                            Command="{Binding AddEnterScriptCommand}"
+                            Background="#2c3e50" Foreground="#ccc" BorderThickness="0"
+                            Padding="12,4" Margin="6,0,0,0" FontSize="11"
+                            ToolTip.Tip="Add this script to the On Enter list"/>
+                </Grid>
 
                 <!-- ON EXIT -->
                 <TextBlock Classes="section-header" Text="ON EXIT  (fires when the player leaves the node)"/>
                 <ItemsControl ItemsSource="{Binding ExitRows}"
                               ItemTemplate="{StaticResource ScriptRowTemplate}"/>
+                <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                    <TextBox Grid.Column="0"
+                             Text="{Binding NewExitFullName, Mode=TwoWay}"
+                             Watermark="Script FullName  e.g. Void SetGlobalValue(String, Int32)"
+                             Background="#141414" Foreground="#ccc" BorderBrush="#444" BorderThickness="1"
+                             FontSize="11" Padding="6,4"
+                             ToolTip.Tip="Enter the exact C# reflection FullName of the script to add"/>
+                    <Button Grid.Column="1" Content="+ Add"
+                            Command="{Binding AddExitScriptCommand}"
+                            Background="#2c3e50" Foreground="#ccc" BorderThickness="0"
+                            Padding="12,4" Margin="6,0,0,0" FontSize="11"
+                            ToolTip.Tip="Add this script to the On Exit list"/>
+                </Grid>
 
                 <!-- ON UPDATE -->
                 <TextBlock Classes="section-header" Text="ON UPDATE  (fires on each update tick while the node is active)"/>
                 <ItemsControl ItemsSource="{Binding UpdateRows}"
                               ItemTemplate="{StaticResource ScriptRowTemplate}"/>
+                <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                    <TextBox Grid.Column="0"
+                             Text="{Binding NewUpdateFullName, Mode=TwoWay}"
+                             Watermark="Script FullName  e.g. Void SetGlobalValue(String, Int32)"
+                             Background="#141414" Foreground="#ccc" BorderBrush="#444" BorderThickness="1"
+                             FontSize="11" Padding="6,4"
+                             ToolTip.Tip="Enter the exact C# reflection FullName of the script to add"/>
+                    <Button Grid.Column="1" Content="+ Add"
+                            Command="{Binding AddUpdateScriptCommand}"
+                            Background="#2c3e50" Foreground="#ccc" BorderThickness="0"
+                            Padding="12,4" Margin="6,0,0,0" FontSize="11"
+                            ToolTip.Tip="Add this script to the On Update list"/>
+                </Grid>
 
             </StackPanel>
         </ScrollViewer>
