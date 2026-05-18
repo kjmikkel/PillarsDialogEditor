@@ -11,7 +11,11 @@ public record FieldChange(string From, string To);
 
 public record DeletedLink(int ToNodeId, bool HasConditions);
 
-public record ModifiedLink(int ToNodeId, float RandomWeight, string QuestionNodeTextDisplay);
+public record ModifiedLink(
+    int    ToNodeId,
+    float  RandomWeight,
+    string QuestionNodeTextDisplay,
+    IReadOnlyList<ConditionNode>? Conditions = null);
 
 // NodeModification is a class (not a positional record) so System.Text.Json can
 // unambiguously select the [JsonConstructor]-annotated 5-parameter overload while

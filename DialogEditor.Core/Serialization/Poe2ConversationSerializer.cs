@@ -70,6 +70,9 @@ public static class Poe2ConversationSerializer
                 var cloned = JsonNode.Parse(orig.ToJsonString())!;
                 cloned["RandomWeight"]            = link.RandomWeight;
                 cloned["QuestionNodeTextDisplay"] = MapQuestionDisplay(link.QuestionNodeTextDisplay);
+                // Update link conditions when the snapshot carries them
+                if (link.Conditions is { Count: >= 0 })
+                    cloned["Conditionals"] = BuildConditionJson(link.Conditions);
                 arr.Add(cloned);
             }
             else
@@ -109,19 +112,25 @@ public static class Poe2ConversationSerializer
         }
         """)!;
 
-    private static JsonNode BuildNewLink(LinkEditSnapshot link) => JsonNode.Parse($$"""
-        {
-          "$type": "{{DialogueLinkType}}",
-          "FromNodeID": {{link.FromNodeId}},
-          "ToNodeID": {{link.ToNodeId}},
-          "PointsToGhost": false,
-          "Conditionals": {"Operator": 0, "Components": []},
-          "ClassExtender": {"ExtendedProperties": []},
-          "RandomWeight": {{link.RandomWeight}},
-          "PlayQuestionNodeVO": true,
-          "QuestionNodeTextDisplay": {{MapQuestionDisplay(link.QuestionNodeTextDisplay)}}
-        }
-        """)!;
+    private static JsonNode BuildNewLink(LinkEditSnapshot link)
+    {
+        var node = JsonNode.Parse($$"""
+            {
+              "$type": "{{DialogueLinkType}}",
+              "FromNodeID": {{link.FromNodeId}},
+              "ToNodeID": {{link.ToNodeId}},
+              "PointsToGhost": false,
+              "Conditionals": {"Operator": 0, "Components": []},
+              "ClassExtender": {"ExtendedProperties": []},
+              "RandomWeight": {{link.RandomWeight}},
+              "PlayQuestionNodeVO": true,
+              "QuestionNodeTextDisplay": {{MapQuestionDisplay(link.QuestionNodeTextDisplay)}}
+            }
+            """)!;
+        if (link.Conditions is { Count: > 0 })
+            node["Conditionals"] = BuildConditionJson(link.Conditions);
+        return node;
+    }
 
     private static JsonNode BuildConditionJson(IReadOnlyList<ConditionNode> conditions)
     {

@@ -212,7 +212,7 @@
                         <DataTemplate DataType="vm:ConnectionViewModel">
                             <Grid RowDefinitions="Auto,Auto" Margin="0,2,0,2">
                                 <!-- Row 0: target + delete -->
-                                <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto">
+                                <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto">
                                     <TextBlock Grid.Column="0"
                                                Text="{StaticResource Link_Arrow}"
                                                Foreground="#5dade2" FontSize="10"
@@ -221,7 +221,18 @@
                                                Text="{Binding Target.Owner.NodeId}"
                                                Foreground="#5dade2" FontSize="10"
                                                VerticalAlignment="Center"/>
+                                    <!-- Condition editor button — dim when no conditions, accent when present -->
                                     <Button Grid.Column="2"
+                                            Content="{Binding ConditionCount,
+                                                StringFormat='⚙{0}'}"
+                                            Click="LinkConditions_Click"
+                                            Tag="{Binding}"
+                                            Background="Transparent" BorderThickness="0"
+                                            FontSize="10" Padding="3,1" Margin="0,0,2,0"
+                                            Foreground="{Binding HasConditions,
+                                                Converter={StaticResource BoolToFemaleTextBrush}}"
+                                            ToolTip.Tip="{StaticResource ToolTip_LinkConditions_None}"/>
+                                    <Button Grid.Column="3"
                                             Content="{StaticResource Button_DeleteLink}"
                                             Command="{Binding DataContext.DeleteLinkCommand,
                                                       RelativeSource={RelativeSource AncestorType=UserControl}}"

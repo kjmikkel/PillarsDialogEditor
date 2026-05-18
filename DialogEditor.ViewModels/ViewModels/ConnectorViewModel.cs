@@ -9,5 +9,5 @@ public partial class ConnectorViewModel : ObservableObject
     private LayoutPoint _anchor;
 
     internal NodeViewModel? Owner { get; set; }
-    internal int GetNodeId() => Owner?.NodeId ?? -1;
+    public   int GetNodeId() => Owner?.NodeId ?? -1;
 }

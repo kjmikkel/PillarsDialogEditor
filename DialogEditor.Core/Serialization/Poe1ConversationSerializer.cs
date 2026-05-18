@@ -67,6 +67,16 @@ public static class Poe1ConversationSerializer
             {
                 orig.Element("RandomWeight")!.Value            = link.RandomWeight.ToString();
                 orig.Element("QuestionNodeTextDisplay")!.Value = link.QuestionNodeTextDisplay;
+                // Update link conditions when the snapshot carries them
+                if (link.Conditions is { Count: >= 0 })
+                {
+                    var lc = orig.Element("Conditionals") ?? new XElement("Conditionals");
+                    if (orig.Element("Conditionals") is null) orig.Add(lc);
+                    var lcc = lc.Element("Components") ?? new XElement("Components");
+                    if (lc.Element("Components") is null) lc.Add(lcc);
+                    lcc.RemoveAll();
+                    foreach (var c in link.Conditions) lcc.Add(BuildConditionXml(c));
+                }
                 linksElem.Add(orig);
             }
             else
@@ -122,7 +132,9 @@ public static class Poe1ConversationSerializer
         new XElement("ToNodeID",                link.ToNodeId),
         new XElement("RandomWeight",            link.RandomWeight),
         new XElement("QuestionNodeTextDisplay", link.QuestionNodeTextDisplay),
-        new XElement("Conditionals",            new XElement("Components")));
+        new XElement("Conditionals",
+            new XElement("Components",
+                (link.Conditions ?? []).Select(c => BuildConditionXml(c)))));
 
     private static void SetOrAdd(XElement parent, string name, string value)
     {

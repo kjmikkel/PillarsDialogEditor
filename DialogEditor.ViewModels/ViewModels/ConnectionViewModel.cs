@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using DialogEditor.Core.Editing;
+using DialogEditor.Core.Models;
 
 namespace DialogEditor.ViewModels;
 
@@ -16,6 +17,7 @@ public partial class ConnectionViewModel : ObservableObject
 
     private string _questionNodeTextDisplay;
     private float  _randomWeight;
+    private IReadOnlyList<ConditionNode> _conditions = [];
 
     public string QuestionNodeTextDisplay
     {
@@ -32,23 +34,34 @@ public partial class ConnectionViewModel : ObservableObject
             v => { _randomWeight = v; OnPropertyChanged(nameof(RandomWeight)); });
     }
 
-    public bool IsAlways => _questionNodeTextDisplay == "Always";
-    public bool IsNever  => _questionNodeTextDisplay == "Never";
+    public IReadOnlyList<ConditionNode> Conditions
+    {
+        get => _conditions;
+        set => Push(_conditions, value, "Edit link conditions",
+            v => { _conditions = v; OnPropertyChanged(nameof(Conditions));
+                   OnPropertyChanged(nameof(HasConditions));
+                   OnPropertyChanged(nameof(ConditionCount)); });
+    }
+
+    public bool IsAlways      => _questionNodeTextDisplay == "Always";
+    public bool IsNever       => _questionNodeTextDisplay == "Never";
+    public bool HasConditions => _conditions.Count > 0;
+    public int  ConditionCount => _conditions.Count;
 
     [ObservableProperty] private bool _isHighlighted;
-
-    public bool HasConditions => false;
 
     public ConnectionViewModel(
         ConnectorViewModel source,
         ConnectorViewModel target,
         string questionNodeTextDisplay = "",
-        float  randomWeight            = 1f)
+        float  randomWeight            = 1f,
+        IReadOnlyList<ConditionNode>? conditions = null)
     {
         Source                    = source;
         Target                    = target;
         _questionNodeTextDisplay  = questionNodeTextDisplay;
         _randomWeight             = randomWeight;
+        _conditions               = conditions ?? [];
     }
 
     private void Push<T>(T current, T value, string description, Action<T> apply)

@@ -62,8 +62,17 @@ public static class DiffEngine
             .ToList();
         var modifiedLinks = current.Links
             .Where(l => baseLinks.TryGetValue(l.ToNodeId, out var b) &&
-                        (b.RandomWeight != l.RandomWeight || b.QuestionNodeTextDisplay != l.QuestionNodeTextDisplay))
-            .Select(l => new ModifiedLink(l.ToNodeId, l.RandomWeight, l.QuestionNodeTextDisplay))
+                        (b.RandomWeight != l.RandomWeight ||
+                         b.QuestionNodeTextDisplay != l.QuestionNodeTextDisplay ||
+                         JsonSerializer.Serialize(b.Conditions) != JsonSerializer.Serialize(l.Conditions)))
+            .Select(l =>
+            {
+                baseLinks.TryGetValue(l.ToNodeId, out var b);
+                var condJson = JsonSerializer.Serialize(l.Conditions);
+                IReadOnlyList<ConditionNode>? conds =
+                    JsonSerializer.Serialize(b?.Conditions) != condJson ? l.Conditions : null;
+                return new ModifiedLink(l.ToNodeId, l.RandomWeight, l.QuestionNodeTextDisplay, conds);
+            })
             .ToList();
 
         // Condition change: compare serialised JSON; store full new list if different

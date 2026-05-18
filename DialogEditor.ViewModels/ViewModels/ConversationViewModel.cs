@@ -176,7 +176,7 @@ public partial class ConversationViewModel : ObservableObject
                     nodeMap.TryGetValue(link.ToNodeId,   out var tgt))
                 {
                     var conn = new ConnectionViewModel(src.Output, tgt.Input,
-                        link.QuestionNodeTextDisplay, link.RandomWeight)
+                        link.QuestionNodeTextDisplay, link.RandomWeight, link.Conditions)
                         { UndoStack = _undoStack };
                     Connections.Add(conn);
                 }
@@ -287,7 +287,8 @@ public partial class ConversationViewModel : ObservableObject
                     c.Target.Owner!.NodeId,
                     c.RandomWeight,
                     c.QuestionNodeTextDisplay,
-                    c.HasConditions))
+                    c.HasConditions)
+                    { Conditions = c.Conditions })
                 .ToList();
             return n.ToSnapshot(links);
         }).ToList());
