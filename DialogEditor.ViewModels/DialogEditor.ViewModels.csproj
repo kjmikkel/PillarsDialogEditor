@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\conditions.json" />
+    <EmbeddedResource Include="Resources\scripts.json" />
   </ItemGroup>
 
   <ItemGroup>

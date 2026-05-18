@@ -129,17 +129,20 @@
                 <ItemsControl ItemsSource="{Binding EnterRows}"
                               ItemTemplate="{StaticResource ScriptRowTemplate}"/>
                 <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
-                    <TextBox Grid.Column="0"
-                             Text="{Binding NewEnterFullName, Mode=TwoWay}"
-                             Watermark="Script FullName  e.g. Void SetGlobalValue(String, Int32)"
+                    <AutoCompleteBox Grid.Column="0"
+                             Text="{Binding NewEnterText, Mode=TwoWay}"
+                             SelectedItem="{Binding SelectedEnterEntry, Mode=TwoWay}"
+                             ItemsSource="{Binding AvailableScripts}"
+                             FilterMode="Contains"
+                             Watermark="{StaticResource Placeholder_ScriptPicker}"
                              Background="#141414" Foreground="#ccc" BorderBrush="#444" BorderThickness="1"
-                             FontSize="11" Padding="6,4"
-                             ToolTip.Tip="Enter the exact C# reflection FullName of the script to add"/>
+                             FontSize="11" Padding="6,4" MinWidth="0"
+                             ToolTip.Tip="{StaticResource ToolTip_ScriptPicker}"/>
                     <Button Grid.Column="1" Content="+ Add"
                             Command="{Binding AddEnterScriptCommand}"
                             Background="#2c3e50" Foreground="#ccc" BorderThickness="0"
                             Padding="12,4" Margin="6,0,0,0" FontSize="11"
-                            ToolTip.Tip="Add this script to the On Enter list"/>
+                            ToolTip.Tip="{StaticResource ToolTip_AddScriptEnter}"/>
                 </Grid>
 
                 <!-- ON EXIT -->
@@ -147,17 +150,20 @@
                 <ItemsControl ItemsSource="{Binding ExitRows}"
                               ItemTemplate="{StaticResource ScriptRowTemplate}"/>
                 <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
-                    <TextBox Grid.Column="0"
-                             Text="{Binding NewExitFullName, Mode=TwoWay}"
-                             Watermark="Script FullName  e.g. Void SetGlobalValue(String, Int32)"
+                    <AutoCompleteBox Grid.Column="0"
+                             Text="{Binding NewExitText, Mode=TwoWay}"
+                             SelectedItem="{Binding SelectedExitEntry, Mode=TwoWay}"
+                             ItemsSource="{Binding AvailableScripts}"
+                             FilterMode="Contains"
+                             Watermark="{StaticResource Placeholder_ScriptPicker}"
                              Background="#141414" Foreground="#ccc" BorderBrush="#444" BorderThickness="1"
-                             FontSize="11" Padding="6,4"
-                             ToolTip.Tip="Enter the exact C# reflection FullName of the script to add"/>
+                             FontSize="11" Padding="6,4" MinWidth="0"
+                             ToolTip.Tip="{StaticResource ToolTip_ScriptPicker}"/>
                     <Button Grid.Column="1" Content="+ Add"
                             Command="{Binding AddExitScriptCommand}"
                             Background="#2c3e50" Foreground="#ccc" BorderThickness="0"
                             Padding="12,4" Margin="6,0,0,0" FontSize="11"
-                            ToolTip.Tip="Add this script to the On Exit list"/>
+                            ToolTip.Tip="{StaticResource ToolTip_AddScriptExit}"/>
                 </Grid>
 
                 <!-- ON UPDATE -->
@@ -165,17 +171,20 @@
                 <ItemsControl ItemsSource="{Binding UpdateRows}"
                               ItemTemplate="{StaticResource ScriptRowTemplate}"/>
                 <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
-                    <TextBox Grid.Column="0"
-                             Text="{Binding NewUpdateFullName, Mode=TwoWay}"
-                             Watermark="Script FullName  e.g. Void SetGlobalValue(String, Int32)"
+                    <AutoCompleteBox Grid.Column="0"
+                             Text="{Binding NewUpdateText, Mode=TwoWay}"
+                             SelectedItem="{Binding SelectedUpdateEntry, Mode=TwoWay}"
+                             ItemsSource="{Binding AvailableScripts}"
+                             FilterMode="Contains"
+                             Watermark="{StaticResource Placeholder_ScriptPicker}"
                              Background="#141414" Foreground="#ccc" BorderBrush="#444" BorderThickness="1"
-                             FontSize="11" Padding="6,4"
-                             ToolTip.Tip="Enter the exact C# reflection FullName of the script to add"/>
+                             FontSize="11" Padding="6,4" MinWidth="0"
+                             ToolTip.Tip="{StaticResource ToolTip_ScriptPicker}"/>
                     <Button Grid.Column="1" Content="+ Add"
                             Command="{Binding AddUpdateScriptCommand}"
                             Background="#2c3e50" Foreground="#ccc" BorderThickness="0"
                             Padding="12,4" Margin="6,0,0,0" FontSize="11"
-                            ToolTip.Tip="Add this script to the On Update list"/>
+                            ToolTip.Tip="{StaticResource ToolTip_AddScriptUpdate}"/>
                 </Grid>
 
             </StackPanel>

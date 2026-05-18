@@ -32,7 +32,7 @@ public partial class NodeDetailView : UserControl
         if (DataContext is not NodeDetailViewModel detailVm) return;
         if (detailVm.Node is null) return;
 
-        var editorVm = new ScriptEditorViewModel(detailVm.Node);
+        var editorVm = new ScriptEditorViewModel(detailVm.Node, detailVm.ActiveGameId);
         var window   = new ScriptEditorWindow(editorVm);
         var owner    = TopLevel.GetTopLevel(this) as Window;
         if (owner is not null)

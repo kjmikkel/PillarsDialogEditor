@@ -46,20 +46,15 @@ public partial class ScriptRowViewModel : ObservableObject
         new(FullName, Parameters.Select(p => p.Value).ToList(), Category);
 }
 
-/// Simple entry in the script catalogue.
-public record ScriptCatalogueEntry(
-    string MethodName,
-    string DisplayName,
-    string Category,
-    string FullName,
-    IReadOnlyList<ConditionParameter> Parameters);
-
 /// Edits the script lists on a node (Enter / Exit / Update).
 public partial class ScriptEditorViewModel : ObservableObject
 {
     private readonly Action<IReadOnlyList<ScriptCall>> _commit;
 
     public string NodeTitle { get; }
+
+    // Catalogue entries available for the add picker (all entries for now; can filter by gameId later)
+    public IReadOnlyList<ScriptCatalogueEntry> AvailableScripts { get; }
 
     // Rows per category
     public ObservableCollection<ScriptRowViewModel> EnterRows  { get; } = [];
@@ -73,22 +68,28 @@ public partial class ScriptEditorViewModel : ObservableObject
     public ScriptEditorViewModel(
         string title,
         IReadOnlyList<ScriptCall> initial,
-        Action<IReadOnlyList<ScriptCall>> commit)
+        Action<IReadOnlyList<ScriptCall>> commit,
+        string gameId = "")
     {
         NodeTitle = title;
         _commit   = commit;
 
+        AvailableScripts = string.IsNullOrEmpty(gameId)
+            ? ScriptCatalogue.Instance.All
+            : ScriptCatalogue.Instance.ForGame(gameId);
+
         foreach (var s in initial)
         {
-            var row = new ScriptRowViewModel(s, null);
-            RowsFor(s.Category).Add(row);
+            // Look up catalogue entry so existing scripts get parameter names/types
+            var entry = ScriptCatalogue.Instance.Find(s.DisplayName);
+            RowsFor(s.Category).Add(new ScriptRowViewModel(s, entry));
         }
     }
 
     // ── Convenience wrapper for nodes ─────────────────────────────────────
-    public ScriptEditorViewModel(NodeViewModel node)
+    public ScriptEditorViewModel(NodeViewModel node, string gameId = "")
         : this($"Node {node.NodeId}", node.Scripts,
-               scripts => node.Scripts = scripts) { }
+               scripts => node.Scripts = scripts, gameId) { }
 
     private ObservableCollection<ScriptRowViewModel> RowsFor(ScriptCategory cat) => cat switch
     {
@@ -98,28 +99,58 @@ public partial class ScriptEditorViewModel : ObservableObject
         _                     => EnterRows,
     };
 
-    // ── Add script by FullName ────────────────────────────────────────────
+    // ── Picker state: one selected entry + text per section ───────────────
 
-    [ObservableProperty] private string _newEnterFullName  = string.Empty;
-    [ObservableProperty] private string _newExitFullName   = string.Empty;
-    [ObservableProperty] private string _newUpdateFullName = string.Empty;
+    [ObservableProperty] private ScriptCatalogueEntry? _selectedEnterEntry;
+    [ObservableProperty] private ScriptCatalogueEntry? _selectedExitEntry;
+    [ObservableProperty] private ScriptCatalogueEntry? _selectedUpdateEntry;
+
+    // Text is also bound so manual FullName entry works when no catalogue entry is selected
+    [ObservableProperty] private string _newEnterText  = string.Empty;
+    [ObservableProperty] private string _newExitText   = string.Empty;
+    [ObservableProperty] private string _newUpdateText = string.Empty;
+
+    // ── Add commands ──────────────────────────────────────────────────────
 
     [RelayCommand]
-    private void AddEnterScript()  => AddByName(NewEnterFullName,  ScriptCategory.Enter,
-        n => NewEnterFullName  = n);
-    [RelayCommand]
-    private void AddExitScript()   => AddByName(NewExitFullName,   ScriptCategory.Exit,
-        n => NewExitFullName   = n);
-    [RelayCommand]
-    private void AddUpdateScript() => AddByName(NewUpdateFullName, ScriptCategory.Update,
-        n => NewUpdateFullName = n);
-
-    private void AddByName(string raw, ScriptCategory category, Action<string> clearField)
+    private void AddEnterScript()
     {
-        var name = raw.Trim();
-        if (string.IsNullOrEmpty(name)) return;
-        RowsFor(category).Add(new ScriptRowViewModel(new ScriptCall(name, [], category), null));
-        clearField(string.Empty);
+        AddScript(SelectedEnterEntry, NewEnterText, ScriptCategory.Enter);
+        SelectedEnterEntry = null;
+        NewEnterText = string.Empty;
+    }
+
+    [RelayCommand]
+    private void AddExitScript()
+    {
+        AddScript(SelectedExitEntry, NewExitText, ScriptCategory.Exit);
+        SelectedExitEntry = null;
+        NewExitText = string.Empty;
+    }
+
+    [RelayCommand]
+    private void AddUpdateScript()
+    {
+        AddScript(SelectedUpdateEntry, NewUpdateText, ScriptCategory.Update);
+        SelectedUpdateEntry = null;
+        NewUpdateText = string.Empty;
+    }
+
+    private void AddScript(ScriptCatalogueEntry? entry, string rawText, ScriptCategory category)
+    {
+        if (entry is not null)
+        {
+            // Catalogue entry: pre-populate parameters with defaults
+            var defaults = entry.Parameters.Select(p => p.Default).ToList();
+            var call     = new ScriptCall(entry.ReflectionFullName, defaults, category);
+            RowsFor(category).Add(new ScriptRowViewModel(call, entry));
+        }
+        else
+        {
+            var name = rawText.Trim();
+            if (string.IsNullOrEmpty(name)) return;
+            RowsFor(category).Add(new ScriptRowViewModel(new ScriptCall(name, [], category), null));
+        }
     }
 
     [RelayCommand]
