@@ -49,7 +49,7 @@
                         ToolTip.Tip="{StaticResource Settings_BackupDirectoryTooltip}"/>
                 <TextBox Classes="path"
                          Text="{Binding BackupDirectory}"
-                         Watermark="(not set)"
+                         Watermark="{StaticResource Settings_PathNotSet}"
                          ToolTip.Tip="{StaticResource Settings_BackupDirectoryTooltip}"/>
             </DockPanel>
 

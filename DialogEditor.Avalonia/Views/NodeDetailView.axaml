@@ -76,7 +76,7 @@
                 <TextBox Classes="detail-field"
                          Text="{Binding FemaleText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="36"
-                         Watermark="(same as default — leave blank)"
+                         Watermark="{StaticResource Placeholder_FemaleText}"
                          ToolTip.Tip="{StaticResource ToolTip_FemaleText}"/>
 
                 <!-- ── Identity ────────────────────────────────────────── -->
@@ -297,7 +297,7 @@
                 <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
                     <TextBox Grid.Column="0"
                              Text="{Binding AddLinkTargetId, Mode=TwoWay}"
-                             Watermark="Target node ID…"
+                             Watermark="{StaticResource Placeholder_AddLinkTargetId}"
                              Background="#1a1a1a" Foreground="#e8e8e8"
                              BorderBrush="#444" BorderThickness="1"
                              FontSize="10" Padding="4,3"
