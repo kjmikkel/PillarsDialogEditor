@@ -52,4 +52,72 @@ public class ScriptCatalogueTests
         Assert.Contains(entry.DisplayName, entry.Label);
         Assert.Contains(entry.Category,    entry.Label);
     }
+
+    // ── Game differentiation ──────────────────────────────────────────────
+
+    [Fact]
+    public void ForGame_Poe1_IncludesStringQuestScript()
+    {
+        // PoE1 StartQuest takes a string name
+        var entries = Catalogue.ForGame("poe1");
+        Assert.Contains(entries, e => e.MethodName == "StartQuest"
+                                   && e.ReflectionFullName.Contains("String"));
+    }
+
+    [Fact]
+    public void ForGame_Poe2_IncludesGuidQuestScript()
+    {
+        // PoE2 StartQuest takes a Guid
+        var entries = Catalogue.ForGame("poe2");
+        Assert.Contains(entries, e => e.MethodName == "StartQuest"
+                                   && e.ReflectionFullName.Contains("Guid"));
+    }
+
+    [Fact]
+    public void ForGame_Poe1_ExcludesGuidQuestScript()
+    {
+        var entries = Catalogue.ForGame("poe1");
+        Assert.DoesNotContain(entries, e => e.MethodName == "StartQuest"
+                                         && e.ReflectionFullName.Contains("Guid"));
+    }
+
+    [Fact]
+    public void ForGame_Poe2_ExcludesStringQuestScript()
+    {
+        var entries = Catalogue.ForGame("poe2");
+        Assert.DoesNotContain(entries, e => e.MethodName == "StartQuest"
+                                         && e.ReflectionFullName.Contains("String"));
+    }
+
+    // ── FindByFullName ────────────────────────────────────────────────────
+
+    [Fact]
+    public void FindByFullName_ExactMatch_ReturnsEntry()
+    {
+        var entry = Catalogue.FindByFullName("Void SetGlobalValue(String, Int32)");
+        Assert.NotNull(entry);
+        Assert.Equal("SetGlobalValue", entry.MethodName);
+    }
+
+    [Fact]
+    public void FindByFullName_UnknownFullName_ReturnsNull()
+        => Assert.Null(Catalogue.FindByFullName("Void NonExistentScript(String)"));
+
+    [Fact]
+    public void FindByFullName_Poe1StartQuest_ReturnsPoe1Entry()
+    {
+        var entry = Catalogue.FindByFullName("Void StartQuest(String)");
+        Assert.NotNull(entry);
+        Assert.Contains("poe1", entry.Games);
+        Assert.DoesNotContain("poe2", entry.Games);
+    }
+
+    [Fact]
+    public void FindByFullName_Poe2StartQuest_ReturnsPoe2Entry()
+    {
+        var entry = Catalogue.FindByFullName("Void StartQuest(Guid)");
+        Assert.NotNull(entry);
+        Assert.Contains("poe2", entry.Games);
+        Assert.DoesNotContain("poe1", entry.Games);
+    }
 }

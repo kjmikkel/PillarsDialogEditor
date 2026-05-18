@@ -80,8 +80,9 @@ public partial class ScriptEditorViewModel : ObservableObject
 
         foreach (var s in initial)
         {
-            // Look up catalogue entry so existing scripts get parameter names/types
-            var entry = ScriptCatalogue.Instance.Find(s.DisplayName);
+            // FindByFullName disambiguates same-named scripts with different signatures
+            // (e.g. PoE1 StartQuest(String) vs PoE2 StartQuest(Guid))
+            var entry = ScriptCatalogue.Instance.FindByFullName(s.FullName);
             RowsFor(s.Category).Add(new ScriptRowViewModel(s, entry));
         }
     }

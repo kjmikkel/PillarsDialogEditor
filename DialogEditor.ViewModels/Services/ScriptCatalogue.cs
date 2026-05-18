@@ -42,6 +42,13 @@ public sealed class ScriptCatalogue
         => _entries.FirstOrDefault(e =>
             string.Equals(e.MethodName, methodName, StringComparison.OrdinalIgnoreCase));
 
+    /// Looks up an entry by its exact C# reflection FullName, e.g. "Void StartQuest(Guid)".
+    /// Use this when loading existing scripts from a game file to find the correct variant
+    /// for the loaded game (PoE1 and PoE2 share method names but differ in parameter types).
+    public ScriptCatalogueEntry? FindByFullName(string fullName)
+        => _entries.FirstOrDefault(e =>
+            string.Equals(e.ReflectionFullName, fullName, StringComparison.OrdinalIgnoreCase));
+
     public IReadOnlyList<ScriptCatalogueEntry> ForGame(string gameId)
         => _entries
             .Where(e => e.Games.Any(g => string.Equals(g, gameId, StringComparison.OrdinalIgnoreCase)))
