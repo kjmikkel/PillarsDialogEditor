@@ -98,7 +98,7 @@
                                                   Foreground="#aaa" FontSize="11"
                                                   Margin="8,0,8,0" VerticalAlignment="Center"
                                                   IsVisible="{Binding IsLeaf}"
-                                                  ToolTip.Tip="Negate — the condition must be FALSE"/>
+                                                  ToolTip.Tip="{StaticResource ToolTip_ConditionNot}"/>
                                         <!-- Display name (leaves) -->
                                         <TextBlock Grid.Column="2"
                                                    Text="{Binding DisplayName}"
@@ -114,7 +114,7 @@
                                             <TextBlock Text="{Binding DisplayName}"
                                                        Foreground="#888" FontSize="12"
                                                        TextTrimming="CharacterEllipsis"
-                                                       ToolTip.Tip="Grouped condition — structure preserved but not editable here"/>
+                                                       ToolTip.Tip="{StaticResource ToolTip_ConditionBranch}"/>
                                         </StackPanel>
                                         <!-- Move up -->
                                         <Button Grid.Column="3" Content="↑"
@@ -123,7 +123,7 @@
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Foreground="#aaa" FontSize="13" Padding="4"
-                                                ToolTip.Tip="Move condition up"/>
+                                                ToolTip.Tip="{StaticResource ToolTip_MoveConditionUp}"/>
                                         <!-- Move down -->
                                         <Button Grid.Column="4" Content="↓"
                                                 Command="{Binding DataContext.MoveDownCommand,
@@ -131,7 +131,7 @@
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Foreground="#aaa" FontSize="13" Padding="4"
-                                                ToolTip.Tip="Move condition down"/>
+                                                ToolTip.Tip="{StaticResource ToolTip_MoveConditionDown}"/>
                                         <!-- Delete -->
                                         <Button Grid.Column="5" Content="✕"
                                                 Command="{Binding DataContext.DeleteRowCommand,
@@ -139,7 +139,7 @@
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Foreground="#c0392b" FontSize="13" Padding="4"
-                                                ToolTip.Tip="Remove this condition"/>
+                                                ToolTip.Tip="{StaticResource ToolTip_DeleteCondition}"/>
                                     </Grid>
 
                                     <!-- Parameters (hidden for branch rows) -->
@@ -191,7 +191,8 @@
                                   SelectedItem="{Binding SelectedNewCondition, Mode=TwoWay}"
                                   PlaceholderText="Pick a condition to add…"
                                   Background="#141414" BorderBrush="#444" BorderThickness="1"
-                                  FontSize="12" Padding="6,4">
+                                  FontSize="12" Padding="6,4"
+                                  ToolTip.Tip="{StaticResource ToolTip_PickCondition}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate DataType="types:ConditionEntry">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
@@ -209,7 +210,7 @@
                                 Command="{Binding AddSelectedConditionCommand}"
                                 Background="#2c3e50" Foreground="#ccc" BorderThickness="0"
                                 Padding="14,6" Margin="8,0,0,0" FontSize="12"
-                                ToolTip.Tip="Add selected condition to the list"/>
+                                ToolTip.Tip="{StaticResource ToolTip_AddCondition}"/>
                     </Grid>
                 </Border>
 

@@ -69,7 +69,7 @@
                 <TextBox Classes="detail-field"
                          Text="{Binding DefaultText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="52"
-                         ToolTip.Tip="Edit the default / male dialogue text"/>
+                         ToolTip.Tip="{StaticResource ToolTip_DefaultText}"/>
 
                 <!-- ── Female text ─────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_FemaleText}"/>
@@ -77,7 +77,7 @@
                          Text="{Binding FemaleText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="36"
                          Watermark="(same as default — leave blank)"
-                         ToolTip.Tip="Optional female-voice variant text"/>
+                         ToolTip.Tip="{StaticResource ToolTip_FemaleText}"/>
 
                 <!-- ── Identity ────────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_GroupIdentity}"/>
@@ -85,7 +85,7 @@
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_Type}"/>
                 <ComboBox Classes="detail-combo"
                           SelectedItem="{Binding NodeTypeString, Mode=TwoWay}"
-                          ToolTip.Tip="Whether this is an NPC line or a player response choice">
+                          ToolTip.Tip="{StaticResource ToolTip_NodeType}">
                     <ComboBox.Items>
                         <sys:String>NPC Line</sys:String>
                         <sys:String>Player Choice</sys:String>
@@ -104,7 +104,7 @@
                 <TextBox Classes="detail-field"
                          Text="{Binding SpeakerGuid, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          FontFamily="Consolas,Courier New,monospace"
-                         ToolTip.Tip="GUID of the speaking character (edit directly or use the name picker above)"/>
+                         ToolTip.Tip="{StaticResource ToolTip_SpeakerGuid}"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_ListenerGuid}"/>
                 <!-- Name picker — visible when speaker data is loaded (PoE2) -->
@@ -118,7 +118,7 @@
                 <TextBox Classes="detail-field"
                          Text="{Binding ListenerGuid, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          FontFamily="Consolas,Courier New,monospace"
-                         ToolTip.Tip="GUID of the listening character (edit directly or use the name picker above)"/>
+                         ToolTip.Tip="{StaticResource ToolTip_ListenerGuid}"/>
 
                 <!-- ── Display ─────────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_GroupDisplay}"/>
@@ -126,7 +126,7 @@
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_DisplayType}"/>
                 <ComboBox Classes="detail-combo"
                           SelectedItem="{Binding DisplayType, Mode=TwoWay}"
-                          ToolTip.Tip="How this node is presented to the player">
+                          ToolTip.Tip="{StaticResource ToolTip_DisplayType}">
                     <ComboBox.Items>
                         <sys:String>Conversation</sys:String>
                         <sys:String>Bark</sys:String>
@@ -136,7 +136,7 @@
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_Persistence}"/>
                 <ComboBox Classes="detail-combo"
                           SelectedItem="{Binding Persistence, Mode=TwoWay}"
-                          ToolTip.Tip="Whether the node is hidden after it has been shown once">
+                          ToolTip.Tip="{StaticResource ToolTip_Persistence}">
                     <ComboBox.Items>
                         <sys:String>None</sys:String>
                         <sys:String>OnceEver</sys:String>
@@ -146,7 +146,7 @@
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_ActorDirection}"/>
                 <TextBox Classes="detail-field"
                          Text="{Binding ActorDirection, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         ToolTip.Tip="Optional actor direction note for the VO recording"/>
+                         ToolTip.Tip="{StaticResource ToolTip_ActorDirection}"/>
 
                 <!-- ── Voice ───────────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_GroupVoice}"/>
@@ -155,24 +155,24 @@
                 <TextBox Classes="detail-field"
                          Text="{Binding ExternalVO, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          FontFamily="Consolas,Courier New,monospace"
-                         ToolTip.Tip="External voice-over file path or identifier"/>
+                         ToolTip.Tip="{StaticResource ToolTip_ExternalVO}"/>
 
                 <CheckBox Classes="detail-check"
                           IsChecked="{Binding HasVO, Mode=TwoWay}"
                           Content="{StaticResource PropertyRow_HasVO}"
-                          ToolTip.Tip="Whether a voice-over recording exists for this node"/>
+                          ToolTip.Tip="{StaticResource ToolTip_HasVO}"/>
 
                 <CheckBox Classes="detail-check"
                           IsChecked="{Binding HideSpeaker, Mode=TwoWay}"
                           Content="{StaticResource PropertyRow_HideSpeaker}"
-                          ToolTip.Tip="Whether the speaker name is hidden during playback"/>
+                          ToolTip.Tip="{StaticResource ToolTip_HideSpeaker}"/>
 
                 <!-- ── Comments ────────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource PropertyRow_Comments}"/>
                 <TextBox Classes="detail-field"
                          Text="{Binding Comments, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30"
-                         ToolTip.Tip="Internal developer notes (not shown to players)"/>
+                         ToolTip.Tip="{StaticResource ToolTip_Comments}"/>
 
                 <!-- ── Scripts (edit in separate window) ─────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_GroupLogic}"/>
@@ -301,7 +301,7 @@
                              Background="#1a1a1a" Foreground="#e8e8e8"
                              BorderBrush="#444" BorderThickness="1"
                              FontSize="10" Padding="4,3"
-                             ToolTip.Tip="Enter a node ID to link to, then click Add"/>
+                             ToolTip.Tip="{StaticResource ToolTip_AddLinkTargetId}"/>
                     <Button Grid.Column="1"
                             Content="{StaticResource Button_AddLink}"
                             Command="{Binding AddLinkCommand}"
