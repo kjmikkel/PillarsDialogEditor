@@ -26,4 +26,25 @@ public partial class NodeDetailView : UserControl
         // Update the summary after the dialog closes
         detailVm.NotifyConditionSummary();
     }
+
+    private async void LinkConditions_Click(object? sender, RoutedEventArgs e)
+    {
+        if (sender is not Button btn) return;
+        if (btn.Tag is not ConnectionViewModel conn) return;
+        if (DataContext is not NodeDetailViewModel detailVm) return;
+
+        var title    = $"Link → {conn.Target.GetNodeId()}";
+        var editorVm = new ConditionEditorViewModel(
+            title,
+            conn.Conditions,
+            conditions => conn.Conditions = conditions,
+            detailVm.ActiveGameId);
+
+        var window = new ConditionEditorWindow(editorVm);
+        var owner  = TopLevel.GetTopLevel(this) as Window;
+        if (owner is not null)
+            await window.ShowDialog(owner);
+        else
+            window.Show();
+    }
 }

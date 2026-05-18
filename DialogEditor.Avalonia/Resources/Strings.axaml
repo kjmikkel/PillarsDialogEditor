@@ -330,6 +330,11 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Placeholder_SpeakerSearch">Search by name…</sys:String>
     <sys:String x:Key="ToolTip_SpeakerPicker">Pick a character by name — sets the GUID below automatically</sys:String>
 
+    <!-- ─── Detail panel — link condition button ────────────────────────── -->
+    <sys:String x:Key="Button_LinkConditions">⚙</sys:String>
+    <sys:String x:Key="ToolTip_LinkConditions_None">No conditions — click to add</sys:String>
+    <sys:String x:Key="ToolTip_LinkConditions_Some">{0} condition(s) — click to edit</sys:String>
+
     <!-- ─── Detail panel — link property labels and tooltips ───────────── -->
     <sys:String x:Key="Label_LinkWeight">w</sys:String>
     <sys:String x:Key="ToolTip_LinkQTD">Controls whether this player choice reappears after selection (ShowOnce / Always / Never)</sys:String>

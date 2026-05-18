@@ -33,16 +33,6 @@ enum (`Narrator`, `Script` values), `Poe1ConversationParser.ClassifySpeaker`.
 
 ## Editing — Links
 
-### Condition editing on links
-**What:** `NodeLink.Conditions` (conditions that gate when a link is followed) are
-preserved through the round-trip but cannot be added, removed, or edited.  
-**Why:** Link conditions were Phase 5b — the condition editor was built for node
-conditions first. The data model (`NodeLink.Conditions`) and serialisers already
-support them fully; only the UI and diff/patch layers need extending.  
-**Where to start:** `ConnectionViewModel` would need a `Conditions` property
-(similar to `QuestionNodeTextDisplay`). `LinkEditSnapshot` would need a
-`Conditions` field. The condition editor window can likely be reused or adapted.
-
 ---
 
 ## Condition Editor

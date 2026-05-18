@@ -8,14 +8,12 @@ namespace DialogEditor.ViewModels;
 
 public partial class ConditionEditorViewModel : ObservableObject
 {
-    private readonly NodeViewModel                    _node;
-    private readonly IReadOnlyList<ConditionNode>     _original;
+    private readonly Action<IReadOnlyList<ConditionNode>> _commit;
+    private readonly string _gameId;
 
     public string NodeTitle { get; }
 
     public ObservableCollection<ConditionRowViewModel> Rows { get; } = [];
-
-    private readonly string _gameId;
 
     public IReadOnlyList<ConditionEntry> AvailableConditions
         => string.IsNullOrEmpty(_gameId)
@@ -27,14 +25,19 @@ public partial class ConditionEditorViewModel : ObservableObject
     public event Action? Confirmed;
     public event Action? Cancelled;
 
-    public ConditionEditorViewModel(NodeViewModel node, string gameId = "")
+    // ── General constructor — works for nodes, links, or anything that
+    //   owns a list of conditions ───────────────────────────────────────
+    public ConditionEditorViewModel(
+        string title,
+        IReadOnlyList<ConditionNode> initial,
+        Action<IReadOnlyList<ConditionNode>> commit,
+        string gameId = "")
     {
-        _node    = node;
-        _gameId  = gameId;
-        _original = node.Conditions.ToList();
-        NodeTitle = $"Node {node.NodeId}";
+        NodeTitle = title;
+        _commit   = commit;
+        _gameId   = gameId;
 
-        foreach (var c in node.Conditions)
+        foreach (var c in initial)
         {
             if (c is ConditionLeaf leaf)
                 Rows.Add(BuildRow(leaf));
@@ -43,9 +46,15 @@ public partial class ConditionEditorViewModel : ObservableObject
         }
     }
 
+    // ── Convenience wrapper for node conditions (existing callers unchanged) ─
+    public ConditionEditorViewModel(NodeViewModel node, string gameId = "")
+        : this($"Node {node.NodeId}",
+               node.Conditions,
+               conditions => node.Conditions = conditions,
+               gameId) { }
+
     private ConditionRowViewModel BuildRow(ConditionLeaf leaf)
     {
-        // Try to match by method name (strip return type and params from FullName)
         var methodName = leaf.FullName.Contains(' ')
             ? leaf.FullName[(leaf.FullName.IndexOf(' ') + 1)..].Split('(')[0]
             : leaf.FullName;
@@ -86,14 +95,10 @@ public partial class ConditionEditorViewModel : ObservableObject
     [RelayCommand]
     private void Confirm()
     {
-        _node.Conditions = Rows.Select(r => r.ToNode()).ToList();
+        _commit(Rows.Select(r => r.ToNode()).ToList());
         Confirmed?.Invoke();
     }
 
     [RelayCommand]
-    private void Cancel()
-    {
-        // Discard — leave _node.Conditions unchanged (still has _original values)
-        Cancelled?.Invoke();
-    }
+    private void Cancel() => Cancelled?.Invoke();
 }

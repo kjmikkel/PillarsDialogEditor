@@ -7,8 +7,11 @@ public record LinkEditSnapshot(
     int ToNodeId,
     float RandomWeight,
     string QuestionNodeTextDisplay,
-    bool HasConditions
-);
+    bool HasConditions)
+{
+    // Non-positional so all existing callers continue to compile.
+    public IReadOnlyList<ConditionNode>? Conditions { get; init; }
+}
 
 public record NodeEditSnapshot(
     int NodeId,

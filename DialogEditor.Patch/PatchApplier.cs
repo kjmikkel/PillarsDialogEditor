@@ -104,7 +104,12 @@ public static class PatchApplier
         var links = node.Links
             .Where(l => !deletedToIds.Contains(l.ToNodeId))
             .Select(l => modifiedById.TryGetValue(l.ToNodeId, out var m)
-                ? l with { RandomWeight = m.RandomWeight, QuestionNodeTextDisplay = m.QuestionNodeTextDisplay }
+                ? l with
+                {
+                    RandomWeight             = m.RandomWeight,
+                    QuestionNodeTextDisplay  = m.QuestionNodeTextDisplay,
+                    Conditions               = m.Conditions ?? l.Conditions,
+                }
                 : l)
             .Concat(mod.AddedLinks)
             .ToList();
