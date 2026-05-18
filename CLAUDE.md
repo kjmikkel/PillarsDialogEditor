@@ -16,7 +16,9 @@ No user-visible text may be hard-coded inline in XAML or C#. All strings — lab
 
 ## UI/UX Guidelines
 
-Every interactive control — buttons, icon-only actions, toolbar items, canvas controls — must carry a descriptive `ToolTip` property that explains its effect in plain language. One-word labels and symbols (⌂, ⊞, ?, +) are not self-explanatory to new users. Tooltips are mandatory; omitting them on new controls is a defect.
+Every interactive control — buttons, icon-only actions, toolbar items, canvas controls, input fields, checkboxes, dropdowns — must carry a detailed `ToolTip` property that explains its purpose and effect in plain language. One-word labels and symbols (⌂, ⊞, ?, +) are not self-explanatory to new users. Tooltips are mandatory; omitting them on new controls is a defect.
+
+The only exception is controls whose purpose is 100% self-explanatory from their label alone in context — for example, **OK** and **Cancel** buttons on a confirmation dialog. When in doubt, add the tooltip.
 
 ## Error Handling
 
