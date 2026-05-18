@@ -322,6 +322,11 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_AddScriptEnter">Add the selected or typed script to the On Enter list</sys:String>
     <sys:String x:Key="ToolTip_AddScriptExit">Add the selected or typed script to the On Exit list</sys:String>
     <sys:String x:Key="ToolTip_AddScriptUpdate">Add the selected or typed script to the On Update list</sys:String>
+    <sys:String x:Key="Label_ScriptSection_Enter">ON ENTER  (fires when the node is shown)</sys:String>
+    <sys:String x:Key="Label_ScriptSection_Exit">ON EXIT  (fires when the player leaves the node)</sys:String>
+    <sys:String x:Key="Label_ScriptSection_Update">ON UPDATE  (fires on each update tick while the node is active)</sys:String>
+    <sys:String x:Key="ToolTip_ScriptEditorCancel">Discard all changes and close</sys:String>
+    <sys:String x:Key="ToolTip_ScriptEditorOK">Apply these scripts to the node</sys:String>
 
     <!-- ─── Detail panel — condition editor ─────────────────────────────── -->
     <sys:String x:Key="Label_GroupConditions">CONDITIONS</sys:String>
@@ -337,6 +342,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_PickCondition">Select a condition from the catalogue to add to this node</sys:String>
     <sys:String x:Key="ToolTip_ConditionNot">Negate this condition — it must evaluate to FALSE for the check to pass</sys:String>
     <sys:String x:Key="ToolTip_ConditionBranch">Grouped condition block — the structure is preserved but cannot be edited here</sys:String>
+    <sys:String x:Key="ToolTip_ConditionEditorCancel">Discard all changes and close</sys:String>
+    <sys:String x:Key="ToolTip_ConditionEditorOK">Apply these conditions to the node</sys:String>
 
     <!-- ─── Detail panel — speaker/listener name picker ────────────────── -->
     <sys:String x:Key="Placeholder_SpeakerSearch">Search by name…</sys:String>
@@ -351,6 +358,10 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Label_LinkWeight">Wt.</sys:String>
     <sys:String x:Key="ToolTip_LinkQTD">Controls whether this player choice reappears after selection (ShowOnce / Always / Never)</sys:String>
     <sys:String x:Key="ToolTip_LinkWeight">Random weight — relative probability when multiple links compete for selection. A link with weight 2 is twice as likely to be chosen as one with weight 1. Default: 1</sys:String>
+
+    <!-- ─── Node detail panel — watermarks ──────────────────────────────── -->
+    <sys:String x:Key="Placeholder_FemaleText">(same as default — leave blank)</sys:String>
+    <sys:String x:Key="Placeholder_AddLinkTargetId">Target node ID…</sys:String>
 
     <!-- ─── Node detail panel — field tooltips ──────────────────────────── -->
     <sys:String x:Key="ToolTip_DefaultText">Edit the default (male) dialogue text for this node</sys:String>
@@ -391,6 +402,7 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Settings_PatchDirectoryTooltip">Folder where .patch files are written when you save a conversation</sys:String>
     <sys:String x:Key="Settings_Browse">Browse…</sys:String>
     <sys:String x:Key="Settings_Close">Close</sys:String>
+    <sys:String x:Key="Settings_PathNotSet">(not set)</sys:String>
     <sys:String x:Key="Settings_BackupDirectoryTitle">Select backup destination folder</sys:String>
     <sys:String x:Key="Settings_PatchDirectoryTitle">Select patch output folder</sys:String>
     <sys:String x:Key="ToolTip_Settings">Open settings (backup directory, patch output directory)</sys:String>

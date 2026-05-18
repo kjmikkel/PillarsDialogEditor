@@ -125,7 +125,7 @@
                 </StackPanel.Resources>
 
                 <!-- ON ENTER -->
-                <TextBlock Classes="section-header" Text="ON ENTER  (fires when the node is shown)"/>
+                <TextBlock Classes="section-header" Text="{StaticResource Label_ScriptSection_Enter}"/>
                 <ItemsControl ItemsSource="{Binding EnterRows}"
                               ItemTemplate="{StaticResource ScriptRowTemplate}"/>
                 <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
@@ -147,7 +147,7 @@
                 </Grid>
 
                 <!-- ON EXIT -->
-                <TextBlock Classes="section-header" Text="ON EXIT  (fires when the player leaves the node)"/>
+                <TextBlock Classes="section-header" Text="{StaticResource Label_ScriptSection_Exit}"/>
                 <ItemsControl ItemsSource="{Binding ExitRows}"
                               ItemTemplate="{StaticResource ScriptRowTemplate}"/>
                 <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
@@ -169,7 +169,7 @@
                 </Grid>
 
                 <!-- ON UPDATE -->
-                <TextBlock Classes="section-header" Text="ON UPDATE  (fires on each update tick while the node is active)"/>
+                <TextBlock Classes="section-header" Text="{StaticResource Label_ScriptSection_Update}"/>
                 <ItemsControl ItemsSource="{Binding UpdateRows}"
                               ItemTemplate="{StaticResource ScriptRowTemplate}"/>
                 <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
@@ -198,10 +198,10 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
                 <Button Classes="footer-btn" Content="Cancel"
                         Command="{Binding CancelCommand}"
-                        ToolTip.Tip="Discard all changes and close"/>
+                        ToolTip.Tip="{StaticResource ToolTip_ScriptEditorCancel}"/>
                 <Button Classes="footer-btn primary" Content="OK"
                         Command="{Binding ConfirmCommand}"
-                        ToolTip.Tip="Apply these scripts to the node"/>
+                        ToolTip.Tip="{StaticResource ToolTip_ScriptEditorOK}"/>
             </StackPanel>
         </Border>
 

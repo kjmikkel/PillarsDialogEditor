@@ -94,7 +94,7 @@
                                         <!-- NOT toggle -->
                                         <CheckBox Grid.Column="1"
                                                   IsChecked="{Binding Not, Mode=TwoWay}"
-                                                  Content="NOT"
+                                                  Content="{StaticResource Label_Condition_NOT}"
                                                   Foreground="#aaa" FontSize="11"
                                                   Margin="8,0,8,0" VerticalAlignment="Center"
                                                   IsVisible="{Binding IsLeaf}"
@@ -189,7 +189,7 @@
                         <ComboBox Grid.Column="0"
                                   ItemsSource="{Binding AvailableConditions}"
                                   SelectedItem="{Binding SelectedNewCondition, Mode=TwoWay}"
-                                  PlaceholderText="Pick a condition to add…"
+                                  PlaceholderText="{StaticResource Placeholder_PickCondition}"
                                   Background="#141414" BorderBrush="#444" BorderThickness="1"
                                   FontSize="12" Padding="6,4"
                                   ToolTip.Tip="{StaticResource ToolTip_PickCondition}">
@@ -223,11 +223,11 @@
                 <Button Classes="footer-btn"
                         Content="Cancel"
                         Command="{Binding CancelCommand}"
-                        ToolTip.Tip="Discard all changes and close"/>
+                        ToolTip.Tip="{StaticResource ToolTip_ConditionEditorCancel}"/>
                 <Button Classes="footer-btn primary"
                         Content="OK"
                         Command="{Binding ConfirmCommand}"
-                        ToolTip.Tip="Apply these conditions to the node"/>
+                        ToolTip.Tip="{StaticResource ToolTip_ConditionEditorOK}"/>
             </StackPanel>
         </Border>
 
