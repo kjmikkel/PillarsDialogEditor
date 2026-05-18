@@ -336,9 +336,9 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_LinkConditions_Some">{0} condition(s) — click to edit</sys:String>
 
     <!-- ─── Detail panel — link property labels and tooltips ───────────── -->
-    <sys:String x:Key="Label_LinkWeight">w</sys:String>
+    <sys:String x:Key="Label_LinkWeight">Wt.</sys:String>
     <sys:String x:Key="ToolTip_LinkQTD">Controls whether this player choice reappears after selection (ShowOnce / Always / Never)</sys:String>
-    <sys:String x:Key="ToolTip_LinkWeight">Relative probability weight when multiple links compete (default: 1)</sys:String>
+    <sys:String x:Key="ToolTip_LinkWeight">Random weight — relative probability when multiple links compete for selection. A link with weight 2 is twice as likely to be chosen as one with weight 1. Default: 1</sys:String>
 
     <!-- ─── Detail panel — link actions ─────────────────────────────────── -->
     <sys:String x:Key="Button_DeleteLink">✕</sys:String>
