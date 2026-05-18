@@ -113,11 +113,11 @@
                                     <MenuItem Header="{StaticResource Menu_DeleteNode}"
                                               Command="{Binding $parent[UserControl].DataContext.DeleteNodeCmdCommand}"
                                               CommandParameter="{Binding}"
-                                              ToolTip.Tip="Remove this node and all its connections"/>
+                                              ToolTip.Tip="{StaticResource ToolTip_DeleteNode}"/>
                                     <MenuItem Header="{StaticResource Menu_AddConnectedNode}"
                                               Command="{Binding $parent[UserControl].DataContext.AddConnectedNodeCmdCommand}"
                                               CommandParameter="{Binding}"
-                                              ToolTip.Tip="Create a new node linked from this one"/>
+                                              ToolTip.Tip="{StaticResource ToolTip_AddConnectedNode}"/>
                                 </ContextMenu>
                             </nodify:Node.ContextMenu>
 
@@ -180,7 +180,7 @@
                                     <MenuItem Header="{StaticResource Menu_DeleteConnection}"
                                               Command="{Binding $parent[UserControl].DataContext.DeleteConnectionCmdCommand}"
                                               CommandParameter="{Binding}"
-                                              ToolTip.Tip="Remove this connection between nodes"/>
+                                              ToolTip.Tip="{StaticResource ToolTip_DeleteConnection}"/>
                                 </ContextMenu>
                             </nodify:Connection.ContextMenu>
                         </nodify:Connection>

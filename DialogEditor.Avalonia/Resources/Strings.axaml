@@ -334,6 +334,9 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_MoveConditionDown">Move condition down</sys:String>
     <sys:String x:Key="Label_Condition_NOT">NOT</sys:String>
     <sys:String x:Key="Placeholder_PickCondition">Pick a condition…</sys:String>
+    <sys:String x:Key="ToolTip_PickCondition">Select a condition from the catalogue to add to this node</sys:String>
+    <sys:String x:Key="ToolTip_ConditionNot">Negate this condition — it must evaluate to FALSE for the check to pass</sys:String>
+    <sys:String x:Key="ToolTip_ConditionBranch">Grouped condition block — the structure is preserved but cannot be edited here</sys:String>
 
     <!-- ─── Detail panel — speaker/listener name picker ────────────────── -->
     <sys:String x:Key="Placeholder_SpeakerSearch">Search by name…</sys:String>
@@ -348,6 +351,31 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Label_LinkWeight">Wt.</sys:String>
     <sys:String x:Key="ToolTip_LinkQTD">Controls whether this player choice reappears after selection (ShowOnce / Always / Never)</sys:String>
     <sys:String x:Key="ToolTip_LinkWeight">Random weight — relative probability when multiple links compete for selection. A link with weight 2 is twice as likely to be chosen as one with weight 1. Default: 1</sys:String>
+
+    <!-- ─── Node detail panel — field tooltips ──────────────────────────── -->
+    <sys:String x:Key="ToolTip_DefaultText">Edit the default (male) dialogue text for this node</sys:String>
+    <sys:String x:Key="ToolTip_FemaleText">Optional female-voice variant. Leave blank to use the default text for both genders.</sys:String>
+    <sys:String x:Key="ToolTip_NodeType">Whether this node is an NPC line or a player response choice</sys:String>
+    <sys:String x:Key="ToolTip_SpeakerGuid">GUID of the speaking character — edit directly or use the name picker above</sys:String>
+    <sys:String x:Key="ToolTip_ListenerGuid">GUID of the listening character — edit directly or use the name picker above</sys:String>
+    <sys:String x:Key="ToolTip_DisplayType">How this node is presented to the player (Conversation = full portrait, Bark = floating text)</sys:String>
+    <sys:String x:Key="ToolTip_Persistence">OnceEver hides this node after it has been shown once, even across saves</sys:String>
+    <sys:String x:Key="ToolTip_ActorDirection">Optional director's note for the voice actor — not shown to players</sys:String>
+    <sys:String x:Key="ToolTip_ExternalVO">External voice-over file path or identifier</sys:String>
+    <sys:String x:Key="ToolTip_HasVO">Check if a voice-over recording exists for this line</sys:String>
+    <sys:String x:Key="ToolTip_HideSpeaker">Hide the speaker name label during dialogue playback</sys:String>
+    <sys:String x:Key="ToolTip_Comments">Internal developer notes — not shown to players</sys:String>
+    <sys:String x:Key="ToolTip_AddLinkTargetId">Type a node ID and click Add to create a link from this node to that one</sys:String>
+
+    <!-- ─── Canvas context menus ──────────────────────────────────────────── -->
+    <sys:String x:Key="ToolTip_DeleteNode">Remove this node and all its connections from the conversation</sys:String>
+    <sys:String x:Key="ToolTip_AddConnectedNode">Create a new node and link it from this one</sys:String>
+    <sys:String x:Key="ToolTip_DeleteConnection">Remove the link between these two nodes</sys:String>
+
+    <!-- ─── Script editor row buttons ─────────────────────────────────────── -->
+    <sys:String x:Key="ToolTip_MoveScriptUp">Move this script up within its section</sys:String>
+    <sys:String x:Key="ToolTip_MoveScriptDown">Move this script down within its section</sys:String>
+    <sys:String x:Key="ToolTip_DeleteScriptRow">Remove this script from the list</sys:String>
 
     <!-- ─── Detail panel — link actions ─────────────────────────────────── -->
     <sys:String x:Key="Button_DeleteLink">✕</sys:String>

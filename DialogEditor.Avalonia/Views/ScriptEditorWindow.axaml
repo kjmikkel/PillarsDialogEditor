@@ -78,21 +78,21 @@
                                             CommandParameter="{Binding}"
                                             Background="Transparent" BorderThickness="0"
                                             Foreground="#aaa" FontSize="13" Padding="4"
-                                            ToolTip.Tip="Move script up"/>
+                                            ToolTip.Tip="{StaticResource ToolTip_MoveScriptUp}"/>
                                     <Button Grid.Column="2" Content="↓"
                                             Command="{Binding DataContext.MoveDownCommand,
                                                       RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding}"
                                             Background="Transparent" BorderThickness="0"
                                             Foreground="#aaa" FontSize="13" Padding="4"
-                                            ToolTip.Tip="Move script down"/>
+                                            ToolTip.Tip="{StaticResource ToolTip_MoveScriptDown}"/>
                                     <Button Grid.Column="3" Content="✕"
                                             Command="{Binding DataContext.DeleteRowCommand,
                                                       RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding}"
                                             Background="Transparent" BorderThickness="0"
                                             Foreground="#c0392b" FontSize="13" Padding="4"
-                                            ToolTip.Tip="Remove this script"/>
+                                            ToolTip.Tip="{StaticResource ToolTip_DeleteScriptRow}"/>
                                 </Grid>
                                 <!-- Parameters -->
                                 <ItemsControl ItemsSource="{Binding Parameters}"
