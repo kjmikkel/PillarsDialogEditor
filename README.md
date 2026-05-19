@@ -64,6 +64,7 @@ shown in green. The conversation file is **not** written to disk until you press
 | Delete a node | Select it, press `Delete`; or right-click › Delete node |
 | Delete a connection | Right-click the connection line › Delete connection |
 | Search nodes | `Ctrl+F`, or type in the search box above the canvas |
+| Find / Replace text | `Ctrl+H` — searches DefaultText and FemaleText across all nodes |
 | Undo / Redo | `Ctrl+Z` / `Ctrl+Y` — all edits are fully undoable within a session |
 
 #### Node detail panel
@@ -75,6 +76,7 @@ Selecting a node opens the detail panel on the right. Fields available for editi
 | Default / Male text | The dialogue line shown to all players, or the male variant in gendered games |
 | Female text | Optional female-voice override; leave blank to use the default text for both genders |
 | Type | NPC Line or Player Choice |
+| Speaker category | NPC, Player, Narrator, or Script — controls the node's colour on the canvas |
 | Speaker / Listener GUID | The characters involved; in PoE2 a name picker is available |
 | Display type | Conversation (full portrait) or Bark (floating text) |
 | Persistence | OnceEver hides this node after it has been shown once |
@@ -87,33 +89,33 @@ Selecting a node opens the detail panel on the right. Fields available for editi
 Each node can carry a list of conditions that the engine evaluates at runtime.
 Click **Edit…** next to the CONDITIONS header to open the Condition Editor.
 
-- Pick from a searchable catalogue of known conditions (shared for PoE1 and PoE2,
-  with game-appropriate filtering when a game folder is loaded).
-- Each condition shows its parameters as labelled fields; enum parameters use
-  dropdowns populated from the game source.
-- Toggle **NOT** to negate a condition; choose **And / Or** to combine them.
-- Use the ↑ ↓ buttons to reorder; ✕ to remove.
-
-**Link conditions:** Individual connections between nodes can also carry conditions.
-Click the **⚙** button on any link row in the detail panel to open the Condition
-Editor for that specific link.
+- Pick from a searchable catalogue of 83 known conditions (game-appropriate
+  filtering when a game folder is loaded; parameters use enum dropdowns or
+  Guid fields as appropriate for each game).
+- Toggle **AND/OR** and **NOT** per condition, including on grouped branches.
+- **Link conditions:** the **⚙** button on any link row opens the Condition
+  Editor for that specific connection.
+- **Grouped conditions:** existing groups show an **Edit group…** button;
+  **+ New group** creates an empty nested group from scratch.
+- Use ↑ ↓ and ✕ to reorder and remove; drag the editor to any monitor.
 
 #### Scripts
 
-Nodes can fire scripts at three points in their lifecycle. Click **Edit…** next
-to the LOGIC header to open the Script Editor.
+Nodes can fire scripts at three lifecycle points. Click **Edit…** next to the
+LOGIC header to open the Script Editor.
 
-Three sections are shown — **On Enter** (when the node is shown), **On Exit**
-(when the player leaves), and **On Update** (each tick while the node is active).
+Three sections — **On Enter** (node shown), **On Exit** (player leaves),
+**On Update** (every tick while active).
 
-- Search the catalogue by typing in the picker, or press the down arrow to browse
-  the full list. Selecting a known script pre-populates all parameters with named
-  fields and correct types (enum dropdowns, text boxes).
-- Unknown scripts can still be added by typing their C# reflection FullName
+- Search the catalogue of 33+ known scripts by typing, or press the down arrow
+  to browse the full list. Selecting a known script pre-populates all parameters
+  with named fields, correct types (enum dropdowns with game source values), and
+  `AutoCompleteBox` filtering for large lists such as the 195-entry PoE1 or
+  322-entry PoE2 area dropdowns on `AreaTransition` and `PreloadScene`.
+- PoE1 and PoE2 variants of the same script (different parameter types) are
+  shown separately and filtered to the loaded game.
+- Unknown scripts can still be added by typing the C# reflection FullName
   directly, e.g. `Void SetGlobalValue(String, Int32)`.
-- PoE1 and PoE2 scripts with the same name but different signatures (quest scripts,
-  item scripts, etc.) are kept separate and shown only for the loaded game.
-- Use ↑ ↓ and ✕ to reorder and remove rows within each section.
 
 ---
 
@@ -123,8 +125,7 @@ Three sections are shown — **On Enter** (when the node is shown), **On Exit**
 
 Records the current conversation's changes as a diff inside the open project file.
 The diff captures only what changed — text edits, node additions/removals, link
-changes, condition and script modifications. If you add a node and then delete it
-before saving, no trace of it appears in the diff. Game files are not modified.
+changes, condition and script modifications. Game files are not modified.
 The project file is plain JSON and can be version-controlled or shared freely.
 
 ---
@@ -138,6 +139,9 @@ can launch the game and verify dialogue in context. Before writing anything, the
 editor makes a lightweight per-file backup of the affected conversations so they
 can be precisely restored afterwards.
 
+New conversations (created with the **⊕** button and not yet on disk) are written
+as blank templates at this point, then patched normally.
+
 While the game files are patched, a modal dialog blocks the editor — this is
 intentional to prevent inconsistent edits during testing.
 
@@ -148,8 +152,8 @@ intentional to prevent inconsistent edits during testing.
 **Test › Restore Conversation** (`F6`)
 
 Reverts the patched game files to their pre-test state and unlocks the editor.
-The project file is unchanged; your edits are still there, ready for the next
-test cycle or final save.
+New conversations that were written by `F5` are deleted again.
+The project file is unchanged; your edits are ready for the next test cycle.
 
 If the editor crashes or is force-quit while in test mode, the next launch detects
 the incomplete state and shows the modal automatically so you can restore before
@@ -157,18 +161,38 @@ editing.
 
 ---
 
-### 7 — Distribute
+### 7 — Distribute and combine patches
 
-Share your `.dialogproject` file. Recipients apply it by:
+#### Single patch
 
-1. Installing this editor (or the planned standalone patch utility)
-2. Opening the matching game folder
-3. Opening the project file
-4. Running **Test › Test Patch** — or, once the standalone utility ships,
-   running it directly without the full editor
+Share your `.dialogproject` file. Recipients open the **Patch Manager** (see below)
+to apply it, or load it in the full editor and press `F5`.
 
-Multiple projects can be **stacked in load order**: each patch is applied on top
-of the previous, with conflict detection if two patches modify the same field.
+#### Combining patches from multiple authors
+
+**File › Merge Projects…**
+
+Merges one or more other `.dialogproject` files into the currently open project.
+Patches for the same conversation are merged field-by-field; the last file you
+pick wins on any contested field. Layouts are merged preserving both sets of
+positions. The merged file is saved immediately.
+
+#### Patch Manager — load order and conflict detection
+
+**File › Patch Manager…** (also available as a standalone `DialogEditor.PatchManager.exe`)
+
+Lets you maintain an ordered stack of `.dialogproject` files, detect conflicts
+before applying, and write all patches to the game folder in one step:
+
+1. **Add project(s)…** — pick one or more `.dialogproject` files
+2. **Reorder** with ↑ ↓ — entries lower in the list win on any conflict
+3. The **conflict panel** identifies every contested field before you apply
+4. **Apply patches** — writes every conversation patch to the selected game folder
+5. **Save / Load load order** — persists the list as a `.patchlist` file;
+   double-clicking a `.patchlist` opens the standalone app directly
+
+The standalone app requires no editor installation and is suitable for end users
+applying community mods.
 
 ---
 
@@ -198,6 +222,7 @@ Legend window can be moved outside the editor (useful on a second monitor).
 | `Ctrl+Z` | Undo |
 | `Ctrl+Y` | Redo |
 | `Ctrl+F` | Focus node search |
+| `Ctrl+H` | Find / Replace |
 | `Delete` | Delete selected node |
 | `F5` | Test Patch |
 | `F6` | Restore Conversation |
