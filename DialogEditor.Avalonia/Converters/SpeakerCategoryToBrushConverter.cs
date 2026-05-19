@@ -34,7 +34,7 @@ public sealed class SpeakerCategoryToBrushConverter : IValueConverter
     {
         if (value is not SpeakerCategory cat) return NpcHeader;
 
-        return parameter as string switch
+        return (parameter as string) switch
         {
             "body" => cat switch
             {
