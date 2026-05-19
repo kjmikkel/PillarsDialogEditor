@@ -140,7 +140,7 @@ public partial class GameBrowserViewModel : ObservableObject
 
         if (newConversationNames is { Count: > 0 })
         {
-            var newFolder = new ConversationFolderViewModel("(new)", isExpanded: true);
+            var newFolder = new ConversationFolderViewModel(Loc.Get("Label_NewConversationsFolder"), isExpanded: true);
             foreach (var name in newConversationNames)
             {
                 var file = provider.BuildNewConversationFile(name);

@@ -326,6 +326,7 @@ public partial class MainWindow : Window
         var title       = (string)(this.FindResource("Dialog_NewConversation_Title")       ?? "New Conversation");
         var prompt      = (string)(this.FindResource("Dialog_NewConversation_Prompt")      ?? "Conversation name:");
         var placeholder = (string)(this.FindResource("Dialog_NewConversation_Placeholder") ?? "my_new_conversation");
+        var lblCreate   = (string)(this.FindResource("Dialog_NewConversation_Create")      ?? "Create");
 
         var tcs = new TaskCompletionSource<string?>();
 
@@ -373,7 +374,7 @@ public partial class MainWindow : Window
 
         var okBtn = new Button
         {
-            Content         = "Create",
+            Content         = lblCreate,
             Padding         = new Thickness(16, 6),
             Background      = new SolidColorBrush(Color.Parse("#1a5276")),
             Foreground      = Brushes.White,

@@ -86,6 +86,8 @@
     <sys:String x:Key="Browser_Header">CONVERSATIONS</sys:String>
     <!-- New conversation feature -->
     <sys:String x:Key="Label_NewConversation_Suffix"> (new)</sys:String>
+    <sys:String x:Key="Label_NewConversationsFolder">(new)</sys:String>
+    <sys:String x:Key="Dialog_NewConversation_Create">Create</sys:String>
     <sys:String x:Key="Button_NewConversation">New conversation…</sys:String>
     <sys:String x:Key="ToolTip_NewConversation">Create a new conversation that doesn't yet exist in the game folder. It will be written to disk when you apply the patch (F5).</sys:String>
     <sys:String x:Key="Dialog_NewConversation_Title">New Conversation</sys:String>
