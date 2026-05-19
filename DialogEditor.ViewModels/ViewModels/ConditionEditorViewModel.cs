@@ -75,6 +75,10 @@ public partial class ConditionEditorViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void AddGroup()
+        => Rows.Add(new ConditionRowViewModel(new ConditionBranch([], false, "And")));
+
+    [RelayCommand]
     private void DeleteRow(ConditionRowViewModel? row)
     {
         if (row is not null) Rows.Remove(row);
