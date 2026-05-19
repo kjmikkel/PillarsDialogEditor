@@ -57,7 +57,6 @@
     <!-- Footer text when the node has no conditions -->
     <sys:String x:Key="Node_NoConditions">[ No conditions ]</sys:String>
     <!-- Canvas toolbar: node count label. {0} = number of nodes loaded -->
-    <sys:String x:Key="Node_CountFormat">{0} nodes</sys:String>
     <sys:String x:Key="Statistics_Summary">{0} nodes  ({1} NPC / {2} player)  ·  {3:N0} words</sys:String>
     <sys:String x:Key="ToolTip_Statistics">Node and word counts for the current conversation. Female-text word count (if any) is shown in the tooltip.</sys:String>
     <sys:String x:Key="Statistics_FemaleDetail">Female text: {0:N0} words</sys:String>
