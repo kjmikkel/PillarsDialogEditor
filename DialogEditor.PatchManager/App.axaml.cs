@@ -1,12 +1,18 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using DialogEditor.PatchManager.Services;
+using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.PatchManager;
 
 public partial class App : Application
 {
-    public override void Initialize() => AvaloniaXamlLoader.Load(this);
+    public override void Initialize()
+    {
+        AvaloniaXamlLoader.Load(this);
+        Loc.Configure(new AvaloniaStringProvider());
+    }
 
     public override void OnFrameworkInitializationCompleted()
     {
