@@ -10,7 +10,7 @@ namespace DialogEditor.ViewModels;
 public partial class ConditionEditorViewModel : ObservableObject
 {
     private readonly Action<IReadOnlyList<ConditionNode>> _commit;
-    private readonly string _gameId;
+    public string GameId { get; }
 
     public string NodeTitle   { get; }
     public string WindowTitle => Loc.Format("WindowTitle_ConditionEditor", NodeTitle);
@@ -18,9 +18,9 @@ public partial class ConditionEditorViewModel : ObservableObject
     public ObservableCollection<ConditionRowViewModel> Rows { get; } = [];
 
     public IReadOnlyList<ConditionEntry> AvailableConditions
-        => string.IsNullOrEmpty(_gameId)
+        => string.IsNullOrEmpty(GameId)
             ? ConditionCatalogue.Instance.All
-            : ConditionCatalogue.Instance.ForGame(_gameId);
+            : ConditionCatalogue.Instance.ForGame(GameId);
 
     [ObservableProperty] private ConditionEntry? _selectedNewCondition;
 
@@ -37,7 +37,7 @@ public partial class ConditionEditorViewModel : ObservableObject
     {
         NodeTitle = title;
         _commit   = commit;
-        _gameId   = gameId;
+        GameId   = gameId;
 
         foreach (var c in initial)
         {

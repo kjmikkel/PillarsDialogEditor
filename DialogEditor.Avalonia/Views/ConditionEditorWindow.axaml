@@ -101,15 +101,23 @@
                                                    FontWeight="SemiBold"
                                                    VerticalAlignment="Center"
                                                    IsVisible="{Binding IsLeaf}"/>
-                                        <!-- Branch read-only indicator -->
+                                        <!-- Branch indicator + edit button -->
                                         <StackPanel Grid.Column="2" Orientation="Horizontal"
                                                     VerticalAlignment="Center" Spacing="6"
                                                     IsVisible="{Binding IsBranch}">
-                                            <TextBlock Text="⚙" Foreground="#f0a830" FontSize="13"/>
+                                            <TextBlock Text="⚙" Foreground="#f0a830" FontSize="13"
+                                                       VerticalAlignment="Center"/>
                                             <TextBlock Text="{Binding DisplayName}"
                                                        Foreground="#888" FontSize="12"
                                                        TextTrimming="CharacterEllipsis"
+                                                       VerticalAlignment="Center"
                                                        ToolTip.Tip="{StaticResource ToolTip_ConditionBranch}"/>
+                                            <Button Content="{StaticResource Button_EditBranchGroup}"
+                                                    Tag="{Binding}"
+                                                    Click="EditBranchGroup_Click"
+                                                    Background="#2c3e50" Foreground="#ccc"
+                                                    BorderThickness="0" Padding="8,2" FontSize="10"
+                                                    ToolTip.Tip="{StaticResource ToolTip_EditBranchGroup}"/>
                                         </StackPanel>
                                         <!-- Move up -->
                                         <Button Grid.Column="3" Content="↑"

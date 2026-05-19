@@ -66,28 +66,42 @@ public partial class ConditionRowViewModel : ObservableObject
     [ObservableProperty] private bool   _not;
     [ObservableProperty] private string _operator = "And";
 
-    public string FullName    { get; }
-    public string DisplayName { get; }
+    public string FullName { get; }
 
-    /// True when this row wraps a ConditionBranch — editing is disabled,
-    /// but the row can be moved or deleted and its node is committed unchanged.
+    private readonly string _fixedDisplayName = string.Empty;
+    private ConditionBranch? _branch;
+
+    /// Human-readable label. For branches, re-computed from the current branch
+    /// components so it stays in sync after UpdateBranchComponents().
+    public string DisplayName => IsBranch ? _branch!.Format() : _fixedDisplayName;
+
+    /// True when this row wraps a leaf condition; false for a ConditionBranch.
     public bool IsLeaf   { get; }
     public bool IsBranch => !IsLeaf;
 
-    private readonly ConditionBranch? _branch;
+    /// The child conditions of this branch row. Empty list for leaf rows.
+    public IReadOnlyList<ConditionNode> BranchComponents
+        => _branch?.Components ?? [];
+
+    /// Replaces the branch's components and notifies the UI to refresh DisplayName.
+    public void UpdateBranchComponents(IReadOnlyList<ConditionNode> components)
+    {
+        if (!IsBranch) return;
+        _branch = _branch! with { Components = components };
+        OnPropertyChanged(nameof(DisplayName));
+    }
 
     public ObservableCollection<ParameterValueViewModel> Parameters { get; }
 
     /// Constructor for ConditionBranch pass-through rows.
     public ConditionRowViewModel(ConditionBranch branch)
     {
-        IsLeaf      = false;
-        _branch     = branch;
-        _not        = branch.Not;
-        _operator   = branch.Operator;
-        FullName    = "(grouped)";
-        DisplayName = branch.Format();
-        Parameters  = [];
+        IsLeaf    = false;
+        _branch   = branch;
+        _not      = branch.Not;
+        _operator = branch.Operator;
+        FullName  = "(grouped)";
+        Parameters = [];
     }
 
     /// Returns the condition node this row represents (leaf or original branch).
@@ -96,9 +110,9 @@ public partial class ConditionRowViewModel : ObservableObject
 
     public ConditionRowViewModel(ConditionLeaf leaf, ConditionEntry? catalogueEntry)
     {
-        IsLeaf      = true;
-        FullName    = leaf.FullName;
-        DisplayName = catalogueEntry?.DisplayName ?? StripReturnType(leaf.FullName);
+        IsLeaf             = true;
+        FullName           = leaf.FullName;
+        _fixedDisplayName  = catalogueEntry?.DisplayName ?? StripReturnType(leaf.FullName);
         _not        = leaf.Not;
         _operator   = leaf.Operator;
 
