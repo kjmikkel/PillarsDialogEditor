@@ -18,20 +18,36 @@ public partial class ConversationViewModel : ObservableObject
 
     public PendingConnectionViewModel PendingConnection { get; }
 
+    private readonly HashSet<NodeViewModel> _subscribedNodes = [];
+
     public ConversationViewModel(IDispatcher dispatcher)
     {
         _dispatcher       = dispatcher;
         PendingConnection = new PendingConnectionViewModel(this);
         Nodes.CollectionChanged += (_, args) =>
         {
-            // Subscribe to text changes on newly added nodes so word counts stay live
-            if (args.NewItems is not null)
-                foreach (NodeViewModel n in args.NewItems)
-                    n.PropertyChanged += OnNodeTextChanged;
-            if (args.OldItems is not null)
-                foreach (NodeViewModel n in args.OldItems)
+            if (args.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+            {
+                // Clear() fires Reset with OldItems=null — unsubscribe via tracked set
+                foreach (var n in _subscribedNodes)
                     n.PropertyChanged -= OnNodeTextChanged;
-
+                _subscribedNodes.Clear();
+            }
+            else
+            {
+                if (args.NewItems is not null)
+                    foreach (NodeViewModel n in args.NewItems)
+                    {
+                        n.PropertyChanged += OnNodeTextChanged;
+                        _subscribedNodes.Add(n);
+                    }
+                if (args.OldItems is not null)
+                    foreach (NodeViewModel n in args.OldItems)
+                    {
+                        n.PropertyChanged -= OnNodeTextChanged;
+                        _subscribedNodes.Remove(n);
+                    }
+            }
             RefreshStatistics();
         };
     }
@@ -41,7 +57,9 @@ public partial class ConversationViewModel : ObservableObject
 
     private void OnNodeTextChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        if (e.PropertyName is nameof(NodeViewModel.DefaultText) or nameof(NodeViewModel.FemaleText))
+        if (e.PropertyName is nameof(NodeViewModel.DefaultText)
+                           or nameof(NodeViewModel.FemaleText)
+                           or nameof(NodeViewModel.IsPlayerChoice))
             RefreshStatistics();
     }
 

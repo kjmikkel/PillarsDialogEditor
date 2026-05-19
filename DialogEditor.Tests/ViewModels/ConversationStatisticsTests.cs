@@ -96,4 +96,33 @@ public class ConversationStatisticsTests
         node.FemaleText = "Female words here";
         Assert.Equal(3, canvas.Statistics.FemaleWordCount);
     }
+
+    [Fact]
+    public void Statistics_UpdatesWhenIsPlayerChoiceChanged()
+    {
+        var node   = MakeNode(1, false, "Hello");   // NPC
+        var canvas = MakeCanvas(node);
+        Assert.Equal(1, canvas.Statistics.NpcCount);
+        Assert.Equal(0, canvas.Statistics.PlayerCount);
+
+        node.IsPlayerChoice = true;
+        Assert.Equal(0, canvas.Statistics.NpcCount);
+        Assert.Equal(1, canvas.Statistics.PlayerCount);
+    }
+
+    [Fact]
+    public void Statistics_NoLeakAfterNodesClear()
+    {
+        var node   = MakeNode(1, false, "Hello");
+        var canvas = MakeCanvas(node);
+
+        // Simulate loading a new conversation (Clear + re-add)
+        canvas.Nodes.Clear();
+        canvas.Nodes.Add(MakeNode(2, false, "New node"));
+        Assert.Equal(1, canvas.Statistics.NodeCount);
+
+        // Old node's text change should NOT affect the new canvas's stats
+        node.DefaultText = "One two three four five";
+        Assert.Equal(2, canvas.Statistics.WordCount);   // "New node" = 2 words
+    }
 }
