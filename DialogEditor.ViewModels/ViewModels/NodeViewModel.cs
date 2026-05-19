@@ -12,7 +12,7 @@ public partial class NodeViewModel : ObservableObject
     public int NodeId { get; }
 
     // ── Undo stack (wired after construction by ConversationViewModel) ────
-    internal UndoRedoStack? UndoStack { get; set; }
+    public UndoRedoStack? UndoStack { get; set; }
 
     // ── Editable backing fields ───────────────────────────────────────────
     private bool            _isPlayerChoice;
@@ -155,11 +155,57 @@ public partial class NodeViewModel : ObservableObject
         }
     }
 
-    // ── Read-only (conditions/scripts not editable in Phase 1) ───────────
-    public IReadOnlyList<string> ConditionStrings   { get; }
-    public string               ConditionExpression { get; }
-    public IReadOnlyList<string> Scripts            { get; }
-    public IReadOnlyList<NodeLink> Links            { get; }
+    // ── Conditions (editable via Push/undo) ──────────────────────────────────
+    private IReadOnlyList<ConditionNode> _conditions = [];
+
+    public IReadOnlyList<ConditionNode> Conditions
+    {
+        get => _conditions;
+        set => Push(_conditions, value, "Edit conditions",
+            v =>
+            {
+                _conditions = v;
+                OnPropertyChanged(nameof(Conditions));
+                OnPropertyChanged(nameof(ConditionStrings));
+                OnPropertyChanged(nameof(ConditionExpression));
+                OnPropertyChanged(nameof(HasConditions));
+            });
+    }
+
+    public bool HasConditions => _conditions.Count > 0;
+
+    // ── Scripts (editable via Push/undo) ─────────────────────────────────────
+    private IReadOnlyList<ScriptCall> _scripts = [];
+
+    public IReadOnlyList<ScriptCall> Scripts
+    {
+        get => _scripts;
+        set => Push(_scripts, value, "Edit scripts",
+            v => { _scripts = v; OnPropertyChanged(nameof(Scripts));
+                   OnPropertyChanged(nameof(HasScripts));
+                   OnPropertyChanged(nameof(ScriptDisplayStrings)); });
+    }
+
+    public bool HasScripts => _scripts.Count > 0;
+
+    public IReadOnlyList<string> ScriptDisplayStrings
+        => _scripts.Select(s =>
+        {
+            var prefix = s.Category switch
+            {
+                ScriptCategory.Enter  => "[Enter]",
+                ScriptCategory.Exit   => "[Exit]",
+                ScriptCategory.Update => "[Update]",
+                _                     => "[Script]",
+            };
+            return $"{prefix} {s.Format()}";
+        }).ToList();
+
+    public IReadOnlyList<NodeLink> Links             { get; }
+
+    // Backward-compat display helpers
+    public IReadOnlyList<string> ConditionStrings   => _conditions.SelectMany(c => c.Leaves()).Select(c => c.Format()).ToList();
+    public string               ConditionExpression => _conditions.FormatTree();
 
     // ── Nodify connector anchors ──────────────────────────────────────────
     public ConnectorViewModel Input   { get; } = new();
@@ -197,10 +243,9 @@ public partial class NodeViewModel : ObservableObject
         _defaultText     = entry?.DefaultText ?? Loc.Get("Node_TextUnavailable");
         _femaleText      = entry?.FemaleText  ?? string.Empty;
 
-        ConditionStrings    = node.ConditionStrings;
-        ConditionExpression = node.ConditionExpression;
-        Scripts             = node.Scripts;
-        Links               = node.Links;
+        _conditions = node.Conditions;
+        _scripts    = node.Scripts;
+        Links       = node.Links;
 
         Inputs  = [Input];
         Outputs = [Output];
@@ -221,5 +266,5 @@ public partial class NodeViewModel : ObservableObject
             _defaultText, _femaleText,
             _displayType, _persistence,
             _actorDirection, _comments, _externalVO,
-            _hasVO, _hideSpeaker, links);
+            _hasVO, _hideSpeaker, links, _conditions, _scripts);
 }

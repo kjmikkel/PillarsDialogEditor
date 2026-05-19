@@ -45,6 +45,7 @@ public partial class ConversationView : UserControl
     private void Editor_DoubleTapped(object? sender, TappedEventArgs e)
     {
         if (DataContext is not ConversationViewModel vm) return;
+        if (!vm.IsEditable) return;
 
         // Only create a node when tapping directly on the editor background
         if (e.Source is not Nodify.NodifyEditor) return;

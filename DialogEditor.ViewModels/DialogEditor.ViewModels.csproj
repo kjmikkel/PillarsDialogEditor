@@ -11,7 +11,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\conditions.json" />
+    <EmbeddedResource Include="Resources\scripts.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\DialogEditor.Core\DialogEditor.Core.csproj" />
+    <ProjectReference Include="..\DialogEditor.Patch\DialogEditor.Patch.csproj" />
   </ItemGroup>
 
 </Project>

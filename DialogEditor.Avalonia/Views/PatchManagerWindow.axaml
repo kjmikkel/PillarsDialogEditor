@@ -1,0 +1,13 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
+        x:Class="DialogEditor.Avalonia.Views.PatchManagerWindow"
+        Title="{StaticResource PatchManager_Title}"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="640" Height="580" MinWidth="500" MinHeight="420"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        Background="#1e1e1e"
+        x:CompileBindings="False">
+    <shared:PatchManagerView/>
+</Window>

@@ -1,0 +1,211 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+        x:Class="DialogEditor.Avalonia.Views.ScriptEditorWindow"
+        Title="{Binding WindowTitle}"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="640" Height="600" MinWidth="480" MinHeight="400"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        Background="#1e1e1e"
+        x:CompileBindings="False">
+
+    <Window.Styles>
+        <Style Selector="TextBlock.section-header">
+            <Setter Property="Foreground"  Value="#888"/>
+            <Setter Property="FontSize"    Value="10"/>
+            <Setter Property="FontWeight"  Value="Bold"/>
+            <Setter Property="Margin"      Value="0,10,0,4"/>
+        </Style>
+        <Style Selector="TextBlock.param-label">
+            <Setter Property="Foreground"        Value="#888"/>
+            <Setter Property="FontSize"          Value="11"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="MinWidth"          Value="110"/>
+        </Style>
+        <Style Selector="TextBox.param-input">
+            <Setter Property="Background"       Value="#141414"/>
+            <Setter Property="Foreground"       Value="#e8e8e8"/>
+            <Setter Property="BorderBrush"      Value="#444"/>
+            <Setter Property="BorderThickness"  Value="1"/>
+            <Setter Property="FontSize"         Value="12"/>
+            <Setter Property="Padding"          Value="6,4"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="AutoCompleteBox.param-input">
+            <Setter Property="Background"       Value="#141414"/>
+            <Setter Property="Foreground"       Value="#e8e8e8"/>
+            <Setter Property="BorderBrush"      Value="#444"/>
+            <Setter Property="BorderThickness"  Value="1"/>
+            <Setter Property="FontSize"         Value="12"/>
+            <Setter Property="Padding"          Value="6,4"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
+        <Style Selector="Button.footer-btn">
+            <Setter Property="Background"      Value="#333"/>
+            <Setter Property="Foreground"      Value="#ccc"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"         Value="20,6"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="MinWidth"        Value="90"/>
+        </Style>
+        <Style Selector="Button.footer-btn.primary">
+            <Setter Property="Background" Value="#1a5276"/>
+            <Setter Property="Foreground" Value="White"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="*,Auto">
+
+        <ScrollViewer Grid.Row="0">
+            <StackPanel Margin="14,8,14,4" Spacing="0">
+
+                <!-- Helper template for a script row list -->
+                <StackPanel.Resources>
+                    <DataTemplate x:Key="ScriptRowTemplate" DataType="vm:ScriptRowViewModel">
+                        <Border Background="#252525" CornerRadius="4" Margin="0,0,0,4" Padding="10,8">
+                            <StackPanel Spacing="6">
+                                <!-- Row header: name + ↑↓✕ -->
+                                <Grid ColumnDefinitions="*,28,28,28">
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding DisplayName}"
+                                               Foreground="#e8e8e8" FontSize="13"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+                                    <Button Grid.Column="1" Content="↑"
+                                            Command="{Binding DataContext.MoveUpCommand,
+                                                      RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}"
+                                            Background="Transparent" BorderThickness="0"
+                                            Foreground="#aaa" FontSize="13" Padding="4"
+                                            ToolTip.Tip="{StaticResource ToolTip_MoveScriptUp}"/>
+                                    <Button Grid.Column="2" Content="↓"
+                                            Command="{Binding DataContext.MoveDownCommand,
+                                                      RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}"
+                                            Background="Transparent" BorderThickness="0"
+                                            Foreground="#aaa" FontSize="13" Padding="4"
+                                            ToolTip.Tip="{StaticResource ToolTip_MoveScriptDown}"/>
+                                    <Button Grid.Column="3" Content="✕"
+                                            Command="{Binding DataContext.DeleteRowCommand,
+                                                      RelativeSource={RelativeSource AncestorType=Window}}"
+                                            CommandParameter="{Binding}"
+                                            Background="Transparent" BorderThickness="0"
+                                            Foreground="#c0392b" FontSize="13" Padding="4"
+                                            ToolTip.Tip="{StaticResource ToolTip_DeleteScriptRow}"/>
+                                </Grid>
+                                <!-- Parameters -->
+                                <ItemsControl ItemsSource="{Binding Parameters}"
+                                              IsVisible="{Binding Parameters.Count,
+                                                          Converter={StaticResource CountToVis}}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="vm:ParameterValueViewModel">
+                                            <Grid ColumnDefinitions="110,*,Auto" Margin="0,2,0,0" MinHeight="32">
+                                                <TextBlock Grid.Column="0" Classes="param-label" Text="{Binding Name}"/>
+                                                <TextBox Grid.Column="1" Classes="param-input"
+                                                         Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                                         IsVisible="{Binding IsText}"
+                                                         ToolTip.Tip="{Binding TypeHint}"/>
+                                                <AutoCompleteBox Grid.Column="1" Classes="param-input"
+                                                              ItemsSource="{Binding EnumOptions}"
+                                                              Text="{Binding Value, Mode=TwoWay}"
+                                                              FilterMode="Contains"
+                                                              MinimumPrefixLength="0"
+                                                              IsVisible="{Binding IsEnum}"
+                                                              ToolTip.Tip="{Binding TypeHint}"/>
+                                                <Button Grid.Column="2" Classes="type-hint"
+                                                        Content="(?)"
+                                                        ToolTip.Tip="{Binding TypeHint}"
+                                                        IsVisible="{Binding HasTypeHint}"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </StackPanel.Resources>
+
+                <!-- ON ENTER -->
+                <TextBlock Classes="section-header" Text="{StaticResource Label_ScriptSection_Enter}"/>
+                <ItemsControl ItemsSource="{Binding EnterRows}"
+                              ItemTemplate="{StaticResource ScriptRowTemplate}"/>
+                <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                    <AutoCompleteBox Grid.Column="0"
+                             Text="{Binding NewEnterText, Mode=TwoWay}"
+                             SelectedItem="{Binding SelectedEnterEntry, Mode=TwoWay}"
+                             ItemsSource="{Binding AvailableScripts}"
+                             FilterMode="Contains"
+                             MinimumPrefixLength="0"
+                             Watermark="{StaticResource Placeholder_ScriptPicker}"
+                             Background="#141414" Foreground="#ccc" BorderBrush="#444" BorderThickness="1"
+                             FontSize="11" Padding="6,4" MinWidth="0"
+                             ToolTip.Tip="{StaticResource ToolTip_ScriptPicker}"/>
+                    <Button Grid.Column="1" Content="+ Add"
+                            Command="{Binding AddEnterScriptCommand}"
+                            Background="#2c3e50" Foreground="#ccc" BorderThickness="0"
+                            Padding="12,4" Margin="6,0,0,0" FontSize="11"
+                            ToolTip.Tip="{StaticResource ToolTip_AddScriptEnter}"/>
+                </Grid>
+
+                <!-- ON EXIT -->
+                <TextBlock Classes="section-header" Text="{StaticResource Label_ScriptSection_Exit}"/>
+                <ItemsControl ItemsSource="{Binding ExitRows}"
+                              ItemTemplate="{StaticResource ScriptRowTemplate}"/>
+                <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                    <AutoCompleteBox Grid.Column="0"
+                             Text="{Binding NewExitText, Mode=TwoWay}"
+                             SelectedItem="{Binding SelectedExitEntry, Mode=TwoWay}"
+                             ItemsSource="{Binding AvailableScripts}"
+                             FilterMode="Contains"
+                             MinimumPrefixLength="0"
+                             Watermark="{StaticResource Placeholder_ScriptPicker}"
+                             Background="#141414" Foreground="#ccc" BorderBrush="#444" BorderThickness="1"
+                             FontSize="11" Padding="6,4" MinWidth="0"
+                             ToolTip.Tip="{StaticResource ToolTip_ScriptPicker}"/>
+                    <Button Grid.Column="1" Content="+ Add"
+                            Command="{Binding AddExitScriptCommand}"
+                            Background="#2c3e50" Foreground="#ccc" BorderThickness="0"
+                            Padding="12,4" Margin="6,0,0,0" FontSize="11"
+                            ToolTip.Tip="{StaticResource ToolTip_AddScriptExit}"/>
+                </Grid>
+
+                <!-- ON UPDATE -->
+                <TextBlock Classes="section-header" Text="{StaticResource Label_ScriptSection_Update}"/>
+                <ItemsControl ItemsSource="{Binding UpdateRows}"
+                              ItemTemplate="{StaticResource ScriptRowTemplate}"/>
+                <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                    <AutoCompleteBox Grid.Column="0"
+                             Text="{Binding NewUpdateText, Mode=TwoWay}"
+                             SelectedItem="{Binding SelectedUpdateEntry, Mode=TwoWay}"
+                             ItemsSource="{Binding AvailableScripts}"
+                             FilterMode="Contains"
+                             MinimumPrefixLength="0"
+                             Watermark="{StaticResource Placeholder_ScriptPicker}"
+                             Background="#141414" Foreground="#ccc" BorderBrush="#444" BorderThickness="1"
+                             FontSize="11" Padding="6,4" MinWidth="0"
+                             ToolTip.Tip="{StaticResource ToolTip_ScriptPicker}"/>
+                    <Button Grid.Column="1" Content="+ Add"
+                            Command="{Binding AddUpdateScriptCommand}"
+                            Background="#2c3e50" Foreground="#ccc" BorderThickness="0"
+                            Padding="12,4" Margin="6,0,0,0" FontSize="11"
+                            ToolTip.Tip="{StaticResource ToolTip_AddScriptUpdate}"/>
+                </Grid>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Footer -->
+        <Border Grid.Row="1" Background="#252525" Padding="14,10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                <Button Classes="footer-btn" Content="Cancel"
+                        Command="{Binding CancelCommand}"
+                        ToolTip.Tip="{StaticResource ToolTip_ScriptEditorCancel}"/>
+                <Button Classes="footer-btn primary" Content="OK"
+                        Command="{Binding ConfirmCommand}"
+                        ToolTip.Tip="{StaticResource ToolTip_ScriptEditorOK}"/>
+            </StackPanel>
+        </Border>
+
+    </Grid>
+</Window>

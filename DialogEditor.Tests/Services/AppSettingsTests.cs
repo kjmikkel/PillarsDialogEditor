@@ -1,4 +1,5 @@
 using DialogEditor.Core.GameData;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.Services;
 
@@ -48,5 +49,41 @@ public class LanguagePickerTests
     public void Pick_OnlyEnglishAvailable_ReturnsEn()
     {
         Assert.Equal("en", LanguagePicker.Pick(EnOnly, null));
+    }
+}
+
+public class AppSettingsPendingRestoreTests : IDisposable
+{
+    public AppSettingsPendingRestoreTests() => AppSettings.ClearPendingRestores();
+    public void Dispose()                   => AppSettings.ClearPendingRestores();
+
+    [Fact]
+    public void GetPendingRestores_WhenNotSet_ReturnsNull()
+    {
+        Assert.Null(AppSettings.GetPendingRestores());
+    }
+
+    [Fact]
+    public void SetPendingRestores_CanBeRetrieved()
+    {
+        var entries = new[]
+        {
+            new PendingRestoreEntry("bkConv1", "bkSt1", "origConv1", "origSt1"),
+            new PendingRestoreEntry("bkConv2", "bkSt2", "origConv2", "origSt2"),
+        };
+        AppSettings.SetPendingRestores(entries);
+        var got = AppSettings.GetPendingRestores();
+        Assert.NotNull(got);
+        Assert.Equal(2, got.Count);
+        Assert.Equal("bkConv1",   got[0].BackupConvPath);
+        Assert.Equal("origSt2",   got[1].OriginalStPath);
+    }
+
+    [Fact]
+    public void ClearPendingRestores_ReturnsNull()
+    {
+        AppSettings.SetPendingRestores([new PendingRestoreEntry("a", "b", "c", "d")]);
+        AppSettings.ClearPendingRestores();
+        Assert.Null(AppSettings.GetPendingRestores());
     }
 }

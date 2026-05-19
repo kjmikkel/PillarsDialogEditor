@@ -1,8 +1,10 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:models="clr-namespace:DialogEditor.ViewModels.Models;assembly=DialogEditor.ViewModels"
-             x:Class="DialogEditor.Avalonia.Views.NodeDetailView" x:CompileBindings="False">
+             xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+             xmlns:types="clr-namespace:DialogEditor.ViewModels.Services;assembly=DialogEditor.ViewModels"
+             x:Class="DialogEditor.Avalonia.Views.NodeDetailView"
+             x:CompileBindings="False">
 
     <UserControl.Styles>
         <Style Selector="TextBlock.group-header">
@@ -67,68 +69,78 @@
                 <TextBox Classes="detail-field"
                          Text="{Binding DefaultText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="52"
-                         ToolTip.Tip="Edit the default / male dialogue text"/>
+                         ToolTip.Tip="{StaticResource ToolTip_DefaultText}"/>
 
                 <!-- ── Female text ─────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_FemaleText}"/>
                 <TextBox Classes="detail-field"
                          Text="{Binding FemaleText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="36"
-                         Watermark="(same as default — leave blank)"
-                         ToolTip.Tip="Optional female-voice variant text"/>
+                         Watermark="{StaticResource Placeholder_FemaleText}"
+                         ToolTip.Tip="{StaticResource ToolTip_FemaleText}"/>
 
                 <!-- ── Identity ────────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_GroupIdentity}"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_Type}"/>
                 <ComboBox Classes="detail-combo"
+                          ItemsSource="{x:Static vm:NodeDetailViewModel.NodeTypeOptions}"
                           SelectedItem="{Binding NodeTypeString, Mode=TwoWay}"
-                          ToolTip.Tip="Whether this is an NPC line or a player response choice">
-                    <ComboBox.Items>
-                        <sys:String>NPC Line</sys:String>
-                        <sys:String>Player Choice</sys:String>
-                    </ComboBox.Items>
-                </ComboBox>
+                          ToolTip.Tip="{StaticResource ToolTip_NodeType}"/>
+
+                <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_SpeakerCategory}"/>
+                <ComboBox Classes="detail-combo"
+                          ItemsSource="{x:Static vm:NodeDetailViewModel.SpeakerCategoryOptions}"
+                          SelectedItem="{Binding SpeakerCategoryString, Mode=TwoWay}"
+                          ToolTip.Tip="{StaticResource ToolTip_SpeakerCategory}"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_SpeakerGuid}"/>
+                <!-- Name picker — visible when speaker data is loaded (PoE2) -->
+                <AutoCompleteBox Classes="detail-field"
+                                 ItemsSource="{Binding AvailableSpeakers}"
+                                 SelectedItem="{Binding SelectedSpeakerEntry, Mode=TwoWay}"
+                                 Watermark="{StaticResource Placeholder_SpeakerSearch}"
+                                 FilterMode="Contains"
+                                 IsVisible="{Binding HasSpeakerData}"
+                                 ToolTip.Tip="{StaticResource ToolTip_SpeakerPicker}"/>
                 <TextBox Classes="detail-field"
                          Text="{Binding SpeakerGuid, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          FontFamily="Consolas,Courier New,monospace"
-                         ToolTip.Tip="GUID of the speaking character"/>
+                         ToolTip.Tip="{StaticResource ToolTip_SpeakerGuid}"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_ListenerGuid}"/>
+                <!-- Name picker — visible when speaker data is loaded (PoE2) -->
+                <AutoCompleteBox Classes="detail-field"
+                                 ItemsSource="{Binding AvailableSpeakers}"
+                                 SelectedItem="{Binding SelectedListenerEntry, Mode=TwoWay}"
+                                 Watermark="{StaticResource Placeholder_SpeakerSearch}"
+                                 FilterMode="Contains"
+                                 IsVisible="{Binding HasSpeakerData}"
+                                 ToolTip.Tip="{StaticResource ToolTip_SpeakerPicker}"/>
                 <TextBox Classes="detail-field"
                          Text="{Binding ListenerGuid, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          FontFamily="Consolas,Courier New,monospace"
-                         ToolTip.Tip="GUID of the listening character"/>
+                         ToolTip.Tip="{StaticResource ToolTip_ListenerGuid}"/>
 
                 <!-- ── Display ─────────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_GroupDisplay}"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_DisplayType}"/>
                 <ComboBox Classes="detail-combo"
+                          ItemsSource="{x:Static vm:NodeDetailViewModel.DisplayTypeOptions}"
                           SelectedItem="{Binding DisplayType, Mode=TwoWay}"
-                          ToolTip.Tip="How this node is presented to the player">
-                    <ComboBox.Items>
-                        <sys:String>Conversation</sys:String>
-                        <sys:String>Bark</sys:String>
-                    </ComboBox.Items>
-                </ComboBox>
+                          ToolTip.Tip="{StaticResource ToolTip_DisplayType}"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_Persistence}"/>
                 <ComboBox Classes="detail-combo"
+                          ItemsSource="{x:Static vm:NodeDetailViewModel.PersistenceOptions}"
                           SelectedItem="{Binding Persistence, Mode=TwoWay}"
-                          ToolTip.Tip="Whether the node is hidden after it has been shown once">
-                    <ComboBox.Items>
-                        <sys:String>None</sys:String>
-                        <sys:String>OnceEver</sys:String>
-                    </ComboBox.Items>
-                </ComboBox>
+                          ToolTip.Tip="{StaticResource ToolTip_Persistence}"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_ActorDirection}"/>
                 <TextBox Classes="detail-field"
                          Text="{Binding ActorDirection, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         ToolTip.Tip="Optional actor direction note for the VO recording"/>
+                         ToolTip.Tip="{StaticResource ToolTip_ActorDirection}"/>
 
                 <!-- ── Voice ───────────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_GroupVoice}"/>
@@ -137,26 +149,42 @@
                 <TextBox Classes="detail-field"
                          Text="{Binding ExternalVO, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          FontFamily="Consolas,Courier New,monospace"
-                         ToolTip.Tip="External voice-over file path or identifier"/>
+                         ToolTip.Tip="{StaticResource ToolTip_ExternalVO}"/>
 
                 <CheckBox Classes="detail-check"
                           IsChecked="{Binding HasVO, Mode=TwoWay}"
                           Content="{StaticResource PropertyRow_HasVO}"
-                          ToolTip.Tip="Whether a voice-over recording exists for this node"/>
+                          ToolTip.Tip="{StaticResource ToolTip_HasVO}"/>
 
                 <CheckBox Classes="detail-check"
                           IsChecked="{Binding HideSpeaker, Mode=TwoWay}"
                           Content="{StaticResource PropertyRow_HideSpeaker}"
-                          ToolTip.Tip="Whether the speaker name is hidden during playback"/>
+                          ToolTip.Tip="{StaticResource ToolTip_HideSpeaker}"/>
 
                 <!-- ── Comments ────────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource PropertyRow_Comments}"/>
                 <TextBox Classes="detail-field"
                          Text="{Binding Comments, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30"
-                         ToolTip.Tip="Internal developer notes (not shown to players)"/>
+                         ToolTip.Tip="{StaticResource ToolTip_Comments}"/>
 
-                <!-- ── Read-only groups (node ID, conditions, scripts) ─── -->
+                <!-- ── Scripts (edit in separate window) ─────────────── -->
+                <TextBlock Classes="group-header" Text="{StaticResource Label_GroupLogic}"/>
+                <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding ScriptSummary}"
+                               Foreground="#888" FontSize="10"
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"/>
+                    <Button Grid.Column="1"
+                            Content="{StaticResource Button_EditScripts}"
+                            Click="EditScripts_Click"
+                            Background="#333" Foreground="#aaa" BorderThickness="0"
+                            Padding="8,3" FontSize="10"
+                            ToolTip.Tip="{StaticResource ToolTip_EditScripts}"/>
+                </Grid>
+
+                <!-- ── Read-only groups (node ID) ─────────────────────── -->
                 <ItemsControl ItemsSource="{Binding PropertyGroups}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -169,24 +197,91 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
+                <!-- ── Conditions (edit in separate window) ───────────── -->
+                <TextBlock Classes="group-header" Text="{StaticResource Label_GroupConditions}"/>
+                <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
+                    <!-- Summary: show count + first condition names -->
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding ConditionSummary}"
+                               Foreground="#888" FontSize="10"
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"/>
+                    <Button Grid.Column="1"
+                            x:Name="EditConditionsButton"
+                            Content="{StaticResource Button_EditConditions}"
+                            Click="EditConditions_Click"
+                            Background="#333" Foreground="#aaa" BorderThickness="0"
+                            Padding="8,3" FontSize="10"
+                            ToolTip.Tip="{StaticResource ToolTip_EditConditions}"/>
+                </Grid>
+
                 <!-- ── Links ──────────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_GroupLinks}"/>
                 <ItemsControl ItemsSource="{Binding Links}">
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="models:LinkRow">
-                            <Grid ColumnDefinitions="55,*,Auto" Margin="0,1,0,1">
-                                <TextBlock Grid.Column="0" Text="{Binding Arrow}"
-                                           Foreground="#5dade2" FontSize="10" VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="{Binding Detail}"
-                                           Foreground="#666" FontSize="10" VerticalAlignment="Center"/>
-                                <Button Grid.Column="2"
-                                        Content="{StaticResource Button_DeleteLink}"
-                                        Command="{Binding DataContext.DeleteLinkCommand,
-                                                  RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                        CommandParameter="{Binding}"
-                                        Background="Transparent" BorderThickness="0"
-                                        Foreground="#888" FontSize="9" Padding="4,1"
-                                        ToolTip.Tip="{StaticResource ToolTip_DeleteLink}"/>
+                        <DataTemplate DataType="vm:ConnectionViewModel">
+                            <Grid RowDefinitions="Auto,Auto" Margin="0,2,0,2">
+                                <!-- Row 0: target + delete -->
+                                <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto">
+                                    <TextBlock Grid.Column="0"
+                                               Text="{StaticResource Link_Arrow}"
+                                               Foreground="#5dade2" FontSize="10"
+                                               VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding Target.Owner.NodeId}"
+                                               Foreground="#5dade2" FontSize="10"
+                                               VerticalAlignment="Center"/>
+                                    <!-- Condition editor button — dim when no conditions, accent when present -->
+                                    <Button Grid.Column="2"
+                                            Content="{Binding ConditionCount,
+                                                StringFormat='⚙{0}'}"
+                                            Click="LinkConditions_Click"
+                                            Tag="{Binding}"
+                                            Background="Transparent" BorderThickness="0"
+                                            FontSize="10" Padding="3,1" Margin="0,0,2,0"
+                                            Foreground="{Binding HasConditions,
+                                                Converter={StaticResource BoolToFemaleTextBrush}}"
+                                            ToolTip.Tip="{StaticResource ToolTip_LinkConditions_None}"/>
+                                    <Button Grid.Column="3"
+                                            Content="{StaticResource Button_DeleteLink}"
+                                            Command="{Binding DataContext.DeleteLinkCommand,
+                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            Background="Transparent" BorderThickness="0"
+                                            Foreground="#888" FontSize="9" Padding="4,1"
+                                            ToolTip.Tip="{StaticResource ToolTip_DeleteLink}"/>
+                                </Grid>
+                                <!-- Row 1: editable properties -->
+                                <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" Margin="12,2,0,0">
+                                    <ComboBox Grid.Column="0"
+                                              SelectedItem="{Binding QuestionNodeTextDisplay, Mode=TwoWay}"
+                                              ItemsSource="{x:Static vm:ConnectionViewModel.QTDOptions}"
+                                              Background="#1a1a1a" Foreground="#ccc"
+                                              BorderBrush="#444" BorderThickness="1"
+                                              FontSize="10" Padding="3,1" Height="22"
+                                              ToolTip.Tip="{StaticResource ToolTip_LinkQTD}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Converter={StaticResource QTDDisplay},
+                                                                  ConverterParameter={StaticResource Option_QTD_Default}}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{StaticResource Label_LinkWeight}"
+                                               Foreground="#666" FontSize="10"
+                                               VerticalAlignment="Center" Margin="6,0,4,0"/>
+                                    <NumericUpDown Grid.Column="2"
+                                                   Value="{Binding RandomWeight, Mode=TwoWay, Converter={StaticResource FloatDecimal}}"
+                                                   Minimum="0" Maximum="100"
+                                                   Increment="0.1" FormatString="0.##"
+                                                   Background="#1a1a1a" Foreground="#ccc"
+                                                   BorderBrush="#444" BorderThickness="1"
+                                                   FontSize="10" Padding="2,0" Width="72"
+                                                   ShowButtonSpinner="False"
+                                                   ClipValueToMinMax="True"
+                                                   ToolTip.Tip="{StaticResource ToolTip_LinkWeight}"/>
+                                </Grid>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -196,11 +291,11 @@
                 <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
                     <TextBox Grid.Column="0"
                              Text="{Binding AddLinkTargetId, Mode=TwoWay}"
-                             Watermark="Target node ID…"
+                             Watermark="{StaticResource Placeholder_AddLinkTargetId}"
                              Background="#1a1a1a" Foreground="#e8e8e8"
                              BorderBrush="#444" BorderThickness="1"
                              FontSize="10" Padding="4,3"
-                             ToolTip.Tip="Enter a node ID to link to, then click Add"/>
+                             ToolTip.Tip="{StaticResource ToolTip_AddLinkTargetId}"/>
                     <Button Grid.Column="1"
                             Content="{StaticResource Button_AddLink}"
                             Command="{Binding AddLinkCommand}"

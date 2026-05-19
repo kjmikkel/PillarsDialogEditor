@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <AvaloniaUseCompiledBindingsByDefault>false</AvaloniaUseCompiledBindingsByDefault>
+    <AssemblyName>DialogEditor.PatchManager</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia"               Version="11.3.14"/>
+    <PackageReference Include="Avalonia.Desktop"       Version="11.3.14"/>
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.14"/>
+    <PackageReference Include="Avalonia.Fonts.Inter"   Version="11.3.14"/>
+    <PackageReference Include="CommunityToolkit.Mvvm"  Version="8.2.2"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DialogEditor.Core\DialogEditor.Core.csproj"/>
+    <ProjectReference Include="..\DialogEditor.Patch\DialogEditor.Patch.csproj"/>
+    <ProjectReference Include="..\DialogEditor.ViewModels\DialogEditor.ViewModels.csproj"/>
+    <ProjectReference Include="..\DialogEditor.Avalonia.Shared\DialogEditor.Avalonia.Shared.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Resources\Strings.axaml"/>
+    <None Update="Assets\app.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+</Project>

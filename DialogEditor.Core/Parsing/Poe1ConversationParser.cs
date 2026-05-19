@@ -26,7 +26,7 @@ public static class Poe1ConversationParser
             .Select(ParseLink)
             .ToList() ?? [];
 
-        var conditions = FlattenConditions(
+        var conditions = ParseConditionTree(
             node.Element("Conditionals")?.Element("Components"));
 
         var scripts = ParseScripts(node);
@@ -41,15 +41,13 @@ public static class Poe1ConversationParser
             SpeakerGuid: (string?)node.Element("SpeakerGuid") ?? string.Empty,
             ListenerGuid: (string?)node.Element("ListenerGuid") ?? string.Empty,
             Links: links,
-            ConditionStrings: conditions,
+            Conditions: conditions,
             Scripts: scripts,
             DisplayType: (string?)node.Element("DisplayType") ?? string.Empty,
             Persistence: (string?)node.Element("Persistence") ?? string.Empty,
             ActorDirection: (string?)node.Element("ActorDirection") ?? string.Empty,
             Comments: (string?)node.Element("Comments") ?? string.Empty,
-            ExternalVO: (string?)node.Element("VOFilename") ?? string.Empty,
-            ConditionExpression: FormatConditionTree(
-                node.Element("Conditionals")?.Element("Components"))
+            ExternalVO: (string?)node.Element("VOFilename") ?? string.Empty
         );
     }
 
@@ -57,43 +55,61 @@ public static class Poe1ConversationParser
         => new(
             FromNodeId: (int)link.Element("FromNodeID")!,
             ToNodeId: (int)link.Element("ToNodeID")!,
-            HasConditions: link.Element("Conditionals")?.Element("Components")?.HasElements == true,
+            Conditions: ParseConditionTree(link.Element("Conditionals")?.Element("Components")),
             RandomWeight: (float?)link.Element("RandomWeight") ?? 1f,
             QuestionNodeTextDisplay: (string?)link.Element("QuestionNodeTextDisplay") ?? string.Empty
         );
 
-    private static List<string> ParseScripts(XElement node)
+    private static List<ScriptCall> ParseScripts(XElement node)
     {
-        var result = new List<string>();
-        AppendScripts(result, node.Element("OnEnterScripts"), CoreStrings.Script_Prefix_Enter);
-        AppendScripts(result, node.Element("OnExitScripts"), CoreStrings.Script_Prefix_Exit);
-        AppendScripts(result, node.Element("OnUpdateScripts"), CoreStrings.Script_Prefix_Update);
+        var result = new List<ScriptCall>();
+        ReadScripts(result, node.Element("OnEnterScripts"),  ScriptCategory.Enter);
+        ReadScripts(result, node.Element("OnExitScripts"),   ScriptCategory.Exit);
+        ReadScripts(result, node.Element("OnUpdateScripts"), ScriptCategory.Update);
         return result;
     }
 
-    private static void AppendScripts(List<string> result, XElement? scriptList, string prefix)
+    private static void ReadScripts(List<ScriptCall> result, XElement? scriptList, ScriptCategory category)
     {
         if (scriptList is null) return;
         foreach (var entry in scriptList.Elements())
         {
             var data = entry.Element("Data");
             if (data is null) continue;
-            var fullName = (string?)data.Element("FullName") ?? string.Empty;
+            var fullName   = (string?)data.Element("FullName") ?? string.Empty;
             var parameters = data.Element("Parameters")?.Elements("string")
                 .Select(e => (string)e)
                 .ToList() ?? [];
-            result.Add($"{prefix} {ConditionFormatter.FormatScript(fullName, parameters)}");
+            result.Add(new ScriptCall(fullName, parameters, category));
         }
     }
 
-    private static List<string> FlattenConditions(XElement? components)
+    internal static IReadOnlyList<ConditionNode> ParseConditionTree(XElement? components)
     {
         if (components is null) return [];
         return components.Elements("ExpressionComponent")
-            .SelectMany(c => c.Element("Data") is not null
-                ? (IEnumerable<string>)[ParseCondition(c)]
-                : FlattenConditions(c.Element("Components")))
+            .Select(ParseConditionComponent)
             .ToList();
+    }
+
+    private static ConditionNode ParseConditionComponent(XElement comp)
+    {
+        var not      = (bool?)comp.Element("Not") ?? false;
+        var op       = (string?)comp.Element("Operator") ?? "And";
+        var data     = comp.Element("Data");
+
+        if (data is not null)
+        {
+            var fullName   = (string)data.Element("FullName")!;
+            var parameters = data.Element("Parameters")?.Elements("string")
+                .Select(e => (string)e)
+                .ToList() ?? [];
+            return new ConditionLeaf(fullName, parameters, not, op);
+        }
+
+        // Nested group
+        var children = ParseConditionTree(comp.Element("Components"));
+        return new ConditionBranch(children, not, op);
     }
 
     private static SpeakerCategory ClassifySpeaker(string nodeType, string speakerGuid) =>
@@ -106,48 +122,4 @@ public static class Poe1ConversationParser
                 : SpeakerCategory.Npc
         };
 
-    private static string ParseCondition(XElement component)
-    {
-        var data = component.Element("Data")!;
-        var fullName = (string)data.Element("FullName")!;
-        var parameters = data.Element("Parameters")?.Elements("string")
-            .Select(e => (string)e)
-            .ToList() ?? [];
-        var not = (bool?)component.Element("Not") ?? false;
-        return ConditionFormatter.Format(fullName, parameters, not);
-    }
-
-    private static string FormatConditionTree(XElement? components, int depth = 0)
-    {
-        if (components is null) return string.Empty;
-        var indent = new string(' ', depth * 2);
-        var sb = new StringBuilder();
-        var items = components.Elements("ExpressionComponent").ToList();
-
-        for (int i = 0; i < items.Count; i++)
-        {
-            var comp = items[i];
-            var not = (bool?)comp.Element("Not") ?? false;
-            var notPrefix = not ? "NOT " : "";
-
-            if (i > 0)
-            {
-                var prevOp = ((string?)items[i - 1].Element("Operator") ?? "And").ToUpperInvariant();
-                sb.Append($"{Environment.NewLine}{indent}{prevOp} ");
-            }
-
-            if (comp.Element("Data") is not null)
-            {
-                // ParseCondition already handles Not internally
-                sb.Append(ParseCondition(comp));
-            }
-            else
-            {
-                var inner = FormatConditionTree(comp.Element("Components"), depth + 1);
-                if (string.IsNullOrEmpty(inner)) continue;
-                sb.Append($"{notPrefix}({Environment.NewLine}{indent}  {inner}{Environment.NewLine}{indent})");
-            }
-        }
-        return sb.ToString();
-    }
 }

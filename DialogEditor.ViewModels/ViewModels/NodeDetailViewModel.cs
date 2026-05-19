@@ -1,15 +1,21 @@
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Models;
 using DialogEditor.ViewModels.Models;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.ViewModels;
 
 public partial class NodeDetailViewModel : ObservableObject
 {
     private NodeViewModel? _node;
+    public  NodeViewModel? Node => _node;
+
+    /// Set by MainWindowViewModel when a game folder is opened.
+    public string ActiveGameId { get; set; } = string.Empty;
 
     [ObservableProperty] private bool _hasContent;
 
@@ -86,12 +92,50 @@ public partial class NodeDetailViewModel : ObservableObject
         set { if (_node != null) _node.HideSpeaker = value; }
     }
 
+    // ── SpeakerCategory proxy (enum ↔ string for ComboBox binding) ───────
+    public string SpeakerCategoryString
+    {
+        get => _node?.SpeakerCategory switch
+        {
+            SpeakerCategory.Player   => Loc.Get("Speaker_Player"),
+            SpeakerCategory.Narrator => Loc.Get("Speaker_Narrator"),
+            SpeakerCategory.Script   => Loc.Get("Speaker_Script"),
+            _                        => Loc.Get("Speaker_Npc"),
+        };
+        set
+        {
+            if (_node is null) return;
+            _node.SpeakerCategory =
+                value == Loc.Get("Speaker_Player")   ? SpeakerCategory.Player   :
+                value == Loc.Get("Speaker_Narrator") ? SpeakerCategory.Narrator :
+                value == Loc.Get("Speaker_Script")   ? SpeakerCategory.Script   :
+                                                        SpeakerCategory.Npc;
+        }
+    }
+
+    public static IReadOnlyList<string> SpeakerCategoryOptions =>
+    [
+        Loc.Get("Speaker_Npc"),
+        Loc.Get("Speaker_Player"),
+        Loc.Get("Speaker_Narrator"),
+        Loc.Get("Speaker_Script"),
+    ];
+
     // ── NodeType proxy (bool ↔ string for ComboBox binding) ──────────────
     public string NodeTypeString
     {
-        get => IsPlayerChoice ? "Player Choice" : "NPC Line";
-        set { if (_node != null) _node.IsPlayerChoice = value == "Player Choice"; }
+        get => IsPlayerChoice ? Loc.Get("Option_PlayerChoice") : Loc.Get("Option_NpcLine");
+        set { if (_node != null) _node.IsPlayerChoice = value == Loc.Get("Option_PlayerChoice"); }
     }
+
+    public static IReadOnlyList<string> NodeTypeOptions
+        => [Loc.Get("Option_NpcLine"), Loc.Get("Option_PlayerChoice")];
+
+    public static IReadOnlyList<string> DisplayTypeOptions
+        => [Loc.Get("Option_DisplayConversation"), Loc.Get("Option_DisplayBark")];
+
+    public static IReadOnlyList<string> PersistenceOptions
+        => [Loc.Get("Option_PersistenceNone"), Loc.Get("Option_PersistenceOnceEver")];
 
     // ── Read-only display ─────────────────────────────────────────────────
     public string FemaleTextDisplay =>
@@ -99,9 +143,9 @@ public partial class NodeDetailViewModel : ObservableObject
 
     public bool HasFemaleText => _node?.HasFemaleText ?? false;
 
-    [ObservableProperty] private IReadOnlyList<PropertyGroup> _propertyGroups  = [];
-    [ObservableProperty] private IReadOnlyList<LinkRow>       _links           = [];
-    [ObservableProperty] private string                       _addLinkTargetId = string.Empty;
+    [ObservableProperty] private IReadOnlyList<PropertyGroup>      _propertyGroups  = [];
+    [ObservableProperty] private IReadOnlyList<ConnectionViewModel> _links           = [];
+    [ObservableProperty] private string                             _addLinkTargetId = string.Empty;
 
     // Raised when the user requests to add/delete a link — ConversationViewModel handles it
     public event Action<int, int>? AddLinkRequested;    // (fromNodeId, toNodeId)
@@ -116,13 +160,10 @@ public partial class NodeDetailViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void DeleteLink(LinkRow? row)
+    private void DeleteLink(ConnectionViewModel? conn)
     {
-        if (_node is null || row is null) return;
-        // Arrow format is "→ {toNodeId}" — parse the ID from it
-        var parts = row.Arrow.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-        if (parts.Length >= 2 && int.TryParse(parts[^1], out var toId))
-            DeleteLinkRequested?.Invoke(toId);
+        if (conn?.Target.Owner is { } target)
+            DeleteLinkRequested?.Invoke(target.NodeId);
     }
 
     // ── Load / Clear ──────────────────────────────────────────────────────
@@ -133,11 +174,11 @@ public partial class NodeDetailViewModel : ObservableObject
 
         _node = node;
 
-        if (node is null) { HasContent = false; return; }
+        if (node is null) { HasContent = false; ConditionRows.Clear(); return; }
 
         node.PropertyChanged += OnNodePropertyChanged;
         RefreshReadOnlyGroups(node);
-        Links      = node.Links.Select(BuildLinkRow).ToList();
+        RebuildConditionRows(node);
         HasContent = true;
         NotifyAllProxies();
     }
@@ -149,12 +190,20 @@ public partial class NodeDetailViewModel : ObservableObject
         NotifyAllProxies();
         if (_node is not null)
             RefreshReadOnlyGroups(_node);
+        if (e.PropertyName == nameof(NodeViewModel.Conditions))
+            OnPropertyChanged(nameof(ConditionSummary));
+        if (e.PropertyName == nameof(NodeViewModel.Scripts))
+        {
+            if (_node is not null) RefreshReadOnlyGroups(_node);
+            OnPropertyChanged(nameof(ScriptSummary));
+        }
     }
 
     private void NotifyAllProxies()
     {
         OnPropertyChanged(nameof(DefaultText));
         OnPropertyChanged(nameof(FemaleText));
+        OnPropertyChanged(nameof(SpeakerCategoryString));
         OnPropertyChanged(nameof(FemaleTextDisplay));
         OnPropertyChanged(nameof(HasFemaleText));
         OnPropertyChanged(nameof(IsPlayerChoice));
@@ -168,6 +217,43 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(ExternalVO));
         OnPropertyChanged(nameof(HasVO));
         OnPropertyChanged(nameof(HideSpeaker));
+
+        // Keep AutoCompleteBox selections in sync whenever any proxy changes
+        _selectedSpeakerEntry  = SpeakerNameService.FindByGuid(_node?.SpeakerGuid);
+        _selectedListenerEntry = SpeakerNameService.FindByGuid(_node?.ListenerGuid);
+        OnPropertyChanged(nameof(SelectedSpeakerEntry));
+        OnPropertyChanged(nameof(SelectedListenerEntry));
+    }
+
+    // ── Speaker / Listener name picker ───────────────────────────────────
+
+    /// True when the loaded game has speaker name data (PoE2); hides picker for PoE1.
+    public bool HasSpeakerData => SpeakerNameService.HasNames;
+
+    /// All known speakers from the loaded game, sorted by name.
+    public IReadOnlyList<SpeakerEntry> AvailableSpeakers => SpeakerNameService.All;
+
+    private SpeakerEntry? _selectedSpeakerEntry;
+    private SpeakerEntry? _selectedListenerEntry;
+
+    public SpeakerEntry? SelectedSpeakerEntry
+    {
+        get => _selectedSpeakerEntry;
+        set
+        {
+            if (SetProperty(ref _selectedSpeakerEntry, value) && value is not null)
+                SpeakerGuid = value.Guid;
+        }
+    }
+
+    public SpeakerEntry? SelectedListenerEntry
+    {
+        get => _selectedListenerEntry;
+        set
+        {
+            if (SetProperty(ref _selectedListenerEntry, value) && value is not null)
+                ListenerGuid = value.Guid;
+        }
     }
 
     private void RefreshReadOnlyGroups(NodeViewModel node)
@@ -179,30 +265,128 @@ public partial class NodeDetailViewModel : ObservableObject
             [
                 new PropertyRow(Loc.Get("PropertyRow_NodeId"), node.NodeId.ToString()),
             ]),
-            new PropertyGroup(Loc.Get("Label_GroupLogic"),
-            [
-                new PropertyRow(Loc.Get("PropertyRow_Conditions"),
-                    string.IsNullOrEmpty(node.ConditionExpression) ? none : node.ConditionExpression,
-                    PropertyValueStyle.Condition),
-                new PropertyRow(Loc.Get("PropertyRow_Scripts"),
-                    node.Scripts.Count == 0 ? none : string.Join(Environment.NewLine, node.Scripts),
-                    PropertyValueStyle.Script),
-            ]),
+            // Scripts and Conditions each have their own editable panel sections.
         ];
     }
 
-    public void RefreshLinks(IEnumerable<NodeLink> links)
-        => Links = links.Select(BuildLinkRow).ToList();
+    public void RefreshLinks(IEnumerable<ConnectionViewModel> connections)
+        => Links = connections.ToList();
 
-    private static LinkRow BuildLinkRow(NodeLink link)
+    public void NotifyConditionSummary()
+        => OnPropertyChanged(nameof(ConditionSummary));
+
+    public void NotifyScriptSummary()
+        => OnPropertyChanged(nameof(ScriptSummary));
+
+    public string ScriptSummary
     {
-        var extras = new List<string>();
-        if (link.RandomWeight != 1f)
-            extras.Add($"{Loc.Get("Link_WeightPrefix")}{link.RandomWeight:0.##}");
-        if (!string.IsNullOrEmpty(link.QuestionNodeTextDisplay) && link.QuestionNodeTextDisplay != "ShowOnce")
-            extras.Add(link.QuestionNodeTextDisplay);
-        var arrow  = $"{Loc.Get("Link_Arrow")} {link.ToNodeId}";
-        var detail = extras.Count == 0 ? Loc.Get("NodeDetail_None") : $"[{string.Join(", ", extras)}]";
-        return new LinkRow(arrow, detail);
+        get
+        {
+            if (_node is null || _node.Scripts.Count == 0)
+                return Loc.Get("NodeDetail_None");
+            return string.Join(", ", _node.Scripts.Select(s => s.DisplayName));
+        }
+    }
+
+    // ── Condition editing ─────────────────────────────────────────────────
+
+    public ObservableCollection<ConditionRowViewModel> ConditionRows { get; } = [];
+
+    /// Brief summary shown in the detail panel (replaces the old inline editor).
+    public string ConditionSummary
+    {
+        get
+        {
+            if (_node is null || _node.Conditions.Count == 0)
+                return Loc.Get("NodeDetail_None");
+            var names = _node.Conditions
+                .OfType<ConditionLeaf>()
+                .Select(l =>
+                {
+                    // FindByFullName(fullName, gameId) resolves both game variants and same-signature entries
+                    var entry = ConditionCatalogue.Instance.FindByFullName(l.FullName, ActiveGameId)
+                             ?? ConditionCatalogue.Instance.Find(
+                                    l.FullName.Contains(' ')
+                                        ? l.FullName[(l.FullName.IndexOf(' ') + 1)..].Split('(')[0]
+                                        : l.FullName);
+                    return entry?.DisplayName ?? (l.FullName.Contains(' ')
+                        ? l.FullName[(l.FullName.IndexOf(' ') + 1)..].Split('(')[0]
+                        : l.FullName);
+                });
+            return string.Join(", ", names);
+        }
+    }
+
+
+    private void RebuildConditionRows(NodeViewModel node)
+    {
+        ConditionRows.Clear();
+        foreach (var c in node.Conditions)
+        {
+            if (c is ConditionLeaf leaf)
+            {
+                // FindByFullName(fullName, gameId) picks the correct game-specific variant
+                var entry = ConditionCatalogue.Instance.FindByFullName(leaf.FullName, ActiveGameId)
+                         ?? ConditionCatalogue.Instance.Find(
+                                leaf.FullName.Contains(' ')
+                                    ? leaf.FullName[(leaf.FullName.IndexOf(' ') + 1)..]
+                                        .Split('(')[0]
+                                    : leaf.FullName);
+                var row = new ConditionRowViewModel(leaf, entry);
+                SubscribeRow(row);
+                ConditionRows.Add(row);
+            }
+            else if (c is ConditionBranch branch)
+            {
+                // Branch rows are read-only pass-throughs — no subscription needed
+                ConditionRows.Add(new ConditionRowViewModel(branch));
+            }
+        }
+    }
+
+    private void SubscribeRow(ConditionRowViewModel row)
+    {
+        row.PropertyChanged += OnRowPropertyChanged;
+        foreach (var p in row.Parameters)
+            p.PropertyChanged += OnRowPropertyChanged;
+    }
+
+    private void OnRowPropertyChanged(object? sender, PropertyChangedEventArgs e)
+        => CommitConditions();
+
+    public void AddCondition(ConditionEntry entry)
+    {
+        if (_node is null) return;
+        var defaults = entry.Parameters.Select(p => p.Default).ToList();
+        var leaf     = new ConditionLeaf(entry.ReflectionFullName, defaults, false, "And");
+        var row      = new ConditionRowViewModel(leaf, entry);
+        SubscribeRow(row);
+        ConditionRows.Add(row);
+        CommitConditions();
+    }
+
+    public void DeleteConditionRow(ConditionRowViewModel row)
+    {
+        if (ConditionRows.Remove(row))
+            CommitConditions();
+    }
+
+    public void MoveConditionUp(ConditionRowViewModel row)
+    {
+        var i = ConditionRows.IndexOf(row);
+        if (i > 0) { ConditionRows.Move(i, i - 1); CommitConditions(); }
+    }
+
+    public void MoveConditionDown(ConditionRowViewModel row)
+    {
+        var i = ConditionRows.IndexOf(row);
+        if (i >= 0 && i < ConditionRows.Count - 1) { ConditionRows.Move(i, i + 1); CommitConditions(); }
+    }
+
+    /// Builds the structured condition list from current rows and pushes it to NodeViewModel.
+    public void CommitConditions()
+    {
+        if (_node is null) return;
+        _node.Conditions = ConditionRows.Select(r => r.ToNode()).ToList();
     }
 }

@@ -1,7 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using DialogEditor.Avalonia.Services;
+using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.Avalonia.Views;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;

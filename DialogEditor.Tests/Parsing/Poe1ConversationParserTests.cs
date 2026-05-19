@@ -298,8 +298,8 @@ public class Poe1ConversationParserTests
     {
         var nodes = Poe1ConversationParser.ParseXml(ScriptedNodeXml);
         Assert.Single(nodes[0].Scripts);
-        Assert.Contains("[Enter]", nodes[0].Scripts[0]);
-        Assert.Contains("ActivateObject", nodes[0].Scripts[0]);
+        Assert.Equal(ScriptCategory.Enter, nodes[0].Scripts[0].Category);
+        Assert.Contains("ActivateObject", nodes[0].Scripts[0].FullName);
     }
 
     private const string ActorDirectionXml = """

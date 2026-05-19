@@ -1,0 +1,196 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+             x:Class="DialogEditor.Avalonia.Shared.PatchManagerView"
+             Background="#1e1e1e"
+             x:CompileBindings="False">
+
+    <UserControl.Styles>
+        <Style Selector="TextBlock.section-label">
+            <Setter Property="Foreground"  Value="#888"/>
+            <Setter Property="FontSize"    Value="10"/>
+            <Setter Property="FontWeight"  Value="Bold"/>
+            <Setter Property="Margin"      Value="0,0,0,4"/>
+        </Style>
+        <Style Selector="Button.action-btn">
+            <Setter Property="Background"      Value="#333"/>
+            <Setter Property="Foreground"      Value="#ccc"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"         Value="10,4"/>
+            <Setter Property="FontSize"        Value="11"/>
+        </Style>
+        <Style Selector="Button.primary-btn">
+            <Setter Property="Background"      Value="#1a5276"/>
+            <Setter Property="Foreground"      Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"         Value="20,6"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="MinWidth"        Value="120"/>
+        </Style>
+        <Style Selector="TextBox.path-box">
+            <Setter Property="Background"      Value="#141414"/>
+            <Setter Property="Foreground"      Value="#e8e8e8"/>
+            <Setter Property="BorderBrush"     Value="#444"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize"        Value="11"/>
+            <Setter Property="Padding"         Value="6,3"/>
+            <Setter Property="IsReadOnly"      Value="True"/>
+        </Style>
+    </UserControl.Styles>
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto" Margin="14,12,14,12">
+
+        <!-- ── Game folder ─────────────────────────────────────────── -->
+        <TextBlock Grid.Row="0" Classes="section-label"
+                   Text="{StaticResource PatchManager_GameFolder}"/>
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+            <TextBox Grid.Column="0" Classes="path-box"
+                     Text="{Binding GameFolder}"
+                     Watermark="{StaticResource PatchManager_GameFolderWatermark}"
+                     ToolTip.Tip="{StaticResource ToolTip_BrowseGameFolder}"/>
+            <Button Grid.Column="1" Classes="action-btn"
+                    Content="{StaticResource PatchManager_BrowseGame}"
+                    Command="{Binding BrowseGameFolderCommand}"
+                    Margin="6,0,0,0"
+                    ToolTip.Tip="{StaticResource ToolTip_BrowseGameFolder}"/>
+        </Grid>
+
+        <!-- ── Load Order ──────────────────────────────────────────── -->
+        <Grid Grid.Row="2" RowDefinitions="Auto,*,Auto">
+
+            <DockPanel Grid.Row="0" Margin="0,0,0,6">
+                <TextBlock Classes="section-label" DockPanel.Dock="Left"
+                           VerticalAlignment="Center"
+                           Text="{StaticResource PatchManager_LoadOrder}"/>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4">
+                    <Button Classes="action-btn"
+                            Content="{StaticResource PatchManager_SaveLoadOrder}"
+                            Command="{Binding SaveLoadOrderCommand}"
+                            ToolTip.Tip="{StaticResource ToolTip_SaveLoadOrder}"/>
+                    <Button Classes="action-btn"
+                            Content="{StaticResource PatchManager_LoadLoadOrder}"
+                            Command="{Binding LoadLoadOrderCommand}"
+                            ToolTip.Tip="{StaticResource ToolTip_LoadLoadOrder}"/>
+                    <Button Classes="action-btn"
+                            Content="{StaticResource PatchManager_AddProjects}"
+                            Command="{Binding AddEntriesCommand}"
+                            ToolTip.Tip="{StaticResource ToolTip_AddProjects}"/>
+                </StackPanel>
+            </DockPanel>
+
+            <!-- Entry list -->
+            <Grid Grid.Row="1">
+                <ScrollViewer Background="#252525">
+                    <ItemsControl ItemsSource="{Binding Entries}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="vm:PatchEntryViewModel">
+                                <Border Background="#2d2d2d" CornerRadius="4"
+                                        Margin="4,2,4,2" Padding="10,8">
+                                    <Grid ColumnDefinitions="*,28,28,28">
+                                        <StackPanel Grid.Column="0" Spacing="2">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <TextBlock Text="{Binding ProjectName}"
+                                                           Foreground="#e8e8e8" FontSize="12"
+                                                           FontWeight="SemiBold"/>
+                                                <TextBlock Text="⚠"
+                                                           Foreground="#e67e22" FontSize="12"
+                                                           VerticalAlignment="Center"
+                                                           IsVisible="{Binding HasConflict}"
+                                                           ToolTip.Tip="{StaticResource PatchManager_EntryConflictDetail}"/>
+                                                <TextBlock Text="⚠"
+                                                           Foreground="#c0392b" FontSize="12"
+                                                           VerticalAlignment="Center"
+                                                           IsVisible="{Binding LoadError,
+                                                                       Converter={StaticResource NullOrEmptyToVis}}"
+                                                           ToolTip.Tip="{Binding LoadError}"/>
+                                            </StackPanel>
+                                            <TextBlock Text="{Binding DisplayPath}"
+                                                       Foreground="#666" FontSize="10"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="1" Content="↑"
+                                                Command="{Binding DataContext.MoveUpCommand,
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                Background="Transparent" BorderThickness="0"
+                                                Foreground="#aaa" FontSize="13" Padding="4"
+                                                ToolTip.Tip="{StaticResource ToolTip_MoveEntryUp}"/>
+                                        <Button Grid.Column="2" Content="↓"
+                                                Command="{Binding DataContext.MoveDownCommand,
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                Background="Transparent" BorderThickness="0"
+                                                Foreground="#aaa" FontSize="13" Padding="4"
+                                                ToolTip.Tip="{StaticResource ToolTip_MoveEntryDown}"/>
+                                        <Button Grid.Column="3" Content="✕"
+                                                Command="{Binding DataContext.RemoveEntryCommand,
+                                                          RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                Background="Transparent" BorderThickness="0"
+                                                Foreground="#c0392b" FontSize="13" Padding="4"
+                                                ToolTip.Tip="{StaticResource ToolTip_RemoveEntry}"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+                <TextBlock Text="{StaticResource PatchManager_EmptyHint}"
+                           Foreground="#444" FontSize="11"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           IsVisible="{Binding HasEntries,
+                                       Converter={StaticResource InverseBoolToVis}}"/>
+            </Grid>
+
+            <TextBlock Grid.Row="2"
+                       Text="{StaticResource PatchManager_OrderHint}"
+                       Foreground="#555" FontSize="9"
+                       HorizontalAlignment="Center" Margin="0,4,0,0"/>
+        </Grid>
+
+        <!-- ── Conflict summary ─────────────────────────────────────── -->
+        <Border Grid.Row="3" Background="#1a1a1a" CornerRadius="3" Padding="10,6"
+                Margin="0,8,0,0"
+                IsVisible="{Binding HasConflicts}">
+            <StackPanel Spacing="4">
+                <TextBlock Text="{Binding StatusText}"
+                           Foreground="#e67e22" FontSize="11" FontWeight="SemiBold"/>
+                <ItemsControl ItemsSource="{Binding Conflicts}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock FontSize="10" Foreground="#aaa">
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="  conversation '{0}' · node {1} · {2}">
+                                        <Binding Path="ConversationName"/>
+                                        <Binding Path="NodeId"/>
+                                        <Binding Path="FieldName"/>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Border>
+
+        <!-- ── Footer ──────────────────────────────────────────────── -->
+        <Grid Grid.Row="4" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+            <TextBlock Grid.Column="0"
+                       Text="{Binding StatusText}"
+                       Foreground="#888" FontSize="10"
+                       VerticalAlignment="Center"
+                       TextTrimming="CharacterEllipsis"
+                       IsVisible="{Binding HasConflicts,
+                                   Converter={StaticResource InverseBoolToVis}}"/>
+            <Button Grid.Column="1" Classes="primary-btn"
+                    Content="{StaticResource PatchManager_Apply}"
+                    Command="{Binding ApplyCommand}"
+                    IsVisible="{Binding IsApplying, Converter={StaticResource InverseBoolToVis}}"
+                    ToolTip.Tip="{StaticResource ToolTip_ApplyPatches}"/>
+            <Button Grid.Column="1" Classes="primary-btn"
+                    Content="{StaticResource PatchManager_Applying}"
+                    IsEnabled="False"
+                    IsVisible="{Binding IsApplying}"/>
+        </Grid>
+
+    </Grid>
+</UserControl>

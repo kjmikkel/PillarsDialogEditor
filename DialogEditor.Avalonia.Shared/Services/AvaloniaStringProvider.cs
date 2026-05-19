@@ -1,7 +1,7 @@
 using Avalonia;
 using DialogEditor.ViewModels.Services;
 
-namespace DialogEditor.Avalonia.Services;
+namespace DialogEditor.Avalonia.Shared.Services;
 
 public sealed class AvaloniaStringProvider : IStringProvider
 {

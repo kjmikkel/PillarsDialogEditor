@@ -7,8 +7,11 @@ public record LinkEditSnapshot(
     int ToNodeId,
     float RandomWeight,
     string QuestionNodeTextDisplay,
-    bool HasConditions
-);
+    bool HasConditions)
+{
+    // Non-positional so all existing callers continue to compile.
+    public IReadOnlyList<ConditionNode>? Conditions { get; init; }
+}
 
 public record NodeEditSnapshot(
     int NodeId,
@@ -25,7 +28,9 @@ public record NodeEditSnapshot(
     string ExternalVO,
     bool HasVO,
     bool HideSpeaker,
-    IReadOnlyList<LinkEditSnapshot> Links
+    IReadOnlyList<LinkEditSnapshot> Links,
+    IReadOnlyList<ConditionNode> Conditions,
+    IReadOnlyList<ScriptCall> Scripts
 );
 
 public record ConversationEditSnapshot(IReadOnlyList<NodeEditSnapshot> Nodes);
