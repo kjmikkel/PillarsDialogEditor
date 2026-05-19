@@ -460,6 +460,11 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_FindPrev">Select the previous matching node</sys:String>
     <sys:String x:Key="ToolTip_Replace">Replace the current match and find the next one</sys:String>
     <sys:String x:Key="ToolTip_ReplaceAll">Replace every match in the current conversation</sys:String>
+    <sys:String x:Key="FindReplace_Matches">{0} match(es)</sys:String>
+    <sys:String x:Key="FindReplace_NoMatches">No matches</sys:String>
+    <sys:String x:Key="FindReplace_Navigation">{0} / {1}</sys:String>
+    <sys:String x:Key="FindReplace_Replaced">Replaced {0} match(es)</sys:String>
+    <sys:String x:Key="FindReplace_NothingReplaced">Nothing replaced</sys:String>
     <sys:String x:Key="Menu_Test">Test</sys:String>
     <sys:String x:Key="Menu_NewProject">New Project…</sys:String>
     <sys:String x:Key="Menu_OpenProject">Open Project…</sys:String>
