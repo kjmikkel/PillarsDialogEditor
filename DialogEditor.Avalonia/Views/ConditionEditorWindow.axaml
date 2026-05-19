@@ -79,20 +79,18 @@
 
                                     <!-- Row header -->
                                     <Grid ColumnDefinitions="70,Auto,*,28,28,28">
-                                        <!-- And / Or (hidden for branch rows — branch controls its own operator) -->
+                                        <!-- And / Or -->
                                         <ComboBox Grid.Column="0"
                                                   ItemsSource="{x:Static vm:ConditionRowViewModel.OperatorOptions}"
                                                   SelectedItem="{Binding Operator, Mode=TwoWay}"
                                                   Background="#1a1a1a" BorderBrush="#555"
-                                                  BorderThickness="1" FontSize="11" Padding="4,2"
-                                                  IsVisible="{Binding IsLeaf}"/>
+                                                  BorderThickness="1" FontSize="11" Padding="4,2"/>
                                         <!-- NOT toggle -->
                                         <CheckBox Grid.Column="1"
                                                   IsChecked="{Binding Not, Mode=TwoWay}"
                                                   Content="{StaticResource Label_Condition_NOT}"
                                                   Foreground="#aaa" FontSize="11"
                                                   Margin="8,0,8,0" VerticalAlignment="Center"
-                                                  IsVisible="{Binding IsLeaf}"
                                                   ToolTip.Tip="{StaticResource ToolTip_ConditionNot}"/>
                                         <!-- Display name (leaves) -->
                                         <TextBlock Grid.Column="2"
