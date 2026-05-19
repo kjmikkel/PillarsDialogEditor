@@ -13,6 +13,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="avares://Nodify/Theme.axaml"/>
                 <ResourceInclude Source="avares://DialogEditor.Avalonia/Resources/Strings.axaml"/>
+                <ResourceInclude Source="avares://DialogEditor.Avalonia.Shared/Resources/Strings.axaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <!-- ToolbarPlainButton / ToolbarPlainToggleButton
