@@ -25,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AvaloniaResource Include="Resources\Strings.axaml"/>
     <None Update="Assets\app.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
