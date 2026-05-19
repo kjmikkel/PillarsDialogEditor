@@ -128,13 +128,17 @@ public partial class MainWindowViewModel : ObservableObject
 
     private void SetProject(DialogProject? project)
     {
+        var prevNew  = _project?.NewConversations;
+        var nextNew  = project?.NewConversations;
         _project = project;
         Canvas.IsEditable = project is not null;
         OnPropertyChanged(nameof(IsProjectOpen));
         SaveProjectCommand.NotifyCanExecuteChanged();
         NewConversationCommand.NotifyCanExecuteChanged();
-        if (_provider is not null)
-            Browser.Load(_provider, project?.NewConversations);
+        // Only re-scan the game folder when NewConversations actually changes —
+        // not on every patch save, which would re-enumerate all conversations.
+        if (_provider is not null && !ReferenceEquals(prevNew, nextNew))
+            Browser.Load(_provider, nextNew);
     }
 
     // ── Partial hooks ─────────────────────────────────────────────────────
@@ -324,8 +328,6 @@ public partial class MainWindowViewModel : ObservableObject
         var file = _provider.BuildNewConversationFile(name);
         SetProject(_project.WithNewConversation(name));
 
-        RefreshBrowserNewConversations();
-
         // Load an empty canvas immediately
         LoadNewConversation(file);
         StatusText = Loc.Format("Status_NewConversationAdded", name);
@@ -359,12 +361,6 @@ public partial class MainWindowViewModel : ObservableObject
         IsModified = false;
         CurrentConversationName = file.Name;
         if (!IsBrowserPinned) IsBrowserExpanded = false;
-    }
-
-    private void RefreshBrowserNewConversations()
-    {
-        if (_provider is null) return;
-        Browser.Load(_provider, _project?.NewConversations);
     }
 
     [RelayCommand(CanExecute = nameof(CanSaveProject))]
