@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Models;
+using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.ViewModels;
@@ -51,7 +52,8 @@ public partial class ScriptEditorViewModel : ObservableObject
 {
     private readonly Action<IReadOnlyList<ScriptCall>> _commit;
 
-    public string NodeTitle { get; }
+    public string NodeTitle   { get; }
+    public string WindowTitle => Loc.Format("WindowTitle_ScriptEditor", NodeTitle);
 
     // Catalogue entries available for the add picker (all entries for now; can filter by gameId later)
     public IReadOnlyList<ScriptCatalogueEntry> AvailableScripts { get; }

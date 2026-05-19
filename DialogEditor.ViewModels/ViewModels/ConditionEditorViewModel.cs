@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Models;
+using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.ViewModels;
@@ -11,7 +12,8 @@ public partial class ConditionEditorViewModel : ObservableObject
     private readonly Action<IReadOnlyList<ConditionNode>> _commit;
     private readonly string _gameId;
 
-    public string NodeTitle { get; }
+    public string NodeTitle   { get; }
+    public string WindowTitle => Loc.Format("WindowTitle_ConditionEditor", NodeTitle);
 
     public ObservableCollection<ConditionRowViewModel> Rows { get; } = [];
 

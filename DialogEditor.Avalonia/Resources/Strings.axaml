@@ -344,6 +344,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_PickCondition">Select a condition from the catalogue to add to this node</sys:String>
     <sys:String x:Key="ToolTip_ConditionNot">Negate this condition — it must evaluate to FALSE for the check to pass</sys:String>
     <sys:String x:Key="ToolTip_ConditionBranch">Grouped condition block — the structure is preserved but cannot be edited here</sys:String>
+    <sys:String x:Key="WindowTitle_ConditionEditor">Conditions — {0}</sys:String>
+    <sys:String x:Key="WindowTitle_ScriptEditor">Scripts — {0}</sys:String>
     <sys:String x:Key="ToolTip_ConditionEditorCancel">Discard all changes and close</sys:String>
     <sys:String x:Key="ToolTip_ConditionEditorOK">Apply these conditions to the node</sys:String>
 
