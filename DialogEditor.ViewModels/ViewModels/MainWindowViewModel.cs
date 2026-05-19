@@ -2,6 +2,7 @@ using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Backup;
+using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
@@ -34,6 +35,13 @@ public partial class MainWindowViewModel : ObservableObject
     private ConversationFile?  _currentFile;
     private string             _currentGameDirectory = string.Empty;
     private string             _activeGameId         = string.Empty;
+
+    // Paths of conversation files created during the current test session.
+    // On restore, these are deleted (there was no original to restore to).
+    private readonly List<string> _createdConversationPaths = [];
+
+    /// Set by the UI layer to provide a name-input dialog for new conversations.
+    public Func<Task<string?>>? RequestConversationName { get; set; }
 
     /// Conditions from the catalogue filtered to the currently loaded game.
     public IReadOnlyList<ConditionEntry> ActiveConditions
@@ -124,6 +132,9 @@ public partial class MainWindowViewModel : ObservableObject
         Canvas.IsEditable = project is not null;
         OnPropertyChanged(nameof(IsProjectOpen));
         SaveProjectCommand.NotifyCanExecuteChanged();
+        NewConversationCommand.NotifyCanExecuteChanged();
+        if (_provider is not null)
+            Browser.Load(_provider, project?.NewConversations);
     }
 
     // ── Partial hooks ─────────────────────────────────────────────────────
@@ -285,6 +296,77 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
+    // ── New conversation ──────────────────────────────────────────────────
+    [RelayCommand(CanExecute = nameof(CanCreateConversation))]
+    private async Task NewConversation()
+    {
+        if (_provider is null || _project is null || RequestConversationName is null) return;
+
+        var name = (await RequestConversationName())?.Trim();
+        if (string.IsNullOrEmpty(name)) return;
+
+        // Validate: no path separators or other illegal chars
+        if (name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+        {
+            StatusText = Loc.Format("Status_NewConversationDuplicate", name);
+            return;
+        }
+
+        // Conflict check
+        var alreadyExists = _provider.FindConversation(name) is not null
+                         || (_project.NewConversations?.Contains(name) == true);
+        if (alreadyExists)
+        {
+            StatusText = Loc.Format("Status_NewConversationDuplicate", name);
+            return;
+        }
+
+        var file = _provider.BuildNewConversationFile(name);
+        SetProject(_project.WithNewConversation(name));
+
+        RefreshBrowserNewConversations();
+
+        // Load an empty canvas immediately
+        LoadNewConversation(file);
+        StatusText = Loc.Format("Status_NewConversationAdded", name);
+        AppLog.Info($"New conversation '{name}' added to project");
+    }
+
+    private bool CanCreateConversation() => _provider is not null && _project is not null;
+
+    private void LoadNewConversation(ConversationFile file)
+    {
+        _currentFile = file;
+        var empty    = new Conversation(file.Name, [], StringTable.Empty);
+
+        // If the project already has a patch (e.g. re-opened project), reconstruct from it
+        if (_project?.Patches.TryGetValue(file.Name, out var existingPatch) == true)
+        {
+            var baseSnap    = new ConversationEditSnapshot([]);
+            var appliedSnap = PatchApplier.Apply(baseSnap, existingPatch);
+            var restored    = ConversationSnapshotBuilder.ToConversation(file.Name, appliedSnap);
+            Canvas.Load(restored);
+        }
+        else
+        {
+            Canvas.Load(empty);
+        }
+
+        var savedLayout = _project?.GetLayout(file.Name);
+        if (savedLayout is not null) Canvas.RestoreLayout(savedLayout);
+
+        Detail.Clear();
+        IsModified = false;
+        CurrentConversationName = file.Name;
+        if (!IsBrowserPinned) IsBrowserExpanded = false;
+    }
+
+    private void RefreshBrowserNewConversations()
+    {
+        if (_provider is null) return;
+        Browser.Load(_provider, _project?.NewConversations);
+    }
+
     [RelayCommand(CanExecute = nameof(CanSaveProject))]
     private void SaveProject()
     {
@@ -343,7 +425,7 @@ public partial class MainWindowViewModel : ObservableObject
             Detail.ActiveGameId = provider.GameId;
             AvailableLanguages = provider.AvailableLanguages;
             SelectedLanguage   = AppSettings.PickLanguage(AvailableLanguages, AppSettings.LastLanguage);
-            Browser.Load(provider);
+            Browser.Load(provider, _project?.NewConversations);
             AppLog.Info($"Loaded {provider.GameName} from {path}");
             StatusText = Loc.Format("Status_FolderLoaded", provider.GameName, path);
 
@@ -461,25 +543,36 @@ public partial class MainWindowViewModel : ObservableObject
         Directory.CreateDirectory(tempDir);
         var restoreEntries = new List<PendingRestoreEntry>();
 
+        _createdConversationPaths.Clear();
+
         try
         {
             foreach (var (convName, patch) in _project.Patches)
             {
-                var file = _provider.FindConversation(convName);
+                // For new (not-yet-on-disk) conversations, skip the backup step
+                var file = _provider.FindConversation(convName)
+                        ?? (_project.IsNewConversation(convName)
+                               ? _provider.BuildNewConversationFile(convName)
+                               : null);
+
                 if (file is null)
                 {
                     AppLog.Warn($"Conversation not found for patch: {convName}");
                     continue;
                 }
 
-                var origConv   = file.ConversationPath;
-                var origSt     = _provider.GetStringTablePath(file);
-                var backupConv = Path.Combine(tempDir, convName + ".conversation.bak");
-                var backupSt   = Path.Combine(tempDir, convName + ".stringtable.bak");
+                if (File.Exists(file.ConversationPath))
+                {
+                    var origConv   = file.ConversationPath;
+                    var origSt     = _provider.GetStringTablePath(file);
+                    var backupConv = Path.Combine(tempDir, convName + ".conversation.bak");
+                    var backupSt   = Path.Combine(tempDir, convName + ".stringtable.bak");
 
-                File.Copy(origConv, backupConv);
-                if (File.Exists(origSt)) File.Copy(origSt, backupSt);
-                restoreEntries.Add(new PendingRestoreEntry(backupConv, backupSt, origConv, origSt));
+                    File.Copy(origConv, backupConv);
+                    if (File.Exists(origSt)) File.Copy(origSt, backupSt);
+                    restoreEntries.Add(new PendingRestoreEntry(backupConv, backupSt, origConv, origSt));
+                }
+                // else: new conversation — nothing to back up
             }
 
             // Persist restore info before writing game files (crash safety)
@@ -487,8 +580,18 @@ public partial class MainWindowViewModel : ObservableObject
 
             foreach (var (convName, patch) in _project.Patches)
             {
-                var file = _provider.FindConversation(convName);
+                var file = _provider.FindConversation(convName)
+                        ?? (_project.IsNewConversation(convName)
+                               ? _provider.BuildNewConversationFile(convName)
+                               : null);
                 if (file is null) continue;
+
+                // Create blank template if file doesn't exist yet
+                if (!File.Exists(file.ConversationPath))
+                {
+                    _provider.InitializeConversationFile(file);
+                    _createdConversationPaths.Add(file.ConversationPath);
+                }
 
                 var conversation = _provider.LoadConversation(file);
                 var baseSnap     = ConversationSnapshotBuilder.Build(conversation);
@@ -537,11 +640,27 @@ public partial class MainWindowViewModel : ObservableObject
                 try { Directory.Delete(dir, recursive: true); }
                 catch (Exception ex) { AppLog.Warn($"Could not delete temp backup folder: {ex.Message}"); }
 
+            // Delete any conversation files that were created from scratch
+            foreach (var created in _createdConversationPaths)
+            {
+                try { if (File.Exists(created)) File.Delete(created); }
+                catch (Exception ex) { AppLog.Warn($"Could not delete created conversation file: {ex.Message}"); }
+            }
+            _createdConversationPaths.Clear();
+
             AppSettings.ClearPendingRestores();
             AppLog.Info($"Restored {entries.Count} conversation(s)");
             StatusText = Loc.Get("Status_RestoreComplete2");
 
-            if (_currentFile is not null) LoadConversationFile(_currentFile);
+            if (_currentFile is not null)
+            {
+                // For new conversations, reload as empty canvas (file no longer exists)
+                if (_project?.IsNewConversation(_currentFile.Name) == true
+                    && !File.Exists(_currentFile.ConversationPath))
+                    LoadNewConversation(_currentFile);
+                else
+                    LoadConversationFile(_currentFile);
+            }
             TestModeExited?.Invoke();
         }
         catch (Exception ex)
@@ -563,7 +682,10 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        LoadConversationFile(file);
+        if (_project?.IsNewConversation(file.Name) == true && !File.Exists(file.ConversationPath))
+            LoadNewConversation(file);
+        else
+            LoadConversationFile(file);
     }
 
     private void LoadConversationFile(ConversationFile file)

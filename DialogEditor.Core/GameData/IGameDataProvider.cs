@@ -18,4 +18,12 @@ public interface IGameDataProvider
     void   SaveConversation(ConversationFile file, ConversationEditSnapshot snapshot);
     string GetStringTablePath(ConversationFile file);
     (string ConversationsRoot, string StringTablesRoot) GetBackupRoots();
+
+    /// Returns a ConversationFile record for a not-yet-existing conversation,
+    /// using this game's path conventions. Does not create any files.
+    ConversationFile BuildNewConversationFile(string name);
+
+    /// Writes a minimal blank template file to disk so that SaveConversation
+    /// can subsequently apply a patch onto it. Creates parent directories.
+    void InitializeConversationFile(ConversationFile file);
 }

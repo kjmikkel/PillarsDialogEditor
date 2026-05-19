@@ -86,7 +86,8 @@
             <converters:QTDDisplayConverter             x:Key="QTDDisplay"/>
             <converters:LayoutPointConverter             x:Key="LayoutPointConverter"/>
             <converters:SpeakerCategoryToBrushConverter x:Key="SpeakerCategoryToBrush"/>
-            <converters:BoolToFemaleTextBrushConverter  x:Key="BoolToFemaleTextBrush"/>
+            <converters:BoolToFemaleTextBrushConverter      x:Key="BoolToFemaleTextBrush"/>
+            <converters:BoolToNewConversationBrushConverter x:Key="BoolToNewConversationBrush"/>
             <converters:InverseBoolConverter            x:Key="InverseBoolToVis"/>
             <converters:NullOrEmptyToBoolConverter      x:Key="NullOrEmptyToVis"/>
             <converters:CountToBoolConverter            x:Key="CountToVis"/>

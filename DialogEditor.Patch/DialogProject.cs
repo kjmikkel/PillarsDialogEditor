@@ -8,12 +8,25 @@ public record DialogProject(
     IReadOnlyDictionary<string, ConversationPatch> Patches,
     // Canvas layout per conversation — metadata, not part of the patch diff.
     // Nullable so existing .dialogproject files without this field load cleanly.
-    IReadOnlyDictionary<string, IReadOnlyDictionary<int, LayoutPoint>>? Layouts = null)
+    IReadOnlyDictionary<string, IReadOnlyDictionary<int, LayoutPoint>>? Layouts = null,
+    // Names of conversations that don't yet exist on disk.
+    // Nullable for back-compat with old .dialogproject files.
+    IReadOnlyList<string>? NewConversations = null)
 {
     public static readonly int CurrentSchemaVersion = 1;
 
     public static DialogProject Empty(string name) =>
         new(name, CurrentSchemaVersion, new Dictionary<string, ConversationPatch>());
+
+    public DialogProject WithNewConversation(string name)
+    {
+        var existing = NewConversations ?? [];
+        if (existing.Contains(name)) return this;
+        return this with { NewConversations = [.. existing, name] };
+    }
+
+    public bool IsNewConversation(string name)
+        => NewConversations?.Contains(name) == true;
 
     public DialogProject WithPatch(ConversationPatch patch) =>
         this with

@@ -80,4 +80,24 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
         Directory.CreateDirectory(Path.GetDirectoryName(stPath)!);
         StringTableSerializer.SaveToFile(stPath, snapshot.Nodes);
     }
+
+    public ConversationFile BuildNewConversationFile(string name)
+    {
+        var convPath = Path.Combine(ConversationsRoot, name + ".conversationbundle");
+        var stPath   = Path.Combine(StringTablesRoot,  name + ".stringtable");
+        return new ConversationFile(
+            Name: name,
+            FolderPath: string.Empty,
+            ConversationPath: convPath,
+            StringTablePath: stPath);
+    }
+
+    private const string Poe2BlankTemplate =
+        """{"Conversations":[{"Nodes":[]}]}""";
+
+    public void InitializeConversationFile(ConversationFile file)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(file.ConversationPath)!);
+        File.WriteAllText(file.ConversationPath, Poe2BlankTemplate, System.Text.Encoding.UTF8);
+    }
 }

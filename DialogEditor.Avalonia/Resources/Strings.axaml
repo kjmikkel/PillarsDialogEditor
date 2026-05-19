@@ -84,6 +84,15 @@
     <sys:String x:Key="Browser_RootFolder">(root)</sys:String>
     <!-- Panel header label -->
     <sys:String x:Key="Browser_Header">CONVERSATIONS</sys:String>
+    <!-- New conversation feature -->
+    <sys:String x:Key="Label_NewConversation_Suffix"> (new)</sys:String>
+    <sys:String x:Key="Button_NewConversation">New conversation…</sys:String>
+    <sys:String x:Key="ToolTip_NewConversation">Create a new conversation that doesn't yet exist in the game folder. It will be written to disk when you apply the patch (F5).</sys:String>
+    <sys:String x:Key="Dialog_NewConversation_Title">New Conversation</sys:String>
+    <sys:String x:Key="Dialog_NewConversation_Prompt">Enter a name for the new conversation file (no extension, e.g. city_market_guard):</sys:String>
+    <sys:String x:Key="Dialog_NewConversation_Placeholder">my_new_conversation</sys:String>
+    <sys:String x:Key="Status_NewConversationAdded">New conversation '{0}' added — add nodes, then Ctrl+S to save.</sys:String>
+    <sys:String x:Key="Status_NewConversationDuplicate">A conversation named '{0}' already exists.</sys:String>
     <!-- Placeholder text inside the filter text box -->
     <sys:String x:Key="Placeholder_FilterConversations">Filter conversations…</sys:String>
 
