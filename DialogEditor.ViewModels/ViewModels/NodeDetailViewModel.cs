@@ -303,8 +303,8 @@ public partial class NodeDetailViewModel : ObservableObject
                 .OfType<ConditionLeaf>()
                 .Select(l =>
                 {
-                    // FindByFullName first so PoE1/PoE2 variants resolve correctly
-                    var entry = ConditionCatalogue.Instance.FindByFullName(l.FullName)
+                    // FindByFullName(fullName, gameId) resolves both game variants and same-signature entries
+                    var entry = ConditionCatalogue.Instance.FindByFullName(l.FullName, ActiveGameId)
                              ?? ConditionCatalogue.Instance.Find(
                                     l.FullName.Contains(' ')
                                         ? l.FullName[(l.FullName.IndexOf(' ') + 1)..].Split('(')[0]
@@ -325,9 +325,8 @@ public partial class NodeDetailViewModel : ObservableObject
         {
             if (c is ConditionLeaf leaf)
             {
-                // FindByFullName disambiguates same-named conditions with different
-                // signatures between PoE1 (String) and PoE2 (Guid)
-                var entry = ConditionCatalogue.Instance.FindByFullName(leaf.FullName)
+                // FindByFullName(fullName, gameId) picks the correct game-specific variant
+                var entry = ConditionCatalogue.Instance.FindByFullName(leaf.FullName, ActiveGameId)
                          ?? ConditionCatalogue.Instance.Find(
                                 leaf.FullName.Contains(' ')
                                     ? leaf.FullName[(leaf.FullName.IndexOf(' ') + 1)..]
