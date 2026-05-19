@@ -191,12 +191,18 @@ public partial class MainWindow : Window
 
     private void FindReplace_Click(object? sender, RoutedEventArgs e)
     {
-        var vm = (MainWindowViewModel)DataContext!;
+        var vm   = (MainWindowViewModel)DataContext!;
+        var frVm = new FindReplaceViewModel(vm.Canvas);
+
         if (_findReplaceWindow is null || !_findReplaceWindow.IsVisible)
         {
-            var frVm = new FindReplaceViewModel(vm.Canvas);
             _findReplaceWindow = new FindReplaceWindow(frVm);
             _findReplaceWindow.Closed += (_, _) => _findReplaceWindow = null;
+        }
+        else
+        {
+            // Conversation may have changed — always give the window the current canvas
+            _findReplaceWindow.DataContext = frVm;
         }
         _findReplaceWindow.Show();
         _findReplaceWindow.Activate();
