@@ -227,7 +227,7 @@ public partial class ConversationViewModel : ObservableObject
     {
         var newId  = NodeIdAllocator.Next(Nodes.Select(n => n.NodeId));
         var newNode = new NodeViewModel(
-            new ConversationNode(newId, false, SpeakerCategory.Npc,
+            new ConversationNode(newId, false, parent.SpeakerCategory,
                 parent.SpeakerGuid, parent.ListenerGuid, [], [], [],
                 parent.DisplayType, parent.Persistence),
             new StringEntry(newId, string.Empty, string.Empty));

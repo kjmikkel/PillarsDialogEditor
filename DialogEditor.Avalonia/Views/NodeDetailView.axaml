@@ -88,6 +88,12 @@
                           SelectedItem="{Binding NodeTypeString, Mode=TwoWay}"
                           ToolTip.Tip="{StaticResource ToolTip_NodeType}"/>
 
+                <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_SpeakerCategory}"/>
+                <ComboBox Classes="detail-combo"
+                          ItemsSource="{x:Static vm:NodeDetailViewModel.SpeakerCategoryOptions}"
+                          SelectedItem="{Binding SpeakerCategoryString, Mode=TwoWay}"
+                          ToolTip.Tip="{StaticResource ToolTip_SpeakerCategory}"/>
+
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_SpeakerGuid}"/>
                 <!-- Name picker — visible when speaker data is loaded (PoE2) -->
                 <AutoCompleteBox Classes="detail-field"

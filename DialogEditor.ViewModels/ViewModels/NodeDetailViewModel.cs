@@ -92,6 +92,35 @@ public partial class NodeDetailViewModel : ObservableObject
         set { if (_node != null) _node.HideSpeaker = value; }
     }
 
+    // ── SpeakerCategory proxy (enum ↔ string for ComboBox binding) ───────
+    public string SpeakerCategoryString
+    {
+        get => _node?.SpeakerCategory switch
+        {
+            SpeakerCategory.Player   => Loc.Get("Speaker_Player"),
+            SpeakerCategory.Narrator => Loc.Get("Speaker_Narrator"),
+            SpeakerCategory.Script   => Loc.Get("Speaker_Script"),
+            _                        => Loc.Get("Speaker_Npc"),
+        };
+        set
+        {
+            if (_node is null) return;
+            _node.SpeakerCategory =
+                value == Loc.Get("Speaker_Player")   ? SpeakerCategory.Player   :
+                value == Loc.Get("Speaker_Narrator") ? SpeakerCategory.Narrator :
+                value == Loc.Get("Speaker_Script")   ? SpeakerCategory.Script   :
+                                                        SpeakerCategory.Npc;
+        }
+    }
+
+    public static IReadOnlyList<string> SpeakerCategoryOptions =>
+    [
+        Loc.Get("Speaker_Npc"),
+        Loc.Get("Speaker_Player"),
+        Loc.Get("Speaker_Narrator"),
+        Loc.Get("Speaker_Script"),
+    ];
+
     // ── NodeType proxy (bool ↔ string for ComboBox binding) ──────────────
     public string NodeTypeString
     {
@@ -174,6 +203,7 @@ public partial class NodeDetailViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(DefaultText));
         OnPropertyChanged(nameof(FemaleText));
+        OnPropertyChanged(nameof(SpeakerCategoryString));
         OnPropertyChanged(nameof(FemaleTextDisplay));
         OnPropertyChanged(nameof(HasFemaleText));
         OnPropertyChanged(nameof(IsPlayerChoice));
