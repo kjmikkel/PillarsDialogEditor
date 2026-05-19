@@ -413,9 +413,11 @@ public partial class MainWindowViewModel : ObservableObject
                 merged = merged.MergeWith(other);
             }
             SetProject(merged);
-            IsModified = true;
-            Canvas.IsModified = true;
-            AppLog.Info($"Merged {paths.Count} project(s) into '{_project.Name}'");
+            // Save immediately — the merged patches are already computed, no canvas diff needed.
+            // IsModified and Canvas.IsModified are intentionally left unchanged so the user's
+            // open-conversation edit state is preserved.
+            DialogProjectSerializer.SaveToFile(_projectPath!, merged);
+            AppLog.Info($"Merged {paths.Count} project(s) into '{merged.Name}'");
             StatusText = Loc.Format("Status_MergeComplete", paths.Count, merged.Name);
         }
         catch (Exception ex)
