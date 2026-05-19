@@ -617,8 +617,7 @@
     "displayName": "Is Player Attribute Score Value",
     "category": "RPG",
     "games": [
-      "poe1",
-      "poe2"
+      "poe1"
     ],
     "description": "Tests the player character's attribute score (Might, Resolve, etc.) against a value.",
     "parameters": [
@@ -2055,6 +2054,60 @@
         "type": "Int32",
         "description": "Gold amount to compare against.",
         "default": "0"
+      }
+    ]
+  },
+  {
+    "methodName": "IsAttributeScoreValue",
+    "fullName": "Boolean IsAttributeScoreValue(Guid, AttributeType, Operator, Int32, Boolean)",
+    "displayName": "Is Attribute Score Value",
+    "category": "RPG",
+    "games": [
+      "poe2"
+    ],
+    "description": "Tests a character's attribute score (Might, Resolve, etc.) against a value.",
+    "parameters": [
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "Character to test.",
+        "default": ""
+      },
+      {
+        "name": "Attribute",
+        "type": "Enum:AttributeType",
+        "description": "Attribute to test.",
+        "default": "Resolve",
+        "options": [
+          "Resolve",
+          "Might",
+          "Dexterity",
+          "Intellect",
+          "Constitution",
+          "Perception"
+        ]
+      },
+      {
+        "name": "Operator",
+        "type": "Operator",
+        "description": "Comparison operator.",
+        "default": "GreaterThanOrEqualTo"
+      },
+      {
+        "name": "Value",
+        "type": "Int32",
+        "description": "Attribute value to compare against.",
+        "default": "0"
+      },
+      {
+        "name": "Hide Notification If Failure",
+        "type": "Boolean",
+        "description": "Suppresses failure notification in scripted interactions.",
+        "default": "false",
+        "options": [
+          "true",
+          "false"
+        ]
       }
     ]
   }
