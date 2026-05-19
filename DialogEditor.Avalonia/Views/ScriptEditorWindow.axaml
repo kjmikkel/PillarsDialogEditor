@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
         x:Class="DialogEditor.Avalonia.Views.ScriptEditorWindow"
-        Title="{Binding NodeTitle, StringFormat='Scripts — {0}'}"
+        Title="{Binding WindowTitle}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="640" Height="600" MinWidth="480" MinHeight="400"
         CanResize="True"

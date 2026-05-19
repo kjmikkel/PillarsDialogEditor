@@ -3,7 +3,7 @@
         xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
         xmlns:types="clr-namespace:DialogEditor.ViewModels.Services;assembly=DialogEditor.ViewModels"
         x:Class="DialogEditor.Avalonia.Views.ConditionEditorWindow"
-        Title="{Binding NodeTitle, StringFormat='Conditions — {0}'}"
+        Title="{Binding WindowTitle}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="640" Height="560" MinWidth="480" MinHeight="360"
         CanResize="True"
