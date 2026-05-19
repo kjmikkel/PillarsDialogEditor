@@ -1,0 +1,97 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DialogEditor.Avalonia.Views.FindReplaceWindow"
+        Title="{StaticResource FindReplace_Title}"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="420" Height="200"
+        CanResize="False"
+        ShowInTaskbar="False"
+        Background="#1e1e1e"
+        WindowStartupLocation="CenterOwner"
+        x:CompileBindings="False">
+
+    <Window.Styles>
+        <Style Selector="TextBox.find-box">
+            <Setter Property="Background"       Value="#141414"/>
+            <Setter Property="Foreground"       Value="#e8e8e8"/>
+            <Setter Property="BorderBrush"      Value="#444"/>
+            <Setter Property="BorderThickness"  Value="1"/>
+            <Setter Property="FontSize"         Value="12"/>
+            <Setter Property="Padding"          Value="6,3"/>
+        </Style>
+        <Style Selector="Button.action-btn">
+            <Setter Property="Background"      Value="#333"/>
+            <Setter Property="Foreground"      Value="#ccc"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"         Value="10,4"/>
+            <Setter Property="FontSize"        Value="11"/>
+            <Setter Property="MinWidth"        Value="80"/>
+        </Style>
+        <Style Selector="Button.primary-btn">
+            <Setter Property="Background"      Value="#1a5276"/>
+            <Setter Property="Foreground"      Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"         Value="10,4"/>
+            <Setter Property="FontSize"        Value="11"/>
+            <Setter Property="MinWidth"        Value="80"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto" Margin="14,10,14,10">
+
+        <!-- Find row -->
+        <Grid Grid.Row="0" ColumnDefinitions="70,*" Margin="0,0,0,6">
+            <TextBlock Grid.Column="0" Text="{StaticResource FindReplace_Find}"
+                       Foreground="#aaa" FontSize="11" VerticalAlignment="Center"/>
+            <TextBox Grid.Column="1" Classes="find-box"
+                     Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     x:Name="SearchBox"
+                     ToolTip.Tip="{StaticResource ToolTip_FindAll}"/>
+        </Grid>
+
+        <!-- Replace row -->
+        <Grid Grid.Row="1" ColumnDefinitions="70,*" Margin="0,0,0,8">
+            <TextBlock Grid.Column="0" Text="{StaticResource FindReplace_Replace}"
+                       Foreground="#aaa" FontSize="11" VerticalAlignment="Center"/>
+            <TextBox Grid.Column="1" Classes="find-box"
+                     Text="{Binding ReplaceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                     ToolTip.Tip="{StaticResource ToolTip_ReplaceAll}"/>
+        </Grid>
+
+        <!-- Options row -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12" Margin="0,0,0,8">
+            <CheckBox IsChecked="{Binding CaseSensitive, Mode=TwoWay}"
+                      Content="{StaticResource FindReplace_CaseSensitive}"
+                      Foreground="#ccc" FontSize="11"
+                      ToolTip.Tip="Match exact capitalisation"/>
+            <TextBlock Text="{Binding StatusText}"
+                       Foreground="#888" FontSize="10"
+                       VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Buttons -->
+        <WrapPanel Grid.Row="3" Orientation="Horizontal" ItemWidth="88">
+            <Button Classes="action-btn" Margin="0,0,4,4"
+                    Content="{StaticResource FindReplace_FindAll}"
+                    Command="{Binding FindCommand}"
+                    ToolTip.Tip="{StaticResource ToolTip_FindAll}"/>
+            <Button Classes="action-btn" Margin="0,0,4,4"
+                    Content="{StaticResource FindReplace_FindPrev}"
+                    Command="{Binding FindPrevCommand}"
+                    ToolTip.Tip="{StaticResource ToolTip_FindPrev}"/>
+            <Button Classes="action-btn" Margin="0,0,4,4"
+                    Content="{StaticResource FindReplace_FindNext}"
+                    Command="{Binding FindNextCommand}"
+                    ToolTip.Tip="{StaticResource ToolTip_FindNext}"/>
+            <Button Classes="action-btn" Margin="0,0,4,4"
+                    Content="{StaticResource FindReplace_Replace}"
+                    Command="{Binding ReplaceCommand}"
+                    ToolTip.Tip="{StaticResource ToolTip_Replace}"/>
+            <Button Classes="primary-btn" Margin="0,0,4,4"
+                    Content="{StaticResource FindReplace_ReplaceAll}"
+                    Command="{Binding ReplaceAllCommand}"
+                    ToolTip.Tip="{StaticResource ToolTip_ReplaceAll}"/>
+        </WrapPanel>
+
+    </Grid>
+</Window>

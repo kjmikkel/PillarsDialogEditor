@@ -69,6 +69,11 @@
                         <MenuItem Header="{StaticResource Button_Redo}"
                                   Command="{Binding Canvas.RedoCommand}"
                                   InputGesture="Ctrl+Y"/>
+                        <Separator/>
+                        <MenuItem Header="{StaticResource Menu_FindReplace}"
+                                  Click="FindReplace_Click"
+                                  InputGesture="Ctrl+H"
+                                  ToolTip.Tip="{StaticResource ToolTip_FindReplace}"/>
                     </MenuItem>
 
                     <MenuItem Header="{StaticResource Menu_Test}">

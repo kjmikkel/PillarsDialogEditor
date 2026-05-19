@@ -18,6 +18,7 @@ public partial class MainWindow : Window
     private double _detailExpandedWidth  = 240;
     private LegendWindow?       _legendWindow;
     private PatchManagerWindow? _patchManagerWindow;
+    private FindReplaceWindow?  _findReplaceWindow;
 
     // Set to true immediately before a programmatic Close() call so that
     // the re-entrant OnClosing doesn't show the dirty-close dialog again.
@@ -117,6 +118,11 @@ public partial class MainWindow : Window
                 e.Handled = true;
                 break;
 
+            case Key.H when e.KeyModifiers == KeyModifiers.Control:
+                FindReplace_Click(null, null!);
+                e.Handled = true;
+                break;
+
             case Key.N when e.KeyModifiers == KeyModifiers.Control:
                 vm.NewProjectCommand.Execute(null);
                 e.Handled = true;
@@ -181,6 +187,19 @@ public partial class MainWindow : Window
                 e.Handled = true;
                 break;
         }
+    }
+
+    private void FindReplace_Click(object? sender, RoutedEventArgs e)
+    {
+        var vm = (MainWindowViewModel)DataContext!;
+        if (_findReplaceWindow is null || !_findReplaceWindow.IsVisible)
+        {
+            var frVm = new FindReplaceViewModel(vm.Canvas);
+            _findReplaceWindow = new FindReplaceWindow(frVm);
+            _findReplaceWindow.Closed += (_, _) => _findReplaceWindow = null;
+        }
+        _findReplaceWindow.Show();
+        _findReplaceWindow.Activate();
     }
 
     private void PatchManager_Click(object? sender, RoutedEventArgs e)
