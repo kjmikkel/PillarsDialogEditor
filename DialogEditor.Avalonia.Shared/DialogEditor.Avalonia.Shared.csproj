@@ -17,4 +17,8 @@
     <ProjectReference Include="..\DialogEditor.ViewModels\DialogEditor.ViewModels.csproj"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <AvaloniaResource Include="Resources\Strings.axaml"/>
+  </ItemGroup>
+
 </Project>
