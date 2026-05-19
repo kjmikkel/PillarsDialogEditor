@@ -255,8 +255,7 @@
     "displayName": "Is Player Class",
     "category": "RPG",
     "games": [
-      "poe1",
-      "poe2"
+      "poe1"
     ],
     "description": "True if the player character is the specified class.",
     "parameters": [
@@ -324,8 +323,7 @@
     "displayName": "Is Player Race",
     "category": "RPG",
     "games": [
-      "poe1",
-      "poe2"
+      "poe1"
     ],
     "description": "True if the player character is the specified race.",
     "parameters": [
@@ -356,8 +354,7 @@
     "displayName": "Is Player Subrace",
     "category": "RPG",
     "games": [
-      "poe1",
-      "poe2"
+      "poe1"
     ],
     "description": "True if the player character is the specified subrace.",
     "parameters": [
@@ -394,8 +391,7 @@
     "displayName": "Is Player Gender",
     "category": "RPG",
     "games": [
-      "poe1",
-      "poe2"
+      "poe1"
     ],
     "description": "True if the player character is the specified gender.",
     "parameters": [
@@ -418,8 +414,7 @@
     "displayName": "Is Player Background",
     "category": "RPG",
     "games": [
-      "poe1",
-      "poe2"
+      "poe1"
     ],
     "description": "True if the player character has the specified background.",
     "parameters": [
@@ -461,8 +456,7 @@
     "displayName": "Is Player Culture",
     "category": "RPG",
     "games": [
-      "poe1",
-      "poe2"
+      "poe1"
     ],
     "description": "True if the player character is from the specified culture.",
     "parameters": [
@@ -1964,5 +1958,34 @@
     ],
     "description": "True if the Deck of Many Things DLC is installed.",
     "parameters": []
+  },
+  {
+    "methodName": "IsGender",
+    "fullName": "Boolean IsGender(Guid, Gender)",
+    "displayName": "Is Gender",
+    "category": "RPG",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the specified character is the given gender.",
+    "parameters": [
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "Character to test.",
+        "default": ""
+      },
+      {
+        "name": "Gender",
+        "type": "Enum:Gender",
+        "description": "Gender to test.",
+        "default": "Male",
+        "options": [
+          "Male",
+          "Female",
+          "Neuter"
+        ]
+      }
+    ]
   }
 ]

@@ -303,10 +303,15 @@ public partial class NodeDetailViewModel : ObservableObject
                 .OfType<ConditionLeaf>()
                 .Select(l =>
                 {
-                    var mn = l.FullName.Contains(' ')
+                    // FindByFullName first so PoE1/PoE2 variants resolve correctly
+                    var entry = ConditionCatalogue.Instance.FindByFullName(l.FullName)
+                             ?? ConditionCatalogue.Instance.Find(
+                                    l.FullName.Contains(' ')
+                                        ? l.FullName[(l.FullName.IndexOf(' ') + 1)..].Split('(')[0]
+                                        : l.FullName);
+                    return entry?.DisplayName ?? (l.FullName.Contains(' ')
                         ? l.FullName[(l.FullName.IndexOf(' ') + 1)..].Split('(')[0]
-                        : l.FullName;
-                    return ConditionCatalogue.Instance.Find(mn)?.DisplayName ?? mn;
+                        : l.FullName);
                 });
             return string.Join(", ", names);
         }
@@ -320,11 +325,14 @@ public partial class NodeDetailViewModel : ObservableObject
         {
             if (c is ConditionLeaf leaf)
             {
-                var entry = ConditionCatalogue.Instance.Find(
-                    leaf.FullName.Contains(' ')
-                        ? leaf.FullName[(leaf.FullName.IndexOf(' ') + 1)..]
-                            .Split('(')[0]
-                        : leaf.FullName);
+                // FindByFullName disambiguates same-named conditions with different
+                // signatures between PoE1 (String) and PoE2 (Guid)
+                var entry = ConditionCatalogue.Instance.FindByFullName(leaf.FullName)
+                         ?? ConditionCatalogue.Instance.Find(
+                                leaf.FullName.Contains(' ')
+                                    ? leaf.FullName[(leaf.FullName.IndexOf(' ') + 1)..]
+                                        .Split('(')[0]
+                                    : leaf.FullName);
                 var row = new ConditionRowViewModel(leaf, entry);
                 SubscribeRow(row);
                 ConditionRows.Add(row);
