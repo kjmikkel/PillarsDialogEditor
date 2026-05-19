@@ -77,4 +77,24 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
         Directory.CreateDirectory(Path.GetDirectoryName(stPath)!);
         StringTableSerializer.SaveToFile(stPath, snapshot.Nodes);
     }
+
+    public ConversationFile BuildNewConversationFile(string name)
+    {
+        var convPath = Path.Combine(ConversationsRoot, name + ".conversation");
+        var stPath   = Path.Combine(StringTablesRoot,  name + ".stringtable");
+        return new ConversationFile(
+            Name: name,
+            FolderPath: string.Empty,
+            ConversationPath: convPath,
+            StringTablePath: stPath);
+    }
+
+    private const string Poe1BlankTemplate =
+        """<?xml version="1.0" encoding="utf-8"?><ConversationData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema"><NextNodeID>0</NextNodeID><Nodes /></ConversationData>""";
+
+    public void InitializeConversationFile(ConversationFile file)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(file.ConversationPath)!);
+        File.WriteAllText(file.ConversationPath, Poe1BlankTemplate, System.Text.Encoding.UTF8);
+    }
 }

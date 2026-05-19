@@ -37,6 +37,7 @@ public partial class MainWindow : Window
         vm.UnsavedChangesRequested += () => _ = ShowUnsavedChangesDialogAsync(vm);
         vm.TestModeEntered += () => TestOverlay.IsVisible = true;
         vm.TestModeExited  += () => TestOverlay.IsVisible = false;
+        vm.RequestConversationName = () => PromptConversationNameAsync();
 
         if (!vm.IsBrowserExpanded)
         {
@@ -317,5 +318,96 @@ public partial class MainWindow : Window
                 vm.CancelPendingNavigation();
                 break;
         }
+    }
+
+    // ── New conversation name dialog ──────────────────────────────────────
+    private async Task<string?> PromptConversationNameAsync()
+    {
+        var title       = (string)(this.FindResource("Dialog_NewConversation_Title")       ?? "New Conversation");
+        var prompt      = (string)(this.FindResource("Dialog_NewConversation_Prompt")      ?? "Conversation name:");
+        var placeholder = (string)(this.FindResource("Dialog_NewConversation_Placeholder") ?? "my_new_conversation");
+
+        var tcs = new TaskCompletionSource<string?>();
+
+        var dialog = new Window
+        {
+            Title  = title,
+            Icon   = Icon,
+            Width  = 460,
+            SizeToContent = SizeToContent.Height,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            CanResize = false,
+            Background = new SolidColorBrush(Color.Parse("#252525")),
+        };
+
+        var panel = new StackPanel { Margin = new Thickness(20) };
+
+        panel.Children.Add(new TextBlock
+        {
+            Text         = prompt,
+            Foreground   = new SolidColorBrush(Color.Parse("#e8e8e8")),
+            FontSize     = 12,
+            TextWrapping = TextWrapping.Wrap,
+            Margin       = new Thickness(0, 0, 0, 10),
+        });
+
+        var nameBox = new TextBox
+        {
+            Watermark       = placeholder,
+            Background      = new SolidColorBrush(Color.Parse("#141414")),
+            Foreground      = new SolidColorBrush(Color.Parse("#e8e8e8")),
+            BorderBrush     = new SolidColorBrush(Color.Parse("#444")),
+            BorderThickness = new Thickness(1),
+            FontSize        = 12,
+            Padding         = new Thickness(6, 4),
+            Margin          = new Thickness(0, 0, 0, 16),
+        };
+        panel.Children.Add(nameBox);
+
+        var buttons = new StackPanel
+        {
+            Orientation         = Orientation.Horizontal,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            Spacing             = 8,
+        };
+
+        var okBtn = new Button
+        {
+            Content         = "Create",
+            Padding         = new Thickness(16, 6),
+            Background      = new SolidColorBrush(Color.Parse("#1a5276")),
+            Foreground      = Brushes.White,
+            BorderThickness = new Thickness(0),
+            FontSize        = 12,
+        };
+        okBtn.Click += (_, _) => { tcs.TrySetResult(nameBox.Text); dialog.Close(); };
+
+        var cancelBtn = new Button
+        {
+            Content         = "Cancel",
+            Padding         = new Thickness(16, 6),
+            Background      = new SolidColorBrush(Color.Parse("#333")),
+            Foreground      = Brushes.White,
+            BorderThickness = new Thickness(0),
+            FontSize        = 12,
+        };
+        cancelBtn.Click += (_, _) => { tcs.TrySetResult(null); dialog.Close(); };
+
+        buttons.Children.Add(cancelBtn);
+        buttons.Children.Add(okBtn);
+        panel.Children.Add(buttons);
+
+        dialog.Content = panel;
+
+        // Focus the TextBox and allow Enter to confirm
+        dialog.Opened += (_, _) => nameBox.Focus();
+        nameBox.KeyDown += (_, e) =>
+        {
+            if (e.Key == Key.Enter)  { tcs.TrySetResult(nameBox.Text); dialog.Close(); }
+            if (e.Key == Key.Escape) { tcs.TrySetResult(null);         dialog.Close(); }
+        };
+
+        await dialog.ShowDialog(this);
+        return await tcs.Task;
     }
 }

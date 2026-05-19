@@ -118,7 +118,8 @@ public partial class GameBrowserViewModel : ObservableObject
         }
     }
 
-    public void Load(IGameDataProvider provider)
+    public void Load(IGameDataProvider provider,
+                     IReadOnlyList<string>? newConversationNames = null)
     {
         _filterCts?.Cancel();
         GameName = provider.GameName;
@@ -135,6 +136,18 @@ public partial class GameBrowserViewModel : ObservableObject
             foreach (var file in group)
                 folder.Items.Add(new ConversationItemViewModel(file));
             Folders.Add(folder);
+        }
+
+        if (newConversationNames is { Count: > 0 })
+        {
+            var newFolder = new ConversationFolderViewModel("(new)", isExpanded: true);
+            foreach (var name in newConversationNames)
+            {
+                var file = provider.BuildNewConversationFile(name);
+                newFolder.Items.Add(new ConversationItemViewModel(file, isNew: true));
+            }
+            // Insert at the top so new conversations are immediately visible
+            Folders.Insert(0, newFolder);
         }
     }
 }
