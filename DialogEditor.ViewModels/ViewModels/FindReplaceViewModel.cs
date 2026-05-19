@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.ViewModels;
 
@@ -55,9 +56,9 @@ public partial class FindReplaceViewModel : ObservableObject
 
         Results       = results;
         CurrentIndex  = results.Count > 0 ? 0 : -1;
-        StatusText    = results.Count > 0
-            ? $"{results.Count} match{(results.Count == 1 ? "" : "es")}"
-            : "No matches";
+        StatusText = results.Count > 0
+            ? Loc.Format("FindReplace_Matches", results.Count)
+            : Loc.Get("FindReplace_NoMatches");
 
         OnPropertyChanged(nameof(Results));
         SelectCurrent();
@@ -74,7 +75,7 @@ public partial class FindReplaceViewModel : ObservableObject
     {
         if (Results.Count == 0) return;
         CurrentIndex = (CurrentIndex + 1) % Results.Count;
-        StatusText   = $"{CurrentIndex + 1} / {Results.Count}";
+        StatusText   = Loc.Format("FindReplace_Navigation", CurrentIndex + 1, Results.Count);
         SelectCurrent();
     }
 
@@ -83,7 +84,7 @@ public partial class FindReplaceViewModel : ObservableObject
     {
         if (Results.Count == 0) return;
         CurrentIndex = (CurrentIndex - 1 + Results.Count) % Results.Count;
-        StatusText   = $"{CurrentIndex + 1} / {Results.Count}";
+        StatusText   = Loc.Format("FindReplace_Navigation", CurrentIndex + 1, Results.Count);
         SelectCurrent();
     }
 
@@ -118,9 +119,9 @@ public partial class FindReplaceViewModel : ObservableObject
         var count = Results.Count;
         Results      = [];
         CurrentIndex = -1;
-        StatusText   = count > 0
-            ? $"Replaced {count} match{(count == 1 ? "" : "es")}"
-            : "Nothing replaced";
+        StatusText = count > 0
+            ? Loc.Format("FindReplace_Replaced", count)
+            : Loc.Get("FindReplace_NothingReplaced");
 
         OnPropertyChanged(nameof(Results));
         ReplaceAllCommand.NotifyCanExecuteChanged();

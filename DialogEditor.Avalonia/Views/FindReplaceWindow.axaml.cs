@@ -1,5 +1,4 @@
 using Avalonia.Controls;
-using Avalonia.Interactivity;
 using DialogEditor.ViewModels;
 
 namespace DialogEditor.Avalonia.Views;
