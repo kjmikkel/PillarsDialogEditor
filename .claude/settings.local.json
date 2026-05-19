@@ -67,7 +67,17 @@
       "Bash(Select-Object -First 20 FullName)",
       "Bash(git push *)",
       "Bash(sed -i 's/links ?? \\\\[\\\\], \\\\[\\\\]\\);$/links ?? [], [], []\\);/' DialogEditor.Tests/Serialization/Poe1ConversationSerializerTests.cs DialogEditor.Tests/Serialization/Poe2ConversationSerializerTests.cs)",
-      "Bash(sed -i 's/, \\\\[\\\\]\\)\\\\]$/, [], []\\)]/' DialogEditor.Tests/Patch/DialogProjectTests.cs)"
+      "Bash(sed -i 's/, \\\\[\\\\]\\)\\\\]$/, [], []\\)]/' DialogEditor.Tests/Patch/DialogProjectTests.cs)",
+      "Bash(grep -v \"^--$\")",
+      "Bash(grep -v \"Scripts\\\\\\\\\\\\\\\\AI\\\\|Scripts\\\\\\\\\\\\\\\\Audio\\\\|Scripts\\\\\\\\\\\\\\\\Cam\\\\|Scripts\\\\\\\\\\\\\\\\Anim\\\\|Scripts\\\\\\\\\\\\\\\\Particle\\\\|Scripts\\\\\\\\\\\\\\\\Test\\\\|Scripts\\\\\\\\\\\\\\\\Debug\\\\|Scripts\\\\\\\\\\\\\\\\VFX\\\\|Scripts\\\\\\\\\\\\\\\\Cinemachine\")",
+      "Bash(grep -A6 'Scripts\\\\\\\\\\\\\\\\Quest\\\\|Scripts\\\\\\\\\\\\\\\\Globals\\\\|Scripts\\\\\\\\\\\\\\\\Items\\\\|Scripts\\\\\\\\\\\\\\\\Party\\\\|Scripts\\\\\\\\\\\\\\\\Conversation\\\\|Scripts\\\\\\\\\\\\\\\\Reputation\\\\|Scripts\\\\\\\\\\\\\\\\Disposition\\\\|Scripts\\\\\\\\\\\\\\\\OCL\\\\|Scripts\\\\\\\\\\\\\\\\Fade\\\\|Scripts\\\\\\\\\\\\\\\\Area\\\\|Scripts\\\\\\\\\\\\\\\\General' \"C:/Users/kjmik/Documents/Programming/Deadfire/PoE2 Code/Assembly-CSharp/Game/Scripts.cs\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\kjmik\\\\Documents\\\\Programming\\\\Deadfire\\\\Dialog Editor\" -Recurse -Filter \"*.axaml\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\kjmik\\\\Documents\\\\Programming\\\\Deadfire\\\\Dialog Editor\" -Directory)",
+      "Bash(Select-Object Name)",
+      "Bash(grep -v 'Content=\"✕\\\\|Content=\"↑\\\\|Content=\"↓\\\\|Content=\"\\\\.\\\\.\\\\.\\\\|Content=\"\\(?\\)\\\\|Content=\"OK\\\\|Content=\"Cancel\\\\|Content=\"\\\\+\\\\|Content=\"\\\\s*$')",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\kjmik\\\\Documents\\\\Programming\\\\Deadfire\\\\PoE1 Code\" -Filter \"*.conversation\" -Recurse -ErrorAction SilentlyContinue)",
+      "Bash(Select-Object -First 1 FullName)",
+      "Bash(grep -v \"^\\\\s*//\")"
     ]
   }
 }

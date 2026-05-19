@@ -3,6 +3,7 @@
   <Project Path="DialogEditor.Patch/DialogEditor.Patch.csproj" />
   <Project Path="DialogEditor.Tests/DialogEditor.Tests.csproj" />
   <Project Path="DialogEditor.ViewModels/DialogEditor.ViewModels.csproj" />
+  <Project Path="DialogEditor.Avalonia.Shared/DialogEditor.Avalonia.Shared.csproj" />
   <Project Path="DialogEditor.Avalonia/DialogEditor.Avalonia.csproj" />
   <Project Path="DialogEditor.PatchManager/DialogEditor.PatchManager.csproj" />
 </Solution>

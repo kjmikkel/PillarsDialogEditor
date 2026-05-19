@@ -1,5 +1,5 @@
 using Avalonia.Controls;
-using DialogEditor.PatchManager.Services;
+using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.ViewModels;
 
 namespace DialogEditor.PatchManager;
@@ -15,7 +15,6 @@ public partial class MainWindow : Window
         DataContext = vm;
     }
 
-    /// Opens the window with a pre-loaded .patchlist file (e.g. from a command-line argument).
     public void LoadPatchList(string path) =>
         ((PatchManagerViewModel)DataContext!).LoadFromFile(path);
 }

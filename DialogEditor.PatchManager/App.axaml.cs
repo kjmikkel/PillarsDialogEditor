@@ -1,7 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using DialogEditor.PatchManager.Services;
+using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.PatchManager;

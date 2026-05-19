@@ -2,7 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using DialogEditor.ViewModels.Services;
 
-namespace DialogEditor.PatchManager.Services;
+namespace DialogEditor.Avalonia.Shared.Services;
 
 public sealed class AvaloniaFolderPicker(TopLevel topLevel) : IFolderPicker
 {

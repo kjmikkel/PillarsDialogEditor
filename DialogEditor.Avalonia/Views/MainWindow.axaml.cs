@@ -6,6 +6,7 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using DialogEditor.Avalonia.Services;
+using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Services;
 

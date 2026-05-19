@@ -2,41 +2,10 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=System.Runtime">
 
-    <!-- Patch Manager strings — standalone app edition -->
-    <sys:String x:Key="PatchManager_Title">Patch Manager</sys:String>
+    <!-- Standalone-app-only strings (general editor keys not in the shared lib) -->
     <sys:String x:Key="PatchManager_WindowTitle">Patch Manager — Pillars Dialog Editor</sys:String>
-
-    <!-- Keys used by PatchManagerViewModel (Loc.Get/Format) -->
     <sys:String x:Key="Dialog_SelectFolder">Select game root folder</sys:String>
     <sys:String x:Key="FileType_DialogProject">Dialog Project (*.dialogproject)</sys:String>
-    <sys:String x:Key="FileType_PatchList">Patch List (*.patchlist)</sys:String>
     <sys:String x:Key="Status_FolderNotRecognized">Folder not recognised as PoE1 or PoE2 root.</sys:String>
-    <sys:String x:Key="PatchManager_NoConflicts">No conflicts detected.</sys:String>
-    <sys:String x:Key="PatchManager_ConflictsFound">{0} conflict(s) detected — reorder so the version you want is lowest in the list.</sys:String>
-    <sys:String x:Key="PatchManager_ApplySuccess">Applied {0} patch(es) to {1}.</sys:String>
-    <sys:String x:Key="PatchManager_ApplyError">Apply failed: {0}</sys:String>
-    <sys:String x:Key="PatchManager_LoadError">Could not load '{0}': {1}</sys:String>
-
-    <sys:String x:Key="PatchManager_GameFolder">Game folder</sys:String>
-    <sys:String x:Key="PatchManager_GameFolderWatermark">(no game folder selected)</sys:String>
-    <sys:String x:Key="PatchManager_BrowseGame">Browse…</sys:String>
-    <sys:String x:Key="PatchManager_LoadOrder">Load Order</sys:String>
-    <sys:String x:Key="PatchManager_SaveLoadOrder">Save load order…</sys:String>
-    <sys:String x:Key="PatchManager_LoadLoadOrder">Load load order…</sys:String>
-    <sys:String x:Key="PatchManager_AddProjects">Add project(s)…</sys:String>
-    <sys:String x:Key="PatchManager_Apply">Apply patches</sys:String>
-    <sys:String x:Key="PatchManager_Applying">Applying…</sys:String>
-    <sys:String x:Key="PatchManager_EmptyHint">Add .dialogproject files above. Lower entries win on conflict.</sys:String>
-    <sys:String x:Key="PatchManager_OrderHint">↑ First applied   ↓ Last applied (wins on conflict)</sys:String>
-    <sys:String x:Key="PatchManager_EntryConflictDetail">Conflicts with another project — move lower to override the other, or higher to be overridden</sys:String>
-
-    <sys:String x:Key="ToolTip_BrowseGameFolder">Select the root folder of your PoE1 or PoE2 installation</sys:String>
-    <sys:String x:Key="ToolTip_AddProjects">Add one or more .dialogproject files to the load order</sys:String>
-    <sys:String x:Key="ToolTip_SaveLoadOrder">Save the current load order to a .patchlist file for later reuse</sys:String>
-    <sys:String x:Key="ToolTip_LoadLoadOrder">Open a previously saved .patchlist file</sys:String>
-    <sys:String x:Key="ToolTip_MoveEntryUp">Move up — lower index is applied first; lower position wins on conflict</sys:String>
-    <sys:String x:Key="ToolTip_MoveEntryDown">Move down — lower position in the list wins on conflict</sys:String>
-    <sys:String x:Key="ToolTip_RemoveEntry">Remove from load order</sys:String>
-    <sys:String x:Key="ToolTip_ApplyPatches">Apply all patches to the game folder in load order. Lower entries win on conflict.</sys:String>
 
 </ResourceDictionary>
