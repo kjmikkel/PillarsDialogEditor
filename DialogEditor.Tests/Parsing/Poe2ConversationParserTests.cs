@@ -280,10 +280,10 @@ public class Poe2ConversationParserTests
     {
         var nodes = Poe2ConversationParser.ParseJson(ScriptedTalkNodeJson);
         Assert.Equal(2, nodes[0].Scripts.Count);
-        Assert.Contains("[Enter]", nodes[0].Scripts[0]);
-        Assert.Contains("ActivateObject", nodes[0].Scripts[0]);
-        Assert.Contains("[Exit]", nodes[0].Scripts[1]);
-        Assert.Contains("DeactivateObject", nodes[0].Scripts[1]);
+        Assert.Equal(ScriptCategory.Enter, nodes[0].Scripts[0].Category);
+        Assert.Contains("ActivateObject", nodes[0].Scripts[0].FullName);
+        Assert.Equal(ScriptCategory.Exit, nodes[0].Scripts[1].Category);
+        Assert.Contains("DeactivateObject", nodes[0].Scripts[1].FullName);
     }
 
     private const string VoiceFieldsJson = """

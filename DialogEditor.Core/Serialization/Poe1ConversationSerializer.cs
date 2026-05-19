@@ -1,6 +1,7 @@
 using System.Text;
 using System.Xml.Linq;
 using DialogEditor.Core.Editing;
+using DialogEditor.Core.Models;
 
 namespace DialogEditor.Core.Serialization;
 
@@ -43,6 +44,19 @@ public static class Poe1ConversationSerializer
         SetOrAdd(node, "Comments",       snap.Comments);
         SetOrAdd(node, "VOFilename",     snap.ExternalVO);
 
+        // Update script lists from snapshot
+        ReplaceScripts(node, "OnEnterScripts",  snap.Scripts, ScriptCategory.Enter);
+        ReplaceScripts(node, "OnExitScripts",   snap.Scripts, ScriptCategory.Exit);
+        ReplaceScripts(node, "OnUpdateScripts", snap.Scripts, ScriptCategory.Update);
+
+        // Update condition tree from snapshot
+        var condElem = node.Element("Conditionals") ?? new XElement("Conditionals");
+        if (node.Element("Conditionals") is null) node.Add(condElem);
+        var compElem = condElem.Element("Components") ?? new XElement("Components");
+        if (condElem.Element("Components") is null) condElem.Add(compElem);
+        compElem.RemoveAll();
+        foreach (var c in snap.Conditions) compElem.Add(BuildConditionXml(c));
+
         var linksElem = node.Element("Links") ?? new XElement("Links");
         if (node.Element("Links") is null) node.Add(linksElem);
         var origLinks = linksElem.Elements("FlowChartLink").ToList();
@@ -58,6 +72,16 @@ public static class Poe1ConversationSerializer
             {
                 orig.Element("RandomWeight")!.Value            = link.RandomWeight.ToString();
                 orig.Element("QuestionNodeTextDisplay")!.Value = link.QuestionNodeTextDisplay;
+                // Update link conditions when the snapshot carries them
+                if (link.Conditions is { Count: >= 0 })
+                {
+                    var lc = orig.Element("Conditionals") ?? new XElement("Conditionals");
+                    if (orig.Element("Conditionals") is null) orig.Add(lc);
+                    var lcc = lc.Element("Components") ?? new XElement("Components");
+                    if (lc.Element("Components") is null) lc.Add(lcc);
+                    lcc.RemoveAll();
+                    foreach (var c in link.Conditions) lcc.Add(BuildConditionXml(c));
+                }
                 linksElem.Add(orig);
             }
             else
@@ -73,22 +97,82 @@ public static class Poe1ConversationSerializer
         new XElement("SpeakerGuid",  snap.SpeakerGuid),
         new XElement("ListenerGuid", snap.ListenerGuid),
         new XElement("Links"),
-        new XElement("Conditionals", new XElement("Components")),
-        new XElement("OnEnterScripts"),
-        new XElement("OnExitScripts"),
-        new XElement("OnUpdateScripts"),
+        new XElement("Conditionals",
+            new XElement("Components",
+                snap.Conditions.Select(c => BuildConditionXml(c)))),
+        BuildScriptListXml("OnEnterScripts",  snap.Scripts, ScriptCategory.Enter),
+        BuildScriptListXml("OnExitScripts",   snap.Scripts, ScriptCategory.Exit),
+        BuildScriptListXml("OnUpdateScripts", snap.Scripts, ScriptCategory.Update),
         new XElement("DisplayType",    snap.DisplayType),
         new XElement("Persistence",    snap.Persistence),
         new XElement("ActorDirection", snap.ActorDirection),
         new XElement("Comments",       snap.Comments),
         new XElement("VOFilename",     snap.ExternalVO));
 
+    private static XElement BuildConditionXml(ConditionNode node)
+    {
+        if (node is ConditionLeaf leaf)
+        {
+            return new XElement("ExpressionComponent",
+                new XAttribute(Xsi + "type", "ConditionalCall"),
+                new XElement("Data",
+                    new XElement("FullName", leaf.FullName),
+                    new XElement("Parameters",
+                        leaf.Parameters.Select(p => new XElement("string", p)))),
+                new XElement("Not",      leaf.Not),
+                new XElement("Operator", leaf.Operator));
+        }
+
+        var branch = (ConditionBranch)node;
+        return new XElement("ExpressionComponent",
+            new XAttribute(Xsi + "type", "ConditionalExpression"),
+            new XElement("Components",
+                branch.Components.Select(c => BuildConditionXml(c))),
+            new XElement("Not",      branch.Not),
+            new XElement("Operator", branch.Operator));
+    }
+
     private static XElement BuildNewLink(LinkEditSnapshot link) => new("FlowChartLink",
         new XElement("FromNodeID",              link.FromNodeId),
         new XElement("ToNodeID",                link.ToNodeId),
         new XElement("RandomWeight",            link.RandomWeight),
         new XElement("QuestionNodeTextDisplay", link.QuestionNodeTextDisplay),
-        new XElement("Conditionals",            new XElement("Components")));
+        new XElement("Conditionals",
+            new XElement("Components",
+                (link.Conditions ?? []).Select(c => BuildConditionXml(c)))));
+
+    private static XElement BuildScriptListXml(
+        string elementName,
+        IReadOnlyList<ScriptCall> scripts,
+        ScriptCategory category)
+    {
+        var calls = scripts.Where(s => s.Category == category)
+            .Select(s => new XElement("ScriptCall",
+                new XAttribute(Xsi + "type", "ConditionalCall"),
+                new XElement("Data",
+                    new XElement("FullName", s.FullName),
+                    new XElement("Parameters",
+                        s.Parameters.Select(p => new XElement("string", p))))));
+        return new XElement(elementName, calls);
+    }
+
+    private static void ReplaceScripts(
+        XElement node,
+        string elementName,
+        IReadOnlyList<ScriptCall> scripts,
+        ScriptCategory category)
+    {
+        var elem = node.Element(elementName);
+        if (elem is null) { node.Add(BuildScriptListXml(elementName, scripts, category)); return; }
+        elem.RemoveAll();
+        foreach (var s in scripts.Where(sc => sc.Category == category))
+            elem.Add(new XElement("ScriptCall",
+                new XAttribute(Xsi + "type", "ConditionalCall"),
+                new XElement("Data",
+                    new XElement("FullName", s.FullName),
+                    new XElement("Parameters",
+                        s.Parameters.Select(p => new XElement("string", p))))));
+    }
 
     private static void SetOrAdd(XElement parent, string name, string value)
     {

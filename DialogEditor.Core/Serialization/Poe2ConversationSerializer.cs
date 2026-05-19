@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using DialogEditor.Core.Editing;
+using DialogEditor.Core.Models;
 
 namespace DialogEditor.Core.Serialization;
 
@@ -51,7 +52,11 @@ public static class Poe2ConversationSerializer
         node["HideSpeaker"]  = snap.HideSpeaker;
         node["HasVO"]        = snap.HasVO;
         node["ExternalVO"]   = snap.ExternalVO;
-        node["Links"]        = BuildLinks(snap.Links, original["Links"]?.AsArray());
+        node["Links"]            = BuildLinks(snap.Links, original["Links"]?.AsArray());
+        node["Conditionals"]     = BuildConditionJson(snap.Conditions);
+        node["OnEnterScripts"]   = BuildScriptListJson(snap.Scripts, ScriptCategory.Enter);
+        node["OnExitScripts"]    = BuildScriptListJson(snap.Scripts, ScriptCategory.Exit);
+        node["OnUpdateScripts"]  = BuildScriptListJson(snap.Scripts, ScriptCategory.Update);
     }
 
     private static JsonArray BuildLinks(IReadOnlyList<LinkEditSnapshot> links, JsonArray? originalLinks)
@@ -68,6 +73,9 @@ public static class Poe2ConversationSerializer
                 var cloned = JsonNode.Parse(orig.ToJsonString())!;
                 cloned["RandomWeight"]            = link.RandomWeight;
                 cloned["QuestionNodeTextDisplay"] = MapQuestionDisplay(link.QuestionNodeTextDisplay);
+                // Update link conditions when the snapshot carries them
+                if (link.Conditions is { Count: >= 0 })
+                    cloned["Conditionals"] = BuildConditionJson(link.Conditions);
                 arr.Add(cloned);
             }
             else
@@ -78,7 +86,38 @@ public static class Poe2ConversationSerializer
         return arr;
     }
 
-    private static JsonNode BuildNewNode(NodeEditSnapshot snap) => JsonNode.Parse($$"""
+    private static JsonNode BuildNewNode(NodeEditSnapshot snap)
+    {
+        var node = BuildNewNodeBase(snap);
+        node["Conditionals"]    = BuildConditionJson(snap.Conditions);
+        node["OnEnterScripts"]  = BuildScriptListJson(snap.Scripts, ScriptCategory.Enter);
+        node["OnExitScripts"]   = BuildScriptListJson(snap.Scripts, ScriptCategory.Exit);
+        node["OnUpdateScripts"] = BuildScriptListJson(snap.Scripts, ScriptCategory.Update);
+        return node;
+    }
+
+    private static JsonArray BuildScriptListJson(
+        IReadOnlyList<ScriptCall> scripts,
+        ScriptCategory category)
+    {
+        var arr = new JsonArray();
+        foreach (var s in scripts.Where(sc => sc.Category == category))
+        {
+            var parameters = new JsonArray();
+            foreach (var p in s.Parameters) parameters.Add(JsonValue.Create(p));
+            arr.Add(new JsonObject
+            {
+                ["Data"] = new JsonObject
+                {
+                    ["FullName"]   = s.FullName,
+                    ["Parameters"] = parameters,
+                },
+            });
+        }
+        return arr;
+    }
+
+    private static JsonNode BuildNewNodeBase(NodeEditSnapshot snap) => JsonNode.Parse($$"""
         {
           "$type": "{{(snap.IsPlayerChoice ? PlayerNodeType : TalkNodeType)}}",
           "SpeakerGuid":  "{{snap.SpeakerGuid}}",
@@ -100,19 +139,63 @@ public static class Poe2ConversationSerializer
         }
         """)!;
 
-    private static JsonNode BuildNewLink(LinkEditSnapshot link) => JsonNode.Parse($$"""
+    private static JsonNode BuildNewLink(LinkEditSnapshot link)
+    {
+        var node = JsonNode.Parse($$"""
+            {
+              "$type": "{{DialogueLinkType}}",
+              "FromNodeID": {{link.FromNodeId}},
+              "ToNodeID": {{link.ToNodeId}},
+              "PointsToGhost": false,
+              "Conditionals": {"Operator": 0, "Components": []},
+              "ClassExtender": {"ExtendedProperties": []},
+              "RandomWeight": {{link.RandomWeight}},
+              "PlayQuestionNodeVO": true,
+              "QuestionNodeTextDisplay": {{MapQuestionDisplay(link.QuestionNodeTextDisplay)}}
+            }
+            """)!;
+        if (link.Conditions is { Count: > 0 })
+            node["Conditionals"] = BuildConditionJson(link.Conditions);
+        return node;
+    }
+
+    private static JsonNode BuildConditionJson(IReadOnlyList<ConditionNode> conditions)
+    {
+        var components = new JsonArray();
+        foreach (var c in conditions)
+            components.Add(BuildConditionComponentJson(c));
+        return new JsonObject { ["Operator"] = 0, ["Components"] = components };
+    }
+
+    private static JsonNode BuildConditionComponentJson(ConditionNode node)
+    {
+        if (node is ConditionLeaf leaf)
         {
-          "$type": "{{DialogueLinkType}}",
-          "FromNodeID": {{link.FromNodeId}},
-          "ToNodeID": {{link.ToNodeId}},
-          "PointsToGhost": false,
-          "Conditionals": {"Operator": 0, "Components": []},
-          "ClassExtender": {"ExtendedProperties": []},
-          "RandomWeight": {{link.RandomWeight}},
-          "PlayQuestionNodeVO": true,
-          "QuestionNodeTextDisplay": {{MapQuestionDisplay(link.QuestionNodeTextDisplay)}}
+            var parameters = new JsonArray();
+            foreach (var p in leaf.Parameters) parameters.Add(JsonValue.Create(p));
+            return new JsonObject
+            {
+                ["$type"] = "OEIFormats.FlowCharts.ConditionalCall, OEIFormats",
+                ["Data"]  = new JsonObject
+                {
+                    ["FullName"]   = leaf.FullName,
+                    ["Parameters"] = parameters,
+                },
+                ["Not"]      = leaf.Not,
+                ["Operator"] = leaf.Operator == "Or" ? 1 : 0,
+            };
         }
-        """)!;
+        var branch     = (ConditionBranch)node;
+        var childComps = new JsonArray();
+        foreach (var c in branch.Components) childComps.Add(BuildConditionComponentJson(c));
+        return new JsonObject
+        {
+            ["$type"]      = "OEIFormats.FlowCharts.ConditionalExpression, OEIFormats",
+            ["Components"] = childComps,
+            ["Not"]        = branch.Not,
+            ["Operator"]   = branch.Operator == "Or" ? 1 : 0,
+        };
+    }
 
     private static int MapDisplayType(string s)     => s == "Bark"     ? 1 : 0;
     private static int MapPersistence(string s)     => s == "OnceEver" ? 1 : 0;

@@ -5,6 +5,7 @@ using DialogEditor.Core.Editing;
 using DialogEditor.Core.Layout;
 using DialogEditor.Core.Models;
 using DialogEditor.ViewModels.Editing;
+using DialogEditor.ViewModels.Models;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
 
@@ -17,17 +18,98 @@ public partial class ConversationViewModel : ObservableObject
 
     public PendingConnectionViewModel PendingConnection { get; }
 
+    private readonly HashSet<NodeViewModel> _subscribedNodes = [];
+
     public ConversationViewModel(IDispatcher dispatcher)
     {
         _dispatcher       = dispatcher;
         PendingConnection = new PendingConnectionViewModel(this);
-        Nodes.CollectionChanged += (_, _) => OnPropertyChanged(nameof(NodeCountText));
+        Nodes.CollectionChanged += (_, args) =>
+        {
+            if (args.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+            {
+                // Clear() fires Reset with OldItems=null — unsubscribe via tracked set
+                foreach (var n in _subscribedNodes)
+                    n.PropertyChanged -= OnNodeTextChanged;
+                _subscribedNodes.Clear();
+            }
+            else
+            {
+                if (args.NewItems is not null)
+                    foreach (NodeViewModel n in args.NewItems)
+                    {
+                        n.PropertyChanged += OnNodeTextChanged;
+                        _subscribedNodes.Add(n);
+                    }
+                if (args.OldItems is not null)
+                    foreach (NodeViewModel n in args.OldItems)
+                    {
+                        n.PropertyChanged -= OnNodeTextChanged;
+                        _subscribedNodes.Remove(n);
+                    }
+            }
+            RefreshStatistics();
+        };
     }
 
     public ObservableCollection<NodeViewModel>      Nodes       { get; } = [];
     public ObservableCollection<ConnectionViewModel> Connections { get; } = [];
 
-    public string NodeCountText => Loc.Format("Node_CountFormat", Nodes.Count);
+    private void OnNodeTextChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(NodeViewModel.DefaultText)
+                           or nameof(NodeViewModel.FemaleText)
+                           or nameof(NodeViewModel.IsPlayerChoice))
+            RefreshStatistics();
+    }
+
+    private void RefreshStatistics()
+    {
+        OnPropertyChanged(nameof(Statistics));
+        OnPropertyChanged(nameof(StatisticsText));
+        OnPropertyChanged(nameof(StatisticsTooltip));
+    }
+
+    public ConversationStatistics Statistics
+    {
+        get
+        {
+            int npc = 0, player = 0, words = 0, femaleWords = 0;
+            foreach (var n in Nodes)
+            {
+                if (n.IsPlayerChoice) player++; else npc++;
+                words       += CountWords(n.DefaultText);
+                femaleWords += CountWords(n.FemaleText);
+            }
+            return new ConversationStatistics(Nodes.Count, npc, player, words, femaleWords);
+        }
+    }
+
+    public string StatisticsText
+    {
+        get
+        {
+            var s = Statistics;
+            return Loc.Format("Statistics_Summary", s.NodeCount, s.NpcCount, s.PlayerCount, s.WordCount);
+        }
+    }
+
+    public string StatisticsTooltip
+    {
+        get
+        {
+            var s = Statistics;
+            return s.FemaleWordCount > 0
+                ? Loc.Format("Statistics_FemaleDetail", s.FemaleWordCount)
+                : Loc.Get("ToolTip_Statistics");
+        }
+    }
+
+    private static int CountWords(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return 0;
+        return text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).Length;
+    }
 
     [ObservableProperty]
     private NodeViewModel? _selectedNode;
@@ -38,6 +120,12 @@ public partial class ConversationViewModel : ObservableObject
 
     [ObservableProperty]
     private bool _isModified;
+
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(DeleteNodeCmdCommand))]
+    [NotifyCanExecuteChangedFor(nameof(AddConnectedNodeCmdCommand))]
+    [NotifyCanExecuteChangedFor(nameof(DeleteConnectionCmdCommand))]
+    private bool _isEditable;
 
     // ── Undo/Redo state ───────────────────────────────────────────────────
     public bool    CanUndo         => _undoStack.CanUndo;
@@ -125,6 +213,9 @@ public partial class ConversationViewModel : ObservableObject
         node.DefaultText.Contains(q, StringComparison.OrdinalIgnoreCase) ||
         node.SpeakerName.Contains(q, StringComparison.OrdinalIgnoreCase);
 
+    // ── Base snapshot (used for patch diffing) ────────────────────────────
+    internal ConversationEditSnapshot? BaseSnapshot { get; private set; }
+
     // ── Load ──────────────────────────────────────────────────────────────
     public void Load(Conversation conversation)
     {
@@ -135,6 +226,7 @@ public partial class ConversationViewModel : ObservableObject
         Connections.Clear();
         SelectedNode = null;
         SearchQuery  = string.Empty;
+        BaseSnapshot = null;
         RefreshUndoRedo();
 
         var nodeMap = new Dictionary<int, NodeViewModel>();
@@ -165,11 +257,14 @@ public partial class ConversationViewModel : ObservableObject
                 if (nodeMap.TryGetValue(link.FromNodeId, out var src) &&
                     nodeMap.TryGetValue(link.ToNodeId,   out var tgt))
                 {
-                    Connections.Add(new ConnectionViewModel(src.Output, tgt.Input,
-                        link.QuestionNodeTextDisplay));
+                    var conn = new ConnectionViewModel(src.Output, tgt.Input,
+                        link.QuestionNodeTextDisplay, link.RandomWeight, link.Conditions)
+                        { UndoStack = _undoStack };
+                    Connections.Add(conn);
                 }
             }
         }
+        BaseSnapshot = BuildSnapshot();
     }
 
     // ── Structural edit methods ───────────────────────────────────────────
@@ -197,7 +292,7 @@ public partial class ConversationViewModel : ObservableObject
 
     public void AddConnection(ConnectorViewModel source, ConnectorViewModel target)
     {
-        var conn = new ConnectionViewModel(source, target);
+        var conn = new ConnectionViewModel(source, target) { UndoStack = _undoStack };
         _undoStack.Execute(new AddConnectionCommand(this, conn));
         IsModified = true;
         RefreshUndoRedo();
@@ -214,7 +309,7 @@ public partial class ConversationViewModel : ObservableObject
     {
         var newId  = NodeIdAllocator.Next(Nodes.Select(n => n.NodeId));
         var newNode = new NodeViewModel(
-            new ConversationNode(newId, false, SpeakerCategory.Npc,
+            new ConversationNode(newId, false, parent.SpeakerCategory,
                 parent.SpeakerGuid, parent.ListenerGuid, [], [], [],
                 parent.DisplayType, parent.Persistence),
             new StringEntry(newId, string.Empty, string.Empty));
@@ -226,30 +321,41 @@ public partial class ConversationViewModel : ObservableObject
 
         _undoStack.Execute(new AddNodeCommand(this, newNode));
         _undoStack.Execute(new AddConnectionCommand(this,
-            new ConnectionViewModel(parent.Output, newNode.Input)));
+            new ConnectionViewModel(parent.Output, newNode.Input) { UndoStack = _undoStack }));
         IsModified   = true;
         SelectedNode = newNode;
         RefreshUndoRedo();
     }
 
     // ── Relay commands for UI binding (context menus, keyboard) ───────────
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditable))]
     private void DeleteNodeCmd(NodeViewModel? node)
     {
         if (node is not null) DeleteNode(node);
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditable))]
     private void AddConnectedNodeCmd(NodeViewModel? parent)
     {
         if (parent is null) return;
         AddConnectedNode(parent, new LayoutPoint(parent.Location.X + 250, parent.Location.Y));
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditable))]
     private void DeleteConnectionCmd(ConnectionViewModel? connection)
     {
         if (connection is not null) DeleteConnection(connection);
+    }
+
+    // ── Layout helpers ────────────────────────────────────────────────────
+    public IReadOnlyDictionary<int, LayoutPoint> GetCurrentLayout() =>
+        Nodes.ToDictionary(n => n.NodeId, n => n.Location);
+
+    public void RestoreLayout(IReadOnlyDictionary<int, LayoutPoint> positions)
+    {
+        foreach (var node in Nodes)
+            if (positions.TryGetValue(node.NodeId, out var pos))
+                node.Location = pos;
     }
 
     // ── Snapshot for save ─────────────────────────────────────────────────
@@ -261,9 +367,10 @@ public partial class ConversationViewModel : ObservableObject
                 .Select(c => new LinkEditSnapshot(
                     n.NodeId,
                     c.Target.Owner!.NodeId,
-                    1f,
+                    c.RandomWeight,
                     c.QuestionNodeTextDisplay,
-                    c.HasConditions))
+                    c.HasConditions)
+                    { Conditions = c.Conditions })
                 .ToList();
             return n.ToSnapshot(links);
         }).ToList());

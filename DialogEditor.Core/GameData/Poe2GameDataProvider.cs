@@ -8,6 +8,7 @@ namespace DialogEditor.Core.GameData;
 public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
 {
     public string GameName => "Pillars of Eternity II: Deadfire";
+    public string GameId   => "poe2";
     public string Language { get; set; } = "en";
 
     private string ExportedRoot    => Path.Combine(rootPath, "PillarsOfEternityII_Data", "exported");
@@ -54,6 +55,9 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
         return new Conversation(file.Name, nodes, strings);
     }
 
+    public string GetStringTablePath(ConversationFile file)
+        => StringTablePathFor(file.ConversationPath);
+
     private string StringTablePathFor(string convPath)
     {
         var relative = Path.GetRelativePath(ConversationsRoot, convPath);
@@ -75,5 +79,25 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
         var stPath = StringTablePathFor(file.ConversationPath);
         Directory.CreateDirectory(Path.GetDirectoryName(stPath)!);
         StringTableSerializer.SaveToFile(stPath, snapshot.Nodes);
+    }
+
+    public ConversationFile BuildNewConversationFile(string name)
+    {
+        var convPath = Path.Combine(ConversationsRoot, name + ".conversationbundle");
+        var stPath   = Path.Combine(StringTablesRoot,  name + ".stringtable");
+        return new ConversationFile(
+            Name: name,
+            FolderPath: string.Empty,
+            ConversationPath: convPath,
+            StringTablePath: stPath);
+    }
+
+    private const string Poe2BlankTemplate =
+        """{"Conversations":[{"Nodes":[]}]}""";
+
+    public void InitializeConversationFile(ConversationFile file)
+    {
+        Directory.CreateDirectory(Path.GetDirectoryName(file.ConversationPath)!);
+        File.WriteAllText(file.ConversationPath, Poe2BlankTemplate, System.Text.Encoding.UTF8);
     }
 }

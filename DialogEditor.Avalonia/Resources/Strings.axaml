@@ -32,6 +32,7 @@
     <!-- Shown in the node title and detail panel when the speaker GUID is
          not resolved to a named character. These are category labels, not
          character names. -->
+    <sys:String x:Key="Speaker_Npc">NPC</sys:String>
     <sys:String x:Key="Speaker_Player">Player</sys:String>
     <sys:String x:Key="Speaker_Narrator">Narrator</sys:String>
     <sys:String x:Key="Speaker_Script">Script</sys:String>
@@ -56,7 +57,9 @@
     <!-- Footer text when the node has no conditions -->
     <sys:String x:Key="Node_NoConditions">[ No conditions ]</sys:String>
     <!-- Canvas toolbar: node count label. {0} = number of nodes loaded -->
-    <sys:String x:Key="Node_CountFormat">{0} nodes</sys:String>
+    <sys:String x:Key="Statistics_Summary">{0} nodes  ({1} NPC / {2} player)  ·  {3:N0} words</sys:String>
+    <sys:String x:Key="ToolTip_Statistics">Node and word counts for the current conversation. Female-text word count (if any) is shown in the tooltip.</sys:String>
+    <sys:String x:Key="Statistics_FemaleDetail">Female text: {0:N0} words</sys:String>
 
     <!-- ─── Detail panel — values ──────────────────────────────────────── -->
     <!-- Node type shown in the NODE row of the detail panel -->
@@ -83,6 +86,17 @@
     <sys:String x:Key="Browser_RootFolder">(root)</sys:String>
     <!-- Panel header label -->
     <sys:String x:Key="Browser_Header">CONVERSATIONS</sys:String>
+    <!-- New conversation feature -->
+    <sys:String x:Key="Label_NewConversation_Suffix"> (new)</sys:String>
+    <sys:String x:Key="Label_NewConversationsFolder">(new)</sys:String>
+    <sys:String x:Key="Dialog_NewConversation_Create">Create</sys:String>
+    <sys:String x:Key="Button_NewConversation">New conversation…</sys:String>
+    <sys:String x:Key="ToolTip_NewConversation">Create a new conversation that doesn't yet exist in the game folder. It will be written to disk when you apply the patch (F5).</sys:String>
+    <sys:String x:Key="Dialog_NewConversation_Title">New Conversation</sys:String>
+    <sys:String x:Key="Dialog_NewConversation_Prompt">Enter a name for the new conversation file (no extension, e.g. city_market_guard):</sys:String>
+    <sys:String x:Key="Dialog_NewConversation_Placeholder">my_new_conversation</sys:String>
+    <sys:String x:Key="Status_NewConversationAdded">New conversation '{0}' added — add nodes, then Ctrl+S to save.</sys:String>
+    <sys:String x:Key="Status_NewConversationDuplicate">A conversation named '{0}' already exists.</sys:String>
     <!-- Placeholder text inside the filter text box -->
     <sys:String x:Key="Placeholder_FilterConversations">Filter conversations…</sys:String>
 
@@ -120,6 +134,8 @@
     <sys:String x:Key="PropertyRow_NodeId">Node ID</sys:String>
     <sys:String x:Key="PropertyRow_Type">Type</sys:String>
     <sys:String x:Key="PropertyRow_Speaker">Speaker</sys:String>
+    <sys:String x:Key="PropertyRow_SpeakerCategory">Speaker category</sys:String>
+    <sys:String x:Key="ToolTip_SpeakerCategory">The speaker category controls the node colour on the canvas and which speaker slot the line occupies (NPC, Player, Narrator, or Script)</sys:String>
     <sys:String x:Key="PropertyRow_SpeakerGuid">Speaker GUID</sys:String>
     <sys:String x:Key="PropertyRow_Listener">Listener</sys:String>
     <sys:String x:Key="PropertyRow_DisplayType">Display Type</sys:String>
@@ -133,8 +149,10 @@
     <sys:String x:Key="PropertyRow_HideSpeaker">Hide Speaker</sys:String>
 
     <!-- ─── Legend panel — section headers ────────────────────────────── -->
-    <!-- Title bar of the legend overlay -->
+    <!-- Title bar of the legend overlay (all-caps panel header) -->
     <sys:String x:Key="Legend_Header">LEGEND</sys:String>
+    <!-- Window title bar — sentence/title case -->
+    <sys:String x:Key="Legend_WindowTitle">Legend</sys:String>
     <sys:String x:Key="Legend_Connections">CONNECTIONS</sys:String>
     <sys:String x:Key="Legend_NodeTypes">NODE TYPES</sys:String>
     <sys:String x:Key="Legend_Symbols">SYMBOLS</sys:String>
@@ -167,6 +185,24 @@
     <sys:String x:Key="Legend_Symbol_Conditions">node has N visibility conditions</sys:String>
     <sys:String x:Key="Legend_Symbol_FemaleText">female text variant exists</sys:String>
     <sys:String x:Key="Legend_Symbol_PlayerChoice">player choice node (in title)</sys:String>
+
+    <!-- ─── Legend panel — keyboard shortcuts section ───────────────────── -->
+    <sys:String x:Key="Legend_Shortcuts">KEYBOARD SHORTCUTS</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlN_Desc">new project</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlO_Desc">open project</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlS_Desc">save project</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlShiftO">Ctrl+Shift+O</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlShiftO_Desc">open game folder</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlComma">Ctrl+,</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlComma_Desc">settings</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlZ_Desc">undo</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlY_Desc">redo</sys:String>
+    <sys:String x:Key="Legend_Shortcut_Del">Delete</sys:String>
+    <sys:String x:Key="Legend_Shortcut_Del_Desc">delete selected node</sys:String>
+    <sys:String x:Key="Legend_Shortcut_F5_Desc">test patch</sys:String>
+    <sys:String x:Key="Legend_Shortcut_F6_Desc">restore conversation after testing</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlShiftB">Ctrl+Shift+B</sys:String>
+    <sys:String x:Key="Legend_Shortcut_CtrlShiftB_Desc">restore backup (all conversations)</sys:String>
 
     <!-- ─── Legend panel — canvas control descriptions ─────────────────── -->
     <!-- "Fit" is the button label as it appears on the toolbar -->
@@ -273,15 +309,20 @@
     <sys:String x:Key="Dialog_SelectBackupFolder">Select backup destination folder</sys:String>
 
     <!-- ─── Editing — unsaved-changes prompt ────────────────────────────── -->
-    <sys:String x:Key="UnsavedChanges_Message">You have unsaved changes. Save before switching conversations?</sys:String>
-    <sys:String x:Key="UnsavedChanges_Save">Save</sys:String>
-    <sys:String x:Key="UnsavedChanges_Discard">Discard</sys:String>
-    <sys:String x:Key="UnsavedChanges_Cancel">Cancel</sys:String>
+    <!-- {0} = conversation name -->
+    <sys:String x:Key="UnsavedChanges_Title">Unsaved Changes</sys:String>
+    <sys:String x:Key="UnsavedChanges_Message">'{0}' has unsaved changes.
+
+Saving records your edits to the open project — game files are not touched until you run Test Patch (F5).</sys:String>
+    <sys:String x:Key="UnsavedChanges_Save">Save to Project</sys:String>
+    <sys:String x:Key="UnsavedChanges_Discard">Discard Changes</sys:String>
+    <sys:String x:Key="UnsavedChanges_Cancel">Stay Here</sys:String>
 
     <!-- ─── Detail panel — editable field labels ────────────────────────── -->
     <sys:String x:Key="PropertyRow_ListenerGuid">Listener GUID</sys:String>
 
     <!-- ─── Detail panel — combobox option values ───────────────────────── -->
+    <sys:String x:Key="Option_QTD_Default">(default)</sys:String>
     <sys:String x:Key="Option_NpcLine">NPC Line</sys:String>
     <sys:String x:Key="Option_PlayerChoice">Player Choice</sys:String>
     <sys:String x:Key="Option_DisplayConversation">Conversation</sys:String>
@@ -289,10 +330,198 @@
     <sys:String x:Key="Option_PersistenceNone">None</sys:String>
     <sys:String x:Key="Option_PersistenceOnceEver">OnceEver</sys:String>
 
+    <!-- ─── Detail panel — script editor ───────────────────────────────── -->
+    <sys:String x:Key="Button_EditScripts">Edit…</sys:String>
+    <sys:String x:Key="ToolTip_EditScripts">Open the script editor to add, edit, or remove scripts fired when this node is shown, exited, or updated</sys:String>
+    <sys:String x:Key="Placeholder_ScriptPicker">Search catalogue or type a FullName…</sys:String>
+    <sys:String x:Key="ToolTip_ScriptPicker">Select a known script from the catalogue — parameters and their types will be pre-populated. Or type a C# reflection FullName directly, e.g. Void SetGlobalValue(String, Int32), for scripts not in the catalogue.</sys:String>
+    <sys:String x:Key="ToolTip_AddScriptEnter">Add the selected or typed script to the On Enter list</sys:String>
+    <sys:String x:Key="ToolTip_AddScriptExit">Add the selected or typed script to the On Exit list</sys:String>
+    <sys:String x:Key="ToolTip_AddScriptUpdate">Add the selected or typed script to the On Update list</sys:String>
+    <sys:String x:Key="Label_ScriptSection_Enter">ON ENTER  (fires when the node is shown)</sys:String>
+    <sys:String x:Key="Label_ScriptSection_Exit">ON EXIT  (fires when the player leaves the node)</sys:String>
+    <sys:String x:Key="Label_ScriptSection_Update">ON UPDATE  (fires on each update tick while the node is active)</sys:String>
+    <sys:String x:Key="ToolTip_ScriptEditorCancel">Discard all changes and close</sys:String>
+    <sys:String x:Key="ToolTip_ScriptEditorOK">Apply these scripts to the node</sys:String>
+
+    <!-- ─── Detail panel — condition editor ─────────────────────────────── -->
+    <sys:String x:Key="Label_GroupConditions">CONDITIONS</sys:String>
+    <sys:String x:Key="Button_EditConditions">Edit…</sys:String>
+    <sys:String x:Key="ToolTip_EditConditions">Open the condition editor to add, edit, or remove conditions</sys:String>
+    <sys:String x:Key="Button_AddCondition">+ Add</sys:String>
+    <sys:String x:Key="ToolTip_AddCondition">Add selected condition to the list</sys:String>
+    <sys:String x:Key="ToolTip_DeleteCondition">Remove this condition</sys:String>
+    <sys:String x:Key="ToolTip_MoveConditionUp">Move condition up</sys:String>
+    <sys:String x:Key="ToolTip_MoveConditionDown">Move condition down</sys:String>
+    <sys:String x:Key="Label_Condition_NOT">NOT</sys:String>
+    <sys:String x:Key="Option_ConditionAnd">And</sys:String>
+    <sys:String x:Key="Option_ConditionOr">Or</sys:String>
+    <sys:String x:Key="Placeholder_PickCondition">Pick a condition…</sys:String>
+    <sys:String x:Key="ToolTip_PickCondition">Select a condition from the catalogue to add to this node</sys:String>
+    <sys:String x:Key="ToolTip_ConditionNot">Negate this condition — it must evaluate to FALSE for the check to pass</sys:String>
+    <sys:String x:Key="ToolTip_ConditionBranch">Grouped condition block — click Edit group… to modify its contents</sys:String>
+    <sys:String x:Key="Label_BranchGroupTitle">Condition Group</sys:String>
+    <sys:String x:Key="Button_EditBranchGroup">Edit group…</sys:String>
+    <sys:String x:Key="Button_NewGroup">+ New group</sys:String>
+    <sys:String x:Key="ToolTip_NewGroup">Add a new empty condition group. Use 'Edit group…' to add conditions inside it, and And/Or + NOT to control how it combines with other conditions.</sys:String>
+    <sys:String x:Key="ToolTip_EditBranchGroup">Open a nested editor to modify the conditions inside this group</sys:String>
+    <sys:String x:Key="WindowTitle_ConditionEditor">Conditions — {0}</sys:String>
+    <sys:String x:Key="WindowTitle_ScriptEditor">Scripts — {0}</sys:String>
+    <sys:String x:Key="ToolTip_ConditionEditorCancel">Discard all changes and close</sys:String>
+    <sys:String x:Key="ToolTip_ConditionEditorOK">Apply these conditions to the node</sys:String>
+
+    <!-- ─── Detail panel — speaker/listener name picker ────────────────── -->
+    <sys:String x:Key="Placeholder_SpeakerSearch">Search by name…</sys:String>
+    <sys:String x:Key="ToolTip_SpeakerPicker">Pick a character by name — sets the GUID below automatically</sys:String>
+
+    <!-- ─── Detail panel — link condition button ────────────────────────── -->
+    <sys:String x:Key="Button_LinkConditions">⚙</sys:String>
+    <sys:String x:Key="ToolTip_LinkConditions_None">No conditions — click to add</sys:String>
+    <sys:String x:Key="ToolTip_LinkConditions_Some">{0} condition(s) — click to edit</sys:String>
+
+    <!-- ─── Detail panel — link property labels and tooltips ───────────── -->
+    <sys:String x:Key="Label_LinkWeight">Wt.</sys:String>
+    <sys:String x:Key="ToolTip_LinkQTD">Controls whether this player choice reappears after selection (ShowOnce / Always / Never)</sys:String>
+    <sys:String x:Key="ToolTip_LinkWeight">Random weight — relative probability when multiple links compete for selection. A link with weight 2 is twice as likely to be chosen as one with weight 1. Default: 1</sys:String>
+
+    <!-- ─── Node detail panel — watermarks ──────────────────────────────── -->
+    <sys:String x:Key="Placeholder_FemaleText">(same as default — leave blank)</sys:String>
+    <sys:String x:Key="Placeholder_AddLinkTargetId">Target node ID…</sys:String>
+
+    <!-- ─── Node detail panel — field tooltips ──────────────────────────── -->
+    <sys:String x:Key="ToolTip_DefaultText">Edit the default (male) dialogue text for this node</sys:String>
+    <sys:String x:Key="ToolTip_FemaleText">Optional female-voice variant. Leave blank to use the default text for both genders.</sys:String>
+    <sys:String x:Key="ToolTip_NodeType">Whether this node is an NPC line or a player response choice</sys:String>
+    <sys:String x:Key="ToolTip_SpeakerGuid">GUID of the speaking character — edit directly or use the name picker above</sys:String>
+    <sys:String x:Key="ToolTip_ListenerGuid">GUID of the listening character — edit directly or use the name picker above</sys:String>
+    <sys:String x:Key="ToolTip_DisplayType">How this node is presented to the player (Conversation = full portrait, Bark = floating text)</sys:String>
+    <sys:String x:Key="ToolTip_Persistence">OnceEver hides this node after it has been shown once, even across saves</sys:String>
+    <sys:String x:Key="ToolTip_ActorDirection">Optional director's note for the voice actor — not shown to players</sys:String>
+    <sys:String x:Key="ToolTip_ExternalVO">External voice-over file path or identifier</sys:String>
+    <sys:String x:Key="ToolTip_HasVO">Check if a voice-over recording exists for this line</sys:String>
+    <sys:String x:Key="ToolTip_HideSpeaker">Hide the speaker name label during dialogue playback</sys:String>
+    <sys:String x:Key="ToolTip_Comments">Internal developer notes — not shown to players</sys:String>
+    <sys:String x:Key="ToolTip_AddLinkTargetId">Type a node ID and click Add to create a link from this node to that one</sys:String>
+
+    <!-- ─── Canvas context menus ──────────────────────────────────────────── -->
+    <sys:String x:Key="ToolTip_DeleteNode">Remove this node and all its connections from the conversation</sys:String>
+    <sys:String x:Key="ToolTip_AddConnectedNode">Create a new node and link it from this one</sys:String>
+    <sys:String x:Key="ToolTip_DeleteConnection">Remove the link between these two nodes</sys:String>
+
+    <!-- ─── Script editor row buttons ─────────────────────────────────────── -->
+    <sys:String x:Key="ToolTip_MoveScriptUp">Move this script up within its section</sys:String>
+    <sys:String x:Key="ToolTip_MoveScriptDown">Move this script down within its section</sys:String>
+    <sys:String x:Key="ToolTip_DeleteScriptRow">Remove this script from the list</sys:String>
+
     <!-- ─── Detail panel — link actions ─────────────────────────────────── -->
     <sys:String x:Key="Button_DeleteLink">✕</sys:String>
     <sys:String x:Key="ToolTip_DeleteLink">Remove this connection</sys:String>
     <sys:String x:Key="Button_AddLink">Add link…</sys:String>
     <sys:String x:Key="ToolTip_AddLink">Add a connection from this node to another node by ID</sys:String>
+
+    <!-- ─── Settings window ──────────────────────────────────────────────── -->
+    <sys:String x:Key="Settings_Title">Settings</sys:String>
+    <sys:String x:Key="Settings_BackupDirectory">Backup directory</sys:String>
+    <sys:String x:Key="Settings_BackupDirectoryTooltip">Folder where the original game files are backed up for restoration after applying patches</sys:String>
+    <sys:String x:Key="Settings_PatchDirectory">Patch output directory</sys:String>
+    <sys:String x:Key="Settings_PatchDirectoryTooltip">Folder where .patch files are written when you save a conversation</sys:String>
+    <sys:String x:Key="Settings_Browse">Browse…</sys:String>
+    <sys:String x:Key="Settings_Close">Close</sys:String>
+    <sys:String x:Key="Settings_PathNotSet">(not set)</sys:String>
+    <sys:String x:Key="Settings_BackupDirectoryTitle">Select backup destination folder</sys:String>
+    <sys:String x:Key="Settings_PatchDirectoryTitle">Select patch output folder</sys:String>
+    <sys:String x:Key="ToolTip_Settings">Open settings (backup directory, patch output directory)</sys:String>
+
+    <!-- ─── Keyboard shortcut display labels ────────────────────────────── -->
+    <!-- These appear next to toolbar button labels in a secondary (muted) colour. -->
+    <sys:String x:Key="Shortcut_CtrlN">Ctrl+N</sys:String>
+    <sys:String x:Key="Shortcut_CtrlO">Ctrl+O</sys:String>
+    <sys:String x:Key="Shortcut_CtrlS">Ctrl+S</sys:String>
+    <sys:String x:Key="Shortcut_CtrlZ">Ctrl+Z</sys:String>
+    <sys:String x:Key="Shortcut_CtrlY">Ctrl+Y</sys:String>
+    <sys:String x:Key="Shortcut_F5">F5</sys:String>
+    <sys:String x:Key="Shortcut_F6">F6</sys:String>
+
+    <!-- ─── Menu bar ─────────────────────────────────────────────────────── -->
+    <sys:String x:Key="Menu_File">File</sys:String>
+    <sys:String x:Key="Menu_Edit">Edit</sys:String>
+    <sys:String x:Key="Menu_FindReplace">Find / Replace…</sys:String>
+    <sys:String x:Key="ToolTip_FindReplace">Search for text across all nodes in the current conversation and optionally replace it</sys:String>
+    <sys:String x:Key="FindReplace_Title">Find / Replace</sys:String>
+    <sys:String x:Key="FindReplace_FindLabel">Find:</sys:String>
+    <sys:String x:Key="FindReplace_ReplaceLabel">Replace:</sys:String>
+    <sys:String x:Key="FindReplace_CaseSensitive">Case-sensitive</sys:String>
+    <sys:String x:Key="ToolTip_CaseSensitive">Match exact capitalisation</sys:String>
+    <sys:String x:Key="FindReplace_FindAll">Find all</sys:String>
+    <sys:String x:Key="FindReplace_FindNext">Find next</sys:String>
+    <sys:String x:Key="FindReplace_FindPrev">Find prev</sys:String>
+    <sys:String x:Key="FindReplace_ReplaceOne">Replace</sys:String>
+    <sys:String x:Key="FindReplace_ReplaceAll">Replace all</sys:String>
+    <sys:String x:Key="ToolTip_FindAll">Search all nodes for the given text</sys:String>
+    <sys:String x:Key="ToolTip_FindNext">Select the next matching node</sys:String>
+    <sys:String x:Key="ToolTip_FindPrev">Select the previous matching node</sys:String>
+    <sys:String x:Key="ToolTip_Replace">Replace the current match and find the next one</sys:String>
+    <sys:String x:Key="ToolTip_ReplaceAll">Replace every match in the current conversation</sys:String>
+    <sys:String x:Key="FindReplace_Matches">{0} match(es)</sys:String>
+    <sys:String x:Key="FindReplace_NoMatches">No matches</sys:String>
+    <sys:String x:Key="FindReplace_Navigation">{0} / {1}</sys:String>
+    <sys:String x:Key="FindReplace_Replaced">Replaced {0} match(es)</sys:String>
+    <sys:String x:Key="FindReplace_NothingReplaced">Nothing replaced</sys:String>
+    <sys:String x:Key="Menu_Test">Test</sys:String>
+    <sys:String x:Key="Menu_NewProject">New Project…</sys:String>
+    <sys:String x:Key="Menu_OpenProject">Open Project…</sys:String>
+    <sys:String x:Key="Menu_SaveProject">Save Project</sys:String>
+    <sys:String x:Key="Menu_Settings">Settings…</sys:String>
+
+    <!-- ─── Patch — toolbar buttons ──────────────────────────────────────── -->
+    <sys:String x:Key="Button_TestPatch">Test Patch</sys:String>
+    <sys:String x:Key="ToolTip_TestPatch">Apply all patches in the project to game files for testing</sys:String>
+
+    <!-- ─── Test mode overlay ─────────────────────────────────────────────── -->
+    <sys:String x:Key="TestMode_Message">Game files have been patched for testing. Launch the game and test your changes, then press Restore when you are done.</sys:String>
+    <sys:String x:Key="TestMode_Restore">Restore Conversation</sys:String>
+    <sys:String x:Key="ToolTip_TestMode_Restore">Revert the game files to their pre-test state and resume editing</sys:String>
+
+    <!-- ─── Patch — status messages ──────────────────────────────────────── -->
+    <!-- {0} = conversation name -->
+    <sys:String x:Key="Status_PatchSaved">Patch saved: {0}</sys:String>
+    <!-- Shown in the status bar when a conversation is loaded but no project is open -->
+    <sys:String x:Key="Status_NoProjectReadOnly">Viewing only — open or create a project (File › New Project) to start editing.</sys:String>
+    <!-- Shown when trying to save/test but no patch directory is configured -->
+    <sys:String x:Key="Status_NoPatchDirectory">Set a patch output directory in Settings before saving.</sys:String>
+    <!-- {0} = conversation name -->
+    <sys:String x:Key="Status_PatchNotFound">No patch file found for {0} — save first.</sys:String>
+    <!-- {0} = node ID, {1} = field name, {2} = expected value, {3} = actual value -->
+    <sys:String x:Key="Status_PatchConflict">Patch conflict on node {0} field '{1}': expected '{2}' but found '{3}'.</sys:String>
+    <!-- {0} = conversation name, {1} = error message -->
+    <sys:String x:Key="Status_TestApplyError">Test apply failed for {0}: {1}</sys:String>
+    <!-- Shown after successful Restore Conversation -->
+    <sys:String x:Key="Status_RestoreComplete2">Conversation restored — ready to edit.</sys:String>
+
+    <!-- ─── Project — status messages ────────────────────────────────────── -->
+    <!-- {0} = project name -->
+    <sys:String x:Key="Status_ProjectNew">New project: {0}</sys:String>
+    <!-- {0} = project name, {1} = patch count -->
+    <sys:String x:Key="Status_ProjectOpened">Opened project '{0}' ({1} patch(es))</sys:String>
+    <!-- {0} = project name -->
+    <sys:String x:Key="Status_ProjectSaved">Project saved: {0}</sys:String>
+    <!-- Shown when Ctrl+S is pressed with no project open -->
+    <sys:String x:Key="Status_NoProjectOpen">No project is open — use File &gt; New Project or Open Project.</sys:String>
+    <!-- Shown when Test Patch is pressed but project has no patches -->
+    <sys:String x:Key="Status_ProjectNoPatch">The project has no patches yet — save a conversation first.</sys:String>
+    <!-- {0} = path, {1} = error message -->
+    <sys:String x:Key="Status_ProjectOpenError">Could not open project '{0}': {1}</sys:String>
+
+    <!-- ─── Project — file picker dialogs ────────────────────────────────── -->
+    <sys:String x:Key="Dialog_NewProject">Create new project</sys:String>
+    <sys:String x:Key="Dialog_NewProjectDefault">MyMod</sys:String>
+    <sys:String x:Key="Dialog_OpenProject">Open project</sys:String>
+    <sys:String x:Key="FileType_DialogProject">Dialog Project (*.dialogproject)</sys:String>
+    <sys:String x:Key="Menu_MergeProjects">Merge Projects…</sys:String>
+    <sys:String x:Key="ToolTip_MergeProjects">Merge one or more other .dialogproject files into the current project. Later projects win on conflict.</sys:String>
+    <sys:String x:Key="Dialog_MergeProjects">Select projects to merge into the current project</sys:String>
+    <sys:String x:Key="Status_MergeComplete">Merged {0} project(s) into '{1}'</sys:String>
+    <sys:String x:Key="Status_MergeError">Merge failed: {0}</sys:String>
+    <!-- PatchManager strings are in DialogEditor.Avalonia.Shared/Resources/Strings.axaml -->
 
 </ResourceDictionary>

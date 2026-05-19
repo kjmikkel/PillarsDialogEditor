@@ -19,6 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\DialogEditor.Core\DialogEditor.Core.csproj" />
     <ProjectReference Include="..\DialogEditor.ViewModels\DialogEditor.ViewModels.csproj" />
+    <ProjectReference Include="..\DialogEditor.Avalonia.Shared\DialogEditor.Avalonia.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

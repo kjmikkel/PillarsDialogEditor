@@ -4,6 +4,12 @@ using DialogEditor.Core.GameData;
 
 namespace DialogEditor.ViewModels.Services;
 
+public record PendingRestoreEntry(
+    string BackupConvPath,
+    string BackupStPath,
+    string OriginalConvPath,
+    string OriginalStPath);
+
 public static class AppSettings
 {
     private static readonly string SettingsPath = Path.Combine(
@@ -16,8 +22,12 @@ public static class AppSettings
         public string? LastGameDirectory { get; set; }
         public bool BrowserPinned  { get; set; } = true;
         public bool DetailExpanded { get; set; } = true;
-        public HashSet<string> KnownGameDirectories { get; set; } = [];
+        public HashSet<string> KnownGameDirectories  { get; set; } = [];
         public Dictionary<string, string> BackupPaths { get; set; } = [];
+        public string? LastProjectPath               { get; set; }
+        public List<PendingRestoreEntry>? PendingRestores { get; set; }
+        public double? LegendX                       { get; set; }
+        public double? LegendY                       { get; set; }
     }
 
     public static string? LastLanguage
@@ -89,6 +99,43 @@ public static class AppSettings
     {
         var s = Load();
         s.BackupPaths[gameDirectory] = backupRoot;
+        Save(s);
+    }
+
+    public static string? LastProjectPath
+    {
+        get => Load().LastProjectPath;
+        set { var s = Load(); s.LastProjectPath = value; Save(s); }
+    }
+
+    public static IReadOnlyList<PendingRestoreEntry>? GetPendingRestores()
+        => Load().PendingRestores;
+
+    public static void SetPendingRestores(IEnumerable<PendingRestoreEntry> entries)
+    {
+        var s = Load();
+        s.PendingRestores = entries.ToList();
+        Save(s);
+    }
+
+    public static void ClearPendingRestores()
+    {
+        var s = Load();
+        s.PendingRestores = null;
+        Save(s);
+    }
+
+    public static (double X, double Y)? GetLegendPosition()
+    {
+        var s = Load();
+        return s.LegendX is double x && s.LegendY is double y ? (x, y) : null;
+    }
+
+    public static void SetLegendPosition(double x, double y)
+    {
+        var s = Load();
+        s.LegendX = x;
+        s.LegendY = y;
         Save(s);
     }
 

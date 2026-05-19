@@ -46,7 +46,7 @@ public class Poe1ConversationSerializerTests
         IReadOnlyList<LinkEditSnapshot>? links = null) =>
         new(id, false, SpeakerCategory.Npc, speaker, "bbbb",
             "text", "", "Conversation", "None", "", "", "", false, false,
-            links ?? []);
+            links ?? [], [], []);
 
     [Fact]
     public void Serialize_UpdatesSpeakerGuid()
@@ -58,9 +58,13 @@ public class Poe1ConversationSerializerTests
     }
 
     [Fact]
-    public void Serialize_PreservesOriginalConditions()
+    public void Serialize_RoundTripsConditions()
     {
-        var snapshot = new ConversationEditSnapshot([Node(0), Node(1)]);
+        // Parse the XML to get structured conditions, include them in snapshot,
+        // serialize back, parse again — conditions must survive the round-trip.
+        var parsedNodes = Poe1ConversationParser.ParseXml(TwoNodeXml);
+        var snap0 = Node(0) with { Conditions = parsedNodes[0].Conditions };
+        var snapshot = new ConversationEditSnapshot([snap0, Node(1)]);
         var result   = Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot);
         var doc      = XDocument.Parse(result);
         var conds    = doc.Descendants("FlowChartNode").First()

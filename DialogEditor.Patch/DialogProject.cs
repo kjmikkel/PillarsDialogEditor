@@ -1,0 +1,115 @@
+using DialogEditor.Core.Models;
+
+namespace DialogEditor.Patch;
+
+public record DialogProject(
+    string Name,
+    int SchemaVersion,
+    IReadOnlyDictionary<string, ConversationPatch> Patches,
+    // Canvas layout per conversation — metadata, not part of the patch diff.
+    // Nullable so existing .dialogproject files without this field load cleanly.
+    IReadOnlyDictionary<string, IReadOnlyDictionary<int, LayoutPoint>>? Layouts = null,
+    // Names of conversations that don't yet exist on disk.
+    // Nullable for back-compat with old .dialogproject files.
+    IReadOnlyList<string>? NewConversations = null)
+{
+    public static readonly int CurrentSchemaVersion = 1;
+
+    public static DialogProject Empty(string name) =>
+        new(name, CurrentSchemaVersion, new Dictionary<string, ConversationPatch>());
+
+    public DialogProject WithNewConversation(string name)
+    {
+        var existing = NewConversations ?? [];
+        if (existing.Contains(name)) return this;
+        return this with { NewConversations = [.. existing, name] };
+    }
+
+    public bool IsNewConversation(string name)
+        => NewConversations?.Contains(name) == true;
+
+    /// Merges another project into this one. Patches for the same conversation are
+    /// combined using PatchMerger (the other project's values win on conflict).
+    /// Layouts are merged with the other project winning on overlap. NewConversations
+    /// lists are unioned.
+    public DialogProject MergeWith(DialogProject other)
+    {
+        var allConversations = Patches.Keys
+            .Concat(other.Patches.Keys)
+            .Distinct();
+
+        var mergedPatches = new Dictionary<string, ConversationPatch>();
+        foreach (var name in allConversations)
+        {
+            var mine   = Patches.GetValueOrDefault(name);
+            var theirs = other.Patches.GetValueOrDefault(name);
+            mergedPatches[name] = (mine, theirs) switch
+            {
+                (not null, not null) => PatchMerger.Merge(name, [mine, theirs]),
+                (not null, null)     => mine,
+                _                    => theirs!,
+            };
+        }
+
+        var result = this with { Patches = mergedPatches };
+
+        foreach (var (convName, positions) in other.Layouts ?? new Dictionary<string, IReadOnlyDictionary<int, LayoutPoint>>())
+            result = result.MergeLayout(convName, positions);
+
+        var combined = (NewConversations ?? [])
+            .Concat(other.NewConversations ?? [])
+            .Distinct()
+            .ToList();
+        return result with { NewConversations = combined.Count > 0 ? combined : null };
+    }
+
+    public DialogProject WithPatch(ConversationPatch patch) =>
+        this with
+        {
+            Patches = new Dictionary<string, ConversationPatch>(Patches)
+                { [patch.ConversationName] = patch }
+        };
+
+    public DialogProject WithLayout(
+        string conversationName,
+        IReadOnlyDictionary<int, LayoutPoint> positions) =>
+        this with
+        {
+            Layouts = new Dictionary<string, IReadOnlyDictionary<int, LayoutPoint>>(
+                Layouts ?? new Dictionary<string, IReadOnlyDictionary<int, LayoutPoint>>())
+                { [conversationName] = positions }
+        };
+
+    public IReadOnlyDictionary<int, LayoutPoint>? GetLayout(string conversationName) =>
+        Layouts?.GetValueOrDefault(conversationName);
+
+    /// <summary>
+    /// Merges <paramref name="incoming"/> positions into the existing layout for
+    /// <paramref name="conversationName"/>. The incoming value wins for any node
+    /// present in both; nodes present only in the existing layout are preserved.
+    /// </summary>
+    /// <remarks>
+    /// Use this when combining two projects so that positions from both are kept.
+    /// Contrast with <see cref="WithLayout"/>, which replaces the entire entry —
+    /// the correct choice when saving from the canvas (where the caller supplies
+    /// the complete current layout and stale deleted-node entries should be purged).
+    /// </remarks>
+    public DialogProject MergeLayout(
+        string conversationName,
+        IReadOnlyDictionary<int, LayoutPoint> incoming)
+    {
+        var allLayouts  = Layouts ?? new Dictionary<string, IReadOnlyDictionary<int, LayoutPoint>>();
+        var existing    = allLayouts.GetValueOrDefault(conversationName)
+                          ?? new Dictionary<int, LayoutPoint>();
+
+        var merged = new Dictionary<int, LayoutPoint>(existing);
+        foreach (var (id, pos) in incoming)
+            merged[id] = pos;   // incoming wins on overlap
+
+        return this with
+        {
+            Layouts = new Dictionary<string, IReadOnlyDictionary<int, LayoutPoint>>(allLayouts)
+                { [conversationName] = merged }
+        };
+    }
+}

@@ -17,18 +17,17 @@ public class NodeDetailViewModelTests
     private static NodeViewModel MakeNode(
         int id = 1,
         bool isPlayerChoice = false,
+        SpeakerCategory speakerCategory = SpeakerCategory.Npc,
         string speakerGuid = "",
         string listenerGuid = "",
         string displayType = "Conversation",
         string persistence = "None",
         string actorDirection = "",
-        string conditionExpression = "",
         string comments = "",
         string externalVO = "",
         bool hasVO = false,
         bool hideSpeaker = false,
-        IReadOnlyList<string>? scripts = null,
-        IReadOnlyList<string>? conditionStrings = null,
+        IReadOnlyList<ScriptCall>? scripts = null,
         IReadOnlyList<NodeLink>? links = null,
         string defaultText = "Hello",
         string femaleText = "")
@@ -36,11 +35,11 @@ public class NodeDetailViewModelTests
         var node = new ConversationNode(
             NodeId: id,
             IsPlayerChoice: isPlayerChoice,
-            SpeakerCategory: SpeakerCategory.Npc,
+            SpeakerCategory: speakerCategory,
             SpeakerGuid: speakerGuid,
             ListenerGuid: listenerGuid,
             Links: links ?? [],
-            ConditionStrings: conditionStrings ?? [],
+            Conditions: [],
             Scripts: scripts ?? [],
             DisplayType: displayType,
             Persistence: persistence,
@@ -48,8 +47,7 @@ public class NodeDetailViewModelTests
             Comments: comments,
             ExternalVO: externalVO,
             HasVO: hasVO,
-            HideSpeaker: hideSpeaker,
-            ConditionExpression: conditionExpression);
+            HideSpeaker: hideSpeaker);
 
         var entry = new StringEntry(id, defaultText, femaleText);
         return new NodeViewModel(node, entry);
@@ -82,10 +80,10 @@ public class NodeDetailViewModelTests
     // ── Read-only property groups (Identity = NodeId; Logic = conditions/scripts) ──
 
     [Fact]
-    public void Load_PropertyGroups_HasTwoGroups()
+    public void Load_PropertyGroups_HasIdentityGroup()
     {
         _vm.Load(MakeNode());
-        Assert.Equal(2, _vm.PropertyGroups.Count);
+        Assert.Single(_vm.PropertyGroups);   // Scripts/Conditions now have dedicated panels
     }
 
     [Fact]
@@ -98,33 +96,30 @@ public class NodeDetailViewModelTests
     }
 
     [Fact]
-    public void Load_LogicGroup_ContainsConditionsAndScriptsRows()
+    public void Load_ScriptSummary_EmptyWhenNoScripts()
     {
+        // Scripts now have their own panel — verified via ScriptSummary property
         _vm.Load(MakeNode());
-        var logic = _vm.PropertyGroups[1];
-        Assert.Equal(2, logic.Rows.Count);
-        Assert.Contains(logic.Rows, r => r.Label == "PropertyRow_Conditions");
-        Assert.Contains(logic.Rows, r => r.Label == "PropertyRow_Scripts");
+        Assert.Equal("NodeDetail_None", _vm.ScriptSummary);
     }
 
     // ── Links ─────────────────────────────────────────────────────────────
 
     [Fact]
-    public void Load_WithMultipleLinks_CreatesOneRowPerLink()
+    public void RefreshLinks_AfterLoad_ShowsCorrectCount()
     {
-        var links = new[]
-        {
-            new NodeLink(1, 10, false, 1f, "ShowOnce"),
-            new NodeLink(1, 20, false, 2f, "Always"),
-        };
-        _vm.Load(MakeNode(links: links));
+        _vm.Load(MakeNode());
+        _vm.RefreshLinks([MakeConn(), MakeConn()]);
         Assert.Equal(2, _vm.Links.Count);
     }
 
     [Fact]
-    public void Load_WithNoLinks_ProducesEmptyLinksList()
+    public void Load_ClearsLinksFromPreviousNode()
     {
-        _vm.Load(MakeNode(links: []));
+        _vm.Load(MakeNode());
+        _vm.RefreshLinks([MakeConn()]);
+        _vm.Load(MakeNode(id: 2));   // loading a new node doesn't keep old links
+        _vm.RefreshLinks([]);
         Assert.Empty(_vm.Links);
     }
 
@@ -196,29 +191,70 @@ public class NodeDetailViewModelTests
     {
         var node = new ConversationNode(
             NodeId: 99, IsPlayerChoice: false, SpeakerCategory: SpeakerCategory.Npc,
-            SpeakerGuid: "", ListenerGuid: "", Links: [], ConditionStrings: [],
+            SpeakerGuid: "", ListenerGuid: "", Links: [], Conditions: [],
             Scripts: [], DisplayType: "Conversation", Persistence: "None");
         var vm = new NodeViewModel(node, new StringEntry(99, string.Empty, string.Empty));
         _vm.Load(vm);
         Assert.Equal(string.Empty, _vm.DefaultText);
     }
 
+    // ── SpeakerCategory proxy ─────────────────────────────────────────────
+
+    [Fact]
+    public void Load_ExposesSpeakerCategoryString_ForNpcNode()
+    {
+        _vm.Load(MakeNode());
+        Assert.Equal(Loc.Get("Speaker_Npc"), _vm.SpeakerCategoryString);
+    }
+
+    [Fact]
+    public void Load_ExposesSpeakerCategoryString_ForPlayerNode()
+    {
+        _vm.Load(MakeNode(speakerCategory: SpeakerCategory.Player));
+        Assert.Equal(Loc.Get("Speaker_Player"), _vm.SpeakerCategoryString);
+    }
+
+    [Fact]
+    public void SetSpeakerCategoryString_Player_UpdatesNodeViewModel()
+    {
+        var node = MakeNode();
+        _vm.Load(node);
+        _vm.SpeakerCategoryString = Loc.Get("Speaker_Player");
+        Assert.Equal(SpeakerCategory.Player, node.SpeakerCategory);
+    }
+
+    [Fact]
+    public void SetSpeakerCategoryString_UnknownValue_DefaultsToNpc()
+    {
+        var node = MakeNode(speakerCategory: SpeakerCategory.Player);
+        _vm.Load(node);
+        _vm.SpeakerCategoryString = "SomethingUnrecognised";
+        Assert.Equal(SpeakerCategory.Npc, node.SpeakerCategory);
+    }
+
     // ── RefreshLinks (Fix C) ──────────────────────────────────────────────
+
+    private static ConnectionViewModel MakeConn()
+    {
+        var src = new ConnectorViewModel();
+        var tgt = new ConnectorViewModel();
+        return new ConnectionViewModel(src, tgt);
+    }
 
     [Fact]
     public void RefreshLinks_UpdatesLinksList()
     {
         _vm.Load(MakeNode(links: []));
-        _vm.RefreshLinks([new NodeLink(1, 5, false)]);
+        _vm.RefreshLinks([MakeConn()]);
         Assert.Single(_vm.Links);
     }
 
     [Fact]
     public void RefreshLinks_WhenCalledTwice_ReplacesNotAppends()
     {
-        var initial = new[] { new NodeLink(1, 10, false), new NodeLink(1, 20, false) };
-        _vm.Load(MakeNode(links: initial));
-        _vm.RefreshLinks([new NodeLink(1, 30, false)]);
+        _vm.Load(MakeNode());
+        _vm.RefreshLinks([MakeConn(), MakeConn()]);
+        _vm.RefreshLinks([MakeConn()]);
         Assert.Single(_vm.Links);
     }
 }
