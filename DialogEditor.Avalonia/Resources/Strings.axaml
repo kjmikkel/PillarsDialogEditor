@@ -514,5 +514,17 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_PatchManagerOpen">Open the Patch Manager to combine and apply multiple .dialogproject files in a defined load order</sys:String>
     <sys:String x:Key="PatchManager_EntryConflict">⚠ conflicts with another project</sys:String>
     <sys:String x:Key="PatchManager_EntryLoadError">⚠ could not load</sys:String>
+    <sys:String x:Key="PatchManager_GameFolderWatermark">(no game folder selected)</sys:String>
+    <sys:String x:Key="PatchManager_EmptyHint">Add .dialogproject files above. Lower entries win on conflict.</sys:String>
+    <sys:String x:Key="PatchManager_OrderHint">↑ First applied   ↓ Last applied (wins on conflict)</sys:String>
+    <sys:String x:Key="ToolTip_MoveEntryUp">Move up — lower index is applied first; lower position wins on conflict</sys:String>
+    <sys:String x:Key="ToolTip_MoveEntryDown">Move down — lower position in the list wins on conflict</sys:String>
+    <sys:String x:Key="ToolTip_RemoveEntry">Remove from load order</sys:String>
+    <sys:String x:Key="ToolTip_BrowseGameFolder">Select the root folder of your PoE1 or PoE2 installation</sys:String>
+    <sys:String x:Key="ToolTip_AddProjects">Add one or more .dialogproject files to the load order</sys:String>
+    <sys:String x:Key="ToolTip_SaveLoadOrder">Save the current load order to a .patchlist file for later reuse</sys:String>
+    <sys:String x:Key="ToolTip_LoadLoadOrder">Open a previously saved .patchlist file</sys:String>
+    <sys:String x:Key="ToolTip_ApplyPatches">Apply all patches to the game folder in load order. Lower entries win on conflict.</sys:String>
+    <sys:String x:Key="PatchManager_EntryConflictDetail">Conflicts with another project — move lower to override the other, or higher to be overridden</sys:String>
 
 </ResourceDictionary>

@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <AvaloniaResource Include="Resources\Strings.axaml"/>
     <!-- Share the icon from the editor project -->
     <None Update="Assets\app.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
