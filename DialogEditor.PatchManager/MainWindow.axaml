@@ -45,32 +45,38 @@
 
     <Grid RowDefinitions="Auto,Auto,*,Auto,Auto" Margin="14,12,14,12">
 
-        <TextBlock Grid.Row="0" Classes="section-label" Text="Game folder"/>
+        <TextBlock Grid.Row="0" Classes="section-label"
+                   Text="{StaticResource PatchManager_GameFolder}"/>
         <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
             <TextBox Grid.Column="0" Classes="path-box"
                      Text="{Binding GameFolder}"
-                     Watermark="(no game folder selected)"
-                     ToolTip.Tip="The root folder of your PoE1 or PoE2 installation"/>
-            <Button Grid.Column="1" Classes="action-btn" Content="Browse…"
+                     Watermark="{StaticResource PatchManager_GameFolderWatermark}"
+                     ToolTip.Tip="{StaticResource ToolTip_BrowseGameFolder}"/>
+            <Button Grid.Column="1" Classes="action-btn"
+                    Content="{StaticResource PatchManager_BrowseGame}"
                     Command="{Binding BrowseGameFolderCommand}"
                     Margin="6,0,0,0"
-                    ToolTip.Tip="Select the game installation folder"/>
+                    ToolTip.Tip="{StaticResource ToolTip_BrowseGameFolder}"/>
         </Grid>
 
         <Grid Grid.Row="2" RowDefinitions="Auto,*,Auto">
             <DockPanel Grid.Row="0" Margin="0,0,0,6">
                 <TextBlock Classes="section-label" DockPanel.Dock="Left"
-                           VerticalAlignment="Center" Text="Load Order"/>
+                           VerticalAlignment="Center"
+                           Text="{StaticResource PatchManager_LoadOrder}"/>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4">
-                    <Button Classes="action-btn" Content="Save load order…"
+                    <Button Classes="action-btn"
+                            Content="{StaticResource PatchManager_SaveLoadOrder}"
                             Command="{Binding SaveLoadOrderCommand}"
-                            ToolTip.Tip="Save the current load order to a .patchlist file"/>
-                    <Button Classes="action-btn" Content="Load load order…"
+                            ToolTip.Tip="{StaticResource ToolTip_SaveLoadOrder}"/>
+                    <Button Classes="action-btn"
+                            Content="{StaticResource PatchManager_LoadLoadOrder}"
                             Command="{Binding LoadLoadOrderCommand}"
-                            ToolTip.Tip="Open a previously saved .patchlist file"/>
-                    <Button Classes="action-btn" Content="Add project(s)…"
+                            ToolTip.Tip="{StaticResource ToolTip_LoadLoadOrder}"/>
+                    <Button Classes="action-btn"
+                            Content="{StaticResource PatchManager_AddProjects}"
                             Command="{Binding AddEntriesCommand}"
-                            ToolTip.Tip="Add one or more .dialogproject files to the list"/>
+                            ToolTip.Tip="{StaticResource ToolTip_AddProjects}"/>
                 </StackPanel>
             </DockPanel>
 
@@ -90,7 +96,7 @@
                                                 <TextBlock Text="⚠" Foreground="#e67e22" FontSize="12"
                                                            VerticalAlignment="Center"
                                                            IsVisible="{Binding HasConflict}"
-                                                           ToolTip.Tip="Conflicts with another project — move lower to override the other, or higher to be overridden"/>
+                                                           ToolTip.Tip="{StaticResource PatchManager_EntryConflictDetail}"/>
                                                 <TextBlock Text="⚠" Foreground="#c0392b" FontSize="12"
                                                            VerticalAlignment="Center"
                                                            IsVisible="{Binding LoadError,
@@ -106,28 +112,28 @@
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Foreground="#aaa" FontSize="13" Padding="4"
-                                                ToolTip.Tip="Move up (applied first; lower wins on conflict)"/>
+                                                ToolTip.Tip="{StaticResource ToolTip_MoveEntryUp}"/>
                                         <Button Grid.Column="2" Content="↓"
                                                 Command="{Binding DataContext.MoveDownCommand,
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Foreground="#aaa" FontSize="13" Padding="4"
-                                                ToolTip.Tip="Move down (applied last; wins on conflict)"/>
+                                                ToolTip.Tip="{StaticResource ToolTip_MoveEntryDown}"/>
                                         <Button Grid.Column="3" Content="✕"
                                                 Command="{Binding DataContext.RemoveEntryCommand,
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Foreground="#c0392b" FontSize="13" Padding="4"
-                                                ToolTip.Tip="Remove from load order"/>
+                                                ToolTip.Tip="{StaticResource ToolTip_RemoveEntry}"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
-                <TextBlock Text="Add .dialogproject files above. Lower entries win on conflict."
+                <TextBlock Text="{StaticResource PatchManager_EmptyHint}"
                            Foreground="#444" FontSize="11"
                            HorizontalAlignment="Center" VerticalAlignment="Center"
                            IsVisible="{Binding HasEntries,
@@ -135,7 +141,7 @@
             </Grid>
 
             <TextBlock Grid.Row="2"
-                       Text="↑ First applied   ↓ Last applied (wins on conflict)"
+                       Text="{StaticResource PatchManager_OrderHint}"
                        Foreground="#555" FontSize="9"
                        HorizontalAlignment="Center" Margin="0,4,0,0"/>
         </Grid>
@@ -173,12 +179,12 @@
                        IsVisible="{Binding HasConflicts,
                                    Converter={StaticResource InverseBoolToVis}}"/>
             <Button Grid.Column="1" Classes="primary-btn"
-                    Content="Apply patches"
+                    Content="{StaticResource PatchManager_Apply}"
                     Command="{Binding ApplyCommand}"
                     IsVisible="{Binding IsApplying, Converter={StaticResource InverseBoolToVis}}"
-                    ToolTip.Tip="Apply all patches to the selected game folder in load order"/>
+                    ToolTip.Tip="{StaticResource ToolTip_ApplyPatches}"/>
             <Button Grid.Column="1" Classes="primary-btn"
-                    Content="Applying…"
+                    Content="{StaticResource PatchManager_Applying}"
                     IsEnabled="False"
                     IsVisible="{Binding IsApplying}"/>
         </Grid>

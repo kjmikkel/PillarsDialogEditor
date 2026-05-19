@@ -10,8 +10,11 @@
 
     <Application.Resources>
         <ResourceDictionary>
-            <converters:InverseBoolConverter  x:Key="InverseBoolToVis"/>
-            <converters:NullOrEmptyConverter  x:Key="NullOrEmptyToVis"/>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://DialogEditor.PatchManager/Resources/Strings.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+            <converters:InverseBoolConverter x:Key="InverseBoolToVis"/>
+            <converters:NullOrEmptyConverter x:Key="NullOrEmptyToVis"/>
         </ResourceDictionary>
     </Application.Resources>
 </Application>
