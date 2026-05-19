@@ -338,6 +338,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_MoveConditionUp">Move condition up</sys:String>
     <sys:String x:Key="ToolTip_MoveConditionDown">Move condition down</sys:String>
     <sys:String x:Key="Label_Condition_NOT">NOT</sys:String>
+    <sys:String x:Key="Option_ConditionAnd">And</sys:String>
+    <sys:String x:Key="Option_ConditionOr">Or</sys:String>
     <sys:String x:Key="Placeholder_PickCondition">Pick a condition…</sys:String>
     <sys:String x:Key="ToolTip_PickCondition">Select a condition from the catalogue to add to this node</sys:String>
     <sys:String x:Key="ToolTip_ConditionNot">Negate this condition — it must evaluate to FALSE for the check to pass</sys:String>

@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DialogEditor.Core.Models;
+using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.ViewModels;
@@ -59,6 +60,9 @@ public partial class ParameterValueViewModel : ObservableObject
 
 public partial class ConditionRowViewModel : ObservableObject
 {
+    public static IReadOnlyList<string> OperatorOptions
+        => [Loc.Get("Option_ConditionAnd"), Loc.Get("Option_ConditionOr")];
+
     [ObservableProperty] private bool   _not;
     [ObservableProperty] private string _operator = "And";
 

@@ -95,9 +95,18 @@ public partial class NodeDetailViewModel : ObservableObject
     // ── NodeType proxy (bool ↔ string for ComboBox binding) ──────────────
     public string NodeTypeString
     {
-        get => IsPlayerChoice ? "Player Choice" : "NPC Line";
-        set { if (_node != null) _node.IsPlayerChoice = value == "Player Choice"; }
+        get => IsPlayerChoice ? Loc.Get("Option_PlayerChoice") : Loc.Get("Option_NpcLine");
+        set { if (_node != null) _node.IsPlayerChoice = value == Loc.Get("Option_PlayerChoice"); }
     }
+
+    public static IReadOnlyList<string> NodeTypeOptions
+        => [Loc.Get("Option_NpcLine"), Loc.Get("Option_PlayerChoice")];
+
+    public static IReadOnlyList<string> DisplayTypeOptions
+        => [Loc.Get("Option_DisplayConversation"), Loc.Get("Option_DisplayBark")];
+
+    public static IReadOnlyList<string> PersistenceOptions
+        => [Loc.Get("Option_PersistenceNone"), Loc.Get("Option_PersistenceOnceEver")];
 
     // ── Read-only display ─────────────────────────────────────────────────
     public string FemaleTextDisplay =>
