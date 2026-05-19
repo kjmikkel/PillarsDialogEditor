@@ -22,19 +22,35 @@ public partial class ConversationViewModel : ObservableObject
     {
         _dispatcher       = dispatcher;
         PendingConnection = new PendingConnectionViewModel(this);
-        Nodes.CollectionChanged += (_, _) =>
+        Nodes.CollectionChanged += (_, args) =>
         {
-            OnPropertyChanged(nameof(NodeCountText));
-            OnPropertyChanged(nameof(Statistics));
-            OnPropertyChanged(nameof(StatisticsText));
-            OnPropertyChanged(nameof(StatisticsTooltip));
+            // Subscribe to text changes on newly added nodes so word counts stay live
+            if (args.NewItems is not null)
+                foreach (NodeViewModel n in args.NewItems)
+                    n.PropertyChanged += OnNodeTextChanged;
+            if (args.OldItems is not null)
+                foreach (NodeViewModel n in args.OldItems)
+                    n.PropertyChanged -= OnNodeTextChanged;
+
+            RefreshStatistics();
         };
     }
 
     public ObservableCollection<NodeViewModel>      Nodes       { get; } = [];
     public ObservableCollection<ConnectionViewModel> Connections { get; } = [];
 
-    public string NodeCountText => Loc.Format("Node_CountFormat", Nodes.Count);
+    private void OnNodeTextChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(NodeViewModel.DefaultText) or nameof(NodeViewModel.FemaleText))
+            RefreshStatistics();
+    }
+
+    private void RefreshStatistics()
+    {
+        OnPropertyChanged(nameof(Statistics));
+        OnPropertyChanged(nameof(StatisticsText));
+        OnPropertyChanged(nameof(StatisticsTooltip));
+    }
 
     public ConversationStatistics Statistics
     {

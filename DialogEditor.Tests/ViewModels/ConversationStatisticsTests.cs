@@ -74,4 +74,26 @@ public class ConversationStatisticsTests
         canvas.Nodes.Add(MakeNode(2, false, "World"));
         Assert.Equal(2, canvas.Statistics.NodeCount);
     }
+
+    [Fact]
+    public void Statistics_UpdatesWhenDefaultTextEdited()
+    {
+        var node   = MakeNode(1, false, "Hello");
+        var canvas = MakeCanvas(node);
+        Assert.Equal(1, canvas.Statistics.WordCount);
+
+        node.DefaultText = "One two three";
+        Assert.Equal(3, canvas.Statistics.WordCount);
+    }
+
+    [Fact]
+    public void Statistics_UpdatesWhenFemaleTextEdited()
+    {
+        var node   = MakeNode(1, false, "Male");
+        var canvas = MakeCanvas(node);
+        Assert.Equal(0, canvas.Statistics.FemaleWordCount);
+
+        node.FemaleText = "Female words here";
+        Assert.Equal(3, canvas.Statistics.FemaleWordCount);
+    }
 }
