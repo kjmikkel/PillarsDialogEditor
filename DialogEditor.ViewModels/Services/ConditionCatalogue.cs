@@ -46,12 +46,19 @@ public sealed class ConditionCatalogue
             string.Equals(e.MethodName, methodName, StringComparison.OrdinalIgnoreCase));
 
     /// Looks up an entry by its exact C# reflection FullName.
-    /// Use this when loading conditions from a game file to find the correct
-    /// variant (e.g. PoE1 HasConversationNodeBeenPlayed(String,Int32) vs
-    /// PoE2 HasConversationNodeBeenPlayed(Guid,Int32)).
+    /// Prefer the overload that also takes a gameId when available.
     public ConditionEntry? FindByFullName(string fullName)
         => _entries.FirstOrDefault(e =>
             string.Equals(e.ReflectionFullName, fullName, StringComparison.OrdinalIgnoreCase));
+
+    /// Looks up an entry by fullName AND game, returning the game-specific entry
+    /// when two conditions share the same signature but different parameter options
+    /// (e.g. IsMapVisibility with PoE1 vs PoE2 area names).
+    public ConditionEntry? FindByFullName(string fullName, string gameId)
+        => _entries.FirstOrDefault(e =>
+            string.Equals(e.ReflectionFullName, fullName, StringComparison.OrdinalIgnoreCase) &&
+            e.Games.Any(g => string.Equals(g, gameId, StringComparison.OrdinalIgnoreCase)))
+        ?? FindByFullName(fullName);
 
     public IReadOnlyList<ConditionEntry> ForGame(string gameId)
         => _entries

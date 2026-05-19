@@ -5,6 +5,7 @@ using DialogEditor.Core.Editing;
 using DialogEditor.Core.Layout;
 using DialogEditor.Core.Models;
 using DialogEditor.ViewModels.Editing;
+using DialogEditor.ViewModels.Models;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
 
@@ -21,13 +22,60 @@ public partial class ConversationViewModel : ObservableObject
     {
         _dispatcher       = dispatcher;
         PendingConnection = new PendingConnectionViewModel(this);
-        Nodes.CollectionChanged += (_, _) => OnPropertyChanged(nameof(NodeCountText));
+        Nodes.CollectionChanged += (_, _) =>
+        {
+            OnPropertyChanged(nameof(NodeCountText));
+            OnPropertyChanged(nameof(Statistics));
+            OnPropertyChanged(nameof(StatisticsText));
+            OnPropertyChanged(nameof(StatisticsTooltip));
+        };
     }
 
     public ObservableCollection<NodeViewModel>      Nodes       { get; } = [];
     public ObservableCollection<ConnectionViewModel> Connections { get; } = [];
 
     public string NodeCountText => Loc.Format("Node_CountFormat", Nodes.Count);
+
+    public ConversationStatistics Statistics
+    {
+        get
+        {
+            int npc = 0, player = 0, words = 0, femaleWords = 0;
+            foreach (var n in Nodes)
+            {
+                if (n.IsPlayerChoice) player++; else npc++;
+                words       += CountWords(n.DefaultText);
+                femaleWords += CountWords(n.FemaleText);
+            }
+            return new ConversationStatistics(Nodes.Count, npc, player, words, femaleWords);
+        }
+    }
+
+    public string StatisticsText
+    {
+        get
+        {
+            var s = Statistics;
+            return Loc.Format("Statistics_Summary", s.NodeCount, s.NpcCount, s.PlayerCount, s.WordCount);
+        }
+    }
+
+    public string StatisticsTooltip
+    {
+        get
+        {
+            var s = Statistics;
+            return s.FemaleWordCount > 0
+                ? Loc.Format("Statistics_FemaleDetail", s.FemaleWordCount)
+                : Loc.Get("ToolTip_Statistics");
+        }
+    }
+
+    private static int CountWords(string? text)
+    {
+        if (string.IsNullOrWhiteSpace(text)) return 0;
+        return text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).Length;
+    }
 
     [ObservableProperty]
     private NodeViewModel? _selectedNode;

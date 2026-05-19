@@ -54,8 +54,9 @@
                             ToolTip.Tip="{StaticResource ToolTip_JumpToRoot}"/>
                 </StackPanel>
                 <TextBlock DockPanel.Dock="Left"
-                           Text="{Binding NodeCountText}"
-                           Foreground="#888" FontSize="10" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                           Text="{Binding StatisticsText}"
+                           Foreground="#888" FontSize="10" VerticalAlignment="Center" Margin="0,0,8,0"
+                           ToolTip.Tip="{Binding StatisticsTooltip}"/>
                 <Grid VerticalAlignment="Center" Margin="0,0,8,0">
                     <TextBox x:Name="SearchBox"
                              Text="{Binding SearchQuery}"
