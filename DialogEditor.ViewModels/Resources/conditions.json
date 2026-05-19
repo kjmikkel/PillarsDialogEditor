@@ -734,8 +734,7 @@
     "displayName": "Is Deity",
     "category": "RPG",
     "games": [
-      "poe1",
-      "poe2"
+      "poe1"
     ],
     "description": "True if the specified character worships the given deity.",
     "parameters": [
@@ -766,8 +765,7 @@
     "displayName": "Is Paladin Order",
     "category": "RPG",
     "games": [
-      "poe1",
-      "poe2"
+      "poe1"
     ],
     "description": "True if the specified character belongs to the given Paladin order.",
     "parameters": [
@@ -1033,8 +1031,7 @@
     "displayName": "Has Money",
     "category": "Items",
     "games": [
-      "poe1",
-      "poe2"
+      "poe1"
     ],
     "description": "Tests how much gold the party has.",
     "parameters": [
@@ -1385,6 +1382,7 @@
     "displayName": "Is Map Visibility",
     "category": "World Map",
     "games": [
+      "poe1",
       "poe2"
     ],
     "description": "Tests whether a world map location has a specified visibility state.",
@@ -1985,6 +1983,78 @@
           "Female",
           "Neuter"
         ]
+      }
+    ]
+  },
+  {
+    "methodName": "IsDeity",
+    "fullName": "Boolean IsDeity(Guid, Guid)",
+    "displayName": "Is Deity",
+    "category": "RPG",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the specified character worships the given deity (identified by GameData GUID).",
+    "parameters": [
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "Character to test.",
+        "default": ""
+      },
+      {
+        "name": "Deity GUID",
+        "type": "GameData",
+        "description": "GameData GUID of the deity.",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "methodName": "IsPaladinOrder",
+    "fullName": "Boolean IsPaladinOrder(Guid, Guid)",
+    "displayName": "Is Paladin Order",
+    "category": "RPG",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the specified character belongs to the given Paladin order (identified by GameData GUID).",
+    "parameters": [
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "Character to test.",
+        "default": ""
+      },
+      {
+        "name": "Order GUID",
+        "type": "GameData",
+        "description": "GameData GUID of the Paladin order.",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "methodName": "HasMoneyPlayer",
+    "fullName": "Boolean HasMoneyPlayer(Operator, Int32)",
+    "displayName": "Player Has Money",
+    "category": "Items",
+    "games": [
+      "poe2"
+    ],
+    "description": "Tests how much gold the player has.",
+    "parameters": [
+      {
+        "name": "Operator",
+        "type": "Operator",
+        "description": "Comparison operator.",
+        "default": "GreaterThanOrEqualTo"
+      },
+      {
+        "name": "Amount",
+        "type": "Int32",
+        "description": "Gold amount to compare against.",
+        "default": "0"
       }
     ]
   }
