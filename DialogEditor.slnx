@@ -4,4 +4,5 @@
   <Project Path="DialogEditor.Tests/DialogEditor.Tests.csproj" />
   <Project Path="DialogEditor.ViewModels/DialogEditor.ViewModels.csproj" />
   <Project Path="DialogEditor.Avalonia/DialogEditor.Avalonia.csproj" />
+  <Project Path="DialogEditor.PatchManager/DialogEditor.PatchManager.csproj" />
 </Solution>

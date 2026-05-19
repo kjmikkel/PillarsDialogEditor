@@ -15,7 +15,8 @@ public partial class MainWindow : Window
 {
     private double _browserExpandedWidth = 220;
     private double _detailExpandedWidth  = 240;
-    private LegendWindow? _legendWindow;
+    private LegendWindow?       _legendWindow;
+    private PatchManagerWindow? _patchManagerWindow;
 
     // Set to true immediately before a programmatic Close() call so that
     // the re-entrant OnClosing doesn't show the dirty-close dialog again.
@@ -179,6 +180,20 @@ public partial class MainWindow : Window
                 e.Handled = true;
                 break;
         }
+    }
+
+    private void PatchManager_Click(object? sender, RoutedEventArgs e)
+    {
+        if (_patchManagerWindow is null || !_patchManagerWindow.IsVisible)
+        {
+            var vm = new PatchManagerViewModel(
+                new AvaloniaFolderPicker(this),
+                new AvaloniaFilePicker(this));
+            _patchManagerWindow = new PatchManagerWindow(vm);
+            _patchManagerWindow.Closed += (_, _) => _patchManagerWindow = null;
+        }
+        _patchManagerWindow.Show();
+        _patchManagerWindow.Activate();
     }
 
     private async void SettingsButton_Click(object? sender, RoutedEventArgs e)

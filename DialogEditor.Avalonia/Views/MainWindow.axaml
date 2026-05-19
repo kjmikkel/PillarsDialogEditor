@@ -50,6 +50,10 @@
                                   Command="{Binding OpenFolderCommand}"
                                   InputGesture="Ctrl+Shift+O"/>
                         <Separator/>
+                        <MenuItem Header="{StaticResource PatchManager_Title}"
+                                  Click="PatchManager_Click"
+                                  ToolTip.Tip="{StaticResource ToolTip_PatchManagerOpen}"/>
+                        <Separator/>
                         <MenuItem Header="{StaticResource Menu_Settings}"
                                   Click="SettingsButton_Click"
                                   InputGesture="Ctrl+,"/>
