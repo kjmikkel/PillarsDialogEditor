@@ -4,12 +4,30 @@
     "fullName": "Boolean IsGlobalValue(String, Operator, Int32)",
     "displayName": "Is Global Value",
     "category": "Globals",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "Tests a named global integer flag against a value.",
     "parameters": [
-      { "name": "Tag", "type": "GlobalVariable", "description": "Name of the global variable to query.", "default": "GlobalTag" },
-      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
-      { "name": "Value", "type": "Int32", "description": "Integer value to compare against.", "default": "0" }
+      {
+        "name": "Tag",
+        "type": "GlobalVariable",
+        "description": "Name of the global variable to query.",
+        "default": "GlobalTag"
+      },
+      {
+        "name": "Operator",
+        "type": "Operator",
+        "description": "Comparison operator.",
+        "default": "EqualTo"
+      },
+      {
+        "name": "Value",
+        "type": "Int32",
+        "description": "Integer value to compare against.",
+        "default": "0"
+      }
     ]
   },
   {
@@ -17,12 +35,30 @@
     "fullName": "Boolean CompareGlobals(String, Operator, String)",
     "displayName": "Compare Globals",
     "category": "Globals",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "Compares two named global variables against each other.",
     "parameters": [
-      { "name": "Global 1", "type": "GlobalVariable", "description": "First global variable.", "default": "GlobalTag1" },
-      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
-      { "name": "Global 2", "type": "GlobalVariable", "description": "Second global variable.", "default": "GlobalTag2" }
+      {
+        "name": "Global 1",
+        "type": "GlobalVariable",
+        "description": "First global variable.",
+        "default": "GlobalTag1"
+      },
+      {
+        "name": "Operator",
+        "type": "Operator",
+        "description": "Comparison operator.",
+        "default": "EqualTo"
+      },
+      {
+        "name": "Global 2",
+        "type": "GlobalVariable",
+        "description": "Second global variable.",
+        "default": "GlobalTag2"
+      }
     ]
   },
   {
@@ -30,11 +66,23 @@
     "fullName": "Boolean HasConversationNodeBeenPlayed(String, Int32)",
     "displayName": "Has Conversation Node Been Played",
     "category": "Conversation",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1"
+    ],
     "description": "True if the specified node in a conversation has already been shown to the player.",
     "parameters": [
-      { "name": "Conversation", "type": "Conversation", "description": "Name of the conversation file.", "default": "" },
-      { "name": "Node ID", "type": "Int32", "description": "Integer node ID within that conversation.", "default": "0" }
+      {
+        "name": "Conversation",
+        "type": "Conversation",
+        "description": "Name of the conversation file.",
+        "default": ""
+      },
+      {
+        "name": "Node ID",
+        "type": "Int32",
+        "description": "Integer node ID within that conversation.",
+        "default": "0"
+      }
     ]
   },
   {
@@ -42,11 +90,23 @@
     "fullName": "Boolean IsQuestOnNode(String, Int32)",
     "displayName": "Is Quest On Node",
     "category": "Quest",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1"
+    ],
     "description": "True if the specified quest is currently on the given node.",
     "parameters": [
-      { "name": "Quest Name", "type": "Quest", "description": "Name of the quest.", "default": "" },
-      { "name": "Node ID", "type": "Int32", "description": "Quest node ID.", "default": "0" }
+      {
+        "name": "Quest Name",
+        "type": "Quest",
+        "description": "Name of the quest.",
+        "default": ""
+      },
+      {
+        "name": "Node ID",
+        "type": "Int32",
+        "description": "Quest node ID.",
+        "default": "0"
+      }
     ]
   },
   {
@@ -54,11 +114,23 @@
     "fullName": "Boolean IsQuestEventTriggered(String, Int32)",
     "displayName": "Is Quest Event Triggered",
     "category": "Quest",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1"
+    ],
     "description": "True if the specified quest event has been triggered.",
     "parameters": [
-      { "name": "Quest Name", "type": "Quest", "description": "Name of the quest.", "default": "" },
-      { "name": "Event ID", "type": "Int32", "description": "Quest event ID.", "default": "-1" }
+      {
+        "name": "Quest Name",
+        "type": "Quest",
+        "description": "Name of the quest.",
+        "default": ""
+      },
+      {
+        "name": "Event ID",
+        "type": "Int32",
+        "description": "Quest event ID.",
+        "default": "-1"
+      }
     ]
   },
   {
@@ -66,11 +138,23 @@
     "fullName": "Boolean IsQuestAddendumTriggered(String, Int32)",
     "displayName": "Is Quest Addendum Triggered",
     "category": "Quest",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1"
+    ],
     "description": "True if the specified quest addendum has been triggered.",
     "parameters": [
-      { "name": "Quest Name", "type": "Quest", "description": "Name of the quest.", "default": "" },
-      { "name": "Addendum ID", "type": "Int32", "description": "Addendum ID.", "default": "0" }
+      {
+        "name": "Quest Name",
+        "type": "Quest",
+        "description": "Name of the quest.",
+        "default": ""
+      },
+      {
+        "name": "Addendum ID",
+        "type": "Int32",
+        "description": "Addendum ID.",
+        "default": "0"
+      }
     ]
   },
   {
@@ -78,11 +162,23 @@
     "fullName": "Boolean IsQuestEndStateTriggered(String, Int32)",
     "displayName": "Is Quest End State Triggered",
     "category": "Quest",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1"
+    ],
     "description": "True if the specified quest end state has been triggered.",
     "parameters": [
-      { "name": "Quest Name", "type": "Quest", "description": "Name of the quest.", "default": "" },
-      { "name": "End State ID", "type": "Int32", "description": "End state ID.", "default": "0" }
+      {
+        "name": "Quest Name",
+        "type": "Quest",
+        "description": "Name of the quest.",
+        "default": ""
+      },
+      {
+        "name": "End State ID",
+        "type": "Int32",
+        "description": "End state ID.",
+        "default": "0"
+      }
     ]
   },
   {
@@ -90,10 +186,17 @@
     "fullName": "Boolean IsQuestFailed(String)",
     "displayName": "Is Quest Failed",
     "category": "Quest",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1"
+    ],
     "description": "True if the specified quest has been failed.",
     "parameters": [
-      { "name": "Quest Name", "type": "Quest", "description": "Name of the quest.", "default": "" }
+      {
+        "name": "Quest Name",
+        "type": "Quest",
+        "description": "Name of the quest.",
+        "default": ""
+      }
     ]
   },
   {
@@ -101,10 +204,18 @@
     "fullName": "Boolean IsCompanionActiveInParty(Guid)",
     "displayName": "Is Companion Active In Party",
     "category": "General",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if the specified companion is currently active in the party.",
     "parameters": [
-      { "name": "Companion", "type": "ObjectGuid", "description": "GUID of the companion object.", "default": "" }
+      {
+        "name": "Companion",
+        "type": "ObjectGuid",
+        "description": "GUID of the companion object.",
+        "default": ""
+      }
     ]
   },
   {
@@ -112,7 +223,10 @@
     "fullName": "Boolean IsAnyCompanionActiveInParty()",
     "displayName": "Is Any Companion Active In Party",
     "category": "General",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if any companion is currently active in the party.",
     "parameters": []
   },
@@ -121,10 +235,18 @@
     "fullName": "Boolean IsActive(Guid)",
     "displayName": "Is Active",
     "category": "General",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if the specified game object is active.",
     "parameters": [
-      { "name": "Object", "type": "ObjectGuid", "description": "GUID of the object to check.", "default": "" }
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "GUID of the object to check.",
+        "default": ""
+      }
     ]
   },
   {
@@ -132,11 +254,31 @@
     "fullName": "Boolean IsPlayerClass(CharacterStats+Class)",
     "displayName": "Is Player Class",
     "category": "RPG",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if the player character is the specified class.",
     "parameters": [
-      { "name": "Class", "type": "Enum:CharacterStats+Class", "description": "Class to test.", "default": "Fighter",
-        "options": ["Fighter","Rogue","Priest","Wizard","Barbarian","Ranger","Druid","Paladin","Monk","Cipher","Chanter"] }
+      {
+        "name": "Class",
+        "type": "Enum:CharacterStats+Class",
+        "description": "Class to test.",
+        "default": "Fighter",
+        "options": [
+          "Fighter",
+          "Rogue",
+          "Priest",
+          "Wizard",
+          "Barbarian",
+          "Ranger",
+          "Druid",
+          "Paladin",
+          "Monk",
+          "Cipher",
+          "Chanter"
+        ]
+      }
     ]
   },
   {
@@ -144,12 +286,36 @@
     "fullName": "Boolean IsClass(Guid, CharacterStats+Class)",
     "displayName": "Is Class",
     "category": "RPG",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1"
+    ],
     "description": "True if the specified character is the given class.",
     "parameters": [
-      { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
-      { "name": "Class", "type": "Enum:CharacterStats+Class", "description": "Class to test.", "default": "Fighter",
-        "options": ["Fighter","Rogue","Priest","Wizard","Barbarian","Ranger","Druid","Paladin","Monk","Cipher","Chanter"] }
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "Character to test.",
+        "default": ""
+      },
+      {
+        "name": "Class",
+        "type": "Enum:CharacterStats+Class",
+        "description": "Class to test.",
+        "default": "Fighter",
+        "options": [
+          "Fighter",
+          "Rogue",
+          "Priest",
+          "Wizard",
+          "Barbarian",
+          "Ranger",
+          "Druid",
+          "Paladin",
+          "Monk",
+          "Cipher",
+          "Chanter"
+        ]
+      }
     ]
   },
   {
@@ -157,11 +323,31 @@
     "fullName": "Boolean IsPlayerRace(CharacterStats+Race)",
     "displayName": "Is Player Race",
     "category": "RPG",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if the player character is the specified race.",
     "parameters": [
-      { "name": "Race", "type": "Enum:CharacterStats+Race", "description": "Race to test.", "default": "Human",
-        "options": ["Human","Elf","Dwarf","Godlike","Orlan","Aumaua","Beast","Primordial","Spirit","Vessel","Wilder"] }
+      {
+        "name": "Race",
+        "type": "Enum:CharacterStats+Race",
+        "description": "Race to test.",
+        "default": "Human",
+        "options": [
+          "Human",
+          "Elf",
+          "Dwarf",
+          "Godlike",
+          "Orlan",
+          "Aumaua",
+          "Beast",
+          "Primordial",
+          "Spirit",
+          "Vessel",
+          "Wilder"
+        ]
+      }
     ]
   },
   {
@@ -169,11 +355,37 @@
     "fullName": "Boolean IsPlayerSubrace(CharacterStats+Subrace)",
     "displayName": "Is Player Subrace",
     "category": "RPG",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if the player character is the specified subrace.",
     "parameters": [
-      { "name": "Subrace", "type": "Enum:CharacterStats+Subrace", "description": "Subrace to test.", "default": "Meadow_Human",
-        "options": ["Meadow_Human","Ocean_Human","Savannah_Human","Wood_Elf","Snow_Elf","Mountain_Dwarf","Boreal_Dwarf","Death_Godlike","Fire_Godlike","Nature_Godlike","Moon_Godlike","Hearth_Orlan","Wild_Orlan","Coastal_Aumaua","Island_Aumaua","Avian_Godlike","Advanced_Construct"] }
+      {
+        "name": "Subrace",
+        "type": "Enum:CharacterStats+Subrace",
+        "description": "Subrace to test.",
+        "default": "Meadow_Human",
+        "options": [
+          "Meadow_Human",
+          "Ocean_Human",
+          "Savannah_Human",
+          "Wood_Elf",
+          "Snow_Elf",
+          "Mountain_Dwarf",
+          "Boreal_Dwarf",
+          "Death_Godlike",
+          "Fire_Godlike",
+          "Nature_Godlike",
+          "Moon_Godlike",
+          "Hearth_Orlan",
+          "Wild_Orlan",
+          "Coastal_Aumaua",
+          "Island_Aumaua",
+          "Avian_Godlike",
+          "Advanced_Construct"
+        ]
+      }
     ]
   },
   {
@@ -181,11 +393,23 @@
     "fullName": "Boolean IsPlayerGender(Gender)",
     "displayName": "Is Player Gender",
     "category": "RPG",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if the player character is the specified gender.",
     "parameters": [
-      { "name": "Gender", "type": "Enum:Gender", "description": "Gender to test.", "default": "Male",
-        "options": ["Male","Female","Neuter"] }
+      {
+        "name": "Gender",
+        "type": "Enum:Gender",
+        "description": "Gender to test.",
+        "default": "Male",
+        "options": [
+          "Male",
+          "Female",
+          "Neuter"
+        ]
+      }
     ]
   },
   {
@@ -193,11 +417,42 @@
     "fullName": "Boolean IsPlayerBackground(CharacterStats+Background)",
     "displayName": "Is Player Background",
     "category": "RPG",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if the player character has the specified background.",
     "parameters": [
-      { "name": "Background", "type": "Enum:CharacterStats+Background", "description": "Background to test.", "default": "Aristocrat",
-        "options": ["Aristocrat","Artist","Colonist","Dissident","Drifter","Explorer","Hunter","Laborer","Mercenary","Merchant","Mystic","Philosopher","Priest","Raider","Slave","Scholar","Scientist","Farmer","Soldier","Midwife","Gentry","Trapper"] }
+      {
+        "name": "Background",
+        "type": "Enum:CharacterStats+Background",
+        "description": "Background to test.",
+        "default": "Aristocrat",
+        "options": [
+          "Aristocrat",
+          "Artist",
+          "Colonist",
+          "Dissident",
+          "Drifter",
+          "Explorer",
+          "Hunter",
+          "Laborer",
+          "Mercenary",
+          "Merchant",
+          "Mystic",
+          "Philosopher",
+          "Priest",
+          "Raider",
+          "Slave",
+          "Scholar",
+          "Scientist",
+          "Farmer",
+          "Soldier",
+          "Midwife",
+          "Gentry",
+          "Trapper"
+        ]
+      }
     ]
   },
   {
@@ -205,11 +460,31 @@
     "fullName": "Boolean IsPlayerCulture(CharacterStats+Culture)",
     "displayName": "Is Player Culture",
     "category": "RPG",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if the player character is from the specified culture.",
     "parameters": [
-      { "name": "Culture", "type": "Enum:CharacterStats+Culture", "description": "Culture to test.", "default": "Aedyr",
-        "options": ["Aedyr","DeadfireArchipelago","IxamitlPlains","OldVailia","Ruatai","TheLivingLands","TheWhiteThatWends","TheDyrwood","TheVailianRepublics","Nassitaq","EirGlanfath"] }
+      {
+        "name": "Culture",
+        "type": "Enum:CharacterStats+Culture",
+        "description": "Culture to test.",
+        "default": "Aedyr",
+        "options": [
+          "Aedyr",
+          "DeadfireArchipelago",
+          "IxamitlPlains",
+          "OldVailia",
+          "Ruatai",
+          "TheLivingLands",
+          "TheWhiteThatWends",
+          "TheDyrwood",
+          "TheVailianRepublics",
+          "Nassitaq",
+          "EirGlanfath"
+        ]
+      }
     ]
   },
   {
@@ -217,13 +492,37 @@
     "fullName": "Boolean IsPlayerSkillValue(CharacterStats+SkillType, Operator, Int32)",
     "displayName": "Is Player Skill Value",
     "category": "RPG",
-    "games": ["poe1"],
+    "games": [
+      "poe1"
+    ],
     "description": "Tests the player character's skill score against a value. (PoE1 enum-based; use Is Skill Value for PoE2.)",
     "parameters": [
-      { "name": "Skill Type", "type": "Enum:CharacterStats+SkillType", "description": "Skill to test.", "default": "Stealth",
-        "options": ["Stealth","Athletics","Lore","Mechanics","Survival","Crafting"] },
-      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
-      { "name": "Value", "type": "Int32", "description": "Skill value to compare against.", "default": "0" }
+      {
+        "name": "Skill Type",
+        "type": "Enum:CharacterStats+SkillType",
+        "description": "Skill to test.",
+        "default": "Stealth",
+        "options": [
+          "Stealth",
+          "Athletics",
+          "Lore",
+          "Mechanics",
+          "Survival",
+          "Crafting"
+        ]
+      },
+      {
+        "name": "Operator",
+        "type": "Operator",
+        "description": "Comparison operator.",
+        "default": "EqualTo"
+      },
+      {
+        "name": "Value",
+        "type": "Int32",
+        "description": "Skill value to compare against.",
+        "default": "0"
+      }
     ]
   },
   {
@@ -231,14 +530,43 @@
     "fullName": "Boolean IsSkillValue(Guid, CharacterStats+SkillType, Operator, Int32)",
     "displayName": "Is Skill Value (PoE1)",
     "category": "RPG",
-    "games": ["poe1"],
+    "games": [
+      "poe1"
+    ],
     "description": "Tests a character's skill score against a value using an enum skill type. PoE1 only.",
     "parameters": [
-      { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
-      { "name": "Skill Type", "type": "Enum:CharacterStats+SkillType", "description": "Skill to test.", "default": "Stealth",
-        "options": ["Stealth","Athletics","Lore","Mechanics","Survival","Crafting"] },
-      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
-      { "name": "Value", "type": "Int32", "description": "Skill value to compare against.", "default": "0" }
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "Character to test.",
+        "default": ""
+      },
+      {
+        "name": "Skill Type",
+        "type": "Enum:CharacterStats+SkillType",
+        "description": "Skill to test.",
+        "default": "Stealth",
+        "options": [
+          "Stealth",
+          "Athletics",
+          "Lore",
+          "Mechanics",
+          "Survival",
+          "Crafting"
+        ]
+      },
+      {
+        "name": "Operator",
+        "type": "Operator",
+        "description": "Comparison operator.",
+        "default": "EqualTo"
+      },
+      {
+        "name": "Value",
+        "type": "Int32",
+        "description": "Skill value to compare against.",
+        "default": "0"
+      }
     ]
   },
   {
@@ -246,15 +574,47 @@
     "fullName": "Boolean IsSkillValue(Guid, Guid, Operator, Int32, Boolean, Boolean)",
     "displayName": "Is Skill Value (PoE2)",
     "category": "RPG",
-    "games": ["poe2"],
+    "games": [
+      "poe2"
+    ],
     "description": "Tests a character's skill score against a value. PoE2 uses a GameData GUID to identify the skill.",
     "parameters": [
-      { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "b1a8e901-0000-0000-0000-000000000000" },
-      { "name": "Skill Type", "type": "GameData", "description": "Skill GameData GUID (e.g. 90b913bb-960f-4f6c-8394-d01796148367 for Athletics).", "default": "90b913bb-960f-4f6c-8394-d01796148367" },
-      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "GreaterThanOrEqualTo" },
-      { "name": "Value", "type": "Int32", "description": "Skill value to compare against.", "default": "0" },
-      { "name": "Is Assisted", "type": "Boolean", "description": "If true, includes assistance from other party members.", "default": "true" },
-      { "name": "Hide Notification If Failure", "type": "Boolean", "description": "Suppresses failure notification in scripted interactions.", "default": "false" }
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "Character to test.",
+        "default": "b1a8e901-0000-0000-0000-000000000000"
+      },
+      {
+        "name": "Skill Type",
+        "type": "GameData",
+        "description": "Skill GameData GUID (e.g. 90b913bb-960f-4f6c-8394-d01796148367 for Athletics).",
+        "default": "90b913bb-960f-4f6c-8394-d01796148367"
+      },
+      {
+        "name": "Operator",
+        "type": "Operator",
+        "description": "Comparison operator.",
+        "default": "GreaterThanOrEqualTo"
+      },
+      {
+        "name": "Value",
+        "type": "Int32",
+        "description": "Skill value to compare against.",
+        "default": "0"
+      },
+      {
+        "name": "Is Assisted",
+        "type": "Boolean",
+        "description": "If true, includes assistance from other party members.",
+        "default": "true"
+      },
+      {
+        "name": "Hide Notification If Failure",
+        "type": "Boolean",
+        "description": "Suppresses failure notification in scripted interactions.",
+        "default": "false"
+      }
     ]
   },
   {
@@ -262,13 +622,38 @@
     "fullName": "Boolean IsPlayerAttributeScoreValue(CharacterStats+AttributeScoreType, Operator, Int32)",
     "displayName": "Is Player Attribute Score Value",
     "category": "RPG",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "Tests the player character's attribute score (Might, Resolve, etc.) against a value.",
     "parameters": [
-      { "name": "Attribute", "type": "Enum:CharacterStats+AttributeScoreType", "description": "Attribute to test.", "default": "Resolve",
-        "options": ["Resolve","Might","Dexterity","Intellect","Constitution","Perception"] },
-      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
-      { "name": "Value", "type": "Int32", "description": "Attribute value to compare against.", "default": "0" }
+      {
+        "name": "Attribute",
+        "type": "Enum:CharacterStats+AttributeScoreType",
+        "description": "Attribute to test.",
+        "default": "Resolve",
+        "options": [
+          "Resolve",
+          "Might",
+          "Dexterity",
+          "Intellect",
+          "Constitution",
+          "Perception"
+        ]
+      },
+      {
+        "name": "Operator",
+        "type": "Operator",
+        "description": "Comparison operator.",
+        "default": "EqualTo"
+      },
+      {
+        "name": "Value",
+        "type": "Int32",
+        "description": "Attribute value to compare against.",
+        "default": "0"
+      }
     ]
   },
   {
@@ -276,11 +661,23 @@
     "fullName": "Boolean IsPlayerLevel(Operator, Int32)",
     "displayName": "Is Player Level",
     "category": "RPG",
-    "games": ["poe1"],
+    "games": [
+      "poe1"
+    ],
     "description": "Tests the player character's level against a value.",
     "parameters": [
-      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
-      { "name": "Target Level", "type": "Int32", "description": "Level number to compare against.", "default": "1" }
+      {
+        "name": "Operator",
+        "type": "Operator",
+        "description": "Comparison operator.",
+        "default": "EqualTo"
+      },
+      {
+        "name": "Target Level",
+        "type": "Int32",
+        "description": "Level number to compare against.",
+        "default": "1"
+      }
     ]
   },
   {
@@ -288,12 +685,29 @@
     "fullName": "Boolean IsLevel(Guid, Operator, Int32)",
     "displayName": "Is Level",
     "category": "RPG",
-    "games": ["poe2"],
+    "games": [
+      "poe2"
+    ],
     "description": "Tests a character's level against a value.",
     "parameters": [
-      { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
-      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
-      { "name": "Target Level", "type": "Int32", "description": "Level number to compare against.", "default": "1" }
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "Character to test.",
+        "default": ""
+      },
+      {
+        "name": "Operator",
+        "type": "Operator",
+        "description": "Comparison operator.",
+        "default": "EqualTo"
+      },
+      {
+        "name": "Target Level",
+        "type": "Int32",
+        "description": "Level number to compare against.",
+        "default": "1"
+      }
     ]
   },
   {
@@ -301,11 +715,23 @@
     "fullName": "Boolean HasTalentOrAbility(Guid, String)",
     "displayName": "Has Talent or Ability",
     "category": "RPG",
-    "games": ["poe1"],
+    "games": [
+      "poe1"
+    ],
     "description": "True if the specified character has a talent or ability by name.",
     "parameters": [
-      { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
-      { "name": "Ability Name", "type": "String", "description": "Name of the ability or talent.", "default": "AbilityName" }
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "Character to test.",
+        "default": ""
+      },
+      {
+        "name": "Ability Name",
+        "type": "String",
+        "description": "Name of the ability or talent.",
+        "default": "AbilityName"
+      }
     ]
   },
   {
@@ -313,12 +739,31 @@
     "fullName": "Boolean IsDeity(Guid, Religion+Deity)",
     "displayName": "Is Deity",
     "category": "RPG",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if the specified character worships the given deity.",
     "parameters": [
-      { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
-      { "name": "Deity", "type": "Enum:Religion+Deity", "description": "Deity to test.", "default": "Berath",
-        "options": ["Berath","Eothas","Magran","Skaen","Wael"] }
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "Character to test.",
+        "default": ""
+      },
+      {
+        "name": "Deity",
+        "type": "Enum:Religion+Deity",
+        "description": "Deity to test.",
+        "default": "Berath",
+        "options": [
+          "Berath",
+          "Eothas",
+          "Magran",
+          "Skaen",
+          "Wael"
+        ]
+      }
     ]
   },
   {
@@ -326,12 +771,32 @@
     "fullName": "Boolean IsPaladinOrder(Guid, Religion+PaladinOrder)",
     "displayName": "Is Paladin Order",
     "category": "RPG",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if the specified character belongs to the given Paladin order.",
     "parameters": [
-      { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
-      { "name": "Order", "type": "Enum:Religion+PaladinOrder", "description": "Paladin order to test.", "default": "BleakWalkers",
-        "options": ["BleakWalkers","DarcozziPaladini","GoldpactKnights","KindWayfarers","ShieldbearersOfStElcga","FrermasMesCancSuolias"] }
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "Character to test.",
+        "default": ""
+      },
+      {
+        "name": "Order",
+        "type": "Enum:Religion+PaladinOrder",
+        "description": "Paladin order to test.",
+        "default": "BleakWalkers",
+        "options": [
+          "BleakWalkers",
+          "DarcozziPaladini",
+          "GoldpactKnights",
+          "KindWayfarers",
+          "ShieldbearersOfStElcga",
+          "FrermasMesCancSuolias"
+        ]
+      }
     ]
   },
   {
@@ -339,13 +804,41 @@
     "fullName": "Boolean DispositionGreaterOrEqual(Disposition+Axis, Disposition+Rank)",
     "displayName": "Disposition Greater or Equal",
     "category": "Faction",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1"
+    ],
     "description": "True if the player's disposition on the given axis meets or exceeds the specified rank.",
     "parameters": [
-      { "name": "Axis", "type": "Enum:Disposition+Axis", "description": "Disposition type.", "default": "Benevolent",
-        "options": ["Benevolent","Cruel","Clever","Stoic","Aggressive","Diplomatic","Passionate","Rational","Honest","Deceptive"] },
-      { "name": "Rank", "type": "Enum:Disposition+Rank", "description": "Minimum rank required.", "default": "Rank1",
-        "options": ["None","Rank1","Rank2","Rank3"] }
+      {
+        "name": "Axis",
+        "type": "Enum:Disposition+Axis",
+        "description": "Disposition type.",
+        "default": "Benevolent",
+        "options": [
+          "Benevolent",
+          "Cruel",
+          "Clever",
+          "Stoic",
+          "Aggressive",
+          "Diplomatic",
+          "Passionate",
+          "Rational",
+          "Honest",
+          "Deceptive"
+        ]
+      },
+      {
+        "name": "Rank",
+        "type": "Enum:Disposition+Rank",
+        "description": "Minimum rank required.",
+        "default": "Rank1",
+        "options": [
+          "None",
+          "Rank1",
+          "Rank2",
+          "Rank3"
+        ]
+      }
     ]
   },
   {
@@ -353,13 +846,41 @@
     "fullName": "Boolean DispositionEqual(Disposition+Axis, Disposition+Rank)",
     "displayName": "Disposition Equal",
     "category": "Faction",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1"
+    ],
     "description": "True if the player's disposition on the given axis equals the specified rank exactly.",
     "parameters": [
-      { "name": "Axis", "type": "Enum:Disposition+Axis", "description": "Disposition type.", "default": "Benevolent",
-        "options": ["Benevolent","Cruel","Clever","Stoic","Aggressive","Diplomatic","Passionate","Rational","Honest","Deceptive"] },
-      { "name": "Rank", "type": "Enum:Disposition+Rank", "description": "Required rank.", "default": "Rank1",
-        "options": ["None","Rank1","Rank2","Rank3"] }
+      {
+        "name": "Axis",
+        "type": "Enum:Disposition+Axis",
+        "description": "Disposition type.",
+        "default": "Benevolent",
+        "options": [
+          "Benevolent",
+          "Cruel",
+          "Clever",
+          "Stoic",
+          "Aggressive",
+          "Diplomatic",
+          "Passionate",
+          "Rational",
+          "Honest",
+          "Deceptive"
+        ]
+      },
+      {
+        "name": "Rank",
+        "type": "Enum:Disposition+Rank",
+        "description": "Required rank.",
+        "default": "Rank1",
+        "options": [
+          "None",
+          "Rank1",
+          "Rank2",
+          "Rank3"
+        ]
+      }
     ]
   },
   {
@@ -367,14 +888,47 @@
     "fullName": "Boolean ReputationRankByTagEquals(FactionName, Reputation+Axis, Int32)",
     "displayName": "Tagged Reputation Rank Equals",
     "category": "Faction",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1"
+    ],
     "description": "True if the player's reputation rank with a named faction exactly matches the given rank.",
     "parameters": [
-      { "name": "Faction Name", "type": "Enum:FactionName", "description": "Faction to check.", "default": "GildedVale",
-        "options": ["GildedVale","DefianceBay","Dyrford","TwinElms","KightsOfTheCrucible","TheDozens","DunrydRow","HouseDoemenel","EthikNol","OvatesOfTheGoldenGrove","TheFangs","Stalwart"] },
-      { "name": "Axis", "type": "Enum:Reputation+Axis", "description": "Positive or Negative axis.", "default": "Positive",
-        "options": ["Positive","Negative"] },
-      { "name": "Rank", "type": "Int32", "description": "Rank to compare.", "default": "0" }
+      {
+        "name": "Faction Name",
+        "type": "Enum:FactionName",
+        "description": "Faction to check.",
+        "default": "GildedVale",
+        "options": [
+          "GildedVale",
+          "DefianceBay",
+          "Dyrford",
+          "TwinElms",
+          "KightsOfTheCrucible",
+          "TheDozens",
+          "DunrydRow",
+          "HouseDoemenel",
+          "EthikNol",
+          "OvatesOfTheGoldenGrove",
+          "TheFangs",
+          "Stalwart"
+        ]
+      },
+      {
+        "name": "Axis",
+        "type": "Enum:Reputation+Axis",
+        "description": "Positive or Negative axis.",
+        "default": "Positive",
+        "options": [
+          "Positive",
+          "Negative"
+        ]
+      },
+      {
+        "name": "Rank",
+        "type": "Int32",
+        "description": "Rank to compare.",
+        "default": "0"
+      }
     ]
   },
   {
@@ -382,14 +936,47 @@
     "fullName": "Boolean ReputationTagRankGreater(FactionName, Reputation+Axis, Int32)",
     "displayName": "Tagged Reputation Rank Greater or Equal",
     "category": "Faction",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1"
+    ],
     "description": "True if the player's reputation rank with a named faction meets or exceeds the given rank.",
     "parameters": [
-      { "name": "Faction Name", "type": "Enum:FactionName", "description": "Faction to check.", "default": "GildedVale",
-        "options": ["GildedVale","DefianceBay","Dyrford","TwinElms","KightsOfTheCrucible","TheDozens","DunrydRow","HouseDoemenel","EthikNol","OvatesOfTheGoldenGrove","TheFangs","Stalwart"] },
-      { "name": "Axis", "type": "Enum:Reputation+Axis", "description": "Positive or Negative axis.", "default": "Positive",
-        "options": ["Positive","Negative"] },
-      { "name": "Rank", "type": "Int32", "description": "Minimum rank required.", "default": "0" }
+      {
+        "name": "Faction Name",
+        "type": "Enum:FactionName",
+        "description": "Faction to check.",
+        "default": "GildedVale",
+        "options": [
+          "GildedVale",
+          "DefianceBay",
+          "Dyrford",
+          "TwinElms",
+          "KightsOfTheCrucible",
+          "TheDozens",
+          "DunrydRow",
+          "HouseDoemenel",
+          "EthikNol",
+          "OvatesOfTheGoldenGrove",
+          "TheFangs",
+          "Stalwart"
+        ]
+      },
+      {
+        "name": "Axis",
+        "type": "Enum:Reputation+Axis",
+        "description": "Positive or Negative axis.",
+        "default": "Positive",
+        "options": [
+          "Positive",
+          "Negative"
+        ]
+      },
+      {
+        "name": "Rank",
+        "type": "Int32",
+        "description": "Minimum rank required.",
+        "default": "0"
+      }
     ]
   },
   {
@@ -397,12 +984,29 @@
     "fullName": "Boolean IsItemCount(String, Operator, Int32)",
     "displayName": "Is Item Count",
     "category": "Items",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1"
+    ],
     "description": "Tests how many of a named item the party has.",
     "parameters": [
-      { "name": "Item Name", "type": "String", "description": "Name of the item.", "default": "ItemName" },
-      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
-      { "name": "Count", "type": "Int32", "description": "Item count to compare against.", "default": "0" }
+      {
+        "name": "Item Name",
+        "type": "String",
+        "description": "Name of the item.",
+        "default": "ItemName"
+      },
+      {
+        "name": "Operator",
+        "type": "Operator",
+        "description": "Comparison operator.",
+        "default": "EqualTo"
+      },
+      {
+        "name": "Count",
+        "type": "Int32",
+        "description": "Item count to compare against.",
+        "default": "0"
+      }
     ]
   },
   {
@@ -410,11 +1014,23 @@
     "fullName": "Boolean IsItemEquipped(Guid, String)",
     "displayName": "Is Item Equipped",
     "category": "Items",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1"
+    ],
     "description": "True if the specified character has a named item equipped.",
     "parameters": [
-      { "name": "Object", "type": "ObjectGuid", "description": "Character to check.", "default": "" },
-      { "name": "Item Name", "type": "String", "description": "Name of the item.", "default": "ItemName" }
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "Character to check.",
+        "default": ""
+      },
+      {
+        "name": "Item Name",
+        "type": "String",
+        "description": "Name of the item.",
+        "default": "ItemName"
+      }
     ]
   },
   {
@@ -422,11 +1038,24 @@
     "fullName": "Boolean HasMoney(Operator, Int32)",
     "displayName": "Has Money",
     "category": "Items",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "Tests how much gold the party has.",
     "parameters": [
-      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "EqualTo" },
-      { "name": "Amount", "type": "Int32", "description": "Gold amount to compare against.", "default": "0" }
+      {
+        "name": "Operator",
+        "type": "Operator",
+        "description": "Comparison operator.",
+        "default": "EqualTo"
+      },
+      {
+        "name": "Amount",
+        "type": "Int32",
+        "description": "Gold amount to compare against.",
+        "default": "0"
+      }
     ]
   },
   {
@@ -434,7 +1063,10 @@
     "fullName": "Boolean IsInCombat()",
     "displayName": "Is In Combat",
     "category": "General",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if the party is currently in combat.",
     "parameters": []
   },
@@ -443,7 +1075,10 @@
     "fullName": "Boolean IsCurrentlyDaytime()",
     "displayName": "Is Currently Daytime",
     "category": "Time",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if the current in-game time is daytime.",
     "parameters": []
   },
@@ -452,7 +1087,10 @@
     "fullName": "Boolean IsCurrentlyNighttime()",
     "displayName": "Is Currently Nighttime",
     "category": "Time",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if the current in-game time is nighttime.",
     "parameters": []
   },
@@ -461,11 +1099,23 @@
     "fullName": "Boolean IsCurrentTime(Operator, Single)",
     "displayName": "Is Current Time of Day",
     "category": "Time",
-    "games": ["poe2"],
+    "games": [
+      "poe2"
+    ],
     "description": "Compares the current time of day (in hours) against a value.",
     "parameters": [
-      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "GreaterThan" },
-      { "name": "Time (Hours)", "type": "Single", "description": "Hour value to compare against (0–24).", "default": "0" }
+      {
+        "name": "Operator",
+        "type": "Operator",
+        "description": "Comparison operator.",
+        "default": "GreaterThan"
+      },
+      {
+        "name": "Time (Hours)",
+        "type": "Single",
+        "description": "Hour value to compare against (0\u00e2\u20ac\u201c24).",
+        "default": "0"
+      }
     ]
   },
   {
@@ -473,7 +1123,10 @@
     "fullName": "Boolean IsEasy()",
     "displayName": "Is Easy",
     "category": "Difficulty",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if the current difficulty setting is Easy.",
     "parameters": []
   },
@@ -482,7 +1135,10 @@
     "fullName": "Boolean IsNormal()",
     "displayName": "Is Normal",
     "category": "Difficulty",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if the current difficulty setting is Normal.",
     "parameters": []
   },
@@ -491,7 +1147,10 @@
     "fullName": "Boolean IsHard()",
     "displayName": "Is Hard",
     "category": "Difficulty",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if the current difficulty setting is Hard.",
     "parameters": []
   },
@@ -500,7 +1159,10 @@
     "fullName": "Boolean IsStoryTime()",
     "displayName": "Is Story Time",
     "category": "Difficulty",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if the current difficulty setting is Story Time.",
     "parameters": []
   },
@@ -509,7 +1171,10 @@
     "fullName": "Boolean IsUserInStealth()",
     "displayName": "Is User In Stealth",
     "category": "General",
-    "games": ["poe1", "poe2"],
+    "games": [
+      "poe1",
+      "poe2"
+    ],
     "description": "True if the conversation's owner object is currently in stealth mode.",
     "parameters": []
   },
@@ -518,15 +1183,49 @@
     "fullName": "Boolean IsPartySkillValueCount(CharacterStats+SkillType, Operator, Int32, Operator, Int32)",
     "displayName": "Is Party Skill Value Count (PoE1)",
     "category": "RPG",
-    "games": ["poe1"],
+    "games": [
+      "poe1"
+    ],
     "description": "Tests how many party members meet a skill threshold.",
     "parameters": [
-      { "name": "Skill Type", "type": "Enum:CharacterStats+SkillType", "description": "Skill to test.", "default": "Stealth",
-        "options": ["Stealth","Athletics","Lore","Mechanics","Survival","Crafting"] },
-      { "name": "Skill Operator", "type": "Operator", "description": "Skill comparison operator.", "default": "EqualTo" },
-      { "name": "Skill Value", "type": "Int32", "description": "Skill threshold.", "default": "0" },
-      { "name": "Party Operator", "type": "Operator", "description": "Operator for the party member count.", "default": "EqualTo" },
-      { "name": "Party Value", "type": "Int32", "description": "Number of party members who must pass.", "default": "0" }
+      {
+        "name": "Skill Type",
+        "type": "Enum:CharacterStats+SkillType",
+        "description": "Skill to test.",
+        "default": "Stealth",
+        "options": [
+          "Stealth",
+          "Athletics",
+          "Lore",
+          "Mechanics",
+          "Survival",
+          "Crafting"
+        ]
+      },
+      {
+        "name": "Skill Operator",
+        "type": "Operator",
+        "description": "Skill comparison operator.",
+        "default": "EqualTo"
+      },
+      {
+        "name": "Skill Value",
+        "type": "Int32",
+        "description": "Skill threshold.",
+        "default": "0"
+      },
+      {
+        "name": "Party Operator",
+        "type": "Operator",
+        "description": "Operator for the party member count.",
+        "default": "EqualTo"
+      },
+      {
+        "name": "Party Value",
+        "type": "Int32",
+        "description": "Number of party members who must pass.",
+        "default": "0"
+      }
     ]
   },
   {
@@ -534,15 +1233,47 @@
     "fullName": "Boolean IsPartySkillValueCount(Guid, Operator, Int32, Operator, Int32, Boolean)",
     "displayName": "Is Party Skill Value Count (PoE2)",
     "category": "RPG",
-    "games": ["poe2"],
+    "games": [
+      "poe2"
+    ],
     "description": "Tests how many party members meet a skill threshold. PoE2 uses a GameData GUID to identify the skill.",
     "parameters": [
-      { "name": "Skill Type", "type": "GameData", "description": "Skill GameData GUID (e.g. 90b913bb-960f-4f6c-8394-d01796148367 for Athletics).", "default": "90b913bb-960f-4f6c-8394-d01796148367" },
-      { "name": "Skill Operator", "type": "Operator", "description": "Skill comparison operator.", "default": "EqualTo" },
-      { "name": "Skill Value", "type": "Int32", "description": "Skill threshold.", "default": "0" },
-      { "name": "Party Operator", "type": "Operator", "description": "Operator for the party member count.", "default": "EqualTo" },
-      { "name": "Party Value", "type": "Int32", "description": "Number of party members who must pass.", "default": "0" },
-      { "name": "Hide Notification If Failure", "type": "Boolean", "description": "Suppresses failure notification in scripted interactions.", "default": "false" }
+      {
+        "name": "Skill Type",
+        "type": "GameData",
+        "description": "Skill GameData GUID (e.g. 90b913bb-960f-4f6c-8394-d01796148367 for Athletics).",
+        "default": "90b913bb-960f-4f6c-8394-d01796148367"
+      },
+      {
+        "name": "Skill Operator",
+        "type": "Operator",
+        "description": "Skill comparison operator.",
+        "default": "EqualTo"
+      },
+      {
+        "name": "Skill Value",
+        "type": "Int32",
+        "description": "Skill threshold.",
+        "default": "0"
+      },
+      {
+        "name": "Party Operator",
+        "type": "Operator",
+        "description": "Operator for the party member count.",
+        "default": "EqualTo"
+      },
+      {
+        "name": "Party Value",
+        "type": "Int32",
+        "description": "Number of party members who must pass.",
+        "default": "0"
+      },
+      {
+        "name": "Hide Notification If Failure",
+        "type": "Boolean",
+        "description": "Suppresses failure notification in scripted interactions.",
+        "default": "false"
+      }
     ]
   },
   {
@@ -550,11 +1281,24 @@
     "fullName": "Boolean IsMoraleStatus(MoraleStateType)",
     "displayName": "Is Morale Status",
     "category": "Ship Crew",
-    "games": ["poe2"],
+    "games": [
+      "poe2"
+    ],
     "description": "True if the crew's morale is at the specified state.",
     "parameters": [
-      { "name": "Morale State", "type": "Enum:MoraleStateType", "description": "Morale state to check.", "default": "Lively",
-        "options": ["Lively","Content","Concerned","Angry","Mutinous"] }
+      {
+        "name": "Morale State",
+        "type": "Enum:MoraleStateType",
+        "description": "Morale state to check.",
+        "default": "Lively",
+        "options": [
+          "Lively",
+          "Content",
+          "Concerned",
+          "Angry",
+          "Mutinous"
+        ]
+      }
     ]
   },
   {
@@ -562,13 +1306,35 @@
     "fullName": "Boolean IsPlayerShipAttribute(ShipAttributeType, Operator, Int32)",
     "displayName": "Is Player Ship Attribute",
     "category": "Ships",
-    "games": ["poe2"],
+    "games": [
+      "poe2"
+    ],
     "description": "Tests a player ship attribute (speed, armour, etc.) against a value.",
     "parameters": [
-      { "name": "Attribute", "type": "Enum:ShipAttributeType", "description": "Ship attribute to test.", "default": "CombatSpeed",
-        "options": ["CombatSpeed","SailHealth","HullHealth","TravelSpeed"] },
-      { "name": "Operator", "type": "Operator", "description": "Comparison operator.", "default": "GreaterThanOrEqualTo" },
-      { "name": "Value", "type": "Int32", "description": "Attribute value to compare against.", "default": "0" }
+      {
+        "name": "Attribute",
+        "type": "Enum:ShipAttributeType",
+        "description": "Ship attribute to test.",
+        "default": "CombatSpeed",
+        "options": [
+          "CombatSpeed",
+          "SailHealth",
+          "HullHealth",
+          "TravelSpeed"
+        ]
+      },
+      {
+        "name": "Operator",
+        "type": "Operator",
+        "description": "Comparison operator.",
+        "default": "GreaterThanOrEqualTo"
+      },
+      {
+        "name": "Value",
+        "type": "Int32",
+        "description": "Attribute value to compare against.",
+        "default": "0"
+      }
     ]
   },
   {
@@ -576,11 +1342,23 @@
     "fullName": "Boolean HasKeyword(Guid, Guid)",
     "displayName": "Has Keyword",
     "category": "RPG",
-    "games": ["poe2"],
+    "games": [
+      "poe2"
+    ],
     "description": "True if the specified character has the given keyword.",
     "parameters": [
-      { "name": "Object", "type": "ObjectGuid", "description": "Character to test.", "default": "" },
-      { "name": "Keyword", "type": "GameData", "description": "Keyword GUID.", "default": "" }
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "Character to test.",
+        "default": ""
+      },
+      {
+        "name": "Keyword",
+        "type": "GameData",
+        "description": "Keyword GUID.",
+        "default": ""
+      }
     ]
   },
   {
@@ -588,11 +1366,23 @@
     "fullName": "Boolean HasStatusEffect(Guid, Guid)",
     "displayName": "Has Status Effect",
     "category": "Targeting Filter",
-    "games": ["poe2"],
+    "games": [
+      "poe2"
+    ],
     "description": "True if the specified character currently has the given status effect.",
     "parameters": [
-      { "name": "Object", "type": "ObjectGuid", "description": "Character to check.", "default": "" },
-      { "name": "Status Effect", "type": "GameData", "description": "Status effect GUID.", "default": "" }
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "Character to check.",
+        "default": ""
+      },
+      {
+        "name": "Status Effect",
+        "type": "GameData",
+        "description": "Status effect GUID.",
+        "default": ""
+      }
     ]
   },
   {
@@ -600,12 +1390,579 @@
     "fullName": "Boolean IsMapVisibility(MapType, MapVisibilityType)",
     "displayName": "Is Map Visibility",
     "category": "World Map",
-    "games": ["poe2"],
+    "games": [
+      "poe2"
+    ],
     "description": "Tests whether a world map location has a specified visibility state.",
     "parameters": [
-      { "name": "Map Type", "type": "String", "description": "Map type enum value (e.g. Global, DesignGlobal, or a specific area name).", "default": "Global" },
-      { "name": "Visibility", "type": "Enum:MapVisibilityType", "description": "Visibility state to test.", "default": "Unlocked",
-        "options": ["Locked","Unlocked","Hidden","DeveloperOnly","Unidentified"] }
+      {
+        "name": "Map Type",
+        "type": "String",
+        "description": "Map type enum value (e.g. Global, DesignGlobal, or a specific area name).",
+        "default": "Global"
+      },
+      {
+        "name": "Visibility",
+        "type": "Enum:MapVisibilityType",
+        "description": "Visibility state to test.",
+        "default": "Unlocked",
+        "options": [
+          "Locked",
+          "Unlocked",
+          "Hidden",
+          "DeveloperOnly",
+          "Unidentified"
+        ]
+      }
     ]
+  },
+  {
+    "methodName": "HasPX1",
+    "fullName": "Boolean HasPX1()",
+    "displayName": "Has White March Part 1",
+    "category": "General",
+    "games": [
+      "poe1"
+    ],
+    "description": "True if the White March Part 1 DLC is installed.",
+    "parameters": []
+  },
+  {
+    "methodName": "HasPX2",
+    "fullName": "Boolean HasPX2()",
+    "displayName": "Has White March Part 2",
+    "category": "General",
+    "games": [
+      "poe1"
+    ],
+    "description": "True if the White March Part 2 DLC is installed.",
+    "parameters": []
+  },
+  {
+    "methodName": "HasPX4",
+    "fullName": "Boolean HasPX4()",
+    "displayName": "Has Expansion 4",
+    "category": "General",
+    "games": [
+      "poe1"
+    ],
+    "description": "True if the fourth PoE1 expansion pack is installed.",
+    "parameters": []
+  },
+  {
+    "methodName": "IsItemEquippedOnPlayer",
+    "fullName": "Boolean IsItemEquippedOnPlayer(String)",
+    "displayName": "Is Item Equipped On Player",
+    "category": "Items",
+    "games": [
+      "poe1"
+    ],
+    "description": "True if the player character has the named item equipped.",
+    "parameters": [
+      {
+        "name": "Item Name",
+        "type": "String",
+        "description": "Internal name of the item to check.",
+        "default": "ItemName"
+      }
+    ]
+  },
+  {
+    "methodName": "IsQuestOnNode",
+    "fullName": "Boolean IsQuestOnNode(Guid, Int32)",
+    "displayName": "Is Quest On Node",
+    "category": "Quest",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the specified quest is currently on the given node.",
+    "parameters": [
+      {
+        "name": "Quest GUID",
+        "type": "Guid",
+        "description": "GameData GUID of the quest.",
+        "default": ""
+      },
+      {
+        "name": "Node ID",
+        "type": "Int32",
+        "description": "Quest node ID.",
+        "default": "0"
+      }
+    ]
+  },
+  {
+    "methodName": "IsQuestEventTriggered",
+    "fullName": "Boolean IsQuestEventTriggered(Guid, Int32)",
+    "displayName": "Is Quest Event Triggered",
+    "category": "Quest",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the specified quest event has been triggered.",
+    "parameters": [
+      {
+        "name": "Quest GUID",
+        "type": "Guid",
+        "description": "GameData GUID of the quest.",
+        "default": ""
+      },
+      {
+        "name": "Event ID",
+        "type": "Int32",
+        "description": "Quest event ID.",
+        "default": "-1"
+      }
+    ]
+  },
+  {
+    "methodName": "IsQuestAddendumTriggered",
+    "fullName": "Boolean IsQuestAddendumTriggered(Guid, Int32)",
+    "displayName": "Is Quest Addendum Triggered",
+    "category": "Quest",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the specified quest addendum has been triggered.",
+    "parameters": [
+      {
+        "name": "Quest GUID",
+        "type": "Guid",
+        "description": "GameData GUID of the quest.",
+        "default": ""
+      },
+      {
+        "name": "Addendum ID",
+        "type": "Int32",
+        "description": "Addendum ID.",
+        "default": "0"
+      }
+    ]
+  },
+  {
+    "methodName": "IsQuestEndStateTriggered",
+    "fullName": "Boolean IsQuestEndStateTriggered(Guid, Int32)",
+    "displayName": "Is Quest End State Triggered",
+    "category": "Quest",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the specified quest end state has been triggered.",
+    "parameters": [
+      {
+        "name": "Quest GUID",
+        "type": "Guid",
+        "description": "GameData GUID of the quest.",
+        "default": ""
+      },
+      {
+        "name": "End State ID",
+        "type": "Int32",
+        "description": "End state ID.",
+        "default": "0"
+      }
+    ]
+  },
+  {
+    "methodName": "IsQuestFailed",
+    "fullName": "Boolean IsQuestFailed(Guid)",
+    "displayName": "Is Quest Failed",
+    "category": "Quest",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the specified quest has been failed.",
+    "parameters": [
+      {
+        "name": "Quest GUID",
+        "type": "Guid",
+        "description": "GameData GUID of the quest.",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "methodName": "HasQuestStarted",
+    "fullName": "Boolean HasQuestStarted(Guid)",
+    "displayName": "Has Quest Started",
+    "category": "Quest",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the specified quest has been started.",
+    "parameters": [
+      {
+        "name": "Quest GUID",
+        "type": "Guid",
+        "description": "GameData GUID of the quest.",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "methodName": "IsQuestCompleted",
+    "fullName": "Boolean IsQuestCompleted(Guid)",
+    "displayName": "Is Quest Completed",
+    "category": "Quest",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the specified quest has been completed.",
+    "parameters": [
+      {
+        "name": "Quest GUID",
+        "type": "Guid",
+        "description": "GameData GUID of the quest.",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "methodName": "IsQuestActive",
+    "fullName": "Boolean IsQuestActive(Guid)",
+    "displayName": "Is Quest Active",
+    "category": "Quest",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the specified quest is currently active (started but not completed or failed).",
+    "parameters": [
+      {
+        "name": "Quest GUID",
+        "type": "Guid",
+        "description": "GameData GUID of the quest.",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "methodName": "HasConversationNodeBeenPlayed",
+    "fullName": "Boolean HasConversationNodeBeenPlayed(Guid, Int32)",
+    "displayName": "Has Conversation Node Been Played",
+    "category": "Conversation",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the specified node in a conversation has already been shown to the player.",
+    "parameters": [
+      {
+        "name": "Conversation GUID",
+        "type": "Guid",
+        "description": "GameData GUID of the conversation.",
+        "default": ""
+      },
+      {
+        "name": "Node ID",
+        "type": "Int32",
+        "description": "Integer node ID within that conversation.",
+        "default": "0"
+      }
+    ]
+  },
+  {
+    "methodName": "IsItemCount",
+    "fullName": "Boolean IsItemCount(Guid, Operator, Int32)",
+    "displayName": "Is Item Count",
+    "category": "Items",
+    "games": [
+      "poe2"
+    ],
+    "description": "Tests how many of a specific item (by GameData GUID) the party has.",
+    "parameters": [
+      {
+        "name": "Item GUID",
+        "type": "Guid",
+        "description": "GameData GUID of the item.",
+        "default": ""
+      },
+      {
+        "name": "Operator",
+        "type": "Operator",
+        "description": "Comparison operator.",
+        "default": "EqualTo"
+      },
+      {
+        "name": "Count",
+        "type": "Int32",
+        "description": "Item count to compare against.",
+        "default": "0"
+      }
+    ]
+  },
+  {
+    "methodName": "IsItemEquipped",
+    "fullName": "Boolean IsItemEquipped(Guid, Guid)",
+    "displayName": "Is Item Equipped",
+    "category": "Items",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the specified character has the given item (by GameData GUID) equipped.",
+    "parameters": [
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "Character to check.",
+        "default": ""
+      },
+      {
+        "name": "Item GUID",
+        "type": "Guid",
+        "description": "GameData GUID of the item.",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "methodName": "HasClass",
+    "fullName": "Boolean HasClass(Guid, Guid)",
+    "displayName": "Has Class",
+    "category": "RPG",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the specified character has the given class (by GameData GUID).",
+    "parameters": [
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "Character to test.",
+        "default": ""
+      },
+      {
+        "name": "Class GUID",
+        "type": "GameData",
+        "description": "GameData GUID of the class.",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "methodName": "IsRace",
+    "fullName": "Boolean IsRace(Guid, Guid)",
+    "displayName": "Is Race",
+    "category": "RPG",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the specified character is the given race (by GameData GUID).",
+    "parameters": [
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "Character to test.",
+        "default": ""
+      },
+      {
+        "name": "Race GUID",
+        "type": "GameData",
+        "description": "GameData GUID of the race.",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "methodName": "HasAbility",
+    "fullName": "Boolean HasAbility(Guid, Guid)",
+    "displayName": "Has Ability, Talent, or Phrase",
+    "category": "RPG",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the specified character has the given ability, talent, or chanter phrase.",
+    "parameters": [
+      {
+        "name": "Object",
+        "type": "ObjectGuid",
+        "description": "Character to test.",
+        "default": ""
+      },
+      {
+        "name": "Ability GUID",
+        "type": "GameData",
+        "description": "GameData GUID of the ability.",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "methodName": "IsDisposition",
+    "fullName": "Boolean IsDisposition(Guid, Disposition+Rank, Operator)",
+    "displayName": "Is Disposition",
+    "category": "Faction",
+    "games": [
+      "poe2"
+    ],
+    "description": "Tests the player character's disposition rank for a specific disposition type.",
+    "parameters": [
+      {
+        "name": "Disposition GUID",
+        "type": "GameData",
+        "description": "GameData GUID of the disposition type.",
+        "default": ""
+      },
+      {
+        "name": "Rank",
+        "type": "Enum:Disposition+Rank",
+        "description": "Rank to compare against.",
+        "default": "Rank1",
+        "options": [
+          "None",
+          "Rank1",
+          "Rank2",
+          "Rank3"
+        ]
+      },
+      {
+        "name": "Operator",
+        "type": "Operator",
+        "description": "Comparison operator.",
+        "default": "GreaterThanOrEqualTo"
+      }
+    ]
+  },
+  {
+    "methodName": "IsReputation",
+    "fullName": "Boolean IsReputation(Guid, RankType, Int32, Operator)",
+    "displayName": "Is Reputation",
+    "category": "Faction",
+    "games": [
+      "poe2"
+    ],
+    "description": "Tests the player's reputation with a faction (by GameData GUID) against a rank value.",
+    "parameters": [
+      {
+        "name": "Faction GUID",
+        "type": "GameData",
+        "description": "GameData GUID of the faction.",
+        "default": ""
+      },
+      {
+        "name": "Rank Type",
+        "type": "Enum:RankType",
+        "description": "Which reputation axis to check.",
+        "default": "Good",
+        "options": [
+          "Default",
+          "Good",
+          "Bad",
+          "Mixed"
+        ]
+      },
+      {
+        "name": "Rank Value",
+        "type": "Int32",
+        "description": "Numeric rank value to compare against.",
+        "default": "0"
+      },
+      {
+        "name": "Operator",
+        "type": "Operator",
+        "description": "Comparison operator.",
+        "default": "GreaterThanOrEqualTo"
+      }
+    ]
+  },
+  {
+    "methodName": "IsCompanionInRoster",
+    "fullName": "Boolean IsCompanionInRoster(Guid)",
+    "displayName": "Is Companion In Roster",
+    "category": "General",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the specified companion is in the party roster (not necessarily the active party).",
+    "parameters": [
+      {
+        "name": "Companion",
+        "type": "ObjectGuid",
+        "description": "GUID of the companion to check.",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "methodName": "IsCompanionActiveInPartyOrPresent",
+    "fullName": "Boolean IsCompanionActiveInPartyOrPresent(Guid)",
+    "displayName": "Is Companion Active In Party Or Present",
+    "category": "General",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the specified companion is either in the active party or present in the current scene.",
+    "parameters": [
+      {
+        "name": "Companion",
+        "type": "ObjectGuid",
+        "description": "GUID of the companion to check.",
+        "default": ""
+      }
+    ]
+  },
+  {
+    "methodName": "IsPathOfTheDamned",
+    "fullName": "Boolean IsPathOfTheDamned()",
+    "displayName": "Is Path of the Damned",
+    "category": "Difficulty",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the current difficulty setting is Path of the Damned.",
+    "parameters": []
+  },
+  {
+    "methodName": "HasAnyLAX",
+    "fullName": "Boolean HasAnyLAX()",
+    "displayName": "Has Any DLC",
+    "category": "General",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if any Deadfire DLC expansion is installed.",
+    "parameters": []
+  },
+  {
+    "methodName": "HasLAX1",
+    "fullName": "Boolean HasLAX1()",
+    "displayName": "Has Beast of Winter",
+    "category": "General",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the Beast of Winter DLC is installed.",
+    "parameters": []
+  },
+  {
+    "methodName": "HasLAX2",
+    "fullName": "Boolean HasLAX2()",
+    "displayName": "Has Seeker, Slayer, Survivor",
+    "category": "General",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the Seeker, Slayer, Survivor DLC is installed.",
+    "parameters": []
+  },
+  {
+    "methodName": "HasLAX3",
+    "fullName": "Boolean HasLAX3()",
+    "displayName": "Has The Forgotten Sanctum",
+    "category": "General",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if The Forgotten Sanctum DLC is installed.",
+    "parameters": []
+  },
+  {
+    "methodName": "HasLAX4",
+    "fullName": "Boolean HasLAX4()",
+    "displayName": "Has Deck of Many Things",
+    "category": "General",
+    "games": [
+      "poe2"
+    ],
+    "description": "True if the Deck of Many Things DLC is installed.",
+    "parameters": []
   }
 ]
