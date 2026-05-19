@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
         x:Class="DialogEditor.PatchManager.MainWindow"
-        Title="Patch Manager — Pillars Dialog Editor"
+        Title="{StaticResource PatchManager_WindowTitle}"
         Icon="avares://DialogEditor.PatchManager/Assets/app.ico"
         Width="640" Height="580" MinWidth="500" MinHeight="420"
         CanResize="True"

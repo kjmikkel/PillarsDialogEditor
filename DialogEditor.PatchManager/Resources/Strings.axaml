@@ -3,6 +3,8 @@
                     xmlns:sys="clr-namespace:System;assembly=System.Runtime">
 
     <!-- Patch Manager strings — standalone app edition -->
+    <sys:String x:Key="PatchManager_Title">Patch Manager</sys:String>
+    <sys:String x:Key="PatchManager_WindowTitle">Patch Manager — Pillars Dialog Editor</sys:String>
 
     <sys:String x:Key="PatchManager_GameFolder">Game folder</sys:String>
     <sys:String x:Key="PatchManager_GameFolderWatermark">(no game folder selected)</sys:String>
