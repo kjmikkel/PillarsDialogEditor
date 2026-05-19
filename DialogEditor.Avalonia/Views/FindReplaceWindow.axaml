@@ -41,7 +41,7 @@
 
         <!-- Find row -->
         <Grid Grid.Row="0" ColumnDefinitions="70,*" Margin="0,0,0,6">
-            <TextBlock Grid.Column="0" Text="{StaticResource FindReplace_Find}"
+            <TextBlock Grid.Column="0" Text="{StaticResource FindReplace_FindLabel}"
                        Foreground="#aaa" FontSize="11" VerticalAlignment="Center"/>
             <TextBox Grid.Column="1" Classes="find-box"
                      Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -51,7 +51,7 @@
 
         <!-- Replace row -->
         <Grid Grid.Row="1" ColumnDefinitions="70,*" Margin="0,0,0,8">
-            <TextBlock Grid.Column="0" Text="{StaticResource FindReplace_Replace}"
+            <TextBlock Grid.Column="0" Text="{StaticResource FindReplace_ReplaceLabel}"
                        Foreground="#aaa" FontSize="11" VerticalAlignment="Center"/>
             <TextBox Grid.Column="1" Classes="find-box"
                      Text="{Binding ReplaceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -63,7 +63,7 @@
             <CheckBox IsChecked="{Binding CaseSensitive, Mode=TwoWay}"
                       Content="{StaticResource FindReplace_CaseSensitive}"
                       Foreground="#ccc" FontSize="11"
-                      ToolTip.Tip="Match exact capitalisation"/>
+                      ToolTip.Tip="{StaticResource ToolTip_CaseSensitive}"/>
             <TextBlock Text="{Binding StatusText}"
                        Foreground="#888" FontSize="10"
                        VerticalAlignment="Center"/>
@@ -84,7 +84,7 @@
                     Command="{Binding FindNextCommand}"
                     ToolTip.Tip="{StaticResource ToolTip_FindNext}"/>
             <Button Classes="action-btn" Margin="0,0,4,4"
-                    Content="{StaticResource FindReplace_Replace}"
+                    Content="{StaticResource FindReplace_ReplaceOne}"
                     Command="{Binding ReplaceCommand}"
                     ToolTip.Tip="{StaticResource ToolTip_Replace}"/>
             <Button Classes="primary-btn" Margin="0,0,4,4"

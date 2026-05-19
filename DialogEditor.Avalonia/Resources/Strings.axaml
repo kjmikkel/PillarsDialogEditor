@@ -446,13 +446,14 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Menu_FindReplace">Find / Replace…</sys:String>
     <sys:String x:Key="ToolTip_FindReplace">Search for text across all nodes in the current conversation and optionally replace it</sys:String>
     <sys:String x:Key="FindReplace_Title">Find / Replace</sys:String>
-    <sys:String x:Key="FindReplace_Find">Find:</sys:String>
-    <sys:String x:Key="FindReplace_Replace">Replace:</sys:String>
+    <sys:String x:Key="FindReplace_FindLabel">Find:</sys:String>
+    <sys:String x:Key="FindReplace_ReplaceLabel">Replace:</sys:String>
     <sys:String x:Key="FindReplace_CaseSensitive">Case-sensitive</sys:String>
+    <sys:String x:Key="ToolTip_CaseSensitive">Match exact capitalisation</sys:String>
     <sys:String x:Key="FindReplace_FindAll">Find all</sys:String>
     <sys:String x:Key="FindReplace_FindNext">Find next</sys:String>
     <sys:String x:Key="FindReplace_FindPrev">Find prev</sys:String>
-    <sys:String x:Key="FindReplace_Replace">Replace</sys:String>
+    <sys:String x:Key="FindReplace_ReplaceOne">Replace</sys:String>
     <sys:String x:Key="FindReplace_ReplaceAll">Replace all</sys:String>
     <sys:String x:Key="ToolTip_FindAll">Search all nodes for the given text</sys:String>
     <sys:String x:Key="ToolTip_FindNext">Select the next matching node</sys:String>
