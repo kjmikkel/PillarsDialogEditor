@@ -17,6 +17,7 @@ public class NodeDetailViewModelTests
     private static NodeViewModel MakeNode(
         int id = 1,
         bool isPlayerChoice = false,
+        SpeakerCategory speakerCategory = SpeakerCategory.Npc,
         string speakerGuid = "",
         string listenerGuid = "",
         string displayType = "Conversation",
@@ -34,7 +35,7 @@ public class NodeDetailViewModelTests
         var node = new ConversationNode(
             NodeId: id,
             IsPlayerChoice: isPlayerChoice,
-            SpeakerCategory: SpeakerCategory.Npc,
+            SpeakerCategory: speakerCategory,
             SpeakerGuid: speakerGuid,
             ListenerGuid: listenerGuid,
             Links: links ?? [],
@@ -195,6 +196,40 @@ public class NodeDetailViewModelTests
         var vm = new NodeViewModel(node, new StringEntry(99, string.Empty, string.Empty));
         _vm.Load(vm);
         Assert.Equal(string.Empty, _vm.DefaultText);
+    }
+
+    // ── SpeakerCategory proxy ─────────────────────────────────────────────
+
+    [Fact]
+    public void Load_ExposesSpeakerCategoryString_ForNpcNode()
+    {
+        _vm.Load(MakeNode());
+        Assert.Equal(Loc.Get("Speaker_Npc"), _vm.SpeakerCategoryString);
+    }
+
+    [Fact]
+    public void Load_ExposesSpeakerCategoryString_ForPlayerNode()
+    {
+        _vm.Load(MakeNode(speakerCategory: SpeakerCategory.Player));
+        Assert.Equal(Loc.Get("Speaker_Player"), _vm.SpeakerCategoryString);
+    }
+
+    [Fact]
+    public void SetSpeakerCategoryString_Player_UpdatesNodeViewModel()
+    {
+        var node = MakeNode();
+        _vm.Load(node);
+        _vm.SpeakerCategoryString = Loc.Get("Speaker_Player");
+        Assert.Equal(SpeakerCategory.Player, node.SpeakerCategory);
+    }
+
+    [Fact]
+    public void SetSpeakerCategoryString_UnknownValue_DefaultsToNpc()
+    {
+        var node = MakeNode(speakerCategory: SpeakerCategory.Player);
+        _vm.Load(node);
+        _vm.SpeakerCategoryString = "SomethingUnrecognised";
+        Assert.Equal(SpeakerCategory.Npc, node.SpeakerCategory);
     }
 
     // ── RefreshLinks (Fix C) ──────────────────────────────────────────────

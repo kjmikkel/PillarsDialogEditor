@@ -32,6 +32,7 @@
     <!-- Shown in the node title and detail panel when the speaker GUID is
          not resolved to a named character. These are category labels, not
          character names. -->
+    <sys:String x:Key="Speaker_Npc">NPC</sys:String>
     <sys:String x:Key="Speaker_Player">Player</sys:String>
     <sys:String x:Key="Speaker_Narrator">Narrator</sys:String>
     <sys:String x:Key="Speaker_Script">Script</sys:String>
@@ -120,6 +121,8 @@
     <sys:String x:Key="PropertyRow_NodeId">Node ID</sys:String>
     <sys:String x:Key="PropertyRow_Type">Type</sys:String>
     <sys:String x:Key="PropertyRow_Speaker">Speaker</sys:String>
+    <sys:String x:Key="PropertyRow_SpeakerCategory">Speaker category</sys:String>
+    <sys:String x:Key="ToolTip_SpeakerCategory">The speaker category controls the node colour on the canvas and which speaker slot the line occupies (NPC, Player, Narrator, or Script)</sys:String>
     <sys:String x:Key="PropertyRow_SpeakerGuid">Speaker GUID</sys:String>
     <sys:String x:Key="PropertyRow_Listener">Listener</sys:String>
     <sys:String x:Key="PropertyRow_DisplayType">Display Type</sys:String>
