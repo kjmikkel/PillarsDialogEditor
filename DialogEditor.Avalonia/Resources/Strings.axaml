@@ -493,5 +493,26 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Dialog_NewProjectDefault">MyMod</sys:String>
     <sys:String x:Key="Dialog_OpenProject">Open project</sys:String>
     <sys:String x:Key="FileType_DialogProject">Dialog Project (*.dialogproject)</sys:String>
+    <sys:String x:Key="FileType_PatchList">Patch List (*.patchlist)</sys:String>
+
+    <!-- ─── Patch Manager ──────────────────────────────────────────────── -->
+    <sys:String x:Key="PatchManager_Title">Patch Manager</sys:String>
+    <sys:String x:Key="PatchManager_GameFolder">Game folder</sys:String>
+    <sys:String x:Key="PatchManager_BrowseGame">Browse…</sys:String>
+    <sys:String x:Key="PatchManager_AddProjects">Add project(s)…</sys:String>
+    <sys:String x:Key="PatchManager_LoadOrder">Load Order</sys:String>
+    <sys:String x:Key="PatchManager_SaveLoadOrder">Save load order…</sys:String>
+    <sys:String x:Key="PatchManager_LoadLoadOrder">Load load order…</sys:String>
+    <sys:String x:Key="PatchManager_Apply">Apply patches</sys:String>
+    <sys:String x:Key="PatchManager_Applying">Applying…</sys:String>
+    <sys:String x:Key="PatchManager_NoConflicts">No conflicts detected.</sys:String>
+    <sys:String x:Key="PatchManager_ConflictsFound">{0} conflict(s) detected — reorder so the version you want is lowest in the list.</sys:String>
+    <sys:String x:Key="PatchManager_ApplySuccess">Applied {0} patch(es) to {1}.</sys:String>
+    <sys:String x:Key="PatchManager_ApplyError">Apply failed: {0}</sys:String>
+    <sys:String x:Key="PatchManager_NoGameFolder">Select a game folder before applying.</sys:String>
+    <sys:String x:Key="PatchManager_LoadError">Could not load '{0}': {1}</sys:String>
+    <sys:String x:Key="ToolTip_PatchManagerOpen">Open the Patch Manager to combine and apply multiple .dialogproject files in a defined load order</sys:String>
+    <sys:String x:Key="PatchManager_EntryConflict">⚠ conflicts with another project</sys:String>
+    <sys:String x:Key="PatchManager_EntryLoadError">⚠ could not load</sys:String>
 
 </ResourceDictionary>

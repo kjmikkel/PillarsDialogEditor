@@ -2,7 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Platform.Storage;
 using DialogEditor.ViewModels.Services;
 
-namespace DialogEditor.Avalonia.Services;
+namespace DialogEditor.PatchManager.Services;
 
 public sealed class AvaloniaFilePicker(TopLevel topLevel) : IFilePicker
 {
