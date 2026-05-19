@@ -106,11 +106,13 @@
                                                          Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                                          IsVisible="{Binding IsText}"
                                                          ToolTip.Tip="{Binding TypeHint}"/>
-                                                <ComboBox Grid.Column="1" Classes="param-input"
-                                                          ItemsSource="{Binding EnumOptions}"
-                                                          SelectedItem="{Binding Value, Mode=TwoWay}"
-                                                          IsVisible="{Binding IsEnum}"
-                                                          ToolTip.Tip="{Binding TypeHint}"/>
+                                                <AutoCompleteBox Grid.Column="1" Classes="param-input"
+                                                              ItemsSource="{Binding EnumOptions}"
+                                                              Text="{Binding Value, Mode=TwoWay}"
+                                                              FilterMode="Contains"
+                                                              MinimumPrefixLength="0"
+                                                              IsVisible="{Binding IsEnum}"
+                                                              ToolTip.Tip="{Binding TypeHint}"/>
                                                 <Button Grid.Column="2" Classes="type-hint"
                                                         Content="(?)"
                                                         ToolTip.Tip="{Binding TypeHint}"

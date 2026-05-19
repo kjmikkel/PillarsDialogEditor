@@ -160,11 +160,14 @@
                                                              Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                                              IsVisible="{Binding IsText}"
                                                              ToolTip.Tip="{Binding TypeHint}"/>
-                                                    <!-- Enum/Operator ComboBox -->
-                                                    <ComboBox Grid.Column="1"
+                                                    <!-- Enum/Operator AutoCompleteBox — supports both
+                                                         free-text and filtering for large option lists -->
+                                                    <AutoCompleteBox Grid.Column="1"
                                                               Classes="param-input"
                                                               ItemsSource="{Binding EnumOptions}"
-                                                              SelectedItem="{Binding Value, Mode=TwoWay}"
+                                                              Text="{Binding Value, Mode=TwoWay}"
+                                                              FilterMode="Contains"
+                                                              MinimumPrefixLength="0"
                                                               IsVisible="{Binding IsEnum}"
                                                               ToolTip.Tip="{Binding TypeHint}"/>
                                                     <!-- Type hint (?) — Button for reliable tooltip on hover -->
