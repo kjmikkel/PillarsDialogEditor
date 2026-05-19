@@ -135,6 +135,7 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(IsProjectOpen));
         SaveProjectCommand.NotifyCanExecuteChanged();
         NewConversationCommand.NotifyCanExecuteChanged();
+        MergeProjectsCommand.NotifyCanExecuteChanged();
         // Only re-scan the game folder when NewConversations actually changes —
         // not on every patch save, which would re-enumerate all conversations.
         if (_provider is not null && !ReferenceEquals(prevNew, nextNew))
@@ -390,6 +391,41 @@ public partial class MainWindowViewModel : ObservableObject
     private bool CanSaveProject() =>
         _project is not null && _projectPath is not null &&
         _currentFile is not null && IsModified;
+
+    // ── Merge projects ────────────────────────────────────────────────────
+    [RelayCommand(CanExecute = nameof(CanMergeProjects))]
+    private async Task MergeProjects()
+    {
+        if (_project is null) return;
+
+        var paths = await _filePicker.PickOpenFilesAsync(
+            Loc.Get("Dialog_MergeProjects"),
+            ".dialogproject",
+            Loc.Get("FileType_DialogProject"));
+        if (paths.Count == 0) return;
+
+        try
+        {
+            var merged = _project;
+            foreach (var path in paths)
+            {
+                var other = DialogProjectSerializer.LoadFromFile(path);
+                merged = merged.MergeWith(other);
+            }
+            SetProject(merged);
+            IsModified = true;
+            Canvas.IsModified = true;
+            AppLog.Info($"Merged {paths.Count} project(s) into '{_project.Name}'");
+            StatusText = Loc.Format("Status_MergeComplete", paths.Count, merged.Name);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error("Merge projects failed", ex);
+            StatusText = Loc.Format("Status_MergeError", ex.Message);
+        }
+    }
+
+    private bool CanMergeProjects() => _project is not null && _projectPath is not null;
 
     // ── Open folder ───────────────────────────────────────────────────────
     [RelayCommand]

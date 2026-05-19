@@ -45,6 +45,9 @@
                         <MenuItem Header="{StaticResource Menu_SaveProject}"
                                   Command="{Binding SaveProjectCommand}"
                                   InputGesture="Ctrl+S"/>
+                        <MenuItem Header="{StaticResource Menu_MergeProjects}"
+                                  Command="{Binding MergeProjectsCommand}"
+                                  ToolTip.Tip="{StaticResource ToolTip_MergeProjects}"/>
                         <Separator/>
                         <MenuItem Header="{StaticResource Button_OpenFolder}"
                                   Command="{Binding OpenFolderCommand}"
