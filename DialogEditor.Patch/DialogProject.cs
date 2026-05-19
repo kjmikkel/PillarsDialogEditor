@@ -28,6 +28,41 @@ public record DialogProject(
     public bool IsNewConversation(string name)
         => NewConversations?.Contains(name) == true;
 
+    /// Merges another project into this one. Patches for the same conversation are
+    /// combined using PatchMerger (the other project's values win on conflict).
+    /// Layouts are merged with the other project winning on overlap. NewConversations
+    /// lists are unioned.
+    public DialogProject MergeWith(DialogProject other)
+    {
+        var allConversations = Patches.Keys
+            .Concat(other.Patches.Keys)
+            .Distinct();
+
+        var mergedPatches = new Dictionary<string, ConversationPatch>();
+        foreach (var name in allConversations)
+        {
+            var mine   = Patches.GetValueOrDefault(name);
+            var theirs = other.Patches.GetValueOrDefault(name);
+            mergedPatches[name] = (mine, theirs) switch
+            {
+                (not null, not null) => PatchMerger.Merge(name, [mine, theirs]),
+                (not null, null)     => mine,
+                _                    => theirs!,
+            };
+        }
+
+        var result = this with { Patches = mergedPatches };
+
+        foreach (var (convName, positions) in other.Layouts ?? new Dictionary<string, IReadOnlyDictionary<int, LayoutPoint>>())
+            result = result.MergeLayout(convName, positions);
+
+        var combined = (NewConversations ?? [])
+            .Concat(other.NewConversations ?? [])
+            .Distinct()
+            .ToList();
+        return result with { NewConversations = combined.Count > 0 ? combined : null };
+    }
+
     public DialogProject WithPatch(ConversationPatch patch) =>
         this with
         {
