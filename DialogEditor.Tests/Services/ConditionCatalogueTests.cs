@@ -62,4 +62,36 @@ public class ConditionCatalogueTests
     {
         Assert.Equal(Catalogue.ForGame("poe1").Count, Catalogue.ForGame("POE1").Count);
     }
+
+    // ── FindByFullName ────────────────────────────────────────────────────
+
+    [Fact]
+    public void FindByFullName_ExactMatch_ReturnsEntry()
+    {
+        var entry = Catalogue.FindByFullName("Boolean IsGlobalValue(String, Operator, Int32)");
+        Assert.NotNull(entry);
+        Assert.Equal("IsGlobalValue", entry.MethodName);
+    }
+
+    [Fact]
+    public void FindByFullName_UnknownFullName_ReturnsNull()
+        => Assert.Null(Catalogue.FindByFullName("Boolean NonExistentCondition_XYZ(String)"));
+
+    [Fact]
+    public void FindByFullName_Poe1HasConversationNode_ReturnsPoe1Entry()
+    {
+        var entry = Catalogue.FindByFullName("Boolean HasConversationNodeBeenPlayed(String, Int32)");
+        Assert.NotNull(entry);
+        Assert.Contains("poe1", entry.Games);
+        Assert.DoesNotContain("poe2", entry.Games);
+    }
+
+    [Fact]
+    public void FindByFullName_Poe2HasConversationNode_ReturnsPoe2Entry()
+    {
+        var entry = Catalogue.FindByFullName("Boolean HasConversationNodeBeenPlayed(Guid, Int32)");
+        Assert.NotNull(entry);
+        Assert.Contains("poe2", entry.Games);
+        Assert.DoesNotContain("poe1", entry.Games);
+    }
 }
