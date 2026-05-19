@@ -1,10 +1,10 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:sys="clr-namespace:System;assembly=System.Runtime"
              xmlns:models="clr-namespace:DialogEditor.ViewModels.Models;assembly=DialogEditor.ViewModels"
              xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
              xmlns:types="clr-namespace:DialogEditor.ViewModels.Services;assembly=DialogEditor.ViewModels"
-             x:Class="DialogEditor.Avalonia.Views.NodeDetailView" x:CompileBindings="False">
+             x:Class="DialogEditor.Avalonia.Views.NodeDetailView"
+             x:CompileBindings="False">
 
     <UserControl.Styles>
         <Style Selector="TextBlock.group-header">
@@ -84,13 +84,9 @@
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_Type}"/>
                 <ComboBox Classes="detail-combo"
+                          ItemsSource="{x:Static vm:NodeDetailViewModel.NodeTypeOptions}"
                           SelectedItem="{Binding NodeTypeString, Mode=TwoWay}"
-                          ToolTip.Tip="{StaticResource ToolTip_NodeType}">
-                    <ComboBox.Items>
-                        <sys:String>NPC Line</sys:String>
-                        <sys:String>Player Choice</sys:String>
-                    </ComboBox.Items>
-                </ComboBox>
+                          ToolTip.Tip="{StaticResource ToolTip_NodeType}"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_SpeakerGuid}"/>
                 <!-- Name picker — visible when speaker data is loaded (PoE2) -->
@@ -125,23 +121,15 @@
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_DisplayType}"/>
                 <ComboBox Classes="detail-combo"
+                          ItemsSource="{x:Static vm:NodeDetailViewModel.DisplayTypeOptions}"
                           SelectedItem="{Binding DisplayType, Mode=TwoWay}"
-                          ToolTip.Tip="{StaticResource ToolTip_DisplayType}">
-                    <ComboBox.Items>
-                        <sys:String>Conversation</sys:String>
-                        <sys:String>Bark</sys:String>
-                    </ComboBox.Items>
-                </ComboBox>
+                          ToolTip.Tip="{StaticResource ToolTip_DisplayType}"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_Persistence}"/>
                 <ComboBox Classes="detail-combo"
+                          ItemsSource="{x:Static vm:NodeDetailViewModel.PersistenceOptions}"
                           SelectedItem="{Binding Persistence, Mode=TwoWay}"
-                          ToolTip.Tip="{StaticResource ToolTip_Persistence}">
-                    <ComboBox.Items>
-                        <sys:String>None</sys:String>
-                        <sys:String>OnceEver</sys:String>
-                    </ComboBox.Items>
-                </ComboBox>
+                          ToolTip.Tip="{StaticResource ToolTip_Persistence}"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_ActorDirection}"/>
                 <TextBox Classes="detail-field"

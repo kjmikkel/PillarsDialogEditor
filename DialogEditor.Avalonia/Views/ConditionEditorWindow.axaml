@@ -1,6 +1,5 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:sys="clr-namespace:System;assembly=System.Runtime"
         xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
         xmlns:types="clr-namespace:DialogEditor.ViewModels.Services;assembly=DialogEditor.ViewModels"
         x:Class="DialogEditor.Avalonia.Views.ConditionEditorWindow"
@@ -82,15 +81,11 @@
                                     <Grid ColumnDefinitions="70,Auto,*,28,28,28">
                                         <!-- And / Or (hidden for branch rows — branch controls its own operator) -->
                                         <ComboBox Grid.Column="0"
+                                                  ItemsSource="{x:Static vm:ConditionRowViewModel.OperatorOptions}"
                                                   SelectedItem="{Binding Operator, Mode=TwoWay}"
                                                   Background="#1a1a1a" BorderBrush="#555"
                                                   BorderThickness="1" FontSize="11" Padding="4,2"
-                                                  IsVisible="{Binding IsLeaf}">
-                                            <ComboBox.Items>
-                                                <sys:String>And</sys:String>
-                                                <sys:String>Or</sys:String>
-                                            </ComboBox.Items>
-                                        </ComboBox>
+                                                  IsVisible="{Binding IsLeaf}"/>
                                         <!-- NOT toggle -->
                                         <CheckBox Grid.Column="1"
                                                   IsChecked="{Binding Not, Mode=TwoWay}"
