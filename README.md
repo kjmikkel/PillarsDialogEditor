@@ -49,7 +49,11 @@ as you like; they are all saved into the same file and applied together at test 
 
 ### 3 — Browse and edit
 
-Click any conversation in the browser to open it on the canvas.
+Click any conversation in the browser to open it on the canvas. To start a brand-new
+conversation that doesn't exist yet in the game folder, click the **⊕** button in the
+browser header — a name dialog opens, and the new entry appears in a **(new)** folder
+shown in green. The conversation file is **not** written to disk until you press
+`F5`; `F6` deletes it again, leaving the project entry intact for the next test cycle.
 
 | Action | How |
 |--------|-----|
