@@ -186,7 +186,7 @@
 
                 <!-- Add condition row -->
                 <Border Background="#1a1a1a" CornerRadius="3" Padding="8,6">
-                    <Grid ColumnDefinitions="*,Auto">
+                    <Grid ColumnDefinitions="*,Auto,Auto">
                         <ComboBox Grid.Column="0"
                                   ItemsSource="{Binding AvailableConditions}"
                                   SelectedItem="{Binding SelectedNewCondition, Mode=TwoWay}"
@@ -212,6 +212,12 @@
                                 Background="#2c3e50" Foreground="#ccc" BorderThickness="0"
                                 Padding="14,6" Margin="8,0,0,0" FontSize="12"
                                 ToolTip.Tip="{StaticResource ToolTip_AddCondition}"/>
+                        <Button Grid.Column="2"
+                                Content="{StaticResource Button_NewGroup}"
+                                Command="{Binding AddGroupCommand}"
+                                Background="#2c3e50" Foreground="#ccc" BorderThickness="0"
+                                Padding="14,6" Margin="6,0,0,0" FontSize="12"
+                                ToolTip.Tip="{StaticResource ToolTip_NewGroup}"/>
                     </Grid>
                 </Border>
 

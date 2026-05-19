@@ -1,5 +1,6 @@
 using DialogEditor.Core.Models;
 using DialogEditor.ViewModels;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.ViewModels;
 
@@ -58,5 +59,26 @@ public class ConditionBranchEditingTests
         var node = (ConditionBranch)row.ToNode();
         Assert.True(node.Not);
         Assert.Equal("Or", node.Operator);
+    }
+
+    // ── AddGroupCommand ───────────────────────────────────────────────────
+
+    [Fact]
+    public void AddGroup_AddsRowToConditionEditor()
+    {
+        var vm = new ConditionEditorViewModel("Test", [], _ => {});
+        vm.AddGroupCommand.Execute(null);
+        Assert.Single(vm.Rows);
+    }
+
+    [Fact]
+    public void AddGroup_NewRow_IsBranch_WithEmptyComponents()
+    {
+        var vm = new ConditionEditorViewModel("Test", [], _ => {});
+        vm.AddGroupCommand.Execute(null);
+
+        var row = vm.Rows[0];
+        Assert.True(row.IsBranch);
+        Assert.Empty(row.BranchComponents);
     }
 }

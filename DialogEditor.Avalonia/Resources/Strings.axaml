@@ -349,6 +349,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_ConditionBranch">Grouped condition block — click Edit group… to modify its contents</sys:String>
     <sys:String x:Key="Label_BranchGroupTitle">Condition Group</sys:String>
     <sys:String x:Key="Button_EditBranchGroup">Edit group…</sys:String>
+    <sys:String x:Key="Button_NewGroup">+ New group</sys:String>
+    <sys:String x:Key="ToolTip_NewGroup">Add a new empty condition group. Use 'Edit group…' to add conditions inside it, and And/Or + NOT to control how it combines with other conditions.</sys:String>
     <sys:String x:Key="ToolTip_EditBranchGroup">Open a nested editor to modify the conditions inside this group</sys:String>
     <sys:String x:Key="WindowTitle_ConditionEditor">Conditions — {0}</sys:String>
     <sys:String x:Key="WindowTitle_ScriptEditor">Scripts — {0}</sys:String>
