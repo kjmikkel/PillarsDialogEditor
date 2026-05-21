@@ -1369,5 +1369,125 @@
         ]
       }
     ]
+  },
+  {
+    "methodName": "StartConversation",
+    "fullName": "Void StartConversation(Guid, String, Int32)",
+    "displayName": "Start Conversation",
+    "category": "Conversation",
+    "games": [
+      "poe1"
+    ],
+    "description": "Starts a conversation with the given speaker NPC, beginning at the specified node. The NPC must be alive and present in the scene.",
+    "parameters": [
+      {
+        "name": "Speaker",
+        "type": "ObjectGuid",
+        "description": "GUID of the NPC who will speak.",
+        "default": ""
+      },
+      {
+        "name": "Conversation",
+        "type": "Conversation",
+        "description": "Conversation filename (no path or extension).",
+        "default": ""
+      },
+      {
+        "name": "Start Node",
+        "type": "Int32",
+        "description": "Node ID to start from. Use 0 to start from the beginning.",
+        "default": "0"
+      }
+    ]
+  },
+  {
+    "methodName": "StartConversation",
+    "fullName": "Void StartConversation(Guid, Guid, Int32)",
+    "displayName": "Start Conversation",
+    "category": "Conversation",
+    "games": [
+      "poe2"
+    ],
+    "description": "Starts a conversation with the given speaker NPC, beginning at the specified node. The NPC must be alive and present in the scene.",
+    "parameters": [
+      {
+        "name": "Speaker",
+        "type": "ObjectGuid",
+        "description": "GUID of the NPC who will speak.",
+        "default": ""
+      },
+      {
+        "name": "Conversation GUID",
+        "type": "Guid",
+        "description": "GameData GUID of the conversation asset.",
+        "default": ""
+      },
+      {
+        "name": "Start Node",
+        "type": "Int32",
+        "description": "Node ID to start from. Use 0 to start from the beginning.",
+        "default": "0"
+      }
+    ]
+  },
+  {
+    "methodName": "StartConversationFacingListener",
+    "fullName": "Void StartConversationFacingListener(Guid, String, Int32)",
+    "displayName": "Start Conversation Facing Listener",
+    "category": "Conversation",
+    "games": [
+      "poe1"
+    ],
+    "description": "Same as Start Conversation, but also turns the speaker to face the listener (player) before dialogue begins.",
+    "parameters": [
+      {
+        "name": "Speaker",
+        "type": "ObjectGuid",
+        "description": "GUID of the NPC who will speak.",
+        "default": ""
+      },
+      {
+        "name": "Conversation",
+        "type": "Conversation",
+        "description": "Conversation filename (no path or extension).",
+        "default": ""
+      },
+      {
+        "name": "Start Node",
+        "type": "Int32",
+        "description": "Node ID to start from. Use 0 to start from the beginning.",
+        "default": "0"
+      }
+    ]
+  },
+  {
+    "methodName": "StartConversationFacingListener",
+    "fullName": "Void StartConversationFacingListener(Guid, Guid, Int32)",
+    "displayName": "Start Conversation Facing Listener",
+    "category": "Conversation",
+    "games": [
+      "poe2"
+    ],
+    "description": "Same as Start Conversation, but also turns the speaker to face the listener (player) before dialogue begins.",
+    "parameters": [
+      {
+        "name": "Speaker",
+        "type": "ObjectGuid",
+        "description": "GUID of the NPC who will speak.",
+        "default": ""
+      },
+      {
+        "name": "Conversation GUID",
+        "type": "Guid",
+        "description": "GameData GUID of the conversation asset.",
+        "default": ""
+      },
+      {
+        "name": "Start Node",
+        "type": "Int32",
+        "description": "Node ID to start from. Use 0 to start from the beginning.",
+        "default": "0"
+      }
+    ]
   }
 ]
