@@ -6,4 +6,5 @@
   <Project Path="DialogEditor.Avalonia.Shared/DialogEditor.Avalonia.Shared.csproj" />
   <Project Path="DialogEditor.Avalonia/DialogEditor.Avalonia.csproj" />
   <Project Path="DialogEditor.PatchManager/DialogEditor.PatchManager.csproj" />
+  <Project Path="DialogEditor.PatchCli/DialogEditor.PatchCli.csproj" />
 </Solution>
