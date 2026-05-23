@@ -493,8 +493,22 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Status_PatchNotFound">No patch file found for {0} — save first.</sys:String>
     <!-- {0} = node ID, {1} = field name, {2} = expected value, {3} = actual value -->
     <sys:String x:Key="Status_PatchConflict">Patch conflict on node {0} field '{1}': expected '{2}' but found '{3}'.</sys:String>
+    <!-- {0} = node ID, {1} = field name -->
+    <sys:String x:Key="Status_PatchConflictCancelled">Test cancelled — conflict on node {0} field '{1}'.</sys:String>
     <!-- {0} = conversation name, {1} = error message -->
     <sys:String x:Key="Status_TestApplyError">Test apply failed for {0}: {1}</sys:String>
+
+    <!-- ─── Conflict resolution dialog ──────────────────────────────────── -->
+    <sys:String x:Key="ConflictDialog_Title">Patch Conflict</sys:String>
+    <sys:String x:Key="ConflictDialog_Intro">This patch cannot be applied cleanly because a game file has changed since the patch was created.</sys:String>
+    <sys:String x:Key="ConflictDialog_NodeLabel">Node ID:</sys:String>
+    <sys:String x:Key="ConflictDialog_FieldLabel">Field:</sys:String>
+    <sys:String x:Key="ConflictDialog_ExpectedLabel">Patch expects:</sys:String>
+    <sys:String x:Key="ConflictDialog_ActualLabel">File currently has:</sys:String>
+    <sys:String x:Key="ConflictDialog_Force">Force Apply</sys:String>
+    <sys:String x:Key="ConflictDialog_Cancel">Cancel Test</sys:String>
+    <sys:String x:Key="ConflictDialog_ForceTooltip">Apply the patch anyway, ignoring the mismatch. The patch's target value will overwrite whatever is currently in the file.</sys:String>
+    <sys:String x:Key="ConflictDialog_CancelTooltip">Cancel the test and leave game files unchanged.</sys:String>
     <!-- Shown after successful Restore Conversation -->
     <sys:String x:Key="Status_RestoreComplete2">Conversation restored — ready to edit.</sys:String>
 

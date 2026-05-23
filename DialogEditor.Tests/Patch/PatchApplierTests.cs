@@ -77,6 +77,18 @@ public class PatchApplierTests
         Assert.Throws<PatchConflictException>(() => PatchApplier.Apply(snap, patch));
     }
 
+    [Fact]
+    public void Apply_FieldChange_ConflictingFrom_WhenIgnoreConflicts_AppliesChange()
+    {
+        var snap = Snap(MakeNode(1, defaultText: "current"));
+        var mod  = new NodeModification(1,
+            new Dictionary<string, FieldChange> { ["DefaultText"] = new("\"expected\"", "\"new\"") },
+            [], []);
+        var patch  = new ConversationPatch("conv", 1, [], [], [mod]);
+        var result = PatchApplier.Apply(snap, patch, ignoreConflicts: true);
+        Assert.Equal("new", result.Nodes[0].DefaultText);
+    }
+
     // ── Link changes ──────────────────────────────────────────────────────
 
     [Fact]

@@ -23,33 +23,7 @@ enum (`Narrator`, `Script` values), `Poe1ConversationParser.ClassifySpeaker`.
 
 ---
 
-## Condition Editor
-
-### ConditionBranch editing
-**What:** Grouped / nested conditions (`ConditionBranch`) appear in the condition
-editor as read-only rows with a ⚙ indicator. You can move or delete them but
-cannot edit their internal logic (e.g. change `(A AND B) OR C` to `(A OR B) AND C`).  
-**Why:** Full branch editing requires a recursive sub-editor UI and was
-explicitly deferred to a future phase. The data model (`ConditionBranch`),
-parsers, and serialisers all support it fully.  
-**Where to start:** `ConditionRowViewModel.IsBranch`, `ConditionEditorWindow.axaml`
-branch row section. A nested `ConditionEditorWindow` opened from a branch row's
-"Edit group…" button is the most natural approach.
-
----
-
 ## Patch / Workflow
-
-### Standalone patch apply utility
-**What:** The `DialogEditor.Patch` project was designed from the start to be
-reusable without the full editor. A standalone CLI / GUI tool that lets
-players/modders apply a `.dialogproject` file to their game without installing
-the dialog editor has not been built.  
-**Why:** Deferred until the core editor was stable.  
-**Where to start:** `DialogEditor.Patch` + `DialogEditor.Core` are the only
-dependencies. `PatchApplier.ApplyAll`, `ConversationSnapshotBuilder.Build`,
-and both serialisers are all that's needed. A simple CLI that takes
-`<game-dir> <project-file>` would cover the basic case.
 
 ### Patch stacking conflict resolution UI
 **What:** `PatchApplier.ApplyAll` throws `PatchConflictException` when two
@@ -60,14 +34,3 @@ and shown in the status bar.
 use case (one author, one project) doesn't need it.  
 **Where to start:** `PatchConflictException` (field, node ID, expected vs actual),
 `MainWindowViewModel.TestPatch` catch block.
-
----
-
-## UI / UX
-
-### New conversation from scratch
-**What:** The editor can only open and modify existing `.conversation` /
-`.conversationbundle` files. There is no "New Conversation" action.  
-**Why:** Creating a new conversation requires knowing valid file paths, game
-metadata (speaker GUIDs for a root node), and the serialisation format for a
-minimal valid file. Edge case for the primary modding use case.

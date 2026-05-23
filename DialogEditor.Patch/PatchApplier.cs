@@ -8,7 +8,8 @@ public static class PatchApplier
 {
     public static ConversationEditSnapshot Apply(
         ConversationEditSnapshot baseSnap,
-        ConversationPatch patch)
+        ConversationPatch patch,
+        bool ignoreConflicts = false)
     {
         var nodeMap = baseSnap.Nodes.ToDictionary(n => n.NodeId);
 
@@ -25,7 +26,7 @@ public static class PatchApplier
         {
             if (!nodeMap.TryGetValue(mod.NodeId, out var node))
                 continue;
-            nodeMap[mod.NodeId] = ApplyModification(node, mod);
+            nodeMap[mod.NodeId] = ApplyModification(node, mod, ignoreConflicts);
         }
 
         return new ConversationEditSnapshot(nodeMap.Values.ToList());
@@ -33,17 +34,19 @@ public static class PatchApplier
 
     public static ConversationEditSnapshot ApplyAll(
         ConversationEditSnapshot baseSnap,
-        IEnumerable<ConversationPatch> patches)
+        IEnumerable<ConversationPatch> patches,
+        bool ignoreConflicts = false)
     {
         var current = baseSnap;
         foreach (var patch in patches)
-            current = Apply(current, patch);
+            current = Apply(current, patch, ignoreConflicts);
         return current;
     }
 
     private static NodeEditSnapshot ApplyModification(
         NodeEditSnapshot node,
-        NodeModification mod)
+        NodeModification mod,
+        bool ignoreConflicts = false)
     {
         // Apply field changes
         var isPlayerChoice = node.IsPlayerChoice;
@@ -78,7 +81,7 @@ public static class PatchApplier
                 _ => throw new InvalidOperationException($"Unknown field: {field}")
             };
 
-            if (actualJson != change.From)
+            if (actualJson != change.From && !ignoreConflicts)
                 throw new PatchConflictException(node.NodeId, field, change.From, actualJson);
 
             switch (field)
