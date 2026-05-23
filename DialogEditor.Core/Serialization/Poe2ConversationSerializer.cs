@@ -10,7 +10,15 @@ public static class Poe2ConversationSerializer
 {
     private const string TalkNodeType     = "OEIFormats.FlowCharts.Conversations.TalkNode, OEIFormats";
     private const string PlayerNodeType   = "OEIFormats.FlowCharts.Conversations.PlayerResponseNode, OEIFormats";
+    private const string ScriptNodeType   = "OEIFormats.FlowCharts.Conversations.ScriptNode, OEIFormats";
     private const string DialogueLinkType = "OEIFormats.FlowCharts.Conversations.DialogueLink, OEIFormats";
+
+    private static string NodeType(NodeEditSnapshot snap) => snap.SpeakerCategory switch
+    {
+        SpeakerCategory.Player => PlayerNodeType,
+        SpeakerCategory.Script => ScriptNodeType,
+        _                      => TalkNodeType,
+    };
 
     public static string Serialize(string originalJson, ConversationEditSnapshot snapshot)
     {
@@ -44,7 +52,7 @@ public static class Poe2ConversationSerializer
 
     private static void ApplyNodeSnapshot(JsonNode node, NodeEditSnapshot snap, JsonNode original)
     {
-        node["$type"]        = snap.IsPlayerChoice ? PlayerNodeType : TalkNodeType;
+        node["$type"]        = NodeType(snap);
         node["SpeakerGuid"]  = snap.SpeakerGuid;
         node["ListenerGuid"] = snap.ListenerGuid;
         node["DisplayType"]  = MapDisplayType(snap.DisplayType);
@@ -119,7 +127,7 @@ public static class Poe2ConversationSerializer
 
     private static JsonNode BuildNewNodeBase(NodeEditSnapshot snap) => JsonNode.Parse($$"""
         {
-          "$type": "{{(snap.IsPlayerChoice ? PlayerNodeType : TalkNodeType)}}",
+          "$type": "{{NodeType(snap)}}",
           "SpeakerGuid":  "{{snap.SpeakerGuid}}",
           "ListenerGuid": "{{snap.ListenerGuid}}",
           "IsQuestionNode": false,
