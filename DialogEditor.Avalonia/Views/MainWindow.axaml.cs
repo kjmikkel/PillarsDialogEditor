@@ -40,7 +40,8 @@ public partial class MainWindow : Window
         vm.UnsavedChangesRequested += () => _ = ShowUnsavedChangesDialogAsync(vm);
         vm.TestModeEntered += () => TestOverlay.IsVisible = true;
         vm.TestModeExited  += () => TestOverlay.IsVisible = false;
-        vm.RequestConversationName = () => PromptConversationNameAsync();
+        vm.RequestConversationName   = () => PromptConversationNameAsync();
+        vm.RequestConflictResolution = ex => ShowConflictResolutionDialogAsync(ex);
 
         if (!vm.IsBrowserExpanded)
         {
@@ -359,6 +360,119 @@ public partial class MainWindow : Window
                 vm.CancelPendingNavigation();
                 break;
         }
+    }
+
+    // ── Patch conflict resolution dialog ─────────────────────────────────
+    private async Task<bool> ShowConflictResolutionDialogAsync(DialogEditor.Patch.PatchConflictException ex)
+    {
+        var title       = (string)(this.FindResource("ConflictDialog_Title")        ?? "Patch Conflict");
+        var intro       = (string)(this.FindResource("ConflictDialog_Intro")        ?? "Conflict detected.");
+        var nodeLabel   = (string)(this.FindResource("ConflictDialog_NodeLabel")    ?? "Node ID:");
+        var fieldLabel  = (string)(this.FindResource("ConflictDialog_FieldLabel")   ?? "Field:");
+        var expLabel    = (string)(this.FindResource("ConflictDialog_ExpectedLabel") ?? "Expected:");
+        var actLabel    = (string)(this.FindResource("ConflictDialog_ActualLabel")   ?? "Actual:");
+        var lblForce    = (string)(this.FindResource("ConflictDialog_Force")        ?? "Force Apply");
+        var lblCancel   = (string)(this.FindResource("ConflictDialog_Cancel")       ?? "Cancel Test");
+        var forceTip    = (string)(this.FindResource("ConflictDialog_ForceTooltip") ?? string.Empty);
+        var cancelTip   = (string)(this.FindResource("ConflictDialog_CancelTooltip") ?? string.Empty);
+
+        var tcs = new TaskCompletionSource<bool>();
+
+        var dialog = new Window
+        {
+            Title  = title,
+            Icon   = Icon,
+            Width  = 520,
+            SizeToContent = SizeToContent.Height,
+            WindowStartupLocation = WindowStartupLocation.CenterOwner,
+            CanResize = false,
+            Background = new SolidColorBrush(Color.Parse("#252525")),
+        };
+
+        SolidColorBrush Fg(string hex) => new(Color.Parse(hex));
+
+        TextBlock Label(string text) => new()
+        {
+            Text       = text,
+            Foreground = Fg("#888"),
+            FontSize   = 11,
+            MinWidth   = 120,
+            VerticalAlignment = VerticalAlignment.Center,
+        };
+
+        TextBlock Value(string text) => new()
+        {
+            Text         = text,
+            Foreground   = Fg("#e8e8e8"),
+            FontSize     = 12,
+            TextWrapping = TextWrapping.Wrap,
+        };
+
+        Grid Row(string label, string value) => new()
+        {
+            ColumnDefinitions = new ColumnDefinitions("120,*"),
+            Margin = new Thickness(0, 3, 0, 3),
+            Children = { Label(label), new Border { [Grid.ColumnProperty] = 1, Child = Value(value) } },
+        };
+
+        var panel = new StackPanel { Margin = new Thickness(20) };
+
+        panel.Children.Add(new TextBlock
+        {
+            Text         = intro,
+            Foreground   = Fg("#e8e8e8"),
+            FontSize     = 13,
+            TextWrapping = TextWrapping.Wrap,
+            Margin       = new Thickness(0, 0, 0, 14),
+        });
+
+        var details = new Border
+        {
+            Background    = new SolidColorBrush(Color.Parse("#1a1a1a")),
+            CornerRadius  = new CornerRadius(4),
+            Padding       = new Thickness(12, 8),
+            Margin        = new Thickness(0, 0, 0, 16),
+        };
+        var detailStack = new StackPanel();
+        detailStack.Children.Add(Row(nodeLabel,  ex.NodeId.ToString()));
+        detailStack.Children.Add(Row(fieldLabel, ex.FieldName));
+        detailStack.Children.Add(Row(expLabel,   ex.ExpectedFrom));
+        detailStack.Children.Add(Row(actLabel,   ex.ActualValue));
+        details.Child = detailStack;
+        panel.Children.Add(details);
+
+        var buttons = new StackPanel
+        {
+            Orientation         = Orientation.Horizontal,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            Spacing             = 8,
+        };
+
+        Button MakeBtn(string label, bool result, string bg, string tip)
+        {
+            var btn = new Button
+            {
+                Content         = label,
+                Padding         = new Thickness(16, 6),
+                Background      = new SolidColorBrush(Color.Parse(bg)),
+                Foreground      = Brushes.White,
+                BorderThickness = new Thickness(0),
+                FontSize        = 12,
+            };
+            if (!string.IsNullOrEmpty(tip))
+                ToolTip.SetTip(btn, tip);
+            btn.Click += (_, _) => { tcs.TrySetResult(result); dialog.Close(); };
+            return btn;
+        }
+
+        buttons.Children.Add(MakeBtn(lblCancel, false, "#333",    cancelTip));
+        buttons.Children.Add(MakeBtn(lblForce,  true,  "#8e4912", forceTip));
+
+        panel.Children.Add(buttons);
+        dialog.Content = panel;
+
+        await dialog.ShowDialog(this);
+        return await tcs.Task;
     }
 
     // ── New conversation name dialog ──────────────────────────────────────

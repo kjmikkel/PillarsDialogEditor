@@ -43,6 +43,10 @@ public partial class MainWindowViewModel : ObservableObject
     /// Set by the UI layer to provide a name-input dialog for new conversations.
     public Func<Task<string?>>? RequestConversationName { get; set; }
 
+    /// Set by the UI layer to surface a patch conflict and ask whether to force-apply.
+    /// Returns true if the user chooses Force Apply, false to cancel.
+    public Func<PatchConflictException, Task<bool>>? RequestConflictResolution { get; set; }
+
     /// Conditions from the catalogue filtered to the currently loaded game.
     public IReadOnlyList<ConditionEntry> ActiveConditions
         => string.IsNullOrEmpty(_activeGameId)
@@ -563,7 +567,9 @@ public partial class MainWindowViewModel : ObservableObject
 
     // ── Test Patch (applies every patch in the project) ───────────────────
     [RelayCommand(CanExecute = nameof(CanTestPatch))]
-    private void TestPatch()
+    private async Task TestPatch() => await DoTestPatch(ignoreConflicts: false);
+
+    private async Task DoTestPatch(bool ignoreConflicts)
     {
         if (_provider is null || _project is null) return;
 
@@ -629,7 +635,7 @@ public partial class MainWindowViewModel : ObservableObject
 
                 var conversation = _provider.LoadConversation(file);
                 var baseSnap     = ConversationSnapshotBuilder.Build(conversation);
-                var merged       = PatchApplier.Apply(baseSnap, patch);
+                var merged       = PatchApplier.Apply(baseSnap, patch, ignoreConflicts);
                 _provider.SaveConversation(file, merged);
             }
 
@@ -638,16 +644,43 @@ public partial class MainWindowViewModel : ObservableObject
         }
         catch (PatchConflictException ex)
         {
-            AppSettings.ClearPendingRestores();
             AppLog.Error($"Patch conflict testing project '{_project.Name}'", ex);
-            StatusText = Loc.Format("Status_PatchConflict",
-                ex.NodeId, ex.FieldName, ex.ExpectedFrom, ex.ActualValue);
+
+            if (!ignoreConflicts && RequestConflictResolution is not null)
+            {
+                // Restore partial writes before asking — keeps game files clean while user decides
+                RestoreFilesFromBackup(restoreEntries);
+                AppSettings.ClearPendingRestores();
+
+                var force = await RequestConflictResolution(ex);
+                if (force)
+                    await DoTestPatch(ignoreConflicts: true);
+                else
+                    StatusText = Loc.Format("Status_PatchConflictCancelled", ex.NodeId, ex.FieldName);
+            }
+            else
+            {
+                AppSettings.ClearPendingRestores();
+                StatusText = Loc.Format("Status_PatchConflict",
+                    ex.NodeId, ex.FieldName, ex.ExpectedFrom, ex.ActualValue);
+            }
         }
         catch (Exception ex)
         {
             AppSettings.ClearPendingRestores();
             AppLog.Error($"Failed to test project '{_project?.Name}'", ex);
             StatusText = Loc.Format("Status_TestApplyError", _project!.Name, ex.Message);
+        }
+    }
+
+    private static void RestoreFilesFromBackup(IReadOnlyList<PendingRestoreEntry> entries)
+    {
+        foreach (var r in entries)
+        {
+            if (File.Exists(r.BackupConvPath))
+                File.Copy(r.BackupConvPath, r.OriginalConvPath, overwrite: true);
+            if (File.Exists(r.BackupStPath))
+                File.Copy(r.BackupStPath, r.OriginalStPath, overwrite: true);
         }
     }
 
