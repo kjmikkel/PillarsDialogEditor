@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>dialog-patcher</AssemblyName>
+    <RootNamespace>DialogEditor.PatchCli</RootNamespace>
+    <Nullable>enable</Nullable>
+    <!-- Include runtime so the binary runs without a .NET SDK installed -->
+    <SelfContained>false</SelfContained>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DialogEditor.Patch\DialogEditor.Patch.csproj" />
+    <ProjectReference Include="..\DialogEditor.Core\DialogEditor.Core.csproj" />
+  </ItemGroup>
+
+</Project>
