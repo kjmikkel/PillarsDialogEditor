@@ -76,7 +76,7 @@ Selecting a node opens the detail panel on the right. Fields available for editi
 | Default / Male text | The dialogue line shown to all players, or the male variant in gendered games |
 | Female text | Optional female-voice override; leave blank to use the default text for both genders |
 | Type | NPC Line or Player Choice |
-| Speaker category | NPC, Player, Narrator, or Script — controls the node's colour on the canvas |
+| Speaker category | NPC, Player, Narrator, or Script — controls the node's colour on the canvas and the `xsi:type` / `$type` written to the game file |
 | Speaker / Listener GUID | The characters involved; in PoE2 a name picker is available |
 | Display type | Conversation (full portrait) or Bark (floating text) |
 | Persistence | OnceEver hides this node after it has been shown once |
@@ -89,14 +89,15 @@ Selecting a node opens the detail panel on the right. Fields available for editi
 Each node can carry a list of conditions that the engine evaluates at runtime.
 Click **Edit…** next to the CONDITIONS header to open the Condition Editor.
 
-- Pick from a searchable catalogue of 83 known conditions (game-appropriate
+- Pick from a searchable catalogue of 166 known conditions (game-appropriate
   filtering when a game folder is loaded; parameters use enum dropdowns or
   Guid fields as appropriate for each game).
 - Toggle **AND/OR** and **NOT** per condition, including on grouped branches.
 - **Link conditions:** the **⚙** button on any link row opens the Condition
   Editor for that specific connection.
-- **Grouped conditions:** existing groups show an **Edit group…** button;
-  **+ New group** creates an empty nested group from scratch.
+- **Grouped conditions:** existing groups show an **Edit group…** button that
+  opens a nested Condition Editor; **+ New group** creates an empty nested group
+  from scratch.
 - Use ↑ ↓ and ✕ to reorder and remove; drag the editor to any monitor.
 
 #### Scripts
@@ -107,7 +108,7 @@ LOGIC header to open the Script Editor.
 Three sections — **On Enter** (node shown), **On Exit** (player leaves),
 **On Update** (every tick while active).
 
-- Search the catalogue of 33+ known scripts by typing, or press the down arrow
+- Search the catalogue of 37 known scripts by typing, or press the down arrow
   to browse the full list. Selecting a known script pre-populates all parameters
   with named fields, correct types (enum dropdowns with game source values), and
   `AutoCompleteBox` filtering for large lists such as the 195-entry PoE1 or
@@ -145,6 +146,12 @@ as blank templates at this point, then patched normally.
 While the game files are patched, a modal dialog blocks the editor — this is
 intentional to prevent inconsistent edits during testing.
 
+**Conflict detection:** If a game file has changed since your patch was created
+(e.g. after a game update), the editor shows a conflict dialog with the affected
+node, field, and the expected vs. actual values. You can choose **Force Apply**
+to apply your patch's target value anyway, or **Cancel Test** to leave game files
+unchanged.
+
 ---
 
 ### 6 — Restore after testing
@@ -166,7 +173,7 @@ editing.
 #### Single patch
 
 Share your `.dialogproject` file. Recipients open the **Patch Manager** (see below)
-to apply it, or load it in the full editor and press `F5`.
+to apply it, or use the [`dialog-patcher` CLI](#dialog-patcher-cli) for scripted installs.
 
 #### Combining patches from multiple authors
 
@@ -193,6 +200,58 @@ before applying, and write all patches to the game folder in one step:
 
 The standalone app requires no editor installation and is suitable for end users
 applying community mods.
+
+---
+
+## dialog-patcher CLI
+
+A lightweight command-line tool for scripted or automated patch application,
+suitable for mod installers, CI pipelines, and power users.
+
+```
+dialog-patcher <game-dir> <project.dialogproject> [project2 ...] [options]
+```
+
+Multiple project files are merged in order before being applied (later project
+wins on any contested field), matching the Patch Manager's load-order semantics.
+
+| Option | Description |
+|--------|-------------|
+| `-f`, `--force` | Apply patches even when a field's baseline doesn't match — use after a game update |
+| `-v`, `--verbose` | Print each conversation as it is patched |
+| `-q`, `--quiet` | Suppress all output except errors; only the exit code signals success |
+| `--dry-run` | List what would be patched without writing any files |
+| `--version` | Print version and exit |
+| `-h`, `--help` | Show usage |
+
+**Exit codes:** `0` success · `1` conflict (re-run with `--force`) · `2` error
+
+**Examples:**
+
+```sh
+# Apply a single mod
+dialog-patcher "C:/GOG Games/Pillars of Eternity" my_mod.dialogproject
+
+# Apply two mods in load order, verbose
+dialog-patcher "C:/PoE2" base_mod.dialogproject override_mod.dialogproject --verbose
+
+# Validate without touching game files
+dialog-patcher "C:/PoE2" my_mod.dialogproject --dry-run
+
+# Scripted install — check exit code
+if dialog-patcher "$GAME_DIR" "$MOD_FILE" --quiet; then
+    echo "Patched OK"
+else
+    echo "Patch failed" >&2
+fi
+```
+
+**Publishing a self-contained executable** (no .NET installation required on the
+target machine):
+
+```sh
+dotnet publish DialogEditor.PatchCli -r win-x64 --self-contained -o dist/
+```
 
 ---
 
