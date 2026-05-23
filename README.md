@@ -246,12 +246,65 @@ else
 fi
 ```
 
-**Publishing a self-contained executable** (no .NET installation required on the
-target machine):
+---
 
-```sh
-dotnet publish DialogEditor.PatchCli -r win-x64 --self-contained -o dist/
+## Building for distribution
+
+Three PowerShell scripts are provided at the repo root.
+
+### build.ps1 — full release build (recommended)
+
+Runs the test suite, then produces all six archives under `dist/`:
+
+```powershell
+.\build.ps1                  # reads version from VERSION file
+.\build.ps1 -Version 1.2.0   # override version
+.\build.ps1 -SkipTests       # skip the test gate
 ```
+
+Aborts immediately if any test fails. Cleans `dist/` before each run so old
+files never accumulate.
+
+### build-dist.ps1 — binary archives only
+
+Publishes each app as a self-contained win-x64 executable (no .NET installation
+required on the target machine) and zips it:
+
+| Archive | Contents |
+|---------|----------|
+| `PillarsDialogEditor-<ver>.zip` | Main editor |
+| `PatchManager-<ver>.zip` | Standalone Patch Manager |
+| `dialog-patcher-<ver>.zip` | CLI patcher (single-file exe) |
+
+```powershell
+.\build-dist.ps1
+.\build-dist.ps1 -Version 1.2.0
+```
+
+### build-source.ps1 — source archives only
+
+Copies the project folders needed to build each app (excluding `bin/`, `obj/`,
+and editor artefacts), writes a trimmed `.slnx` solution file, and zips:
+
+| Archive | Contents |
+|---------|----------|
+| `PillarsDialogEditor-<ver>-src.zip` | Full editor source |
+| `PatchManager-<ver>-src.zip` | Patch Manager source |
+| `dialog-patcher-<ver>-src.zip` | CLI source |
+
+Each source archive includes `README.md`, `VERSION`, and `DialogEditor.Tests`
+so recipients can build and verify with `dotnet test` without any extra setup.
+
+```powershell
+.\build-source.ps1
+.\build-source.ps1 -Version 1.2.0
+```
+
+### Versioning
+
+The canonical version lives in `VERSION` at the repo root. All three scripts
+read it automatically when `-Version` is not supplied. The `dialog-patcher`
+binary reports this version at runtime via `--version`.
 
 ---
 

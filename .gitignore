@@ -29,3 +29,6 @@ Desktop.ini
 
 # Git worktrees
 .worktrees/
+
+# Distribution output
+dist/
