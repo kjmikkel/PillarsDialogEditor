@@ -85,17 +85,6 @@ use case (one author, one project) doesn't need it.
 
 ## UI / UX
 
-### PoE1 speaker/character GUID data source
-**What:** For PoE2, character GUIDs come from `speakers.gamedatabundle` and are
-loaded automatically. For PoE1, `SpeakerNameService.Register()` is called with
-an empty dictionary because no equivalent bundle was found at implementation time.
-The GUID → Name map must be sourced from PoE1 game assets (likely the NPC or
-character data files — the user will locate the correct asset and report back).  
-**Why deferred:** The PoE1 asset location is unknown; the PoE2 path is already
-implemented and working.  
-**Next step:** User will identify the correct PoE1 asset path and report it so
-the parser can be added to `Poe1GameDataProvider.LoadSpeakerNames()`.
-
 ### New conversation from scratch
 **What:** The editor can only open and modify existing `.conversation` /
 `.conversationbundle` files. There is no "New Conversation" action.  
