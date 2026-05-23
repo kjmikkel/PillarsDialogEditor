@@ -1,3 +1,4 @@
+using System.Reflection;
 using DialogEditor.Core.GameData;
 using DialogEditor.Patch;
 
@@ -117,10 +118,10 @@ if (merged.Patches.Count == 0)
 }
 
 // ── Collect all conversation names to patch ───────────────────────────────────
+// Only names that have a patch entry — new conversations without edits produce
+// no patch and are intentionally excluded (nothing to apply).
 
 var allConvNames = merged.Patches.Keys
-    .Concat(merged.NewConversations ?? [])
-    .Distinct()
     .OrderBy(n => n)
     .ToList();
 
@@ -141,9 +142,7 @@ try
 {
     foreach (var convName in allConvNames)
     {
-        if (!merged.Patches.TryGetValue(convName, out var patch))
-            continue;
-
+        var patch = merged.Patches[convName];
         var isNew = merged.IsNewConversation(convName);
         var file  = provider.FindConversation(convName)
                  ?? (isNew ? provider.BuildNewConversationFile(convName) : null);
