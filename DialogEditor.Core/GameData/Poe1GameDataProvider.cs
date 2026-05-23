@@ -64,8 +64,11 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
         return Path.Combine(StringTablesRoot, withoutExt + ".stringtable");
     }
 
+    private string CharactersStringtablePath =>
+        Path.Combine(LocalizedRoot, Language, "text", "game", "characters.stringtable");
+
     public IReadOnlyDictionary<string, string> LoadSpeakerNames() =>
-        new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        Poe1SpeakerNameParser.ParseFromDisk(ConversationsRoot, CharactersStringtablePath);
 
     public (string ConversationsRoot, string StringTablesRoot) GetBackupRoots()
         => (ConversationsRoot, StringTablesRoot);
