@@ -81,7 +81,17 @@
       "Bash(grep -v \"^$\\\\|->$\\\\|Determining\\\\|All projects\\\\|Build succeeded\")",
       "Bash(rm fix_conditions3.py)",
       "Bash(cp data/conditions.json DialogEditor.ViewModels/Resources/conditions.json)",
-      "Bash(grep -v \"//\")"
+      "Bash(grep -v \"//\")",
+      "Bash(rm \"../add_start_conversation.py\")",
+      "Bash(cp data/scripts.json DialogEditor.ViewModels/Resources/scripts.json)",
+      "Read(//c/Users/kjmik/Documents/Programming/Deadfire/PoE1 Code/Assembly-CSharp/**)",
+      "Bash(Get-ChildItem -Path . -Directory)",
+      "Bash(Select-Object -First 20)",
+      "Bash(Get-ChildItem -Path . -Name \"*.prefab\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\kjmik\\\\Documents\\\\Programming\\\\Deadfire\\\\Dialog Editor\" -Recurse -Force)",
+      "Bash(Get-ChildItem *)",
+      "PowerShell(Head *)",
+      "PowerShell(Select-String *)"
     ]
   }
 }
