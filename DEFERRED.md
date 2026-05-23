@@ -36,26 +36,6 @@ parsers, and serialisers all support it fully.
 branch row section. A nested `ConditionEditorWindow` opened from a branch row's
 "Edit group…" button is the most natural approach.
 
-### Condition catalogue completeness
-**What:** The catalogue (`data/conditions.json`) covers 50 of 131+ PoE1 and
-287+ PoE2 conditions — the dialogue-relevant ones. Uncatalogued conditions that
-already exist in game files are preserved and displayed with their stripped
-method name and no parameter type hints; they cannot be *added* from the picker.  
-**Why:** The full set was not catalogued to keep the initial work manageable.
-The research data (`data/conditions-poe1.md`, `data/conditions-poe2.md`) lists
-all conditions; adding entries to `conditions.json` is the only work needed.  
-**Where to start:** `data/conditions-poe1.md` / `conditions-poe2.md` are the
-authoritative reference. Copy the method name, parameters, and types into
-`conditions.json` following the existing format. The `fullName` must be the
-exact C# reflection format: `Boolean MethodName(Type1, Type2, ...)`.
-
-### PoE2 MapType for IsMapVisibility
-**What:** `IsMapVisibility` takes a `MapType` enum with hundreds of area-specific
-integer-keyed values. The parameter is currently a free-text `String` field
-with a description pointing the user to the enum name.  
-**Why:** The enum is too large for a ComboBox and the values are mostly internal
-area identifiers. A searchable picker seeded from the enum would help.
-
 ---
 
 ## Patch / Workflow
