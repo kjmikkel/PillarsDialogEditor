@@ -103,4 +103,32 @@ public class Poe2ConversationSerializerTests
         Assert.Single(nodes[0].Links);
         Assert.Equal(1, nodes[0].Links[0].ToNodeId);
     }
+
+    private static NodeEditSnapshot ScriptNode(int id) =>
+        new(id, false, SpeakerCategory.Script, "aaaa-0000", "bbbb-0000",
+            "text", "", "Conversation", "None", "", "", "", false, false,
+            [], [], []);
+
+    private const string ScriptNodeType = "OEIFormats.FlowCharts.Conversations.ScriptNode, OEIFormats";
+
+    [Fact]
+    public void Serialize_ScriptNode_EmitsScriptNodeType()
+    {
+        var snapshot = new ConversationEditSnapshot([ScriptNode(0), Node(1)]);
+        var result = Poe2ConversationSerializer.Serialize(TwoNodeJson, snapshot);
+        var root = JsonNode.Parse(result)!;
+        var type = root["Conversations"]![0]!["Nodes"]![0]!["$type"]!.GetValue<string>();
+        Assert.Equal(ScriptNodeType, type);
+    }
+
+    [Fact]
+    public void Serialize_NewScriptNode_EmitsScriptNodeType()
+    {
+        var snapshot = new ConversationEditSnapshot([Node(0), Node(1), ScriptNode(99)]);
+        var result = Poe2ConversationSerializer.Serialize(TwoNodeJson, snapshot);
+        var root = JsonNode.Parse(result)!;
+        var nodes = root["Conversations"]![0]!["Nodes"]!.AsArray();
+        var node99 = nodes.First(n => n!["NodeID"]!.GetValue<int>() == 99)!;
+        Assert.Equal(ScriptNodeType, node99["$type"]!.GetValue<string>());
+    }
 }

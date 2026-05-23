@@ -90,4 +90,47 @@ public class Poe1ConversationSerializerTests
         var nodes    = Poe1ConversationParser.ParseXml(result);
         Assert.Contains(nodes, n => n.NodeId == 99);
     }
+
+    private static NodeEditSnapshot ScriptNode(int id) =>
+        new(id, false, SpeakerCategory.Script, "aaaa", "bbbb",
+            "text", "", "Conversation", "None", "", "", "", false, false,
+            [], [], []);
+
+    private static NodeEditSnapshot NarratorNode(int id) =>
+        new(id, false, SpeakerCategory.Narrator, "00000000-0000-0000-0000-000000000000", "bbbb",
+            "text", "", "Conversation", "None", "", "", "", false, false,
+            [], [], []);
+
+    [Fact]
+    public void Serialize_ScriptNode_EmitsScriptNodeXsiType()
+    {
+        var snapshot = new ConversationEditSnapshot([ScriptNode(0), Node(1)]);
+        var result   = Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot);
+        var doc      = System.Xml.Linq.XDocument.Parse(result);
+        var ns       = System.Xml.Linq.XNamespace.Get("http://www.w3.org/2001/XMLSchema-instance");
+        var node0    = doc.Descendants("FlowChartNode").First(n => (int)n.Element("NodeID")! == 0);
+        Assert.Equal("ScriptNode", node0.Attribute(ns + "type")?.Value);
+    }
+
+    [Fact]
+    public void Serialize_NarratorNode_EmitsTalkNodeXsiType()
+    {
+        var snapshot = new ConversationEditSnapshot([NarratorNode(0), Node(1)]);
+        var result   = Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot);
+        var doc      = System.Xml.Linq.XDocument.Parse(result);
+        var ns       = System.Xml.Linq.XNamespace.Get("http://www.w3.org/2001/XMLSchema-instance");
+        var node0    = doc.Descendants("FlowChartNode").First(n => (int)n.Element("NodeID")! == 0);
+        Assert.Equal("TalkNode", node0.Attribute(ns + "type")?.Value);
+    }
+
+    [Fact]
+    public void Serialize_NewScriptNode_EmitsScriptNodeXsiType()
+    {
+        var snapshot = new ConversationEditSnapshot([Node(0), Node(1), ScriptNode(99)]);
+        var result   = Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot);
+        var doc      = System.Xml.Linq.XDocument.Parse(result);
+        var ns       = System.Xml.Linq.XNamespace.Get("http://www.w3.org/2001/XMLSchema-instance");
+        var node99   = doc.Descendants("FlowChartNode").First(n => (int)n.Element("NodeID")! == 99);
+        Assert.Equal("ScriptNode", node99.Attribute(ns + "type")?.Value);
+    }
 }

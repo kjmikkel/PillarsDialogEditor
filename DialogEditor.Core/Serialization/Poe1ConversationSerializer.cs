@@ -33,9 +33,16 @@ public static class Poe1ConversationSerializer
         return doc.ToString(SaveOptions.None);
     }
 
+    private static string XsiType(NodeEditSnapshot snap) => snap.SpeakerCategory switch
+    {
+        SpeakerCategory.Player => "PlayerResponseNode",
+        SpeakerCategory.Script => "ScriptNode",
+        _                      => "TalkNode",
+    };
+
     private static void ApplyNodeSnapshot(XElement node, NodeEditSnapshot snap)
     {
-        node.SetAttributeValue(Xsi + "type", snap.IsPlayerChoice ? "PlayerResponseNode" : "TalkNode");
+        node.SetAttributeValue(Xsi + "type", XsiType(snap));
         SetOrAdd(node, "SpeakerGuid",    snap.SpeakerGuid);
         SetOrAdd(node, "ListenerGuid",   snap.ListenerGuid);
         SetOrAdd(node, "DisplayType",    snap.DisplayType);
@@ -92,7 +99,7 @@ public static class Poe1ConversationSerializer
     }
 
     private static XElement BuildNewNode(NodeEditSnapshot snap) => new("FlowChartNode",
-        new XAttribute(Xsi + "type", snap.IsPlayerChoice ? "PlayerResponseNode" : "TalkNode"),
+        new XAttribute(Xsi + "type", XsiType(snap)),
         new XElement("NodeID",       snap.NodeId),
         new XElement("SpeakerGuid",  snap.SpeakerGuid),
         new XElement("ListenerGuid", snap.ListenerGuid),

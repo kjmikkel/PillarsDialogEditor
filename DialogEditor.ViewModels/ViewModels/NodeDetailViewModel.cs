@@ -105,11 +105,13 @@ public partial class NodeDetailViewModel : ObservableObject
         set
         {
             if (_node is null) return;
-            _node.SpeakerCategory =
+            var category =
                 value == Loc.Get("Speaker_Player")   ? SpeakerCategory.Player   :
                 value == Loc.Get("Speaker_Narrator") ? SpeakerCategory.Narrator :
                 value == Loc.Get("Speaker_Script")   ? SpeakerCategory.Script   :
                                                         SpeakerCategory.Npc;
+            _node.SpeakerCategory  = category;
+            _node.IsPlayerChoice   = category == SpeakerCategory.Player;
         }
     }
 
