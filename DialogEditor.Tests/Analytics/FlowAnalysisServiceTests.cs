@@ -237,6 +237,30 @@ public class FlowAnalysisServiceTests
         Assert.Empty(report.Issues.Where(i => i.Kind == FlowIssueKind.EmptyText && i.NodeId == 1));
     }
 
+    [Fact]
+    public void Analyze_WhitespaceTextOnNpcNode_FlagsEmptyText()
+    {
+        var snapshot = Snapshot(
+            MakeNode(0, links: [Link(0, 1)]),
+            MakeNode(1, SpeakerCategory.Npc, defaultText: "   ", femaleText: "\t"));
+
+        var report = FlowAnalysisService.Analyze(snapshot);
+
+        Assert.Contains(report.Issues, i => i.Kind == FlowIssueKind.EmptyText && i.NodeId == 1);
+    }
+
+    [Fact]
+    public void Analyze_EmptyDefaultTextButFemaleTextPresent_NotFlagged()
+    {
+        var snapshot = Snapshot(
+            MakeNode(0, links: [Link(0, 1)]),
+            MakeNode(1, SpeakerCategory.Npc, defaultText: "", femaleText: "Hello"));
+
+        var report = FlowAnalysisService.Analyze(snapshot);
+
+        Assert.Empty(report.Issues.Where(i => i.Kind == FlowIssueKind.EmptyText && i.NodeId == 1));
+    }
+
     // ── Issue: NoIncomingLinks ────────────────────────────────────────────
 
     [Fact]
