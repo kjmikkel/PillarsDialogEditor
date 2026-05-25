@@ -171,4 +171,126 @@ public class FlowAnalysisServiceTests
 
         Assert.Empty(report.Issues.Where(i => i.Kind == FlowIssueKind.Unreachable));
     }
+
+    // ── Issue: PlayerDeadEnd ──────────────────────────────────────────────
+
+    [Fact]
+    public void Analyze_NpcDeadEnd_NotFlagged()
+    {
+        var snapshot = Snapshot(
+            MakeNode(0, links: [Link(0, 1)]),
+            MakeNode(1, SpeakerCategory.Npc)); // NPC with no outgoing links — intentional end
+
+        var report = FlowAnalysisService.Analyze(snapshot);
+
+        Assert.Empty(report.Issues.Where(i => i.Kind == FlowIssueKind.PlayerDeadEnd));
+    }
+
+    [Fact]
+    public void Analyze_PlayerDeadEnd_FlagsDeadEnd()
+    {
+        var snapshot = Snapshot(
+            MakeNode(0, links: [Link(0, 1)]),
+            MakeNode(1, SpeakerCategory.Player, isPlayerChoice: true)); // no outgoing links
+
+        var report = FlowAnalysisService.Analyze(snapshot);
+
+        var issue = Assert.Single(report.Issues.Where(i => i.Kind == FlowIssueKind.PlayerDeadEnd));
+        Assert.Equal(1, issue.NodeId);
+    }
+
+    // ── Issue: EmptyText ──────────────────────────────────────────────────
+
+    [Fact]
+    public void Analyze_EmptyTextOnNpcNode_FlagsEmptyText()
+    {
+        var snapshot = Snapshot(
+            MakeNode(0, links: [Link(0, 1)]),
+            MakeNode(1, SpeakerCategory.Npc, defaultText: "", femaleText: ""));
+
+        var report = FlowAnalysisService.Analyze(snapshot);
+
+        Assert.Contains(report.Issues, i => i.Kind == FlowIssueKind.EmptyText && i.NodeId == 1);
+    }
+
+    [Fact]
+    public void Analyze_EmptyTextOnScriptNode_NotFlagged()
+    {
+        var snapshot = Snapshot(
+            MakeNode(0, links: [Link(0, 1)]),
+            MakeNode(1, SpeakerCategory.Script, defaultText: "", femaleText: ""));
+
+        var report = FlowAnalysisService.Analyze(snapshot);
+
+        Assert.Empty(report.Issues.Where(i => i.Kind == FlowIssueKind.EmptyText));
+    }
+
+    [Fact]
+    public void Analyze_NonEmptyTextOnNpcNode_NotFlagged()
+    {
+        var snapshot = Snapshot(
+            MakeNode(0, links: [Link(0, 1)]),
+            MakeNode(1, SpeakerCategory.Npc, defaultText: "Hello"));
+
+        var report = FlowAnalysisService.Analyze(snapshot);
+
+        Assert.Empty(report.Issues.Where(i => i.Kind == FlowIssueKind.EmptyText && i.NodeId == 1));
+    }
+
+    // ── Issue: NoIncomingLinks ────────────────────────────────────────────
+
+    [Fact]
+    public void Analyze_NodeWithNoIncomingLinks_Flagged()
+    {
+        // Node 2 has no incoming links (neither 0 nor 1 points to it)
+        var snapshot = Snapshot(
+            MakeNode(0, links: [Link(0, 1)]),
+            MakeNode(1),
+            MakeNode(2, links: [Link(2, 1)])); // has outgoing but no incoming
+
+        var report = FlowAnalysisService.Analyze(snapshot);
+
+        Assert.Contains(report.Issues, i => i.Kind == FlowIssueKind.NoIncomingLinks && i.NodeId == 2);
+    }
+
+    [Fact]
+    public void Analyze_RootNode_NoIncomingLinks_NotFlagged()
+    {
+        var snapshot = Snapshot(MakeNode(0));
+
+        var report = FlowAnalysisService.Analyze(snapshot);
+
+        Assert.Empty(report.Issues.Where(i => i.Kind == FlowIssueKind.NoIncomingLinks));
+    }
+
+    // ── Issue ordering ────────────────────────────────────────────────────
+
+    [Fact]
+    public void Analyze_Issues_SortedByNodeId()
+    {
+        var snapshot = Snapshot(
+            MakeNode(0),   // unreachable: none (it's root); empty text: yes
+            MakeNode(5),   // unreachable: yes (not linked from root)
+            MakeNode(3));  // unreachable: yes; no incoming: yes
+
+        var report = FlowAnalysisService.Analyze(snapshot);
+
+        var ids = report.Issues.Select(i => i.NodeId).ToList();
+        Assert.Equal(ids.OrderBy(x => x).ToList(), ids);
+    }
+
+    // ── Edge case: no root node ───────────────────────────────────────────
+
+    [Fact]
+    public void Analyze_NoRootNode_AllNodesUnreachable()
+    {
+        // No NodeId 0 in the snapshot — all nodes should be flagged Unreachable
+        var snapshot = Snapshot(
+            MakeNode(1, links: [Link(1, 2)]),
+            MakeNode(2));
+
+        var report = FlowAnalysisService.Analyze(snapshot);
+
+        Assert.Equal(2, report.Issues.Count(i => i.Kind == FlowIssueKind.Unreachable));
+    }
 }
