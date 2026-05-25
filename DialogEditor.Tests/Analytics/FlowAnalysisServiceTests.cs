@@ -217,7 +217,7 @@ public class FlowAnalysisServiceTests
     public void Analyze_EmptyTextOnScriptNode_NotFlagged()
     {
         var snapshot = Snapshot(
-            MakeNode(0, links: [Link(0, 1)]),
+            MakeNode(0, defaultText: "Hello", links: [Link(0, 1)]),
             MakeNode(1, SpeakerCategory.Script, defaultText: "", femaleText: ""));
 
         var report = FlowAnalysisService.Analyze(snapshot);
