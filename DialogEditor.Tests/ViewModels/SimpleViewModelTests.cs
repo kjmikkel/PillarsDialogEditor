@@ -6,11 +6,11 @@ using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.Tests.ViewModels;
 
-public class SimpleViewModelTests
-{
-    public SimpleViewModelTests() => Loc.Configure(new StubStringProvider());
+// ── ConversationFolderViewModel ───────────────────────────────────────────────
 
-    // ── ConversationFolderViewModel ──────────────────────────────────────
+public class ConversationFolderViewModelTests
+{
+    public ConversationFolderViewModelTests() => Loc.Configure(new StubStringProvider());
 
     [Fact]
     public void FolderViewModel_DisplayName_EmptyPath_ReturnsRootFolderKey()
@@ -46,11 +46,16 @@ public class SimpleViewModelTests
         vm.IsExpanded = true;
         Assert.True(raised);
     }
+}
 
-    // ── ConversationItemViewModel ────────────────────────────────────────
+// ── ConversationItemViewModel ─────────────────────────────────────────────────
+
+public class ConversationItemViewModelTests
+{
+    public ConversationItemViewModelTests() => Loc.Configure(new StubStringProvider());
 
     private static ConversationFile MakeFile(string name)
-        => new(name, "", "/path/to/" + name + ".conversation", "");
+        => new(name, Path.Combine("conversations", name + ".conversation"), "conversations", "");
 
     [Fact]
     public void ItemViewModel_DisplayName_IsNewFalse_ReturnsName()
@@ -64,12 +69,15 @@ public class SimpleViewModelTests
     {
         var vm = new ConversationItemViewModel(MakeFile("myconv"), isNew: true);
         // StubStringProvider returns "Label_NewConversation_Suffix" as the suffix value
-        Assert.Contains("myconv", vm.DisplayName);
+        Assert.StartsWith("myconv", vm.DisplayName);
         Assert.Contains("Label_NewConversation_Suffix", vm.DisplayName);
     }
+}
 
-    // ── PatchEntryViewModel ──────────────────────────────────────────────
+// ── PatchEntryViewModel ───────────────────────────────────────────────────────
 
+public class PatchEntryViewModelTests
+{
     [Fact]
     public void PatchEntry_SuccessPath_IsLoaded_True()
     {
