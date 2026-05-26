@@ -7,36 +7,39 @@
 
 ## Overview
 
-Enables mod authors to export dialogue text for human translators, receive translated text back, and ship all languages inside a single `.dialogproject` file. When the patch is applied (via the editor or `dialog-patcher` CLI), translated stringtables are written to every language directory present in the patch.
+Enables mod authors to export dialogue text for human translators, receive translated text back, and ship all languages inside a single `.dialogproject` file. All text — including the author's own language — lives exclusively in `ConversationPatch.Translations`; no language is privileged. When the patch is applied, translated stringtables are written for every language that is both present in the patch and installed on the user's machine.
+
+This introduces a **schema v2** for `ConversationPatch`. The application has not been distributed, so no migration is required and backwards compatibility with v1 patches is not needed.
 
 ---
 
 ## Architecture
 
-Six components, one new enum:
+Six components, one new enum, and changes to two existing classes:
 
 ```
 DialogEditor.Core
-  Models/NodeTranslation.cs          — new record (NodeId, DefaultText, FemaleText)
-  GameData/IGameDataProvider.cs      — new GetStringTablePath(file, language) overload
-  Serialization/StringTableSerializer.cs — new overload accepting IEnumerable<NodeTranslation>
+  Models/NodeTranslation.cs              — new record (NodeId, DefaultText, FemaleText)
+  GameData/IGameDataProvider.cs          — new GetStringTablePath(file, language) overload
 
 DialogEditor.Patch
-  ConversationPatch.cs               — new Translations property
-  TranslationApplier.cs              — writes per-language stringtables after patch apply
-  LocalizationExportService.cs       — extracts text from a project to CSV/JSON/XLIFF
-  LocalizationImportService.cs       — reads translated file back into project patches
-  LocalizationExportFormat.cs        — enum: Csv, Json, Xliff
+  ConversationPatch.cs                   — Translations now required; text removed from AddedNodes/ModifiedNodes; CurrentSchemaVersion → 2
+  StringTableSerializer.cs              — new overload accepting IEnumerable<NodeTranslation>
+  PatchApplier.cs                        — structural apply only; text handled by TranslationApplier
+  TranslationApplier.cs                  — writes per-language stringtables for all installed languages
+  LocalizationExportService.cs          — extracts text from a project to CSV/JSON/XLIFF
+  LocalizationImportService.cs          — reads translated file back into project patches
+  LocalizationExportFormat.cs           — enum: Csv, Json, Xliff
 
 DialogEditor.ViewModels
-  ViewModels/MainWindowViewModel.cs  — ExportForTranslationCommand, ImportTranslationCommand
-  Services/AppSettings.cs            — DefaultLocalizationFormat setting
-  ViewModels/SettingsViewModel.cs    — LocalizationFormat property + combobox binding
+  ViewModels/MainWindowViewModel.cs      — ExportForTranslationCommand, ImportTranslationCommand
+  Services/AppSettings.cs               — DefaultLocalizationFormat setting
+  ViewModels/SettingsViewModel.cs        — LocalizationFormat property + combobox binding
 
 DialogEditor.Avalonia
-  Views/MainWindow.axaml             — two new File menu items
-  Views/LanguageCodeDialog.axaml+cs  — small modal: language code input
-  Resources/Strings.axaml            — new string keys
+  Views/MainWindow.axaml                 — two new File menu items
+  Views/LanguageCodeDialog.axaml+cs     — small modal: language code input
+  Resources/Strings.axaml               — new string keys
 ```
 
 Existing `dialog-patcher` CLI calls `TranslationApplier.WriteTranslations` after each `SaveConversation` — no other CLI changes needed.
@@ -51,9 +54,9 @@ Existing `dialog-patcher` CLI calls `TranslationApplier.WriteTranslations` after
 public record NodeTranslation(int NodeId, string DefaultText, string FemaleText);
 ```
 
-### `ConversationPatch` — new `Translations` property
+### `ConversationPatch` — schema v2
 
-Non-positional so existing serialised patches deserialise cleanly (value is `null` when absent):
+Text fields are removed from `NodeEditSnapshot` (used in `AddedNodes`) and from `NodeModification.FieldChanges`. All text, including the author's own language, lives exclusively in `Translations`.
 
 ```csharp
 public record ConversationPatch(
@@ -63,16 +66,26 @@ public record ConversationPatch(
     IReadOnlyList<int>              DeletedNodeIds,
     IReadOnlyList<NodeModification> ModifiedNodes)
 {
-    public static readonly int CurrentSchemaVersion = 1;
+    public static readonly int CurrentSchemaVersion = 2;
 
-    // key = language code, e.g. "fr", "de"
-    public IReadOnlyDictionary<string, IReadOnlyList<NodeTranslation>>? Translations { get; init; }
+    // key = language code, e.g. "en", "fr", "de"
+    // Contains at least one entry (the author's own language).
+    public IReadOnlyDictionary<string, IReadOnlyList<NodeTranslation>> Translations { get; init; }
+        = new Dictionary<string, IReadOnlyList<NodeTranslation>>();
 
     public bool IsEmpty => ...  // unchanged
 }
 ```
 
-Each `NodeTranslation` entry covers one node for one language. An entry only exists for nodes the patch adds or changes text on.
+`NodeEditSnapshot` retains `DefaultText` / `FemaleText` as **in-memory-only** fields for the editor to display and edit, but these fields are **not serialised** into the patch file. When a patch is created from the editor state, text goes into `Translations[provider.Language]`, not into snapshot fields or `FieldChanges`.
+
+`NodeModification.FieldChanges` may no longer contain `"DefaultText"` or `"FemaleText"` keys.
+
+### Patch creation (existing code — change required)
+
+When the editor builds a `ConversationPatch` from the current editing session:
+- Text changes (new or modified `DefaultText`/`FemaleText`) are accumulated into `Translations[provider.Language]`, covering every node that was added or had its text modified.
+- `AddedNodes` snapshots and `ModifiedNodes.FieldChanges` carry only structural fields (speaker, links, conditions, scripts, etc.).
 
 ---
 
@@ -86,6 +99,10 @@ string GetStringTablePath(ConversationFile file, string language);
 
 Both `Poe1GameDataProvider` and `Poe2GameDataProvider` implement it by substituting `language` into their existing path formula (same logic as the parameterless overload, but with an explicit language instead of `this.Language`).
 
+### `PatchApplier` — structural apply only
+
+`PatchApplier` applies structural changes (node additions, deletions, link/speaker/condition/script modifications) and calls `provider.SaveConversation`. `SaveConversation` writes **structure only** — it no longer writes or reads the stringtable for the active language. Text is handled entirely by `TranslationApplier`.
+
 ### `StringTableSerializer` — new overload
 
 ```csharp
@@ -96,6 +113,8 @@ Writes the same XML format as the existing overload, using `NodeTranslation.Node
 
 ### `TranslationApplier` (new class in `DialogEditor.Patch/`)
 
+Writes stringtable files for every language that is both present in `patch.Translations` and installed on the user's machine. No language is treated specially.
+
 ```csharp
 public static class TranslationApplier
 {
@@ -104,7 +123,7 @@ public static class TranslationApplier
         ConversationPatch patch,
         IGameDataProvider provider)
     {
-        if (patch.Translations is null) return;
+        if (patch.Translations.Count == 0) return;
         var installed = provider.AvailableLanguages.ToHashSet(StringComparer.OrdinalIgnoreCase);
         foreach (var (lang, translations) in patch.Translations)
         {
@@ -117,7 +136,7 @@ public static class TranslationApplier
 }
 ```
 
-Call sites: `dialog-patcher` CLI and the editor's test-patch path both call `WriteTranslations` immediately after `provider.SaveConversation`. `PatchApplier` itself is unchanged.
+Call sites: `dialog-patcher` CLI and the editor's apply path both call `WriteTranslations` immediately after `provider.SaveConversation`.
 
 ---
 
@@ -127,11 +146,10 @@ New `LocalizationExportService` static class in `DialogEditor.Patch/`.
 
 ### What gets exported
 
-For each `ConversationPatch` in the project:
-- **Added nodes:** `patch.AddedNodes[i].DefaultText` / `.FemaleText`
-- **Modified nodes:** `mod.FieldChanges["DefaultText"].To` and `["FemaleText"].To` — only if those fields are present in the modification
+For each `ConversationPatch` in the project, read from `patch.Translations[sourceLanguage]`:
+- Every `NodeTranslation` in the source-language entry becomes one export row.
 
-Each entry: `ConversationName`, `NodeId`, `SourceDefaultText`, `SourceFemaleText`, empty `TranslatedDefaultText`, empty `TranslatedFemaleText`.
+If a node already has an entry in another language in `Translations`, the existing translated text is pre-populated in the corresponding output column (allowing re-export after partial translation without losing prior work). Nodes absent from the source-language entry are excluded.
 
 ### Entry point
 
@@ -141,9 +159,12 @@ public static class LocalizationExportService
     public static void Export(
         DialogProject project,
         string outputPath,
-        LocalizationExportFormat format);
+        LocalizationExportFormat format,
+        string sourceLanguage);
 }
 ```
+
+`sourceLanguage` is the language whose text populates the source columns. The UI defaults it to `provider.Language` (the editor's current language).
 
 ### Formats
 
@@ -152,9 +173,10 @@ public static class LocalizationExportService
 ConversationName,NodeId,SourceDefaultText,SourceFemaleText,TranslatedDefaultText,TranslatedFemaleText
 ```
 
-**JSON** — top-level object; `targetLanguage` starts empty for the translator to fill in:
+**JSON** — top-level object; both `sourceLanguage` and `targetLanguage` are recorded:
 ```json
 {
+  "sourceLanguage": "en",
   "targetLanguage": "",
   "entries": [
     {
@@ -169,7 +191,7 @@ ConversationName,NodeId,SourceDefaultText,SourceFemaleText,TranslatedDefaultText
 }
 ```
 
-**XLIFF 1.2** — one `<file>` per conversation, one `<trans-unit>` per node. `DefaultText` is the unit source/target. Non-empty `FemaleText` is added as a `<note>`. `target-language` attribute is empty until filled by a CAT tool or the user.
+**XLIFF 1.2** — one `<file>` per conversation, one `<trans-unit>` per node. `DefaultText` is the unit source/target. Non-empty `FemaleText` is added as a `<note>`. `source-language` and `target-language` attributes are set; `target-language` is empty until filled by a CAT tool or the user.
 
 ### `LocalizationExportFormat` enum (new file in `DialogEditor.Patch/`)
 
@@ -202,7 +224,7 @@ public static class LocalizationImportService
 
 1. Read the file and group entries by `ConversationName`.
 2. For each `ConversationPatch` in the project whose name matches, set or replace `patch.Translations[language]` with the imported `NodeTranslation` list.
-3. Entries with both `TranslatedDefaultText` and `TranslatedFemaleText` empty are excluded (untranslated — no point storing empty strings).
+3. Entries with both `TranslatedDefaultText` and `TranslatedFemaleText` empty are excluded (untranslated).
 4. Entries referencing a conversation not in the project are silently ignored.
 5. Return a new `DialogProject` (immutable update via `with`).
 
@@ -229,8 +251,9 @@ Both commands are disabled (`CanExecute = false`) when no project is open.
 ### Export flow
 
 1. File save dialog filtered to the default format (from `AppSettings.DefaultLocalizationFormat`). All three formats are always available as additional filters.
-2. `LocalizationExportService.Export` runs.
-3. Status bar shows success message or logs error via `AppLog.Error`.
+2. `LanguageCodeDialog` opens pre-populated with `provider.Language` as the source language (user can change).
+3. `LocalizationExportService.Export` runs.
+4. Status bar shows success message or logs error via `AppLog.Error`.
 
 ### Import flow
 
@@ -268,16 +291,16 @@ Settings_LocalizationFormat
 
 ## Testing
 
-- `LocalizationExportServiceTests` — export produces correct CSV/JSON/XLIFF from a project with known patches; empty patch produces no rows; modified-text-only nodes included; structural-only modifications (no text fields) excluded
-- `LocalizationImportServiceTests` — round-trip (export then import) preserves all text; partial translation (some rows empty) skips empty entries; unknown conversation silently ignored; language parameter stored correctly on the patch
-- `TranslationApplierTests` — `WriteTranslations` writes the correct file at the correct language path; null `Translations` writes nothing; multiple languages each get their own file; languages absent from `provider.AvailableLanguages` are skipped
-- `ConversationPatchSerializationTests` — patch with `Translations` round-trips through JSON correctly; patch without `Translations` deserialises with null (backwards compatibility)
+- `LocalizationExportServiceTests` — export produces correct CSV/JSON/XLIFF from a project with known patches; empty `Translations` produces no rows; pre-existing translations in a second language are pre-populated in output; `sourceLanguage` absent from `Translations` produces no rows
+- `LocalizationImportServiceTests` — round-trip (export then import) preserves all text; partial translation (some rows empty) skips empty entries; unknown conversation silently ignored; language parameter stored correctly on the patch; importing the author's own language (`"en"`) works identically to any other language
+- `TranslationApplierTests` — `WriteTranslations` writes the correct file at the correct language path; empty `Translations` writes nothing; multiple languages each get their own file; languages absent from `provider.AvailableLanguages` are skipped; the author's own language is written through the same path as any other language
+- `ConversationPatchSerializationTests` — v2 patch with `Translations` round-trips through JSON correctly; `AddedNodes` and `ModifiedNodes` contain no text fields in the serialised form
 
 ---
 
 ## TDD Order
 
-1. `NodeTranslation` + `ConversationPatch.Translations` serialisation tests → implement
+1. `ConversationPatch` schema v2 serialisation tests (no text in `AddedNodes`/`ModifiedNodes`; `Translations` round-trips) → update `ConversationPatch` and patch creation logic
 2. `StringTableSerializer` new overload tests → implement
 3. `IGameDataProvider.GetStringTablePath(file, lang)` + `TranslationApplierTests` → implement
 4. `LocalizationExportServiceTests` → implement (CSV first, then JSON, then XLIFF)
