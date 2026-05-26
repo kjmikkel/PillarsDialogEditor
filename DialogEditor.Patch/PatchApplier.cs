@@ -48,12 +48,9 @@ public static class PatchApplier
         NodeModification mod,
         bool ignoreConflicts = false)
     {
-        // Apply field changes
         var isPlayerChoice = node.IsPlayerChoice;
         var speakerGuid    = node.SpeakerGuid;
         var listenerGuid   = node.ListenerGuid;
-        var defaultText    = node.DefaultText;
-        var femaleText     = node.FemaleText;
         var displayType    = node.DisplayType;
         var persistence    = node.Persistence;
         var actorDirection = node.ActorDirection;
@@ -69,8 +66,6 @@ public static class PatchApplier
                 "IsPlayerChoice" => JsonSerializer.Serialize(isPlayerChoice),
                 "SpeakerGuid"    => JsonSerializer.Serialize(speakerGuid),
                 "ListenerGuid"   => JsonSerializer.Serialize(listenerGuid),
-                "DefaultText"    => JsonSerializer.Serialize(defaultText),
-                "FemaleText"     => JsonSerializer.Serialize(femaleText),
                 "DisplayType"    => JsonSerializer.Serialize(displayType),
                 "Persistence"    => JsonSerializer.Serialize(persistence),
                 "ActorDirection" => JsonSerializer.Serialize(actorDirection),
@@ -89,8 +84,6 @@ public static class PatchApplier
                 case "IsPlayerChoice": isPlayerChoice = JsonSerializer.Deserialize<bool>(change.To); break;
                 case "SpeakerGuid":    speakerGuid    = JsonSerializer.Deserialize<string>(change.To)!; break;
                 case "ListenerGuid":   listenerGuid   = JsonSerializer.Deserialize<string>(change.To)!; break;
-                case "DefaultText":    defaultText    = JsonSerializer.Deserialize<string>(change.To)!; break;
-                case "FemaleText":     femaleText     = JsonSerializer.Deserialize<string>(change.To)!; break;
                 case "DisplayType":    displayType    = JsonSerializer.Deserialize<string>(change.To)!; break;
                 case "Persistence":    persistence    = JsonSerializer.Deserialize<string>(change.To)!; break;
                 case "ActorDirection": actorDirection = JsonSerializer.Deserialize<string>(change.To)!; break;
@@ -101,17 +94,16 @@ public static class PatchApplier
             }
         }
 
-        // Apply link changes
-        var deletedToIds  = mod.DeletedLinks.Select(d => d.ToNodeId).ToHashSet();
-        var modifiedById  = mod.ModifiedLinks.ToDictionary(m => m.ToNodeId);
+        var deletedToIds = mod.DeletedLinks.Select(d => d.ToNodeId).ToHashSet();
+        var modifiedById = mod.ModifiedLinks.ToDictionary(m => m.ToNodeId);
         var links = node.Links
             .Where(l => !deletedToIds.Contains(l.ToNodeId))
             .Select(l => modifiedById.TryGetValue(l.ToNodeId, out var m)
                 ? l with
                 {
-                    RandomWeight             = m.RandomWeight,
-                    QuestionNodeTextDisplay  = m.QuestionNodeTextDisplay,
-                    Conditions               = m.Conditions ?? l.Conditions,
+                    RandomWeight            = m.RandomWeight,
+                    QuestionNodeTextDisplay = m.QuestionNodeTextDisplay,
+                    Conditions              = m.Conditions ?? l.Conditions,
                 }
                 : l)
             .Concat(mod.AddedLinks)
@@ -125,8 +117,6 @@ public static class PatchApplier
             IsPlayerChoice = isPlayerChoice,
             SpeakerGuid    = speakerGuid,
             ListenerGuid   = listenerGuid,
-            DefaultText    = defaultText,
-            FemaleText     = femaleText,
             DisplayType    = displayType,
             Persistence    = persistence,
             ActorDirection = actorDirection,
