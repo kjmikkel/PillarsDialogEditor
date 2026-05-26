@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DialogEditor.Core.Editing;
 using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.ViewModels;
@@ -144,18 +145,5 @@ public partial class FindReplaceViewModel : ObservableObject
 
     private static string ReplaceAll(string source, string search, string replacement,
         StringComparison comparison)
-    {
-        if (string.IsNullOrEmpty(search)) return source;
-        var result = new System.Text.StringBuilder();
-        var pos    = 0;
-        while (true)
-        {
-            var idx = source.IndexOf(search, pos, comparison);
-            if (idx < 0) { result.Append(source, pos, source.Length - pos); break; }
-            result.Append(source, pos, idx - pos);
-            result.Append(replacement);
-            pos = idx + search.Length;
-        }
-        return result.ToString();
-    }
+        => StringReplace.ReplaceAll(source, search, replacement, comparison);
 }

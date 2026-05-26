@@ -91,7 +91,10 @@
       "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\kjmik\\\\Documents\\\\Programming\\\\Deadfire\\\\Dialog Editor\" -Recurse -Force)",
       "Bash(Get-ChildItem *)",
       "PowerShell(Head *)",
-      "PowerShell(Select-String *)"
+      "PowerShell(Select-String *)",
+      "PowerShell(cd \"C:\\\\Users\\\\kjmik\\\\Documents\\\\Programming\\\\Deadfire\\\\Dialog Editor\"; Get-ChildItem -Directory -Name | Where-Object { $_ -match \"DialogEditor\" })",
+      "Bash(xargs basename -a)",
+      "Bash(grep -E \"\\\\.cs$\")"
     ]
   }
 }
