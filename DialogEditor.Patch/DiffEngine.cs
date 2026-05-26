@@ -1,5 +1,4 @@
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 
@@ -10,12 +9,17 @@ public static class DiffEngine
     public static ConversationPatch Diff(
         string conversationName,
         ConversationEditSnapshot baseSnap,
-        ConversationEditSnapshot currentSnap)
+        ConversationEditSnapshot currentSnap,
+        string language)
     {
         var baseById    = baseSnap.Nodes.ToDictionary(n => n.NodeId);
         var currentById = currentSnap.Nodes.ToDictionary(n => n.NodeId);
 
-        var added   = currentSnap.Nodes.Where(n => !baseById.ContainsKey(n.NodeId)).ToList();
+        // Added nodes: strip text (goes to Translations instead)
+        var added   = currentSnap.Nodes
+            .Where(n => !baseById.ContainsKey(n.NodeId))
+            .Select(n => n with { DefaultText = "", FemaleText = "" })
+            .ToList();
         var deleted = baseSnap.Nodes.Select(n => n.NodeId)
                               .Where(id => !currentById.ContainsKey(id)).ToList();
         var modified = new List<NodeModification>();
@@ -27,12 +31,31 @@ public static class DiffEngine
             if (mod is not null) modified.Add(mod);
         }
 
+        // Build Translations[language]: added nodes + nodes with text changes
+        var translationList = new List<NodeTranslation>();
+
+        foreach (var node in currentSnap.Nodes.Where(n => !baseById.ContainsKey(n.NodeId)))
+            translationList.Add(new NodeTranslation(node.NodeId, node.DefaultText, node.FemaleText));
+
+        foreach (var current in currentSnap.Nodes)
+        {
+            if (!baseById.TryGetValue(current.NodeId, out var @base)) continue;
+            if (@base.DefaultText != current.DefaultText || @base.FemaleText != current.FemaleText)
+                translationList.Add(new NodeTranslation(current.NodeId, current.DefaultText, current.FemaleText));
+        }
+
+        IReadOnlyDictionary<string, IReadOnlyList<NodeTranslation>> translations =
+            translationList.Count > 0
+                ? new Dictionary<string, IReadOnlyList<NodeTranslation>> { [language] = translationList }
+                : new Dictionary<string, IReadOnlyList<NodeTranslation>>();
+
         return new ConversationPatch(
             conversationName,
             ConversationPatch.CurrentSchemaVersion,
             added,
             deleted,
-            modified);
+            modified)
+            { Translations = translations };
     }
 
     private static NodeModification? DiffNode(NodeEditSnapshot @base, NodeEditSnapshot current)
@@ -42,8 +65,7 @@ public static class DiffEngine
         TryAddChange(changes, "IsPlayerChoice", @base.IsPlayerChoice,    current.IsPlayerChoice);
         TryAddChange(changes, "SpeakerGuid",    @base.SpeakerGuid,       current.SpeakerGuid);
         TryAddChange(changes, "ListenerGuid",   @base.ListenerGuid,      current.ListenerGuid);
-        TryAddChange(changes, "DefaultText",    @base.DefaultText,       current.DefaultText);
-        TryAddChange(changes, "FemaleText",     @base.FemaleText,        current.FemaleText);
+        // DefaultText and FemaleText are now in Translations, not FieldChanges
         TryAddChange(changes, "DisplayType",    @base.DisplayType,       current.DisplayType);
         TryAddChange(changes, "Persistence",    @base.Persistence,       current.Persistence);
         TryAddChange(changes, "ActorDirection", @base.ActorDirection,    current.ActorDirection);
@@ -75,13 +97,11 @@ public static class DiffEngine
             })
             .ToList();
 
-        // Condition change
         var baseCondJson    = JsonSerializer.Serialize(@base.Conditions);
         var currentCondJson = JsonSerializer.Serialize(current.Conditions);
         IReadOnlyList<ConditionNode>? updatedConditions =
             baseCondJson != currentCondJson ? current.Conditions : null;
 
-        // Script change
         var baseScriptJson    = JsonSerializer.Serialize(@base.Scripts);
         var currentScriptJson = JsonSerializer.Serialize(current.Scripts);
         IReadOnlyList<ScriptCall>? updatedScripts =
@@ -93,7 +113,6 @@ public static class DiffEngine
 
         return new NodeModification(current.NodeId, changes, addedLinks, deletedLinks, modifiedLinks)
             { UpdatedConditions = updatedConditions, UpdatedScripts = updatedScripts };
-
     }
 
     private static void TryAddChange<T>(

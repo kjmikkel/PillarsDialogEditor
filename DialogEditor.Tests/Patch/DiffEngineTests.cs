@@ -26,7 +26,7 @@ public class DiffEngineTests
     public void Diff_IdenticalSnapshots_ProducesEmptyPatch()
     {
         var snap = Snap(MakeNode(1));
-        var patch = DiffEngine.Diff("conv", snap, snap);
+        var patch = DiffEngine.Diff("conv", snap, snap, "en");
         Assert.True(patch.IsEmpty);
     }
 
@@ -37,7 +37,7 @@ public class DiffEngineTests
     {
         var baseSnap    = Snap(MakeNode(1));
         var currentSnap = Snap(MakeNode(1), MakeNode(2));
-        var patch = DiffEngine.Diff("conv", baseSnap, currentSnap);
+        var patch = DiffEngine.Diff("conv", baseSnap, currentSnap, "en");
         Assert.Single(patch.AddedNodes);
         Assert.Equal(2, patch.AddedNodes[0].NodeId);
         Assert.Empty(patch.DeletedNodeIds);
@@ -49,7 +49,7 @@ public class DiffEngineTests
     {
         var baseSnap    = Snap(MakeNode(1), MakeNode(2));
         var currentSnap = Snap(MakeNode(1));
-        var patch = DiffEngine.Diff("conv", baseSnap, currentSnap);
+        var patch = DiffEngine.Diff("conv", baseSnap, currentSnap, "en");
         Assert.Single(patch.DeletedNodeIds);
         Assert.Equal(2, patch.DeletedNodeIds[0]);
         Assert.Empty(patch.AddedNodes);
@@ -59,24 +59,21 @@ public class DiffEngineTests
     // ── Field changes ─────────────────────────────────────────────────────
 
     [Fact]
-    public void Diff_ChangedDefaultText_CorrectFromAndTo()
+    public void Diff_ChangedDefaultText_GoesToTranslationsNotFieldChanges()
     {
         var baseSnap    = Snap(MakeNode(1, defaultText: "old"));
         var currentSnap = Snap(MakeNode(1, defaultText: "new"));
-        var patch = DiffEngine.Diff("conv", baseSnap, currentSnap);
-        Assert.Single(patch.ModifiedNodes);
-        var mod = patch.ModifiedNodes[0];
-        Assert.Equal(1, mod.NodeId);
-        Assert.True(mod.FieldChanges.ContainsKey("DefaultText"));
-        Assert.Equal("\"old\"", mod.FieldChanges["DefaultText"].From);
-        Assert.Equal("\"new\"", mod.FieldChanges["DefaultText"].To);
+        var patch = DiffEngine.Diff("conv", baseSnap, currentSnap, "en");
+        Assert.False(patch.ModifiedNodes.Any(m => m.FieldChanges.ContainsKey("DefaultText")));
+        Assert.True(patch.Translations.ContainsKey("en"));
+        Assert.Equal("new", patch.Translations["en"].Single(x => x.NodeId == 1).DefaultText);
     }
 
     [Fact]
     public void Diff_UnchangedNode_ProducesNoModification()
     {
         var node = MakeNode(1, defaultText: "same");
-        var patch = DiffEngine.Diff("conv", Snap(node), Snap(node));
+        var patch = DiffEngine.Diff("conv", Snap(node), Snap(node), "en");
         Assert.Empty(patch.ModifiedNodes);
     }
 
@@ -88,7 +85,7 @@ public class DiffEngineTests
         var link = new LinkEditSnapshot(1, 5, 1f, "", false);
         var baseSnap    = Snap(MakeNode(1, links: []));
         var currentSnap = Snap(MakeNode(1, links: [link]));
-        var patch = DiffEngine.Diff("conv", baseSnap, currentSnap);
+        var patch = DiffEngine.Diff("conv", baseSnap, currentSnap, "en");
         Assert.Single(patch.ModifiedNodes);
         Assert.Single(patch.ModifiedNodes[0].AddedLinks);
         Assert.Equal(5, patch.ModifiedNodes[0].AddedLinks[0].ToNodeId);
@@ -100,7 +97,7 @@ public class DiffEngineTests
         var link = new LinkEditSnapshot(1, 5, 1f, "", false);
         var baseSnap    = Snap(MakeNode(1, links: [link]));
         var currentSnap = Snap(MakeNode(1, links: []));
-        var patch = DiffEngine.Diff("conv", baseSnap, currentSnap);
+        var patch = DiffEngine.Diff("conv", baseSnap, currentSnap, "en");
         Assert.Single(patch.ModifiedNodes);
         Assert.Single(patch.ModifiedNodes[0].DeletedLinks);
         Assert.Equal(5, patch.ModifiedNodes[0].DeletedLinks[0].ToNodeId);
@@ -115,7 +112,8 @@ public class DiffEngineTests
         var currentLink = new LinkEditSnapshot(1, 5, 1f, "Always",   false);
         var patch = DiffEngine.Diff("conv",
             Snap(MakeNode(1, links: [baseLink])),
-            Snap(MakeNode(1, links: [currentLink])));
+            Snap(MakeNode(1, links: [currentLink])),
+            "en");
         Assert.Single(patch.ModifiedNodes);
         Assert.Single(patch.ModifiedNodes[0].ModifiedLinks);
         Assert.Equal(5,        patch.ModifiedNodes[0].ModifiedLinks[0].ToNodeId);
@@ -129,7 +127,8 @@ public class DiffEngineTests
         var currentLink = new LinkEditSnapshot(1, 5, 2.5f,"ShowOnce", false);
         var patch = DiffEngine.Diff("conv",
             Snap(MakeNode(1, links: [baseLink])),
-            Snap(MakeNode(1, links: [currentLink])));
+            Snap(MakeNode(1, links: [currentLink])),
+            "en");
         Assert.Single(patch.ModifiedNodes[0].ModifiedLinks);
         Assert.Equal(2.5f, patch.ModifiedNodes[0].ModifiedLinks[0].RandomWeight);
     }
@@ -140,7 +139,8 @@ public class DiffEngineTests
         var link = new LinkEditSnapshot(1, 5, 1f, "ShowOnce", false);
         var patch = DiffEngine.Diff("conv",
             Snap(MakeNode(1, links: [link])),
-            Snap(MakeNode(1, links: [link])));
+            Snap(MakeNode(1, links: [link])),
+            "en");
         Assert.True(patch.IsEmpty);
     }
 
@@ -150,8 +150,51 @@ public class DiffEngineTests
     public void Diff_SetsConversationNameAndSchemaVersion()
     {
         var snap  = Snap(MakeNode(1));
-        var patch = DiffEngine.Diff("myConversation", snap, snap);
+        var patch = DiffEngine.Diff("myConversation", snap, snap, "en");
         Assert.Equal("myConversation", patch.ConversationName);
         Assert.Equal(ConversationPatch.CurrentSchemaVersion, patch.SchemaVersion);
+    }
+
+    // ── Text → Translations ───────────────────────────────────────────────
+
+    [Fact]
+    public void Diff_AddedNode_TextGoesToTranslations()
+    {
+        var baseSnap = Snap();
+        var added    = MakeNode(5, defaultText: "Hi", femaleText: "Hello");
+        var patch    = DiffEngine.Diff("c", baseSnap, Snap(added), "en");
+        Assert.Empty(patch.AddedNodes[0].DefaultText); // not in node
+        Assert.True(patch.Translations.ContainsKey("en"));
+        var t = patch.Translations["en"].Single(x => x.NodeId == 5);
+        Assert.Equal("Hi",    t.DefaultText);
+        Assert.Equal("Hello", t.FemaleText);
+    }
+
+    [Fact]
+    public void Diff_TextChange_GoesToTranslationsNotFieldChanges()
+    {
+        var base_  = MakeNode(1, defaultText: "Old");
+        var curr   = MakeNode(1, defaultText: "New");
+        var patch  = DiffEngine.Diff("c", Snap(base_), Snap(curr), "fr");
+        Assert.False(patch.ModifiedNodes.Any(m => m.FieldChanges.ContainsKey("DefaultText")));
+        Assert.True(patch.Translations.ContainsKey("fr"));
+        Assert.Equal("New", patch.Translations["fr"].Single(x => x.NodeId == 1).DefaultText);
+    }
+
+    [Fact]
+    public void Diff_NoTextChange_NoTranslationEntry()
+    {
+        var node  = MakeNode(1, defaultText: "Same");
+        var patch = DiffEngine.Diff("c", Snap(node), Snap(node), "en");
+        Assert.Empty(patch.Translations);
+    }
+
+    [Fact]
+    public void Diff_StructuralChangeOnly_NoTranslationEntry()
+    {
+        var base_ = MakeNode(1, defaultText: "Text");
+        var curr  = base_ with { IsPlayerChoice = true };
+        var patch = DiffEngine.Diff("c", Snap(base_), Snap(curr), "en");
+        Assert.Empty(patch.Translations);
     }
 }
