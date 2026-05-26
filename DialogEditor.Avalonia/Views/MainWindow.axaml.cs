@@ -16,9 +16,11 @@ public partial class MainWindow : Window
 {
     private double _browserExpandedWidth = 220;
     private double _detailExpandedWidth  = 240;
-    private LegendWindow?       _legendWindow;
-    private PatchManagerWindow? _patchManagerWindow;
-    private FindReplaceWindow?  _findReplaceWindow;
+    private LegendWindow?          _legendWindow;
+    private PatchManagerWindow?    _patchManagerWindow;
+    private FindReplaceWindow?     _findReplaceWindow;
+    private BatchReplaceWindow?    _batchReplaceWindow;
+    private FlowAnalyticsWindow?   _flowAnalyticsWindow;
 
     // Set to true immediately before a programmatic Close() call so that
     // the re-entrant OnClosing doesn't show the dirty-close dialog again.
@@ -124,6 +126,11 @@ public partial class MainWindow : Window
                 e.Handled = true;
                 break;
 
+            case Key.H when e.KeyModifiers == (KeyModifiers.Control | KeyModifiers.Shift):
+                BatchReplace_Click(null, null!);
+                e.Handled = true;
+                break;
+
             case Key.N when e.KeyModifiers == KeyModifiers.Control:
                 vm.NewProjectCommand.Execute(null);
                 e.Handled = true;
@@ -156,6 +163,11 @@ public partial class MainWindow : Window
 
             case Key.F6 when e.KeyModifiers == KeyModifiers.None:
                 vm.RestoreConversationCommand.Execute(null);
+                e.Handled = true;
+                break;
+
+            case Key.F7 when e.KeyModifiers == KeyModifiers.None:
+                FlowAnalytics_Click(null, null!);
                 e.Handled = true;
                 break;
 
@@ -207,6 +219,59 @@ public partial class MainWindow : Window
         }
         _findReplaceWindow.Show();
         _findReplaceWindow.Activate();
+    }
+
+    private void BatchReplace_Click(object? sender, RoutedEventArgs e)
+    {
+        var vm = (MainWindowViewModel)DataContext!;
+        if (vm.Provider is null) return;
+
+        var allFiles = vm.Provider.EnumerateConversations();
+        var brVm = new BatchReplaceViewModel(
+            vm.Provider,
+            allFiles,
+            f => f.Name == vm.CurrentConversationName);
+
+        if (_batchReplaceWindow is null || !_batchReplaceWindow.IsVisible)
+        {
+            _batchReplaceWindow = new BatchReplaceWindow(brVm);
+            _batchReplaceWindow.Closed += (_, _) => _batchReplaceWindow = null;
+        }
+        else
+        {
+            _batchReplaceWindow.DataContext = brVm;
+        }
+        _batchReplaceWindow.Show();
+        _batchReplaceWindow.Activate();
+    }
+
+    private void FlowAnalytics_Click(object? sender, RoutedEventArgs e)
+    {
+        var vm = (MainWindowViewModel)DataContext!;
+
+        if (_flowAnalyticsWindow is null || !_flowAnalyticsWindow.IsVisible)
+        {
+            var analyticsVm = new FlowAnalyticsViewModel(
+                () => vm.Canvas.BuildSnapshot(),
+                nodeId =>
+                {
+                    var node = vm.Canvas.Nodes.FirstOrDefault(n => n.NodeId == nodeId);
+                    if (node is not null) CanvasView.ScrollToNode(node);
+                });
+
+            _flowAnalyticsWindow = new FlowAnalyticsWindow(analyticsVm);
+
+            void OnSaved() => analyticsVm.RefreshCommand.Execute(null);
+            vm.ConversationSaved += OnSaved;
+            _flowAnalyticsWindow.Closed += (_, _) =>
+            {
+                vm.ConversationSaved -= OnSaved;
+                _flowAnalyticsWindow = null;
+            };
+        }
+
+        _flowAnalyticsWindow.Show();
+        _flowAnalyticsWindow.Activate();
     }
 
     private void PatchManager_Click(object? sender, RoutedEventArgs e)
