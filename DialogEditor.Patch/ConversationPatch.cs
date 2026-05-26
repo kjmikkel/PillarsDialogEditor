@@ -62,10 +62,20 @@ public record ConversationPatch(
     IReadOnlyList<int>              DeletedNodeIds,
     IReadOnlyList<NodeModification> ModifiedNodes)
 {
-    public static readonly int CurrentSchemaVersion = 1;
+    public static readonly int CurrentSchemaVersion = 2;
+
+    // key = language code e.g. "en", "fr", "de"
+    public IReadOnlyDictionary<string, IReadOnlyList<NodeTranslation>> Translations { get; init; }
+        = new Dictionary<string, IReadOnlyList<NodeTranslation>>();
+
+    // key = node ID; language-neutral translator context
+    public IReadOnlyDictionary<int, string> NodeComments { get; init; }
+        = new Dictionary<int, string>();
 
     public bool IsEmpty =>
-        AddedNodes.Count == 0 &&
+        AddedNodes.Count     == 0 &&
         DeletedNodeIds.Count == 0 &&
-        ModifiedNodes.Count == 0;
+        ModifiedNodes.Count  == 0 &&
+        Translations.Count   == 0 &&
+        NodeComments.Count   == 0;
 }

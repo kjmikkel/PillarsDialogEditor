@@ -46,8 +46,6 @@ public class PatchSerializerTests
         var node = deserialized.AddedNodes[0];
         Assert.Equal(99,           node.NodeId);
         Assert.True(node.IsPlayerChoice);
-        Assert.Equal("Added text", node.DefaultText);
-        Assert.Equal("Female text", node.FemaleText);
         Assert.Single(node.Links);
         Assert.Equal(100,     node.Links[0].ToNodeId);
         Assert.Equal(1.5f,    node.Links[0].RandomWeight);
@@ -77,5 +75,74 @@ public class PatchSerializerTests
         var json  = PatchSerializer.Serialize(patch);
         Assert.Contains("\"ConversationName\"", json);
         Assert.Contains('\n', json); // indented
+    }
+
+    [Fact]
+    public void Serialize_V2_TranslationsRoundTrip()
+    {
+        var patch = new ConversationPatch("conv", 2, [], [], [])
+        {
+            Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
+            {
+                ["en"] = [new NodeTranslation(1, "Hello", "")],
+                ["fr"] = [new NodeTranslation(1, "Bonjour", "")],
+            }
+        };
+        var json  = PatchSerializer.Serialize(patch);
+        var back  = PatchSerializer.Deserialize(json);
+        Assert.Equal(2, back.Translations.Count);
+        Assert.Equal("Hello",   back.Translations["en"][0].DefaultText);
+        Assert.Equal("Bonjour", back.Translations["fr"][0].DefaultText);
+    }
+
+    [Fact]
+    public void Serialize_V2_NodeCommentsRoundTrip()
+    {
+        var patch = new ConversationPatch("conv", 2, [], [], [])
+        {
+            NodeComments = new Dictionary<int, string> { [42] = "Said sarcastically." }
+        };
+        var back = PatchSerializer.Deserialize(PatchSerializer.Serialize(patch));
+        Assert.Equal("Said sarcastically.", back.NodeComments[42]);
+    }
+
+    [Fact]
+    public void Serialize_V2_AddedNodeHasNoTextInJson()
+    {
+        var node = new NodeEditSnapshot(
+            99, false, SpeakerCategory.Npc, "", "", "Hello", "", // DefaultText = "Hello"
+            "Conversation", "None", "", "", "", false, false, [], [], []);
+        var patch = new ConversationPatch("conv", 2, [node], [], []);
+        var json  = PatchSerializer.Serialize(patch);
+        // DefaultText must NOT appear in the serialised AddedNodes
+        Assert.DoesNotContain("\"DefaultText\"", json.Split("AddedNodes")[1].Split("ModifiedNodes")[0]);
+    }
+
+    [Fact]
+    public void IsEmpty_TrueWhenOnlyDefaultProperties()
+    {
+        var patch = new ConversationPatch("conv", 2, [], [], []);
+        Assert.True(patch.IsEmpty);
+    }
+
+    [Fact]
+    public void IsEmpty_FalseWhenNodeCommentsPresent()
+    {
+        var patch = new ConversationPatch("conv", 2, [], [], [])
+        {
+            NodeComments = new Dictionary<int, string> { [1] = "note" }
+        };
+        Assert.False(patch.IsEmpty);
+    }
+
+    [Fact]
+    public void IsEmpty_FalseWhenTranslationsPresent()
+    {
+        var patch = new ConversationPatch("conv", 2, [], [], [])
+        {
+            Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
+                { ["en"] = [new NodeTranslation(1, "Hi", "")] }
+        };
+        Assert.False(patch.IsEmpty);
     }
 }

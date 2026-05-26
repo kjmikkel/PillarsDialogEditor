@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using DialogEditor.Core.Models;
 
 namespace DialogEditor.Core.Editing;
@@ -19,8 +20,8 @@ public record NodeEditSnapshot(
     SpeakerCategory SpeakerCategory,
     string SpeakerGuid,
     string ListenerGuid,
-    string DefaultText,
-    string FemaleText,
+    [property: JsonIgnore] string DefaultText,
+    [property: JsonIgnore] string FemaleText,
     string DisplayType,
     string Persistence,
     string ActorDirection,
