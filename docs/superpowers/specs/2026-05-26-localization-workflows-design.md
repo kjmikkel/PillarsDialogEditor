@@ -105,8 +105,10 @@ public static class TranslationApplier
         IGameDataProvider provider)
     {
         if (patch.Translations is null) return;
+        var installed = provider.AvailableLanguages.ToHashSet(StringComparer.OrdinalIgnoreCase);
         foreach (var (lang, translations) in patch.Translations)
         {
+            if (!installed.Contains(lang)) continue;
             var stPath = provider.GetStringTablePath(file, lang);
             Directory.CreateDirectory(Path.GetDirectoryName(stPath)!);
             StringTableSerializer.SaveToFile(stPath, translations);
@@ -268,7 +270,7 @@ Settings_LocalizationFormat
 
 - `LocalizationExportServiceTests` — export produces correct CSV/JSON/XLIFF from a project with known patches; empty patch produces no rows; modified-text-only nodes included; structural-only modifications (no text fields) excluded
 - `LocalizationImportServiceTests` — round-trip (export then import) preserves all text; partial translation (some rows empty) skips empty entries; unknown conversation silently ignored; language parameter stored correctly on the patch
-- `TranslationApplierTests` — `WriteTranslations` writes the correct file at the correct language path; null `Translations` writes nothing; multiple languages each get their own file
+- `TranslationApplierTests` — `WriteTranslations` writes the correct file at the correct language path; null `Translations` writes nothing; multiple languages each get their own file; languages absent from `provider.AvailableLanguages` are skipped
 - `ConversationPatchSerializationTests` — patch with `Translations` round-trips through JSON correctly; patch without `Translations` deserialises with null (backwards compatibility)
 
 ---
