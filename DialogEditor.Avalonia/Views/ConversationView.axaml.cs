@@ -34,6 +34,12 @@ public partial class ConversationView : UserControl
     private void ZoomIn_Click(object? sender, RoutedEventArgs e)      => Editor.ZoomIn();
     private void ZoomOut_Click(object? sender, RoutedEventArgs e)     => Editor.ZoomOut();
 
+    public void ScrollToNode(NodeViewModel node)
+    {
+        node.IsSelected = true;
+        Editor.BringIntoView(new global::Avalonia.Point(node.Location.X, node.Location.Y));
+    }
+
     private void CenterOnRoot_Click(object? sender, RoutedEventArgs e)
     {
         if (DataContext is not ConversationViewModel vm) return;
