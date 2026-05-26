@@ -12,12 +12,6 @@ Significant coverage has been added: both `IGameDataProvider` implementations, `
 
 ## Feature Gaps
 
-### Reputation / Faction Conditions
-Pillars of Eternity scripted interactions heavily use reputation checks (Positive/Negative with factions like Dozens, Crucible Knights, etc.). If the condition catalogue does not model these well, many real mod scenarios are difficult or impossible to author.
-
-### Batch Operations Across Conversations
-Find/Replace works within a single conversation. Mods that touch multiple NPCs — e.g., renaming a location referenced by many characters — require opening each conversation manually. No cross-conversation search or batch edit exists.
-
 ### Localization Workflows
 No support for exporting strings for translators, importing translated strings back, or managing multiple language variants of a patch.
 
