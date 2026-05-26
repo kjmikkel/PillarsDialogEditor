@@ -74,6 +74,14 @@
                                   Click="FindReplace_Click"
                                   InputGesture="Ctrl+H"
                                   ToolTip.Tip="{StaticResource ToolTip_FindReplace}"/>
+                        <MenuItem Header="{StaticResource Menu_BatchReplace}"
+                                  Click="BatchReplace_Click"
+                                  InputGesture="Ctrl+Shift+H"
+                                  ToolTip.Tip="{StaticResource ToolTip_BatchReplace}"/>
+                        <MenuItem Header="{StaticResource Menu_FlowAnalytics}"
+                                  Click="FlowAnalytics_Click"
+                                  InputGesture="F7"
+                                  ToolTip.Tip="{StaticResource ToolTip_FlowAnalytics}"/>
                     </MenuItem>
 
                     <MenuItem Header="{StaticResource Menu_Test}">
