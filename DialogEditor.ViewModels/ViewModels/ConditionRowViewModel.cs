@@ -12,8 +12,26 @@ public partial class ParameterValueViewModel : ObservableObject
     public string Description { get; init; } = string.Empty;
     public string Type        { get; init; } = string.Empty;
     public IReadOnlyList<string>? Options { get; init; }
+    public IReadOnlyList<string>? Values  { get; init; }
 
     [ObservableProperty] private string _value = string.Empty;
+
+    // True when Options are display labels and Values are the actual stored strings.
+    public bool IsLabeledEnum => Values is { Count: > 0 } && Options is { Count: > 0 }
+                               && Values.Count == Options.Count;
+
+    /// The value to serialise into the condition node. For labeled enums this is
+    /// the entry from Values[] that corresponds to the currently selected label;
+    /// for all other types it is Value itself.
+    public string EffectiveValue
+    {
+        get
+        {
+            if (!IsLabeledEnum) return Value;
+            var idx = Options!.ToList().IndexOf(Value);
+            return idx >= 0 ? Values![idx] : Value;
+        }
+    }
 
     // For the condition editor window
     public bool IsEnum
@@ -120,13 +138,22 @@ public partial class ConditionRowViewModel : ObservableObject
         {
             // Align values from the leaf with catalogue parameter definitions
             Parameters = new(catalogueEntry.Parameters
-                .Select((p, i) => new ParameterValueViewModel
+                .Select((p, i) =>
                 {
-                    Name        = p.Name,
-                    Description = p.Description,
-                    Type        = p.Type,
-                    Options     = p.Options,
-                    Value       = i < leaf.Parameters.Count ? leaf.Parameters[i] : p.Default,
+                    var stored = i < leaf.Parameters.Count ? leaf.Parameters[i] : p.Default;
+                    // For labeled enums, display the label rather than the stored value
+                    var display = (p.Values is { Count: > 0 } && p.Options is { Count: > 0 })
+                        ? LookupLabel(stored, p.Options, p.Values) ?? stored
+                        : stored;
+                    return new ParameterValueViewModel
+                    {
+                        Name        = p.Name,
+                        Description = p.Description,
+                        Type        = p.Type,
+                        Options     = p.Options,
+                        Values      = p.Values,
+                        Value       = display,
+                    };
                 }));
         }
         else
@@ -138,7 +165,16 @@ public partial class ConditionRowViewModel : ObservableObject
     }
 
     public ConditionLeaf ToLeaf() =>
-        new(FullName, Parameters.Select(p => p.Value).ToList(), Not, Operator);
+        new(FullName, Parameters.Select(p => p.EffectiveValue).ToList(), Not, Operator);
+
+    private static string? LookupLabel(
+        string stored, IReadOnlyList<string> options, IReadOnlyList<string> values)
+    {
+        for (var i = 0; i < values.Count; i++)
+            if (string.Equals(values[i], stored, StringComparison.OrdinalIgnoreCase) && i < options.Count)
+                return options[i];
+        return null;
+    }
 
     private static string StripReturnType(string fullName)
     {

@@ -888,8 +888,9 @@
         "name": "Faction Name",
         "type": "Enum:FactionName",
         "description": "Faction to check.",
-        "default": "GildedVale",
+        "default": "None",
         "options": [
+          "None",
           "GildedVale",
           "DefianceBay",
           "Dyrford",
@@ -936,8 +937,9 @@
         "name": "Faction Name",
         "type": "Enum:FactionName",
         "description": "Faction to check.",
-        "default": "GildedVale",
+        "default": "None",
         "options": [
+          "None",
           "GildedVale",
           "DefianceBay",
           "Dyrford",
@@ -1103,7 +1105,7 @@
       {
         "name": "Time (Hours)",
         "type": "Single",
-        "description": "Hour value to compare against (0\u00e2\u20ac\u201c24).",
+        "description": "Hour value to compare against (0â€“24).",
         "default": "0"
       }
     ]
@@ -1791,10 +1793,24 @@
     "description": "Tests the player's reputation with a faction (by GameData GUID) against a rank value.",
     "parameters": [
       {
-        "name": "Faction GUID",
+        "name": "Faction",
         "type": "GameData",
         "description": "GameData GUID of the faction.",
-        "default": ""
+        "default": "Huana",
+        "options": [
+          "Huana",
+          "Royal Deadfire Company",
+          "Neketaka",
+          "Principi sen Patrena",
+          "Vailian Trading Company"
+        ],
+        "values": [
+          "5325a7f1-0292-41bb-a223-2c84c005779a",
+          "f3e9e979-e5bf-47b8-b1c3-208d76aa9b68",
+          "1346f12d-ca42-4add-9599-aa3fe72f5e53",
+          "0e5d53f8-8d15-4b45-9565-dc063cb24d30",
+          "08abadbb-1d2e-4a3c-a8ca-0dbb19379428"
+        ]
       },
       {
         "name": "Rank Type",
@@ -2982,7 +2998,7 @@
       {
         "name": "Percentage",
         "type": "Single",
-        "description": "Health percentage (0–100) to compare against.",
+        "description": "Health percentage (0â€“100) to compare against.",
         "default": "50"
       }
     ]
@@ -3042,7 +3058,7 @@
       {
         "name": "Percentage",
         "type": "Single",
-        "description": "Stamina percentage (0–100) to compare against.",
+        "description": "Stamina percentage (0â€“100) to compare against.",
         "default": "50"
       }
     ]
@@ -4679,74 +4695,6 @@
           "Rank2",
           "Rank3"
         ]
-      }
-    ]
-  },
-  {
-    "methodName": "ReputationRankByTagEquals",
-    "fullName": "Boolean ReputationRankByTagEquals(FactionName, Reputation+Axis, Int32)",
-    "displayName": "Tagged Reputation Rank Equals",
-    "category": "Faction",
-    "games": [
-      "poe2"
-    ],
-    "description": "True if the player's reputation rank with a named PoE2 faction exactly matches the given rank.",
-    "parameters": [
-      {
-        "name": "Faction Name",
-        "type": "String",
-        "description": "Internal faction name tag (e.g. Principi, VTC, RDC, Huana).",
-        "default": ""
-      },
-      {
-        "name": "Axis",
-        "type": "Enum:Reputation+Axis",
-        "description": "Positive or Negative axis.",
-        "default": "Positive",
-        "options": [
-          "Positive",
-          "Negative"
-        ]
-      },
-      {
-        "name": "Rank",
-        "type": "Int32",
-        "description": "Rank to match.",
-        "default": "0"
-      }
-    ]
-  },
-  {
-    "methodName": "ReputationTagRankGreater",
-    "fullName": "Boolean ReputationTagRankGreater(FactionName, Reputation+Axis, Int32)",
-    "displayName": "Tagged Reputation Rank Greater or Equal",
-    "category": "Faction",
-    "games": [
-      "poe2"
-    ],
-    "description": "True if the player's reputation rank with a named PoE2 faction meets or exceeds the given rank.",
-    "parameters": [
-      {
-        "name": "Faction Name",
-        "type": "String",
-        "description": "Internal faction name tag (e.g. Principi, VTC, RDC, Huana).",
-        "default": ""
-      },
-      {
-        "name": "Axis",
-        "type": "Enum:Reputation+Axis",
-        "description": "Positive or Negative axis.",
-        "default": "Positive",
-        "options": [
-          "Positive",
-          "Negative"
-        ]
-      },
-      {
-        "name": "Rank",
-        "type": "Int32",
-        "description": "Minimum rank required.",
-        "default": "0"
       }
     ]
   },
