@@ -1,0 +1,189 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+        x:Class="DialogEditor.Avalonia.Views.BatchReplaceWindow"
+        Title="{StaticResource BatchReplace_Title}"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="720" Height="560" MinWidth="560" MinHeight="360"
+        CanResize="True"
+        ShowInTaskbar="False"
+        Background="#1e1e1e"
+        WindowStartupLocation="CenterOwner"
+        x:CompileBindings="False">
+
+    <Window.Styles>
+        <Style Selector="TextBox.find-box">
+            <Setter Property="Background"      Value="#141414"/>
+            <Setter Property="Foreground"      Value="#e8e8e8"/>
+            <Setter Property="BorderBrush"     Value="#444"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="Padding"         Value="6,3"/>
+        </Style>
+        <Style Selector="Button.action-btn">
+            <Setter Property="Background"      Value="#333"/>
+            <Setter Property="Foreground"      Value="#ccc"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"         Value="12,5"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="MinWidth"        Value="80"/>
+        </Style>
+        <Style Selector="Button.primary-btn">
+            <Setter Property="Background"      Value="#1a5276"/>
+            <Setter Property="Foreground"      Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"         Value="14,5"/>
+            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="MinWidth"        Value="80"/>
+        </Style>
+        <Style Selector="TextBlock.label">
+            <Setter Property="Foreground"        Value="#888"/>
+            <Setter Property="FontSize"          Value="11"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="MinWidth"          Value="70"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto,*,Auto" Margin="14,12,14,12">
+
+        <!-- ── Search form ──────────────────────────────────────────────── -->
+        <StackPanel Grid.Row="0" Spacing="7">
+
+            <!-- Find row -->
+            <Grid ColumnDefinitions="70,*,Auto">
+                <TextBlock Classes="label" Text="{StaticResource BatchReplace_Find}"/>
+                <TextBox Grid.Column="1" Classes="find-box" Name="SearchBox"
+                         Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         ToolTip.Tip="{StaticResource ToolTip_BatchReplace_Find}"/>
+                <CheckBox Grid.Column="2" Margin="10,0,0,0"
+                          IsChecked="{Binding CaseSensitive, Mode=TwoWay}"
+                          Content="{StaticResource BatchReplace_CaseSensitive}"
+                          Foreground="#aaa" FontSize="11"
+                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_CaseSensitive}"/>
+            </Grid>
+
+            <!-- Replace row -->
+            <Grid ColumnDefinitions="70,*">
+                <TextBlock Classes="label" Text="{StaticResource BatchReplace_Replace}"/>
+                <TextBox Grid.Column="1" Classes="find-box"
+                         Text="{Binding ReplaceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                         ToolTip.Tip="{StaticResource ToolTip_BatchReplace_Replace}"/>
+            </Grid>
+
+            <!-- Search-in toggles -->
+            <WrapPanel Orientation="Horizontal">
+                <TextBlock Text="{StaticResource BatchReplace_SearchIn}"
+                           Foreground="#888" FontSize="11"
+                           VerticalAlignment="Center" Margin="0,0,8,0"/>
+                <CheckBox IsChecked="{Binding InNodeText, Mode=TwoWay}"
+                          Content="{StaticResource BatchReplace_InNodeText}"
+                          Foreground="#ccc" FontSize="11" Margin="0,0,10,0"
+                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InNodeText}"/>
+                <CheckBox IsChecked="{Binding InSpeakerGuids, Mode=TwoWay}"
+                          Content="{StaticResource BatchReplace_InSpeakerGuids}"
+                          Foreground="#ccc" FontSize="11" Margin="0,0,10,0"
+                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InSpeakerGuids}"/>
+                <CheckBox IsChecked="{Binding InScriptParams, Mode=TwoWay}"
+                          Content="{StaticResource BatchReplace_InScriptParams}"
+                          Foreground="#ccc" FontSize="11" Margin="0,0,10,0"
+                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InScriptParams}"/>
+                <CheckBox IsChecked="{Binding InConditionParams, Mode=TwoWay}"
+                          Content="{StaticResource BatchReplace_InConditionParams}"
+                          Foreground="#ccc" FontSize="11" Margin="0,0,10,0"
+                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InConditionParams}"/>
+                <CheckBox IsChecked="{Binding InLinkChoiceText, Mode=TwoWay}"
+                          Content="{StaticResource BatchReplace_InLinkChoiceText}"
+                          Foreground="#ccc" FontSize="11"
+                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InLinkChoiceText}"/>
+            </WrapPanel>
+
+            <!-- Action buttons -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                <Button Classes="action-btn"
+                        Content="{StaticResource BatchReplace_Preview}"
+                        Command="{Binding PreviewCommand}"
+                        ToolTip.Tip="{StaticResource ToolTip_BatchReplace_Preview}"/>
+                <Button Classes="primary-btn"
+                        Content="{StaticResource BatchReplace_Apply}"
+                        Command="{Binding ApplyCommand}"
+                        ToolTip.Tip="{StaticResource ToolTip_BatchReplace_Apply}"/>
+            </StackPanel>
+
+            <Separator Background="#333" Height="1"/>
+        </StackPanel>
+
+        <!-- ── Results tree ──────────────────────────────────────────────── -->
+        <ScrollViewer Grid.Row="1" Margin="0,8,0,8">
+            <ItemsControl ItemsSource="{Binding Results}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="vm:BatchReplaceConversationViewModel">
+                        <Border Background="#252525" CornerRadius="3"
+                                Margin="0,0,0,4" Padding="10,7">
+                            <StackPanel Spacing="4">
+
+                                <!-- Conversation header -->
+                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                    <CheckBox Grid.Column="0"
+                                              IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                              VerticalAlignment="Center"
+                                              ToolTip.Tip="{StaticResource ToolTip_BatchReplace_ConvCheckbox}"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding Name}"
+                                               Foreground="#e8e8e8" FontSize="13"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center" Margin="6,0,0,0"/>
+                                    <TextBlock Grid.Column="2"
+                                               Text="{Binding MatchCount, StringFormat='{}{0} match(es)'}"
+                                               Foreground="#888" FontSize="11"
+                                               VerticalAlignment="Center"/>
+                                </Grid>
+
+                                <!-- Match rows -->
+                                <ItemsControl ItemsSource="{Binding Matches}" Margin="28,2,0,0">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="vm:BatchReplaceMatchViewModel">
+                                            <Border Padding="6,4" Margin="0,1">
+                                                <StackPanel Spacing="2">
+                                                    <TextBlock Text="{Binding FieldPath, StringFormat='Node {NodeId} — {FieldPath}'}"
+                                                               Foreground="#aaa" FontSize="11"/>
+                                                    <Grid ColumnDefinitions="Auto,*">
+                                                        <TextBlock Grid.Column="0"
+                                                                   Text="Before: "
+                                                                   Foreground="#888" FontSize="11"
+                                                                   VerticalAlignment="Top"/>
+                                                        <TextBlock Grid.Column="1"
+                                                                   Text="{Binding Before}"
+                                                                   Foreground="#e05555" FontSize="11"
+                                                                   TextWrapping="Wrap"/>
+                                                    </Grid>
+                                                    <Grid ColumnDefinitions="Auto,*">
+                                                        <TextBlock Grid.Column="0"
+                                                                   Text="After:  "
+                                                                   Foreground="#888" FontSize="11"
+                                                                   VerticalAlignment="Top"/>
+                                                        <TextBlock Grid.Column="1"
+                                                                   Text="{Binding After}"
+                                                                   Foreground="#5db55d" FontSize="11"
+                                                                   TextWrapping="Wrap"/>
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- ── Status bar ────────────────────────────────────────────────── -->
+        <TextBlock Grid.Row="2"
+                   Text="{Binding StatusText}"
+                   Foreground="#888" FontSize="11"
+                   VerticalAlignment="Center"/>
+    </Grid>
+
+</Window>
