@@ -57,36 +57,48 @@ public class PatchApplierTests
     [Fact]
     public void Apply_FieldChange_UpdatesValue()
     {
-        var snap = Snap(MakeNode(1, defaultText: "old"));
+        var snap = Snap(MakeNode(1));
         var mod  = new NodeModification(1,
-            new Dictionary<string, FieldChange> { ["DefaultText"] = new("\"old\"", "\"new\"") },
+            new Dictionary<string, FieldChange> { ["Comments"] = new("\"\"", "\"updated\"") },
             [], []);
-        var patch  = new ConversationPatch("conv", 1, [], [], [mod]);
+        var patch  = new ConversationPatch("conv", 2, [], [], [mod]);
         var result = PatchApplier.Apply(snap, patch);
-        Assert.Equal("new", result.Nodes[0].DefaultText);
+        Assert.Equal("updated", result.Nodes[0].Comments);
     }
 
     [Fact]
     public void Apply_FieldChange_ConflictingFrom_ThrowsPatchConflictException()
     {
-        var snap = Snap(MakeNode(1, defaultText: "current"));
+        var snap = Snap(MakeNode(1));
         var mod  = new NodeModification(1,
-            new Dictionary<string, FieldChange> { ["DefaultText"] = new("\"expected\"", "\"new\"") },
+            new Dictionary<string, FieldChange> { ["Comments"] = new("\"expected\"", "\"new\"") },
             [], []);
-        var patch = new ConversationPatch("conv", 1, [], [], [mod]);
+        var patch = new ConversationPatch("conv", 2, [], [], [mod]);
         Assert.Throws<PatchConflictException>(() => PatchApplier.Apply(snap, patch));
     }
 
     [Fact]
     public void Apply_FieldChange_ConflictingFrom_WhenIgnoreConflicts_AppliesChange()
     {
-        var snap = Snap(MakeNode(1, defaultText: "current"));
+        var snap = Snap(MakeNode(1));
         var mod  = new NodeModification(1,
-            new Dictionary<string, FieldChange> { ["DefaultText"] = new("\"expected\"", "\"new\"") },
+            new Dictionary<string, FieldChange> { ["Comments"] = new("\"expected\"", "\"new\"") },
             [], []);
-        var patch  = new ConversationPatch("conv", 1, [], [], [mod]);
+        var patch  = new ConversationPatch("conv", 2, [], [], [mod]);
         var result = PatchApplier.Apply(snap, patch, ignoreConflicts: true);
-        Assert.Equal("new", result.Nodes[0].DefaultText);
+        Assert.Equal("new", result.Nodes[0].Comments);
+    }
+
+    [Fact]
+    public void Apply_TextFieldInFieldChanges_ThrowsUnknownField()
+    {
+        // v2 patches must not contain DefaultText in FieldChanges
+        var mod = new NodeModification(1,
+            new Dictionary<string, FieldChange> { ["DefaultText"] = new("\"old\"", "\"new\"") },
+            [], []);
+        var snap  = Snap(MakeNode(1));
+        var patch = new ConversationPatch("conv", 2, [], [], [mod]);
+        Assert.Throws<InvalidOperationException>(() => PatchApplier.Apply(snap, patch));
     }
 
     // ── Link changes ──────────────────────────────────────────────────────
@@ -154,30 +166,30 @@ public class PatchApplierTests
     [Fact]
     public void ApplyAll_TwoNonConflictingPatches_BothApplied()
     {
-        var snap   = Snap(MakeNode(1, defaultText: "original"));
-        var patchA = new ConversationPatch("conv", 1, [MakeNode(2)], [], []);
+        var snap   = Snap(MakeNode(1));
+        var patchA = new ConversationPatch("conv", 2, [MakeNode(2)], [], []);
         var modB   = new NodeModification(1,
-            new Dictionary<string, FieldChange> { ["DefaultText"] = new("\"original\"", "\"updated\"") },
+            new Dictionary<string, FieldChange> { ["Comments"] = new("\"\"", "\"updated\"") },
             [], []);
-        var patchB = new ConversationPatch("conv", 1, [], [], [modB]);
+        var patchB = new ConversationPatch("conv", 2, [], [], [modB]);
 
         var result = PatchApplier.ApplyAll(snap, [patchA, patchB]);
         Assert.Equal(2, result.Nodes.Count);
-        Assert.Equal("updated", result.Nodes.First(n => n.NodeId == 1).DefaultText);
+        Assert.Equal("updated", result.Nodes.First(n => n.NodeId == 1).Comments);
     }
 
     [Fact]
     public void ApplyAll_ConflictingPatches_ThrowsPatchConflictException()
     {
-        var snap   = Snap(MakeNode(1, defaultText: "original"));
+        var snap   = Snap(MakeNode(1));
         var modA   = new NodeModification(1,
-            new Dictionary<string, FieldChange> { ["DefaultText"] = new("\"original\"", "\"versionA\"") },
+            new Dictionary<string, FieldChange> { ["Comments"] = new("\"\"", "\"versionA\"") },
             [], []);
         var modB   = new NodeModification(1,
-            new Dictionary<string, FieldChange> { ["DefaultText"] = new("\"original\"", "\"versionB\"") },
+            new Dictionary<string, FieldChange> { ["Comments"] = new("\"\"", "\"versionB\"") },
             [], []);
-        var patchA = new ConversationPatch("conv", 1, [], [], [modA]);
-        var patchB = new ConversationPatch("conv", 1, [], [], [modB]);
+        var patchA = new ConversationPatch("conv", 2, [], [], [modA]);
+        var patchB = new ConversationPatch("conv", 2, [], [], [modB]);
 
         Assert.Throws<PatchConflictException>(() => PatchApplier.ApplyAll(snap, [patchA, patchB]));
     }
