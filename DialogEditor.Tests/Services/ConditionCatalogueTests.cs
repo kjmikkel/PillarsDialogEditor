@@ -94,4 +94,65 @@ public class ConditionCatalogueTests
         Assert.Contains("poe2", entry.Games);
         Assert.DoesNotContain("poe1", entry.Games);
     }
+
+    // ── Faction conditions — PoE1 vs PoE2 correctness ────────────────────
+
+    [Fact]
+    public void ReputationRankByTagEquals_OnlyInPoe1()
+    {
+        var poe2Entries = Catalogue.ForGame("poe2");
+        Assert.DoesNotContain(poe2Entries, e => e.MethodName == "ReputationRankByTagEquals");
+    }
+
+    [Fact]
+    public void ReputationTagRankGreater_OnlyInPoe1()
+    {
+        var poe2Entries = Catalogue.ForGame("poe2");
+        Assert.DoesNotContain(poe2Entries, e => e.MethodName == "ReputationTagRankGreater");
+    }
+
+    [Fact]
+    public void ReputationRankByTagEquals_Poe1_FactionNameIncludesNone()
+    {
+        var entry = Catalogue.ForGame("poe1").Single(e => e.MethodName == "ReputationRankByTagEquals");
+        var factionParam = entry.Parameters.First(p => p.Type == "Enum:FactionName");
+        Assert.Contains("None", factionParam.Options!);
+    }
+
+    [Fact]
+    public void ReputationTagRankGreater_Poe1_FactionNameIncludesNone()
+    {
+        var entry = Catalogue.ForGame("poe1").Single(e => e.MethodName == "ReputationTagRankGreater");
+        var factionParam = entry.Parameters.First(p => p.Type == "Enum:FactionName");
+        Assert.Contains("None", factionParam.Options!);
+    }
+
+    [Fact]
+    public void IsReputation_Poe2_UsesFactionGuid()
+    {
+        var entries = Catalogue.ForGame("poe2");
+        var entry = entries.Single(e => e.MethodName == "IsReputation");
+        Assert.Equal("GameData", entry.Parameters[0].Type);
+    }
+
+    [Fact]
+    public void IsReputation_Poe2_FactionParam_HasLabeledOptions()
+    {
+        var entry = Catalogue.ForGame("poe2").Single(e => e.MethodName == "IsReputation");
+        var param = entry.Parameters[0];
+        Assert.NotNull(param.Options);
+        Assert.NotNull(param.Values);
+        Assert.Equal(param.Options!.Count, param.Values!.Count);
+        Assert.Contains("Huana", param.Options);
+        Assert.Contains("Vailian Trading Company", param.Options);
+    }
+
+    [Fact]
+    public void IsReputation_Poe2_FactionParam_LabelsMappedToGuids()
+    {
+        var entry = Catalogue.ForGame("poe2").Single(e => e.MethodName == "IsReputation");
+        var param = entry.Parameters[0];
+        var idx = param.Options!.ToList().IndexOf("Huana");
+        Assert.Equal("5325a7f1-0292-41bb-a223-2c84c005779a", param.Values![idx]);
+    }
 }

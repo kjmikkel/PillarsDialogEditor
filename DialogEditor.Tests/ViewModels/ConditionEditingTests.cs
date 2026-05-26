@@ -135,6 +135,95 @@ public class ConditionEditingTests
         Assert.IsType<ConditionBranch>(nodeVm.Conditions[1]);
     }
 
+    // ── Labeled enum (Options = display labels, Values = stored GUIDs) ───
+
+    private static ConditionEntry MakeFactionEntry() => new(
+        "IsReputation", "Is Reputation", "Faction", ["poe2"],
+        "Tests faction reputation.",
+        [
+            new ConditionParameter(
+                "Faction", "GameData", "Faction to check.", "Huana",
+                Options: ["Huana", "Royal Deadfire Company"],
+                Values:  ["aaaa-guid", "bbbb-guid"]),
+            new ConditionParameter("Rank Type", "Enum:RankType", "", "Good",
+                Options: ["Default", "Good", "Bad", "Mixed"]),
+            new ConditionParameter("Rank Value", "Int32", "", "0"),
+            new ConditionParameter("Operator", "Operator", "", "GreaterThanOrEqualTo"),
+        ]);
+
+    [Fact]
+    public void EffectiveValue_WithoutValues_ReturnsSameAsValue()
+    {
+        var pvm = new ParameterValueViewModel
+        {
+            Name = "Tag", Type = "String", Description = "", Options = null, Value = "myFlag"
+        };
+        Assert.Equal("myFlag", pvm.EffectiveValue);
+    }
+
+    [Fact]
+    public void EffectiveValue_WithLabeledOptions_ReturnsCorrespondingStoredValue()
+    {
+        var pvm = new ParameterValueViewModel
+        {
+            Name    = "Faction",
+            Type    = "GameData",
+            Description = "",
+            Options = ["Huana", "Royal Deadfire Company"],
+            Values  = ["aaaa-guid", "bbbb-guid"],
+            Value   = "Huana",
+        };
+        Assert.Equal("aaaa-guid", pvm.EffectiveValue);
+    }
+
+    [Fact]
+    public void EffectiveValue_UnrecognizedLabel_ReturnsFallback()
+    {
+        var pvm = new ParameterValueViewModel
+        {
+            Name    = "Faction",
+            Type    = "GameData",
+            Description = "",
+            Options = ["Huana"],
+            Values  = ["aaaa-guid"],
+            Value   = "unknown-faction",
+        };
+        Assert.Equal("unknown-faction", pvm.EffectiveValue);
+    }
+
+    [Fact]
+    public void LoadFromLeaf_StoredGuid_DisplaysLabel()
+    {
+        var leaf = new ConditionLeaf("Boolean IsReputation(Guid, RankType, Int32, Operator)",
+            ["aaaa-guid", "Good", "0", "GreaterThanOrEqualTo"], false, "And");
+        var row = new ConditionRowViewModel(leaf, MakeFactionEntry());
+        // First parameter stored as GUID should be shown as its label
+        Assert.Equal("Huana", row.Parameters[0].Value);
+    }
+
+    [Fact]
+    public void ToLeaf_LabeledEnum_StoredValueIsGuid()
+    {
+        var leaf = new ConditionLeaf("Boolean IsReputation(Guid, RankType, Int32, Operator)",
+            ["aaaa-guid", "Good", "0", "GreaterThanOrEqualTo"], false, "And");
+        var row = new ConditionRowViewModel(leaf, MakeFactionEntry());
+        // Round-trip: editing nothing, serialising back should preserve the GUID
+        var serialised = row.ToLeaf();
+        Assert.Equal("aaaa-guid", serialised.Parameters[0]);
+    }
+
+    [Fact]
+    public void ToLeaf_NonLabeledParam_StoredValueUnchanged()
+    {
+        var leaf = new ConditionLeaf("Boolean IsReputation(Guid, RankType, Int32, Operator)",
+            ["aaaa-guid", "Good", "0", "GreaterThanOrEqualTo"], false, "And");
+        var row = new ConditionRowViewModel(leaf, MakeFactionEntry());
+        var serialised = row.ToLeaf();
+        // Non-labeled params are stored as-is
+        Assert.Equal("Good", serialised.Parameters[1]);
+        Assert.Equal("0",    serialised.Parameters[2]);
+    }
+
     // ── CommitConditions ──────────────────────────────────────────────────
 
     [Fact]
