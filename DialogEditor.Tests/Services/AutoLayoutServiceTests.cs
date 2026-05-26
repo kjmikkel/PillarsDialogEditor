@@ -52,6 +52,7 @@ public class AutoLayoutServiceTests
         // 0 → 1 and 0 → 2
         var pos = Capture([Node(0, 1, 2), Node(1), Node(2)]);
         Assert.Equal(pos[1].x, pos[2].x);
+        Assert.NotEqual(pos[1].y, pos[2].y);
         Assert.True(pos[0].x < pos[1].x);
     }
 
@@ -72,6 +73,8 @@ public class AutoLayoutServiceTests
         var pos = Capture(nodes);
         Assert.True(pos.ContainsKey(0));
         Assert.True(pos.ContainsKey(1));
+        // Nodes should be in different layers (not both at same position)
+        Assert.False(pos[0].x == pos[1].x && pos[0].y == pos[1].y);
     }
 
     [Fact]
