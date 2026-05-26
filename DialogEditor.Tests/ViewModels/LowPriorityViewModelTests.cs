@@ -4,6 +4,7 @@ using DialogEditor.Patch;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.ViewModels;
 
@@ -255,5 +256,13 @@ public class SettingsViewModelTests
         var before = vm.BackupDirectory;
         await vm.BrowseBackupDirectoryCommand.ExecuteAsync(null);
         Assert.Equal(before, vm.BackupDirectory);
+    }
+
+    [Fact]
+    public void Constructor_BackupDirectory_InitialisedFromAppSettings()
+    {
+        var expected = AppSettings.GetBackupPath("/game") ?? string.Empty;
+        var vm = new SettingsViewModel("/game", new StubFolderPicker());
+        Assert.Equal(expected, vm.BackupDirectory);
     }
 }
