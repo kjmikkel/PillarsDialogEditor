@@ -55,8 +55,9 @@ public static class StringTableSerializer
 
     public static void SaveToFile(string path, IEnumerable<NodeTranslation> translations)
     {
-        var original = File.Exists(path) ? File.ReadAllText(path) : string.Empty;
-        if (File.Exists(path))
+        var exists   = File.Exists(path);
+        var original = exists ? File.ReadAllText(path) : string.Empty;
+        if (exists)
             File.Copy(path, path + ".bak", overwrite: true);
         File.WriteAllText(path, SerializeTranslations(original, translations), Encoding.UTF8);
     }
