@@ -1,0 +1,161 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+        x:Class="DialogEditor.Avalonia.Views.FlowAnalyticsWindow"
+        Title="{StaticResource FlowAnalytics_Title}"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="500" Height="460" MinWidth="400" MinHeight="340"
+        CanResize="True"
+        ShowInTaskbar="False"
+        Background="#1e1e1e"
+        WindowStartupLocation="CenterOwner"
+        x:CompileBindings="False">
+
+    <Window.Styles>
+        <Style Selector="TextBlock.stat-label">
+            <Setter Property="Foreground"  Value="#888"/>
+            <Setter Property="FontSize"    Value="10"/>
+        </Style>
+        <Style Selector="TextBlock.stat-value">
+            <Setter Property="Foreground"  Value="#e8e8e8"/>
+            <Setter Property="FontSize"    Value="14"/>
+            <Setter Property="FontWeight"  Value="SemiBold"/>
+        </Style>
+        <Style Selector="TextBlock.section-header">
+            <Setter Property="Foreground"  Value="#888"/>
+            <Setter Property="FontSize"    Value="10"/>
+            <Setter Property="FontWeight"  Value="Bold"/>
+            <Setter Property="LetterSpacing" Value="1"/>
+        </Style>
+        <Style Selector="Button.action-btn">
+            <Setter Property="Background"      Value="#333"/>
+            <Setter Property="Foreground"      Value="#ccc"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding"         Value="12,5"/>
+            <Setter Property="FontSize"        Value="12"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto,*,Auto" Margin="14,12,14,12">
+
+        <!-- ── Statistics panel (visible after first Refresh) ─────────────── -->
+        <StackPanel Grid.Row="0" Spacing="6" IsVisible="{Binding HasData}">
+
+            <TextBlock Classes="section-header"
+                       Text="{StaticResource FlowAnalytics_Statistics}"/>
+
+            <!-- Row 1: Nodes, Words, Max depth -->
+            <Grid ColumnDefinitions="*,*,*">
+                <StackPanel Grid.Column="0">
+                    <TextBlock Classes="stat-label" Text="{StaticResource FlowAnalytics_Stat_Nodes}"/>
+                    <TextBlock Classes="stat-value" Text="{Binding Statistics.TotalNodes}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1">
+                    <TextBlock Classes="stat-label" Text="{StaticResource FlowAnalytics_Stat_Words}"/>
+                    <TextBlock Classes="stat-value" Text="{Binding Statistics.WordCount}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Classes="stat-label" Text="{StaticResource FlowAnalytics_Stat_MaxDepth}"/>
+                    <TextBlock Classes="stat-value" Text="{Binding Statistics.MaxDepth}"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Row 2: Player, NPC, Narrator -->
+            <Grid ColumnDefinitions="*,*,*">
+                <StackPanel Grid.Column="0">
+                    <TextBlock Classes="stat-label" Text="{StaticResource FlowAnalytics_Stat_Player}"/>
+                    <TextBlock Classes="stat-value" Text="{Binding Statistics.PlayerCount}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1">
+                    <TextBlock Classes="stat-label" Text="{StaticResource FlowAnalytics_Stat_NPC}"/>
+                    <TextBlock Classes="stat-value" Text="{Binding Statistics.NpcCount}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Classes="stat-label" Text="{StaticResource FlowAnalytics_Stat_Narrator}"/>
+                    <TextBlock Classes="stat-value" Text="{Binding Statistics.NarratorCount}"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Row 3: Script, Avg links/node, Conditional links -->
+            <Grid ColumnDefinitions="*,*,*">
+                <StackPanel Grid.Column="0">
+                    <TextBlock Classes="stat-label" Text="{StaticResource FlowAnalytics_Stat_Script}"/>
+                    <TextBlock Classes="stat-value" Text="{Binding Statistics.ScriptCount}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1">
+                    <TextBlock Classes="stat-label" Text="{StaticResource FlowAnalytics_Stat_AvgLinks}"/>
+                    <TextBlock Classes="stat-value" Text="{Binding Statistics.AvgLinksPerNode, StringFormat='{}{0:F1}'}"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Classes="stat-label" Text="{StaticResource FlowAnalytics_Stat_ConditionalLinks}"/>
+                    <TextBlock Classes="stat-value" Text="{Binding ConditionalLinksDisplay}"/>
+                </StackPanel>
+            </Grid>
+
+            <Separator Background="#333" Height="1" Margin="0,2,0,2"/>
+
+            <!-- Issues header -->
+            <TextBlock Classes="section-header" Text="{Binding StatusText}"/>
+
+        </StackPanel>
+
+        <!-- ── No-data placeholder ────────────────────────────────────────── -->
+        <TextBlock Grid.Row="0"
+                   Text="{StaticResource FlowAnalytics_NoData}"
+                   Foreground="#555" FontSize="13" FontStyle="Italic"
+                   HorizontalAlignment="Center" VerticalAlignment="Center"
+                   IsVisible="{Binding !HasData}"/>
+
+        <!-- ── Issues list ────────────────────────────────────────────────── -->
+        <ScrollViewer Grid.Row="1" Margin="0,6,0,6">
+            <ItemsControl ItemsSource="{Binding Issues}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="vm:FlowIssueViewModel">
+                        <Grid ColumnDefinitions="4,Auto,*,Auto"
+                              Margin="0,2" Height="32">
+                            <!-- Severity bar -->
+                            <Border Grid.Column="0"
+                                    Background="{Binding Kind, Converter={StaticResource FlowIssueSeverityBrush}}"
+                                    CornerRadius="2,0,0,2"/>
+                            <!-- Kind label -->
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding KindLabel}"
+                                       Foreground="#bbb" FontSize="10" FontWeight="Bold"
+                                       VerticalAlignment="Center"
+                                       Width="110" Margin="8,0,6,0"/>
+                            <!-- Node snippet -->
+                            <TextBlock Grid.Column="2"
+                                       Text="{Binding DisplayText}"
+                                       Foreground="#ccc" FontSize="11"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <!-- Navigate button -->
+                            <Button Grid.Column="3"
+                                    Content="→"
+                                    Command="{Binding NavigateCommand}"
+                                    Background="Transparent" BorderThickness="0"
+                                    Foreground="#888" FontSize="14"
+                                    Padding="8,0" Margin="4,0,0,0"
+                                    VerticalAlignment="Center"
+                                    ToolTip.Tip="{StaticResource ToolTip_FlowAnalytics_Navigate}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
+        <!-- ── Bottom bar ─────────────────────────────────────────────────── -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+            <TextBlock Grid.Column="0"
+                       Text="{Binding LastAnalysed}"
+                       Foreground="#666" FontSize="10"
+                       VerticalAlignment="Center"/>
+            <Button Grid.Column="1" Classes="action-btn"
+                    Content="{StaticResource FlowAnalytics_Refresh}"
+                    Command="{Binding RefreshCommand}"
+                    ToolTip.Tip="{StaticResource ToolTip_FlowAnalytics_Refresh}"/>
+        </Grid>
+
+    </Grid>
+
+</Window>

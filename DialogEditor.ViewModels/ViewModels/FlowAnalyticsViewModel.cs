@@ -44,8 +44,9 @@ public partial class FlowAnalyticsViewModel : ObservableObject
     private readonly Action<int>                     _navigateToNode;
 
     [ObservableProperty] private FlowStatistics? _statistics;
-    [ObservableProperty] private string          _statusText   = string.Empty;
-    [ObservableProperty] private string          _lastAnalysed = string.Empty;
+    [ObservableProperty] private string          _statusText             = string.Empty;
+    [ObservableProperty] private string          _lastAnalysed           = string.Empty;
+    [ObservableProperty] private string          _conditionalLinksDisplay = string.Empty;
     [ObservableProperty] private bool            _hasData;
 
     public ObservableCollection<FlowIssueViewModel> Issues { get; } = [];
@@ -82,6 +83,12 @@ public partial class FlowAnalyticsViewModel : ObservableObject
                 : $"({node?.SpeakerCategory.ToString().ToLower() ?? "unknown"}, no text)";
             Issues.Add(new FlowIssueViewModel(issue, snippet, _navigateToNode));
         }
+
+        var total = report.Statistics.TotalLinkCount;
+        var cond  = report.Statistics.ConditionalLinkCount;
+        ConditionalLinksDisplay = total > 0
+            ? $"{cond} ({(int)(cond * 100.0 / total)}%)"
+            : cond.ToString();
 
         var issueCount = report.Issues.Count;
         StatusText  = issueCount > 0

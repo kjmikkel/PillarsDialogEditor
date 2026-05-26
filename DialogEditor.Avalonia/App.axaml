@@ -95,6 +95,7 @@
             <converters:BoolToOpacityConverter          x:Key="SearchMatchOpacity"/>
             <converters:StringIsEmptyConverter              x:Key="StringIsEmpty"/>
             <converters:PropertyValueStyleToBrushConverter x:Key="PropertyValueStyleToBrush"/>
+            <converters:FlowIssueKindToSeverityBrushConverter x:Key="FlowIssueSeverityBrush"/>
 
         </ResourceDictionary>
     </Application.Resources>
