@@ -3,12 +3,10 @@
 ## Structural (Code Quality)
 
 ### ViewModel Test Coverage
-35 ViewModel files exist but only 2 have corresponding tests (`NodeDetailViewModelTests`, `ConversationViewModelEditTests`). Complex editing operations — multi-node selection, bulk edits, undo on branching scenarios — are untested and fragile to regression. CLAUDE.md mandates strict TDD; this area is the largest violation of that policy.
+Significant coverage has been added: both `IGameDataProvider` implementations, `AutoLayoutService`, and several previously untested ViewModels (ConversationFolderViewModel, ConversationItemViewModel, PatchEntryViewModel, SettingsViewModel) now have tests. The remaining gaps are:
 
-**Untested UI-adjacent layers:**
+- Complex editing operations — multi-node selection, bulk edits, undo on branching scenarios — are untested and fragile to regression
 - Views / Converters (26 .cs files) — no unit tests, relies on manual verification
-- IGameDataProvider implementations (Poe1/Poe2 data loading not exercised)
-- AutoLayoutService algorithm details
 
 ---
 
