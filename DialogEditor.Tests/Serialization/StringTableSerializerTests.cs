@@ -65,4 +65,48 @@ public class StringTableSerializerTests
         var reparsed = StringTableParser.Parse(result);
         Assert.Equal("Brand new", reparsed.Get(5)!.DefaultText);
     }
+
+    // ── NodeTranslation overload ─────────────────────────────────────────
+
+    [Fact]
+    public void SaveToFile_NodeTranslation_WritesEntries()
+    {
+        var dir  = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        Directory.CreateDirectory(dir);
+        var path = Path.Combine(dir, "test.stringtable");
+        try
+        {
+            var translations = new[]
+            {
+                new NodeTranslation(1, "Bonjour", ""),
+                new NodeTranslation(2, "Au revoir", "Adieu"),
+            };
+            StringTableSerializer.SaveToFile(path, translations);
+            var reparsed = StringTableParser.ParseFile(path);
+            Assert.Equal("Bonjour",   reparsed.Get(1)!.DefaultText);
+            Assert.Equal("Au revoir", reparsed.Get(2)!.DefaultText);
+            Assert.Equal("Adieu",     reparsed.Get(2)!.FemaleText);
+        }
+        finally { Directory.Delete(dir, true); }
+    }
+
+    [Fact]
+    public void SaveToFile_NodeTranslation_MergesWithExistingEntries()
+    {
+        var dir  = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        Directory.CreateDirectory(dir);
+        var path = Path.Combine(dir, "test.stringtable");
+        try
+        {
+            // Pre-populate with two entries
+            StringTableSerializer.SaveToFile(path,
+                new[] { new NodeTranslation(10, "Hello", ""), new NodeTranslation(11, "World", "") });
+            // Now update only node 10
+            StringTableSerializer.SaveToFile(path, new[] { new NodeTranslation(10, "Hola", "") });
+            var reparsed = StringTableParser.ParseFile(path);
+            Assert.Equal("Hola",  reparsed.Get(10)!.DefaultText);
+            Assert.Equal("World", reparsed.Get(11)!.DefaultText); // preserved
+        }
+        finally { Directory.Delete(dir, true); }
+    }
 }
