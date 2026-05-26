@@ -59,7 +59,7 @@ public static class LocalizationExportService
             sb.Append(CsvField(r.WriterComment));    sb.Append(',');
             sb.Append(CsvField(r.SourceDefaultText));sb.Append(',');
             sb.Append(CsvField(r.SourceFemaleText)); sb.Append(',');
-            sb.Append(','); // TranslatedDefaultText — empty
+            sb.Append("\"\""); sb.Append(','); // TranslatedDefaultText — empty placeholder
             sb.AppendLine();  // TranslatedFemaleText — empty
         }
         File.WriteAllText(path, sb.ToString(), Encoding.UTF8);
@@ -109,7 +109,7 @@ public static class LocalizationExportService
                 var unit = new XElement(ns + "trans-unit",
                     new XAttribute("id", $"node_{r.NodeId}"),
                     new XElement(ns + "source", r.SourceDefaultText),
-                    new XElement(ns + "target", string.Empty));
+                    new XElement(ns + "target"));
 
                 if (!string.IsNullOrEmpty(r.SourceFemaleText))
                     unit.Add(new XElement(ns + "note",
