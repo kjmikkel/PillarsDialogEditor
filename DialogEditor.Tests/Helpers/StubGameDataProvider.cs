@@ -35,6 +35,7 @@ public sealed class StubProvider(
     public IReadOnlyDictionary<string, string> LoadSpeakerNames()
         => new Dictionary<string, string>();
     public string GetStringTablePath(ConversationFile f) => string.Empty;
+    public string GetStringTablePath(ConversationFile f, string language) => string.Empty;
     public (string, string) GetBackupRoots() => (string.Empty, string.Empty);
     public ConversationFile BuildNewConversationFile(string name) => file;
     public void InitializeConversationFile(ConversationFile f) { }
@@ -70,6 +71,7 @@ public sealed class MultiFileProvider(
     public IReadOnlyDictionary<string, string> LoadSpeakerNames()
         => new Dictionary<string, string>();
     public string GetStringTablePath(ConversationFile f) => string.Empty;
+    public string GetStringTablePath(ConversationFile f, string language) => string.Empty;
     public (string, string) GetBackupRoots() => (string.Empty, string.Empty);
     public ConversationFile BuildNewConversationFile(string name) => data[0].File;
     public void InitializeConversationFile(ConversationFile f) { }

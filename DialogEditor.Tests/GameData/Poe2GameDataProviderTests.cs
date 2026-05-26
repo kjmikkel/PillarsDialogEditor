@@ -187,4 +187,30 @@ public class Poe2GameDataProviderTests : IDisposable
         Assert.True(File.Exists(file.ConversationPath));
         Assert.NotEmpty(File.ReadAllText(file.ConversationPath));
     }
+
+    [Fact]
+    public void GetStringTablePath_WithLanguage_ReturnsCorrectPath()
+    {
+        WriteBundle("conv1", TwoNodeJson);
+        var file   = _provider.EnumerateConversations().First();
+        var enPath = _provider.GetStringTablePath(file);
+        var frPath = _provider.GetStringTablePath(file, "fr");
+        Assert.Contains(Path.Combine("localized", "fr"), frPath);
+        Assert.Contains(Path.Combine("localized", "en"), enPath);
+        Assert.Equal(Path.GetFileName(enPath), Path.GetFileName(frPath));
+    }
+
+    [Fact]
+    public void SaveConversation_DoesNotWriteStringtable()
+    {
+        var path     = WriteBundle("test", TwoNodeJson);
+        var file     = new ConversationFile("test", "", path, "");
+        var conv     = _provider.LoadConversation(file);
+        var snap     = ConversationSnapshotBuilder.Build(conv);
+        var stPath   = _provider.GetStringTablePath(file);
+        var stBefore = File.Exists(stPath) ? File.ReadAllText(stPath) : null;
+        _provider.SaveConversation(file, snap);
+        var stAfter  = File.Exists(stPath) ? File.ReadAllText(stPath) : null;
+        Assert.Equal(stBefore, stAfter);
+    }
 }
