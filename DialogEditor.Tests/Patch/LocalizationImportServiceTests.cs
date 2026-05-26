@@ -96,9 +96,15 @@ public class LocalizationImportServiceTests : IDisposable
     public void Import_Json_WriterComments_NotImported()
     {
         var exportPath = ExportAndGetPath(LocalizationExportFormat.Json);
+        // Fill in a translation so the import actually executes the patch update
+        var json = File.ReadAllText(exportPath)
+            .Replace("\"translatedDefaultText\": \"\"", "\"translatedDefaultText\": \"Bonjour\"");
+        File.WriteAllText(exportPath, json);
+
         var result = LocalizationImportService.Import(BaseProject(), exportPath,
                                                       LocalizationExportFormat.Json, "fr");
-        // NodeComments should be unchanged (import never writes them)
+        // Translation was stored but NodeComments must remain empty (import never writes them)
+        Assert.Contains(result.Patches["conv"].Translations["fr"], t => t.DefaultText == "Bonjour");
         Assert.Empty(result.Patches["conv"].NodeComments);
     }
 
@@ -116,6 +122,7 @@ public class LocalizationImportServiceTests : IDisposable
                                                       LocalizationExportFormat.Xliff, "fr");
         var frTrans = result.Patches["conv"].Translations["fr"];
         Assert.NotEmpty(frTrans);
+        Assert.All(frTrans, t => Assert.Equal("Bonjour", t.DefaultText));
     }
 
     // ── Author's own language ─────────────────────────────────────────────
