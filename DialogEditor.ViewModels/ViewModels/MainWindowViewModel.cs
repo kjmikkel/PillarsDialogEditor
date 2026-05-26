@@ -33,6 +33,8 @@ public partial class MainWindowViewModel : ObservableObject
 
     private IGameDataProvider? _provider;
     private ConversationFile?  _currentFile;
+
+    public IGameDataProvider? Provider => _provider;
     private string             _currentGameDirectory = string.Empty;
     private string             _activeGameId         = string.Empty;
 
@@ -384,6 +386,7 @@ public partial class MainWindowViewModel : ObservableObject
             SaveProjectCommand.NotifyCanExecuteChanged();
             AppLog.Info($"Project saved: {_projectPath}");
             StatusText = Loc.Format("Status_ProjectSaved", _project.Name);
+            ConversationSaved?.Invoke();
         }
         catch (Exception ex)
         {
@@ -561,9 +564,10 @@ public partial class MainWindowViewModel : ObservableObject
 
     private bool CanSave() => _provider is not null && _currentFile is not null && IsModified;
 
-    // ── Test / Restore events (listened to by the View) ───────────────────
+    // ── Events (listened to by the View) ─────────────────────────────────
     public event Action? TestModeEntered;
     public event Action? TestModeExited;
+    public event Action? ConversationSaved;
 
     // ── Test Patch (applies every patch in the project) ───────────────────
     [RelayCommand(CanExecute = nameof(CanTestPatch))]
