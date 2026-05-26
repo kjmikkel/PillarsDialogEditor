@@ -34,6 +34,7 @@ public static class DiffEngine
         // Build Translations[language]: added nodes + nodes with text changes
         var translationList = new List<NodeTranslation>();
 
+        // Use currentSnap here — 'added' already has text stripped to ""
         foreach (var node in currentSnap.Nodes.Where(n => !baseById.ContainsKey(n.NodeId)))
             translationList.Add(new NodeTranslation(node.NodeId, node.DefaultText, node.FemaleText));
 
