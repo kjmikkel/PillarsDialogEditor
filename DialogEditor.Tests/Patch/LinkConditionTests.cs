@@ -32,7 +32,8 @@ public class LinkConditionTests
 
         var patch = DiffEngine.Diff("c",
             Snap(MakeNode(1, [baseLink])),
-            Snap(MakeNode(1, [newLink])));
+            Snap(MakeNode(1, [newLink])),
+            "en");
 
         var ml = Assert.Single(patch.ModifiedNodes[0].ModifiedLinks);
         Assert.NotNull(ml.Conditions);
@@ -44,7 +45,7 @@ public class LinkConditionTests
     {
         var link = new LinkEditSnapshot(1, 5, 1f, "ShowOnce", false)
             { Conditions = [Leaf] };
-        var patch = DiffEngine.Diff("c", Snap(MakeNode(1, [link])), Snap(MakeNode(1, [link])));
+        var patch = DiffEngine.Diff("c", Snap(MakeNode(1, [link])), Snap(MakeNode(1, [link])), "en");
         Assert.True(patch.IsEmpty);
     }
 

@@ -376,7 +376,7 @@ public partial class MainWindowViewModel : ObservableObject
         if (_project is null || _projectPath is null || _currentFile is null || Canvas.BaseSnapshot is null) return;
         try
         {
-            var patch    = DiffEngine.Diff(_currentFile.Name, Canvas.BaseSnapshot, Canvas.BuildSnapshot());
+            var patch    = DiffEngine.Diff(_currentFile.Name, Canvas.BaseSnapshot, Canvas.BuildSnapshot(), _provider!.Language);
             var layout   = Canvas.GetCurrentLayout();
             SetProject(_project!.WithPatch(patch).WithLayout(_currentFile.Name, layout));
             DialogProjectSerializer.SaveToFile(_projectPath, _project);
