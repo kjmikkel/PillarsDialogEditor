@@ -20,14 +20,8 @@ Pillars of Eternity scripted interactions heavily use reputation checks (Positiv
 ### Batch Operations Across Conversations
 Find/Replace works within a single conversation. Mods that touch multiple NPCs — e.g., renaming a location referenced by many characters — require opening each conversation manually. No cross-conversation search or batch edit exists.
 
-### Voice-Over Integration
-An "External VO" field exists but there is no path validation, lip-sync metadata support, or audio preview. Mods that add or replace voiced lines have no tooling support.
-
 ### Localization Workflows
 No support for exporting strings for translators, importing translated strings back, or managing multiple language variants of a patch.
-
-### Visual Flow Analytics
-No statistics on conversation length, branching depth, dead-end nodes, or unreachable nodes. Hard to audit complex conversations for structural problems.
 
 ### Version Control Integration
 No built-in diff viewing or merge conflict resolution UI for Git. Collaborating on the same conversation across branches is a manual process.
@@ -37,3 +31,6 @@ Only game XML is supported as a source. No import path from dialogue authoring t
 
 ### Barks System
 Display Type toggle exists but no bark-specific tooling — no preview of overhead floating text in context, no bark-specific validation.
+
+### Voice-Over Integration
+An "External VO" field exists but there is no path validation, lip-sync metadata support, or audio preview. Mods that add or replace voiced lines have no tooling support. Note: actual voice-over audio is stored in a proprietary archive format — requires investigation before tooling can be designed.
