@@ -17,6 +17,7 @@ public interface IGameDataProvider
     IReadOnlyDictionary<string, string> LoadSpeakerNames();
     void   SaveConversation(ConversationFile file, ConversationEditSnapshot snapshot);
     string GetStringTablePath(ConversationFile file);
+    string GetStringTablePath(ConversationFile file, string language);
     (string ConversationsRoot, string StringTablesRoot) GetBackupRoots();
 
     /// Returns a ConversationFile record for a not-yet-existing conversation,

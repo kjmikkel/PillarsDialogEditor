@@ -47,7 +47,7 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
     public Conversation LoadConversation(ConversationFile file)
     {
         var nodes = Poe1ConversationParser.ParseFile(file.ConversationPath);
-        var stPath = StringTablePathFor(file.ConversationPath);
+        var stPath = StringTablePathFor(file.ConversationPath, Language);
         var strings = File.Exists(stPath)
             ? StringTableParser.ParseFile(stPath)
             : StringTable.Empty;
@@ -55,13 +55,17 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
     }
 
     public string GetStringTablePath(ConversationFile file)
-        => StringTablePathFor(file.ConversationPath);
+        => StringTablePathFor(file.ConversationPath, Language);
 
-    private string StringTablePathFor(string convPath)
+    public string GetStringTablePath(ConversationFile file, string language)
+        => StringTablePathFor(file.ConversationPath, language);
+
+    private string StringTablePathFor(string convPath, string language)
     {
-        var relative = Path.GetRelativePath(ConversationsRoot, convPath);
+        var relative   = Path.GetRelativePath(ConversationsRoot, convPath);
         var withoutExt = Path.ChangeExtension(relative, null);
-        return Path.Combine(StringTablesRoot, withoutExt + ".stringtable");
+        var root       = Path.Combine(LocalizedRoot, language, "text", "conversations");
+        return Path.Combine(root, withoutExt + ".stringtable");
     }
 
     private string CharactersStringtablePath =>
@@ -76,9 +80,6 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
     public void SaveConversation(ConversationFile file, ConversationEditSnapshot snapshot)
     {
         Poe1ConversationSerializer.SaveToFile(file.ConversationPath, snapshot);
-        var stPath = StringTablePathFor(file.ConversationPath);
-        Directory.CreateDirectory(Path.GetDirectoryName(stPath)!);
-        StringTableSerializer.SaveToFile(stPath, snapshot.Nodes);
     }
 
     public ConversationFile BuildNewConversationFile(string name)
