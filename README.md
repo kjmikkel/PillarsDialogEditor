@@ -131,7 +131,41 @@ The project file is plain JSON and can be version-controlled or shared freely.
 
 ---
 
-### 5 — Test in-game
+### 5 — Translate your mod
+
+If your mod changes dialogue text, you can produce translated versions for other languages without writing separate patches. All translated text is stored inside the same `.dialogproject` file and written to the correct game stringtable paths when the patch is applied.
+
+#### Export for translation
+
+**File › Export for Translation…**
+
+Opens a save dialog followed by a language-code prompt (pre-filled with your current game language). Writes a file containing every edited line alongside writer-comment context columns for the translator.
+
+Three formats are supported — choose in **Settings**:
+
+| Format | Extension | Notes |
+|--------|-----------|-------|
+| CSV | `.csv` | RFC 4180; opens in any spreadsheet |
+| JSON | `.json` | Structured; easy to diff in version control |
+| XLIFF 1.2 | `.xlf` | Industry-standard CAT-tool format |
+
+Each row/entry has: conversation name, node ID, writer comment (if any), source default text, source female text, and empty *translated default / female* columns for the translator to fill in.
+
+If a language already has partial translations in the project, those are pre-populated so re-exporting never discards prior work.
+
+#### Import translations
+
+**File › Import Translation…**
+
+Opens a file picker (`.csv`, `.json`, `.xlf`/`.xliff` accepted) followed by a language-code prompt. Rows where both translated columns are empty are skipped. The translations are stored in the project under that language code — **save the project afterwards** to persist them.
+
+#### Applying multi-language patches
+
+`F5` (Test Patch) and the `dialog-patcher` CLI both write stringtables for **every language present in the patch** that is also installed on the player's machine. If a player has the French localisation installed and your project contains a `"fr"` entry, the French stringtable is updated automatically.
+
+---
+
+### 6 — Test in-game
 
 **Test › Test Patch** (`F5`)
 
@@ -154,7 +188,7 @@ unchanged.
 
 ---
 
-### 6 — Restore after testing
+### 7 — Restore after testing
 
 **Test › Restore Conversation** (`F6`)
 
@@ -168,7 +202,7 @@ editing.
 
 ---
 
-### 7 — Distribute and combine patches
+### 8 — Distribute and combine patches
 
 #### Single patch
 
@@ -315,6 +349,7 @@ binary reports this version at runtime via `--version`.
 | Setting | Purpose |
 |---------|---------|
 | Backup directory | The folder chosen during first-time setup where the original game files are stored. Used for full disaster recovery via **Test › Restore Backup** (`Ctrl+Shift+B`). Can be changed here if you want to move the backup to a different location. |
+| Default localization format | File format used by **File › Export for Translation…** — `Csv`, `Json`, or `Xliff`. All three formats are always selectable in the save dialog; this setting controls which is offered first. |
 
 ---
 
