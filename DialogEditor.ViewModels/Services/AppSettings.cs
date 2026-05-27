@@ -12,9 +12,13 @@ public record PendingRestoreEntry(
 
 public static class AppSettings
 {
-    private static readonly string SettingsPath = Path.Combine(
+    private static readonly string _defaultSettingsPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "PillarsDialogEditor", "settings.json");
+
+    internal static string? SettingsPathOverride;
+
+    private static string SettingsPath => SettingsPathOverride ?? _defaultSettingsPath;
 
     private sealed class SettingsData
     {
