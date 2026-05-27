@@ -359,10 +359,14 @@ public partial class MainWindowViewModel : ObservableObject
     {
         if (_provider is null || _project is null) return;
 
-        // Build file filter tuples from the factory
-        var fileTypes = DialogImporterFactory.AllFileTypes
-            .Select(ft => (ft.Extension, ft.Label))
-            .ToArray();
+        // Build file filter tuples using localizable labels
+        var fileTypes = new (string Extension, string Label)[]
+        {
+            (".csv",  Loc.Get("FileType_CsvDialog")),
+            (".json", Loc.Get("FileType_JsonDialog")),
+            (".xml",  Loc.Get("FileType_ArticyXml")),
+            (".yarn", Loc.Get("FileType_YarnSpinner")),
+        };
 
         var path = await _filePicker.PickOpenFileAsync(
             Loc.Get("Dialog_ImportConversation"),
