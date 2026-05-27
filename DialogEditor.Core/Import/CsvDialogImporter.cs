@@ -98,6 +98,7 @@ public class CsvDialogImporter : IDialogImporter
         return value.Length == 0 ? defaultValue : value;
     }
 
+    // Tolerate unknown values — reject the whole file for one bad field would be too strict.
     private static SpeakerCategory ParseSpeakerCategory(string value) =>
         Enum.TryParse<SpeakerCategory>(value, ignoreCase: true, out var result)
             ? result
@@ -128,7 +129,6 @@ public class CsvDialogImporter : IDialogImporter
         return links;
     }
 
-    // Minimal CSV row parser: handles quoted fields (RFC 4180 subset).
     private static List<string> ParseCsvRow(string line)
     {
         var fields = new List<string>();

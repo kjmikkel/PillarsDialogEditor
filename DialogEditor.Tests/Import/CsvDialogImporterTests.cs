@@ -18,7 +18,7 @@ public class CsvDialogImporterTests : IDisposable
     public void Dispose()
     {
         foreach (var f in _tempFiles)
-            try { File.Delete(f); } catch { /* best-effort cleanup */ }
+            try { File.Delete(f); } catch (Exception) { /* best-effort cleanup */ }
     }
 
     private static readonly CsvDialogImporter Importer = new();
@@ -176,6 +176,36 @@ public class CsvDialogImporterTests : IDisposable
         Assert.Equal(1f, link.RandomWeight);
         Assert.Equal("", link.QuestionNodeTextDisplay);
         Assert.Null(link.Conditions);
+    }
+
+    // ── Quoted fields ─────────────────────────────────────────────────────
+
+    [Fact]
+    public void Import_QuotedFields_ParsedCorrectly()
+    {
+        var path = WriteTempCsv("""
+            NodeId,SpeakerCategory,DefaultText,FemaleText,LinksTo,DisplayType,Persistence
+            1,Npc,"Hello, traveler!",,2,Conversation,None
+            2,Npc,Farewell,,,Conversation,None
+            """);
+
+        var result = Importer.Import(path);
+
+        var node = result.Nodes.Single(n => n.NodeId == 1);
+        Assert.Equal("Hello, traveler!", node.DefaultText);
+    }
+
+    // ── Non-numeric NodeId ────────────────────────────────────────────────
+
+    [Fact]
+    public void Import_NonNumericNodeId_ThrowsFormatException()
+    {
+        var path = WriteTempCsv("""
+            NodeId,SpeakerCategory,DefaultText
+            abc,Npc,Hello
+            """);
+
+        Assert.Throws<FormatException>(() => Importer.Import(path));
     }
 
     // ── SpeakerCategory case-insensitivity and fallback ──────────────────
