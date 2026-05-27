@@ -11,13 +11,18 @@ public partial class SettingsViewModel : ObservableObject
     private readonly IFolderPicker _picker;
 
     [ObservableProperty] private string _backupDirectory;
+    [ObservableProperty] private string _localizationFormat;
 
     public SettingsViewModel(string gameDirectory, IFolderPicker picker)
     {
-        _gameDirectory   = gameDirectory;
-        _picker          = picker;
-        _backupDirectory = AppSettings.GetBackupPath(gameDirectory) ?? string.Empty;
+        _gameDirectory      = gameDirectory;
+        _picker             = picker;
+        _backupDirectory    = AppSettings.GetBackupPath(gameDirectory) ?? string.Empty;
+        _localizationFormat = AppSettings.DefaultLocalizationFormat;
     }
+
+    partial void OnLocalizationFormatChanged(string value)
+        => AppSettings.DefaultLocalizationFormat = value;
 
     [RelayCommand]
     private async Task BrowseBackupDirectory()
