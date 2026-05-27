@@ -140,28 +140,52 @@
 
                             <Grid Width="200" RowDefinitions="Auto,Auto,Auto"
                                   Opacity="{Binding IsSearchMatch, Converter={StaticResource SearchMatchOpacity}}">
-                                <Border Grid.Row="0"
-                                        Background="{Binding SpeakerCategory, Converter={StaticResource SpeakerCategoryToBrush}}"
-                                        CornerRadius="2,2,0,0">
-                                    <TextBlock Text="{Binding Title}"
-                                               Foreground="White" FontWeight="Bold"
-                                               FontSize="10" Padding="6,3"
-                                               TextTrimming="CharacterEllipsis"/>
+
+                                <!-- Header — amber when Bark, speaker-color when Conversation -->
+                                <Border Grid.Row="0" CornerRadius="2,2,0,0">
+                                    <Border.Background>
+                                        <MultiBinding Converter="{StaticResource NodeColorConverter}">
+                                            <Binding Path="SpeakerCategory"/>
+                                            <Binding Path="DisplayType"/>
+                                        </MultiBinding>
+                                    </Border.Background>
+                                    <StackPanel Orientation="Horizontal">
+                                        <!-- Speaker-identity dot: always present, only informative for bark nodes -->
+                                        <Ellipse Width="6" Height="6" Margin="6,0,4,0" VerticalAlignment="Center"
+                                                 Fill="{Binding SpeakerCategory, Converter={StaticResource SpeakerCategoryToBrush}}"
+                                                 ToolTip.Tip="{Binding SpeakerCategory}"/>
+                                        <TextBlock Text="{Binding Title}"
+                                                   Foreground="White" FontWeight="Bold"
+                                                   FontSize="10" Padding="0,3,6,3"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                    </StackPanel>
                                 </Border>
-                                <TextBlock Grid.Row="1"
-                                           Text="{Binding TextPreview}"
-                                           TextWrapping="Wrap"
-                                           Padding="6,4" FontSize="10"
-                                           Foreground="#333" MaxHeight="70"
-                                           Background="{Binding SpeakerCategory,
-                                               Converter={StaticResource SpeakerCategoryToBrush},
-                                               ConverterParameter=body}"/>
-                                <Border Grid.Row="2" Padding="6,2"
-                                        Background="{Binding SpeakerCategory,
-                                            Converter={StaticResource SpeakerCategoryToBrush},
-                                            ConverterParameter=footer}">
+
+                                <!-- Body -->
+                                <Border Grid.Row="1">
+                                    <Border.Background>
+                                        <MultiBinding Converter="{StaticResource NodeColorConverter}" ConverterParameter="body">
+                                            <Binding Path="SpeakerCategory"/>
+                                            <Binding Path="DisplayType"/>
+                                        </MultiBinding>
+                                    </Border.Background>
+                                    <TextBlock Text="{Binding TextPreview}"
+                                               TextWrapping="Wrap"
+                                               Padding="6,4" FontSize="10"
+                                               Foreground="#333" MaxHeight="70"/>
+                                </Border>
+
+                                <!-- Footer -->
+                                <Border Grid.Row="2" Padding="6,2">
+                                    <Border.Background>
+                                        <MultiBinding Converter="{StaticResource NodeColorConverter}" ConverterParameter="footer">
+                                            <Binding Path="SpeakerCategory"/>
+                                            <Binding Path="DisplayType"/>
+                                        </MultiBinding>
+                                    </Border.Background>
                                     <TextBlock Text="{Binding FooterText}" FontSize="9" Foreground="#666"/>
                                 </Border>
+
                             </Grid>
 
                         </nodify:Node>
