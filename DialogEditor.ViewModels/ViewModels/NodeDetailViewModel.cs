@@ -117,7 +117,7 @@ public partial class NodeDetailViewModel : ObservableObject
         {
             var warnings = new List<string>(_node?.BarkWarnings ?? []);
             if (_node?.IsBark == true
-                && _links.Any(l => l.Target.Owner?.IsPlayerChoice == true))
+                && Links.Any(l => l.Target.Owner?.IsPlayerChoice == true))
             {
                 warnings.Add(Loc.Get("Bark_Warning_PlayerChoiceChild"));
             }
