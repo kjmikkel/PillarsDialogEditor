@@ -213,6 +213,28 @@ public partial class ConversationViewModel : ObservableObject
         node.DefaultText.Contains(q, StringComparison.OrdinalIgnoreCase) ||
         node.SpeakerName.Contains(q, StringComparison.OrdinalIgnoreCase);
 
+    // ── NodeComments — translator context for each node ───────────────────
+    private Dictionary<int, string> _nodeComments = new();
+
+    internal void LoadNodeComments(IReadOnlyDictionary<int, string> comments)
+    {
+        _nodeComments = new Dictionary<int, string>(comments);
+    }
+
+    internal void SetNodeComment(int nodeId, string comment)
+    {
+        if (string.IsNullOrWhiteSpace(comment))
+            _nodeComments.Remove(nodeId);
+        else
+            _nodeComments[nodeId] = comment.Trim();
+        IsModified = true;
+    }
+
+    internal string GetNodeComment(int nodeId) =>
+        _nodeComments.TryGetValue(nodeId, out var c) ? c : string.Empty;
+
+    internal IReadOnlyDictionary<int, string> NodeComments => _nodeComments;
+
     // ── Base snapshot (used for patch diffing) ────────────────────────────
     internal ConversationEditSnapshot? BaseSnapshot { get; private set; }
 

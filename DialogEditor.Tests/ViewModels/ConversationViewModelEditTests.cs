@@ -111,4 +111,23 @@ public class ConversationViewModelEditTests
         Assert.Single(node1Snap.Links);
         Assert.Equal(2, node1Snap.Links[0].ToNodeId);
     }
+
+    // ── NodeComments ──────────────────────────────────────────────────────
+
+    [Fact]
+    public void SetNodeComment_WhitespaceOnly_RemovesEntry()
+    {
+        var vm = MakeVm();
+        vm.LoadNodeComments(new Dictionary<int, string> { [1] = "existing" });
+        vm.SetNodeComment(1, "   ");
+        Assert.False(vm.NodeComments.ContainsKey(1));
+    }
+
+    [Fact]
+    public void SetNodeComment_NewEntry_AddsToDict()
+    {
+        var vm = MakeVm();
+        vm.SetNodeComment(5, "context");
+        Assert.Equal("context", vm.NodeComments[5]);
+    }
 }

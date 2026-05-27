@@ -168,6 +168,13 @@
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30"
                          ToolTip.Tip="{StaticResource ToolTip_Comments}"/>
 
+                <!-- ── Translator note ────────────────────────────────── -->
+                <TextBlock Classes="group-header" Text="{StaticResource NodeDetail_TranslatorNote}"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding TranslatorNote, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30"
+                         ToolTip.Tip="{StaticResource ToolTip_NodeDetail_TranslatorNote}"/>
+
                 <!-- ── Scripts (edit in separate window) ─────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_GroupLogic}"/>
                 <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">

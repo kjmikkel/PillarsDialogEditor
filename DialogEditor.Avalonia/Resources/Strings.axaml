@@ -401,6 +401,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_HasVO">Check if a voice-over recording exists for this line</sys:String>
     <sys:String x:Key="ToolTip_HideSpeaker">Hide the speaker name label during dialogue playback</sys:String>
     <sys:String x:Key="ToolTip_Comments">Internal developer notes — not shown to players</sys:String>
+    <sys:String x:Key="NodeDetail_TranslatorNote">TRANSLATOR NOTE</sys:String>
+    <sys:String x:Key="ToolTip_NodeDetail_TranslatorNote">Context for translators: tone, character mood, length constraints, etc. Exported with translation files but never written to game data.</sys:String>
     <sys:String x:Key="ToolTip_AddLinkTargetId">Type a node ID and click Add to create a link from this node to that one</sys:String>
 
     <!-- ─── Canvas context menus ──────────────────────────────────────────── -->

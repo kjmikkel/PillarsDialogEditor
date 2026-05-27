@@ -372,6 +372,12 @@ public partial class MainWindowViewModel : ObservableObject
         var savedLayout = _project?.GetLayout(file.Name);
         if (savedLayout is not null) Canvas.RestoreLayout(savedLayout);
 
+        Detail.Canvas = Canvas;
+        var existingComments2 = _project?.Patches.TryGetValue(file.Name, out var p2) == true
+            ? p2.NodeComments
+            : new Dictionary<int, string>();
+        Canvas.LoadNodeComments(existingComments2);
+
         Detail.Clear();
         IsModified = false;
         CurrentConversationName = file.Name;
@@ -385,6 +391,7 @@ public partial class MainWindowViewModel : ObservableObject
         try
         {
             var patch    = DiffEngine.Diff(_currentFile.Name, Canvas.BaseSnapshot, Canvas.BuildSnapshot(), _provider!.Language);
+            patch = patch with { NodeComments = Canvas.NodeComments };
             var layout   = Canvas.GetCurrentLayout();
             SetProject(_project!.WithPatch(patch).WithLayout(_currentFile.Name, layout));
             DialogProjectSerializer.SaveToFile(_projectPath, _project);
@@ -852,6 +859,12 @@ public partial class MainWindowViewModel : ObservableObject
             var savedLayout = _project?.GetLayout(file.Name);
             if (savedLayout is not null)
                 Canvas.RestoreLayout(savedLayout);
+
+            Detail.Canvas = Canvas;
+            var existingComments = _project?.Patches.TryGetValue(file.Name, out var p) == true
+                ? p.NodeComments
+                : new Dictionary<int, string>();
+            Canvas.LoadNodeComments(existingComments);
 
             Detail.Clear();
             IsModified = false;
