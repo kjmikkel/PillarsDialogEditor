@@ -454,10 +454,12 @@ public partial class MainWindowViewModel : ObservableObject
         if (_project is null) return;
         var fmt = ParseFormat(AppSettings.DefaultLocalizationFormat);
         var ext = FormatExtension(fmt);
+        var allTypes = new (string, string)[] { (".csv", "CSV"), (".json", "JSON"), (".xlf", "XLIFF") };
+        var ordered = allTypes.OrderByDescending(t => t.Item1 == ext).ToArray();
         var path = await _filePicker.PickSaveFileAsync(
             "Export for Translation",
             "export" + ext,
-            new[] { (".csv", "CSV"), (".json", "JSON"), (".xlf", "XLIFF") });
+            ordered);
         if (path is null) return;
         var lang = await (RequestLanguageCode?.Invoke("Source language", _provider?.Language)
                           ?? Task.FromResult<string?>(_provider?.Language));
@@ -472,8 +474,7 @@ public partial class MainWindowViewModel : ObservableObject
         if (_project is null) return;
         var path = await _filePicker.PickOpenFileAsync(
             "Import Translation",
-            ".csv,.json,.xlf,.xliff",
-            "Translation Files");
+            new[] { (".csv", "CSV"), (".json", "JSON"), (".xlf", "XLIFF") });
         if (path is null) return;
         var fmt  = DetectFormat(path);
         var lang = await (RequestLanguageCode?.Invoke("Target language", null)

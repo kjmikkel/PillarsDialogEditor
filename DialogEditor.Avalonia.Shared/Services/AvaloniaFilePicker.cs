@@ -24,6 +24,25 @@ public sealed class AvaloniaFilePicker(TopLevel topLevel) : IFilePicker
         return results.FirstOrDefault()?.Path.LocalPath;
     }
 
+    public async Task<string?> PickOpenFileAsync(
+        string title,
+        IReadOnlyList<(string Extension, string Description)> fileTypes)
+    {
+        var types = fileTypes.Select(ft => new FilePickerFileType(ft.Description)
+        {
+            Patterns = new[] { $"*{ft.Extension}" }
+        }).ToList();
+
+        var results = await topLevel.StorageProvider.OpenFilePickerAsync(
+            new FilePickerOpenOptions
+            {
+                Title         = title,
+                AllowMultiple = false,
+                FileTypeFilter = [.. types, FilePickerFileTypes.All],
+            });
+        return results.FirstOrDefault()?.Path.LocalPath;
+    }
+
     public async Task<IReadOnlyList<string>> PickOpenFilesAsync(
         string title, string extension, string extensionDescription)
     {
