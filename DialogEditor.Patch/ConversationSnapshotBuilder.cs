@@ -7,8 +7,17 @@ public static class ConversationSnapshotBuilder
 {
     /// Reconstructs a Conversation from a snapshot. Used to restore the canvas
     /// state for new (not-yet-on-disk) conversations when reopening a project.
-    public static Conversation ToConversation(string name, ConversationEditSnapshot snap)
+    /// When <paramref name="translations"/> is provided, node text is sourced from
+    /// it (since <see cref="NodeEditSnapshot.DefaultText"/> is [JsonIgnore] and
+    /// does not survive serialization).
+    public static Conversation ToConversation(
+        string name,
+        ConversationEditSnapshot snap,
+        IReadOnlyList<NodeTranslation>? translations = null)
     {
+        var textById = translations?.ToDictionary(t => t.NodeId)
+                      ?? new Dictionary<int, NodeTranslation>();
+
         var nodes = snap.Nodes.Select(n => new ConversationNode(
             NodeId:          n.NodeId,
             IsPlayerChoice:  n.IsPlayerChoice,
@@ -29,9 +38,13 @@ public static class ConversationSnapshotBuilder
             HasVO:           n.HasVO,
             HideSpeaker:     n.HideSpeaker)).ToList();
 
-        var strings = new StringTable(snap.Nodes
-            .Select(n => new StringEntry(n.NodeId, n.DefaultText, n.FemaleText))
-            .ToList());
+        var strings = new StringTable(snap.Nodes.Select(n =>
+        {
+            textById.TryGetValue(n.NodeId, out var t);
+            return new StringEntry(n.NodeId,
+                t?.DefaultText ?? n.DefaultText,
+                t?.FemaleText  ?? n.FemaleText);
+        }).ToList());
 
         return new Conversation(name, nodes, strings);
     }

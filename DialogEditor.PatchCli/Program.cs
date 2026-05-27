@@ -161,6 +161,7 @@ try
         var baseSnap     = ConversationSnapshotBuilder.Build(conversation);
         var result       = PatchApplier.Apply(baseSnap, patch, ignoreConflicts: force);
         provider.SaveConversation(file, result);
+        TranslationApplier.WriteTranslations(file, patch, provider);
 
         applied++;
         Verbose($"  patched: {convName}");
