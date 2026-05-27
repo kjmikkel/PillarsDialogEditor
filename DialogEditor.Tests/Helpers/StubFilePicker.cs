@@ -13,6 +13,12 @@ public sealed class StubFilePicker(
     public Task<string?> PickSaveFileAsync(string title, string suggestedName, string extension, string extensionDescription)
         => Task.FromResult(saveResult);
 
+    public Task<string?> PickSaveFileAsync(
+        string title,
+        string suggestedName,
+        IReadOnlyList<(string Extension, string Description)> fileTypes)
+        => Task.FromResult(saveResult);
+
     public Task<IReadOnlyList<string>> PickOpenFilesAsync(string title, string extension, string extensionDescription)
         => Task.FromResult(multiResult ?? (IReadOnlyList<string>)Array.Empty<string>());
 }
