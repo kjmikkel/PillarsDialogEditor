@@ -28,6 +28,7 @@ public static class AppSettings
         public List<PendingRestoreEntry>? PendingRestores { get; set; }
         public double? LegendX                       { get; set; }
         public double? LegendY                       { get; set; }
+        public string DefaultLocalizationFormat      { get; set; } = "Csv";
     }
 
     public static string? LastLanguage
@@ -137,6 +138,12 @@ public static class AppSettings
         s.LegendX = x;
         s.LegendY = y;
         Save(s);
+    }
+
+    public static string DefaultLocalizationFormat
+    {
+        get => Load().DefaultLocalizationFormat;
+        set { var s = Load(); s.DefaultLocalizationFormat = value; Save(s); }
     }
 
     public static string PickLanguage(IReadOnlyList<string> available, string? preferred)

@@ -265,4 +265,22 @@ public class SettingsViewModelTests
         var vm = new SettingsViewModel("/game", new StubFolderPicker());
         Assert.Equal(expected, vm.BackupDirectory);
     }
+
+    [Fact]
+    public void LocalizationFormat_DefaultIsCsv()
+    {
+        var vm = new SettingsViewModel("/game", new StubFolderPicker());
+        Assert.Equal("Csv", vm.LocalizationFormat);
+    }
+
+    [Fact]
+    public void LocalizationFormat_RoundTripsViaAppSettings()
+    {
+        // AppSettings.DefaultLocalizationFormat is static; test the ViewModel binding
+        var vm = new SettingsViewModel("/game", new StubFolderPicker());
+        vm.LocalizationFormat = "Json";
+        Assert.Equal("Json", AppSettings.DefaultLocalizationFormat);
+        // Reset
+        AppSettings.DefaultLocalizationFormat = "Csv";
+    }
 }
