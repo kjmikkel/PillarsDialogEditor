@@ -57,6 +57,13 @@
                                   Click="PatchManager_Click"
                                   ToolTip.Tip="{StaticResource ToolTip_PatchManagerOpen}"/>
                         <Separator/>
+                        <MenuItem Header="{StaticResource Menu_ExportForTranslation}"
+                                  Command="{Binding ExportForTranslationCommand}"
+                                  ToolTip.Tip="{StaticResource ToolTip_ExportForTranslation}"/>
+                        <MenuItem Header="{StaticResource Menu_ImportTranslation}"
+                                  Command="{Binding ImportTranslationCommand}"
+                                  ToolTip.Tip="{StaticResource ToolTip_ImportTranslation}"/>
+                        <Separator/>
                         <MenuItem Header="{StaticResource Menu_Settings}"
                                   Click="SettingsButton_Click"
                                   InputGesture="Ctrl+,"/>

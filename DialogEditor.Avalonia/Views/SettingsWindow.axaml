@@ -3,7 +3,7 @@
         x:Class="DialogEditor.Avalonia.Views.SettingsWindow"
         Title="{StaticResource Settings_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Width="500" Height="130"
+        Width="500" Height="180"
         CanResize="False"
         Background="#1e1e1e"
         WindowStartupLocation="CenterOwner"
@@ -51,6 +51,17 @@
                          Text="{Binding BackupDirectory}"
                          Watermark="{StaticResource Settings_PathNotSet}"
                          ToolTip.Tip="{StaticResource Settings_BackupDirectoryTooltip}"/>
+            </DockPanel>
+
+            <!-- Default localization format -->
+            <DockPanel>
+                <TextBlock Classes="label" Text="{StaticResource Settings_LocalizationFormat}"/>
+                <ComboBox SelectedItem="{Binding LocalizationFormat, Mode=TwoWay}"
+                          MinWidth="120">
+                    <ComboBoxItem Content="Csv"/>
+                    <ComboBoxItem Content="Json"/>
+                    <ComboBoxItem Content="Xliff"/>
+                </ComboBox>
             </DockPanel>
 
         </StackPanel>

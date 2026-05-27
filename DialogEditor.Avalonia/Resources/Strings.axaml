@@ -593,6 +593,23 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Dialog_MergeProjects">Select projects to merge into the current project</sys:String>
     <sys:String x:Key="Status_MergeComplete">Merged {0} project(s) into '{1}'</sys:String>
     <sys:String x:Key="Status_MergeError">Merge failed: {0}</sys:String>
+
+    <!-- ─── Localization — export / import translation ─────────────────── -->
+    <sys:String x:Key="Menu_ExportForTranslation">Export for Translation…</sys:String>
+    <sys:String x:Key="Menu_ImportTranslation">Import Translation…</sys:String>
+    <sys:String x:Key="ToolTip_ExportForTranslation">Export dialogue text to CSV, JSON, or XLIFF for human translators.</sys:String>
+    <sys:String x:Key="ToolTip_ImportTranslation">Import translated text back into the project from CSV, JSON, or XLIFF.</sys:String>
+    <sys:String x:Key="Localization_LanguageCodeDialog_Title">Language Code</sys:String>
+    <sys:String x:Key="Localization_LanguageCodeDialog_Prompt">Language code (e.g. en, fr, de, ja):</sys:String>
+    <!-- {0} = entry count, {1} = file path -->
+    <sys:String x:Key="Localization_StatusExported">Exported {0} entries to {1}</sys:String>
+    <!-- {0} = entry count, {1} = language code -->
+    <sys:String x:Key="Localization_StatusImported">{0} translations imported for {1}</sys:String>
+    <sys:String x:Key="Localization_StatusImportNoEntries">No translated entries found in file</sys:String>
+
+    <!-- ─── Settings — localization format ────────────────────────────── -->
+    <sys:String x:Key="Settings_LocalizationFormat">Default localization format</sys:String>
+
     <!-- PatchManager strings are in DialogEditor.Avalonia.Shared/Resources/Strings.axaml -->
 
 </ResourceDictionary>

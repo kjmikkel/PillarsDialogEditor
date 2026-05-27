@@ -44,6 +44,12 @@ public partial class MainWindow : Window
         vm.TestModeExited  += () => TestOverlay.IsVisible = false;
         vm.RequestConversationName   = () => PromptConversationNameAsync();
         vm.RequestConflictResolution = ex => ShowConflictResolutionDialogAsync(ex);
+        vm.RequestLanguageCode = async (title, defaultValue) =>
+        {
+            var dialog = new LanguageCodeDialog(defaultValue);
+            await dialog.ShowDialog(this);
+            return dialog.Result;
+        };
 
         if (!vm.IsBrowserExpanded)
         {
