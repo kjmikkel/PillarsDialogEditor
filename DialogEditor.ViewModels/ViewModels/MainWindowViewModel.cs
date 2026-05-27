@@ -351,9 +351,11 @@ public partial class MainWindowViewModel : ObservableObject
         // If the project already has a patch (e.g. re-opened project), reconstruct from it
         if (_project?.Patches.TryGetValue(file.Name, out var existingPatch) == true)
         {
-            var baseSnap    = new ConversationEditSnapshot([]);
-            var appliedSnap = PatchApplier.Apply(baseSnap, existingPatch);
-            var restored    = ConversationSnapshotBuilder.ToConversation(file.Name, appliedSnap);
+            var baseSnap     = new ConversationEditSnapshot([]);
+            var appliedSnap  = PatchApplier.Apply(baseSnap, existingPatch);
+            var translations = existingPatch.Translations
+                .GetValueOrDefault(_provider?.Language ?? "en");
+            var restored     = ConversationSnapshotBuilder.ToConversation(file.Name, appliedSnap, translations);
             Canvas.Load(restored);
         }
         else
