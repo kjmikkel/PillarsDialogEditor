@@ -16,7 +16,7 @@ Significant coverage has been added: both `IGameDataProvider` implementations, `
 No built-in diff viewing or merge conflict resolution UI for Git. Collaborating on the same conversation across branches is a manual process.
 
 ### Import from Other Formats
-Only game XML is supported as a source. No import path from dialogue authoring tools (Articy Draft, etc.) or other intermediate formats.
+Four one-shot import paths are implemented: CSV (spreadsheet-authored dialogue), a purpose-built JSON schema, Articy Draft 3/X XML, and Yarn Spinner `.yarn` files. Each produces a new conversation auto-laid-out on the canvas. Remaining limitations: no round-trip export back to these formats; Yarn Spinner conditions and commands (`<<if>>`, `<<set>>`, `<<command>>`) are silently skipped rather than imported.
 
 ### Barks System — Bark Preview
 Bark nodes now render with an amber color scheme on the canvas, carry bark-specific validation warnings (text too long, player-choice child), and those warnings surface in Flow Analytics. The remaining gap is an in-context preview of overhead floating text: writers cannot see how a bark will actually appear above an NPC's head without running the game. Implementing this requires investigating the game's bark rendering (font, line-wrapping, maximum visible width) before UI work can be designed.
