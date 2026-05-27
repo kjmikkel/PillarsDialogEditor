@@ -54,8 +54,15 @@ public class LanguagePickerTests
 
 public class AppSettingsPendingRestoreTests : IDisposable
 {
-    public AppSettingsPendingRestoreTests() => AppSettings.ClearPendingRestores();
-    public void Dispose()                   => AppSettings.ClearPendingRestores();
+    public AppSettingsPendingRestoreTests()
+        => AppSettings.SettingsPathOverride = Path.GetTempFileName();
+
+    public void Dispose()
+    {
+        var path = AppSettings.SettingsPathOverride;
+        AppSettings.SettingsPathOverride = null;
+        if (path is not null) File.Delete(path);
+    }
 
     [Fact]
     public void GetPendingRestores_WhenNotSet_ReturnsNull()
