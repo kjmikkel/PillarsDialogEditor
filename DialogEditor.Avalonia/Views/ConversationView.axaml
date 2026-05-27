@@ -233,9 +233,14 @@
                         <Setter Property="Height" Value="80"/>
                         <Setter Property="Template">
                             <ControlTemplate TargetType="nodify:MinimapItem">
-                                <Border Background="{Binding SpeakerCategory,
-                                                    Converter={StaticResource SpeakerCategoryToBrush}}"
-                                        CornerRadius="2"/>
+                                <Border CornerRadius="2">
+                                    <Border.Background>
+                                        <MultiBinding Converter="{StaticResource NodeColorConverter}">
+                                            <Binding Path="SpeakerCategory"/>
+                                            <Binding Path="DisplayType"/>
+                                        </MultiBinding>
+                                    </Border.Background>
+                                </Border>
                             </ControlTemplate>
                         </Setter>
                     </ControlTheme>
