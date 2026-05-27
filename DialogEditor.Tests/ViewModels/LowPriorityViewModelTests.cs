@@ -1,3 +1,4 @@
+using System.IO;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
@@ -235,9 +236,20 @@ public class PatchEntryViewModelTests
 
 // ── SettingsViewModel ─────────────────────────────────────────────────────────
 
-public class SettingsViewModelTests
+public class SettingsViewModelTests : IDisposable
 {
-    public SettingsViewModelTests() => Loc.Configure(new StubStringProvider());
+    public SettingsViewModelTests()
+    {
+        AppSettings.SettingsPathOverride = Path.GetTempFileName();
+        Loc.Configure(new StubStringProvider());
+    }
+
+    public void Dispose()
+    {
+        var path = AppSettings.SettingsPathOverride;
+        AppSettings.SettingsPathOverride = null;
+        if (path is not null) File.Delete(path);
+    }
 
     [Fact]
     public async Task BrowseBackupDirectory_WhenPickerReturnsPath_SetsBackupDirectory()
@@ -276,11 +288,8 @@ public class SettingsViewModelTests
     [Fact]
     public void LocalizationFormat_RoundTripsViaAppSettings()
     {
-        // AppSettings.DefaultLocalizationFormat is static; test the ViewModel binding
         var vm = new SettingsViewModel("/game", new StubFolderPicker());
         vm.LocalizationFormat = "Json";
         Assert.Equal("Json", AppSettings.DefaultLocalizationFormat);
-        // Reset
-        AppSettings.DefaultLocalizationFormat = "Csv";
     }
 }
