@@ -14,10 +14,11 @@ public class FlowAnalysisServiceTests
         bool isPlayerChoice        = false,
         string defaultText         = "",
         string femaleText          = "",
+        string displayType         = "Conversation",
         IReadOnlyList<LinkEditSnapshot>? links = null) =>
         new(id, isPlayerChoice, category,
             "", "", defaultText, femaleText,
-            "Conversation", "None", "", "", "", false, false,
+            displayType, "None", "", "", "", false, false,
             links ?? [], [], []);
 
     private static LinkEditSnapshot Link(int from, int to, bool hasConditions = false) =>
@@ -316,5 +317,75 @@ public class FlowAnalysisServiceTests
         var report = FlowAnalysisService.Analyze(snapshot);
 
         Assert.Equal(2, report.Issues.Count(i => i.Kind == FlowIssueKind.Unreachable));
+    }
+
+    // ── Issue: BarkTextTooLong ────────────────────────────────────────
+
+    [Fact]
+    public void Analyze_BarkNode_LongText_EmitsBarkTextTooLongIssue()
+    {
+        var longText = new string('x', BarkConstants.TextLengthWarningThreshold + 1);
+        var snapshot = Snapshot(
+            MakeNode(0, links: [Link(0, 1)]),
+            MakeNode(1, defaultText: longText, displayType: "Bark"));
+
+        var report = FlowAnalysisService.Analyze(snapshot);
+
+        Assert.Contains(report.Issues, i => i.Kind == FlowIssueKind.BarkTextTooLong && i.NodeId == 1);
+    }
+
+    [Fact]
+    public void Analyze_BarkNode_ShortText_NoBarkTextIssue()
+    {
+        var shortText = new string('x', BarkConstants.TextLengthWarningThreshold);
+        var snapshot = Snapshot(
+            MakeNode(0, links: [Link(0, 1)]),
+            MakeNode(1, defaultText: shortText, displayType: "Bark"));
+
+        var report = FlowAnalysisService.Analyze(snapshot);
+
+        Assert.Empty(report.Issues.Where(i => i.Kind == FlowIssueKind.BarkTextTooLong));
+    }
+
+    [Fact]
+    public void Analyze_ConversationNode_LongText_NoIssue()
+    {
+        var longText = new string('x', BarkConstants.TextLengthWarningThreshold + 1);
+        var snapshot = Snapshot(
+            MakeNode(0, links: [Link(0, 1)]),
+            MakeNode(1, defaultText: longText, displayType: "Conversation"));
+
+        var report = FlowAnalysisService.Analyze(snapshot);
+
+        Assert.Empty(report.Issues.Where(i => i.Kind == FlowIssueKind.BarkTextTooLong));
+    }
+
+    // ── Issue: BarkHasPlayerChoiceChild ──────────────────────────────
+
+    [Fact]
+    public void Analyze_BarkNode_WithPlayerChoiceChild_EmitsBarkHasPlayerChoiceChildIssue()
+    {
+        var snapshot = Snapshot(
+            MakeNode(0, links: [Link(0, 1)]),
+            MakeNode(1, displayType: "Bark", links: [Link(1, 2)]),
+            MakeNode(2, isPlayerChoice: true));
+
+        var report = FlowAnalysisService.Analyze(snapshot);
+
+        Assert.Contains(report.Issues,
+            i => i.Kind == FlowIssueKind.BarkHasPlayerChoiceChild && i.NodeId == 1);
+    }
+
+    [Fact]
+    public void Analyze_BarkNode_WithNpcChild_NoBarkChildIssue()
+    {
+        var snapshot = Snapshot(
+            MakeNode(0, links: [Link(0, 1)]),
+            MakeNode(1, displayType: "Bark", links: [Link(1, 2)]),
+            MakeNode(2, SpeakerCategory.Npc));
+
+        var report = FlowAnalysisService.Analyze(snapshot);
+
+        Assert.Empty(report.Issues.Where(i => i.Kind == FlowIssueKind.BarkHasPlayerChoiceChild));
     }
 }

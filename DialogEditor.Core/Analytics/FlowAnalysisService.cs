@@ -15,6 +15,7 @@ public static class FlowAnalysisService
 
         // ── Build adjacency and incoming-link sets ────────────────────────
         var linksByFrom      = nodes.ToDictionary(n => n.NodeId, n => n.Links);
+        var nodeById         = nodes.ToDictionary(n => n.NodeId);
         var nodesWithIncoming = new HashSet<int>();
         var totalLinks       = 0;
         var conditionalLinks = 0;
@@ -91,6 +92,21 @@ public static class FlowAnalysisService
 
             if (node.NodeId != 0 && !nodesWithIncoming.Contains(node.NodeId))
                 issues.Add(new FlowIssue(node.NodeId, FlowIssueKind.NoIncomingLinks));
+
+            if (node.DisplayType == "Bark")
+            {
+                if (node.DefaultText.Length > BarkConstants.TextLengthWarningThreshold)
+                    issues.Add(new FlowIssue(node.NodeId, FlowIssueKind.BarkTextTooLong));
+
+                foreach (var link in node.Links)
+                {
+                    if (nodeById.TryGetValue(link.ToNodeId, out var target) && target.IsPlayerChoice)
+                    {
+                        issues.Add(new FlowIssue(node.NodeId, FlowIssueKind.BarkHasPlayerChoiceChild));
+                        break;
+                    }
+                }
+            }
         }
 
         var maxDepth = depth.Count > 0 ? depth.Values.Max() : 0;
