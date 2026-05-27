@@ -42,7 +42,8 @@ public partial class MainWindow : Window
         vm.UnsavedChangesRequested += () => _ = ShowUnsavedChangesDialogAsync(vm);
         vm.TestModeEntered += () => TestOverlay.IsVisible = true;
         vm.TestModeExited  += () => TestOverlay.IsVisible = false;
-        vm.RequestConversationName   = () => PromptConversationNameAsync();
+        vm.RequestConversationName               = () => PromptConversationNameAsync();
+        vm.RequestConversationNameWithSuggestion = suggested => PromptConversationNameAsync(defaultValue: suggested);
         vm.RequestConflictResolution = ex => ShowConflictResolutionDialogAsync(ex);
         vm.RequestLanguageCode = async (title, defaultValue) =>
         {
@@ -547,9 +548,10 @@ public partial class MainWindow : Window
     }
 
     // ── New conversation name dialog ──────────────────────────────────────
-    private async Task<string?> PromptConversationNameAsync()
+    private async Task<string?> PromptConversationNameAsync(string? defaultValue = null)
     {
-        var title       = (string)(this.FindResource("Dialog_NewConversation_Title")       ?? "New Conversation");
+        var titleKey    = defaultValue is null ? "Dialog_NewConversation_Title" : "Dialog_ImportConversation";
+        var title       = (string)(this.FindResource(titleKey)                             ?? "New Conversation");
         var prompt      = (string)(this.FindResource("Dialog_NewConversation_Prompt")      ?? "Conversation name:");
         var placeholder = (string)(this.FindResource("Dialog_NewConversation_Placeholder") ?? "my_new_conversation");
         var lblCreate   = (string)(this.FindResource("Dialog_NewConversation_Create")      ?? "Create");
@@ -581,6 +583,7 @@ public partial class MainWindow : Window
         var nameBox = new TextBox
         {
             Watermark       = placeholder,
+            Text            = defaultValue,
             Background      = new SolidColorBrush(Color.Parse("#141414")),
             Foreground      = new SolidColorBrush(Color.Parse("#e8e8e8")),
             BorderBrush     = new SolidColorBrush(Color.Parse("#444")),
