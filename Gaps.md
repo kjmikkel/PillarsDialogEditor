@@ -18,8 +18,8 @@ No built-in diff viewing or merge conflict resolution UI for Git. Collaborating 
 ### Import from Other Formats
 Only game XML is supported as a source. No import path from dialogue authoring tools (Articy Draft, etc.) or other intermediate formats.
 
-### Barks System
-Display Type toggle exists but no bark-specific tooling — no preview of overhead floating text in context, no bark-specific validation.
+### Barks System — Bark Preview
+Bark nodes now render with an amber color scheme on the canvas, carry bark-specific validation warnings (text too long, player-choice child), and those warnings surface in Flow Analytics. The remaining gap is an in-context preview of overhead floating text: writers cannot see how a bark will actually appear above an NPC's head without running the game. Implementing this requires investigating the game's bark rendering (font, line-wrapping, maximum visible width) before UI work can be designed.
 
 ### Voice-Over Integration
 An "External VO" field exists but there is no path validation, lip-sync metadata support, or audio preview. Mods that add or replace voiced lines have no tooling support. Note: actual voice-over audio is stored in a proprietary archive format — requires investigation before tooling can be designed.
