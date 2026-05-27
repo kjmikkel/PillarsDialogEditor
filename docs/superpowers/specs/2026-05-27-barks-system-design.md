@@ -9,10 +9,11 @@
 
 `DisplayType` already exists on every `ConversationNode` (stored as `"Conversation"` or `"Bark"`) and round-trips correctly through both PoE1 and PoE2 serializers. A ComboBox in `NodeDetailView` lets writers toggle it. However, bark nodes are visually indistinguishable from conversation nodes on the canvas, and there is no bark-specific validation to help writers catch common authoring mistakes.
 
-This spec covers two additions:
+This spec covers three additions:
 
 1. **Canvas visual distinction** — bark nodes render with a distinct amber color scheme so they are recognisable at any zoom level.
-2. **Bark-specific validation** — non-blocking warnings for text length and structurally inappropriate child links.
+2. **Bark-specific validation** — non-blocking warnings for text length and structurally inappropriate child links, surfaced in the node detail panel.
+3. **Flow Analytics integration** — the same two bark rules appear as issues in the Flow Analytics window, navigable like any other flow issue.
 
 ---
 
@@ -55,13 +56,19 @@ It must be raised in the `DisplayType` setter's `OnPropertyChanged` chain so bin
 
 Warnings are non-blocking — they inform writers but do not prevent saving or serialisation.
 
-### Rule 1 — Text length (NodeViewModel)
+### Shared constant
 
-A named constant defines the threshold:
+The text-length threshold is defined once in `DialogEditor.Core` so both the ViewModel layer and `FlowAnalysisService` reference the same value:
 
 ```csharp
-public const int BarkTextLengthWarning = 150;
+// DialogEditor.Core/Analytics/BarkConstants.cs
+public static class BarkConstants
+{
+    public const int TextLengthWarningThreshold = 150;
+}
 ```
+
+### Rule 1 — Text length (NodeViewModel)
 
 `NodeViewModel` exposes:
 
@@ -69,7 +76,7 @@ public const int BarkTextLengthWarning = 150;
 public IReadOnlyList<string> BarkWarnings { get; }
 ```
 
-The list contains a length-warning string when `IsBark && DefaultText.Length > BarkTextLengthWarning`. It is empty for non-bark nodes or bark nodes within the limit.
+The list contains a length-warning string when `IsBark && DefaultText.Length > BarkConstants.TextLengthWarningThreshold`. It is empty for non-bark nodes or bark nodes within the limit.
 
 `BarkWarnings` is re-evaluated (via `OnPropertyChanged`) whenever `DefaultText` or `DisplayType` changes.
 
@@ -91,6 +98,30 @@ In `NodeDetailView.axaml`, immediately below the DisplayType ComboBox, a `Border
 
 ---
 
+## Flow Analytics Integration
+
+### New FlowIssueKind values
+
+Two new members are added to the `FlowIssueKind` enum in `FlowAnalysisModels.cs`:
+
+- `BarkTextTooLong` — bark node whose `DefaultText.Length > BarkConstants.TextLengthWarningThreshold`
+- `BarkHasPlayerChoiceChild` — bark node that links to at least one node where `IsPlayerChoice == true`
+
+### FlowAnalysisService changes
+
+`FlowAnalysisService.Analyze()` builds a node-by-id lookup before its main loop. During the loop it adds `BarkTextTooLong` issues directly. For `BarkHasPlayerChoiceChild` it checks each outgoing link's target against the lookup — this is a second pass or an inline check using the already-built `linksByFrom` map.
+
+Both bark issue kinds use the amber severity bar in `FlowIssueKindToSeverityBrushConverter` (they are warnings, not errors). The converter's current fallback to amber already handles them without code changes, but the switch should be made explicit for the two new values.
+
+### FlowIssueViewModel.KindLabel
+
+Two new cases in the `KindLabel` switch:
+
+- `FlowIssueKind.BarkTextTooLong` → `Loc.Get("FlowAnalytics_Issue_BarkTextTooLong")`
+- `FlowIssueKind.BarkHasPlayerChoiceChild` → `Loc.Get("FlowAnalytics_Issue_BarkHasPlayerChoiceChild")`
+
+---
+
 ## Testing
 
 All tests are written before implementation (TDD — red/green).
@@ -107,6 +138,14 @@ All tests are written before implementation (TDD — red/green).
 - `BarkWarnings_EmptyWhenNoPlayerChoiceChildren` — bark node with only NPC children produces no warnings.
 - `BarkWarnings_PlayerChoiceWarning_WhenChildIsPlayerChoice` — bark node with at least one player-choice child produces a warning.
 
+### FlowAnalysisServiceTests
+
+- `Analyze_BarkNode_LongText_EmitsBarkTextTooLongIssue`
+- `Analyze_BarkNode_ShortText_NoBarkTextIssue`
+- `Analyze_BarkNode_WithPlayerChoiceChild_EmitsBarkHasPlayerChoiceChildIssue`
+- `Analyze_BarkNode_WithNpcChild_NoBarkChildIssue`
+- `Analyze_ConversationNode_LongText_NoIssue` — confirms the text rule only fires on bark nodes.
+
 ### NodeColorConverterTests (new test class)
 
 - `Convert_BarkNode_ReturnsAmberHeader` — any `SpeakerCategory` + `"Bark"` → dark gold brush for the header zone.
@@ -121,9 +160,15 @@ All tests are written before implementation (TDD — red/green).
 | `DialogEditor.Avalonia/Converters/NodeColorConverter.cs` | New — `IMultiValueConverter` |
 | `DialogEditor.Avalonia/Views/ConversationView.axaml` | Switch to `NodeColorConverter`; add speaker-identity dot |
 | `DialogEditor.Avalonia/Views/NodeDetailView.axaml` | Add warning box below DisplayType ComboBox |
-| `DialogEditor.Avalonia/Resources/Strings.axaml` | Add warning message strings |
-| `DialogEditor.ViewModels/ViewModels/NodeViewModel.cs` | Add `IsBark`, `BarkWarnings`, `BarkTextLengthWarning` |
+| `DialogEditor.Avalonia/Resources/Strings.axaml` | Add warning message strings + two new `FlowAnalytics_Issue_Bark*` labels |
+| `DialogEditor.Core/Analytics/BarkConstants.cs` | New — shared `TextLengthWarningThreshold` constant |
+| `DialogEditor.Core/Analytics/FlowAnalysisModels.cs` | Add `BarkTextTooLong`, `BarkHasPlayerChoiceChild` to `FlowIssueKind` |
+| `DialogEditor.Core/Analytics/FlowAnalysisService.cs` | Add bark issue checks |
+| `DialogEditor.ViewModels/ViewModels/FlowAnalyticsViewModel.cs` | Add `KindLabel` cases for two new kinds |
+| `DialogEditor.Avalonia/Converters/FlowIssueKindToSeverityBrushConverter.cs` | Explicit amber cases for bark kinds |
+| `DialogEditor.ViewModels/ViewModels/NodeViewModel.cs` | Add `IsBark`, `BarkWarnings` (references `BarkConstants`) |
 | `DialogEditor.ViewModels/ViewModels/NodeDetailViewModel.cs` | Add merged `BarkWarnings` computed property |
 | `DialogEditor.Tests/ViewModels/NodeViewModelTests.cs` | New bark warning tests |
 | `DialogEditor.Tests/ViewModels/NodeDetailViewModelTests.cs` | New player-choice child tests |
 | `DialogEditor.Tests/Converters/NodeColorConverterTests.cs` | New converter tests |
+| `DialogEditor.Tests/Analytics/FlowAnalysisServiceTests.cs` | New bark issue tests |
