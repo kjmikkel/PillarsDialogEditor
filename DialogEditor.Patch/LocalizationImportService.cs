@@ -39,6 +39,41 @@ public static class LocalizationImportService
         return result;
     }
 
+    public static string? DetectLanguage(string path, LocalizationExportFormat format)
+    {
+        try
+        {
+            return format switch
+            {
+                LocalizationExportFormat.Csv   => null,
+                LocalizationExportFormat.Json  => DetectLanguageJson(path),
+                LocalizationExportFormat.Xliff => DetectLanguageXliff(path),
+                _                              => null,
+            };
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static string? DetectLanguageJson(string path)
+    {
+        using var doc = JsonDocument.Parse(File.ReadAllText(path));
+        if (!doc.RootElement.TryGetProperty("targetLanguage", out var prop)) return null;
+        var value = prop.GetString();
+        return string.IsNullOrEmpty(value) ? null : value;
+    }
+
+    private static string? DetectLanguageXliff(string path)
+    {
+        var doc = XDocument.Load(path);
+        XNamespace ns = "urn:oasis:names:tc:xliff:document:1.2";
+        var file = doc.Descendants(ns + "file").FirstOrDefault();
+        var value = file?.Attribute("target-language")?.Value;
+        return string.IsNullOrEmpty(value) ? null : value;
+    }
+
     // ── CSV ──────────────────────────────────────────────────────────────
 
     private static Dictionary<string, List<NodeTranslation>> ParseCsv(string path)

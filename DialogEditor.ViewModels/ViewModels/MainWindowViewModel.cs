@@ -464,8 +464,11 @@ public partial class MainWindowViewModel : ObservableObject
         var lang = await (RequestLanguageCode?.Invoke("Source language", _provider?.Language)
                           ?? Task.FromResult<string?>(_provider?.Language));
         if (lang is null) return;
+        var count = _project.Patches.Values
+            .Where(p => p.Translations.ContainsKey(lang))
+            .Sum(p => p.Translations[lang].Count);
         LocalizationExportService.Export(_project, path, fmt, lang);
-        StatusText = string.Format("Exported {0} entries to {1}", 0, path);
+        StatusText = Loc.Format("Localization_StatusExported", count, Path.GetFileName(path));
     }
 
     [RelayCommand(CanExecute = nameof(IsProjectLoaded))]
@@ -476,13 +479,16 @@ public partial class MainWindowViewModel : ObservableObject
             "Import Translation",
             new[] { (".csv", "CSV"), (".json", "JSON"), (".xlf", "XLIFF") });
         if (path is null) return;
-        var fmt  = DetectFormat(path);
-        var lang = await (RequestLanguageCode?.Invoke("Target language", null)
-                          ?? Task.FromResult<string?>(null));
+        var fmt          = DetectFormat(path);
+        var suggestedLang = LocalizationImportService.DetectLanguage(path, fmt);
+        var lang = await (RequestLanguageCode?.Invoke("Target language", suggestedLang)
+                          ?? Task.FromResult<string?>(suggestedLang));
         if (lang is null) return;
         _project  = LocalizationImportService.Import(_project, path, fmt, lang);
         IsModified = true;
-        StatusText = string.Format("Imported translation for language '{0}'", lang);
+        var count = _project.Patches.Values
+            .Sum(p => p.Translations.TryGetValue(lang, out var t) ? t.Count : 0);
+        StatusText = Loc.Format("Localization_StatusImported", count, lang);
     }
 
     private static LocalizationExportFormat ParseFormat(string value) =>
