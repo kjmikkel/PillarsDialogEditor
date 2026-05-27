@@ -1,3 +1,5 @@
+using DialogEditor.Core.Models;
+using DialogEditor.Patch;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
@@ -10,6 +12,26 @@ public class MainWindowViewModelTests
 
     private static MainWindowViewModel MakeVm() =>
         new(new StubDispatcher(), new StubFolderPicker(), new StubFilePicker());
+
+    /// <summary>Injects a project into the VM via the private SetProject method using reflection.</summary>
+    private static void InjectProject(MainWindowViewModel vm, DialogProject project)
+    {
+        var mi = typeof(MainWindowViewModel)
+            .GetMethod("SetProject", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+        mi.Invoke(vm, [project]);
+    }
+
+    private static DialogProject MakeProjectWithTranslations()
+    {
+        var patch = new ConversationPatch("test_conv", 2, [], [], [])
+        {
+            Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
+            {
+                ["en"] = [new NodeTranslation(1, "Hello", "")],
+            },
+        };
+        return DialogProject.Empty("TestProject").WithPatch(patch);
+    }
 
     // ── WindowTitle ───────────────────────────────────────────────────────
 
@@ -167,6 +189,90 @@ public class MainWindowViewModelTests
     {
         var vm = MakeVm();
         Assert.False(vm.IsProjectOpen);
+    }
+
+    // ── ExportForTranslationCommand ───────────────────────────────────────
+
+    [Fact]
+    public async Task ExportForTranslation_WithProject_CallsExportService()
+    {
+        var tempFile = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".csv");
+        var vm = new MainWindowViewModel(
+            new StubDispatcher(),
+            new StubFolderPicker(),
+            new StubFilePicker(saveResult: tempFile));
+
+        InjectProject(vm, MakeProjectWithTranslations());
+        vm.RequestLanguageCode = (_, _) => Task.FromResult<string?>("en");
+
+        await vm.ExportForTranslationCommand.ExecuteAsync(null);
+
+        Assert.True(File.Exists(tempFile), "Export service should have written a file at the stub path.");
+        if (File.Exists(tempFile)) File.Delete(tempFile);
+    }
+
+    [Fact]
+    public async Task ImportTranslation_WithProject_MarksProjectDirty()
+    {
+        // Write a minimal CSV that the import service can parse
+        var tempCsv = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".csv");
+        File.WriteAllText(tempCsv,
+            "ConversationName,NodeId,WriterComment,SourceDefaultText,SourceFemaleText,TranslatedDefaultText,TranslatedFemaleText\r\n" +
+            "test_conv,1,,Hello,,Bonjour,\r\n");
+
+        try
+        {
+            var vm = new MainWindowViewModel(
+                new StubDispatcher(),
+                new StubFolderPicker(),
+                new StubFilePicker(openResult: tempCsv));
+
+            InjectProject(vm, MakeProjectWithTranslations());
+            vm.RequestLanguageCode = (_, _) => Task.FromResult<string?>("fr");
+
+            await vm.ImportTranslationCommand.ExecuteAsync(null);
+
+            Assert.True(vm.IsModified, "Importing a translation should mark the project as dirty.");
+        }
+        finally
+        {
+            if (File.Exists(tempCsv)) File.Delete(tempCsv);
+        }
+    }
+
+    [Fact]
+    public void ExportForTranslation_WithoutProject_CommandDisabled()
+    {
+        var vm = MakeVm();
+        Assert.False(vm.ExportForTranslationCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task ImportTranslation_LanguageCancelled_DoesNotMarkDirty()
+    {
+        var tempCsv = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".csv");
+        File.WriteAllText(tempCsv,
+            "ConversationName,NodeId,WriterComment,SourceDefaultText,SourceFemaleText,TranslatedDefaultText,TranslatedFemaleText\r\n" +
+            "test_conv,1,,Hello,,Bonjour,\r\n");
+
+        try
+        {
+            var vm = new MainWindowViewModel(
+                new StubDispatcher(),
+                new StubFolderPicker(),
+                new StubFilePicker(openResult: tempCsv));
+
+            InjectProject(vm, MakeProjectWithTranslations());
+            vm.RequestLanguageCode = (_, _) => Task.FromResult<string?>(null); // user cancels
+
+            await vm.ImportTranslationCommand.ExecuteAsync(null);
+
+            Assert.False(vm.IsModified, "Cancelling language dialog should not mark the project dirty.");
+        }
+        finally
+        {
+            if (File.Exists(tempCsv)) File.Delete(tempCsv);
+        }
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────

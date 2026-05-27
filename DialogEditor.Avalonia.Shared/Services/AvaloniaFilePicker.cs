@@ -59,4 +59,24 @@ public sealed class AvaloniaFilePicker(TopLevel topLevel) : IFilePicker
             });
         return result?.Path.LocalPath;
     }
+
+    public async Task<string?> PickSaveFileAsync(
+        string title,
+        string suggestedName,
+        IReadOnlyList<(string Extension, string Description)> fileTypes)
+    {
+        var types = fileTypes.Select(ft => new FilePickerFileType(ft.Description)
+        {
+            Patterns = new[] { $"*{ft.Extension}" }
+        }).ToList();
+
+        var result = await topLevel.StorageProvider.SaveFilePickerAsync(
+            new FilePickerSaveOptions
+            {
+                Title             = title,
+                SuggestedFileName = suggestedName,
+                FileTypeChoices   = types,
+            });
+        return result?.Path.LocalPath;
+    }
 }

@@ -49,6 +49,10 @@ public partial class MainWindowViewModel : ObservableObject
     /// Returns true if the user chooses Force Apply, false to cancel.
     public Func<PatchConflictException, Task<bool>>? RequestConflictResolution { get; set; }
 
+    /// Set by the UI layer to show a language-code input dialog.
+    /// Takes (title, defaultValue) and returns the entered language code, or null if cancelled.
+    public Func<string, string?, Task<string?>>? RequestLanguageCode { get; set; }
+
     /// Conditions from the catalogue filtered to the currently loaded game.
     public IReadOnlyList<ConditionEntry> ActiveConditions
         => string.IsNullOrEmpty(_activeGameId)
@@ -142,6 +146,8 @@ public partial class MainWindowViewModel : ObservableObject
         SaveProjectCommand.NotifyCanExecuteChanged();
         NewConversationCommand.NotifyCanExecuteChanged();
         MergeProjectsCommand.NotifyCanExecuteChanged();
+        ExportForTranslationCommand.NotifyCanExecuteChanged();
+        ImportTranslationCommand.NotifyCanExecuteChanged();
         // Only re-scan the game folder when NewConversations actually changes —
         // not on every patch save, which would re-enumerate all conversations.
         if (_provider is not null && !ReferenceEquals(prevNew, nextNew))
@@ -437,6 +443,70 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     private bool CanMergeProjects() => _project is not null && _projectPath is not null;
+
+    // ── Export / Import for translation ──────────────────────────────────
+
+    private bool IsProjectLoaded() => _project is not null;
+
+    [RelayCommand(CanExecute = nameof(IsProjectLoaded))]
+    private async Task ExportForTranslation()
+    {
+        if (_project is null) return;
+        var fmt = ParseFormat(AppSettings.DefaultLocalizationFormat);
+        var ext = FormatExtension(fmt);
+        var path = await _filePicker.PickSaveFileAsync(
+            "Export for Translation",
+            "export" + ext,
+            new[] { (".csv", "CSV"), (".json", "JSON"), (".xlf", "XLIFF") });
+        if (path is null) return;
+        var lang = await (RequestLanguageCode?.Invoke("Source language", _provider?.Language)
+                          ?? Task.FromResult<string?>(_provider?.Language));
+        if (lang is null) return;
+        LocalizationExportService.Export(_project, path, fmt, lang);
+        StatusText = string.Format("Exported {0} entries to {1}", 0, path);
+    }
+
+    [RelayCommand(CanExecute = nameof(IsProjectLoaded))]
+    private async Task ImportTranslation()
+    {
+        if (_project is null) return;
+        var path = await _filePicker.PickOpenFileAsync(
+            "Import Translation",
+            ".csv,.json,.xlf,.xliff",
+            "Translation Files");
+        if (path is null) return;
+        var fmt  = DetectFormat(path);
+        var lang = await (RequestLanguageCode?.Invoke("Target language", null)
+                          ?? Task.FromResult<string?>(null));
+        if (lang is null) return;
+        _project  = LocalizationImportService.Import(_project, path, fmt, lang);
+        IsModified = true;
+        StatusText = string.Format("Imported translation for language '{0}'", lang);
+    }
+
+    private static LocalizationExportFormat ParseFormat(string value) =>
+        Enum.TryParse<LocalizationExportFormat>(value, ignoreCase: true, out var result)
+            ? result
+            : LocalizationExportFormat.Csv;
+
+    private static string FormatExtension(LocalizationExportFormat fmt) => fmt switch
+    {
+        LocalizationExportFormat.Json  => ".json",
+        LocalizationExportFormat.Xliff => ".xlf",
+        _                              => ".csv",
+    };
+
+    private static LocalizationExportFormat DetectFormat(string path)
+    {
+        var ext = Path.GetExtension(path).ToLowerInvariant();
+        return ext switch
+        {
+            ".json"  => LocalizationExportFormat.Json,
+            ".xlf"   => LocalizationExportFormat.Xliff,
+            ".xliff" => LocalizationExportFormat.Xliff,
+            _        => LocalizationExportFormat.Csv,
+        };
+    }
 
     // ── Open folder ───────────────────────────────────────────────────────
     [RelayCommand]
