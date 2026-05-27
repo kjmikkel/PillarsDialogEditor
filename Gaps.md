@@ -12,9 +12,6 @@ Significant coverage has been added: both `IGameDataProvider` implementations, `
 
 ## Feature Gaps
 
-### Writer Comments (Localization)
-`NodeComments` entries are stored in the patch file and included in CSV/JSON/XLIFF exports as translator context, but there is no UI to write them. Authors must edit the `.dialogproject` JSON directly to populate the `nodeComments` map.
-
 ### Version Control Integration
 No built-in diff viewing or merge conflict resolution UI for Git. Collaborating on the same conversation across branches is a manual process.
 
