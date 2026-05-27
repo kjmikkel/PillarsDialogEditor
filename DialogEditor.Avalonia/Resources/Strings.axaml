@@ -601,6 +601,17 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Status_MergeComplete">Merged {0} project(s) into '{1}'</sys:String>
     <sys:String x:Key="Status_MergeError">Merge failed: {0}</sys:String>
 
+    <!-- ─── Import Conversation (from external formats) ─────────────────── -->
+    <sys:String x:Key="Menu_ImportConversation">Import Conversation…</sys:String>
+    <sys:String x:Key="ToolTip_ImportConversation">Import a conversation from an external file (CSV, JSON, Articy Draft XML, or Yarn Spinner) and add it to the current project.</sys:String>
+    <sys:String x:Key="Dialog_ImportConversation">Import Conversation</sys:String>
+    <!-- {0} = file name -->
+    <sys:String x:Key="Status_ImportConversationUnknownFormat">Could not import '{0}': unrecognised file format.</sys:String>
+    <!-- {0} = file name, {1} = error message -->
+    <sys:String x:Key="Status_ImportConversationError">Failed to import '{0}': {1}</sys:String>
+    <!-- {0} = conversation name, {1} = node count -->
+    <sys:String x:Key="Status_ImportConversationAdded">Imported '{0}' ({1} nodes).</sys:String>
+
     <!-- ─── Localization — export / import translation ─────────────────── -->
     <sys:String x:Key="Menu_ExportForTranslation">Export for Translation…</sys:String>
     <sys:String x:Key="Menu_ImportTranslation">Import Translation…</sys:String>
