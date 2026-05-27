@@ -1,3 +1,4 @@
+using DialogEditor.Core.Analytics;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Tests.Helpers;
@@ -11,13 +12,14 @@ public class NodeViewModelTests
     public NodeViewModelTests() => Loc.Configure(new StubStringProvider());
 
     private static NodeViewModel MakeNode(
-        int    id            = 1,
-        string defaultText   = "Hello",
-        string femaleText    = "",
+        int    id             = 1,
+        string defaultText    = "Hello",
+        string femaleText     = "",
         bool   isPlayerChoice = false,
         SpeakerCategory speakerCategory = SpeakerCategory.Npc,
-        string speakerGuid  = "",
-        string listenerGuid = "")
+        string speakerGuid   = "",
+        string listenerGuid  = "",
+        string displayType   = "Conversation")
     {
         var node = new ConversationNode(
             NodeId: id,
@@ -28,7 +30,7 @@ public class NodeViewModelTests
             Links: [],
             Conditions: [],
             Scripts: [],
-            DisplayType: "Conversation",
+            DisplayType: displayType,
             Persistence: "None");
         return new NodeViewModel(node, new StringEntry(id, defaultText, femaleText));
     }
@@ -294,5 +296,48 @@ public class NodeViewModelTests
         var snap = vm.ToSnapshot([link]);
         Assert.Single(snap.Links);
         Assert.Equal(2, snap.Links[0].ToNodeId);
+    }
+
+    // ── IsBark ───────────────────────────────────────────────────────
+
+    [Fact]
+    public void IsBark_TrueWhenDisplayTypeBark()
+    {
+        var vm = MakeNode(displayType: "Bark");
+        Assert.True(vm.IsBark);
+    }
+
+    [Fact]
+    public void IsBark_FalseWhenDisplayTypeConversation()
+    {
+        var vm = MakeNode(displayType: "Conversation");
+        Assert.False(vm.IsBark);
+    }
+
+    // ── BarkWarnings ─────────────────────────────────────────────────
+
+    [Fact]
+    public void BarkWarnings_EmptyForConversationNode_EvenWithLongText()
+    {
+        var longText = new string('x', BarkConstants.TextLengthWarningThreshold + 1);
+        var vm = MakeNode(defaultText: longText, displayType: "Conversation");
+        Assert.Empty(vm.BarkWarnings);
+    }
+
+    [Fact]
+    public void BarkWarnings_EmptyForShortBark()
+    {
+        var shortText = new string('x', BarkConstants.TextLengthWarningThreshold);
+        var vm = MakeNode(defaultText: shortText, displayType: "Bark");
+        Assert.Empty(vm.BarkWarnings);
+    }
+
+    [Fact]
+    public void BarkWarnings_TextLengthWarning_WhenBarkTextExceedsThreshold()
+    {
+        var longText = new string('x', BarkConstants.TextLengthWarningThreshold + 1);
+        var vm = MakeNode(defaultText: longText, displayType: "Bark");
+        Assert.Single(vm.BarkWarnings);
+        Assert.Equal("Bark_Warning_TextTooLong", vm.BarkWarnings[0]);
     }
 }

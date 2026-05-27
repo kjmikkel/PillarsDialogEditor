@@ -1,4 +1,5 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using DialogEditor.Core.Analytics;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.ViewModels.Resources;
@@ -62,7 +63,10 @@ public partial class NodeViewModel : ObservableObject
     {
         get => _defaultText;
         set => Push(_defaultText, value, "Edit dialog text",
-            v => { _defaultText = v; OnPropertyChanged(nameof(DefaultText)); OnPropertyChanged(nameof(TextPreview)); });
+            v => { _defaultText = v;
+                   OnPropertyChanged(nameof(DefaultText));
+                   OnPropertyChanged(nameof(TextPreview));
+                   OnPropertyChanged(nameof(BarkWarnings)); });
     }
 
     public string FemaleText
@@ -76,7 +80,10 @@ public partial class NodeViewModel : ObservableObject
     {
         get => _displayType;
         set => Push(_displayType, value, "Edit display type",
-            v => { _displayType = v; OnPropertyChanged(nameof(DisplayType)); });
+            v => { _displayType = v;
+                   OnPropertyChanged(nameof(DisplayType));
+                   OnPropertyChanged(nameof(IsBark));
+                   OnPropertyChanged(nameof(BarkWarnings)); });
     }
 
     public string Persistence
@@ -119,6 +126,20 @@ public partial class NodeViewModel : ObservableObject
         get => _hideSpeaker;
         set => Push(_hideSpeaker, value, "Edit HideSpeaker",
             v => { _hideSpeaker = v; OnPropertyChanged(nameof(HideSpeaker)); });
+    }
+
+    public bool IsBark => _displayType == "Bark";
+
+    public IReadOnlyList<string> BarkWarnings
+    {
+        get
+        {
+            if (!IsBark) return [];
+            var warnings = new List<string>();
+            if (_defaultText.Length > BarkConstants.TextLengthWarningThreshold)
+                warnings.Add(Loc.Get("Bark_Warning_TextTooLong"));
+            return warnings;
+        }
     }
 
     // ── Computed display properties ───────────────────────────────────────
