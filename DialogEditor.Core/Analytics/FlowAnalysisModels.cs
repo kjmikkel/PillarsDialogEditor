@@ -17,7 +17,9 @@ public enum FlowIssueKind
     Unreachable,
     PlayerDeadEnd,
     EmptyText,
-    NoIncomingLinks
+    NoIncomingLinks,
+    BarkTextTooLong,
+    BarkHasPlayerChoiceChild
 }
 
 public record FlowIssue(int NodeId, FlowIssueKind Kind);
