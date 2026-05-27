@@ -10,6 +10,9 @@ public sealed class StubFilePicker(
     public Task<string?> PickOpenFileAsync(string title, string extension, string extensionDescription)
         => Task.FromResult(openResult);
 
+    public Task<string?> PickOpenFileAsync(string title, IReadOnlyList<(string Extension, string Description)> fileTypes)
+        => Task.FromResult(openResult);
+
     public Task<string?> PickSaveFileAsync(string title, string suggestedName, string extension, string extensionDescription)
         => Task.FromResult(saveResult);
 
