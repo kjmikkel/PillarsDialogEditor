@@ -2,6 +2,7 @@ using DialogEditor.Core.Models;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.ViewModels;
 
@@ -256,5 +257,91 @@ public class NodeDetailViewModelTests
         _vm.RefreshLinks([MakeConn(), MakeConn()]);
         _vm.RefreshLinks([MakeConn()]);
         Assert.Single(_vm.Links);
+    }
+
+    // ── Translator note ────────────────────────────────────────────────────
+
+    private static ConversationViewModel MakeCanvas() =>
+        new(new StubDispatcher());
+
+    private static NodeViewModel MakeNodeOnCanvas(ConversationViewModel canvas, int id = 1)
+    {
+        var node = new NodeViewModel(
+            new ConversationNode(id, false, SpeakerCategory.Npc, "", "", [], [], [],
+                                 "Conversation", "None"),
+            new StringEntry(id, "Hello", ""));
+        canvas.AddNode(node, new LayoutPoint(0, 0));
+        return node;
+    }
+
+    [Fact]
+    public void TranslatorNote_LoadsFromCanvas_WhenNodeSelected()
+    {
+        var canvas = MakeCanvas();
+        canvas.LoadNodeComments(new Dictionary<int, string> { [1] = "Test note" });
+        var node = MakeNodeOnCanvas(canvas, 1);
+
+        _vm.Canvas = canvas;
+        _vm.Load(node);
+
+        Assert.Equal("Test note", _vm.TranslatorNote);
+    }
+
+    [Fact]
+    public void TranslatorNote_WritesToCanvas_WhenChanged()
+    {
+        var canvas = MakeCanvas();
+        var node = MakeNodeOnCanvas(canvas, 1);
+
+        _vm.Canvas = canvas;
+        _vm.Load(node);
+        _vm.TranslatorNote = "Hello translators";
+
+        Assert.Equal("Hello translators", canvas.GetNodeComment(1));
+    }
+
+    [Fact]
+    public void TranslatorNote_EmptyString_RemovesFromCanvas()
+    {
+        var canvas = MakeCanvas();
+        canvas.LoadNodeComments(new Dictionary<int, string> { [1] = "some note" });
+        var node = MakeNodeOnCanvas(canvas, 1);
+
+        _vm.Canvas = canvas;
+        _vm.Load(node);
+        _vm.TranslatorNote = "";
+
+        Assert.Equal(string.Empty, canvas.GetNodeComment(1));
+        Assert.False(canvas.NodeComments.ContainsKey(1));
+    }
+
+    [Fact]
+    public void TranslatorNote_MarksCanvasDirty_WhenChanged()
+    {
+        var canvas = MakeCanvas();
+        var node = MakeNodeOnCanvas(canvas, 1);
+        canvas.IsModified = false;   // reset after AddNode
+
+        _vm.Canvas = canvas;
+        _vm.Load(node);
+        _vm.TranslatorNote = "note";
+
+        Assert.True(canvas.IsModified);
+    }
+
+    [Fact]
+    public void TranslatorNote_ClearsOnNodeChange()
+    {
+        var canvas = MakeCanvas();
+        canvas.LoadNodeComments(new Dictionary<int, string> { [1] = "note for node 1" });
+        var node1 = MakeNodeOnCanvas(canvas, 1);
+        var node2 = MakeNodeOnCanvas(canvas, 2);
+
+        _vm.Canvas = canvas;
+        _vm.Load(node1);
+        Assert.Equal("note for node 1", _vm.TranslatorNote);
+
+        _vm.Load(node2);
+        Assert.Equal(string.Empty, _vm.TranslatorNote);
     }
 }

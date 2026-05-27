@@ -17,6 +17,25 @@ public partial class NodeDetailViewModel : ObservableObject
     /// Set by MainWindowViewModel when a game folder is opened.
     public string ActiveGameId { get; set; } = string.Empty;
 
+    /// Set by MainWindowViewModel when a conversation is loaded.
+    public ConversationViewModel? Canvas { get; set; }
+
+    // ── Translator note (backed by ConversationViewModel.NodeComments) ────
+    private string _translatorNote = string.Empty;
+
+    public string TranslatorNote
+    {
+        get => _translatorNote;
+        set
+        {
+            if (_translatorNote == value) return;
+            _translatorNote = value;
+            OnPropertyChanged();
+            if (_node is not null)
+                Canvas?.SetNodeComment(_node.NodeId, value);
+        }
+    }
+
     [ObservableProperty] private bool _hasContent;
 
     // ── Editable proxy properties ─────────────────────────────────────────
@@ -182,6 +201,8 @@ public partial class NodeDetailViewModel : ObservableObject
         RefreshReadOnlyGroups(node);
         RebuildConditionRows(node);
         HasContent = true;
+        _translatorNote = Canvas?.GetNodeComment(node.NodeId) ?? string.Empty;
+        OnPropertyChanged(nameof(TranslatorNote));
         NotifyAllProxies();
     }
 
@@ -219,6 +240,7 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(ExternalVO));
         OnPropertyChanged(nameof(HasVO));
         OnPropertyChanged(nameof(HideSpeaker));
+        OnPropertyChanged(nameof(TranslatorNote));
 
         // Keep AutoCompleteBox selections in sync whenever any proxy changes
         _selectedSpeakerEntry  = SpeakerNameService.FindByGuid(_node?.SpeakerGuid);
