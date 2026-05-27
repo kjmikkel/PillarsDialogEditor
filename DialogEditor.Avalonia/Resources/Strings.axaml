@@ -97,6 +97,8 @@
     <sys:String x:Key="Dialog_NewConversation_Placeholder">my_new_conversation</sys:String>
     <sys:String x:Key="Status_NewConversationAdded">New conversation '{0}' added — add nodes, then Ctrl+S to save.</sys:String>
     <sys:String x:Key="Status_NewConversationDuplicate">A conversation named '{0}' already exists.</sys:String>
+    <!-- {0} = the name the user entered -->
+    <sys:String x:Key="Status_NewConversationInvalidName">'{0}' contains characters that are not allowed in a file name.</sys:String>
     <!-- Placeholder text inside the filter text box -->
     <sys:String x:Key="Placeholder_FilterConversations">Filter conversations…</sys:String>
 

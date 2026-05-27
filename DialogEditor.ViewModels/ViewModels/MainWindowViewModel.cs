@@ -332,7 +332,7 @@ public partial class MainWindowViewModel : ObservableObject
         // Validate: no path separators or other illegal chars
         if (name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
         {
-            StatusText = Loc.Format("Status_NewConversationDuplicate", name);
+            StatusText = Loc.Format("Status_NewConversationInvalidName", name);
             return;
         }
 
@@ -402,7 +402,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         if (name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
         {
-            StatusText = Loc.Format("Status_NewConversationDuplicate", name);
+            StatusText = Loc.Format("Status_NewConversationInvalidName", name);
             return;
         }
 
