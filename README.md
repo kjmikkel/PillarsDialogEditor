@@ -83,6 +83,7 @@ Selecting a node opens the detail panel on the right. Fields available for editi
 | Actor direction | Internal note for the voice actor |
 | External VO | Voice-over file path or identifier |
 | Comments | Internal developer notes — not shown to players |
+| Translator note | Context for translators: tone, character mood, length constraints, etc. Stored in the project file and included in export files; never written to game data. Can be set on any node, including unmodified vanilla nodes. |
 
 #### Conditions
 
@@ -149,7 +150,7 @@ Three formats are supported — choose in **Settings**:
 | JSON | `.json` | Structured; easy to diff in version control |
 | XLIFF 1.2 | `.xlf` | Industry-standard CAT-tool format |
 
-Each row/entry has: conversation name, node ID, writer comment (if any), source default text, source female text, and empty *translated default / female* columns for the translator to fill in.
+Each row/entry has: conversation name, node ID, writer comment (from the **Translator note** field on the node), source default text, source female text, and empty *translated default / female* columns for the translator to fill in.
 
 If a language already has partial translations in the project, those are pre-populated so re-exporting never discards prior work.
 
