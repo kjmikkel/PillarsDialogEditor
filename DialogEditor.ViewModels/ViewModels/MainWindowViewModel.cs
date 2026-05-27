@@ -4,6 +4,8 @@ using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Backup;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
+using DialogEditor.Core.Import;
+using DialogEditor.Core.Layout;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
 using DialogEditor.ViewModels.Resources;
@@ -44,6 +46,10 @@ public partial class MainWindowViewModel : ObservableObject
 
     /// Set by the UI layer to provide a name-input dialog for new conversations.
     public Func<Task<string?>>? RequestConversationName { get; set; }
+
+    /// Set by the UI layer to ask for a conversation name pre-filled with a suggestion.
+    /// Returns the confirmed name, or null if cancelled.
+    public Func<string, Task<string?>>? RequestConversationNameWithSuggestion { get; set; }
 
     /// Set by the UI layer to surface a patch conflict and ask whether to force-apply.
     /// Returns true if the user chooses Force Apply, false to cancel.
@@ -145,6 +151,7 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(IsProjectOpen));
         SaveProjectCommand.NotifyCanExecuteChanged();
         NewConversationCommand.NotifyCanExecuteChanged();
+        ImportConversationCommand.NotifyCanExecuteChanged();
         MergeProjectsCommand.NotifyCanExecuteChanged();
         ExportForTranslationCommand.NotifyCanExecuteChanged();
         ImportTranslationCommand.NotifyCanExecuteChanged();
@@ -345,6 +352,97 @@ public partial class MainWindowViewModel : ObservableObject
         LoadNewConversation(file);
         StatusText = Loc.Format("Status_NewConversationAdded", name);
         AppLog.Info($"New conversation '{name}' added to project");
+    }
+
+    [RelayCommand(CanExecute = nameof(CanCreateConversation))]
+    private async Task ImportConversation()
+    {
+        if (_provider is null || _project is null) return;
+
+        // Build file filter tuples from the factory
+        var fileTypes = DialogImporterFactory.AllFileTypes
+            .Select(ft => (ft.Extension, ft.Label))
+            .ToArray();
+
+        var path = await _filePicker.PickOpenFileAsync(
+            Loc.Get("Dialog_ImportConversation"),
+            fileTypes);
+        if (path is null) return;
+
+        var importer = DialogImporterFactory.GetForFile(path);
+        if (importer is null)
+        {
+            StatusText = Loc.Format("Status_ImportConversationUnknownFormat", Path.GetFileName(path));
+            return;
+        }
+
+        ImportedConversation imported;
+        try
+        {
+            imported = importer.Import(path);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error($"Failed to import conversation from '{path}'", ex);
+            StatusText = Loc.Format("Status_ImportConversationError", Path.GetFileName(path), ex.Message);
+            return;
+        }
+
+        // Ask user to confirm or change the name
+        var suggested = imported.SuggestedName;
+        var name = RequestConversationNameWithSuggestion is not null
+            ? (await RequestConversationNameWithSuggestion(suggested))?.Trim()
+            : (await (RequestConversationName?.Invoke() ?? Task.FromResult<string?>(suggested)))?.Trim();
+
+        if (string.IsNullOrEmpty(name)) return;
+
+        if (name.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+        {
+            StatusText = Loc.Format("Status_NewConversationDuplicate", name);
+            return;
+        }
+
+        var alreadyExists = _provider.FindConversation(name) is not null
+                         || (_project.NewConversations?.Contains(name) == true);
+        if (alreadyExists)
+        {
+            StatusText = Loc.Format("Status_NewConversationDuplicate", name);
+            return;
+        }
+
+        // Build the patch from imported data
+        var patch = new ConversationPatch(
+            name, ConversationPatch.CurrentSchemaVersion,
+            imported.Nodes, [], [])
+        {
+            Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
+                { [_provider.Language] = imported.Texts }
+        };
+
+        // Auto-layout: convert NodeEditSnapshot → ConversationNode just for layout
+        var layoutNodes = imported.Nodes
+            .Select(s => new ConversationNode(
+                s.NodeId, s.IsPlayerChoice, s.SpeakerCategory,
+                s.SpeakerGuid, s.ListenerGuid,
+                s.Links.Select(l => new NodeLink(l.FromNodeId, l.ToNodeId, [], l.RandomWeight, l.QuestionNodeTextDisplay)).ToList(),
+                [], [],
+                s.DisplayType, s.Persistence, s.ActorDirection,
+                s.Comments, s.ExternalVO, s.HasVO, s.HideSpeaker))
+            .ToList();
+
+        var layout = new Dictionary<int, LayoutPoint>();
+        AutoLayoutService.Apply(layoutNodes, (id, x, y) => layout[id] = new LayoutPoint(x, y));
+
+        SetProject(_project
+            .WithNewConversation(name)
+            .WithPatch(patch)
+            .WithLayout(name, layout));
+
+        var file = _provider.BuildNewConversationFile(name);
+        LoadNewConversation(file);
+
+        AppLog.Info($"Imported conversation '{name}' from '{path}' ({imported.Nodes.Count} nodes)");
+        StatusText = Loc.Format("Status_ImportConversationAdded", name, imported.Nodes.Count);
     }
 
     private bool CanCreateConversation() => _provider is not null && _project is not null;
