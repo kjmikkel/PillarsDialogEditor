@@ -327,6 +327,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Option_PlayerChoice">Player Choice</sys:String>
     <sys:String x:Key="Option_DisplayConversation">Conversation</sys:String>
     <sys:String x:Key="Option_DisplayBark">Bark</sys:String>
+    <sys:String x:Key="Bark_Warning_TextTooLong">Bark text exceeds 150 characters and may be cut off in-game.</sys:String>
+    <sys:String x:Key="Bark_Warning_PlayerChoiceChild">Bark nodes should not lead to player choice responses.</sys:String>
     <sys:String x:Key="Option_PersistenceNone">None</sys:String>
     <sys:String x:Key="Option_PersistenceOnceEver">OnceEver</sys:String>
 
@@ -514,6 +516,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="FlowAnalytics_Issue_PlayerDeadEnd">Dead end</sys:String>
     <sys:String x:Key="FlowAnalytics_Issue_EmptyText">Empty text</sys:String>
     <sys:String x:Key="FlowAnalytics_Issue_NoIncomingLinks">No incoming links</sys:String>
+    <sys:String x:Key="FlowAnalytics_Issue_BarkTextTooLong">Bark text too long</sys:String>
+    <sys:String x:Key="FlowAnalytics_Issue_BarkHasPlayerChoiceChild">Bark has player choice</sys:String>
     <sys:String x:Key="FlowAnalytics_Stat_Nodes">Nodes</sys:String>
     <sys:String x:Key="FlowAnalytics_Stat_Words">Words</sys:String>
     <sys:String x:Key="FlowAnalytics_Stat_MaxDepth">Max depth</sys:String>

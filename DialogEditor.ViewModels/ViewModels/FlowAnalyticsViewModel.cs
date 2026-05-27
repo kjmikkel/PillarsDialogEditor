@@ -17,11 +17,13 @@ public partial class FlowIssueViewModel : ObservableObject
 
     public string KindLabel => Kind switch
     {
-        FlowIssueKind.Unreachable      => Loc.Get("FlowAnalytics_Issue_Unreachable"),
-        FlowIssueKind.PlayerDeadEnd    => Loc.Get("FlowAnalytics_Issue_PlayerDeadEnd"),
-        FlowIssueKind.EmptyText        => Loc.Get("FlowAnalytics_Issue_EmptyText"),
-        FlowIssueKind.NoIncomingLinks  => Loc.Get("FlowAnalytics_Issue_NoIncomingLinks"),
-        _                              => Kind.ToString()
+        FlowIssueKind.Unreachable               => Loc.Get("FlowAnalytics_Issue_Unreachable"),
+        FlowIssueKind.PlayerDeadEnd             => Loc.Get("FlowAnalytics_Issue_PlayerDeadEnd"),
+        FlowIssueKind.EmptyText                 => Loc.Get("FlowAnalytics_Issue_EmptyText"),
+        FlowIssueKind.NoIncomingLinks           => Loc.Get("FlowAnalytics_Issue_NoIncomingLinks"),
+        FlowIssueKind.BarkTextTooLong           => Loc.Get("FlowAnalytics_Issue_BarkTextTooLong"),
+        FlowIssueKind.BarkHasPlayerChoiceChild  => Loc.Get("FlowAnalytics_Issue_BarkHasPlayerChoiceChild"),
+        _                                       => Kind.ToString()
     };
 
     public string DisplayText => $"Node {NodeId} — {NodeSnippet}";
