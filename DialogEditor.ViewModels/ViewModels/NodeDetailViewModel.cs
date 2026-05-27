@@ -111,6 +111,20 @@ public partial class NodeDetailViewModel : ObservableObject
         set { if (_node != null) _node.HideSpeaker = value; }
     }
 
+    public IReadOnlyList<string> BarkWarnings
+    {
+        get
+        {
+            var warnings = new List<string>(_node?.BarkWarnings ?? []);
+            if (_node?.IsBark == true
+                && _links.Any(l => l.Target.Owner?.IsPlayerChoice == true))
+            {
+                warnings.Add(Loc.Get("Bark_Warning_PlayerChoiceChild"));
+            }
+            return warnings;
+        }
+    }
+
     // ── SpeakerCategory proxy (enum ↔ string for ComboBox binding) ───────
     public string SpeakerCategoryString
     {
@@ -247,6 +261,7 @@ public partial class NodeDetailViewModel : ObservableObject
         _selectedListenerEntry = SpeakerNameService.FindByGuid(_node?.ListenerGuid);
         OnPropertyChanged(nameof(SelectedSpeakerEntry));
         OnPropertyChanged(nameof(SelectedListenerEntry));
+        OnPropertyChanged(nameof(BarkWarnings));
     }
 
     // ── Speaker / Listener name picker ───────────────────────────────────
@@ -294,7 +309,10 @@ public partial class NodeDetailViewModel : ObservableObject
     }
 
     public void RefreshLinks(IEnumerable<ConnectionViewModel> connections)
-        => Links = connections.ToList();
+    {
+        Links = connections.ToList();
+        OnPropertyChanged(nameof(BarkWarnings));
+    }
 
     public void NotifyConditionSummary()
         => OnPropertyChanged(nameof(ConditionSummary));

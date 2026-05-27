@@ -235,10 +235,17 @@ public class NodeDetailViewModelTests
 
     // ── RefreshLinks (Fix C) ──────────────────────────────────────────────
 
-    private static ConnectionViewModel MakeConn()
+    private static ConnectionViewModel MakeConn(bool targetIsPlayerChoice = false)
     {
         var src = new ConnectorViewModel();
         var tgt = new ConnectorViewModel();
+        if (targetIsPlayerChoice)
+        {
+            var node = new ConversationNode(
+                99, targetIsPlayerChoice, SpeakerCategory.Player,
+                "", "", [], [], [], "Conversation", "None");
+            tgt.Owner = new NodeViewModel(node, new StringEntry(99, "", ""));
+        }
         return new ConnectionViewModel(src, tgt);
     }
 
@@ -343,5 +350,24 @@ public class NodeDetailViewModelTests
 
         _vm.Load(node2);
         Assert.Equal(string.Empty, _vm.TranslatorNote);
+    }
+
+    // ── BarkWarnings (player-choice child) ───────────────────────────────────
+
+    [Fact]
+    public void BarkWarnings_EmptyWhenNoPlayerChoiceChildren()
+    {
+        _vm.Load(MakeNode(displayType: "Bark"));
+        _vm.RefreshLinks([MakeConn(targetIsPlayerChoice: false)]);
+        Assert.Empty(_vm.BarkWarnings);
+    }
+
+    [Fact]
+    public void BarkWarnings_PlayerChoiceWarning_WhenChildIsPlayerChoice()
+    {
+        _vm.Load(MakeNode(displayType: "Bark"));
+        _vm.RefreshLinks([MakeConn(targetIsPlayerChoice: true)]);
+        Assert.Single(_vm.BarkWarnings);
+        Assert.Equal("Bark_Warning_PlayerChoiceChild", _vm.BarkWarnings[0]);
     }
 }
