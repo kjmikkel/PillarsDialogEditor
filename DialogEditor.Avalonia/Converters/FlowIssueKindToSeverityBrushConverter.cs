@@ -11,7 +11,13 @@ public sealed class FlowIssueKindToSeverityBrushConverter : IValueConverter
     private static readonly ISolidColorBrush Amber = new SolidColorBrush(Color.FromRgb(0xb8, 0x76, 0x0a));
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => value is FlowIssueKind.Unreachable ? Red : Amber;
+        => value is FlowIssueKind kind
+            ? kind switch
+            {
+                FlowIssueKind.Unreachable => Red,
+                _                         => Amber
+            }
+            : Amber;
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotImplementedException();
