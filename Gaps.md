@@ -12,9 +12,6 @@ Significant coverage has been added: both `IGameDataProvider` implementations, `
 
 ## Feature Gaps
 
-### Localization Workflows
-No support for exporting strings for translators, importing translated strings back, or managing multiple language variants of a patch.
-
 ### Version Control Integration
 No built-in diff viewing or merge conflict resolution UI for Git. Collaborating on the same conversation across branches is a manual process.
 
