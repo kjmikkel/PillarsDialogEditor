@@ -140,4 +140,47 @@ public class LocalizationImportServiceTests : IDisposable
         var enTrans = result.Patches["conv"].Translations["en"];
         Assert.Contains(enTrans, t => t.NodeId == 1 && t.DefaultText == "Updated Hello");
     }
+
+    // ── DetectLanguage ────────────────────────────────────────────────────
+
+    [Fact]
+    public void DetectLanguage_Csv_ReturnsNull()
+    {
+        var path = ExportAndGetPath(LocalizationExportFormat.Csv);
+        var result = LocalizationImportService.DetectLanguage(path, LocalizationExportFormat.Csv);
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public void DetectLanguage_Json_ReturnsSavedTargetLanguage()
+    {
+        var exportPath = ExportAndGetPath(LocalizationExportFormat.Json);
+        var json = File.ReadAllText(exportPath)
+            .Replace("\"targetLanguage\": \"\"", "\"targetLanguage\": \"fr\"");
+        File.WriteAllText(exportPath, json);
+
+        var result = LocalizationImportService.DetectLanguage(exportPath, LocalizationExportFormat.Json);
+        Assert.Equal("fr", result);
+    }
+
+    [Fact]
+    public void DetectLanguage_Xliff_ReturnsSavedTargetLanguage()
+    {
+        var exportPath = ExportAndGetPath(LocalizationExportFormat.Xliff);
+        var content = File.ReadAllText(exportPath)
+            .Replace("target-language=\"\"", "target-language=\"fr\"");
+        File.WriteAllText(exportPath, content);
+
+        var result = LocalizationImportService.DetectLanguage(exportPath, LocalizationExportFormat.Xliff);
+        Assert.Equal("fr", result);
+    }
+
+    [Fact]
+    public void DetectLanguage_Json_EmptyTargetLanguage_ReturnsNull()
+    {
+        var exportPath = ExportAndGetPath(LocalizationExportFormat.Json);
+        // targetLanguage is already "" from export — no modification needed
+        var result = LocalizationImportService.DetectLanguage(exportPath, LocalizationExportFormat.Json);
+        Assert.Null(result);
+    }
 }
