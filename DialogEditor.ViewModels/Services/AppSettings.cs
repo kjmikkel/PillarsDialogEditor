@@ -16,7 +16,13 @@ public static class AppSettings
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "PillarsDialogEditor", "settings.json");
 
-    internal static string? SettingsPathOverride;
+    // AsyncLocal so each test's override is isolated even when test classes run in parallel.
+    private static readonly AsyncLocal<string?> _settingsPathOverride = new();
+    internal static string? SettingsPathOverride
+    {
+        get => _settingsPathOverride.Value;
+        set => _settingsPathOverride.Value = value;
+    }
 
     private static string SettingsPath => SettingsPathOverride ?? _defaultSettingsPath;
 

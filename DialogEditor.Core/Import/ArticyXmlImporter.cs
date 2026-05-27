@@ -15,20 +15,23 @@ public class ArticyXmlImporter : IDialogImporter
         if (doc.Root?.Name.LocalName != "ArticyExport")
             throw new FormatException("File is not an Articy XML export — root element must be 'ArticyExport'.");
 
-        var models = doc.Descendants("Models").FirstOrDefault();
+        // Collect across all <Models> elements — Articy exports can contain
+        // multiple packages each with their own <Models> block.
+        var allModels = doc.Descendants("Models").ToList();
 
-        var suggestedName = models?
-            .Elements("Dialogue")
+        var suggestedName = allModels
+            .SelectMany(m => m.Elements("Dialogue"))
             .FirstOrDefault()
             ?.Attribute("TechnicalName")?.Value;
 
         if (string.IsNullOrWhiteSpace(suggestedName))
             suggestedName = Path.GetFileNameWithoutExtension(path);
 
-        var entities = BuildEntityMap(models);
+        var entities = BuildEntityMap(allModels);
 
-        var fragmentElements = models?.Elements("DialogueFragment").ToList()
-            ?? [];
+        var fragmentElements = allModels
+            .SelectMany(m => m.Elements("DialogueFragment"))
+            .ToList();
 
         var idMap = BuildIdMap(fragmentElements);
 
@@ -38,7 +41,7 @@ public class ArticyXmlImporter : IDialogImporter
         foreach (var frag in fragmentElements)
         {
             var articyId = frag.Attribute("Id")?.Value ?? "";
-            var intId = idMap[articyId];
+            if (!idMap.TryGetValue(articyId, out int intId)) continue;
 
             var props = frag.Element("Properties");
             var defaultText = props?.Element("Text")?.Value ?? "";
@@ -74,12 +77,12 @@ public class ArticyXmlImporter : IDialogImporter
         return new ImportedConversation(suggestedName, nodes, texts);
     }
 
-    private static Dictionary<string, (string TechnicalName, string DisplayName)> BuildEntityMap(XElement? models)
+    private static Dictionary<string, (string TechnicalName, string DisplayName)> BuildEntityMap(
+        List<XElement> allModels)
     {
         var map = new Dictionary<string, (string, string)>(StringComparer.OrdinalIgnoreCase);
-        if (models is null) return map;
 
-        foreach (var entity in models.Elements("Entity"))
+        foreach (var entity in allModels.SelectMany(m => m.Elements("Entity")))
         {
             var id = entity.Attribute("Id")?.Value;
             if (id is null) continue;
