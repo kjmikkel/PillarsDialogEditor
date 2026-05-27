@@ -131,6 +131,20 @@
                           SelectedItem="{Binding DisplayType, Mode=TwoWay}"
                           ToolTip.Tip="{StaticResource ToolTip_DisplayType}"/>
 
+                <Border Background="#2A2000" BorderBrush="#7A5C00" BorderThickness="1"
+                        CornerRadius="2" Padding="6,4" Margin="0,0,0,4"
+                        IsVisible="{Binding BarkWarnings.Count, Converter={StaticResource CountToVis}}"
+                        ToolTip.Tip="{StaticResource ToolTip_BarkWarnings}">
+                    <ItemsControl ItemsSource="{Binding BarkWarnings}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Foreground="#E8C050"
+                                           FontSize="10" TextWrapping="Wrap"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_Persistence}"/>
                 <ComboBox Classes="detail-combo"
                           ItemsSource="{x:Static vm:NodeDetailViewModel.PersistenceOptions}"
