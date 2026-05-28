@@ -337,4 +337,76 @@ public class ConversationViewModelEditTests
         Assert.True(vm.CanUndo);
         Assert.False(vm.CanRedo);
     }
+
+    // ── RestoreLayout ─────────────────────────────────────────────────────
+
+    [Fact]
+    public void RestoreLayout_SetsPositionsFromDictionary()
+    {
+        var vm = MakeVm();
+        var n1 = MakeNode(1);
+        var n2 = MakeNode(2);
+        vm.AddNode(n1, new LayoutPoint(0, 0));
+        vm.AddNode(n2, new LayoutPoint(0, 0));
+
+        vm.RestoreLayout(new Dictionary<int, LayoutPoint>
+        {
+            [1] = new LayoutPoint(100, 200),
+            [2] = new LayoutPoint(300, 400),
+        });
+
+        Assert.Equal(new LayoutPoint(100, 200), n1.Location);
+        Assert.Equal(new LayoutPoint(300, 400), n2.Location);
+    }
+
+    [Fact]
+    public void RestoreLayout_AbsentNodeIdKeepsOriginalPosition()
+    {
+        var vm   = MakeVm();
+        var node = MakeNode(1);
+        vm.AddNode(node, new LayoutPoint(50, 75));
+
+        vm.RestoreLayout(new Dictionary<int, LayoutPoint>()); // node 1 is absent
+
+        Assert.Equal(new LayoutPoint(50, 75), node.Location);
+    }
+
+    [Fact]
+    public void RestoreLayout_ExtraKeyInDictionary_DoesNotThrow()
+    {
+        var vm = MakeVm();
+        vm.AddNode(MakeNode(1), new LayoutPoint(0, 0));
+
+        var ex = Record.Exception(() => vm.RestoreLayout(new Dictionary<int, LayoutPoint>
+        {
+            [1]   = new LayoutPoint(10, 20),
+            [999] = new LayoutPoint(0,  0),  // no node with id 999 in the VM
+        }));
+
+        Assert.Null(ex);
+    }
+
+    // ── IsModified after undo ─────────────────────────────────────────────
+
+    [Fact]
+    public void IsModified_BecomesFalse_WhenUndoResultsInEmptyCanvas()
+    {
+        // Undo recalculates IsModified as (CanUndo || Nodes.Count > 0 || Connections.Count > 0).
+        // Undoing the only operation leaves all three false, so IsModified goes false.
+        var vm = MakeVm();
+        vm.AddNode(MakeNode(1), new LayoutPoint(0, 0));
+        vm.Undo();
+        Assert.False(vm.IsModified);
+    }
+
+    [Fact]
+    public void IsModified_RemainsTrue_WhenUndoHistoryRemains()
+    {
+        // After undoing one of two operations, CanUndo is still true, so IsModified stays true.
+        var vm = MakeVm();
+        vm.AddNode(MakeNode(1), new LayoutPoint(0, 0));
+        vm.AddNode(MakeNode(2), new LayoutPoint(200, 0));
+        vm.Undo(); // undoes AddNode(2); AddNode(1) still in history
+        Assert.True(vm.IsModified);
+    }
 }
