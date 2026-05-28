@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Avalonia.Headless.XUnit" Version="11.3.14" />
     <PackageReference Include="coverlet.collector" Version="10.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -24,6 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\DialogEditor.Avalonia\DialogEditor.Avalonia.csproj" />
     <ProjectReference Include="..\DialogEditor.Core\DialogEditor.Core.csproj" />
     <ProjectReference Include="..\DialogEditor.Patch\DialogEditor.Patch.csproj" />
     <ProjectReference Include="..\DialogEditor.ViewModels\DialogEditor.ViewModels.csproj" />
