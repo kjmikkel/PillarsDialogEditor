@@ -51,6 +51,11 @@ public partial class MainWindow : Window
             window.Show();
             window.Activate();
         };
+        vm.ShowImportWarnings = async warnings =>
+        {
+            var dialog = new ImportWarningsDialog(warnings);
+            await dialog.ShowDialog(this);
+        };
         vm.RequestLanguageCode = async (title, defaultValue) =>
         {
             var dialog = new LanguageCodeDialog(defaultValue);

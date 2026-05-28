@@ -14,9 +14,6 @@ Significant coverage has been added: both `IGameDataProvider` implementations, `
 ### Version Control Integration
 No built-in diff viewing or merge conflict resolution UI for Git. Collaborating on the same conversation across branches is a manual process.
 
-### Yarn Spinner Import — Conditions and Commands
-The Yarn Spinner importer handles basic dialogue lines and player choices but silently drops conditional blocks (`<<if>>`, `<<if/elseif/else>>`), variable assignments (`<<set>>`), and commands (`<<command>>`). Writers importing `.yarn` files that use these features lose that content without warning. This could be addressed by surfacing a per-import warning listing which constructs were skipped, so writers know what to handle manually.
-
 ### Barks System — Bark Preview
 Bark nodes now render with an amber color scheme on the canvas, carry bark-specific validation warnings (text too long, player-choice child), and those warnings surface in Flow Analytics. The remaining gap is an in-context preview of overhead floating text: writers cannot see how a bark will actually appear above an NPC's head without running the game. Implementing this requires investigating the game's bark rendering (font, line-wrapping, maximum visible width) before UI work can be designed.
 
