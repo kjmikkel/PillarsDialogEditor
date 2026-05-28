@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Input;
 using DialogEditor.Core.Import;
 
 namespace DialogEditor.Avalonia.Views;
@@ -21,5 +22,15 @@ public partial class ImportWarningsDialog : Window
             .ToList();
 
         OkButton.Click += (_, _) => Close();
+    }
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+        if (e.Key is Key.Escape or Key.Enter)
+        {
+            e.Handled = true;
+            Close();
+        }
     }
 }
