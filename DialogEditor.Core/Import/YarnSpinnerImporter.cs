@@ -279,7 +279,7 @@ public class YarnSpinnerImporter : IDialogImporter
     // ── Skipped-construct tallying ────────────────────────────────────────
 
     // Counts each distinct <<keyword>> across all block bodies. The keyword is the
-    // run of characters after "<<", stopping at the first whitespace or ">>".
+    // run of characters after "<<", stopping at the first whitespace or ">".
     private static List<ImportWarning> TallySkippedConstructs(IReadOnlyList<RawBlock> blocks)
     {
         var counts = new Dictionary<string, int>(StringComparer.Ordinal);
