@@ -14,7 +14,7 @@ public class CsvDialogImporter : IDialogImporter
         if (lines.Length == 0 || string.IsNullOrWhiteSpace(lines[0]))
             throw new FormatException("CSV file is missing a header row.");
 
-        var columns = ParseCsvRow(lines[0]);
+        var columns = ParseCsvRow(lines[0], rowNumber: 1);
         var idx = BuildColumnIndex(columns);
 
         if (!idx.TryGetValue("nodeid", out int nodeIdCol))
@@ -36,9 +36,11 @@ public class CsvDialogImporter : IDialogImporter
             if (string.IsNullOrWhiteSpace(line))
                 continue;
 
-            var fields = ParseCsvRow(line);
+            var fields = ParseCsvRow(line, rowNumber: i + 1);
 
-            var nodeId = int.Parse(GetField(fields, nodeIdCol));
+            var nodeIdStr = GetField(fields, nodeIdCol);
+            if (!int.TryParse(nodeIdStr, out int nodeId))
+                throw new FormatException($"Row {i + 1}: '{nodeIdStr}' is not a valid integer NodeId.");
             var speakerCategoryStr = GetField(fields, speakerCategoryCol);
             var defaultText = GetField(fields, defaultTextCol);
             var femaleText = GetField(fields, femaleTextCol);
@@ -129,7 +131,7 @@ public class CsvDialogImporter : IDialogImporter
         return links;
     }
 
-    private static List<string> ParseCsvRow(string line)
+    private static List<string> ParseCsvRow(string line, int rowNumber)
     {
         var fields = new List<string>();
         int pos = 0;
@@ -146,6 +148,7 @@ public class CsvDialogImporter : IDialogImporter
             {
                 pos++;
                 var sb = new System.Text.StringBuilder();
+                bool quoteClosed = false;
                 while (pos < line.Length)
                 {
                     if (line[pos] == '"')
@@ -158,6 +161,7 @@ public class CsvDialogImporter : IDialogImporter
                         }
                         else
                         {
+                            quoteClosed = true;
                             break;
                         }
                     }
@@ -166,6 +170,8 @@ public class CsvDialogImporter : IDialogImporter
                         sb.Append(line[pos++]);
                     }
                 }
+                if (!quoteClosed)
+                    throw new FormatException($"Row {rowNumber}: unclosed quoted field.");
                 fields.Add(sb.ToString());
                 if (pos < line.Length && line[pos] == ',')
                     pos++;

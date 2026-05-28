@@ -198,14 +198,28 @@ public class CsvDialogImporterTests : IDisposable
     // ── Non-numeric NodeId ────────────────────────────────────────────────
 
     [Fact]
-    public void Import_NonNumericNodeId_ThrowsFormatException()
+    public void Import_NonNumericNodeId_ThrowsFormatExceptionWithRowContext()
     {
         var path = WriteTempCsv("""
             NodeId,SpeakerCategory,DefaultText
             abc,Npc,Hello
             """);
 
-        Assert.Throws<FormatException>(() => Importer.Import(path));
+        var ex = Assert.Throws<FormatException>(() => Importer.Import(path));
+        Assert.Contains("Row 2", ex.Message);
+        Assert.Contains("abc", ex.Message);
+    }
+
+    // ── Unclosed quoted field ─────────────────────────────────────────────
+
+    [Fact]
+    public void Import_UnclosedQuotedField_ThrowsFormatExceptionWithRowContext()
+    {
+        var path = WriteTempCsv("NodeId,SpeakerCategory,DefaultText\n1,Npc,\"unclosed");
+
+        var ex = Assert.Throws<FormatException>(() => Importer.Import(path));
+        Assert.Contains("Row 2", ex.Message);
+        Assert.Contains("unclosed", ex.Message);
     }
 
     // ── SpeakerCategory case-insensitivity and fallback ──────────────────
