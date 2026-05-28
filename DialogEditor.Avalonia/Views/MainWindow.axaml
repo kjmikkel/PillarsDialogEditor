@@ -60,6 +60,9 @@
                         <MenuItem Header="{StaticResource Menu_ImportConversation}"
                                   Command="{Binding ImportConversationCommand}"
                                   ToolTip.Tip="{StaticResource ToolTip_ImportConversation}"/>
+                        <MenuItem Header="{StaticResource Menu_ExportConversation}"
+                                  Command="{Binding ExportConversationsCommand}"
+                                  ToolTip.Tip="{StaticResource ToolTip_ExportConversation}"/>
                         <Separator/>
                         <MenuItem Header="{StaticResource Menu_ExportForTranslation}"
                                   Command="{Binding ExportForTranslationCommand}"

@@ -14,9 +14,6 @@ Significant coverage has been added: both `IGameDataProvider` implementations, `
 ### Version Control Integration
 No built-in diff viewing or merge conflict resolution UI for Git. Collaborating on the same conversation across branches is a manual process.
 
-### Export to External Formats
-No export path exists from the editor back to external formats. A writer who starts a conversation in a spreadsheet (CSV), Articy Draft, or Yarn Spinner, imports it, edits it in the editor, and then wants to hand it back to the originating tool has no way to do so. This is a new feature with no existing scaffolding.
-
 ### Yarn Spinner Import — Conditions and Commands
 The Yarn Spinner importer handles basic dialogue lines and player choices but silently drops conditional blocks (`<<if>>`, `<<if/elseif/else>>`), variable assignments (`<<set>>`), and commands (`<<command>>`). Writers importing `.yarn` files that use these features lose that content without warning. This could be addressed by surfacing a per-import warning listing which constructs were skipped, so writers know what to handle manually.
 

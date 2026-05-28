@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Backup;
 using DialogEditor.Core.Editing;
+using DialogEditor.Core.Export;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Import;
 using DialogEditor.Core.Layout;
@@ -58,6 +59,9 @@ public partial class MainWindowViewModel : ObservableObject
     /// Set by the UI layer to show a language-code input dialog.
     /// Takes (title, defaultValue) and returns the entered language code, or null if cancelled.
     public Func<string, string?, Task<string?>>? RequestLanguageCode { get; set; }
+
+    /// Set by the UI layer to open the Export Conversations window.
+    public Action<ExportConversationsViewModel>? ShowExportConversations { get; set; }
 
     /// Conditions from the catalogue filtered to the currently loaded game.
     public IReadOnlyList<ConditionEntry> ActiveConditions
@@ -152,6 +156,7 @@ public partial class MainWindowViewModel : ObservableObject
         SaveProjectCommand.NotifyCanExecuteChanged();
         NewConversationCommand.NotifyCanExecuteChanged();
         ImportConversationCommand.NotifyCanExecuteChanged();
+        ExportConversationsCommand.NotifyCanExecuteChanged();
         MergeProjectsCommand.NotifyCanExecuteChanged();
         ExportForTranslationCommand.NotifyCanExecuteChanged();
         ImportTranslationCommand.NotifyCanExecuteChanged();
@@ -450,6 +455,36 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     private bool CanCreateConversation() => _provider is not null && _project is not null;
+
+    [RelayCommand(CanExecute = nameof(IsProjectLoaded))]
+    private void ExportConversations()
+    {
+        if (_provider is null || _project is null) return;
+
+        var allNames = _provider.EnumerateConversations()
+            .Select(f => f.Name)
+            .Concat(_project.NewConversations ?? [])
+            .OrderBy(n => n)
+            .ToList();
+
+        IReadOnlyList<NodeEditSnapshot> FetchNodes(string name)
+        {
+            if (name == _currentFile?.Name)
+                return Canvas.BuildSnapshot().Nodes;
+            if (_project.Patches.TryGetValue(name, out var patch))
+                return PatchApplier.Apply(new ConversationEditSnapshot([]), patch).Nodes;
+            return [];
+        }
+
+        var exportVm = new ExportConversationsViewModel(
+            allNames,
+            _currentFile?.Name,
+            FetchNodes,
+            _filePicker,
+            _folderPicker);
+
+        ShowExportConversations?.Invoke(exportVm);
+    }
 
     private void LoadNewConversation(ConversationFile file)
     {
