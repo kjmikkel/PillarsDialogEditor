@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using DialogEditor.Avalonia.Views;
 using DialogEditor.Core.Import;
@@ -28,6 +29,19 @@ public class ImportWarningsDialogTests
         var dialog = new ImportWarningsDialog(Warnings);
         dialog.Show();
         dialog.FindControl<Button>("OkButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Assert.False(dialog.IsVisible);
+    }
+
+    [AvaloniaFact]
+    public void EscapeKey_ClosesDialog()
+    {
+        var dialog = new ImportWarningsDialog(Warnings);
+        dialog.Show();
+        dialog.RaiseEvent(new KeyEventArgs
+        {
+            RoutedEvent = InputElement.KeyDownEvent,
+            Key = Key.Escape,
+        });
         Assert.False(dialog.IsVisible);
     }
 }
