@@ -618,6 +618,27 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- {0} = conversation name, {1} = node count -->
     <sys:String x:Key="Status_ImportConversationAdded">Imported '{0}' ({1} nodes).</sys:String>
 
+    <!-- ─── Export Conversation (to external formats) ──────────────────── -->
+    <sys:String x:Key="Menu_ExportConversation">Export Conversation…</sys:String>
+    <sys:String x:Key="ToolTip_ExportConversation">Export selected conversations to CSV, JSON, or Yarn Spinner. This exports conversation structure (nodes, links, speaker categories), not translated text.</sys:String>
+    <sys:String x:Key="ExportConversations_Title">Export Conversations</sys:String>
+    <sys:String x:Key="ExportConversations_SelectAll">Select All</sys:String>
+    <sys:String x:Key="ExportConversations_SelectNone">Select None</sys:String>
+    <sys:String x:Key="ExportConversations_Format">Format</sys:String>
+    <sys:String x:Key="ExportConversations_ArticyNote">Articy Draft XML export is not supported. Articy's format requires proprietary internal IDs and template definitions that the editor does not store.</sys:String>
+    <sys:String x:Key="ExportConversations_Export">Export…</sys:String>
+    <sys:String x:Key="ExportConversations_Close">Close</sys:String>
+    <sys:String x:Key="ToolTip_ExportConversations_SelectAll">Check all conversations in the list.</sys:String>
+    <sys:String x:Key="ToolTip_ExportConversations_SelectNone">Uncheck all conversations in the list.</sys:String>
+    <sys:String x:Key="ToolTip_ExportConversations_Export">Export the checked conversations to the selected format.</sys:String>
+    <sys:String x:Key="ToolTip_ExportConversations_Csv">Export to comma-separated values. Round-trips cleanly through Import Conversation.</sys:String>
+    <sys:String x:Key="ToolTip_ExportConversations_Json">Export to JSON. Round-trips cleanly through Import Conversation.</sys:String>
+    <sys:String x:Key="ToolTip_ExportConversations_Yarn">Export to Yarn Spinner .yarn format. Conditions, scripts, and female text are omitted.</sys:String>
+    <!-- {0} = count, {1} = path or folder -->
+    <sys:String x:Key="Status_ExportConversationsSaved">Exported {0} conversation(s) to {1}.</sys:String>
+    <!-- {0} = error message -->
+    <sys:String x:Key="Status_ExportConversationsError">Export failed: {0}</sys:String>
+
     <!-- ─── Localization — export / import translation ─────────────────── -->
     <sys:String x:Key="Menu_ExportForTranslation">Export for Translation…</sys:String>
     <sys:String x:Key="Menu_ImportTranslation">Import Translation…</sys:String>
@@ -634,6 +655,6 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- ─── Settings — localization format ────────────────────────────── -->
     <sys:String x:Key="Settings_LocalizationFormat">Default localization format</sys:String>
 
-    <!-- PatchManager strings are in DialogEditor.Avalonia.Shared/Resources/Strings.axaml -->
+    <!-- PatchManager strings are in DialogEditor.Avalonia.Shared/Resources/SharedStrings.axaml -->
 
 </ResourceDictionary>
