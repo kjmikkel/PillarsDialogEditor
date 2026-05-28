@@ -5,7 +5,7 @@
 ### ViewModel Test Coverage
 Significant coverage has been added: both `IGameDataProvider` implementations, `AutoLayoutService`, and several previously untested ViewModels (ConversationFolderViewModel, ConversationItemViewModel, PatchEntryViewModel, SettingsViewModel) now have tests. The remaining gaps are:
 
-- Views / Converters (26 .cs files) — no unit tests, relies on manual verification
+- Views / Converters — mostly covered: all 14 converters have unit tests; `LanguageCodeDialog` and `LegendWindow` have headless Avalonia integration tests. Remaining untested views (`MainWindow`, `NodeDetailPanel`, and the canvas controls) require deeper UI interaction simulation and are deferred.
 
 ---
 
