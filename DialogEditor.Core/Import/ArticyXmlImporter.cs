@@ -74,7 +74,7 @@ public class ArticyXmlImporter : IDialogImporter
             texts.Add(new NodeTranslation(intId, defaultText, ""));
         }
 
-        return new ImportedConversation(suggestedName, nodes, texts);
+        return new ImportedConversation(suggestedName, nodes, texts, []);
     }
 
     private static Dictionary<string, (string TechnicalName, string DisplayName)> BuildEntityMap(

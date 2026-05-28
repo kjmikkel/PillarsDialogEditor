@@ -64,7 +64,7 @@ public class JsonDialogImporter : IDialogImporter
             texts.Add(new NodeTranslation(nodeId, defaultText, femaleText));
         }
 
-        return new ImportedConversation(suggestedName, nodes, texts);
+        return new ImportedConversation(suggestedName, nodes, texts, []);
     }
 
     private static SpeakerCategory ParseSpeakerCategory(string value) =>

@@ -222,6 +222,21 @@ public class CsvDialogImporterTests : IDisposable
         Assert.Contains("unclosed", ex.Message);
     }
 
+    // ── Warnings ──────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Import_Csv_HasNoWarnings()
+    {
+        var path = WriteTempCsv("""
+            NodeId,SpeakerCategory,DefaultText
+            1,Npc,Hello
+            """);
+
+        var result = Importer.Import(path);
+
+        Assert.Empty(result.Warnings);
+    }
+
     // ── SpeakerCategory case-insensitivity and fallback ──────────────────
 
     [Fact]

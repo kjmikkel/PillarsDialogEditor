@@ -3,11 +3,16 @@ using DialogEditor.Core.Models;
 
 namespace DialogEditor.Core.Import;
 
+/// One distinct construct that an importer skipped, with how many times it occurred.
+public record ImportWarning(string Construct, int Count);
+
 public record ImportedConversation(
     // Hint for the UI — may be overridden by the user before the conversation is added.
     string SuggestedName,
     IReadOnlyList<NodeEditSnapshot> Nodes,
-    IReadOnlyList<NodeTranslation>  Texts
+    IReadOnlyList<NodeTranslation>  Texts,
+    // Constructs the importer could not represent and silently dropped. Empty when none.
+    IReadOnlyList<ImportWarning>    Warnings
 );
 
 public interface IDialogImporter
