@@ -130,4 +130,60 @@ public class ConversationViewModelEditTests
         vm.SetNodeComment(5, "context");
         Assert.Equal("context", vm.NodeComments[5]);
     }
+
+    // ── AddConnectedNode ──────────────────────────────────────────────────
+
+    [Fact]
+    public void AddConnectedNode_AppearsInNodesAndConnections()
+    {
+        var vm     = MakeVm();
+        var parent = MakeNode(1);
+        vm.AddNode(parent, new LayoutPoint(0, 0));
+        vm.AddConnectedNode(parent, new LayoutPoint(250, 0));
+        Assert.Equal(2, vm.Nodes.Count);
+        Assert.Single(vm.Connections);
+        Assert.Equal(parent.Output, vm.Connections[0].Source);
+    }
+
+    [Fact]
+    public void AddConnectedNode_SetsSelectedNodeToChild()
+    {
+        var vm     = MakeVm();
+        var parent = MakeNode(1);
+        vm.AddNode(parent, new LayoutPoint(0, 0));
+        vm.AddConnectedNode(parent, new LayoutPoint(250, 0));
+        Assert.NotNull(vm.SelectedNode);
+        Assert.NotEqual(parent, vm.SelectedNode);
+    }
+
+    [Fact]
+    public void AddConnectedNode_InheritsParentProperties()
+    {
+        var vm     = MakeVm();
+        var parent = new NodeViewModel(
+            new ConversationNode(1, false, SpeakerCategory.Narrator,
+                "spk-1", "lst-1", [], [], [], "Bark", "ShowOnce"),
+            null);
+        vm.AddNode(parent, new LayoutPoint(0, 0));
+        vm.AddConnectedNode(parent, new LayoutPoint(250, 0));
+
+        var child = vm.Nodes.Single(n => n.NodeId != 1);
+        Assert.Equal(SpeakerCategory.Narrator, child.SpeakerCategory);
+        Assert.Equal("spk-1",    child.SpeakerGuid);
+        Assert.Equal("lst-1",    child.ListenerGuid);
+        Assert.Equal("Bark",     child.DisplayType);
+        Assert.Equal("ShowOnce", child.Persistence);
+    }
+
+    [Fact]
+    public void AddConnectedNode_AllocatesDistinctNodeId()
+    {
+        var vm     = MakeVm();
+        var parent = MakeNode(1);
+        vm.AddNode(parent, new LayoutPoint(0, 0));
+        vm.AddConnectedNode(parent, new LayoutPoint(250, 0));
+
+        var child = vm.Nodes.Single(n => n.NodeId != 1);
+        Assert.NotEqual(1, child.NodeId);
+    }
 }
