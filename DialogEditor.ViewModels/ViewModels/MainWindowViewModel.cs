@@ -60,6 +60,10 @@ public partial class MainWindowViewModel : ObservableObject
     /// Takes (title, defaultValue) and returns the entered language code, or null if cancelled.
     public Func<string, string?, Task<string?>>? RequestLanguageCode { get; set; }
 
+    /// Set by the UI layer to show an informational dialog listing import warnings.
+    /// Awaited before the imported conversation is added to the project.
+    public Func<IReadOnlyList<ImportWarning>, Task>? ShowImportWarnings { get; set; }
+
     /// Set by the UI layer to open the Export Conversations window.
     public Action<ExportConversationsViewModel>? ShowExportConversations { get; set; }
 
@@ -397,6 +401,9 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
+        if (imported.Warnings.Count > 0)
+            await (ShowImportWarnings?.Invoke(imported.Warnings) ?? Task.CompletedTask);
+
         // Ask user to confirm or change the name
         var suggested = imported.SuggestedName;
         var name = RequestConversationNameWithSuggestion is not null
@@ -451,7 +458,16 @@ public partial class MainWindowViewModel : ObservableObject
         LoadNewConversation(file);
 
         AppLog.Info($"Imported conversation '{name}' from '{path}' ({imported.Nodes.Count} nodes)");
-        StatusText = Loc.Format("Status_ImportConversationAdded", name, imported.Nodes.Count);
+        if (imported.Warnings.Count > 0)
+        {
+            var constructs = string.Join(", ", imported.Warnings.Select(w => $"<<{w.Construct}>>"));
+            StatusText = Loc.Format("Status_ImportConversationAddedWithWarnings",
+                name, imported.Nodes.Count, constructs);
+        }
+        else
+        {
+            StatusText = Loc.Format("Status_ImportConversationAdded", name, imported.Nodes.Count);
+        }
     }
 
     private bool CanCreateConversation() => _provider is not null && _project is not null;

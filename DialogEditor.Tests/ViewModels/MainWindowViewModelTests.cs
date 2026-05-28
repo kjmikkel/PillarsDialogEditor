@@ -1,3 +1,6 @@
+using DialogEditor.Core.Editing;
+using DialogEditor.Core.GameData;
+using DialogEditor.Core.Import;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
 using DialogEditor.Tests.Helpers;
@@ -6,9 +9,17 @@ using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.Tests.ViewModels;
 
-public class MainWindowViewModelTests
+public class MainWindowViewModelTests : IDisposable
 {
+    private readonly List<string> _importTempFiles = [];
+
     public MainWindowViewModelTests() => Loc.Configure(new StubStringProvider());
+
+    public void Dispose()
+    {
+        foreach (var f in _importTempFiles)
+            try { File.Delete(f); } catch (Exception) { /* best-effort cleanup */ }
+    }
 
     private static MainWindowViewModel MakeVm() =>
         new(new StubDispatcher(), new StubFolderPicker(), new StubFilePicker());
@@ -19,6 +30,14 @@ public class MainWindowViewModelTests
         var mi = typeof(MainWindowViewModel)
             .GetMethod("SetProject", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
         mi.Invoke(vm, [project]);
+    }
+
+    /// <summary>Injects a provider into the VM's private _provider field via reflection.</summary>
+    private static void InjectProvider(MainWindowViewModel vm, IGameDataProvider provider)
+    {
+        var fi = typeof(MainWindowViewModel)
+            .GetField("_provider", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+        fi.SetValue(vm, provider);
     }
 
     private static DialogProject MakeProjectWithTranslations()
@@ -273,6 +292,104 @@ public class MainWindowViewModelTests
         {
             if (File.Exists(tempCsv)) File.Delete(tempCsv);
         }
+    }
+
+    // ── Import warnings ───────────────────────────────────────────────────
+
+    private string WriteTempYarn(string content)
+    {
+        var path = Path.Combine(Path.GetTempPath(), Path.ChangeExtension(Path.GetRandomFileName(), ".yarn"));
+        File.WriteAllText(path, content);
+        _importTempFiles.Add(path);
+        return path;
+    }
+
+    private static (MainWindowViewModel Vm, StubProvider Provider) MakeImportableVm(string yarnPath)
+    {
+        var file     = new ConversationFile("stub_conv", "", "", "");
+        var provider = new StubProvider(file, new ConversationEditSnapshot([]));
+        var vm = new MainWindowViewModel(
+            new StubDispatcher(),
+            new StubFolderPicker(),
+            new StubFilePicker(openResult: yarnPath));
+        InjectProvider(vm, provider);
+        InjectProject(vm, DialogProject.Empty("TestProject"));
+        return (vm, provider);
+    }
+
+    [Fact]
+    public async Task ImportConversation_YarnWithSkippedConstructs_InvokesWarningCallback()
+    {
+        var path = WriteTempYarn("""
+            title: Start
+            ---
+            <<if $x>>
+            Npc: Hello.
+            ===
+            """);
+        var (vm, _) = MakeImportableVm(path);
+
+        IReadOnlyList<ImportWarning>? captured = null;
+        vm.ShowImportWarnings = w => { captured = w; return Task.CompletedTask; };
+
+        await vm.ImportConversationCommand.ExecuteAsync(null);
+
+        Assert.NotNull(captured);
+        Assert.Contains(captured!, w => w.Construct == "if");
+    }
+
+    [Fact]
+    public async Task ImportConversation_YarnWithoutConstructs_DoesNotInvokeCallback()
+    {
+        var path = WriteTempYarn("""
+            title: Start
+            ---
+            Npc: Just dialogue.
+            ===
+            """);
+        var (vm, _) = MakeImportableVm(path);
+
+        var invoked = false;
+        vm.ShowImportWarnings = w => { invoked = true; return Task.CompletedTask; };
+
+        await vm.ImportConversationCommand.ExecuteAsync(null);
+
+        Assert.False(invoked);
+    }
+
+    [Fact]
+    public async Task ImportConversation_WithWarnings_UsesWarningStatusFormat()
+    {
+        var path = WriteTempYarn("""
+            title: Start
+            ---
+            <<set $y = 1>>
+            Npc: Hi.
+            ===
+            """);
+        var (vm, _) = MakeImportableVm(path);
+        vm.ShowImportWarnings = _ => Task.CompletedTask;
+
+        await vm.ImportConversationCommand.ExecuteAsync(null);
+
+        // StubStringProvider returns the key verbatim, so StatusText equals the chosen key.
+        Assert.Equal("Status_ImportConversationAddedWithWarnings", vm.StatusText);
+    }
+
+    [Fact]
+    public async Task ImportConversation_NoWarnings_UsesCleanStatusFormat()
+    {
+        var path = WriteTempYarn("""
+            title: Start
+            ---
+            Npc: Hi.
+            ===
+            """);
+        var (vm, _) = MakeImportableVm(path);
+
+        await vm.ImportConversationCommand.ExecuteAsync(null);
+
+        Assert.Equal("Status_ImportConversationAdded", vm.StatusText);
     }
 
     // ── Helpers ───────────────────────────────────────────────────────────
