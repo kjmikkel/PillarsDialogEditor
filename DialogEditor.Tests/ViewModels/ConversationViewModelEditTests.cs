@@ -305,4 +305,36 @@ public class ConversationViewModelEditTests
         vm.Redo();
         Assert.Empty(vm.Connections);
     }
+
+    // ── CanUndo / CanRedo ─────────────────────────────────────────────────
+
+    [Fact]
+    public void NewOperationAfterUndo_ClearsRedoStack()
+    {
+        var vm = MakeVm();
+        vm.AddNode(MakeNode(1), new LayoutPoint(0, 0));
+        vm.Undo();
+        vm.AddNode(MakeNode(2), new LayoutPoint(0, 0));
+        Assert.False(vm.CanRedo);
+    }
+
+    [Fact]
+    public void CanUndoCanRedo_StateTransitions()
+    {
+        var vm = MakeVm();
+        Assert.False(vm.CanUndo);
+        Assert.False(vm.CanRedo);
+
+        vm.AddNode(MakeNode(1), new LayoutPoint(0, 0));
+        Assert.True(vm.CanUndo);
+        Assert.False(vm.CanRedo);
+
+        vm.Undo();
+        Assert.False(vm.CanUndo);
+        Assert.True(vm.CanRedo);
+
+        vm.Redo();
+        Assert.True(vm.CanUndo);
+        Assert.False(vm.CanRedo);
+    }
 }
