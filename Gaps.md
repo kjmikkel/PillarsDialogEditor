@@ -5,7 +5,6 @@
 ### ViewModel Test Coverage
 Significant coverage has been added: both `IGameDataProvider` implementations, `AutoLayoutService`, and several previously untested ViewModels (ConversationFolderViewModel, ConversationItemViewModel, PatchEntryViewModel, SettingsViewModel) now have tests. The remaining gaps are:
 
-- Complex editing operations — multi-node selection, bulk edits, undo on branching scenarios — are untested and fragile to regression
 - Views / Converters (26 .cs files) — no unit tests, relies on manual verification
 
 ---
