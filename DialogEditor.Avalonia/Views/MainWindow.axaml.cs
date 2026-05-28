@@ -44,7 +44,13 @@ public partial class MainWindow : Window
         vm.TestModeExited  += () => TestOverlay.IsVisible = false;
         vm.RequestConversationName               = () => PromptConversationNameAsync();
         vm.RequestConversationNameWithSuggestion = suggested => PromptConversationNameAsync(defaultValue: suggested);
-        vm.RequestConflictResolution = ex => ShowConflictResolutionDialogAsync(ex);
+        vm.RequestConflictResolution    = ex => ShowConflictResolutionDialogAsync(ex);
+        vm.ShowExportConversations = exportVm =>
+        {
+            var window = new ExportConversationsWindow(exportVm);
+            window.Show();
+            window.Activate();
+        };
         vm.RequestLanguageCode = async (title, defaultValue) =>
         {
             var dialog = new LanguageCodeDialog(defaultValue);
