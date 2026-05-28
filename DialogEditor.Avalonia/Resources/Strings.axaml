@@ -617,6 +617,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Status_ImportConversationError">Failed to import '{0}': {1}</sys:String>
     <!-- {0} = conversation name, {1} = node count -->
     <sys:String x:Key="Status_ImportConversationAdded">Imported '{0}' ({1} nodes).</sys:String>
+    <!-- {0} = conversation name, {1} = node count, {2} = comma-joined <<keyword>> list -->
+    <sys:String x:Key="Status_ImportConversationAddedWithWarnings">Imported '{0}' ({1} nodes). Skipped Yarn constructs: {2}.</sys:String>
 
     <!-- ─── Export Conversation (to external formats) ──────────────────── -->
     <sys:String x:Key="Menu_ExportConversation">Export Conversation…</sys:String>
