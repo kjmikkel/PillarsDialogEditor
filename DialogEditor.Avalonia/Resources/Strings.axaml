@@ -620,6 +620,13 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- {0} = conversation name, {1} = node count, {2} = comma-joined <<keyword>> list -->
     <sys:String x:Key="Status_ImportConversationAddedWithWarnings">Imported '{0}' ({1} nodes). Skipped Yarn constructs: {2}.</sys:String>
 
+    <!-- ─── Import Warnings dialog ──────────────────────────────────────── -->
+    <sys:String x:Key="ImportWarnings_Title">Import Warnings</sys:String>
+    <sys:String x:Key="ImportWarnings_Body">Some constructs in this file could not be imported and were skipped. The conversation structure was imported, but the following were dropped:</sys:String>
+    <sys:String x:Key="ImportWarnings_Footer">Open the original file to handle these manually if needed.</sys:String>
+    <sys:String x:Key="ImportWarnings_OccurrenceSuffix">occurrence(s)</sys:String>
+    <sys:String x:Key="ImportWarnings_Ok">OK</sys:String>
+
     <!-- ─── Export Conversation (to external formats) ──────────────────── -->
     <sys:String x:Key="Menu_ExportConversation">Export Conversation…</sys:String>
     <sys:String x:Key="ToolTip_ExportConversation">Export selected conversations to CSV, JSON, or Yarn Spinner. This exports conversation structure (nodes, links, speaker categories), not translated text.</sys:String>
