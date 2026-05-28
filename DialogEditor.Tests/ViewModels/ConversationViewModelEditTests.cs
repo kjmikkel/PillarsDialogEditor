@@ -186,4 +186,64 @@ public class ConversationViewModelEditTests
         var child = vm.Nodes.Single(n => n.NodeId != 1);
         Assert.NotEqual(1, child.NodeId);
     }
+
+    [Fact]
+    public void UndoAddConnectedNode_FirstUndoRemovesConnectionOnly()
+    {
+        var vm     = MakeVm();
+        var parent = MakeNode(1);
+        vm.AddNode(parent, new LayoutPoint(0, 0));
+        vm.AddConnectedNode(parent, new LayoutPoint(250, 0));
+
+        vm.Undo(); // undoes the AddConnection command
+        Assert.Equal(2, vm.Nodes.Count);
+        Assert.Empty(vm.Connections);
+    }
+
+    [Fact]
+    public void UndoAddConnectedNode_SecondUndoRemovesChildNode()
+    {
+        var vm     = MakeVm();
+        var parent = MakeNode(1);
+        vm.AddNode(parent, new LayoutPoint(0, 0));
+        vm.AddConnectedNode(parent, new LayoutPoint(250, 0));
+
+        vm.Undo(); // undoes AddConnection
+        vm.Undo(); // undoes AddNode (child)
+        Assert.Single(vm.Nodes); // only the parent remains
+        Assert.Empty(vm.Connections);
+    }
+
+    [Fact]
+    public void RedoAddConnectedNode_FirstRedoRestoresChildNodeOnly()
+    {
+        var vm     = MakeVm();
+        var parent = MakeNode(1);
+        vm.AddNode(parent, new LayoutPoint(0, 0));
+        vm.AddConnectedNode(parent, new LayoutPoint(250, 0));
+
+        vm.Undo(); // undo connection
+        vm.Undo(); // undo child node
+        vm.Redo(); // redo AddNode — child is back, no connection yet
+
+        Assert.Equal(2, vm.Nodes.Count);
+        Assert.Empty(vm.Connections);
+    }
+
+    [Fact]
+    public void RedoAddConnectedNode_SecondRedoRestoresConnection()
+    {
+        var vm     = MakeVm();
+        var parent = MakeNode(1);
+        vm.AddNode(parent, new LayoutPoint(0, 0));
+        vm.AddConnectedNode(parent, new LayoutPoint(250, 0));
+
+        vm.Undo(); // undo connection
+        vm.Undo(); // undo child node
+        vm.Redo(); // redo AddNode
+        vm.Redo(); // redo AddConnection
+
+        Assert.Equal(2, vm.Nodes.Count);
+        Assert.Single(vm.Connections);
+    }
 }
