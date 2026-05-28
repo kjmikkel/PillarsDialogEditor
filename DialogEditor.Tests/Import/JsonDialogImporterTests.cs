@@ -175,6 +175,20 @@ public class JsonDialogImporterTests : IDisposable
         }
     }
 
+    // ── Warnings ──────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Import_Json_HasNoWarnings()
+    {
+        var path = WriteTempJson("""
+            { "name": "c", "nodes": [ { "id": 1, "speakerCategory": "Npc", "defaultText": "Hi" } ] }
+            """);
+
+        var result = Importer.Import(path);
+
+        Assert.Empty(result.Warnings);
+    }
+
     // ── IsPlayerChoice ────────────────────────────────────────────────────
 
     [Fact]

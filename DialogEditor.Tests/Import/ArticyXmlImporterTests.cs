@@ -221,6 +221,16 @@ public class ArticyXmlImporterTests : IDisposable
         Assert.Equal("fallback_name", result.SuggestedName);
     }
 
+    // ── Warnings ──────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Import_Articy_HasNoWarnings()
+    {
+        var path = WriteTempXml(TwoFragmentXml);
+        var result = Importer.Import(path);
+        Assert.Empty(result.Warnings);
+    }
+
     // ── Error handling ────────────────────────────────────────────────────
 
     [Fact]

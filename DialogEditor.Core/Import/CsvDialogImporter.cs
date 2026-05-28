@@ -77,7 +77,7 @@ public class CsvDialogImporter : IDialogImporter
         }
 
         var name = Path.GetFileNameWithoutExtension(path);
-        return new ImportedConversation(name, nodes, texts);
+        return new ImportedConversation(name, nodes, texts, []);
     }
 
     private static Dictionary<string, int> BuildColumnIndex(List<string> headers)

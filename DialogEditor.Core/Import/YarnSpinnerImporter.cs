@@ -61,7 +61,7 @@ public class YarnSpinnerImporter : IDialogImporter
         }
 
         var name = Path.GetFileNameWithoutExtension(path);
-        return new ImportedConversation(name, nodes, texts);
+        return new ImportedConversation(name, nodes, texts, []);
     }
 
     // ── Block parsing ─────────────────────────────────────────────────────
