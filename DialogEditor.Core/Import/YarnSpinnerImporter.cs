@@ -60,8 +60,9 @@ public class YarnSpinnerImporter : IDialogImporter
             texts.Add(new NodeTranslation(pending.NodeId, pending.DefaultText, ""));
         }
 
+        var warnings = TallySkippedConstructs(rawBlocks);
         var name = Path.GetFileNameWithoutExtension(path);
-        return new ImportedConversation(name, nodes, texts, []);
+        return new ImportedConversation(name, nodes, texts, warnings);
     }
 
     // ── Block parsing ─────────────────────────────────────────────────────
@@ -273,6 +274,46 @@ public class YarnSpinnerImporter : IDialogImporter
         if (speakerName.Equals("narrator", StringComparison.OrdinalIgnoreCase))
             return SpeakerCategory.Narrator;
         return SpeakerCategory.Npc;
+    }
+
+    // ── Skipped-construct tallying ────────────────────────────────────────
+
+    // Counts each distinct <<keyword>> across all block bodies. The keyword is the
+    // run of characters after "<<", stopping at the first whitespace or ">>".
+    private static List<ImportWarning> TallySkippedConstructs(IReadOnlyList<RawBlock> blocks)
+    {
+        var counts = new Dictionary<string, int>(StringComparer.Ordinal);
+
+        foreach (var block in blocks)
+        {
+            foreach (var raw in block.BodyLines)
+            {
+                if (!raw.StartsWith("<<", StringComparison.Ordinal))
+                    continue;
+
+                var keyword = ExtractKeyword(raw);
+                if (keyword.Length == 0)
+                    continue;
+
+                counts[keyword] = counts.GetValueOrDefault(keyword) + 1;
+            }
+        }
+
+        return counts.Select(kv => new ImportWarning(kv.Key, kv.Value)).ToList();
+    }
+
+    // "<<if $gold > 10>>" -> "if";  "<<endif>>" -> "endif";  "<<>>" -> "".
+    private static string ExtractKeyword(string line)
+    {
+        int start = 2; // skip "<<"
+        int i = start;
+        while (i < line.Length
+               && !char.IsWhiteSpace(line[i])
+               && line[i] != '>')
+        {
+            i++;
+        }
+        return line[start..i];
     }
 
     // ── Link resolution ───────────────────────────────────────────────────

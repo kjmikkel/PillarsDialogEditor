@@ -387,4 +387,59 @@ public class YarnSpinnerImporterTests : IDisposable
         Assert.True(playerNode.IsPlayerChoice);
         Assert.Equal(SpeakerCategory.Player, playerNode.SpeakerCategory);
     }
+
+    // ── Skipped-construct warnings ────────────────────────────────────────
+
+    [Fact]
+    public void Import_SkippedConstructs_ReportedAsWarnings()
+    {
+        var path = WriteTempYarn("""
+            title: Start
+            ---
+            <<if $gold > 10>>
+            Merchant: You can afford this.
+            <<set $seen = true>>
+            <<endif>>
+            ===
+            """);
+
+        var result = Importer.Import(path);
+
+        Assert.Contains(result.Warnings, w => w.Construct == "if"  && w.Count == 1);
+        Assert.Contains(result.Warnings, w => w.Construct == "set" && w.Count == 1);
+        Assert.Contains(result.Warnings, w => w.Construct == "endif" && w.Count == 1);
+    }
+
+    [Fact]
+    public void Import_RepeatedConstruct_TalliesCount()
+    {
+        var path = WriteTempYarn("""
+            title: Start
+            ---
+            <<if $a>>
+            Npc: One.
+            <<if $b>>
+            Npc: Two.
+            ===
+            """);
+
+        var result = Importer.Import(path);
+
+        Assert.Contains(result.Warnings, w => w.Construct == "if" && w.Count == 2);
+    }
+
+    [Fact]
+    public void Import_NoConstructs_HasNoWarnings()
+    {
+        var path = WriteTempYarn("""
+            title: Start
+            ---
+            Npc: Plain dialogue only.
+            ===
+            """);
+
+        var result = Importer.Import(path);
+
+        Assert.Empty(result.Warnings);
+    }
 }
