@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using DialogEditor.Core.Editing;
+using DialogEditor.Core.Layout;
 using DialogEditor.Core.Models;
 using DialogEditor.ViewModels;
 
@@ -57,12 +58,10 @@ public partial class ConversationView : UserControl
         if (e.Source is not Nodify.NodifyEditor) return;
 
         var screenPos  = e.GetPosition(Editor);
-        // Convert screen → canvas: canvas = screen / zoom + viewportOrigin
         var zoom       = Editor.ViewportZoom;
         var origin     = Editor.ViewportLocation;
-        var canvasPos  = new global::Avalonia.Point(
-            screenPos.X / zoom + origin.X,
-            screenPos.Y / zoom + origin.Y);
+        var (cx, cy)   = CanvasMath.ScreenToCanvas(screenPos.X, screenPos.Y, zoom, origin.X, origin.Y);
+        var canvasPos  = new global::Avalonia.Point(cx, cy);
 
         var newId  = NodeIdAllocator.Next(vm.Nodes.Select(n => n.NodeId));
         var newNode = new NodeViewModel(
