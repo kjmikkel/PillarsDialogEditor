@@ -25,6 +25,8 @@
   <ItemGroup>
     <AvaloniaResource Include="Assets\**"/>
     <AvaloniaResource Include="Resources\Strings.axaml"/>
+    <!-- Prevent the SDK from also treating Strings.axaml as a compiled AvaloniaXaml resource -->
+    <AvaloniaXaml Remove="Resources\Strings.axaml"/>
   </ItemGroup>
 
 </Project>
