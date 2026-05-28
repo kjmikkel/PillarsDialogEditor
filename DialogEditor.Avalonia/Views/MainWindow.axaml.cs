@@ -359,76 +359,14 @@ public partial class MainWindow : Window
     // ── Unsaved-changes dialog ────────────────────────────────────────────
     private async Task ShowUnsavedChangesDialogAsync(MainWindowViewModel vm)
     {
-        var tcs = new TaskCompletionSource<string>();
-
-        // Resolve localised strings
-        var title   = (string)(this.FindResource("UnsavedChanges_Title") ?? "Unsaved Changes");
-        var message = string.Format(
-            (string)(this.FindResource("UnsavedChanges_Message") ?? "{0} has unsaved changes."),
-            vm.CurrentConversationName ?? "This conversation");
-        var lblSave    = (string)(this.FindResource("UnsavedChanges_Save")    ?? "Save to Project");
-        var lblDiscard = (string)(this.FindResource("UnsavedChanges_Discard") ?? "Discard Changes");
-        var lblCancel  = (string)(this.FindResource("UnsavedChanges_Cancel")  ?? "Stay Here");
-
-        var dialog = new Window
-        {
-            Title  = title,
-            Icon   = Icon,
-            Width  = 420,
-            SizeToContent = SizeToContent.Height,
-            WindowStartupLocation = WindowStartupLocation.CenterOwner,
-            CanResize = false,
-            Background = new SolidColorBrush(Color.Parse("#252525")),
-        };
-
-        var panel = new StackPanel { Margin = new Thickness(20) };
-
-        panel.Children.Add(new TextBlock
-        {
-            Text         = message,
-            Foreground   = new SolidColorBrush(Color.Parse("#e8e8e8")),
-            FontSize     = 13,
-            TextWrapping = TextWrapping.Wrap,
-            Margin       = new Thickness(0, 0, 0, 20),
-        });
-
-        var buttons = new StackPanel
-        {
-            Orientation = Orientation.Horizontal,
-            HorizontalAlignment = HorizontalAlignment.Right,
-            Spacing = 8,
-        };
-
-        Button MakeBtn(string label, string result, string bg = "#333")
-        {
-            var btn = new Button
-            {
-                Content         = label,
-                Padding         = new Thickness(16, 6),
-                Background      = new SolidColorBrush(Color.Parse(bg)),
-                Foreground      = Brushes.White,
-                BorderThickness = new Thickness(0),
-                FontSize        = 12,
-            };
-            btn.Click += (_, _) => { tcs.TrySetResult(result); dialog.Close(); };
-            return btn;
-        }
-
-        buttons.Children.Add(MakeBtn(lblCancel,  "cancel"));
-        buttons.Children.Add(MakeBtn(lblDiscard, "discard"));
-        buttons.Children.Add(MakeBtn(lblSave,    "save", "#1a5276"));
-
-        panel.Children.Add(buttons);
-        dialog.Content = panel;
-
+        var dialog = new UnsavedChangesDialog(vm.CurrentConversationName ?? "This conversation");
         await dialog.ShowDialog(this);
-
-        switch (await tcs.Task)
+        switch (dialog.Result)
         {
-            case "save":    vm.SaveAndProceed();          break;
-            case "discard": vm.DiscardAndProceed();       break;
+            case UnsavedChangesResult.Save:    vm.SaveAndProceed();    break;
+            case UnsavedChangesResult.Discard: vm.DiscardAndProceed(); break;
             default:
-                _closingConfirmed = false;   // user chose Stay Here — reset so next close attempt works
+                _closingConfirmed = false;
                 vm.CancelPendingNavigation();
                 break;
         }
@@ -437,207 +375,16 @@ public partial class MainWindow : Window
     // ── Patch conflict resolution dialog ─────────────────────────────────
     private async Task<bool> ShowConflictResolutionDialogAsync(DialogEditor.Patch.PatchConflictException ex)
     {
-        var title       = (string)(this.FindResource("ConflictDialog_Title")        ?? "Patch Conflict");
-        var intro       = (string)(this.FindResource("ConflictDialog_Intro")        ?? "Conflict detected.");
-        var nodeLabel   = (string)(this.FindResource("ConflictDialog_NodeLabel")    ?? "Node ID:");
-        var fieldLabel  = (string)(this.FindResource("ConflictDialog_FieldLabel")   ?? "Field:");
-        var expLabel    = (string)(this.FindResource("ConflictDialog_ExpectedLabel") ?? "Expected:");
-        var actLabel    = (string)(this.FindResource("ConflictDialog_ActualLabel")   ?? "Actual:");
-        var lblForce    = (string)(this.FindResource("ConflictDialog_Force")        ?? "Force Apply");
-        var lblCancel   = (string)(this.FindResource("ConflictDialog_Cancel")       ?? "Cancel Test");
-        var forceTip    = (string)(this.FindResource("ConflictDialog_ForceTooltip") ?? string.Empty);
-        var cancelTip   = (string)(this.FindResource("ConflictDialog_CancelTooltip") ?? string.Empty);
-
-        var tcs = new TaskCompletionSource<bool>();
-
-        var dialog = new Window
-        {
-            Title  = title,
-            Icon   = Icon,
-            Width  = 520,
-            SizeToContent = SizeToContent.Height,
-            WindowStartupLocation = WindowStartupLocation.CenterOwner,
-            CanResize = false,
-            Background = new SolidColorBrush(Color.Parse("#252525")),
-        };
-
-        SolidColorBrush Fg(string hex) => new(Color.Parse(hex));
-
-        TextBlock Label(string text) => new()
-        {
-            Text       = text,
-            Foreground = Fg("#888"),
-            FontSize   = 11,
-            MinWidth   = 120,
-            VerticalAlignment = VerticalAlignment.Center,
-        };
-
-        TextBlock Value(string text) => new()
-        {
-            Text         = text,
-            Foreground   = Fg("#e8e8e8"),
-            FontSize     = 12,
-            TextWrapping = TextWrapping.Wrap,
-        };
-
-        Grid Row(string label, string value) => new()
-        {
-            ColumnDefinitions = new ColumnDefinitions("120,*"),
-            Margin = new Thickness(0, 3, 0, 3),
-            Children = { Label(label), new Border { [Grid.ColumnProperty] = 1, Child = Value(value) } },
-        };
-
-        var panel = new StackPanel { Margin = new Thickness(20) };
-
-        panel.Children.Add(new TextBlock
-        {
-            Text         = intro,
-            Foreground   = Fg("#e8e8e8"),
-            FontSize     = 13,
-            TextWrapping = TextWrapping.Wrap,
-            Margin       = new Thickness(0, 0, 0, 14),
-        });
-
-        var details = new Border
-        {
-            Background    = new SolidColorBrush(Color.Parse("#1a1a1a")),
-            CornerRadius  = new CornerRadius(4),
-            Padding       = new Thickness(12, 8),
-            Margin        = new Thickness(0, 0, 0, 16),
-        };
-        var detailStack = new StackPanel();
-        detailStack.Children.Add(Row(nodeLabel,  ex.NodeId.ToString()));
-        detailStack.Children.Add(Row(fieldLabel, ex.FieldName));
-        detailStack.Children.Add(Row(expLabel,   ex.ExpectedFrom));
-        detailStack.Children.Add(Row(actLabel,   ex.ActualValue));
-        details.Child = detailStack;
-        panel.Children.Add(details);
-
-        var buttons = new StackPanel
-        {
-            Orientation         = Orientation.Horizontal,
-            HorizontalAlignment = HorizontalAlignment.Right,
-            Spacing             = 8,
-        };
-
-        Button MakeBtn(string label, bool result, string bg, string tip)
-        {
-            var btn = new Button
-            {
-                Content         = label,
-                Padding         = new Thickness(16, 6),
-                Background      = new SolidColorBrush(Color.Parse(bg)),
-                Foreground      = Brushes.White,
-                BorderThickness = new Thickness(0),
-                FontSize        = 12,
-            };
-            if (!string.IsNullOrEmpty(tip))
-                ToolTip.SetTip(btn, tip);
-            btn.Click += (_, _) => { tcs.TrySetResult(result); dialog.Close(); };
-            return btn;
-        }
-
-        buttons.Children.Add(MakeBtn(lblCancel, false, "#333",    cancelTip));
-        buttons.Children.Add(MakeBtn(lblForce,  true,  "#8e4912", forceTip));
-
-        panel.Children.Add(buttons);
-        dialog.Content = panel;
-
+        var dialog = new ConflictResolutionDialog(ex);
         await dialog.ShowDialog(this);
-        return await tcs.Task;
+        return dialog.ForceApply;
     }
 
     // ── New conversation name dialog ──────────────────────────────────────
     private async Task<string?> PromptConversationNameAsync(string? defaultValue = null)
     {
-        var titleKey    = defaultValue is null ? "Dialog_NewConversation_Title" : "Dialog_ImportConversation";
-        var title       = (string)(this.FindResource(titleKey)                             ?? "New Conversation");
-        var prompt      = (string)(this.FindResource("Dialog_NewConversation_Prompt")      ?? "Conversation name:");
-        var placeholder = (string)(this.FindResource("Dialog_NewConversation_Placeholder") ?? "my_new_conversation");
-        var lblCreate   = (string)(this.FindResource("Dialog_NewConversation_Create")      ?? "Create");
-
-        var tcs = new TaskCompletionSource<string?>();
-
-        var dialog = new Window
-        {
-            Title  = title,
-            Icon   = Icon,
-            Width  = 460,
-            SizeToContent = SizeToContent.Height,
-            WindowStartupLocation = WindowStartupLocation.CenterOwner,
-            CanResize = false,
-            Background = new SolidColorBrush(Color.Parse("#252525")),
-        };
-
-        var panel = new StackPanel { Margin = new Thickness(20) };
-
-        panel.Children.Add(new TextBlock
-        {
-            Text         = prompt,
-            Foreground   = new SolidColorBrush(Color.Parse("#e8e8e8")),
-            FontSize     = 12,
-            TextWrapping = TextWrapping.Wrap,
-            Margin       = new Thickness(0, 0, 0, 10),
-        });
-
-        var nameBox = new TextBox
-        {
-            Watermark       = placeholder,
-            Text            = defaultValue,
-            Background      = new SolidColorBrush(Color.Parse("#141414")),
-            Foreground      = new SolidColorBrush(Color.Parse("#e8e8e8")),
-            BorderBrush     = new SolidColorBrush(Color.Parse("#444")),
-            BorderThickness = new Thickness(1),
-            FontSize        = 12,
-            Padding         = new Thickness(6, 4),
-            Margin          = new Thickness(0, 0, 0, 16),
-        };
-        panel.Children.Add(nameBox);
-
-        var buttons = new StackPanel
-        {
-            Orientation         = Orientation.Horizontal,
-            HorizontalAlignment = HorizontalAlignment.Right,
-            Spacing             = 8,
-        };
-
-        var okBtn = new Button
-        {
-            Content         = lblCreate,
-            Padding         = new Thickness(16, 6),
-            Background      = new SolidColorBrush(Color.Parse("#1a5276")),
-            Foreground      = Brushes.White,
-            BorderThickness = new Thickness(0),
-            FontSize        = 12,
-        };
-        okBtn.Click += (_, _) => { tcs.TrySetResult(nameBox.Text); dialog.Close(); };
-
-        var cancelBtn = new Button
-        {
-            Content         = "Cancel",
-            Padding         = new Thickness(16, 6),
-            Background      = new SolidColorBrush(Color.Parse("#333")),
-            Foreground      = Brushes.White,
-            BorderThickness = new Thickness(0),
-            FontSize        = 12,
-        };
-        cancelBtn.Click += (_, _) => { tcs.TrySetResult(null); dialog.Close(); };
-
-        buttons.Children.Add(cancelBtn);
-        buttons.Children.Add(okBtn);
-        panel.Children.Add(buttons);
-
-        dialog.Content = panel;
-
-        // Focus the TextBox and allow Enter to confirm
-        dialog.Opened += (_, _) => nameBox.Focus();
-        nameBox.KeyDown += (_, e) =>
-        {
-            if (e.Key == Key.Enter)  { tcs.TrySetResult(nameBox.Text); dialog.Close(); }
-            if (e.Key == Key.Escape) { tcs.TrySetResult(null);         dialog.Close(); }
-        };
-
+        var dialog = new ConversationNameDialog(defaultValue);
         await dialog.ShowDialog(this);
-        return await tcs.Task;
+        return dialog.Result;
     }
 }

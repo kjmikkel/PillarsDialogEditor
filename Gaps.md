@@ -5,7 +5,7 @@
 ### ViewModel Test Coverage
 Significant coverage has been added: both `IGameDataProvider` implementations, `AutoLayoutService`, and several previously untested ViewModels (ConversationFolderViewModel, ConversationItemViewModel, PatchEntryViewModel, SettingsViewModel) now have tests. The remaining gaps are:
 
-- Views / Converters — mostly covered: all 14 converters have unit tests; `LanguageCodeDialog` and `LegendWindow` have headless Avalonia integration tests. Remaining untested views (`MainWindow`, `NodeDetailPanel`, and the canvas controls) require deeper UI interaction simulation and are deferred.
+- Views / Converters — mostly covered: all 14 converters have unit tests; `LanguageCodeDialog`, `LegendWindow`, `UnsavedChangesDialog`, `ConflictResolutionDialog`, and `ConversationNameDialog` have headless Avalonia integration tests. Remaining untested views (`MainWindow` wiring, `NodeDetailView` modal launchers, and the Nodify canvas controls) contain no testable logic beyond what is already covered at the ViewModel layer.
 
 ---
 
