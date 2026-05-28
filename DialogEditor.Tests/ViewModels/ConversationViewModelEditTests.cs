@@ -246,4 +246,63 @@ public class ConversationViewModelEditTests
         Assert.Equal(2, vm.Nodes.Count);
         Assert.Single(vm.Connections);
     }
+
+    // ── Redo ──────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void RedoAddNode_RestoresNode()
+    {
+        var vm   = MakeVm();
+        var node = MakeNode(1);
+        vm.AddNode(node, new LayoutPoint(0, 0));
+        vm.Undo();
+        vm.Redo();
+        Assert.Contains(node, vm.Nodes);
+    }
+
+    [Fact]
+    public void RedoDeleteNode_RemovesNodeAgain()
+    {
+        var vm = MakeVm();
+        var n1 = MakeNode(1);
+        var n2 = MakeNode(2);
+        vm.AddNode(n1, new LayoutPoint(0, 0));
+        vm.AddNode(n2, new LayoutPoint(200, 0));
+        vm.AddConnection(n1.Output, n2.Input);
+        vm.DeleteNode(n1);
+        vm.Undo();
+        vm.Redo();
+        Assert.DoesNotContain(n1, vm.Nodes);
+        Assert.Empty(vm.Connections);
+    }
+
+    [Fact]
+    public void RedoAddConnection_RestoresConnection()
+    {
+        var vm = MakeVm();
+        var n1 = MakeNode(1);
+        var n2 = MakeNode(2);
+        vm.AddNode(n1, new LayoutPoint(0, 0));
+        vm.AddNode(n2, new LayoutPoint(200, 0));
+        vm.AddConnection(n1.Output, n2.Input);
+        vm.Undo();
+        vm.Redo();
+        Assert.Single(vm.Connections);
+    }
+
+    [Fact]
+    public void RedoDeleteConnection_RemovesConnectionAgain()
+    {
+        var vm = MakeVm();
+        var n1 = MakeNode(1);
+        var n2 = MakeNode(2);
+        vm.AddNode(n1, new LayoutPoint(0, 0));
+        vm.AddNode(n2, new LayoutPoint(200, 0));
+        vm.AddConnection(n1.Output, n2.Input);
+        var conn = vm.Connections.Single();
+        vm.DeleteConnection(conn);
+        vm.Undo();
+        vm.Redo();
+        Assert.Empty(vm.Connections);
+    }
 }
