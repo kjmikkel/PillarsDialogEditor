@@ -250,7 +250,16 @@ public partial class MainWindowViewModel : ObservableObject
         if (AppSettings.GetPendingRestores() is not null)
             TestModeEntered?.Invoke();
 
-        // Re-open last project if one was open
+        // Re-opening the last project is deferred to ReopenLastProjectOnStartup(),
+        // invoked by the View once the window is shown and callbacks are wired — so a
+        // conflicted project can offer resolution rather than only showing guidance.
+    }
+
+    /// Re-opens the last project, if any. Must be called by the View after the main
+    /// window is shown and ShowGitConflictResolution is wired (see the ctor note),
+    /// otherwise a conflicted project would silently fall back to a guidance message.
+    public void ReopenLastProjectOnStartup()
+    {
         var lastProject = AppSettings.LastProjectPath;
         if (!string.IsNullOrEmpty(lastProject) && File.Exists(lastProject))
             LoadProject(lastProject);

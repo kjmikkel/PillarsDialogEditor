@@ -7,6 +7,7 @@ using DialogEditor.Patch.GitConflict;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.ViewModels;
 
@@ -170,6 +171,33 @@ public class MainWindowViewModelTests : IDisposable
 
         Assert.False(vm.IsProjectOpen);
         Assert.Equal("Status_ProjectGitConflictCancelled", vm.StatusText);
+    }
+
+    [Fact]
+    public void ReopenLastProjectOnStartup_ConflictedProject_OffersResolution()
+    {
+        // C1: the startup re-open is deferred to here (called by the View after the
+        // window is shown), so a conflicted last-project reaches the resolution dialog
+        // rather than only a guidance message.
+        var saved = AppSettings.LastProjectPath;
+        try
+        {
+            var path = TempProjectPath();
+            File.WriteAllText(path, ConflictedBlob(GreetingProject("friend"), GreetingProject("traveler")));
+            AppSettings.LastProjectPath = path;
+
+            var vm = MakeVm();
+            var offered = false;
+            vm.ShowGitConflictResolution = _ => { offered = true; return Task.FromResult<DialogProject?>(null); };
+
+            vm.ReopenLastProjectOnStartup();
+
+            Assert.True(offered);
+        }
+        finally
+        {
+            AppSettings.LastProjectPath = saved;
+        }
     }
 
     // ── WindowTitle ───────────────────────────────────────────────────────

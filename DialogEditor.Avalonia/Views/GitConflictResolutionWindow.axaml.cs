@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
@@ -13,6 +14,8 @@ public partial class GitConflictResolutionWindow : Window
     private static readonly IBrush MineBrush   = new SolidColorBrush(Color.Parse("#9be39b"));
     private static readonly IBrush TheirsBrush = new SolidColorBrush(Color.Parse("#ff9c9c"));
 
+    private readonly GitConflictResolutionViewModel? _vm;
+
     // Parameterless constructor required so the XAML compiler embeds this type
     // (avoids AVLN3000 wiping precompiled resources on a clean build).
     public GitConflictResolutionWindow() => InitializeComponent();
@@ -20,11 +23,22 @@ public partial class GitConflictResolutionWindow : Window
     public GitConflictResolutionWindow(GitConflictResolutionViewModel vm)
     {
         InitializeComponent();
+        _vm = vm;
         DataContext = vm;
         vm.RequestClose += Close;
         CancelButton.Click += (_, _) => Close();
         vm.PropertyChanged += OnVmPropertyChanged;
         UpdateDiff(vm.Selected);
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
+        if (_vm is not null)
+        {
+            _vm.RequestClose      -= Close;
+            _vm.PropertyChanged   -= OnVmPropertyChanged;
+        }
     }
 
     private void OnVmPropertyChanged(object? sender, PropertyChangedEventArgs e)
