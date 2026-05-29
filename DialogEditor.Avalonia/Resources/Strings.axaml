@@ -598,6 +598,10 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- {0} = project name -->
     <sys:String x:Key="Status_ProjectGitConflictResolved">Resolved git conflicts in '{0}'. Review and save to write the merged project to disk.</sys:String>
     <sys:String x:Key="Status_ProjectGitConflictCancelled">Conflict resolution cancelled — project not opened.</sys:String>
+    <!-- Startup deferral: {0} = path, {1} = conflict count -->
+    <sys:String x:Key="Status_ProjectGitConflictPending">'{0}' has {1} unresolved git merge conflict(s). Click Resolve to fix them.</sys:String>
+    <sys:String x:Key="MainWindow_ResolveConflictsButton">Resolve…</sys:String>
+    <sys:String x:Key="MainWindow_ResolveConflictsTooltip">Open the conflict resolution dialog for the project that was reopened with unresolved git merge conflicts.</sys:String>
     <!-- Git conflict resolution row titles. {0} = conversation, {1} = node id, {2} = field / kind -->
     <sys:String x:Key="GitConflict_RowTitleField">{0} · node {1} · {2}</sys:String>
     <sys:String x:Key="GitConflict_RowTitleNode">{0} · node {1} · {2}</sys:String>

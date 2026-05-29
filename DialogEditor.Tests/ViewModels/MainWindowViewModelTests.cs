@@ -65,7 +65,7 @@ public class MainWindowViewModelTests : IDisposable
     {
         var mi = typeof(MainWindowViewModel)
             .GetMethod("LoadProjectAsync", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
-        return (Task)mi.Invoke(vm, [path])!;
+        return (Task)mi.Invoke(vm, [path, false])!;   // offerDeferred: false (explicit-open semantics)
     }
 
     private string TempProjectPath()
@@ -174,11 +174,9 @@ public class MainWindowViewModelTests : IDisposable
     }
 
     [Fact]
-    public void ReopenLastProjectOnStartup_ConflictedProject_OffersResolution()
+    public void ReopenLastProjectOnStartup_ConflictedProject_OffersResolvePromptNotModal()
     {
-        // C1: the startup re-open is deferred to here (called by the View after the
-        // window is shown), so a conflicted last-project reaches the resolution dialog
-        // rather than only a guidance message.
+        // Startup must NOT slam up the resolution modal; it offers a "Resolve…" action.
         var saved = AppSettings.LastProjectPath;
         try
         {
@@ -187,12 +185,47 @@ public class MainWindowViewModelTests : IDisposable
             AppSettings.LastProjectPath = path;
 
             var vm = MakeVm();
-            var offered = false;
-            vm.ShowGitConflictResolution = _ => { offered = true; return Task.FromResult<DialogProject?>(null); };
+            var shown = false;
+            vm.ShowGitConflictResolution = _ => { shown = true; return Task.FromResult<DialogProject?>(null); };
 
             vm.ReopenLastProjectOnStartup();
 
-            Assert.True(offered);
+            Assert.False(shown);                                       // no immediate modal
+            Assert.True(vm.HasPendingConflictResolution);              // a Resolve… prompt is offered
+            Assert.True(vm.ResolveConflictsCommand.CanExecute(null));
+            Assert.False(vm.IsProjectOpen);                            // not opened until resolved
+        }
+        finally
+        {
+            AppSettings.LastProjectPath = saved;
+        }
+    }
+
+    [Fact]
+    public async Task ResolveConflictsCommand_ShowsDialogResolvesAndClearsPrompt()
+    {
+        var saved = AppSettings.LastProjectPath;
+        try
+        {
+            var path = TempProjectPath();
+            File.WriteAllText(path, ConflictedBlob(GreetingProject("friend"), GreetingProject("traveler")));
+            AppSettings.LastProjectPath = path;
+
+            var vm = MakeVm();
+            vm.ShowGitConflictResolution = res =>
+            {
+                res.Conflicts[0].Choice = MergeSide.Theirs;
+                res.ApplyCommand.Execute(null);
+                return Task.FromResult(res.Result);
+            };
+
+            vm.ReopenLastProjectOnStartup();
+            Assert.True(vm.HasPendingConflictResolution);
+
+            await vm.ResolveConflictsCommand.ExecuteAsync(null);
+
+            Assert.True(vm.IsProjectOpen);
+            Assert.False(vm.HasPendingConflictResolution);   // prompt cleared after resolve
         }
         finally
         {

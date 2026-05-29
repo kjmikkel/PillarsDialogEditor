@@ -261,7 +261,17 @@
 
         <!-- Status bar -->
         <Border Grid.Row="2" Background="#1a1a1a" Padding="8,4">
-            <TextBlock Text="{Binding StatusText}" Foreground="#888" FontSize="11"/>
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0" Text="{Binding StatusText}"
+                           Foreground="#888" FontSize="11" VerticalAlignment="Center"/>
+                <Button Grid.Column="1"
+                        Content="{StaticResource MainWindow_ResolveConflictsButton}"
+                        Command="{Binding ResolveConflictsCommand}"
+                        IsVisible="{Binding HasPendingConflictResolution}"
+                        ToolTip.Tip="{StaticResource MainWindow_ResolveConflictsTooltip}"
+                        Background="#8e4912" Foreground="White" BorderThickness="0"
+                        Padding="12,2" FontSize="11"/>
+            </Grid>
         </Border>
     </Grid>
 </Window>
