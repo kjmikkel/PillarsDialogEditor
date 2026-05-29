@@ -474,4 +474,52 @@ public class YarnSpinnerImporterTests : IDisposable
 
         Assert.Equal("Come in.", result.Nodes[0].DefaultText);
     }
+
+    [Fact]
+    public void Import_ChoiceWithInlineConstruct_TalliesWarning()
+    {
+        var path = WriteTempYarn("""
+            title: Start
+            ---
+            Npc: Choose.
+            -> Yes I can <<if $x>>
+            ===
+            """);
+
+        var result = Importer.Import(path);
+
+        Assert.Contains(result.Warnings, w => w.Construct == "if" && w.Count == 1);
+    }
+
+    [Fact]
+    public void Import_DialogueWithInlineConstruct_TalliesWarning()
+    {
+        var path = WriteTempYarn("""
+            title: Start
+            ---
+            Npc: Come in. <<fade_in>>
+            ===
+            """);
+
+        var result = Importer.Import(path);
+
+        Assert.Contains(result.Warnings, w => w.Construct == "fade_in" && w.Count == 1);
+    }
+
+    [Fact]
+    public void Import_MixedStandaloneAndInlineConstructs_TalliedTogether()
+    {
+        var path = WriteTempYarn("""
+            title: Start
+            ---
+            <<if $gold>>
+            Merchant: Buy this. <<if $offer>>
+            -> Deal. <<if $agree>>
+            ===
+            """);
+
+        var result = Importer.Import(path);
+
+        Assert.Contains(result.Warnings, w => w.Construct == "if" && w.Count == 3);
+    }
 }
