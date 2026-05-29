@@ -52,6 +52,37 @@ public class MainWindowViewModelTests : IDisposable
         return DialogProject.Empty("TestProject").WithPatch(patch);
     }
 
+    private static void InvokeLoadProject(MainWindowViewModel vm, string path)
+    {
+        var mi = typeof(MainWindowViewModel)
+            .GetMethod("LoadProject", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+        mi.Invoke(vm, [path]);
+    }
+
+    // ── Git conflict detection on open ────────────────────────────────────
+
+    [Fact]
+    public void LoadProject_GitConflictUnparseable_ShowsGuidanceAndDoesNotOpen()
+    {
+        var conflicted =
+            "{\n" +
+            "<<<<<<< HEAD\n" +
+            "  this is not valid json\n" +
+            "=======\n" +
+            "  neither is this\n" +
+            ">>>>>>> feature\n" +
+            "}\n";
+        var path = Path.Combine(Path.GetTempPath(), $"conf_{Guid.NewGuid():N}.dialogproject");
+        File.WriteAllText(path, conflicted);
+        _importTempFiles.Add(path);
+
+        var vm = MakeVm();
+        InvokeLoadProject(vm, path);
+
+        Assert.Equal("Status_ProjectGitConflictUnparseable", vm.StatusText);
+        Assert.False(vm.IsProjectOpen);
+    }
+
     // ── WindowTitle ───────────────────────────────────────────────────────
 
     [Fact]

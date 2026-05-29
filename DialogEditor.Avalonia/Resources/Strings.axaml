@@ -591,6 +591,13 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Status_ProjectNoPatch">The project has no patches yet — save a conversation first.</sys:String>
     <!-- {0} = path, {1} = error message -->
     <sys:String x:Key="Status_ProjectOpenError">Could not open project '{0}': {1}</sys:String>
+    <!-- Git conflict resolution. {0} = path, {1} = conflict count -->
+    <sys:String x:Key="Status_ProjectGitConflictDetected">'{0}' has {1} unresolved git merge conflict(s). Resolve them to open the project.</sys:String>
+    <!-- {0} = path -->
+    <sys:String x:Key="Status_ProjectGitConflictUnparseable">'{0}' has git merge conflicts too complex to resolve here — resolve them in your git tool, then reopen.</sys:String>
+    <!-- {0} = project name -->
+    <sys:String x:Key="Status_ProjectGitConflictResolved">Resolved git conflicts in '{0}'. Review and save to write the merged project to disk.</sys:String>
+    <sys:String x:Key="Status_ProjectGitConflictCancelled">Conflict resolution cancelled — project not opened.</sys:String>
 
     <!-- ─── Project — file picker dialogs ────────────────────────────────── -->
     <sys:String x:Key="Dialog_NewProject">Create new project</sys:String>
