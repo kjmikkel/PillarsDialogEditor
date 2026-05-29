@@ -609,6 +609,19 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="GitConflict_KeepTheirs">Keep theirs</sys:String>
     <sys:String x:Key="GitConflict_AcceptDeletion">Accept deletion</sys:String>
     <sys:String x:Key="GitConflict_KeepEdit">Keep the edit</sys:String>
+    <!-- Git conflict resolution window chrome -->
+    <sys:String x:Key="GitConflictWindow_Title">Resolve Git Conflicts</sys:String>
+    <sys:String x:Key="GitConflictWindow_Intro">This project has unresolved git merge conflicts. Choose which side to keep for each one, then Apply. The merged project opens unsaved — review it and save to write the resolution to disk.</sys:String>
+    <sys:String x:Key="GitConflictWindow_ListHeader">Conflicts</sys:String>
+    <sys:String x:Key="GitConflictWindow_MineHeader">Mine (current branch)</sys:String>
+    <sys:String x:Key="GitConflictWindow_TheirsHeader">Theirs (incoming)</sys:String>
+    <sys:String x:Key="GitConflictWindow_MineTooltip">Keep your side's value for this conflict (the version on your current branch).</sys:String>
+    <sys:String x:Key="GitConflictWindow_TheirsTooltip">Keep the incoming side's value for this conflict (the version being merged in).</sys:String>
+    <sys:String x:Key="GitConflictWindow_Apply">Apply</sys:String>
+    <sys:String x:Key="GitConflictWindow_ApplyTooltip">Build the merged project from your choices and open it unsaved. Enabled once every conflict has a choice.</sys:String>
+    <sys:String x:Key="GitConflictWindow_Cancel">Cancel</sys:String>
+    <sys:String x:Key="GitConflictWindow_CancelTooltip">Close without resolving — the project is not opened and the file on disk is left unchanged.</sys:String>
+    <sys:String x:Key="GitConflictWindow_Unresolved">unresolved</sys:String>
 
     <!-- ─── Project — file picker dialogs ────────────────────────────────── -->
     <sys:String x:Key="Dialog_NewProject">Create new project</sys:String>

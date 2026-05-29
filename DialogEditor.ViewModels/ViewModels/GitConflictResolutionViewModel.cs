@@ -23,9 +23,31 @@ public partial class ConflictRowViewModel : ObservableObject
     [ObservableProperty]
     private MergeSide? _choice;
 
+    // Two-way radio-button bindings (avoid an enum↔bool converter in XAML).
+    // Setting false is ignored: the sibling radio's check drives the change.
+    public bool IsMineChosen
+    {
+        get => Choice == MergeSide.Mine;
+        set { if (value) Choice = MergeSide.Mine; }
+    }
+
+    public bool IsTheirsChosen
+    {
+        get => Choice == MergeSide.Theirs;
+        set { if (value) Choice = MergeSide.Theirs; }
+    }
+
+    public bool IsUnresolved => Choice is null;
+
     public event Action? ChoiceChanged;
 
-    partial void OnChoiceChanged(MergeSide? value) => ChoiceChanged?.Invoke();
+    partial void OnChoiceChanged(MergeSide? value)
+    {
+        OnPropertyChanged(nameof(IsMineChosen));
+        OnPropertyChanged(nameof(IsTheirsChosen));
+        OnPropertyChanged(nameof(IsUnresolved));
+        ChoiceChanged?.Invoke();
+    }
 
     public ConflictRowViewModel(MergeConflict conflict)
     {
