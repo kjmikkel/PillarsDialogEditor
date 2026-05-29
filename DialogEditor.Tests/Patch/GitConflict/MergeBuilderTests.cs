@@ -29,7 +29,7 @@ public class MergeBuilderTests
         var conflict = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
 
         var merged = MergeBuilder.Build(mine, theirs,
-            new Dictionary<MergeConflict, MergeSide> { [conflict] = MergeSide.Theirs });
+            [(conflict, MergeSide.Theirs)]);
 
         var mod = merged.Patches["greeting"].ModifiedNodes.Single(m => m.NodeId == 4);
         Assert.Equal("traveler", mod.FieldChanges["DefaultText"].To);
@@ -43,7 +43,7 @@ public class MergeBuilderTests
         var conflict = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
 
         var merged = MergeBuilder.Build(mine, theirs,
-            new Dictionary<MergeConflict, MergeSide> { [conflict] = MergeSide.Mine });
+            [(conflict, MergeSide.Mine)]);
 
         var mod = merged.Patches["greeting"].ModifiedNodes.Single(m => m.NodeId == 4);
         Assert.Equal("friend", mod.FieldChanges["DefaultText"].To);
@@ -57,7 +57,7 @@ public class MergeBuilderTests
             "shop", ConversationPatch.CurrentSchemaVersion, [], [], []));
 
         // greeting identical on both sides → no conflicts; shop is theirs-only.
-        var merged = MergeBuilder.Build(mine, theirs, new Dictionary<MergeConflict, MergeSide>());
+        var merged = MergeBuilder.Build(mine, theirs, []);
 
         Assert.Contains("shop", merged.Patches.Keys);
         Assert.Contains("greeting", merged.Patches.Keys);
@@ -71,7 +71,7 @@ public class MergeBuilderTests
         var conflict = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
 
         var merged = MergeBuilder.Build(mine, theirs,
-            new Dictionary<MergeConflict, MergeSide> { [conflict] = MergeSide.Theirs });
+            [(conflict, MergeSide.Theirs)]);
 
         Assert.DoesNotContain(merged.Patches["greeting"].ModifiedNodes, m => m.NodeId == 4);
         Assert.Contains(4, merged.Patches["greeting"].DeletedNodeIds);
@@ -86,7 +86,7 @@ public class MergeBuilderTests
 
         // Keep mine (the edit) → node stays, not deleted.
         var merged = MergeBuilder.Build(mine, theirs,
-            new Dictionary<MergeConflict, MergeSide> { [conflict] = MergeSide.Mine });
+            [(conflict, MergeSide.Mine)]);
 
         Assert.Contains(merged.Patches["greeting"].ModifiedNodes, m => m.NodeId == 4);
         Assert.DoesNotContain(4, merged.Patches["greeting"].DeletedNodeIds);

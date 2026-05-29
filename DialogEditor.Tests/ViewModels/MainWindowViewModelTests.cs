@@ -3,6 +3,7 @@ using DialogEditor.Core.GameData;
 using DialogEditor.Core.Import;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
+using DialogEditor.Patch.GitConflict;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
@@ -59,6 +60,36 @@ public class MainWindowViewModelTests : IDisposable
         mi.Invoke(vm, [path]);
     }
 
+    private static Task InvokeLoadProjectAsync(MainWindowViewModel vm, string path)
+    {
+        var mi = typeof(MainWindowViewModel)
+            .GetMethod("LoadProjectAsync", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+        return (Task)mi.Invoke(vm, [path])!;
+    }
+
+    private string TempProjectPath()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"conf_{Guid.NewGuid():N}.dialogproject");
+        _importTempFiles.Add(path);
+        return path;
+    }
+
+    // A DialogProject with one conversation whose node 4 sets DefaultText to `to`.
+    private static DialogProject GreetingProject(string to)
+    {
+        var mod = new NodeModification(
+            4, new Dictionary<string, FieldChange> { ["DefaultText"] = new FieldChange("orig", to) }, [], []);
+        return DialogProject.Empty("ConfProj").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [], [], [mod]));
+    }
+
+    // Wraps two serialized projects in git conflict markers — the reconstructed
+    // sides deserialize back to `mine` / `theirs`.
+    private static string ConflictedBlob(DialogProject mine, DialogProject theirs)
+        => "<<<<<<< HEAD\n" + DialogProjectSerializer.Serialize(mine)
+         + "\n=======\n"    + DialogProjectSerializer.Serialize(theirs)
+         + "\n>>>>>>> branch\n";
+
     // ── Git conflict detection on open ────────────────────────────────────
 
     [Fact]
@@ -81,6 +112,64 @@ public class MainWindowViewModelTests : IDisposable
 
         Assert.Equal("Status_ProjectGitConflictUnparseable", vm.StatusText);
         Assert.False(vm.IsProjectOpen);
+    }
+
+    [Fact]
+    public async Task LoadProject_GitConflictResolved_OpensDirtyAndSavePersistsMerged()
+    {
+        var path = TempProjectPath();
+        File.WriteAllText(path, ConflictedBlob(GreetingProject("friend"), GreetingProject("traveler")));
+
+        var vm = MakeVm();
+        vm.ShowGitConflictResolution = res =>
+        {
+            res.Conflicts[0].Choice = MergeSide.Theirs;   // take "traveler"
+            res.ApplyCommand.Execute(null);
+            return Task.FromResult(res.Result);
+        };
+
+        await InvokeLoadProjectAsync(vm, path);
+
+        Assert.True(vm.IsProjectOpen);
+        Assert.True(vm.IsModified);
+        Assert.True(vm.SaveProjectCommand.CanExecute(null));   // I1: saveable with no conversation open
+
+        vm.SaveProjectCommand.Execute(null);
+
+        var reloaded = DialogProjectSerializer.LoadFromFile(path);
+        var mod = reloaded.Patches["greeting"].ModifiedNodes.Single(m => m.NodeId == 4);
+        Assert.Equal("traveler", mod.FieldChanges["DefaultText"].To);
+    }
+
+    [Fact]
+    public async Task LoadProject_MarkersButIdenticalSides_OpensWithoutShowingDialog()
+    {
+        var path = TempProjectPath();
+        File.WriteAllText(path, ConflictedBlob(GreetingProject("same"), GreetingProject("same")));
+
+        var vm = MakeVm();
+        var dialogShown = false;
+        vm.ShowGitConflictResolution = _ => { dialogShown = true; return Task.FromResult<DialogProject?>(null); };
+
+        await InvokeLoadProjectAsync(vm, path);
+
+        Assert.False(dialogShown);
+        Assert.True(vm.IsProjectOpen);
+    }
+
+    [Fact]
+    public async Task LoadProject_GitConflictCancelled_DoesNotOpen()
+    {
+        var path = TempProjectPath();
+        File.WriteAllText(path, ConflictedBlob(GreetingProject("friend"), GreetingProject("traveler")));
+
+        var vm = MakeVm();
+        vm.ShowGitConflictResolution = _ => Task.FromResult<DialogProject?>(null);   // user cancels
+
+        await InvokeLoadProjectAsync(vm, path);
+
+        Assert.False(vm.IsProjectOpen);
+        Assert.Equal("Status_ProjectGitConflictCancelled", vm.StatusText);
     }
 
     // ── WindowTitle ───────────────────────────────────────────────────────

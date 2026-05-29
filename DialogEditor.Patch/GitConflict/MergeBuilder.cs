@@ -10,10 +10,13 @@ public static class MergeBuilder
 {
     private const string DeletedMarker = MergeConflict.DeletedMarker;
 
+    // Takes a list of (conflict, chosen side) pairs rather than a dictionary so we
+    // don't depend on MergeConflict's value-equality as a hash key (two structurally
+    // identical conflicts must not collapse into one entry).
     public static DialogProject Build(
         DialogProject mine,
         DialogProject theirs,
-        IReadOnlyDictionary<MergeConflict, MergeSide> choices)
+        IReadOnlyList<(MergeConflict Conflict, MergeSide Side)> choices)
     {
         var patches = new Dictionary<string, ConversationPatch>(mine.Patches);
 
@@ -24,8 +27,8 @@ public static class MergeBuilder
 
         // Apply theirs-resolved conflicts, grouped per conversation.
         var theirsResolved = choices
-            .Where(kv => kv.Value == MergeSide.Theirs)
-            .Select(kv => kv.Key)
+            .Where(c => c.Side == MergeSide.Theirs)
+            .Select(c => c.Conflict)
             .GroupBy(c => c.ConversationName);
 
         foreach (var group in theirsResolved)
@@ -42,12 +45,12 @@ public static class MergeBuilder
         ConversationPatch theirPatch,
         IEnumerable<MergeConflict> theirsConflicts)
     {
-        var modifiedById = minePatch.ModifiedNodes.ToDictionary(m => m.NodeId);
-        var addedById    = minePatch.AddedNodes.ToDictionary(n => n.NodeId);
+        var modifiedById = ById(minePatch.ModifiedNodes, m => m.NodeId);
+        var addedById    = ById(minePatch.AddedNodes,    n => n.NodeId);
         var deleted      = minePatch.DeletedNodeIds.ToHashSet();
 
-        var theirModById   = theirPatch.ModifiedNodes.ToDictionary(m => m.NodeId);
-        var theirAddedById = theirPatch.AddedNodes.ToDictionary(n => n.NodeId);
+        var theirModById   = ById(theirPatch.ModifiedNodes, m => m.NodeId);
+        var theirAddedById = ById(theirPatch.AddedNodes,    n => n.NodeId);
 
         foreach (var c in theirsConflicts)
         {
@@ -92,6 +95,16 @@ public static class MergeBuilder
             DeletedNodeIds = deleted.ToList(),
             ModifiedNodes  = modifiedById.Values.ToList(),
         };
+    }
+
+    // Index by id with last-wins semantics — tolerant of a malformed reconstruction
+    // that yields duplicate NodeIds (a plain ToDictionary would throw).
+    private static Dictionary<int, T> ById<T>(IEnumerable<T> items, Func<T, int> key)
+    {
+        var map = new Dictionary<int, T>();
+        foreach (var item in items)
+            map[key(item)] = item;
+        return map;
     }
 
     // Returns a copy of `mineMod` with the named field taken from `theirMod`.
