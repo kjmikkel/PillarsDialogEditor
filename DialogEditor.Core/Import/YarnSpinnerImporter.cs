@@ -1,3 +1,4 @@
+using System.Text;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 
@@ -332,7 +333,7 @@ public class YarnSpinnerImporter : IDialogImporter
     // "Yes I can <<if $x>>" → "Yes I can"
     private static string StripInlineConstructs(string text)
     {
-        var sb = new System.Text.StringBuilder();
+        var sb = new StringBuilder();
         int i = 0;
         while (i < text.Length)
         {
