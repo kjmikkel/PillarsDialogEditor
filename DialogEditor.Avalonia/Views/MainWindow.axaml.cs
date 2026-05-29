@@ -56,6 +56,12 @@ public partial class MainWindow : Window
             var dialog = new ImportWarningsDialog(warnings);
             await dialog.ShowDialog(this);
         };
+        vm.ShowGitConflictResolution = async resolutionVm =>
+        {
+            var dialog = new GitConflictResolutionWindow(resolutionVm);
+            await dialog.ShowDialog(this);
+            return resolutionVm.Result;   // null if the user cancelled
+        };
         vm.RequestLanguageCode = async (title, defaultValue) =>
         {
             var dialog = new LanguageCodeDialog(defaultValue);

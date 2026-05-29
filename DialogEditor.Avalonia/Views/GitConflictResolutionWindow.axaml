@@ -1,0 +1,92 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DialogEditor.Avalonia.Views.GitConflictResolutionWindow"
+        Title="{StaticResource GitConflictWindow_Title}"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="780" Height="500"
+        WindowStartupLocation="CenterOwner"
+        Background="#252525">
+
+    <Grid Margin="16" RowDefinitions="Auto,*,Auto" ColumnDefinitions="260,*">
+
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
+                   Text="{StaticResource GitConflictWindow_Intro}"
+                   Foreground="#e8e8e8" FontSize="13"
+                   TextWrapping="Wrap" Margin="0,0,0,14"/>
+
+        <!-- Conflict list -->
+        <DockPanel Grid.Row="1" Grid.Column="0" Margin="0,0,12,0">
+            <TextBlock DockPanel.Dock="Top"
+                       Text="{StaticResource GitConflictWindow_ListHeader}"
+                       Foreground="#888" FontSize="11" Margin="0,0,0,4"/>
+            <ListBox x:Name="ConflictList"
+                     ItemsSource="{Binding Conflicts}"
+                     SelectedItem="{Binding Selected, Mode=TwoWay}"
+                     Background="#1a1a1a" BorderThickness="0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Margin="0,2">
+                            <TextBlock Text="{Binding Title}"
+                                       Foreground="#e8e8e8" FontSize="12" TextWrapping="Wrap"/>
+                            <TextBlock Text="{StaticResource GitConflictWindow_Unresolved}"
+                                       Foreground="#c08a2a" FontSize="10"
+                                       IsVisible="{Binding IsUnresolved}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+
+        <!-- Detail: side-by-side mine vs theirs for the selected conflict -->
+        <ScrollViewer Grid.Row="1" Grid.Column="1" DataContext="{Binding Selected}">
+            <Grid ColumnDefinitions="*,*" RowDefinitions="Auto">
+                <Border Grid.Column="0" Background="#1a2738" CornerRadius="4"
+                        Padding="12" Margin="0,0,6,0">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="{StaticResource GitConflictWindow_MineHeader}"
+                                   Foreground="#9cc4ff" FontSize="12" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding MineValue}"
+                                   Foreground="#e8e8e8" FontSize="12" TextWrapping="Wrap"/>
+                        <RadioButton x:Name="MineRadio" GroupName="Choice"
+                                     Content="{Binding MineLabel}"
+                                     IsChecked="{Binding IsMineChosen, Mode=TwoWay}"
+                                     ToolTip.Tip="{StaticResource GitConflictWindow_MineTooltip}"
+                                     Foreground="#e8e8e8"/>
+                    </StackPanel>
+                </Border>
+                <Border Grid.Column="1" Background="#3a1a1a" CornerRadius="4"
+                        Padding="12" Margin="6,0,0,0">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="{StaticResource GitConflictWindow_TheirsHeader}"
+                                   Foreground="#ff9c9c" FontSize="12" FontWeight="Bold"/>
+                        <TextBlock Text="{Binding TheirsValue}"
+                                   Foreground="#e8e8e8" FontSize="12" TextWrapping="Wrap"/>
+                        <RadioButton x:Name="TheirsRadio" GroupName="Choice"
+                                     Content="{Binding TheirsLabel}"
+                                     IsChecked="{Binding IsTheirsChosen, Mode=TwoWay}"
+                                     ToolTip.Tip="{StaticResource GitConflictWindow_TheirsTooltip}"
+                                     Foreground="#e8e8e8"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </ScrollViewer>
+
+        <!-- Footer -->
+        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Spacing="8" Margin="0,14,0,0">
+            <Button x:Name="CancelButton"
+                    Content="{StaticResource GitConflictWindow_Cancel}"
+                    ToolTip.Tip="{StaticResource GitConflictWindow_CancelTooltip}"
+                    Background="#333" Foreground="White" BorderThickness="0"
+                    Padding="16,6" FontSize="12"/>
+            <Button x:Name="ApplyButton"
+                    Content="{StaticResource GitConflictWindow_Apply}"
+                    Command="{Binding ApplyCommand}"
+                    ToolTip.Tip="{StaticResource GitConflictWindow_ApplyTooltip}"
+                    Background="#2d6a2d" Foreground="White" BorderThickness="0"
+                    Padding="16,6" FontSize="12"/>
+        </StackPanel>
+
+    </Grid>
+
+</Window>
