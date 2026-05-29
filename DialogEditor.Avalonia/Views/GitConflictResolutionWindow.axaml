@@ -45,8 +45,8 @@
                     <StackPanel Spacing="8">
                         <TextBlock Text="{StaticResource GitConflictWindow_MineHeader}"
                                    Foreground="#9cc4ff" FontSize="12" FontWeight="Bold"/>
-                        <TextBlock Text="{Binding MineValue}"
-                                   Foreground="#e8e8e8" FontSize="12" TextWrapping="Wrap"/>
+                        <TextBlock x:Name="MineDiffText"
+                                   FontSize="12" TextWrapping="Wrap"/>
                         <RadioButton x:Name="MineRadio" GroupName="Choice"
                                      Content="{Binding MineLabel}"
                                      IsChecked="{Binding IsMineChosen, Mode=TwoWay}"
@@ -59,8 +59,8 @@
                     <StackPanel Spacing="8">
                         <TextBlock Text="{StaticResource GitConflictWindow_TheirsHeader}"
                                    Foreground="#ff9c9c" FontSize="12" FontWeight="Bold"/>
-                        <TextBlock Text="{Binding TheirsValue}"
-                                   Foreground="#e8e8e8" FontSize="12" TextWrapping="Wrap"/>
+                        <TextBlock x:Name="TheirsDiffText"
+                                   FontSize="12" TextWrapping="Wrap"/>
                         <RadioButton x:Name="TheirsRadio" GroupName="Choice"
                                      Content="{Binding TheirsLabel}"
                                      IsChecked="{Binding IsTheirsChosen, Mode=TwoWay}"
