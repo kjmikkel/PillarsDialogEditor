@@ -11,7 +11,7 @@ namespace DialogEditor.Patch.GitConflict;
 /// rather than merely flagging fields touched by both sides.
 public static class GitMergeAnalyzer
 {
-    private const string DeletedMarker = "(deleted)";
+    private const string DeletedMarker = MergeConflict.DeletedMarker;
 
     public static List<MergeConflict> Analyze(DialogProject mine, DialogProject theirs)
     {

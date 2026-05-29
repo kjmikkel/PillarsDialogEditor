@@ -598,6 +598,17 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- {0} = project name -->
     <sys:String x:Key="Status_ProjectGitConflictResolved">Resolved git conflicts in '{0}'. Review and save to write the merged project to disk.</sys:String>
     <sys:String x:Key="Status_ProjectGitConflictCancelled">Conflict resolution cancelled — project not opened.</sys:String>
+    <!-- Git conflict resolution row titles. {0} = conversation, {1} = node id, {2} = field / kind -->
+    <sys:String x:Key="GitConflict_RowTitleField">{0} · node {1} · {2}</sys:String>
+    <sys:String x:Key="GitConflict_RowTitleNode">{0} · node {1} · {2}</sys:String>
+    <sys:String x:Key="GitConflict_KindDeleteVsEdit">deletion vs edit</sys:String>
+    <sys:String x:Key="GitConflict_KindAddAdd">added on both sides</sys:String>
+    <sys:String x:Key="GitConflict_KindConversation">conversation-level change</sys:String>
+    <!-- Per-side choice labels -->
+    <sys:String x:Key="GitConflict_KeepMine">Keep mine</sys:String>
+    <sys:String x:Key="GitConflict_KeepTheirs">Keep theirs</sys:String>
+    <sys:String x:Key="GitConflict_AcceptDeletion">Accept deletion</sys:String>
+    <sys:String x:Key="GitConflict_KeepEdit">Keep the edit</sys:String>
 
     <!-- ─── Project — file picker dialogs ────────────────────────────────── -->
     <sys:String x:Key="Dialog_NewProject">Create new project</sys:String>

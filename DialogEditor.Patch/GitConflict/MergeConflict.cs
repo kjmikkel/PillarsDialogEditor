@@ -18,4 +18,9 @@ public record MergeConflict(
     int               NodeId,        // -1 when not node-scoped (ConversationLevel)
     string?           FieldName,     // set only for FieldEdit
     string            MineValue,
-    string            TheirsValue);
+    string            TheirsValue)
+{
+    /// Sentinel placed in MineValue/TheirsValue for the side that deletes a node
+    /// in a DeleteVsEdit conflict.
+    public const string DeletedMarker = "(deleted)";
+}
