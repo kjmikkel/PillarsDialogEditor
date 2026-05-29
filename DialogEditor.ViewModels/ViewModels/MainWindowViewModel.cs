@@ -9,6 +9,7 @@ using DialogEditor.Core.Import;
 using DialogEditor.Core.Layout;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
+using DialogEditor.Patch.GitConflict;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
 
@@ -55,6 +56,10 @@ public partial class MainWindowViewModel : ObservableObject
     /// Set by the UI layer to surface a patch conflict and ask whether to force-apply.
     /// Returns true if the user chooses Force Apply, false to cancel.
     public Func<PatchConflictException, Task<bool>>? RequestConflictResolution { get; set; }
+
+    /// Set by the UI layer to present git merge conflicts for resolution.
+    /// Returns the merged project to load, or null if the user cancelled.
+    public Func<GitConflictResolutionViewModel, Task<DialogProject?>>? ShowGitConflictResolution { get; set; }
 
     /// Set by the UI layer to show a language-code input dialog.
     /// Takes (title, defaultValue) and returns the entered language code, or null if cancelled.
@@ -310,23 +315,82 @@ public partial class MainWindowViewModel : ObservableObject
         LoadProject(path);
     }
 
-    private void LoadProject(string path)
+    private void LoadProject(string path) => _ = LoadProjectAsync(path);
+
+    private async Task LoadProjectAsync(string path)
     {
         try
         {
-            var loaded = DialogProjectSerializer.LoadFromFile(path);
-            SetProject(loaded);
-            _projectPath = path;
-            AppSettings.LastProjectPath = path;
-            CurrentProjectName = loaded.Name;
-            AppLog.Info($"Opened project: {path}");
-            StatusText = Loc.Format("Status_ProjectOpened", loaded.Name, loaded.Patches.Count);
+            var text = File.ReadAllText(path);
+
+            if (GitConflictMarkers.HasMarkers(text))
+            {
+                await LoadConflictedProjectAsync(path, text);
+                return;
+            }
+
+            var loaded = DialogProjectSerializer.Deserialize(text);
+            FinishLoad(loaded, path);
         }
         catch (Exception ex)
         {
             AppLog.Error($"Failed to open project '{path}'", ex);
             StatusText = Loc.Format("Status_ProjectOpenError", path, ex.Message);
         }
+    }
+
+    private async Task LoadConflictedProjectAsync(string path, string text)
+    {
+        var (mineText, theirsText) = GitConflictMarkers.SplitSides(text);
+
+        DialogProject mine, theirs;
+        try
+        {
+            mine   = DialogProjectSerializer.Deserialize(mineText);
+            theirs = DialogProjectSerializer.Deserialize(theirsText);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Warn($"Git-conflicted project '{path}' has unparseable sides: {ex.Message}");
+            StatusText = Loc.Format("Status_ProjectGitConflictUnparseable", path);
+            return;
+        }
+
+        var conflicts = GitMergeAnalyzer.Analyze(mine, theirs);
+
+        if (conflicts.Count == 0)            // markers but sides agree — just load mine
+        {
+            FinishLoad(mine, path);
+            return;
+        }
+
+        if (ShowGitConflictResolution is null)   // no resolution UI wired — guide the user
+        {
+            StatusText = Loc.Format("Status_ProjectGitConflictDetected", path, conflicts.Count);
+            return;
+        }
+
+        var vm = new GitConflictResolutionViewModel(mine, theirs, conflicts);
+        var merged = await ShowGitConflictResolution(vm);
+        if (merged is null)
+        {
+            StatusText = Loc.Get("Status_ProjectGitConflictCancelled");
+            return;
+        }
+
+        FinishLoad(merged, path);
+        IsModified = true;   // open in memory; user Saves to write back to `path`
+        StatusText = Loc.Format("Status_ProjectGitConflictResolved", merged.Name);
+    }
+
+    private void FinishLoad(DialogProject loaded, string path)
+    {
+        SetProject(loaded);
+        _projectPath = path;
+        AppSettings.LastProjectPath = path;
+        CurrentProjectName = loaded.Name;
+        AppLog.Info($"Opened project: {path}");
+        StatusText = Loc.Format("Status_ProjectOpened", loaded.Name, loaded.Patches.Count);
     }
 
     // ── New conversation ──────────────────────────────────────────────────
