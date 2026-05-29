@@ -442,4 +442,36 @@ public class YarnSpinnerImporterTests : IDisposable
 
         Assert.Empty(result.Warnings);
     }
+
+    [Fact]
+    public void Import_ChoiceWithInlineConstruct_StripsFromText()
+    {
+        var path = WriteTempYarn("""
+            title: Start
+            ---
+            Npc: Choose.
+            -> Yes I can <<if $x>>
+            ===
+            """);
+
+        var result = Importer.Import(path);
+
+        var choice = result.Nodes.Single(n => n.IsPlayerChoice);
+        Assert.Equal("Yes I can", choice.DefaultText);
+    }
+
+    [Fact]
+    public void Import_DialogueWithInlineConstruct_StripsFromText()
+    {
+        var path = WriteTempYarn("""
+            title: Start
+            ---
+            Npc: Come in. <<fade_in>>
+            ===
+            """);
+
+        var result = Importer.Import(path);
+
+        Assert.Equal("Come in.", result.Nodes[0].DefaultText);
+    }
 }

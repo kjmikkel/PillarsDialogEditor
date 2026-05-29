@@ -156,6 +156,7 @@ public class YarnSpinnerImporter : IDialogImporter
                     jumpTarget = choiceText[(jumpStart + 2)..^2].Trim();
                     choiceText = choiceText[..jumpStart].Trim();
                 }
+                choiceText = StripInlineConstructs(choiceText);
                 contentLines.Add((true, choiceText, jumpTarget));
             }
             else
@@ -168,6 +169,7 @@ public class YarnSpinnerImporter : IDialogImporter
                 else
                     dialogText = raw;
 
+                dialogText = StripInlineConstructs(dialogText);
                 contentLines.Add((false, dialogText, null));
             }
         }
@@ -314,6 +316,39 @@ public class YarnSpinnerImporter : IDialogImporter
             i++;
         }
         return line[start..i];
+    }
+
+    // Remove all <<...>> spans from text, returning the trimmed result.
+    // "Yes I can <<if $x>>" → "Yes I can"
+    private static string StripInlineConstructs(string text)
+    {
+        var sb = new System.Text.StringBuilder();
+        int i = 0;
+        while (i < text.Length)
+        {
+            int open = text.IndexOf("<<", i, StringComparison.Ordinal);
+            if (open < 0) { sb.Append(text, i, text.Length - i); break; }
+            sb.Append(text, i, open - i);
+            int close = text.IndexOf(">>", open + 2, StringComparison.Ordinal);
+            i = close < 0 ? text.Length : close + 2;
+        }
+        return sb.ToString().Trim();
+    }
+
+    // Scan text for all <<keyword>> patterns and add their counts to `counts`.
+    private static void ScanEmbeddedConstructs(string text, Dictionary<string, int> counts)
+    {
+        int i = 0;
+        while (i < text.Length)
+        {
+            int open = text.IndexOf("<<", i, StringComparison.Ordinal);
+            if (open < 0) break;
+            var keyword = ExtractKeyword(text[open..]);
+            if (keyword.Length > 0)
+                counts[keyword] = counts.GetValueOrDefault(keyword) + 1;
+            int close = text.IndexOf(">>", open + 2, StringComparison.Ordinal);
+            i = close < 0 ? text.Length : close + 2;
+        }
     }
 
     // ── Link resolution ───────────────────────────────────────────────────
