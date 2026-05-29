@@ -330,12 +330,13 @@ public class YarnSpinnerImporter : IDialogImporter
             if (open < 0) { sb.Append(text, i, text.Length - i); break; }
             sb.Append(text, i, open - i);
             int close = text.IndexOf(">>", open + 2, StringComparison.Ordinal);
-            i = close < 0 ? text.Length : close + 2;
+            i = close < 0 ? text.Length : close + 2; // unclosed << — drop tail; malformed input
         }
         return sb.ToString().Trim();
     }
 
     // Scan text for all <<keyword>> patterns and add their counts to `counts`.
+    // Called by TallySkippedConstructs to cover inline constructs on choice/dialogue lines.
     private static void ScanEmbeddedConstructs(string text, Dictionary<string, int> counts)
     {
         int i = 0;
