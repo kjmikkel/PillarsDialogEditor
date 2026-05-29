@@ -290,14 +290,24 @@ public class YarnSpinnerImporter : IDialogImporter
         {
             foreach (var raw in block.BodyLines)
             {
-                if (!raw.StartsWith("<<", StringComparison.Ordinal))
-                    continue;
-
-                var keyword = ExtractKeyword(raw);
-                if (keyword.Length == 0)
-                    continue;
-
-                counts[keyword] = counts.GetValueOrDefault(keyword) + 1;
+                if (raw.StartsWith("<<", StringComparison.Ordinal))
+                {
+                    // Standalone command line — existing behaviour
+                    var keyword = ExtractKeyword(raw);
+                    if (keyword.Length > 0)
+                        counts[keyword] = counts.GetValueOrDefault(keyword) + 1;
+                }
+                else if (raw.StartsWith("->", StringComparison.Ordinal))
+                {
+                    // Choice line — scan for inline <<...>> after the "->"
+                    ScanEmbeddedConstructs(raw[2..], counts);
+                }
+                else if (!raw.StartsWith("//", StringComparison.Ordinal)
+                         && !string.IsNullOrWhiteSpace(raw))
+                {
+                    // Dialogue line — scan the whole line for inline <<...>>
+                    ScanEmbeddedConstructs(raw, counts);
+                }
             }
         }
 

@@ -14,9 +14,6 @@ Significant coverage has been added: both `IGameDataProvider` implementations, `
 ### Version Control Integration
 No built-in diff viewing or merge conflict resolution UI for Git. Collaborating on the same conversation across branches is a manual process.
 
-### Yarn Spinner Import — Inline Conditional Choices
-Line-level Yarn constructs (`<<if>>`, `<<set>>`, `<<command>>`) are now skipped *with a warning* on import. But a conditional written inline on a choice — `-> Choice text <<if $x>>` — is parsed as a plain choice and the trailing `<<if>>` is dropped silently, because the skipped-construct tally only matches lines that *start* with `<<`. This is the same silent-drop failure mode the warning feature addresses, just at a position the tally doesn't reach. Closing it means extending the importer to detect and strip trailing inline constructs from `->` lines and fold them into the warning tally.
-
 ### Barks System — Bark Preview
 Bark nodes now render with an amber color scheme on the canvas, carry bark-specific validation warnings (text too long, player-choice child), and those warnings surface in Flow Analytics. The remaining gap is an in-context preview of overhead floating text: writers cannot see how a bark will actually appear above an NPC's head without running the game. Implementing this requires investigating the game's bark rendering (font, line-wrapping, maximum visible width) before UI work can be designed.
 
