@@ -58,6 +58,26 @@ public class GitConflictMarkersTests
     }
 
     [Fact]
+    public void SplitSides_IndentedMarkerLikeContent_IsNotTreatedAsSeparator()
+    {
+        // A JSON string value that literally contains "=======" is always indented
+        // in the serializer's output, so it must not be mistaken for a separator.
+        var conflicted =
+            "{\n" +
+            "<<<<<<< HEAD\n" +
+            "  \"Text\": \"mine\",\n" +
+            "=======\n" +
+            "  \"Text\": \"======= not a real marker\",\n" +
+            ">>>>>>> feature\n" +
+            "}\n";
+
+        var (mine, theirs) = GitConflictMarkers.SplitSides(conflicted);
+
+        Assert.Contains("======= not a real marker", theirs);
+        Assert.DoesNotContain("======= not a real marker", mine);
+    }
+
+    [Fact]
     public void SplitSides_MultipleHunksAllResolved()
     {
         var two =

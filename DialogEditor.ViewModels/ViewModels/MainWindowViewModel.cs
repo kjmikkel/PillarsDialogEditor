@@ -344,10 +344,12 @@ public partial class MainWindowViewModel : ObservableObject
         var (mineText, theirsText) = GitConflictMarkers.SplitSides(text);
 
         DialogProject mine, theirs;
+        List<MergeConflict> conflicts;
         try
         {
-            mine   = DialogProjectSerializer.Deserialize(mineText);
-            theirs = DialogProjectSerializer.Deserialize(theirsText);
+            mine      = DialogProjectSerializer.Deserialize(mineText);
+            theirs    = DialogProjectSerializer.Deserialize(theirsText);
+            conflicts = GitMergeAnalyzer.Analyze(mine, theirs);
         }
         catch (Exception ex)
         {
@@ -355,8 +357,6 @@ public partial class MainWindowViewModel : ObservableObject
             StatusText = Loc.Format("Status_ProjectGitConflictUnparseable", path);
             return;
         }
-
-        var conflicts = GitMergeAnalyzer.Analyze(mine, theirs);
 
         if (conflicts.Count == 0)            // markers but sides agree — just load mine
         {
@@ -380,6 +380,8 @@ public partial class MainWindowViewModel : ObservableObject
 
         FinishLoad(merged, path);
         IsModified = true;   // open in memory; user Saves to write back to `path`
+        SaveCommand.NotifyCanExecuteChanged();
+        SaveProjectCommand.NotifyCanExecuteChanged();
         StatusText = Loc.Format("Status_ProjectGitConflictResolved", merged.Name);
     }
 
@@ -604,14 +606,20 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanSaveProject))]
     private void SaveProject()
     {
-        if (_project is null || _projectPath is null || _currentFile is null || Canvas.BaseSnapshot is null) return;
+        if (_project is null || _projectPath is null) return;
         try
         {
-            var patch    = DiffEngine.Diff(_currentFile.Name, Canvas.BaseSnapshot, Canvas.BuildSnapshot(), _provider!.Language);
-            patch = patch with { NodeComments = Canvas.NodeComments };
-            var layout   = Canvas.GetCurrentLayout();
-            SetProject(_project!.WithPatch(patch).WithLayout(_currentFile.Name, layout));
-            DialogProjectSerializer.SaveToFile(_projectPath, _project);
+            // With a conversation open, fold the canvas edits into its patch first.
+            // With no conversation open (e.g. a freshly conflict-merged project), the
+            // in-memory _project is already complete — just serialize it.
+            if (_currentFile is not null && Canvas.BaseSnapshot is not null)
+            {
+                var patch  = DiffEngine.Diff(_currentFile.Name, Canvas.BaseSnapshot, Canvas.BuildSnapshot(), _provider!.Language);
+                patch = patch with { NodeComments = Canvas.NodeComments };
+                var layout = Canvas.GetCurrentLayout();
+                SetProject(_project!.WithPatch(patch).WithLayout(_currentFile.Name, layout));
+            }
+            DialogProjectSerializer.SaveToFile(_projectPath, _project!);
             Canvas.IsModified = false;
             IsModified = false;
             SaveCommand.NotifyCanExecuteChanged();
@@ -628,8 +636,7 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     private bool CanSaveProject() =>
-        _project is not null && _projectPath is not null &&
-        _currentFile is not null && IsModified;
+        _project is not null && _projectPath is not null && IsModified;
 
     // ── Merge projects ────────────────────────────────────────────────────
     [RelayCommand(CanExecute = nameof(CanMergeProjects))]

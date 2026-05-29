@@ -124,7 +124,7 @@ public partial class GitConflictResolutionViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(AllResolved))]
     private void Apply()
     {
-        var choices = Conflicts.ToDictionary(r => r.Conflict, r => r.Choice!.Value);
+        var choices = Conflicts.Select(r => (r.Conflict, r.Choice!.Value)).ToList();
         Result = MergeBuilder.Build(_mine, _theirs, choices);
         RequestClose?.Invoke();
     }

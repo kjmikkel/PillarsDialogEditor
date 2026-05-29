@@ -64,7 +64,12 @@ public static class GitMergeAnalyzer
                     DescribeTouched(mine, nodeId), DeletedMarker));
 
         // ── Add/add ──────────────────────────────────────────────────────
-        var theirAdded = theirs.AddedNodes.ToDictionary(n => n.NodeId);
+        // Last-wins index — tolerant of a malformed reconstruction with
+        // duplicate NodeIds (a plain ToDictionary would throw).
+        var theirAdded = new Dictionary<int, Core.Editing.NodeEditSnapshot>();
+        foreach (var node in theirs.AddedNodes)
+            theirAdded[node.NodeId] = node;
+
         foreach (var mineNode in mine.AddedNodes)
         {
             if (!theirAdded.TryGetValue(mineNode.NodeId, out var theirNode))
@@ -106,13 +111,20 @@ public static class GitMergeAnalyzer
     }
 
     // A short display string for the side that kept the node (vs the deleting side).
+    // Field names rather than raw JSON — readable in the resolution dialog.
     private static string DescribeTouched(ConversationPatch patch, int nodeId)
     {
-        var added = patch.AddedNodes.FirstOrDefault(n => n.NodeId == nodeId);
-        if (added is not null) return JsonSerializer.Serialize(added);
+        if (patch.AddedNodes.Any(n => n.NodeId == nodeId))
+            return "(added)";
 
         var mod = patch.ModifiedNodes.FirstOrDefault(m => m.NodeId == nodeId);
-        if (mod is not null) return JsonSerializer.Serialize(mod.FieldChanges);
+        if (mod is not null)
+        {
+            var fields = mod.FieldChanges.Keys.ToList();
+            if (mod.UpdatedConditions is not null) fields.Add("Conditions");
+            if (mod.UpdatedScripts is not null)    fields.Add("Scripts");
+            return fields.Count > 0 ? string.Join(", ", fields) : "(modified)";
+        }
 
         return "(modified)";
     }
