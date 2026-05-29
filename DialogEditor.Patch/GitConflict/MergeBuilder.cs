@@ -8,7 +8,7 @@ namespace DialogEditor.Patch.GitConflict;
 /// side are carried through unchanged.
 public static class MergeBuilder
 {
-    private const string DeletedMarker = "(deleted)";
+    private const string DeletedMarker = MergeConflict.DeletedMarker;
 
     public static DialogProject Build(
         DialogProject mine,
