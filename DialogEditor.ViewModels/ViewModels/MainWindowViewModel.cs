@@ -31,6 +31,10 @@ public partial class MainWindowViewModel : ObservableObject
     private DialogProject? _project;
     private string?        _projectPath;
 
+    // Set when a conflicted project is detected on startup but resolution is deferred
+    // behind a "Resolve…" action rather than shown immediately.
+    private string? _pendingConflictPath;
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(WindowTitle))]
     private string? _currentProjectName;
@@ -262,7 +266,30 @@ public partial class MainWindowViewModel : ObservableObject
     {
         var lastProject = AppSettings.LastProjectPath;
         if (!string.IsNullOrEmpty(lastProject) && File.Exists(lastProject))
-            LoadProject(lastProject);
+            _ = LoadProjectAsync(lastProject, offerDeferred: true);
+    }
+
+    // ── Deferred git conflict resolution (startup) ────────────────────────
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(ResolveConflictsCommand))]
+    private bool _hasPendingConflictResolution;
+
+    [RelayCommand(CanExecute = nameof(HasPendingConflictResolution))]
+    private async Task ResolveConflicts()
+    {
+        var path = _pendingConflictPath;
+        if (path is null || !File.Exists(path))
+        {
+            ClearPendingConflict();
+            return;
+        }
+        await LoadProjectAsync(path, offerDeferred: false);
+    }
+
+    private void ClearPendingConflict()
+    {
+        _pendingConflictPath         = null;
+        HasPendingConflictResolution = false;
     }
 
     partial void OnSelectedLanguageChanged(string value)
@@ -324,9 +351,12 @@ public partial class MainWindowViewModel : ObservableObject
         LoadProject(path);
     }
 
-    private void LoadProject(string path) => _ = LoadProjectAsync(path);
+    // Explicit opens (File > Open) resolve conflicts immediately; startup re-open
+    // defers to a "Resolve…" prompt (offerDeferred: true) so we don't slam a modal
+    // over a freshly shown window.
+    private void LoadProject(string path) => _ = LoadProjectAsync(path, offerDeferred: false);
 
-    private async Task LoadProjectAsync(string path)
+    private async Task LoadProjectAsync(string path, bool offerDeferred)
     {
         try
         {
@@ -334,12 +364,13 @@ public partial class MainWindowViewModel : ObservableObject
 
             if (GitConflictMarkers.HasMarkers(text))
             {
-                await LoadConflictedProjectAsync(path, text);
+                await LoadConflictedProjectAsync(path, text, offerDeferred);
                 return;
             }
 
             var loaded = DialogProjectSerializer.Deserialize(text);
             FinishLoad(loaded, path);
+            ClearPendingConflict();
         }
         catch (Exception ex)
         {
@@ -348,7 +379,7 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    private async Task LoadConflictedProjectAsync(string path, string text)
+    private async Task LoadConflictedProjectAsync(string path, string text, bool offerDeferred)
     {
         var (mineText, theirsText) = GitConflictMarkers.SplitSides(text);
 
@@ -370,6 +401,7 @@ public partial class MainWindowViewModel : ObservableObject
         if (conflicts.Count == 0)            // markers but sides agree — just load mine
         {
             FinishLoad(mine, path);
+            ClearPendingConflict();
             return;
         }
 
@@ -379,16 +411,26 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
+        if (offerDeferred)   // startup: don't auto-show the modal — offer a Resolve… action
+        {
+            _pendingConflictPath        = path;
+            HasPendingConflictResolution = true;
+            StatusText = Loc.Format("Status_ProjectGitConflictPending", path, conflicts.Count);
+            return;
+        }
+
         var vm = new GitConflictResolutionViewModel(mine, theirs, conflicts);
         var merged = await ShowGitConflictResolution(vm);
         if (merged is null)
         {
+            // Leave any pending prompt intact so the user can retry.
             StatusText = Loc.Get("Status_ProjectGitConflictCancelled");
             return;
         }
 
         FinishLoad(merged, path);
         IsModified = true;   // open in memory; user Saves to write back to `path`
+        ClearPendingConflict();
         SaveCommand.NotifyCanExecuteChanged();
         SaveProjectCommand.NotifyCanExecuteChanged();
         StatusText = Loc.Format("Status_ProjectGitConflictResolved", merged.Name);
