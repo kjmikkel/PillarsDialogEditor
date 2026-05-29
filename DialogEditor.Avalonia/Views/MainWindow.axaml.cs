@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
@@ -25,6 +26,9 @@ public partial class MainWindow : Window
     // Set to true immediately before a programmatic Close() call so that
     // the re-entrant OnClosing doesn't show the dirty-close dialog again.
     private bool _closingConfirmed = false;
+
+    // Guards the one-time startup project re-open in OnOpened.
+    private bool _startupDone = false;
 
     private ColumnDefinition BrowserColumn => ContentGrid.ColumnDefinitions[0];
     private ColumnDefinition DetailColumn  => ContentGrid.ColumnDefinitions[4];
@@ -353,6 +357,18 @@ public partial class MainWindow : Window
                 AppSettings.SetLegendPosition(_legendWindow.Position.X, _legendWindow.Position.Y);
         };
         return _legendWindow;
+    }
+
+    // ── Startup project re-open ───────────────────────────────────────────
+    // Deferred to here (rather than the VM constructor) so the window is shown
+    // and all callbacks — including ShowGitConflictResolution — are wired before
+    // a conflicted last-project tries to open its resolution dialog.
+    protected override void OnOpened(EventArgs e)
+    {
+        base.OnOpened(e);
+        if (_startupDone) return;
+        _startupDone = true;
+        ((MainWindowViewModel)DataContext!).ReopenLastProjectOnStartup();
     }
 
     // ── App-close guard ───────────────────────────────────────────────────
