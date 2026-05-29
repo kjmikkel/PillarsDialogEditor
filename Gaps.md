@@ -12,7 +12,7 @@ Significant coverage has been added: both `IGameDataProvider` implementations, `
 ## Feature Gaps
 
 ### Version Control Integration
-No built-in diff viewing or merge conflict resolution UI for Git. Collaborating on the same conversation across branches is a manual process.
+Git **merge-conflict resolution** for `.dialogproject` files is now implemented: opening a conflicted file reconstructs the mine/theirs sides, presents a dedicated resolution window (field-level merge for same-node edits, binary keep-mine/keep-theirs for structural conflicts, word-level inline highlighting of text changes), and loads the merged result as an unsaved project. Remaining gaps: **diff viewing** between arbitrary commits/branches (showing what changed in a conversation, rendered in the canvas rather than raw JSON) and **branch/history navigation** (browsing git log, switching branches, attribution).
 
 ### Barks System — Bark Preview
 Bark nodes now render with an amber color scheme on the canvas, carry bark-specific validation warnings (text too long, player-choice child), and those warnings surface in Flow Analytics. The remaining gap is an in-context preview of overhead floating text: writers cannot see how a bark will actually appear above an NPC's head without running the game. Implementing this requires investigating the game's bark rendering (font, line-wrapping, maximum visible width) before UI work can be designed.

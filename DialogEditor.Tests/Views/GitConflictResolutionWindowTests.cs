@@ -49,6 +49,18 @@ public class GitConflictResolutionWindowTests
     }
 
     [AvaloniaFact]
+    public void SelectedFieldEditConflict_BuildsHighlightedInlines()
+    {
+        var vm     = MakeVm();
+        var window = new GitConflictResolutionWindow(vm);
+        window.Show();
+
+        var mineText = window.FindControl<TextBlock>("MineDiffText")!;
+        Assert.NotNull(mineText.Inlines);
+        Assert.True(mineText.Inlines!.Count > 0);
+    }
+
+    [AvaloniaFact]
     public void ResolveAndApply_ProducesMergedResult()
     {
         var vm     = MakeVm();
