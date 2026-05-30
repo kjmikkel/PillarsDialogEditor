@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using DialogEditor.Avalonia.Views;
+using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
 using DialogEditor.Patch.GitConflict;
@@ -104,6 +105,35 @@ public class GitConflictResolutionWindowTests
         Assert.NotNull(vm.Result);
         var t = vm.Result!.Patches["greeting"].Translations["en"].Single(x => x.NodeId == 4);
         Assert.Equal("Hello traveler", t.DefaultText);
+    }
+
+    private static GitConflictResolutionViewModel MakeConversationLevelVm()
+    {
+        static NodeEditSnapshot Node(int id) =>
+            new(id, false, SpeakerCategory.Npc, "", "", "", "", "Conversation", "None", "", "", "", false, false, [], [], []);
+        static DialogProject P(params NodeEditSnapshot[] nodes) =>
+            DialogProject.Empty("p").WithPatch(
+                new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, nodes, [], []));
+
+        var mine   = P(Node(5));
+        var theirs = P(Node(5), Node(9));
+        return new GitConflictResolutionViewModel(mine, theirs, GitMergeAnalyzer.Analyze(mine, theirs));
+    }
+
+    [AvaloniaFact]
+    public void ConversationLevelConflict_ResolvesToTheirsWholePatch()
+    {
+        var vm     = MakeConversationLevelVm();
+        var window = new GitConflictResolutionWindow(vm);
+        window.Show();
+
+        Assert.Equal(MergeConflictKind.ConversationLevel, vm.Conflicts[0].Conflict.Kind);
+
+        vm.Conflicts[0].Choice = MergeSide.Theirs;
+        window.FindControl<Button>("ApplyButton")!.Command!.Execute(null);
+
+        Assert.NotNull(vm.Result);
+        Assert.Contains(vm.Result!.Patches["greeting"].AddedNodes, n => n.NodeId == 9);
     }
 
     [AvaloniaFact]

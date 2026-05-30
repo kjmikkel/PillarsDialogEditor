@@ -59,6 +59,8 @@ public partial class ConflictRowViewModel : ObservableObject
                 Loc.Format("GitConflict_RowTitleField", conflict.ConversationName, conflict.NodeId, conflict.FieldName ?? ""),
             MergeConflictKind.TranslationEdit =>
                 Loc.Format("GitConflict_RowTitleTranslation", conflict.ConversationName, conflict.NodeId, conflict.FieldName ?? ""),
+            MergeConflictKind.ConversationLevel =>
+                Loc.Format("GitConflict_RowTitleConversation", conflict.ConversationName),
             _ =>
                 Loc.Format("GitConflict_RowTitleNode", conflict.ConversationName, conflict.NodeId, DescribeKind(conflict)),
         };

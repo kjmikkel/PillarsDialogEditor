@@ -12,14 +12,12 @@ Significant coverage has been added: both `IGameDataProvider` implementations, `
 ## Feature Gaps
 
 ### Version Control Integration
-Git **merge-conflict resolution** for `.dialogproject` files is now implemented: opening a conflicted file reconstructs the mine/theirs sides, presents a dedicated resolution window (field-level merge for same-node edits, **per-language text/translation conflicts**, binary keep-mine/keep-theirs for structural conflicts, word-level inline highlighting of text changes), and loads the merged result as an unsaved project. Canvas **layout positions** and the **new-conversation list** are auto-merged (layouts union per node with theirs winning on overlap; new-conversation lists are unioned).
+Git **merge-conflict resolution** for `.dialogproject` files is now implemented: opening a conflicted file reconstructs the mine/theirs sides, presents a dedicated resolution window (field-level merge for same-node edits, **per-language text/translation conflicts**, binary keep-mine/keep-theirs for structural conflicts, **a whole-conversation fallback when a conversation diverges beyond per-node merge**, word-level inline highlighting of text changes), and loads the merged result as an unsaved project. Canvas **layout positions** and the **new-conversation list** are auto-merged (layouts union per node with theirs winning on overlap; new-conversation lists are unioned).
 
-Remaining gaps, in two groups:
+Conflict-resolution coverage is essentially complete. Minor known limitations:
 
-**Conflict-resolution coverage** (`GitMergeAnalyzer` / `MergeBuilder` in `DialogEditor.Patch/GitConflict/`):
-
-- **`ConversationLevel` conflicts are never produced.** `MergeBuilder` handles the `ConversationLevel` kind defensively, but `GitMergeAnalyzer` does not yet emit it; any divergence not reducible to field-edit / translation-edit / delete-vs-edit / add-add is currently not represented as its own conflict.
-- **Minor:** a translation conflict where only `FemaleText` differs (same `DefaultText`) is detected and resolvable, but the resolution dialog shows the `FemaleText` rather than labelling it as the female-variant — a cosmetic display limitation.
+- A translation conflict where only `FemaleText` differs (same `DefaultText`) is detected and resolvable, but the resolution dialog shows the `FemaleText` rather than labelling it as the female-variant — a cosmetic display limitation.
+- The whole-conversation (`ConversationLevel`) fallback is deliberately eager: any theirs-side content the per-node merge can't preserve (e.g. a translation in a language only theirs has) collapses that conversation to a single keep-mine/keep-theirs choice, trading per-node granularity for guaranteed no-silent-loss.
 
 **Broader VCS features** (not started): **diff viewing** between arbitrary commits/branches (showing what changed in a conversation, rendered in the canvas rather than raw JSON) and **branch/history navigation** (browsing git log, switching branches, attribution).
 

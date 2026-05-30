@@ -1,3 +1,4 @@
+using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
 using DialogEditor.Patch.GitConflict;
@@ -7,6 +8,13 @@ namespace DialogEditor.Tests.Patch.GitConflict;
 
 public class MergeBuilderTests
 {
+    private static NodeEditSnapshot Node(int id) =>
+        new(id, false, SpeakerCategory.Npc, "", "", "", "", "Conversation", "None", "", "", "", false, false, [], [], []);
+
+    private static DialogProject ProjectWithAddedNodes(params NodeEditSnapshot[] nodes)
+        => DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, nodes, [], []));
+
     private static DialogProject ProjectWithFieldChange(int nodeId, string field, string to)
     {
         var mod = new NodeModification(
@@ -114,6 +122,31 @@ public class MergeBuilderTests
 
         var t = merged.Patches["greeting"].Translations["en"].Single(x => x.NodeId == 4);
         Assert.Equal("Hello friend", t.DefaultText);
+    }
+
+    [Fact]
+    public void ConversationLevelResolvedToTheirs_ReplacesWholePatch()
+    {
+        var mine   = ProjectWithAddedNodes(Node(5));
+        var theirs = ProjectWithAddedNodes(Node(5), Node(9));
+        var conflict = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
+        Assert.Equal(MergeConflictKind.ConversationLevel, conflict.Kind);
+
+        var merged = MergeBuilder.Build(mine, theirs, [(conflict, MergeSide.Theirs)]);
+
+        Assert.Contains(merged.Patches["greeting"].AddedNodes, n => n.NodeId == 9);
+    }
+
+    [Fact]
+    public void ConversationLevelResolvedToMine_KeepsMinePatch()
+    {
+        var mine   = ProjectWithAddedNodes(Node(5));
+        var theirs = ProjectWithAddedNodes(Node(5), Node(9));
+        var conflict = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
+
+        var merged = MergeBuilder.Build(mine, theirs, [(conflict, MergeSide.Mine)]);
+
+        Assert.DoesNotContain(merged.Patches["greeting"].AddedNodes, n => n.NodeId == 9);
     }
 
     [Fact]

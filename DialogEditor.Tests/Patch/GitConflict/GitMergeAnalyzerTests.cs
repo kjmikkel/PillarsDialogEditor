@@ -143,11 +143,56 @@ public class GitMergeAnalyzerTests
     }
 
     [Fact]
-    public void TranslationLanguageOnlyOnOneSide_IsNotConflict()
+    public void TheirsOnlyLanguage_IsConversationLevel()
     {
+        // theirs adds a French line mine lacks — the per-node merge can't preserve it,
+        // so it surfaces as a whole-conversation choice rather than being dropped.
         var mine   = ProjectWithTranslation(4, "en", "Hello");
         var theirs = ProjectWithTranslation(4, "fr", "Bonjour");
-        Assert.Empty(GitMergeAnalyzer.Analyze(mine, theirs));
+
+        var c = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
+        Assert.Equal(MergeConflictKind.ConversationLevel, c.Kind);
+        Assert.Equal(-1, c.NodeId);
+        Assert.Equal("greeting", c.ConversationName);
+    }
+
+    [Fact]
+    public void TheirsOnlyAddedNode_IsConversationLevel()
+    {
+        var mine   = ProjectWithAddedNode(Node(5));
+        var theirs = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [Node(5), Node(9)], [], []));
+
+        var c = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
+        Assert.Equal(MergeConflictKind.ConversationLevel, c.Kind);
+    }
+
+    [Fact]
+    public void TheirsOnlyDeletion_IsConversationLevel()
+    {
+        var mine   = ProjectWithFieldChange(7, "DisplayType", "X");  // mine touches node 7
+        var theirs = ProjectWithDeletion(4);                         // theirs deletes node 4
+
+        var c = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
+        Assert.Equal(MergeConflictKind.ConversationLevel, c.Kind);
+    }
+
+    [Fact]
+    public void UncoveredTheirsContent_SuppressesGranularConflicts()
+    {
+        var mineMod  = new NodeModification(4,
+            new Dictionary<string, FieldChange> { ["DisplayType"] = new FieldChange("o", "A") }, [], []);
+        var theirMod = new NodeModification(4,
+            new Dictionary<string, FieldChange> { ["DisplayType"] = new FieldChange("o", "B") }, [], []);
+        var mine   = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [], [], [mineMod]));
+        var theirs = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [Node(9)], [], [theirMod]));
+
+        // A node-4 field edit AND a theirs-only added node 9 → single whole-conversation
+        // conflict, not the granular FieldEdit.
+        var c = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
+        Assert.Equal(MergeConflictKind.ConversationLevel, c.Kind);
     }
 
     [Fact]
