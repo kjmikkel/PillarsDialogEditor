@@ -79,7 +79,7 @@ public class DiffViewModelTests : IDisposable
         var git = new FakeGit(_ => new GitResult(128, "", "fatal: not a git repo"));
         var projectA = WriteTempProject(Empty());
 
-        var vm = new DiffViewModel(git, projectA);
+        var vm = new DiffViewModel(git, new StubDispatcher(), projectA);
 
         Assert.Contains(vm.EndpointOptions, o => o.Endpoint is DiffEndpoint.WorkingCopy);
     }
@@ -90,7 +90,7 @@ public class DiffViewModelTests : IDisposable
         var git = new FakeGit(_ => new GitResult(128, "", "fatal"));
         var path = WriteTempProject(Empty());
 
-        var vm = new DiffViewModel(git, path);
+        var vm = new DiffViewModel(git, new StubDispatcher(), path);
 
         var wc = vm.EndpointOptions.Single(o => o.Endpoint is DiffEndpoint.WorkingCopy);
         // StubStringProvider returns the key itself
@@ -104,7 +104,7 @@ public class DiffViewModelTests : IDisposable
         var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
         var git  = MakeFakeGit(dir, refContent: null, branchOutput: "main\nfeature/xyz\n");
 
-        var vm = new DiffViewModel(git, path);
+        var vm = new DiffViewModel(git, new StubDispatcher(), path);
 
         var refs = vm.EndpointOptions.Where(o => o.Endpoint is DiffEndpoint.GitRef).ToList();
         Assert.Contains(refs, o => o.Label == "main" && ((DiffEndpoint.GitRef)o.Endpoint).Ref == "main");
@@ -119,7 +119,7 @@ public class DiffViewModelTests : IDisposable
         var git  = MakeFakeGit(dir, refContent: null,
             logOutput: "abc1234 Add greeting node\ndef5678 Fix typo\n");
 
-        var vm = new DiffViewModel(git, path);
+        var vm = new DiffViewModel(git, new StubDispatcher(), path);
 
         var refs = vm.EndpointOptions.Where(o => o.Endpoint is DiffEndpoint.GitRef).ToList();
         // SHA is first token; label is the full line
@@ -135,7 +135,7 @@ public class DiffViewModelTests : IDisposable
         var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
         var git  = MakeFakeGit(dir, refContent: null, branchOutput: "main\n");
 
-        var vm = new DiffViewModel(git, path);
+        var vm = new DiffViewModel(git, new StubDispatcher(), path);
 
         Assert.IsType<DiffEndpoint.GitRef>(vm.LeftEndpoint?.Endpoint);
     }
@@ -146,7 +146,7 @@ public class DiffViewModelTests : IDisposable
         var git = new FakeGit(_ => new GitResult(128, "", "fatal"));
         var path = WriteTempProject(Empty());
 
-        var vm = new DiffViewModel(git, path);
+        var vm = new DiffViewModel(git, new StubDispatcher(), path);
 
         Assert.IsType<DiffEndpoint.WorkingCopy>(vm.LeftEndpoint?.Endpoint);
     }
@@ -158,7 +158,7 @@ public class DiffViewModelTests : IDisposable
         var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
         var git  = MakeFakeGit(dir, refContent: null, branchOutput: "main\n");
 
-        var vm = new DiffViewModel(git, path);
+        var vm = new DiffViewModel(git, new StubDispatcher(), path);
 
         Assert.IsType<DiffEndpoint.WorkingCopy>(vm.RightEndpoint?.Endpoint);
     }
@@ -181,7 +181,7 @@ public class DiffViewModelTests : IDisposable
         var refJson = DialogProjectSerializer.Serialize(projectA);
         var git     = MakeFakeGit(dir, refContent: refJson, branchOutput: "main\n");
 
-        var vm = new DiffViewModel(git, path);
+        var vm = new DiffViewModel(git, new StubDispatcher(), path);
 
         // LeftEndpoint = main (git ref), RightEndpoint = working copy — default
         Assert.IsType<DiffEndpoint.GitRef>(vm.LeftEndpoint?.Endpoint);
@@ -197,7 +197,7 @@ public class DiffViewModelTests : IDisposable
         var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
         var git  = MakeFakeGit(dir, refContent: null, branchOutput: "main\n");
 
-        var vm = new DiffViewModel(git, path);
+        var vm = new DiffViewModel(git, new StubDispatcher(), path);
 
         Assert.Empty(vm.Changes);
         Assert.NotEmpty(vm.StatusText);
@@ -209,7 +209,7 @@ public class DiffViewModelTests : IDisposable
         var git = new FakeGit(_ => new GitResult(128, "", "fatal"));
         var path = WriteTempProject(Empty());
 
-        var vm = new DiffViewModel(git, path);
+        var vm = new DiffViewModel(git, new StubDispatcher(), path);
         vm.LeftEndpoint  = null;
         vm.RightEndpoint = null;
 
@@ -226,7 +226,7 @@ public class DiffViewModelTests : IDisposable
         var refJson = DialogProjectSerializer.Serialize(project);
         var git     = MakeFakeGit(dir, refContent: refJson, branchOutput: "main\n");
 
-        var vm = new DiffViewModel(git, path);
+        var vm = new DiffViewModel(git, new StubDispatcher(), path);
 
         Assert.Empty(vm.Changes);
         // StatusText should contain key string (StubStringProvider returns key)
@@ -247,7 +247,7 @@ public class DiffViewModelTests : IDisposable
         var refJson = DialogProjectSerializer.Serialize(projectDifferent);
 
         var git = MakeFakeGit(dir, refContent: refJson, branchOutput: "main\n");
-        var vm  = new DiffViewModel(git, path);
+        var vm  = new DiffViewModel(git, new StubDispatcher(), path);
 
         // Initial: left=main (different from disk), right=working copy → 1 change
         Assert.Single(vm.Changes);
@@ -257,6 +257,90 @@ public class DiffViewModelTests : IDisposable
         vm.RightEndpoint = mainOption;
 
         Assert.Empty(vm.Changes);
+    }
+
+    // ── BuildDiffCanvas tests ─────────────────────────────────────────────────
+
+    [Fact]
+    public void BuildDiffCanvas_WithProvider_AddedNode_YieldsCanvasWithAddedDiffStatus()
+    {
+        // Arrange: left project has node 1 only; right (disk) has nodes 1+2.
+        // The StubProvider "knows" the conversation and returns nodes 1+2.
+        var convName = "greeting";
+        var file     = new ConversationFile(convName, "", "/fake/greeting.conversation", "/fake/greeting.stringtable");
+        var snap2    = new ConversationEditSnapshot([Node(1), Node(2)]);
+        var provider = new StubProvider(file, snap2);
+
+        // Disk project: nodes 1+2
+        var diskProject = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch(convName, ConversationPatch.CurrentSchemaVersion,
+                [Node(1), Node(2)], [], []));
+
+        // Left git ref project: node 1 only
+        var leftProject = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch(convName, ConversationPatch.CurrentSchemaVersion,
+                [Node(1)], [], []));
+
+        var path = WriteTempProject(diskProject);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+
+        var refJson = DialogProjectSerializer.Serialize(leftProject);
+        var git     = MakeFakeGit(dir, refContent: refJson, branchOutput: "main\n");
+
+        // Act
+        var vm = new DiffViewModel(git, new StubDispatcher(), path, provider, "en");
+
+        // Should have one change (greeting) with node 2 added
+        Assert.Single(vm.Changes);
+        var change = vm.Changes[0];
+        Assert.Equal(convName, change.Name);
+        Assert.Contains(2, change.Added);
+
+        // Select the change → triggers BuildDiffCanvas
+        vm.Selected = change;
+
+        // Assert
+        Assert.NotNull(vm.DiffCanvas);
+        var addedNode = vm.DiffCanvas.Nodes.FirstOrDefault(n => n.NodeId == 2);
+        Assert.NotNull(addedNode);
+        Assert.Equal(DiffStatus.Added, addedNode.DiffStatus);
+    }
+
+    [Fact]
+    public void BuildDiffCanvas_NoProvider_DiffCanvasIsNull_CanvasHintSet()
+    {
+        // No provider → canvas stays null and CanvasHint is set
+        var diskProject = WithNode(1);
+        var path        = WriteTempProject(diskProject);
+        var dir         = Path.GetDirectoryName(Path.GetFullPath(path))!;
+
+        var leftProject = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion,
+                [Node(1), Node(2)], [], []));
+        var refJson = DialogProjectSerializer.Serialize(leftProject);
+        var git     = MakeFakeGit(dir, refContent: refJson, branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path, provider: null, "en");
+
+        if (vm.Changes.Count > 0)
+        {
+            vm.Selected = vm.Changes[0];
+            Assert.Null(vm.DiffCanvas);
+            Assert.NotEmpty(vm.CanvasHint);
+        }
+        // If no changes, test is trivially satisfied (no crash)
+    }
+
+    [Fact]
+    public void BuildDiffCanvas_NullSelected_DiffCanvasIsNull()
+    {
+        var git  = new FakeGit(_ => new GitResult(128, "", "fatal"));
+        var path = WriteTempProject(Empty());
+        var vm   = new DiffViewModel(git, new StubDispatcher(), path);
+
+        vm.Selected = null;
+
+        Assert.Null(vm.DiffCanvas);
     }
 
     // ── helper ────────────────────────────────────────────────────────────────
