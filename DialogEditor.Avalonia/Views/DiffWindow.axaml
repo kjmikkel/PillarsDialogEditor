@@ -75,7 +75,7 @@
                         Command="{Binding ApplyCommand}"
                         ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"/>
                 <StackPanel>
-                    <TextBlock Text="{Binding DanglingLinks.Count, StringFormat={}{0} link(s) may not lead anywhere}"
+                    <TextBlock Text="{Binding DanglingLinks.Count, StringFormat={StaticResource Diff_DanglingWarning}}"
                                Foreground="#e0a030" FontSize="10"
                                IsVisible="{Binding DanglingLinks.Count, Converter={StaticResource CountToVis}}"/>
                     <TextBlock Text="{StaticResource Diff_Hint}" Foreground="#888" FontSize="11" VerticalAlignment="Center"/>
@@ -126,7 +126,7 @@
                                                               ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"/>
                                                     <Border Width="9" Height="9" VerticalAlignment="Center"
                                                             Background="{Binding Kind, Converter={StaticResource DiffStatusToBrushConverter}}"/>
-                                                    <TextBlock Text="{Binding NodeId, StringFormat='Line {0}'}" Foreground="#ccc" FontSize="11" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding NodeId, StringFormat={StaticResource Diff_NodeLine}}" Foreground="#ccc" FontSize="11" VerticalAlignment="Center"/>
                                                 </StackPanel>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>

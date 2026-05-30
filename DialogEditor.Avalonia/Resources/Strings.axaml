@@ -528,6 +528,10 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_DiffChangedList">Conversations that differ between the selected versions — click to inspect</sys:String>
     <sys:String x:Key="Diff_BringInButton">Bring in</sys:String>
     <sys:String x:Key="Diff_Hint">Tick the changes you want to bring into your copy, then Bring in.</sys:String>
+    <!-- {0} = node ID integer -->
+    <sys:String x:Key="Diff_NodeLine">Line {0}</sys:String>
+    <!-- {0} = number of dangling links -->
+    <sys:String x:Key="Diff_DanglingWarning">{0} link(s) may not lead anywhere</sys:String>
     <sys:String x:Key="Diff_ViewChanges">Changes</sys:String>
     <sys:String x:Key="Diff_ViewPreview">Applied preview</sys:String>
     <sys:String x:Key="Diff_LegendAdded">Added</sys:String>
