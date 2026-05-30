@@ -1,4 +1,5 @@
 using DialogEditor.Core.Editing;
+using DialogEditor.Core.Models;
 using DialogEditor.Patch;
 using DialogEditor.Patch.Diff;
 using Xunit;
@@ -84,5 +85,84 @@ public class NodeApplyBuilderTests
         var result = NodeApplyBuilder.Apply(target, source, [new("c", 7)]);
 
         Assert.Equal("mine", result.Patches["c"].NodeComments[7]); // target's note preserved, not transplanted
+    }
+
+    private static NodeTranslation Tr(int id) => new(id, "hello", "");
+
+    [Fact]
+    public void Apply_RevertsNode_WhenSourceHasNoContribution()
+    {
+        var target = Project("c", Patch("c", added: [Node(7)]));
+        var source = Project("c", Patch("c"));
+
+        var result = NodeApplyBuilder.Apply(target, source, [new("c", 7)]);
+
+        Assert.DoesNotContain(result.Patches["c"].AddedNodes, n => n.NodeId == 7);
+    }
+
+    [Fact]
+    public void Apply_BringsInADeletion_FromSource()
+    {
+        var target = Project("c", Patch("c"));
+        var source = Project("c", Patch("c", deleted: [7]));
+
+        var result = NodeApplyBuilder.Apply(target, source, [new("c", 7)]);
+
+        Assert.Contains(7, result.Patches["c"].DeletedNodeIds);
+    }
+
+    [Fact]
+    public void Apply_BringsInATranslation_AndDropsTargetsOwn()
+    {
+        var target = Project("c", Patch("c") with
+        {
+            Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
+                { ["en"] = [new NodeTranslation(7, "OLD", "")] }
+        });
+        var source = Project("c", Patch("c") with
+        {
+            Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
+                { ["en"] = [Tr(7)] }
+        });
+
+        var result = NodeApplyBuilder.Apply(target, source, [new("c", 7)]);
+
+        var en = result.Patches["c"].Translations["en"];
+        Assert.Equal("hello", Assert.Single(en, t => t.NodeId == 7).DefaultText);
+    }
+
+    [Fact]
+    public void Apply_OnlyTouchesSelectedConversations()
+    {
+        var target = new DialogProject("p", DialogProject.CurrentSchemaVersion,
+            new Dictionary<string, ConversationPatch>
+            {
+                ["a"] = Patch("a", added: [Node(1)]),
+                ["b"] = Patch("b", added: [Node(2)]),
+            });
+        var source = new DialogProject("p", DialogProject.CurrentSchemaVersion,
+            new Dictionary<string, ConversationPatch>
+            {
+                ["a"] = Patch("a", added: [Node(1), Node(9)]),
+                ["b"] = Patch("b"),
+            });
+
+        var result = NodeApplyBuilder.Apply(target, source, [new("a", 9)]);
+
+        Assert.Contains(result.Patches["a"].AddedNodes, n => n.NodeId == 9);
+        Assert.Contains(result.Patches["b"].AddedNodes, n => n.NodeId == 2);
+    }
+
+    [Fact]
+    public void Apply_DoesNotMutateInputs()
+    {
+        var targetPatch = Patch("c", added: [Node(1)]);
+        var target = Project("c", targetPatch);
+        var source = Project("c", Patch("c", added: [Node(9)]));
+
+        NodeApplyBuilder.Apply(target, source, [new("c", 9)]);
+
+        Assert.Single(target.Patches["c"].AddedNodes);
+        Assert.Single(targetPatch.AddedNodes);
     }
 }
