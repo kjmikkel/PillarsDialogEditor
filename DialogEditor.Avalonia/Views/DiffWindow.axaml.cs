@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using DialogEditor.ViewModels;
 
 namespace DialogEditor.Avalonia.Views;
@@ -12,4 +13,17 @@ public partial class DiffWindow : Window
         InitializeComponent();
         DataContext = vm;
     }
+
+    private DiffHelpWindow? _helpWindow;
+
+    private void Help_Click(object? sender, RoutedEventArgs e)
+    {
+        if (_helpWindow is null || !_helpWindow.IsVisible)
+            _helpWindow = new DiffHelpWindow();
+        _helpWindow.Show();
+        _helpWindow.Activate();
+    }
+
+    private void UndoBringIn_Click(object? sender, RoutedEventArgs e)
+        => (DataContext as DiffViewModel)?.RequestUndoApply?.Invoke();
 }

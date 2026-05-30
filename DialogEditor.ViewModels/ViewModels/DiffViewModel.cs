@@ -56,6 +56,9 @@ public partial class DiffViewModel : ObservableObject
     /// <summary>Raised when the user brings in changes; the host persists the new project.</summary>
     public Action<DialogProject>? CommitApply { get; set; }
 
+    /// <summary>Raised when the user clicks "Undo bring-in"; the host reverses the last apply.</summary>
+    public Action? RequestUndoApply { get; set; }
+
     public ObservableCollection<DanglingLink> DanglingLinks { get; } = [];
 
     [RelayCommand(CanExecute = nameof(CanApply))]

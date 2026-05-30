@@ -74,6 +74,9 @@
                 <Button DockPanel.Dock="Right" Content="{StaticResource Diff_BringInButton}"
                         Command="{Binding ApplyCommand}"
                         ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"/>
+                <Button DockPanel.Dock="Right" Content="{StaticResource Diff_UndoBringIn}"
+                        Click="UndoBringIn_Click" Margin="0,0,8,0"
+                        ToolTip.Tip="{StaticResource ToolTip_Diff_UndoBringIn}"/>
                 <StackPanel>
                     <TextBlock Text="{Binding DanglingLinks.Count, StringFormat={StaticResource Diff_DanglingWarning}}"
                                Foreground="#e0a030" FontSize="10"
@@ -155,6 +158,8 @@
                     <TextBlock Text="{StaticResource Diff_LegendChanged}" Foreground="#aaa" FontSize="10" VerticalAlignment="Center"/>
                     <Border Width="10" Height="10" Background="#e74c3c" VerticalAlignment="Center"/>
                     <TextBlock Text="{StaticResource Diff_LegendRemoved}" Foreground="#aaa" FontSize="10" VerticalAlignment="Center"/>
+                    <Button Content="{StaticResource Diff_HelpButton}" Click="Help_Click"
+                            ToolTip.Tip="{StaticResource ToolTip_Diff_Help}"/>
                 </StackPanel>
 
                 <!-- Canvas panel -->

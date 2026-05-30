@@ -540,6 +540,25 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Diff_DanglingHeader">Heads up: some links may not lead anywhere after this.</sys:String>
     <sys:String x:Key="ToolTip_Diff_BringIn">Brings the ticked changes into your copy and saves it straight away. Your copy must be one of the two versions being compared.</sys:String>
     <sys:String x:Key="ToolTip_Diff_ViewToggle">Switch between seeing everything that differs between the two versions, and a preview of what your copy will look like after you bring in the ticked changes.</sys:String>
+    <sys:String x:Key="Diff_HelpButton">?</sys:String>
+    <sys:String x:Key="Diff_UndoBringIn">Undo bring-in</sys:String>
+    <sys:String x:Key="ToolTip_Diff_Help">Open a short guide explaining how comparing versions and bringing in changes works.</sys:String>
+    <sys:String x:Key="ToolTip_Diff_UndoBringIn">Reverses the last set of changes you brought in, restoring your copy to how it was just before.</sys:String>
+    <sys:String x:Key="DiffHelp_Title">Comparing versions — help</sys:String>
+    <sys:String x:Key="DiffHelp_ColourKeyHeader">What the colours mean</sys:String>
+    <sys:String x:Key="DiffHelp_Added">Green — a line that was added.</sys:String>
+    <sys:String x:Key="DiffHelp_Changed">Orange — a line that was changed.</sys:String>
+    <sys:String x:Key="DiffHelp_Removed">Red — a line that was removed.</sys:String>
+    <sys:String x:Key="DiffHelp_CompareHeader">Comparing two versions</sys:String>
+    <sys:String x:Key="DiffHelp_CompareBody">Pick two versions of your dialogue at the top. The list shows every conversation that differs between them; click one to see it.</sys:String>
+    <sys:String x:Key="DiffHelp_ViewsHeader">The two views</sys:String>
+    <sys:String x:Key="DiffHelp_ViewsBody">"Changes" shows everything different between the two versions. "Applied preview" shows what your copy will look like after you bring in the lines you have ticked.</sys:String>
+    <sys:String x:Key="DiffHelp_BringInHeader">Bringing in changes</sys:String>
+    <sys:String x:Key="DiffHelp_BringInBody">Tick the lines you want, then press "Bring in". The changes are written into your own copy and saved. Your copy must be one of the two versions on screen.</sys:String>
+    <sys:String x:Key="DiffHelp_UndoHeader">Undo</sys:String>
+    <sys:String x:Key="DiffHelp_UndoBody">"Undo bring-in" reverses the last set of changes you brought in.</sys:String>
+    <sys:String x:Key="DiffHelp_LinksHeader">A note on links</sys:String>
+    <sys:String x:Key="DiffHelp_LinksBody">If you bring in a line that points to a line you removed, you will see a warning. It is safe to continue, but that link may not lead anywhere.</sys:String>
 
     <!-- ─── Flow Analytics window ───────────────────────────────────────── -->
     <sys:String x:Key="Menu_FlowAnalytics">Flow Analytics…</sys:String>
