@@ -46,6 +46,19 @@ public class NodeLinkAnalyzerTests
     }
 
     [Fact]
+    public void Analyze_FlagsModifiedNodeModifiedLink_ToADeletedNode()
+    {
+        var mod = new NodeModification(5, new Dictionary<string, FieldChange>(),
+            [], [], [new ModifiedLink(8, 1f, "")]);
+        var project = Project("c", Patch("c", deleted: [8], modified: [mod]));
+
+        var dangling = NodeLinkAnalyzer.Analyze(project);
+
+        var link = Assert.Single(dangling);
+        Assert.Equal(("c", 5, 8), (link.Conversation, link.FromNode, link.ToNode));
+    }
+
+    [Fact]
     public void Analyze_ReturnsEmpty_WhenNoLinkTargetsADeletedNode()
     {
         var project = Project("c", Patch("c", added: [NodeWithLink(5, 6)]));
