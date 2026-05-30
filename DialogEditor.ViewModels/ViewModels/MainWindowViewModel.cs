@@ -42,7 +42,8 @@ public partial class MainWindowViewModel : ObservableObject
     private IGameDataProvider? _provider;
     private ConversationFile?  _currentFile;
 
-    public IGameDataProvider? Provider => _provider;
+    public IGameDataProvider? Provider    => _provider;
+    public string?            ProjectPath => _projectPath;
     private string             _currentGameDirectory = string.Empty;
     private string             _activeGameId         = string.Empty;
 

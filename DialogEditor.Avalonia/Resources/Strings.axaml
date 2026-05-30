@@ -505,6 +505,21 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_BatchReplace_Apply">Write the previewed replacements to disk for all selected conversations</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace_ConvCheckbox">Uncheck to exclude this conversation from the apply step</sys:String>
 
+    <!-- ─── Diff / Compare Versions window ──────────────────────────────── -->
+    <sys:String x:Key="DiffWindow_Title">Compare Versions</sys:String>
+    <sys:String x:Key="DiffWindow_LeftLabel">Old:</sys:String>
+    <sys:String x:Key="DiffWindow_RightLabel">New:</sys:String>
+    <sys:String x:Key="DiffWindow_ChangedHeader">Changed conversations</sys:String>
+    <sys:String x:Key="DiffWindow_NoGameFolder">Open a game folder to see the conversation graph.</sys:String>
+    <sys:String x:Key="Menu_CompareVersions">Compare Versions…</sys:String>
+    <sys:String x:Key="ToolTip_CompareVersions">Open the diff viewer to compare conversations between two git versions or branches.</sys:String>
+    <sys:String x:Key="Diff_WorkingCopy">Working copy</sys:String>
+    <!-- {0} = changed conversation count -->
+    <sys:String x:Key="Status_DiffComputed">{0} changed conversation(s)</sys:String>
+    <sys:String x:Key="ToolTip_DiffLeftPicker">Select the older (left) version to compare from</sys:String>
+    <sys:String x:Key="ToolTip_DiffRightPicker">Select the newer (right) version to compare to</sys:String>
+    <sys:String x:Key="ToolTip_DiffChangedList">Conversations that differ between the selected versions — click to inspect</sys:String>
+
     <!-- ─── Flow Analytics window ───────────────────────────────────────── -->
     <sys:String x:Key="Menu_FlowAnalytics">Flow Analytics…</sys:String>
     <sys:String x:Key="ToolTip_FlowAnalytics">Open the Flow Analytics window to view conversation statistics and structural issues</sys:String>

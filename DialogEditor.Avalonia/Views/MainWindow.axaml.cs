@@ -8,6 +8,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using DialogEditor.Avalonia.Services;
 using DialogEditor.Avalonia.Shared.Services;
+using DialogEditor.Patch.Diff;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Services;
 
@@ -300,6 +301,15 @@ public partial class MainWindow : Window
 
         _flowAnalyticsWindow.Show();
         _flowAnalyticsWindow.Activate();
+    }
+
+    private void CompareVersions_Click(object? sender, RoutedEventArgs e)
+    {
+        var vm = (MainWindowViewModel)DataContext!;
+        if (vm.ProjectPath is null) return;
+        var diffVm = new DiffViewModel(new ProcessGitRunner(), vm.ProjectPath,
+                                       vm.Provider, vm.Provider?.Language ?? "en");
+        new DiffWindow(diffVm).Show();
     }
 
     private void PatchManager_Click(object? sender, RoutedEventArgs e)
