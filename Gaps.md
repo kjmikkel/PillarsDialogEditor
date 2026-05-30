@@ -12,15 +12,15 @@ Significant coverage has been added: both `IGameDataProvider` implementations, `
 ## Feature Gaps
 
 ### Version Control Integration
-Git **merge-conflict resolution** for `.dialogproject` files is now implemented: opening a conflicted file reconstructs the mine/theirs sides, presents a dedicated resolution window (field-level merge for same-node edits, binary keep-mine/keep-theirs for structural conflicts, word-level inline highlighting of text changes), and loads the merged result as an unsaved project.
+Git **merge-conflict resolution** for `.dialogproject` files is now implemented: opening a conflicted file reconstructs the mine/theirs sides, presents a dedicated resolution window (field-level merge for same-node edits, **per-language text/translation conflicts**, binary keep-mine/keep-theirs for structural conflicts, word-level inline highlighting of text changes), and loads the merged result as an unsaved project.
 
 Remaining gaps, in two groups:
 
 **Conflict-resolution coverage** (`GitMergeAnalyzer` / `MergeBuilder` in `DialogEditor.Patch/GitConflict/`):
 
-- **Translation conflicts are not analyzed.** Text edits on *modified* nodes are covered (they appear as `FieldChanges`, so they surface as `FieldEdit` conflicts), but text carried in a patch's `Translations` is not diffed. In particular, `NodeEditSnapshot.DefaultText`/`FemaleText` are `[JsonIgnore]`, so the `NodeAddAdd` comparison is structural only — two added nodes that differ *only* in their text would not be flagged as a conflict, and a node whose translation differs between sides is not detected at all.
 - **`Layouts` and `NewConversations` divergence is not merged.** `MergeBuilder` starts from "mine" and unions only conversation *patches* present solely on the "theirs" side; canvas layout positions and the new-conversation list fall back to "mine" wholesale. A layout or new-conversation difference that lived inside a git conflict hunk is therefore silently resolved in mine's favour.
-- **`ConversationLevel` conflicts are never produced.** `MergeBuilder` handles the `ConversationLevel` kind defensively, but `GitMergeAnalyzer` does not yet emit it; any divergence not reducible to field-edit / delete-vs-edit / add-add is currently not represented as its own conflict.
+- **`ConversationLevel` conflicts are never produced.** `MergeBuilder` handles the `ConversationLevel` kind defensively, but `GitMergeAnalyzer` does not yet emit it; any divergence not reducible to field-edit / translation-edit / delete-vs-edit / add-add is currently not represented as its own conflict.
+- **Minor:** a translation conflict where only `FemaleText` differs (same `DefaultText`) is detected and resolvable, but the resolution dialog shows the `FemaleText` rather than labelling it as the female-variant — a cosmetic display limitation.
 
 **Broader VCS features** (not started): **diff viewing** between arbitrary commits/branches (showing what changed in a conversation, rendered in the canvas rather than raw JSON) and **branch/history navigation** (browsing git log, switching branches, attribution).
 
