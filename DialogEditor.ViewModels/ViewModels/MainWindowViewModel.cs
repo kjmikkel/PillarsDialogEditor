@@ -709,12 +709,27 @@ public partial class MainWindowViewModel : ObservableObject
             if (ConfirmSaveBeforeApply is null) return;
             var proceed = await ConfirmSaveBeforeApply();
             if (!proceed) return;
-            SaveProject();
+            SaveProject();   // flush the user's real open edits first
         }
 
         _preApplyProject = _project;
         SetProject(applied);
-        SaveProject();
+        // Serialize `applied` directly — do NOT call SaveProject() here.
+        // SaveProject() re-folds the currently-open canvas back into the project,
+        // which would overwrite the just-applied patch with the stale canvas snapshot.
+        // Mirror the MergeProjects precedent: write the already-computed project directly.
+        try
+        {
+            DialogProjectSerializer.SaveToFile(_projectPath!, applied);
+            Canvas.IsModified = false;
+            IsModified = false;
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error("ApplyFromDiff: save failed", ex);
+            StatusText = Loc.Format("Status_SaveError", applied.Name, ex.Message);
+            return;
+        }
         UndoApplyCommand.NotifyCanExecuteChanged();
         StatusText = Loc.Format("Status_BroughtInApplied", applied.Name);
     }
@@ -723,9 +738,24 @@ public partial class MainWindowViewModel : ObservableObject
     private void UndoApply()
     {
         if (_preApplyProject is null) return;
-        SetProject(_preApplyProject);
-        SaveProject();
+        var previous = _preApplyProject;
         _preApplyProject = null;
+        SetProject(previous);
+        // Serialize `previous` directly — do NOT call SaveProject() here.
+        // SaveProject() would re-fold the open canvas over the restored project,
+        // losing the undo. Mirror the MergeProjects / ApplyFromDiff precedent.
+        try
+        {
+            DialogProjectSerializer.SaveToFile(_projectPath!, previous);
+            Canvas.IsModified = false;
+            IsModified = false;
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error("UndoApply: save failed", ex);
+            StatusText = Loc.Format("Status_SaveError", previous.Name, ex.Message);
+            return;
+        }
         UndoApplyCommand.NotifyCanExecuteChanged();
     }
 
