@@ -307,9 +307,15 @@ public partial class MainWindow : Window
     {
         var vm = (MainWindowViewModel)DataContext!;
         if (vm.ProjectPath is null) return;
+
         var diffVm = new DiffViewModel(new ProcessGitRunner(), new AvaloniaDispatcher(),
                                        vm.ProjectPath,
                                        vm.Provider, vm.Provider?.Language ?? "en");
+
+        diffVm.CommitApply      = applied => _ = vm.ApplyFromDiff(applied);
+        diffVm.RequestUndoApply = () => vm.UndoApplyCommand.Execute(null);
+        vm.ConfirmSaveBeforeApply = () => ShowSaveBeforeApplyDialogAsync(vm);
+
         new DiffWindow(diffVm).Show();
     }
 
@@ -414,6 +420,15 @@ public partial class MainWindow : Window
                 vm.CancelPendingNavigation();
                 break;
         }
+    }
+
+    // ── Save-before-apply guard ───────────────────────────────────────────
+    // Returns true only if the user chooses Save; Discard/Cancel both abort the bring-in.
+    private async Task<bool> ShowSaveBeforeApplyDialogAsync(MainWindowViewModel vm)
+    {
+        var dialog = new UnsavedChangesDialog(vm.CurrentConversationName ?? "This project");
+        await dialog.ShowDialog(this);
+        return dialog.Result == UnsavedChangesResult.Save;
     }
 
     // ── Patch conflict resolution dialog ─────────────────────────────────
