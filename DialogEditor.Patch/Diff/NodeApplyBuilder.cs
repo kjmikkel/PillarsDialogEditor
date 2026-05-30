@@ -62,6 +62,9 @@ public static class NodeApplyBuilder
             .Where(kv => kv.Value.Count > 0)
             .ToDictionary(kv => kv.Key, kv => (IReadOnlyList<NodeTranslation>)kv.Value);
 
+        // NodeComments are intentionally left as target's: they are outside the apply
+        // unit (ProjectDiff's change signature excludes them), so a node's comment is
+        // never transplanted or stripped by a bring-in.
         return target with
         {
             AddedNodes     = added,
