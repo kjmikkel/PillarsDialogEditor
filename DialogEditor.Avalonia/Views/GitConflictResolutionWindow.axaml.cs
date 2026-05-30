@@ -49,14 +49,14 @@ public partial class GitConflictResolutionWindow : Window
     }
 
     // Render the selected conflict's mine/theirs values with the differing run
-    // highlighted. For non-field (structural) conflicts there is nothing to diff,
-    // so the raw values are shown.
+    // highlighted. Field and translation (text) edits get word-level highlighting;
+    // structural conflicts have nothing to diff, so the raw values are shown.
     private void UpdateDiff(ConflictRowViewModel? row)
     {
         var mine   = new InlineCollection();
         var theirs = new InlineCollection();
 
-        if (row is { Kind: MergeConflictKind.FieldEdit })
+        if (row is { Kind: MergeConflictKind.FieldEdit or MergeConflictKind.TranslationEdit })
         {
             foreach (var span in TextDiff.Diff(row.MineValue, row.TheirsValue))
             {

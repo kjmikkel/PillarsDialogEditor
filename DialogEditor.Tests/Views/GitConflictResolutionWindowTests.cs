@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using DialogEditor.Avalonia.Views;
+using DialogEditor.Core.Models;
 using DialogEditor.Patch;
 using DialogEditor.Patch.GitConflict;
 using DialogEditor.Tests.Helpers;
@@ -58,6 +59,51 @@ public class GitConflictResolutionWindowTests
         var mineText = window.FindControl<TextBlock>("MineDiffText")!;
         Assert.NotNull(mineText.Inlines);
         Assert.True(mineText.Inlines!.Count > 0);
+    }
+
+    private static GitConflictResolutionViewModel MakeTranslationVm()
+    {
+        static DialogProject P(string text)
+        {
+            var patch = new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [], [], [])
+            {
+                Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
+                {
+                    ["en"] = [new NodeTranslation(4, text, "")],
+                },
+            };
+            return DialogProject.Empty("p").WithPatch(patch);
+        }
+
+        var mine   = P("Hello friend");
+        var theirs = P("Hello traveler");
+        return new GitConflictResolutionViewModel(mine, theirs, GitMergeAnalyzer.Analyze(mine, theirs));
+    }
+
+    [AvaloniaFact]
+    public void SelectedTranslationConflict_BuildsHighlightedInlines()
+    {
+        var vm     = MakeTranslationVm();
+        var window = new GitConflictResolutionWindow(vm);
+        window.Show();
+
+        var mineText = window.FindControl<TextBlock>("MineDiffText")!;
+        Assert.True(mineText.Inlines!.Count > 1);   // common + mine-only spans
+    }
+
+    [AvaloniaFact]
+    public void TranslationResolveAndApply_TakesTheirsText()
+    {
+        var vm     = MakeTranslationVm();
+        var window = new GitConflictResolutionWindow(vm);
+        window.Show();
+
+        vm.Conflicts[0].Choice = MergeSide.Theirs;
+        window.FindControl<Button>("ApplyButton")!.Command!.Execute(null);
+
+        Assert.NotNull(vm.Result);
+        var t = vm.Result!.Patches["greeting"].Translations["en"].Single(x => x.NodeId == 4);
+        Assert.Equal("Hello traveler", t.DefaultText);
     }
 
     [AvaloniaFact]

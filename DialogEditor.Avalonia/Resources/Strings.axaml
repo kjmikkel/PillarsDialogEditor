@@ -605,6 +605,8 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- Git conflict resolution row titles. {0} = conversation, {1} = node id, {2} = field / kind -->
     <sys:String x:Key="GitConflict_RowTitleField">{0} · node {1} · {2}</sys:String>
     <sys:String x:Key="GitConflict_RowTitleNode">{0} · node {1} · {2}</sys:String>
+    <!-- {0} = conversation, {1} = node id, {2} = language code -->
+    <sys:String x:Key="GitConflict_RowTitleTranslation">{0} · node {1} · text ({2})</sys:String>
     <sys:String x:Key="GitConflict_KindDeleteVsEdit">deletion vs edit</sys:String>
     <sys:String x:Key="GitConflict_KindAddAdd">added on both sides</sys:String>
     <sys:String x:Key="GitConflict_KindConversation">conversation-level change</sys:String>
