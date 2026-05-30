@@ -117,6 +117,45 @@ public class MergeBuilderTests
     }
 
     [Fact]
+    public void TheirsOnlyLayout_IsCarriedThrough()
+    {
+        var mine   = DialogProject.Empty("p");
+        var theirs = DialogProject.Empty("p").WithLayout(
+            "greeting", new Dictionary<int, LayoutPoint> { [4] = new LayoutPoint(10, 20) });
+
+        var merged = MergeBuilder.Build(mine, theirs, []);
+
+        var layout = merged.GetLayout("greeting");
+        Assert.NotNull(layout);
+        Assert.Equal(new LayoutPoint(10, 20), layout![4]);
+    }
+
+    [Fact]
+    public void LayoutOverlap_TheirsWins()
+    {
+        var mine   = DialogProject.Empty("p").WithLayout(
+            "greeting", new Dictionary<int, LayoutPoint> { [4] = new LayoutPoint(1, 1) });
+        var theirs = DialogProject.Empty("p").WithLayout(
+            "greeting", new Dictionary<int, LayoutPoint> { [4] = new LayoutPoint(9, 9) });
+
+        var merged = MergeBuilder.Build(mine, theirs, []);
+
+        Assert.Equal(new LayoutPoint(9, 9), merged.GetLayout("greeting")![4]);
+    }
+
+    [Fact]
+    public void NewConversations_AreUnioned()
+    {
+        var mine   = DialogProject.Empty("p").WithNewConversation("a");
+        var theirs = DialogProject.Empty("p").WithNewConversation("b");
+
+        var merged = MergeBuilder.Build(mine, theirs, []);
+
+        Assert.Contains("a", merged.NewConversations!);
+        Assert.Contains("b", merged.NewConversations!);
+    }
+
+    [Fact]
     public void DeleteVsEditResolvedToMineEdit_KeepsNode()
     {
         var mine   = ProjectWithFieldChange(4, "DefaultText", "edited"); // mine edits
