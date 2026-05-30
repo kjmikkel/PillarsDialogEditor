@@ -68,6 +68,21 @@
                        VerticalAlignment="Center"/>
         </Border>
 
+        <!-- ── Apply bar ──────────────────────────────────────────────── -->
+        <Border DockPanel.Dock="Bottom" Background="#202020" Padding="8,6" Margin="0,6,0,0">
+            <DockPanel>
+                <Button DockPanel.Dock="Right" Content="{StaticResource Diff_BringInButton}"
+                        Command="{Binding ApplyCommand}"
+                        ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"/>
+                <StackPanel>
+                    <TextBlock Text="{Binding DanglingLinks.Count, StringFormat={}{0} link(s) may not lead anywhere}"
+                               Foreground="#e0a030" FontSize="10"
+                               IsVisible="{Binding DanglingLinks.Count, Converter={StaticResource CountToVis}}"/>
+                    <TextBlock Text="{StaticResource Diff_Hint}" Foreground="#888" FontSize="11" VerticalAlignment="Center"/>
+                </StackPanel>
+            </DockPanel>
+        </Border>
+
         <!-- ── Main area: list + detail ───────────────────────────────── -->
         <Grid>
             <Grid.ColumnDefinitions>
@@ -89,41 +104,33 @@
                         BorderThickness="1"
                         CornerRadius="4">
                     <ListBox x:Name="ChangedList"
-                             ItemsSource="{Binding Changes}"
-                             SelectedItem="{Binding Selected, Mode=TwoWay}"
+                             ItemsSource="{Binding Groups}"
+                             SelectedItem="{Binding SelectedGroup, Mode=TwoWay}"
                              Background="Transparent"
                              ToolTip.Tip="{StaticResource ToolTip_DiffChangedList}">
                         <ListBox.ItemTemplate>
-                            <DataTemplate DataType="{x:Type diff:ConversationChange}">
-                                <StackPanel Orientation="Vertical" Margin="4,2">
-                                    <TextBlock Text="{Binding Name}"
-                                               Foreground="#ddd"
-                                               FontSize="12"/>
+                            <DataTemplate DataType="{x:Type vm:ConversationChangeViewModel}">
+                                <StackPanel Orientation="Vertical" Margin="2,2">
                                     <StackPanel Orientation="Horizontal">
-                                        <TextBlock Foreground="#7dcea0" FontSize="10">
-                                            <TextBlock.Text>
-                                                <MultiBinding StringFormat="+{0}">
-                                                    <Binding Path="AddedCount"/>
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                        </TextBlock>
-                                        <TextBlock Text=" " FontSize="10"/>
-                                        <TextBlock Foreground="#f0ad4e" FontSize="10">
-                                            <TextBlock.Text>
-                                                <MultiBinding StringFormat="~{0}">
-                                                    <Binding Path="ModifiedCount"/>
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                        </TextBlock>
-                                        <TextBlock Text=" " FontSize="10"/>
-                                        <TextBlock Foreground="#e74c3c" FontSize="10">
-                                            <TextBlock.Text>
-                                                <MultiBinding StringFormat="−{0}">
-                                                    <Binding Path="RemovedCount"/>
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                        </TextBlock>
+                                        <CheckBox IsChecked="{Binding IsAllSelected, Mode=TwoWay}" IsThreeState="True"
+                                                  ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"/>
+                                        <ToggleButton Content="{Binding Name}" IsChecked="{Binding IsExpanded, Mode=TwoWay}"
+                                                      Background="Transparent" Foreground="#ddd" BorderThickness="0" Padding="4,0"
+                                                      ToolTip.Tip="{StaticResource ToolTip_Diff_ViewToggle}"/>
                                     </StackPanel>
+                                    <ItemsControl ItemsSource="{Binding Nodes}" IsVisible="{Binding IsExpanded}" Margin="20,0,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type vm:NodeChangeViewModel}">
+                                                <StackPanel Orientation="Horizontal" Spacing="6">
+                                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                              ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"/>
+                                                    <Border Width="9" Height="9" VerticalAlignment="Center"
+                                                            Background="{Binding Kind, Converter={StaticResource DiffStatusToBrushConverter}}"/>
+                                                    <TextBlock Text="{Binding NodeId, StringFormat='Line {0}'}" Foreground="#ccc" FontSize="11" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
                                 </StackPanel>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -131,42 +138,62 @@
                 </Border>
             </Grid>
 
-            <!-- Right: diff canvas (when a conversation is selected and provider is available) -->
-            <Panel Grid.Column="2">
+            <!-- Right: canvas header + diff canvas -->
+            <DockPanel Grid.Column="2">
 
-                <!-- Canvas — shown when DiffCanvas is not null -->
-                <views:ConversationView DataContext="{Binding DiffCanvas}"
-                                        IsVisible="{Binding DiffCanvas, Converter={StaticResource IsNotNull}}"/>
+                <!-- Canvas mode toggle + colour key -->
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,6">
+                    <RadioButton GroupName="CanvasMode" Content="{StaticResource Diff_ViewChanges}"
+                                 IsChecked="{Binding CanvasMode, Converter={StaticResource EnumToBool}, ConverterParameter=Changes, Mode=TwoWay}"
+                                 ToolTip.Tip="{StaticResource ToolTip_Diff_ViewToggle}"/>
+                    <RadioButton GroupName="CanvasMode" Content="{StaticResource Diff_ViewPreview}"
+                                 IsChecked="{Binding CanvasMode, Converter={StaticResource EnumToBool}, ConverterParameter=AppliedPreview, Mode=TwoWay}"
+                                 ToolTip.Tip="{StaticResource ToolTip_Diff_ViewToggle}"/>
+                    <Border Width="10" Height="10" Background="#7dcea0" VerticalAlignment="Center"/>
+                    <TextBlock Text="{StaticResource Diff_LegendAdded}" Foreground="#aaa" FontSize="10" VerticalAlignment="Center"/>
+                    <Border Width="10" Height="10" Background="#f0ad4e" VerticalAlignment="Center"/>
+                    <TextBlock Text="{StaticResource Diff_LegendChanged}" Foreground="#aaa" FontSize="10" VerticalAlignment="Center"/>
+                    <Border Width="10" Height="10" Background="#e74c3c" VerticalAlignment="Center"/>
+                    <TextBlock Text="{StaticResource Diff_LegendRemoved}" Foreground="#aaa" FontSize="10" VerticalAlignment="Center"/>
+                </StackPanel>
 
-                <!-- Hint — shown when DiffCanvas is null -->
-                <Border Background="#1e1e1e"
-                        IsVisible="{Binding DiffCanvas, Converter={StaticResource IsNull}}">
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                        <TextBlock Text="{Binding Selected.Name}"
-                                   Foreground="#ccc"
-                                   FontSize="14"
-                                   HorizontalAlignment="Center"
-                                   Margin="0,0,0,8"
-                                   IsVisible="{Binding Selected, Converter={StaticResource IsNotNull}}"/>
-                        <TextBlock Text="{Binding CanvasHint}"
-                                   Foreground="#555"
-                                   FontSize="11"
-                                   HorizontalAlignment="Center"
-                                   TextWrapping="Wrap"
-                                   TextAlignment="Center"
-                                   MaxWidth="260"
-                                   IsVisible="{Binding CanvasHint, Converter={StaticResource NullOrEmptyToVis}}"/>
-                        <TextBlock Text="{StaticResource DiffWindow_SelectHint}"
-                                   Foreground="#555"
-                                   FontSize="11"
-                                   HorizontalAlignment="Center"
-                                   TextWrapping="Wrap"
-                                   TextAlignment="Center"
-                                   MaxWidth="260"
-                                   IsVisible="{Binding Selected, Converter={StaticResource IsNull}}"/>
-                    </StackPanel>
-                </Border>
-            </Panel>
+                <!-- Canvas panel -->
+                <Panel>
+
+                    <!-- Canvas — shown when DiffCanvas is not null -->
+                    <views:ConversationView DataContext="{Binding DiffCanvas}"
+                                            IsVisible="{Binding DiffCanvas, Converter={StaticResource IsNotNull}}"/>
+
+                    <!-- Hint — shown when DiffCanvas is null -->
+                    <Border Background="#1e1e1e"
+                            IsVisible="{Binding DiffCanvas, Converter={StaticResource IsNull}}">
+                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                            <TextBlock Text="{Binding Selected.Name}"
+                                       Foreground="#ccc"
+                                       FontSize="14"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,0,0,8"
+                                       IsVisible="{Binding Selected, Converter={StaticResource IsNotNull}}"/>
+                            <TextBlock Text="{Binding CanvasHint}"
+                                       Foreground="#555"
+                                       FontSize="11"
+                                       HorizontalAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Center"
+                                       MaxWidth="260"
+                                       IsVisible="{Binding CanvasHint, Converter={StaticResource NullOrEmptyToVis}}"/>
+                            <TextBlock Text="{StaticResource DiffWindow_SelectHint}"
+                                       Foreground="#555"
+                                       FontSize="11"
+                                       HorizontalAlignment="Center"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Center"
+                                       MaxWidth="260"
+                                       IsVisible="{Binding Selected, Converter={StaticResource IsNull}}"/>
+                        </StackPanel>
+                    </Border>
+                </Panel>
+            </DockPanel>
         </Grid>
 
     </DockPanel>

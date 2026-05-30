@@ -37,6 +37,7 @@ public partial class DiffViewModel : ObservableObject
     [ObservableProperty] private ConversationViewModel? _diffCanvas;
     [ObservableProperty] private string               _canvasHint  = "";
     [ObservableProperty] private CanvasMode           _canvasMode  = CanvasMode.Changes;
+    [ObservableProperty] private ConversationChangeViewModel? _selectedGroup;
 
     // True when exactly one endpoint is the working copy (the writable target).
     private bool WorkingCopyIsEndpoint =>
@@ -118,6 +119,9 @@ public partial class DiffViewModel : ObservableObject
     partial void OnRightEndpointChanged(EndpointOption? value) => Recompute();
 
     partial void OnSelectedChanged(ConversationChange? value) => BuildDiffCanvas();
+
+    partial void OnSelectedGroupChanged(ConversationChangeViewModel? value)
+        => Selected = value is null ? null : Changes.FirstOrDefault(c => c.Name == value.Name);
 
     // ── private ───────────────────────────────────────────────────────────
 

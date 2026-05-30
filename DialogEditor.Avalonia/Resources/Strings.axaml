@@ -526,6 +526,16 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_DiffLeftPicker">Select the older (left) version to compare from</sys:String>
     <sys:String x:Key="ToolTip_DiffRightPicker">Select the newer (right) version to compare to</sys:String>
     <sys:String x:Key="ToolTip_DiffChangedList">Conversations that differ between the selected versions — click to inspect</sys:String>
+    <sys:String x:Key="Diff_BringInButton">Bring in</sys:String>
+    <sys:String x:Key="Diff_Hint">Tick the changes you want to bring into your copy, then Bring in.</sys:String>
+    <sys:String x:Key="Diff_ViewChanges">Changes</sys:String>
+    <sys:String x:Key="Diff_ViewPreview">Applied preview</sys:String>
+    <sys:String x:Key="Diff_LegendAdded">Added</sys:String>
+    <sys:String x:Key="Diff_LegendChanged">Changed</sys:String>
+    <sys:String x:Key="Diff_LegendRemoved">Removed</sys:String>
+    <sys:String x:Key="Diff_DanglingHeader">Heads up: some links may not lead anywhere after this.</sys:String>
+    <sys:String x:Key="ToolTip_Diff_BringIn">Brings the ticked changes into your copy and saves it straight away. Your copy must be one of the two versions being compared.</sys:String>
+    <sys:String x:Key="ToolTip_Diff_ViewToggle">Switch between seeing everything that differs between the two versions, and a preview of what your copy will look like after you bring in the ticked changes.</sys:String>
 
     <!-- ─── Flow Analytics window ───────────────────────────────────────── -->
     <sys:String x:Key="Menu_FlowAnalytics">Flow Analytics…</sys:String>
