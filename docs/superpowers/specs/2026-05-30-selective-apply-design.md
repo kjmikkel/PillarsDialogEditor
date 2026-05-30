@@ -70,7 +70,7 @@ public readonly record struct NodeSelection(string ConversationName, int NodeId)
 
 ### `NodeLinkAnalyzer` (pure, `DialogEditor.Patch/Diff/`)
 
-`Analyze(DialogProject projectedResult, IGameDataProvider? provider) → IReadOnlyList<DanglingLink>` where `DanglingLink` is `(string Conversation, int FromNode, int ToNode)`. Finds links in the projected result whose target node will not exist after apply. Independently testable; the VM only formats its output for the warning panel.
+`Analyze(DialogProject projectedResult) → IReadOnlyList<DanglingLink>` where `DanglingLink` is `(string Conversation, int FromNode, int ToNode)`. **Best-effort, patch-level** (no game-data reconstruction): for each conversation in the projected result, it flags any link — from an added node's `Links`, or a modified node's `AddedLinks`/`ModifiedLinks` — whose `ToNodeId` is in that same conversation's `DeletedNodeIds`. This catches the common "you brought in a line that points to a line you also removed" case purely and testably. Full base-game reachability analysis (links to nodes that simply never existed) is deferred, consistent with the warn-but-allow stance. Independently testable; the VM only formats its output for the warning panel.
 
 ### `DiffViewModel` (ViewModels)
 
