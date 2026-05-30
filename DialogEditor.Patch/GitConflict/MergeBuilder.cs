@@ -1,3 +1,5 @@
+using DialogEditor.Core.Models;
+
 namespace DialogEditor.Patch.GitConflict;
 
 /// Produces the merged project from the user's per-conflict resolutions.
@@ -52,6 +54,14 @@ public static class MergeBuilder
         var theirModById   = ById(theirPatch.ModifiedNodes, m => m.NodeId);
         var theirAddedById = ById(theirPatch.AddedNodes,    n => n.NodeId);
 
+        // Mutable copy of mine's translations (lang -> list), plus a lookup of
+        // theirs' translations by (nodeId, lang) for TranslationEdit overlays.
+        var translations = minePatch.Translations.ToDictionary(kv => kv.Key, kv => kv.Value.ToList());
+        var theirTr = new Dictionary<(int NodeId, string Lang), NodeTranslation>();
+        foreach (var (lang, list) in theirPatch.Translations)
+            foreach (var t in list)
+                theirTr[(t.NodeId, lang)] = t;
+
         foreach (var c in theirsConflicts)
         {
             switch (c.Kind)
@@ -59,6 +69,11 @@ public static class MergeBuilder
                 case MergeConflictKind.FieldEdit:
                     modifiedById[c.NodeId] = ApplyField(
                         modifiedById[c.NodeId], theirModById[c.NodeId], c.FieldName!);
+                    break;
+
+                case MergeConflictKind.TranslationEdit:
+                    if (theirTr.TryGetValue((c.NodeId, c.FieldName!), out var theirText))
+                        SetTranslation(translations, c.FieldName!, theirText);
                     break;
 
                 case MergeConflictKind.DeleteVsEdit:
@@ -94,7 +109,20 @@ public static class MergeBuilder
             AddedNodes     = addedById.Values.ToList(),
             DeletedNodeIds = deleted.ToList(),
             ModifiedNodes  = modifiedById.Values.ToList(),
+            Translations   = translations.ToDictionary(
+                kv => kv.Key, kv => (IReadOnlyList<NodeTranslation>)kv.Value),
         };
+    }
+
+    // Replace (or add) the translation for a node within a language list.
+    private static void SetTranslation(
+        Dictionary<string, List<NodeTranslation>> translations, string lang, NodeTranslation t)
+    {
+        if (!translations.TryGetValue(lang, out var list))
+            translations[lang] = list = [];
+        var idx = list.FindIndex(x => x.NodeId == t.NodeId);
+        if (idx >= 0) list[idx] = t;
+        else          list.Add(t);
     }
 
     // Index by id with last-wins semantics — tolerant of a malformed reconstruction
