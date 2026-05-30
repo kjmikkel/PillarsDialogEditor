@@ -3,6 +3,7 @@ namespace DialogEditor.Patch.GitConflict;
 public enum MergeConflictKind
 {
     FieldEdit,        // same (node, field) set to different values on each side → field-level merge
+    TranslationEdit,  // same (node, language) localized text differs → field-level merge on text
     DeleteVsEdit,     // one side deletes a node the other modifies/adds
     NodeAddAdd,       // both sides add the same NodeId with different content
     ConversationLevel // whole-conversation divergence not reducible to the above
@@ -11,12 +12,13 @@ public enum MergeConflictKind
 public enum MergeSide { Mine, Theirs }
 
 /// One resolvable conflict between the mine and theirs projects.
-/// Value fields are JSON-encoded strings (same encoding as FieldChange) for display.
+/// Value fields are display strings (for FieldEdit, the JSON-encoded `To` values;
+/// for TranslationEdit, the differing localized text).
 public record MergeConflict(
     MergeConflictKind Kind,
     string            ConversationName,
     int               NodeId,        // -1 when not node-scoped (ConversationLevel)
-    string?           FieldName,     // set only for FieldEdit
+    string?           FieldName,     // FieldEdit: field name; TranslationEdit: language code
     string            MineValue,
     string            TheirsValue)
 {
