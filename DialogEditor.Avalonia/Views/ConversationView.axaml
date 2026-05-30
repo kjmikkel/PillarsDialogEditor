@@ -138,8 +138,17 @@
                                 </DataTemplate>
                             </nodify:Node.OutputConnectorTemplate>
 
-                            <Grid Width="200" RowDefinitions="Auto,Auto,Auto"
+                            <Grid Width="200" RowDefinitions="Auto,Auto,Auto,Auto"
                                   Opacity="{Binding IsSearchMatch, Converter={StaticResource SearchMatchOpacity}}">
+
+                                <!-- Diff tint overlay — transparent when Unchanged -->
+                                <Border Grid.Row="0" Grid.RowSpan="3"
+                                        CornerRadius="2"
+                                        IsHitTestVisible="False"
+                                        ZIndex="10"
+                                        BorderThickness="3"
+                                        BorderBrush="{Binding DiffStatus, Converter={StaticResource DiffStatusToBrushConverter}}"
+                                        Background="Transparent"/>
 
                                 <!-- Header — amber when Bark, speaker-color when Conversation -->
                                 <Border Grid.Row="0" CornerRadius="2,2,0,0">

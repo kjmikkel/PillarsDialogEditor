@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
+using DialogEditor.Core.Models;
 using DialogEditor.Patch;
 using DialogEditor.Patch.Diff;
 using DialogEditor.ViewModels.Resources;
@@ -13,10 +15,14 @@ public record EndpointOption(string Label, DiffEndpoint Endpoint);
 public partial class DiffViewModel : ObservableObject
 {
     private readonly IGitRunner          _git;
+    private readonly IDispatcher         _dispatcher;
     private readonly string              _projectFilePath;
     private readonly IGameDataProvider?  _provider;
     private readonly string              _language;
     private readonly ProjectVersionLoader _loader;
+
+    private DialogProject? _leftProject;
+    private DialogProject? _rightProject;
 
     public IReadOnlyList<EndpointOption>           EndpointOptions { get; }
     public ObservableCollection<ConversationChange> Changes         { get; } = [];
@@ -24,15 +30,19 @@ public partial class DiffViewModel : ObservableObject
     [ObservableProperty] private EndpointOption?      _leftEndpoint;
     [ObservableProperty] private EndpointOption?      _rightEndpoint;
     [ObservableProperty] private ConversationChange?  _selected;
-    [ObservableProperty] private string               _statusText = "";
+    [ObservableProperty] private string               _statusText  = "";
+    [ObservableProperty] private ConversationViewModel? _diffCanvas;
+    [ObservableProperty] private string               _canvasHint  = "";
 
     public DiffViewModel(
         IGitRunner        git,
+        IDispatcher       dispatcher,
         string            projectFilePath,
         IGameDataProvider? provider = null,
         string            language  = "en")
     {
         _git             = git;
+        _dispatcher      = dispatcher;
         _projectFilePath = projectFilePath;
         _provider        = provider;
         _language        = language;
@@ -53,6 +63,8 @@ public partial class DiffViewModel : ObservableObject
 
     partial void OnLeftEndpointChanged(EndpointOption? value)  => Recompute();
     partial void OnRightEndpointChanged(EndpointOption? value) => Recompute();
+
+    partial void OnSelectedChanged(ConversationChange? value) => BuildDiffCanvas();
 
     // ── private ───────────────────────────────────────────────────────────
 
@@ -111,15 +123,17 @@ public partial class DiffViewModel : ObservableObject
     private void Recompute()
     {
         Changes.Clear();
+        _leftProject  = null;
+        _rightProject = null;
 
         if (LeftEndpoint is null || RightEndpoint is null)
             return;
 
         try
         {
-            var a       = _loader.Load(LeftEndpoint.Endpoint,  _projectFilePath);
-            var b       = _loader.Load(RightEndpoint.Endpoint, _projectFilePath);
-            var results = ProjectDiff.Diff(a, b);
+            _leftProject  = _loader.Load(LeftEndpoint.Endpoint,  _projectFilePath);
+            _rightProject = _loader.Load(RightEndpoint.Endpoint, _projectFilePath);
+            var results   = ProjectDiff.Diff(_leftProject, _rightProject);
 
             foreach (var change in results)
                 Changes.Add(change);
@@ -130,6 +144,131 @@ public partial class DiffViewModel : ObservableObject
         {
             AppLog.Warn($"DiffViewModel: diff failed: {ex.Message}");
             StatusText = ex.Message;
+        }
+
+        // Reset canvas when endpoints change
+        BuildDiffCanvas();
+    }
+
+    private void BuildDiffCanvas()
+    {
+        if (Selected is null)
+        {
+            DiffCanvas  = null;
+            CanvasHint  = "";
+            return;
+        }
+
+        if (_provider is null)
+        {
+            DiffCanvas  = null;
+            CanvasHint  = Loc.Get("DiffWindow_NoGameFolder");
+            return;
+        }
+
+        try
+        {
+            var name = Selected.Name;
+
+            // ── Reconstruct the RIGHT (new) conversation ──────────────────
+            Conversation rightConv = ReconstructConversation(name, _rightProject, _provider);
+
+            var vm = new ConversationViewModel(_dispatcher);
+            vm.Load(rightConv);
+            vm.IsEditable = false;
+
+            // ── Tint nodes according to diff ──────────────────────────────
+            var addedSet    = Selected.Added.ToHashSet();
+            var modifiedSet = Selected.Modified.ToHashSet();
+            var removedSet  = Selected.Removed.ToHashSet();
+
+            foreach (var node in vm.Nodes)
+            {
+                if (addedSet.Contains(node.NodeId))
+                    node.DiffStatus = DiffStatus.Added;
+                else if (modifiedSet.Contains(node.NodeId))
+                    node.DiffStatus = DiffStatus.Changed;
+                else if (removedSet.Contains(node.NodeId))
+                    node.DiffStatus = DiffStatus.Removed;
+            }
+
+            // ── Ghost removed nodes (from the left / old project) ─────────
+            if (removedSet.Count > 0)
+            {
+                try
+                {
+                    Conversation leftConv = ReconstructConversation(name, _leftProject, _provider);
+                    foreach (var leftNode in leftConv.Nodes)
+                    {
+                        if (!removedSet.Contains(leftNode.NodeId)) continue;
+                        // Only inject if not already present (removed nodes are absent from right)
+                        if (vm.Nodes.Any(n => n.NodeId == leftNode.NodeId)) continue;
+
+                        var entry   = leftConv.Strings.Get(leftNode.NodeId);
+                        var ghost   = new NodeViewModel(leftNode, entry);
+                        ghost.OnSelected   = n => vm.SelectedNode = n;
+                        ghost.Input.Owner  = ghost;
+                        ghost.Output.Owner = ghost;
+                        ghost.DiffStatus   = DiffStatus.Removed;
+                        vm.Nodes.Add(ghost);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    AppLog.Warn($"DiffViewModel: could not inject ghost removed nodes for '{name}': {ex.Message}");
+                }
+            }
+
+            DiffCanvas = vm;
+            CanvasHint = "";
+        }
+        catch (Exception ex)
+        {
+            AppLog.Warn($"DiffViewModel: BuildDiffCanvas failed for '{Selected?.Name}': {ex.Message}");
+            DiffCanvas  = null;
+            CanvasHint  = ex.Message;
+        }
+    }
+
+    /// <summary>
+    /// Reconstructs the effective Conversation for <paramref name="name"/> from
+    /// <paramref name="project"/>'s patch (if present) over the game-data base, or
+    /// just the base conversation if there is no patch.
+    /// </summary>
+    private Conversation ReconstructConversation(
+        string name, DialogProject? project, IGameDataProvider provider)
+    {
+        var file = provider.FindConversation(name);
+
+        if (project is not null && project.Patches.TryGetValue(name, out var patch))
+        {
+            if (file is not null)
+            {
+                // Base from disk + apply patch
+                var conv     = provider.LoadConversation(file);
+                var baseSnap = ConversationSnapshotBuilder.Build(conv);
+                var merged   = PatchApplier.Apply(baseSnap, patch, ignoreConflicts: true);
+                var translations = patch.Translations.GetValueOrDefault(_language);
+                return ConversationSnapshotBuilder.ToConversation(name, merged, translations);
+            }
+            else
+            {
+                // New conversation (no on-disk file): apply patch over empty snapshot
+                var baseSnap = new ConversationEditSnapshot([]);
+                var merged   = PatchApplier.Apply(baseSnap, patch, ignoreConflicts: true);
+                var translations = patch.Translations.GetValueOrDefault(_language);
+                return ConversationSnapshotBuilder.ToConversation(name, merged, translations);
+            }
+        }
+        else if (file is not null)
+        {
+            // No patch — just the on-disk conversation
+            return provider.LoadConversation(file);
+        }
+        else
+        {
+            // No game-data file and no patch → empty
+            return new Conversation(name, [], new StringTable([]));
         }
     }
 }

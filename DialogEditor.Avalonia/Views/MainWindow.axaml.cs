@@ -307,7 +307,8 @@ public partial class MainWindow : Window
     {
         var vm = (MainWindowViewModel)DataContext!;
         if (vm.ProjectPath is null) return;
-        var diffVm = new DiffViewModel(new ProcessGitRunner(), vm.ProjectPath,
+        var diffVm = new DiffViewModel(new ProcessGitRunner(), new AvaloniaDispatcher(),
+                                       vm.ProjectPath,
                                        vm.Provider, vm.Provider?.Language ?? "en");
         new DiffWindow(diffVm).Show();
     }

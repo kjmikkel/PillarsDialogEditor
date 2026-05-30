@@ -99,6 +99,8 @@
             <converters:PropertyValueStyleToBrushConverter x:Key="PropertyValueStyleToBrush"/>
             <converters:FlowIssueKindToSeverityBrushConverter x:Key="FlowIssueSeverityBrush"/>
             <converters:DiffStatusToBrushConverter              x:Key="DiffStatusToBrushConverter"/>
+            <converters:IsNullConverter                          x:Key="IsNull"/>
+            <converters:IsNotNullConverter                       x:Key="IsNotNull"/>
 
         </ResourceDictionary>
     </Application.Resources>

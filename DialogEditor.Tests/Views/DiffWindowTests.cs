@@ -77,7 +77,7 @@ public class DiffWindowTests : IDisposable
         var refJson = DialogProjectSerializer.Serialize(refProject);
 
         var git = MakeFakeGit(dir, refContent: refJson);
-        var vm  = new DiffViewModel(git, path);
+        var vm  = new DiffViewModel(git, new StubDispatcher(), path);
 
         var window = new DiffWindow(vm);
         window.Show();

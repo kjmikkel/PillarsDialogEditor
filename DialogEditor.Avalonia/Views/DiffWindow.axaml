@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
         xmlns:diff="clr-namespace:DialogEditor.Patch.Diff;assembly=DialogEditor.Patch"
+        xmlns:views="clr-namespace:DialogEditor.Avalonia.Views"
         x:Class="DialogEditor.Avalonia.Views.DiffWindow"
         Title="{StaticResource DiffWindow_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
@@ -130,27 +131,42 @@
                 </Border>
             </Grid>
 
-            <!-- Right: detail placeholder -->
-            <Border Grid.Column="2"
-                    BorderBrush="#444"
-                    BorderThickness="1"
-                    CornerRadius="4"
-                    Background="#1e1e1e"
-                    Padding="12">
-                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                    <TextBlock Text="{Binding Selected.Name}"
-                               Foreground="#ccc"
-                               FontSize="14"
-                               HorizontalAlignment="Center"
-                               Margin="0,0,0,8"/>
-                    <TextBlock Text="{StaticResource DiffWindow_NoGameFolder}"
-                               Foreground="#555"
-                               FontSize="11"
-                               HorizontalAlignment="Center"
-                               TextWrapping="Wrap"
-                               TextAlignment="Center"/>
-                </StackPanel>
-            </Border>
+            <!-- Right: diff canvas (when a conversation is selected and provider is available) -->
+            <Panel Grid.Column="2">
+
+                <!-- Canvas — shown when DiffCanvas is not null -->
+                <views:ConversationView DataContext="{Binding DiffCanvas}"
+                                        IsVisible="{Binding DiffCanvas, Converter={StaticResource IsNotNull}}"/>
+
+                <!-- Hint — shown when DiffCanvas is null -->
+                <Border Background="#1e1e1e"
+                        IsVisible="{Binding DiffCanvas, Converter={StaticResource IsNull}}">
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <TextBlock Text="{Binding Selected.Name}"
+                                   Foreground="#ccc"
+                                   FontSize="14"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,0,0,8"
+                                   IsVisible="{Binding Selected, Converter={StaticResource IsNotNull}}"/>
+                        <TextBlock Text="{Binding CanvasHint}"
+                                   Foreground="#555"
+                                   FontSize="11"
+                                   HorizontalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   MaxWidth="260"
+                                   IsVisible="{Binding CanvasHint, Converter={StaticResource NullOrEmptyToVis}}"/>
+                        <TextBlock Text="{StaticResource DiffWindow_SelectHint}"
+                                   Foreground="#555"
+                                   FontSize="11"
+                                   HorizontalAlignment="Center"
+                                   TextWrapping="Wrap"
+                                   TextAlignment="Center"
+                                   MaxWidth="260"
+                                   IsVisible="{Binding Selected, Converter={StaticResource IsNull}}"/>
+                    </StackPanel>
+                </Border>
+            </Panel>
         </Grid>
 
     </DockPanel>
