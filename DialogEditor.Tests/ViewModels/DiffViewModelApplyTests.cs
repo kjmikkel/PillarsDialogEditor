@@ -149,6 +149,14 @@ public class DiffViewModelApplyTests : IDisposable
     }
 
     [Fact]
+    public void SelectedGroup_SettingIt_SetsMatchingSelectedChange()
+    {
+        var vm = MakeWorkingVsRef();           // existing fixture; has a "greeting" change
+        vm.SelectedGroup = vm.Groups.First(g => g.Name == "greeting");
+        Assert.Equal("greeting", vm.Selected?.Name);
+    }
+
+    [Fact]
     public void Apply_RaisesCommitApply_BringingInSelectedNode()
     {
         var vm = MakeRefHasExtraNode();

@@ -99,6 +99,7 @@
             <converters:PropertyValueStyleToBrushConverter x:Key="PropertyValueStyleToBrush"/>
             <converters:FlowIssueKindToSeverityBrushConverter x:Key="FlowIssueSeverityBrush"/>
             <converters:DiffStatusToBrushConverter              x:Key="DiffStatusToBrushConverter"/>
+            <converters:EnumToBoolConverter                      x:Key="EnumToBool"/>
             <converters:IsNullConverter                          x:Key="IsNull"/>
             <converters:IsNotNullConverter                       x:Key="IsNotNull"/>
 
