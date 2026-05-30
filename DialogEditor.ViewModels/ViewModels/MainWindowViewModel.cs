@@ -62,6 +62,12 @@ public partial class MainWindowViewModel : ObservableObject
     /// Returns true if the user chooses Force Apply, false to cancel.
     public Func<PatchConflictException, Task<bool>>? RequestConflictResolution { get; set; }
 
+    /// Set by the UI: asks the user to save the current copy before bringing in
+    /// changes. Returns true to proceed (after saving), false to abort.
+    public Func<Task<bool>>? ConfirmSaveBeforeApply { get; set; }
+
+    private DialogProject? _preApplyProject;
+
     /// Set by the UI layer to present git merge conflicts for resolution.
     /// Returns the merged project to load, or null if the user cancelled.
     public Func<GitConflictResolutionViewModel, Task<DialogProject?>>? ShowGitConflictResolution { get; set; }
@@ -689,6 +695,41 @@ public partial class MainWindowViewModel : ObservableObject
 
     private bool CanSaveProject() =>
         _project is not null && _projectPath is not null && IsModified;
+
+    // ── Apply from diff ───────────────────────────────────────────────────
+
+    /// Brings an applied project (from the compare window) into the live editor:
+    /// guards on unsaved changes, snapshots the prior state, swaps + saves.
+    public async Task ApplyFromDiff(DialogProject applied)
+    {
+        if (_projectPath is null) return;
+
+        if (IsModified)
+        {
+            if (ConfirmSaveBeforeApply is null) return;
+            var proceed = await ConfirmSaveBeforeApply();
+            if (!proceed) return;
+            SaveProject();
+        }
+
+        _preApplyProject = _project;
+        SetProject(applied);
+        SaveProject();
+        UndoApplyCommand.NotifyCanExecuteChanged();
+        StatusText = Loc.Format("Status_BroughtInApplied", applied.Name);
+    }
+
+    [RelayCommand(CanExecute = nameof(CanUndoApply))]
+    private void UndoApply()
+    {
+        if (_preApplyProject is null) return;
+        SetProject(_preApplyProject);
+        SaveProject();
+        _preApplyProject = null;
+        UndoApplyCommand.NotifyCanExecuteChanged();
+    }
+
+    private bool CanUndoApply() => _preApplyProject is not null;
 
     // ── Merge projects ────────────────────────────────────────────────────
     [RelayCommand(CanExecute = nameof(CanMergeProjects))]
