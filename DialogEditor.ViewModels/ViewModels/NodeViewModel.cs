@@ -234,6 +234,14 @@ public partial class NodeViewModel : ObservableObject
     public IReadOnlyList<ConnectorViewModel> Inputs  { get; }
     public IReadOnlyList<ConnectorViewModel> Outputs { get; }
 
+    // ── Diff state (read-only by the user; set by diff engine) ───────────
+    private DiffStatus _diffStatus = DiffStatus.Unchanged;
+    public DiffStatus DiffStatus
+    {
+        get => _diffStatus;
+        set { _diffStatus = value; OnPropertyChanged(nameof(DiffStatus)); }
+    }
+
     // ── Canvas state ──────────────────────────────────────────────────────
     [ObservableProperty] private LayoutPoint _location;
     [ObservableProperty] private bool        _isSelected;

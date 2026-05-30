@@ -4,6 +4,7 @@ using Avalonia.Media;
 using DialogEditor.Avalonia.Converters;
 using DialogEditor.Core.Analytics;
 using DialogEditor.Core.Models;
+using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Models;
 
 namespace DialogEditor.Tests.Converters;
@@ -138,5 +139,38 @@ public class BrushConverterTests
             new object?[] { cat, displayType },
             typeof(ISolidColorBrush), zone, Inv);
         Assert.Equal(Color.FromRgb(r, g, b), BrushColor(result));
+    }
+
+    // ── DiffStatusToBrushConverter ─────────────────────────────────────────
+
+    [AvaloniaFact]
+    public void DiffStatusToBrush_Added_ReturnsGreen()
+        => Assert.Equal(Color.Parse("#3a7a3a"),
+            BrushColor(new DiffStatusToBrushConverter().Convert(DiffStatus.Added, typeof(IBrush), null, Inv)));
+
+    [AvaloniaFact]
+    public void DiffStatusToBrush_Changed_ReturnsAmber()
+        => Assert.Equal(Color.Parse("#c08a2a"),
+            BrushColor(new DiffStatusToBrushConverter().Convert(DiffStatus.Changed, typeof(IBrush), null, Inv)));
+
+    [AvaloniaFact]
+    public void DiffStatusToBrush_Removed_ReturnsRed()
+        => Assert.Equal(Color.Parse("#7a2a2a"),
+            BrushColor(new DiffStatusToBrushConverter().Convert(DiffStatus.Removed, typeof(IBrush), null, Inv)));
+
+    [AvaloniaFact]
+    public void DiffStatusToBrush_Unchanged_ReturnsTransparent()
+    {
+        var result = new DiffStatusToBrushConverter().Convert(DiffStatus.Unchanged, typeof(IBrush), null, Inv);
+        Assert.IsAssignableFrom<ISolidColorBrush>(result);
+        Assert.Equal(Colors.Transparent, ((ISolidColorBrush)result!).Color);
+    }
+
+    [AvaloniaFact]
+    public void DiffStatusToBrush_Null_ReturnsTransparent()
+    {
+        var result = new DiffStatusToBrushConverter().Convert(null, typeof(IBrush), null, Inv);
+        Assert.IsAssignableFrom<ISolidColorBrush>(result);
+        Assert.Equal(Colors.Transparent, ((ISolidColorBrush)result!).Color);
     }
 }
