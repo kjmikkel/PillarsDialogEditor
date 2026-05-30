@@ -517,6 +517,12 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Diff_WorkingCopy">Working copy</sys:String>
     <!-- {0} = changed conversation count -->
     <sys:String x:Key="Status_DiffComputed">{0} changed conversation(s)</sys:String>
+    <!-- {0} = number of changes brought in -->
+    <sys:String x:Key="Status_BroughtIn">Brought in {0} change(s) to your copy.</sys:String>
+    <!-- {0} = error message -->
+    <sys:String x:Key="Status_BringInError">Couldn't bring in the changes: {0}</sys:String>
+    <!-- {0} = project name -->
+    <sys:String x:Key="Status_BroughtInApplied">Brought changes into '{0}'. Use Undo bring-in to reverse it.</sys:String>
     <sys:String x:Key="ToolTip_DiffLeftPicker">Select the older (left) version to compare from</sys:String>
     <sys:String x:Key="ToolTip_DiffRightPicker">Select the newer (right) version to compare to</sys:String>
     <sys:String x:Key="ToolTip_DiffChangedList">Conversations that differ between the selected versions — click to inspect</sys:String>
