@@ -1,3 +1,4 @@
+using DialogEditor.Core.Models;
 using DialogEditor.Patch;
 using DialogEditor.Patch.GitConflict;
 using Xunit;
@@ -20,6 +21,18 @@ public class MergeBuilderTests
     private static DialogProject ProjectWithDeletion(int nodeId)
         => DialogProject.Empty("p").WithPatch(
             new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [], [nodeId], []));
+
+    private static DialogProject ProjectWithTranslation(int nodeId, string lang, string text)
+    {
+        var patch = new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [], [], [])
+        {
+            Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
+            {
+                [lang] = [new NodeTranslation(nodeId, text, "")],
+            },
+        };
+        return DialogProject.Empty("p").WithPatch(patch);
+    }
 
     [Fact]
     public void FieldEditResolvedToTheirs_TakesTheirsValue()
@@ -75,6 +88,32 @@ public class MergeBuilderTests
 
         Assert.DoesNotContain(merged.Patches["greeting"].ModifiedNodes, m => m.NodeId == 4);
         Assert.Contains(4, merged.Patches["greeting"].DeletedNodeIds);
+    }
+
+    [Fact]
+    public void TranslationResolvedToTheirs_TakesTheirsText()
+    {
+        var mine   = ProjectWithTranslation(4, "en", "Hello friend");
+        var theirs = ProjectWithTranslation(4, "en", "Hello traveler");
+        var conflict = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
+
+        var merged = MergeBuilder.Build(mine, theirs, [(conflict, MergeSide.Theirs)]);
+
+        var t = merged.Patches["greeting"].Translations["en"].Single(x => x.NodeId == 4);
+        Assert.Equal("Hello traveler", t.DefaultText);
+    }
+
+    [Fact]
+    public void TranslationResolvedToMine_KeepsMineText()
+    {
+        var mine   = ProjectWithTranslation(4, "en", "Hello friend");
+        var theirs = ProjectWithTranslation(4, "en", "Hello traveler");
+        var conflict = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
+
+        var merged = MergeBuilder.Build(mine, theirs, [(conflict, MergeSide.Mine)]);
+
+        var t = merged.Patches["greeting"].Translations["en"].Single(x => x.NodeId == 4);
+        Assert.Equal("Hello friend", t.DefaultText);
     }
 
     [Fact]
