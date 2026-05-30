@@ -33,6 +33,18 @@ public class GitMergeAnalyzerTests
         => DialogProject.Empty("p").WithPatch(
             new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [], [nodeId], []));
 
+    private static DialogProject ProjectWithTranslation(int nodeId, string lang, string text, string female = "")
+    {
+        var patch = new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [], [], [])
+        {
+            Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
+            {
+                [lang] = [new NodeTranslation(nodeId, text, female)],
+            },
+        };
+        return DialogProject.Empty("p").WithPatch(patch);
+    }
+
     [Fact]
     public void SameFieldDifferentValue_IsFieldEditConflict()
     {
@@ -105,6 +117,49 @@ public class GitMergeAnalyzerTests
         var mine   = ProjectWithFieldChange(1, "DefaultText", "a");
         var theirs = DialogProject.Empty("p"); // no patches
         Assert.Empty(GitMergeAnalyzer.Analyze(mine, theirs));
+    }
+
+    [Fact]
+    public void TranslationTextDiffers_IsTranslationEditConflict()
+    {
+        var mine   = ProjectWithTranslation(4, "en", "Hello friend");
+        var theirs = ProjectWithTranslation(4, "en", "Hello traveler");
+
+        var c = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
+        Assert.Equal(MergeConflictKind.TranslationEdit, c.Kind);
+        Assert.Equal("greeting", c.ConversationName);
+        Assert.Equal(4, c.NodeId);
+        Assert.Equal("en", c.FieldName);
+        Assert.Equal("Hello friend",   c.MineValue);
+        Assert.Equal("Hello traveler", c.TheirsValue);
+    }
+
+    [Fact]
+    public void TranslationIdentical_IsNotConflict()
+    {
+        var mine   = ProjectWithTranslation(4, "en", "Hello");
+        var theirs = ProjectWithTranslation(4, "en", "Hello");
+        Assert.Empty(GitMergeAnalyzer.Analyze(mine, theirs));
+    }
+
+    [Fact]
+    public void TranslationLanguageOnlyOnOneSide_IsNotConflict()
+    {
+        var mine   = ProjectWithTranslation(4, "en", "Hello");
+        var theirs = ProjectWithTranslation(4, "fr", "Bonjour");
+        Assert.Empty(GitMergeAnalyzer.Analyze(mine, theirs));
+    }
+
+    [Fact]
+    public void TranslationFemaleTextDiffers_FallsBackToFemaleTextForDisplay()
+    {
+        var mine   = ProjectWithTranslation(4, "en", "Hello", "HelloF");
+        var theirs = ProjectWithTranslation(4, "en", "Hello", "HelloFemale");
+
+        var c = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
+        Assert.Equal(MergeConflictKind.TranslationEdit, c.Kind);
+        Assert.Equal("HelloF",      c.MineValue);
+        Assert.Equal("HelloFemale", c.TheirsValue);
     }
 
     [Fact]

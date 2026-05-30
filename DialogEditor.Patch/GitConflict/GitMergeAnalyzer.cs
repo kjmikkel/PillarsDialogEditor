@@ -1,4 +1,5 @@
 using System.Text.Json;
+using DialogEditor.Core.Models;
 
 namespace DialogEditor.Patch.GitConflict;
 
@@ -81,7 +82,35 @@ public static class GitMergeAnalyzer
                 conflicts.Add(new MergeConflict(
                     MergeConflictKind.NodeAddAdd, conv, mineNode.NodeId, null, mineJson, theirJson));
         }
+
+        // ── Translation (text) edits ─────────────────────────────────────
+        // Node text lives in Translations[lang], not FieldChanges (see DiffEngine),
+        // so text conflicts surface only here.
+        var mineTr  = BuildTranslationMap(mine);
+        var theirTr = BuildTranslationMap(theirs);
+
+        foreach (var (key, mineT) in mineTr)
+        {
+            if (theirTr.TryGetValue(key, out var theirT) && !mineT.Equals(theirT))
+                conflicts.Add(new MergeConflict(
+                    MergeConflictKind.TranslationEdit, conv, key.NodeId, key.Lang,
+                    DisplayText(mineT, theirT), DisplayText(theirT, mineT)));
+        }
     }
+
+    private static Dictionary<(int NodeId, string Lang), NodeTranslation> BuildTranslationMap(ConversationPatch patch)
+    {
+        var map = new Dictionary<(int, string), NodeTranslation>();
+        foreach (var (lang, list) in patch.Translations)
+            foreach (var t in list)
+                map[(t.NodeId, lang)] = t;   // last-wins
+        return map;
+    }
+
+    // Show the field that actually differs: DefaultText when it differs, else the
+    // FemaleText (so a female-only difference is still visible in the dialog).
+    private static string DisplayText(NodeTranslation self, NodeTranslation other)
+        => self.DefaultText != other.DefaultText ? self.DefaultText : self.FemaleText;
 
     // (nodeId, field) -> comparable value. FieldChanges contribute their `To`
     // value; the replace-all Conditions/Scripts lists are JSON-encoded so they
