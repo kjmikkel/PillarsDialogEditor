@@ -238,6 +238,45 @@ applying community mods.
 
 ---
 
+## Collaborating with Git
+
+Because a `.dialogproject` is plain JSON, it lives comfortably in a Git
+repository — branch, review, and share it like source code. The one rough edge of
+text-based version control is the *merge conflict*: when two branches edit the same
+project and you `git merge` or `git pull`, Git rewrites the file with
+`<<<<<<<` / `=======` / `>>>>>>>` markers, which makes it invalid JSON.
+
+The editor handles this for you. **Open Project** (`Ctrl+O`) on a conflicted file
+detects the markers, reconstructs both sides, and opens a **Resolve Git Conflicts**
+window instead of failing. No Git installation is required — it reads the markers
+already in the file.
+
+For each conflict you choose which side to keep:
+
+| Conflict | What you see | Choices |
+|----------|--------------|---------|
+| Text / translation edit | The two versions side-by-side with the changed words highlighted, per language | Keep mine / Keep theirs |
+| Other field edit (speaker, links, conditions, …) | The two field values, per field | Keep mine / Keep theirs |
+| Both branches added the same node | The two node definitions | Keep mine / Keep theirs |
+| One branch edited a node the other deleted | The edit vs. the deletion | Keep my edit / Accept deletion |
+
+When every conflict has a choice, **Apply** builds the merged project and opens it
+**unsaved**. Review it on the canvas, then **Save Project** (`Ctrl+S`) writes clean
+JSON back to the file — after which a normal `git add` completes the merge. Cancelling
+leaves the file untouched so you can fall back to your usual Git tooling.
+
+If the project that was open when you last closed the editor has conflicts, startup
+shows a status message with a **Resolve…** button rather than interrupting you with a
+dialog — click it when you're ready.
+
+> **Scope:** node text, fields, conditions/scripts, additions, and deletions are
+> resolved in-app. Canvas layout positions and the list of not-yet-created
+> conversations currently fall back to your side; resolve those in your Git tool if
+> they matter. If either side of the conflict is too damaged to parse as JSON, the
+> editor says so and asks you to resolve it in your Git tool first.
+
+---
+
 ## dialog-patcher CLI
 
 A lightweight command-line tool for scripted or automated patch application,
