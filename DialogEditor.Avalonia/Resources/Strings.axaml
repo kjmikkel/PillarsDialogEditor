@@ -513,8 +513,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="DiffWindow_NoGameFolder">Open a game folder to see the conversation graph.</sys:String>
     <sys:String x:Key="DiffWindow_SelectHint">Select a conversation from the list to inspect it.</sys:String>
     <sys:String x:Key="Menu_CompareVersions">Compare Versions…</sys:String>
-    <sys:String x:Key="ToolTip_CompareVersions">Open the diff viewer to compare conversations between two git versions or branches.</sys:String>
-    <sys:String x:Key="Diff_WorkingCopy">Working copy</sys:String>
+    <sys:String x:Key="ToolTip_CompareVersions">Compare two versions of your dialogue (such as a branch or an earlier save) and see what changed in each conversation.</sys:String>
+    <sys:String x:Key="Diff_WorkingCopy">Your copy</sys:String>
     <!-- {0} = changed conversation count -->
     <sys:String x:Key="Status_DiffComputed">{0} changed conversation(s)</sys:String>
     <!-- {0} = number of changes brought in -->
