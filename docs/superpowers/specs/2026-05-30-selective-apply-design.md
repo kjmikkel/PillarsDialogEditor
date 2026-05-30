@@ -37,12 +37,14 @@ Undo is **conversation-scoped** in this app (each `ConversationViewModel` owns a
 - Per-node checkable selection in the diff window (two-level tree), with `CanApply` gating.
 - Editor integration: save-guard prompt, write-to-disk + in-sync editor, single-step "Undo apply".
 - Segmented canvas toggle with a live, selection-aware "applied preview".
+- **Approachability for non-technical writers:** a jargon-free terminology pass on all user-facing strings, a Help window (legend + prose), and always-on in-context cues. See the dedicated section below.
 
 **Out of scope (YAGNI / later):**
 - Automatic dependency-pulling when a selection would dangle (warn-only in v1).
 - Before/after node-text detail in the warning or canvas (already deferred from Spec 1 Task 9).
 - Multi-step apply history (single revert only).
 - Applying *into* a git ref (only the working copy is writable).
+- **First-run intro/tour panel — deferred (revisit).** A one-time, dismissible explanatory panel shown the first time the compare window opens. Deferred because it needs persisted "seen" state; the always-on in-context cues cover the immediate need. Recorded in `Gaps.md` so it is not lost. Revisit after v1 ships.
 
 ## Architecture & components
 
@@ -95,22 +97,62 @@ public readonly record struct NodeSelection(string ConversationName, int NodeId)
 
 ### UI — `DiffWindow.axaml`
 
-- Replace the flat `ListBox` item template with the expandable, checkable two-level tree (node rows reuse the existing `+ / ~ / −` colour coding).
-- Add a **segmented toggle** above the canvas: *Changes* / *Applied preview*, each with a tooltip describing what it shows.
-- Add a bottom-docked **apply bar**: an Apply button, a checked-count label, an **Undo apply** button, and a collapsible dangling-link warning panel.
-  - Apply tooltip (enabled): "Applies the checked changes into your working-copy `.dialogproject`. The working copy must be one of the two compared versions; the changes are written into it and saved."
-  - Apply tooltip (disabled): explains that apply requires the working copy to be one of the two endpoints, and a saved (non-dirty) editor.
-- All new strings live in resource dictionaries / `.resx` (localisation rule); every new control carries a detailed `ToolTip` (UI/UX rule).
+- Replace the flat `ListBox` item template with the expandable, checkable two-level tree (node rows reuse the existing `+ / ~ / −` colour coding). The two-level rows read as "dialogue line" in their labels, not "node".
+- Add a **segmented toggle** above the canvas: *Changes* / *Applied preview*, each with a tooltip describing what it shows. Beside it sits a compact **colour-key strip** (green/orange/red swatches) and a **`?` Help button** that opens `DiffHelpWindow`.
+- Add a bottom-docked **apply bar**: a one-line hint, a **"Bring in"** button (internally `ApplyCommand`), a checked-count label, an **"Undo bring-in"** button (internally `UndoApplyCommand`), and a collapsible dangling-link warning panel.
+  - "Bring in" tooltip (enabled): "Brings the ticked changes into your copy. Your copy must be one of the two versions being compared; the changes are written into it and saved straight away."
+  - "Bring in" tooltip (disabled): explains in plain language that it needs *your copy* to be one of the two versions on screen, and that your copy must be saved first.
+  - "Undo bring-in" tooltip: "Reverses the last set of changes you brought in, restoring your copy to how it was just before."
+- All new strings live in resource dictionaries / `.resx` (localisation rule) and follow the terminology glossary above; every new control carries a detailed, jargon-free `ToolTip` (UI/UX rule).
+
+## Approachability for non-technical writers
+
+The primary users of a dialogue diff are narrative writers, not version-control experts. Version-control vocabulary ("ref", "patch", "cherry-pick", "working copy") is a barrier, so the feature is designed to be usable without it. Three surfaces, all required for v1.
+
+### 1. Jargon-free terminology pass
+
+User-facing strings use plain language; version-control jargon stays in *code only* (`DiffEndpoint`, `ConversationPatch`, `NodeApplyBuilder` keep their technical names). Guiding glossary for every label, button, tooltip, status message, and help string:
+
+| In code / VC term | User-facing wording |
+|---|---|
+| endpoint | **version** |
+| working copy | **your copy** (or "your current copy") |
+| git ref / branch / commit | **a saved version** (branch or snapshot) |
+| diff / compare endpoints | **compare versions** |
+| apply / cherry-pick | **bring in** (changes) |
+| patch | *(never surfaced)* |
+| node | **dialogue line** (or "line") |
+| added / modified / removed | **added / changed / removed** |
+| undo apply | **undo bring-in** |
+
+This is a guideline, not a code unit: it constrains the wording of the resource strings introduced for this feature (and lightly revisits the Spec 1 strings the compare window already shows, e.g. endpoint-picker labels).
+
+### 2. Help window (legend + prose)
+
+A `?` / Help button on the compare window opens a **`DiffHelpWindow`**, modeled on the existing `LegendWindow.axaml` (scrollable, sectioned, all strings from resources, app icon per the windows-need-an-icon rule). Sections:
+
+- **Colour key** — green = added line, orange = changed line, red = removed line (matches `DiffStatusToBrushConverter`).
+- **Comparing versions** — what "compare two versions" means in plain terms.
+- **The two views** — *Changes* (everything different between the two versions) vs *Applied preview* (what your copy will look like after you bring in the ticked changes).
+- **Bringing in changes** — tick the lines you want, then "Bring in"; this updates *your copy* and saves it.
+- **Undo** — "Undo bring-in" reverses the last bring-in.
+- **A note on links** — if you bring in a line that points to a line you didn't bring in, you'll see a warning; it's safe to proceed, but the link may not lead anywhere.
+
+### 3. In-context cues (always visible, no window needed)
+
+- A compact **colour-key strip** on the canvas (green/orange/red swatches with one-word labels) so tint meaning is never hidden behind a button.
+- A **one-line hint** above the apply bar: "Tick the changes you want to bring into your copy, then Bring in."
+- Detailed, plain-language **tooltips** on every new control, written for someone who has never used version control — full sentences describing the effect and its consequence (e.g. the Apply/"Bring in" tooltips already drafted in the UI section).
 
 ## Data flow
 
 1. User compares **working copy** against a **git ref** (or ref against working copy) → Spec 1 produces `Changes`.
 2. User expands conversations and checks individual node changes; the tri-state conversation checkboxes roll up.
 3. (Optional) User switches the canvas to **Applied preview** to see the projected working copy for the selected conversation, tinted by their current selection; toggling checkboxes updates it live.
-4. User clicks **Apply** (enabled only when `CanApply`).
+4. User clicks **Bring in** (the `ApplyCommand`, enabled only when `CanApply`).
 5. `ApplyCommand` projects the result via `NodeApplyBuilder`, runs `NodeLinkAnalyzer`, shows any dangling-link warning, and raises `CommitApply(result)`.
 6. `MainWindowViewModel.ApplyFromDiff` runs the save-guard, snapshots the pre-apply project, `SetProject(result)`, and saves to disk.
-7. User may **Undo apply** once to restore the snapshot and re-save.
+7. User may click **Undo bring-in** (the `UndoApplyCommand`) once to restore the snapshot and re-save.
 
 ## Error handling
 
@@ -126,6 +168,7 @@ Tests mirror structure in `DialogEditor.Tests`.
 - **`NodeLinkAnalyzer`** — dangling link detected when a selected node links to an unselected/absent node; clean case yields none; removed-but-still-linked case.
 - **`DiffViewModel`** — `CanApply` across endpoint combinations (working-vs-ref, ref-vs-working, ref-vs-ref disabled, empty selection disabled); tri-state roll-up; `CanvasMode` switching rebuilds the canvas; applied-preview tinting reflects the selection.
 - **`MainWindowViewModel.ApplyFromDiff`** — save-guard prompt on dirty (proceed vs cancel), pre-apply snapshot, `SetProject` + save leaves a clean state, `UndoApplyCommand` restores the snapshot.
+- **`DiffHelpWindow`** — headless Avalonia integration test that it constructs and shows (mirroring the existing `LegendWindow` test). The terminology pass itself is a wording guideline, not a code unit, so it is verified by review rather than automated tests.
 
 ## Build sequence
 
@@ -135,4 +178,5 @@ Tests mirror structure in `DialogEditor.Tests`.
 4. `MainWindowViewModel.ApplyFromDiff` + save-guard + `UndoApplyCommand` + tests.
 5. `DiffViewModel` applied-preview branch (`CanvasMode`) + tests.
 6. `DiffWindow.axaml` UI: checkable tree, segmented toggle, apply bar, warning panel, resources, tooltips.
-7. `MainWindow` wiring of `CommitApply`.
+7. Approachability: jargon-free terminology pass on all new (and the touched Spec 1) strings, colour-key strip + one-line hint, and the `DiffHelpWindow` (legend + prose) with its `?` button.
+8. `MainWindow` wiring of `CommitApply`.
