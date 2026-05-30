@@ -1,0 +1,268 @@
+using System.Collections.Generic;
+using DialogEditor.Core.Editing;
+using DialogEditor.Core.GameData;
+using DialogEditor.Core.Models;
+using DialogEditor.Patch;
+using DialogEditor.Patch.Diff;
+using DialogEditor.Tests.Helpers;
+using DialogEditor.ViewModels;
+using DialogEditor.ViewModels.Resources;
+
+namespace DialogEditor.Tests.ViewModels;
+
+public class DiffViewModelTests : IDisposable
+{
+    private readonly List<string> _tempFiles = [];
+
+    public DiffViewModelTests() => Loc.Configure(new StubStringProvider());
+
+    public void Dispose()
+    {
+        foreach (var f in _tempFiles)
+            try { File.Delete(f); } catch { /* best-effort */ }
+    }
+
+    // ── helpers ──────────────────────────────────────────────────────────────
+
+    private string WriteTempProject(DialogProject project)
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"diff_{Guid.NewGuid():N}.dialogproject");
+        _tempFiles.Add(path);
+        File.WriteAllText(path, DialogProjectSerializer.Serialize(project));
+        return path;
+    }
+
+    private static NodeEditSnapshot Node(int id) =>
+        new(id, false, SpeakerCategory.Npc, "", "", "", "", "Conversation", "None", "", "", "", false, false, [], [], []);
+
+    private static DialogProject WithNode(int id) =>
+        DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [Node(id)], [], []));
+
+    private static DialogProject Empty() => DialogProject.Empty("p");
+
+    /// <summary>
+    /// Builds a FakeGit that:
+    ///   - rev-parse --show-toplevel → returns the directory of projectFilePath
+    ///   - show &lt;ref&gt;:&lt;rel&gt;  → returns refContent (or fails if refContent is null)
+    ///   - branch / log            → empty OK (no branches / commits by default)
+    /// </summary>
+    private static FakeGit MakeFakeGit(string projectDir, string? refContent,
+        string branchOutput = "", string logOutput = "")
+        => new(args =>
+        {
+            if (args is ["rev-parse", "--show-toplevel"])
+                return new GitResult(0, projectDir + "\n", "");
+
+            if (args.Length == 2 && args[0] == "show")
+            {
+                if (refContent is null)
+                    return new GitResult(128, "", "fatal: bad ref");
+                return new GitResult(0, refContent, "");
+            }
+
+            if (args.Length >= 1 && args[0] == "branch")
+                return new GitResult(0, branchOutput, "");
+
+            if (args.Length >= 1 && args[0] == "log")
+                return new GitResult(0, logOutput, "");
+
+            return new GitResult(0, "", "");
+        });
+
+    // ── tests ─────────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void EndpointOptions_AlwaysContainsWorkingCopyOption_EvenWhenGitFails()
+    {
+        // git returns non-zero for everything
+        var git = new FakeGit(_ => new GitResult(128, "", "fatal: not a git repo"));
+        var projectA = WriteTempProject(Empty());
+
+        var vm = new DiffViewModel(git, projectA);
+
+        Assert.Contains(vm.EndpointOptions, o => o.Endpoint is DiffEndpoint.WorkingCopy);
+    }
+
+    [Fact]
+    public void EndpointOptions_WorkingCopyLabel_ComesFromLoc()
+    {
+        var git = new FakeGit(_ => new GitResult(128, "", "fatal"));
+        var path = WriteTempProject(Empty());
+
+        var vm = new DiffViewModel(git, path);
+
+        var wc = vm.EndpointOptions.Single(o => o.Endpoint is DiffEndpoint.WorkingCopy);
+        // StubStringProvider returns the key itself
+        Assert.Equal("Diff_WorkingCopy", wc.Label);
+    }
+
+    [Fact]
+    public void EndpointOptions_IncludesBranchesFromGit()
+    {
+        var path = WriteTempProject(Empty());
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: null, branchOutput: "main\nfeature/xyz\n");
+
+        var vm = new DiffViewModel(git, path);
+
+        var refs = vm.EndpointOptions.Where(o => o.Endpoint is DiffEndpoint.GitRef).ToList();
+        Assert.Contains(refs, o => o.Label == "main" && ((DiffEndpoint.GitRef)o.Endpoint).Ref == "main");
+        Assert.Contains(refs, o => o.Label == "feature/xyz");
+    }
+
+    [Fact]
+    public void EndpointOptions_IncludesRecentCommitsFromGit()
+    {
+        var path = WriteTempProject(Empty());
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: null,
+            logOutput: "abc1234 Add greeting node\ndef5678 Fix typo\n");
+
+        var vm = new DiffViewModel(git, path);
+
+        var refs = vm.EndpointOptions.Where(o => o.Endpoint is DiffEndpoint.GitRef).ToList();
+        // SHA is first token; label is the full line
+        Assert.Contains(refs, o => ((DiffEndpoint.GitRef)o.Endpoint).Ref == "abc1234"
+                                   && o.Label == "abc1234 Add greeting node");
+        Assert.Contains(refs, o => ((DiffEndpoint.GitRef)o.Endpoint).Ref == "def5678");
+    }
+
+    [Fact]
+    public void DefaultLeftEndpoint_IsFirstGitRef_WhenAvailable()
+    {
+        var path = WriteTempProject(Empty());
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: null, branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, path);
+
+        Assert.IsType<DiffEndpoint.GitRef>(vm.LeftEndpoint?.Endpoint);
+    }
+
+    [Fact]
+    public void DefaultLeftEndpoint_IsWorkingCopy_WhenNoGitRefs()
+    {
+        var git = new FakeGit(_ => new GitResult(128, "", "fatal"));
+        var path = WriteTempProject(Empty());
+
+        var vm = new DiffViewModel(git, path);
+
+        Assert.IsType<DiffEndpoint.WorkingCopy>(vm.LeftEndpoint?.Endpoint);
+    }
+
+    [Fact]
+    public void DefaultRightEndpoint_IsWorkingCopy()
+    {
+        var path = WriteTempProject(Empty());
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: null, branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, path);
+
+        Assert.IsType<DiffEndpoint.WorkingCopy>(vm.RightEndpoint?.Endpoint);
+    }
+
+    [Fact]
+    public void Diff_OneAddedNode_YieldsOneChange_WithAddedCount1()
+    {
+        // ProjectA (at git ref "main") has node 1; working copy (disk) adds node 2.
+        var projectA = WithNode(1);
+        var projectB = WithNode(1); // overwritten below — disk has nodes 1+2
+        // Working copy on disk: nodes 1 + 2
+        var diskProject = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion,
+                [Node(1), Node(2)], [], []));
+
+        var path = WriteTempProject(diskProject);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+
+        // git show for the ref returns projectA JSON (node 1 only)
+        var refJson = DialogProjectSerializer.Serialize(projectA);
+        var git     = MakeFakeGit(dir, refContent: refJson, branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, path);
+
+        // LeftEndpoint = main (git ref), RightEndpoint = working copy — default
+        Assert.IsType<DiffEndpoint.GitRef>(vm.LeftEndpoint?.Endpoint);
+        Assert.Single(vm.Changes);
+        Assert.Equal(1, vm.Changes[0].AddedCount);
+    }
+
+    [Fact]
+    public void Diff_GitRefShowFails_ChangesEmpty_StatusNonEmpty()
+    {
+        // git show returns non-zero
+        var path = WriteTempProject(Empty());
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: null, branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, path);
+
+        Assert.Empty(vm.Changes);
+        Assert.NotEmpty(vm.StatusText);
+    }
+
+    [Fact]
+    public void Diff_BothEndpointsNull_ChangesEmpty()
+    {
+        var git = new FakeGit(_ => new GitResult(128, "", "fatal"));
+        var path = WriteTempProject(Empty());
+
+        var vm = new DiffViewModel(git, path);
+        vm.LeftEndpoint  = null;
+        vm.RightEndpoint = null;
+
+        Assert.Empty(vm.Changes);
+    }
+
+    [Fact]
+    public void Diff_IdenticalProjects_ChangesEmpty_StatusSet()
+    {
+        var project = WithNode(1);
+        var path    = WriteTempProject(project);
+        var dir     = Path.GetDirectoryName(Path.GetFullPath(path))!;
+
+        var refJson = DialogProjectSerializer.Serialize(project);
+        var git     = MakeFakeGit(dir, refContent: refJson, branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, path);
+
+        Assert.Empty(vm.Changes);
+        // StatusText should contain key string (StubStringProvider returns key)
+        Assert.Equal("Status_DiffComputed", vm.StatusText);
+    }
+
+    [Fact]
+    public void ChangingEndpoint_TriggersRecompute()
+    {
+        // Start with identical projects (no changes), then swap right to a ref with a different version
+        var projectBase = WithNode(1);
+        var path        = WriteTempProject(projectBase);
+        var dir         = Path.GetDirectoryName(Path.GetFullPath(path))!;
+
+        var projectDifferent = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion,
+                [Node(1), Node(2)], [], []));
+        var refJson = DialogProjectSerializer.Serialize(projectDifferent);
+
+        var git = MakeFakeGit(dir, refContent: refJson, branchOutput: "main\n");
+        var vm  = new DiffViewModel(git, path);
+
+        // Initial: left=main (different from disk), right=working copy → 1 change
+        Assert.Single(vm.Changes);
+
+        // Change right endpoint to the git ref as well → same content → no changes
+        var mainOption = vm.EndpointOptions.First(o => o.Endpoint is DiffEndpoint.GitRef);
+        vm.RightEndpoint = mainOption;
+
+        Assert.Empty(vm.Changes);
+    }
+
+    // ── helper ────────────────────────────────────────────────────────────────
+
+    private sealed class FakeGit(Func<string[], GitResult> handler) : IGitRunner
+    {
+        public GitResult Run(string workingDirectory, params string[] args) => handler(args);
+    }
+}
