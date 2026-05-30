@@ -1,5 +1,6 @@
 using System.Linq;
 using DialogEditor.Core.Editing;
+using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
 using DialogEditor.Patch.Diff;
@@ -172,6 +173,36 @@ public class DiffViewModelApplyTests : IDisposable
         vm.ApplyCommand.Execute(null);
 
         Assert.NotEmpty(vm.DanglingLinks);
+    }
+
+    [Fact]
+    public void AppliedPreview_TintsBroughtInNode_AsAdded()
+    {
+        var convName = "greeting";
+        var file     = new ConversationFile(convName, "", "/fake/greeting.conversation", "/fake/greeting.stringtable");
+        var baseSnap = new ConversationEditSnapshot([Node(1), Node(2)]);
+        var provider = new StubProvider(file, baseSnap);
+
+        // working copy (target/right) = [1]; ref (source/left) = [1,2]
+        var disk = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch(convName, ConversationPatch.CurrentSchemaVersion, [Node(1)], [], []));
+        var refProject = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch(convName, ConversationPatch.CurrentSchemaVersion, [Node(1), Node(2)], [], []));
+
+        var path = WriteTempProject(disk);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, DialogProjectSerializer.Serialize(refProject), "main\n");
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path, provider, "en");
+
+        // node 2 shows as a change (Removed: ref has it, working copy doesn't). Tick it.
+        vm.Groups[0].Nodes.First(n => n.NodeId == 2).IsSelected = true;
+        vm.CanvasMode = CanvasMode.AppliedPreview;
+        vm.Selected   = vm.Changes.First(c => c.Name == convName);
+
+        Assert.NotNull(vm.DiffCanvas);
+        var node2 = vm.DiffCanvas!.Nodes.First(n => n.NodeId == 2);
+        Assert.Equal(DiffStatus.Added, node2.DiffStatus);
     }
 
     private sealed class FakeGit(Func<string[], GitResult> handler) : IGitRunner
