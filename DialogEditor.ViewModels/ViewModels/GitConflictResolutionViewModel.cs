@@ -53,9 +53,15 @@ public partial class ConflictRowViewModel : ObservableObject
     {
         Conflict = conflict;
 
-        Title = conflict.Kind == MergeConflictKind.FieldEdit
-            ? Loc.Format("GitConflict_RowTitleField", conflict.ConversationName, conflict.NodeId, conflict.FieldName ?? "")
-            : Loc.Format("GitConflict_RowTitleNode", conflict.ConversationName, conflict.NodeId, DescribeKind(conflict));
+        Title = conflict.Kind switch
+        {
+            MergeConflictKind.FieldEdit =>
+                Loc.Format("GitConflict_RowTitleField", conflict.ConversationName, conflict.NodeId, conflict.FieldName ?? ""),
+            MergeConflictKind.TranslationEdit =>
+                Loc.Format("GitConflict_RowTitleTranslation", conflict.ConversationName, conflict.NodeId, conflict.FieldName ?? ""),
+            _ =>
+                Loc.Format("GitConflict_RowTitleNode", conflict.ConversationName, conflict.NodeId, DescribeKind(conflict)),
+        };
 
         (MineLabel, TheirsLabel) = Labels(conflict);
     }
