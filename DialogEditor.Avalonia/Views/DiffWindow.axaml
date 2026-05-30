@@ -1,0 +1,157 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+        xmlns:diff="clr-namespace:DialogEditor.Patch.Diff;assembly=DialogEditor.Patch"
+        x:Class="DialogEditor.Avalonia.Views.DiffWindow"
+        Title="{StaticResource DiffWindow_Title}"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="820" Height="560"
+        Background="#252525"
+        WindowStartupLocation="CenterOwner"
+        x:CompileBindings="False">
+
+    <DockPanel Margin="12">
+
+        <!-- ── Endpoint selectors ─────────────────────────────────────── -->
+        <Grid DockPanel.Dock="Top" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0"
+                       Text="{StaticResource DiffWindow_LeftLabel}"
+                       Foreground="#aaa"
+                       VerticalAlignment="Center"
+                       Margin="0,0,6,0"
+                       ToolTip.Tip="{StaticResource ToolTip_DiffLeftPicker}"/>
+            <ComboBox Grid.Column="1"
+                      x:Name="LeftPicker"
+                      ItemsSource="{Binding EndpointOptions}"
+                      SelectedItem="{Binding LeftEndpoint, Mode=TwoWay}"
+                      ToolTip.Tip="{StaticResource ToolTip_DiffLeftPicker}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:EndpointOption}">
+                        <TextBlock Text="{Binding Label}" Foreground="#ddd"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <TextBlock Grid.Column="3"
+                       Text="{StaticResource DiffWindow_RightLabel}"
+                       Foreground="#aaa"
+                       VerticalAlignment="Center"
+                       Margin="0,0,6,0"
+                       ToolTip.Tip="{StaticResource ToolTip_DiffRightPicker}"/>
+            <ComboBox Grid.Column="4"
+                      x:Name="RightPicker"
+                      ItemsSource="{Binding EndpointOptions}"
+                      SelectedItem="{Binding RightEndpoint, Mode=TwoWay}"
+                      ToolTip.Tip="{StaticResource ToolTip_DiffRightPicker}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:EndpointOption}">
+                        <TextBlock Text="{Binding Label}" Foreground="#ddd"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+        </Grid>
+
+        <!-- ── Status bar ─────────────────────────────────────────────── -->
+        <Border DockPanel.Dock="Bottom" Background="#1a1a1a" Padding="8,4" Margin="0,8,0,0">
+            <TextBlock Text="{Binding StatusText}"
+                       Foreground="#888"
+                       FontSize="11"
+                       VerticalAlignment="Center"/>
+        </Border>
+
+        <!-- ── Main area: list + detail ───────────────────────────────── -->
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="280"/>
+                <ColumnDefinition Width="8"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left: changed conversations list -->
+            <Grid Grid.Column="0" RowDefinitions="Auto,*">
+                <TextBlock Grid.Row="0"
+                           Text="{StaticResource DiffWindow_ChangedHeader}"
+                           Foreground="#888"
+                           FontSize="10"
+                           FontWeight="Bold"
+                           Margin="0,0,0,4"/>
+                <Border Grid.Row="1"
+                        BorderBrush="#444"
+                        BorderThickness="1"
+                        CornerRadius="4">
+                    <ListBox x:Name="ChangedList"
+                             ItemsSource="{Binding Changes}"
+                             SelectedItem="{Binding Selected, Mode=TwoWay}"
+                             Background="Transparent"
+                             ToolTip.Tip="{StaticResource ToolTip_DiffChangedList}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type diff:ConversationChange}">
+                                <StackPanel Orientation="Vertical" Margin="4,2">
+                                    <TextBlock Text="{Binding Name}"
+                                               Foreground="#ddd"
+                                               FontSize="12"/>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Foreground="#7dcea0" FontSize="10">
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="+{0}">
+                                                    <Binding Path="AddedCount"/>
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                        <TextBlock Text=" " FontSize="10"/>
+                                        <TextBlock Foreground="#f0ad4e" FontSize="10">
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="~{0}">
+                                                    <Binding Path="ModifiedCount"/>
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                        <TextBlock Text=" " FontSize="10"/>
+                                        <TextBlock Foreground="#e74c3c" FontSize="10">
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat="−{0}">
+                                                    <Binding Path="RemovedCount"/>
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Border>
+            </Grid>
+
+            <!-- Right: detail placeholder -->
+            <Border Grid.Column="2"
+                    BorderBrush="#444"
+                    BorderThickness="1"
+                    CornerRadius="4"
+                    Background="#1e1e1e"
+                    Padding="12">
+                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <TextBlock Text="{Binding Selected.Name}"
+                               Foreground="#ccc"
+                               FontSize="14"
+                               HorizontalAlignment="Center"
+                               Margin="0,0,0,8"/>
+                    <TextBlock Text="{StaticResource DiffWindow_NoGameFolder}"
+                               Foreground="#555"
+                               FontSize="11"
+                               HorizontalAlignment="Center"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+    </DockPanel>
+</Window>

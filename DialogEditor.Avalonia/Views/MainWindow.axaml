@@ -96,6 +96,10 @@
                                   Click="FlowAnalytics_Click"
                                   InputGesture="F7"
                                   ToolTip.Tip="{StaticResource ToolTip_FlowAnalytics}"/>
+                        <MenuItem Header="{StaticResource Menu_CompareVersions}"
+                                  Click="CompareVersions_Click"
+                                  IsEnabled="{Binding IsProjectOpen}"
+                                  ToolTip.Tip="{StaticResource ToolTip_CompareVersions}"/>
                     </MenuItem>
 
                     <MenuItem Header="{StaticResource Menu_Test}">
