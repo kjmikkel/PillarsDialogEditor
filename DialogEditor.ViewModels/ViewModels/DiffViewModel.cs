@@ -237,6 +237,13 @@ public partial class DiffViewModel : ObservableObject
             return;
         }
 
+        if (CanvasMode == CanvasMode.AppliedPreview && WorkingCopyIsEndpoint
+            && TargetProject is not null && SourceProject is not null)
+        {
+            BuildAppliedPreviewCanvas();
+            return;
+        }
+
         try
         {
             var name = Selected.Name;
@@ -298,6 +305,51 @@ public partial class DiffViewModel : ObservableObject
             AppLog.Warn($"DiffViewModel: BuildDiffCanvas failed for '{Selected?.Name}': {ex.Message}");
             DiffCanvas  = null;
             CanvasHint  = ex.Message;
+        }
+    }
+
+    private void BuildAppliedPreviewCanvas()
+    {
+        try
+        {
+            var name = Selected!.Name;
+            var selection = Groups
+                .Where(g => g.Name == name)
+                .SelectMany(g => g.SelectedNodeIds.Select(id => new NodeSelection(name, id)))
+                .ToList();
+
+            var projected = NodeApplyBuilder.Apply(TargetProject!, SourceProject!, selection);
+
+            // What changes in the working copy as a result (target → projected).
+            var change = ProjectDiff.Diff(TargetProject!, projected)
+                .FirstOrDefault(c => c.Name == name);
+
+            Conversation conv = ReconstructConversation(name, projected, _provider!);
+            var vm = new ConversationViewModel(_dispatcher);
+            vm.Load(conv);
+            vm.IsEditable = false;
+
+            if (change is not null)
+            {
+                var addedSet   = change.Added.ToHashSet();
+                var changedSet = change.Modified.ToHashSet();
+                var removedSet = change.Removed.ToHashSet();
+                foreach (var node in vm.Nodes)
+                {
+                    if (addedSet.Contains(node.NodeId))        node.DiffStatus = DiffStatus.Added;
+                    else if (changedSet.Contains(node.NodeId)) node.DiffStatus = DiffStatus.Changed;
+                    else if (removedSet.Contains(node.NodeId)) node.DiffStatus = DiffStatus.Removed;
+                }
+            }
+
+            DiffCanvas = vm;
+            CanvasHint = "";
+        }
+        catch (Exception ex)
+        {
+            AppLog.Warn($"DiffViewModel: applied-preview build failed for '{Selected?.Name}': {ex.Message}");
+            DiffCanvas = null;
+            CanvasHint = ex.Message;
         }
     }
 
