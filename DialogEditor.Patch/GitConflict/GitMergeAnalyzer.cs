@@ -34,6 +34,8 @@ public static class GitMergeAnalyzer
     private static void AnalyzeConversation(
         string conv, ConversationPatch mine, ConversationPatch theirs, List<MergeConflict> conflicts)
     {
+        var granular = new List<MergeConflict>();
+
         // ── Field edits ──────────────────────────────────────────────────
         var mineFields  = BuildFieldMap(mine);
         var theirFields = BuildFieldMap(theirs);
@@ -43,7 +45,7 @@ public static class GitMergeAnalyzer
             if (theirFields.TryGetValue(key, out var theirValue)
                 && !string.Equals(mineValue, theirValue, StringComparison.Ordinal))
             {
-                conflicts.Add(new MergeConflict(
+                granular.Add(new MergeConflict(
                     MergeConflictKind.FieldEdit, conv, key.NodeId, key.Field, mineValue, theirValue));
             }
         }
@@ -54,13 +56,13 @@ public static class GitMergeAnalyzer
 
         foreach (var nodeId in mine.DeletedNodeIds)
             if (theirTouched.Contains(nodeId))
-                conflicts.Add(new MergeConflict(
+                granular.Add(new MergeConflict(
                     MergeConflictKind.DeleteVsEdit, conv, nodeId, null,
                     DeletedMarker, DescribeTouched(theirs, nodeId)));
 
         foreach (var nodeId in theirs.DeletedNodeIds)
             if (mineTouched.Contains(nodeId))
-                conflicts.Add(new MergeConflict(
+                granular.Add(new MergeConflict(
                     MergeConflictKind.DeleteVsEdit, conv, nodeId, null,
                     DescribeTouched(mine, nodeId), DeletedMarker));
 
@@ -79,7 +81,7 @@ public static class GitMergeAnalyzer
             var mineJson  = JsonSerializer.Serialize(mineNode);
             var theirJson = JsonSerializer.Serialize(theirNode);
             if (!string.Equals(mineJson, theirJson, StringComparison.Ordinal))
-                conflicts.Add(new MergeConflict(
+                granular.Add(new MergeConflict(
                     MergeConflictKind.NodeAddAdd, conv, mineNode.NodeId, null, mineJson, theirJson));
         }
 
@@ -92,10 +94,67 @@ public static class GitMergeAnalyzer
         foreach (var (key, mineT) in mineTr)
         {
             if (theirTr.TryGetValue(key, out var theirT) && !mineT.Equals(theirT))
-                conflicts.Add(new MergeConflict(
+                granular.Add(new MergeConflict(
                     MergeConflictKind.TranslationEdit, conv, key.NodeId, key.Lang,
                     DisplayText(mineT, theirT), DisplayText(theirT, mineT)));
         }
+
+        // ── Conversation-level fallback ──────────────────────────────────
+        // If theirs holds content the per-node merge can't preserve — an addition,
+        // deletion, field, or translation on a node not wholly covered by a
+        // delete-vs-edit / add-add — the granular merge would silently drop it.
+        // Replace the granular conflicts with one whole-conversation choice.
+        var wholeCovered = granular
+            .Where(c => c.Kind is MergeConflictKind.DeleteVsEdit or MergeConflictKind.NodeAddAdd)
+            .Select(c => c.NodeId)
+            .ToHashSet();
+
+        if (HasUncoveredTheirsContent(mine, theirs, mineFields, theirFields, mineTr, theirTr, wholeCovered))
+            conflicts.Add(new MergeConflict(
+                MergeConflictKind.ConversationLevel, conv, -1, null,
+                SummarizePatch(mine), SummarizePatch(theirs)));
+        else
+            conflicts.AddRange(granular);
+    }
+
+    // True when theirs has any added node, deletion, modified field, or translation
+    // that mine lacks and that no whole-node conflict (delete-vs-edit / add-add) covers
+    // — i.e. content the granular merge (mine base + per-node overlays) would lose.
+    private static bool HasUncoveredTheirsContent(
+        ConversationPatch mine, ConversationPatch theirs,
+        Dictionary<(int NodeId, string Field), string> mineFields,
+        Dictionary<(int NodeId, string Field), string> theirFields,
+        Dictionary<(int NodeId, string Lang), NodeTranslation> mineTr,
+        Dictionary<(int NodeId, string Lang), NodeTranslation> theirTr,
+        HashSet<int> wholeCovered)
+    {
+        var mineAdded   = mine.AddedNodes.Select(n => n.NodeId).ToHashSet();
+        var mineDeleted = mine.DeletedNodeIds.ToHashSet();
+
+        foreach (var node in theirs.AddedNodes)
+            if (!mineAdded.Contains(node.NodeId) && !wholeCovered.Contains(node.NodeId))
+                return true;
+
+        foreach (var id in theirs.DeletedNodeIds)
+            if (!mineDeleted.Contains(id) && !wholeCovered.Contains(id))
+                return true;
+
+        foreach (var key in theirFields.Keys)
+            if (!wholeCovered.Contains(key.NodeId) && !mineFields.ContainsKey(key))
+                return true;
+
+        foreach (var key in theirTr.Keys)
+            if (!wholeCovered.Contains(key.NodeId) && !mineTr.ContainsKey(key))
+                return true;
+
+        return false;
+    }
+
+    // Compact per-side summary shown for a whole-conversation conflict, e.g. "+1 ~2 -0 (3 text)".
+    private static string SummarizePatch(ConversationPatch p)
+    {
+        var text = p.Translations.Sum(kv => kv.Value.Count);
+        return $"+{p.AddedNodes.Count} ~{p.ModifiedNodes.Count} -{p.DeletedNodeIds.Count} ({text} text)";
     }
 
     private static Dictionary<(int NodeId, string Lang), NodeTranslation> BuildTranslationMap(ConversationPatch patch)
