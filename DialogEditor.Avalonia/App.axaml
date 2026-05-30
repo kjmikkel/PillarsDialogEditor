@@ -98,6 +98,7 @@
             <converters:StringEqualsBoolConverter           x:Key="StringEqualsBool"/>
             <converters:PropertyValueStyleToBrushConverter x:Key="PropertyValueStyleToBrush"/>
             <converters:FlowIssueKindToSeverityBrushConverter x:Key="FlowIssueSeverityBrush"/>
+            <converters:DiffStatusToBrushConverter              x:Key="DiffStatusToBrushConverter"/>
 
         </ResourceDictionary>
     </Application.Resources>
