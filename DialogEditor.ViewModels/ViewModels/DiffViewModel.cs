@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
@@ -26,6 +27,7 @@ public partial class DiffViewModel : ObservableObject
 
     public IReadOnlyList<EndpointOption>           EndpointOptions { get; }
     public ObservableCollection<ConversationChange> Changes         { get; } = [];
+    public ObservableCollection<ConversationChangeViewModel> Groups  { get; } = [];
 
     [ObservableProperty] private EndpointOption?      _leftEndpoint;
     [ObservableProperty] private EndpointOption?      _rightEndpoint;
@@ -33,6 +35,21 @@ public partial class DiffViewModel : ObservableObject
     [ObservableProperty] private string               _statusText  = "";
     [ObservableProperty] private ConversationViewModel? _diffCanvas;
     [ObservableProperty] private string               _canvasHint  = "";
+    [ObservableProperty] private CanvasMode           _canvasMode  = CanvasMode.Changes;
+
+    // True when exactly one endpoint is the working copy (the writable target).
+    private bool WorkingCopyIsEndpoint =>
+        (LeftEndpoint?.Endpoint is DiffEndpoint.WorkingCopy) ^
+        (RightEndpoint?.Endpoint is DiffEndpoint.WorkingCopy);
+
+    private DialogProject? TargetProject =>
+        LeftEndpoint?.Endpoint is DiffEndpoint.WorkingCopy ? _leftProject : _rightProject;
+    private DialogProject? SourceProject =>
+        LeftEndpoint?.Endpoint is DiffEndpoint.WorkingCopy ? _rightProject : _leftProject;
+
+    public bool CanApply =>
+        WorkingCopyIsEndpoint && TargetProject is not null && SourceProject is not null
+        && Groups.Any(g => g.SelectedNodeIds.Count > 0);
 
     public DiffViewModel(
         IGitRunner        git,
@@ -123,6 +140,7 @@ public partial class DiffViewModel : ObservableObject
     private void Recompute()
     {
         Changes.Clear();
+        Groups.Clear();
         _leftProject  = null;
         _rightProject = null;
 
@@ -138,6 +156,14 @@ public partial class DiffViewModel : ObservableObject
             foreach (var change in results)
                 Changes.Add(change);
 
+            foreach (var change in results)
+            {
+                var group = new ConversationChangeViewModel(change);
+                group.SelectionChanged += OnSelectionChanged;
+                Groups.Add(group);
+            }
+            OnPropertyChanged(nameof(CanApply));
+
             StatusText = Loc.Format("Status_DiffComputed", Changes.Count);
         }
         catch (DiffException ex)
@@ -149,6 +175,14 @@ public partial class DiffViewModel : ObservableObject
         // Reset canvas when endpoints change
         BuildDiffCanvas();
     }
+
+    private void OnSelectionChanged()
+    {
+        OnPropertyChanged(nameof(CanApply));
+        if (CanvasMode == CanvasMode.AppliedPreview) BuildDiffCanvas();
+    }
+
+    partial void OnCanvasModeChanged(CanvasMode value) => BuildDiffCanvas();
 
     private void BuildDiffCanvas()
     {
