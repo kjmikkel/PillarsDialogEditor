@@ -65,6 +65,7 @@ public readonly record struct NodeSelection(string ConversationName, int NodeId)
   - source has the node in `AddedNodes` / `ModifiedNodes` / `DeletedNodeIds` / per-language `Translations` → set/replace the same bucket(s) in a clone of `target.Patches[conv]`;
   - source has **no contribution** for the node (it equals the base game file on the source side) → **remove** the node from the target patch entirely (drop from Added/Modified/Deleted/Translations), i.e. revert it to base.
 - Because the labels are not load-bearing, the same rule correctly handles every list item: an *Added* item adopts source's added node, a *Modified* item adopts source's modification, a *Removed* item adopts source's "no contribution" (reverting/removing it in the target). Which side is older/newer is irrelevant.
+- **`NodeComments` are intentionally outside the apply unit** — they are carried through from the target unchanged, never transplanted or stripped. Rationale: `ProjectDiff.Signatures()` excludes `NodeComments` from a node's change signature, so a comment-only change is never detected or selectable; transplanting could silently delete a writer's translator note.
 - Returns a new `DialogProject` (records are immutable); never mutates inputs. An empty selection returns `target` unchanged.
 - Reuses MergeBuilder's `ById` / `ConversationPatch with { ... }` *idiom*, not its conflict API.
 
