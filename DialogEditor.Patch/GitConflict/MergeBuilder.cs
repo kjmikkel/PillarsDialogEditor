@@ -39,7 +39,22 @@ public static class MergeBuilder
             patches[conv] = ApplyToPatch(mine.Patches[conv], theirs.Patches[conv], group);
         }
 
-        return mine with { Patches = patches };
+        var result = mine with { Patches = patches };
+
+        // Fold in theirs' canvas layout positions (per-node union; theirs wins on
+        // overlap, matching DialogProject.MergeLayout) — cosmetic, auto-merged.
+        foreach (var (conv, positions) in theirs.Layouts
+                 ?? new Dictionary<string, IReadOnlyDictionary<int, LayoutPoint>>())
+            result = result.MergeLayout(conv, positions);
+
+        // Union the new-conversation lists — additive, so a conversation either side
+        // created is never lost.
+        var newConvs = (mine.NewConversations ?? [])
+            .Concat(theirs.NewConversations ?? [])
+            .Distinct()
+            .ToList();
+
+        return newConvs.Count > 0 ? result with { NewConversations = newConvs } : result;
     }
 
     private static ConversationPatch ApplyToPatch(
