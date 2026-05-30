@@ -68,4 +68,21 @@ public class NodeApplyBuilderTests
         var result = NodeApplyBuilder.Apply(target, target, []);
         Assert.Same(target, result);
     }
+
+    [Fact]
+    public void Apply_LeavesNodeComments_Untouched()
+    {
+        var target = Project("c", Patch("c", added: [Node(7)]) with
+        {
+            NodeComments = new Dictionary<int, string> { [7] = "mine" }
+        });
+        var source = Project("c", Patch("c", added: [Node(7)]) with
+        {
+            NodeComments = new Dictionary<int, string> { [7] = "theirs" }
+        });
+
+        var result = NodeApplyBuilder.Apply(target, source, [new("c", 7)]);
+
+        Assert.Equal("mine", result.Patches["c"].NodeComments[7]); // target's note preserved, not transplanted
+    }
 }
