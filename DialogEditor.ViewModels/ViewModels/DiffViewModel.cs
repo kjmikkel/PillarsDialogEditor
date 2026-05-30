@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
@@ -50,6 +51,41 @@ public partial class DiffViewModel : ObservableObject
     public bool CanApply =>
         WorkingCopyIsEndpoint && TargetProject is not null && SourceProject is not null
         && Groups.Any(g => g.SelectedNodeIds.Count > 0);
+
+    /// <summary>Raised when the user brings in changes; the host persists the new project.</summary>
+    public Action<DialogProject>? CommitApply { get; set; }
+
+    public ObservableCollection<DanglingLink> DanglingLinks { get; } = [];
+
+    [RelayCommand(CanExecute = nameof(CanApply))]
+    private void Apply()
+    {
+        if (TargetProject is null || SourceProject is null) return;
+
+        var selection = Groups
+            .SelectMany(g => g.SelectedNodeIds.Select(id => new NodeSelection(g.Name, id)))
+            .ToList();
+        if (selection.Count == 0) return;
+
+        DialogProject result;
+        try
+        {
+            result = NodeApplyBuilder.Apply(TargetProject, SourceProject, selection);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error("DiffViewModel: bring-in failed", ex);
+            StatusText = Loc.Format("Status_BringInError", ex.Message);
+            return;
+        }
+
+        DanglingLinks.Clear();
+        foreach (var d in NodeLinkAnalyzer.Analyze(result))
+            DanglingLinks.Add(d);
+
+        CommitApply?.Invoke(result);
+        StatusText = Loc.Format("Status_BroughtIn", selection.Count);
+    }
 
     public DiffViewModel(
         IGitRunner        git,
@@ -179,6 +215,7 @@ public partial class DiffViewModel : ObservableObject
     private void OnSelectionChanged()
     {
         OnPropertyChanged(nameof(CanApply));
+        ApplyCommand.NotifyCanExecuteChanged();
         if (CanvasMode == CanvasMode.AppliedPreview) BuildDiffCanvas();
     }
 

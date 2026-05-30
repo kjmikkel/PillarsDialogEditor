@@ -1,3 +1,4 @@
+using System.Linq;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
@@ -102,6 +103,10 @@ public class DiffViewModelApplyTests : IDisposable
     private static NodeEditSnapshot Node(int id) =>
         new(id, false, SpeakerCategory.Npc, "", "", "", "", "Conversation", "None", "", "", "", false, false, [], [], []);
 
+    private static NodeEditSnapshot NodeWithLink(int id, int toId) =>
+        new(id, false, SpeakerCategory.Npc, "", "", "", "", "Conversation", "None", "", "", "", false, false,
+            [new LinkEditSnapshot(id, toId, 1f, "", false)], [], []);
+
     private static FakeGit MakeFakeGit(string projectDir, string? refContent, string branchOutput = "")
         => new(args =>
         {
@@ -112,6 +117,62 @@ public class DiffViewModelApplyTests : IDisposable
             if (args.Length >= 1 && args[0] == "log")    return new GitResult(0, "", "");
             return new GitResult(0, "", "");
         });
+
+    // Source (ref/left) HAS node 9; target (working copy/right) lacks it.
+    // Bringing in node 9 adds it to the working copy.
+    private DiffViewModel MakeRefHasExtraNode()
+    {
+        var disk = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [Node(1)], [], []));
+        var refProject = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [Node(1), Node(9)], [], []));
+        var path = WriteTempProject(disk);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, DialogProjectSerializer.Serialize(refProject), "main\n");
+        return new DiffViewModel(git, new StubDispatcher(), path);
+    }
+
+    // Source (ref/left) adds node 5 (which links to node 8) AND deletes node 8.
+    // Target (working copy/right) has neither. Bringing both in leaves node 5's
+    // link pointing at deleted node 8 → a dangling link.
+    private DiffViewModel MakeDanglingScenario()
+    {
+        var disk = DialogProject.Empty("p");
+        var refProject = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion,
+                [NodeWithLink(5, 8)], [8], []));
+        var path = WriteTempProject(disk);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, DialogProjectSerializer.Serialize(refProject), "main\n");
+        return new DiffViewModel(git, new StubDispatcher(), path);
+    }
+
+    [Fact]
+    public void Apply_RaisesCommitApply_BringingInSelectedNode()
+    {
+        var vm = MakeRefHasExtraNode();
+        // node 9 appears as a change; tick it.
+        vm.Groups[0].Nodes.First(n => n.NodeId == 9).IsSelected = true;
+        DialogProject? committed = null;
+        vm.CommitApply = p => committed = p;
+
+        vm.ApplyCommand.Execute(null);
+
+        Assert.NotNull(committed);
+        Assert.Contains(committed!.Patches["greeting"].AddedNodes, n => n.NodeId == 9);
+    }
+
+    [Fact]
+    public void Apply_PopulatesDanglingWarning_WhenSelectionLeavesADanglingLink()
+    {
+        var vm = MakeDanglingScenario();
+        foreach (var g in vm.Groups) g.IsAllSelected = true;
+        vm.CommitApply = _ => { };
+
+        vm.ApplyCommand.Execute(null);
+
+        Assert.NotEmpty(vm.DanglingLinks);
+    }
 
     private sealed class FakeGit(Func<string[], GitResult> handler) : IGitRunner
     {
