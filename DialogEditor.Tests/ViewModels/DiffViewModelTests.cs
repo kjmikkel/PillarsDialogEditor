@@ -367,6 +367,128 @@ public class DiffViewModelTests : IDisposable
         Assert.Null(vm.DiffCanvas);
     }
 
+    // ── NodeDiffDetail tests ──────────────────────────────────────────────────
+
+    // NodeT: used only for building patches where DefaultText/FemaleText survive
+    // in-memory (not through serialization). Text that must survive round-tripping
+    // must be placed in ConversationPatch.Translations instead.
+    private static NodeEditSnapshot NodeT(int id) =>
+        new(id, false, SpeakerCategory.Npc, "", "", "", "", "Conversation", "None", "", "", "", false, false, [], [], []);
+
+    // Builds a ConversationPatch whose node text survives JSON serialisation by
+    // placing it in Translations["en"] instead of [JsonIgnore] DefaultText.
+    private static ConversationPatch PatchWithText(
+        string convName,
+        IReadOnlyList<(int Id, string Text)> addedNodes,
+        IReadOnlyList<(int Id, string Text)>? translations = null)
+    {
+        var snapNodes = addedNodes.Select(n => NodeT(n.Id)).ToList();
+        var txList = (translations ?? addedNodes)
+            .Select(n => new NodeTranslation(n.Id, n.Text, ""))
+            .ToList();
+        return new ConversationPatch(
+            convName, ConversationPatch.CurrentSchemaVersion,
+            snapNodes, [], [])
+        {
+            Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
+                { ["en"] = txList }
+        };
+    }
+
+    [Fact]
+    public void SelectingAddedNode_PopulatesDetail_WithPlaceholderBefore()
+    {
+        var convName = "greeting";
+        var file     = new ConversationFile(convName, "", "/fake/greeting.conversation", "/fake/greeting.stringtable");
+        // Provider snap is not used for text (text comes from Translations); nodes just need to exist.
+        var provider = new StubProvider(file, new ConversationEditSnapshot([]));
+
+        // Disk (left / working copy): only node 1
+        var diskProject = DialogProject.Empty("p").WithPatch(
+            PatchWithText(convName, [(1, "Hi")]));
+
+        // Git ref (right): nodes 1 + 2
+        var refProject = DialogProject.Empty("p").WithPatch(
+            PatchWithText(convName, [(1, "Hi"), (2, "Added line")]));
+
+        var path = WriteTempProject(diskProject);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(refProject), branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path, provider, "en");
+        vm.Selected = vm.Changes.Single(c => c.Name == convName);
+
+        var node2 = vm.DiffCanvas!.Nodes.First(n => n.NodeId == 2);
+        vm.DiffCanvas.SelectedNode = node2;
+
+        Assert.NotNull(vm.SelectedNodeDetail);
+        Assert.Equal(2, vm.SelectedNodeDetail!.NodeId);
+        Assert.Equal(DiffStatus.Added, vm.SelectedNodeDetail.Kind);
+        Assert.Equal("Diff_Detail_NodeAdded", vm.SelectedNodeDetail.DefaultBefore);
+        Assert.Equal(node2.DefaultText, vm.SelectedNodeDetail.DefaultAfter);
+    }
+
+    [Fact]
+    public void SelectingChangedNode_PopulatesBothSides_FromTheirReconstructions()
+    {
+        var convName = "greeting";
+        var file     = new ConversationFile(convName, "", "/fake/greeting.conversation", "/fake/greeting.stringtable");
+        var provider = new StubProvider(file, new ConversationEditSnapshot([]));
+
+        // Left (working copy / disk): node 1 with text "old text"
+        var diskProject = DialogProject.Empty("p").WithPatch(
+            PatchWithText(convName, [(1, "old text")]));
+
+        // Right (git ref): node 1 with text "new text" — different translation → Modified
+        var refProject = DialogProject.Empty("p").WithPatch(
+            PatchWithText(convName, [(1, "new text")]));
+
+        var path = WriteTempProject(diskProject);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(refProject), branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path, provider, "en");
+        vm.Selected = vm.Changes.Single(c => c.Name == convName);
+
+        var node1 = vm.DiffCanvas!.Nodes.First(n => n.NodeId == 1);
+        vm.DiffCanvas.SelectedNode = node1;
+
+        Assert.NotNull(vm.SelectedNodeDetail);
+        Assert.Equal(DiffStatus.Changed, vm.SelectedNodeDetail!.Kind);
+        Assert.Equal(node1.DefaultText, vm.SelectedNodeDetail.DefaultAfter);
+        Assert.NotEqual(vm.SelectedNodeDetail.DefaultBefore, vm.SelectedNodeDetail.DefaultAfter);
+        Assert.NotEqual("Diff_Detail_NodeAdded", vm.SelectedNodeDetail.DefaultBefore);
+    }
+
+    [Fact]
+    public void SelectingUnchangedNode_LeavesDetailNull()
+    {
+        var convName = "greeting";
+        var file     = new ConversationFile(convName, "", "/fake/greeting.conversation", "/fake/greeting.stringtable");
+        var provider = new StubProvider(file, new ConversationEditSnapshot([]));
+
+        // Disk (left): only node 1
+        var diskProject = DialogProject.Empty("p").WithPatch(
+            PatchWithText(convName, [(1, "Hi")]));
+
+        // Git ref (right): nodes 1 + 2; node 1 is unchanged between sides
+        var refProject = DialogProject.Empty("p").WithPatch(
+            PatchWithText(convName, [(1, "Hi"), (2, "Added line")]));
+
+        var path = WriteTempProject(diskProject);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(refProject), branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path, provider, "en");
+        vm.Selected = vm.Changes.Single(c => c.Name == convName);
+
+        // Node 1 is Unchanged (same translation on both sides) → detail must be null
+        var node1 = vm.DiffCanvas!.Nodes.First(n => n.NodeId == 1);
+        vm.DiffCanvas.SelectedNode = node1;
+
+        Assert.Null(vm.SelectedNodeDetail);
+    }
+
     // ── helper ────────────────────────────────────────────────────────────────
 
     private sealed class FakeGit(Func<string[], GitResult> handler) : IGitRunner

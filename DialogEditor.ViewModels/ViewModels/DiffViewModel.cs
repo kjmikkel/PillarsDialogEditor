@@ -26,6 +26,10 @@ public partial class DiffViewModel : ObservableObject
     private DialogProject? _leftProject;
     private DialogProject? _rightProject;
 
+    private readonly Dictionary<int, (string Default, string Female)> _leftTextById  = new();
+    private readonly Dictionary<int, (string Default, string Female)> _rightTextById = new();
+    private ConversationViewModel? _observedCanvas;
+
     public IReadOnlyList<EndpointOption>           EndpointOptions { get; }
     public ObservableCollection<ConversationChange> Changes         { get; } = [];
     public ObservableCollection<ConversationChangeViewModel> Groups  { get; } = [];
@@ -38,6 +42,7 @@ public partial class DiffViewModel : ObservableObject
     [ObservableProperty] private string               _canvasHint  = "";
     [ObservableProperty] private CanvasMode           _canvasMode  = CanvasMode.Changes;
     [ObservableProperty] private ConversationChangeViewModel? _selectedGroup;
+    [ObservableProperty] private NodeDiffDetailViewModel? _selectedNodeDetail;
 
     // True when exactly one endpoint is the working copy (the writable target).
     private bool WorkingCopyIsEndpoint =>
@@ -253,10 +258,43 @@ public partial class DiffViewModel : ObservableObject
 
     partial void OnCanvasModeChanged(CanvasMode value) => BuildDiffCanvas();
 
+    private void ObserveCanvas(ConversationViewModel? canvas)
+    {
+        if (_observedCanvas is not null)
+            _observedCanvas.PropertyChanged -= OnCanvasPropertyChanged;
+        _observedCanvas = canvas;
+        if (_observedCanvas is not null)
+            _observedCanvas.PropertyChanged += OnCanvasPropertyChanged;
+    }
+
+    private void OnCanvasPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ConversationViewModel.SelectedNode))
+            UpdateSelectedNodeDetail();
+    }
+
+    private void UpdateSelectedNodeDetail()
+    {
+        var node = DiffCanvas?.SelectedNode;
+        if (CanvasMode != CanvasMode.Changes || node is null
+            || node.DiffStatus == DiffStatus.Unchanged)
+        {
+            SelectedNodeDetail = null;
+            return;
+        }
+
+        var (dl, fl) = _leftTextById.GetValueOrDefault(node.NodeId, ("", ""));
+        var (dr, fr) = _rightTextById.GetValueOrDefault(node.NodeId, ("", ""));
+        SelectedNodeDetail = new NodeDiffDetailViewModel(node.NodeId, node.DiffStatus, dl, dr, fl, fr);
+    }
+
     private void BuildDiffCanvas()
     {
+        SelectedNodeDetail = null;
+
         if (Selected is null)
         {
+            ObserveCanvas(null);
             DiffCanvas  = null;
             CanvasHint  = "";
             return;
@@ -264,6 +302,7 @@ public partial class DiffViewModel : ObservableObject
 
         if (_provider is null)
         {
+            ObserveCanvas(null);
             DiffCanvas  = null;
             CanvasHint  = Loc.Get("DiffWindow_NoGameFolder");
             return;
@@ -305,12 +344,29 @@ public partial class DiffViewModel : ObservableObject
                     node.DiffStatus = DiffStatus.Removed;
             }
 
-            // ── Ghost removed nodes (from the left / old project) ─────────
-            if (removedSet.Count > 0)
+            // ── Cache right-side text for the before/after detail panel ────
+            _rightTextById.Clear();
+            foreach (var n in rightConv.Nodes)
             {
-                try
+                var e = rightConv.Strings.Get(n.NodeId);
+                _rightTextById[n.NodeId] = (e?.DefaultText ?? "", e?.FemaleText ?? "");
+            }
+
+            // ── Reconstruct the LEFT (old) conversation once: feeds both the
+            //    left text cache and the ghost-removed-node injection ────────
+            _leftTextById.Clear();
+            try
+            {
+                Conversation leftConv = ReconstructConversation(name, _leftProject, _provider);
+
+                foreach (var n in leftConv.Nodes)
                 {
-                    Conversation leftConv = ReconstructConversation(name, _leftProject, _provider);
+                    var e = leftConv.Strings.Get(n.NodeId);
+                    _leftTextById[n.NodeId] = (e?.DefaultText ?? "", e?.FemaleText ?? "");
+                }
+
+                if (removedSet.Count > 0)
+                {
                     foreach (var leftNode in leftConv.Nodes)
                     {
                         if (!removedSet.Contains(leftNode.NodeId)) continue;
@@ -326,18 +382,21 @@ public partial class DiffViewModel : ObservableObject
                         vm.Nodes.Add(ghost);
                     }
                 }
-                catch (Exception ex)
-                {
-                    AppLog.Warn($"DiffViewModel: could not inject ghost removed nodes for '{name}': {ex.Message}");
-                }
+            }
+            catch (Exception ex)
+            {
+                AppLog.Warn($"DiffViewModel: could not reconstruct left conversation for '{name}': {ex.Message}");
             }
 
             DiffCanvas = vm;
             CanvasHint = "";
+            ObserveCanvas(vm);
+            UpdateSelectedNodeDetail();
         }
         catch (Exception ex)
         {
             AppLog.Warn($"DiffViewModel: BuildDiffCanvas failed for '{Selected?.Name}': {ex.Message}");
+            ObserveCanvas(null);
             DiffCanvas  = null;
             CanvasHint  = Loc.Get("DiffWindow_CanvasError");
         }
@@ -345,6 +404,7 @@ public partial class DiffViewModel : ObservableObject
 
     private void BuildAppliedPreviewCanvas()
     {
+        SelectedNodeDetail = null;
         try
         {
             var name = Selected!.Name;
@@ -378,6 +438,7 @@ public partial class DiffViewModel : ObservableObject
             }
 
             DiffCanvas = vm;
+            ObserveCanvas(null);
             CanvasHint = "";
         }
         catch (Exception ex)
