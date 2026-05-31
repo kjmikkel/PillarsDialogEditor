@@ -56,8 +56,10 @@ public class DiffViewModelApplyTests : IDisposable
     public void CanApply_False_WhenNeitherEndpointIsWorkingCopy()
     {
         var vm = MakeWorkingVsRef();
-        // Move the right endpoint off the working copy onto the git ref → ref vs ref.
-        vm.RightEndpoint = vm.EndpointOptions.First(o => o.Endpoint is DiffEndpoint.GitRef);
+        // Move BOTH endpoints to the git ref → ref vs ref (no working copy involved).
+        var gitRefOption = vm.EndpointOptions.First(o => o.Endpoint is DiffEndpoint.GitRef);
+        vm.LeftEndpoint  = gitRefOption;
+        vm.RightEndpoint = gitRefOption;
         Assert.False(vm.CanApply);
     }
 
@@ -78,7 +80,7 @@ public class DiffViewModelApplyTests : IDisposable
 
     // ── fixture helpers ───────────────────────────────────────────────────
     // Working copy (disk) = greeting nodes [1,9]; ref "main" = greeting node [1].
-    // Default endpoints: Left = main (git ref) = SOURCE, Right = working copy = TARGET.
+    // Default endpoints: Left = working copy = TARGET, Right = main (git ref) = SOURCE.
     private DiffViewModel MakeWorkingVsRef()
     {
         var disk = DialogProject.Empty("p").WithPatch(
@@ -119,7 +121,7 @@ public class DiffViewModelApplyTests : IDisposable
             return new GitResult(0, "", "");
         });
 
-    // Source (ref/left) HAS node 9; target (working copy/right) lacks it.
+    // Source (ref/right) HAS node 9; target (working copy/left) lacks it.
     // Bringing in node 9 adds it to the working copy.
     private DiffViewModel MakeRefHasExtraNode()
     {
@@ -133,8 +135,8 @@ public class DiffViewModelApplyTests : IDisposable
         return new DiffViewModel(git, new StubDispatcher(), path);
     }
 
-    // Source (ref/left) adds node 5 (which links to node 8) AND deletes node 8.
-    // Target (working copy/right) has neither. Bringing both in leaves node 5's
+    // Source (ref/right) adds node 5 (which links to node 8) AND deletes node 8.
+    // Target (working copy/left) has neither. Bringing both in leaves node 5's
     // link pointing at deleted node 8 → a dangling link.
     private DiffViewModel MakeDanglingScenario()
     {
@@ -191,7 +193,7 @@ public class DiffViewModelApplyTests : IDisposable
         var baseSnap = new ConversationEditSnapshot([Node(1), Node(2)]);
         var provider = new StubProvider(file, baseSnap);
 
-        // working copy (target/right) = [1]; ref (source/left) = [1,2]
+        // working copy (target/left) = [1]; ref (source/right) = [1,2]
         var disk = DialogProject.Empty("p").WithPatch(
             new ConversationPatch(convName, ConversationPatch.CurrentSchemaVersion, [Node(1)], [], []));
         var refProject = DialogProject.Empty("p").WithPatch(
@@ -203,7 +205,7 @@ public class DiffViewModelApplyTests : IDisposable
 
         var vm = new DiffViewModel(git, new StubDispatcher(), path, provider, "en");
 
-        // node 2 shows as a change (Removed: ref has it, working copy doesn't). Tick it.
+        // node 2 shows as a change (Added: ref/right has it, working copy/left doesn't). Tick it.
         vm.Groups[0].Nodes.First(n => n.NodeId == 2).IsSelected = true;
         vm.CanvasMode = CanvasMode.AppliedPreview;
         vm.Selected   = vm.Changes.First(c => c.Name == convName);
