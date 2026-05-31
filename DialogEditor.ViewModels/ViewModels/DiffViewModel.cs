@@ -298,6 +298,9 @@ public partial class DiffViewModel : ObservableObject
                     node.DiffStatus = DiffStatus.Added;
                 else if (modifiedSet.Contains(node.NodeId))
                     node.DiffStatus = DiffStatus.Changed;
+                // NOTE: ProjectDiff is patch-relative (see ProjectDiff remarks). A node
+                // present here but flagged Removed has "reverted to base" between the two
+                // versions rather than being deleted; it is tinted Removed by design.
                 else if (removedSet.Contains(node.NodeId))
                     node.DiffStatus = DiffStatus.Removed;
             }
