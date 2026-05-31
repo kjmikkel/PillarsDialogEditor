@@ -573,6 +573,17 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="DiffHelp_LinksHeader">A note on links</sys:String>
     <sys:String x:Key="DiffHelp_LinksBody">If you bring in a line that points to a line you removed, you will see a warning. It is safe to continue, but that link may not lead anywhere.</sys:String>
 
+    <!-- Diff: before/after node detail panel -->
+    <sys:String x:Key="Diff_Detail_Header">Node {0}</sys:String>
+    <sys:String x:Key="Diff_Detail_BeforeLabel">Before</sys:String>
+    <sys:String x:Key="Diff_Detail_AfterLabel">After</sys:String>
+    <sys:String x:Key="Diff_Detail_DefaultTextLabel">Default text</sys:String>
+    <sys:String x:Key="Diff_Detail_FemaleTextLabel">Female text</sys:String>
+    <sys:String x:Key="Diff_Detail_NodeAdded">(node added — no previous text)</sys:String>
+    <sys:String x:Key="Diff_Detail_NodeRemoved">(node removed)</sys:String>
+    <sys:String x:Key="Diff_Detail_StructuralOnly">No text change — only structural fields (conditions, scripts, or speaker) differ.</sys:String>
+    <sys:String x:Key="ToolTip_Diff_Detail">Shows the selected node's text before and after the change. Added or removed text is highlighted; the left value is the version on the left endpoint, the right value the version on the right endpoint.</sys:String>
+
     <!-- ─── Flow Analytics window ───────────────────────────────────────── -->
     <sys:String x:Key="Menu_FlowAnalytics">Flow Analytics…</sys:String>
     <sys:String x:Key="ToolTip_FlowAnalytics">Open the Flow Analytics window to view conversation statistics and structural issues</sys:String>
