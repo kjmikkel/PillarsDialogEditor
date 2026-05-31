@@ -491,6 +491,162 @@ public class DiffViewModelTests : IDisposable
         Assert.Null(vm.SelectedNodeDetail);
     }
 
+    // ── Test A — AppliedPreview mode suppresses the detail panel ─────────────
+
+    [Fact]
+    public void AppliedPreviewMode_SuppressesSelectedNodeDetail()
+    {
+        var convName = "greeting";
+        var file     = new ConversationFile(convName, "", "/fake/greeting.conversation", "/fake/greeting.stringtable");
+        var provider = new StubProvider(file, new ConversationEditSnapshot([]));
+
+        // Left (working copy / disk): node 1 with text "old text"
+        var diskProject = DialogProject.Empty("p").WithPatch(
+            PatchWithText(convName, [(1, "old text")]));
+
+        // Right (git ref): node 1 with text "new text" → Modified
+        var refProject = DialogProject.Empty("p").WithPatch(
+            PatchWithText(convName, [(1, "new text")]));
+
+        var path = WriteTempProject(diskProject);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(refProject), branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path, provider, "en");
+
+        // Step 1: select the changed conversation
+        vm.Selected = vm.Changes.Single(c => c.Name == convName);
+
+        // Step 2: select the changed node — canvas is in Changes mode
+        var node1 = vm.DiffCanvas!.Nodes.First(n => n.NodeId == 1);
+        vm.DiffCanvas.SelectedNode = node1;
+
+        // Step 3: detail is populated in Changes mode
+        Assert.NotNull(vm.SelectedNodeDetail);
+
+        // Step 4: switch to AppliedPreview mode
+        vm.CanvasMode = CanvasMode.AppliedPreview;
+
+        // Step 5: detail must be suppressed
+        Assert.Null(vm.SelectedNodeDetail);
+
+        // Step 6: selecting a node on the preview canvas must keep detail null
+        if (vm.DiffCanvas?.Nodes.FirstOrDefault(n => n.NodeId == 1) is { } pn)
+            vm.DiffCanvas.SelectedNode = pn;
+        Assert.Null(vm.SelectedNodeDetail);
+    }
+
+    // ── Test B — clearing the selected conversation nulls the detail ──────────
+
+    [Fact]
+    public void ClearingSelectedConversation_NullsSelectedNodeDetail()
+    {
+        var convName = "greeting";
+        var file     = new ConversationFile(convName, "", "/fake/greeting.conversation", "/fake/greeting.stringtable");
+        var provider = new StubProvider(file, new ConversationEditSnapshot([]));
+
+        var diskProject = DialogProject.Empty("p").WithPatch(
+            PatchWithText(convName, [(1, "old text")]));
+        var refProject = DialogProject.Empty("p").WithPatch(
+            PatchWithText(convName, [(1, "new text")]));
+
+        var path = WriteTempProject(diskProject);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(refProject), branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path, provider, "en");
+
+        // Step 1: select conversation and node → detail populated
+        vm.Selected = vm.Changes.Single(c => c.Name == convName);
+        vm.DiffCanvas!.SelectedNode = vm.DiffCanvas.Nodes.First(n => n.NodeId == 1);
+        Assert.NotNull(vm.SelectedNodeDetail);
+
+        // Step 2: clear the selected conversation
+        vm.Selected = null;
+
+        // Step 3: detail must be null
+        Assert.Null(vm.SelectedNodeDetail);
+    }
+
+    // ── Test C — clearing the canvas node selection nulls the detail ──────────
+
+    [Fact]
+    public void ClearingCanvasNodeSelection_NullsSelectedNodeDetail()
+    {
+        var convName = "greeting";
+        var file     = new ConversationFile(convName, "", "/fake/greeting.conversation", "/fake/greeting.stringtable");
+        var provider = new StubProvider(file, new ConversationEditSnapshot([]));
+
+        var diskProject = DialogProject.Empty("p").WithPatch(
+            PatchWithText(convName, [(1, "old text")]));
+        var refProject = DialogProject.Empty("p").WithPatch(
+            PatchWithText(convName, [(1, "new text")]));
+
+        var path = WriteTempProject(diskProject);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(refProject), branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path, provider, "en");
+
+        // Step 1: select conversation and node → detail populated
+        vm.Selected = vm.Changes.Single(c => c.Name == convName);
+        vm.DiffCanvas!.SelectedNode = vm.DiffCanvas.Nodes.First(n => n.NodeId == 1);
+        Assert.NotNull(vm.SelectedNodeDetail);
+
+        // Step 2: deselect the node
+        vm.DiffCanvas.SelectedNode = null;
+
+        // Step 3: detail must be null
+        Assert.Null(vm.SelectedNodeDetail);
+    }
+
+    // ── Test D — selecting a removed (ghost) node shows the removed placeholder ─
+
+    [Fact]
+    public void SelectingRemovedGhostNode_PopulatesDetail_WithRemovedPlaceholder()
+    {
+        var convName = "greeting";
+        var file     = new ConversationFile(convName, "", "/fake/greeting.conversation", "/fake/greeting.stringtable");
+
+        // Provider base snapshot has nodes 1 and 2 so the left reconstruction includes node 2.
+        var baseSnap = new ConversationEditSnapshot([NodeT(1), NodeT(2)]);
+        var provider = new StubProvider(file, baseSnap);
+
+        // Left (working copy / disk): nodes 1 AND 2; node 2 carries text "removed line" via Translations.
+        var diskProject = DialogProject.Empty("p").WithPatch(
+            PatchWithText(convName, [(1, "Hi"), (2, "removed line")]));
+
+        // Right (git ref): node 1 only — node 2 is absent → Removed in the left→right diff.
+        var refProject = DialogProject.Empty("p").WithPatch(
+            PatchWithText(convName, [(1, "Hi")]));
+
+        var path = WriteTempProject(diskProject);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(refProject), branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path, provider, "en");
+
+        // Step 1: select the conversation; node 2 should be in the Removed set.
+        var changedConv = vm.Changes.Single(c => c.Name == convName);
+        Assert.Contains(2, changedConv.Removed);
+        vm.Selected = changedConv;
+
+        // Step 2: find the ghost node and confirm it is tinted Removed.
+        var ghost = vm.DiffCanvas!.Nodes.FirstOrDefault(n => n.NodeId == 2);
+        Assert.NotNull(ghost);
+        Assert.Equal(DiffStatus.Removed, ghost.DiffStatus);
+
+        // Step 3: select the ghost node.
+        vm.DiffCanvas.SelectedNode = ghost;
+
+        // Step 4: detail must reflect the removed placeholder pattern.
+        Assert.NotNull(vm.SelectedNodeDetail);
+        Assert.Equal(DiffStatus.Removed, vm.SelectedNodeDetail!.Kind);
+        // For a Removed node: DefaultBefore = the old text; DefaultAfter = placeholder key.
+        Assert.Equal("removed line", vm.SelectedNodeDetail.DefaultBefore);
+        Assert.Equal("Diff_Detail_NodeRemoved", vm.SelectedNodeDetail.DefaultAfter);
+    }
+
     // ── helper ────────────────────────────────────────────────────────────────
 
     private sealed class FakeGit(Func<string[], GitResult> handler) : IGitRunner
