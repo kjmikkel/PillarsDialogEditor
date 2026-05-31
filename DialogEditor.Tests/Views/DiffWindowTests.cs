@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using DialogEditor.Avalonia.Views;
 using DialogEditor.Core.Editing;
+using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
 using DialogEditor.Patch.Diff;
@@ -83,6 +85,90 @@ public class DiffWindowTests : IDisposable
         window.Show();
 
         Assert.Equal(1, window.FindControl<ListBox>("ChangedList")!.ItemCount);
+    }
+
+    // ── Detail panel helpers ──────────────────────────────────────────────────
+
+    private static NodeEditSnapshot NodeT(int id) =>
+        new(id, false, SpeakerCategory.Npc, "", "", "", "", "Conversation", "None", "", "", "", false, false, [], [], []);
+
+    private static ConversationPatch PatchWithText(
+        string convName,
+        IReadOnlyList<(int Id, string Text)> nodes)
+    {
+        var snapNodes = nodes.Select(n => NodeT(n.Id)).ToList();
+        var txList    = nodes.Select(n => new NodeTranslation(n.Id, n.Text, "")).ToList();
+        return new ConversationPatch(
+            convName, ConversationPatch.CurrentSchemaVersion,
+            snapNodes, [], [])
+        {
+            Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
+                { ["en"] = txList }
+        };
+    }
+
+    // ── Detail panel tests ────────────────────────────────────────────────────
+
+    [AvaloniaFact]
+    public void DetailPanel_Hidden_WhenNoNodeSelected()
+    {
+        var convName = "greeting";
+        var file     = new ConversationFile(convName, "", "/fake/greeting.conversation", "/fake/greeting.stringtable");
+        var provider = new StubProvider(file, new ConversationEditSnapshot([]));
+
+        // Disk (left): node 1 with text "old text"
+        var diskProject = DialogProject.Empty("p").WithPatch(
+            PatchWithText(convName, [(1, "old text")]));
+
+        // Git ref (right): node 1 with different text → Changed
+        var refProject = DialogProject.Empty("p").WithPatch(
+            PatchWithText(convName, [(1, "new text")]));
+
+        var path = WriteTempProject(diskProject);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(refProject));
+        var vm   = new DiffViewModel(git, new StubDispatcher(), path, provider, "en");
+
+        // Select the conversation so the canvas is built, but do NOT select any node
+        vm.Selected = vm.Changes.Single(c => c.Name == convName);
+
+        var window = new DiffWindow(vm);
+        window.Show();
+
+        Assert.False(window.FindControl<Border>("DetailPanel")!.IsVisible);
+    }
+
+    [AvaloniaFact]
+    public void DetailPanel_Visible_AfterSelectingChangedNode()
+    {
+        var convName = "greeting";
+        var file     = new ConversationFile(convName, "", "/fake/greeting.conversation", "/fake/greeting.stringtable");
+        var provider = new StubProvider(file, new ConversationEditSnapshot([]));
+
+        // Disk (left): node 1 with text "old text"
+        var diskProject = DialogProject.Empty("p").WithPatch(
+            PatchWithText(convName, [(1, "old text")]));
+
+        // Git ref (right): node 1 with different text → Changed
+        var refProject = DialogProject.Empty("p").WithPatch(
+            PatchWithText(convName, [(1, "new text")]));
+
+        var path = WriteTempProject(diskProject);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(refProject));
+        var vm   = new DiffViewModel(git, new StubDispatcher(), path, provider, "en");
+
+        // Select the conversation → canvas is built
+        vm.Selected = vm.Changes.Single(c => c.Name == convName);
+
+        var window = new DiffWindow(vm);
+        window.Show();
+
+        // Select the changed node on the canvas → SelectedNodeDetail should be set
+        var changedNode = vm.DiffCanvas!.Nodes.First(n => n.NodeId == 1);
+        vm.DiffCanvas.SelectedNode = changedNode;
+
+        Assert.True(window.FindControl<Border>("DetailPanel")!.IsVisible);
     }
 
     private sealed class FakeGit(Func<string[], GitResult> handler) : IGitRunner

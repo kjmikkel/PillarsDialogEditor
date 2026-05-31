@@ -162,6 +162,50 @@
                             ToolTip.Tip="{StaticResource ToolTip_Diff_Help}"/>
                 </StackPanel>
 
+                <!-- ── Before/after detail panel (shown when a node is selected) ── -->
+                <Border DockPanel.Dock="Bottom"
+                        x:Name="DetailPanel"
+                        Background="#1e1e1e"
+                        BorderBrush="#444" BorderThickness="1" CornerRadius="4"
+                        Padding="8" Margin="0,6,0,0"
+                        IsVisible="{Binding SelectedNodeDetail, Converter={StaticResource IsNotNull}}"
+                        ToolTip.Tip="{StaticResource ToolTip_Diff_Detail}">
+                    <StackPanel Spacing="4" DataContext="{Binding SelectedNodeDetail}">
+                        <TextBlock Text="{Binding HeaderText}" Foreground="#ddd" FontWeight="Bold" FontSize="12"/>
+
+                        <!-- Structural-only hint -->
+                        <TextBlock Text="{StaticResource Diff_Detail_StructuralOnly}"
+                                   Foreground="#e0a030" FontSize="11" TextWrapping="Wrap"
+                                   IsVisible="{Binding IsStructuralOnly}"/>
+
+                        <!-- Default text before/after -->
+                        <StackPanel Spacing="2" IsVisible="{Binding ShowTextRows}">
+                            <TextBlock Text="{StaticResource Diff_Detail_DefaultTextLabel}" Foreground="#888" FontSize="10"/>
+                            <Grid ColumnDefinitions="Auto,*">
+                                <TextBlock Grid.Column="0" Text="{StaticResource Diff_Detail_BeforeLabel}" Foreground="#888" FontSize="11" Margin="0,0,6,0"/>
+                                <TextBlock Grid.Column="1" x:Name="DefaultBeforeText" Foreground="#ddd" FontSize="12" TextWrapping="Wrap"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto,*">
+                                <TextBlock Grid.Column="0" Text="{StaticResource Diff_Detail_AfterLabel}" Foreground="#888" FontSize="11" Margin="0,0,6,0"/>
+                                <TextBlock Grid.Column="1" x:Name="DefaultAfterText" Foreground="#ddd" FontSize="12" TextWrapping="Wrap"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Female text before/after -->
+                        <StackPanel Spacing="2" IsVisible="{Binding ShowFemaleRow}">
+                            <TextBlock Text="{StaticResource Diff_Detail_FemaleTextLabel}" Foreground="#888" FontSize="10"/>
+                            <Grid ColumnDefinitions="Auto,*">
+                                <TextBlock Grid.Column="0" Text="{StaticResource Diff_Detail_BeforeLabel}" Foreground="#888" FontSize="11" Margin="0,0,6,0"/>
+                                <TextBlock Grid.Column="1" x:Name="FemaleBeforeText" Foreground="#ddd" FontSize="12" TextWrapping="Wrap"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto,*">
+                                <TextBlock Grid.Column="0" Text="{StaticResource Diff_Detail_AfterLabel}" Foreground="#888" FontSize="11" Margin="0,0,6,0"/>
+                                <TextBlock Grid.Column="1" x:Name="FemaleAfterText" Foreground="#ddd" FontSize="12" TextWrapping="Wrap"/>
+                            </Grid>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
                 <!-- Canvas panel -->
                 <Panel>
 
