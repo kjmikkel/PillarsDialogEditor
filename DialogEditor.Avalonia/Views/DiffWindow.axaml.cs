@@ -26,6 +26,7 @@ public partial class DiffWindow : Window
         _vm = vm;
         DataContext = vm;
         vm.PropertyChanged += OnVmPropertyChanged;
+        UpdateDetail(vm.SelectedNodeDetail);
     }
 
     protected override void OnClosed(EventArgs e)

@@ -89,14 +89,11 @@ public class DiffWindowTests : IDisposable
 
     // ── Detail panel helpers ──────────────────────────────────────────────────
 
-    private static NodeEditSnapshot NodeT(int id) =>
-        new(id, false, SpeakerCategory.Npc, "", "", "", "", "Conversation", "None", "", "", "", false, false, [], [], []);
-
     private static ConversationPatch PatchWithText(
         string convName,
         IReadOnlyList<(int Id, string Text)> nodes)
     {
-        var snapNodes = nodes.Select(n => NodeT(n.Id)).ToList();
+        var snapNodes = nodes.Select(n => Node(n.Id)).ToList();
         var txList    = nodes.Select(n => new NodeTranslation(n.Id, n.Text, "")).ToList();
         return new ConversationPatch(
             convName, ConversationPatch.CurrentSchemaVersion,
