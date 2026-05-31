@@ -107,11 +107,12 @@ public partial class DiffViewModel : ObservableObject
 
         EndpointOptions = BuildEndpointOptions();
 
-        // Defaults: left = first GitRef option (or working copy), right = working copy
         var workingCopyOption = EndpointOptions.First(o => o.Endpoint is DiffEndpoint.WorkingCopy);
-        LeftEndpoint  = EndpointOptions.FirstOrDefault(o => o.Endpoint is DiffEndpoint.GitRef)
+        // Your copy on the left (the bring-in target); the other version on the right.
+        // This makes the left→right diff direction match what "Bring in" does.
+        LeftEndpoint  = workingCopyOption;
+        RightEndpoint = EndpointOptions.FirstOrDefault(o => o.Endpoint is DiffEndpoint.GitRef)
                         ?? workingCopyOption;
-        RightEndpoint = workingCopyOption;
 
         Recompute();
     }

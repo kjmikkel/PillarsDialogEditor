@@ -507,8 +507,8 @@ Saving records your edits to the open project — game files are not touched unt
 
     <!-- ─── Diff / Compare Versions window ──────────────────────────────── -->
     <sys:String x:Key="DiffWindow_Title">Compare Versions</sys:String>
-    <sys:String x:Key="DiffWindow_LeftLabel">Old:</sys:String>
-    <sys:String x:Key="DiffWindow_RightLabel">New:</sys:String>
+    <sys:String x:Key="DiffWindow_LeftLabel">Your copy:</sys:String>
+    <sys:String x:Key="DiffWindow_RightLabel">Other version:</sys:String>
     <sys:String x:Key="DiffWindow_ChangedHeader">Changed conversations</sys:String>
     <sys:String x:Key="DiffWindow_NoGameFolder">Open a game folder to see the conversation graph.</sys:String>
     <sys:String x:Key="DiffWindow_SelectHint">Select a conversation from the list to inspect it.</sys:String>
@@ -523,8 +523,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Status_BringInError">Couldn't bring in the changes: {0}</sys:String>
     <!-- {0} = project name -->
     <sys:String x:Key="Status_BroughtInApplied">Brought changes into '{0}'. Use Undo bring-in to reverse it.</sys:String>
-    <sys:String x:Key="ToolTip_DiffLeftPicker">Select the older (left) version to compare from</sys:String>
-    <sys:String x:Key="ToolTip_DiffRightPicker">Select the newer (right) version to compare to</sys:String>
+    <sys:String x:Key="ToolTip_DiffLeftPicker">This is your copy — the version that changes are brought into. You can also pick a saved version here if you want.</sys:String>
+    <sys:String x:Key="ToolTip_DiffRightPicker">The other version to compare your copy against. Ticked changes are brought from here into your copy.</sys:String>
     <sys:String x:Key="ToolTip_DiffChangedList">Conversations that differ between the selected versions — click to inspect</sys:String>
     <sys:String x:Key="Diff_BringInButton">Bring in</sys:String>
     <sys:String x:Key="Diff_Hint">Tick the changes you want to bring into your copy, then Bring in.</sys:String>
@@ -540,6 +540,7 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Diff_DanglingHeader">Heads up: some links may not lead anywhere after this.</sys:String>
     <sys:String x:Key="ToolTip_Diff_BringIn">Brings the ticked changes into your copy and saves it straight away. Your copy must be one of the two versions being compared.</sys:String>
     <sys:String x:Key="ToolTip_Diff_ViewToggle">Switch between seeing everything that differs between the two versions, and a preview of what your copy will look like after you bring in the ticked changes.</sys:String>
+    <sys:String x:Key="ToolTip_Diff_ExpandConversation">Show or hide the changed lines in this conversation.</sys:String>
     <sys:String x:Key="Diff_HelpButton">?</sys:String>
     <sys:String x:Key="Diff_UndoBringIn">Undo bring-in</sys:String>
     <sys:String x:Key="ToolTip_Diff_Help">Open a short guide explaining how comparing versions and bringing in changes works.</sys:String>

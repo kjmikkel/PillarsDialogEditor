@@ -129,7 +129,7 @@ public class DiffViewModelTests : IDisposable
     }
 
     [Fact]
-    public void DefaultLeftEndpoint_IsFirstGitRef_WhenAvailable()
+    public void DefaultLeftEndpoint_IsWorkingCopy()
     {
         var path = WriteTempProject(Empty());
         var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
@@ -137,7 +137,7 @@ public class DiffViewModelTests : IDisposable
 
         var vm = new DiffViewModel(git, new StubDispatcher(), path);
 
-        Assert.IsType<DiffEndpoint.GitRef>(vm.LeftEndpoint?.Endpoint);
+        Assert.IsType<DiffEndpoint.WorkingCopy>(vm.LeftEndpoint?.Endpoint);
     }
 
     [Fact]
@@ -152,7 +152,7 @@ public class DiffViewModelTests : IDisposable
     }
 
     [Fact]
-    public void DefaultRightEndpoint_IsWorkingCopy()
+    public void DefaultRightEndpoint_IsFirstGitRef_WhenAvailable()
     {
         var path = WriteTempProject(Empty());
         var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
@@ -160,31 +160,32 @@ public class DiffViewModelTests : IDisposable
 
         var vm = new DiffViewModel(git, new StubDispatcher(), path);
 
-        Assert.IsType<DiffEndpoint.WorkingCopy>(vm.RightEndpoint?.Endpoint);
+        Assert.IsType<DiffEndpoint.GitRef>(vm.RightEndpoint?.Endpoint);
     }
 
     [Fact]
     public void Diff_OneAddedNode_YieldsOneChange_WithAddedCount1()
     {
-        // ProjectA (at git ref "main") has node 1; working copy (disk) adds node 2.
-        var projectA = WithNode(1);
-        var projectB = WithNode(1); // overwritten below — disk has nodes 1+2
-        // Working copy on disk: nodes 1 + 2
-        var diskProject = DialogProject.Empty("p").WithPatch(
+        // Working copy (disk / left) has only node 1; git ref (right) adds node 2.
+        // Node 2 appears on the right → it is Added in the left→right diff.
+        var diskProject = WithNode(1);
+
+        // git ref project: nodes 1 + 2
+        var refProject = DialogProject.Empty("p").WithPatch(
             new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion,
                 [Node(1), Node(2)], [], []));
 
         var path = WriteTempProject(diskProject);
         var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
 
-        // git show for the ref returns projectA JSON (node 1 only)
-        var refJson = DialogProjectSerializer.Serialize(projectA);
+        // git show for the ref returns refProject JSON (nodes 1+2)
+        var refJson = DialogProjectSerializer.Serialize(refProject);
         var git     = MakeFakeGit(dir, refContent: refJson, branchOutput: "main\n");
 
         var vm = new DiffViewModel(git, new StubDispatcher(), path);
 
-        // LeftEndpoint = main (git ref), RightEndpoint = working copy — default
-        Assert.IsType<DiffEndpoint.GitRef>(vm.LeftEndpoint?.Endpoint);
+        // LeftEndpoint = working copy, RightEndpoint = git ref — new default
+        Assert.IsType<DiffEndpoint.WorkingCopy>(vm.LeftEndpoint?.Endpoint);
         Assert.Single(vm.Changes);
         Assert.Equal(1, vm.Changes[0].AddedCount);
     }
@@ -236,7 +237,7 @@ public class DiffViewModelTests : IDisposable
     [Fact]
     public void ChangingEndpoint_TriggersRecompute()
     {
-        // Start with identical projects (no changes), then swap right to a ref with a different version
+        // Disk (working copy / left) has node 1 only; the git ref (right) has nodes 1+2.
         var projectBase = WithNode(1);
         var path        = WriteTempProject(projectBase);
         var dir         = Path.GetDirectoryName(Path.GetFullPath(path))!;
@@ -249,12 +250,12 @@ public class DiffViewModelTests : IDisposable
         var git = MakeFakeGit(dir, refContent: refJson, branchOutput: "main\n");
         var vm  = new DiffViewModel(git, new StubDispatcher(), path);
 
-        // Initial: left=main (different from disk), right=working copy → 1 change
+        // Initial: left=working copy (node 1), right=main (nodes 1+2) → 1 change
         Assert.Single(vm.Changes);
 
-        // Change right endpoint to the git ref as well → same content → no changes
+        // Change left endpoint to the git ref as well → same content on both sides → no changes
         var mainOption = vm.EndpointOptions.First(o => o.Endpoint is DiffEndpoint.GitRef);
-        vm.RightEndpoint = mainOption;
+        vm.LeftEndpoint = mainOption;
 
         Assert.Empty(vm.Changes);
     }
@@ -264,33 +265,34 @@ public class DiffViewModelTests : IDisposable
     [Fact]
     public void BuildDiffCanvas_WithProvider_AddedNode_YieldsCanvasWithAddedDiffStatus()
     {
-        // Arrange: left project has node 1 only; right (disk) has nodes 1+2.
-        // The StubProvider "knows" the conversation and returns nodes 1+2.
+        // Arrange: disk (working copy / left) has node 1 only; git ref (right) has nodes 1+2.
+        // Node 2 is Added on the right → the canvas reconstructs the right endpoint and tints it Added.
+        // The StubProvider "knows" the conversation and returns nodes 1+2 (matching the ref).
         var convName = "greeting";
         var file     = new ConversationFile(convName, "", "/fake/greeting.conversation", "/fake/greeting.stringtable");
         var snap2    = new ConversationEditSnapshot([Node(1), Node(2)]);
         var provider = new StubProvider(file, snap2);
 
-        // Disk project: nodes 1+2
+        // Disk project (working copy / left): node 1 only
         var diskProject = DialogProject.Empty("p").WithPatch(
             new ConversationPatch(convName, ConversationPatch.CurrentSchemaVersion,
-                [Node(1), Node(2)], [], []));
-
-        // Left git ref project: node 1 only
-        var leftProject = DialogProject.Empty("p").WithPatch(
-            new ConversationPatch(convName, ConversationPatch.CurrentSchemaVersion,
                 [Node(1)], [], []));
+
+        // Git ref project (right): nodes 1+2
+        var refProject = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch(convName, ConversationPatch.CurrentSchemaVersion,
+                [Node(1), Node(2)], [], []));
 
         var path = WriteTempProject(diskProject);
         var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
 
-        var refJson = DialogProjectSerializer.Serialize(leftProject);
+        var refJson = DialogProjectSerializer.Serialize(refProject);
         var git     = MakeFakeGit(dir, refContent: refJson, branchOutput: "main\n");
 
         // Act
         var vm = new DiffViewModel(git, new StubDispatcher(), path, provider, "en");
 
-        // Should have one change (greeting) with node 2 added
+        // Should have one change (greeting) with node 2 added (on the right)
         Assert.Single(vm.Changes);
         var change = vm.Changes[0];
         Assert.Equal(convName, change.Name);
@@ -299,7 +301,7 @@ public class DiffViewModelTests : IDisposable
         // Select the change → triggers BuildDiffCanvas
         vm.Selected = change;
 
-        // Assert
+        // Assert: canvas is built from the right (ref) endpoint; node 2 is tinted Added
         Assert.NotNull(vm.DiffCanvas);
         var addedNode = vm.DiffCanvas.Nodes.FirstOrDefault(n => n.NodeId == 2);
         Assert.NotNull(addedNode);
