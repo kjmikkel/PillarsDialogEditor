@@ -187,11 +187,16 @@ user clicks node on DiffCanvas
   idea (revisit):* an optional expander for power users who want the full
   structural before/after — kept collapsed by default to avoid clutter for the
   majority. Confirmed acceptable during brainstorming.
-- **Single language.** Before/after female/default text uses the diff window's
-  current `_language`; multi-language before/after is out of scope.
+- **Single language (deferred feature — wanted later).** Before/after
+  default/female text uses the diff window's current `_language`. Showing all
+  changed languages at once is **not** built now: in practice a single edit
+  rarely touches more than one language, and a reviewer can switch the diff
+  window's language to double-check the others. But this is a genuine future
+  feature, not a permanent exclusion — reviewers will eventually want every
+  changed language surfaced together (if only for completeness), so it is
+  recorded here to be picked up later rather than dropped.
 
 ## Out of scope (YAGNI)
 
 - Editing from the panel (the diff canvas is read-only).
 - Structural field diffs inline (see deferred follow-up).
-- Multi-language before/after.
