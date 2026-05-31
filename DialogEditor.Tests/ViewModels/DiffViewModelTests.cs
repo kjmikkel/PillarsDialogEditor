@@ -458,6 +458,8 @@ public class DiffViewModelTests : IDisposable
         Assert.Equal(node1.DefaultText, vm.SelectedNodeDetail.DefaultAfter);
         Assert.NotEqual(vm.SelectedNodeDetail.DefaultBefore, vm.SelectedNodeDetail.DefaultAfter);
         Assert.NotEqual("Diff_Detail_NodeAdded", vm.SelectedNodeDetail.DefaultBefore);
+        Assert.Equal("old text", vm.SelectedNodeDetail.DefaultBefore);
+        Assert.Equal("new text", vm.SelectedNodeDetail.DefaultAfter);
     }
 
     [Fact]

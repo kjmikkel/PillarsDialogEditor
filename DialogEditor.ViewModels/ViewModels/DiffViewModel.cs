@@ -297,6 +297,8 @@ public partial class DiffViewModel : ObservableObject
             ObserveCanvas(null);
             DiffCanvas  = null;
             CanvasHint  = "";
+            _leftTextById.Clear();
+            _rightTextById.Clear();
             return;
         }
 
@@ -305,6 +307,8 @@ public partial class DiffViewModel : ObservableObject
             ObserveCanvas(null);
             DiffCanvas  = null;
             CanvasHint  = Loc.Get("DiffWindow_NoGameFolder");
+            _leftTextById.Clear();
+            _rightTextById.Clear();
             return;
         }
 
@@ -444,6 +448,7 @@ public partial class DiffViewModel : ObservableObject
         catch (Exception ex)
         {
             AppLog.Warn($"DiffViewModel: applied-preview build failed for '{Selected?.Name}': {ex.Message}");
+            ObserveCanvas(null);
             DiffCanvas = null;
             CanvasHint = Loc.Get("DiffWindow_CanvasError");
         }
