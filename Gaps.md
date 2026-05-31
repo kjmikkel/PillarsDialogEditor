@@ -21,6 +21,11 @@ Conflict-resolution coverage is essentially complete. Minor known limitations:
 
 **Diff viewing** (implemented): selecting two endpoints (working copy, git branch, or recent commit) lists changed conversations with +/~/− counts; selecting a conversation renders it on a read-only canvas with per-node colour tinting (green = added, amber = changed, red = removed). Ghost nodes for removed nodes are injected from the left project's reconstruction. Before/after text detail for a selected node is not yet implemented (deferred — the canvas tinting is the priority).
 
+Known, **intentional** diff limitations (a whole-feature review on 2026-05-31 confirmed these are by-design, documented in `ProjectDiff` remarks):
+- The diff is **patch-relative**, not effective-conversation-relative. A node that one version's patch modifies and the other leaves at the game-base value is reported **Removed** ("reverted to base"), even though it still exists. A fully effective diff would need to reconstruct both conversations against the game base, coupling the (currently game-folder-free) list to game data — deferred.
+- **Comment-only** node changes are not surfaced (NodeComments are excluded from the diff signature), consistent with selective apply treating comments as outside the apply unit.
+- Endpoint-load errors are now localized and name the failing version; the working-copy read is guarded against IO/permission failures (was an unhandled-exception crash path).
+
 **Selective apply** (implemented): from the compare window the user ticks individual changed lines and **brings them into their copy** (per-node cherry-pick into the working-copy `.dialogproject`). Your copy is the left endpoint (the bring-in target); the other version is on the right, so the tree colours match the bring-in effect. Includes a live "applied preview", a save-before-apply guard, a single-step undo, a count-only dangling-link warning (warn-but-allow), and a plain-language Help window. Two follow-ups left intentionally: a fuller (listed/collapsible) dangling-link panel, and automatic dependency-pulling.
 
 **Remaining VCS gaps**: **branch/history navigation** (browsing git log, switching branches, attribution) is not started.
