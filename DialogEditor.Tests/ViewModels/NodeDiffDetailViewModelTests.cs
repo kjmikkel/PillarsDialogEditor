@@ -82,4 +82,36 @@ public class NodeDiffDetailViewModelTests
         Assert.False(vm.IsStructuralOnly);
         Assert.True(vm.HasFemaleRow);
     }
+
+    [Fact]
+    public void Added_WithFemaleText_FemaleBeforeIsPlaceholder()
+    {
+        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Added,
+            defaultLeft: "", defaultRight: "hi", femaleLeft: "", femaleRight: "elle");
+
+        Assert.True(vm.HasFemaleRow);
+        Assert.Equal("Diff_Detail_NodeAdded", vm.FemaleBefore);
+        Assert.Equal("elle", vm.FemaleAfter);
+    }
+
+    [Fact]
+    public void Removed_WithFemaleText_FemaleAfterIsPlaceholder()
+    {
+        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Removed,
+            defaultLeft: "bye", defaultRight: "", femaleLeft: "elle", femaleRight: "");
+
+        Assert.True(vm.HasFemaleRow);
+        Assert.Equal("elle", vm.FemaleBefore);
+        Assert.Equal("Diff_Detail_NodeRemoved", vm.FemaleAfter);
+    }
+
+    [Fact]
+    public void HeaderText_UsesLocFormatKey()
+    {
+        var vm = new NodeDiffDetailViewModel(7, DiffStatus.Changed,
+            defaultLeft: "a", defaultRight: "b", femaleLeft: "", femaleRight: "");
+
+        // StubStringProvider returns the key verbatim; Loc.Format leaves it unchanged.
+        Assert.Equal("Diff_Detail_Header", vm.HeaderText);
+    }
 }
