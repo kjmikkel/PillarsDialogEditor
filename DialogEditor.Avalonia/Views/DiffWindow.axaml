@@ -119,7 +119,7 @@
                                                   ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"/>
                                         <ToggleButton Content="{Binding Name}" IsChecked="{Binding IsExpanded, Mode=TwoWay}"
                                                       Background="Transparent" Foreground="#ddd" BorderThickness="0" Padding="4,0"
-                                                      ToolTip.Tip="{StaticResource ToolTip_Diff_ViewToggle}"/>
+                                                      ToolTip.Tip="{StaticResource ToolTip_Diff_ExpandConversation}"/>
                                     </StackPanel>
                                     <ItemsControl ItemsSource="{Binding Nodes}" IsVisible="{Binding IsExpanded}" Margin="20,0,0,0">
                                         <ItemsControl.ItemTemplate>
