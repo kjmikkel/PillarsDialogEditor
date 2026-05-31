@@ -193,7 +193,7 @@ public class DiffViewModelTests : IDisposable
     [Fact]
     public void Diff_GitRefShowFails_ChangesEmpty_StatusNonEmpty()
     {
-        // git show returns non-zero
+        // git show returns non-zero → DiffExceptionKind.BadRef → Status_DiffBadRef key
         var path = WriteTempProject(Empty());
         var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
         var git  = MakeFakeGit(dir, refContent: null, branchOutput: "main\n");
@@ -201,7 +201,29 @@ public class DiffViewModelTests : IDisposable
         var vm = new DiffViewModel(git, new StubDispatcher(), path);
 
         Assert.Empty(vm.Changes);
-        Assert.NotEmpty(vm.StatusText);
+        // StubStringProvider returns the key verbatim; Loc.Format returns the key unchanged.
+        Assert.Equal("Status_DiffBadRef", vm.StatusText);
+    }
+
+    [Fact]
+    public void Diff_RevParseFails_StatusIsNotARepo()
+    {
+        // rev-parse fails → DiffExceptionKind.NotARepo → Status_DiffNoRepo key
+        var path = WriteTempProject(Empty());
+        var git  = new FakeGit(args => args is ["rev-parse", "--show-toplevel"]
+            ? new GitResult(128, "", "fatal: not a git repository")
+            : new GitResult(0, "", ""));
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path);
+
+        // Force a git-ref endpoint to trigger rev-parse on Recompute
+        // (default RightEndpoint may be working copy when no branches listed)
+        // Since git also returns non-zero for branch/log, EndpointOptions will only have WorkingCopy.
+        // Set RightEndpoint to a fake GitRef to drive through the NotARepo path.
+        var gitRefOption = new EndpointOption("bad", new DiffEndpoint.GitRef("bad"));
+        vm.RightEndpoint = gitRefOption;
+
+        Assert.Equal("Status_DiffNoRepo", vm.StatusText);
     }
 
     [Fact]
