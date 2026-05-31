@@ -15,9 +15,9 @@ See `docs/superpowers/specs/2026-05-30-diff-viewer-design.md` (Spec 1) and `docs
 
 | Topic | Decision |
 |---|---|
-| **Direction** | Only the working-copy `.dialogproject` is writable. Apply is enabled **only when the working copy is one of the two endpoints**, and pulls selected changes from the *other* (source) endpoint into it. When two git refs are compared, apply is disabled with an explanatory tooltip. |
+| **Direction** | Only the working-copy `.dialogproject` is writable. Apply is enabled **only when the working copy is one of the two endpoints**, and pulls selected changes from the *other* (source) endpoint into it. When two git refs are compared, apply is disabled with an explanatory tooltip. **Default orientation (decided during execution): your copy is the *left* endpoint (the bring-in target) and the other version is the *right*.** This makes the left→right diff direction equal the bring-in effect, so the tree's colours/labels match what "Bring in" does (a green "Added" line is one bring-in adds to your copy). Pickers are labelled "Your copy:" / "Other version:". |
 | **Granularity** | **Per node**, grouped under each conversation, with a "select all in conversation" tri-state checkbox. True cherry-pick. |
-| **Dangling links** | **Warn, but allow.** Detect links that would point at a node not present after apply; show a non-blocking warning listing them. The user may apply anyway. Automatic dependency-pulling is out of scope. |
+| **Dangling links** | **Warn, but allow.** Detect links that would point at a node not present after apply; show a non-blocking warning. The user may apply anyway. Automatic dependency-pulling is out of scope. **v1 ships a count-only warning** ("N link(s) may not lead anywhere"); a fuller listed/collapsible panel is deferred. |
 | **Engine** | A **dedicated `NodeApplyBuilder`** in `DialogEditor.Patch`, alongside `MergeBuilder` (not merged into it). MergeBuilder is field/conflict-oriented; apply is node-oriented. They share only small plumbing idioms. |
 | **Save guard** | Apply requires a clean (saved) working copy so memory and disk agree. If the editor is dirty when Apply is clicked, **prompt to save → apply**; cancel aborts. |
 | **Post-apply state** | **Write the `.dialogproject` to disk and keep the live editor in sync (clean, not dirty), with a single-step undo.** |
