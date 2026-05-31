@@ -517,6 +517,18 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Diff_WorkingCopy">Your copy</sys:String>
     <!-- {0} = changed conversation count -->
     <sys:String x:Key="Status_DiffComputed">{0} changed conversation(s)</sys:String>
+    <!-- Shown when the folder is not a git repository or git is not installed -->
+    <sys:String x:Key="Status_DiffNoRepo">This folder isn't a git repository, or git isn't installed.</sys:String>
+    <!-- {0} = endpoint label (branch name, commit, etc.) -->
+    <sys:String x:Key="Status_DiffBadRef">Couldn't read the '{0}' version. It may not exist in this repository.</sys:String>
+    <!-- Shown when the working-copy project file cannot be found on disk -->
+    <sys:String x:Key="Status_DiffFileNotFound">Couldn't find your project file to compare.</sys:String>
+    <!-- {0} = endpoint label; shown when file is locked or unreadable -->
+    <sys:String x:Key="Status_DiffReadError">Couldn't read the '{0}' version: the file may be locked or unreadable.</sys:String>
+    <!-- {0} = endpoint label; fallback for unexpected load failures -->
+    <sys:String x:Key="Status_DiffLoadError">Couldn't load the '{0}' version to compare.</sys:String>
+    <!-- Shown in the canvas hint area when the diff canvas cannot be built -->
+    <sys:String x:Key="DiffWindow_CanvasError">Couldn't build the comparison view for this conversation.</sys:String>
     <!-- {0} = number of changes brought in -->
     <sys:String x:Key="Status_BroughtIn">Brought in {0} change(s) to your copy.</sys:String>
     <!-- {0} = error message -->

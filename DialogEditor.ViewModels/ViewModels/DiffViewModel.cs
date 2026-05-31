@@ -193,32 +193,56 @@ public partial class DiffViewModel : ObservableObject
 
         try
         {
-            _leftProject  = _loader.Load(LeftEndpoint.Endpoint,  _projectFilePath);
-            _rightProject = _loader.Load(RightEndpoint.Endpoint, _projectFilePath);
-            var results   = ProjectDiff.Diff(_leftProject, _rightProject);
-
-            foreach (var change in results)
-                Changes.Add(change);
-
-            foreach (var change in results)
-            {
-                var group = new ConversationChangeViewModel(change);
-                group.SelectionChanged += OnSelectionChanged;
-                Groups.Add(group);
-            }
-            OnPropertyChanged(nameof(CanApply));
-
-            StatusText = Loc.Format("Status_DiffComputed", Changes.Count);
+            _leftProject = _loader.Load(LeftEndpoint.Endpoint, _projectFilePath);
         }
         catch (DiffException ex)
         {
             AppLog.Warn($"DiffViewModel: diff failed: {ex.Message}");
-            StatusText = ex.Message;
+            StatusText = MapDiffError(ex, LeftEndpoint.Label);
+            BuildDiffCanvas();
+            return;
         }
+
+        try
+        {
+            _rightProject = _loader.Load(RightEndpoint.Endpoint, _projectFilePath);
+        }
+        catch (DiffException ex)
+        {
+            AppLog.Warn($"DiffViewModel: diff failed: {ex.Message}");
+            StatusText = MapDiffError(ex, RightEndpoint.Label);
+            BuildDiffCanvas();
+            return;
+        }
+
+        var results = ProjectDiff.Diff(_leftProject, _rightProject);
+
+        foreach (var change in results)
+            Changes.Add(change);
+
+        foreach (var change in results)
+        {
+            var group = new ConversationChangeViewModel(change);
+            group.SelectionChanged += OnSelectionChanged;
+            Groups.Add(group);
+        }
+        OnPropertyChanged(nameof(CanApply));
+
+        StatusText = Loc.Format("Status_DiffComputed", Changes.Count);
 
         // Reset canvas when endpoints change
         BuildDiffCanvas();
     }
+
+    private static string MapDiffError(DiffException ex, string endpointLabel) =>
+        ex.Kind switch
+        {
+            DiffExceptionKind.NotARepo     => Loc.Get("Status_DiffNoRepo"),
+            DiffExceptionKind.BadRef       => Loc.Format("Status_DiffBadRef", endpointLabel),
+            DiffExceptionKind.FileNotFound => Loc.Get("Status_DiffFileNotFound"),
+            DiffExceptionKind.ReadFailed   => Loc.Format("Status_DiffReadError", endpointLabel),
+            _                              => Loc.Format("Status_DiffLoadError", endpointLabel),
+        };
 
     private void OnSelectionChanged()
     {
@@ -312,7 +336,7 @@ public partial class DiffViewModel : ObservableObject
         {
             AppLog.Warn($"DiffViewModel: BuildDiffCanvas failed for '{Selected?.Name}': {ex.Message}");
             DiffCanvas  = null;
-            CanvasHint  = ex.Message;
+            CanvasHint  = Loc.Get("DiffWindow_CanvasError");
         }
     }
 
@@ -357,7 +381,7 @@ public partial class DiffViewModel : ObservableObject
         {
             AppLog.Warn($"DiffViewModel: applied-preview build failed for '{Selected?.Name}': {ex.Message}");
             DiffCanvas = null;
-            CanvasHint = ex.Message;
+            CanvasHint = Loc.Get("DiffWindow_CanvasError");
         }
     }
 
