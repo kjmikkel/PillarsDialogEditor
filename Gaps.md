@@ -21,7 +21,9 @@ Conflict-resolution coverage is essentially complete. Minor known limitations:
 
 **Diff viewing** (implemented): selecting two endpoints (working copy, git branch, or recent commit) lists changed conversations with +/~/− counts; selecting a conversation renders it on a read-only canvas with per-node colour tinting (green = added, amber = changed, red = removed). Ghost nodes for removed nodes are injected from the left project's reconstruction. Before/after text detail for a selected node is not yet implemented (deferred — the canvas tinting is the priority).
 
-**Remaining VCS gaps**: **selective apply** (applying individual conversation patches from one branch to another) and **branch/history navigation** (browsing git log, switching branches, attribution) are not started.
+**Selective apply** (implemented): from the compare window the user ticks individual changed lines and **brings them into their copy** (per-node cherry-pick into the working-copy `.dialogproject`). Your copy is the left endpoint (the bring-in target); the other version is on the right, so the tree colours match the bring-in effect. Includes a live "applied preview", a save-before-apply guard, a single-step undo, a count-only dangling-link warning (warn-but-allow), and a plain-language Help window. Two follow-ups left intentionally: a fuller (listed/collapsible) dangling-link panel, and automatic dependency-pulling.
+
+**Remaining VCS gaps**: **branch/history navigation** (browsing git log, switching branches, attribution) is not started.
 
 > **Deferred idea (revisit) — first-run intro for the compare/apply window.** A one-time, dismissible explanatory panel shown the first time a writer opens the compare window, to orient non-technical users. Deferred from the selective-apply design (`docs/superpowers/specs/2026-05-30-selective-apply-design.md`) because it needs persisted "seen" state; the always-on in-context cues (colour-key strip, one-line hint, plain-language tooltips, Help window) cover the immediate need. Worth reconsidering after selective apply ships.
 
