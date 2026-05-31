@@ -403,6 +403,8 @@ public partial class DiffViewModel : ObservableObject
             ObserveCanvas(null);
             DiffCanvas  = null;
             CanvasHint  = Loc.Get("DiffWindow_CanvasError");
+            _leftTextById.Clear();
+            _rightTextById.Clear();
         }
     }
 
