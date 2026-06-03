@@ -26,9 +26,12 @@ public partial class DiffViewModel : ObservableObject
     private DialogProject? _leftProject;
     private DialogProject? _rightProject;
 
-    private readonly Dictionary<int, (string Default, string Female)> _leftTextById  = new();
-    private readonly Dictionary<int, (string Default, string Female)> _rightTextById = new();
+    private readonly Dictionary<int, Dictionary<string, (string Default, string Female)>> _leftTextById  = new();
+    private readonly Dictionary<int, Dictionary<string, (string Default, string Female)>> _rightTextById = new();
     private ConversationViewModel? _observedCanvas;
+
+    private static readonly IReadOnlyDictionary<string, (string Default, string Female)> EmptyLangMap =
+        new Dictionary<string, (string Default, string Female)>();
 
     public IReadOnlyList<EndpointOption>           EndpointOptions { get; }
     public ObservableCollection<ConversationChange> Changes         { get; } = [];
@@ -283,9 +286,10 @@ public partial class DiffViewModel : ObservableObject
             return;
         }
 
-        var (dl, fl) = _leftTextById.GetValueOrDefault(node.NodeId, ("", ""));
-        var (dr, fr) = _rightTextById.GetValueOrDefault(node.NodeId, ("", ""));
-        SelectedNodeDetail = new NodeDiffDetailViewModel(node.NodeId, node.DiffStatus, dl, dr, fl, fr);
+        var leftByLang  = _leftTextById.GetValueOrDefault(node.NodeId)  ?? EmptyLangMap;
+        var rightByLang = _rightTextById.GetValueOrDefault(node.NodeId) ?? EmptyLangMap;
+        SelectedNodeDetail = new NodeDiffDetailViewModel(
+            node.NodeId, node.DiffStatus, _language, leftByLang, rightByLang);
     }
 
     private void BuildDiffCanvas()
@@ -348,26 +352,11 @@ public partial class DiffViewModel : ObservableObject
                     node.DiffStatus = DiffStatus.Removed;
             }
 
-            // ── Cache right-side text for the before/after detail panel ────
-            _rightTextById.Clear();
-            foreach (var n in rightConv.Nodes)
-            {
-                var e = rightConv.Strings.Get(n.NodeId);
-                _rightTextById[n.NodeId] = (e?.DefaultText ?? "", e?.FemaleText ?? "");
-            }
-
-            // ── Reconstruct the LEFT (old) conversation once: feeds both the
-            //    left text cache and the ghost-removed-node injection ────────
-            _leftTextById.Clear();
+            // ── Reconstruct the LEFT (old) conversation (primary language) to
+            //    inject ghost nodes for removed entries ──────────────────────
             try
             {
                 Conversation leftConv = ReconstructConversation(name, _leftProject, _provider, _language);
-
-                foreach (var n in leftConv.Nodes)
-                {
-                    var e = leftConv.Strings.Get(n.NodeId);
-                    _leftTextById[n.NodeId] = (e?.DefaultText ?? "", e?.FemaleText ?? "");
-                }
 
                 if (removedSet.Count > 0)
                 {
@@ -392,6 +381,16 @@ public partial class DiffViewModel : ObservableObject
                 AppLog.Warn($"DiffViewModel: could not reconstruct left conversation for '{name}': {ex.Message}");
             }
 
+            // ── Per-language before/after text caches for the detail panel ──
+            var candidateLangs = new HashSet<string>(StringComparer.Ordinal) { _language };
+            foreach (var k in _leftProject?.Patches.GetValueOrDefault(name)?.Translations.Keys
+                              ?? Enumerable.Empty<string>())
+                candidateLangs.Add(k);
+            foreach (var k in _rightProject?.Patches.GetValueOrDefault(name)?.Translations.Keys
+                              ?? Enumerable.Empty<string>())
+                candidateLangs.Add(k);
+            BuildTextCaches(name, candidateLangs);
+
             DiffCanvas = vm;
             CanvasHint = "";
             ObserveCanvas(vm);
@@ -405,6 +404,42 @@ public partial class DiffViewModel : ObservableObject
             CanvasHint  = Loc.Get("DiffWindow_CanvasError");
             _leftTextById.Clear();
             _rightTextById.Clear();
+        }
+    }
+
+    // Reconstructs each diff side once per candidate language and caches each
+    // node's (default, female) text per language, for the before/after panel.
+    private void BuildTextCaches(string name, IEnumerable<string> languages)
+    {
+        _leftTextById.Clear();
+        _rightTextById.Clear();
+        if (_provider is null) return;
+
+        foreach (var lang in languages)
+        {
+            FillLangCache(_rightTextById, name, _rightProject, lang);
+            FillLangCache(_leftTextById,  name, _leftProject,  lang);
+        }
+    }
+
+    private void FillLangCache(
+        Dictionary<int, Dictionary<string, (string Default, string Female)>> cache,
+        string name, DialogProject? project, string lang)
+    {
+        try
+        {
+            var conv = ReconstructConversation(name, project, _provider!, lang);
+            foreach (var n in conv.Nodes)
+            {
+                var e = conv.Strings.Get(n.NodeId);
+                if (!cache.TryGetValue(n.NodeId, out var byLang))
+                    cache[n.NodeId] = byLang = new Dictionary<string, (string Default, string Female)>(StringComparer.Ordinal);
+                byLang[lang] = (e?.DefaultText ?? "", e?.FemaleText ?? "");
+            }
+        }
+        catch (Exception ex)
+        {
+            AppLog.Warn($"DiffViewModel: text cache for '{name}' [{lang}] failed: {ex.Message}");
         }
     }
 

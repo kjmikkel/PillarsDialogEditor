@@ -395,6 +395,59 @@ public class DiffViewModelTests : IDisposable
         };
     }
 
+    // Builds a patch whose nodes carry per-language text via Translations.
+    private static ConversationPatch PatchMultiLang(
+        string convName,
+        IReadOnlyList<int> nodeIds,
+        IReadOnlyDictionary<string, IReadOnlyList<(int Id, string Text)>> byLang)
+    {
+        var snapNodes = nodeIds.Select(NodeT).ToList();
+        var translations = byLang.ToDictionary(
+            kv => kv.Key,
+            kv => (IReadOnlyList<NodeTranslation>)kv.Value
+                .Select(t => new NodeTranslation(t.Id, t.Text, "")).ToList());
+        return new ConversationPatch(convName, ConversationPatch.CurrentSchemaVersion, snapNodes, [], [])
+        {
+            Translations = translations
+        };
+    }
+
+    [Fact]
+    public void SelectingNodeChangedInTwoLanguages_YieldsSectionPerLanguage()
+    {
+        var convName = "greeting";
+        var file     = new ConversationFile(convName, "", "/fake/greeting.conversation", "/fake/greeting.stringtable");
+        var provider = new StubProvider(file, new ConversationEditSnapshot([]));
+
+        var disk = DialogProject.Empty("p").WithPatch(PatchMultiLang(convName, [1],
+            new Dictionary<string, IReadOnlyList<(int, string)>>
+            {
+                ["en"] = [(1, "old en")],
+                ["fr"] = [(1, "vieux fr")],
+            }));
+        var refp = DialogProject.Empty("p").WithPatch(PatchMultiLang(convName, [1],
+            new Dictionary<string, IReadOnlyList<(int, string)>>
+            {
+                ["en"] = [(1, "new en")],
+                ["fr"] = [(1, "neuf fr")],
+            }));
+
+        var path = WriteTempProject(disk);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(refp), branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path, provider, "en");
+        vm.Selected = vm.Changes.Single(c => c.Name == convName);
+        vm.DiffCanvas!.SelectedNode = vm.DiffCanvas.Nodes.First(n => n.NodeId == 1);
+
+        var codes = vm.SelectedNodeDetail!.Sections.Select(s => s.LanguageCode).ToList();
+        Assert.Contains("en", codes);
+        Assert.Contains("fr", codes);
+        var fr = vm.SelectedNodeDetail.Sections.Single(s => s.LanguageCode == "fr");
+        Assert.Equal("vieux fr", fr.DefaultBefore);
+        Assert.Equal("neuf fr",  fr.DefaultAfter);
+    }
+
     [Fact]
     public void SelectingAddedNode_PopulatesDetail_WithPlaceholderBefore()
     {
@@ -424,8 +477,9 @@ public class DiffViewModelTests : IDisposable
         Assert.NotNull(vm.SelectedNodeDetail);
         Assert.Equal(2, vm.SelectedNodeDetail!.NodeId);
         Assert.Equal(DiffStatus.Added, vm.SelectedNodeDetail.Kind);
-        Assert.Equal("Diff_Detail_NodeAdded", vm.SelectedNodeDetail.DefaultBefore);
-        Assert.Equal(node2.DefaultText, vm.SelectedNodeDetail.DefaultAfter);
+        var sec = vm.SelectedNodeDetail.Sections.Single(s => s.LanguageCode == "en");
+        Assert.Equal("Diff_Detail_NodeAdded", sec.DefaultBefore);
+        Assert.Equal(node2.DefaultText, sec.DefaultAfter);
     }
 
     [Fact]
@@ -455,11 +509,11 @@ public class DiffViewModelTests : IDisposable
 
         Assert.NotNull(vm.SelectedNodeDetail);
         Assert.Equal(DiffStatus.Changed, vm.SelectedNodeDetail!.Kind);
-        Assert.Equal(node1.DefaultText, vm.SelectedNodeDetail.DefaultAfter);
-        Assert.NotEqual(vm.SelectedNodeDetail.DefaultBefore, vm.SelectedNodeDetail.DefaultAfter);
-        Assert.NotEqual("Diff_Detail_NodeAdded", vm.SelectedNodeDetail.DefaultBefore);
-        Assert.Equal("old text", vm.SelectedNodeDetail.DefaultBefore);
-        Assert.Equal("new text", vm.SelectedNodeDetail.DefaultAfter);
+        var sec = vm.SelectedNodeDetail.Sections.Single(s => s.LanguageCode == "en");
+        Assert.Equal(node1.DefaultText, sec.DefaultAfter);
+        Assert.NotEqual(sec.DefaultBefore, sec.DefaultAfter);
+        Assert.Equal("old text", sec.DefaultBefore);
+        Assert.Equal("new text", sec.DefaultAfter);
     }
 
     [Fact]
@@ -643,8 +697,9 @@ public class DiffViewModelTests : IDisposable
         Assert.NotNull(vm.SelectedNodeDetail);
         Assert.Equal(DiffStatus.Removed, vm.SelectedNodeDetail!.Kind);
         // For a Removed node: DefaultBefore = the old text; DefaultAfter = placeholder key.
-        Assert.Equal("removed line", vm.SelectedNodeDetail.DefaultBefore);
-        Assert.Equal("Diff_Detail_NodeRemoved", vm.SelectedNodeDetail.DefaultAfter);
+        var sec = vm.SelectedNodeDetail.Sections.Single(s => s.LanguageCode == "en");
+        Assert.Equal("removed line", sec.DefaultBefore);
+        Assert.Equal("Diff_Detail_NodeRemoved", sec.DefaultAfter);
     }
 
     // ── helper ────────────────────────────────────────────────────────────────
