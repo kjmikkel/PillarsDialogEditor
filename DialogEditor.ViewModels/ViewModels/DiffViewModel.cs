@@ -324,7 +324,7 @@ public partial class DiffViewModel : ObservableObject
             var name = Selected.Name;
 
             // ── Reconstruct the RIGHT (new) conversation ──────────────────
-            Conversation rightConv = ReconstructConversation(name, _rightProject, _provider);
+            Conversation rightConv = ReconstructConversation(name, _rightProject, _provider, _language);
 
             var vm = new ConversationViewModel(_dispatcher);
             vm.Load(rightConv);
@@ -361,7 +361,7 @@ public partial class DiffViewModel : ObservableObject
             _leftTextById.Clear();
             try
             {
-                Conversation leftConv = ReconstructConversation(name, _leftProject, _provider);
+                Conversation leftConv = ReconstructConversation(name, _leftProject, _provider, _language);
 
                 foreach (var n in leftConv.Nodes)
                 {
@@ -425,7 +425,7 @@ public partial class DiffViewModel : ObservableObject
             var change = ProjectDiff.Diff(TargetProject!, projected)
                 .FirstOrDefault(c => c.Name == name);
 
-            Conversation conv = ReconstructConversation(name, projected, _provider!);
+            Conversation conv = ReconstructConversation(name, projected, _provider!, _language);
             var vm = new ConversationViewModel(_dispatcher);
             vm.Load(conv);
             vm.IsEditable = false;
@@ -462,7 +462,7 @@ public partial class DiffViewModel : ObservableObject
     /// just the base conversation if there is no patch.
     /// </summary>
     private Conversation ReconstructConversation(
-        string name, DialogProject? project, IGameDataProvider provider)
+        string name, DialogProject? project, IGameDataProvider provider, string language)
     {
         var file = provider.FindConversation(name);
 
@@ -474,7 +474,7 @@ public partial class DiffViewModel : ObservableObject
                 var conv     = provider.LoadConversation(file);
                 var baseSnap = ConversationSnapshotBuilder.Build(conv);
                 var merged   = PatchApplier.Apply(baseSnap, patch, ignoreConflicts: true);
-                var translations = patch.Translations.GetValueOrDefault(_language);
+                var translations = patch.Translations.GetValueOrDefault(language);
                 return ConversationSnapshotBuilder.ToConversation(name, merged, translations);
             }
             else
@@ -482,7 +482,7 @@ public partial class DiffViewModel : ObservableObject
                 // New conversation (no on-disk file): apply patch over empty snapshot
                 var baseSnap = new ConversationEditSnapshot([]);
                 var merged   = PatchApplier.Apply(baseSnap, patch, ignoreConflicts: true);
-                var translations = patch.Translations.GetValueOrDefault(_language);
+                var translations = patch.Translations.GetValueOrDefault(language);
                 return ConversationSnapshotBuilder.ToConversation(name, merged, translations);
             }
         }
