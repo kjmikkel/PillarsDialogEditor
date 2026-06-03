@@ -446,6 +446,8 @@ public partial class DiffViewModel : ObservableObject
     private void BuildAppliedPreviewCanvas()
     {
         SelectedNodeDetail = null;
+        _leftTextById.Clear();
+        _rightTextById.Clear();
         try
         {
             var name = Selected!.Name;

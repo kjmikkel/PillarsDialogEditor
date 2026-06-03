@@ -192,6 +192,14 @@ node selected on DiffCanvas
 - **No per-language editing** (canvas is read-only).
 - Friendly names cover the common PoE codes; exotic/unmapped codes show the raw
   code (acceptable fallback).
+- **Non-primary base-text fallback.** `ReconstructConversation` sources base
+  (untranslated) text from the provider's primary language; the `language`
+  parameter only selects the translation overlay. So in a non-primary language
+  section, a side with no translation for that node shows the primary-language
+  base text (the effective in-game fallback), not a blank. A language translated
+  on only one side can therefore show primary-language text under a non-primary
+  header. Sourcing base text per language would couple the diff to
+  game-data-per-language, which this feature deliberately avoids — deferred.
 
 ## Out of scope (YAGNI)
 
