@@ -584,6 +584,20 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Diff_Detail_StructuralOnly">No text change — only structural fields (conditions, scripts, or speaker) differ.</sys:String>
     <sys:String x:Key="ToolTip_Diff_Detail">Shows the selected node's text before and after the change. Added or removed text is highlighted; the left value is the version on the left endpoint, the right value the version on the right endpoint.</sys:String>
 
+    <!-- Diff detail: language section labels -->
+    <sys:String x:Key="Diff_Detail_PrimaryMarker">(primary)</sys:String>
+    <sys:String x:Key="Language_Name_en">English</sys:String>
+    <sys:String x:Key="Language_Name_fr">French</sys:String>
+    <sys:String x:Key="Language_Name_de">German</sys:String>
+    <sys:String x:Key="Language_Name_es">Spanish</sys:String>
+    <sys:String x:Key="Language_Name_it">Italian</sys:String>
+    <sys:String x:Key="Language_Name_pl">Polish</sys:String>
+    <sys:String x:Key="Language_Name_ru">Russian</sys:String>
+    <sys:String x:Key="Language_Name_ptBR">Portuguese (Brazil)</sys:String>
+    <sys:String x:Key="Language_Name_zhCN">Chinese (Simplified)</sys:String>
+    <sys:String x:Key="Language_Name_ko">Korean</sys:String>
+    <sys:String x:Key="Language_Name_ja">Japanese</sys:String>
+
     <!-- ─── Flow Analytics window ───────────────────────────────────────── -->
     <sys:String x:Key="Menu_FlowAnalytics">Flow Analytics…</sys:String>
     <sys:String x:Key="ToolTip_FlowAnalytics">Open the Flow Analytics window to view conversation statistics and structural issues</sys:String>
