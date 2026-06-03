@@ -1,4 +1,5 @@
-using System;
+using System.Collections.Generic;
+using System.Linq;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
@@ -9,109 +10,109 @@ public class NodeDiffDetailViewModelTests
 {
     public NodeDiffDetailViewModelTests() => Loc.Configure(new StubStringProvider());
 
-    [Fact]
-    public void Changed_PopulatesBothDefaultSides()
-    {
-        var vm = new NodeDiffDetailViewModel(42, DiffStatus.Changed,
-            defaultLeft: "old", defaultRight: "new", femaleLeft: "", femaleRight: "");
+    private static IReadOnlyDictionary<string, (string Default, string Female)> Map(
+        params (string Lang, string Default, string Female)[] items) =>
+        items.ToDictionary(i => i.Lang, i => (i.Default, i.Female));
 
-        Assert.Equal("old", vm.DefaultBefore);
-        Assert.Equal("new", vm.DefaultAfter);
-        Assert.False(vm.IsStructuralOnly);
-        Assert.True(vm.ShowTextRows);
+    private static readonly IReadOnlyDictionary<string, (string Default, string Female)> Empty = Map();
+
+    [Fact]
+    public void Primary_IsAlwaysPresent_EvenWhenUnchanged()
+    {
+        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Changed, "en",
+            Map(("en", "a", ""), ("fr", "x", "")),
+            Map(("en", "a", ""), ("fr", "y", "")));
+
+        Assert.Equal(2, vm.Sections.Count);
+        var en = vm.Sections.Single(s => s.LanguageCode == "en");
+        Assert.True(en.IsPrimary);
+        Assert.Contains(vm.Sections, s => s.LanguageCode == "fr");
     }
 
     [Fact]
-    public void Added_BeforeIsPlaceholder_AfterIsText()
+    public void NonPrimary_Unchanged_IsExcluded()
     {
-        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Added,
-            defaultLeft: "", defaultRight: "hello", femaleLeft: "", femaleRight: "");
+        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Changed, "en",
+            Map(("en", "a", ""), ("de", "d", "")),
+            Map(("en", "b", ""), ("de", "d", "")));
 
-        Assert.Equal("Diff_Detail_NodeAdded", vm.DefaultBefore);
-        Assert.Equal("hello", vm.DefaultAfter);
+        Assert.Single(vm.Sections);
+        Assert.Equal("en", vm.Sections[0].LanguageCode);
     }
 
     [Fact]
-    public void Removed_AfterIsPlaceholder_BeforeIsText()
+    public void Sections_OrderedPrimaryFirstThenAlphabetical()
     {
-        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Removed,
-            defaultLeft: "goodbye", defaultRight: "", femaleLeft: "", femaleRight: "");
+        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Changed, "fr",
+            Map(("en", "1", ""), ("de", "2", ""), ("fr", "3", "")),
+            Map(("en", "x", ""), ("de", "y", ""), ("fr", "z", "")));
 
-        Assert.Equal("goodbye", vm.DefaultBefore);
-        Assert.Equal("Diff_Detail_NodeRemoved", vm.DefaultAfter);
+        Assert.Equal(new[] { "fr", "de", "en" }, vm.Sections.Select(s => s.LanguageCode).ToArray());
     }
 
     [Fact]
-    public void FemaleRow_Hidden_WhenBothFemaleEmpty()
+    public void StructuralOnly_WhenNoLanguageDiffers()
     {
-        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Changed,
-            defaultLeft: "a", defaultRight: "b", femaleLeft: "", femaleRight: "");
-
-        Assert.False(vm.HasFemaleRow);
-        Assert.False(vm.ShowFemaleRow);
-    }
-
-    [Fact]
-    public void FemaleRow_Shown_WhenEitherSideHasFemale()
-    {
-        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Changed,
-            defaultLeft: "a", defaultRight: "b", femaleLeft: "", femaleRight: "elle");
-
-        Assert.True(vm.HasFemaleRow);
-        Assert.True(vm.ShowFemaleRow);
-        Assert.Equal("", vm.FemaleBefore);
-        Assert.Equal("elle", vm.FemaleAfter);
-    }
-
-    [Fact]
-    public void StructuralOnly_True_WhenChangedButTextIdentical()
-    {
-        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Changed,
-            defaultLeft: "same", defaultRight: "same", femaleLeft: "f", femaleRight: "f");
+        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Changed, "en",
+            Map(("en", "a", "")), Map(("en", "a", "")));
 
         Assert.True(vm.IsStructuralOnly);
-        Assert.False(vm.ShowTextRows);
+        Assert.False(vm.ShowSections);
+        Assert.Empty(vm.Sections);
     }
 
     [Fact]
-    public void StructuralOnly_False_WhenFemaleDiffers()
+    public void Added_PlaceholderBefore_PerSection()
     {
-        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Changed,
-            defaultLeft: "same", defaultRight: "same", femaleLeft: "f1", femaleRight: "f2");
+        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Added, "en",
+            Empty, Map(("en", "hi", ""), ("fr", "salut", "")));
 
-        Assert.False(vm.IsStructuralOnly);
-        Assert.True(vm.HasFemaleRow);
+        var en = vm.Sections.Single(s => s.LanguageCode == "en");
+        Assert.Equal("Diff_Detail_NodeAdded", en.DefaultBefore);
+        Assert.Equal("hi", en.DefaultAfter);
+        var fr = vm.Sections.Single(s => s.LanguageCode == "fr");
+        Assert.Equal("Diff_Detail_NodeAdded", fr.DefaultBefore);
+        Assert.Equal("salut", fr.DefaultAfter);
     }
 
     [Fact]
-    public void Added_WithFemaleText_FemaleBeforeIsPlaceholder()
+    public void Removed_PlaceholderAfter_PerSection()
     {
-        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Added,
-            defaultLeft: "", defaultRight: "hi", femaleLeft: "", femaleRight: "elle");
+        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Removed, "en",
+            Map(("en", "bye", ""), ("fr", "adieu", "")), Empty);
 
-        Assert.True(vm.HasFemaleRow);
-        Assert.Equal("Diff_Detail_NodeAdded", vm.FemaleBefore);
-        Assert.Equal("elle", vm.FemaleAfter);
+        var en = vm.Sections.Single(s => s.LanguageCode == "en");
+        Assert.Equal("bye", en.DefaultBefore);
+        Assert.Equal("Diff_Detail_NodeRemoved", en.DefaultAfter);
     }
 
     [Fact]
-    public void Removed_WithFemaleText_FemaleAfterIsPlaceholder()
+    public void FemaleRow_Visibility_IsPerSection()
     {
-        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Removed,
-            defaultLeft: "bye", defaultRight: "", femaleLeft: "elle", femaleRight: "");
+        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Changed, "en",
+            Map(("en", "a", "fa"), ("de", "d", "")),
+            Map(("en", "b", "fb"), ("de", "e", "")));
 
-        Assert.True(vm.HasFemaleRow);
-        Assert.Equal("elle", vm.FemaleBefore);
-        Assert.Equal("Diff_Detail_NodeRemoved", vm.FemaleAfter);
+        Assert.True(vm.Sections.Single(s => s.LanguageCode == "en").HasFemaleRow);
+        Assert.False(vm.Sections.Single(s => s.LanguageCode == "de").HasFemaleRow);
+    }
+
+    [Fact]
+    public void Section_LanguageName_IsResolved()
+    {
+        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Changed, "en",
+            Map(("en", "a", "")), Map(("en", "b", "")));
+
+        // Stub returns the resource key verbatim.
+        Assert.Equal("Language_Name_en", vm.Sections[0].LanguageName);
     }
 
     [Fact]
     public void HeaderText_UsesLocFormatKey()
     {
-        var vm = new NodeDiffDetailViewModel(7, DiffStatus.Changed,
-            defaultLeft: "a", defaultRight: "b", femaleLeft: "", femaleRight: "");
+        var vm = new NodeDiffDetailViewModel(7, DiffStatus.Changed, "en",
+            Map(("en", "a", "")), Map(("en", "b", "")));
 
-        // StubStringProvider returns the key verbatim; Loc.Format leaves it unchanged.
         Assert.Equal("Diff_Detail_Header", vm.HeaderText);
     }
 }

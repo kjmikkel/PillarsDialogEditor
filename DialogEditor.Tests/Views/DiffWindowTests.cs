@@ -104,6 +104,21 @@ public class DiffWindowTests : IDisposable
         };
     }
 
+    private static ConversationPatch PatchMultiLang(
+        string convName, IReadOnlyList<int> nodeIds,
+        IReadOnlyDictionary<string, IReadOnlyList<(int Id, string Text)>> byLang)
+    {
+        var snapNodes = nodeIds.Select(Node).ToList();
+        var translations = byLang.ToDictionary(
+            kv => kv.Key,
+            kv => (IReadOnlyList<NodeTranslation>)kv.Value
+                .Select(t => new NodeTranslation(t.Id, t.Text, "")).ToList());
+        return new ConversationPatch(convName, ConversationPatch.CurrentSchemaVersion, snapNodes, [], [])
+        {
+            Translations = translations
+        };
+    }
+
     // ── Detail panel tests ────────────────────────────────────────────────────
 
     [AvaloniaFact]
@@ -166,6 +181,34 @@ public class DiffWindowTests : IDisposable
         vm.DiffCanvas.SelectedNode = changedNode;
 
         Assert.True(window.FindControl<Border>("DetailPanel")!.IsVisible);
+    }
+
+    [AvaloniaFact]
+    public void DetailPanel_ShowsOneSectionPerChangedLanguage()
+    {
+        var convName = "greeting";
+        var file     = new ConversationFile(convName, "", "/fake/greeting.conversation", "/fake/greeting.stringtable");
+        var provider = new StubProvider(file, new ConversationEditSnapshot([]));
+
+        var disk = DialogProject.Empty("p").WithPatch(PatchMultiLang(convName, [1],
+            new Dictionary<string, IReadOnlyList<(int, string)>>
+            { ["en"] = [(1, "old en")], ["fr"] = [(1, "vieux")] }));
+        var refp = DialogProject.Empty("p").WithPatch(PatchMultiLang(convName, [1],
+            new Dictionary<string, IReadOnlyList<(int, string)>>
+            { ["en"] = [(1, "new en")], ["fr"] = [(1, "neuf")] }));
+
+        var path = WriteTempProject(disk);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(refp));
+
+        var vm     = new DiffViewModel(git, new StubDispatcher(), path, provider, "en");
+        var window = new DiffWindow(vm);
+        window.Show();
+
+        vm.Selected = vm.Changes.Single(c => c.Name == convName);
+        vm.DiffCanvas!.SelectedNode = vm.DiffCanvas.Nodes.First(n => n.NodeId == 1);
+
+        Assert.Equal(2, window.FindControl<ItemsControl>("SectionsList")!.ItemCount);
     }
 
     private sealed class FakeGit(Func<string[], GitResult> handler) : IGitRunner
