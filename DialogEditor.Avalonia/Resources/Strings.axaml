@@ -734,6 +734,21 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="GitConflictWindow_CancelTooltip">Close without resolving — the project is not opened and the file on disk is left unchanged.</sys:String>
     <sys:String x:Key="GitConflictWindow_Unresolved">unresolved</sys:String>
 
+    <!-- History browser -->
+    <sys:String x:Key="HistoryWindow_Title">Project History</sys:String>
+    <sys:String x:Key="HistoryWindow_ColDate">Date</sys:String>
+    <sys:String x:Key="HistoryWindow_ColAuthor">Author</sys:String>
+    <sys:String x:Key="HistoryWindow_ColCommit">Commit</sys:String>
+    <sys:String x:Key="HistoryWindow_ColMessage">Message</sys:String>
+    <sys:String x:Key="HistoryWindow_CompareButton">Compare with my copy</sys:String>
+    <sys:String x:Key="HistoryWindow_CompareTooltip">Open the selected commit in the compare window, alongside your current working copy. From there you can view what changed and bring individual changes back into your copy.</sys:String>
+    <sys:String x:Key="HistoryWindow_Close">Close</sys:String>
+    <sys:String x:Key="History_StatusNoHistory">No git history found for this project file yet.</sys:String>
+    <sys:String x:Key="History_StatusNotARepo">This project is not inside a git repository, so there is no history to show.</sys:String>
+    <sys:String x:Key="History_StatusError">Could not read this project's git history. See the log for details.</sys:String>
+    <sys:String x:Key="Menu_History">History…</sys:String>
+    <sys:String x:Key="ToolTip_History">Browse the git commit history of the open project file. Select a commit to compare it with your current copy.</sys:String>
+
     <!-- ─── Project — file picker dialogs ────────────────────────────────── -->
     <sys:String x:Key="Dialog_NewProject">Create new project</sys:String>
     <sys:String x:Key="Dialog_NewProjectDefault">MyMod</sys:String>
