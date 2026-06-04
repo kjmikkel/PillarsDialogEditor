@@ -749,6 +749,23 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Menu_History">History…</sys:String>
     <sys:String x:Key="ToolTip_History">Browse the git commit history of the open project file. Select a commit to compare it with your current copy.</sys:String>
 
+    <!-- Attribution / blame -->
+    <sys:String x:Key="BlameWindow_Title">Node Attribution</sys:String>
+    <sys:String x:Key="BlameWindow_ColConversation">Conversation</sys:String>
+    <sys:String x:Key="BlameWindow_ColNode">Node</sys:String>
+    <sys:String x:Key="BlameWindow_ColAuthor">Author</sys:String>
+    <sys:String x:Key="BlameWindow_ColDate">Date</sys:String>
+    <sys:String x:Key="BlameWindow_ColCommit">Commit</sys:String>
+    <sys:String x:Key="BlameWindow_ColMessage">Message</sys:String>
+    <sys:String x:Key="BlameWindow_Close">Close</sys:String>
+    <sys:String x:Key="Blame_StatusNoData">No committed attribution found for this project file yet. Newly added nodes appear here once committed to git.</sys:String>
+    <sys:String x:Key="Blame_StatusNotARepo">This project is not inside a git repository, so there is no attribution to show.</sys:String>
+    <sys:String x:Key="Blame_StatusError">Could not read this project's git attribution. See the log for details.</sys:String>
+    <sys:String x:Key="Menu_Attribution">Attribution…</sys:String>
+    <sys:String x:Key="ToolTip_Attribution">Show who last edited each dialogue node, based on the git history of the open project file. Read-only; reflects the last committed change.</sys:String>
+    <sys:String x:Key="NodeDetail_LastEditedLabel">Last edited</sys:String>
+    <sys:String x:Key="NodeDetail_LastEditedTooltip">Last committed change to this node: "{0}" (commit {1}).</sys:String>
+
     <!-- ─── Project — file picker dialogs ────────────────────────────────── -->
     <sys:String x:Key="Dialog_NewProject">Create new project</sys:String>
     <sys:String x:Key="Dialog_NewProjectDefault">MyMod</sys:String>

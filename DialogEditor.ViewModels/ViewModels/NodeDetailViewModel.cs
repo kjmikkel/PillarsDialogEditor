@@ -1,8 +1,10 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Models;
+using DialogEditor.Patch.Diff;
 using DialogEditor.ViewModels.Models;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
@@ -19,6 +21,24 @@ public partial class NodeDetailViewModel : ObservableObject
 
     /// Set by MainWindowViewModel when a conversation is loaded.
     public ConversationViewModel? Canvas { get; set; }
+
+    // ── Git attribution (read-only "last edited by") ──────────────────────
+    /// Set by MainWindowViewModel: looks up (conversationName, nodeId) → last-touching commit.
+    public Func<string, int, NodeBlame?>? AttributionLookup { get; set; }
+    private NodeBlame? _attribution;
+
+    public bool HasAttribution => _attribution is not null;
+
+    /// Composed "author · date · short-sha" line for the loaded node (empty when none).
+    public string LastEditedSummary => _attribution is null
+        ? string.Empty
+        : $"{_attribution.LastCommit.Author} · "
+          + $"{_attribution.LastCommit.Date.ToString("d", CultureInfo.CurrentCulture)} · "
+          + _attribution.LastCommit.ShortSha;
+
+    public string LastEditedTooltip => _attribution is null
+        ? string.Empty
+        : Loc.Format("NodeDetail_LastEditedTooltip", _attribution.LastCommit.Subject, _attribution.LastCommit.Sha);
 
     // ── Translator note (backed by ConversationViewModel.NodeComments) ────
     private string _translatorNote = string.Empty;
@@ -208,6 +228,13 @@ public partial class NodeDetailViewModel : ObservableObject
             _node.PropertyChanged -= OnNodePropertyChanged;
 
         _node = node;
+
+        _attribution = node is not null && Canvas?.ConversationName is string conv
+            ? AttributionLookup?.Invoke(conv, node.NodeId)
+            : null;
+        OnPropertyChanged(nameof(HasAttribution));
+        OnPropertyChanged(nameof(LastEditedSummary));
+        OnPropertyChanged(nameof(LastEditedTooltip));
 
         if (node is null) { HasContent = false; ConditionRows.Clear(); return; }
 

@@ -20,6 +20,14 @@ public class ConversationViewModelEditTests
             [], [], "Conversation", "None"), null);
 
     [Fact]
+    public void Load_SetsConversationName()
+    {
+        var vm = MakeVm();
+        vm.Load(new Conversation("tavern", [], new StringTable([])));
+        Assert.Equal("tavern", vm.ConversationName);
+    }
+
+    [Fact]
     public void AddNode_AppearsInNodes()
     {
         var vm   = MakeVm();

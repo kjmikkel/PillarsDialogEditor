@@ -1,0 +1,71 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DialogEditor.Avalonia.Views.BlameWindow"
+        Title="{StaticResource BlameWindow_Title}"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="780" Height="520"
+        WindowStartupLocation="CenterOwner"
+        Background="#252525">
+
+    <Grid Margin="16" RowDefinitions="Auto,*,Auto">
+
+        <!-- Column headers (shown only when there are rows) -->
+        <Grid Grid.Row="0" ColumnDefinitions="160,60,130,110,90,*"
+              Margin="0,0,0,6" IsVisible="{Binding HasData}">
+            <TextBlock Grid.Column="0" Text="{StaticResource BlameWindow_ColConversation}"
+                       Foreground="#9a9a9a" FontSize="12" FontWeight="Bold"/>
+            <TextBlock Grid.Column="1" Text="{StaticResource BlameWindow_ColNode}"
+                       Foreground="#9a9a9a" FontSize="12" FontWeight="Bold"/>
+            <TextBlock Grid.Column="2" Text="{StaticResource BlameWindow_ColAuthor}"
+                       Foreground="#9a9a9a" FontSize="12" FontWeight="Bold"/>
+            <TextBlock Grid.Column="3" Text="{StaticResource BlameWindow_ColDate}"
+                       Foreground="#9a9a9a" FontSize="12" FontWeight="Bold"/>
+            <TextBlock Grid.Column="4" Text="{StaticResource BlameWindow_ColCommit}"
+                       Foreground="#9a9a9a" FontSize="12" FontWeight="Bold"/>
+            <TextBlock Grid.Column="5" Text="{StaticResource BlameWindow_ColMessage}"
+                       Foreground="#9a9a9a" FontSize="12" FontWeight="Bold"/>
+        </Grid>
+
+        <TextBlock Grid.Row="1"
+                   Text="{Binding StatusText}"
+                   Foreground="#c08a2a" FontSize="13" TextWrapping="Wrap"
+                   IsVisible="{Binding !HasData}"
+                   VerticalAlignment="Top"/>
+
+        <ListBox Grid.Row="1" x:Name="BlameList"
+                 ItemsSource="{Binding Rows}"
+                 Background="#1a1a1a" BorderThickness="0"
+                 IsVisible="{Binding HasData}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid ColumnDefinitions="160,60,130,110,90,*" Margin="0,3">
+                        <TextBlock Grid.Column="0" Text="{Binding ConversationName}"
+                                   Foreground="#cfcfcf" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Grid.Column="1" Text="{Binding NodeId}"
+                                   Foreground="#cfcfcf" FontSize="12"/>
+                        <TextBlock Grid.Column="2" Text="{Binding Author}"
+                                   Foreground="#cfcfcf" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Grid.Column="3"
+                                   Text="{Binding Date, Converter={StaticResource CommitDate}}"
+                                   ToolTip.Tip="{Binding Date}"
+                                   Foreground="#cfcfcf" FontSize="12"/>
+                        <TextBlock Grid.Column="4" Text="{Binding ShortSha}"
+                                   Foreground="#888" FontSize="12" FontFamily="Consolas,monospace"/>
+                        <TextBlock Grid.Column="5" Text="{Binding Subject}"
+                                   Foreground="#e8e8e8" FontSize="12" TextWrapping="Wrap"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Spacing="8" Margin="0,14,0,0">
+            <Button x:Name="CloseButton"
+                    Content="{StaticResource BlameWindow_Close}"
+                    Background="#333" Foreground="White" BorderThickness="0"
+                    Padding="16,6" FontSize="12"/>
+        </StackPanel>
+
+    </Grid>
+
+</Window>

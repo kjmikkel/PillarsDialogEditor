@@ -1,4 +1,5 @@
 using DialogEditor.Core.Models;
+using DialogEditor.Patch.Diff;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
@@ -61,6 +62,35 @@ public class NodeDetailViewModelTests
     {
         _vm.Load(MakeNode());
         Assert.True(_vm.HasContent);
+    }
+
+    // ── Attribution (git blame) ─────────────────────────────────────────────
+
+    [Fact]
+    public void Load_WithAttribution_SetsSummaryAndHasAttribution()
+    {
+        var canvas = new ConversationViewModel(new StubDispatcher());
+        canvas.Load(new Conversation("greeting", [], new StringTable([])));
+        _vm.Canvas = canvas;
+        _vm.AttributionLookup = (conv, id) =>
+            conv == "greeting" && id == 1
+                ? new NodeBlame("greeting", 1,
+                    new CommitInfo("deadbeefdeadbeef", "deadbeef", "Mia", DateTimeOffset.UnixEpoch, "Reword"))
+                : null;
+
+        _vm.Load(MakeNode(1));
+
+        Assert.True(_vm.HasAttribution);
+        Assert.Contains("Mia", _vm.LastEditedSummary);
+        Assert.Contains("deadbeef", _vm.LastEditedSummary);
+    }
+
+    [Fact]
+    public void Load_WithoutAttribution_HasAttributionFalse()
+    {
+        _vm.AttributionLookup = (_, _) => null;
+        _vm.Load(MakeNode(2));
+        Assert.False(_vm.HasAttribution);
     }
 
     [Fact]

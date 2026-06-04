@@ -9,6 +9,7 @@ using DialogEditor.Core.Import;
 using DialogEditor.Core.Layout;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
+using DialogEditor.Patch.Diff;
 using DialogEditor.Patch.GitConflict;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
@@ -34,6 +35,14 @@ public partial class MainWindowViewModel : ObservableObject
     // Set when a conflicted project is detected on startup but resolution is deferred
     // behind a "Resolve…" action rather than shown immediately.
     private string? _pendingConflictPath;
+
+    // ── Git attribution (read-only "last edited by") ──────────────────────
+    /// Set by the host (View): loads per-node blame for a project file. Kept off the VM
+    /// so the VM stays free of the concrete git runner. Built lazily and cached per path.
+    public Func<string, IReadOnlyList<NodeBlame>>? AttributionLoader { get; set; }
+    private IReadOnlyDictionary<(string Conv, int NodeId), NodeBlame> _attribution
+        = new Dictionary<(string, int), NodeBlame>();
+    private string? _attributionPath;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(WindowTitle))]
@@ -228,6 +237,8 @@ public partial class MainWindowViewModel : ObservableObject
                 Canvas.DeleteConnection(conn);
         };
 
+        Detail.AttributionLookup = LookupAttribution;
+
         Canvas.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(ConversationViewModel.SelectedNode))
@@ -362,6 +373,33 @@ public partial class MainWindowViewModel : ObservableObject
     // defers to a "Resolve…" prompt (offerDeferred: true) so we don't slam a modal
     // over a freshly shown window.
     private void LoadProject(string path) => _ = LoadProjectAsync(path, offerDeferred: false);
+
+    // Per-node attribution for the node detail panel. Built lazily on first lookup after
+    // the project path changes (blame is HEAD-based, so it's stable for the open project).
+    private NodeBlame? LookupAttribution(string conversationName, int nodeId)
+    {
+        if (_projectPath != _attributionPath)
+        {
+            _attributionPath = _projectPath;
+            _attribution = BuildAttribution(_projectPath);
+        }
+        return _attribution.GetValueOrDefault((conversationName, nodeId));
+    }
+
+    private IReadOnlyDictionary<(string, int), NodeBlame> BuildAttribution(string? path)
+    {
+        if (path is null || AttributionLoader is null)
+            return new Dictionary<(string, int), NodeBlame>();
+        try
+        {
+            return AttributionLoader(path).ToDictionary(b => (b.ConversationName, b.NodeId));
+        }
+        catch (DiffException ex)
+        {
+            AppLog.Warn($"MainWindowViewModel: could not load attribution: {ex.Message}");
+            return new Dictionary<(string, int), NodeBlame>();
+        }
+    }
 
     private async Task LoadProjectAsync(string path, bool offerDeferred)
     {
