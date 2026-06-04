@@ -196,15 +196,30 @@ public class GitMergeAnalyzerTests
     }
 
     [Fact]
-    public void TranslationFemaleTextDiffers_FallsBackToFemaleTextForDisplay()
+    public void TranslationFemaleOnlyDiffers_DefaultEqual_FemaleCarriesDiff()
     {
         var mine   = ProjectWithTranslation(4, "en", "Hello", "HelloF");
         var theirs = ProjectWithTranslation(4, "en", "Hello", "HelloFemale");
 
         var c = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
         Assert.Equal(MergeConflictKind.TranslationEdit, c.Kind);
-        Assert.Equal("HelloF",      c.MineValue);
-        Assert.Equal("HelloFemale", c.TheirsValue);
+        Assert.Equal("Hello",       c.MineValue);          // shared Default
+        Assert.Equal("Hello",       c.TheirsValue);
+        Assert.Equal("HelloF",      c.MineFemaleValue);
+        Assert.Equal("HelloFemale", c.TheirsFemaleValue);
+    }
+
+    [Fact]
+    public void TranslationBothVariantsDiffer_AllFourValuesCarried()
+    {
+        var mine   = ProjectWithTranslation(4, "en", "Hi friend",   "Hi friendF");
+        var theirs = ProjectWithTranslation(4, "en", "Hi traveler", "Hi travelerF");
+
+        var c = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
+        Assert.Equal("Hi friend",    c.MineValue);
+        Assert.Equal("Hi traveler",  c.TheirsValue);
+        Assert.Equal("Hi friendF",   c.MineFemaleValue);
+        Assert.Equal("Hi travelerF", c.TheirsFemaleValue);
     }
 
     [Fact]
