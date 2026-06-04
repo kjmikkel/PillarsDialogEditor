@@ -30,18 +30,21 @@ session, read its entry, and tackle it.
   "Compare with my copy" opens a commit in the compare window. Spec/plan:
   `docs/superpowers/specs/2026-06-04-history-browser-design.md`,
   `docs/superpowers/plans/2026-06-04-history-browser.md`.
+- **Attribution / blame** (2026-06-04) — per-node "last edited by" from
+  `git blame --line-porcelain HEAD`, mapped onto nodes via `DialogProjectLineMap`.
+  Standalone Attribution window + a "Last edited" line in the node detail panel.
+  HEAD-based, computed at project open (see `Gaps.md` for limitations).
 
 ---
 
 ## Queued (not started)
 
 ### Branch/history navigation — remaining sub-projects
-The **history browser** (sub-project 1) shipped 2026-06-04. Remaining:
-- **Attribution / blame** (read-only) — map `git blame` onto nodes; mapping JSON
-  blame lines back to structured nodes is the hard part.
+The **history browser** (sub-project 1, 2026-06-04) and **attribution / blame**
+(sub-project 2, 2026-06-04) shipped. Remaining:
 - **Branch switching** (read-write) — `git checkout` reconciled with the open
   project + unsaved edits; the first git write op; design its write-semantics
-  carefully. Benefits from the now-shipped history UI.
+  carefully. Benefits from the now-shipped history + attribution UI.
 
 ### Blocked on investigation (can't design yet)
 - **Bark preview** — in-context preview of overhead floating bark text. Needs

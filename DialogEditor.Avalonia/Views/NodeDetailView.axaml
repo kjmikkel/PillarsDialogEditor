@@ -64,6 +64,14 @@
         <ScrollViewer Background="#2d2d2d" IsVisible="{Binding HasContent}">
             <StackPanel Margin="8">
 
+                <!-- ── Attribution (git: who last edited this node) ────── -->
+                <StackPanel IsVisible="{Binding HasAttribution}">
+                    <TextBlock Classes="group-header" Text="{StaticResource NodeDetail_LastEditedLabel}"/>
+                    <TextBlock Text="{Binding LastEditedSummary}"
+                               ToolTip.Tip="{Binding LastEditedTooltip}"
+                               Foreground="#bdbd80" FontSize="10" TextWrapping="Wrap"/>
+                </StackPanel>
+
                 <!-- ── Default / Male text ─────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_DefaultMaleText}"/>
                 <TextBox Classes="detail-field"

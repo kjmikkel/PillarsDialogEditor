@@ -239,8 +239,12 @@ public partial class ConversationViewModel : ObservableObject
     internal ConversationEditSnapshot? BaseSnapshot { get; private set; }
 
     // ── Load ──────────────────────────────────────────────────────────────
+    /// Name of the currently loaded conversation; used to key per-node git attribution.
+    public string ConversationName { get; private set; } = "";
+
     public void Load(Conversation conversation)
     {
+        ConversationName = conversation.Name;
         _searchCts?.Cancel();
         _undoStack.Clear();
         IsModified  = false;

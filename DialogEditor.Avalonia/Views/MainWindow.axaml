@@ -104,6 +104,10 @@
                                   Click="History_Click"
                                   IsEnabled="{Binding IsProjectOpen}"
                                   ToolTip.Tip="{StaticResource ToolTip_History}"/>
+                        <MenuItem Header="{StaticResource Menu_Attribution}"
+                                  Click="Attribution_Click"
+                                  IsEnabled="{Binding IsProjectOpen}"
+                                  ToolTip.Tip="{StaticResource ToolTip_Attribution}"/>
                     </MenuItem>
 
                     <MenuItem Header="{StaticResource Menu_Test}">

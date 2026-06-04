@@ -49,6 +49,7 @@ public partial class MainWindow : Window
         vm.TestModeExited  += () => TestOverlay.IsVisible = false;
         vm.RequestConversationName               = () => PromptConversationNameAsync();
         vm.RequestConversationNameWithSuggestion = suggested => PromptConversationNameAsync(defaultValue: suggested);
+        vm.AttributionLoader = path => new ProjectBlameService(new ProcessGitRunner()).Load(path);
         vm.RequestConflictResolution    = ex => ShowConflictResolutionDialogAsync(ex);
         vm.ShowExportConversations = exportVm =>
         {
@@ -338,6 +339,14 @@ public partial class MainWindow : Window
         };
 
         new HistoryWindow(historyVm).Show();
+    }
+
+    private void Attribution_Click(object? sender, RoutedEventArgs e)
+    {
+        var vm = (MainWindowViewModel)DataContext!;
+        if (vm.ProjectPath is null) return;
+
+        new BlameWindow(new BlameViewModel(new ProcessGitRunner(), vm.ProjectPath)).Show();
     }
 
     private void PatchManager_Click(object? sender, RoutedEventArgs e)
