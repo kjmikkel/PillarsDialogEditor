@@ -79,6 +79,11 @@
                         Click="UndoBringIn_Click" Margin="0,0,8,0"
                         ToolTip.Tip="{StaticResource ToolTip_Diff_UndoBringIn}"/>
                 <StackPanel>
+                    <CheckBox x:Name="AutoPullCheck"
+                              Content="{StaticResource Diff_AutoPullLabel}"
+                              IsChecked="{Binding AutoPullDependencies, Mode=TwoWay}"
+                              Foreground="#ccc" FontSize="11"
+                              ToolTip.Tip="{StaticResource ToolTip_Diff_AutoPull}"/>
                     <TextBlock Text="{StaticResource Diff_Hint}" Foreground="#888" FontSize="11" VerticalAlignment="Center"/>
                 </StackPanel>
             </DockPanel>
