@@ -744,6 +744,27 @@ public class DiffViewModelTests : IDisposable
         Assert.Contains(vm.EndpointOptions, o => o.Endpoint is DiffEndpoint.GitRef { Ref: "deadbeef" });
     }
 
+    [Fact]
+    public void InitialRightRef_FullSha_MatchesEnumeratedShortSha_NoDuplicate()
+    {
+        // Production wiring: the history browser passes the full %H sha, while the
+        // endpoint list enumerates short %h shas. The full sha must match the
+        // existing short-sha option (prefix) rather than synthesizing a duplicate.
+        var path = WriteTempProject(DialogProject.Empty("p"));
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(DialogProject.Empty("p")),
+                               branchOutput: "main\n", logOutput: "a1b2c3d first\n");
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path, provider: null, "en",
+                                   initialRightRef: "a1b2c3def4567890");
+
+        // No synthesized duplicate carrying the raw full sha as its label/ref.
+        Assert.DoesNotContain(vm.EndpointOptions,
+            o => o.Endpoint is DiffEndpoint.GitRef { Ref: "a1b2c3def4567890" });
+        // The existing short-sha option is preselected instead.
+        Assert.True(vm.RightEndpoint!.Endpoint is DiffEndpoint.GitRef { Ref: "a1b2c3d" });
+    }
+
     // ── helper ────────────────────────────────────────────────────────────────
 
     private sealed class FakeGit(Func<string[], GitResult> handler) : IGitRunner
