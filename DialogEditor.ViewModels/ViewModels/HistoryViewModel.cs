@@ -6,16 +6,6 @@ using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.ViewModels;
 
-/// One commit row. Presentation-free Date (DateTimeOffset); the view formats it.
-public class CommitRowViewModel(CommitInfo commit)
-{
-    public string         Sha      => commit.Sha;
-    public string         ShortSha => commit.ShortSha;
-    public string         Author   => commit.Author;
-    public DateTimeOffset Date     => commit.Date;
-    public string         Subject  => commit.Subject;
-}
-
 /// Lists the open project file's git history; "Compare" opens the selected commit
 /// in the compare window via a host callback (the VM layer can't open windows).
 public partial class HistoryViewModel : ObservableObject

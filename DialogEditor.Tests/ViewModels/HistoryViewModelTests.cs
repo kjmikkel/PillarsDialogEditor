@@ -1,4 +1,4 @@
-﻿using DialogEditor.Patch.Diff;
+using DialogEditor.Patch.Diff;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
