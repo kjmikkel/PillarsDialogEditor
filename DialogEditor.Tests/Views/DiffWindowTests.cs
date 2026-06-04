@@ -211,6 +211,60 @@ public class DiffWindowTests : IDisposable
         Assert.Equal(2, window.FindControl<ItemsControl>("SectionsList")!.ItemCount);
     }
 
+    private static NodeEditSnapshot NodeWithLink(int id, int toId) =>
+        new(id, false, SpeakerCategory.Npc, "", "", "", "", "Conversation", "None", "", "", "", false, false,
+            [new LinkEditSnapshot(id, toId, 1f, "", false)], [], []);
+
+    [AvaloniaFact]
+    public void DanglingPanel_Hidden_WhenApplyLeavesNoDanglingLinks()
+    {
+        // working copy (left) = [1]; ref (right) adds node 9, no deletions.
+        var disk = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [Node(1)], [], []));
+        var refp = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [Node(1), Node(9)], [], []));
+
+        var path = WriteTempProject(disk);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(refp));
+        var vm   = new DiffViewModel(git, new StubDispatcher(), path);
+
+        var window = new DiffWindow(vm);
+        window.Show();
+
+        foreach (var g in vm.Groups) g.IsAllSelected = true;
+        vm.ApplyCommand.Execute(null);
+
+        Assert.Empty(vm.DanglingLinks);
+        Assert.False(window.FindControl<Expander>("DanglingPanel")!.IsVisible);
+    }
+
+    [AvaloniaFact]
+    public void DanglingPanel_VisibleWithRows_AfterApplyLeavesDanglingLinks()
+    {
+        // ref adds node 5 (links to 8) AND deletes node 8 → bringing in both dangles.
+        var disk = DialogProject.Empty("p");
+        var refp = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion,
+                [NodeWithLink(5, 8)], [8], []));
+
+        var path = WriteTempProject(disk);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(refp));
+        var vm   = new DiffViewModel(git, new StubDispatcher(), path);
+
+        var window = new DiffWindow(vm);
+        window.Show();
+
+        foreach (var g in vm.Groups) g.IsAllSelected = true;
+        vm.ApplyCommand.Execute(null);
+
+        Assert.NotEmpty(vm.DanglingLinks);
+        Assert.True(window.FindControl<Expander>("DanglingPanel")!.IsVisible);
+        Assert.Equal(vm.DanglingLinks.Count,
+                     window.FindControl<ItemsControl>("DanglingList")!.ItemCount);
+    }
+
     private sealed class FakeGit(Func<string[], GitResult> handler) : IGitRunner
     {
         public GitResult Run(string workingDirectory, params string[] args) => handler(args);
