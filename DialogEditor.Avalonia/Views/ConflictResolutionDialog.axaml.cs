@@ -7,6 +7,9 @@ public partial class ConflictResolutionDialog : Window
 {
     public bool ForceApply { get; private set; }
 
+    // Parameterless ctor so the XAML resource is reachable via the runtime loader (avoids AVLN3001).
+    public ConflictResolutionDialog() => InitializeComponent();
+
     public ConflictResolutionDialog(PatchConflictException ex)
     {
         InitializeComponent();

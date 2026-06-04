@@ -9,6 +9,9 @@ public partial class UnsavedChangesDialog : Window
 {
     public UnsavedChangesResult Result { get; private set; } = UnsavedChangesResult.Cancel;
 
+    // Parameterless ctor so the XAML resource is reachable via the runtime loader (avoids AVLN3001).
+    public UnsavedChangesDialog() => InitializeComponent();
+
     public UnsavedChangesDialog(string conversationName)
     {
         InitializeComponent();

@@ -8,7 +8,12 @@ public partial class ConversationNameDialog : Window
 {
     public string? Result { get; private set; }
 
-    public ConversationNameDialog(string? defaultValue = null)
+    // Parameterless ctor: a "new conversation" dialog with no prefill. Delegates so
+    // zero-arg construction still wires everything up, and makes the XAML resource
+    // reachable via the runtime loader (avoids AVLN3001).
+    public ConversationNameDialog() : this(null) { }
+
+    public ConversationNameDialog(string? defaultValue)
     {
         InitializeComponent();
 
