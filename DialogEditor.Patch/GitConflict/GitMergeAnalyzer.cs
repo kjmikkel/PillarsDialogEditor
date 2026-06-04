@@ -96,7 +96,11 @@ public static class GitMergeAnalyzer
             if (theirTr.TryGetValue(key, out var theirT) && !mineT.Equals(theirT))
                 granular.Add(new MergeConflict(
                     MergeConflictKind.TranslationEdit, conv, key.NodeId, key.Lang,
-                    DisplayText(mineT, theirT), DisplayText(theirT, mineT)));
+                    mineT.DefaultText, theirT.DefaultText)
+                {
+                    MineFemaleValue   = mineT.FemaleText,
+                    TheirsFemaleValue = theirT.FemaleText,
+                });
         }
 
         // ── Conversation-level fallback ──────────────────────────────────
@@ -165,11 +169,6 @@ public static class GitMergeAnalyzer
                 map[(t.NodeId, lang)] = t;   // last-wins
         return map;
     }
-
-    // Show the field that actually differs: DefaultText when it differs, else the
-    // FemaleText (so a female-only difference is still visible in the dialog).
-    private static string DisplayText(NodeTranslation self, NodeTranslation other)
-        => self.DefaultText != other.DefaultText ? self.DefaultText : self.FemaleText;
 
     // (nodeId, field) -> comparable value. FieldChanges contribute their `To`
     // value; the replace-all Conditions/Scripts lists are JSON-encoded so they
