@@ -51,6 +51,84 @@ public class DiffViewModelApplyTests : IDisposable
         Assert.Equal([1], group.SelectedNodeIds);
     }
 
+    // ── auto-pull (dependency) group tests ────────────────────────────────
+    private static ConversationChangeViewModel MakeGroupWithDeps(
+        ConversationChange change,
+        IReadOnlyDictionary<int, IReadOnlyList<int>> outgoing,
+        IReadOnlySet<int> addedIds,
+        bool autoPull = true)
+    {
+        var g = new ConversationChangeViewModel(change);
+        g.SetDependencies(outgoing, addedIds);
+        g.AutoPullEnabled = autoPull;
+        return g;
+    }
+
+    [Fact]
+    public void Group_TickingAddedNode_AutoTicksLinkedAddedNode()
+    {
+        var change = new ConversationChange("c", Added: [1, 2], Removed: [], Modified: []);
+        var g = MakeGroupWithDeps(change,
+            new Dictionary<int, IReadOnlyList<int>> { [1] = [2] }, new HashSet<int> { 1, 2 });
+
+        g.Nodes.First(n => n.NodeId == 1).IsSelected = true;
+
+        Assert.True(g.Nodes.First(n => n.NodeId == 2).IsSelected);
+    }
+
+    [Fact]
+    public void Group_AutoPull_IsTransitive()
+    {
+        var change = new ConversationChange("c", Added: [1, 2, 3], Removed: [], Modified: []);
+        var g = MakeGroupWithDeps(change,
+            new Dictionary<int, IReadOnlyList<int>> { [1] = [2], [2] = [3] }, new HashSet<int> { 1, 2, 3 });
+
+        g.Nodes.First(n => n.NodeId == 1).IsSelected = true;
+
+        Assert.True(g.Nodes.First(n => n.NodeId == 2).IsSelected);
+        Assert.True(g.Nodes.First(n => n.NodeId == 3).IsSelected);
+    }
+
+    [Fact]
+    public void Group_AutoPullOff_DoesNotPull()
+    {
+        var change = new ConversationChange("c", Added: [1, 2], Removed: [], Modified: []);
+        var g = MakeGroupWithDeps(change,
+            new Dictionary<int, IReadOnlyList<int>> { [1] = [2] }, new HashSet<int> { 1, 2 }, autoPull: false);
+
+        g.Nodes.First(n => n.NodeId == 1).IsSelected = true;
+
+        Assert.False(g.Nodes.First(n => n.NodeId == 2).IsSelected);
+    }
+
+    [Fact]
+    public void Group_DoesNotPull_ModifiedOrRemovedTargets()
+    {
+        // Node 1 (added) links to 4 (modified) and 5 (removed); neither is in addedIds.
+        var change = new ConversationChange("c", Added: [1], Removed: [5], Modified: [4]);
+        var g = MakeGroupWithDeps(change,
+            new Dictionary<int, IReadOnlyList<int>> { [1] = [4, 5] }, new HashSet<int> { 1 });
+
+        g.Nodes.First(n => n.NodeId == 1).IsSelected = true;
+
+        Assert.False(g.Nodes.First(n => n.NodeId == 4).IsSelected);
+        Assert.False(g.Nodes.First(n => n.NodeId == 5).IsSelected);
+    }
+
+    [Fact]
+    public void Group_UntickingSource_LeavesDependenciesTicked()
+    {
+        var change = new ConversationChange("c", Added: [1, 2], Removed: [], Modified: []);
+        var g = MakeGroupWithDeps(change,
+            new Dictionary<int, IReadOnlyList<int>> { [1] = [2] }, new HashSet<int> { 1, 2 });
+
+        var n1 = g.Nodes.First(n => n.NodeId == 1);
+        n1.IsSelected = true;        // pulls 2
+        n1.IsSelected = false;       // untick source
+
+        Assert.True(g.Nodes.First(n => n.NodeId == 2).IsSelected); // dependency stays
+    }
+
     // ── CanApply / selection-tree tests ───────────────────────────────────
     [Fact]
     public void CanApply_False_WhenNeitherEndpointIsWorkingCopy()

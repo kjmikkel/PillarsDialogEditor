@@ -15,6 +15,22 @@ public partial class ConversationChangeViewModel : ObservableObject
 
     private bool _suppressRollDown;
 
+    private IReadOnlyDictionary<int, IReadOnlyList<int>> _outgoing =
+        new Dictionary<int, IReadOnlyList<int>>();
+    private IReadOnlySet<int> _addedIds = new HashSet<int>();
+
+    /// When true, ticking a node also ticks the added nodes it links to (transitively).
+    public bool AutoPullEnabled { get; set; }
+
+    /// Supplies the conversation's outgoing-link map (source node id → target node ids)
+    /// and the set of added node ids eligible to be auto-pulled.
+    public void SetDependencies(
+        IReadOnlyDictionary<int, IReadOnlyList<int>> outgoing, IReadOnlySet<int> addedIds)
+    {
+        _outgoing = outgoing;
+        _addedIds = addedIds;
+    }
+
     public event Action? SelectionChanged;
 
     public ConversationChangeViewModel(ConversationChange change)
@@ -28,7 +44,7 @@ public partial class ConversationChangeViewModel : ObservableObject
     private void Add(int id, DiffStatus kind)
     {
         var node = new NodeChangeViewModel(id, kind);
-        node.SelectionChanged += OnNodeSelectionChanged;
+        node.SelectionChanged += () => OnNodeSelectionChanged(node);
         Nodes.Add(node);
     }
 
@@ -56,10 +72,26 @@ public partial class ConversationChangeViewModel : ObservableObject
         }
     }
 
-    private void OnNodeSelectionChanged()
+    private void OnNodeSelectionChanged(NodeChangeViewModel node)
     {
         if (_suppressRollDown) return;
+
+        if (node.IsSelected && AutoPullEnabled)
+            PullDependencies(node.NodeId);
+
         OnPropertyChanged(nameof(IsAllSelected));
         SelectionChanged?.Invoke();
+    }
+
+    private void PullDependencies(int startNodeId)
+    {
+        var toSelect = DependencyClosure.Expand(startNodeId, _outgoing, _addedIds);
+        if (toSelect.Count == 0) return;
+
+        _suppressRollDown = true;
+        foreach (var n in Nodes)
+            if (toSelect.Contains(n.NodeId))
+                n.IsSelected = true;
+        _suppressRollDown = false;
     }
 }
