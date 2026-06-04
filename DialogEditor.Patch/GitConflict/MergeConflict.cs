@@ -25,4 +25,12 @@ public record MergeConflict(
     /// Sentinel placed in MineValue/TheirsValue for the side that deletes a node
     /// in a DeleteVsEdit conflict.
     public const string DeletedMarker = "(deleted)";
+
+    /// Female-variant text for a TranslationEdit conflict (mine side).
+    /// Empty for every other conflict kind. Display-only: the merge replaces
+    /// the whole NodeTranslation regardless of which sub-field differs.
+    public string MineFemaleValue { get; init; } = "";
+
+    /// Female-variant text for a TranslationEdit conflict (theirs side). See MineFemaleValue.
+    public string TheirsFemaleValue { get; init; } = "";
 }

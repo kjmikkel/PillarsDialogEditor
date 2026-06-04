@@ -20,6 +20,15 @@ public partial class ConflictRowViewModel : ObservableObject
     public string            MineValue   => Conflict.MineValue;
     public string            TheirsValue => Conflict.TheirsValue;
 
+    public string MineFemaleValue   => Conflict.MineFemaleValue;
+    public string TheirsFemaleValue => Conflict.TheirsFemaleValue;
+
+    // True only for a translation conflict that carries female-variant text on
+    // either side. Drives the Default/Female labelled rows in the dialog.
+    public bool HasFemaleRow =>
+        Kind == MergeConflictKind.TranslationEdit
+        && (!string.IsNullOrEmpty(MineFemaleValue) || !string.IsNullOrEmpty(TheirsFemaleValue));
+
     [ObservableProperty]
     private MergeSide? _choice;
 
