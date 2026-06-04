@@ -319,6 +319,27 @@ public partial class MainWindow : Window
         new DiffWindow(diffVm).Show();
     }
 
+    private void History_Click(object? sender, RoutedEventArgs e)
+    {
+        var vm = (MainWindowViewModel)DataContext!;
+        if (vm.ProjectPath is null) return;
+
+        var historyVm = new HistoryViewModel(new ProcessGitRunner(), vm.ProjectPath);
+        historyVm.CompareWithCommit = sha =>
+        {
+            var diffVm = new DiffViewModel(new ProcessGitRunner(), new AvaloniaDispatcher(),
+                                           vm.ProjectPath,
+                                           vm.Provider, vm.Provider?.Language ?? "en",
+                                           initialRightRef: sha);
+            diffVm.CommitApply      = applied => _ = vm.ApplyFromDiff(applied);
+            diffVm.RequestUndoApply = () => vm.UndoApplyCommand.Execute(null);
+            vm.ConfirmSaveBeforeApply = () => ShowSaveBeforeApplyDialogAsync(vm);
+            new DiffWindow(diffVm).Show();
+        };
+
+        new HistoryWindow(historyVm).Show();
+    }
+
     private void PatchManager_Click(object? sender, RoutedEventArgs e)
     {
         if (_patchManagerWindow is null || !_patchManagerWindow.IsVisible)
