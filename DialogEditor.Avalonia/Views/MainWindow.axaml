@@ -100,6 +100,10 @@
                                   Click="CompareVersions_Click"
                                   IsEnabled="{Binding IsProjectOpen}"
                                   ToolTip.Tip="{StaticResource ToolTip_CompareVersions}"/>
+                        <MenuItem Header="{StaticResource Menu_History}"
+                                  Click="History_Click"
+                                  IsEnabled="{Binding IsProjectOpen}"
+                                  ToolTip.Tip="{StaticResource ToolTip_History}"/>
                     </MenuItem>
 
                     <MenuItem Header="{StaticResource Menu_Test}">
