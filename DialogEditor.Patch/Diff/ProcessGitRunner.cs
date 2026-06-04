@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text;
 
 namespace DialogEditor.Patch.Diff;
 
@@ -14,6 +15,10 @@ public sealed class ProcessGitRunner : IGitRunner
             RedirectStandardError  = true,
             UseShellExecute        = false,
             CreateNoWindow         = true,
+            // Git emits UTF-8; decode as such so non-ASCII content and a file's
+            // UTF-8 BOM survive intact (the default console encoding mangles them).
+            StandardOutputEncoding = Encoding.UTF8,
+            StandardErrorEncoding  = Encoding.UTF8,
         };
         foreach (var a in args) psi.ArgumentList.Add(a);
 
