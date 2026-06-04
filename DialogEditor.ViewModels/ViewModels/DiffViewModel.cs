@@ -128,8 +128,10 @@ public partial class DiffViewModel : ObservableObject
         EndpointOption right;
         if (initialRightRef is not null)
         {
+            // The caller may pass a full sha while the enumerated commits use short
+            // shas (or vice versa), so treat a sha-prefix match as the same commit.
             var match = options.FirstOrDefault(
-                o => o.Endpoint is DiffEndpoint.GitRef g && g.Ref == initialRightRef);
+                o => o.Endpoint is DiffEndpoint.GitRef g && RefsMatch(g.Ref, initialRightRef));
             if (match is null)
             {
                 // Commit older than the enumerated list (or otherwise absent):
@@ -164,6 +166,19 @@ public partial class DiffViewModel : ObservableObject
         => Selected = value is null ? null : Changes.FirstOrDefault(c => c.Name == value.Name);
 
     // ── private ───────────────────────────────────────────────────────────
+
+    // A full sha and its abbreviated form refer to the same commit. Match on
+    // equality, or when one is a hex prefix of the other of at least 7 chars
+    // (git's default abbreviation floor) — so a short branch name can't match by
+    // coincidence, and non-sha refs (branch names) only match exactly.
+    private static bool RefsMatch(string a, string b)
+    {
+        if (a == b) return true;
+        var (shorter, longer) = a.Length <= b.Length ? (a, b) : (b, a);
+        return shorter.Length >= 7
+            && shorter.All(Uri.IsHexDigit)
+            && longer.StartsWith(shorter, StringComparison.OrdinalIgnoreCase);
+    }
 
     private IReadOnlyList<EndpointOption> BuildEndpointOptions()
     {
