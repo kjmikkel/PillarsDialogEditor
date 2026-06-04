@@ -45,8 +45,17 @@
                     <StackPanel Spacing="8">
                         <TextBlock Text="{StaticResource GitConflictWindow_MineHeader}"
                                    Foreground="#9cc4ff" FontSize="12" FontWeight="Bold"/>
+                        <TextBlock Text="{StaticResource GitConflict_DefaultTextLabel}"
+                                   Foreground="#888" FontSize="10"
+                                   IsVisible="{Binding HasFemaleRow}"/>
                         <TextBlock x:Name="MineDiffText"
                                    FontSize="12" TextWrapping="Wrap"/>
+                        <TextBlock Text="{StaticResource GitConflict_FemaleTextLabel}"
+                                   Foreground="#888" FontSize="10"
+                                   IsVisible="{Binding HasFemaleRow}"/>
+                        <TextBlock x:Name="MineFemaleDiffText"
+                                   FontSize="12" TextWrapping="Wrap"
+                                   IsVisible="{Binding HasFemaleRow}"/>
                         <RadioButton x:Name="MineRadio" GroupName="Choice"
                                      Content="{Binding MineLabel}"
                                      IsChecked="{Binding IsMineChosen, Mode=TwoWay}"
@@ -59,8 +68,17 @@
                     <StackPanel Spacing="8">
                         <TextBlock Text="{StaticResource GitConflictWindow_TheirsHeader}"
                                    Foreground="#ff9c9c" FontSize="12" FontWeight="Bold"/>
+                        <TextBlock Text="{StaticResource GitConflict_DefaultTextLabel}"
+                                   Foreground="#888" FontSize="10"
+                                   IsVisible="{Binding HasFemaleRow}"/>
                         <TextBlock x:Name="TheirsDiffText"
                                    FontSize="12" TextWrapping="Wrap"/>
+                        <TextBlock Text="{StaticResource GitConflict_FemaleTextLabel}"
+                                   Foreground="#888" FontSize="10"
+                                   IsVisible="{Binding HasFemaleRow}"/>
+                        <TextBlock x:Name="TheirsFemaleDiffText"
+                                   FontSize="12" TextWrapping="Wrap"
+                                   IsVisible="{Binding HasFemaleRow}"/>
                         <RadioButton x:Name="TheirsRadio" GroupName="Choice"
                                      Content="{Binding TheirsLabel}"
                                      IsChecked="{Binding IsTheirsChosen, Mode=TwoWay}"
