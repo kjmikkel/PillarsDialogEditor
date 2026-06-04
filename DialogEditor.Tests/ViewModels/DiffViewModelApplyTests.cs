@@ -90,6 +90,24 @@ public class DiffViewModelApplyTests : IDisposable
     }
 
     [Fact]
+    public void Group_AutoPull_FiresSelectionChangedExactlyOnce()
+    {
+        // Ticking node 1 pulls 2 and 3, but the cascade is suppressed: the group must
+        // raise SelectionChanged once (for the originating tick), not once per pulled node.
+        var change = new ConversationChange("c", Added: [1, 2, 3], Removed: [], Modified: []);
+        var g = MakeGroupWithDeps(change,
+            new Dictionary<int, IReadOnlyList<int>> { [1] = [2, 3] }, new HashSet<int> { 1, 2, 3 });
+        var fired = 0;
+        g.SelectionChanged += () => fired++;
+
+        g.Nodes.First(n => n.NodeId == 1).IsSelected = true;
+
+        Assert.Equal(1, fired);
+        Assert.True(g.Nodes.First(n => n.NodeId == 2).IsSelected);
+        Assert.True(g.Nodes.First(n => n.NodeId == 3).IsSelected);
+    }
+
+    [Fact]
     public void Group_AutoPullOff_DoesNotPull()
     {
         var change = new ConversationChange("c", Added: [1, 2], Removed: [], Modified: []);
@@ -240,6 +258,32 @@ public class DiffViewModelApplyTests : IDisposable
         var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
         var git  = MakeFakeGit(dir, DialogProjectSerializer.Serialize(refProject), "main\n");
         return new DiffViewModel(git, new StubDispatcher(), path);
+    }
+
+    // Source chains added nodes: 5 → 6 → 7 (all added). Validates BuildDependencyData
+    // assembles the real link map and the closure pulls the whole chain through the VM.
+    private DiffViewModel MakeChainedAddScenario()
+    {
+        var disk = DialogProject.Empty("p");
+        var refProject = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion,
+                [NodeWithLink(5, 6), NodeWithLink(6, 7), Node(7)], [], []));
+        var path = WriteTempProject(disk);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, DialogProjectSerializer.Serialize(refProject), "main\n");
+        return new DiffViewModel(git, new StubDispatcher(), path);
+    }
+
+    [Fact]
+    public void DiffViewModel_AutoPull_IsTransitive_ThroughRealSourcePatch()
+    {
+        var vm = MakeChainedAddScenario();
+        var group = vm.Groups.First(g => g.Name == "greeting");
+
+        group.Nodes.First(n => n.NodeId == 5).IsSelected = true;
+
+        Assert.True(group.Nodes.First(n => n.NodeId == 6).IsSelected);
+        Assert.True(group.Nodes.First(n => n.NodeId == 7).IsSelected);
     }
 
     [Fact]
