@@ -26,14 +26,22 @@ session, read its entry, and tackle it.
   both the female-only and both-variants-differ display cases. Shipped. Spec/plan:
   `docs/superpowers/specs/2026-06-04-git-conflict-female-text-detail-design.md`,
   `docs/superpowers/plans/2026-06-04-git-conflict-female-text-detail.md`.
+- **History browser** (2026-06-04) — git history timeline for the open project;
+  "Compare with my copy" opens a commit in the compare window. Spec/plan:
+  `docs/superpowers/specs/2026-06-04-history-browser-design.md`,
+  `docs/superpowers/plans/2026-06-04-history-browser.md`.
 
 ---
 
 ## Queued (not started)
 
-### Branch/history navigation
-Browse git log, switch branches, attribution. The last open VCS gap and the biggest
-scope — decompose during brainstorming.
+### Branch/history navigation — remaining sub-projects
+The **history browser** (sub-project 1) shipped 2026-06-04. Remaining:
+- **Attribution / blame** (read-only) — map `git blame` onto nodes; mapping JSON
+  blame lines back to structured nodes is the hard part.
+- **Branch switching** (read-write) — `git checkout` reconciled with the open
+  project + unsaved edits; the first git write op; design its write-semantics
+  carefully. Benefits from the now-shipped history UI.
 
 ### Blocked on investigation (can't design yet)
 - **Bark preview** — in-context preview of overhead floating bark text. Needs
