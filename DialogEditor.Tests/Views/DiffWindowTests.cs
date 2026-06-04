@@ -265,6 +265,29 @@ public class DiffWindowTests : IDisposable
                      window.FindControl<ItemsControl>("DanglingList")!.ItemCount);
     }
 
+    [AvaloniaFact]
+    public void AutoPullCheckbox_DefaultsChecked_AndBindsToViewModel()
+    {
+        var disk = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [Node(1), Node(2)], [], []));
+        var refp = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [Node(1)], [], []));
+
+        var path = WriteTempProject(disk);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(refp));
+        var vm   = new DiffViewModel(git, new StubDispatcher(), path);
+
+        var window = new DiffWindow(vm);
+        window.Show();
+
+        var cb = window.FindControl<CheckBox>("AutoPullCheck")!;
+        Assert.True(cb.IsChecked);
+
+        vm.AutoPullDependencies = false;
+        Assert.False(cb.IsChecked);
+    }
+
     private sealed class FakeGit(Func<string[], GitResult> handler) : IGitRunner
     {
         public GitResult Run(string workingDirectory, params string[] args) => handler(args);

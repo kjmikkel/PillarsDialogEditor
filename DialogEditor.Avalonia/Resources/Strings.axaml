@@ -540,6 +540,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_DiffChangedList">Conversations that differ between the selected versions — click to inspect</sys:String>
     <sys:String x:Key="Diff_BringInButton">Bring in</sys:String>
     <sys:String x:Key="Diff_Hint">Tick the changes you want to bring into your copy, then Bring in.</sys:String>
+    <sys:String x:Key="Diff_AutoPullLabel">Also bring in linked nodes</sys:String>
+    <sys:String x:Key="ToolTip_Diff_AutoPull">When ticking a change, also tick the added nodes it links to, so brought-in links don't point at nodes that were never created. Turn off for surgical single-node picks.</sys:String>
     <!-- {0} = node ID integer -->
     <sys:String x:Key="Diff_NodeLine">Line {0}</sys:String>
     <!-- {0} = number of dangling links -->
