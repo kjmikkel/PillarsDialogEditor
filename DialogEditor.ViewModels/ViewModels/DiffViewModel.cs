@@ -33,7 +33,7 @@ public partial class DiffViewModel : ObservableObject
     private static readonly IReadOnlyDictionary<string, (string Default, string Female)> EmptyLangMap =
         new Dictionary<string, (string Default, string Female)>();
 
-    public IReadOnlyList<EndpointOption>           EndpointOptions { get; }
+    public IReadOnlyList<EndpointOption>           EndpointOptions { get; private set; }
     public ObservableCollection<ConversationChange> Changes         { get; } = [];
     public ObservableCollection<ConversationChangeViewModel> Groups  { get; } = [];
 
@@ -112,7 +112,8 @@ public partial class DiffViewModel : ObservableObject
         IDispatcher       dispatcher,
         string            projectFilePath,
         IGameDataProvider? provider = null,
-        string            language  = "en")
+        string            language  = "en",
+        string?           initialRightRef = null)
     {
         _git             = git;
         _dispatcher      = dispatcher;
@@ -121,14 +122,33 @@ public partial class DiffViewModel : ObservableObject
         _language        = language;
         _loader          = new ProjectVersionLoader(git);
 
-        EndpointOptions = BuildEndpointOptions();
+        var options = BuildEndpointOptions().ToList();
+        var workingCopyOption = options.First(o => o.Endpoint is DiffEndpoint.WorkingCopy);
 
-        var workingCopyOption = EndpointOptions.First(o => o.Endpoint is DiffEndpoint.WorkingCopy);
+        EndpointOption right;
+        if (initialRightRef is not null)
+        {
+            var match = options.FirstOrDefault(
+                o => o.Endpoint is DiffEndpoint.GitRef g && g.Ref == initialRightRef);
+            if (match is null)
+            {
+                // Commit older than the enumerated list (or otherwise absent):
+                // synthesize an option so any historical commit is reachable.
+                match = new EndpointOption(initialRightRef, new DiffEndpoint.GitRef(initialRightRef));
+                options.Insert(1, match);   // just after the working-copy option
+            }
+            right = match;
+        }
+        else
+        {
+            right = options.FirstOrDefault(o => o.Endpoint is DiffEndpoint.GitRef) ?? workingCopyOption;
+        }
+
+        EndpointOptions = options;
         // Your copy on the left (the bring-in target); the other version on the right.
         // This makes the left→right diff direction match what "Bring in" does.
         LeftEndpoint  = workingCopyOption;
-        RightEndpoint = EndpointOptions.FirstOrDefault(o => o.Endpoint is DiffEndpoint.GitRef)
-                        ?? workingCopyOption;
+        RightEndpoint = right;
 
         Recompute();
     }
