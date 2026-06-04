@@ -33,7 +33,10 @@ during brainstorming.
 - **Automatic dependency-pulling** when a selection would dangle (v1 is warn-but-allow).
 
 ### Minor diff polish (optional)
-- `DiffException.ReadFailed` is used for both IO-read and JSON-parse failures, so a corrupt
-  project file shows "locked or unreadable". A `ParseFailed` kind + message would be more precise.
+- ~~`DiffException.ReadFailed` is used for both IO-read and JSON-parse failures, so a corrupt
+  project file shows "locked or unreadable". A `ParseFailed` kind + message would be more precise.~~
+  **Done** (2026-06-04): added `DiffExceptionKind.ParseFailed`; `ProjectVersionLoader` throws it on
+  deserialization failure, and `DiffViewModel` maps it to the new `Status_DiffParseError` string
+  ("the file looks damaged or isn't a valid project file"), distinct from the locked/unreadable message.
 
 See `Gaps.md` for the full known-limitations list.

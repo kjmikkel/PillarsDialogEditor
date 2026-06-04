@@ -102,6 +102,37 @@ public class ProjectVersionLoaderTests
     }
 
     [Fact]
+    public void WorkingCopy_CorruptJson_KindIsParseFailed()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"corrupt_{Guid.NewGuid():N}.dialogproject");
+        File.WriteAllText(path, "{ this is not valid project json");
+        try
+        {
+            var loader = new ProjectVersionLoader(new FakeGit());
+            var ex = Assert.Throws<DiffException>((Action)(() =>
+                loader.Load(new DiffEndpoint.WorkingCopy(), path)));
+            Assert.Equal(DiffExceptionKind.ParseFailed, ex.Kind);
+        }
+        finally { File.Delete(path); }
+    }
+
+    [Fact]
+    public void GitRef_CorruptJson_KindIsParseFailed()
+    {
+        var fake = new FakeGit
+        {
+            Handler = args => args is ["rev-parse", "--show-toplevel"]
+                ? new GitResult(0, "C:/repo\n", "")
+                : new GitResult(0, "{ not valid json", "")
+        };
+        var loader = new ProjectVersionLoader(fake);
+
+        var ex = Assert.Throws<DiffException>((Action)(() =>
+            loader.Load(new DiffEndpoint.GitRef("main"), "C:/repo/mods/my.dialogproject")));
+        Assert.Equal(DiffExceptionKind.ParseFailed, ex.Kind);
+    }
+
+    [Fact]
     public void GitRef_RevParseFails_KindIsNotARepo()
     {
         var fake = new FakeGit

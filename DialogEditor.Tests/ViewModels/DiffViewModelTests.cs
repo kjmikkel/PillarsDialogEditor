@@ -206,6 +206,21 @@ public class DiffViewModelTests : IDisposable
     }
 
     [Fact]
+    public void Diff_GitRefCorruptJson_StatusIsParseError()
+    {
+        // git show succeeds but returns unparseable content → DiffExceptionKind.ParseFailed
+        // → Status_DiffParseError key (distinct from the locked/unreadable read error).
+        var path = WriteTempProject(Empty());
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: "{ not valid project json", branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path);
+
+        Assert.Empty(vm.Changes);
+        Assert.Equal("Status_DiffParseError", vm.StatusText);
+    }
+
+    [Fact]
     public void Diff_RevParseFails_StatusIsNotARepo()
     {
         // rev-parse fails → DiffExceptionKind.NotARepo → Status_DiffNoRepo key

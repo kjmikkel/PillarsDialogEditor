@@ -15,7 +15,7 @@ public class ProjectVersionLoader(IGitRunner git)
         };
 
         try { return DialogProjectSerializer.Deserialize(json); }
-        catch (Exception ex) { throw new DiffException($"Could not read project: {ex.Message}", DiffExceptionKind.ReadFailed); }
+        catch (Exception ex) { throw new DiffException($"Could not parse project: {ex.Message}", DiffExceptionKind.ParseFailed); }
     }
 
     private static string ReadWorkingCopy(string path)

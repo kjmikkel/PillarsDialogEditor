@@ -1,6 +1,6 @@
 namespace DialogEditor.Patch.Diff;
 
-public enum DiffExceptionKind { Unknown, NotARepo, BadRef, FileNotFound, ReadFailed }
+public enum DiffExceptionKind { Unknown, NotARepo, BadRef, FileNotFound, ReadFailed, ParseFailed }
 
 /// Thrown when an endpoint cannot be loaded. Message is English (for logs); the UI
 /// maps Kind to a localized string rather than showing Message directly.
