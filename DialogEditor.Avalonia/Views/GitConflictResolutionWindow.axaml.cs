@@ -49,40 +49,53 @@ public partial class GitConflictResolutionWindow : Window
     }
 
     // Render the selected conflict's mine/theirs values with the differing run
-    // highlighted. Field and translation (text) edits get word-level highlighting;
-    // structural conflicts have nothing to diff, so the raw values are shown.
+    // highlighted, for both the Default and Female text variants. The female blocks
+    // are bound (in XAML) to HasFemaleRow, so they only show when relevant.
     private void UpdateDiff(ConflictRowViewModel? row)
     {
-        var mine   = new InlineCollection();
-        var theirs = new InlineCollection();
+        MineDiffText.Inlines   = BuildInlines(row, isMine: true,  female: false);
+        TheirsDiffText.Inlines = BuildInlines(row, isMine: false, female: false);
 
-        if (row is { Kind: MergeConflictKind.FieldEdit or MergeConflictKind.TranslationEdit })
+        MineFemaleDiffText.Inlines   = BuildInlines(row, isMine: true,  female: true);
+        TheirsFemaleDiffText.Inlines = BuildInlines(row, isMine: false, female: true);
+    }
+
+    // Build the highlighted inlines for one cell. Field and translation (text) edits
+    // get word-level highlighting; structural conflicts have nothing to diff, so the
+    // raw value is shown.
+    private static InlineCollection BuildInlines(ConflictRowViewModel? row, bool isMine, bool female)
+    {
+        var result = new InlineCollection();
+        if (row is null)
+            return result;
+
+        var mineValue   = female ? row.MineFemaleValue   : row.MineValue;
+        var theirsValue = female ? row.TheirsFemaleValue : row.TheirsValue;
+
+        if (row.Kind is MergeConflictKind.FieldEdit or MergeConflictKind.TranslationEdit)
         {
-            foreach (var span in TextDiff.Diff(row.MineValue, row.TheirsValue))
+            foreach (var span in TextDiff.Diff(mineValue, theirsValue))
             {
                 switch (span.Kind)
                 {
                     case DiffKind.Common:
-                        mine.Add(MakeRun(span.Text, CommonBrush));
-                        theirs.Add(MakeRun(span.Text, CommonBrush));
+                        result.Add(MakeRun(span.Text, CommonBrush));
                         break;
-                    case DiffKind.MineOnly:
-                        mine.Add(MakeRun(span.Text, MineBrush));
+                    case DiffKind.MineOnly when isMine:
+                        result.Add(MakeRun(span.Text, MineBrush));
                         break;
-                    case DiffKind.TheirsOnly:
-                        theirs.Add(MakeRun(span.Text, TheirsBrush));
+                    case DiffKind.TheirsOnly when !isMine:
+                        result.Add(MakeRun(span.Text, TheirsBrush));
                         break;
                 }
             }
         }
-        else if (row is not null)
+        else
         {
-            mine.Add(MakeRun(row.MineValue, CommonBrush));
-            theirs.Add(MakeRun(row.TheirsValue, CommonBrush));
+            result.Add(MakeRun(isMine ? mineValue : theirsValue, CommonBrush));
         }
 
-        MineDiffText.Inlines   = mine;
-        TheirsDiffText.Inlines = theirs;
+        return result;
     }
 
     private static Run MakeRun(string text, IBrush brush) => new(text) { Foreground = brush };

@@ -92,6 +92,47 @@ public class GitConflictResolutionWindowTests
         Assert.True(mineText.Inlines!.Count > 1);   // common + mine-only spans
     }
 
+    private static GitConflictResolutionViewModel MakeFemaleTranslationVm()
+    {
+        static DialogProject P(string female)
+        {
+            var patch = new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [], [], [])
+            {
+                Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
+                {
+                    ["en"] = [new NodeTranslation(4, "Hello", female)],   // Default equal both sides
+                },
+            };
+            return DialogProject.Empty("p").WithPatch(patch);
+        }
+
+        var mine   = P("Hello friend");
+        var theirs = P("Hello traveler");
+        return new GitConflictResolutionViewModel(mine, theirs, GitMergeAnalyzer.Analyze(mine, theirs));
+    }
+
+    [AvaloniaFact]
+    public void FemaleTranslationConflict_RendersVisibleFemaleInlines()
+    {
+        var vm     = MakeFemaleTranslationVm();
+        var window = new GitConflictResolutionWindow(vm);
+        window.Show();
+
+        var femaleText = window.FindControl<TextBlock>("MineFemaleDiffText")!;
+        Assert.True(femaleText.IsVisible);
+        Assert.True(femaleText.Inlines!.Count > 1);   // common + mine-only spans
+    }
+
+    [AvaloniaFact]
+    public void FieldEditConflict_HidesFemaleBlock()
+    {
+        var vm     = MakeVm();   // field edit, no female text
+        var window = new GitConflictResolutionWindow(vm);
+        window.Show();
+
+        Assert.False(window.FindControl<TextBlock>("MineFemaleDiffText")!.IsVisible);
+    }
+
     [AvaloniaFact]
     public void TranslationResolveAndApply_TakesTheirsText()
     {
