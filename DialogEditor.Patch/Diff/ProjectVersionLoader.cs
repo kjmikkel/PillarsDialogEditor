@@ -32,16 +32,7 @@ public class ProjectVersionLoader(IGitRunner git)
 
     private string ReadAtRef(string gitRef, string projectFilePath)
     {
-        var dir = Path.GetDirectoryName(Path.GetFullPath(projectFilePath))
-                  ?? throw new DiffException("Project path has no directory.", DiffExceptionKind.Unknown);
-
-        var root = git.Run(dir, "rev-parse", "--show-toplevel");
-        if (!root.Ok)
-            throw new DiffException("Not a git repository (or git is not installed).", DiffExceptionKind.NotARepo);
-
-        var repoRoot = root.StdOut.Trim();
-        var relative = Path.GetRelativePath(repoRoot, Path.GetFullPath(projectFilePath))
-                           .Replace('\\', '/');
+        var (dir, relative) = GitRepoPath.ResolveRepoRelative(git, projectFilePath);
 
         var show = git.Run(dir, "show", $"{gitRef}:{relative}");
         if (!show.Ok)
