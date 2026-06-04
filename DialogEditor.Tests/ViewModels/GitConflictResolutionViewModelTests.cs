@@ -1,3 +1,4 @@
+using DialogEditor.Core.Models;
 using DialogEditor.Patch;
 using DialogEditor.Patch.GitConflict;
 using DialogEditor.Tests.Helpers;
@@ -24,6 +25,56 @@ public class GitConflictResolutionViewModelTests
         var mine   = P("friend");
         var theirs = P("traveler");
         return (mine, theirs, GitMergeAnalyzer.Analyze(mine, theirs));
+    }
+
+    private static (DialogProject Mine, DialogProject Theirs, IReadOnlyList<MergeConflict> Conflicts) TranslationCase(
+        string mineDefault, string theirsDefault, string mineFemale, string theirsFemale)
+    {
+        DialogProject P(string def, string fem)
+        {
+            var patch = new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [], [], [])
+            {
+                Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
+                {
+                    ["en"] = [new NodeTranslation(4, def, fem)],
+                },
+            };
+            return DialogProject.Empty("p").WithPatch(patch);
+        }
+
+        var mine   = P(mineDefault, mineFemale);
+        var theirs = P(theirsDefault, theirsFemale);
+        return (mine, theirs, GitMergeAnalyzer.Analyze(mine, theirs));
+    }
+
+    [Fact]
+    public void TranslationRow_WithFemaleText_HasFemaleRowAndValues()
+    {
+        var (m, t, c) = TranslationCase("Hello", "Hello", "HelloF", "HelloFemale");
+        var vm = new GitConflictResolutionViewModel(m, t, c);
+        var row = vm.Conflicts[0];
+
+        Assert.True(row.HasFemaleRow);
+        Assert.Equal("HelloF",      row.MineFemaleValue);
+        Assert.Equal("HelloFemale", row.TheirsFemaleValue);
+    }
+
+    [Fact]
+    public void TranslationRow_NoFemaleText_NoFemaleRow()
+    {
+        var (m, t, c) = TranslationCase("Hello friend", "Hello traveler", "", "");
+        var vm = new GitConflictResolutionViewModel(m, t, c);
+
+        Assert.False(vm.Conflicts[0].HasFemaleRow);
+    }
+
+    [Fact]
+    public void FieldEditRow_HasNoFemaleRow()
+    {
+        var (m, t, c) = FieldEditCase();
+        var vm = new GitConflictResolutionViewModel(m, t, c);
+
+        Assert.False(vm.Conflicts[0].HasFemaleRow);
     }
 
     [Fact]
