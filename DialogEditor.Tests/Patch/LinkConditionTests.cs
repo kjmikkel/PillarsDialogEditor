@@ -78,7 +78,9 @@ public class LinkConditionTests
             [], [], [ml]);
         var result = PatchApplier.Apply(snap, new ConversationPatch("c", 1, [], [], [mod]));
 
-        Assert.Single(result.Nodes[0].Links[0].Conditions);   // original preserved
+        var conditions = result.Nodes[0].Links[0].Conditions;
+        Assert.NotNull(conditions);            // original preserved (not nulled out)
+        Assert.Single(conditions);
     }
 
     // ── Serialiser round-trip ─────────────────────────────────────────────

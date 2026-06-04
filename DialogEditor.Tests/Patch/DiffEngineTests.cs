@@ -64,7 +64,7 @@ public class DiffEngineTests
         var baseSnap    = Snap(MakeNode(1, defaultText: "old"));
         var currentSnap = Snap(MakeNode(1, defaultText: "new"));
         var patch = DiffEngine.Diff("conv", baseSnap, currentSnap, "en");
-        Assert.False(patch.ModifiedNodes.Any(m => m.FieldChanges.ContainsKey("DefaultText")));
+        Assert.DoesNotContain(patch.ModifiedNodes, m => m.FieldChanges.ContainsKey("DefaultText"));
         Assert.True(patch.Translations.ContainsKey("en"));
         Assert.Equal("new", patch.Translations["en"].Single(x => x.NodeId == 1).DefaultText);
     }
@@ -176,7 +176,7 @@ public class DiffEngineTests
         var base_  = MakeNode(1, defaultText: "Old");
         var curr   = MakeNode(1, defaultText: "New");
         var patch  = DiffEngine.Diff("c", Snap(base_), Snap(curr), "fr");
-        Assert.False(patch.ModifiedNodes.Any(m => m.FieldChanges.ContainsKey("DefaultText")));
+        Assert.DoesNotContain(patch.ModifiedNodes, m => m.FieldChanges.ContainsKey("DefaultText"));
         Assert.True(patch.Translations.ContainsKey("fr"));
         Assert.Equal("New", patch.Translations["fr"].Single(x => x.NodeId == 1).DefaultText);
     }
