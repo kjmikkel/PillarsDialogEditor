@@ -33,7 +33,7 @@ public partial class DiffViewModel : ObservableObject
     private static readonly IReadOnlyDictionary<string, (string Default, string Female)> EmptyLangMap =
         new Dictionary<string, (string Default, string Female)>();
 
-    public IReadOnlyList<EndpointOption>           EndpointOptions { get; private set; }
+    public IReadOnlyList<EndpointOption>           EndpointOptions { get; }
     public ObservableCollection<ConversationChange> Changes         { get; } = [];
     public ObservableCollection<ConversationChangeViewModel> Groups  { get; } = [];
 
