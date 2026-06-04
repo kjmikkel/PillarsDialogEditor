@@ -69,6 +69,8 @@ public partial class DiffViewModel : ObservableObject
 
     public ObservableCollection<DanglingLink> DanglingLinks { get; } = [];
 
+    public ObservableCollection<string> DanglingLinkDescriptions { get; } = [];
+
     [RelayCommand(CanExecute = nameof(CanApply))]
     private void Apply()
     {
@@ -92,8 +94,13 @@ public partial class DiffViewModel : ObservableObject
         }
 
         DanglingLinks.Clear();
+        DanglingLinkDescriptions.Clear();
         foreach (var d in NodeLinkAnalyzer.Analyze(result))
+        {
             DanglingLinks.Add(d);
+            DanglingLinkDescriptions.Add(
+                Loc.Format("Diff_DanglingRow", d.Conversation, d.FromNode, d.ToNode));
+        }
 
         CommitApply?.Invoke(result);
         StatusText = Loc.Format("Status_BroughtIn", selection.Count);
