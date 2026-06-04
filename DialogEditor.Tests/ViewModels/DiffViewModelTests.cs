@@ -717,6 +717,33 @@ public class DiffViewModelTests : IDisposable
         Assert.Equal("Diff_Detail_NodeRemoved", sec.DefaultAfter);
     }
 
+    [Fact]
+    public void InitialRightRef_MatchingEnumeratedCommit_IsPreselected()
+    {
+        var path = WriteTempProject(DialogProject.Empty("p"));
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(DialogProject.Empty("p")),
+                               branchOutput: "main\n", logOutput: "abc123 first\n");
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path, provider: null, "en", initialRightRef: "abc123");
+
+        Assert.True(vm.RightEndpoint!.Endpoint is DiffEndpoint.GitRef { Ref: "abc123" });
+    }
+
+    [Fact]
+    public void InitialRightRef_NotEnumerated_IsSynthesizedAndSelected()
+    {
+        var path = WriteTempProject(DialogProject.Empty("p"));
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(DialogProject.Empty("p")),
+                               branchOutput: "main\n", logOutput: "abc123 first\n");
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path, provider: null, "en", initialRightRef: "deadbeef");
+
+        Assert.True(vm.RightEndpoint!.Endpoint is DiffEndpoint.GitRef { Ref: "deadbeef" });
+        Assert.Contains(vm.EndpointOptions, o => o.Endpoint is DiffEndpoint.GitRef { Ref: "deadbeef" });
+    }
+
     // ── helper ────────────────────────────────────────────────────────────────
 
     private sealed class FakeGit(Func<string[], GitResult> handler) : IGitRunner
