@@ -186,6 +186,21 @@ public class DiffViewModelApplyTests : IDisposable
     }
 
     [Fact]
+    public void Apply_PopulatesDanglingLinkDescriptions_MatchingDanglingLinks()
+    {
+        var vm = MakeDanglingScenario();
+        foreach (var g in vm.Groups) g.IsAllSelected = true;
+        vm.CommitApply = _ => { };
+
+        vm.ApplyCommand.Execute(null);
+
+        Assert.NotEmpty(vm.DanglingLinkDescriptions);
+        Assert.Equal(vm.DanglingLinks.Count, vm.DanglingLinkDescriptions.Count);
+        // StubStringProvider returns the key verbatim, so every row is the format key.
+        Assert.All(vm.DanglingLinkDescriptions, d => Assert.Equal("Diff_DanglingRow", d));
+    }
+
+    [Fact]
     public void AppliedPreview_TintsBroughtInNode_AsAdded()
     {
         var convName = "greeting";
