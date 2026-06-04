@@ -46,6 +46,7 @@ public partial class DiffViewModel : ObservableObject
     [ObservableProperty] private CanvasMode           _canvasMode  = CanvasMode.Changes;
     [ObservableProperty] private ConversationChangeViewModel? _selectedGroup;
     [ObservableProperty] private NodeDiffDetailViewModel? _selectedNodeDetail;
+    [ObservableProperty] private bool _autoPullDependencies = true;
 
     // True when exactly one endpoint is the working copy (the writable target).
     private bool WorkingCopyIsEndpoint =>
@@ -239,6 +240,9 @@ public partial class DiffViewModel : ObservableObject
         {
             var group = new ConversationChangeViewModel(change);
             group.SelectionChanged += OnSelectionChanged;
+            var (outgoing, addedIds) = BuildDependencyData(change);
+            group.SetDependencies(outgoing, addedIds);
+            group.AutoPullEnabled = AutoPullDependencies;
             Groups.Add(group);
         }
         OnPropertyChanged(nameof(CanApply));
@@ -247,6 +251,31 @@ public partial class DiffViewModel : ObservableObject
 
         // Reset canvas when endpoints change
         BuildDiffCanvas();
+    }
+
+    private (IReadOnlyDictionary<int, IReadOnlyList<int>> Outgoing, IReadOnlySet<int> AddedIds)
+        BuildDependencyData(ConversationChange change)
+    {
+        var addedIds = (IReadOnlySet<int>)change.Added.ToHashSet();
+        var outgoing = new Dictionary<int, IReadOnlyList<int>>();
+
+        var sourcePatch = SourceProject?.Patches.GetValueOrDefault(change.Name);
+        if (sourcePatch is not null)
+        {
+            foreach (var n in sourcePatch.AddedNodes)
+                outgoing[n.NodeId] = n.Links.Select(l => l.ToNodeId).ToList();
+            foreach (var m in sourcePatch.ModifiedNodes)
+                outgoing[m.NodeId] = m.AddedLinks.Select(l => l.ToNodeId)
+                    .Concat(m.ModifiedLinks.Select(l => l.ToNodeId)).ToList();
+        }
+
+        return (outgoing, addedIds);
+    }
+
+    partial void OnAutoPullDependenciesChanged(bool value)
+    {
+        foreach (var group in Groups)
+            group.AutoPullEnabled = value;
     }
 
     private static string MapDiffError(DiffException ex, string endpointLabel) =>

@@ -228,6 +228,43 @@ public class DiffViewModelApplyTests : IDisposable
         return new DiffViewModel(git, new StubDispatcher(), path);
     }
 
+    // Source (ref/right) adds node 5 (which links to added node 6) and node 6.
+    // Target (working copy/left) has neither → both are Added; ticking 5 pulls 6.
+    private DiffViewModel MakeLinkedAddScenario()
+    {
+        var disk = DialogProject.Empty("p");
+        var refProject = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion,
+                [NodeWithLink(5, 6), Node(6)], [], []));
+        var path = WriteTempProject(disk);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, DialogProjectSerializer.Serialize(refProject), "main\n");
+        return new DiffViewModel(git, new StubDispatcher(), path);
+    }
+
+    [Fact]
+    public void DiffViewModel_TickingAddedNode_AutoPullsLinkedAddedNode()
+    {
+        var vm = MakeLinkedAddScenario();
+        var group = vm.Groups.First(g => g.Name == "greeting");
+
+        group.Nodes.First(n => n.NodeId == 5).IsSelected = true;
+
+        Assert.True(group.Nodes.First(n => n.NodeId == 6).IsSelected);
+    }
+
+    [Fact]
+    public void DiffViewModel_AutoPullToggleOff_DisablesPull()
+    {
+        var vm = MakeLinkedAddScenario();
+        vm.AutoPullDependencies = false;
+        var group = vm.Groups.First(g => g.Name == "greeting");
+
+        group.Nodes.First(n => n.NodeId == 5).IsSelected = true;
+
+        Assert.False(group.Nodes.First(n => n.NodeId == 6).IsSelected);
+    }
+
     [Fact]
     public void SelectedGroup_SettingIt_SetsMatchingSelectedChange()
     {
