@@ -79,13 +79,34 @@
                         Click="UndoBringIn_Click" Margin="0,0,8,0"
                         ToolTip.Tip="{StaticResource ToolTip_Diff_UndoBringIn}"/>
                 <StackPanel>
-                    <TextBlock Text="{Binding DanglingLinks.Count, StringFormat={StaticResource Diff_DanglingWarning}}"
-                               Foreground="#e0a030" FontSize="10"
-                               IsVisible="{Binding DanglingLinks.Count, Converter={StaticResource CountToVis}}"/>
                     <TextBlock Text="{StaticResource Diff_Hint}" Foreground="#888" FontSize="11" VerticalAlignment="Center"/>
                 </StackPanel>
             </DockPanel>
         </Border>
+
+        <!-- ── Dangling-link panel (above apply bar; visible after an apply leaves dangling links) ── -->
+        <Expander DockPanel.Dock="Bottom"
+                  x:Name="DanglingPanel"
+                  Margin="0,6,0,0"
+                  IsExpanded="False"
+                  IsVisible="{Binding DanglingLinks.Count, Converter={StaticResource CountToVis}}"
+                  ToolTip.Tip="{StaticResource ToolTip_Diff_DanglingPanel}">
+            <Expander.Header>
+                <TextBlock Text="{Binding DanglingLinks.Count, StringFormat={StaticResource Diff_DanglingWarning}}"
+                           Foreground="#e0a030" FontSize="11"/>
+            </Expander.Header>
+            <StackPanel Margin="8,4,0,4" Spacing="2">
+                <TextBlock Text="{StaticResource Diff_DanglingHeader}"
+                           Foreground="#888" FontSize="11" TextWrapping="Wrap"/>
+                <ItemsControl x:Name="DanglingList" ItemsSource="{Binding DanglingLinkDescriptions}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" Foreground="#ccc" FontSize="11" Margin="0,1,0,0"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </Expander>
 
         <!-- ── Main area: list + detail ───────────────────────────────── -->
         <Grid>
