@@ -24,9 +24,12 @@ public partial class BlameViewModel : ObservableObject
         catch (DiffException ex)
         {
             AppLog.Warn($"BlameViewModel: could not load attribution: {ex.Message}");
-            StatusText = ex.Kind == DiffExceptionKind.NotARepo
-                ? Loc.Get("Blame_StatusNotARepo")
-                : Loc.Get("Blame_StatusError");
+            StatusText = ex.Kind switch
+            {
+                DiffExceptionKind.GitMissing => Loc.Get("Blame_StatusGitMissing"),
+                DiffExceptionKind.NotARepo   => Loc.Get("Blame_StatusNotARepo"),
+                _                            => Loc.Get("Blame_StatusError"),
+            };
         }
 
         Rows = blames.Select(b => new NodeBlameRowViewModel(b)).ToList();

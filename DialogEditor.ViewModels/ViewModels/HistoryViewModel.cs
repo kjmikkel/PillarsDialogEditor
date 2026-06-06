@@ -29,9 +29,12 @@ public partial class HistoryViewModel : ObservableObject
         catch (DiffException ex)
         {
             AppLog.Warn($"HistoryViewModel: could not load history: {ex.Message}");
-            StatusText = ex.Kind == DiffExceptionKind.NotARepo
-                ? Loc.Get("History_StatusNotARepo")
-                : Loc.Get("History_StatusError");
+            StatusText = ex.Kind switch
+            {
+                DiffExceptionKind.GitMissing => Loc.Get("History_StatusGitMissing"),
+                DiffExceptionKind.NotARepo   => Loc.Get("History_StatusNotARepo"),
+                _                            => Loc.Get("History_StatusError"),
+            };
         }
 
         Commits = commits.Select(c => new CommitRowViewModel(c)).ToList();

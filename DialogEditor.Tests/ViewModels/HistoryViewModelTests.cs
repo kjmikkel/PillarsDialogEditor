@@ -90,4 +90,15 @@ public class HistoryViewModelTests
         Assert.False(vm.HasCommits);
         Assert.False(string.IsNullOrEmpty(vm.StatusText));
     }
+
+    [Fact]
+    public void GitMissing_SetsDistinctStatus()
+    {
+        // The runner throws GitMissing (executable absent) before any result is returned.
+        var git = new FakeGit { Handler = _ => throw new DiffException("no git", DiffExceptionKind.GitMissing) };
+        var vm  = new HistoryViewModel(git, ProjPath());
+
+        Assert.False(vm.HasCommits);
+        Assert.Equal("History_StatusGitMissing", vm.StatusText);   // StubStringProvider returns the key
+    }
 }
