@@ -87,6 +87,28 @@ public partial class BranchesViewModel : ObservableObject
             return;   // cancelled at the unsaved-edits gate
 
         var result = _service.Checkout(_projectFilePath, target);
+
+        if (result.Status == BranchOpStatus.BlockedByLocalChanges)
+        {
+            IReadOnlyList<string> files;
+            try { files = _service.ListUncommittedChanges(_projectFilePath); }
+            catch (DiffException) { files = []; }
+
+            var message = RequestCommitConfirmation is null
+                ? null
+                : await RequestCommitConfirmation(new PendingCommit(files, Loc.Get("Branches_DefaultCommitMessage")));
+            if (message is null) return;   // consent cancelled / no handler
+
+            var commit = _service.CommitAll(_projectFilePath, message);
+            if (commit.Status != BranchOpStatus.Ok)
+            {
+                AppLog.Warn($"BranchesViewModel: commit before switch failed: {commit.Detail}");
+                StatusText = Loc.Get("Branches_StatusCommitFailed");
+                return;
+            }
+            result = _service.Checkout(_projectFilePath, target);
+        }
+
         FinishSwitch(result, target);
     }
 

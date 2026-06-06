@@ -110,4 +110,79 @@ public class BranchesViewModelTests
 
         Assert.False(checkedOut);
     }
+
+    // Checkout blocks once (tracked), succeeds after a commit; status reports tracked changes.
+    private static GitBranchService BlockingThenCommitting(List<string> log) => new(Git(a =>
+    {
+        if (a is ["for-each-ref", ..]) return new GitResult(0, "main\nfeature/x\n", "");
+        if (a is ["status", "--porcelain"]) return new GitResult(0, " M conv.dialogproject\n", "");
+        if (a is ["checkout", "feature/x"])
+        {
+            log.Add("checkout");
+            return log.Contains("commit") ? new GitResult(0, "", "") : new GitResult(1, "", "would be overwritten");
+        }
+        if (a.Length > 0 && a[0] == "commit") { log.Add("commit"); return new GitResult(0, "", ""); }
+        return null;
+    }));
+
+    [Fact]
+    public async Task Switch_Blocked_OffersCommit_ThenRetriesAndReloads()
+    {
+        var log = new List<string>();
+        PendingCommit? shown = null;
+        var vm = new BranchesViewModel(BlockingThenCommitting(log), ProjPath())
+        {
+            EnsureNoUnsavedEdits      = () => Task.FromResult(true),
+            ReloadProjectFromDisk     = () => log.Add("reload"),
+            RequestCommitConfirmation = p => { shown = p; return Task.FromResult<string?>("commit msg"); },
+        };
+        vm.Selected = vm.Branches[1];
+
+        await vm.SwitchCommand.ExecuteAsync(null);
+
+        Assert.NotNull(shown);
+        Assert.Contains("conv.dialogproject", shown!.Files);
+        Assert.Equal(new[] { "checkout", "commit", "checkout", "reload" }, log);
+    }
+
+    [Fact]
+    public async Task Switch_Blocked_ConsentCancelled_DoesNotCommit()
+    {
+        var log = new List<string>();
+        var vm = new BranchesViewModel(BlockingThenCommitting(log), ProjPath())
+        {
+            EnsureNoUnsavedEdits      = () => Task.FromResult(true),
+            RequestCommitConfirmation = _ => Task.FromResult<string?>(null),   // cancelled
+        };
+        vm.Selected = vm.Branches[1];
+
+        await vm.SwitchCommand.ExecuteAsync(null);
+
+        Assert.DoesNotContain("commit", log);
+    }
+
+    [Fact]
+    public async Task Switch_BlockedByUntracked_ShowsCaseAStatus_NoCommit()
+    {
+        var committed = false;
+        var svc = new GitBranchService(Git(a =>
+        {
+            if (a is ["for-each-ref", ..]) return new GitResult(0, "main\nfeature/x\n", "");
+            if (a is ["checkout", ..]) return new GitResult(1, "", "would be overwritten");
+            if (a is ["status", "--porcelain"]) return new GitResult(0, "?? new.tmp\n", "");
+            if (a.Length > 0 && a[0] == "commit") { committed = true; return new GitResult(0, "", ""); }
+            return null;
+        }));
+        var vm = new BranchesViewModel(svc, ProjPath())
+        {
+            EnsureNoUnsavedEdits      = () => Task.FromResult(true),
+            RequestCommitConfirmation = _ => Task.FromResult<string?>("x"),
+        };
+        vm.Selected = vm.Branches[1];
+
+        await vm.SwitchCommand.ExecuteAsync(null);
+
+        Assert.False(committed);
+        Assert.False(string.IsNullOrEmpty(vm.StatusText));
+    }
 }
