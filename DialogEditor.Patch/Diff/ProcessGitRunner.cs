@@ -33,8 +33,15 @@ public sealed class ProcessGitRunner : IGitRunner
         }
         catch (Exception ex) when (ex is not DiffException)
         {
-            // git missing / not on PATH
-            throw new DiffException($"git is not available: {ex.Message}");
+            throw ClassifyStartFailure(ex);
         }
     }
+
+    /// Maps a Process.Start failure to a DiffException. A Win32 "file not found"
+    /// (error 2) means the git executable isn't on PATH → GitMissing; anything
+    /// else stays generic. Exposed for unit testing (we can't summon a missing git).
+    public static DiffException ClassifyStartFailure(Exception ex) =>
+        ex is System.ComponentModel.Win32Exception { NativeErrorCode: 2 }
+            ? new DiffException($"git is not installed or not on PATH: {ex.Message}", DiffExceptionKind.GitMissing)
+            : new DiffException($"git is not available: {ex.Message}", DiffExceptionKind.Unknown);
 }
