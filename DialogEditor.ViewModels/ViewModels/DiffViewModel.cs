@@ -321,6 +321,7 @@ public partial class DiffViewModel : ObservableObject
             DiffExceptionKind.FileNotFound => Loc.Get("Status_DiffFileNotFound"),
             DiffExceptionKind.ReadFailed   => Loc.Format("Status_DiffReadError", endpointLabel),
             DiffExceptionKind.ParseFailed  => Loc.Format("Status_DiffParseError", endpointLabel),
+            DiffExceptionKind.GitMissing   => Loc.Get("Status_DiffGitMissing"),
             _                              => Loc.Format("Status_DiffLoadError", endpointLabel),
         };
 
