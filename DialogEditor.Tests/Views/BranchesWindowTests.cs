@@ -23,7 +23,6 @@ public class BranchesWindowTests
 
     private static BranchesViewModel TwoBranchesVm()
     {
-        Loc.Configure(new StubStringProvider());
         var git = new FakeGit
         {
             Handler = a =>
@@ -56,7 +55,7 @@ public class BranchesWindowTests
         var btn = win.FindControl<Button>("SwitchButton")!;
         Assert.False(btn.Command!.CanExecute(null));   // nothing selected
 
-        vm.Selected = vm.Branches[0];                  // select current branch (main)
+        vm.Selected = vm.Branches[1];                  // select a non-current branch (feature/x)
         Assert.True(btn.Command!.CanExecute(null));
     }
 
