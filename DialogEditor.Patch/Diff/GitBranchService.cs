@@ -135,6 +135,17 @@ public class GitBranchService(IGitRunner git)
             return res.Ok ? BranchOpResult.Success : new BranchOpResult(BranchOpStatus.GitFailed, res.StdErr.Trim());
         });
 
+    public BranchOpResult Delete(string projectFilePath, string branch, bool force)
+        => Guarded(projectFilePath, dir =>
+        {
+            var res = git.Run(dir, "branch", force ? "-D" : "-d", branch);
+            if (res.Ok) return BranchOpResult.Success;
+            // Safe (-d) refusal is almost always "not fully merged" → offer force.
+            return force
+                ? new BranchOpResult(BranchOpStatus.GitFailed, res.StdErr.Trim())
+                : new BranchOpResult(BranchOpStatus.NotMerged, res.StdErr.Trim());
+        });
+
     public BranchOpResult CommitAll(string projectFilePath, string message)
         => Guarded(projectFilePath, dir =>
         {
