@@ -40,6 +40,7 @@ public partial class BranchesViewModel : ObservableObject
     {
         _service = service;
         _projectFilePath = projectFilePath;
+        Branches.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasBranches));
         LoadBranches();
     }
 
@@ -62,7 +63,6 @@ public partial class BranchesViewModel : ObservableObject
                 _                            => Loc.Get("Branches_StatusError"),
             };
         }
-        OnPropertyChanged(nameof(HasBranches));
         NotifyCommands();
     }
 
