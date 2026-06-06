@@ -130,6 +130,15 @@ public class GitBranchServiceTests
     }
 
     [Fact]
+    public void ListUncommittedChanges_GitFails_Throws()
+    {
+        var git = Git(a => a is ["status", "--porcelain"]
+            ? new GitResult(128, "", "fatal: not a git repository") : null);
+        Assert.Throws<DiffException>(() =>
+            new GitBranchService(git).ListUncommittedChanges(ProjPath()));
+    }
+
+    [Fact]
     public void CommitAll_IssuesCommitDashA_ReturnsOk()
     {
         string[]? committed = null;
