@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Patch.Diff;
@@ -46,6 +47,7 @@ public partial class BranchesViewModel : ObservableObject
 
     private void LoadBranches()
     {
+        var previousName = Selected?.Name;   // rows are rebuilt below, so reconcile by name
         Branches.Clear();
         try
         {
@@ -63,6 +65,11 @@ public partial class BranchesViewModel : ObservableObject
                 _                            => Loc.Get("Branches_StatusError"),
             };
         }
+        // Re-point the selection into the freshly built rows (or clear it if the branch is
+        // gone), so Selected is never a stale row detached from Branches.
+        Selected = previousName is null
+            ? null
+            : Branches.FirstOrDefault(b => b.Name == previousName);
         NotifyCommands();
     }
 

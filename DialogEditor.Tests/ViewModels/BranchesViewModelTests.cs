@@ -259,4 +259,42 @@ public class BranchesViewModelTests
 
         Assert.False(forced);
     }
+
+    [Fact]
+    public async Task Switch_Succeeds_ReselectsSameBranchInRebuiltList()
+    {
+        var svc = new GitBranchService(Git(a =>
+        {
+            if (a is ["checkout", "feature/x"]) return new GitResult(0, "", "");
+            if (a is ["for-each-ref", ..]) return new GitResult(0, "main\nfeature/x\n", "");
+            return null;
+        }));
+        var vm = new BranchesViewModel(svc, ProjPath()) { EnsureNoUnsavedEdits = () => Task.FromResult(true) };
+        vm.Selected = vm.Branches[1];          // feature/x — the row that LoadBranches will discard
+
+        await vm.SwitchCommand.ExecuteAsync(null);
+
+        Assert.NotNull(vm.Selected);
+        Assert.Equal("feature/x", vm.Selected!.Name);
+        Assert.Contains(vm.Selected, vm.Branches);   // re-pointed into the rebuilt list, not stale
+    }
+
+    [Fact]
+    public async Task Delete_Succeeds_ClearsSelectionForGoneBranch()
+    {
+        var deleted = false;
+        var svc = new GitBranchService(Git(a =>
+        {
+            if (a is ["branch", "-d", "feature/x"]) { deleted = true; return new GitResult(0, "", ""); }
+            if (a is ["for-each-ref", ..]) return new GitResult(0, deleted ? "main\n" : "main\nfeature/x\n", "");
+            return null;
+        }));
+        var vm = new BranchesViewModel(svc, ProjPath());
+        vm.Selected = vm.Branches[1];          // feature/x — about to be deleted
+
+        await vm.DeleteCommand.ExecuteAsync(null);
+
+        Assert.Null(vm.Selected);              // the deleted branch is no longer selectable
+        Assert.DoesNotContain(vm.Branches, b => b.Name == "feature/x");
+    }
 }
