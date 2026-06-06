@@ -142,11 +142,55 @@ public partial class BranchesViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private Task CreateAsync() => Task.CompletedTask;   // implemented in a later task
+    private async Task CreateAsync()
+    {
+        if (RequestBranchName is null) return;
+        var name = await RequestBranchName(null);
+        if (string.IsNullOrWhiteSpace(name)) return;
+        ApplyMutationResult(_service.Create(_projectFilePath, name), "Branches_StatusCreated", name);
+    }
 
     [RelayCommand(CanExecute = nameof(CanActOnSelection))]
-    private Task RenameAsync() => Task.CompletedTask;   // implemented in a later task
+    private async Task RenameAsync()
+    {
+        if (RequestBranchName is null) return;
+        var from = Selected!.Name;
+        var name = await RequestBranchName(from);
+        if (string.IsNullOrWhiteSpace(name) || name == from) return;
+        ApplyMutationResult(_service.Rename(_projectFilePath, from, name), "Branches_StatusRenamed", name);
+    }
 
     [RelayCommand(CanExecute = nameof(CanDelete))]
-    private Task DeleteAsync() => Task.CompletedTask;   // implemented in a later task
+    private async Task DeleteAsync()
+    {
+        var name   = Selected!.Name;
+        var result = _service.Delete(_projectFilePath, name, force: false);
+
+        if (result.Status == BranchOpStatus.NotMerged)
+        {
+            var ok = ConfirmForceDelete is not null && await ConfirmForceDelete(name);
+            if (!ok) return;
+            result = _service.Delete(_projectFilePath, name, force: true);
+        }
+        ApplyMutationResult(result, "Branches_StatusDeleted", name);
+    }
+
+    private void ApplyMutationResult(BranchOpResult result, string successKey, string name)
+    {
+        if (result.Status == BranchOpStatus.Ok)
+        {
+            LoadBranches();
+            StatusText = Loc.Format(successKey, name);
+            return;
+        }
+        AppLog.Warn($"BranchesViewModel: operation failed: {result.Status} {result.Detail}");
+        StatusText = result.Status switch
+        {
+            BranchOpStatus.NameInvalid => Loc.Get("Branches_StatusNameInvalid"),
+            BranchOpStatus.NameExists  => Loc.Get("Branches_StatusNameExists"),
+            BranchOpStatus.GitMissing  => Loc.Get("Branches_StatusGitMissing"),
+            BranchOpStatus.NotARepo    => Loc.Get("Branches_StatusNotARepo"),
+            _                          => Loc.Get("Branches_StatusError"),
+        };
+    }
 }
