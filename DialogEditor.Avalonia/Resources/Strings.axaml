@@ -840,4 +840,65 @@ Saving records your edits to the open project — game files are not touched unt
 
     <!-- PatchManager strings are in DialogEditor.Avalonia.Shared/Resources/SharedStrings.axaml -->
 
+    <!-- ─── Branches window ────────────────────────────────────────────── -->
+    <sys:String x:Key="Branches_WindowTitle">Branches</sys:String>
+    <sys:String x:Key="Branches_CurrentTag">(current)</sys:String>
+    <sys:String x:Key="Branches_Switch">Switch</sys:String>
+    <sys:String x:Key="Branches_SwitchTip">Check out the selected branch. Unsaved edits are guarded first; if your saved work blocks the switch, you'll be offered to commit it.</sys:String>
+    <sys:String x:Key="Branches_New">New…</sys:String>
+    <sys:String x:Key="Branches_NewTip">Create a new branch from the current state and switch to it.</sys:String>
+    <sys:String x:Key="Branches_Rename">Rename…</sys:String>
+    <sys:String x:Key="Branches_RenameTip">Rename the selected branch.</sys:String>
+    <sys:String x:Key="Branches_Delete">Delete</sys:String>
+    <sys:String x:Key="Branches_DeleteTip">Delete the selected branch. Refuses an unmerged branch unless you confirm a force-delete. The current branch cannot be deleted.</sys:String>
+    <sys:String x:Key="Branches_Close">Close</sys:String>
+
+    <!-- {0} = branch name -->
+    <sys:String x:Key="Branches_StatusSwitched">Switched to {0}.</sys:String>
+    <sys:String x:Key="Branches_StatusCreated">Created and switched to {0}.</sys:String>
+    <sys:String x:Key="Branches_StatusRenamed">Renamed to {0}.</sys:String>
+    <sys:String x:Key="Branches_StatusDeleted">Deleted {0}.</sys:String>
+    <sys:String x:Key="Branches_StatusNone">No branches yet.</sys:String>
+    <sys:String x:Key="Branches_StatusNotARepo">This project isn't inside a Git repository.</sys:String>
+    <sys:String x:Key="Branches_StatusGitMissing">Git isn't installed. Install Git to manage branches.</sys:String>
+    <sys:String x:Key="Branches_StatusError">Couldn't read the project's branches.</sys:String>
+    <sys:String x:Key="Branches_StatusSwitchFailed">Couldn't switch branches.</sys:String>
+    <sys:String x:Key="Branches_StatusCommitFailed">Couldn't commit your changes, so the switch was cancelled.</sys:String>
+    <sys:String x:Key="Branches_StatusBlockedUntracked">Some new files in the project folder would be overwritten by switching to this branch. A developer may need to move or remove them first.</sys:String>
+    <sys:String x:Key="Branches_StatusNameInvalid">That isn't a valid branch name.</sys:String>
+    <sys:String x:Key="Branches_StatusNameExists">A branch with that name already exists.</sys:String>
+    <sys:String x:Key="Branches_DefaultCommitMessage">Save dialog edits before switching branches</sys:String>
+
+    <!-- Commit-consent dialog -->
+    <sys:String x:Key="CommitConsent_Title">Commit changes before switching</sys:String>
+    <sys:String x:Key="CommitConsent_Intro">These files will be committed before switching:</sys:String>
+    <sys:String x:Key="CommitConsent_MessageLabel">Message</sys:String>
+    <sys:String x:Key="CommitConsent_Commit">Commit &amp; Switch</sys:String>
+    <sys:String x:Key="CommitConsent_Cancel">Cancel</sys:String>
+
+    <!-- Branch-name dialog -->
+    <sys:String x:Key="BranchName_NewTitle">New branch</sys:String>
+    <sys:String x:Key="BranchName_RenameTitle">Rename branch</sys:String>
+    <sys:String x:Key="BranchName_Label">Branch name</sys:String>
+    <sys:String x:Key="BranchName_Ok">OK</sys:String>
+    <sys:String x:Key="BranchName_Cancel">Cancel</sys:String>
+
+    <!-- Force-delete dialog. {0} = branch name -->
+    <sys:String x:Key="ForceDelete_Title">Delete unmerged branch?</sys:String>
+    <sys:String x:Key="ForceDelete_Message">Branch "{0}" has commits that aren't merged anywhere else. Deleting it will lose those commits permanently. Delete anyway?</sys:String>
+    <sys:String x:Key="ForceDelete_Confirm">Delete permanently</sys:String>
+    <sys:String x:Key="ForceDelete_Cancel">Cancel</sys:String>
+
+    <!-- Branches menu entry -->
+    <sys:String x:Key="Menu_Branches">Branches…</sys:String>
+    <sys:String x:Key="Menu_BranchesTip">View and manage the local Git branches of the open project.</sys:String>
+
+    <!-- Project no longer on the switched-to branch. {0} = path -->
+    <sys:String x:Key="Status_ProjectNotOnBranch">The project file doesn't exist on this branch: {0}</sys:String>
+
+    <!-- Distinct git-not-installed status for the read-only git tools -->
+    <sys:String x:Key="History_StatusGitMissing">Git isn't installed. Install Git to browse history.</sys:String>
+    <sys:String x:Key="Blame_StatusGitMissing">Git isn't installed. Install Git to see attribution.</sys:String>
+    <sys:String x:Key="Status_DiffGitMissing">Git isn't installed. Install Git to compare versions.</sys:String>
+
 </ResourceDictionary>
