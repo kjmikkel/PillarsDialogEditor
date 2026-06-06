@@ -10,6 +10,9 @@ original game files directly, making the workflow safe, reversible, and shareabl
 
 - [.NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)
 - A PoE1 or PoE2 installation
+- **Git** *(optional)* — required only for the built-in version-control features
+  (Compare, History, Attribution, Branches). See
+  [Git-powered features](#git-powered-features). Everything else works without it.
 
 ---
 
@@ -274,6 +277,40 @@ dialog — click it when you're ready.
 > conversations currently fall back to your side; resolve those in your Git tool if
 > they matter. If either side of the conflict is too damaged to parse as JSON, the
 > editor says so and asks you to resolve it in your Git tool first.
+
+### Git-powered features
+
+Several optional tools read your project's Git history directly and therefore need
+**Git installed** on your computer:
+
+| Feature | What it does |
+|---------|--------------|
+| **Compare** | Diff your project against a branch or past commit and selectively bring changes in |
+| **History** | Browse the project file's commit timeline and open any commit in Compare |
+| **Attribution** | Show who last edited each node ("blame"), drawn from the Git history |
+| **Branches** | Switch, create, rename, and delete local branches from inside the editor |
+
+If Git isn't installed, these windows simply tell you so and stay empty — nothing
+crashes, and the rest of the editor is unaffected. (Conflict resolution, above, is
+the exception: it reads markers already written into the file and needs no Git.)
+
+**What is Git?** Git is a free, widely used *version-control* program. It records a
+project's history as a series of saved snapshots ("commits") so you can review what
+changed, return to an earlier version, and collaborate without overwriting each
+other's work. Because a `.dialogproject` is plain text, Git tracks it cleanly.
+
+**Installing Git quickly:**
+
+| OS | How |
+|----|-----|
+| **Windows** | `winget install --id Git.Git -e`, or download the installer from [git-scm.com/download/win](https://git-scm.com/download/win) |
+| **macOS** | `brew install git` (Homebrew), or run `xcode-select --install` for Apple's bundled version |
+| **Linux — Debian/Ubuntu** | `sudo apt install git` |
+| **Linux — Fedora** | `sudo dnf install git` |
+| **Linux — Arch** | `sudo pacman -S git` |
+
+After installing, **restart the editor** so it detects Git on your `PATH`. To
+confirm Git is available, run `git --version` in a terminal.
 
 ---
 
