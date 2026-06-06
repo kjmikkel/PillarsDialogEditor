@@ -1,0 +1,92 @@
+using System.Collections.ObjectModel;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using DialogEditor.Patch.Diff;
+using DialogEditor.ViewModels.Resources;
+using DialogEditor.ViewModels.Services;
+
+namespace DialogEditor.ViewModels;
+
+public partial class BranchRowViewModel(BranchInfo info) : ObservableObject
+{
+    public string Name      => info.Name;
+    public bool   IsCurrent => info.IsCurrent;
+}
+
+/// The set of files a commit-then-switch will commit, plus a default message.
+public record PendingCommit(IReadOnlyList<string> Files, string DefaultMessage);
+
+/// Lists and manages the open project's local git branches. Switching coordinates
+/// with the host (unsaved-edits guard + reload) via callbacks; the VM never opens windows.
+public partial class BranchesViewModel : ObservableObject
+{
+    private readonly GitBranchService _service;
+    private readonly string _projectFilePath;
+
+    [ObservableProperty] private BranchRowViewModel? _selected;
+    [ObservableProperty] private string _statusText = "";
+
+    public ObservableCollection<BranchRowViewModel> Branches { get; } = [];
+    public bool HasBranches => Branches.Count > 0;
+
+    // ── Host callbacks ──
+    public Func<Task<bool>>?                   EnsureNoUnsavedEdits      { get; set; }
+    public Action?                             ReloadProjectFromDisk     { get; set; }
+    public Func<PendingCommit, Task<string?>>? RequestCommitConfirmation { get; set; }
+    public Func<string, Task<bool>>?           ConfirmForceDelete        { get; set; }
+    public Func<string?, Task<string?>>?       RequestBranchName         { get; set; }
+
+    public BranchesViewModel(GitBranchService service, string projectFilePath)
+    {
+        _service = service;
+        _projectFilePath = projectFilePath;
+        LoadBranches();
+    }
+
+    private void LoadBranches()
+    {
+        Branches.Clear();
+        try
+        {
+            foreach (var b in _service.List(_projectFilePath))
+                Branches.Add(new BranchRowViewModel(b));
+            StatusText = Branches.Count == 0 ? Loc.Get("Branches_StatusNone") : "";
+        }
+        catch (DiffException ex)
+        {
+            AppLog.Warn($"BranchesViewModel: could not list branches: {ex.Message}");
+            StatusText = ex.Kind switch
+            {
+                DiffExceptionKind.GitMissing => Loc.Get("Branches_StatusGitMissing"),
+                DiffExceptionKind.NotARepo   => Loc.Get("Branches_StatusNotARepo"),
+                _                            => Loc.Get("Branches_StatusError"),
+            };
+        }
+        OnPropertyChanged(nameof(HasBranches));
+        NotifyCommands();
+    }
+
+    private void NotifyCommands()
+    {
+        SwitchCommand.NotifyCanExecuteChanged();
+        RenameCommand.NotifyCanExecuteChanged();
+        DeleteCommand.NotifyCanExecuteChanged();
+    }
+
+    partial void OnSelectedChanged(BranchRowViewModel? value) => NotifyCommands();
+
+    private bool CanActOnSelection => Selected is not null;
+    private bool CanDelete         => Selected is { IsCurrent: false };
+
+    [RelayCommand(CanExecute = nameof(CanActOnSelection))]
+    private Task SwitchAsync() => Task.CompletedTask;   // implemented in later tasks
+
+    [RelayCommand]
+    private Task CreateAsync() => Task.CompletedTask;   // implemented in a later task
+
+    [RelayCommand(CanExecute = nameof(CanActOnSelection))]
+    private Task RenameAsync() => Task.CompletedTask;   // implemented in a later task
+
+    [RelayCommand(CanExecute = nameof(CanDelete))]
+    private Task DeleteAsync() => Task.CompletedTask;   // implemented in a later task
+}
