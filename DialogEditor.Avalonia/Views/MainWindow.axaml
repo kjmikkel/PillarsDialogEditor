@@ -108,6 +108,10 @@
                                   Click="Attribution_Click"
                                   IsEnabled="{Binding IsProjectOpen}"
                                   ToolTip.Tip="{StaticResource ToolTip_Attribution}"/>
+                        <MenuItem Header="{StaticResource Menu_Branches}"
+                                  Click="OnOpenBranches"
+                                  IsEnabled="{Binding IsProjectOpen}"
+                                  ToolTip.Tip="{StaticResource Menu_BranchesTip}"/>
                     </MenuItem>
 
                     <MenuItem Header="{StaticResource Menu_Test}">

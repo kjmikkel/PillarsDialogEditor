@@ -10,6 +10,7 @@ using DialogEditor.Avalonia.Services;
 using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.Patch.Diff;
 using DialogEditor.ViewModels;
+using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Avalonia.Views;
@@ -347,6 +348,32 @@ public partial class MainWindow : Window
         if (vm.ProjectPath is null) return;
 
         new BlameWindow(new BlameViewModel(new ProcessGitRunner(), vm.ProjectPath)).Show();
+    }
+
+    private void OnOpenBranches(object? sender, RoutedEventArgs e)
+    {
+        var vm = (MainWindowViewModel)DataContext!;
+        var path = vm.ProjectPath;
+        if (path is null) return;
+
+        var branchesVm = new BranchesViewModel(new GitBranchService(new ProcessGitRunner()), path)
+        {
+            EnsureNoUnsavedEdits  = () => vm.EnsureNoUnsavedEditsAsync(),
+            ReloadProjectFromDisk = () => vm.ReloadCurrentProjectFromDisk(),
+        };
+
+        var window = new BranchesWindow(branchesVm);
+
+        branchesVm.RequestCommitConfirmation = pending => new CommitConsentDialog(pending).ShowDialogAsync(window);
+        branchesVm.RequestBranchName = prefill =>
+        {
+            var title = Loc.Get(prefill is null ? "BranchName_NewTitle" : "BranchName_RenameTitle");
+            return new BranchNameDialog(title, prefill).ShowDialogAsync(window);
+        };
+        branchesVm.ConfirmForceDelete = name =>
+            new ForceDeleteDialog(Loc.Format("ForceDelete_Message", name)).ShowDialogAsync(window);
+
+        window.Show(this);
     }
 
     private void PatchManager_Click(object? sender, RoutedEventArgs e)
