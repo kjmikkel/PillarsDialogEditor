@@ -79,7 +79,35 @@ public partial class BranchesViewModel : ObservableObject
     private bool CanDelete         => Selected is { IsCurrent: false };
 
     [RelayCommand(CanExecute = nameof(CanActOnSelection))]
-    private Task SwitchAsync() => Task.CompletedTask;   // implemented in later tasks
+    private async Task SwitchAsync()
+    {
+        var target = Selected!.Name;
+
+        if (EnsureNoUnsavedEdits is not null && !await EnsureNoUnsavedEdits())
+            return;   // cancelled at the unsaved-edits gate
+
+        var result = _service.Checkout(_projectFilePath, target);
+        FinishSwitch(result, target);
+    }
+
+    private void FinishSwitch(BranchOpResult result, string target)
+    {
+        switch (result.Status)
+        {
+            case BranchOpStatus.Ok:
+                ReloadProjectFromDisk?.Invoke();
+                LoadBranches();
+                StatusText = Loc.Format("Branches_StatusSwitched", target);
+                break;
+            case BranchOpStatus.BlockedByUntrackedFiles:
+                StatusText = Loc.Get("Branches_StatusBlockedUntracked");
+                break;
+            default:
+                AppLog.Warn($"BranchesViewModel: switch to '{target}' failed: {result.Status} {result.Detail}");
+                StatusText = Loc.Get("Branches_StatusSwitchFailed");
+                break;
+        }
+    }
 
     [RelayCommand]
     private Task CreateAsync() => Task.CompletedTask;   // implemented in a later task
