@@ -109,6 +109,21 @@ public class GitBranchService(IGitRunner git)
         return files;
     }
 
+    public BranchOpResult Create(string projectFilePath, string newName)
+        => Guarded(projectFilePath, dir =>
+        {
+            if (!IsValidName(dir, newName)) return new BranchOpResult(BranchOpStatus.NameInvalid);
+            if (BranchExists(dir, newName)) return new BranchOpResult(BranchOpStatus.NameExists);
+            var res = git.Run(dir, "checkout", "-b", newName);  // creates from HEAD AND switches; working tree unchanged
+            return res.Ok ? BranchOpResult.Success : new BranchOpResult(BranchOpStatus.GitFailed, res.StdErr.Trim());
+        });
+
+    private bool IsValidName(string dir, string name)
+        => git.Run(dir, "check-ref-format", "--branch", name).Ok;
+
+    private bool BranchExists(string dir, string name)
+        => git.Run(dir, "show-ref", "--verify", "--quiet", $"refs/heads/{name}").Ok;
+
     public BranchOpResult CommitAll(string projectFilePath, string message)
         => Guarded(projectFilePath, dir =>
         {
