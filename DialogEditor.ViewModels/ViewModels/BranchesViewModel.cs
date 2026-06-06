@@ -91,8 +91,17 @@ public partial class BranchesViewModel : ObservableObject
         if (result.Status == BranchOpStatus.BlockedByLocalChanges)
         {
             IReadOnlyList<string> files;
-            try { files = _service.ListUncommittedChanges(_projectFilePath); }
-            catch (DiffException) { files = []; }
+            try
+            {
+                files = _service.ListUncommittedChanges(_projectFilePath);
+            }
+            catch (DiffException ex)
+            {
+                // Fall back to an empty list so the user can still consent; commit -a
+                // commits all tracked changes regardless of what the dialog lists.
+                AppLog.Warn($"BranchesViewModel: could not list uncommitted files before commit prompt: {ex.Message}");
+                files = [];
+            }
 
             var message = RequestCommitConfirmation is null
                 ? null
