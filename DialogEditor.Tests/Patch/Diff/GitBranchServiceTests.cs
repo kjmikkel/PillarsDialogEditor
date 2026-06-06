@@ -198,4 +198,42 @@ public class GitBranchServiceTests
         Assert.Equal(BranchOpStatus.Ok, r.Status);
         Assert.Equal(new[] { "checkout", "-b", "feature/new" }, created);
     }
+
+    [Fact]
+    public void Rename_Other_IssuesBranchDashM_FromTo()
+    {
+        string[]? renamed = null;
+        var git = GitForNameOps(valid: true, exists: false, a =>
+        {
+            if (a is ["branch", "-m", ..]) { renamed = a; return new GitResult(0, "", ""); }
+            return null;
+        });
+
+        var r = new GitBranchService(git).Rename(ProjPath(), "old", "new");
+
+        Assert.Equal(BranchOpStatus.Ok, r.Status);
+        Assert.Equal(new[] { "branch", "-m", "old", "new" }, renamed);
+    }
+
+    [Fact]
+    public void Rename_Current_NullFrom_IssuesBranchDashM_ToOnly()
+    {
+        string[]? renamed = null;
+        var git = GitForNameOps(valid: true, exists: false, a =>
+        {
+            if (a is ["branch", "-m", ..]) { renamed = a; return new GitResult(0, "", ""); }
+            return null;
+        });
+
+        new GitBranchService(git).Rename(ProjPath(), null, "renamed");
+
+        Assert.Equal(new[] { "branch", "-m", "renamed" }, renamed);
+    }
+
+    [Fact]
+    public void Rename_DuplicateName_IsNameExists()
+    {
+        var git = GitForNameOps(valid: true, exists: true, _ => null);
+        Assert.Equal(BranchOpStatus.NameExists, new GitBranchService(git).Rename(ProjPath(), "old", "taken").Status);
+    }
 }
