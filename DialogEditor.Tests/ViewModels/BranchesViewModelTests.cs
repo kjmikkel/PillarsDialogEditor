@@ -185,4 +185,78 @@ public class BranchesViewModelTests
         Assert.False(committed);
         Assert.False(string.IsNullOrEmpty(vm.StatusText));
     }
+
+    [Fact]
+    public async Task Create_PromptsName_AndCreates()
+    {
+        string[]? created = null;
+        var svc = new GitBranchService(Git(a =>
+        {
+            if (a is ["check-ref-format", ..]) return new GitResult(0, "", "");
+            if (a is ["show-ref", ..]) return new GitResult(1, "", "");
+            if (a is ["checkout", "-b", ..]) { created = a; return new GitResult(0, "", ""); }
+            if (a is ["for-each-ref", ..]) return new GitResult(0, "main\n", "");
+            return null;
+        }));
+        var vm = new BranchesViewModel(svc, ProjPath()) { RequestBranchName = _ => Task.FromResult<string?>("feature/new") };
+
+        await vm.CreateCommand.ExecuteAsync(null);
+
+        Assert.Equal(new[] { "checkout", "-b", "feature/new" }, created);
+    }
+
+    [Fact]
+    public async Task Create_NameExists_SetsStatus()
+    {
+        var svc = new GitBranchService(Git(a =>
+        {
+            if (a is ["check-ref-format", ..]) return new GitResult(0, "", "");
+            if (a is ["show-ref", ..]) return new GitResult(0, "", "");   // already exists
+            if (a is ["for-each-ref", ..]) return new GitResult(0, "main\n", "");
+            return null;
+        }));
+        var vm = new BranchesViewModel(svc, ProjPath()) { RequestBranchName = _ => Task.FromResult<string?>("main") };
+
+        await vm.CreateCommand.ExecuteAsync(null);
+
+        Assert.False(string.IsNullOrEmpty(vm.StatusText));
+    }
+
+    [Fact]
+    public async Task Delete_NotMerged_AsksForceConfirm_ThenForceDeletes()
+    {
+        string[]? forced = null;
+        var svc = new GitBranchService(Git(a =>
+        {
+            if (a is ["branch", "-d", ..]) return new GitResult(1, "", "not fully merged");
+            if (a is ["branch", "-D", ..]) { forced = a; return new GitResult(0, "", ""); }
+            if (a is ["for-each-ref", ..]) return new GitResult(0, "main\nfeature/x\n", "");
+            return null;
+        }));
+        var vm = new BranchesViewModel(svc, ProjPath()) { ConfirmForceDelete = _ => Task.FromResult(true) };
+        vm.Selected = vm.Branches[1];
+
+        await vm.DeleteCommand.ExecuteAsync(null);
+
+        Assert.Equal(new[] { "branch", "-D", "feature/x" }, forced);
+    }
+
+    [Fact]
+    public async Task Delete_NotMerged_ConfirmDeclined_DoesNotForce()
+    {
+        var forced = false;
+        var svc = new GitBranchService(Git(a =>
+        {
+            if (a is ["branch", "-d", ..]) return new GitResult(1, "", "not fully merged");
+            if (a is ["branch", "-D", ..]) { forced = true; return new GitResult(0, "", ""); }
+            if (a is ["for-each-ref", ..]) return new GitResult(0, "main\nfeature/x\n", "");
+            return null;
+        }));
+        var vm = new BranchesViewModel(svc, ProjPath()) { ConfirmForceDelete = _ => Task.FromResult(false) };
+        vm.Selected = vm.Branches[1];
+
+        await vm.DeleteCommand.ExecuteAsync(null);
+
+        Assert.False(forced);
+    }
 }
