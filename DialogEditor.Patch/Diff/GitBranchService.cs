@@ -103,6 +103,7 @@ public class GitBranchService(IGitRunner git)
             var line = raw.TrimEnd('\r');
             if (line.Length < 4) continue;       // porcelain entries are "XY <path>"
             if (line.StartsWith("??")) continue; // untracked excluded (tracked-only commit)
+            // Rename lines look like "old -> new"; fine for a display list, not usable as a path.
             files.Add(line[3..].Trim());
         }
         return files;
