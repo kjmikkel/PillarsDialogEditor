@@ -130,8 +130,9 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     // ── Unsaved-changes navigation guard ──────────────────────────────────
-    private ConversationFile? _pendingFile;
-    private Action?           _pendingAction;   // for close/project-switch continuations
+    private ConversationFile?              _pendingFile;
+    private Action?                        _pendingAction;   // for close/project-switch continuations
+    private TaskCompletionSource<bool>?    _unsavedDecision;
     public event Action? UnsavedChangesRequested;
 
     /// Guard that fires UnsavedChangesRequested if dirty, otherwise runs action immediately.
@@ -148,6 +149,21 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
+    /// Awaitable form of the unsaved-edits guard, for flows that must continue on the
+    /// same call stack (branch switching). Returns true to proceed (clean, or after
+    /// Save/Discard), false if the user Cancelled. Reuses the existing
+    /// UnsavedChangesRequested dialog plumbing.
+    public Task<bool> EnsureNoUnsavedEditsAsync()
+    {
+        if (!(IsModified && CurrentConversationName is not null))
+            return Task.FromResult(true);
+
+        _unsavedDecision = new TaskCompletionSource<bool>();
+        _pendingAction = () => { _unsavedDecision?.TrySetResult(true); _unsavedDecision = null; };
+        UnsavedChangesRequested?.Invoke();
+        return _unsavedDecision.Task;
+    }
+
     public void SaveAndProceed()
     {
         SaveCommand.Execute(null);
@@ -160,6 +176,8 @@ public partial class MainWindowViewModel : ObservableObject
     {
         _pendingFile   = null;
         _pendingAction = null;
+        _unsavedDecision?.TrySetResult(false);
+        _unsavedDecision = null;
     }
 
     private void Proceed()

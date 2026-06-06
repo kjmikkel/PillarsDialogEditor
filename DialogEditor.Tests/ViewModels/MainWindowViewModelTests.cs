@@ -573,6 +573,46 @@ public class MainWindowViewModelTests : IDisposable
         Assert.Equal("Status_ImportConversationAdded", vm.StatusText);
     }
 
+    // ── EnsureNoUnsavedEditsAsync ─────────────────────────────────────────
+
+    private static void SetModified(MainWindowViewModel vm, bool value)
+    {
+        vm.IsModified = value;
+        // CurrentConversationName must be non-null for the dirty guard to engage.
+        vm.CurrentConversationName = value ? "conv" : null;
+    }
+
+    [Fact]
+    public async Task EnsureNoUnsavedEdits_Clean_ReturnsTrueImmediately()
+    {
+        var vm = MakeVm();
+        Assert.True(await vm.EnsureNoUnsavedEditsAsync());
+    }
+
+    [Fact]
+    public async Task EnsureNoUnsavedEdits_Dirty_Discard_ReturnsTrue()
+    {
+        var vm = MakeVm();
+        SetModified(vm, true);
+
+        var task = vm.EnsureNoUnsavedEditsAsync();      // pends on the dialog decision
+        vm.DiscardAndProceed();                          // host's "Discard" path
+
+        Assert.True(await task);
+    }
+
+    [Fact]
+    public async Task EnsureNoUnsavedEdits_Dirty_Cancel_ReturnsFalse()
+    {
+        var vm = MakeVm();
+        SetModified(vm, true);
+
+        var task = vm.EnsureNoUnsavedEditsAsync();
+        vm.CancelPendingNavigation();                    // host's "Cancel" path
+
+        Assert.False(await task);
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────
 
     private static NodeViewModel MakeNode(int id)
