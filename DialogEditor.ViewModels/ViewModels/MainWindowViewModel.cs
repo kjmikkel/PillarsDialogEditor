@@ -398,6 +398,30 @@ public partial class MainWindowViewModel : ObservableObject
     // over a freshly shown window.
     private void LoadProject(string path) => _ = LoadProjectAsync(path, offerDeferred: false);
 
+    /// Re-reads the open project after the working tree changed underneath it (branch
+    /// switch). If the file no longer exists on the new branch, closes the project.
+    /// Invalidates the HEAD-based attribution cache so "last edited" recomputes.
+    public void ReloadCurrentProjectFromDisk()
+    {
+        var path = _projectPath;
+        if (path is null) return;
+
+        if (!File.Exists(path))
+        {
+            AppLog.Info($"Project file not present on current branch: {path}");
+            SetProject(null);
+            _projectPath = null;
+            CurrentProjectName = null;
+            _attributionPath = null;   // force attribution rebuild next time
+            StatusText = Loc.Format("Status_ProjectNotOnBranch", path);
+            SaveProjectCommand.NotifyCanExecuteChanged();
+            return;
+        }
+
+        _attributionPath = null;       // HEAD moved → stale blame
+        _ = LoadProjectAsync(path, offerDeferred: false);
+    }
+
     // Per-node attribution for the node detail panel. Built lazily on first lookup after
     // the project path changes (blame is HEAD-based, so it's stable for the open project).
     private NodeBlame? LookupAttribution(string conversationName, int nodeId)
