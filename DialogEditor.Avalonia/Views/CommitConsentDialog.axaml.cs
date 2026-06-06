@@ -18,11 +18,12 @@ public partial class CommitConsentDialog : Window
         MessageBox.Text = pending.DefaultMessage;
         CommitButton.Click += (_, _) => Commit();
         CancelButton.Click += (_, _) => { Result = null; Close(); };
+        Opened += (_, _) => MessageBox.Focus();
     }
 
     private void Commit()
     {
-        Result = MessageBox.Text;
+        Result = string.IsNullOrWhiteSpace(MessageBox.Text) ? null : MessageBox.Text.Trim();
         Close();
     }
 
