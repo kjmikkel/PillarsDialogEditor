@@ -412,6 +412,7 @@ public partial class MainWindowViewModel : ObservableObject
             SetProject(null);
             _projectPath = null;
             CurrentProjectName = null;
+            IsModified = false;        // nothing open → not dirty
             _attributionPath = null;   // force attribution rebuild next time
             StatusText = Loc.Format("Status_ProjectNotOnBranch", path);
             SaveProjectCommand.NotifyCanExecuteChanged();
