@@ -236,4 +236,30 @@ public class GitBranchServiceTests
         var git = GitForNameOps(valid: true, exists: true, _ => null);
         Assert.Equal(BranchOpStatus.NameExists, new GitBranchService(git).Rename(ProjPath(), "old", "taken").Status);
     }
+
+    [Fact]
+    public void Delete_Safe_Success()
+    {
+        var git = Git(a => a is ["branch", "-d", "feature/x"] ? new GitResult(0, "", "") : null);
+        Assert.Equal(BranchOpStatus.Ok, new GitBranchService(git).Delete(ProjPath(), "feature/x", force: false).Status);
+    }
+
+    [Fact]
+    public void Delete_SafeRefusedUnmerged_IsNotMerged()
+    {
+        var git = Git(a => a is ["branch", "-d", ..] ? new GitResult(1, "", "not fully merged") : null);
+        Assert.Equal(BranchOpStatus.NotMerged, new GitBranchService(git).Delete(ProjPath(), "feature/x", force: false).Status);
+    }
+
+    [Fact]
+    public void Delete_Force_IssuesDashD()
+    {
+        string[]? deleted = null;
+        var git = Git(a => { if (a is ["branch", "-D", ..]) { deleted = a; return new GitResult(0, "", ""); } return null; });
+
+        var r = new GitBranchService(git).Delete(ProjPath(), "feature/x", force: true);
+
+        Assert.Equal(BranchOpStatus.Ok, r.Status);
+        Assert.Equal(new[] { "branch", "-D", "feature/x" }, deleted);
+    }
 }
