@@ -41,7 +41,7 @@ public sealed class ProcessGitRunner : IGitRunner
     /// (error 2) means the git executable isn't on PATH → GitMissing; anything
     /// else stays generic. Exposed for unit testing (we can't summon a missing git).
     public static DiffException ClassifyStartFailure(Exception ex) =>
-        ex is System.ComponentModel.Win32Exception { NativeErrorCode: 2 }
+        ex is System.ComponentModel.Win32Exception { NativeErrorCode: 2 }   // ERROR_FILE_NOT_FOUND
             ? new DiffException($"git is not installed or not on PATH: {ex.Message}", DiffExceptionKind.GitMissing)
             : new DiffException($"git is not available: {ex.Message}", DiffExceptionKind.Unknown);
 }
