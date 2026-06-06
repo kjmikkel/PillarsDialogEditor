@@ -44,6 +44,52 @@ public class GitBranchService(IGitRunner git)
         return branches;
     }
 
+    public BranchOpResult Checkout(string projectFilePath, string branch)
+        => Guarded(projectFilePath, dir =>
+        {
+            var res = git.Run(dir, "checkout", branch);
+            return res.Ok ? BranchOpResult.Success : ClassifyCheckoutFailure(dir, res);
+        });
+
+    // Runs `op` against the resolved repo dir, mapping a DiffException (not-a-repo /
+    // git-missing) to a typed result instead of throwing. Mutating ops use this so the
+    // VM can branch on Status; List() throws (the VM ctor catches it, like History).
+    private BranchOpResult Guarded(string projectFilePath, Func<string, BranchOpResult> op)
+    {
+        try
+        {
+            var (dir, _) = GitRepoPath.ResolveRepoRelative(git, projectFilePath);
+            return op(dir);
+        }
+        catch (DiffException ex)
+        {
+            return new BranchOpResult(ex.Kind switch
+            {
+                DiffExceptionKind.GitMissing => BranchOpStatus.GitMissing,
+                DiffExceptionKind.NotARepo   => BranchOpStatus.NotARepo,
+                _                            => BranchOpStatus.GitFailed,
+            }, ex.Message);
+        }
+    }
+
+    // Locale-safe: a failed checkout is classified by git status --porcelain, not by
+    // parsing English stderr. Tracked modifications → offer commit; only untracked → case A.
+    private BranchOpResult ClassifyCheckoutFailure(string dir, GitResult checkout)
+    {
+        var status = git.Run(dir, "status", "--porcelain");
+        bool hasTracked = false, hasUntracked = false;
+        foreach (var raw in status.StdOut.Split('\n'))
+        {
+            var line = raw.TrimEnd('\r');
+            if (line.Length == 0) continue;
+            if (line.StartsWith("??")) hasUntracked = true;
+            else                       hasTracked   = true;
+        }
+        if (hasTracked)   return new BranchOpResult(BranchOpStatus.BlockedByLocalChanges,  checkout.StdErr.Trim());
+        if (hasUntracked) return new BranchOpResult(BranchOpStatus.BlockedByUntrackedFiles, checkout.StdErr.Trim());
+        return new BranchOpResult(BranchOpStatus.GitFailed, checkout.StdErr.Trim());
+    }
+
     // null when detached (HEAD) or unreadable.
     private string? CurrentBranch(string dir)
     {
