@@ -86,7 +86,8 @@ public enum BranchOpStatus
     NotMerged,                // safe delete refused → offer force-delete behind strong confirm
     NameInvalid,              // create/rename: name fails git ref-format rules
     NameExists,               // create/rename: a branch with that name already exists
-    NotARepo,                 // not a git repo / git missing
+    GitMissing,               // the git executable is not installed / not on PATH
+    NotARepo,                 // git is present, but the project is not inside a git repo
     GitFailed                 // any other non-zero exit; Detail carries stderr for the log
 }
 
@@ -124,8 +125,32 @@ public class GitBranchService(IGitRunner git)
 }
 ```
 
-All methods resolve repo dir + relative path via `GitRepoPath`; a `rev-parse`
-failure surfaces as `NotARepo`.
+All methods resolve repo dir + relative path via `GitRepoPath`. The service catches
+`DiffException` and maps its `Kind`: `GitMissing` → `BranchOpStatus.GitMissing`,
+`NotARepo` → `NotARepo`, anything else → `GitFailed` (`Detail` logged). A non-zero
+`rev-parse` (git present, not a repo) surfaces as `NotARepo`; a missing git
+executable surfaces as `GitMissing` (see *Shared change* below).
+
+### Shared change: distinguish git-missing from not-a-repo
+
+Today `ProcessGitRunner` throws `DiffException` with the default kind `Unknown`
+when the `git` executable can't be started, so History/Diff/Blame show a generic
+"couldn't load" message rather than "git isn't installed." This is a write feature
+where that distinction is actionable, so:
+
+- Add `GitMissing` to the shared `DiffExceptionKind`
+  (`DialogEditor.Patch/Diff/DiffException.cs`).
+- In `ProcessGitRunner.Run`, when `Process.Start` fails because the executable was
+  not found (`Win32Exception` with `NativeErrorCode == 2 /*ERROR_FILE_NOT_FOUND*/`),
+  throw `DiffException(..., DiffExceptionKind.GitMissing)`; other start failures
+  stay as the generic kind. Because the runner *throws* before returning, this
+  propagates cleanly through `GitRepoPath` without changing its `!Ok` → `NotARepo`
+  logic.
+- `BranchesViewModel`, and (as a quiet win) `HistoryViewModel` / `DiffViewModel` /
+  `BlameViewModel`, gain a distinct localized **"Git isn't installed — install it
+  to use these features"** message for `GitMissing`. Updating the existing read-only
+  VMs' mapping is in scope (the "improve code we're already touching" principle);
+  their existing tests must still pass.
 
 - **List** — `git for-each-ref refs/heads --format=%(refname:short)%1f%(HEAD)`.
   `%(HEAD)` is `*` for the current branch, space otherwise. Split on `0x1f`
@@ -197,9 +222,10 @@ public partial class BranchesViewModel : ObservableObject
 }
 ```
 
-- Ctor loads `Branches` via `service.List`. On `NotARepo` it catches, sets a
-  localized `StatusText`, logs `AppLog.Warn`, leaves `Branches` empty. Empty list
-  (no error) → `StatusText` = "no branches yet".
+- Ctor loads `Branches` via `service.List`. On a non-`Ok` result (`GitMissing` →
+  "git isn't installed", `NotARepo` → "not a git repo", else generic) it sets a
+  localized `StatusText`, logs `AppLog.Warn`, and leaves `Branches` empty. Empty
+  list (no error) → `StatusText` = "no branches yet".
 - Every command refreshes the list and re-evaluates `CanExecute` after running.
 - All git/result outcomes map to a localized `StatusText`; nothing crashes; every
   caught exception is logged (`AppLog`), `OperationCanceledException` excepted.
@@ -338,8 +364,12 @@ MainWindow "Branches…"
    - `Delete`: `-d` Ok; `-d` failure → `NotMerged`; `force` issues `-D`.
    - `ListUncommittedChanges`: drops `??` lines, returns tracked paths.
    - `CommitAll`: issues `commit -a`; failure → `GitFailed`.
-   - `rev-parse` failure on any op → `NotARepo`.
-2. **`BranchesViewModel`** (stub service + stub callbacks):
+   - `rev-parse` failure (git present) on any op → `NotARepo`.
+   - A `DiffException` of kind `GitMissing` from the runner → `GitMissing`.
+2. **`ProcessGitRunner`**: a `Process.Start` `Win32Exception` with
+   `NativeErrorCode == 2` → `DiffException` of kind `GitMissing`; other start
+   failures keep the generic kind.
+3. **`BranchesViewModel`** (stub service + stub callbacks):
    - Switch happy path: `EnsureNoUnsavedEdits`→`Checkout(Ok)`→`ReloadProjectFromDisk`.
    - Switch cancelled at unsaved-edits gate → no checkout.
    - `BlockedByLocalChanges` → `RequestCommitConfirmation` (carrying the file list)
@@ -350,18 +380,22 @@ MainWindow "Branches…"
    - Rename happy path.
    - Delete: `CanDelete` false for the current branch; `NotMerged` →
      `ConfirmForceDelete` → force delete; declining the confirm → no delete.
-   - `NotARepo` on load → `StatusText` set, `Branches` empty, `HasBranches` false.
-3. **`MainWindowViewModel`**:
+   - `GitMissing` / `NotARepo` on load → the matching localized `StatusText`,
+     `Branches` empty, `HasBranches` false.
+4. **`MainWindowViewModel`**:
    - `EnsureNoUnsavedEditsAsync` → true when clean / after Save / after Discard;
      false after Cancel.
    - `ReloadCurrentProjectFromDisk`: normal reload re-reads the file and
      invalidates the attribution cache; missing file closes the project with a
      localized status.
-4. **`BranchesWindow`** (headless Avalonia): list populates from a stub VM; current
+5. **`BranchesWindow`** (headless Avalonia): list populates from a stub VM; current
    branch marked; Switch/Rename/Delete disabled with no selection; Delete disabled
    on the current branch; empty/error state shows when there are no branches.
-5. **Commit-consent dialog** (headless): renders the file list and default
+6. **Commit-consent dialog** (headless): renders the file list and default
    message; returns the edited message on Commit, null on Cancel.
+7. **Read-only VM mapping** (`HistoryViewModel` / `DiffViewModel` /
+   `BlameViewModel`): a `GitMissing` `DiffException` now maps to the distinct
+   "git isn't installed" message; existing `NotARepo`/error tests still pass.
 
 ## Files
 
@@ -372,12 +406,18 @@ MainWindow "Branches…"
   (`DialogEditor.Avalonia/Views/…`)
 - Modify: `DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs`
   (`EnsureNoUnsavedEditsAsync`, `ReloadCurrentProjectFromDisk`)
+- Modify: `DialogEditor.Patch/Diff/DiffException.cs` (add `GitMissing` kind)
+- Modify: `DialogEditor.Patch/Diff/ProcessGitRunner.cs` (throw `GitMissing` when
+  the git executable isn't found)
+- Modify: `DialogEditor.ViewModels/ViewModels/HistoryViewModel.cs`,
+  `DiffViewModel.cs`, `BlameViewModel.cs` (map `GitMissing` to its own message)
 - Modify: `DialogEditor.Avalonia/Views/MainWindow.axaml(.cs)` (Branches… entry)
 - Modify: `DialogEditor.Avalonia/Resources/Strings.axaml` (labels, tooltips,
-  status/result messages, the "(current)" tag, case-A copy, force-delete copy)
+  status/result messages, the "(current)" tag, case-A copy, force-delete copy,
+  git-not-installed copy)
 - Tests: `GitBranchServiceTests`, `BranchesViewModelTests`,
   `MainWindowViewModelTests` (additions), `BranchesWindowTests`, commit-consent
-  dialog tests.
+  dialog tests, `ProcessGitRunner`/read-only-VM `GitMissing` mapping tests.
 - Docs: update `Gaps.md` / `NEXT-STEPS.md` when shipped.
 
 ## Out of scope (YAGNI / later)
