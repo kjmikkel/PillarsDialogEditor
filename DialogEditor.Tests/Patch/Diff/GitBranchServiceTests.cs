@@ -157,4 +157,45 @@ public class GitBranchServiceTests
         var r = new GitBranchService(git).CommitAll(ProjPath(), "msg");
         Assert.Equal(BranchOpStatus.GitFailed, r.Status);
     }
+
+    // Helper: validation answers for create/rename. valid=check-ref-format ok; exists=show-ref ok.
+    private static FakeGit GitForNameOps(bool valid, bool exists, Func<string[], GitResult?> rest) => new()
+    {
+        Handler = a =>
+            a is ["rev-parse", "--show-toplevel"]      ? new GitResult(0, Root + "\n", "") :
+            a is ["rev-parse", "--abbrev-ref", "HEAD"] ? new GitResult(0, "main\n", "") :
+            a is ["check-ref-format", ..]              ? new GitResult(valid  ? 0 : 1, "", "") :
+            a is ["show-ref", ..]                      ? new GitResult(exists ? 0 : 1, "", "") :
+            rest(a) ?? new GitResult(0, "", ""),
+    };
+
+    [Fact]
+    public void Create_InvalidName_IsNameInvalid()
+    {
+        var git = GitForNameOps(valid: false, exists: false, _ => null);
+        Assert.Equal(BranchOpStatus.NameInvalid, new GitBranchService(git).Create(ProjPath(), "bad name").Status);
+    }
+
+    [Fact]
+    public void Create_ExistingName_IsNameExists()
+    {
+        var git = GitForNameOps(valid: true, exists: true, _ => null);
+        Assert.Equal(BranchOpStatus.NameExists, new GitBranchService(git).Create(ProjPath(), "feature/x").Status);
+    }
+
+    [Fact]
+    public void Create_Valid_IssuesCheckoutDashB()
+    {
+        string[]? created = null;
+        var git = GitForNameOps(valid: true, exists: false, a =>
+        {
+            if (a is ["checkout", "-b", ..]) { created = a; return new GitResult(0, "", ""); }
+            return null;
+        });
+
+        var r = new GitBranchService(git).Create(ProjPath(), "feature/new");
+
+        Assert.Equal(BranchOpStatus.Ok, r.Status);
+        Assert.Equal(new[] { "checkout", "-b", "feature/new" }, created);
+    }
 }
