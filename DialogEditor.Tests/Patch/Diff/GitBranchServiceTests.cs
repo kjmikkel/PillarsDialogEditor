@@ -51,4 +51,20 @@ public class GitBranchServiceTests
         var ex = Assert.Throws<DiffException>(() => new GitBranchService(git).List(ProjPath()));
         Assert.Equal(DiffExceptionKind.NotARepo, ex.Kind);
     }
+
+    [Fact]
+    public void List_DetachedHead_NoCurrentBranch()
+    {
+        var git = new FakeGit { Handler = a =>
+            a is ["rev-parse", "--show-toplevel"]      ? new GitResult(0, Root + "\n", "") :
+            a is ["rev-parse", "--abbrev-ref", "HEAD"] ? new GitResult(0, "HEAD\n", "") :
+            a is ["for-each-ref", ..]                  ? new GitResult(0, "main\n", "") :
+            new GitResult(0, "", "")
+        };
+
+        var branches = new GitBranchService(git).List(ProjPath());
+
+        Assert.Single(branches);
+        Assert.False(branches[0].IsCurrent);
+    }
 }
