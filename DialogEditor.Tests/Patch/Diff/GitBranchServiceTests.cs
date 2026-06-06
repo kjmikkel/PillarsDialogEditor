@@ -117,4 +117,35 @@ public class GitBranchServiceTests
 
         Assert.Equal(BranchOpStatus.GitMissing, r.Status);
     }
+
+    [Fact]
+    public void ListUncommittedChanges_ExcludesUntracked_ReturnsTrackedPaths()
+    {
+        var git = Git(a => a is ["status", "--porcelain"]
+            ? new GitResult(0, " M conv.dialogproject\nA  added.json\n?? scratch.tmp\n", "") : null);
+
+        var files = new GitBranchService(git).ListUncommittedChanges(ProjPath());
+
+        Assert.Equal(new[] { "conv.dialogproject", "added.json" }, files);
+    }
+
+    [Fact]
+    public void CommitAll_IssuesCommitDashA_ReturnsOk()
+    {
+        string[]? committed = null;
+        var git = Git(a => { if (a.Length > 0 && a[0] == "commit") committed = a; return a.Length > 0 && a[0] == "commit" ? new GitResult(0, "", "") : null; });
+
+        var r = new GitBranchService(git).CommitAll(ProjPath(), "my message");
+
+        Assert.Equal(BranchOpStatus.Ok, r.Status);
+        Assert.Equal(new[] { "commit", "-a", "-m", "my message" }, committed);
+    }
+
+    [Fact]
+    public void CommitAll_Failure_IsGitFailed()
+    {
+        var git = Git(a => a.Length > 0 && a[0] == "commit" ? new GitResult(1, "", "nothing to commit") : null);
+        var r = new GitBranchService(git).CommitAll(ProjPath(), "msg");
+        Assert.Equal(BranchOpStatus.GitFailed, r.Status);
+    }
 }

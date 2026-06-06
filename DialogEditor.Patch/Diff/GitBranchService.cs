@@ -90,6 +90,32 @@ public class GitBranchService(IGitRunner git)
         return new BranchOpResult(BranchOpStatus.GitFailed, checkout.StdErr.Trim());
     }
 
+    public IReadOnlyList<string> ListUncommittedChanges(string projectFilePath)
+    {
+        var (dir, _) = GitRepoPath.ResolveRepoRelative(git, projectFilePath);
+        var res = git.Run(dir, "status", "--porcelain");
+        if (!res.Ok)
+            throw new DiffException($"Could not read git status: {res.StdErr.Trim()}", DiffExceptionKind.Unknown);
+
+        var files = new List<string>();
+        foreach (var raw in res.StdOut.Split('\n'))
+        {
+            var line = raw.TrimEnd('\r');
+            if (line.Length < 4) continue;       // porcelain entries are "XY <path>"
+            if (line.StartsWith("??")) continue; // untracked excluded (tracked-only commit)
+            files.Add(line[3..].Trim());
+        }
+        return files;
+    }
+
+    public BranchOpResult CommitAll(string projectFilePath, string message)
+        => Guarded(projectFilePath, dir =>
+        {
+            var res = git.Run(dir, "commit", "-a", "-m", message);
+            return res.Ok ? BranchOpResult.Success
+                          : new BranchOpResult(BranchOpStatus.GitFailed, res.StdErr.Trim());
+        });
+
     // null when detached (HEAD) or unreadable.
     private string? CurrentBranch(string dir)
     {
