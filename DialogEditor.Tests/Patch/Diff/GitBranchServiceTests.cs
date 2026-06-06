@@ -67,4 +67,42 @@ public class GitBranchServiceTests
         Assert.Single(branches);
         Assert.False(branches[0].IsCurrent);
     }
+
+    [Fact]
+    public void Checkout_Success_ReturnsOk()
+    {
+        var git = Git(a => a is ["checkout", "feature/x"] ? new GitResult(0, "", "") : null);
+        var r = new GitBranchService(git).Checkout(ProjPath(), "feature/x");
+        Assert.Equal(BranchOpStatus.Ok, r.Status);
+    }
+
+    [Fact]
+    public void Checkout_BlockedByTrackedChanges_IsBlockedByLocalChanges()
+    {
+        var git = Git(a =>
+            a is ["checkout", ..]          ? new GitResult(1, "", "would be overwritten") :
+            a is ["status", "--porcelain"] ? new GitResult(0, " M conv.dialogproject\n", "") : null);
+        var r = new GitBranchService(git).Checkout(ProjPath(), "feature/x");
+        Assert.Equal(BranchOpStatus.BlockedByLocalChanges, r.Status);
+    }
+
+    [Fact]
+    public void Checkout_BlockedByUntrackedOnly_IsBlockedByUntrackedFiles()
+    {
+        var git = Git(a =>
+            a is ["checkout", ..]          ? new GitResult(1, "", "would be overwritten") :
+            a is ["status", "--porcelain"] ? new GitResult(0, "?? newfile.txt\n", "") : null);
+        var r = new GitBranchService(git).Checkout(ProjPath(), "feature/x");
+        Assert.Equal(BranchOpStatus.BlockedByUntrackedFiles, r.Status);
+    }
+
+    [Fact]
+    public void Checkout_FailsWithCleanTree_IsGitFailed()
+    {
+        var git = Git(a =>
+            a is ["checkout", ..]          ? new GitResult(1, "", "some other error") :
+            a is ["status", "--porcelain"] ? new GitResult(0, "", "") : null);
+        var r = new GitBranchService(git).Checkout(ProjPath(), "feature/x");
+        Assert.Equal(BranchOpStatus.GitFailed, r.Status);
+    }
 }
