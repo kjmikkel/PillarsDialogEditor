@@ -66,4 +66,48 @@ public class BranchesViewModelTests
         vm.Selected = vm.Branches[1];          // not current
         Assert.True(vm.DeleteCommand.CanExecute(null));
     }
+
+    [Fact]
+    public async Task Switch_HappyPath_ChecksOut_GuardsThenReloads()
+    {
+        var order = new List<string>();
+        var svc = new GitBranchService(Git(a =>
+        {
+            if (a is ["checkout", "feature/x"]) { order.Add("checkout"); return new GitResult(0, "", ""); }
+            if (a is ["for-each-ref", ..]) return new GitResult(0, "main\nfeature/x\n", "");
+            return null;
+        }));
+        var vm = new BranchesViewModel(svc, ProjPath())
+        {
+            EnsureNoUnsavedEdits  = () => { order.Add("guard"); return Task.FromResult(true); },
+            ReloadProjectFromDisk = () => order.Add("reload"),
+        };
+        vm.Selected = vm.Branches[1];
+
+        await vm.SwitchCommand.ExecuteAsync(null);
+
+        Assert.Equal(new[] { "guard", "checkout", "reload" }, order);
+        Assert.False(string.IsNullOrEmpty(vm.StatusText));
+    }
+
+    [Fact]
+    public async Task Switch_CancelledAtGuard_DoesNotCheckout()
+    {
+        var checkedOut = false;
+        var svc = new GitBranchService(Git(a =>
+        {
+            if (a is ["checkout", ..]) { checkedOut = true; return new GitResult(0, "", ""); }
+            if (a is ["for-each-ref", ..]) return new GitResult(0, "main\nfeature/x\n", "");
+            return null;
+        }));
+        var vm = new BranchesViewModel(svc, ProjPath())
+        {
+            EnsureNoUnsavedEdits = () => Task.FromResult(false),   // user cancelled
+        };
+        vm.Selected = vm.Branches[1];
+
+        await vm.SwitchCommand.ExecuteAsync(null);
+
+        Assert.False(checkedOut);
+    }
 }
