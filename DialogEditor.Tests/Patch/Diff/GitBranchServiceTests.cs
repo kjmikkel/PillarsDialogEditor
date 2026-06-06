@@ -105,4 +105,16 @@ public class GitBranchServiceTests
         var r = new GitBranchService(git).Checkout(ProjPath(), "feature/x");
         Assert.Equal(BranchOpStatus.GitFailed, r.Status);
     }
+
+    [Fact]
+    public void Checkout_GitMissing_MapsToGitMissingStatus()
+    {
+        // The real runner throws DiffException(GitMissing) when git isn't installed;
+        // it propagates through ResolveRepoRelative into Guarded's catch.
+        var git = new FakeGit { Handler = _ => throw new DiffException("git not installed", DiffExceptionKind.GitMissing) };
+
+        var r = new GitBranchService(git).Checkout(ProjPath(), "feature/x");
+
+        Assert.Equal(BranchOpStatus.GitMissing, r.Status);
+    }
 }
