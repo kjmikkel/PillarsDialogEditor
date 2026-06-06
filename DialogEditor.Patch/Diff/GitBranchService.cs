@@ -140,7 +140,10 @@ public class GitBranchService(IGitRunner git)
         {
             var res = git.Run(dir, "branch", force ? "-D" : "-d", branch);
             if (res.Ok) return BranchOpResult.Success;
-            // Safe (-d) refusal is almost always "not fully merged" → offer force.
+            // Any safe-delete (-d) failure is surfaced as NotMerged so the VM can offer
+            // force-delete. The edge case where the branch simply doesn't exist falls
+            // through to a force attempt, which also fails and returns GitFailed. The VM
+            // prevents deleting the current branch before reaching here.
             return force
                 ? new BranchOpResult(BranchOpStatus.GitFailed, res.StdErr.Trim())
                 : new BranchOpResult(BranchOpStatus.NotMerged, res.StdErr.Trim());
