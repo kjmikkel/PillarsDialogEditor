@@ -613,6 +613,18 @@ public class MainWindowViewModelTests : IDisposable
         Assert.False(await task);
     }
 
+    [Fact]
+    public async Task EnsureNoUnsavedEdits_Dirty_Save_ReturnsTrue()
+    {
+        var vm = MakeVm();
+        SetModified(vm, true);
+
+        var task = vm.EnsureNoUnsavedEditsAsync();
+        vm.SaveAndProceed();   // Save (no-ops without a provider/file in tests) then Proceed
+
+        Assert.True(await task);
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────
 
     private static NodeViewModel MakeNode(int id)

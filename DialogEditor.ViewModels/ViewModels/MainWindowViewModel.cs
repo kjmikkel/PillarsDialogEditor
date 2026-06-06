@@ -158,6 +158,12 @@ public partial class MainWindowViewModel : ObservableObject
         if (!(IsModified && CurrentConversationName is not null))
             return Task.FromResult(true);
 
+        // Defensive: resolve any stale pending decision and drop a stale pending-file
+        // load so this flow never inherits another guard's continuation (the UI is
+        // modal so this should not happen, but the shared state makes it worth guarding).
+        _unsavedDecision?.TrySetResult(false);
+        _pendingFile = null;
+
         _unsavedDecision = new TaskCompletionSource<bool>();
         _pendingAction = () => { _unsavedDecision?.TrySetResult(true); _unsavedDecision = null; };
         UnsavedChangesRequested?.Invoke();
