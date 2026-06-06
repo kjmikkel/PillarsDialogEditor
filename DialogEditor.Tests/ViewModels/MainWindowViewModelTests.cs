@@ -625,6 +625,40 @@ public class MainWindowViewModelTests : IDisposable
         Assert.True(await task);
     }
 
+    // ── ReloadCurrentProjectFromDisk ──────────────────────────────────────
+
+    private static void SetProjectPath(MainWindowViewModel vm, string? path) =>
+        typeof(MainWindowViewModel)
+            .GetField("_projectPath", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+            .SetValue(vm, path);
+
+    [Fact]
+    public void Reload_FileExists_ReloadsProject()
+    {
+        var vm   = MakeVm();
+        var path = TempProjectPath();
+        DialogProjectSerializer.SaveToFile(path, DialogProject.Empty("Reloaded"));
+        SetProjectPath(vm, path);
+
+        vm.ReloadCurrentProjectFromDisk();
+
+        Assert.True(vm.IsProjectOpen);
+        Assert.Equal("Reloaded", vm.CurrentProjectName);
+    }
+
+    [Fact]
+    public void Reload_FileMissingOnBranch_ClosesProject()
+    {
+        var vm = MakeVm();
+        InjectProject(vm, DialogProject.Empty("Open"));
+        SetProjectPath(vm, Path.Combine(Path.GetTempPath(), $"gone_{Guid.NewGuid():N}.dialogproject"));
+
+        vm.ReloadCurrentProjectFromDisk();
+
+        Assert.False(vm.IsProjectOpen);
+        Assert.False(string.IsNullOrEmpty(vm.StatusText));
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────
 
     private static NodeViewModel MakeNode(int id)
