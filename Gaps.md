@@ -27,7 +27,19 @@ Known, **intentional** diff limitations (a whole-feature review on 2026-05-31 co
 
 **Selective apply** (implemented): from the compare window the user ticks individual changed lines and **brings them into their copy** (per-node cherry-pick into the working-copy `.dialogproject`). Your copy is the left endpoint (the bring-in target); the other version is on the right, so the tree colours match the bring-in effect. Includes a live "applied preview", a save-before-apply guard, a single-step undo, a count-only dangling-link warning (warn-but-allow), and a plain-language Help window. The dangling-link warning is now a collapsible panel above the apply bar listing each dangling link (conversation, source node, removed target); read-only, collapsed by default, hidden when there are none. Automatic dependency-pulling is implemented: ticking a change auto-ticks the added nodes it links to (transitively), preventing brought-in links that point at nodes never created. It is outgoing-only and has a default-on "Also bring in linked nodes" toggle.
 
-**Remaining VCS gaps**: **branch switching** (`git checkout` from the app) is not started. The **history browser** is implemented: a timeline of the open project file's git history (message, author, system-formatted date with an ISO tooltip); selecting a commit opens it in the compare window (diff + selective bring-in) via a preset right endpoint.
+The **history browser** is implemented: a timeline of the open project file's git history (message, author, system-formatted date with an ISO tooltip); selecting a commit opens it in the compare window (diff + selective bring-in) via a preset right endpoint.
+
+**Branch management** (implemented): a Branches window (Edit ▸ Branches…) lists
+local branches with the current one marked, and switches, creates (`checkout -b`),
+renames, and deletes them. Switching guards unsaved editor edits, reloads the project
+from disk afterwards, and — when saved-but-uncommitted changes block the checkout —
+offers an informed-consent "commit changes, then switch" (tracked files only; the
+file list is shown before you accept). An untracked-file block is surfaced (not
+papered over); deleting an unmerged branch requires a force-delete confirmation; the
+current branch can't be deleted. Git-not-installed now shows a distinct message
+across Compare/History/Attribution/Branches.
+
+The Version Control Integration section is now essentially complete.
 
 **Attribution / blame** (implemented): per-node "who last edited this" derived from `git blame --line-porcelain HEAD` of the `.dialogproject`. A single blame is mapped back onto nodes by `DialogProjectLineMap` (parses the exact blamed bytes with `Utf8JsonReader`, tracking line offsets, to find each node's line ranges across its `AddedNodes`/`ModifiedNodes` object, its `Translations[lang]` entries, and its `NodeComments` entry); each node is attributed to the most-recent commit touching any of those lines. Surfaced two ways: a standalone **Attribution** window (Versions ▸ Attribution…) listing every node with its last editor (author, date, commit, message), and a read-only "Last edited" line in the node detail panel for the selected node. Known limitations: blame is **HEAD-based** (uncommitted edits aren't attributed until committed; brand-new nodes simply don't appear); the map is computed at project open and **not auto-refreshed** after an in-session commit; `DeletedNodeIds` and layout-only changes are out of scope.
 

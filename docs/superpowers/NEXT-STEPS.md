@@ -34,17 +34,16 @@ session, read its entry, and tackle it.
   `git blame --line-porcelain HEAD`, mapped onto nodes via `DialogProjectLineMap`.
   Standalone Attribution window + a "Last edited" line in the node detail panel.
   HEAD-based, computed at project open (see `Gaps.md` for limitations).
+- **Branch management** (2026-06-06) — switch/create/rename/delete local branches in a
+  dedicated window; commit-then-switch with informed consent (tracked-only), case-A
+  untracked block surfaced, force-delete behind a confirm. Distinct git-not-installed
+  message added to History/Diff/Blame too. Spec/plan:
+  `docs/superpowers/specs/2026-06-05-branch-management-design.md`,
+  `docs/superpowers/plans/2026-06-06-branch-management.md`.
 
 ---
 
 ## Queued (not started)
-
-### Branch/history navigation — remaining sub-projects
-The **history browser** (sub-project 1, 2026-06-04) and **attribution / blame**
-(sub-project 2, 2026-06-04) shipped. Remaining:
-- **Branch switching** (read-write) — `git checkout` reconciled with the open
-  project + unsaved edits; the first git write op; design its write-semantics
-  carefully. Benefits from the now-shipped history + attribution UI.
 
 ### Blocked on investigation (can't design yet)
 - **Bark preview** — in-context preview of overhead floating bark text. Needs
