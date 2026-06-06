@@ -1,0 +1,44 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+        x:Class="DialogEditor.Avalonia.Views.BranchesWindow"
+        x:DataType="vm:BranchesViewModel"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Title="{DynamicResource Branches_WindowTitle}"
+        Width="420" Height="380"
+        WindowStartupLocation="CenterOwner">
+  <DockPanel Margin="12">
+    <TextBlock DockPanel.Dock="Bottom" Text="{Binding StatusText}" TextWrapping="Wrap"
+               IsVisible="{Binding StatusText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+               Margin="0,8,0,0"/>
+
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6" Margin="0,8,0,0">
+      <Button x:Name="SwitchButton" Content="{DynamicResource Branches_Switch}"
+              ToolTip.Tip="{DynamicResource Branches_SwitchTip}"
+              Command="{Binding SwitchCommand}"/>
+      <Button x:Name="NewButton" Content="{DynamicResource Branches_New}"
+              ToolTip.Tip="{DynamicResource Branches_NewTip}"
+              Command="{Binding CreateCommand}"/>
+      <Button x:Name="RenameButton" Content="{DynamicResource Branches_Rename}"
+              ToolTip.Tip="{DynamicResource Branches_RenameTip}"
+              Command="{Binding RenameCommand}"/>
+      <Button x:Name="DeleteButton" Content="{DynamicResource Branches_Delete}"
+              ToolTip.Tip="{DynamicResource Branches_DeleteTip}"
+              Command="{Binding DeleteCommand}"/>
+      <Button x:Name="CloseButton" Content="{DynamicResource Branches_Close}"/>
+    </StackPanel>
+
+    <ListBox x:Name="BranchList" ItemsSource="{Binding Branches}"
+             SelectedItem="{Binding Selected}">
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="vm:BranchRowViewModel">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock Text="{Binding Name}"/>
+            <TextBlock Text="{DynamicResource Branches_CurrentTag}" Opacity="0.7"
+                       IsVisible="{Binding IsCurrent}"/>
+          </StackPanel>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </DockPanel>
+</Window>
