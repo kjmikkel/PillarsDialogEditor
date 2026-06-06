@@ -100,6 +100,7 @@ public partial class BranchesViewModel : ObservableObject
                 StatusText = Loc.Format("Branches_StatusSwitched", target);
                 break;
             case BranchOpStatus.BlockedByUntrackedFiles:
+                AppLog.Warn($"BranchesViewModel: switch to '{target}' blocked by untracked files: {result.Detail}");
                 StatusText = Loc.Get("Branches_StatusBlockedUntracked");
                 break;
             default:
