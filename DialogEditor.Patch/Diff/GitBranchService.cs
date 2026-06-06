@@ -124,6 +124,17 @@ public class GitBranchService(IGitRunner git)
     private bool BranchExists(string dir, string name)
         => git.Run(dir, "show-ref", "--verify", "--quiet", $"refs/heads/{name}").Ok;
 
+    public BranchOpResult Rename(string projectFilePath, string? from, string to)
+        => Guarded(projectFilePath, dir =>
+        {
+            if (!IsValidName(dir, to)) return new BranchOpResult(BranchOpStatus.NameInvalid);
+            if (BranchExists(dir, to)) return new BranchOpResult(BranchOpStatus.NameExists);
+            var res = from is null
+                ? git.Run(dir, "branch", "-m", to)        // rename the current branch
+                : git.Run(dir, "branch", "-m", from, to); // rename a named branch
+            return res.Ok ? BranchOpResult.Success : new BranchOpResult(BranchOpStatus.GitFailed, res.StdErr.Trim());
+        });
+
     public BranchOpResult CommitAll(string projectFilePath, string message)
         => Guarded(projectFilePath, dir =>
         {
