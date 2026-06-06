@@ -24,4 +24,18 @@ public class CommitConsentDialogTests
         var msg = dlg.FindControl<TextBox>("MessageBox")!;
         Assert.Equal("default msg", msg.Text);
     }
+
+    [AvaloniaFact]
+    public void CommitButton_WithWhitespaceMessage_SetsResultNull()
+    {
+        var dlg = new CommitConsentDialog(new PendingCommit(new[] { "a.dialogproject" }, "default"));
+        dlg.Show();
+
+        dlg.FindControl<TextBox>("MessageBox")!.Text = "   ";
+
+        var btn = dlg.FindControl<Button>("CommitButton")!;
+        btn.RaiseEvent(new global::Avalonia.Interactivity.RoutedEventArgs(global::Avalonia.Controls.Button.ClickEvent));
+
+        Assert.Null(dlg.Result);
+    }
 }
