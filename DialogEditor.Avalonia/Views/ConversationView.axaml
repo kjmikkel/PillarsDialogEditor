@@ -86,15 +86,23 @@
                                  Background="#7a6a8e"
                                  ItemsSource="{Binding Nodes}"
                                  Connections="{Binding Connections}"
+                                 PendingConnection="{Binding PendingConnection}"
                                  DoubleTapped="Editor_DoubleTapped">
 
-                <!-- Drag-to-connect: PendingConnection handles the in-progress line -->
-                <nodify:NodifyEditor.PendingConnection>
-                    <nodify:PendingConnection
-                        StartedCommand="{Binding PendingConnection.StartCommand}"
-                        CompletedCommand="{Binding PendingConnection.CompleteCommand}"
-                        Stroke="#aaaaaa" StrokeThickness="2" StrokeDashArray="4,3"/>
-                </nodify:NodifyEditor.PendingConnection>
+                <!-- Drag-to-connect: the PendingConnection control MUST live inside
+                     PendingConnectionTemplate (not be assigned to the PendingConnection
+                     DataContext property directly). Only when hosted via the template does
+                     it find its owner NodifyEditor (GetParentOfType) and subscribe to the
+                     drag events that update SourceAnchor/TargetAnchor — without that, the
+                     in-progress line has no coordinates to draw and stays invisible. -->
+                <nodify:NodifyEditor.PendingConnectionTemplate>
+                    <DataTemplate DataType="{x:Type vm:PendingConnectionViewModel}">
+                        <nodify:PendingConnection
+                            StartedCommand="{Binding StartCommand}"
+                            CompletedCommand="{Binding CompleteCommand}"
+                            Stroke="#aaaaaa" StrokeThickness="2" StrokeDashArray="4,3"/>
+                    </DataTemplate>
+                </nodify:NodifyEditor.PendingConnectionTemplate>
 
                 <nodify:NodifyEditor.ItemContainerTheme>
                     <ControlTheme TargetType="nodify:ItemContainer"
