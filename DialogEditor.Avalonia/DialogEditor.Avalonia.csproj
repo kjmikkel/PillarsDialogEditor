@@ -29,4 +29,11 @@
     <AvaloniaXaml Remove="Resources\Strings.axaml"/>
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Ship the beginner walkthrough next to the executable so Help > Open Walkthrough finds it. -->
+    <Content Include="..\docs\walkthrough.md" Link="docs\walkthrough.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
