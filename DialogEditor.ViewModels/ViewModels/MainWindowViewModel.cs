@@ -1059,8 +1059,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     // ── Open Walkthrough (Help menu) ──────────────────────────────────────
     private const string WalkthroughFileName = "walkthrough.md";
-    // ⚠ Confirm the public docs URL (plan header item 2).
-    private const string WalkthroughUrl = "https://github.com/OWNER/REPO/blob/main/docs/walkthrough.md";
+    private const string WalkthroughUrl = "https://github.com/kjmikkel/PillarsDialogEditor/blob/main/docs/walkthrough.md";
 
     /// Test/extension seam: tries each candidate (bundled path, then URL) and returns true on
     /// the first that opens. Defaults to launching via the OS handler.
