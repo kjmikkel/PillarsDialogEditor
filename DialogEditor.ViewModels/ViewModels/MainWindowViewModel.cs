@@ -9,6 +9,7 @@ using DialogEditor.Core.Import;
 using DialogEditor.Core.Layout;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
+using DialogEditor.Patch.Changelog;
 using DialogEditor.Patch.Diff;
 using DialogEditor.Patch.GitConflict;
 using DialogEditor.ViewModels.Resources;
@@ -1099,6 +1100,52 @@ public partial class MainWindowViewModel : ObservableObject
         }
         return false;
     }
+
+    // ── Changelog (Help menu) ─────────────────────────────────────────────
+    private const string ChangelogFileName = "CHANGELOG.md";
+
+    /// Test seam: returns the raw changelog text, or null when unavailable.
+    public Func<string?>? ChangelogReader { get; set; }
+
+    /// Set by the UI layer to open the changelog reader window.
+    public Action<ChangelogViewModel>? ShowChangelog { get; set; }
+
+    [RelayCommand]
+    private void Changelog()
+    {
+        var read = ChangelogReader ?? DefaultChangelogReader;
+        var text = read();
+        if (text is null) AppLog.Warn("Changelog: CHANGELOG.md unavailable.");
+        var releases = text is null
+            ? Array.Empty<ChangelogRelease>()
+            : ChangelogParser.Parse(text);
+        ShowChangelog?.Invoke(new ChangelogViewModel(releases));
+    }
+
+    private static string? DefaultChangelogReader()
+    {
+        try
+        {
+            var path = Path.Combine(AppContext.BaseDirectory, ChangelogFileName);
+            return File.Exists(path) ? File.ReadAllText(path) : null;
+        }
+        catch (Exception ex)
+        {
+            AppLog.Warn($"Changelog read failed: {ex.Message}");
+            return null;
+        }
+    }
+
+    // ── About (Help menu) ─────────────────────────────────────────────────
+    public const string RepositoryUrl = "https://github.com/kjmikkel/PillarsDialogEditor";
+    public const string DocsUrl = "https://github.com/kjmikkel/PillarsDialogEditor#readme";
+
+    /// Set by the UI layer to open the About window.
+    public Action<AboutViewModel>? ShowAbout { get; set; }
+
+    [RelayCommand]
+    private void About()
+        => ShowAbout?.Invoke(new AboutViewModel(AppVersion.Current, RepositoryUrl, DocsUrl));
 
     // ── Backup offer (first time per game folder) ─────────────────────────
     private async Task OfferBackupAsync(string gameDirectory)
