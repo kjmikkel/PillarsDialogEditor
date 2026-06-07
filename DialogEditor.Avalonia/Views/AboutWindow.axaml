@@ -1,0 +1,34 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DialogEditor.Avalonia.Views.AboutWindow"
+        Title="{StaticResource About_Title}"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="420" Height="320" CanResize="False"
+        ShowInTaskbar="False" Background="#1a1a2a">
+    <StackPanel Margin="18,16,18,16" Spacing="8">
+        <TextBlock Text="{Binding AppName}" Foreground="#eee" FontSize="18" FontWeight="Bold"/>
+        <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock Text="{StaticResource About_VersionLabel}" Foreground="#888" FontSize="12"/>
+            <TextBlock Text="{Binding Version}" Foreground="#ccc" FontSize="12"/>
+        </StackPanel>
+        <TextBlock Text="{Binding Description}" Foreground="#bbb" FontSize="12" TextWrapping="Wrap"/>
+        <TextBlock Text="{Binding License}" Foreground="#999" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0"/>
+        <TextBlock Text="{Binding Credits}" Foreground="#999" FontSize="11" TextWrapping="Wrap"/>
+
+        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+            <Button Content="{StaticResource About_OpenRepository}"
+                    ToolTip.Tip="{StaticResource About_OpenRepositoryTip}"
+                    Command="{Binding OpenRepositoryCommand}"/>
+            <Button Content="{StaticResource About_OpenDocs}"
+                    ToolTip.Tip="{StaticResource About_OpenDocsTip}"
+                    Command="{Binding OpenDocsCommand}"/>
+        </StackPanel>
+
+        <TextBlock Text="{Binding Status}" Foreground="#e0a" FontSize="11" TextWrapping="Wrap"/>
+
+        <Button HorizontalAlignment="Right" Margin="0,8,0,0"
+                Content="{StaticResource About_Close}"
+                ToolTip.Tip="{StaticResource About_Close}"
+                Click="Close_Click"/>
+    </StackPanel>
+</Window>
