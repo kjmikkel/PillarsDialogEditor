@@ -12,6 +12,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="avares://DialogEditor.Avalonia/Resources/Palette.axaml"/>
+                <ResourceInclude Source="avares://DialogEditor.Avalonia/Resources/Tokens.axaml"/>
                 <ResourceInclude Source="avares://Nodify/Theme.axaml"/>
                 <ResourceInclude Source="avares://DialogEditor.Avalonia/Resources/Strings.axaml"/>
                 <ResourceInclude Source="avares://DialogEditor.Avalonia.Shared/Resources/SharedStrings.axaml"/>
