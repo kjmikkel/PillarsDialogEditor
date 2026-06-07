@@ -31,6 +31,8 @@ public class TokenRegistryTests
     [InlineData("Brush.Text.Status.Changed",     0xFF, 0xf0, 0xad, 0x4e)] // #e0a030 absorbed
     [InlineData("Brush.Syntax.Code",             0xFF, 0x9c, 0xdc, 0xfe)]
     [InlineData("Brush.Conflict.Theirs.Foreground",0xFF, 0x9c, 0xc4, 0xff)]
+    [InlineData("Brush.Diff.Inline.Mine",         0xFF, 0x9b, 0xe3, 0x9b)] // preserved #9be39b
+    [InlineData("Brush.Diff.Inline.Theirs",       0xFF, 0xff, 0x9c, 0x9c)]
     public void TokenResolvesToExpectedColor(string key, byte a, byte r, byte g, byte b)
         => Assert.Equal(Color.FromArgb(a, r, g, b), Brush(key).Color);
 
@@ -60,6 +62,7 @@ public class TokenRegistryTests
         "Brush.Text.Status.Removed","Brush.Text.Status.Success","Brush.Text.Status.Error",
         "Brush.Text.Status.Pending","Brush.Text.Meta.Commit",
         "Brush.Syntax.Condition","Brush.Syntax.Script","Brush.Syntax.Code","Brush.Syntax.Default",
+        "Brush.Diff.Inline.Mine","Brush.Diff.Inline.Theirs",
         "Brush.Conflict.Mine.Background","Brush.Conflict.Mine.Foreground",
         "Brush.Conflict.Theirs.Background","Brush.Conflict.Theirs.Foreground",
         "Brush.Button.Confirm.Background","Brush.Button.Caution.Background",

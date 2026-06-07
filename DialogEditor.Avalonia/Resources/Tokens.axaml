@@ -90,6 +90,13 @@
     <SolidColorBrush x:Key="Brush.Syntax.Code"      Color="{StaticResource Palette.Sky.250}"/>
     <SolidColorBrush x:Key="Brush.Syntax.Default"   Color="{StaticResource Palette.Neutral.910}"/>
 
+    <!-- Inline text-diff word highlight (InlineDiffTextBlock + GitConflictResolutionWindow
+         code-behind). Foreground accents for the differing run: mine/before = green,
+         theirs/after = pink. Distinct from the Brush.Diff.*.Fill canvas backgrounds and
+         from the Conflict.* panel foregrounds; Theirs reuses Palette.Red.300 by design. -->
+    <SolidColorBrush x:Key="Brush.Diff.Inline.Mine"   Color="{StaticResource Palette.Green.350}"/>
+    <SolidColorBrush x:Key="Brush.Diff.Inline.Theirs" Color="{StaticResource Palette.Red.300}"/>
+
     <!-- Merge-conflict mine/theirs -->
     <SolidColorBrush x:Key="Brush.Conflict.Mine.Background"   Color="{StaticResource Palette.Maroon.900}"/>
     <SolidColorBrush x:Key="Brush.Conflict.Mine.Foreground"   Color="{StaticResource Palette.Red.300}"/>

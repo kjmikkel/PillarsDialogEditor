@@ -3,6 +3,7 @@ using System.ComponentModel;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Media;
+using DialogEditor.Avalonia.Theming;
 using DialogEditor.Patch.GitConflict;
 using DialogEditor.ViewModels;
 
@@ -10,9 +11,12 @@ namespace DialogEditor.Avalonia.Views;
 
 public partial class GitConflictResolutionWindow : Window
 {
-    private static readonly IBrush CommonBrush = new SolidColorBrush(Color.Parse("#e8e8e8"));
-    private static readonly IBrush MineBrush   = new SolidColorBrush(Color.Parse("#9be39b"));
-    private static readonly IBrush TheirsBrush = new SolidColorBrush(Color.Parse("#ff9c9c"));
+    // Inline word-diff highlight colours come from the token registry (Tokens.axaml),
+    // shared with InlineDiffTextBlock. See
+    // docs/superpowers/specs/2026-06-07-colour-token-taxonomy-design.md §10.
+    private static IBrush CommonBrush => TokenBrushes.Resolve("Brush.Text.Primary");
+    private static IBrush MineBrush   => TokenBrushes.Resolve("Brush.Diff.Inline.Mine");
+    private static IBrush TheirsBrush => TokenBrushes.Resolve("Brush.Diff.Inline.Theirs");
 
     private readonly GitConflictResolutionViewModel? _vm;
 
