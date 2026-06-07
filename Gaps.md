@@ -59,5 +59,12 @@ A natural home now exists: the **Help** menu introduced for *Create Sample Proje
 Adding **Help ▸ About…** — a small dialog reading the version from the same source the CLI
 uses — would close this gap. Deferred to keep the sample/tutorial work focused.
 
+### Onboarding
+A **Create Sample Project** command (Help menu) plus a shipped **beginner walkthrough**
+(`docs/walkthrough.md`) now give newcomers a safe, install-matched sandbox for learning the
+editor and the version-control tools. The remaining onboarding idea is an **in-app guided
+tour** (highlighting controls step-by-step), deferred — see the sample/tutorial spec's
+"Future enhancements".
+
 ### Voice-Over Integration
 An "External VO" field exists but there is no path validation, lip-sync metadata support, or audio preview. Mods that add or replace voiced lines have no tooling support. Note: actual voice-over audio is stored in a proprietary archive format — requires investigation before tooling can be designed.
