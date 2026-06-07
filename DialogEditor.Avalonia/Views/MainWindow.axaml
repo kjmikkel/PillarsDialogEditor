@@ -134,6 +134,13 @@
                         <MenuItem Header="{StaticResource Menu_OpenWalkthrough}"
                                   ToolTip.Tip="{StaticResource Menu_OpenWalkthroughTip}"
                                   Command="{Binding OpenWalkthroughCommand}"/>
+                        <Separator/>
+                        <MenuItem Header="{StaticResource Menu_Changelog}"
+                                  ToolTip.Tip="{StaticResource Menu_ChangelogTip}"
+                                  Command="{Binding ChangelogCommand}"/>
+                        <MenuItem Header="{StaticResource Menu_About}"
+                                  ToolTip.Tip="{StaticResource Menu_AboutTip}"
+                                  Command="{Binding AboutCommand}"/>
                     </MenuItem>
 
                 </Menu>
