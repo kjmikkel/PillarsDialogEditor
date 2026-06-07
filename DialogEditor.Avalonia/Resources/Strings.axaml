@@ -901,4 +901,21 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Blame_StatusGitMissing">Git isn't installed. Install Git to see attribution.</sys:String>
     <sys:String x:Key="Status_DiffGitMissing">Git isn't installed. Install Git to compare versions.</sys:String>
 
+    <!-- ─── Help menu + Sample project ──────────────────────────────────── -->
+    <sys:String x:Key="Menu_Help">Help</sys:String>
+    <sys:String x:Key="Menu_CreateSample">Create Sample Project…</sys:String>
+    <sys:String x:Key="Menu_CreateSampleTip">Generate a small, safe practice project from your installed game — with a ready-made history so you can try the version-control tools. Opens it for you. Requires a game folder to be open.</sys:String>
+    <sys:String x:Key="Menu_OpenWalkthrough">Open Walkthrough…</sys:String>
+    <sys:String x:Key="Menu_OpenWalkthroughTip">Open the step-by-step beginner guide that walks you through editing, testing, translating, and version control using the sample project.</sys:String>
+
+    <sys:String x:Key="Sample_SelectFolder">Choose an empty folder for the sample project</sys:String>
+    <sys:String x:Key="Sample_FolderNotEmpty">Please choose an empty folder — the sample needs its own folder so it doesn't disturb existing files.</sys:String>
+    <sys:String x:Key="Sample_ConversationMissing">Couldn't find the conversation the sample uses in this game installation.</sys:String>
+    <sys:String x:Key="Sample_BuildFailed">Couldn't build the sample project.</sys:String>
+    <!-- {0} = file name -->
+    <sys:String x:Key="Sample_Created">Sample project {0} created and opened. Try Edit ▸ Branches and the other version-control tools.</sys:String>
+    <sys:String x:Key="Sample_CreatedNoGit">Sample project created and opened. Install Git to try the version-control tools.</sys:String>
+    <sys:String x:Key="Sample_CreatedHistoryPartial">Sample project created and opened, but its practice history couldn't be completed.</sys:String>
+    <sys:String x:Key="Walkthrough_OpenFailed">Couldn't open the walkthrough. You can find it in the app's docs folder.</sys:String>
+
 </ResourceDictionary>
