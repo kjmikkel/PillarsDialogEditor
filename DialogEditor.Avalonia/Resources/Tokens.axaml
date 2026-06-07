@@ -1,0 +1,116 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--  TOKENS — semantic brush layer (Layer 0, public contract).
+          Every view, converter, and dependent gap binds THESE keys (never Palette.*).
+          Each brush references exactly one Palette.* colour; two tokens may share a
+          primitive on purpose (e.g. Text.Female.Active and Text.Primary) to decouple
+          meaning from value. Foreground vs background of the same concept are distinct
+          tokens by design. See spec §3.1, §4, §7. -->
+
+    <!-- Node cards (dissolves SpeakerCategoryToBrushConverter / NodeColorConverter dup) -->
+    <SolidColorBrush x:Key="Brush.Node.Npc.Header"      Color="{StaticResource Palette.Crimson.700}"/>
+    <SolidColorBrush x:Key="Brush.Node.Npc.Body"        Color="{StaticResource Palette.Parchment.100}"/>
+    <SolidColorBrush x:Key="Brush.Node.Npc.Footer"      Color="{StaticResource Palette.Parchment.200}"/>
+    <SolidColorBrush x:Key="Brush.Node.Player.Header"    Color="{StaticResource Palette.Azure.600}"/>
+    <SolidColorBrush x:Key="Brush.Node.Player.Body"      Color="{StaticResource Palette.Azure.150}"/>
+    <SolidColorBrush x:Key="Brush.Node.Player.Footer"    Color="{StaticResource Palette.Azure.250}"/>
+    <SolidColorBrush x:Key="Brush.Node.Narrator.Header"  Color="{StaticResource Palette.Teal.600}"/>
+    <SolidColorBrush x:Key="Brush.Node.Narrator.Body"    Color="{StaticResource Palette.Teal.150}"/>
+    <SolidColorBrush x:Key="Brush.Node.Narrator.Footer"  Color="{StaticResource Palette.Teal.250}"/>
+    <SolidColorBrush x:Key="Brush.Node.Script.Header"    Color="{StaticResource Palette.Slate.700}"/>
+    <SolidColorBrush x:Key="Brush.Node.Script.Body"      Color="{StaticResource Palette.Neutral.875}"/>
+    <SolidColorBrush x:Key="Brush.Node.Script.Footer"    Color="{StaticResource Palette.Neutral.785}"/>
+    <SolidColorBrush x:Key="Brush.Node.Bark.Header"      Color="{StaticResource Palette.Amber.900}"/>
+    <SolidColorBrush x:Key="Brush.Node.Bark.Body"        Color="{StaticResource Palette.Cream.100}"/>
+    <SolidColorBrush x:Key="Brush.Node.Bark.Footer"      Color="{StaticResource Palette.Amber.570}"/>
+
+    <!-- Diff canvas fills -->
+    <SolidColorBrush x:Key="Brush.Diff.Added.Fill"    Color="{StaticResource Palette.Green.550}"/>
+    <SolidColorBrush x:Key="Brush.Diff.Changed.Fill"  Color="{StaticResource Palette.Amber.600}"/>
+    <SolidColorBrush x:Key="Brush.Diff.Removed.Fill"  Color="{StaticResource Palette.Maroon.800}"/>
+
+    <!-- Severity -->
+    <SolidColorBrush x:Key="Brush.Severity.Info"     Color="{StaticResource Palette.Sky.450}"/>
+    <SolidColorBrush x:Key="Brush.Severity.Warning"  Color="{StaticResource Palette.Amber.500}"/>
+    <SolidColorBrush x:Key="Brush.Severity.Error"    Color="{StaticResource Palette.Red.500}"/>
+
+    <!-- Toolbar buttons -->
+    <SolidColorBrush x:Key="Brush.Toolbar.Button.Background"   Color="{StaticResource Palette.Neutral.200}"/>
+    <SolidColorBrush x:Key="Brush.Toolbar.Button.Foreground"   Color="{StaticResource Palette.Neutral.665}"/>
+    <SolidColorBrush x:Key="Brush.Toolbar.Button.Hover"        Color="{StaticResource Palette.Neutral.265}"/>
+    <SolidColorBrush x:Key="Brush.Toolbar.Button.Pressed"      Color="{StaticResource Palette.Neutral.290}"/>
+    <SolidColorBrush x:Key="Brush.Toolbar.Button.Checked"      Color="{StaticResource Palette.Neutral.225}"/>
+    <SolidColorBrush x:Key="Brush.Toolbar.Button.CheckedHover" Color="{StaticResource Palette.Neutral.265}"/>
+
+    <!-- Surfaces -->
+    <SolidColorBrush x:Key="Brush.Surface.Window"  Color="{StaticResource Palette.Neutral.115}"/>
+    <SolidColorBrush x:Key="Brush.Surface.Panel"   Color="{StaticResource Palette.Neutral.145}"/>
+    <SolidColorBrush x:Key="Brush.Surface.Card"    Color="{StaticResource Palette.Neutral.100}"/>
+    <SolidColorBrush x:Key="Brush.Surface.Input"   Color="{StaticResource Palette.Neutral.80}"/>
+    <SolidColorBrush x:Key="Brush.Surface.Inset"   Color="{StaticResource Palette.Neutral.125}"/>
+    <SolidColorBrush x:Key="Brush.Surface.Header"  Color="{StaticResource Palette.Neutral.200}"/>
+    <SolidColorBrush x:Key="Brush.Surface.Info"    Color="{StaticResource Palette.Navy.100}"/>
+    <SolidColorBrush x:Key="Brush.Surface.Overlay.Scrim" Color="{StaticResource Palette.Alpha.Scrim}"/>
+
+    <!-- Borders -->
+    <SolidColorBrush x:Key="Brush.Border.Default" Color="{StaticResource Palette.Neutral.200}"/>
+    <SolidColorBrush x:Key="Brush.Border.Subtle"  Color="{StaticResource Palette.Neutral.175}"/>
+    <SolidColorBrush x:Key="Brush.Border.Strong"  Color="{StaticResource Palette.Neutral.265}"/>
+    <SolidColorBrush x:Key="Brush.Border.Muted"   Color="{StaticResource Palette.Neutral.335}"/>
+    <SolidColorBrush x:Key="Brush.Border.OnDark"  Color="{StaticResource Palette.Alpha.HairlineOnDark}"/>
+    <SolidColorBrush x:Key="Brush.Border.Focus"   Color="{StaticResource Palette.Azure.600}"/>
+
+    <!-- Text -->
+    <!-- Text emphasis ramp (light→dim), each a distinct used grey level -->
+    <SolidColorBrush x:Key="Brush.Text.Primary"      Color="{StaticResource Palette.Neutral.910}"/>
+    <SolidColorBrush x:Key="Brush.Text.Emphasis"     Color="{StaticResource Palette.Neutral.865}"/>
+    <SolidColorBrush x:Key="Brush.Text.Secondary"    Color="{StaticResource Palette.Neutral.800}"/>
+    <SolidColorBrush x:Key="Brush.Text.Tertiary"     Color="{StaticResource Palette.Neutral.735}"/>
+    <SolidColorBrush x:Key="Brush.Text.Muted.Light"  Color="{StaticResource Palette.Neutral.665}"/>
+    <SolidColorBrush x:Key="Brush.Text.Caption"      Color="{StaticResource Palette.Neutral.600}"/>
+    <SolidColorBrush x:Key="Brush.Text.Muted"        Color="{StaticResource Palette.Neutral.535}"/>
+    <SolidColorBrush x:Key="Brush.Text.Disabled"     Color="{StaticResource Palette.Neutral.400}"/>
+    <SolidColorBrush x:Key="Brush.Text.OnAccent"     Color="{StaticResource Palette.White}"/>
+    <SolidColorBrush x:Key="Brush.Text.Female.Active" Color="{StaticResource Palette.Neutral.910}"/>
+    <SolidColorBrush x:Key="Brush.Text.Female.Dim"    Color="{StaticResource Palette.Neutral.335}"/>
+
+    <!-- Status foreground accents -->
+    <SolidColorBrush x:Key="Brush.Text.Status.New"     Color="{StaticResource Palette.Green.400}"/>
+    <SolidColorBrush x:Key="Brush.Text.Status.Added"   Color="{StaticResource Palette.Green.400}"/>
+    <SolidColorBrush x:Key="Brush.Text.Status.Changed" Color="{StaticResource Palette.Amber.540}"/>
+    <SolidColorBrush x:Key="Brush.Text.Status.Removed"  Color="{StaticResource Palette.Red.450}"/>
+    <SolidColorBrush x:Key="Brush.Text.Status.Success"  Color="{StaticResource Palette.Green.500}"/>
+    <SolidColorBrush x:Key="Brush.Text.Status.Error"    Color="{StaticResource Palette.Red.550}"/>
+    <SolidColorBrush x:Key="Brush.Text.Status.Pending"  Color="{StaticResource Palette.Magenta.500}"/>
+    <SolidColorBrush x:Key="Brush.Text.Meta.Commit"     Color="{StaticResource Palette.Amber.600}"/>
+
+    <!-- Syntax / parameter styling -->
+    <SolidColorBrush x:Key="Brush.Syntax.Condition" Color="{StaticResource Palette.Amber.550}"/>
+    <SolidColorBrush x:Key="Brush.Syntax.Script"    Color="{StaticResource Palette.Green.400}"/>
+    <SolidColorBrush x:Key="Brush.Syntax.Code"      Color="{StaticResource Palette.Sky.250}"/>
+    <SolidColorBrush x:Key="Brush.Syntax.Default"   Color="{StaticResource Palette.Neutral.910}"/>
+
+    <!-- Merge-conflict mine/theirs -->
+    <SolidColorBrush x:Key="Brush.Conflict.Mine.Background"   Color="{StaticResource Palette.Maroon.900}"/>
+    <SolidColorBrush x:Key="Brush.Conflict.Mine.Foreground"   Color="{StaticResource Palette.Red.300}"/>
+    <SolidColorBrush x:Key="Brush.Conflict.Theirs.Background"  Color="{StaticResource Palette.Navy.150}"/>
+    <SolidColorBrush x:Key="Brush.Conflict.Theirs.Foreground"  Color="{StaticResource Palette.Sky.300}"/>
+
+    <!-- Action buttons -->
+    <SolidColorBrush x:Key="Brush.Button.Confirm.Background" Color="{StaticResource Palette.Green.600}"/>
+    <SolidColorBrush x:Key="Brush.Button.Caution.Background" Color="{StaticResource Palette.Burnt.600}"/>
+
+    <!-- Bark detail block + canvas bark outline -->
+    <SolidColorBrush x:Key="Brush.Bark.Detail.Background" Color="{StaticResource Palette.Amber.950}"/>
+    <SolidColorBrush x:Key="Brush.Bark.Detail.Border"    Color="{StaticResource Palette.Amber.900}"/>
+    <SolidColorBrush x:Key="Brush.Bark.Detail.Text"      Color="{StaticResource Palette.Amber.560}"/>
+    <SolidColorBrush x:Key="Brush.Node.Bark.Outline"     Color="{StaticResource Palette.Amber.520}"/>
+    <SolidColorBrush x:Key="Brush.Node.Quotidian.Note"   Color="{StaticResource Palette.Olive.500}"/>
+
+    <!-- Links, info text, highlight, badge (accent foregrounds) -->
+    <SolidColorBrush x:Key="Brush.Text.Link"         Color="{StaticResource Palette.Sky.400}"/>
+    <SolidColorBrush x:Key="Brush.Text.Link.Subtle"  Color="{StaticResource Palette.Sky.350}"/>
+    <SolidColorBrush x:Key="Brush.Text.Info"         Color="{StaticResource Palette.Sky.450}"/>
+    <SolidColorBrush x:Key="Brush.Text.Highlight"    Color="{StaticResource Palette.Amber.520}"/>
+    <SolidColorBrush x:Key="Brush.Accent.Badge"      Color="{StaticResource Palette.Mauve.500}"/>
+</ResourceDictionary>
