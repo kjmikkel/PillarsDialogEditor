@@ -1,23 +1,20 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
-using Avalonia.Media;
+using DialogEditor.Avalonia.Theming;
 using DialogEditor.Core.Analytics;
 
 namespace DialogEditor.Avalonia.Converters;
 
+/// <summary>
+/// Maps a <see cref="FlowIssueKind"/> to a severity brush: Unreachable = error,
+/// everything else = warning. Resolves Brush.Severity.* tokens (spec §7.3).
+/// </summary>
 public sealed class FlowIssueKindToSeverityBrushConverter : IValueConverter
 {
-    private static readonly ISolidColorBrush Red   = new SolidColorBrush(Color.FromRgb(0xc0, 0x39, 0x2b));
-    private static readonly ISolidColorBrush Amber = new SolidColorBrush(Color.FromRgb(0xb8, 0x76, 0x0a));
-
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => value is FlowIssueKind kind
-            ? kind switch
-            {
-                FlowIssueKind.Unreachable => Red,
-                _                         => Amber
-            }
-            : Amber;
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is FlowIssueKind kind && kind == FlowIssueKind.Unreachable
+            ? TokenBrushes.Resolve("Brush.Severity.Error")
+            : TokenBrushes.Resolve("Brush.Severity.Warning");
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotImplementedException();
