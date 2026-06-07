@@ -6,31 +6,31 @@
     <Grid RowDefinitions="Auto,*,Auto">
 
         <!-- Filter box -->
-        <Border Grid.Row="0" Background="#252525" Padding="4" BorderBrush="#333" BorderThickness="0,0,0,1">
+        <Border Grid.Row="0" Background="{DynamicResource Brush.Surface.Panel}" Padding="4" BorderBrush="{DynamicResource Brush.Border.Default}" BorderThickness="0,0,0,1">
             <Grid>
                 <TextBox x:Name="FilterBox"
                          Text="{Binding FilterText}"
-                         Background="#333" Foreground="#ccc" CaretBrush="#ccc"
-                         BorderBrush="#555" BorderThickness="1"
+                         Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" CaretBrush="{DynamicResource Brush.Text.Secondary}"
+                         BorderBrush="{DynamicResource Brush.Border.Muted}" BorderThickness="1"
                          Padding="6,3,24,3" FontSize="12" Height="26"
                          VerticalContentAlignment="Center"
                          KeyDown="FilterBox_KeyDown"
                          ToolTip.Tip="{StaticResource ToolTip_FilterConversations}"/>
                 <TextBlock Text="{StaticResource Placeholder_FilterConversations}"
-                           Foreground="#555" FontSize="10"
+                           Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10"
                            Padding="8,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"
                            IsVisible="{Binding FilterText, Converter={StaticResource StringIsEmpty}}"/>
                 <Button Command="{Binding ClearFilterCommand}"
                         HorizontalAlignment="Right" Width="20"
                         Content="✕" VerticalAlignment="Center"
                         Background="Transparent" BorderThickness="0"
-                        Foreground="#555" FontSize="10" Cursor="Hand"
+                        Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10" Cursor="Hand"
                         ToolTip.Tip="{StaticResource ToolTip_ClearFilter}"/>
             </Grid>
         </Border>
 
         <!-- Conversation tree -->
-        <TreeView Grid.Row="1" Background="#2d2d2d"
+        <TreeView Grid.Row="1" Background="{DynamicResource Brush.Surface.Subtle}"
                   BorderThickness="0"
                   ItemsSource="{Binding FilteredFolders}"
                   SelectedItem="{Binding SelectedTreeItem, Mode=TwoWay}"
@@ -39,16 +39,16 @@
             <TreeView.Styles>
                 <!-- Selection highlight -->
                 <Style Selector="TreeViewItem:selected /template/ ContentPresenter#PART_HeaderPresenter">
-                    <Setter Property="Background" Value="#1a5276"/>
+                    <Setter Property="Background" Value="{DynamicResource Brush.Border.Focus}"/>
                 </Style>
                 <Style Selector="TreeViewItem:selected:focus /template/ ContentPresenter#PART_HeaderPresenter">
-                    <Setter Property="Background" Value="#1a5276"/>
+                    <Setter Property="Background" Value="{DynamicResource Brush.Border.Focus}"/>
                 </Style>
             </TreeView.Styles>
 
             <TreeView.DataTemplates>
                 <TreeDataTemplate DataType="{x:Type vm:ConversationFolderViewModel}" ItemsSource="{Binding Items}">
-                    <TextBlock Text="{Binding DisplayName}" Foreground="#888" FontSize="10" Padding="2"/>
+                    <TextBlock Text="{Binding DisplayName}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="10" Padding="2"/>
                 </TreeDataTemplate>
                 <DataTemplate DataType="{x:Type vm:ConversationItemViewModel}">
                     <TextBlock Text="{Binding DisplayName}"
@@ -68,8 +68,8 @@
         </TreeView>
 
         <!-- Game name footer -->
-        <Border Grid.Row="2" Background="#1a1a1a" Padding="8,5">
-            <TextBlock Text="{Binding GameName}" Foreground="#555" FontSize="9"/>
+        <Border Grid.Row="2" Background="{DynamicResource Brush.Surface.Card}" Padding="8,5">
+            <TextBlock Text="{Binding GameName}" Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="9"/>
         </Border>
     </Grid>
 </UserControl>

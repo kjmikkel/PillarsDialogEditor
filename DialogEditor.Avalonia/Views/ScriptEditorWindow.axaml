@@ -7,50 +7,50 @@
         Width="640" Height="600" MinWidth="480" MinHeight="400"
         CanResize="True"
         WindowStartupLocation="CenterOwner"
-        Background="#1e1e1e"
+        Background="{DynamicResource Brush.Surface.Window}"
         x:CompileBindings="False">
 
     <Window.Styles>
         <Style Selector="TextBlock.section-header">
-            <Setter Property="Foreground"  Value="#888"/>
+            <Setter Property="Foreground"  Value="{DynamicResource Brush.Text.Muted}"/>
             <Setter Property="FontSize"    Value="10"/>
             <Setter Property="FontWeight"  Value="Bold"/>
             <Setter Property="Margin"      Value="0,10,0,4"/>
         </Style>
         <Style Selector="TextBlock.param-label">
-            <Setter Property="Foreground"        Value="#888"/>
+            <Setter Property="Foreground"        Value="{DynamicResource Brush.Text.Muted}"/>
             <Setter Property="FontSize"          Value="11"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="MinWidth"          Value="110"/>
         </Style>
         <Style Selector="TextBox.param-input">
-            <Setter Property="Background"       Value="#141414"/>
-            <Setter Property="Foreground"       Value="#e8e8e8"/>
-            <Setter Property="BorderBrush"      Value="#444"/>
+            <Setter Property="Background"       Value="{DynamicResource Brush.Surface.Input}"/>
+            <Setter Property="Foreground"       Value="{DynamicResource Brush.Text.Primary}"/>
+            <Setter Property="BorderBrush"      Value="{DynamicResource Brush.Border.Strong}"/>
             <Setter Property="BorderThickness"  Value="1"/>
             <Setter Property="FontSize"         Value="12"/>
             <Setter Property="Padding"          Value="6,4"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
         <Style Selector="AutoCompleteBox.param-input">
-            <Setter Property="Background"       Value="#141414"/>
-            <Setter Property="Foreground"       Value="#e8e8e8"/>
-            <Setter Property="BorderBrush"      Value="#444"/>
+            <Setter Property="Background"       Value="{DynamicResource Brush.Surface.Input}"/>
+            <Setter Property="Foreground"       Value="{DynamicResource Brush.Text.Primary}"/>
+            <Setter Property="BorderBrush"      Value="{DynamicResource Brush.Border.Strong}"/>
             <Setter Property="BorderThickness"  Value="1"/>
             <Setter Property="FontSize"         Value="12"/>
             <Setter Property="Padding"          Value="6,4"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
         <Style Selector="Button.footer-btn">
-            <Setter Property="Background"      Value="#333"/>
-            <Setter Property="Foreground"      Value="#ccc"/>
+            <Setter Property="Background"      Value="{DynamicResource Brush.Surface.Header}"/>
+            <Setter Property="Foreground"      Value="{DynamicResource Brush.Text.Secondary}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"         Value="20,6"/>
             <Setter Property="FontSize"        Value="12"/>
             <Setter Property="MinWidth"        Value="90"/>
         </Style>
         <Style Selector="Button.footer-btn.primary">
-            <Setter Property="Background" Value="#1a5276"/>
+            <Setter Property="Background" Value="{DynamicResource Brush.Button.Primary.Background}"/>
             <Setter Property="Foreground" Value="White"/>
         </Style>
     </Window.Styles>
@@ -63,13 +63,13 @@
                 <!-- Helper template for a script row list -->
                 <StackPanel.Resources>
                     <DataTemplate x:Key="ScriptRowTemplate" DataType="vm:ScriptRowViewModel">
-                        <Border Background="#252525" CornerRadius="4" Margin="0,0,0,4" Padding="10,8">
+                        <Border Background="{DynamicResource Brush.Surface.Panel}" CornerRadius="4" Margin="0,0,0,4" Padding="10,8">
                             <StackPanel Spacing="6">
                                 <!-- Row header: name + ↑↓✕ -->
                                 <Grid ColumnDefinitions="*,28,28,28">
                                     <TextBlock Grid.Column="0"
                                                Text="{Binding DisplayName}"
-                                               Foreground="#e8e8e8" FontSize="13"
+                                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="13"
                                                FontWeight="SemiBold"
                                                VerticalAlignment="Center"/>
                                     <Button Grid.Column="1" Content="↑"
@@ -77,21 +77,21 @@
                                                       RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding}"
                                             Background="Transparent" BorderThickness="0"
-                                            Foreground="#aaa" FontSize="13" Padding="4"
+                                            Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="13" Padding="4"
                                             ToolTip.Tip="{StaticResource ToolTip_MoveScriptUp}"/>
                                     <Button Grid.Column="2" Content="↓"
                                             Command="{Binding DataContext.MoveDownCommand,
                                                       RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding}"
                                             Background="Transparent" BorderThickness="0"
-                                            Foreground="#aaa" FontSize="13" Padding="4"
+                                            Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="13" Padding="4"
                                             ToolTip.Tip="{StaticResource ToolTip_MoveScriptDown}"/>
                                     <Button Grid.Column="3" Content="✕"
                                             Command="{Binding DataContext.DeleteRowCommand,
                                                       RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding}"
                                             Background="Transparent" BorderThickness="0"
-                                            Foreground="#c0392b" FontSize="13" Padding="4"
+                                            Foreground="{DynamicResource Brush.Severity.Error}" FontSize="13" Padding="4"
                                             ToolTip.Tip="{StaticResource ToolTip_DeleteScriptRow}"/>
                                 </Grid>
                                 <!-- Parameters -->
@@ -138,12 +138,12 @@
                              FilterMode="Contains"
                              MinimumPrefixLength="0"
                              Watermark="{StaticResource Placeholder_ScriptPicker}"
-                             Background="#141414" Foreground="#ccc" BorderBrush="#444" BorderThickness="1"
+                             Background="{DynamicResource Brush.Surface.Input}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                              FontSize="11" Padding="6,4" MinWidth="0"
                              ToolTip.Tip="{StaticResource ToolTip_ScriptPicker}"/>
                     <Button Grid.Column="1" Content="+ Add"
                             Command="{Binding AddEnterScriptCommand}"
-                            Background="#2c3e50" Foreground="#ccc" BorderThickness="0"
+                            Background="{DynamicResource Brush.Node.Script.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
                             Padding="12,4" Margin="6,0,0,0" FontSize="11"
                             ToolTip.Tip="{StaticResource ToolTip_AddScriptEnter}"/>
                 </Grid>
@@ -160,12 +160,12 @@
                              FilterMode="Contains"
                              MinimumPrefixLength="0"
                              Watermark="{StaticResource Placeholder_ScriptPicker}"
-                             Background="#141414" Foreground="#ccc" BorderBrush="#444" BorderThickness="1"
+                             Background="{DynamicResource Brush.Surface.Input}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                              FontSize="11" Padding="6,4" MinWidth="0"
                              ToolTip.Tip="{StaticResource ToolTip_ScriptPicker}"/>
                     <Button Grid.Column="1" Content="+ Add"
                             Command="{Binding AddExitScriptCommand}"
-                            Background="#2c3e50" Foreground="#ccc" BorderThickness="0"
+                            Background="{DynamicResource Brush.Node.Script.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
                             Padding="12,4" Margin="6,0,0,0" FontSize="11"
                             ToolTip.Tip="{StaticResource ToolTip_AddScriptExit}"/>
                 </Grid>
@@ -182,12 +182,12 @@
                              FilterMode="Contains"
                              MinimumPrefixLength="0"
                              Watermark="{StaticResource Placeholder_ScriptPicker}"
-                             Background="#141414" Foreground="#ccc" BorderBrush="#444" BorderThickness="1"
+                             Background="{DynamicResource Brush.Surface.Input}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                              FontSize="11" Padding="6,4" MinWidth="0"
                              ToolTip.Tip="{StaticResource ToolTip_ScriptPicker}"/>
                     <Button Grid.Column="1" Content="+ Add"
                             Command="{Binding AddUpdateScriptCommand}"
-                            Background="#2c3e50" Foreground="#ccc" BorderThickness="0"
+                            Background="{DynamicResource Brush.Node.Script.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
                             Padding="12,4" Margin="6,0,0,0" FontSize="11"
                             ToolTip.Tip="{StaticResource ToolTip_AddScriptUpdate}"/>
                 </Grid>
@@ -196,7 +196,7 @@
         </ScrollViewer>
 
         <!-- Footer -->
-        <Border Grid.Row="1" Background="#252525" Padding="14,10">
+        <Border Grid.Row="1" Background="{DynamicResource Brush.Surface.Panel}" Padding="14,10">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
                 <Button Classes="footer-btn" Content="Cancel"
                         Command="{Binding CancelCommand}"

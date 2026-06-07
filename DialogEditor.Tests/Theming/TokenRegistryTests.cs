@@ -50,7 +50,7 @@ public class TokenRegistryTests
         "Brush.Toolbar.Button.Background","Brush.Toolbar.Button.Foreground","Brush.Toolbar.Button.Hover",
         "Brush.Toolbar.Button.Pressed","Brush.Toolbar.Button.Checked","Brush.Toolbar.Button.CheckedHover",
         "Brush.Surface.Window","Brush.Surface.Panel","Brush.Surface.Card","Brush.Surface.Input",
-        "Brush.Surface.Inset","Brush.Surface.Header","Brush.Surface.Info","Brush.Surface.Overlay.Scrim",
+        "Brush.Surface.Inset","Brush.Surface.Subtle","Brush.Surface.Header","Brush.Surface.Info","Brush.Surface.Overlay.Scrim",
         "Brush.Border.Default","Brush.Border.Subtle","Brush.Border.Strong","Brush.Border.Muted",
         "Brush.Border.OnDark","Brush.Border.Focus",
         "Brush.Text.Primary","Brush.Text.Emphasis","Brush.Text.Secondary","Brush.Text.Tertiary",

@@ -5,7 +5,7 @@
         Title="{StaticResource ExportConversations_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="480" Height="520"
-        Background="#1e1e1e"
+        Background="{DynamicResource Brush.Surface.Window}"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
         x:CompileBindings="False">
@@ -21,26 +21,26 @@
                         Padding="0"
                         Background="Transparent"
                         BorderThickness="0"
-                        Foreground="#4a9eff"
+                        Foreground="{DynamicResource Brush.Text.Link}"
                         ToolTip.Tip="{StaticResource ToolTip_ExportConversations_SelectAll}"/>
-                <TextBlock Text=" / " Foreground="#888" VerticalAlignment="Center"/>
+                <TextBlock Text=" / " Foreground="{DynamicResource Brush.Text.Muted}" VerticalAlignment="Center"/>
                 <Button x:Name="SelectNoneButton"
                         Content="{StaticResource ExportConversations_SelectNone}"
                         Command="{Binding SelectNoneCommand}"
                         Padding="0"
                         Background="Transparent"
                         BorderThickness="0"
-                        Foreground="#4a9eff"
+                        Foreground="{DynamicResource Brush.Text.Link}"
                         ToolTip.Tip="{StaticResource ToolTip_ExportConversations_SelectNone}"/>
             </StackPanel>
-            <Border Height="200" BorderBrush="#444" BorderThickness="1" CornerRadius="4">
+            <Border Height="200" BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1" CornerRadius="4">
                 <ScrollViewer>
                     <ItemsControl ItemsSource="{Binding ConversationItems}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type vm:ConversationExportItem}">
                                 <CheckBox Content="{Binding Name}"
                                           IsChecked="{Binding IsChecked}"
-                                          Foreground="#ddd"
+                                          Foreground="{DynamicResource Brush.Text.Emphasis}"
                                           Padding="8,4"/>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -59,7 +59,7 @@
             </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0"
                        Text="{Binding StatusText}"
-                       Foreground="#888"
+                       Foreground="{DynamicResource Brush.Text.Muted}"
                        VerticalAlignment="Center"
                        TextWrapping="Wrap"/>
             <Button Grid.Column="1"
@@ -78,7 +78,7 @@
         <!-- ── Format selector ───────────────────────────────────────── -->
         <StackPanel Margin="0,0,0,12">
             <TextBlock Text="{StaticResource ExportConversations_Format}"
-                       Foreground="#aaa"
+                       Foreground="{DynamicResource Brush.Text.Muted.Light}"
                        Margin="0,0,0,6"/>
             <RadioButton Content="CSV"
                          GroupName="Format"
