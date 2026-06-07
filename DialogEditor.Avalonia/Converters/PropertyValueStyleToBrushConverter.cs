@@ -1,24 +1,23 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
-using Avalonia.Media;
+using DialogEditor.Avalonia.Theming;
 using DialogEditor.ViewModels.Models;
 
 namespace DialogEditor.Avalonia.Converters;
 
+/// <summary>
+/// Maps a <see cref="PropertyValueStyle"/> to its syntax highlight brush; returns null
+/// for non-style values so the binding falls back. Resolves Brush.Syntax.* (spec §7.7).
+/// </summary>
 public sealed class PropertyValueStyleToBrushConverter : IValueConverter
 {
-    private static readonly ISolidColorBrush ConditionBrush = new SolidColorBrush(Color.FromRgb(0xe8, 0xa0, 0x20));
-    private static readonly ISolidColorBrush ScriptBrush    = new SolidColorBrush(Color.FromRgb(0x7d, 0xce, 0xa0));
-    private static readonly ISolidColorBrush CodeBrush      = new SolidColorBrush(Color.FromRgb(0x9c, 0xdc, 0xfe));
-    private static readonly ISolidColorBrush DefaultBrush   = new SolidColorBrush(Color.FromRgb(0xe8, 0xe8, 0xe8));
-
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
         value is PropertyValueStyle style ? style switch
         {
-            PropertyValueStyle.Condition => ConditionBrush,
-            PropertyValueStyle.Script    => ScriptBrush,
-            PropertyValueStyle.Code      => CodeBrush,
-            _                            => DefaultBrush,
+            PropertyValueStyle.Condition => TokenBrushes.Resolve("Brush.Syntax.Condition"),
+            PropertyValueStyle.Script    => TokenBrushes.Resolve("Brush.Syntax.Script"),
+            PropertyValueStyle.Code      => TokenBrushes.Resolve("Brush.Syntax.Code"),
+            _                            => TokenBrushes.Resolve("Brush.Syntax.Default"),
         } : null;
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>

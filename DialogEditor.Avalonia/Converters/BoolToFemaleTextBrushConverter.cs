@@ -1,16 +1,17 @@
 using System.Globalization;
 using Avalonia.Data.Converters;
-using Avalonia.Media;
+using DialogEditor.Avalonia.Theming;
 
 namespace DialogEditor.Avalonia.Converters;
 
+/// Active vs dim text for the female-VO indicator. Resolves
+/// Brush.Text.Female.Active / Brush.Text.Female.Dim (spec §7.5).
 public sealed class BoolToFemaleTextBrushConverter : IValueConverter
 {
-    private static readonly ISolidColorBrush ActiveBrush = new SolidColorBrush(Color.FromRgb(0xe8, 0xe8, 0xe8));
-    private static readonly ISolidColorBrush DimBrush    = new SolidColorBrush(Color.FromRgb(0x55, 0x55, 0x55));
-
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => value is true ? ActiveBrush : DimBrush;
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+        => value is true
+            ? TokenBrushes.Resolve("Brush.Text.Female.Active")
+            : TokenBrushes.Resolve("Brush.Text.Female.Dim");
 
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
         => throw new NotImplementedException();
