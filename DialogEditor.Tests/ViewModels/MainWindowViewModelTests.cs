@@ -42,6 +42,17 @@ public class MainWindowViewModelTests : IDisposable
         fi.SetValue(vm, provider);
     }
 
+    [Fact]
+    public void CreateSampleProject_DisabledUntilGameLoaded()
+    {
+        var vm = MakeVm();
+        Assert.False(vm.CreateSampleProjectCommand.CanExecute(null));
+
+        InjectProvider(vm, new DialogEditor.Tests.Helpers.FakeGameDataProvider("poe1", "en"));
+
+        Assert.True(vm.CreateSampleProjectCommand.CanExecute(null));
+    }
+
     private static DialogProject MakeProjectWithTranslations()
     {
         var patch = new ConversationPatch("test_conv", 2, [], [], [])

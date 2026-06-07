@@ -989,6 +989,7 @@ public partial class MainWindowViewModel : ObservableObject
             Browser.Load(provider, _project?.NewConversations);
             AppLog.Info($"Loaded {provider.GameName} from {path}");
             StatusText = Loc.Format("Status_FolderLoaded", provider.GameName, path);
+            CreateSampleProjectCommand.NotifyCanExecuteChanged();
 
             if (!AppSettings.IsKnownGameDirectory(path))
                 _ = OfferBackupAsync(path);
@@ -999,6 +1000,61 @@ public partial class MainWindowViewModel : ObservableObject
             AppLog.Error($"Failed to initialise game data from {path}", ex);
             StatusText = Loc.Format("Status_LoadError", path, ex.Message);
         }
+    }
+
+    // ── Create Sample Project (Help menu) ─────────────────────────────────
+    private bool CanCreateSample() => _provider is not null;
+
+    [RelayCommand(CanExecute = nameof(CanCreateSample))]
+    private async Task CreateSampleProjectAsync()
+    {
+        if (_provider is null) return;
+
+        string? folder;
+        try { folder = await _folderPicker.PickFolderAsync(Loc.Get("Sample_SelectFolder")); }
+        catch (OperationCanceledException) { return; }
+        if (folder is null) return;   // cancelled
+
+        if (Directory.EnumerateFileSystemEntries(folder).Any())
+        {
+            StatusText = Loc.Get("Sample_FolderNotEmpty");
+            return;
+        }
+
+        var service = new SampleProjectService(new ProcessGitRunner());
+        SampleBuild build;
+        try
+        {
+            build = service.BuildSample(_provider);
+        }
+        catch (SampleConversationNotFoundException ex)
+        {
+            AppLog.Warn($"Create sample: {ex.Message}");
+            StatusText = Loc.Get("Sample_ConversationMissing");
+            return;
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error($"Create sample: build failed: {ex}");
+            StatusText = Loc.Get("Sample_BuildFailed");
+            return;
+        }
+
+        var projectPath = Path.Combine(folder, build.ProjectFileName);
+        var seed = service.SeedHistory(folder, build);
+        if (seed != SampleSeedResult.Seeded)
+            DialogProjectSerializer.SaveToFile(projectPath, build.Final);  // guarantee an openable file
+
+        StatusText = seed switch
+        {
+            SampleSeedResult.Seeded     => Loc.Format("Sample_Created", build.ProjectFileName),
+            SampleSeedResult.GitMissing => Loc.Get("Sample_CreatedNoGit"),
+            _                           => Loc.Get("Sample_CreatedHistoryPartial"),
+        };
+        if (seed == SampleSeedResult.Partial)
+            AppLog.Warn("Create sample: git history seeding failed part-way; wrote the final project.");
+
+        await LoadProjectAsync(projectPath, offerDeferred: false);
     }
 
     // ── Backup offer (first time per game folder) ─────────────────────────
