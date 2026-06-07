@@ -50,6 +50,93 @@ The Version Control Integration section is now essentially complete.
 
 > **Deferred idea (revisit) — first-run intro for the compare/apply window.** A one-time, dismissible explanatory panel shown the first time a writer opens the compare window, to orient non-technical users. Deferred from the selective-apply design (`docs/superpowers/specs/2026-05-30-selective-apply-design.md`) because it needs persisted "seen" state; the always-on in-context cues (colour-key strip, one-line hint, plain-language tooltips, Help window) cover the immediate need. Worth reconsidering after selective apply ships.
 
+### Canvas Annotations (Sticky Notes & Regions)
+**Deferred feature.** Writers should be able to leave free-floating annotations on the
+conversation canvas — short reminders ("tighten this up, too many NPC nodes in a row") and
+at-a-glance area labels ("the critical romance path", "locked into combat from here", "the
+trauma conversation"). These serve both solo reminders and team communication.
+
+**Design (settled):** sticky notes and coloured regions are **one primitive**, not two
+features. It is a titled, optionally coloured **box** placed at canvas coordinates. "Note"
+vs "region" is purely a function of *size and whether it happens to enclose nodes* — there
+is **no count-based mode switch**. Drop a small box → reads as a sticky note; drag a large
+one around a cluster → reads as a region. Scope is **a single conversation's canvas** (no
+cross-conversation regions).
+
+Key decisions and their rationale:
+
+- **Spatial, not membership-based.** The box is a rectangle in canvas space; it bounds
+  whatever currently sits under it and does **not** track the node IDs it was drawn around.
+  Moving a node out of a region simply removes it from the region with no caveat — this is
+  correct by construction, not a disclaimer. (The rejected alternative — capturing node
+  membership at creation but behaving spatially afterwards — implies a relationship it never
+  maintains; the other alternative, true membership with hull recomputation + orphan
+  handling on delete, is more machinery than the use case warrants.)
+- **Canvas-owned, not node-attached** — this keeps it from duplicating the existing
+  **per-node comment**. The two fill different roles: a node comment is *owned by the node*,
+  part of its data/inspector, seen only when you inspect that node, and answers "why is
+  *this line* written this way?"; an annotation is *owned by the canvas*, always-on and
+  glanceable, and answers "what's going on in *this patch of the map*?". A single small
+  annotation does **not** encroach as long as annotations are never anchored to / travelling
+  with a node (that anchoring is exactly what would rebuild the node-comment feature behind
+  a different renderer, so it is deliberately excluded).
+- **Title + body, with a minimum readable size.** A pure-size model fights the requirement
+  to hold a *medium, readable message*: the structure is a title bar (always visible, works
+  as a region label even when the box is small) plus a wrapping body, with a sensible
+  minimum width so the box can't be shrunk into illegibility.
+- **Editor metadata, never game data.** Annotations must not leak into the file the game
+  consumes — they persist as editor-only state (sidecar to / an ignored section of the
+  `.dialogproject`). Persistence strategy is the main implementation decision still open.
+
+Accessibility note: per-annotation colour should be drawn from a curated, theme-aware
+palette rather than a raw RGB picker, so saved colours stay legible across light/dark/
+high-contrast — see the **Centralised UI Colour Tokens** gap (the annotation region colours
+are its `Brush.Annotation.Region.*` Layer 0 tokens). Because
+~8% of men can't distinguish common hue pairs, region meaning must not rely on colour
+alone (title text already provides the redundant encoding).
+
+### Centralised UI Colour Tokens
+**Deferred feature — purely UI; configured by the user in Settings.** Today colours are
+scattered across three tiers with no single source of truth: hardcoded hex in `App.axaml`
+control themes (`#333`/`#aaa`/`#444` on `ToolbarPlainButton`), hardcoded RGB constants in
+~8 brush converters (`NodeColorConverter`, `DiffStatusToBrushConverter`,
+`SpeakerCategoryToBrushConverter`, …), and inline values across ~34 `.axaml` files. The app
+is hardcoded to `RequestedThemeVariant="Dark"` (stock `FluentTheme`) — there is no
+light/dark switch to plug into. The duplication already drifts: `NodeColorConverter` carries
+the comment *"mirrors `SpeakerCategoryToBrushConverter`"* because the speaker palette is
+hand-copied into two files.
+
+The goal is a single, named-token colour registry. It is framed as **layers**, of which only
+the foundation is ever a dependency for other gaps; the upper layers are independent and may
+land later or never without making anything beneath them wrong.
+
+- **Layer 0 — Token registry (the foundation; the ONLY layer other gaps may depend on).**
+  One resource dictionary of *semantically named* tokens (e.g. `Brush.Node.Npc.Header`,
+  `Brush.Diff.Added`, `Brush.Toolbar.Button.Background`, `Brush.Annotation.Region.*`). Every
+  hardcoded value migrates to it: `App.axaml` themes use `DynamicResource`; the brush
+  converters resolve from the registry instead of `new SolidColorBrush(...)`. The drift bug
+  dies by construction — duplicated palettes become one shared key. **Published contract:**
+  "there exists a named token for every semantic colour role, and nothing in the app
+  constructs a colour any other way." No switching, no settings UI required for this layer to
+  be complete and dependable. The load-bearing design decision here is the **token naming
+  taxonomy** — those semantic role names *are* the public interface every dependent gap
+  quotes, so they must outlive any particular palette.
+- **Layer 1 — Palette sets (deferred, independent).** Alternative *values* for the same token
+  keys: Dark (today's colours), Light, High-Contrast, and colourblind-tuned sets. Same keys,
+  different hex; because Layer 0 guarantees everything reads keys, swapping the set retints
+  the whole app.
+- **Layer 2 — Runtime selection (deferred, independent).** The Settings UI to choose a
+  palette/theme at runtime, persist the choice, and plug into Avalonia's `ThemeVariant`. This
+  is the bulk of the work.
+- **Layer 2.5 — Redundant non-colour encoding (deferred, independent; accessibility).** The
+  part palettes can't fix: meaning must survive when hue is indistinguishable (~8% of men),
+  via icons/borders/labels alongside colour. May warrant its own gap.
+
+**Dependency rule:** other gaps point only at Layer 0. E.g. the **Canvas Annotations** gap
+draws region colours from `Brush.Annotation.Region.*` tokens; if Layers 1/2/2.5 never ship,
+annotations still render correctly with the single Dark set that exists today — never blocked
+on, nor made wrong by, an upper layer that doesn't exist.
+
 ### Barks System — Bark Preview
 Bark nodes now render with an amber color scheme on the canvas, carry bark-specific validation warnings (text too long, player-choice child), and those warnings surface in Flow Analytics. The remaining gap is an in-context preview of overhead floating text: writers cannot see how a bark will actually appear above an NPC's head without running the game. Implementing this requires investigating the game's bark rendering (font, line-wrapping, maximum visible width) before UI work can be designed.
 
