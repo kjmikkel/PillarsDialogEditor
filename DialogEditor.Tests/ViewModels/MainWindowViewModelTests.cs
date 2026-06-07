@@ -14,11 +14,24 @@ namespace DialogEditor.Tests.ViewModels;
 public class MainWindowViewModelTests : IDisposable
 {
     private readonly List<string> _importTempFiles = [];
+    private readonly string _settingsPath;
 
-    public MainWindowViewModelTests() => Loc.Configure(new StubStringProvider());
+    public MainWindowViewModelTests()
+    {
+        Loc.Configure(new StubStringProvider());
+        // Isolate AppSettings so the VM constructor doesn't auto-load the machine's real
+        // last game folder — which reads thousands of game files from disk and makes these
+        // tests slow and dependent on local state (see project_flaky_test_appsettings).
+        // A fresh, non-existent settings file means LastGameDirectory is null, so the
+        // constructor's startup LoadDirectory(...) is skipped.
+        _settingsPath = Path.Combine(Path.GetTempPath(), $"mwvm_settings_{Guid.NewGuid():N}.json");
+        AppSettings.SettingsPathOverride = _settingsPath;
+    }
 
     public void Dispose()
     {
+        AppSettings.SettingsPathOverride = null;
+        try { if (File.Exists(_settingsPath)) File.Delete(_settingsPath); } catch (Exception) { /* best-effort */ }
         foreach (var f in _importTempFiles)
             try { File.Delete(f); } catch (Exception) { /* best-effort cleanup */ }
     }
@@ -34,8 +47,8 @@ public class MainWindowViewModelTests : IDisposable
         mi.Invoke(vm, [project]);
     }
 
-    /// <summary>Injects a provider (or null) into the VM's private _provider field via reflection.</summary>
-    private static void InjectProvider(MainWindowViewModel vm, IGameDataProvider? provider)
+    /// <summary>Injects a provider into the VM's private _provider field via reflection.</summary>
+    private static void InjectProvider(MainWindowViewModel vm, IGameDataProvider provider)
     {
         var fi = typeof(MainWindowViewModel)
             .GetField("_provider", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
@@ -45,12 +58,7 @@ public class MainWindowViewModelTests : IDisposable
     [Fact]
     public void CreateSampleProject_DisabledUntilGameLoaded()
     {
-        var vm = MakeVm();
-
-        // Force a known "no game loaded" state — the constructor may auto-load the last
-        // game folder from AppSettings, which would otherwise make this depend on machine
-        // state (see project_flaky_test_appsettings).
-        InjectProvider(vm, null);
+        var vm = MakeVm();   // AppSettings is isolated in the fixture, so no game is auto-loaded
         Assert.False(vm.CreateSampleProjectCommand.CanExecute(null));
 
         InjectProvider(vm, new DialogEditor.Tests.Helpers.FakeGameDataProvider("poe1", "en"));
