@@ -35,7 +35,39 @@ When fixed, append to the moved entry:
 
 ## Open
 
-_None yet._
+### B-002 — No visible in-progress line when making a node connection
+- **Area:** Conversation canvas — connection-making (`ConversationView.axaml`, `PendingConnectionViewModel`)
+- **Severity:** minor
+- **Repro:**
+  1. Open a conversation on the canvas (editable).
+  2. Begin a connection from a node's "out" connector toward another node's "in" connector.
+  3. Watch the area between the source connector and the cursor before completing.
+- **Expected:** A clearly visible preview line follows the cursor from the source connector
+  until the connection is completed (or cancelled), so it's obvious a connection is in
+  progress.
+- **Actual:** Nothing visible — no preview line at all (or so faint as to be invisible),
+  including when the cursor passes over other nodes (so it's not merely blending into the
+  `#7a6a8e` canvas background). The connection only appears once both connectors have been
+  clicked.
+- **Notes:** A `nodify:PendingConnection` **is already configured** in
+  `ConversationView.axaml` (lines ~92–97) with `Stroke="#aaaaaa" StrokeThickness="2"
+  StrokeDashArray="4,3"` and `StartedCommand`/`CompletedCommand` bound to
+  `PendingConnectionViewModel.Start`/`Complete`. Connections *do* get created, so `Start`
+  (sets `Source`) and `Complete` both fire — only the in-progress **visual** is missing.
+  Two competing hypotheses, which imply different fixes:
+  - **(a) Gesture model.** Nodify's native pending-preview follows the cursor only during a
+    held *press-drag-release*. If the real interaction is *click-release-then-click* (two
+    discrete clicks — matches the reporter's description), there is no active drag between
+    the clicks, so Nodify never draws the preview. Fix would be a custom preview line from
+    `Source.Anchor` to the live pointer position rendered while `Source != null`.
+  - **(b) Rendering/z-order/anchor.** The preview renders but is invisible — e.g. drawn
+    beneath the items layer, or the geometry is degenerate because the `Source` anchor
+    (`LayoutPointConverter`, `OneWayToSource`) isn't supplied to `PendingConnection`. Fix
+    would be visibility/z-order/anchor wiring (and a higher-contrast stroke regardless).
+  - No custom connector click-handling exists in `ConversationView.axaml.cs`, so behaviour
+    is entirely Nodify-driven. Diagnose which hypothesis holds (ideally by observing the live
+    drag) before fixing. A **cursor change** during an in-progress connection is a worthwhile
+    secondary affordance but should not replace fixing the missing line.
 
 ---
 
