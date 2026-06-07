@@ -5,20 +5,20 @@
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="720" Height="480"
         WindowStartupLocation="CenterOwner"
-        Background="#252525">
+        Background="{DynamicResource Brush.Surface.Panel}">
 
     <Grid Margin="16" RowDefinitions="*,Auto">
 
         <TextBlock Grid.Row="0"
                    Text="{Binding StatusText}"
-                   Foreground="#c08a2a" FontSize="13" TextWrapping="Wrap"
+                   Foreground="{DynamicResource Brush.Text.Meta.Commit}" FontSize="13" TextWrapping="Wrap"
                    IsVisible="{Binding !HasCommits}"
                    VerticalAlignment="Top"/>
 
         <ListBox Grid.Row="0" x:Name="CommitList"
                  ItemsSource="{Binding Commits}"
                  SelectedItem="{Binding Selected, Mode=TwoWay}"
-                 Background="#1a1a1a" BorderThickness="0"
+                 Background="{DynamicResource Brush.Surface.Card}" BorderThickness="0"
                  IsVisible="{Binding HasCommits}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
@@ -26,13 +26,13 @@
                         <TextBlock Grid.Column="0"
                                    Text="{Binding Date, Converter={StaticResource CommitDate}}"
                                    ToolTip.Tip="{Binding Date}"
-                                   Foreground="#cfcfcf" FontSize="12"/>
+                                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12"/>
                         <TextBlock Grid.Column="1" Text="{Binding Author}"
-                                   Foreground="#cfcfcf" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12" TextTrimming="CharacterEllipsis"/>
                         <TextBlock Grid.Column="2" Text="{Binding ShortSha}"
-                                   Foreground="#888" FontSize="12" FontFamily="Consolas,monospace"/>
+                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="12" FontFamily="Consolas,monospace"/>
                         <TextBlock Grid.Column="3" Text="{Binding Subject}"
-                                   Foreground="#e8e8e8" FontSize="12" TextWrapping="Wrap"/>
+                                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12" TextWrapping="Wrap"/>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
@@ -44,11 +44,11 @@
                     Content="{StaticResource HistoryWindow_CompareButton}"
                     Command="{Binding CompareCommand}"
                     ToolTip.Tip="{StaticResource HistoryWindow_CompareTooltip}"
-                    Background="#2d6a2d" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Button.Confirm.Background}" Foreground="White" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
             <Button x:Name="CloseButton"
                     Content="{StaticResource HistoryWindow_Close}"
-                    Background="#333" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Surface.Header}" Foreground="White" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
         </StackPanel>
 
