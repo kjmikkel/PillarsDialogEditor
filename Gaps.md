@@ -59,8 +59,15 @@ A natural home now exists: the **Help** menu introduced for *Create Sample Proje
 Adding **Help ▸ About…** — a small dialog reading the version from the same source the CLI
 uses — would close this gap. Deferred to keep the sample/tutorial work focused.
 
-### Onboarding
-A **Create Sample Project** command (Help menu) plus a shipped **beginner walkthrough**
+### Changelog / Release Notes
+There is no in-app **changelog**. A user can't see what changed between the build they
+were running and the one they upgraded to without leaving the app (or reading git
+history). The plan is a human-curated changelog — a file we **append to after each
+release**, grouped by version — surfaced via **Help ▸ Changelog…** (the same Help menu
+that hosts *Create Sample Project…* and *Open Walkthrough…*, and the proposed
+*About…*). It pairs naturally with the About work: About answers "which build am I on?",
+the changelog answers "what's different in it?". Deferred for now; like *About…* it
+needs only a small reader dialog plus the curated source file.
 (`docs/walkthrough.md`) now give newcomers a safe, install-matched sandbox for learning the
 editor and the version-control tools. The remaining onboarding idea is an **in-app guided
 tour** (highlighting controls step-by-step), deferred — see the sample/tutorial spec's
