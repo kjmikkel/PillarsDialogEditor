@@ -99,24 +99,35 @@
                                                    FontWeight="SemiBold"
                                                    VerticalAlignment="Center"
                                                    IsVisible="{Binding IsLeaf}"/>
-                                        <!-- Branch indicator + edit button -->
-                                        <StackPanel Grid.Column="2" Orientation="Horizontal"
-                                                    VerticalAlignment="Center" Spacing="6"
-                                                    IsVisible="{Binding IsBranch}">
-                                            <TextBlock Text="⚙" Foreground="#f0a830" FontSize="13"
-                                                       VerticalAlignment="Center"/>
-                                            <TextBlock Text="{Binding DisplayName}"
+                                        <!-- Branch indicator + edit button: ⚙ icon and the
+                                             truncated group name share the flexible middle
+                                             column (the * bounds the name so the ellipsis
+                                             actually fires); the Edit button docks hard-right
+                                             so it clusters with the outer ↑ ↓ ✕ buttons and
+                                             can never be pushed off-screen. -->
+                                        <Grid Grid.Column="2"
+                                              ColumnDefinitions="Auto,*,Auto"
+                                              VerticalAlignment="Center"
+                                              IsVisible="{Binding IsBranch}">
+                                            <TextBlock Grid.Column="0" Text="⚙"
+                                                       Foreground="#f0a830" FontSize="13"
+                                                       VerticalAlignment="Center"
+                                                       Margin="0,0,6,0"
+                                                       ToolTip.Tip="{StaticResource ToolTip_ConditionBranch}"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding DisplayName}"
                                                        Foreground="#888" FontSize="12"
                                                        TextTrimming="CharacterEllipsis"
                                                        VerticalAlignment="Center"
-                                                       ToolTip.Tip="{StaticResource ToolTip_ConditionBranch}"/>
-                                            <Button Content="{StaticResource Button_EditBranchGroup}"
+                                                       ToolTip.Tip="{Binding DisplayName}"/>
+                                            <Button Grid.Column="2"
+                                                    Content="{StaticResource Button_EditBranchGroup}"
                                                     Tag="{Binding}"
                                                     Click="EditBranchGroup_Click"
                                                     Background="#2c3e50" Foreground="#ccc"
                                                     BorderThickness="0" Padding="8,2" FontSize="10"
+                                                    Margin="6,0,0,0"
                                                     ToolTip.Tip="{StaticResource ToolTip_EditBranchGroup}"/>
-                                        </StackPanel>
+                                        </Grid>
                                         <!-- Move up -->
                                         <Button Grid.Column="3" Content="↑"
                                                 Command="{Binding DataContext.MoveUpCommand,
