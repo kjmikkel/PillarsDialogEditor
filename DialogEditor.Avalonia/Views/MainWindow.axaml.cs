@@ -58,6 +58,18 @@ public partial class MainWindow : Window
             window.Show();
             window.Activate();
         };
+        vm.ShowChangelog = changelogVm =>
+        {
+            var window = new ChangelogWindow(changelogVm);
+            window.Show();
+            window.Activate();
+        };
+        vm.ShowAbout = aboutVm =>
+        {
+            var window = new AboutWindow(aboutVm);
+            window.Show();
+            window.Activate();
+        };
         vm.ShowImportWarnings = async warnings =>
         {
             var dialog = new ImportWarningsDialog(warnings);
