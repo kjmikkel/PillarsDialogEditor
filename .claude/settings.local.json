@@ -94,7 +94,9 @@
       "PowerShell(Select-String *)",
       "PowerShell(cd \"C:\\\\Users\\\\kjmik\\\\Documents\\\\Programming\\\\Deadfire\\\\Dialog Editor\"; Get-ChildItem -Directory -Name | Where-Object { $_ -match \"DialogEditor\" })",
       "Bash(xargs basename -a)",
-      "Bash(grep -E \"\\\\.cs$\")"
+      "Bash(grep -E \"\\\\.cs$\")",
+      "PowerShell(dotnet test *)",
+      "PowerShell(dotnet build *)"
     ]
   }
 }
