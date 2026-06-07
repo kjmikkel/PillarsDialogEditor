@@ -26,6 +26,8 @@ public class SampleProjectService(IGitRunner git)
     public const string Poe2SampleConversation = "companion_eder";   // Eder reunion, Port Maje
 
     // Sample *content* (data, not UI chrome) — intentionally literal, not localized.
+    private const string SampleAuthorName  = "Dialog Editor Sample";
+    private const string SampleAuthorEmail = "sample@dialogeditor.invalid";
     private const string EditedLineSuffix  = "  (try changing this line!)";
     private const string AltLineSuffix     = "  (an alternate greeting on the experiment branch)";
     private const string NewLineText        = "And this whole line was added as a sample.";
@@ -107,5 +109,50 @@ public class SampleProjectService(IGitRunner git)
                 NodeComments = new Dictionary<int, string> { [noteNodeId] = TranslatorNote }
             };
         return DialogProject.Empty("Sample").WithPatch(patch);
+    }
+
+    /// Best-effort: lays down main(C1,C2) + experiment(C3) and ends on main. Writes each
+    /// version's JSON before staging it. Returns GitMissing if git isn't installed, Partial
+    /// if any git step fails part-way (the caller then writes Final to guarantee an openable file).
+    public SampleSeedResult SeedHistory(string repoDir, SampleBuild build)
+    {
+        var path = Path.Combine(repoDir, build.ProjectFileName);
+        try
+        {
+            Run(repoDir, "init", "-b", "main");
+            Run(repoDir, "config", "user.email", SampleAuthorEmail);
+            Run(repoDir, "config", "user.name",  SampleAuthorName);
+
+            var experimentCreated = false;
+            foreach (var commit in build.Commits)
+            {
+                if (commit.OnNewExperimentBranch && !experimentCreated)
+                {
+                    Run(repoDir, "checkout", "-b", "experiment");
+                    experimentCreated = true;
+                }
+                DialogProjectSerializer.SaveToFile(path, commit.Project);
+                Run(repoDir, "add", "-A");
+                Run(repoDir, "commit", "-m", commit.Message);
+            }
+            Run(repoDir, "checkout", "main");
+            return SampleSeedResult.Seeded;
+        }
+        catch (DiffException ex) when (ex.Kind == DiffExceptionKind.GitMissing)
+        {
+            return SampleSeedResult.GitMissing;
+        }
+        catch (DiffException)
+        {
+            return SampleSeedResult.Partial;
+        }
+    }
+
+    private void Run(string dir, params string[] args)
+    {
+        var r = git.Run(dir, args);
+        if (!r.Ok)
+            throw new DiffException($"git {string.Join(' ', args)} failed: {r.StdErr.Trim()}",
+                                    DiffExceptionKind.Unknown);
     }
 }

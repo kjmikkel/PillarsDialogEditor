@@ -66,4 +66,63 @@ public class SampleProjectServiceTests
         Assert.Throws<SampleConversationNotFoundException>(
             () => new SampleProjectService(new OkGit()).BuildSample(provider));
     }
+
+    private sealed class RecordingGit : IGitRunner
+    {
+        public List<string[]> Calls { get; } = [];
+        public Func<string[], GitResult>? Handler { get; init; }
+        public GitResult Run(string workingDirectory, params string[] args)
+        {
+            Calls.Add(args);
+            return Handler?.Invoke(args) ?? new GitResult(0, "", "");
+        }
+    }
+
+    private static SampleBuild TinyBuild() =>
+        new("sample-poe1.dialogproject",
+            DialogProject.Empty("Sample"),
+            new List<SampleCommit>
+            {
+                new("c1", DialogProject.Empty("Sample"), false),
+                new("c2", DialogProject.Empty("Sample"), false),
+                new("c3", DialogProject.Empty("Sample"), true),
+            });
+
+    [Fact]
+    public void SeedHistory_IssuesExpectedGitSequence()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), $"sample_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(dir);
+        var git = new RecordingGit();
+
+        var result = new SampleProjectService(git).SeedHistory(dir, TinyBuild());
+
+        Assert.Equal(SampleSeedResult.Seeded, result);
+        Assert.Equal(new[]
+        {
+            new[] { "init", "-b", "main" },
+            new[] { "config", "user.email", "sample@dialogeditor.invalid" },
+            new[] { "config", "user.name", "Dialog Editor Sample" },
+            new[] { "add", "-A" }, new[] { "commit", "-m", "c1" },
+            new[] { "add", "-A" }, new[] { "commit", "-m", "c2" },
+            new[] { "checkout", "-b", "experiment" },
+            new[] { "add", "-A" }, new[] { "commit", "-m", "c3" },
+            new[] { "checkout", "main" },
+        }, git.Calls);
+    }
+
+    [Fact]
+    public void SeedHistory_GitMissing_ReturnsGitMissing()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), $"sample_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(dir);
+        var git = new RecordingGit
+        {
+            Handler = _ => throw new DiffException("no git", DiffExceptionKind.GitMissing)
+        };
+
+        var result = new SampleProjectService(git).SeedHistory(dir, TinyBuild());
+
+        Assert.Equal(SampleSeedResult.GitMissing, result);
+    }
 }
