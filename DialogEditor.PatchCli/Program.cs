@@ -2,10 +2,7 @@ using System.Reflection;
 using DialogEditor.Core.GameData;
 using DialogEditor.Patch;
 
-var Version =
-    typeof(Program).Assembly
-        .GetCustomAttribute<System.Reflection.AssemblyInformationalVersionAttribute>()
-        ?.InformationalVersion ?? "unknown";
+var Version = AppVersion.FromAssembly(Assembly.GetExecutingAssembly());
 
 const string Help = """
   dialog-patcher — apply Pillars of Eternity dialog patch projects to game files
