@@ -907,6 +907,27 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Menu_CreateSampleTip">Generate a small, safe practice project from your installed game — with a ready-made history so you can try the version-control tools. Opens it for you. Requires a game folder to be open.</sys:String>
     <sys:String x:Key="Menu_OpenWalkthrough">Open Walkthrough…</sys:String>
     <sys:String x:Key="Menu_OpenWalkthroughTip">Open the step-by-step beginner guide that walks you through editing, testing, translating, and version control using the sample project.</sys:String>
+    <sys:String x:Key="Menu_Changelog">Changelog…</sys:String>
+    <sys:String x:Key="Menu_ChangelogTip">See what has changed in each released version of the editor, newest first.</sys:String>
+    <sys:String x:Key="Menu_About">About…</sys:String>
+    <sys:String x:Key="Menu_AboutTip">Show the application version, licence, credits, and links to the project's repository and online documentation.</sys:String>
+
+    <sys:String x:Key="Changelog_Title">Changelog</sys:String>
+    <sys:String x:Key="Changelog_Empty">No release notes yet — the first public release has not happened.</sys:String>
+    <sys:String x:Key="Changelog_Close">Close</sys:String>
+
+    <sys:String x:Key="About_Title">About</sys:String>
+    <sys:String x:Key="About_AppName">Pillars Dialog Editor</sys:String>
+    <sys:String x:Key="About_Description">A visual editor and patch toolkit for Pillars of Eternity I &amp; II conversations.</sys:String>
+    <sys:String x:Key="About_VersionLabel">Version</sys:String>
+    <sys:String x:Key="About_License">MIT Licence — © 2026 Mikkel Kjær Jensen. See LICENSE in the project repository.</sys:String>
+    <sys:String x:Key="About_Credits">Built with Avalonia and Nodify.</sys:String>
+    <sys:String x:Key="About_OpenRepository">Repository</sys:String>
+    <sys:String x:Key="About_OpenRepositoryTip">Open the project's source-code repository in your browser.</sys:String>
+    <sys:String x:Key="About_OpenDocs">Online documentation</sys:String>
+    <sys:String x:Key="About_OpenDocsTip">Open the project's online documentation (README) in your browser.</sys:String>
+    <sys:String x:Key="About_OpenFailed">Couldn't open the link. Please check your internet connection or browser.</sys:String>
+    <sys:String x:Key="About_Close">Close</sys:String>
 
     <sys:String x:Key="Sample_SelectFolder">Choose an empty folder for the sample project</sys:String>
     <sys:String x:Key="Sample_FolderNotEmpty">Please choose an empty folder — the sample needs its own folder so it doesn't disturb existing files.</sys:String>
