@@ -48,5 +48,16 @@ The Version Control Integration section is now essentially complete.
 ### Barks System — Bark Preview
 Bark nodes now render with an amber color scheme on the canvas, carry bark-specific validation warnings (text too long, player-choice child), and those warnings surface in Flow Analytics. The remaining gap is an in-context preview of overhead floating text: writers cannot see how a bark will actually appear above an NPC's head without running the game. Implementing this requires investigating the game's bark rendering (font, line-wrapping, maximum visible width) before UI work can be designed.
 
+### About / Version Info
+The editor has no **About** dialog — there is no in-app place showing the application
+version, license, credits, and links (online docs / repository). The canonical version
+lives in the `VERSION` file and is reported by `dialog-patcher --version`, but the GUI never
+surfaces it, so a user can't tell which build they're running without leaving the app.
+
+A natural home now exists: the **Help** menu introduced for *Create Sample Project…* and
+*Open Walkthrough…* (see `docs/superpowers/specs/2026-06-07-sample-project-and-tutorial-design.md`).
+Adding **Help ▸ About…** — a small dialog reading the version from the same source the CLI
+uses — would close this gap. Deferred to keep the sample/tutorial work focused.
+
 ### Voice-Over Integration
 An "External VO" field exists but there is no path validation, lip-sync metadata support, or audio preview. Mods that add or replace voiced lines have no tooling support. Note: actual voice-over audio is stored in a proprietary archive format — requires investigation before tooling can be designed.

@@ -139,10 +139,16 @@ user lands directly in it.
   `CanExecute` = a game folder is loaded. Orchestrates: prompt for an empty target folder
   → `BuildSampleProject` → write via `DialogProjectSerializer` → `SeedHistory` → open the
   project. Owns status text and logging.
-- **MainWindow**: a new top-level **Help** menu, positioned **last** among the menus, with
-  a single item **Create Sample Project…** (`ToolTip` explaining it). Reuses the existing
-  `ProcessGitRunner`. The item is disabled (greyed) with an explanatory tooltip when no
-  game folder is loaded.
+- **MainWindow**: a new top-level **Help** menu, positioned **last** among the menus —
+  a small getting-started *hub* rather than a one-item menu:
+  - **Create Sample Project…** (`ToolTip` explaining it). Reuses the existing
+    `ProcessGitRunner`. Disabled (greyed) with an explanatory tooltip when no game folder
+    is loaded.
+  - **Open Walkthrough…** — opens the shipped beginner walkthrough document (Deliverable 2)
+    via the OS default handler, with a fallback to the project's online docs URL if the
+    bundled file isn't found. Always enabled (no game folder required).
+  - Leaves room for a future **About…** item (tracked as a gap in `Gaps.md`); not built
+    here.
 
 ### Error handling
 
@@ -154,6 +160,7 @@ user lands directly in it.
 | Conversation load/parse fails | `AppLog.Error`; localized status; abort cleanly. |
 | Git not installed / git command fails | Still create and open the project; status: "Sample created. Install Git to try the version-control tools." Seeding is best-effort; `AppLog.Warn` on partial failure. |
 | User cancels the folder picker | `OperationCanceledException` swallowed silently (per CLAUDE.md). |
+| Walkthrough document can't be opened (missing locally and URL launch fails) | `AppLog.Warn`; localized status pointing the user to the docs location. |
 
 ### Localization & logging
 
@@ -188,7 +195,11 @@ Every caught exception is logged via `AppLog.Warn`/`AppLog.Error` except
    that experimenting can't harm anything.
 9. **Where to go next** — pointer to the README reference and the Patch Manager.
 
-No automated test (prose content). A manual link/step check before release.
+**In-app entry point:** reachable any time from **Help ▸ Open Walkthrough…** (see the menu
+wiring above), so a user who created the sample can open the matching guide without leaving
+the editor.
+
+No automated test for the prose content. A manual link/step check before release.
 
 ---
 
@@ -210,7 +221,10 @@ Red/green/refactor throughout; tests in `DialogEditor.Tests` mirroring structure
     calls.
   - Git-missing → a `DialogProject` is still produced and no history is required.
 - **Command enablement**: `CreateSampleProjectCommand.CanExecute` is false with no game
-  loaded, true once a provider is set.
+  loaded, true once a provider is set. The **Open Walkthrough** command is always enabled.
+- **Walkthrough launcher**: the open is delegated through an injectable seam (e.g. a
+  `Func<string,bool>` document-opener) so a test can assert it targets the bundled file and
+  falls back to the docs URL when the file is absent — without launching a real process.
 - All new strings present in `Strings.axaml` (exercised via `StubStringProvider` keys).
 
 ---
