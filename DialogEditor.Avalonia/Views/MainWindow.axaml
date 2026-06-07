@@ -127,6 +127,15 @@
                                   InputGesture="Ctrl+Shift+B"/>
                     </MenuItem>
 
+                    <MenuItem Header="{StaticResource Menu_Help}">
+                        <MenuItem Header="{StaticResource Menu_CreateSample}"
+                                  ToolTip.Tip="{StaticResource Menu_CreateSampleTip}"
+                                  Command="{Binding CreateSampleProjectCommand}"/>
+                        <MenuItem Header="{StaticResource Menu_OpenWalkthrough}"
+                                  ToolTip.Tip="{StaticResource Menu_OpenWalkthroughTip}"
+                                  Command="{Binding OpenWalkthroughCommand}"/>
+                    </MenuItem>
+
                 </Menu>
 
                 <!-- Language selector -->
