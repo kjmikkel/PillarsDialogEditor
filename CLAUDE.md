@@ -31,6 +31,18 @@ back-fill entries before then — pre-release churn is not changelog-worthy and 
 ships effectively empty (or with a single "unreleased" placeholder). **Remove this rule
 when the initial version is published**, after which every release appends its entries.
 
+## Internal Tracking (pre-launch)
+
+`BUGS.md` and `Gaps.md` are **temporary pre-launch** working files for solo development.
+**Delete both before the initial public release** — at launch, anything still worth doing is
+transferred to GitHub Issues for public scrutiny, and tracking lives there afterwards.
+
+- `BUGS.md` — defect log; newest first; move a fixed entry to the *Fixed* section with the
+  fixing commit hash rather than deleting it.
+- `Gaps.md` — known design gaps / deferred features.
+
+**Remove this rule when both files are removed.**
+
 ## Worktree Cleanup
 
 Before removing a worktree, always run `git -C <worktree-path> status --short` and inspect the output. If there are staged or unstaged changes, determine whether they represent work that should be preserved. If yes, commit them to the branch before removing the worktree.

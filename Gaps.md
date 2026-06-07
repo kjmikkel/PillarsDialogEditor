@@ -1,5 +1,10 @@
 # Dialog Editor — Known Gaps
 
+> **Temporary file — delete before the initial public release.** This is an internal,
+> pre-launch record of design gaps and deferred features for solo development. At launch,
+> anything still worth pursuing is transferred to GitHub Issues for public scrutiny, and
+> this file is removed (see the **Internal Tracking (pre-launch)** rule in `CLAUDE.md`).
+
 ## Structural (Code Quality)
 
 ### ViewModel Test Coverage
