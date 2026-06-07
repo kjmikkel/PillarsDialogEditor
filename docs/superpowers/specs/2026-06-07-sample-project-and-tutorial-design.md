@@ -78,7 +78,7 @@ Responsibilities:
 - **`BuildSampleProject(IGameDataProvider provider)` → `DialogProject`**
   1. Select the target `ConversationFile` by the game-keyed constant.
   2. `LoadConversation` → baseline `ConversationEditSnapshot`.
-  3. Produce an edited snapshot applying the three demo edits (below).
+  3. Produce an edited snapshot applying the four demo edits (below).
   4. `DiffEngine.Diff(name, baseSnap, editedSnap, provider.Language)` → `ConversationPatch`.
   5. `DialogProject.Empty(sampleName).WithPatch(patch)` (+ translator note / translation
      carried by the patch). Return it.
@@ -88,13 +88,17 @@ Responsibilities:
   if git is absent or a command fails, leaves whatever succeeded and signals partial
   completion to the caller (which surfaces a localized status). Never throws to the UI.
 
-### The three demo edits (each teaches a feature)
+### The four demo edits (each teaches a feature)
 
 | Edit | Teaches |
 |------|---------|
 | Change one node's **DefaultText** | Compare highlighting + a translatable line for export. |
 | Add **a new node + a link** to it | Node addition in the diff and on the canvas. |
+| **Remove a node** | Node deletion in the diff (and how Compare/Attribution surface removals). |
 | Add a **translator note** to a node | The translation-export "writer comment" column. |
+
+The removed node is a leaf (no nodes link *from* it onward) so the deletion can't orphan a
+branch of the conversation — keeping the sandbox tidy and the canvas readable.
 
 ### Git history shape
 
@@ -103,7 +107,7 @@ So every VC tool has something to show, and `main` is the end state:
 ```
 main:   C1 "Initial sample"      (text edit)
             │
-        C2 "Add a new line"      (the added node + link + translator note)
+        C2 "Reshape the scene"   (add a node + link + translator note; remove a leaf node)
             │
             ├── experiment:  C3 "Try an alternate greeting" (one more text edit)
             │
@@ -195,7 +199,8 @@ Red/green/refactor throughout; tests in `DialogEditor.Tests` mirroring structure
 - **`SampleProjectService`** with a **fake `IGameDataProvider`** (returns a small canned
   conversation) and **fake `IGitRunner`**:
   - `BuildSampleProject` produces a `DialogProject` whose patch has the expected text
-    modification, the added node, the translation entry, and the translator note.
+    modification, the added node, the **deleted node**, the translation entry, and the
+    translator note.
   - Target-conversation selection is keyed correctly by `GameId`.
   - Missing target conversation → defined failure (no throw to UI).
   - `SeedHistory` issues the expected git **command sequence** — each commit preceded by
