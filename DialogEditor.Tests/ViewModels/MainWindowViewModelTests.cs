@@ -34,8 +34,8 @@ public class MainWindowViewModelTests : IDisposable
         mi.Invoke(vm, [project]);
     }
 
-    /// <summary>Injects a provider into the VM's private _provider field via reflection.</summary>
-    private static void InjectProvider(MainWindowViewModel vm, IGameDataProvider provider)
+    /// <summary>Injects a provider (or null) into the VM's private _provider field via reflection.</summary>
+    private static void InjectProvider(MainWindowViewModel vm, IGameDataProvider? provider)
     {
         var fi = typeof(MainWindowViewModel)
             .GetField("_provider", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
@@ -46,10 +46,14 @@ public class MainWindowViewModelTests : IDisposable
     public void CreateSampleProject_DisabledUntilGameLoaded()
     {
         var vm = MakeVm();
+
+        // Force a known "no game loaded" state — the constructor may auto-load the last
+        // game folder from AppSettings, which would otherwise make this depend on machine
+        // state (see project_flaky_test_appsettings).
+        InjectProvider(vm, null);
         Assert.False(vm.CreateSampleProjectCommand.CanExecute(null));
 
         InjectProvider(vm, new DialogEditor.Tests.Helpers.FakeGameDataProvider("poe1", "en"));
-
         Assert.True(vm.CreateSampleProjectCommand.CanExecute(null));
     }
 
