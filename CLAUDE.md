@@ -24,6 +24,13 @@ The only exception is controls whose purpose is 100% self-explanatory from their
 
 Every caught exception must be logged via `AppLog.Error(...)` or `AppLog.Warn(...)` before or after any user-facing status update. The sole exception is `OperationCanceledException`, which represents deliberate cancellation and must be swallowed silently. Bare `catch { }` blocks are not permitted.
 
+## Changelog
+
+`CHANGELOG.md` is **frozen until the initial public release**. Do not add, edit, or
+back-fill entries before then — pre-release churn is not changelog-worthy and the file
+ships effectively empty (or with a single "unreleased" placeholder). **Remove this rule
+when the initial version is published**, after which every release appends its entries.
+
 ## Worktree Cleanup
 
 Before removing a worktree, always run `git -C <worktree-path> status --short` and inspect the output. If there are staged or unstaged changes, determine whether they represent work that should be preserved. If yes, commit them to the branch before removing the worktree.
