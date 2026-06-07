@@ -58,8 +58,8 @@ the games' lives:
 
 | Game | Conversation | Why |
 |------|--------------|-----|
-| PoE1 | **Eder, first meeting (Gilded Vale)** | Early, branching, recognizable; good canvas content. |
-| PoE2 | **Eder reunion (Port Maje)** | Early Deadfire scene; exercises the PoE2 speaker name-picker the doc calls out. |
+| PoE1 | **`companion_cv_eder_intro`** (Eder, first meeting in Gilded Vale) | Early, branching, recognizable; good canvas content. |
+| PoE2 | **`companion_eder_hub`** (Eder's companion conversation hub) | Eder-centric, so the deterministic anchor node and the "keep Eder's tone" translator note stay coherent (the awakening scenes mix in other speakers). |
 
 These are stored as constants in `SampleProjectService` (`Poe1SampleConversation`,
 `Poe2SampleConversation`), keyed off `IGameDataProvider.GameId` (`"poe1"` / `"poe2"`).

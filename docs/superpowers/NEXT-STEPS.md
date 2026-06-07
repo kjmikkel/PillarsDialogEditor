@@ -41,8 +41,8 @@ session, read its entry, and tackle it.
   `docs/superpowers/specs/2026-06-05-branch-management-design.md`,
   `docs/superpowers/plans/2026-06-06-branch-management.md`.
 - **Sample project + beginner tutorial** (2026-06-07) — Help ▸ Create Sample Project…
-  generates an install-matched sample `.dialogproject` from the loaded game (Eder: Gilded
-  Vale in PoE1, Port Maje in PoE2) with four demo edits (text change, added node, removed
+  generates an install-matched sample `.dialogproject` from the loaded game (Eder:
+  `companion_cv_eder_intro` in PoE1, `companion_eder_hub` in PoE2) with four demo edits (text change, added node, removed
   leaf, translator note) and a seeded `main`/`experiment` git history, then opens it.
   Help ▸ Open Walkthrough… opens a shipped step-by-step beginner doc (`docs/walkthrough.md`).
   Spec/plan: `docs/superpowers/specs/2026-06-07-sample-project-and-tutorial-design.md`,

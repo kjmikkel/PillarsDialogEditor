@@ -21,9 +21,10 @@ public record SampleBuild(string ProjectFileName, DialogProject Final, IReadOnly
 /// git history. Pure and testable (IGitRunner + IGameDataProvider injected); no UI, no logging.
 public class SampleProjectService(IGitRunner git)
 {
-    // ⚠ Confirm these against the loaded game's conversation browser (see plan header).
-    public const string Poe1SampleConversation = "companion_eder";   // Eder, Gilded Vale
-    public const string Poe2SampleConversation = "companion_eder";   // Eder reunion, Port Maje
+    // Verified present in both GOG installs (2026-06-07). PoE1 uses *.conversation,
+    // PoE2 *.conversationbundle; the name is the file stem.
+    public const string Poe1SampleConversation = "companion_cv_eder_intro";  // Eder, first meeting (Gilded Vale)
+    public const string Poe2SampleConversation = "companion_eder_hub";       // Eder's companion conversation hub
 
     // Sample *content* (data, not UI chrome) — intentionally literal, not localized.
     private const string SampleAuthorName  = "Dialog Editor Sample";

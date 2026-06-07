@@ -9,8 +9,8 @@ button, make mistakes, and undo them, without touching your real game or your re
 > you can delete the sample folder whenever you like. Relax and experiment.
 
 This guide uses **Eder**, a companion you meet early in both games:
-- **Pillars of Eternity (PoE1):** his first meeting, in Gilded Vale.
-- **Pillars of Eternity II: Deadfire (PoE2):** reuniting with him at Port Maje.
+- **Pillars of Eternity (PoE1):** his first meeting, in Gilded Vale (`companion_cv_eder_intro`).
+- **Pillars of Eternity II: Deadfire (PoE2):** his companion conversation hub (`companion_eder_hub`).
 
 ---
 
