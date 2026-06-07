@@ -24,8 +24,8 @@
                  change, no size change. TargetType is required so TemplateBinding
                  resolves Padding correctly. -->
             <ControlTheme x:Key="ToolbarPlainButton" TargetType="Button">
-                <Setter Property="Background" Value="#333"/>
-                <Setter Property="Foreground" Value="#aaa"/>
+                <Setter Property="Background" Value="{DynamicResource Brush.Toolbar.Button.Background}"/>
+                <Setter Property="Foreground" Value="{DynamicResource Brush.Toolbar.Button.Foreground}"/>
                 <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="Padding" Value="8,4"/>
                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -44,16 +44,16 @@
                     </ControlTemplate>
                 </Setter>
                 <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                    <Setter Property="Background" Value="#444"/>
+                    <Setter Property="Background" Value="{DynamicResource Brush.Toolbar.Button.Hover}"/>
                 </Style>
                 <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
-                    <Setter Property="Background" Value="#4a4a4a"/>
+                    <Setter Property="Background" Value="{DynamicResource Brush.Toolbar.Button.Pressed}"/>
                 </Style>
             </ControlTheme>
 
             <ControlTheme x:Key="ToolbarPlainToggleButton" TargetType="ToggleButton">
-                <Setter Property="Background" Value="#333"/>
-                <Setter Property="Foreground" Value="#aaa"/>
+                <Setter Property="Background" Value="{DynamicResource Brush.Toolbar.Button.Background}"/>
+                <Setter Property="Foreground" Value="{DynamicResource Brush.Toolbar.Button.Foreground}"/>
                 <Setter Property="BorderThickness" Value="0"/>
                 <Setter Property="Padding" Value="8,4"/>
                 <Setter Property="HorizontalContentAlignment" Value="Center"/>
@@ -72,16 +72,16 @@
                     </ControlTemplate>
                 </Setter>
                 <Style Selector="^:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                    <Setter Property="Background" Value="#444"/>
+                    <Setter Property="Background" Value="{DynamicResource Brush.Toolbar.Button.Hover}"/>
                 </Style>
                 <Style Selector="^:pressed /template/ ContentPresenter#PART_ContentPresenter">
-                    <Setter Property="Background" Value="#4a4a4a"/>
+                    <Setter Property="Background" Value="{DynamicResource Brush.Toolbar.Button.Pressed}"/>
                 </Style>
                 <Style Selector="^:checked /template/ ContentPresenter#PART_ContentPresenter">
-                    <Setter Property="Background" Value="#3a3a3a"/>
+                    <Setter Property="Background" Value="{DynamicResource Brush.Toolbar.Button.Checked}"/>
                 </Style>
                 <Style Selector="^:checked:pointerover /template/ ContentPresenter#PART_ContentPresenter">
-                    <Setter Property="Background" Value="#444"/>
+                    <Setter Property="Background" Value="{DynamicResource Brush.Toolbar.Button.CheckedHover}"/>
                 </Style>
             </ControlTheme>
 
