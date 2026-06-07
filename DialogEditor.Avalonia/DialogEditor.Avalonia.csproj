@@ -34,6 +34,10 @@
     <Content Include="..\docs\walkthrough.md" Link="docs\walkthrough.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <!-- Ship the changelog next to the executable so Help > Changelog finds it. -->
+    <Content Include="..\CHANGELOG.md" Link="CHANGELOG.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
