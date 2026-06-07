@@ -5,29 +5,29 @@
         Width="460" SizeToContent="Height"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
-        Background="#252525">
+        Background="{DynamicResource Brush.Surface.Panel}">
 
     <StackPanel Margin="20">
 
         <TextBlock Text="{StaticResource Dialog_NewConversation_Prompt}"
-                   Foreground="#e8e8e8" FontSize="12"
+                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12"
                    TextWrapping="Wrap" Margin="0,0,0,10"/>
 
         <TextBox x:Name="NameBox"
                  Watermark="{StaticResource Dialog_NewConversation_Placeholder}"
-                 Background="#141414" Foreground="#e8e8e8"
-                 BorderBrush="#444" BorderThickness="1"
+                 Background="{DynamicResource Brush.Surface.Input}" Foreground="{DynamicResource Brush.Text.Primary}"
+                 BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                  FontSize="12" Padding="6,4" Margin="0,0,0,16"
                  AcceptsReturn="False"/>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
             <Button x:Name="CancelButton"
                     Content="Cancel"
-                    Background="#333" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Surface.Header}" Foreground="White" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
             <Button x:Name="OkButton"
                     Content="{StaticResource Dialog_NewConversation_Create}"
-                    Background="#1a5276" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="White" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
         </StackPanel>
 

@@ -6,18 +6,18 @@
         Width="340" Height="160"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
-        Background="#1e1e1e"
+        Background="{DynamicResource Brush.Surface.Window}"
         x:CompileBindings="False">
 
     <StackPanel Margin="16" Spacing="10">
 
         <TextBlock Text="{StaticResource Localization_LanguageCodeDialog_Prompt}"
-                   Foreground="#e8e8e8" FontSize="12" TextWrapping="Wrap"/>
+                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12" TextWrapping="Wrap"/>
 
         <TextBox x:Name="LanguageCodeBox"
-                 Background="#141414"
-                 Foreground="#e8e8e8"
-                 BorderBrush="#444"
+                 Background="{DynamicResource Brush.Surface.Input}"
+                 Foreground="{DynamicResource Brush.Text.Primary}"
+                 BorderBrush="{DynamicResource Brush.Border.Strong}"
                  BorderThickness="1"
                  FontSize="12"
                  Padding="6,4"
@@ -27,12 +27,12 @@
             <Button x:Name="CancelButton"
                     Content="Cancel"
                     IsCancel="True"
-                    Background="#333" Foreground="#ccc" BorderThickness="0"
+                    Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
                     Padding="16,5"/>
             <Button x:Name="OkButton"
                     Content="OK"
                     IsDefault="True"
-                    Background="#1a5276" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="White" BorderThickness="0"
                     Padding="16,5"
                     Click="OkButton_Click"/>
         </StackPanel>
