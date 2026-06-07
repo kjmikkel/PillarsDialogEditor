@@ -19,17 +19,60 @@ public static class AutoLayoutService
             .OrderBy(g => g.Key)
             .ToList();
 
+        const double pitch = NodeHeight + VerticalGap;
+
+        // Stable tiebreak for nodes that want the same row: original input order.
+        var inputOrder = new Dictionary<int, int>();
+        for (var i = 0; i < nodes.Count; i++)
+            inputOrder[nodes[i].NodeId] = i;
+
+        // Parents restricted to earlier layers, so their Y is already assigned when a
+        // child is placed. Back-edges and same-layer links are ignored for positioning.
+        var parents = nodes
+            .SelectMany(n => n.Links
+                .Where(l => layers.TryGetValue(l.ToNodeId, out var childLayer)
+                            && childLayer > layers[n.NodeId])
+                .Select(l => (Child: l.ToNodeId, Parent: n.NodeId)))
+            .GroupBy(p => p.Child)
+            .ToDictionary(g => g.Key, g => g.Select(p => p.Parent).ToList());
+
+        var assignedY = new Dictionary<int, double>();
+
         foreach (var layer in byLayer)
         {
             var nodeIds = layer.ToList();
-            var x = layer.Key * (NodeWidth + HorizontalGap);
-            var startY = -(nodeIds.Count - 1) * (NodeHeight + VerticalGap) / 2.0;
 
-            for (var i = 0; i < nodeIds.Count; i++)
+            if (layer.Key == 0)
             {
-                var y = startY + i * (NodeHeight + VerticalGap);
-                setLocation(nodeIds[i], x, y);
+                // Roots have no parent to align to — keep them centred on the origin.
+                var startY = -(nodeIds.Count - 1) * pitch / 2.0;
+                for (var i = 0; i < nodeIds.Count; i++)
+                    assignedY[nodeIds[i]] = startY + i * pitch;
+                continue;
             }
+
+            // Desired row = barycentre of already-placed parents (fallback to origin).
+            double Desired(int id) =>
+                parents.TryGetValue(id, out var ps) && ps.Count > 0
+                    ? ps.Average(p => assignedY[p])
+                    : 0.0;
+
+            // Anchor the topmost node at its desired row; push the rest down only as far
+            // as needed to keep the row pitch — so a node is never bumped without a reason.
+            var prev = double.NegativeInfinity;
+            foreach (var id in nodeIds.OrderBy(Desired).ThenBy(id => inputOrder[id]))
+            {
+                var y = Math.Max(Desired(id), prev + pitch);
+                assignedY[id] = y;
+                prev = y;
+            }
+        }
+
+        foreach (var layer in byLayer)
+        {
+            var x = layer.Key * (NodeWidth + HorizontalGap);
+            foreach (var id in layer)
+                setLocation(id, x, assignedY[id]);
         }
     }
 

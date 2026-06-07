@@ -59,6 +59,26 @@ public class AutoLayoutServiceTests
     }
 
     [Fact]
+    public void Apply_SingleParentChild_AlignsWithParentRowInsteadOfBeingBumped()
+    {
+        // Three roots so the parent (0) sits at the top row, not centred on the origin.
+        // 0 → 4 and 0 → 5 (each has only parent 0); 4 → 6 (only parent 4).
+        var nodes = new[]
+        {
+            Node(0, 4, 5), Node(1), Node(2), Node(4, 6), Node(5), Node(6),
+        };
+        var positions = new Dictionary<int, (double X, double Y)>();
+        AutoLayoutService.Apply(nodes, (id, x, y) => positions[id] = (x, y));
+
+        // The topmost child inherits its only parent's row instead of being bumped down.
+        Assert.Equal(positions[0].Y, positions[4].Y);
+        // The grandchild likewise aligns with its only parent.
+        Assert.Equal(positions[4].Y, positions[6].Y);
+        // Only the genuinely-conflicting second child drops, by exactly one row.
+        Assert.Equal(positions[4].Y + (NodeHeight + VGap), positions[5].Y);
+    }
+
+    [Fact]
     public void Apply_AllNodesReceivePosition()
     {
         var nodes = new[] { Node(0, 1), Node(1, 2), Node(2) };
