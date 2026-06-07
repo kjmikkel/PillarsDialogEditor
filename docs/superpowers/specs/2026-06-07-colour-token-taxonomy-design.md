@@ -286,15 +286,20 @@ Brush.Border.OnDark      -> Palette.White @ 0x33   (#33ffffff)
 Brush.Border.Focus       -> Palette.Azure.600     (#1a5276 — focus/primary accent)
 
 Brush.Text.Primary       -> Palette.Neutral.910   (#e8e8e8)
-Brush.Text.Secondary     -> Palette.Neutral.800   (#ccc)
 Brush.Text.Emphasis      -> Palette.Neutral.865   (#ddd)
-Brush.Text.Muted         -> Palette.Neutral.535   (#888)
+Brush.Text.Secondary     -> Palette.Neutral.800   (#ccc)
+Brush.Text.Tertiary      -> Palette.Neutral.735   (#bbb)
 Brush.Text.Muted.Light   -> Palette.Neutral.665   (#aaa)
+Brush.Text.Caption       -> Palette.Neutral.600   (#999)
+Brush.Text.Muted         -> Palette.Neutral.535   (#888)
 Brush.Text.Disabled      -> Palette.Neutral.400   (#666)
 Brush.Text.OnAccent      -> Palette.White         (#ffffff "White")
 Brush.Text.Female.Active  -> Palette.Neutral.910   (#e8e8e8)
 Brush.Text.Female.Dim     -> Palette.Neutral.335   (#555)
 ```
+> The text ramp has seven used emphasis levels (Primary→Caption→Muted); each maps to a
+> distinct existing grey, so none are merged. `Tertiary` (#bbb) and `Caption` (#999) were
+> added during planning to cover greys §7's first draft missed.
 > `#333` and `#555` are the genuinely dual-role greys. The **attribute disambiguates**:
 > `Background="#333"` → `Brush.Surface.Header`; `BorderBrush="#333"` → `Brush.Border.Default`;
 > `BorderBrush="#555"` → `Brush.Border.Muted`; `Foreground="#555"` → `Brush.Text.Female.Dim`
@@ -335,15 +340,27 @@ Brush.Button.Confirm.Background  -> Palette.Green.600   (#2d6a2d Apply/Switch/Co
 Brush.Button.Caution.Background   -> Palette.Burnt.600   (#8e4912 force/destructive-ish)
 ```
 
-### 7.10 Bark detail block (`NodeDetailView` bark preview)
+### 7.10 Bark detail block (`NodeDetailView` bark preview) + canvas bark outline
 ```
 Brush.Bark.Detail.Background  -> Palette.Amber.950   (#2a2000)
 Brush.Bark.Detail.Border      -> Palette.Amber.900   (#7a5c00)
 Brush.Bark.Detail.Text        -> Palette.Amber.560   (#e8c050)
+Brush.Node.Bark.Outline       -> Palette.Amber.520   (#f0a830 canvas bark node Stroke)
 Brush.Node.Quotidian.Note     -> Palette.Olive.500   (#bdbd80)
 ```
 
-### 7.11 Reserved (declared, no values — for the Canvas Annotations gap)
+### 7.11 Links, info text, highlight, badge (accent foregrounds)
+```
+Brush.Text.Link          -> Palette.Sky.400    (#4a9eff hyperlink)
+Brush.Text.Link.Subtle    -> Palette.Sky.350    (#99aadd changelog version link)
+Brush.Text.Info          -> Palette.Sky.450    (#5dade2 info caption; shares Severity.Info)
+Brush.Text.Highlight     -> Palette.Amber.520  (#f0a830 condition value / test-mode text)
+Brush.Accent.Badge       -> Palette.Mauve.500  (#7a6a8e ConversationView badge background)
+```
+> §7.10/§7.11 tokens (`Bark.Outline`, `Link*`, `Info`, `Highlight`, `Badge`) were added
+> during planning to cover primitives §7's first draft listed but never assigned a token.
+
+### 7.12 Reserved (declared, no values — for the Canvas Annotations gap)
 ```
 Brush.Annotation.Region.*      -- reserved key namespace; populated when that feature lands.
 ```
