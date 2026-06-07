@@ -120,7 +120,9 @@ land later or never without making anything beneath them wrong.
   constructs a colour any other way." No switching, no settings UI required for this layer to
   be complete and dependable. The load-bearing design decision here is the **token naming
   taxonomy** — those semantic role names *are* the public interface every dependent gap
-  quotes, so they must outlive any particular palette.
+  quotes, so they must outlive any particular palette. **Design settled (2026-06-07):**
+  the full Layer 0 taxonomy, exhaustive migration table, and enforcement plan live in
+  `docs/superpowers/specs/2026-06-07-colour-token-taxonomy-design.md`.
 - **Layer 1 — Palette sets (deferred, independent).** Alternative *values* for the same token
   keys: Dark (today's colours), Light, High-Contrast, and colourblind-tuned sets. Same keys,
   different hex; because Layer 0 guarantees everything reads keys, swapping the set retints
