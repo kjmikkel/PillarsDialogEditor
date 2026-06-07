@@ -103,9 +103,14 @@
     <SolidColorBrush x:Key="Brush.Conflict.Theirs.Background"  Color="{StaticResource Palette.Navy.150}"/>
     <SolidColorBrush x:Key="Brush.Conflict.Theirs.Foreground"  Color="{StaticResource Palette.Sky.300}"/>
 
-    <!-- Action buttons -->
-    <SolidColorBrush x:Key="Brush.Button.Confirm.Background" Color="{StaticResource Palette.Green.600}"/>
-    <SolidColorBrush x:Key="Brush.Button.Caution.Background" Color="{StaticResource Palette.Burnt.600}"/>
+    <!-- Action buttons (coloured background, white text). Confirm = green commit/apply;
+         Caution = burnt force/destructive-ish; Primary = azure default dialog action
+         (OK/Create/Save); Destructive = crimson hard delete. Primary/Destructive complete
+         the family for the dialog action buttons §7.9's first draft omitted (spec §7.9). -->
+    <SolidColorBrush x:Key="Brush.Button.Confirm.Background"     Color="{StaticResource Palette.Green.600}"/>
+    <SolidColorBrush x:Key="Brush.Button.Caution.Background"     Color="{StaticResource Palette.Burnt.600}"/>
+    <SolidColorBrush x:Key="Brush.Button.Primary.Background"     Color="{StaticResource Palette.Azure.600}"/>
+    <SolidColorBrush x:Key="Brush.Button.Destructive.Background" Color="{StaticResource Palette.Crimson.700}"/>
 
     <!-- Bark detail block + canvas bark outline -->
     <SolidColorBrush x:Key="Brush.Bark.Detail.Background" Color="{StaticResource Palette.Amber.950}"/>

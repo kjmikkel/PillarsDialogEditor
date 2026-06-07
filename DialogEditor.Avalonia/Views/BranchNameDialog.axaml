@@ -5,25 +5,25 @@
         Width="400" SizeToContent="Height"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
-        Background="#252525">
+        Background="{DynamicResource Brush.Surface.Panel}">
   <StackPanel Margin="20" Spacing="8">
     <TextBlock Text="{StaticResource BranchName_Label}"
-               Foreground="#e8e8e8" FontSize="12"/>
+               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12"/>
     <TextBox x:Name="NameBox"
-             Background="#141414" Foreground="#e8e8e8"
-             BorderBrush="#444" BorderThickness="1"
+             Background="{DynamicResource Brush.Surface.Input}" Foreground="{DynamicResource Brush.Text.Primary}"
+             BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
              FontSize="12" Padding="6,4"
              AcceptsReturn="False"
              ToolTip.Tip="{StaticResource BranchName_Label}"/>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
       <Button x:Name="CancelButton"
               Content="{StaticResource BranchName_Cancel}"
-              Background="#333" Foreground="White" BorderThickness="0"
+              Background="{DynamicResource Brush.Surface.Header}" Foreground="White" BorderThickness="0"
               Padding="16,6" FontSize="12"
               IsCancel="True"/>
       <Button x:Name="OkButton"
               Content="{StaticResource BranchName_Ok}"
-              Background="#1a5276" Foreground="White" BorderThickness="0"
+              Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="White" BorderThickness="0"
               Padding="16,6" FontSize="12"
               IsDefault="True"/>
     </StackPanel>

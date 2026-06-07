@@ -6,40 +6,40 @@
         Width="460" SizeToContent="Height"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
-        Background="#252525">
+        Background="{DynamicResource Brush.Surface.Panel}">
   <StackPanel Margin="14" Spacing="8">
     <TextBlock Text="{StaticResource CommitConsent_Intro}"
-               Foreground="#e8e8e8" FontSize="12"
+               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12"
                TextWrapping="Wrap"/>
-    <Border BorderBrush="#33ffffff" BorderThickness="1" CornerRadius="3" Padding="6" MaxHeight="160">
+    <Border BorderBrush="{DynamicResource Brush.Border.OnDark}" BorderThickness="1" CornerRadius="3" Padding="6" MaxHeight="160">
       <ScrollViewer>
         <ItemsControl x:Name="FileList">
           <ItemsControl.ItemTemplate>
             <DataTemplate>
               <TextBlock Text="{Binding}" FontFamily="Consolas,monospace"
-                         Foreground="#e8e8e8" FontSize="12"/>
+                         Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12"/>
             </DataTemplate>
           </ItemsControl.ItemTemplate>
         </ItemsControl>
       </ScrollViewer>
     </Border>
     <TextBlock Text="{StaticResource CommitConsent_MessageLabel}"
-               Foreground="#e8e8e8" FontSize="12"/>
+               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12"/>
     <TextBox x:Name="MessageBox"
-             Background="#141414" Foreground="#e8e8e8"
-             BorderBrush="#444" BorderThickness="1"
+             Background="{DynamicResource Brush.Surface.Input}" Foreground="{DynamicResource Brush.Text.Primary}"
+             BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
              FontSize="12" Padding="6,4"
              AcceptsReturn="False"
              ToolTip.Tip="{StaticResource CommitConsent_MessageLabel}"/>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
       <Button x:Name="CancelButton"
               Content="{StaticResource CommitConsent_Cancel}"
-              Background="#333" Foreground="White" BorderThickness="0"
+              Background="{DynamicResource Brush.Surface.Header}" Foreground="White" BorderThickness="0"
               Padding="16,6" FontSize="12"
               IsCancel="True"/>
       <Button x:Name="CommitButton"
               Content="{StaticResource CommitConsent_Commit}"
-              Background="#1a5276" Foreground="White" BorderThickness="0"
+              Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="White" BorderThickness="0"
               Padding="16,6" FontSize="12"
               IsDefault="True"/>
     </StackPanel>

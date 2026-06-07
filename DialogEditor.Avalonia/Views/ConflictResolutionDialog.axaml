@@ -6,39 +6,39 @@
         Width="520" SizeToContent="Height"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
-        Background="#252525">
+        Background="{DynamicResource Brush.Surface.Panel}">
 
     <StackPanel Margin="20">
 
         <TextBlock Text="{StaticResource ConflictDialog_Intro}"
-                   Foreground="#e8e8e8" FontSize="13"
+                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="13"
                    TextWrapping="Wrap" Margin="0,0,0,14"/>
 
-        <Border Background="#1a1a1a" CornerRadius="4" Padding="12,8" Margin="0,0,0,16">
+        <Border Background="{DynamicResource Brush.Surface.Card}" CornerRadius="4" Padding="12,8" Margin="0,0,0,16">
             <StackPanel>
                 <Grid ColumnDefinitions="120,*" Margin="0,3">
                     <TextBlock Text="{StaticResource ConflictDialog_NodeLabel}"
-                               Foreground="#888" FontSize="11" VerticalAlignment="Center"/>
+                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" VerticalAlignment="Center"/>
                     <TextBlock x:Name="NodeIdBlock" Grid.Column="1"
-                               Foreground="#e8e8e8" FontSize="12" TextWrapping="Wrap"/>
+                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12" TextWrapping="Wrap"/>
                 </Grid>
                 <Grid ColumnDefinitions="120,*" Margin="0,3">
                     <TextBlock Text="{StaticResource ConflictDialog_FieldLabel}"
-                               Foreground="#888" FontSize="11" VerticalAlignment="Center"/>
+                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" VerticalAlignment="Center"/>
                     <TextBlock x:Name="FieldNameBlock" Grid.Column="1"
-                               Foreground="#e8e8e8" FontSize="12" TextWrapping="Wrap"/>
+                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12" TextWrapping="Wrap"/>
                 </Grid>
                 <Grid ColumnDefinitions="120,*" Margin="0,3">
                     <TextBlock Text="{StaticResource ConflictDialog_ExpectedLabel}"
-                               Foreground="#888" FontSize="11" VerticalAlignment="Center"/>
+                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" VerticalAlignment="Center"/>
                     <TextBlock x:Name="ExpectedBlock" Grid.Column="1"
-                               Foreground="#e8e8e8" FontSize="12" TextWrapping="Wrap"/>
+                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12" TextWrapping="Wrap"/>
                 </Grid>
                 <Grid ColumnDefinitions="120,*" Margin="0,3">
                     <TextBlock Text="{StaticResource ConflictDialog_ActualLabel}"
-                               Foreground="#888" FontSize="11" VerticalAlignment="Center"/>
+                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" VerticalAlignment="Center"/>
                     <TextBlock x:Name="ActualBlock" Grid.Column="1"
-                               Foreground="#e8e8e8" FontSize="12" TextWrapping="Wrap"/>
+                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12" TextWrapping="Wrap"/>
                 </Grid>
             </StackPanel>
         </Border>
@@ -47,12 +47,12 @@
             <Button x:Name="CancelButton"
                     Content="{StaticResource ConflictDialog_Cancel}"
                     ToolTip.Tip="{StaticResource ConflictDialog_CancelTooltip}"
-                    Background="#333" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Surface.Header}" Foreground="White" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
             <Button x:Name="ForceButton"
                     Content="{StaticResource ConflictDialog_Force}"
                     ToolTip.Tip="{StaticResource ConflictDialog_ForceTooltip}"
-                    Background="#8e4912" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Button.Caution.Background}" Foreground="White" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
         </StackPanel>
 
