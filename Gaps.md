@@ -76,3 +76,83 @@ tour** (highlighting controls step-by-step), deferred — see the sample/tutoria
 
 ### Voice-Over Integration
 An "External VO" field exists but there is no path validation, lip-sync metadata support, or audio preview. Mods that add or replace voiced lines have no tooling support. Note: actual voice-over audio is stored in a proprietary archive format — requires investigation before tooling can be designed.
+
+### GUID Parameter Readability
+Script and conditional parameters that are GUID-typed (`ObjectGuid`, `Guid`,
+`GameData`) currently render as a plain `TextBox`, so the writer sees only opaque
+strings — `b1a7e800-0000-0000-0000-000000000000` gives no clue that it refers to a
+party member, let alone which one. We should identify the most-used GUID parameter
+types in PoE2 and expose each value's human-readable meaning at the point of entry.
+
+The target UX: keep free-text entry (any GUID can still be typed/pasted), but back
+GUID inputs with a filtered suggestion list that matches on **both** the raw GUID
+and the readable name (so typing "Aloth", "Edér", or part of the GUID surfaces the
+right entry). This is the `AutoCompleteBox` pattern already used for enum params and
+the script/condition pickers, applied to GUID-typed parameters instead of the plain
+`TextBox`.
+
+Most of the infrastructure exists, **for both games**. `SpeakerNameService` is the
+single GUID→name registry, fed by whichever `IGameDataProvider` is loaded
+(`MainWindowViewModel` registers `provider.LoadSpeakerNames()` on game load). PoE2
+gets explicit names from `speakers.gamedatabundle`; PoE1 derives them via
+`Poe1SpeakerNameParser` (maps `CharacterMapping` GUID→InstanceTag from the
+`.conversation` files, resolves the tag against `characters.stringtable`, with
+codename overrides like `GGP`→Durance). Both games also use GUID-typed parameters in
+scripts/conditionals (e.g. PoE1 has 36 `ObjectGuid` condition params), so the feature
+is equally relevant to both. The remaining work:
+
+- Route `ObjectGuid`/`Guid` parameters to a suggestion-backed input sourced from
+  `SpeakerNameService.All`, while preserving free text. Because both games normalise
+  to the same registry, this is **game-agnostic** — building it once covers PoE1 and
+  PoE2 with no game-specific branch.
+- Make the suggestion filter match the GUID as well as the name (`SpeakerEntry.ToString()`
+  currently returns only the name, so the GUID isn't searchable — needs a combined
+  display string or a custom item filter), and show both ("Edér — b1a7e801-…") so the
+  mapping is visible at a glance.
+- For `GameData` / quest / item GUIDs there is no lookup table yet; identifying and
+  loading the most common ones is a larger, deferred follow-up. A first pass can
+  cover party/companion `ObjectGuid` params, which are the most common and already
+  resolvable.
+
+Caveat on PoE1 coverage: PoE1 names are *derived* heuristically rather than read from
+an explicit speaker table, so resolution is good but imperfect (unmatched tags fall
+back to the normalised instance tag). This is existing `SpeakerNameService` behaviour,
+not extra work for this feature — it just means PoE1 suggestions may occasionally show
+a tag-like name instead of a polished display name.
+
+### Parameter Readability — Beyond Characters (PoE2 survey)
+**Follow-up to GUID Parameter Readability; do this after the character case ships.**
+Resolving character GUIDs (`ObjectGuid` → `SpeakerNameService`) is only the first slice.
+Many other script/condition parameters are equally opaque, and before we can give them
+the same name-suggestion treatment we need to know *what kinds of values they are* and
+*where the readable names would come from*. The catalogue's `Type` field is coarse — it
+flattens many distinct game-data kinds into `Guid`/`GameData` — so this gap's first step
+is a **survey**, not implementation.
+
+First step (the actual deliverable here): go through `scripts.json` and `conditions.json`
+and, per parameter, record (a) its declared `Type`, (b) the concrete game-data kind it
+actually points at (quest, item, ability, faction, global flag, map, …), and (c) where a
+human-readable name for that kind could be sourced. The flattened types hide this — e.g.
+a `Guid` param on `StartQuest` points at a quest, while a `GameData` param elsewhere
+points at an item or ability, but both read as the same type today.
+
+Current PoE2 type inventory (from the catalogues, to seed the survey):
+
+- **Already readable / no work:** `Boolean`, `Operator`, and all `Enum:*` types already
+  render as Options-backed suggestion lists. `Int32`/`Single` are plain numbers.
+- **Character GUIDs:** `ObjectGuid` (≈51 condition + 2 script params) — handled by the
+  GUID Parameter Readability gap above.
+- **Opaque game-data GUIDs (the real follow-up targets):** `Guid` (≈30) and `GameData`
+  (≈28) point at non-character assets — quests, items, abilities, factions, etc. Each
+  distinct kind needs its own GUID→name lookup table sourced from the relevant
+  `*.gamedatabundle`, mirroring what `Poe2SpeakerNameParser`/`SpeakerNameService` did for
+  characters. They can't be tackled until the survey establishes which params map to which
+  kind.
+- **Other opaque-but-not-GUID:** `GlobalVariable` flag names (its `TypeHint` already points
+  at `GlobalVariables.csv`, an obvious autocomplete source) and free-form `String` params
+  (context-dependent — flag/item/conversation names — and may not generalise).
+
+Output of the survey should be one or more concrete follow-up gaps (e.g. "Quest GUID
+readability", "Item GUID readability", "GlobalVariable autocomplete"), each scoped to a
+single game-data kind with an identified name source — so they can be implemented the same
+way the character case was.
