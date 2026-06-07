@@ -35,43 +35,47 @@ When fixed, append to the moved entry:
 
 ## Open
 
+_None yet._
+
+---
+
+## Fixed
+
 ### B-002 — No visible in-progress line when making a node connection
 - **Area:** Conversation canvas — connection-making (`ConversationView.axaml`, `PendingConnectionViewModel`)
 - **Severity:** minor
 - **Repro:**
   1. Open a conversation on the canvas (editable).
-  2. Begin a connection from a node's "out" connector toward another node's "in" connector.
+  2. Press-drag from a node's "out" connector toward another node's "in" connector.
   3. Watch the area between the source connector and the cursor before completing.
 - **Expected:** A clearly visible preview line follows the cursor from the source connector
   until the connection is completed (or cancelled), so it's obvious a connection is in
   progress.
-- **Actual:** Nothing visible — no preview line at all (or so faint as to be invisible),
-  including when the cursor passes over other nodes (so it's not merely blending into the
-  `#7a6a8e` canvas background). The connection only appears once both connectors have been
-  clicked.
-- **Notes:** A `nodify:PendingConnection` **is already configured** in
-  `ConversationView.axaml` (lines ~92–97) with `Stroke="#aaaaaa" StrokeThickness="2"
-  StrokeDashArray="4,3"` and `StartedCommand`/`CompletedCommand` bound to
-  `PendingConnectionViewModel.Start`/`Complete`. Connections *do* get created, so `Start`
-  (sets `Source`) and `Complete` both fire — only the in-progress **visual** is missing.
-  Two competing hypotheses, which imply different fixes:
-  - **(a) Gesture model.** Nodify's native pending-preview follows the cursor only during a
-    held *press-drag-release*. If the real interaction is *click-release-then-click* (two
-    discrete clicks — matches the reporter's description), there is no active drag between
-    the clicks, so Nodify never draws the preview. Fix would be a custom preview line from
-    `Source.Anchor` to the live pointer position rendered while `Source != null`.
-  - **(b) Rendering/z-order/anchor.** The preview renders but is invisible — e.g. drawn
-    beneath the items layer, or the geometry is degenerate because the `Source` anchor
-    (`LayoutPointConverter`, `OneWayToSource`) isn't supplied to `PendingConnection`. Fix
-    would be visibility/z-order/anchor wiring (and a higher-contrast stroke regardless).
-  - No custom connector click-handling exists in `ConversationView.axaml.cs`, so behaviour
-    is entirely Nodify-driven. Diagnose which hypothesis holds (ideally by observing the live
-    drag) before fixing. A **cursor change** during an in-progress connection is a worthwhile
-    secondary affordance but should not replace fixing the missing line.
-
----
-
-## Fixed
+- **Actual:** Nothing visible — no preview line at all, including when the cursor passes over
+  other nodes (so it's not merely blending into the `#7a6a8e` canvas background). The
+  connection only appears once both connectors have been clicked.
+- **Notes:** A `nodify:PendingConnection` *was* configured in `ConversationView.axaml`, and
+  connections *did* get created, so `Start`/`Complete` both fired — only the in-progress
+  **visual** was missing. The two hypotheses originally logged (gesture-model; rendering/
+  z-order/anchor) were **both wrong**.
+- **Root cause (confirmed via Nodify source):** The `<nodify:PendingConnection>` *control*
+  was assigned directly to `NodifyEditor.PendingConnection`, which is a `StyledProperty<object>`
+  (a *DataContext* slot), with **no** `PendingConnectionTemplate`. Nodify's `PendingConnection`
+  locates its owner editor in `OnApplyTemplate` via `GetParentOfType<NodifyEditor>()` and only
+  then subscribes to the `PendingConnectionStarted/Drag/Completed` events that set
+  `SourceAnchor`/`TargetAnchor`. Not hosted through the template, the control never attached to
+  the editor, so its anchors never updated during a drag and the line had no coordinates to
+  draw. The `StartedCommand`/`CompletedCommand` bindings still resolved against the inherited
+  `ConversationViewModel` DataContext, so connections were created regardless — exactly the
+  observed symptoms.
+- **Fixed:** `987873b` — switched to the documented Nodify pattern: bind
+  `PendingConnection="{Binding PendingConnection}"` to the VM and move the
+  `<nodify:PendingConnection>` control into `NodifyEditor.PendingConnectionTemplate` (a
+  `DataTemplate` for `PendingConnectionViewModel`, with `StartCommand`/`CompleteCommand` bound
+  directly). Stroke styling unchanged. View-layer XAML wiring with no Core/VM logic change
+  (the VM is already covered by `PendingConnectionViewModelTests`); verified visually by the
+  user — the dashed preview line now follows the cursor during a drag. If the `#aaaaaa` stroke
+  proves too faint against the canvas, a contrast bump is a separate follow-up.
 
 ### B-001 — Grouped Condition Block has no Edit button and text overflows the window
 - **Area:** Condition Editor — branch/group row (`ConditionEditorWindow.axaml`)
