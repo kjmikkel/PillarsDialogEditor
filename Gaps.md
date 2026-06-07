@@ -49,25 +49,21 @@ The Version Control Integration section is now essentially complete.
 Bark nodes now render with an amber color scheme on the canvas, carry bark-specific validation warnings (text too long, player-choice child), and those warnings surface in Flow Analytics. The remaining gap is an in-context preview of overhead floating text: writers cannot see how a bark will actually appear above an NPC's head without running the game. Implementing this requires investigating the game's bark rendering (font, line-wrapping, maximum visible width) before UI work can be designed.
 
 ### About / Version Info
-The editor has no **About** dialog — there is no in-app place showing the application
-version, license, credits, and links (online docs / repository). The canonical version
-lives in the `VERSION` file and is reported by `dialog-patcher --version`, but the GUI never
-surfaces it, so a user can't tell which build they're running without leaving the app.
-
-A natural home now exists: the **Help** menu introduced for *Create Sample Project…* and
-*Open Walkthrough…* (see `docs/superpowers/specs/2026-06-07-sample-project-and-tutorial-design.md`).
-Adding **Help ▸ About…** — a small dialog reading the version from the same source the CLI
-uses — would close this gap. Deferred to keep the sample/tutorial work focused.
+**Implemented.** **Help ▸ About…** shows the application name, version, licence, credits,
+and links to the repository and online documentation. The version is read via the shared
+`AppVersion` helper — the same source as `dialog-patcher --version` — so the GUI and CLI
+never drift. (See `docs/superpowers/specs/2026-06-07-changelog-and-about-design.md`.)
 
 ### Changelog / Release Notes
-There is no in-app **changelog**. A user can't see what changed between the build they
-were running and the one they upgraded to without leaving the app (or reading git
-history). The plan is a human-curated changelog — a file we **append to after each
-release**, grouped by version — surfaced via **Help ▸ Changelog…** (the same Help menu
-that hosts *Create Sample Project…* and *Open Walkthrough…*, and the proposed
-*About…*). It pairs naturally with the About work: About answers "which build am I on?",
-the changelog answers "what's different in it?". Deferred for now; like *About…* it
-needs only a small reader dialog plus the curated source file.
+**Implemented.** **Help ▸ Changelog…** opens an in-app reader that parses a bundled
+`CHANGELOG.md` (grouped `### Added`/`### Changed`/`### Fixed` subsections per version,
+newest first) and shows an empty-state message when there are no entries. Per the CLAUDE.md
+**Changelog** rule, `CHANGELOG.md` stays **frozen until the initial public release**;
+thereafter each release appends its notes. A version-aware "what's new since your last run"
+layer remains a future enhancement — see the design spec.
+
+### Onboarding
+A **Create Sample Project** command (Help menu) plus a shipped **beginner walkthrough**
 (`docs/walkthrough.md`) now give newcomers a safe, install-matched sandbox for learning the
 editor and the version-control tools. The remaining onboarding idea is an **in-app guided
 tour** (highlighting controls step-by-step), deferred — see the sample/tutorial spec's
