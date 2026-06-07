@@ -8,12 +8,12 @@
         Width="640" Height="560" MinWidth="480" MinHeight="360"
         CanResize="True"
         WindowStartupLocation="CenterOwner"
-        Background="#1e1e1e"
+        Background="{DynamicResource Brush.Surface.Window}"
         x:CompileBindings="False">
 
     <Window.Styles>
         <Style Selector="TextBlock.param-label">
-            <Setter Property="Foreground"        Value="#888"/>
+            <Setter Property="Foreground"        Value="{DynamicResource Brush.Text.Muted}"/>
             <Setter Property="FontSize"          Value="11"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="MinWidth"          Value="110"/>
@@ -21,7 +21,7 @@
         <Style Selector="Button.type-hint">
             <Setter Property="Background"        Value="Transparent"/>
             <Setter Property="BorderThickness"   Value="0"/>
-            <Setter Property="Foreground"        Value="#888"/>
+            <Setter Property="Foreground"        Value="{DynamicResource Brush.Text.Muted}"/>
             <Setter Property="FontSize"          Value="11"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Margin"            Value="4,0,0,0"/>
@@ -30,36 +30,36 @@
             <Setter Property="Focusable"         Value="False"/>
         </Style>
         <Style Selector="Button.type-hint:pointerover">
-            <Setter Property="Foreground" Value="#ccc"/>
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}"/>
         </Style>
         <Style Selector="TextBox.param-input">
-            <Setter Property="Background"       Value="#141414"/>
-            <Setter Property="Foreground"       Value="#e8e8e8"/>
-            <Setter Property="BorderBrush"      Value="#444"/>
+            <Setter Property="Background"       Value="{DynamicResource Brush.Surface.Input}"/>
+            <Setter Property="Foreground"       Value="{DynamicResource Brush.Text.Primary}"/>
+            <Setter Property="BorderBrush"      Value="{DynamicResource Brush.Border.Strong}"/>
             <Setter Property="BorderThickness"  Value="1"/>
             <Setter Property="FontSize"         Value="12"/>
             <Setter Property="Padding"          Value="6,4"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
         <Style Selector="AutoCompleteBox.param-input">
-            <Setter Property="Background"       Value="#141414"/>
-            <Setter Property="Foreground"       Value="#e8e8e8"/>
-            <Setter Property="BorderBrush"      Value="#444"/>
+            <Setter Property="Background"       Value="{DynamicResource Brush.Surface.Input}"/>
+            <Setter Property="Foreground"       Value="{DynamicResource Brush.Text.Primary}"/>
+            <Setter Property="BorderBrush"      Value="{DynamicResource Brush.Border.Strong}"/>
             <Setter Property="BorderThickness"  Value="1"/>
             <Setter Property="FontSize"         Value="12"/>
             <Setter Property="Padding"          Value="6,4"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
         <Style Selector="Button.footer-btn">
-            <Setter Property="Background"      Value="#333"/>
-            <Setter Property="Foreground"      Value="#ccc"/>
+            <Setter Property="Background"      Value="{DynamicResource Brush.Surface.Header}"/>
+            <Setter Property="Foreground"      Value="{DynamicResource Brush.Text.Secondary}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"         Value="20,6"/>
             <Setter Property="FontSize"        Value="12"/>
             <Setter Property="MinWidth"        Value="90"/>
         </Style>
         <Style Selector="Button.footer-btn.primary">
-            <Setter Property="Background" Value="#1a5276"/>
+            <Setter Property="Background" Value="{DynamicResource Brush.Button.Primary.Background}"/>
             <Setter Property="Foreground" Value="White"/>
         </Style>
     </Window.Styles>
@@ -73,7 +73,7 @@
                 <ItemsControl ItemsSource="{Binding Rows}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="vm:ConditionRowViewModel">
-                            <Border Background="#252525" CornerRadius="4"
+                            <Border Background="{DynamicResource Brush.Surface.Panel}" CornerRadius="4"
                                     Margin="0,0,0,4" Padding="10,8">
                                 <StackPanel Spacing="6">
 
@@ -83,19 +83,19 @@
                                         <ComboBox Grid.Column="0"
                                                   ItemsSource="{x:Static vm:ConditionRowViewModel.OperatorOptions}"
                                                   SelectedItem="{Binding Operator, Mode=TwoWay}"
-                                                  Background="#1a1a1a" BorderBrush="#555"
+                                                  Background="{DynamicResource Brush.Surface.Card}" BorderBrush="{DynamicResource Brush.Border.Muted}"
                                                   BorderThickness="1" FontSize="11" Padding="4,2"/>
                                         <!-- NOT toggle -->
                                         <CheckBox Grid.Column="1"
                                                   IsChecked="{Binding Not, Mode=TwoWay}"
                                                   Content="{StaticResource Label_Condition_NOT}"
-                                                  Foreground="#aaa" FontSize="11"
+                                                  Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="11"
                                                   Margin="8,0,8,0" VerticalAlignment="Center"
                                                   ToolTip.Tip="{StaticResource ToolTip_ConditionNot}"/>
                                         <!-- Display name (leaves) -->
                                         <TextBlock Grid.Column="2"
                                                    Text="{Binding DisplayName}"
-                                                   Foreground="#e8e8e8" FontSize="13"
+                                                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="13"
                                                    FontWeight="SemiBold"
                                                    VerticalAlignment="Center"
                                                    IsVisible="{Binding IsLeaf}"/>
@@ -110,12 +110,12 @@
                                               VerticalAlignment="Center"
                                               IsVisible="{Binding IsBranch}">
                                             <TextBlock Grid.Column="0" Text="⚙"
-                                                       Foreground="#f0a830" FontSize="13"
+                                                       Foreground="{DynamicResource Brush.Text.Highlight}" FontSize="13"
                                                        VerticalAlignment="Center"
                                                        Margin="0,0,6,0"
                                                        ToolTip.Tip="{StaticResource ToolTip_ConditionBranch}"/>
                                             <TextBlock Grid.Column="1" Text="{Binding DisplayName}"
-                                                       Foreground="#888" FontSize="12"
+                                                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="12"
                                                        TextTrimming="CharacterEllipsis"
                                                        VerticalAlignment="Center"
                                                        ToolTip.Tip="{Binding DisplayName}"/>
@@ -123,7 +123,7 @@
                                                     Content="{StaticResource Button_EditBranchGroup}"
                                                     Tag="{Binding}"
                                                     Click="EditBranchGroup_Click"
-                                                    Background="#2c3e50" Foreground="#ccc"
+                                                    Background="{DynamicResource Brush.Node.Script.Header}" Foreground="{DynamicResource Brush.Text.Secondary}"
                                                     BorderThickness="0" Padding="8,2" FontSize="10"
                                                     Margin="6,0,0,0"
                                                     ToolTip.Tip="{StaticResource ToolTip_EditBranchGroup}"/>
@@ -134,7 +134,7 @@
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
-                                                Foreground="#aaa" FontSize="13" Padding="4"
+                                                Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="13" Padding="4"
                                                 ToolTip.Tip="{StaticResource ToolTip_MoveConditionUp}"/>
                                         <!-- Move down -->
                                         <Button Grid.Column="4" Content="↓"
@@ -142,7 +142,7 @@
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
-                                                Foreground="#aaa" FontSize="13" Padding="4"
+                                                Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="13" Padding="4"
                                                 ToolTip.Tip="{StaticResource ToolTip_MoveConditionDown}"/>
                                         <!-- Delete -->
                                         <Button Grid.Column="5" Content="✕"
@@ -150,7 +150,7 @@
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
-                                                Foreground="#c0392b" FontSize="13" Padding="4"
+                                                Foreground="{DynamicResource Brush.Severity.Error}" FontSize="13" Padding="4"
                                                 ToolTip.Tip="{StaticResource ToolTip_DeleteCondition}"/>
                                     </Grid>
 
@@ -199,22 +199,22 @@
                 </ItemsControl>
 
                 <!-- Add condition row -->
-                <Border Background="#1a1a1a" CornerRadius="3" Padding="8,6">
+                <Border Background="{DynamicResource Brush.Surface.Card}" CornerRadius="3" Padding="8,6">
                     <Grid ColumnDefinitions="*,Auto,Auto">
                         <ComboBox Grid.Column="0"
                                   ItemsSource="{Binding AvailableConditions}"
                                   SelectedItem="{Binding SelectedNewCondition, Mode=TwoWay}"
                                   PlaceholderText="{StaticResource Placeholder_PickCondition}"
-                                  Background="#141414" BorderBrush="#444" BorderThickness="1"
+                                  Background="{DynamicResource Brush.Surface.Input}" BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                                   FontSize="12" Padding="6,4"
                                   ToolTip.Tip="{StaticResource ToolTip_PickCondition}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate DataType="types:ConditionEntry">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <TextBlock Text="{Binding DisplayName}"
-                                                   Foreground="#e8e8e8" FontSize="12"/>
+                                                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12"/>
                                         <TextBlock Text="{Binding Category}"
-                                                   Foreground="#555" FontSize="10"
+                                                   Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10"
                                                    VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </DataTemplate>
@@ -223,13 +223,13 @@
                         <Button Grid.Column="1"
                                 Content="+ Add"
                                 Command="{Binding AddSelectedConditionCommand}"
-                                Background="#2c3e50" Foreground="#ccc" BorderThickness="0"
+                                Background="{DynamicResource Brush.Node.Script.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
                                 Padding="14,6" Margin="8,0,0,0" FontSize="12"
                                 ToolTip.Tip="{StaticResource ToolTip_AddCondition}"/>
                         <Button Grid.Column="2"
                                 Content="{StaticResource Button_NewGroup}"
                                 Command="{Binding AddGroupCommand}"
-                                Background="#2c3e50" Foreground="#ccc" BorderThickness="0"
+                                Background="{DynamicResource Brush.Node.Script.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
                                 Padding="14,6" Margin="6,0,0,0" FontSize="12"
                                 ToolTip.Tip="{StaticResource ToolTip_NewGroup}"/>
                     </Grid>
@@ -239,7 +239,7 @@
         </ScrollViewer>
 
         <!-- Footer -->
-        <Border Grid.Row="1" Background="#252525" Padding="14,10">
+        <Border Grid.Row="1" Background="{DynamicResource Brush.Surface.Panel}" Padding="14,10">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
                 <Button Classes="footer-btn"
                         Content="Cancel"

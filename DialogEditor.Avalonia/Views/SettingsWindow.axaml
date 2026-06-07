@@ -5,29 +5,29 @@
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="500" Height="180"
         CanResize="False"
-        Background="#1e1e1e"
+        Background="{DynamicResource Brush.Surface.Window}"
         WindowStartupLocation="CenterOwner"
         x:CompileBindings="False">
 
     <Window.Styles>
         <Style Selector="TextBlock.label">
-            <Setter Property="Foreground"       Value="#aaa"/>
+            <Setter Property="Foreground"       Value="{DynamicResource Brush.Text.Muted.Light}"/>
             <Setter Property="FontSize"         Value="11"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Width"            Value="140"/>
         </Style>
         <Style Selector="TextBox.path">
-            <Setter Property="Background"   Value="#1a1a1a"/>
-            <Setter Property="Foreground"   Value="#e8e8e8"/>
-            <Setter Property="BorderBrush"  Value="#444"/>
+            <Setter Property="Background"   Value="{DynamicResource Brush.Surface.Card}"/>
+            <Setter Property="Foreground"   Value="{DynamicResource Brush.Text.Primary}"/>
+            <Setter Property="BorderBrush"  Value="{DynamicResource Brush.Border.Strong}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="FontSize"     Value="11"/>
             <Setter Property="IsReadOnly"   Value="True"/>
             <Setter Property="Padding"      Value="4,3"/>
         </Style>
         <Style Selector="Button.browse">
-            <Setter Property="Background"   Value="#333"/>
-            <Setter Property="Foreground"   Value="#ccc"/>
+            <Setter Property="Background"   Value="{DynamicResource Brush.Surface.Header}"/>
+            <Setter Property="Foreground"   Value="{DynamicResource Brush.Text.Secondary}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"      Value="10,4"/>
             <Setter Property="Margin"       Value="6,0,0,0"/>
@@ -70,7 +70,7 @@
         <Button Grid.Row="1"
                 Content="{StaticResource Settings_Close}"
                 HorizontalAlignment="Right"
-                Background="#333" Foreground="#ccc" BorderThickness="0"
+                Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
                 Padding="16,5" Margin="0,12,0,0"
                 Click="Close_Click"/>
 

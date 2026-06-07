@@ -7,29 +7,29 @@
         Width="720" Height="560" MinWidth="560" MinHeight="360"
         CanResize="True"
         ShowInTaskbar="False"
-        Background="#1e1e1e"
+        Background="{DynamicResource Brush.Surface.Window}"
         WindowStartupLocation="CenterOwner"
         x:CompileBindings="False">
 
     <Window.Styles>
         <Style Selector="TextBox.find-box">
-            <Setter Property="Background"      Value="#141414"/>
-            <Setter Property="Foreground"      Value="#e8e8e8"/>
-            <Setter Property="BorderBrush"     Value="#444"/>
+            <Setter Property="Background"      Value="{DynamicResource Brush.Surface.Input}"/>
+            <Setter Property="Foreground"      Value="{DynamicResource Brush.Text.Primary}"/>
+            <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Border.Strong}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="FontSize"        Value="12"/>
             <Setter Property="Padding"         Value="6,3"/>
         </Style>
         <Style Selector="Button.action-btn">
-            <Setter Property="Background"      Value="#333"/>
-            <Setter Property="Foreground"      Value="#ccc"/>
+            <Setter Property="Background"      Value="{DynamicResource Brush.Surface.Header}"/>
+            <Setter Property="Foreground"      Value="{DynamicResource Brush.Text.Secondary}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"         Value="12,5"/>
             <Setter Property="FontSize"        Value="12"/>
             <Setter Property="MinWidth"        Value="80"/>
         </Style>
         <Style Selector="Button.primary-btn">
-            <Setter Property="Background"      Value="#1a5276"/>
+            <Setter Property="Background"      Value="{DynamicResource Brush.Button.Primary.Background}"/>
             <Setter Property="Foreground"      Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"         Value="14,5"/>
@@ -37,7 +37,7 @@
             <Setter Property="MinWidth"        Value="80"/>
         </Style>
         <Style Selector="TextBlock.label">
-            <Setter Property="Foreground"        Value="#888"/>
+            <Setter Property="Foreground"        Value="{DynamicResource Brush.Text.Muted}"/>
             <Setter Property="FontSize"          Value="11"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="MinWidth"          Value="70"/>
@@ -58,7 +58,7 @@
                 <CheckBox Grid.Column="2" Margin="10,0,0,0"
                           IsChecked="{Binding CaseSensitive, Mode=TwoWay}"
                           Content="{StaticResource BatchReplace_CaseSensitive}"
-                          Foreground="#aaa" FontSize="11"
+                          Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="11"
                           ToolTip.Tip="{StaticResource ToolTip_BatchReplace_CaseSensitive}"/>
             </Grid>
 
@@ -73,27 +73,27 @@
             <!-- Search-in toggles -->
             <WrapPanel Orientation="Horizontal">
                 <TextBlock Text="{StaticResource BatchReplace_SearchIn}"
-                           Foreground="#888" FontSize="11"
+                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11"
                            VerticalAlignment="Center" Margin="0,0,8,0"/>
                 <CheckBox IsChecked="{Binding InNodeText, Mode=TwoWay}"
                           Content="{StaticResource BatchReplace_InNodeText}"
-                          Foreground="#ccc" FontSize="11" Margin="0,0,10,0"
+                          Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="11" Margin="0,0,10,0"
                           ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InNodeText}"/>
                 <CheckBox IsChecked="{Binding InSpeakerGuids, Mode=TwoWay}"
                           Content="{StaticResource BatchReplace_InSpeakerGuids}"
-                          Foreground="#ccc" FontSize="11" Margin="0,0,10,0"
+                          Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="11" Margin="0,0,10,0"
                           ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InSpeakerGuids}"/>
                 <CheckBox IsChecked="{Binding InScriptParams, Mode=TwoWay}"
                           Content="{StaticResource BatchReplace_InScriptParams}"
-                          Foreground="#ccc" FontSize="11" Margin="0,0,10,0"
+                          Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="11" Margin="0,0,10,0"
                           ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InScriptParams}"/>
                 <CheckBox IsChecked="{Binding InConditionParams, Mode=TwoWay}"
                           Content="{StaticResource BatchReplace_InConditionParams}"
-                          Foreground="#ccc" FontSize="11" Margin="0,0,10,0"
+                          Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="11" Margin="0,0,10,0"
                           ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InConditionParams}"/>
                 <CheckBox IsChecked="{Binding InLinkChoiceText, Mode=TwoWay}"
                           Content="{StaticResource BatchReplace_InLinkChoiceText}"
-                          Foreground="#ccc" FontSize="11"
+                          Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="11"
                           ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InLinkChoiceText}"/>
             </WrapPanel>
 
@@ -109,7 +109,7 @@
                         ToolTip.Tip="{StaticResource ToolTip_BatchReplace_Apply}"/>
             </StackPanel>
 
-            <Separator Background="#333" Height="1"/>
+            <Separator Background="{DynamicResource Brush.Border.Default}" Height="1"/>
         </StackPanel>
 
         <!-- ── Results tree ──────────────────────────────────────────────── -->
@@ -117,7 +117,7 @@
             <ItemsControl ItemsSource="{Binding Results}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="vm:BatchReplaceConversationViewModel">
-                        <Border Background="#252525" CornerRadius="3"
+                        <Border Background="{DynamicResource Brush.Surface.Panel}" CornerRadius="3"
                                 Margin="0,0,0,4" Padding="10,7">
                             <StackPanel Spacing="4">
 
@@ -129,12 +129,12 @@
                                               ToolTip.Tip="{StaticResource ToolTip_BatchReplace_ConvCheckbox}"/>
                                     <TextBlock Grid.Column="1"
                                                Text="{Binding Name}"
-                                               Foreground="#e8e8e8" FontSize="13"
+                                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="13"
                                                FontWeight="SemiBold"
                                                VerticalAlignment="Center" Margin="6,0,0,0"/>
                                     <TextBlock Grid.Column="2"
                                                Text="{Binding MatchCount, StringFormat='{}{0} match(es)'}"
-                                               Foreground="#888" FontSize="11"
+                                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11"
                                                VerticalAlignment="Center"/>
                                 </Grid>
 
@@ -145,25 +145,25 @@
                                             <Border Padding="6,4" Margin="0,1">
                                                 <StackPanel Spacing="2">
                                                     <TextBlock Text="{Binding FieldPath, StringFormat='Node {NodeId} — {FieldPath}'}"
-                                                               Foreground="#aaa" FontSize="11"/>
+                                                               Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="11"/>
                                                     <Grid ColumnDefinitions="Auto,*">
                                                         <TextBlock Grid.Column="0"
                                                                    Text="Before: "
-                                                                   Foreground="#888" FontSize="11"
+                                                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11"
                                                                    VerticalAlignment="Top"/>
                                                         <TextBlock Grid.Column="1"
                                                                    Text="{Binding Before}"
-                                                                   Foreground="#e05555" FontSize="11"
+                                                                   Foreground="{DynamicResource Brush.Text.Status.Error}" FontSize="11"
                                                                    TextWrapping="Wrap"/>
                                                     </Grid>
                                                     <Grid ColumnDefinitions="Auto,*">
                                                         <TextBlock Grid.Column="0"
                                                                    Text="After:  "
-                                                                   Foreground="#888" FontSize="11"
+                                                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11"
                                                                    VerticalAlignment="Top"/>
                                                         <TextBlock Grid.Column="1"
                                                                    Text="{Binding After}"
-                                                                   Foreground="#5db55d" FontSize="11"
+                                                                   Foreground="{DynamicResource Brush.Text.Status.Success}" FontSize="11"
                                                                    TextWrapping="Wrap"/>
                                                     </Grid>
                                                 </StackPanel>
@@ -182,7 +182,7 @@
         <!-- ── Status bar ────────────────────────────────────────────────── -->
         <TextBlock Grid.Row="2"
                    Text="{Binding StatusText}"
-                   Foreground="#888" FontSize="11"
+                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11"
                    VerticalAlignment="Center"/>
     </Grid>
 

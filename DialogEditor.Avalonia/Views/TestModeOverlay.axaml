@@ -5,11 +5,11 @@
              x:CompileBindings="False">
 
     <!-- Full-screen semi-transparent backdrop that absorbs all pointer events -->
-    <Grid Background="#BB000000">
+    <Grid Background="{DynamicResource Brush.Surface.Overlay.Scrim}">
 
         <!-- Centred card -->
-        <Border Background="#252525"
-                BorderBrush="#555" BorderThickness="1"
+        <Border Background="{DynamicResource Brush.Surface.Panel}"
+                BorderBrush="{DynamicResource Brush.Border.Muted}" BorderThickness="1"
                 CornerRadius="6"
                 Padding="32,24"
                 MaxWidth="480"
@@ -22,10 +22,10 @@
                 <TextBlock Text="⚗"
                            FontSize="32"
                            HorizontalAlignment="Center"
-                           Foreground="#f0a830"/>
+                           Foreground="{DynamicResource Brush.Text.Highlight}"/>
 
                 <TextBlock Text="{StaticResource TestMode_Message}"
-                           Foreground="#e8e8e8"
+                           Foreground="{DynamicResource Brush.Text.Primary}"
                            FontSize="13"
                            TextWrapping="Wrap"
                            TextAlignment="Center"
@@ -34,7 +34,7 @@
                 <Button Content="{StaticResource TestMode_Restore}"
                         Command="{Binding RestoreConversationCommand}"
                         HorizontalAlignment="Center"
-                        Background="#c0392b" Foreground="White"
+                        Background="{DynamicResource Brush.Severity.Error}" Foreground="White"
                         BorderThickness="0"
                         Padding="24,8" FontSize="13"
                         ToolTip.Tip="{StaticResource ToolTip_TestMode_Restore}"/>

@@ -48,6 +48,9 @@
     <SolidColorBrush x:Key="Brush.Surface.Card"    Color="{StaticResource Palette.Neutral.100}"/>
     <SolidColorBrush x:Key="Brush.Surface.Input"   Color="{StaticResource Palette.Neutral.80}"/>
     <SolidColorBrush x:Key="Brush.Surface.Inset"   Color="{StaticResource Palette.Neutral.125}"/>
+    <!-- Subtle surface (tree/list panels). Neutral.175 is "subtle surface / divider"
+         per spec §5; this is its surface role (Border.Subtle is the divider role). -->
+    <SolidColorBrush x:Key="Brush.Surface.Subtle"  Color="{StaticResource Palette.Neutral.175}"/>
     <SolidColorBrush x:Key="Brush.Surface.Header"  Color="{StaticResource Palette.Neutral.200}"/>
     <SolidColorBrush x:Key="Brush.Surface.Info"    Color="{StaticResource Palette.Navy.100}"/>
     <SolidColorBrush x:Key="Brush.Surface.Overlay.Scrim" Color="{StaticResource Palette.Alpha.Scrim}"/>
