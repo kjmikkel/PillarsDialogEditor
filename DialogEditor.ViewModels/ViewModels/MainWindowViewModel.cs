@@ -1057,6 +1057,50 @@ public partial class MainWindowViewModel : ObservableObject
         await LoadProjectAsync(projectPath, offerDeferred: false);
     }
 
+    // ── Open Walkthrough (Help menu) ──────────────────────────────────────
+    private const string WalkthroughFileName = "walkthrough.md";
+    // ⚠ Confirm the public docs URL (plan header item 2).
+    private const string WalkthroughUrl = "https://github.com/OWNER/REPO/blob/main/docs/walkthrough.md";
+
+    /// Test/extension seam: tries each candidate (bundled path, then URL) and returns true on
+    /// the first that opens. Defaults to launching via the OS handler.
+    public Func<IReadOnlyList<string>, bool>? WalkthroughOpener { get; set; }
+
+    [RelayCommand]
+    private void OpenWalkthrough()
+    {
+        var candidates = new[]
+        {
+            Path.Combine(AppContext.BaseDirectory, "docs", WalkthroughFileName),
+            WalkthroughUrl,
+        };
+        var opener = WalkthroughOpener ?? LaunchFirstAvailable;
+        if (!opener(candidates))
+        {
+            AppLog.Warn("Open walkthrough: no candidate could be opened.");
+            StatusText = Loc.Get("Walkthrough_OpenFailed");
+        }
+    }
+
+    private static bool LaunchFirstAvailable(IReadOnlyList<string> candidates)
+    {
+        foreach (var c in candidates)
+        {
+            var isFile = !c.StartsWith("http", StringComparison.OrdinalIgnoreCase);
+            if (isFile && !File.Exists(c)) continue;
+            try
+            {
+                System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(c) { UseShellExecute = true });
+                return true;
+            }
+            catch (Exception ex)
+            {
+                AppLog.Warn($"Open walkthrough: failed to launch '{c}': {ex.Message}");
+            }
+        }
+        return false;
+    }
+
     // ── Backup offer (first time per game folder) ─────────────────────────
     private async Task OfferBackupAsync(string gameDirectory)
     {

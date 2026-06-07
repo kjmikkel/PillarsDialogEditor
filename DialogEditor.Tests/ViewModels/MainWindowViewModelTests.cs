@@ -53,6 +53,21 @@ public class MainWindowViewModelTests : IDisposable
         Assert.True(vm.CreateSampleProjectCommand.CanExecute(null));
     }
 
+    [Fact]
+    public void OpenWalkthrough_TriesBundledFileThenUrl()
+    {
+        var vm = MakeVm();
+        IReadOnlyList<string>? offered = null;
+        vm.WalkthroughOpener = candidates => { offered = candidates; return true; };
+
+        vm.OpenWalkthroughCommand.Execute(null);
+
+        Assert.NotNull(offered);
+        Assert.Equal(2, offered!.Count);
+        Assert.EndsWith("walkthrough.md", offered[0]);   // bundled file first
+        Assert.StartsWith("http", offered[1]);           // URL fallback second
+    }
+
     private static DialogProject MakeProjectWithTranslations()
     {
         var patch = new ConversationPatch("test_conv", 2, [], [], [])
