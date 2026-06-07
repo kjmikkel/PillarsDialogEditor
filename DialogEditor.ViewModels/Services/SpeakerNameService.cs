@@ -21,7 +21,7 @@ public static class SpeakerNameService
     private static Dictionary<string, string> _registered =
         new(StringComparer.OrdinalIgnoreCase);
 
-    // True when game-specific speaker data has been loaded (PoE2 yes, PoE1 currently no)
+    // True when game-specific speaker data has been loaded (both PoE1 and PoE2 supply names)
     public static bool HasNames => _registered.Count > 0;
 
     // All known speakers sorted by name — built-ins always included
