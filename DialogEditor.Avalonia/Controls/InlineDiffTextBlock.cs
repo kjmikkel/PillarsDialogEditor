@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Media;
+using DialogEditor.Avalonia.Theming;
 using DialogEditor.Patch.GitConflict;
 
 namespace DialogEditor.Avalonia.Controls;
@@ -12,9 +13,13 @@ namespace DialogEditor.Avalonia.Controls;
 /// git-conflict resolution window.
 public class InlineDiffTextBlock : TextBlock
 {
-    private static readonly IBrush CommonBrush = new SolidColorBrush(Color.Parse("#e8e8e8"));
-    private static readonly IBrush BeforeBrush = new SolidColorBrush(Color.Parse("#9be39b"));
-    private static readonly IBrush AfterBrush  = new SolidColorBrush(Color.Parse("#ff9c9c"));
+    // Colours resolve from the token registry (Tokens.axaml) at render time, so the
+    // diff highlight shares one source of truth with the rest of the app and a future
+    // Layer 2 palette swap re-resolves live. See
+    // docs/superpowers/specs/2026-06-07-colour-token-taxonomy-design.md §10.
+    private static IBrush CommonBrush => TokenBrushes.Resolve("Brush.Text.Primary");
+    private static IBrush BeforeBrush => TokenBrushes.Resolve("Brush.Diff.Inline.Mine");
+    private static IBrush AfterBrush  => TokenBrushes.Resolve("Brush.Diff.Inline.Theirs");
 
     public static readonly StyledProperty<string?> BeforeProperty =
         AvaloniaProperty.Register<InlineDiffTextBlock, string?>(nameof(Before));
