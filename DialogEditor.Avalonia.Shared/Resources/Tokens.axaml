@@ -78,9 +78,10 @@
     <SolidColorBrush x:Key="Brush.Text.Female.Dim"    Color="{StaticResource Palette.Neutral.335}"/>
     <!-- Dark text on the LIGHT-tinted node-card bodies (NPC parchment, player azure, …) —
          the inverse of the dark-theme ramp above. No Text.* token matched Neutral.200/400
-         as a foreground, so these name the "dark-on-light" role for the Layer 1 seam. -->
-    <SolidColorBrush x:Key="Brush.Text.OnLight"       Color="{StaticResource Palette.Neutral.200}"/>
-    <SolidColorBrush x:Key="Brush.Text.OnLight.Muted" Color="{StaticResource Palette.Neutral.400}"/>
+         as a foreground, so these name the "dark-on-light" role for the Layer 1 seam.
+         Re-pointed to Palette.Ink.* per Layer 1 spec §3.3. -->
+    <SolidColorBrush x:Key="Brush.Text.OnLight"       Color="{StaticResource Palette.Ink.Strong}"/>
+    <SolidColorBrush x:Key="Brush.Text.OnLight.Muted" Color="{StaticResource Palette.Ink.Muted}"/>
 
     <!-- Status foreground accents -->
     <SolidColorBrush x:Key="Brush.Text.Status.New"     Color="{StaticResource Palette.Green.400}"/>
