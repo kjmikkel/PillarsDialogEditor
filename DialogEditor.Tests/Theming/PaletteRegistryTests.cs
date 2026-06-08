@@ -30,6 +30,8 @@ public class PaletteRegistryTests
     [InlineData("Palette.Cream.100",   0xFF, 0xff, 0xf8, 0xdc)]
     [InlineData("Palette.Amber.570",   0xFF, 0xe8, 0xd0, 0x80)] // bark footer, distinct from Amber.560
     [InlineData("Palette.Alpha.Scrim", 0xBB, 0x00, 0x00, 0x00)]
+    [InlineData("Palette.Ink.Strong", 0xFF, 0x33, 0x33, 0x33)]
+    [InlineData("Palette.Ink.Muted",  0xFF, 0x66, 0x66, 0x66)]
     public void PrimitiveResolvesToExpectedColor(string key, byte a, byte r, byte g, byte b)
         => Assert.Equal(Color.FromArgb(a, r, g, b), Resolve(key));
 

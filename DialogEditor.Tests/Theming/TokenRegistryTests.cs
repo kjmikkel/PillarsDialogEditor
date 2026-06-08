@@ -34,6 +34,8 @@ public class TokenRegistryTests
     [InlineData("Brush.Conflict.Theirs.Foreground", 0xFF, 0xff, 0x9c, 0x9c)] // Theirs = red (Red.300)
     [InlineData("Brush.Diff.Inline.Mine",         0xFF, 0x9c, 0xdc, 0xfe)] // bright blue tint (Sky.250)
     [InlineData("Brush.Diff.Inline.Theirs",       0xFF, 0xff, 0x9c, 0x9c)] // bright red tint (Red.300)
+    [InlineData("Brush.Text.OnLight",       0xFF, 0x33, 0x33, 0x33)] // now -> Palette.Ink.Strong
+    [InlineData("Brush.Text.OnLight.Muted", 0xFF, 0x66, 0x66, 0x66)] // now -> Palette.Ink.Muted
     public void TokenResolvesToExpectedColor(string key, byte a, byte r, byte g, byte b)
         => Assert.Equal(Color.FromArgb(a, r, g, b), Brush(key).Color);
 
