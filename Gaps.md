@@ -111,16 +111,20 @@ the foundation is ever a dependency for other gaps; the upper layers are indepen
 land later or never without making anything beneath them wrong.
 
 - **Layer 0 — Token registry (the foundation; the ONLY layer other gaps may depend on). ✅ IMPLEMENTED (2026-06-08).**
-  Two merged resource dictionaries of *semantically named* tokens — `Resources/Palette.axaml`
-  (primitive `Palette.*` colours; the only file permitted a hex literal) → `Resources/Tokens.axaml`
+  Two merged resource dictionaries of *semantically named* tokens — `Palette.axaml`
+  (primitive `Palette.*` colours; the only file permitted a hex literal) → `Tokens.axaml`
   (semantic `Brush.*` brushes, e.g. `Brush.Node.Npc.Header`, `Brush.Diff.Added.Fill`,
-  `Brush.Toolbar.Button.Background`). Every hardcoded value migrated: `App.axaml` themes and all
-  29 views bind `DynamicResource Brush.*`; the brush converters and code-behind resolve through
-  `Theming/TokenBrushes.Resolve` instead of `new SolidColorBrush(...)`. The drift bug died by
+  `Brush.Toolbar.Button.Background`). Both now live in **`DialogEditor.Avalonia.Shared/Resources`**
+  and are merged by *both* GUI apps' `App.axaml` (the editor and the standalone PatchManager),
+  so the single registry serves the whole solution. Every hardcoded value migrated: `App.axaml`
+  themes and all 29 views bind `DynamicResource Brush.*`; the brush converters and code-behind
+  resolve through `Theming/TokenBrushes.Resolve` instead of `new SolidColorBrush(...)`. The drift bug died by
   construction — the duplicated `NodeColorConverter`/`SpeakerCategoryToBrushConverter` palettes
   became one shared key. **Published contract enforced by test:** `NoStrayHexTests` fails the
-  build if any hex literal appears outside `Palette.axaml` or any converter constructs a colour,
-  making "nothing constructs a colour any other way" true rather than aspirational. The token
+  build if any hex literal appears outside `Palette.axaml`, or any production type constructs a
+  colour, making "nothing constructs a colour any other way" true rather than aspirational. The
+  enforcer is **solution-wide** (anchored on `DialogEditor.slnx`, scanning every project's `.axaml`
+  and production `.cs`), so the contract holds app-wide, not just for the editor project. The token
   naming taxonomy — the public interface every dependent gap quotes — and the exhaustive
   migration table live in `docs/superpowers/specs/2026-06-07-colour-token-taxonomy-design.md`;
   the TDD implementation plan is `docs/superpowers/plans/2026-06-07-colour-token-taxonomy.md`.
@@ -128,31 +132,41 @@ land later or never without making anything beneath them wrong.
   Annotations gap. (Implementation added a few semantic tokens the spec's first draft omitted —
   `Brush.Button.{Primary,Destructive}.Background`, `Brush.Surface.Subtle`, `Brush.Connection.*`,
   `Brush.Text.OnLight*`, `Brush.Diff.Inline.*` — each value-faithful, no new colours.)
-  - **Layer 0 follow-up — `DialogEditor.Avalonia.Shared` not yet migrated (deferred).** The
-    Layer 0 migration and its `NoStrayHexTests` enforcer cover the **`DialogEditor.Avalonia`**
-    project only. The sibling **`DialogEditor.Avalonia.Shared`** project is out of scope and
-    still hardcodes colour: `PatchManagerView.axaml` carries **23 inline hex literals** (its
-    code-behind constructs no brushes). Because the enforcer never scans this project, those
-    literals are undetected — so the contract "nothing constructs a colour any other way" holds
-    for the main app but **not** app-wide. To close: tokenise `PatchManagerView.axaml` onto the
-    existing `Brush.*` keys (`Tokens.axaml` is already merged app-wide via `App.axaml`, so the
-    tokens resolve there), then widen `NoStrayHexTests.AvaloniaRoot()` (or add a second root) to
-    also scan `DialogEditor.Avalonia.Shared`. No new tokens are expected — the 23 literals should
-    map onto the same surface/border/text greys and accents already in the registry.
+  - **Layer 0 follow-up — solution-wide coverage. ✅ DONE (2026-06-08).** The migration and its
+    `NoStrayHexTests` enforcer now cover the **entire solution**, not just `DialogEditor.Avalonia`.
+    Closed in three moves: (1) the token registry (`Palette.axaml` + `Tokens.axaml`) was relocated
+    from `DialogEditor.Avalonia/Resources` into **`DialogEditor.Avalonia.Shared/Resources`** and is
+    merged by *both* apps' `App.axaml`, so the shared `PatchManagerView` resolves the same `Brush.*`
+    keys whether hosted by the editor or the standalone PatchManager app (the standalone app
+    previously merged neither dictionary). (2) `PatchManagerView.axaml` (23 literals) and
+    `PatchManager/MainWindow.axaml` (1 literal) were tokenised. (3) `NoStrayHexTests` now anchors on
+    `DialogEditor.slnx` and scans every project's `.axaml` plus all production `.cs` (excluding the
+    Tests project and the sanctioned `TokenBrushes` resolver). One nuance vs. the original "no new
+    tokens expected" prediction: PatchManager carried a warning orange (`#e67e22`) absent from the
+    palette and two hint greys (`#444`/`#555`) with no text-role token. Rather than grow the
+    registry, these were **consolidated** onto the nearest existing tokens — `⚠` glyphs →
+    `Brush.Severity.Warning`, faint hints → `Brush.Text.Disabled` — a deliberate, minor hue shift in
+    PatchManager (leaner registry, no new colours). Everything else mapped value-faithfully.
 - **Layer 1 — Palette sets (deferred, independent).** Alternative *values* for the same token
   keys: Dark (today's colours), Light, High-Contrast, and colourblind-tuned sets. Same keys,
-  different hex; because Layer 0 guarantees everything reads keys, swapping the set retints
-  the whole app.
-- **Layer 2 — Runtime selection (deferred, independent).** The Settings UI to choose a
-  palette/theme at runtime, persist the choice, and plug into Avalonia's `ThemeVariant`. This
+  different hex; the sets live in the shared registry (`DialogEditor.Avalonia.Shared/Resources`)
+  alongside Layer 0, so because Layer 0 guarantees everything across the solution reads keys,
+  swapping the set retints the **whole solution** — both the editor and the standalone
+  PatchManager — in one move.
+- **Layer 2 — Runtime selection (deferred, independent).** The Settings UI (in the editor) to
+  choose a palette/theme at runtime, persist the choice, and plug into Avalonia's `ThemeVariant`
+  **across both apps** — the standalone PatchManager honouring the same persisted choice from the
+  shared registry, so the selection retints the whole solution rather than the editor alone. This
   is the bulk of the work.
 - **Layer 2.5 — Redundant non-colour encoding (deferred, independent; accessibility).** The
   part palettes can't fix: meaning must survive when hue is indistinguishable (~8% of men),
-  via icons/borders/labels alongside colour. May warrant its own gap.
+  via icons/borders/labels alongside colour — applied **across the whole solution** (both apps),
+  not just the editor. May warrant its own gap.
 
-**Dependency rule:** other gaps point only at Layer 0. E.g. the **Canvas Annotations** gap
-draws region colours from `Brush.Annotation.Region.*` tokens; if Layers 1/2/2.5 never ship,
-annotations still render correctly with the single Dark set that exists today — never blocked
+**Dependency rule:** other gaps point only at Layer 0 — which, being solution-wide, resolves the
+same `Brush.*` keys in both apps. E.g. the **Canvas Annotations** gap draws region colours from
+`Brush.Annotation.Region.*` tokens; if Layers 1/2/2.5 never ship, annotations still render
+correctly across the whole solution with the single Dark set that exists today — never blocked
 on, nor made wrong by, an upper layer that doesn't exist.
 
 ### Barks System — Bark Preview
