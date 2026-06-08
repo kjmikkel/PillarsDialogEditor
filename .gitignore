@@ -32,3 +32,6 @@ Desktop.ini
 
 # Distribution output
 dist/
+
+# Palette golden test — transient artifact; only the .approved.txt is committed
+palette-golden.received.txt
