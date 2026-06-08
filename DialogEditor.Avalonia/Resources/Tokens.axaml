@@ -99,10 +99,13 @@
     <SolidColorBrush x:Key="Brush.Syntax.Default"   Color="{StaticResource Palette.Neutral.910}"/>
 
     <!-- Inline text-diff word highlight (InlineDiffTextBlock + GitConflictResolutionWindow
-         code-behind). Foreground accents for the differing run: mine/before = green,
-         theirs/after = pink. Distinct from the Brush.Diff.*.Fill canvas backgrounds and
-         from the Conflict.* panel foregrounds; Theirs reuses Palette.Red.300 by design. -->
-    <SolidColorBrush x:Key="Brush.Diff.Inline.Mine"   Color="{StaticResource Palette.Green.350}"/>
+         code-behind). Foreground accents for the differing run, each a BRIGHT tint of its
+         side's hue so the word glows in that side's colour: mine = blue, theirs = red —
+         mirroring the Conflict.*.Foreground pair. Blue+red (not green+red) keeps the two
+         sides distinguishable for red-green colour deficiency. Distinct tokens from the
+         Brush.Diff.*.Fill canvas backgrounds; Mine is a brighter Sky tone than the panel
+         header (Sky.300) so it pops within body text. -->
+    <SolidColorBrush x:Key="Brush.Diff.Inline.Mine"   Color="{StaticResource Palette.Sky.250}"/>
     <SolidColorBrush x:Key="Brush.Diff.Inline.Theirs" Color="{StaticResource Palette.Red.300}"/>
 
     <!-- Merge-conflict mine/theirs (GitConflictResolutionWindow). Mine = the BLUE pair,
