@@ -46,10 +46,14 @@ Layer 1 is the realisation of exactly that sentence, three times over.
 
 - No runtime palette/`ThemeVariant` switching, no Settings UI, no "apply at startup" hook (Layer 2).
 - No shape/icon/border redundancy encoding for colour-deficient users (Layer 2.5).
-- No changes to `Tokens.axaml` or any *semantic consumer* (views, converters, code-behind). No new
-  `Brush.*` keys, no new `Palette.*` keys — Layer 1 re-values the existing key set, it does not
-  extend it. (The Dark-file rename does touch each app's `App.axaml` merge list — a resource-host
-  edit, not a consumer/semantic change; see §3, §6.)
+- No changes to any *semantic consumer* (views, converters, code-behind) and no new `Brush.*` keys —
+  Layer 1 re-values the existing key set, it does not extend the public contract. (The Dark-file
+  rename does touch each app's `App.axaml` merge list — a resource-host edit, not a consumer/semantic
+  change; see §3, §6.)
+- **One surgical exception** to "frozen `Tokens.axaml` / no new primitives": the dark-on-light text
+  split in §3.3 (two new `Palette.Ink.*` primitives + re-pointing the two `Text.OnLight*` token
+  lines). Dark stays byte-identical; this is the minimum needed to make Light/HC renderable at all.
+  No other `Tokens.axaml` line or `Palette.*` key changes.
 - No visual change to the shipping (Dark) app. The rename is value-preserving.
 
 ## 3. Architecture — sibling palette files, frozen Tokens, swap deferred
@@ -103,6 +107,34 @@ too.
 literal still fails. The test's doc-comment ("hex primitives live ONLY in Palette.axaml") updates to
 say "the palette family".
 
+### 3.3 The dark-on-light text split (the one Tokens edit)
+
+The node cards render as **light cards in every palette** (parchment/azure/teal/cream bodies with
+dark text) — that is intentional and unchanged. Their text binds `Brush.Text.OnLight` and
+`Brush.Text.OnLight.Muted`, which in Layer 0 point at `Palette.Neutral.200` / `Palette.Neutral.400`.
+But those same two primitives also back surface/border/disabled roles (`Border.Default`,
+`Surface.Header`, `Toolbar.Button.Background` → Neutral.200; `Text.Disabled` → Neutral.400). In Dark
+the coincidence is harmless (all want the same mid-grey). In Light and High-Contrast it is a hard
+contradiction: the slot must be simultaneously **dark** (so the card-body ink reads) and **light /
+black** (so the surface/border/disabled role reads). One value cannot serve both.
+
+**Fix:** introduce two dedicated primitives for dark-on-light text and re-point only those two token
+lines:
+
+```
+Palette.Ink.Strong   (new)   ← Brush.Text.OnLight        (was Palette.Neutral.200)
+Palette.Ink.Muted    (new)   ← Brush.Text.OnLight.Muted  (was Palette.Neutral.400)
+```
+
+- In **Dark**, `Ink.Strong = #333333` and `Ink.Muted = #666666` (the current Neutral.200/400
+  values) → every resolved colour is unchanged, Dark ships byte-identical, all Layer 0 tests stay
+  green.
+- `Ink.*` stays **dark in every palette** (the cards are always light), so Neutral.200/400 are now
+  free to go light in Light and black in HC for their surface/border/disabled roles.
+- This is the **only** edit to `Tokens.axaml` (two `Color="..."` references) and the only new
+  `Palette.*` keys. `Ink` is intentionally a named role-primitive, not a numeric tone, because it is
+  defined by its *use* (dark-on-light ink) rather than a position in the neutral ramp.
+
 ## 4. Per-palette derivation strategy & accessibility targets
 
 The full `{key → hex}` table per palette is **implementation output**, generated into a reviewable
@@ -125,9 +157,12 @@ enforce.
 
 - Surfaces collapse toward **near-pure black**; `Text.Primary` → white.
 - **Structure carried by borders, not fills:** `Border.*` become bright hairlines throughout.
-- **Node headers become bright coloured text on black with a bright divider** rather than coloured
-  fills (a coloured fill would sink the header text's contrast below AAA).
-- Accents go fully saturated/bright, each verified ≥7:1 against the black background.
+- **Node headers stay coloured fills** (consumers are frozen — the header brush is bound as a
+  `Background`, and Layer 1 changes no view). HC therefore chooses header fill values deep/saturated
+  enough that the white header text (`Text.OnAccent`) and the dark body text (`Text.OnLight`) on the
+  light card body both clear AAA. Restyling headers from fills to outlines/bright-text-on-black is a
+  *consumer* change and is deferred beyond Layer 1.
+- Accents go fully saturated/bright, each verified ≥7:1 against their background.
 - Keeps the Dark slot lightness ordering (does not invert).
 
 ### 4.3 Colourblind-tuned — aim: hue pairs distinct under deuteranopia/protanopia/tritanopia; Dark-level contrast
@@ -179,8 +214,14 @@ code. This keeps adding palettes append-only at the test level too — see §9.
 
    | Palette | Normal text | Large text / non-text UI |
    |---|---|---|
-   | Dark, Light, Colourblind | ≥ 4.5 : 1 (AA) | ≥ 3 : 1 |
+   | Light, Colourblind | ≥ 4.5 : 1 (AA) | ≥ 3 : 1 |
    | High-Contrast | ≥ 7 : 1 (AAA) | ≥ 4.5 : 1 |
+
+   **Dark is exempt** — it is the shipped baseline Layer 1 must not alter (§2), and a few of its
+   existing pairs already sit just under AA (e.g. `Severity.Error` on `Surface.Panel` ≈ 2.8:1). Gating
+   Dark would be permanently red with no allowed fix, so the contract is enforced only on the three
+   **new** palettes we author here. (Improving Dark's own ratios is a separate, later change to the
+   shipping theme, out of scope.)
 
    Verified at the **token/value level** (computed from resolved colours), not by rendering controls
    and sampling pixels — deterministic, simple, and it catches the real risk (a value that fails the
@@ -204,11 +245,18 @@ threshold (text pairs at the "normal text" bar unless marked *large/UI*).
   `Button.Destructive.Background`, `Button.Caution.Background`
 - `Text.Status.Added`, `Text.Status.Changed`, `Text.Status.Removed` on `Surface.Card`
 - `Severity.Warning`, `Severity.Error`, `Severity.Info` on `Surface.Panel` *(large/UI bar)*
-- `Border.Default` / `Border.Strong` on `Surface.Window` *(non-text/UI bar — structural visibility)*
 
-> For High-Contrast, node "header" pairs are evaluated as the **bright-text-on-black** treatment
-> (§4.2), i.e. the header *text* token against `Surface.Window`, since HC headers are not fills.
-> The implementation maps each pair to the concrete token actually painted in that palette.
+(`Border.*` pairs are deliberately **excluded**: subtle dividers are low-contrast by design in
+dark/light themes (~1.3:1) and a ratio gate on them is wrong. Border visibility is a visual concern,
+not a text-legibility one.)
+
+> These are **canonical role pairs** — the legibility contract the palette must satisfy
+> ("`Text.OnAccent` must read on a node header fill"), evaluated uniformly across all palettes
+> including High-Contrast (HC headers remain fills per §4.2, so the pair is unchanged — only HC's
+> threshold is higher). The test computes each pair from the two tokens' resolved colours; because
+> the token→primitive mapping is fixed (frozen bar the §3.3 `Ink` re-point), that equals comparing the
+> two backing `Palette.*` primitives in the palette under test — so the tests operate at the primitive
+> level (e.g. `Text.OnLight` → `Palette.Ink.Strong`).
 
 ## 6. Build order (for the implementation plan)
 
@@ -216,20 +264,28 @@ threshold (text pairs at the "normal text" bar unless marked *large/UI*).
    both apps' `App.axaml` `ResourceInclude`; widen `NoStrayHexTests` (regex + doc-comment + any
    `EndsWith("Palette.axaml")` reference). Pure rename — **all existing tests stay green, zero value
    change.**
-2. **Test helper** — merge `Palette.<set>` + `Tokens` into an isolated `ResourceDictionary`; resolve
-   keys. Serves parity, golden, contrast.
-3. **Structural parity test** (red) → create the three palette files carrying the complete key set →
-   green (skeletons established).
-4. **Golden + contrast tests drive the values**, one palette at a time: **Light** (biggest inversion)
-   → **High-Contrast** → **Colourblind** (smallest delta). Tests red; fill values til green; record
+2. **Dark-on-light text split (§3.3).** Add `Palette.Ink.Strong`/`Palette.Ink.Muted` to
+   `Palette.Dark.axaml` (`#333333`/`#666666`); re-point `Brush.Text.OnLight`/`.Muted` in
+   `Tokens.axaml` to them; add both keys to `TokenRegistryTests.AllTokens` and a `PaletteRegistryTests`
+   golden row. **Dark resolves byte-identical — all existing tests stay green.**
+3. **Test helper + WCAG helper** — load a `Palette.<set>.axaml` as an isolated `ResourceDictionary`
+   and read `Color` primitives; a `Wcag.ContrastRatio` function. Serves parity, golden, contrast (all
+   primitive-level — no `Tokens` needed at test time).
+4. **Structural parity test** (red) → create the three palette files as **verbatim copies of
+   `Palette.Dark.axaml`** (same keys, Dark values as a placeholder) → green (skeletons established).
+5. **Golden + contrast tests drive the values**, one palette at a time: **Light** (biggest inversion)
+   → **High-Contrast** → **Colourblind** (smallest delta). The contrast test covers the three new
+   palettes only (Dark exempt, §5). Tests red; fill values til green; record
    the generated `{key → hex}` appendix per palette.
-5. **Rationale headers** in each new palette file pointing back to this spec.
+6. **Rationale headers** in each new palette file pointing back to this spec.
 
 The three new files remain merged nowhere; `App.axaml` still loads only `Palette.Dark.axaml`.
 
 ## 7. Doc updates
 
 - This spec (new).
+- **`Tokens.axaml`** — re-point `Brush.Text.OnLight` / `.Muted` to the new `Palette.Ink.*` primitives
+  (§3.3); the only edit to the otherwise-frozen semantic layer.
 - **Revise Layer 0 spec §3.2** — `Neutral.*` is slot identity; lightness flips per palette (§3.1).
 - **`Gaps.md`** — update the Layer 1 entry (designed; points at this spec) and fix the Layer 0
   "only `Palette.axaml` permits a hex literal" wording to "the palette family"; reflect the
