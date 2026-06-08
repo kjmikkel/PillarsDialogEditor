@@ -5,12 +5,12 @@
         Title="{Binding WindowTitle}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="1400" Height="850"
-        Background="#1e1e1e" x:CompileBindings="False">
+        Background="{DynamicResource Brush.Surface.Window}" x:CompileBindings="False">
 
     <Grid RowDefinitions="Auto,*,Auto">
 
         <!-- Menu bar + slim toolbar -->
-        <Border Grid.Row="0" Background="#252525" Padding="0">
+        <Border Grid.Row="0" Background="{DynamicResource Brush.Surface.Panel}" Padding="0">
             <DockPanel>
 
                 <!-- Right-docked: ? and ⚙ -->
@@ -32,7 +32,7 @@
                 <Menu DockPanel.Dock="Left"
                       Background="Transparent"
                       VerticalAlignment="Center"
-                      Foreground="#ccc"
+                      Foreground="{DynamicResource Brush.Text.Secondary}"
                       Margin="4,0,8,0">
 
                     <MenuItem Header="{StaticResource Menu_File}">
@@ -148,7 +148,7 @@
                 <!-- Language selector -->
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal"
                             VerticalAlignment="Center" Margin="4,0,0,0">
-                    <TextBlock Text="{StaticResource Label_Language}" Foreground="#888" FontSize="11"
+                    <TextBlock Text="{StaticResource Label_Language}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11"
                                VerticalAlignment="Center" Margin="0,0,6,0"
                                IsVisible="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}"/>
                     <ComboBox ItemsSource="{Binding AvailableLanguages}"
@@ -183,32 +183,32 @@
                         Classes.flyout="{Binding IsBrowserFlyoutOpen}">
                     <Border.Styles>
                         <Style Selector="Border.flyout">
-                            <Setter Property="BoxShadow" Value="0 0 18 0 #A0000000"/>
+                            <Setter Property="BoxShadow" Value="{DynamicResource Palette.Effect.CardShadow}"/>
                             <Setter Property="ZIndex" Value="5"/>
                         </Style>
                     </Border.Styles>
                     <Grid RowDefinitions="Auto,*">
-                    <Border Background="#252525" Padding="6,4">
+                    <Border Background="{DynamicResource Brush.Surface.Panel}" Padding="6,4">
                         <DockPanel>
                             <ToggleButton DockPanel.Dock="Right"
                                           IsChecked="{Binding IsBrowserPinned, Mode=TwoWay}"
                                           Content="📌"
-                                          Background="#333" Foreground="#aaa" BorderThickness="0" Padding="6,2"
+                                          Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="6,2"
                                           ToolTip.Tip="{StaticResource ToolTip_PinPanel}"/>
                           <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="{StaticResource Browser_Header}" Foreground="#888" FontSize="10" FontWeight="Bold"/>
+                            <TextBlock Text="{StaticResource Browser_Header}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="10" FontWeight="Bold"/>
                           </StackPanel>
                           <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,6,0">
                                 <Button Command="{Binding Browser.ExpandAllCommand}" Content="⊞"
-                                        Background="Transparent" BorderThickness="0" Foreground="#555"
+                                        Background="Transparent" BorderThickness="0" Foreground="{DynamicResource Brush.Text.Disabled}"
                                         FontSize="10" Cursor="Hand"
                                         ToolTip.Tip="{StaticResource ToolTip_ExpandAll}"/>
                                 <Button Command="{Binding Browser.CollapseAllCommand}" Content="⊟" Margin="2,0,0,0"
-                                        Background="Transparent" BorderThickness="0" Foreground="#555"
+                                        Background="Transparent" BorderThickness="0" Foreground="{DynamicResource Brush.Text.Disabled}"
                                         FontSize="10" Cursor="Hand"
                                         ToolTip.Tip="{StaticResource ToolTip_CollapseAll}"/>
                                 <Button Command="{Binding NewConversationCommand}" Content="⊕" Margin="4,0,0,0"
-                                        Background="Transparent" BorderThickness="0" Foreground="#7dcea0"
+                                        Background="Transparent" BorderThickness="0" Foreground="{DynamicResource Brush.Text.Status.New}"
                                         FontSize="12" Cursor="Hand"
                                         ToolTip.Tip="{StaticResource ToolTip_NewConversation}"/>
                             </StackPanel>
@@ -224,7 +224,7 @@
                     <ToggleButton Grid.Row="0" Margin="4,4,4,0"
                                   IsChecked="{Binding IsBrowserPinned, Mode=TwoWay}"
                                   Content="📌"
-                                  Background="#333" Foreground="#aaa" BorderThickness="0" Padding="6,2"
+                                  Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="6,2"
                                   ToolTip.Tip="{StaticResource ToolTip_PinPanel}"/>
                     <Button Grid.Row="1" Grid.RowSpan="2"
                             Background="Transparent" BorderThickness="0"
@@ -236,31 +236,31 @@
                                 <RotateTransform Angle="90"/>
                             </LayoutTransformControl.LayoutTransform>
                             <TextBlock Text="{StaticResource Browser_Header}"
-                                       Foreground="#555" FontSize="10" FontWeight="Bold"/>
+                                       Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10" FontWeight="Bold"/>
                         </LayoutTransformControl>
                     </Button>
                 </Grid>
             </Grid>
 
-            <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="#333"/>
+            <GridSplitter Grid.Column="1" ResizeDirection="Columns" Background="{DynamicResource Brush.Border.Default}"/>
             <views:ConversationView x:Name="CanvasView" Grid.Column="2" DataContext="{Binding Canvas}"/>
-            <GridSplitter Grid.Column="3" ResizeDirection="Columns" Background="#333"/>
+            <GridSplitter Grid.Column="3" ResizeDirection="Columns" Background="{DynamicResource Brush.Border.Default}"/>
 
             <!-- Detail panel -->
             <Grid Grid.Column="4" x:Name="DetailPanel">
                 <!-- Expanded state -->
                 <Grid IsVisible="{Binding IsDetailExpanded}" RowDefinitions="Auto,*">
-                    <Border Background="#252525" Padding="6,4">
+                    <Border Background="{DynamicResource Brush.Surface.Panel}" Padding="6,4">
                         <DockPanel>
                             <Button DockPanel.Dock="Right"
                                     Content="−"
                                     Click="ToggleDetail_Click"
-                                    Background="#333" Foreground="#aaa" BorderThickness="0" Padding="6,2"
+                                    Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="6,2"
                                     ToolTip.Tip="{StaticResource ToolTip_TogglePanel}"/>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="{StaticResource Label_NodeDetails}" Foreground="#888" FontSize="10" FontWeight="Bold"/>
+                                <TextBlock Text="{StaticResource Label_NodeDetails}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="10" FontWeight="Bold"/>
                                 <TextBlock Text="{Binding CurrentConversationName}"
-                                           Foreground="#555" FontSize="10" Margin="6,0,0,0"
+                                           Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10" Margin="6,0,0,0"
                                            IsVisible="{Binding CurrentConversationName, Converter={StaticResource NullOrEmptyToVis}}"/>
                             </StackPanel>
                         </DockPanel>
@@ -275,7 +275,7 @@
                     <Button Grid.Row="0" Margin="4,4,4,0"
                             Content="+"
                             Click="ToggleDetail_Click"
-                            Background="#333" Foreground="#aaa" BorderThickness="0" Padding="6,2"
+                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="6,2"
                             ToolTip.Tip="{StaticResource ToolTip_TogglePanel}"/>
                     <LayoutTransformControl Grid.Row="1" Margin="0,10,0,0"
                                             HorizontalAlignment="Center" VerticalAlignment="Top">
@@ -283,7 +283,7 @@
                             <RotateTransform Angle="90"/>
                         </LayoutTransformControl.LayoutTransform>
                         <TextBlock Text="{StaticResource Label_NodeDetails}"
-                                   Foreground="#555" FontSize="10" FontWeight="Bold"/>
+                                   Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10" FontWeight="Bold"/>
                     </LayoutTransformControl>
                 </Grid>
             </Grid>
@@ -292,16 +292,16 @@
         </Grid>
 
         <!-- Status bar -->
-        <Border Grid.Row="2" Background="#1a1a1a" Padding="8,4">
+        <Border Grid.Row="2" Background="{DynamicResource Brush.Surface.Card}" Padding="8,4">
             <Grid ColumnDefinitions="*,Auto">
                 <TextBlock Grid.Column="0" Text="{Binding StatusText}"
-                           Foreground="#888" FontSize="11" VerticalAlignment="Center"/>
+                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" VerticalAlignment="Center"/>
                 <Button Grid.Column="1"
                         Content="{StaticResource MainWindow_ResolveConflictsButton}"
                         Command="{Binding ResolveConflictsCommand}"
                         IsVisible="{Binding HasPendingConflictResolution}"
                         ToolTip.Tip="{StaticResource MainWindow_ResolveConflictsTooltip}"
-                        Background="#8e4912" Foreground="White" BorderThickness="0"
+                        Background="{DynamicResource Brush.Button.Caution.Background}" Foreground="White" BorderThickness="0"
                         Padding="12,2" FontSize="11"/>
             </Grid>
         </Border>
