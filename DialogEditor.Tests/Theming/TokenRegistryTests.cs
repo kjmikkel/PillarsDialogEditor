@@ -30,7 +30,8 @@ public class TokenRegistryTests
     [InlineData("Brush.Text.Female.Active",      0xFF, 0xe8, 0xe8, 0xe8)]
     [InlineData("Brush.Text.Status.Changed",     0xFF, 0xf0, 0xad, 0x4e)] // #e0a030 absorbed
     [InlineData("Brush.Syntax.Code",             0xFF, 0x9c, 0xdc, 0xfe)]
-    [InlineData("Brush.Conflict.Theirs.Foreground",0xFF, 0x9c, 0xc4, 0xff)]
+    [InlineData("Brush.Conflict.Mine.Foreground",   0xFF, 0x9c, 0xc4, 0xff)] // Mine = blue (Sky.300)
+    [InlineData("Brush.Conflict.Theirs.Foreground", 0xFF, 0xff, 0x9c, 0x9c)] // Theirs = red (Red.300)
     [InlineData("Brush.Diff.Inline.Mine",         0xFF, 0x9b, 0xe3, 0x9b)] // preserved #9be39b
     [InlineData("Brush.Diff.Inline.Theirs",       0xFF, 0xff, 0x9c, 0x9c)]
     public void TokenResolvesToExpectedColor(string key, byte a, byte r, byte g, byte b)

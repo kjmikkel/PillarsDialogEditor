@@ -38,18 +38,15 @@
         </DockPanel>
 
         <!-- Detail: side-by-side mine vs theirs for the selected conflict.
-             NOTE: the "Mine" panel is deliberately the BLUE pair and "Theirs" the RED pair,
-             preserving the pre-token colours exactly. The Brush.Conflict.* token NAMES are the
-             opposite hue (Mine=red, Theirs=blue per spec §7.8), so the Mine panel binds the
-             Theirs.* tokens and vice-versa. This cross-mapping is intentional — do NOT "fix" it
-             to match the labels, as that would silently swap the two panels' colours. -->
+             Mine = the BLUE pair, Theirs = the RED pair (Brush.Conflict.Mine/Theirs.* now
+             name those hues; see Tokens.axaml). -->
         <ScrollViewer Grid.Row="1" Grid.Column="1" DataContext="{Binding Selected}">
             <Grid ColumnDefinitions="*,*" RowDefinitions="Auto">
-                <Border Grid.Column="0" Background="{DynamicResource Brush.Conflict.Theirs.Background}" CornerRadius="4"
+                <Border Grid.Column="0" Background="{DynamicResource Brush.Conflict.Mine.Background}" CornerRadius="4"
                         Padding="12" Margin="0,0,6,0">
                     <StackPanel Spacing="8">
                         <TextBlock Text="{StaticResource GitConflictWindow_MineHeader}"
-                                   Foreground="{DynamicResource Brush.Conflict.Theirs.Foreground}" FontSize="12" FontWeight="Bold"/>
+                                   Foreground="{DynamicResource Brush.Conflict.Mine.Foreground}" FontSize="12" FontWeight="Bold"/>
                         <TextBlock Text="{StaticResource GitConflict_DefaultTextLabel}"
                                    Foreground="{DynamicResource Brush.Text.Muted}" FontSize="10"
                                    IsVisible="{Binding HasFemaleRow}"/>
@@ -68,11 +65,11 @@
                                      Foreground="{DynamicResource Brush.Text.Primary}"/>
                     </StackPanel>
                 </Border>
-                <Border Grid.Column="1" Background="{DynamicResource Brush.Conflict.Mine.Background}" CornerRadius="4"
+                <Border Grid.Column="1" Background="{DynamicResource Brush.Conflict.Theirs.Background}" CornerRadius="4"
                         Padding="12" Margin="6,0,0,0">
                     <StackPanel Spacing="8">
                         <TextBlock Text="{StaticResource GitConflictWindow_TheirsHeader}"
-                                   Foreground="{DynamicResource Brush.Conflict.Mine.Foreground}" FontSize="12" FontWeight="Bold"/>
+                                   Foreground="{DynamicResource Brush.Conflict.Theirs.Foreground}" FontSize="12" FontWeight="Bold"/>
                         <TextBlock Text="{StaticResource GitConflict_DefaultTextLabel}"
                                    Foreground="{DynamicResource Brush.Text.Muted}" FontSize="10"
                                    IsVisible="{Binding HasFemaleRow}"/>
