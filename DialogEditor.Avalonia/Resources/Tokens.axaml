@@ -105,11 +105,14 @@
     <SolidColorBrush x:Key="Brush.Diff.Inline.Mine"   Color="{StaticResource Palette.Green.350}"/>
     <SolidColorBrush x:Key="Brush.Diff.Inline.Theirs" Color="{StaticResource Palette.Red.300}"/>
 
-    <!-- Merge-conflict mine/theirs -->
-    <SolidColorBrush x:Key="Brush.Conflict.Mine.Background"   Color="{StaticResource Palette.Maroon.900}"/>
-    <SolidColorBrush x:Key="Brush.Conflict.Mine.Foreground"   Color="{StaticResource Palette.Red.300}"/>
-    <SolidColorBrush x:Key="Brush.Conflict.Theirs.Background"  Color="{StaticResource Palette.Navy.150}"/>
-    <SolidColorBrush x:Key="Brush.Conflict.Theirs.Foreground"  Color="{StaticResource Palette.Sky.300}"/>
+    <!-- Merge-conflict mine/theirs (GitConflictResolutionWindow). Mine = the BLUE pair,
+         Theirs = the RED pair, matching the live window's panels. Spec §7.8's first draft
+         listed these names against the opposite hues; the shipping window is authoritative,
+         so the values are corrected here and the window now binds its matching-named tokens. -->
+    <SolidColorBrush x:Key="Brush.Conflict.Mine.Background"   Color="{StaticResource Palette.Navy.150}"/>
+    <SolidColorBrush x:Key="Brush.Conflict.Mine.Foreground"   Color="{StaticResource Palette.Sky.300}"/>
+    <SolidColorBrush x:Key="Brush.Conflict.Theirs.Background"  Color="{StaticResource Palette.Maroon.900}"/>
+    <SolidColorBrush x:Key="Brush.Conflict.Theirs.Foreground"  Color="{StaticResource Palette.Red.300}"/>
 
     <!-- Canvas connection strokes (ConversationView edges + LegendWindow swatches).
          A distinct semantic family from text/borders so a future palette can recolour

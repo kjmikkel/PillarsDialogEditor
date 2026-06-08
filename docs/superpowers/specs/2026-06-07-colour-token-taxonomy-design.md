@@ -327,11 +327,15 @@ Brush.Syntax.Default     -> Palette.Neutral.910 (#e8e8e8)
 ```
 
 ### 7.8 Merge-conflict mine/theirs pair (`GitConflictResolutionWindow`)
+> Corrected 2026-06-08: this table's first draft named Mine against the red pair and
+> Theirs against the blue, but the shipping window paints **Mine = blue, Theirs = red**.
+> The window is authoritative, so the token *names* now bind the hues below (values
+> unchanged on screen; only the name→value pairing was fixed).
 ```
-Brush.Conflict.Mine.Background     -> Palette.Maroon.900   (#3a1a1a)
-Brush.Conflict.Mine.Foreground     -> Palette.Red.300      (#ff9c9c)
-Brush.Conflict.Theirs.Background    -> Palette.Navy.150     (#1a2738)
-Brush.Conflict.Theirs.Foreground    -> Palette.Sky.300      (#9cc4ff)
+Brush.Conflict.Mine.Background     -> Palette.Navy.150     (#1a2738 blue)
+Brush.Conflict.Mine.Foreground     -> Palette.Sky.300      (#9cc4ff blue)
+Brush.Conflict.Theirs.Background    -> Palette.Maroon.900   (#3a1a1a red)
+Brush.Conflict.Theirs.Foreground    -> Palette.Red.300      (#ff9c9c red)
 ```
 
 ### 7.9 Action buttons (coloured, with white text)
