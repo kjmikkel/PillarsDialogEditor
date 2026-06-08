@@ -8,36 +8,36 @@
 
     <UserControl.Styles>
         <Style Selector="TextBlock.group-header">
-            <Setter Property="Foreground" Value="#888"/>
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Muted}"/>
             <Setter Property="FontSize"   Value="8"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Margin"     Value="0,10,0,3"/>
         </Style>
         <Style Selector="TextBlock.field-label">
-            <Setter Property="Foreground"  Value="#999"/>
+            <Setter Property="Foreground"  Value="{DynamicResource Brush.Text.Caption}"/>
             <Setter Property="FontSize"    Value="9"/>
             <Setter Property="Margin"      Value="0,4,0,2"/>
         </Style>
         <Style Selector="TextBox.detail-field">
-            <Setter Property="Background"      Value="#1a1a1a"/>
-            <Setter Property="Foreground"      Value="#e8e8e8"/>
-            <Setter Property="BorderBrush"     Value="#444"/>
+            <Setter Property="Background"      Value="{DynamicResource Brush.Surface.Card}"/>
+            <Setter Property="Foreground"      Value="{DynamicResource Brush.Text.Primary}"/>
+            <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Border.Strong}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="FontSize"        Value="10"/>
             <Setter Property="Padding"         Value="4,3"/>
             <Setter Property="Margin"          Value="0,0,0,4"/>
         </Style>
         <Style Selector="ComboBox.detail-combo">
-            <Setter Property="Background"          Value="#1a1a1a"/>
-            <Setter Property="Foreground"          Value="#e8e8e8"/>
-            <Setter Property="BorderBrush"         Value="#444"/>
+            <Setter Property="Background"          Value="{DynamicResource Brush.Surface.Card}"/>
+            <Setter Property="Foreground"          Value="{DynamicResource Brush.Text.Primary}"/>
+            <Setter Property="BorderBrush"         Value="{DynamicResource Brush.Border.Strong}"/>
             <Setter Property="FontSize"            Value="10"/>
             <Setter Property="Padding"             Value="4,2"/>
             <Setter Property="Margin"              Value="0,0,0,4"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
         </Style>
         <Style Selector="CheckBox.detail-check">
-            <Setter Property="Foreground" Value="#ccc"/>
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}"/>
             <Setter Property="FontSize"   Value="10"/>
             <Setter Property="Margin"     Value="0,0,0,4"/>
         </Style>
@@ -47,7 +47,7 @@
         <DataTemplate x:Key="ReadOnlyRowTemplate" DataType="models:PropertyRow">
             <Grid ColumnDefinitions="110,*" Margin="0,1,0,1">
                 <TextBlock Grid.Column="0" Text="{Binding Label}"
-                           Foreground="#999" FontSize="10" VerticalAlignment="Top"/>
+                           Foreground="{DynamicResource Brush.Text.Caption}" FontSize="10" VerticalAlignment="Top"/>
                 <TextBlock Grid.Column="1" Text="{Binding Value}"
                            Foreground="{Binding Style, Converter={StaticResource PropertyValueStyleToBrush}}"
                            FontSize="10" TextWrapping="Wrap" LineHeight="15"/>
@@ -57,11 +57,11 @@
 
     <Grid>
         <TextBlock Text="{StaticResource Label_SelectNode}"
-                   Foreground="#555" FontSize="11"
+                   Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="11"
                    HorizontalAlignment="Center" VerticalAlignment="Center"
                    IsVisible="{Binding HasContent, Converter={StaticResource InverseBoolToVis}}"/>
 
-        <ScrollViewer Background="#2d2d2d" IsVisible="{Binding HasContent}">
+        <ScrollViewer Background="{DynamicResource Brush.Surface.Subtle}" IsVisible="{Binding HasContent}">
             <StackPanel Margin="8">
 
                 <!-- ── Attribution (git: who last edited this node) ────── -->
@@ -69,7 +69,7 @@
                     <TextBlock Classes="group-header" Text="{StaticResource NodeDetail_LastEditedLabel}"/>
                     <TextBlock Text="{Binding LastEditedSummary}"
                                ToolTip.Tip="{Binding LastEditedTooltip}"
-                               Foreground="#bdbd80" FontSize="10" TextWrapping="Wrap"/>
+                               Foreground="{DynamicResource Brush.Node.Quotidian.Note}" FontSize="10" TextWrapping="Wrap"/>
                 </StackPanel>
 
                 <!-- ── Default / Male text ─────────────────────────────── -->
@@ -139,14 +139,14 @@
                           SelectedItem="{Binding DisplayType, Mode=TwoWay}"
                           ToolTip.Tip="{StaticResource ToolTip_DisplayType}"/>
 
-                <Border Background="#2A2000" BorderBrush="#7A5C00" BorderThickness="1"
+                <Border Background="{DynamicResource Brush.Bark.Detail.Background}" BorderBrush="{DynamicResource Brush.Bark.Detail.Border}" BorderThickness="1"
                         CornerRadius="2" Padding="6,4" Margin="0,0,0,4"
                         IsVisible="{Binding BarkWarnings.Count, Converter={StaticResource CountToVis}}"
                         ToolTip.Tip="{StaticResource ToolTip_BarkWarnings}">
                     <ItemsControl ItemsSource="{Binding BarkWarnings}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding}" Foreground="#E8C050"
+                                <TextBlock Text="{Binding}" Foreground="{DynamicResource Brush.Bark.Detail.Text}"
                                            FontSize="10" TextWrapping="Wrap"/>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -202,13 +202,13 @@
                 <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
                     <TextBlock Grid.Column="0"
                                Text="{Binding ScriptSummary}"
-                               Foreground="#888" FontSize="10"
+                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="10"
                                VerticalAlignment="Center"
                                TextTrimming="CharacterEllipsis"/>
                     <Button Grid.Column="1"
                             Content="{StaticResource Button_EditScripts}"
                             Click="EditScripts_Click"
-                            Background="#333" Foreground="#aaa" BorderThickness="0"
+                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0"
                             Padding="8,3" FontSize="10"
                             ToolTip.Tip="{StaticResource ToolTip_EditScripts}"/>
                 </Grid>
@@ -232,14 +232,14 @@
                     <!-- Summary: show count + first condition names -->
                     <TextBlock Grid.Column="0"
                                Text="{Binding ConditionSummary}"
-                               Foreground="#888" FontSize="10"
+                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="10"
                                VerticalAlignment="Center"
                                TextTrimming="CharacterEllipsis"/>
                     <Button Grid.Column="1"
                             x:Name="EditConditionsButton"
                             Content="{StaticResource Button_EditConditions}"
                             Click="EditConditions_Click"
-                            Background="#333" Foreground="#aaa" BorderThickness="0"
+                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0"
                             Padding="8,3" FontSize="10"
                             ToolTip.Tip="{StaticResource ToolTip_EditConditions}"/>
                 </Grid>
@@ -254,11 +254,11 @@
                                 <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto">
                                     <TextBlock Grid.Column="0"
                                                Text="{StaticResource Link_Arrow}"
-                                               Foreground="#5dade2" FontSize="10"
+                                               Foreground="{DynamicResource Brush.Text.Info}" FontSize="10"
                                                VerticalAlignment="Center" Margin="0,0,4,0"/>
                                     <TextBlock Grid.Column="1"
                                                Text="{Binding Target.Owner.NodeId}"
-                                               Foreground="#5dade2" FontSize="10"
+                                               Foreground="{DynamicResource Brush.Text.Info}" FontSize="10"
                                                VerticalAlignment="Center"/>
                                     <!-- Condition editor button — dim when no conditions, accent when present -->
                                     <Button Grid.Column="2"
@@ -277,7 +277,7 @@
                                                       RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             CommandParameter="{Binding}"
                                             Background="Transparent" BorderThickness="0"
-                                            Foreground="#888" FontSize="9" Padding="4,1"
+                                            Foreground="{DynamicResource Brush.Text.Muted}" FontSize="9" Padding="4,1"
                                             ToolTip.Tip="{StaticResource ToolTip_DeleteLink}"/>
                                 </Grid>
                                 <!-- Row 1: editable properties -->
@@ -285,8 +285,8 @@
                                     <ComboBox Grid.Column="0"
                                               SelectedItem="{Binding QuestionNodeTextDisplay, Mode=TwoWay}"
                                               ItemsSource="{x:Static vm:ConnectionViewModel.QTDOptions}"
-                                              Background="#1a1a1a" Foreground="#ccc"
-                                              BorderBrush="#444" BorderThickness="1"
+                                              Background="{DynamicResource Brush.Surface.Card}" Foreground="{DynamicResource Brush.Text.Secondary}"
+                                              BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                                               FontSize="10" Padding="3,1" Height="22"
                                               ToolTip.Tip="{StaticResource ToolTip_LinkQTD}">
                                         <ComboBox.ItemTemplate>
@@ -298,14 +298,14 @@
                                     </ComboBox>
                                     <TextBlock Grid.Column="1"
                                                Text="{StaticResource Label_LinkWeight}"
-                                               Foreground="#666" FontSize="10"
+                                               Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10"
                                                VerticalAlignment="Center" Margin="6,0,4,0"/>
                                     <NumericUpDown Grid.Column="2"
                                                    Value="{Binding RandomWeight, Mode=TwoWay, Converter={StaticResource FloatDecimal}}"
                                                    Minimum="0" Maximum="100"
                                                    Increment="0.1" FormatString="0.##"
-                                                   Background="#1a1a1a" Foreground="#ccc"
-                                                   BorderBrush="#444" BorderThickness="1"
+                                                   Background="{DynamicResource Brush.Surface.Card}" Foreground="{DynamicResource Brush.Text.Secondary}"
+                                                   BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                                                    FontSize="10" Padding="2,0" Width="72"
                                                    ShowButtonSpinner="False"
                                                    ClipValueToMinMax="True"
@@ -321,14 +321,14 @@
                     <TextBox Grid.Column="0"
                              Text="{Binding AddLinkTargetId, Mode=TwoWay}"
                              Watermark="{StaticResource Placeholder_AddLinkTargetId}"
-                             Background="#1a1a1a" Foreground="#e8e8e8"
-                             BorderBrush="#444" BorderThickness="1"
+                             Background="{DynamicResource Brush.Surface.Card}" Foreground="{DynamicResource Brush.Text.Primary}"
+                             BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                              FontSize="10" Padding="4,3"
                              ToolTip.Tip="{StaticResource ToolTip_AddLinkTargetId}"/>
                     <Button Grid.Column="1"
                             Content="{StaticResource Button_AddLink}"
                             Command="{Binding AddLinkCommand}"
-                            Background="#333" Foreground="#aaa" BorderThickness="0"
+                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0"
                             Padding="6,2" Margin="4,0,0,0"
                             ToolTip.Tip="{StaticResource ToolTip_AddLink}"/>
                 </Grid>

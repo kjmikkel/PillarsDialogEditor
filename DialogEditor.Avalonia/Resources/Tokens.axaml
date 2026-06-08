@@ -76,6 +76,11 @@
     <SolidColorBrush x:Key="Brush.Text.OnAccent"     Color="{StaticResource Palette.White}"/>
     <SolidColorBrush x:Key="Brush.Text.Female.Active" Color="{StaticResource Palette.Neutral.910}"/>
     <SolidColorBrush x:Key="Brush.Text.Female.Dim"    Color="{StaticResource Palette.Neutral.335}"/>
+    <!-- Dark text on the LIGHT-tinted node-card bodies (NPC parchment, player azure, …) —
+         the inverse of the dark-theme ramp above. No Text.* token matched Neutral.200/400
+         as a foreground, so these name the "dark-on-light" role for the Layer 1 seam. -->
+    <SolidColorBrush x:Key="Brush.Text.OnLight"       Color="{StaticResource Palette.Neutral.200}"/>
+    <SolidColorBrush x:Key="Brush.Text.OnLight.Muted" Color="{StaticResource Palette.Neutral.400}"/>
 
     <!-- Status foreground accents -->
     <SolidColorBrush x:Key="Brush.Text.Status.New"     Color="{StaticResource Palette.Green.400}"/>
@@ -105,6 +110,16 @@
     <SolidColorBrush x:Key="Brush.Conflict.Mine.Foreground"   Color="{StaticResource Palette.Red.300}"/>
     <SolidColorBrush x:Key="Brush.Conflict.Theirs.Background"  Color="{StaticResource Palette.Navy.150}"/>
     <SolidColorBrush x:Key="Brush.Conflict.Theirs.Foreground"  Color="{StaticResource Palette.Sky.300}"/>
+
+    <!-- Canvas connection strokes (ConversationView edges + LegendWindow swatches).
+         A distinct semantic family from text/borders so a future palette can recolour
+         edges independently; the White highlight is tokenised here for family completeness. -->
+    <SolidColorBrush x:Key="Brush.Connection.Default"            Color="{StaticResource Palette.Neutral.665}"/>
+    <SolidColorBrush x:Key="Brush.Connection.Always"            Color="{StaticResource Palette.Amber.500}"/>
+    <SolidColorBrush x:Key="Brush.Connection.Never"             Color="{StaticResource Palette.Neutral.335}"/>
+    <SolidColorBrush x:Key="Brush.Connection.Highlighted"        Color="{StaticResource Palette.White}"/>
+    <SolidColorBrush x:Key="Brush.Connection.Highlighted.Always" Color="{StaticResource Palette.Amber.520}"/>
+    <SolidColorBrush x:Key="Brush.Connection.Highlighted.Never"  Color="{StaticResource Palette.Neutral.735}"/>
 
     <!-- Action buttons (coloured background, white text). Confirm = green commit/apply;
          Caution = burnt force/destructive-ish; Primary = azure default dialog action

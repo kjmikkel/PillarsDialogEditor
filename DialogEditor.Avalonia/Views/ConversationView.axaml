@@ -8,73 +8,73 @@
     <UserControl.Styles>
         <!-- Connection stroke colours — driven by CSS classes set in code -->
         <Style Selector="nodify|Connection">
-            <Setter Property="Stroke" Value="#aaa"/>
+            <Setter Property="Stroke" Value="{DynamicResource Brush.Connection.Default}"/>
             <Setter Property="StrokeThickness" Value="1.5"/>
         </Style>
         <Style Selector="nodify|Connection.always">
-            <Setter Property="Stroke" Value="#b8760a"/>
+            <Setter Property="Stroke" Value="{DynamicResource Brush.Connection.Always}"/>
         </Style>
         <Style Selector="nodify|Connection.never">
-            <Setter Property="Stroke" Value="#555"/>
+            <Setter Property="Stroke" Value="{DynamicResource Brush.Connection.Never}"/>
             <Setter Property="StrokeDashArray" Value="4,3"/>
         </Style>
         <Style Selector="nodify|Connection.highlighted">
-            <Setter Property="Stroke" Value="White"/>
+            <Setter Property="Stroke" Value="{DynamicResource Brush.Connection.Highlighted}"/>
             <Setter Property="StrokeThickness" Value="2.5"/>
         </Style>
         <Style Selector="nodify|Connection.highlighted.always">
-            <Setter Property="Stroke" Value="#f0a830"/>
+            <Setter Property="Stroke" Value="{DynamicResource Brush.Connection.Highlighted.Always}"/>
         </Style>
         <Style Selector="nodify|Connection.highlighted.never">
-            <Setter Property="Stroke" Value="#bbb"/>
+            <Setter Property="Stroke" Value="{DynamicResource Brush.Connection.Highlighted.Never}"/>
         </Style>
     </UserControl.Styles>
 
     <Grid RowDefinitions="Auto,*">
 
         <!-- Toolbar -->
-        <Border Grid.Row="0" Background="#252525" Padding="8,4">
+        <Border Grid.Row="0" Background="{DynamicResource Brush.Surface.Panel}" Padding="8,4">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                     <Button Content="{StaticResource Legend_Control_Fit}"
                             Click="FitToScreen_Click"
-                            Background="#333" Foreground="#aaa" BorderThickness="0" Padding="8,2"
+                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2"
                             ToolTip.Tip="{StaticResource ToolTip_FitToScreen}"/>
                     <Button Content="+"
                             Click="ZoomIn_Click"
-                            Background="#333" Foreground="#aaa" BorderThickness="0" Padding="8,2" Margin="4,0,0,0"
+                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2" Margin="4,0,0,0"
                             ToolTip.Tip="{StaticResource ToolTip_ZoomIn}"/>
                     <Button Content="−"
                             Click="ZoomOut_Click"
-                            Background="#333" Foreground="#aaa" BorderThickness="0" Padding="8,2" Margin="2,0,0,0"
+                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2" Margin="2,0,0,0"
                             ToolTip.Tip="{StaticResource ToolTip_ZoomOut}"/>
                     <Button Content="⌂"
                             Click="CenterOnRoot_Click"
-                            Background="#333" Foreground="#aaa" BorderThickness="0" Padding="8,2" Margin="8,0,0,0"
+                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2" Margin="8,0,0,0"
                             ToolTip.Tip="{StaticResource ToolTip_JumpToRoot}"/>
                 </StackPanel>
                 <TextBlock DockPanel.Dock="Left"
                            Text="{Binding StatisticsText}"
-                           Foreground="#888" FontSize="10" VerticalAlignment="Center" Margin="0,0,8,0"
+                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="10" VerticalAlignment="Center" Margin="0,0,8,0"
                            ToolTip.Tip="{Binding StatisticsTooltip}"/>
                 <Grid VerticalAlignment="Center" Margin="0,0,8,0">
                     <TextBox x:Name="SearchBox"
                              Text="{Binding SearchQuery}"
-                             Background="#333" Foreground="#ccc" CaretBrush="#ccc"
-                             BorderBrush="#555" BorderThickness="1"
+                             Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" CaretBrush="{DynamicResource Brush.Text.Secondary}"
+                             BorderBrush="{DynamicResource Brush.Border.Muted}" BorderThickness="1"
                              Padding="6,2,24,2" FontSize="12" Height="26"
                              VerticalContentAlignment="Center"
                              KeyDown="SearchBox_KeyDown"
                              ToolTip.Tip="{StaticResource ToolTip_SearchNodes}"/>
                     <TextBlock Text="{StaticResource Placeholder_SearchNodes}"
-                               Foreground="#555" FontSize="10"
+                               Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10"
                                Padding="8,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"
                                IsVisible="{Binding SearchQuery, Converter={StaticResource StringIsEmpty}}"/>
                     <Button Command="{Binding ClearSearchCommand}"
                             HorizontalAlignment="Right" Width="20"
                             Content="✕" VerticalAlignment="Center"
                             Background="Transparent" BorderThickness="0"
-                            Foreground="#666" FontSize="10" Cursor="Hand"
+                            Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10" Cursor="Hand"
                             ToolTip.Tip="{StaticResource ToolTip_ClearSearch}"/>
                 </Grid>
             </DockPanel>
@@ -83,7 +83,7 @@
         <!-- Canvas -->
         <Grid Grid.Row="1">
             <nodify:NodifyEditor x:Name="Editor"
-                                 Background="#7a6a8e"
+                                 Background="{DynamicResource Brush.Accent.Badge}"
                                  ItemsSource="{Binding Nodes}"
                                  Connections="{Binding Connections}"
                                  PendingConnection="{Binding PendingConnection}"
@@ -100,7 +100,7 @@
                         <nodify:PendingConnection
                             StartedCommand="{Binding StartCommand}"
                             CompletedCommand="{Binding CompleteCommand}"
-                            Stroke="#aaaaaa" StrokeThickness="2" StrokeDashArray="4,3"/>
+                            Stroke="{DynamicResource Brush.Connection.Default}" StrokeThickness="2" StrokeDashArray="4,3"/>
                     </DataTemplate>
                 </nodify:NodifyEditor.PendingConnectionTemplate>
 
@@ -189,7 +189,7 @@
                                     <TextBlock Text="{Binding TextPreview}"
                                                TextWrapping="Wrap"
                                                Padding="6,4" FontSize="10"
-                                               Foreground="#333" MaxHeight="70"/>
+                                               Foreground="{DynamicResource Brush.Text.OnLight}" MaxHeight="70"/>
                                 </Border>
 
                                 <!-- Footer -->
@@ -200,7 +200,7 @@
                                             <Binding Path="DisplayType"/>
                                         </MultiBinding>
                                     </Border.Background>
-                                    <TextBlock Text="{Binding FooterText}" FontSize="9" Foreground="#666"/>
+                                    <TextBlock Text="{Binding FooterText}" FontSize="9" Foreground="{DynamicResource Brush.Text.OnLight.Muted}"/>
                                 </Border>
 
                             </Grid>
@@ -236,7 +236,7 @@
                 HorizontalAlignment="Right" VerticalAlignment="Bottom"
                 Margin="8" Width="160" Height="110"
                 IsReadOnly="False"
-                Background="#1a1a2a"
+                Background="{DynamicResource Brush.Surface.Info}"
                 ItemsSource="{Binding Nodes}"
                 ViewportLocation="{Binding ViewportLocation, ElementName=Editor, Mode=TwoWay}"
                 ViewportSize="{Binding ViewportSize, ElementName=Editor}"
