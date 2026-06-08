@@ -60,10 +60,6 @@
     <Color x:Key="Palette.Green.550">#FF3A7A3A</Color>
     <Color x:Key="Palette.Green.500">#FF5DB55D</Color>
     <Color x:Key="Palette.Green.400">#FF7DCEA0</Color>
-    <!-- Green.350: inline text-diff "mine/before" word highlight. Lighter than Green.400;
-         exact preservation of the legacy #9be39b code-behind literal (spec Appendix B
-         "confirm at impl" — no existing green matched, so its own primitive). -->
-    <Color x:Key="Palette.Green.350">#FF9BE39B</Color>
     <Color x:Key="Palette.Amber.500">#FFB8760A</Color>
     <Color x:Key="Palette.Amber.600">#FFC08A2A</Color>
     <Color x:Key="Palette.Amber.520">#FFF0A830</Color>
