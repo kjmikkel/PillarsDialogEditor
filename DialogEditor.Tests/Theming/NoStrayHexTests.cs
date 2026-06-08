@@ -3,6 +3,15 @@ using Xunit;
 
 namespace DialogEditor.Tests.Theming;
 
+/// <summary>
+/// The colour-token contract enforcer (Layer 0 definition-of-done). Two tiers: hex
+/// primitives live ONLY in Palette.axaml (private tier); everything else — views,
+/// control themes, converters — binds the semantic Brush.* tokens in Tokens.axaml
+/// (public tier). These tests fail the build if any hex literal escapes Palette.axaml
+/// or any converter constructs a brush, so "nothing constructs a colour any other way"
+/// is true rather than aspirational. See
+/// docs/superpowers/specs/2026-06-07-colour-token-taxonomy-design.md §11.
+/// </summary>
 public class NoStrayHexTests
 {
     // Repo root: walk up from the test bin dir until we find the Avalonia project folder.
