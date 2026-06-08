@@ -7,7 +7,7 @@
         Width="640" Height="580" MinWidth="500" MinHeight="420"
         CanResize="True"
         WindowStartupLocation="CenterScreen"
-        Background="#1e1e1e"
+        Background="{DynamicResource Brush.Surface.Window}"
         x:CompileBindings="False">
     <shared:PatchManagerView/>
 </Window>
