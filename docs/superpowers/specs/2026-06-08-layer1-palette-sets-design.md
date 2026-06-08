@@ -158,6 +158,10 @@ All written test-first; Layer 1 is "done" when they are green. A shared test hel
 `Palette.<set>` + `Tokens.axaml` into a throwaway `ResourceDictionary` and resolves keys, so one
 harness serves groups 2 and 3 and can load a non-default palette in isolation.
 
+**Make the harness data-driven over a *list* of palettes** (parity, golden, and contrast all iterate
+the same palette collection) so a future palette set is a single list entry, not new bespoke test
+code. This keeps adding palettes append-only at the test level too — see §9.
+
 1. **Structural parity (keystone).** Load all four palette dictionaries; assert each defines
    **exactly** the same `Palette.*` key set as `Palette.Dark.axaml` — no missing, no extra keys. This
    is what guarantees the frozen `Tokens.axaml` resolves cleanly under any palette. A missing key
@@ -231,7 +235,34 @@ The three new files remain merged nowhere; `App.axaml` still loads only `Palette
   "only `Palette.axaml` permits a hex literal" wording to "the palette family"; reflect the
   `Palette.Dark.axaml` rename where Layer 0 text names the file.
 
-## 8. Open questions
+## 8. Layer 2 hand-off note
+
+When Layer 2 builds the palette chooser, it should **enumerate the available `Palette.*.axaml` files
+dynamically** rather than hardcode the count or names of the four sets that exist today. Combined
+with the data-driven test harness (§5) and the append-only file structure (§3), this makes adding a
+future palette free at *every* level — file, test, and chooser. Do not bake "there are four
+palettes" into Layer 2.
+
+## 9. Future palette expansion (why deferral is safe)
+
+Adding more palettes later — including **per-type colourblind sets** (separate deuteranopia /
+protanopia / tritanopia tunings) — carries **no deferral penalty**: each is a purely additive
+`Palette.<Set>.axaml` (full key set, one golden + contrast entry), picked up by the data-driven tests
+(§5) and the family regex enforcer (§3.2). The per-palette cost is constant whenever it is paid.
+
+Two deliberate consequences:
+
+- **The single `Colourblind` set is intentional (YAGNI).** Okabe–Ito is *colour-universal* — designed
+  to stay distinguishable under deuteranopia, protanopia, **and** tritanopia at once — so per-type
+  palettes are a heavier, separate philosophy (three colourblind sets to keep contrast-valid, a
+  busier chooser) for benefit Okabe–Ito is built to make unnecessary. Defer per-type sets until a
+  real user shows the universal set fails them for a specific type.
+- **The reusable one-time cost is already banked here.** The expensive, type-independent work is
+  identifying *which token roles are colour-load-bearing* (the §4.3 remap table). That analysis is
+  captured now and is reused unchanged by any future per-type palette; only the destination hues
+  would differ.
+
+## 10. Open questions
 
 None at design time. The per-palette hex values are deferred to implementation by design (driven by
 the golden + contrast tests), not because they are undecided in principle.
