@@ -128,6 +128,17 @@ land later or never without making anything beneath them wrong.
   Annotations gap. (Implementation added a few semantic tokens the spec's first draft omitted —
   `Brush.Button.{Primary,Destructive}.Background`, `Brush.Surface.Subtle`, `Brush.Connection.*`,
   `Brush.Text.OnLight*`, `Brush.Diff.Inline.*` — each value-faithful, no new colours.)
+  - **Layer 0 follow-up — `DialogEditor.Avalonia.Shared` not yet migrated (deferred).** The
+    Layer 0 migration and its `NoStrayHexTests` enforcer cover the **`DialogEditor.Avalonia`**
+    project only. The sibling **`DialogEditor.Avalonia.Shared`** project is out of scope and
+    still hardcodes colour: `PatchManagerView.axaml` carries **23 inline hex literals** (its
+    code-behind constructs no brushes). Because the enforcer never scans this project, those
+    literals are undetected — so the contract "nothing constructs a colour any other way" holds
+    for the main app but **not** app-wide. To close: tokenise `PatchManagerView.axaml` onto the
+    existing `Brush.*` keys (`Tokens.axaml` is already merged app-wide via `App.axaml`, so the
+    tokens resolve there), then widen `NoStrayHexTests.AvaloniaRoot()` (or add a second root) to
+    also scan `DialogEditor.Avalonia.Shared`. No new tokens are expected — the 23 literals should
+    map onto the same surface/border/text greys and accents already in the registry.
 - **Layer 1 — Palette sets (deferred, independent).** Alternative *values* for the same token
   keys: Dark (today's colours), Light, High-Contrast, and colourblind-tuned sets. Same keys,
   different hex; because Layer 0 guarantees everything reads keys, swapping the set retints
