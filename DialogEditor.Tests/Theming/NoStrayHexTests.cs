@@ -4,7 +4,7 @@ namespace DialogEditor.Tests.Theming;
 
 /// <summary>
 /// The colour-token contract enforcer (Layer 0 definition-of-done). Two tiers: hex
-/// primitives live ONLY in Palette.axaml (private tier); everything else — views,
+/// primitives live ONLY in the palette family (`Palette*.axaml`) (private tier); everything else — views,
 /// control themes, converters, code-behind — binds the semantic Brush.* tokens in
 /// Tokens.axaml (public tier) or resolves them via <c>TokenBrushes.Resolve</c>. These
 /// tests fail the build if any hex literal escapes Palette.axaml or any production type
@@ -37,6 +37,11 @@ public class NoStrayHexTests
         path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}") ||
         path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}");
 
+    // The sanctioned hex tier is the whole palette family: Palette.Dark.axaml plus the Layer 1
+    // alternates (Palette.Light/HighContrast/Colourblind.axaml). Any other filename with hex fails.
+    private static readonly Regex PaletteFile =
+        new(@"^Palette(\.[A-Za-z]+)?\.axaml$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
     private static readonly Regex Hex = new(@"#[0-9A-Fa-f]{3,8}\b", RegexOptions.Compiled);
     private static readonly Regex CSharpColour = new(
         @"new\s+SolidColorBrush|Color\.FromRgb|Color\.FromArgb|Color\.Parse", RegexOptions.Compiled);
@@ -49,14 +54,14 @@ public class NoStrayHexTests
         foreach (var file in Directory.EnumerateFiles(root, "*.axaml", SearchOption.AllDirectories))
         {
             if (IsBuildArtifact(file)) continue;
-            if (file.EndsWith("Palette.axaml", StringComparison.OrdinalIgnoreCase)) continue;
+            if (PaletteFile.IsMatch(Path.GetFileName(file))) continue;
             var lines = File.ReadAllLines(file);
             for (var i = 0; i < lines.Length; i++)
                 if (Hex.IsMatch(lines[i]))
                     offenders.Add($"{Path.GetFileName(file)}:{i + 1}: {lines[i].Trim()}");
         }
         Assert.True(offenders.Count == 0,
-            "Hex colour literals are only allowed in Palette.axaml. Offenders:\n" + string.Join("\n", offenders));
+            "Hex colour literals are only allowed in the palette family (Palette*.axaml). Offenders:\n" + string.Join("\n", offenders));
     }
 
     [Fact]

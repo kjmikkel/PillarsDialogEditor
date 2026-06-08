@@ -14,7 +14,7 @@
                 <!-- Layer 0 token registry lives in the SHARED project so BOTH the editor
                      and the standalone PatchManager app resolve the same Brush.* keys
                      (the shared PatchManagerView is hosted by both). -->
-                <ResourceInclude Source="avares://DialogEditor.Avalonia.Shared/Resources/Palette.axaml"/>
+                <ResourceInclude Source="avares://DialogEditor.Avalonia.Shared/Resources/Palette.Dark.axaml"/>
                 <ResourceInclude Source="avares://DialogEditor.Avalonia.Shared/Resources/Tokens.axaml"/>
                 <ResourceInclude Source="avares://Nodify/Theme.axaml"/>
                 <ResourceInclude Source="avares://DialogEditor.Avalonia/Resources/Strings.axaml"/>
