@@ -110,19 +110,24 @@ The goal is a single, named-token colour registry. It is framed as **layers**, o
 the foundation is ever a dependency for other gaps; the upper layers are independent and may
 land later or never without making anything beneath them wrong.
 
-- **Layer 0 — Token registry (the foundation; the ONLY layer other gaps may depend on).**
-  One resource dictionary of *semantically named* tokens (e.g. `Brush.Node.Npc.Header`,
-  `Brush.Diff.Added`, `Brush.Toolbar.Button.Background`, `Brush.Annotation.Region.*`). Every
-  hardcoded value migrates to it: `App.axaml` themes use `DynamicResource`; the brush
-  converters resolve from the registry instead of `new SolidColorBrush(...)`. The drift bug
-  dies by construction — duplicated palettes become one shared key. **Published contract:**
-  "there exists a named token for every semantic colour role, and nothing in the app
-  constructs a colour any other way." No switching, no settings UI required for this layer to
-  be complete and dependable. The load-bearing design decision here is the **token naming
-  taxonomy** — those semantic role names *are* the public interface every dependent gap
-  quotes, so they must outlive any particular palette. **Design settled (2026-06-07):**
-  the full Layer 0 taxonomy, exhaustive migration table, and enforcement plan live in
-  `docs/superpowers/specs/2026-06-07-colour-token-taxonomy-design.md`.
+- **Layer 0 — Token registry (the foundation; the ONLY layer other gaps may depend on). ✅ IMPLEMENTED (2026-06-08).**
+  Two merged resource dictionaries of *semantically named* tokens — `Resources/Palette.axaml`
+  (primitive `Palette.*` colours; the only file permitted a hex literal) → `Resources/Tokens.axaml`
+  (semantic `Brush.*` brushes, e.g. `Brush.Node.Npc.Header`, `Brush.Diff.Added.Fill`,
+  `Brush.Toolbar.Button.Background`). Every hardcoded value migrated: `App.axaml` themes and all
+  29 views bind `DynamicResource Brush.*`; the brush converters and code-behind resolve through
+  `Theming/TokenBrushes.Resolve` instead of `new SolidColorBrush(...)`. The drift bug died by
+  construction — the duplicated `NodeColorConverter`/`SpeakerCategoryToBrushConverter` palettes
+  became one shared key. **Published contract enforced by test:** `NoStrayHexTests` fails the
+  build if any hex literal appears outside `Palette.axaml` or any converter constructs a colour,
+  making "nothing constructs a colour any other way" true rather than aspirational. The token
+  naming taxonomy — the public interface every dependent gap quotes — and the exhaustive
+  migration table live in `docs/superpowers/specs/2026-06-07-colour-token-taxonomy-design.md`;
+  the TDD implementation plan is `docs/superpowers/plans/2026-06-07-colour-token-taxonomy.md`.
+  `Brush.Annotation.Region.*` remains a reserved (unpopulated) namespace for the Canvas
+  Annotations gap. (Implementation added a few semantic tokens the spec's first draft omitted —
+  `Brush.Button.{Primary,Destructive}.Background`, `Brush.Surface.Subtle`, `Brush.Connection.*`,
+  `Brush.Text.OnLight*`, `Brush.Diff.Inline.*` — each value-faithful, no new colours.)
 - **Layer 1 — Palette sets (deferred, independent).** Alternative *values* for the same token
   keys: Dark (today's colours), Light, High-Contrast, and colourblind-tuned sets. Same keys,
   different hex; because Layer 0 guarantees everything reads keys, swapping the set retints
