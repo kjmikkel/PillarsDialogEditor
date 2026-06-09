@@ -1,7 +1,14 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!--  PALETTE — LIGHT set (Layer 1). Same keys as Palette.Dark.axaml, light-theme values.
-          Slot-inverted neutrals; node cards stay light cards; accent text deepened for contrast. See spec §4.1. -->
+    <!--  PALETTE — LIGHT set (Layer 1 palette sets). Same Palette.* keys as Palette.Dark.axaml,
+          different values; the frozen Tokens.axaml resolves against whichever palette is merged.
+          NOT merged by any App.axaml yet — inert groundwork until Layer 2 adds runtime selection.
+          Derivation (spec §4.1): the neutral ramp is SLOT-INVERTED (surfaces -> light, text -> dark,
+          borders -> mid); node header fills and card-body tints are kept identical to Dark (the node
+          cards are light cards in every theme); every accent used as text-on-light is deepened to
+          clear WCAG AA. Keys are guaranteed to match Dark by PaletteSetParityTests; values are locked
+          by PaletteGoldenTests and gated by PaletteContrastTests (AA).
+          See docs/superpowers/specs/2026-06-08-layer1-palette-sets-design.md §4.1. -->
 
     <!-- Neutrals (grayscale ramp) -->
     <Color x:Key="Palette.Neutral.80">#FFFBFBFB</Color>

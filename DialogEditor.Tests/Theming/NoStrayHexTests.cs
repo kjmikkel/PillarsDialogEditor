@@ -7,7 +7,7 @@ namespace DialogEditor.Tests.Theming;
 /// primitives live ONLY in the palette family (`Palette*.axaml`) (private tier); everything else — views,
 /// control themes, converters, code-behind — binds the semantic Brush.* tokens in
 /// Tokens.axaml (public tier) or resolves them via <c>TokenBrushes.Resolve</c>. These
-/// tests fail the build if any hex literal escapes Palette.axaml or any production type
+/// tests fail the build if any hex literal escapes the palette family or any production type
 /// constructs a brush, so "nothing constructs a colour any other way" is true rather
 /// than aspirational.
 ///
@@ -69,7 +69,7 @@ public class NoStrayHexTests
     {
         // Closes the gap the brush-construction scan leaves open: a bare hex string
         // (e.g. var c = "#FF0000";) that is never passed to a brush/colour ctor would
-        // otherwise slip through. Hex primitives belong only in Palette.axaml, so no
+        // otherwise slip through. Hex primitives belong only in the palette family, so no
         // production .cs may carry one. The Tests project legitimately names hex values
         // (asserting on the registry) and is excluded, as is the sanctioned resolver.
         var root = SolutionRoot();
@@ -85,7 +85,7 @@ public class NoStrayHexTests
                     offenders.Add($"{Path.GetFileName(file)}:{i + 1}: {lines[i].Trim()}");
         }
         Assert.True(offenders.Count == 0,
-            "Hex colour literals are only allowed in Palette.axaml, never in production code. Offenders:\n"
+            "Hex colour literals are only allowed in the palette family (Palette*.axaml), never in production code. Offenders:\n"
             + string.Join("\n", offenders));
     }
 

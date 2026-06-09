@@ -1,4 +1,3 @@
-using Avalonia.Media;
 using Avalonia.Headless.XUnit;
 
 namespace DialogEditor.Tests.Theming;

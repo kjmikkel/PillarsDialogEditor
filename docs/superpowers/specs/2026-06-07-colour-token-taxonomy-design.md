@@ -99,6 +99,15 @@ moment Layer 1 re-values that slot (a high-contrast theme might make it darker).
 rank encodes *position*, which survives re-valuing; the value is free to change per palette.
 This is the same reason Tailwind/Material name slots 50–950 rather than by hex.
 
+> **Revision (2026-06-09, Layer 1):** in practice the number is best read as **slot identity** —
+> "the recessed input/inset surface", "the primary body-text neutral" — rather than *absolute*
+> lightness, because the lightness ordering **inverts** in the Light palette (a slot that is darkest
+> in Dark is lightest in Light). Position-as-role survives re-valuing; position-as-absolute-lightness
+> does not. See the Layer 1 spec `2026-06-08-layer1-palette-sets-design.md` §3.1. Layer 1 also found
+> that a few primitives serving *both* a dark-theme surface/border role and a dark-on-light text role
+> can't invert cleanly; the dedicated `Palette.Ink.*` primitives (§3.3 there) resolve the load-bearing
+> case.
+
 ## 4. Naming grammar
 
 - Dot-separated `PascalCase` segments, read left→right general→specific.
