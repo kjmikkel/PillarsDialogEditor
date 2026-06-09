@@ -40,6 +40,7 @@ public class PaletteContrastTests
     [AvaloniaTheory]
     [InlineData("Palette.Light", 4.5, 3.0)]
     [InlineData("Palette.Colourblind", 4.5, 3.0)]
+    [InlineData("Palette.HighContrast", 7.0, 4.5)]
     public void PaletteMeetsContrastTargets(string set, double normalMin, double largeMin)
     {
         var dict = PaletteHarness.Load(set);
@@ -54,5 +55,33 @@ public class PaletteContrastTests
         }
         Assert.True(failures.Count == 0,
             $"{set} contrast failures:\n" + string.Join("\n", failures));
+    }
+
+    // Borders are NOT in the shared Pairs list: Light/Dark borders are intentionally low-contrast
+    // dividers (~1.3:1). High-Contrast is the one palette where bright, visible borders are the whole
+    // point of the Line.* split — so it gets its own gate (spec 2026-06-09 §5). Non-text UI bar: >=4.5.
+    private static readonly (string Line, string Surface)[] HcBorderPairs =
+    {
+        ("Palette.Line.Subtle",  "Palette.Neutral.115"), // Border.Subtle on Surface.Window
+        ("Palette.Line.Subtle",  "Palette.Neutral.100"), // on Surface.Card
+        ("Palette.Line.Default", "Palette.Neutral.115"),
+        ("Palette.Line.Default", "Palette.Neutral.145"), // on Surface.Panel
+        ("Palette.Line.Strong",  "Palette.Neutral.115"),
+    };
+
+    [AvaloniaFact]
+    public void HighContrastBordersAreVisible()
+    {
+        var dict = PaletteHarness.Load("Palette.HighContrast");
+        var failures = new System.Collections.Generic.List<string>();
+        foreach (var (line, surface) in HcBorderPairs)
+        {
+            var ratio = Wcag.ContrastRatio(
+                PaletteHarness.Color(dict, line), PaletteHarness.Color(dict, surface));
+            if (ratio < 4.5)
+                failures.Add($"{line} on {surface}: {ratio:F2}:1 < 4.5:1");
+        }
+        Assert.True(failures.Count == 0,
+            "High-Contrast borders must be visible (>=4.5:1):\n" + string.Join("\n", failures));
     }
 }
