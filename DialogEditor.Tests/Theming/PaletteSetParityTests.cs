@@ -7,6 +7,7 @@ public class PaletteSetParityTests
     [AvaloniaTheory]
     [InlineData("Palette.Light")]
     [InlineData("Palette.Colourblind")]
+    [InlineData("Palette.HighContrast")]
     public void AlternatePaletteHasExactlySameKeysAsDark(string set)
     {
         var dark = PaletteHarness.Load("Palette.Dark").Keys.Cast<string>().ToHashSet();
