@@ -148,26 +148,24 @@ land later or never without making anything beneath them wrong.
     registry, these were **consolidated** onto the nearest existing tokens — `⚠` glyphs →
     `Brush.Severity.Warning`, faint hints → `Brush.Text.Disabled` — a deliberate, minor hue shift in
     PatchManager (leaner registry, no new colours). Everything else mapped value-faithfully.
-- **Layer 1 — Palette sets. ✅ IMPLEMENTED for Light + Colourblind (2026-06-09); High-Contrast deferred.**
+- **Layer 1 — Palette sets. ✅ IMPLEMENTED — all four palettes (2026-06-09).**
   Alternative *values* for the same `Palette.*` token keys, as sibling files in
   `DialogEditor.Avalonia.Shared/Resources` beside the renamed `Palette.Dark.axaml`:
-  `Palette.Light.axaml` (neutral ramp slot-inverted; WCAG AA) and `Palette.Colourblind.axaml`
-  (Dark + an Okabe–Ito remap of the red/green-collision accents; WCAG AA). `Tokens.axaml` stays the
-  frozen public contract **bar two surgical splits** a faithful light theme required: dark-on-light
-  text got dedicated `Palette.Ink.*` primitives, and `Brush.Diff.Changed.Fill` got `Palette.Amber.610`
-  (separate from the commit-hash gold) — both Dark-byte-identical. The sets are **merged nowhere**
-  (the running app is unchanged); runtime selection is Layer 2. Accessibility is enforced by tests:
-  `PaletteSetParityTests` (every palette has the identical key set), `PaletteGoldenTests` (a committed
-  per-value snapshot), and `PaletteContrastTests` (WCAG AA on curated foreground/background pairs;
-  Dark is the grandfathered baseline and exempt). Design:
-  `docs/superpowers/specs/2026-06-08-layer1-palette-sets-design.md`; plan:
-  `docs/superpowers/plans/2026-06-08-layer1-palette-sets.md`.
-  - **High-Contrast — deferred follow-up (do next).** A faithful HC palette needs the border tokens
-    (`Border.Default/Subtle/Strong/Muted`) separated from the surface/toolbar tokens they share
-    (`Neutral.175/200/265/335`): coherent in Dark, contradictory in HC (one slot can't be a bright
-    divider *and* a near-black surface). That is a token-structure change beyond Layer 1's
-    minimal-split intent, so HC is its own task — do the border/surface split, then author + gate the
-    values (target WCAG AAA). The data-driven test harness makes re-adding HC one list entry + the file.
+  `Palette.Light.axaml` (neutral ramp slot-inverted; WCAG AA), `Palette.Colourblind.axaml`
+  (Dark + an Okabe–Ito remap of the red/green-collision accents; WCAG AA), and
+  `Palette.HighContrast.axaml` (near-black surfaces, bright borders, white node cards; WCAG AAA).
+  `Tokens.axaml` stays the frozen public contract **bar three surgical token splits** the alternate
+  themes required: dark-on-light text → `Palette.Ink.*`; `Brush.Diff.Changed.Fill` → `Palette.Amber.610`
+  (separate from the commit-hash gold); and the border/control split → `Palette.Line.*` +
+  `Palette.Control.Background` (so HC can make dividers bright and toolbar buttons visible while
+  surfaces go near-black). Every split is Dark/Light/Colourblind byte-identical. The sets are
+  **merged nowhere** (the running app is unchanged); runtime selection is Layer 2. Accessibility is
+  enforced by tests: `PaletteSetParityTests` (identical key set per palette), `PaletteGoldenTests`
+  (committed per-value snapshot), `PaletteContrastTests` (WCAG AA for Light/Colourblind, AAA for
+  High-Contrast; Dark is the grandfathered baseline and exempt), and `HighContrastBordersAreVisible`
+  (HC dividers ≥4.5:1). Designs:
+  `docs/superpowers/specs/2026-06-08-layer1-palette-sets-design.md` (Light/Colourblind) and
+  `2026-06-09-layer1-highcontrast-design.md` (HC); plans alongside in `docs/superpowers/plans/`.
 - **Layer 2 — Runtime selection (deferred, independent).** The Settings UI (in the editor) to
   choose a palette/theme at runtime, persist the choice, and plug into Avalonia's `ThemeVariant`
   **across both apps** — the standalone PatchManager honouring the same persisted choice from the
