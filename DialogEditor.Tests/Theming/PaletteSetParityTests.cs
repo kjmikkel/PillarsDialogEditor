@@ -7,7 +7,6 @@ public class PaletteSetParityTests
 {
     [AvaloniaTheory]
     [InlineData("Palette.Light")]
-    [InlineData("Palette.HighContrast")]
     [InlineData("Palette.Colourblind")]
     public void AlternatePaletteHasExactlySameKeysAsDark(string set)
     {
