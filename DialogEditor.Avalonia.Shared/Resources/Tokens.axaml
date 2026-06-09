@@ -36,7 +36,7 @@
     <SolidColorBrush x:Key="Brush.Severity.Error"    Color="{StaticResource Palette.Red.500}"/>
 
     <!-- Toolbar buttons -->
-    <SolidColorBrush x:Key="Brush.Toolbar.Button.Background"   Color="{StaticResource Palette.Neutral.200}"/>
+    <SolidColorBrush x:Key="Brush.Toolbar.Button.Background"   Color="{StaticResource Palette.Control.Background}"/>
     <SolidColorBrush x:Key="Brush.Toolbar.Button.Foreground"   Color="{StaticResource Palette.Neutral.665}"/>
     <SolidColorBrush x:Key="Brush.Toolbar.Button.Hover"        Color="{StaticResource Palette.Neutral.265}"/>
     <SolidColorBrush x:Key="Brush.Toolbar.Button.Pressed"      Color="{StaticResource Palette.Neutral.290}"/>
@@ -56,11 +56,12 @@
     <SolidColorBrush x:Key="Brush.Surface.Info"    Color="{StaticResource Palette.Navy.100}"/>
     <SolidColorBrush x:Key="Brush.Surface.Overlay.Scrim" Color="{StaticResource Palette.Alpha.Scrim}"/>
 
-    <!-- Borders -->
-    <SolidColorBrush x:Key="Brush.Border.Default" Color="{StaticResource Palette.Neutral.200}"/>
-    <SolidColorBrush x:Key="Brush.Border.Subtle"  Color="{StaticResource Palette.Neutral.175}"/>
-    <SolidColorBrush x:Key="Brush.Border.Strong"  Color="{StaticResource Palette.Neutral.265}"/>
-    <SolidColorBrush x:Key="Brush.Border.Muted"   Color="{StaticResource Palette.Neutral.335}"/>
+    <!-- Borders — re-pointed to the Palette.Line.* split so High-Contrast can make dividers bright
+         while surfaces go near-black (spec 2026-06-09-layer1-highcontrast-design.md §3). -->
+    <SolidColorBrush x:Key="Brush.Border.Default" Color="{StaticResource Palette.Line.Default}"/>
+    <SolidColorBrush x:Key="Brush.Border.Subtle"  Color="{StaticResource Palette.Line.Subtle}"/>
+    <SolidColorBrush x:Key="Brush.Border.Strong"  Color="{StaticResource Palette.Line.Strong}"/>
+    <SolidColorBrush x:Key="Brush.Border.Muted"   Color="{StaticResource Palette.Line.Muted}"/>
     <SolidColorBrush x:Key="Brush.Border.OnDark"  Color="{StaticResource Palette.Alpha.HairlineOnDark}"/>
     <SolidColorBrush x:Key="Brush.Border.Focus"   Color="{StaticResource Palette.Azure.600}"/>
 

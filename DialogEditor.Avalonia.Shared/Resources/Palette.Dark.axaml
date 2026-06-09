@@ -42,6 +42,16 @@
     <Color x:Key="Palette.Ink.Strong">#FF333333</Color>
     <Color x:Key="Palette.Ink.Muted">#FF666666</Color>
 
+    <!--  LINE / CONTROL — border-divider and interactive-control-background primitives, split off the
+          shared neutrals so the High-Contrast palette can make borders bright + controls visible while
+          surfaces go near-black (spec 2026-06-09-layer1-highcontrast-design.md §3). These values equal
+          the neutral each replaced, so this palette is unchanged on screen. -->
+    <Color x:Key="Palette.Line.Subtle">#FF2D2D2D</Color>
+    <Color x:Key="Palette.Line.Default">#FF333333</Color>
+    <Color x:Key="Palette.Line.Strong">#FF444444</Color>
+    <Color x:Key="Palette.Line.Muted">#FF555555</Color>
+    <Color x:Key="Palette.Control.Background">#FF333333</Color>
+
     <!-- Accents -->
     <Color x:Key="Palette.Crimson.700">#FF7B241C</Color>
     <Color x:Key="Palette.Maroon.800">#FF7A2A2A</Color>
