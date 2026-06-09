@@ -16,6 +16,7 @@ Palette.Dark	Palette.Azure.250	#FFB0CDE8
 Palette.Dark	Palette.Azure.600	#FF1A5276
 Palette.Dark	Palette.Black	#FF000000
 Palette.Dark	Palette.Burnt.600	#FF8E4912
+Palette.Dark	Palette.Control.Background	#FF333333
 Palette.Dark	Palette.Cream.100	#FFFFF8DC
 Palette.Dark	Palette.Crimson.700	#FF7B241C
 Palette.Dark	Palette.Green.400	#FF7DCEA0
@@ -24,6 +25,10 @@ Palette.Dark	Palette.Green.550	#FF3A7A3A
 Palette.Dark	Palette.Green.600	#FF2D6A2D
 Palette.Dark	Palette.Ink.Muted	#FF666666
 Palette.Dark	Palette.Ink.Strong	#FF333333
+Palette.Dark	Palette.Line.Default	#FF333333
+Palette.Dark	Palette.Line.Muted	#FF555555
+Palette.Dark	Palette.Line.Strong	#FF444444
+Palette.Dark	Palette.Line.Subtle	#FF2D2D2D
 Palette.Dark	Palette.Magenta.500	#FFEE00AA
 Palette.Dark	Palette.Maroon.800	#FF7A2A2A
 Palette.Dark	Palette.Maroon.900	#FF3A1A1A
@@ -86,6 +91,7 @@ Palette.Light	Palette.Azure.250	#FFB0CDE8
 Palette.Light	Palette.Azure.600	#FF1A5276
 Palette.Light	Palette.Black	#FF000000
 Palette.Light	Palette.Burnt.600	#FF8E4912
+Palette.Light	Palette.Control.Background	#FFD6D6D4
 Palette.Light	Palette.Cream.100	#FFFFF8DC
 Palette.Light	Palette.Crimson.700	#FF7B241C
 Palette.Light	Palette.Green.400	#FF1F7A3D
@@ -94,6 +100,10 @@ Palette.Light	Palette.Green.550	#FFCDEBD5
 Palette.Light	Palette.Green.600	#FF2D6A2D
 Palette.Light	Palette.Ink.Muted	#FF666666
 Palette.Light	Palette.Ink.Strong	#FF333333
+Palette.Light	Palette.Line.Default	#FFD6D6D4
+Palette.Light	Palette.Line.Muted	#FF9A9A9A
+Palette.Light	Palette.Line.Strong	#FFC2C2C0
+Palette.Light	Palette.Line.Subtle	#FFDEDEDC
 Palette.Light	Palette.Magenta.500	#FFB8007F
 Palette.Light	Palette.Maroon.800	#FFF3D2CD
 Palette.Light	Palette.Maroon.900	#FFF5DEDC
@@ -156,6 +166,7 @@ Palette.Colourblind	Palette.Azure.250	#FFB0CDE8
 Palette.Colourblind	Palette.Azure.600	#FF1A5276
 Palette.Colourblind	Palette.Black	#FF000000
 Palette.Colourblind	Palette.Burnt.600	#FF8E4912
+Palette.Colourblind	Palette.Control.Background	#FF333333
 Palette.Colourblind	Palette.Cream.100	#FFFFF8DC
 Palette.Colourblind	Palette.Crimson.700	#FF7B241C
 Palette.Colourblind	Palette.Green.400	#FF56B4E9
@@ -164,6 +175,10 @@ Palette.Colourblind	Palette.Green.550	#FF0072B2
 Palette.Colourblind	Palette.Green.600	#FF2D6A2D
 Palette.Colourblind	Palette.Ink.Muted	#FF666666
 Palette.Colourblind	Palette.Ink.Strong	#FF333333
+Palette.Colourblind	Palette.Line.Default	#FF333333
+Palette.Colourblind	Palette.Line.Muted	#FF555555
+Palette.Colourblind	Palette.Line.Strong	#FF444444
+Palette.Colourblind	Palette.Line.Subtle	#FF2D2D2D
 Palette.Colourblind	Palette.Magenta.500	#FFEE00AA
 Palette.Colourblind	Palette.Maroon.800	#FFD55E00
 Palette.Colourblind	Palette.Maroon.900	#FF3A1A1A
