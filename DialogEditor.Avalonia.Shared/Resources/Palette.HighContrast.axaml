@@ -1,97 +1,95 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!--  PALETTE — HIGH-CONTRAST set (Layer 1). Same keys as Palette.Dark.axaml; skeleton = Dark
-          values until the HC-authoring task fills them. See spec
-          docs/superpowers/specs/2026-06-09-layer1-highcontrast-design.md §4. -->
+    <!--  PALETTE — HIGH-CONTRAST set (Layer 1). Same Palette.* keys as Palette.Dark.axaml.
+          Aim: WCAG AAA — text >=7:1, non-text UI (borders) >=4.5:1. Surfaces collapse to near-black;
+          structure is carried by the bright Palette.Line.* borders and the visible
+          Palette.Control.Background (the §3 split), NOT by surface-tone steps. Node cards stay light
+          cards taken to the extreme (white bodies, black Ink). Header fills are kept (no consumer
+          change) and deepened where needed for white text >=7. Keys matched by PaletteSetParityTests;
+          values locked by PaletteGoldenTests; gated by PaletteContrastTests (AAA) +
+          HighContrastBordersAreVisible. See spec docs/superpowers/specs/2026-06-09-layer1-highcontrast-design.md. -->
 
-    <!-- Neutrals (grayscale ramp) -->
-    <Color x:Key="Palette.Neutral.80">#FF141414</Color>
-    <Color x:Key="Palette.Neutral.100">#FF1A1A1A</Color>
-    <Color x:Key="Palette.Neutral.115">#FF1E1E1E</Color>
-    <Color x:Key="Palette.Neutral.125">#FF202020</Color>
-    <Color x:Key="Palette.Neutral.145">#FF252525</Color>
-    <Color x:Key="Palette.Neutral.175">#FF2D2D2D</Color>
-    <Color x:Key="Palette.Neutral.200">#FF333333</Color>
-    <Color x:Key="Palette.Neutral.225">#FF3A3A3A</Color>
-    <Color x:Key="Palette.Neutral.265">#FF444444</Color>
-    <Color x:Key="Palette.Neutral.290">#FF4A4A4A</Color>
-    <Color x:Key="Palette.Neutral.335">#FF555555</Color>
-    <Color x:Key="Palette.Neutral.400">#FF666666</Color>
-    <Color x:Key="Palette.Neutral.535">#FF888888</Color>
-    <Color x:Key="Palette.Neutral.600">#FF999999</Color>
-    <Color x:Key="Palette.Neutral.665">#FFAAAAAA</Color>
-    <Color x:Key="Palette.Neutral.735">#FFBBBBBB</Color>
-    <Color x:Key="Palette.Neutral.785">#FFC8C8C8</Color>
-    <Color x:Key="Palette.Neutral.800">#FFCCCCCC</Color>
-    <Color x:Key="Palette.Neutral.865">#FFDDDDDD</Color>
-    <Color x:Key="Palette.Neutral.875">#FFE0E0E0</Color>
-    <Color x:Key="Palette.Neutral.910">#FFE8E8E8</Color>
+    <!-- Neutrals: surfaces -> black; text -> white/light; toolbar states -> visible mid-greys -->
+    <Color x:Key="Palette.Neutral.80">#FF000000</Color>   <!-- input surface -->
+    <Color x:Key="Palette.Neutral.100">#FF000000</Color>  <!-- card surface -->
+    <Color x:Key="Palette.Neutral.115">#FF000000</Color>  <!-- window surface -->
+    <Color x:Key="Palette.Neutral.125">#FF000000</Color>  <!-- inset surface -->
+    <Color x:Key="Palette.Neutral.145">#FF000000</Color>  <!-- panel surface -->
+    <Color x:Key="Palette.Neutral.175">#FF000000</Color>  <!-- subtle surface -->
+    <Color x:Key="Palette.Neutral.200">#FF000000</Color>  <!-- header surface -->
+    <Color x:Key="Palette.Neutral.225">#FF6D6D6D</Color>  <!-- toolbar checked -->
+    <Color x:Key="Palette.Neutral.265">#FF5D5D5D</Color>  <!-- toolbar hover / checkedhover -->
+    <Color x:Key="Palette.Neutral.290">#FF6D6D6D</Color>  <!-- toolbar pressed -->
+    <Color x:Key="Palette.Neutral.335">#FF9A9A9A</Color>  <!-- border.muted / female.dim / connection.never -->
+    <Color x:Key="Palette.Neutral.400">#FFB8B8B8</Color>  <!-- disabled text (brightened for HC; still dimmest, ~9:1) -->
+    <Color x:Key="Palette.Neutral.535">#FFD4D4D4</Color>  <!-- muted text -->
+    <Color x:Key="Palette.Neutral.600">#FFDCDCDC</Color>  <!-- caption text -->
+    <Color x:Key="Palette.Neutral.665">#FFFFFFFF</Color>  <!-- toolbar fg / muted.light / connection default -->
+    <Color x:Key="Palette.Neutral.735">#FFD6D6D6</Color>  <!-- tertiary text -->
+    <Color x:Key="Palette.Neutral.785">#FFF0F0F0</Color>  <!-- script card footer (light) -->
+    <Color x:Key="Palette.Neutral.800">#FFE6E6E6</Color>  <!-- secondary text -->
+    <Color x:Key="Palette.Neutral.865">#FFF0F0F0</Color>  <!-- emphasis text -->
+    <Color x:Key="Palette.Neutral.875">#FFFFFFFF</Color>  <!-- script card body (light) -->
+    <Color x:Key="Palette.Neutral.910">#FFFFFFFF</Color>  <!-- primary text -->
     <Color x:Key="Palette.Black">#FF000000</Color>
     <Color x:Key="Palette.White">#FFFFFFFF</Color>
 
-    <!--  INK — dedicated dark-on-light text primitives (spec §3.3). Kept on their OWN keys (not
-          Neutral.200/400) so the always-light node-card body text can stay dark while Neutral.200/400
-          re-value for surface/border/disabled roles in the Light & High-Contrast palettes. Dark values
-          equal the former Neutral.200/400 so this layer changes nothing on screen. Ink is a named
-          role-primitive (defined by use, dark-on-light), not a numeric tone in the neutral ramp. -->
-    <Color x:Key="Palette.Ink.Strong">#FF333333</Color>
-    <Color x:Key="Palette.Ink.Muted">#FF666666</Color>
+    <!-- Ink — dark-on-light node-card text (cards are white in HC) -->
+    <Color x:Key="Palette.Ink.Strong">#FF000000</Color>
+    <Color x:Key="Palette.Ink.Muted">#FF2A2A2A</Color>
 
-    <!--  LINE / CONTROL — border-divider and interactive-control-background primitives, split off the
-          shared neutrals so the High-Contrast palette can make borders bright + controls visible while
-          surfaces go near-black (spec 2026-06-09-layer1-highcontrast-design.md §3). These values equal
-          the neutral each replaced, so this palette is unchanged on screen. -->
-    <Color x:Key="Palette.Line.Subtle">#FF2D2D2D</Color>
-    <Color x:Key="Palette.Line.Default">#FF333333</Color>
-    <Color x:Key="Palette.Line.Strong">#FF444444</Color>
-    <Color x:Key="Palette.Line.Muted">#FF555555</Color>
-    <Color x:Key="Palette.Control.Background">#FF333333</Color>
+    <!-- Line / Control — bright dividers + visible control backgrounds (the §3 split; gated >=4.5) -->
+    <Color x:Key="Palette.Line.Subtle">#FF8C8C8C</Color>
+    <Color x:Key="Palette.Line.Default">#FFA8A8A8</Color>
+    <Color x:Key="Palette.Line.Strong">#FFFFFFFF</Color>
+    <Color x:Key="Palette.Line.Muted">#FF6A6A6A</Color>
+    <Color x:Key="Palette.Control.Background">#FF4D4D4D</Color>
 
     <!-- Accents -->
-    <Color x:Key="Palette.Crimson.700">#FF7B241C</Color>
-    <Color x:Key="Palette.Maroon.800">#FF7A2A2A</Color>
-    <Color x:Key="Palette.Maroon.900">#FF3A1A1A</Color>
-    <Color x:Key="Palette.Red.500">#FFC0392B</Color>
-    <Color x:Key="Palette.Red.450">#FFE74C3C</Color>
-    <Color x:Key="Palette.Red.550">#FFE05555</Color>
-    <Color x:Key="Palette.Red.300">#FFFF9C9C</Color>
-    <Color x:Key="Palette.Azure.600">#FF1A5276</Color>
-    <Color x:Key="Palette.Azure.150">#FFD5E8F5</Color>
-    <Color x:Key="Palette.Azure.250">#FFB0CDE8</Color>
-    <Color x:Key="Palette.Slate.700">#FF2C3E50</Color>
-    <Color x:Key="Palette.Navy.100">#FF1A1A2A</Color>
-    <Color x:Key="Palette.Navy.150">#FF1A2738</Color>
-    <Color x:Key="Palette.Sky.300">#FF9CC4FF</Color>
-    <Color x:Key="Palette.Sky.250">#FF9CDCFE</Color>
-    <Color x:Key="Palette.Sky.350">#FF99AADD</Color>
-    <Color x:Key="Palette.Sky.400">#FF4A9EFF</Color>
-    <Color x:Key="Palette.Sky.450">#FF5DADE2</Color>
-    <Color x:Key="Palette.Teal.600">#FF0E6655</Color>
-    <Color x:Key="Palette.Teal.150">#FFD5F0E8</Color>
-    <Color x:Key="Palette.Teal.250">#FFB0E0D5</Color>
-    <Color x:Key="Palette.Green.600">#FF2D6A2D</Color>
-    <Color x:Key="Palette.Green.550">#FF3A7A3A</Color>
-    <Color x:Key="Palette.Green.500">#FF5DB55D</Color>
-    <Color x:Key="Palette.Green.400">#FF7DCEA0</Color>
-    <Color x:Key="Palette.Amber.500">#FFB8760A</Color>
-    <Color x:Key="Palette.Amber.600">#FFC08A2A</Color>
-    <Color x:Key="Palette.Amber.610">#FFC08A2A</Color>
-    <Color x:Key="Palette.Amber.520">#FFF0A830</Color>
-    <Color x:Key="Palette.Amber.540">#FFF0AD4E</Color>
-    <Color x:Key="Palette.Amber.560">#FFE8C050</Color>
-    <Color x:Key="Palette.Amber.570">#FFE8D080</Color>
-    <Color x:Key="Palette.Amber.550">#FFE8A020</Color>
-    <Color x:Key="Palette.Amber.900">#FF7A5C00</Color>
-    <Color x:Key="Palette.Amber.950">#FF2A2000</Color>
-    <Color x:Key="Palette.Olive.500">#FFBDBD80</Color>
-    <Color x:Key="Palette.Burnt.600">#FF8E4912</Color>
-    <Color x:Key="Palette.Parchment.100">#FFF5F0D0</Color>
-    <Color x:Key="Palette.Parchment.200">#FFE8E0B0</Color>
-    <Color x:Key="Palette.Cream.100">#FFFFF8DC</Color>
-    <Color x:Key="Palette.Mauve.500">#FF7A6A8E</Color>
-    <Color x:Key="Palette.Magenta.500">#FFEE00AA</Color>
+    <Color x:Key="Palette.Crimson.700">#FF7B241C</Color>  <!-- NPC header / destructive (white text >=7) -->
+    <Color x:Key="Palette.Maroon.800">#FFFF8080</Color>   <!-- diff removed fill (bright) -->
+    <Color x:Key="Palette.Maroon.900">#FF2A0000</Color>   <!-- conflict theirs bg -->
+    <Color x:Key="Palette.Red.500">#FFFF6B6B</Color>      <!-- severity error -->
+    <Color x:Key="Palette.Red.450">#FFFF8080</Color>      <!-- removed text -->
+    <Color x:Key="Palette.Red.550">#FFFF8080</Color>      <!-- inline error text -->
+    <Color x:Key="Palette.Red.300">#FFFF9C9C</Color>      <!-- conflict theirs fg -->
+    <Color x:Key="Palette.Azure.600">#FF1A5276</Color>    <!-- player header / primary button / focus (white >=7) -->
+    <Color x:Key="Palette.Azure.150">#FFFFFFFF</Color>    <!-- player card body -->
+    <Color x:Key="Palette.Azure.250">#FFF0F0F0</Color>    <!-- player card footer -->
+    <Color x:Key="Palette.Slate.700">#FF2C3E50</Color>    <!-- script header (white >=7) -->
+    <Color x:Key="Palette.Navy.100">#FF000000</Color>     <!-- info window bg -->
+    <Color x:Key="Palette.Navy.150">#FF001A33</Color>     <!-- conflict mine bg -->
+    <Color x:Key="Palette.Sky.300">#FF8CC4FF</Color>      <!-- conflict mine fg -->
+    <Color x:Key="Palette.Sky.250">#FF9CDCFE</Color>      <!-- syntax code / inline mine -->
+    <Color x:Key="Palette.Sky.350">#FF9CC4FF</Color>      <!-- link subtle -->
+    <Color x:Key="Palette.Sky.400">#FF6BB6FF</Color>      <!-- link -->
+    <Color x:Key="Palette.Sky.450">#FF6BB6FF</Color>      <!-- info / severity info -->
+    <Color x:Key="Palette.Teal.600">#FF0A4A3E</Color>     <!-- narrator header (deepened; white >=7) -->
+    <Color x:Key="Palette.Teal.150">#FFFFFFFF</Color>     <!-- narrator card body -->
+    <Color x:Key="Palette.Teal.250">#FFF0F0F0</Color>     <!-- narrator card footer -->
+    <Color x:Key="Palette.Green.600">#FF155018</Color>    <!-- confirm button bg (white >=7) -->
+    <Color x:Key="Palette.Green.550">#FF5BFF8F</Color>    <!-- diff added fill (bright) -->
+    <Color x:Key="Palette.Green.500">#FF5BFF8F</Color>    <!-- success text -->
+    <Color x:Key="Palette.Green.400">#FF5BFF8F</Color>    <!-- added/new text; syntax script -->
+    <Color x:Key="Palette.Amber.500">#FFFFC04D</Color>    <!-- severity warning -->
+    <Color x:Key="Palette.Amber.600">#FFFFD23B</Color>    <!-- commit-meta gold -->
+    <Color x:Key="Palette.Amber.520">#FFFFB000</Color>    <!-- bark outline / highlight -->
+    <Color x:Key="Palette.Amber.540">#FFFFD23B</Color>    <!-- changed text -->
+    <Color x:Key="Palette.Amber.560">#FFFFD24D</Color>    <!-- bark detail text / bark footer -->
+    <Color x:Key="Palette.Amber.570">#FFFFE08A</Color>    <!-- bark footer (light) -->
+    <Color x:Key="Palette.Amber.550">#FFFFD24D</Color>    <!-- syntax condition -->
+    <Color x:Key="Palette.Amber.900">#FF5C4500</Color>    <!-- bark header / border -->
+    <Color x:Key="Palette.Amber.950">#FF1A1400</Color>    <!-- bark detail bg -->
+    <Color x:Key="Palette.Amber.610">#FFFFD23B</Color>    <!-- diff changed fill -->
+    <Color x:Key="Palette.Olive.500">#FFC8C860</Color>    <!-- quotidian note -->
+    <Color x:Key="Palette.Burnt.600">#FF6E3A0E</Color>    <!-- caution button (white >=7) -->
+    <Color x:Key="Palette.Parchment.100">#FFFFFFFF</Color> <!-- NPC card body -->
+    <Color x:Key="Palette.Parchment.200">#FFF0F0F0</Color> <!-- NPC card footer -->
+    <Color x:Key="Palette.Cream.100">#FFFFFFFF</Color>     <!-- bark card body -->
+    <Color x:Key="Palette.Mauve.500">#FFB0A0C8</Color>    <!-- accent badge bg -->
+    <Color x:Key="Palette.Magenta.500">#FFFF5BD0</Color>  <!-- about-window status text -->
 
-    <!-- Alpha / effect primitives (overlays + shadow live here so hex stays confined) -->
+    <!-- Alpha / effect primitives (overlays + shadow) -->
     <Color x:Key="Palette.Alpha.Scrim">#BB000000</Color>
     <Color x:Key="Palette.Alpha.Shadow">#A0000000</Color>
     <Color x:Key="Palette.Alpha.HairlineOnDark">#33FFFFFF</Color>
