@@ -1,7 +1,10 @@
 # Centralised UI Colour Tokens — Layer 1: Palette Sets (Design)
 
 **Date:** 2026-06-08
-**Status:** Design — awaiting review
+**Status:** Implemented 2026-06-09 — **Light + Colourblind shipped**; **High-Contrast deferred** to a
+focused follow-up (it needs border-vs-surface token splits beyond this layer's minimal intent; see the
+note below and `Gaps.md`). Where this spec says "three new palettes", read "Light + Colourblind now,
+High-Contrast later".
 **Gap:** `Gaps.md` → *Centralised UI Colour Tokens* (Layer 1 — Palette sets)
 **Builds on:** `docs/superpowers/specs/2026-06-07-colour-token-taxonomy-design.md` (Layer 0)
 

@@ -38,7 +38,8 @@ public class NoStrayHexTests
         path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}");
 
     // The sanctioned hex tier is the whole palette family: Palette.Dark.axaml plus the Layer 1
-    // alternates (Palette.Light/HighContrast/Colourblind.axaml). Any other filename with hex fails.
+    // alternates (Palette.Light/Colourblind.axaml today, and a future Palette.HighContrast.axaml
+    // when that deferred set is added). Any other filename with hex fails.
     private static readonly Regex PaletteFile =
         new(@"^Palette(\.[A-Za-z]+)?\.axaml$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
