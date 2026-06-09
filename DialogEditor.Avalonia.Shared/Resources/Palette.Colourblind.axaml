@@ -1,7 +1,15 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!--  PALETTE — COLOURBLIND-tuned set (Layer 1). Same keys as Palette.Dark.axaml, colourblind-safe values.
-          Inherits Dark; only red/green-collision accents remapped to Okabe-Ito (blue/orange/vermillion). See spec §4.3. -->
+    <!--  PALETTE — COLOURBLIND-tuned set (Layer 1 palette sets). Same Palette.* keys as
+          Palette.Dark.axaml; inherits Dark wholesale and remaps ONLY the red/green-collision accents
+          (added/changed/removed status, diff fills, severity warning/error) to the Okabe-Ito
+          colour-universal family: greens -> blue (#56B4E9 text / #0072B2 fill), ambers -> orange
+          (#E69F00), reds -> vermillion (#FF7A45 text / #D55E00 fill). Confirm-button green, node
+          speaker headers, bark, and the already-CVD-safe blue/red conflict pair are deliberately left
+          as Dark. Shape/icon redundancy is Layer 2.5. Distinguishable under deuteranopia / protanopia
+          / tritanopia by construction; NOT merged by any App.axaml yet (Layer 2). Values locked by
+          PaletteGoldenTests, gated AA by PaletteContrastTests, keys matched by PaletteSetParityTests.
+          See docs/superpowers/specs/2026-06-08-layer1-palette-sets-design.md §4.3. -->
 
     <!-- Neutrals (grayscale ramp) -->
     <Color x:Key="Palette.Neutral.80">#FF141414</Color>

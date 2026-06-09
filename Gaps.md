@@ -111,8 +111,9 @@ the foundation is ever a dependency for other gaps; the upper layers are indepen
 land later or never without making anything beneath them wrong.
 
 - **Layer 0 — Token registry (the foundation; the ONLY layer other gaps may depend on). ✅ IMPLEMENTED (2026-06-08).**
-  Two merged resource dictionaries of *semantically named* tokens — `Palette.axaml`
-  (primitive `Palette.*` colours; the only file permitted a hex literal) → `Tokens.axaml`
+  Two merged resource dictionaries of *semantically named* tokens — `Palette.Dark.axaml`
+  (primitive `Palette.*` colours; one of the palette family `Palette*.axaml`, the only files
+  permitted hex literals — renamed from `Palette.axaml` when Layer 1 added sibling palettes) → `Tokens.axaml`
   (semantic `Brush.*` brushes, e.g. `Brush.Node.Npc.Header`, `Brush.Diff.Added.Fill`,
   `Brush.Toolbar.Button.Background`). Both now live in **`DialogEditor.Avalonia.Shared/Resources`**
   and are merged by *both* GUI apps' `App.axaml` (the editor and the standalone PatchManager),
@@ -121,8 +122,8 @@ land later or never without making anything beneath them wrong.
   resolve through `Theming/TokenBrushes.Resolve` instead of `new SolidColorBrush(...)`. The drift bug died by
   construction — the duplicated `NodeColorConverter`/`SpeakerCategoryToBrushConverter` palettes
   became one shared key. **Published contract enforced by test:** `NoStrayHexTests` fails the
-  build if any hex literal appears outside `Palette.axaml`, or any production type constructs a
-  colour, making "nothing constructs a colour any other way" true rather than aspirational. The
+  build if any hex literal appears outside the palette family (`Palette*.axaml`), or any production
+  type constructs a colour, making "nothing constructs a colour any other way" true rather than aspirational. The
   enforcer is **solution-wide** (anchored on `DialogEditor.slnx`, scanning every project's `.axaml`
   and production `.cs`), so the contract holds app-wide, not just for the editor project. The token
   naming taxonomy — the public interface every dependent gap quotes — and the exhaustive
@@ -147,12 +148,26 @@ land later or never without making anything beneath them wrong.
     registry, these were **consolidated** onto the nearest existing tokens — `⚠` glyphs →
     `Brush.Severity.Warning`, faint hints → `Brush.Text.Disabled` — a deliberate, minor hue shift in
     PatchManager (leaner registry, no new colours). Everything else mapped value-faithfully.
-- **Layer 1 — Palette sets (deferred, independent).** Alternative *values* for the same token
-  keys: Dark (today's colours), Light, High-Contrast, and colourblind-tuned sets. Same keys,
-  different hex; the sets live in the shared registry (`DialogEditor.Avalonia.Shared/Resources`)
-  alongside Layer 0, so because Layer 0 guarantees everything across the solution reads keys,
-  swapping the set retints the **whole solution** — both the editor and the standalone
-  PatchManager — in one move.
+- **Layer 1 — Palette sets. ✅ IMPLEMENTED for Light + Colourblind (2026-06-09); High-Contrast deferred.**
+  Alternative *values* for the same `Palette.*` token keys, as sibling files in
+  `DialogEditor.Avalonia.Shared/Resources` beside the renamed `Palette.Dark.axaml`:
+  `Palette.Light.axaml` (neutral ramp slot-inverted; WCAG AA) and `Palette.Colourblind.axaml`
+  (Dark + an Okabe–Ito remap of the red/green-collision accents; WCAG AA). `Tokens.axaml` stays the
+  frozen public contract **bar two surgical splits** a faithful light theme required: dark-on-light
+  text got dedicated `Palette.Ink.*` primitives, and `Brush.Diff.Changed.Fill` got `Palette.Amber.610`
+  (separate from the commit-hash gold) — both Dark-byte-identical. The sets are **merged nowhere**
+  (the running app is unchanged); runtime selection is Layer 2. Accessibility is enforced by tests:
+  `PaletteSetParityTests` (every palette has the identical key set), `PaletteGoldenTests` (a committed
+  per-value snapshot), and `PaletteContrastTests` (WCAG AA on curated foreground/background pairs;
+  Dark is the grandfathered baseline and exempt). Design:
+  `docs/superpowers/specs/2026-06-08-layer1-palette-sets-design.md`; plan:
+  `docs/superpowers/plans/2026-06-08-layer1-palette-sets.md`.
+  - **High-Contrast — deferred follow-up (do next).** A faithful HC palette needs the border tokens
+    (`Border.Default/Subtle/Strong/Muted`) separated from the surface/toolbar tokens they share
+    (`Neutral.175/200/265/335`): coherent in Dark, contradictory in HC (one slot can't be a bright
+    divider *and* a near-black surface). That is a token-structure change beyond Layer 1's
+    minimal-split intent, so HC is its own task — do the border/surface split, then author + gate the
+    values (target WCAG AAA). The data-driven test harness makes re-adding HC one list entry + the file.
 - **Layer 2 — Runtime selection (deferred, independent).** The Settings UI (in the editor) to
   choose a palette/theme at runtime, persist the choice, and plug into Avalonia's `ThemeVariant`
   **across both apps** — the standalone PatchManager honouring the same persisted choice from the
