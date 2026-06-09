@@ -131,9 +131,17 @@ Palette.Ink.Muted    (new)   ← Brush.Text.OnLight.Muted  (was Palette.Neutral.
   green.
 - `Ink.*` stays **dark in every palette** (the cards are always light), so Neutral.200/400 are now
   free to go light in Light and black in HC for their surface/border/disabled roles.
-- This is the **only** edit to `Tokens.axaml` (two `Color="..."` references) and the only new
-  `Palette.*` keys. `Ink` is intentionally a named role-primitive, not a numeric tone, because it is
+- `Ink` is intentionally a named role-primitive, not a numeric tone, because it is
   defined by its *use* (dark-on-light ink) rather than a position in the neutral ramp.
+
+**Second approved split (during Light authoring — option (b)):** `Brush.Diff.Changed.Fill` and
+`Brush.Text.Meta.Commit` both pointed at `Palette.Amber.600`. The same diverge-under-light problem
+applies: a light theme wants the diff "changed" fill as a soft pastel but the commit-hash gold as a
+dark, readable tone. A new primitive `Palette.Amber.610` is added (Dark value `#C08A2A`, identical to
+`Amber.600`, so Dark stays byte-identical) and `Brush.Diff.Changed.Fill` is re-pointed to it;
+`Brush.Text.Meta.Commit` keeps `Amber.600`. With both splits, `Tokens.axaml` has exactly three
+re-pointed lines and there are three new `Palette.*` keys (`Ink.Strong`, `Ink.Muted`, `Amber.610`);
+no other token or primitive changes.
 
 ## 4. Per-palette derivation strategy & accessibility targets
 
