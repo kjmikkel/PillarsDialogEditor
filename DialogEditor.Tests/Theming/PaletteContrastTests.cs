@@ -38,6 +38,7 @@ public class PaletteContrastTests
     // Dark is exempt (grandfathered baseline, spec §5). Thresholds: {normalText, largeUI}.
     [AvaloniaTheory]
     [InlineData("Palette.Light", 4.5, 3.0)]
+    [InlineData("Palette.Colourblind", 4.5, 3.0)]
     public void PaletteMeetsContrastTargets(string set, double normalMin, double largeMin)
     {
         var dict = PaletteHarness.Load(set);

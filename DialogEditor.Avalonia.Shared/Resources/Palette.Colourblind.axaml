@@ -1,7 +1,7 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <!--  PALETTE — COLOURBLIND-tuned set (Layer 1). Same keys as Palette.Dark.axaml, colourblind-safe values.
-          Skeleton = Dark values until the Colourblind-authoring task fills them. See spec §4.3. -->
+          Inherits Dark; only red/green-collision accents remapped to Okabe-Ito (blue/orange/vermillion). See spec §4.3. -->
 
     <!-- Neutrals (grayscale ramp) -->
     <Color x:Key="Palette.Neutral.80">#FF141414</Color>
@@ -38,11 +38,11 @@
 
     <!-- Accents -->
     <Color x:Key="Palette.Crimson.700">#FF7B241C</Color>
-    <Color x:Key="Palette.Maroon.800">#FF7A2A2A</Color>
+    <Color x:Key="Palette.Maroon.800">#FFD55E00</Color>
     <Color x:Key="Palette.Maroon.900">#FF3A1A1A</Color>
-    <Color x:Key="Palette.Red.500">#FFC0392B</Color>
-    <Color x:Key="Palette.Red.450">#FFE74C3C</Color>
-    <Color x:Key="Palette.Red.550">#FFE05555</Color>
+    <Color x:Key="Palette.Red.500">#FFD55E00</Color>
+    <Color x:Key="Palette.Red.450">#FFFF7A45</Color>
+    <Color x:Key="Palette.Red.550">#FFFF7A45</Color>
     <Color x:Key="Palette.Red.300">#FFFF9C9C</Color>
     <Color x:Key="Palette.Azure.600">#FF1A5276</Color>
     <Color x:Key="Palette.Azure.150">#FFD5E8F5</Color>
@@ -59,14 +59,14 @@
     <Color x:Key="Palette.Teal.150">#FFD5F0E8</Color>
     <Color x:Key="Palette.Teal.250">#FFB0E0D5</Color>
     <Color x:Key="Palette.Green.600">#FF2D6A2D</Color>
-    <Color x:Key="Palette.Green.550">#FF3A7A3A</Color>
-    <Color x:Key="Palette.Green.500">#FF5DB55D</Color>
-    <Color x:Key="Palette.Green.400">#FF7DCEA0</Color>
-    <Color x:Key="Palette.Amber.500">#FFB8760A</Color>
+    <Color x:Key="Palette.Green.550">#FF0072B2</Color>
+    <Color x:Key="Palette.Green.500">#FF56B4E9</Color>
+    <Color x:Key="Palette.Green.400">#FF56B4E9</Color>
+    <Color x:Key="Palette.Amber.500">#FFE69F00</Color>
     <Color x:Key="Palette.Amber.600">#FFC08A2A</Color>
-    <Color x:Key="Palette.Amber.610">#FFC08A2A</Color>
+    <Color x:Key="Palette.Amber.610">#FFE69F00</Color>
     <Color x:Key="Palette.Amber.520">#FFF0A830</Color>
-    <Color x:Key="Palette.Amber.540">#FFF0AD4E</Color>
+    <Color x:Key="Palette.Amber.540">#FFE69F00</Color>
     <Color x:Key="Palette.Amber.560">#FFE8C050</Color>
     <Color x:Key="Palette.Amber.570">#FFE8D080</Color>
     <Color x:Key="Palette.Amber.550">#FFE8A020</Color>
