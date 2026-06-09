@@ -14,14 +14,13 @@ internal static class PaletteHarness
 {
     private const string ResDir = "avares://DialogEditor.Avalonia.Shared/Resources/";
 
-    // The default first; the two Layer 1 alternates follow. A new palette = one entry here.
-    // High-Contrast is deferred: it needs Border/Surface token splits beyond Layer 1 scope.
+    // The default first; the Layer 1 alternates follow. A new palette = one entry here.
     public static readonly string[] AllSets =
-        { "Palette.Dark", "Palette.Light", "Palette.Colourblind" };
+        { "Palette.Dark", "Palette.Light", "Palette.Colourblind", "Palette.HighContrast" };
 
     // The sets the accessibility contract is enforced on (Dark is the grandfathered baseline, §5).
     public static readonly string[] EnforcedSets =
-        { "Palette.Light", "Palette.Colourblind" };
+        { "Palette.Light", "Palette.Colourblind", "Palette.HighContrast" };
 
     public static ResourceDictionary Load(string set)
         => (ResourceDictionary)AvaloniaXamlLoader.Load(new Uri(ResDir + set + ".axaml"));

@@ -1,0 +1,99 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!--  PALETTE — HIGH-CONTRAST set (Layer 1). Same keys as Palette.Dark.axaml; skeleton = Dark
+          values until the HC-authoring task fills them. See spec
+          docs/superpowers/specs/2026-06-09-layer1-highcontrast-design.md §4. -->
+
+    <!-- Neutrals (grayscale ramp) -->
+    <Color x:Key="Palette.Neutral.80">#FF141414</Color>
+    <Color x:Key="Palette.Neutral.100">#FF1A1A1A</Color>
+    <Color x:Key="Palette.Neutral.115">#FF1E1E1E</Color>
+    <Color x:Key="Palette.Neutral.125">#FF202020</Color>
+    <Color x:Key="Palette.Neutral.145">#FF252525</Color>
+    <Color x:Key="Palette.Neutral.175">#FF2D2D2D</Color>
+    <Color x:Key="Palette.Neutral.200">#FF333333</Color>
+    <Color x:Key="Palette.Neutral.225">#FF3A3A3A</Color>
+    <Color x:Key="Palette.Neutral.265">#FF444444</Color>
+    <Color x:Key="Palette.Neutral.290">#FF4A4A4A</Color>
+    <Color x:Key="Palette.Neutral.335">#FF555555</Color>
+    <Color x:Key="Palette.Neutral.400">#FF666666</Color>
+    <Color x:Key="Palette.Neutral.535">#FF888888</Color>
+    <Color x:Key="Palette.Neutral.600">#FF999999</Color>
+    <Color x:Key="Palette.Neutral.665">#FFAAAAAA</Color>
+    <Color x:Key="Palette.Neutral.735">#FFBBBBBB</Color>
+    <Color x:Key="Palette.Neutral.785">#FFC8C8C8</Color>
+    <Color x:Key="Palette.Neutral.800">#FFCCCCCC</Color>
+    <Color x:Key="Palette.Neutral.865">#FFDDDDDD</Color>
+    <Color x:Key="Palette.Neutral.875">#FFE0E0E0</Color>
+    <Color x:Key="Palette.Neutral.910">#FFE8E8E8</Color>
+    <Color x:Key="Palette.Black">#FF000000</Color>
+    <Color x:Key="Palette.White">#FFFFFFFF</Color>
+
+    <!--  INK — dedicated dark-on-light text primitives (spec §3.3). Kept on their OWN keys (not
+          Neutral.200/400) so the always-light node-card body text can stay dark while Neutral.200/400
+          re-value for surface/border/disabled roles in the Light & High-Contrast palettes. Dark values
+          equal the former Neutral.200/400 so this layer changes nothing on screen. Ink is a named
+          role-primitive (defined by use, dark-on-light), not a numeric tone in the neutral ramp. -->
+    <Color x:Key="Palette.Ink.Strong">#FF333333</Color>
+    <Color x:Key="Palette.Ink.Muted">#FF666666</Color>
+
+    <!--  LINE / CONTROL — border-divider and interactive-control-background primitives, split off the
+          shared neutrals so the High-Contrast palette can make borders bright + controls visible while
+          surfaces go near-black (spec 2026-06-09-layer1-highcontrast-design.md §3). These values equal
+          the neutral each replaced, so this palette is unchanged on screen. -->
+    <Color x:Key="Palette.Line.Subtle">#FF2D2D2D</Color>
+    <Color x:Key="Palette.Line.Default">#FF333333</Color>
+    <Color x:Key="Palette.Line.Strong">#FF444444</Color>
+    <Color x:Key="Palette.Line.Muted">#FF555555</Color>
+    <Color x:Key="Palette.Control.Background">#FF333333</Color>
+
+    <!-- Accents -->
+    <Color x:Key="Palette.Crimson.700">#FF7B241C</Color>
+    <Color x:Key="Palette.Maroon.800">#FF7A2A2A</Color>
+    <Color x:Key="Palette.Maroon.900">#FF3A1A1A</Color>
+    <Color x:Key="Palette.Red.500">#FFC0392B</Color>
+    <Color x:Key="Palette.Red.450">#FFE74C3C</Color>
+    <Color x:Key="Palette.Red.550">#FFE05555</Color>
+    <Color x:Key="Palette.Red.300">#FFFF9C9C</Color>
+    <Color x:Key="Palette.Azure.600">#FF1A5276</Color>
+    <Color x:Key="Palette.Azure.150">#FFD5E8F5</Color>
+    <Color x:Key="Palette.Azure.250">#FFB0CDE8</Color>
+    <Color x:Key="Palette.Slate.700">#FF2C3E50</Color>
+    <Color x:Key="Palette.Navy.100">#FF1A1A2A</Color>
+    <Color x:Key="Palette.Navy.150">#FF1A2738</Color>
+    <Color x:Key="Palette.Sky.300">#FF9CC4FF</Color>
+    <Color x:Key="Palette.Sky.250">#FF9CDCFE</Color>
+    <Color x:Key="Palette.Sky.350">#FF99AADD</Color>
+    <Color x:Key="Palette.Sky.400">#FF4A9EFF</Color>
+    <Color x:Key="Palette.Sky.450">#FF5DADE2</Color>
+    <Color x:Key="Palette.Teal.600">#FF0E6655</Color>
+    <Color x:Key="Palette.Teal.150">#FFD5F0E8</Color>
+    <Color x:Key="Palette.Teal.250">#FFB0E0D5</Color>
+    <Color x:Key="Palette.Green.600">#FF2D6A2D</Color>
+    <Color x:Key="Palette.Green.550">#FF3A7A3A</Color>
+    <Color x:Key="Palette.Green.500">#FF5DB55D</Color>
+    <Color x:Key="Palette.Green.400">#FF7DCEA0</Color>
+    <Color x:Key="Palette.Amber.500">#FFB8760A</Color>
+    <Color x:Key="Palette.Amber.600">#FFC08A2A</Color>
+    <Color x:Key="Palette.Amber.610">#FFC08A2A</Color>
+    <Color x:Key="Palette.Amber.520">#FFF0A830</Color>
+    <Color x:Key="Palette.Amber.540">#FFF0AD4E</Color>
+    <Color x:Key="Palette.Amber.560">#FFE8C050</Color>
+    <Color x:Key="Palette.Amber.570">#FFE8D080</Color>
+    <Color x:Key="Palette.Amber.550">#FFE8A020</Color>
+    <Color x:Key="Palette.Amber.900">#FF7A5C00</Color>
+    <Color x:Key="Palette.Amber.950">#FF2A2000</Color>
+    <Color x:Key="Palette.Olive.500">#FFBDBD80</Color>
+    <Color x:Key="Palette.Burnt.600">#FF8E4912</Color>
+    <Color x:Key="Palette.Parchment.100">#FFF5F0D0</Color>
+    <Color x:Key="Palette.Parchment.200">#FFE8E0B0</Color>
+    <Color x:Key="Palette.Cream.100">#FFFFF8DC</Color>
+    <Color x:Key="Palette.Mauve.500">#FF7A6A8E</Color>
+    <Color x:Key="Palette.Magenta.500">#FFEE00AA</Color>
+
+    <!-- Alpha / effect primitives (overlays + shadow live here so hex stays confined) -->
+    <Color x:Key="Palette.Alpha.Scrim">#BB000000</Color>
+    <Color x:Key="Palette.Alpha.Shadow">#A0000000</Color>
+    <Color x:Key="Palette.Alpha.HairlineOnDark">#33FFFFFF</Color>
+    <BoxShadows x:Key="Palette.Effect.CardShadow">0 0 18 0 #A0000000</BoxShadows>
+</ResourceDictionary>
