@@ -25,8 +25,9 @@
     <SolidColorBrush x:Key="Brush.Node.Bark.Footer"      Color="{StaticResource Palette.Amber.570}"/>
 
     <!-- Diff canvas fills -->
+    <!-- Brush.Text.Meta.Commit stays on Amber.600 (commit gold). Diff.Changed.Fill split onto Amber.610 (separate from commit gold) per Layer 1 spec §3.3. -->
     <SolidColorBrush x:Key="Brush.Diff.Added.Fill"    Color="{StaticResource Palette.Green.550}"/>
-    <SolidColorBrush x:Key="Brush.Diff.Changed.Fill"  Color="{StaticResource Palette.Amber.600}"/>
+    <SolidColorBrush x:Key="Brush.Diff.Changed.Fill"  Color="{StaticResource Palette.Amber.610}"/>
     <SolidColorBrush x:Key="Brush.Diff.Removed.Fill"  Color="{StaticResource Palette.Maroon.800}"/>
 
     <!-- Severity -->

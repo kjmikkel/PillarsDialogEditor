@@ -64,6 +64,7 @@
     <Color x:Key="Palette.Green.400">#FF7DCEA0</Color>
     <Color x:Key="Palette.Amber.500">#FFB8760A</Color>
     <Color x:Key="Palette.Amber.600">#FFC08A2A</Color>
+    <Color x:Key="Palette.Amber.610">#FFC08A2A</Color>
     <Color x:Key="Palette.Amber.520">#FFF0A830</Color>
     <Color x:Key="Palette.Amber.540">#FFF0AD4E</Color>
     <Color x:Key="Palette.Amber.560">#FFE8C050</Color>
