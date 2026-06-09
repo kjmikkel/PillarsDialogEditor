@@ -1,7 +1,9 @@
 # Layer 1 — High-Contrast Palette (Design)
 
 **Date:** 2026-06-09
-**Status:** Design — awaiting review
+**Status:** Implemented 2026-06-09 — `Palette.HighContrast.axaml` ships at WCAG AAA via the
+`Palette.Line.*`/`Control.Background` split; gated by `PaletteContrastTests` (AAA) and
+`HighContrastBordersAreVisible`.
 **Gap:** `Gaps.md` → *Centralised UI Colour Tokens* (Layer 1 — Palette sets → High-Contrast follow-up)
 **Builds on:** `docs/superpowers/specs/2026-06-08-layer1-palette-sets-design.md` (Layer 1: Light + Colourblind), `docs/superpowers/specs/2026-06-07-colour-token-taxonomy-design.md` (Layer 0)
 
