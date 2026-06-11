@@ -24,7 +24,7 @@
     <Color x:Key="Palette.Neutral.400">#FFB8B8B8</Color>  <!-- disabled text (brightened for HC; still dimmest, ~9:1) -->
     <Color x:Key="Palette.Neutral.535">#FFD4D4D4</Color>  <!-- muted text -->
     <Color x:Key="Palette.Neutral.600">#FFDCDCDC</Color>  <!-- caption text -->
-    <Color x:Key="Palette.Neutral.665">#FFFFFFFF</Color>  <!-- toolbar fg / muted.light / connection default -->
+    <Color x:Key="Palette.Neutral.665">#FFFFFFFF</Color>  <!-- toolbar fg / muted.light -->
     <Color x:Key="Palette.Neutral.735">#FFD6D6D6</Color>  <!-- tertiary text -->
     <Color x:Key="Palette.Neutral.785">#FFF0F0F0</Color>  <!-- script card footer (light) -->
     <Color x:Key="Palette.Neutral.800">#FFE6E6E6</Color>  <!-- secondary text -->
@@ -44,6 +44,7 @@
     <Color x:Key="Palette.Line.Strong">#FFFFFFFF</Color>
     <Color x:Key="Palette.Line.Muted">#FF6A6A6A</Color>
     <Color x:Key="Palette.Control.Background">#FF4D4D4D</Color>
+    <Color x:Key="Palette.Connection.Base">#FFAAAAAA</Color>  <!-- resting connection stroke: grey, NOT white, so the white highlighted link stands out (>=1.8:1) while staying visible on the canvas (~5.8:1) -->
 
     <!-- Accents -->
     <Color x:Key="Palette.Crimson.700">#FF7B241C</Color>  <!-- NPC header / destructive (white text >=7) -->

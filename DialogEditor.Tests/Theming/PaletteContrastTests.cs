@@ -73,6 +73,21 @@ public class PaletteContrastTests
         ("Palette.Line.Default", "Palette.Mauve.500"),   // GridSplitter on the canvas backdrop
     };
 
+    // A highlighted connection (Brush.Connection.Highlighted = Palette.White) must stand out
+    // from a resting one (Brush.Connection.Default = Palette.Connection.Base). In HC they
+    // collided at pure white (Neutral.665 = white for text), so the highlight was invisible
+    // among default links — hence the dedicated Connection.* primitive, dimmed in HC.
+    [AvaloniaFact]
+    public void HighContrastHighlightedConnectionStandsOut()
+    {
+        var dict  = PaletteHarness.Load("Palette.HighContrast");
+        var ratio = Wcag.ContrastRatio(
+            PaletteHarness.Color(dict, "Palette.White"),
+            PaletteHarness.Color(dict, "Palette.Connection.Base"));
+        Assert.True(ratio >= 1.8,
+            $"highlighted vs resting connection in HC: {ratio:F2}:1 < 1.8:1");
+    }
+
     [AvaloniaFact]
     public void HighContrastBordersAreVisible()
     {

@@ -51,6 +51,7 @@
     <Color x:Key="Palette.Line.Strong">#FF444444</Color>
     <Color x:Key="Palette.Line.Muted">#FF555555</Color>
     <Color x:Key="Palette.Control.Background">#FF333333</Color>
+    <Color x:Key="Palette.Connection.Base">#FFAAAAAA</Color>  <!-- resting connection stroke (split off Neutral.665 so HC can dim it below the white highlight) -->
 
     <!-- Accents -->
     <Color x:Key="Palette.Crimson.700">#FF7B241C</Color>
