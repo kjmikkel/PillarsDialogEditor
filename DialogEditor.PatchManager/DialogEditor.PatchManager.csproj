@@ -26,8 +26,8 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Resources\Strings.axaml"/>
-    <None Update="Assets\app.ico">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    <!-- app.ico must be an AvaloniaResource (not just copied to output) so the window's
+         Icon="avares://.../Assets/app.ico" resolves at startup. -->
+    <AvaloniaResource Include="Assets\**"/>
   </ItemGroup>
 </Project>
