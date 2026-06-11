@@ -39,6 +39,9 @@ public static class AppSettings
         public double? LegendX                       { get; set; }
         public double? LegendY                       { get; set; }
         public string DefaultLocalizationFormat      { get; set; } = "Csv";
+        // Layer 2 (runtime theming): the selected palette id (see ThemeApplier catalog).
+        // Default "Dark" matches the historical hardcoded RequestedThemeVariant="Dark".
+        public string Theme                          { get; set; } = "Dark";
     }
 
     public static string? LastLanguage
@@ -154,6 +157,12 @@ public static class AppSettings
     {
         get => Load().DefaultLocalizationFormat;
         set { var s = Load(); s.DefaultLocalizationFormat = value; Save(s); }
+    }
+
+    public static string Theme
+    {
+        get => Load().Theme;
+        set { var s = Load(); s.Theme = value; Save(s); }
     }
 
     public static string PickLanguage(IReadOnlyList<string> available, string? preferred)

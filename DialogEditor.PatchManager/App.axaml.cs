@@ -2,7 +2,9 @@ using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using DialogEditor.Avalonia.Shared.Services;
+using DialogEditor.Avalonia.Shared.Theming;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.PatchManager;
 
@@ -18,6 +20,9 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            // Honour the theme the user picked in the editor (or here) on the previous run,
+            // before the first window is built (overrides App.axaml's Dark default).
+            new ThemeApplier().Apply(AppSettings.Theme);
             var window = new MainWindow();
             desktop.MainWindow = window;
 

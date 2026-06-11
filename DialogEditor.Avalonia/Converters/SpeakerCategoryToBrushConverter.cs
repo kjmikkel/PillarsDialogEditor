@@ -12,13 +12,19 @@ namespace DialogEditor.Avalonia.Converters;
 /// Tokens.axaml — this converter holds no colours (was a hand-copied RGB table that
 /// drifted against NodeColorConverter; both now share the same keys).
 /// </summary>
-public sealed class SpeakerCategoryToBrushConverter : IValueConverter
+public sealed class SpeakerCategoryToBrushConverter : IValueConverter, IMultiValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
         var cat = value is SpeakerCategory c ? c : SpeakerCategory.Npc;
         return TokenBrushes.Resolve(Key(cat, parameter as string));
     }
+
+    // Multi-value overload for the canvas speaker-dot: values[0] = SpeakerCategory; any
+    // further values (the ThemeService.Revision tick) exist only to re-fire the binding on a
+    // palette swap and are ignored here.
+    public object Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
+        => Convert(values.Count > 0 ? values[0] : null, targetType, parameter, culture);
 
     internal static string Key(SpeakerCategory cat, string? zone)
     {
