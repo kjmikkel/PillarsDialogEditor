@@ -123,7 +123,7 @@
     <!-- Canvas connection strokes (ConversationView edges + LegendWindow swatches).
          A distinct semantic family from text/borders so a future palette can recolour
          edges independently; the White highlight is tokenised here for family completeness. -->
-    <SolidColorBrush x:Key="Brush.Connection.Default"            Color="{StaticResource Palette.Neutral.665}"/>
+    <SolidColorBrush x:Key="Brush.Connection.Default"            Color="{StaticResource Palette.Connection.Base}"/>
     <SolidColorBrush x:Key="Brush.Connection.Always"            Color="{StaticResource Palette.Amber.500}"/>
     <SolidColorBrush x:Key="Brush.Connection.Never"             Color="{StaticResource Palette.Neutral.335}"/>
     <SolidColorBrush x:Key="Brush.Connection.Highlighted"        Color="{StaticResource Palette.White}"/>
