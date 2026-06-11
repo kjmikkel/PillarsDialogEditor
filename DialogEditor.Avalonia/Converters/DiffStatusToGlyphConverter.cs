@@ -18,7 +18,7 @@ public sealed class DiffStatusToGlyphConverter : IValueConverter
             {
                 DiffStatus.Added   => "+",
                 DiffStatus.Changed => "~",
-                DiffStatus.Removed => "-",
+                DiffStatus.Removed => "−",
                 _                  => "",
             }
             : "";
