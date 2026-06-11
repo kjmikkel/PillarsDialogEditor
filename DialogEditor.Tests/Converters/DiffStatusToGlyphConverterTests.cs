@@ -12,7 +12,7 @@ public class DiffStatusToGlyphConverterTests
     [Theory]
     [InlineData(DiffStatus.Added,   "+")]
     [InlineData(DiffStatus.Changed, "~")]
-    [InlineData(DiffStatus.Removed, "-")]
+    [InlineData(DiffStatus.Removed, "−")]
     [InlineData(DiffStatus.Unchanged, "")]
     public void Convert_DiffStatus_ReturnsExpectedGlyph(DiffStatus status, string expected)
         => Assert.Equal(expected, new DiffStatusToGlyphConverter().Convert(status, typeof(string), null, Inv));
