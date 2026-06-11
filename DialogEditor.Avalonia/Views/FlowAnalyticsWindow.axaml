@@ -111,12 +111,18 @@
             <ItemsControl ItemsSource="{Binding Issues}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="vm:FlowIssueViewModel">
-                        <Grid ColumnDefinitions="4,Auto,*,Auto"
+                        <Grid ColumnDefinitions="16,Auto,*,Auto"
                               Margin="0,2" Height="32">
-                            <!-- Severity bar -->
+                            <!-- Severity icon -->
                             <Border Grid.Column="0"
+                                    Width="16" Height="16"
+                                    CornerRadius="3"
                                     Background="{Binding Kind, Converter={StaticResource FlowIssueSeverityBrush}}"
-                                    CornerRadius="2,0,0,2"/>
+                                    HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Kind, Converter={StaticResource FlowIssueSeverityGlyph}}"
+                                           FontSize="10" Foreground="White"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
                             <!-- Kind label -->
                             <TextBlock Grid.Column="1"
                                        Text="{Binding KindLabel}"
