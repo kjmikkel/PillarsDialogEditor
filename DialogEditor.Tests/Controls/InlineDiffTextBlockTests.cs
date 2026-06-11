@@ -1,6 +1,7 @@
 using System.Linq;
 using Avalonia.Controls.Documents;
 using Avalonia.Headless.XUnit;
+using Avalonia.Media;
 using DialogEditor.Avalonia.Controls;
 
 namespace DialogEditor.Tests.Controls;
@@ -38,5 +39,23 @@ public class InlineDiffTextBlockTests
     {
         var c = new InlineDiffTextBlock { ShowAfter = false };
         Assert.Equal("", Text(c));
+    }
+
+    [AvaloniaFact]
+    public void BeforeSide_RemovedTextHasStrikethrough()
+    {
+        var c = new InlineDiffTextBlock { ShowAfter = false, Before = "hello world", After = "hello there" };
+        var removedRun = (c.Inlines ?? new InlineCollection()).OfType<Run>().Last();
+        Assert.Equal("world", removedRun.Text);
+        Assert.Equal(TextDecorations.Strikethrough, removedRun.TextDecorations);
+    }
+
+    [AvaloniaFact]
+    public void AfterSide_AddedTextHasUnderline()
+    {
+        var c = new InlineDiffTextBlock { ShowAfter = true, Before = "hello world", After = "hello there" };
+        var addedRun = (c.Inlines ?? new InlineCollection()).OfType<Run>().Last();
+        Assert.Equal("there", addedRun.Text);
+        Assert.Equal(TextDecorations.Underline, addedRun.TextDecorations);
     }
 }

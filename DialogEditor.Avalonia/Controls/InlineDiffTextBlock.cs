@@ -55,10 +55,10 @@ public class InlineDiffTextBlock : TextBlock
                     inlines.Add(MakeRun(span.Text, CommonBrush));
                     break;
                 case DiffKind.MineOnly:
-                    if (!ShowAfter) inlines.Add(MakeRun(span.Text, BeforeBrush));
+                    if (!ShowAfter) inlines.Add(MakeRun(span.Text, BeforeBrush, global::Avalonia.Media.TextDecorations.Strikethrough));
                     break;
                 case DiffKind.TheirsOnly:
-                    if (ShowAfter) inlines.Add(MakeRun(span.Text, AfterBrush));
+                    if (ShowAfter) inlines.Add(MakeRun(span.Text, AfterBrush, global::Avalonia.Media.TextDecorations.Underline));
                     break;
             }
         }
@@ -66,5 +66,6 @@ public class InlineDiffTextBlock : TextBlock
         Inlines = inlines;
     }
 
-    private static Run MakeRun(string text, IBrush brush) => new(text) { Foreground = brush };
+    private static Run MakeRun(string text, IBrush brush, TextDecorationCollection? decorations = null) =>
+        new(text) { Foreground = brush, TextDecorations = decorations };
 }
