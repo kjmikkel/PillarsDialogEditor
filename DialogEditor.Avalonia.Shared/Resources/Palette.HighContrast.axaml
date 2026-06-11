@@ -86,7 +86,7 @@
     <Color x:Key="Palette.Parchment.100">#FFFFFFFF</Color> <!-- NPC card body -->
     <Color x:Key="Palette.Parchment.200">#FFF0F0F0</Color> <!-- NPC card footer -->
     <Color x:Key="Palette.Cream.100">#FFFFFFFF</Color>     <!-- bark card body -->
-    <Color x:Key="Palette.Mauve.500">#FFB0A0C8</Color>    <!-- accent badge bg -->
+    <Color x:Key="Palette.Mauve.500">#FF332A47</Color>    <!-- canvas backdrop (Brush.Accent.Badge): mid-dark so the bright Line.Default GridSplitters stay visible (~5.7:1) and white node cards pop, while still stepping off the near-black chrome -->
     <Color x:Key="Palette.Magenta.500">#FFFF5BD0</Color>  <!-- about-window status text -->
 
     <!-- Alpha / effect primitives (overlays + shadow) -->

@@ -257,7 +257,7 @@ Palette.HighContrast	Palette.Line.Subtle	#FF8C8C8C
 Palette.HighContrast	Palette.Magenta.500	#FFFF5BD0
 Palette.HighContrast	Palette.Maroon.800	#FFFF8080
 Palette.HighContrast	Palette.Maroon.900	#FF2A0000
-Palette.HighContrast	Palette.Mauve.500	#FFB0A0C8
+Palette.HighContrast	Palette.Mauve.500	#FF332A47
 Palette.HighContrast	Palette.Navy.100	#FF000000
 Palette.HighContrast	Palette.Navy.150	#FF001A33
 Palette.HighContrast	Palette.Neutral.100	#FF000000
