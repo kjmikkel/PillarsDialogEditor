@@ -104,6 +104,7 @@
             <converters:StringEqualsBoolConverter           x:Key="StringEqualsBool"/>
             <converters:PropertyValueStyleToBrushConverter x:Key="PropertyValueStyleToBrush"/>
             <converters:FlowIssueKindToSeverityBrushConverter x:Key="FlowIssueSeverityBrush"/>
+            <converters:FlowIssueKindToSeverityGlyphConverter   x:Key="FlowIssueSeverityGlyph"/>
             <converters:DiffStatusToBrushConverter              x:Key="DiffStatusToBrushConverter"/>
             <converters:DiffStatusToGlyphConverter               x:Key="DiffStatusToGlyph"/>
             <converters:CommitDateConverter                      x:Key="CommitDate"/>
