@@ -14,6 +14,7 @@
         </Style>
         <Style Selector="nodify|Connection.always">
             <Setter Property="Stroke" Value="{DynamicResource Brush.Connection.Always}"/>
+            <Setter Property="StrokeDashArray" Value="10,2,2,2"/>
         </Style>
         <Style Selector="nodify|Connection.never">
             <Setter Property="Stroke" Value="{DynamicResource Brush.Connection.Never}"/>
@@ -25,6 +26,7 @@
         </Style>
         <Style Selector="nodify|Connection.highlighted.always">
             <Setter Property="Stroke" Value="{DynamicResource Brush.Connection.Highlighted.Always}"/>
+            <Setter Property="StrokeDashArray" Value="10,2,2,2"/>
         </Style>
         <Style Selector="nodify|Connection.highlighted.never">
             <Setter Property="Stroke" Value="{DynamicResource Brush.Connection.Highlighted.Never}"/>
