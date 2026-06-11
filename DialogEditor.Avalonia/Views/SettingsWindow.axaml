@@ -1,9 +1,10 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.SettingsWindow"
         Title="{StaticResource Settings_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Width="500" Height="180"
+        Width="500" Height="220"
         CanResize="False"
         Background="{DynamicResource Brush.Surface.Window}"
         WindowStartupLocation="CenterOwner"
@@ -63,6 +64,9 @@
                     <ComboBoxItem Content="Xliff"/>
                 </ComboBox>
             </DockPanel>
+
+            <!-- Theme picker (own DataContext set in code-behind; shared with PatchManager) -->
+            <shared:ThemePickerView x:Name="ThemePicker"/>
 
         </StackPanel>
 

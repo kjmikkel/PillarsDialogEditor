@@ -1,4 +1,5 @@
 using System.Globalization;
+using Avalonia.Data.Converters;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using DialogEditor.Avalonia.Converters;
@@ -107,6 +108,15 @@ public class BrushConverterTests
     public void SpeakerCategoryToBrush_ReturnsExpectedColor(SpeakerCategory cat, string? param, byte r, byte g, byte b)
         => Assert.Equal(Color.FromRgb(r, g, b),
             BrushColor(new SpeakerCategoryToBrushConverter().Convert(cat, typeof(ISolidColorBrush), param, Inv)));
+
+    // SpeakerCategoryToBrush also serves the canvas speaker-dot via a MultiBinding whose
+    // second value is the theme-revision tick (so the dot retints live on a palette swap).
+    // The extra value must be ignored; the first value still drives the colour.
+    [AvaloniaFact]
+    public void SpeakerCategoryToBrush_MultiValue_UsesFirstValueAndIgnoresTick()
+        => Assert.Equal(Color.FromRgb(0x1a, 0x52, 0x76), // Player header
+            BrushColor(((IMultiValueConverter)new SpeakerCategoryToBrushConverter()).Convert(
+                new List<object?> { SpeakerCategory.Player, 7 }, typeof(ISolidColorBrush), null, Inv)));
 
     // ── NodeColorConverter ────────────────────────────────────────────────
 

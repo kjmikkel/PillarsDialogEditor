@@ -166,11 +166,21 @@ land later or never without making anything beneath them wrong.
   (HC dividers ≥4.5:1). Designs:
   `docs/superpowers/specs/2026-06-08-layer1-palette-sets-design.md` (Light/Colourblind) and
   `2026-06-09-layer1-highcontrast-design.md` (HC); plans alongside in `docs/superpowers/plans/`.
-- **Layer 2 — Runtime selection (deferred, independent).** The Settings UI (in the editor) to
-  choose a palette/theme at runtime, persist the choice, and plug into Avalonia's `ThemeVariant`
-  **across both apps** — the standalone PatchManager honouring the same persisted choice from the
-  shared registry, so the selection retints the whole solution rather than the editor alone. This
-  is the bulk of the work.
+- **Layer 2 — Runtime selection. ✅ IMPLEMENTED (2026-06-11).** A persisted theme choice
+  (`AppSettings.Theme`, default `"Dark"`) applied at runtime **across both apps**. A shared
+  `ThemePickerView` + `ThemePickerViewModel` (driven by an injected `IThemeApplier` seam) is
+  hosted by the editor's Settings window and by a top bar in the standalone PatchManager, so the
+  same control/strings retint either app live. The Avalonia `ThemeApplier` (in
+  `DialogEditor.Avalonia.Shared`) swaps the merged palette + a freshly-reloaded `Tokens.axaml`
+  (Tokens references palette colours via `{StaticResource}`, resolved once at load, so it must
+  be reloaded after the new palette) and flips `RequestedThemeVariant` (Light→Light, the rest→
+  Dark). `{DynamicResource Brush.*}` chrome retints for free; converter-driven **canvas node
+  colours** retint live via a `ThemeService.Current.Revision` tick fed as a throwaway extra
+  source into the node-colour MultiBindings. Both `App.axaml.cs` apply the saved theme before
+  the first window shows. The catalogue is a single add-point per palette (no hardcoded count,
+  per Layer 1 §8). Design: `docs/superpowers/specs/2026-06-11-layer2-runtime-theme-design.md`.
+  (Incidental fix: the standalone PatchManager's `app.ico` was declared `<None>`, not
+  `<AvaloniaResource>`, so its window `Icon` crashed startup — corrected to embed the asset.)
 - **Layer 2.5 — Redundant non-colour encoding (deferred, independent; accessibility).** The
   part palettes can't fix: meaning must survive when hue is indistinguishable (~8% of men),
   via icons/borders/labels alongside colour — applied **across the whole solution** (both apps),

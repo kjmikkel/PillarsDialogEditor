@@ -9,5 +9,14 @@
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource Brush.Surface.Window}"
         x:CompileBindings="False">
-    <shared:PatchManagerView/>
+    <DockPanel>
+        <!-- Standalone-only theme bar. Lives here (not in the shared PatchManagerView, which
+             the editor also hosts) so it appears only in the standalone PatchManager. -->
+        <Border DockPanel.Dock="Top"
+                Background="{DynamicResource Brush.Surface.Header}"
+                Padding="8,6">
+            <shared:ThemePickerView x:Name="ThemePicker" HorizontalAlignment="Left"/>
+        </Border>
+        <shared:PatchManagerView/>
+    </DockPanel>
 </Window>

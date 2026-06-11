@@ -42,4 +42,12 @@
     <!-- FileType descriptions (used by file pickers) -->
     <sys:String x:Key="FileType_PatchList">Patch list (*.patchlist)</sys:String>
 
+    <!-- ─── Theme picker (Layer 2) — shared by editor and standalone PatchManager ── -->
+    <sys:String x:Key="Settings_Theme">Theme</sys:String>
+    <sys:String x:Key="Settings_ThemeTooltip">Choose the colour theme for the whole application. The change is applied immediately and remembered for next time. High Contrast and Colourblind improve readability for low vision and colour-vision deficiency.</sys:String>
+    <sys:String x:Key="Theme_Name_Dark">Dark</sys:String>
+    <sys:String x:Key="Theme_Name_Light">Light</sys:String>
+    <sys:String x:Key="Theme_Name_Colourblind">Colourblind</sys:String>
+    <sys:String x:Key="Theme_Name_HighContrast">High Contrast</sys:String>
+
 </ResourceDictionary>

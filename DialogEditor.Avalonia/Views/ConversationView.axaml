@@ -3,6 +3,7 @@
              xmlns:nodify="clr-namespace:Nodify;assembly=Nodify"
              xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
              xmlns:models="clr-namespace:DialogEditor.Core.Models;assembly=DialogEditor.Core"
+             xmlns:theming="clr-namespace:DialogEditor.Avalonia.Shared.Theming;assembly=DialogEditor.Avalonia.Shared"
              x:Class="DialogEditor.Avalonia.Views.ConversationView" x:CompileBindings="False">
 
     <UserControl.Styles>
@@ -32,8 +33,11 @@
 
     <Grid RowDefinitions="Auto,*">
 
-        <!-- Toolbar -->
-        <Border Grid.Row="0" Background="{DynamicResource Brush.Surface.Panel}" Padding="8,4">
+        <!-- Toolbar. Bottom divider so the toolbar/canvas edge reads in every theme — a faint
+             hairline in Dark/Light, a bright separator in High-Contrast (where panel and canvas
+             are both dark and tone alone wouldn't separate them). -->
+        <Border Grid.Row="0" Background="{DynamicResource Brush.Surface.Panel}" Padding="8,4"
+                BorderBrush="{DynamicResource Brush.Border.Default}" BorderThickness="0,0,0,1">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
                     <Button Content="{StaticResource Legend_Control_Fit}"
@@ -164,13 +168,22 @@
                                         <MultiBinding Converter="{StaticResource NodeColorConverter}">
                                             <Binding Path="SpeakerCategory"/>
                                             <Binding Path="DisplayType"/>
+                                            <!-- Theme tick (ignored by the converter): re-fires this binding on a palette swap so the node retints live -->
+                                            <Binding Source="{x:Static theming:ThemeService.Current}" Path="Revision"/>
                                         </MultiBinding>
                                     </Border.Background>
                                     <StackPanel Orientation="Horizontal">
                                         <!-- Speaker-identity dot: always present, only informative for bark nodes -->
                                         <Ellipse Width="6" Height="6" Margin="6,0,4,0" VerticalAlignment="Center"
-                                                 Fill="{Binding SpeakerCategory, Converter={StaticResource SpeakerCategoryToBrush}}"
-                                                 ToolTip.Tip="{Binding SpeakerCategory}"/>
+                                                 ToolTip.Tip="{Binding SpeakerCategory}">
+                                            <Ellipse.Fill>
+                                                <!-- MultiBinding (not a plain Binding) so the theme tick can retint the dot live on a palette swap -->
+                                                <MultiBinding Converter="{StaticResource SpeakerCategoryToBrush}">
+                                                    <Binding Path="SpeakerCategory"/>
+                                                    <Binding Source="{x:Static theming:ThemeService.Current}" Path="Revision"/>
+                                                </MultiBinding>
+                                            </Ellipse.Fill>
+                                        </Ellipse>
                                         <TextBlock Text="{Binding Title}"
                                                    Foreground="White" FontWeight="Bold"
                                                    FontSize="10" Padding="0,3,6,3"
@@ -184,6 +197,8 @@
                                         <MultiBinding Converter="{StaticResource NodeColorConverter}" ConverterParameter="body">
                                             <Binding Path="SpeakerCategory"/>
                                             <Binding Path="DisplayType"/>
+                                            <!-- Theme tick (ignored by the converter): re-fires this binding on a palette swap so the node retints live -->
+                                            <Binding Source="{x:Static theming:ThemeService.Current}" Path="Revision"/>
                                         </MultiBinding>
                                     </Border.Background>
                                     <TextBlock Text="{Binding TextPreview}"
@@ -198,6 +213,8 @@
                                         <MultiBinding Converter="{StaticResource NodeColorConverter}" ConverterParameter="footer">
                                             <Binding Path="SpeakerCategory"/>
                                             <Binding Path="DisplayType"/>
+                                            <!-- Theme tick (ignored by the converter): re-fires this binding on a palette swap so the node retints live -->
+                                            <Binding Source="{x:Static theming:ThemeService.Current}" Path="Revision"/>
                                         </MultiBinding>
                                     </Border.Background>
                                     <TextBlock Text="{Binding FooterText}" FontSize="9" Foreground="{DynamicResource Brush.Text.OnLight.Muted}"/>
@@ -255,6 +272,8 @@
                                         <MultiBinding Converter="{StaticResource NodeColorConverter}">
                                             <Binding Path="SpeakerCategory"/>
                                             <Binding Path="DisplayType"/>
+                                            <!-- Theme tick (ignored by the converter): re-fires this binding on a palette swap so the node retints live -->
+                                            <Binding Source="{x:Static theming:ThemeService.Current}" Path="Revision"/>
                                         </MultiBinding>
                                     </Border.Background>
                                 </Border>

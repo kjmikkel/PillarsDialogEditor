@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+             x:Class="DialogEditor.Avalonia.Shared.ThemePickerView"
+             x:CompileBindings="False">
+
+    <!-- Layer 2 theme picker. Shared so the editor's Settings window and the standalone
+         PatchManager host the exact same control, ViewModel, and localised strings.
+         Strings use DynamicResource (not StaticResource) so they resolve at runtime
+         regardless of which app's resource scope this control is instantiated in. -->
+    <DockPanel ToolTip.Tip="{DynamicResource Settings_ThemeTooltip}">
+        <TextBlock Text="{DynamicResource Settings_Theme}"
+                   Foreground="{DynamicResource Brush.Text.Muted.Light}"
+                   VerticalAlignment="Center"
+                   Width="140"
+                   FontSize="11"/>
+        <ComboBox ItemsSource="{Binding AvailableThemes}"
+                  SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
+                  MinWidth="160"
+                  ToolTip.Tip="{DynamicResource Settings_ThemeTooltip}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding DisplayName}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+    </DockPanel>
+</UserControl>

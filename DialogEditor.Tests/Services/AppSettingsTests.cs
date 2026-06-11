@@ -94,3 +94,29 @@ public class AppSettingsPendingRestoreTests : IDisposable
         Assert.Null(AppSettings.GetPendingRestores());
     }
 }
+
+public class AppSettingsThemeTests : IDisposable
+{
+    public AppSettingsThemeTests()
+        => AppSettings.SettingsPathOverride = Path.GetTempFileName();
+
+    public void Dispose()
+    {
+        var path = AppSettings.SettingsPathOverride;
+        AppSettings.SettingsPathOverride = null;
+        if (path is not null) File.Delete(path);
+    }
+
+    [Fact]
+    public void Theme_DefaultsToDark()
+    {
+        Assert.Equal("Dark", AppSettings.Theme);
+    }
+
+    [Fact]
+    public void Theme_RoundTrips()
+    {
+        AppSettings.Theme = "HighContrast";
+        Assert.Equal("HighContrast", AppSettings.Theme);
+    }
+}
