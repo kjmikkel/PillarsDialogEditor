@@ -173,17 +173,24 @@
                                         </MultiBinding>
                                     </Border.Background>
                                     <StackPanel Orientation="Horizontal">
-                                        <!-- Speaker-identity dot: always present, only informative for bark nodes -->
-                                        <Ellipse Width="6" Height="6" Margin="6,0,4,0" VerticalAlignment="Center"
-                                                 ToolTip.Tip="{Binding SpeakerCategory}">
-                                            <Ellipse.Fill>
-                                                <!-- MultiBinding (not a plain Binding) so the theme tick can retint the dot live on a palette swap -->
+                                        <!-- Node-type shape marker: shape encodes type (redundant with colour for
+                                             accessibility — Layer 2.5), fill mirrors the speaker colour as before -->
+                                        <Path Width="9" Height="9" Margin="6,0,4,0" VerticalAlignment="Center" Stretch="Uniform"
+                                              ToolTip.Tip="{Binding SpeakerCategory}">
+                                            <Path.Data>
+                                                <MultiBinding Converter="{StaticResource NodeTypeShape}">
+                                                    <Binding Path="SpeakerCategory"/>
+                                                    <Binding Path="DisplayType"/>
+                                                </MultiBinding>
+                                            </Path.Data>
+                                            <Path.Fill>
+                                                <!-- MultiBinding (not a plain Binding) so the theme tick can retint the marker live on a palette swap -->
                                                 <MultiBinding Converter="{StaticResource SpeakerCategoryToBrush}">
                                                     <Binding Path="SpeakerCategory"/>
                                                     <Binding Source="{x:Static theming:ThemeService.Current}" Path="Revision"/>
                                                 </MultiBinding>
-                                            </Ellipse.Fill>
-                                        </Ellipse>
+                                            </Path.Fill>
+                                        </Path>
                                         <TextBlock Text="{Binding Title}"
                                                    Foreground="White" FontWeight="Bold"
                                                    FontSize="10" Padding="0,3,6,3"
