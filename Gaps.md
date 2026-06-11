@@ -181,10 +181,25 @@ land later or never without making anything beneath them wrong.
   per Layer 1 §8). Design: `docs/superpowers/specs/2026-06-11-layer2-runtime-theme-design.md`.
   (Incidental fix: the standalone PatchManager's `app.ico` was declared `<None>`, not
   `<AvaloniaResource>`, so its window `Icon` crashed startup — corrected to embed the asset.)
-- **Layer 2.5 — Redundant non-colour encoding (deferred, independent; accessibility).** The
-  part palettes can't fix: meaning must survive when hue is indistinguishable (~8% of men),
-  via icons/borders/labels alongside colour — applied **across the whole solution** (both apps),
-  not just the editor. May warrant its own gap.
+- **Layer 2.5 — Redundant non-colour encoding. ✅ IMPLEMENTED (2026-06-11).** The part
+  palettes can't fix: meaning must survive when hue is indistinguishable (~8% of men), via
+  shape/glyph/line-pattern/text-decoration cues alongside colour, in `DialogEditor.Avalonia`.
+  Five areas: (1) the canvas node header's speaker-identity marker is now a `Path` shape
+  (Circle/Square/Triangle/Diamond/Player/Narrator/Script, Star for Bark) via
+  `NodeTypeShapeConverter`, replacing a colour-only `Ellipse`; (2) diff-view nodes get a
+  `+`/`~`/`−` corner badge (`DiffStatusToGlyphConverter`) alongside the existing coloured
+  border; (3) "Always" connections get a `10,2,2,2` dash-dot `StrokeDashArray`, distinct from
+  "Never"'s `4,3` dash, on both `Connection.always` and `Connection.highlighted.always`; (4)
+  the Flow Analytics severity indicator widened from a 4px colour bar to a 16x16 badge with a
+  ⛔/⚠ glyph (`FlowIssueKindToSeverityGlyphConverter`); (5) inline diff text
+  (`InlineDiffTextBlock`, used by `DiffWindow`/`GitConflictResolutionWindow`) gains
+  strikethrough (removed/before-side) and underline (added/after-side) alongside its existing
+  colours. PatchManager already paired severity colours with ⚠ glyphs/tooltips/labels — no
+  changes needed there. Minimap node markers and the legend window remain colour-only
+  (canvas/PatchManager are the source of truth; out of scope). No new colour tokens — all
+  changes reuse existing `Brush.*` tokens, so `NoStrayHexTests`/`PaletteContrastTests` are
+  unaffected. Design:
+  `docs/superpowers/specs/2026-06-11-layer2.5-non-colour-encoding-design.md`.
 
 **Dependency rule:** other gaps point only at Layer 0 — which, being solution-wide, resolves the
 same `Brush.*` keys in both apps. E.g. the **Canvas Annotations** gap draws region colours from
