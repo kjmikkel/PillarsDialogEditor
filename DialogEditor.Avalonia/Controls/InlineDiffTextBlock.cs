@@ -4,6 +4,7 @@ using Avalonia.Controls.Documents;
 using Avalonia.Media;
 using DialogEditor.Avalonia.Theming;
 using DialogEditor.Patch.GitConflict;
+using AvaloniaTextDecorations = Avalonia.Media.TextDecorations;
 
 namespace DialogEditor.Avalonia.Controls;
 
@@ -55,10 +56,10 @@ public class InlineDiffTextBlock : TextBlock
                     inlines.Add(MakeRun(span.Text, CommonBrush));
                     break;
                 case DiffKind.MineOnly:
-                    if (!ShowAfter) inlines.Add(MakeRun(span.Text, BeforeBrush, global::Avalonia.Media.TextDecorations.Strikethrough));
+                    if (!ShowAfter) inlines.Add(MakeRun(span.Text, BeforeBrush, AvaloniaTextDecorations.Strikethrough));
                     break;
                 case DiffKind.TheirsOnly:
-                    if (ShowAfter) inlines.Add(MakeRun(span.Text, AfterBrush, global::Avalonia.Media.TextDecorations.Underline));
+                    if (ShowAfter) inlines.Add(MakeRun(span.Text, AfterBrush, AvaloniaTextDecorations.Underline));
                     break;
             }
         }
