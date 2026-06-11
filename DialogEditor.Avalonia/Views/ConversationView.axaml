@@ -162,6 +162,21 @@
                                         BorderBrush="{Binding DiffStatus, Converter={StaticResource DiffStatusToBrushConverter}}"
                                         Background="Transparent"/>
 
+                                <!-- Diff status badge — corner glyph mirroring the border colour;
+                                     transparent background + empty glyph when Unchanged, so it
+                                     renders as nothing (Layer 2.5) -->
+                                <Border Grid.Row="0" Grid.RowSpan="3"
+                                        Width="18" Height="18" CornerRadius="9"
+                                        HorizontalAlignment="Right" VerticalAlignment="Top"
+                                        Margin="0,-9,-9,0"
+                                        IsHitTestVisible="False"
+                                        ZIndex="11"
+                                        Background="{Binding DiffStatus, Converter={StaticResource DiffStatusToBrushConverter}}">
+                                    <TextBlock Text="{Binding DiffStatus, Converter={StaticResource DiffStatusToGlyph}}"
+                                               Foreground="White" FontWeight="Bold" FontSize="11"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+
                                 <!-- Header — amber when Bark, speaker-color when Conversation -->
                                 <Border Grid.Row="0" CornerRadius="2,2,0,0">
                                     <Border.Background>
