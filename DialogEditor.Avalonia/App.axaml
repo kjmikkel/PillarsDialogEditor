@@ -105,6 +105,7 @@
             <converters:PropertyValueStyleToBrushConverter x:Key="PropertyValueStyleToBrush"/>
             <converters:FlowIssueKindToSeverityBrushConverter x:Key="FlowIssueSeverityBrush"/>
             <converters:DiffStatusToBrushConverter              x:Key="DiffStatusToBrushConverter"/>
+            <converters:DiffStatusToGlyphConverter               x:Key="DiffStatusToGlyph"/>
             <converters:CommitDateConverter                      x:Key="CommitDate"/>
             <converters:EnumToBoolConverter                      x:Key="EnumToBool"/>
             <converters:IsNullConverter                          x:Key="IsNull"/>
