@@ -147,4 +147,45 @@ public class CanvasNavigationServiceTests
         Assert.Null(CanvasNavigationService.GetSibling(c, +1, nodes, conns));
         Assert.Null(CanvasNavigationService.GetSibling(c, -1, nodes, conns));
     }
+
+    // ── Cycle ─────────────────────────────────────────────────────────────
+    [Fact]
+    public void Cycle_Forward_FollowsCollectionOrderAndWraps()
+    {
+        var a = MakeNode(0); var b = MakeNode(1); var c = MakeNode(2);
+        var nodes = new[] { a, b, c };
+        Assert.Same(b, CanvasNavigationService.Cycle(a, forward: true, nodes));
+        Assert.Same(a, CanvasNavigationService.Cycle(c, forward: true, nodes)); // wraps
+    }
+
+    [Fact]
+    public void Cycle_Backward_Wraps()
+    {
+        var a = MakeNode(0); var b = MakeNode(1);
+        var nodes = new[] { a, b };
+        Assert.Same(b, CanvasNavigationService.Cycle(a, forward: false, nodes)); // wraps
+    }
+
+    [Fact]
+    public void Cycle_FromNull_EntersAtFirstOrLast()
+    {
+        var a = MakeNode(0); var b = MakeNode(1);
+        var nodes = new[] { a, b };
+        Assert.Same(a, CanvasNavigationService.Cycle(null, forward: true, nodes));
+        Assert.Same(b, CanvasNavigationService.Cycle(null, forward: false, nodes));
+    }
+
+    [Fact]
+    public void Cycle_ReachesOrphans()
+    {
+        var root = MakeNode(0); var orphan = MakeNode(7);
+        var nodes = new[] { root, orphan };
+        Assert.Same(orphan, CanvasNavigationService.Cycle(root, forward: true, nodes));
+    }
+
+    [Fact]
+    public void Cycle_EmptyCanvas_ReturnsNull()
+    {
+        Assert.Null(CanvasNavigationService.Cycle(null, forward: true, []));
+    }
 }
