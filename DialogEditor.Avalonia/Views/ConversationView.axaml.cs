@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Layout;
 using DialogEditor.Core.Models;
@@ -48,6 +49,9 @@ public partial class ConversationView : UserControl
 
             Key.Enter when none && vm.SelectedNode is not null => RaiseFocusDetail(),
 
+            Key.Apps                                          => OpenSelectedNodeContextMenu(vm),
+            Key.F10 when e.KeyModifiers == KeyModifiers.Shift => OpenSelectedNodeContextMenu(vm),
+
             Key.Escape when none => vm.Deselect(),
 
             _ => false,
@@ -61,6 +65,22 @@ public partial class ConversationView : UserControl
     private bool RaiseFocusDetail()
     {
         FocusDetailRequested?.Invoke(this, EventArgs.Empty);
+        return true;
+    }
+
+    private bool OpenSelectedNodeContextMenu(ConversationViewModel vm)
+    {
+        if (vm.SelectedNode is null) return false;
+
+        // The ContextMenu lives on the nodify:Node inside the item template, not
+        // on the ItemContainer itself — walk down from the realized container.
+        var container = Editor.ContainerFromItem(vm.SelectedNode);
+        var owner = container?.GetVisualDescendants()
+            .OfType<Control>()
+            .FirstOrDefault(c => c.ContextMenu is not null);
+        if (owner?.ContextMenu is not { } menu) return false;
+
+        menu.Open(owner);
         return true;
     }
 
