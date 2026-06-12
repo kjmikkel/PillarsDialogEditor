@@ -99,6 +99,12 @@ public partial class MainWindow : Window
             DetailColumn.Width = new GridLength(34);
         }
 
+        CanvasView.FocusDetailRequested += (_, _) =>
+        {
+            vm.IsDetailExpanded = true;        // panel may be collapsed — open it first
+            DetailView.FocusFirstField();
+        };
+
         AddHandler(KeyDownEvent, OnKeyDownTunnel, RoutingStrategies.Tunnel);
     }
 

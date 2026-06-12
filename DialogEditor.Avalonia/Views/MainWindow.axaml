@@ -274,7 +274,7 @@
                             </StackPanel>
                         </DockPanel>
                     </Border>
-                    <views:NodeDetailView Grid.Row="1" DataContext="{Binding Detail}"
+                    <views:NodeDetailView x:Name="DetailView" Grid.Row="1" DataContext="{Binding Detail}"
                                          IsEnabled="{Binding IsProjectOpen}"/>
                 </Grid>
 

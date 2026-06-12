@@ -8,6 +8,10 @@ public partial class NodeDetailView : UserControl
 {
     public NodeDetailView() => InitializeComponent();
 
+    /// Keyboard handoff target: Enter on a canvas node lands here (spec:
+    /// 2026-06-12 canvas keyboard editing).
+    public void FocusFirstField() => DefaultTextBox.Focus();
+
     private async void EditConditions_Click(object? sender, RoutedEventArgs e)
     {
         if (DataContext is not NodeDetailViewModel detailVm) return;
