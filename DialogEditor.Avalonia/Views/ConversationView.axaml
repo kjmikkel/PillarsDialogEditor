@@ -98,7 +98,9 @@
                                  ItemsSource="{Binding Nodes}"
                                  Connections="{Binding Connections}"
                                  PendingConnection="{Binding PendingConnection}"
-                                 DoubleTapped="Editor_DoubleTapped">
+                                 DoubleTapped="Editor_DoubleTapped"
+                                 KeyDown="Editor_KeyDown"
+                                 GotFocus="Editor_GotFocus">
 
                 <!-- Drag-to-connect: the PendingConnection control MUST live inside
                      PendingConnectionTemplate (not be assigned to the PendingConnection
