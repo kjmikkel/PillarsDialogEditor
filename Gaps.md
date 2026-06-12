@@ -301,6 +301,60 @@ after the cheap wins. The rest are independent and can land in any order.
     exemption is a clean win. (b) Several hit targets (20px-wide ✕ clear buttons, slim
     toolbar buttons) sit below the WCAG 2.5.8 24×24 minimum.
 
+### UI Localisation Readiness (audit 2026-06-12)
+The localisation rule (no hard-coded user-visible text) has been followed, but the app
+cannot yet actually *switch language*. The good news from the audit: the architecture is
+genuinely localisation-ready, and **restart-based** language switching is close — the
+work is a delivery mechanism and a translation workflow, not a rewrite.
+
+**Already in place (verified):**
+- Single funnel: all UI strings live in three XAML dictionaries (`Strings.axaml`,
+  `SharedStrings.axaml`, PatchManager's `Strings.axaml`); views make ~513
+  `{StaticResource}` string references and ViewModels ~216 `Loc.Get`/`Loc.Format` calls.
+  No class-init string caching found — lookups happen at display time.
+- `Loc` → `AvaloniaStringProvider` queries `Application.Current.TryGetResource` on every
+  call, so swapping the merged dictionary changes every subsequent C# lookup automatically.
+- Theme Layer 2 is the exact mechanism precedent: persisted `AppSettings` choice, shared
+  picker view, merged-dictionary swap applied in both apps' startup before the first
+  window. A `Strings.de.axaml` overlay is the same trick as `Palette.Light.axaml`.
+- Good hygiene: positional `{0}`/`{1}` placeholders via `Loc.Format` (no concatenation
+  patterns found), translator notes already at the top of `Strings.axaml`, and
+  `DialogEditor.Core`'s four strings already use `.resx`/`ResourceManager` with a
+  settable `CoreStrings.Culture` (satellite-assembly ready).
+
+**Work needed for restart-based switching (the recommended path).** Because all XAML
+string references resolve when each window loads, merging the chosen language dictionary
+at startup makes `StaticResource` work as-is — no reference sweep needed:
+1. Per-language dictionaries with **overlay merge**: English merged first, chosen
+   language merged last (last-merged wins), so untranslated keys fall back to English by
+   construction.
+2. `AppSettings.Language` + a Settings picker + a "takes effect after restart" note —
+   clone of the theme-picker pattern, hosted by both apps.
+3. Set `CoreStrings.Culture` at startup; add satellite `.resx` per language.
+4. **Translation workflow (the real cost):** `.axaml` is translator-hostile. An
+   export/import bridge to XLIFF or CSV is needed — the in-house
+   `LocalizationExportService`/`ImportService` pattern (built for game content) is the
+   template.
+5. **Layout elasticity audit:** German/French run ~30% longer; fixed label widths
+   (`Width="140"` in Settings), `CanResize="False"` fixed-height windows, and 200px node
+   cards will clip. Overlaps with Accessibility item 6 (font tokens / text scaling) —
+   do them together.
+6. Minor: naive pluralisation (`"{0} nodes"` breaks in languages with multiple plural
+   forms — usually accepted in tools); and the no-hardcoded-strings rule has **no
+   enforcement test** (honor-system today, and a translated build makes violations
+   invisible in English testing) — the `NoStrayHexTests`/`AutomationNameTests` structural
+   pattern extends naturally here.
+
+**Live switching (no restart) — deliberately out of scope.** It would additionally need
+the ~513 `StaticResource` string refs converted to `DynamicResource` plus a
+change-notification kick for the ~216 ViewModel lookups (the `ThemeService.Revision`
+tick is the precedent). Several times the effort for little gain; restart-on-change is
+the desktop norm.
+
+**Difficulty verdict:** the switching mechanism itself is roughly a day following the
+theme Layer 2 playbook; the honest costs are the translation file workflow (item 4) and
+the layout robustness pass (item 5).
+
 ### Barks System — Bark Preview
 Bark nodes now render with an amber color scheme on the canvas, carry bark-specific validation warnings (text too long, player-choice child), and those warnings surface in Flow Analytics. The remaining gap is an in-context preview of overhead floating text: writers cannot see how a bark will actually appear above an NPC's head without running the game. Implementing this requires investigating the game's bark rendering (font, line-wrapping, maximum visible width) before UI work can be designed.
 
