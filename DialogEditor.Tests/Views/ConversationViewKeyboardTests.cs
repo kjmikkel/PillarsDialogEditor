@@ -6,6 +6,7 @@ using DialogEditor.Core.Models;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.Tests.ViewModels;
 using DialogEditor.ViewModels;
+using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.Tests.Views;
 
@@ -148,5 +149,19 @@ public class ConversationViewKeyboardTests
             NavigationMethod = NavigationMethod.Tab,
         });
         Assert.Same(child, vm.SelectedNode);
+    }
+
+    [AvaloniaFact]
+    public void NodeDetailView_FocusFirstField_FocusesDefaultTextBox()
+    {
+        Loc.Configure(new StubStringProvider());
+        var detail = new NodeDetailView();
+        var window = new Window { Content = detail };
+        window.Show();
+
+        detail.FocusFirstField();
+
+        var box = detail.FindControl<TextBox>("DefaultTextBox")!;
+        Assert.True(box.IsFocused);
     }
 }
