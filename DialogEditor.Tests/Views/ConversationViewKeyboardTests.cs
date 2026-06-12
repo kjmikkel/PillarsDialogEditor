@@ -1,6 +1,8 @@
+using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
+using Avalonia.VisualTree;
 using DialogEditor.Avalonia.Views;
 using DialogEditor.Core.Models;
 using DialogEditor.Tests.Helpers;
@@ -149,6 +151,25 @@ public class ConversationViewKeyboardTests
             NavigationMethod = NavigationMethod.Tab,
         });
         Assert.Same(child, vm.SelectedNode);
+    }
+
+    [AvaloniaFact]
+    public void MenuKey_OpensSelectedNodeContextMenu()
+    {
+        var (_, view, vm, root, _) = Setup();
+        vm.SelectNode(root);
+
+        Press(view, Key.Apps);
+
+        // The node template's ContextMenu (Delete node / Add connected node)
+        // must be open. Find it via the realized container.
+        var editor = view.FindControl<Control>("Editor")!;
+        var menu = ((global::Avalonia.Visual)editor).GetVisualDescendants()
+            .OfType<Control>()
+            .Select(c => c.ContextMenu)
+            .FirstOrDefault(m => m is not null);
+        Assert.NotNull(menu);
+        Assert.True(menu!.IsOpen);
     }
 
     [AvaloniaFact]
