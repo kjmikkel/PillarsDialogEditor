@@ -135,7 +135,8 @@
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="13" Padding="4"
-                                                ToolTip.Tip="{StaticResource ToolTip_MoveConditionUp}"/>
+                                                ToolTip.Tip="{StaticResource ToolTip_MoveConditionUp}"
+                                                AutomationProperties.Name="{StaticResource AutomationName_MoveConditionUp}"/>
                                         <!-- Move down -->
                                         <Button Grid.Column="4" Content="↓"
                                                 Command="{Binding DataContext.MoveDownCommand,
@@ -143,7 +144,8 @@
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="13" Padding="4"
-                                                ToolTip.Tip="{StaticResource ToolTip_MoveConditionDown}"/>
+                                                ToolTip.Tip="{StaticResource ToolTip_MoveConditionDown}"
+                                                AutomationProperties.Name="{StaticResource AutomationName_MoveConditionDown}"/>
                                         <!-- Delete -->
                                         <Button Grid.Column="5" Content="✕"
                                                 Command="{Binding DataContext.DeleteRowCommand,
@@ -151,7 +153,8 @@
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Foreground="{DynamicResource Brush.Severity.Error}" FontSize="13" Padding="4"
-                                                ToolTip.Tip="{StaticResource ToolTip_DeleteCondition}"/>
+                                                ToolTip.Tip="{StaticResource ToolTip_DeleteCondition}"
+                                                AutomationProperties.Name="{StaticResource AutomationName_RemoveCondition}"/>
                                     </Grid>
 
                                     <!-- Parameters (hidden for branch rows) -->
@@ -186,7 +189,8 @@
                                                             Classes="type-hint"
                                                             Content="(?)"
                                                             ToolTip.Tip="{Binding TypeHint}"
-                                                            IsVisible="{Binding HasTypeHint}"/>
+                                                            IsVisible="{Binding HasTypeHint}"
+                                                            AutomationProperties.Name="{StaticResource AutomationName_ParameterHelp}"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>

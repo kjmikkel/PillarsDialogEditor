@@ -25,7 +25,8 @@
                         Content="✕" VerticalAlignment="Center"
                         Background="Transparent" BorderThickness="0"
                         Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10" Cursor="Hand"
-                        ToolTip.Tip="{StaticResource ToolTip_ClearFilter}"/>
+                        ToolTip.Tip="{StaticResource ToolTip_ClearFilter}"
+                        AutomationProperties.Name="{StaticResource AutomationName_ClearFilter}"/>
             </Grid>
         </Border>
 
