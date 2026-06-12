@@ -207,6 +207,100 @@ same `Brush.*` keys in both apps. E.g. the **Canvas Annotations** gap draws regi
 correctly across the whole solution with the single Dark set that exists today — never blocked
 on, nor made wrong by, an upper layer that doesn't exist.
 
+### Accessibility — Assistive Technology & Keyboard (audit 2026-06-12)
+The project has invested heavily in **visual** accessibility — the Layer 1 palette sets
+(High-Contrast, Colourblind), `PaletteContrastTests` enforcing WCAG AA/AAA, the Layer 2.5
+non-colour encoding work, and the mandatory-tooltip rule — but **assistive-technology and
+keyboard accessibility are essentially absent**: there are zero `AutomationProperties` in
+the entire codebase, custom-templated controls have no focus visuals, and the canvas is
+mouse-only. The items below are ordered by the suggested tackle order (cheap, high-leverage
+fixes first; the canvas keyboard-editing design task last among the big ones).
+
+Recommended order rationale: **1 → 2 → 3** first — automation names and focus rings are
+mechanical sweeps that unlock screen-reader/keyboard use of everything *outside* the canvas,
+and each fits the project's test-first style (a failing test asserting the invariant, then
+the sweep). Canvas keyboard editing (**4**) is the one genuine design task and should come
+after the cheap wins. The rest are independent and can land in any order.
+
+1. **Screen-reader names for icon-only buttons. ✅ IMPLEMENTED (2026-06-12).**
+   Icon-only buttons (⚙, ?, 📌, ⊞, ⊟, ⊕, ⌂, ✕, +, −, ↑, ↓, →, (?)) exposed only their
+   glyph as the accessible name — a screen reader read "circled plus, button". Avalonia
+   does **not** use `ToolTip.Tip` as a name fallback, so the mandated tooltips didn't
+   help. All 26 such buttons across 8 views (editor + shared PatchManagerView) now carry
+   `AutomationProperties.Name` bound to short localized `AutomationName_*` resources
+   (19 strings in `Strings.axaml`/`SharedStrings.axaml`; names deliberately *short* —
+   "Zoom in" — while the tooltip keeps the long explanation). Enforced structurally by
+   `AutomationNameTests` (`DialogEditor.Tests/Accessibility`), mirroring `NoStrayHexTests`:
+   any Button/ToggleButton whose Content is a literal glyph (no letters/digits) must have
+   an `AutomationProperties.Name` that is a `{StaticResource}`/`{DynamicResource}`
+   reference — a hard-coded English name also fails, keeping the localisation rule
+   structural. Remaining follow-up idea: extend the CLAUDE.md tooltip rule to mention the
+   paired `AutomationProperties.Name` on new controls (the test already enforces it).
+
+2. **Form-field label association in `NodeDetailView` (and other forms).** Field labels
+   are adjacent `TextBlock`s with no programmatic association — every TextBox/ComboBox
+   reads as unlabeled to a screen reader. Fix with `AutomationProperties.LabeledBy` (or
+   `Name`) per field. Same pattern in `SettingsWindow` and the dialogs.
+
+3. **No visible focus indicators on custom-templated controls.**
+   `ToolbarPlainButton`/`ToolbarPlainToggleButton` (`App.axaml`) define `:pointerover`
+   and `:pressed` styles only; replacing the template discards Fluent's focus visual, so
+   a keyboard user tabbing the toolbar sees nothing. Each custom theme needs a
+   `:focus-visible` style (border or background), and the High-Contrast palette should
+   make it loud (a `Brush.Border.Focus` token already exists). Audit other
+   `BorderThickness="0"` restyled buttons (e.g. `Button.browse` in Settings) for the same
+   loss.
+
+4. **Canvas is mouse-only (the big design task).** `MainWindow.axaml.cs` wires Delete and
+   global shortcuts, but there is no keyboard way to move focus between nodes, follow a
+   connection, move a node, start/complete a connection, or invoke the node context menu.
+   A keyboard-first or motor-impaired user can browse conversations but cannot edit the
+   graph. Minimal first slice: arrow keys traverse the selected node's connections,
+   Ctrl+arrows nudge the node, Enter focuses the detail panel, Menu key opens the context
+   menu. Full treatment (keyboard connection creation, focus ring on the canvas node)
+   needs a design pass — do after items 1–3.
+
+5. **Tooltips are the sole explanation channel, and tooltips are hover-only.** Keyboard
+   and screen-reader users never reach them. Mirror tooltip text into
+   `AutomationProperties.HelpText` (can ride along with item 1's sweep), and consider
+   showing the focused control's hint in the status bar.
+
+6. **Tiny fixed font sizes, no text scaling.** ~127 instances of 9–11px fonts across 19
+   views; `NodeDetailView` group headers are **FontSize 8**. There is no UI-scale setting,
+   and fixed-size windows (`SettingsWindow` is `CanResize="False" Height="220"`) will clip
+   under OS text scaling. Opportunity: move font sizes into `Tokens.axaml` as semantic
+   tokens (`FontSize.Caption`, `FontSize.Body`, …) — the Layer 0 token infrastructure and
+   its enforcement-test pattern already exist — then add a scale factor in Settings.
+
+7. **Colour-only "new conversation" indicator.** The browser tree marks new conversations
+   purely via `BoolToNewConversationBrush` (`GameBrowserView.axaml`) — this contradicts
+   the Layer 2.5 principle shipped elsewhere. A glyph or font-weight change alongside the
+   colour would align it.
+
+8. **Status bar feedback is never announced.** `StatusText` (`MainWindow.axaml`) is the
+   sole feedback for many operations, rendered as 11px muted text, and screen readers
+   won't announce changes. Avalonia supports `AutomationProperties.LiveSetting` — mark the
+   status `TextBlock` as a polite live region so save/error results are spoken.
+
+9. **Fake watermarks.** `ConversationView`'s SearchBox and `GameBrowserView`'s FilterBox
+   simulate placeholders with overlay `TextBlock`s; the real `Watermark` property (already
+   used in `NodeDetailView` and `SettingsWindow`) is exposed to the accessibility tree and
+   handles focus/IME properly. Easy swap.
+
+10. **Hard-coded `Foreground="White"`.** Node titles and the diff badge glyph in
+    `ConversationView.axaml`, plus the Resolve Conflicts button in `MainWindow.axaml`,
+    bypass the palette system (named brushes evade `NoStrayHexTests`' hex check), so
+    High-Contrast cannot adjust them. Tokenise (e.g. `Brush.Text.OnAccent`), and consider
+    teaching `NoStrayHexTests` to also reject named-colour literals.
+
+11. **Theme doesn't follow the OS; small hit targets.** Two smaller items: (a)
+    `RequestedThemeVariant="Dark"` is fixed — detecting the OS high-contrast/dark
+    preference for the *default* palette (Layer 2's `AppSettings.Theme` still overrides)
+    would help users who've already configured their system; relatedly, Dark is
+    "grandfathered" out of `PaletteContrastTests` AA — bringing it to AA and removing the
+    exemption is a clean win. (b) Several hit targets (20px-wide ✕ clear buttons, slim
+    toolbar buttons) sit below the WCAG 2.5.8 24×24 minimum.
+
 ### Barks System — Bark Preview
 Bark nodes now render with an amber color scheme on the canvas, carry bark-specific validation warnings (text too long, player-choice child), and those warnings surface in Flow Analytics. The remaining gap is an in-context preview of overhead floating text: writers cannot see how a bark will actually appear above an NPC's head without running the game. Implementing this requires investigating the game's bark rendering (font, line-wrapping, maximum visible width) before UI work can be designed.
 
