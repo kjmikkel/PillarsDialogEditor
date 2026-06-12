@@ -249,14 +249,17 @@ after the cheap wins. The rest are independent and can land in any order.
    every input control must have `AutomationProperties.Name` as a resource reference
    or binding (hard-coded literals fail), or `AutomationProperties.LabeledBy`.
 
-3. **No visible focus indicators on custom-templated controls.**
-   `ToolbarPlainButton`/`ToolbarPlainToggleButton` (`App.axaml`) define `:pointerover`
-   and `:pressed` styles only; replacing the template discards Fluent's focus visual, so
-   a keyboard user tabbing the toolbar sees nothing. Each custom theme needs a
-   `:focus-visible` style (border or background), and the High-Contrast palette should
-   make it loud (a `Brush.Border.Focus` token already exists). Audit other
-   `BorderThickness="0"` restyled buttons (e.g. `Button.browse` in Settings) for the same
-   loss.
+3. **Focus indicators on custom-templated controls. ✅ VERIFIED — premise disproven,
+   no work needed (2026-06-12).** The audit assumed that replacing a button's template
+   (`ToolbarPlainButton`/`ToolbarPlainToggleButton` define only `:pointerover`/`:pressed`
+   styles) discards the focus visual. A headless probe disproved it: Avalonia's focus
+   adorner lives in the **adorner layer**, independent of the control template, and
+   renders a contrast-proof double ring (2px white outer + 1px semi-transparent black
+   inner) whenever `:focus-visible` is active — keyboard focus IS visible on the custom
+   toolbar buttons, in every palette, and likewise on all restyled-but-not-retemplated
+   buttons. Pinned by `FocusVisibilityTests` (`DialogEditor.Tests/Accessibility`) so a
+   future `FocusAdorner` override or Avalonia default change fails the build instead of
+   silently blinding keyboard users.
 
 4. **Canvas is mouse-only (the big design task).** `MainWindow.axaml.cs` wires Delete and
    global shortcuts, but there is no keyboard way to move focus between nodes, follow a
