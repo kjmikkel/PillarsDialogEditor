@@ -98,4 +98,53 @@ public class CanvasNavigationServiceTests
         var conns = new[] { Connect(a, b) };
         Assert.Null(CanvasNavigationService.GetParent(a, new[] { a, b }, conns));
     }
+
+    // ── Siblings ──────────────────────────────────────────────────────────
+    [Fact]
+    public void GetSibling_NextAndPrevious_InVisualOrder()
+    {
+        var p  = MakeNode(0, 0, 100);
+        var s1 = MakeNode(1, 400, 50);
+        var s2 = MakeNode(2, 400, 150);
+        var s3 = MakeNode(3, 400, 250);
+        var nodes = new[] { p, s1, s2, s3 };
+        var conns = new[] { Connect(p, s1), Connect(p, s2), Connect(p, s3) };
+        Assert.Same(s3, CanvasNavigationService.GetSibling(s2, +1, nodes, conns));
+        Assert.Same(s1, CanvasNavigationService.GetSibling(s2, -1, nodes, conns));
+    }
+
+    [Fact]
+    public void GetSibling_AtEnds_DoesNotWrap()
+    {
+        var p  = MakeNode(0, 0, 100);
+        var s1 = MakeNode(1, 400, 50);
+        var s2 = MakeNode(2, 400, 150);
+        var nodes = new[] { p, s1, s2 };
+        var conns = new[] { Connect(p, s1), Connect(p, s2) };
+        Assert.Null(CanvasNavigationService.GetSibling(s1, -1, nodes, conns));
+        Assert.Null(CanvasNavigationService.GetSibling(s2, +1, nodes, conns));
+    }
+
+    [Fact]
+    public void GetSibling_ParentlessNodes_FormOneGroup()
+    {
+        // Roots and orphans are each other's siblings, ordered by Y.
+        var root   = MakeNode(0, 0, 0);
+        var orphan = MakeNode(5, 800, 200);
+        var child  = MakeNode(1, 400, 0);
+        var nodes = new[] { root, orphan, child };
+        var conns = new[] { Connect(root, child) };
+        Assert.Same(orphan, CanvasNavigationService.GetSibling(root, +1, nodes, conns));
+        Assert.Same(root,   CanvasNavigationService.GetSibling(orphan, -1, nodes, conns));
+    }
+
+    [Fact]
+    public void GetSibling_OnlyChild_ReturnsNull()
+    {
+        var p = MakeNode(0); var c = MakeNode(1, 400, 0);
+        var nodes = new[] { p, c };
+        var conns = new[] { Connect(p, c) };
+        Assert.Null(CanvasNavigationService.GetSibling(c, +1, nodes, conns));
+        Assert.Null(CanvasNavigationService.GetSibling(c, -1, nodes, conns));
+    }
 }

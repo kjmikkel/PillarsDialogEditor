@@ -39,4 +39,34 @@ public static class CanvasNavigationService
 
     private static NodeViewModel? NearestByY(NodeViewModel from, IEnumerable<NodeViewModel> candidates) =>
         candidates.OrderBy(n => Math.Abs(n.Location.Y - from.Location.Y)).FirstOrDefault();
+
+    /// <summary>
+    /// Siblings of a node = children of its primary parent (the same parent ←
+    /// navigates to), in visual (Y) order, no wrap. Parentless nodes (roots and
+    /// orphans) form a single sibling group so ↑/↓ can hop between disconnected
+    /// islands without the mouse.
+    /// </summary>
+    public static NodeViewModel? GetSibling(
+        NodeViewModel from,
+        int offset,
+        IReadOnlyList<NodeViewModel> nodes,
+        IEnumerable<ConnectionViewModel> connections)
+    {
+        var connList = connections as IReadOnlyList<ConnectionViewModel> ?? connections.ToList();
+        var parent = GetParent(from, nodes, connList);
+
+        var group = (parent is null
+                ? nodes.Where(n => GetParent(n, nodes, connList) is null)
+                : connList.Where(c => c.Source.GetNodeId() == parent.NodeId)
+                          .Select(c => ById(nodes, c.Target.GetNodeId()))
+                          .OfType<NodeViewModel>()
+                          .Distinct())
+            .OrderBy(n => n.Location.Y)
+            .ToList();
+
+        var index = group.IndexOf(from);
+        if (index < 0) return null;
+        var target = index + offset;
+        return target >= 0 && target < group.Count ? group[target] : null;
+    }
 }
