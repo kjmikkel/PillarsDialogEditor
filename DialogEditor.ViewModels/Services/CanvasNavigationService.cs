@@ -69,4 +69,25 @@ public static class CanvasNavigationService
         var target = index + offset;
         return target >= 0 && target < group.Count ? group[target] : null;
     }
+
+    /// <summary>
+    /// PgUp/PgDn step through every node in stable collection (file) order,
+    /// wrapping. This is the keyboard-coverage guarantee: orphans with no
+    /// connections are unreachable by arrow traversal but always reachable here.
+    /// </summary>
+    public static NodeViewModel? Cycle(
+        NodeViewModel? from,
+        bool forward,
+        IReadOnlyList<NodeViewModel> nodes)
+    {
+        if (nodes.Count == 0) return null;
+        if (from is null) return forward ? nodes[0] : nodes[^1];
+
+        var index = 0;
+        for (var i = 0; i < nodes.Count; i++)
+            if (ReferenceEquals(nodes[i], from)) { index = i; break; }
+
+        var target = (index + (forward ? 1 : -1) + nodes.Count) % nodes.Count;
+        return nodes[target];
+    }
 }
