@@ -77,7 +77,8 @@
                 <TextBox Classes="detail-field"
                          Text="{Binding DefaultText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="52"
-                         ToolTip.Tip="{StaticResource ToolTip_DefaultText}"/>
+                         ToolTip.Tip="{StaticResource ToolTip_DefaultText}"
+                         AutomationProperties.Name="{StaticResource Label_DefaultMaleText}"/>
 
                 <!-- ── Female text ─────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_FemaleText}"/>
@@ -85,7 +86,8 @@
                          Text="{Binding FemaleText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="36"
                          Watermark="{StaticResource Placeholder_FemaleText}"
-                         ToolTip.Tip="{StaticResource ToolTip_FemaleText}"/>
+                         ToolTip.Tip="{StaticResource ToolTip_FemaleText}"
+                         AutomationProperties.Name="{StaticResource Label_FemaleText}"/>
 
                 <!-- ── Identity ────────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_GroupIdentity}"/>
@@ -94,13 +96,15 @@
                 <ComboBox Classes="detail-combo"
                           ItemsSource="{x:Static vm:NodeDetailViewModel.NodeTypeOptions}"
                           SelectedItem="{Binding NodeTypeString, Mode=TwoWay}"
-                          ToolTip.Tip="{StaticResource ToolTip_NodeType}"/>
+                          ToolTip.Tip="{StaticResource ToolTip_NodeType}"
+                          AutomationProperties.Name="{StaticResource PropertyRow_Type}"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_SpeakerCategory}"/>
                 <ComboBox Classes="detail-combo"
                           ItemsSource="{x:Static vm:NodeDetailViewModel.SpeakerCategoryOptions}"
                           SelectedItem="{Binding SpeakerCategoryString, Mode=TwoWay}"
-                          ToolTip.Tip="{StaticResource ToolTip_SpeakerCategory}"/>
+                          ToolTip.Tip="{StaticResource ToolTip_SpeakerCategory}"
+                          AutomationProperties.Name="{StaticResource PropertyRow_SpeakerCategory}"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_SpeakerGuid}"/>
                 <!-- Name picker — visible when speaker data is loaded (PoE2) -->
@@ -110,11 +114,13 @@
                                  Watermark="{StaticResource Placeholder_SpeakerSearch}"
                                  FilterMode="Contains"
                                  IsVisible="{Binding HasSpeakerData}"
-                                 ToolTip.Tip="{StaticResource ToolTip_SpeakerPicker}"/>
+                                 ToolTip.Tip="{StaticResource ToolTip_SpeakerPicker}"
+                                 AutomationProperties.Name="{StaticResource PropertyRow_SpeakerGuid}"/>
                 <TextBox Classes="detail-field"
                          Text="{Binding SpeakerGuid, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          FontFamily="Consolas,Courier New,monospace"
-                         ToolTip.Tip="{StaticResource ToolTip_SpeakerGuid}"/>
+                         ToolTip.Tip="{StaticResource ToolTip_SpeakerGuid}"
+                         AutomationProperties.Name="{StaticResource PropertyRow_SpeakerGuid}"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_ListenerGuid}"/>
                 <!-- Name picker — visible when speaker data is loaded (PoE2) -->
@@ -124,11 +130,13 @@
                                  Watermark="{StaticResource Placeholder_SpeakerSearch}"
                                  FilterMode="Contains"
                                  IsVisible="{Binding HasSpeakerData}"
-                                 ToolTip.Tip="{StaticResource ToolTip_SpeakerPicker}"/>
+                                 ToolTip.Tip="{StaticResource ToolTip_SpeakerPicker}"
+                                 AutomationProperties.Name="{StaticResource PropertyRow_ListenerGuid}"/>
                 <TextBox Classes="detail-field"
                          Text="{Binding ListenerGuid, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          FontFamily="Consolas,Courier New,monospace"
-                         ToolTip.Tip="{StaticResource ToolTip_ListenerGuid}"/>
+                         ToolTip.Tip="{StaticResource ToolTip_ListenerGuid}"
+                         AutomationProperties.Name="{StaticResource PropertyRow_ListenerGuid}"/>
 
                 <!-- ── Display ─────────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_GroupDisplay}"/>
@@ -137,7 +145,8 @@
                 <ComboBox Classes="detail-combo"
                           ItemsSource="{x:Static vm:NodeDetailViewModel.DisplayTypeOptions}"
                           SelectedItem="{Binding DisplayType, Mode=TwoWay}"
-                          ToolTip.Tip="{StaticResource ToolTip_DisplayType}"/>
+                          ToolTip.Tip="{StaticResource ToolTip_DisplayType}"
+                          AutomationProperties.Name="{StaticResource PropertyRow_DisplayType}"/>
 
                 <Border Background="{DynamicResource Brush.Bark.Detail.Background}" BorderBrush="{DynamicResource Brush.Bark.Detail.Border}" BorderThickness="1"
                         CornerRadius="2" Padding="6,4" Margin="0,0,0,4"
@@ -157,12 +166,14 @@
                 <ComboBox Classes="detail-combo"
                           ItemsSource="{x:Static vm:NodeDetailViewModel.PersistenceOptions}"
                           SelectedItem="{Binding Persistence, Mode=TwoWay}"
-                          ToolTip.Tip="{StaticResource ToolTip_Persistence}"/>
+                          ToolTip.Tip="{StaticResource ToolTip_Persistence}"
+                          AutomationProperties.Name="{StaticResource PropertyRow_Persistence}"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_ActorDirection}"/>
                 <TextBox Classes="detail-field"
                          Text="{Binding ActorDirection, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         ToolTip.Tip="{StaticResource ToolTip_ActorDirection}"/>
+                         ToolTip.Tip="{StaticResource ToolTip_ActorDirection}"
+                         AutomationProperties.Name="{StaticResource PropertyRow_ActorDirection}"/>
 
                 <!-- ── Voice ───────────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_GroupVoice}"/>
@@ -171,7 +182,8 @@
                 <TextBox Classes="detail-field"
                          Text="{Binding ExternalVO, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          FontFamily="Consolas,Courier New,monospace"
-                         ToolTip.Tip="{StaticResource ToolTip_ExternalVO}"/>
+                         ToolTip.Tip="{StaticResource ToolTip_ExternalVO}"
+                         AutomationProperties.Name="{StaticResource PropertyRow_ExternalVO}"/>
 
                 <CheckBox Classes="detail-check"
                           IsChecked="{Binding HasVO, Mode=TwoWay}"
@@ -188,14 +200,16 @@
                 <TextBox Classes="detail-field"
                          Text="{Binding Comments, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30"
-                         ToolTip.Tip="{StaticResource ToolTip_Comments}"/>
+                         ToolTip.Tip="{StaticResource ToolTip_Comments}"
+                         AutomationProperties.Name="{StaticResource PropertyRow_Comments}"/>
 
                 <!-- ── Translator note ────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource NodeDetail_TranslatorNote}"/>
                 <TextBox Classes="detail-field"
                          Text="{Binding TranslatorNote, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30"
-                         ToolTip.Tip="{StaticResource ToolTip_NodeDetail_TranslatorNote}"/>
+                         ToolTip.Tip="{StaticResource ToolTip_NodeDetail_TranslatorNote}"
+                         AutomationProperties.Name="{StaticResource NodeDetail_TranslatorNote}"/>
 
                 <!-- ── Scripts (edit in separate window) ─────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource Label_GroupLogic}"/>
@@ -288,7 +302,8 @@
                                               Background="{DynamicResource Brush.Surface.Card}" Foreground="{DynamicResource Brush.Text.Secondary}"
                                               BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                                               FontSize="10" Padding="3,1" Height="22"
-                                              ToolTip.Tip="{StaticResource ToolTip_LinkQTD}">
+                                              ToolTip.Tip="{StaticResource ToolTip_LinkQTD}"
+                                              AutomationProperties.Name="{StaticResource AutomationName_LinkQTD}">
                                         <ComboBox.ItemTemplate>
                                             <DataTemplate>
                                                 <TextBlock Text="{Binding Converter={StaticResource QTDDisplay},
@@ -309,7 +324,8 @@
                                                    FontSize="10" Padding="2,0" Width="72"
                                                    ShowButtonSpinner="False"
                                                    ClipValueToMinMax="True"
-                                                   ToolTip.Tip="{StaticResource ToolTip_LinkWeight}"/>
+                                                   ToolTip.Tip="{StaticResource ToolTip_LinkWeight}"
+                                                   AutomationProperties.Name="{StaticResource Label_LinkWeight}"/>
                                 </Grid>
                             </Grid>
                         </DataTemplate>
@@ -324,7 +340,8 @@
                              Background="{DynamicResource Brush.Surface.Card}" Foreground="{DynamicResource Brush.Text.Primary}"
                              BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                              FontSize="10" Padding="4,3"
-                             ToolTip.Tip="{StaticResource ToolTip_AddLinkTargetId}"/>
+                             ToolTip.Tip="{StaticResource ToolTip_AddLinkTargetId}"
+                             AutomationProperties.Name="{StaticResource Placeholder_AddLinkTargetId}"/>
                     <Button Grid.Column="1"
                             Content="{StaticResource Button_AddLink}"
                             Command="{Binding AddLinkCommand}"

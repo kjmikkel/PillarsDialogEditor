@@ -45,6 +45,15 @@ public class AutomationNameTests
         (value.StartsWith("{StaticResource ", StringComparison.Ordinal) ||
          value.StartsWith("{DynamicResource ", StringComparison.Ordinal));
 
+    // Template-generated fields (script/condition parameter editors) have per-row labels
+    // that only exist as data, so a binding is the correct accessible name there. A
+    // hard-coded literal is never acceptable — it would bypass the localisation rule.
+    private static bool IsResourceReferenceOrBinding(string? value) =>
+        IsLocalizedResourceReference(value) ||
+        (value is not null &&
+         (value.StartsWith("{Binding ", StringComparison.Ordinal) ||
+          value.StartsWith("{CompiledBinding ", StringComparison.Ordinal)));
+
     [Fact]
     public void IconOnlyButtonsCarryLocalizedAutomationName()
     {
@@ -77,6 +86,45 @@ public class AutomationNameTests
         Assert.True(offenders.Count == 0,
             "Icon-only buttons are meaningless to screen readers without an accessible name. "
             + "Add AutomationProperties.Name bound to a localized resource. Offenders:\n"
+            + string.Join("\n", offenders));
+    }
+
+    /// <summary>
+    /// Gaps.md accessibility item 2: form fields are labelled by *adjacent* TextBlocks
+    /// with no programmatic association, so every TextBox/ComboBox/AutoCompleteBox/
+    /// NumericUpDown reads as an unlabeled "edit" to a screen reader. Each must carry
+    /// either AutomationProperties.Name (a localized resource reference for static
+    /// forms, or a binding for template-generated per-row fields) or
+    /// AutomationProperties.LabeledBy pointing at its label element.
+    /// </summary>
+    [Fact]
+    public void InputControlsCarryAccessibleLabels()
+    {
+        var root = SolutionRoot();
+        var offenders = new List<string>();
+
+        foreach (var file in Directory.EnumerateFiles(root, "*.axaml", SearchOption.AllDirectories))
+        {
+            if (IsExcluded(file)) continue;
+            var doc = XDocument.Load(file, LoadOptions.SetLineInfo);
+
+            foreach (var el in doc.Descendants().Where(e => e.Name.LocalName
+                         is "TextBox" or "ComboBox" or "AutoCompleteBox" or "NumericUpDown"))
+            {
+                if (el.Attribute("AutomationProperties.LabeledBy") is not null) continue;
+                var name = el.Attribute("AutomationProperties.Name")?.Value;
+                if (IsResourceReferenceOrBinding(name)) continue;
+
+                var line = ((IXmlLineInfo)el).HasLineInfo() ? ((IXmlLineInfo)el).LineNumber : 0;
+                offenders.Add(name is null
+                    ? $"{Path.GetFileName(file)}:{line}: <{el.Name.LocalName}> has no AutomationProperties.Name or .LabeledBy"
+                    : $"{Path.GetFileName(file)}:{line}: <{el.Name.LocalName}> has a hard-coded AutomationProperties.Name (must be a resource reference or binding per the localisation rule)");
+            }
+        }
+
+        Assert.True(offenders.Count == 0,
+            "Input controls read as unlabeled \"edit\" fields to screen readers without an accessible name. "
+            + "Add AutomationProperties.Name (localized resource, or a binding in templates) or AutomationProperties.LabeledBy. Offenders:\n"
             + string.Join("\n", offenders));
     }
 }

@@ -46,7 +46,8 @@
             <TextBox Grid.Column="1" Classes="find-box"
                      Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      x:Name="SearchBox"
-                     ToolTip.Tip="{StaticResource ToolTip_FindAll}"/>
+                     ToolTip.Tip="{StaticResource ToolTip_FindAll}"
+                     AutomationProperties.Name="{StaticResource FindReplace_FindLabel}"/>
         </Grid>
 
         <!-- Replace row -->
@@ -55,7 +56,8 @@
                        Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="11" VerticalAlignment="Center"/>
             <TextBox Grid.Column="1" Classes="find-box"
                      Text="{Binding ReplaceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     ToolTip.Tip="{StaticResource ToolTip_ReplaceAll}"/>
+                     ToolTip.Tip="{StaticResource ToolTip_ReplaceAll}"
+                     AutomationProperties.Name="{StaticResource FindReplace_ReplaceLabel}"/>
         </Grid>
 
         <!-- Options row -->

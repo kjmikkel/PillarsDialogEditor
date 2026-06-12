@@ -962,4 +962,9 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="AutomationName_MoveScriptDown">Move script down</sys:String>
     <sys:String x:Key="AutomationName_RemoveScript">Remove script</sys:String>
 
+    <!-- ─── Accessibility — screen-reader names for input fields ──────────── -->
+    <sys:String x:Key="AutomationName_ConditionOperator">Combine with previous row using AND or OR</sys:String>
+    <sys:String x:Key="AutomationName_LinkQTD">Question node text display option for this link</sys:String>
+    <sys:String x:Key="AutomationName_ConversationName">New conversation file name</sys:String>
+
 </ResourceDictionary>

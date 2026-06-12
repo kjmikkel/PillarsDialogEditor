@@ -237,10 +237,17 @@ after the cheap wins. The rest are independent and can land in any order.
    structural. Remaining follow-up idea: extend the CLAUDE.md tooltip rule to mention the
    paired `AutomationProperties.Name` on new controls (the test already enforces it).
 
-2. **Form-field label association in `NodeDetailView` (and other forms).** Field labels
-   are adjacent `TextBlock`s with no programmatic association — every TextBox/ComboBox
-   reads as unlabeled to a screen reader. Fix with `AutomationProperties.LabeledBy` (or
-   `Name`) per field. Same pattern in `SettingsWindow` and the dialogs.
+2. **Form-field label association. ✅ IMPLEMENTED (2026-06-12).** Field labels were
+   adjacent `TextBlock`s with no programmatic association — every input read as an
+   unlabeled "edit" to a screen reader. All 43 TextBox/ComboBox/AutoCompleteBox/
+   NumericUpDown controls across 18 views now carry `AutomationProperties.Name`:
+   static forms reuse the *adjacent label's existing resource key* (no string
+   duplication); template-generated per-row fields (script/condition parameter
+   editors) bind the name to the row's label data (`{Binding Name}`); label-less
+   search/filter boxes reuse their placeholder resources. Only 3 new strings were
+   needed. Enforced by `AutomationNameTests.InputControlsCarryAccessibleLabels`:
+   every input control must have `AutomationProperties.Name` as a resource reference
+   or binding (hard-coded literals fail), or `AutomationProperties.LabeledBy`.
 
 3. **No visible focus indicators on custom-templated controls.**
    `ToolbarPlainButton`/`ToolbarPlainToggleButton` (`App.axaml`) define `:pointerover`

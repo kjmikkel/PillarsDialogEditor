@@ -21,7 +21,8 @@
                  BorderThickness="1"
                  FontSize="12"
                  Padding="6,4"
-                 AcceptsReturn="False"/>
+                 AcceptsReturn="False"
+                 AutomationProperties.Name="{StaticResource Localization_LanguageCodeDialog_Prompt}"/>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
             <Button x:Name="CancelButton"
