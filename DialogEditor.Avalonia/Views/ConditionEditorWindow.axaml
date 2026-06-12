@@ -84,7 +84,8 @@
                                                   ItemsSource="{x:Static vm:ConditionRowViewModel.OperatorOptions}"
                                                   SelectedItem="{Binding Operator, Mode=TwoWay}"
                                                   Background="{DynamicResource Brush.Surface.Card}" BorderBrush="{DynamicResource Brush.Border.Muted}"
-                                                  BorderThickness="1" FontSize="11" Padding="4,2"/>
+                                                  BorderThickness="1" FontSize="11" Padding="4,2"
+                                                  AutomationProperties.Name="{StaticResource AutomationName_ConditionOperator}"/>
                                         <!-- NOT toggle -->
                                         <CheckBox Grid.Column="1"
                                                   IsChecked="{Binding Not, Mode=TwoWay}"
@@ -173,7 +174,8 @@
                                                              Classes="param-input"
                                                              Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                                              IsVisible="{Binding IsText}"
-                                                             ToolTip.Tip="{Binding TypeHint}"/>
+                                                             ToolTip.Tip="{Binding TypeHint}"
+                                                             AutomationProperties.Name="{Binding Name}"/>
                                                     <!-- Enum/Operator AutoCompleteBox — supports both
                                                          free-text and filtering for large option lists -->
                                                     <AutoCompleteBox Grid.Column="1"
@@ -183,7 +185,8 @@
                                                               FilterMode="Contains"
                                                               MinimumPrefixLength="0"
                                                               IsVisible="{Binding IsEnum}"
-                                                              ToolTip.Tip="{Binding TypeHint}"/>
+                                                              ToolTip.Tip="{Binding TypeHint}"
+                                                              AutomationProperties.Name="{Binding Name}"/>
                                                     <!-- Type hint (?) — Button for reliable tooltip on hover -->
                                                     <Button Grid.Column="2"
                                                             Classes="type-hint"
@@ -211,7 +214,8 @@
                                   PlaceholderText="{StaticResource Placeholder_PickCondition}"
                                   Background="{DynamicResource Brush.Surface.Input}" BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                                   FontSize="12" Padding="6,4"
-                                  ToolTip.Tip="{StaticResource ToolTip_PickCondition}">
+                                  ToolTip.Tip="{StaticResource ToolTip_PickCondition}"
+                                  AutomationProperties.Name="{StaticResource Placeholder_PickCondition}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate DataType="types:ConditionEntry">
                                     <StackPanel Orientation="Horizontal" Spacing="8">

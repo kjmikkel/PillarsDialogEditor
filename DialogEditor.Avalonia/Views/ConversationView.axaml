@@ -69,6 +69,7 @@
                 <Grid VerticalAlignment="Center" Margin="0,0,8,0">
                     <TextBox x:Name="SearchBox"
                              Text="{Binding SearchQuery}"
+                             AutomationProperties.Name="{StaticResource Placeholder_SearchNodes}"
                              Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" CaretBrush="{DynamicResource Brush.Text.Secondary}"
                              BorderBrush="{DynamicResource Brush.Border.Muted}" BorderThickness="1"
                              Padding="6,2,24,2" FontSize="12" Height="26"

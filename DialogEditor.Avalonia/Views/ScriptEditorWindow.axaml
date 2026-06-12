@@ -108,14 +108,16 @@
                                                 <TextBox Grid.Column="1" Classes="param-input"
                                                          Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                                          IsVisible="{Binding IsText}"
-                                                         ToolTip.Tip="{Binding TypeHint}"/>
+                                                         ToolTip.Tip="{Binding TypeHint}"
+                                                         AutomationProperties.Name="{Binding Name}"/>
                                                 <AutoCompleteBox Grid.Column="1" Classes="param-input"
                                                               ItemsSource="{Binding EnumOptions}"
                                                               Text="{Binding Value, Mode=TwoWay}"
                                                               FilterMode="Contains"
                                                               MinimumPrefixLength="0"
                                                               IsVisible="{Binding IsEnum}"
-                                                              ToolTip.Tip="{Binding TypeHint}"/>
+                                                              ToolTip.Tip="{Binding TypeHint}"
+                                                              AutomationProperties.Name="{Binding Name}"/>
                                                 <Button Grid.Column="2" Classes="type-hint"
                                                         Content="(?)"
                                                         ToolTip.Tip="{Binding TypeHint}"
@@ -144,7 +146,8 @@
                              Watermark="{StaticResource Placeholder_ScriptPicker}"
                              Background="{DynamicResource Brush.Surface.Input}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                              FontSize="11" Padding="6,4" MinWidth="0"
-                             ToolTip.Tip="{StaticResource ToolTip_ScriptPicker}"/>
+                             ToolTip.Tip="{StaticResource ToolTip_ScriptPicker}"
+                             AutomationProperties.Name="{StaticResource Placeholder_ScriptPicker}"/>
                     <Button Grid.Column="1" Content="+ Add"
                             Command="{Binding AddEnterScriptCommand}"
                             Background="{DynamicResource Brush.Node.Script.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
@@ -166,7 +169,8 @@
                              Watermark="{StaticResource Placeholder_ScriptPicker}"
                              Background="{DynamicResource Brush.Surface.Input}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                              FontSize="11" Padding="6,4" MinWidth="0"
-                             ToolTip.Tip="{StaticResource ToolTip_ScriptPicker}"/>
+                             ToolTip.Tip="{StaticResource ToolTip_ScriptPicker}"
+                             AutomationProperties.Name="{StaticResource Placeholder_ScriptPicker}"/>
                     <Button Grid.Column="1" Content="+ Add"
                             Command="{Binding AddExitScriptCommand}"
                             Background="{DynamicResource Brush.Node.Script.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
@@ -188,7 +192,8 @@
                              Watermark="{StaticResource Placeholder_ScriptPicker}"
                              Background="{DynamicResource Brush.Surface.Input}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                              FontSize="11" Padding="6,4" MinWidth="0"
-                             ToolTip.Tip="{StaticResource ToolTip_ScriptPicker}"/>
+                             ToolTip.Tip="{StaticResource ToolTip_ScriptPicker}"
+                             AutomationProperties.Name="{StaticResource Placeholder_ScriptPicker}"/>
                     <Button Grid.Column="1" Content="+ Add"
                             Command="{Binding AddUpdateScriptCommand}"
                             Background="{DynamicResource Brush.Node.Script.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"

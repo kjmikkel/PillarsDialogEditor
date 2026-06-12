@@ -157,6 +157,7 @@
                               SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
                               MinWidth="60"
                               ToolTip.Tip="{StaticResource ToolTip_Language}"
+                              AutomationProperties.Name="{StaticResource Label_Language}"
                               IsVisible="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}"/>
                 </StackPanel>
             </DockPanel>

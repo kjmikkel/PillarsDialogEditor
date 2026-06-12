@@ -47,7 +47,8 @@
             <TextBox Grid.Column="0" Classes="path-box"
                      Text="{Binding GameFolder}"
                      Watermark="{StaticResource PatchManager_GameFolderWatermark}"
-                     ToolTip.Tip="{StaticResource ToolTip_BrowseGameFolder}"/>
+                     ToolTip.Tip="{StaticResource ToolTip_BrowseGameFolder}"
+                     AutomationProperties.Name="{StaticResource PatchManager_GameFolder}"/>
             <Button Grid.Column="1" Classes="action-btn"
                     Content="{StaticResource PatchManager_BrowseGame}"
                     Command="{Binding BrowseGameFolderCommand}"

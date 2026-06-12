@@ -34,7 +34,8 @@
                       x:Name="LeftPicker"
                       ItemsSource="{Binding EndpointOptions}"
                       SelectedItem="{Binding LeftEndpoint, Mode=TwoWay}"
-                      ToolTip.Tip="{StaticResource ToolTip_DiffLeftPicker}">
+                      ToolTip.Tip="{StaticResource ToolTip_DiffLeftPicker}"
+                      AutomationProperties.Name="{StaticResource DiffWindow_LeftLabel}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:EndpointOption}">
                         <TextBlock Text="{Binding Label}" Foreground="{DynamicResource Brush.Text.Emphasis}"/>
@@ -52,7 +53,8 @@
                       x:Name="RightPicker"
                       ItemsSource="{Binding EndpointOptions}"
                       SelectedItem="{Binding RightEndpoint, Mode=TwoWay}"
-                      ToolTip.Tip="{StaticResource ToolTip_DiffRightPicker}">
+                      ToolTip.Tip="{StaticResource ToolTip_DiffRightPicker}"
+                      AutomationProperties.Name="{StaticResource DiffWindow_RightLabel}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:EndpointOption}">
                         <TextBlock Text="{Binding Label}" Foreground="{DynamicResource Brush.Text.Emphasis}"/>
