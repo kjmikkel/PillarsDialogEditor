@@ -1,6 +1,7 @@
 using DialogEditor.Core.Models;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.ViewModels;
 
@@ -115,5 +116,97 @@ public class CanvasKeyboardViewModelTests
         Assert.Same(only, vm2.SelectedNode);
 
         Assert.False(MakeVm().TrySelectRoot());
+    }
+
+    private static (ConversationViewModel vm, NodeViewModel root, NodeViewModel child) MakeChain()
+    {
+        var vm = MakeVm();
+        var root  = AddNode(vm, 0, 0, 0);
+        var child = AddNode(vm, 1, 400, 0);
+        vm.Connections.Add(CanvasNavigationServiceTests.Connect(root, child));
+        return (vm, root, child);
+    }
+
+    // ── TryNavigate ───────────────────────────────────────────────────────
+    [Fact]
+    public void TryNavigate_Child_MovesSelection()
+    {
+        var (vm, root, child) = MakeChain();
+        vm.SelectNode(root);
+
+        Assert.True(vm.TryNavigate(CanvasNavDirection.Child));
+        Assert.Same(child, vm.SelectedNode);
+        Assert.True(child.IsSelected);
+        Assert.False(root.IsSelected);
+    }
+
+    [Fact]
+    public void TryNavigate_NoCandidate_ReturnsFalseAndKeepsSelection()
+    {
+        var (vm, root, _) = MakeChain();
+        vm.SelectNode(root);
+
+        Assert.False(vm.TryNavigate(CanvasNavDirection.Parent)); // root has no parent
+        Assert.Same(root, vm.SelectedNode);
+    }
+
+    [Fact]
+    public void TryNavigate_NothingSelected_ReturnsFalse()
+    {
+        var (vm, _, _) = MakeChain();
+        Assert.False(vm.TryNavigate(CanvasNavDirection.Child));
+    }
+
+    // ── TryCycle ──────────────────────────────────────────────────────────
+    [Fact]
+    public void TryCycle_MovesToNextNode_EvenFromNoSelection()
+    {
+        var (vm, root, child) = MakeChain();
+
+        Assert.True(vm.TryCycle(forward: true));   // no selection → first node
+        Assert.Same(root, vm.SelectedNode);
+        Assert.True(vm.TryCycle(forward: true));
+        Assert.Same(child, vm.SelectedNode);
+        Assert.True(vm.TryCycle(forward: true));   // wraps
+        Assert.Same(root, vm.SelectedNode);
+    }
+
+    [Fact]
+    public void TryCycle_EmptyCanvas_ReturnsFalse()
+    {
+        Assert.False(MakeVm().TryCycle(forward: true));
+    }
+
+    // ── NudgeSelected ─────────────────────────────────────────────────────
+    [Fact]
+    public void NudgeSelected_MovesLocation()
+    {
+        var (vm, root, _) = MakeChain();
+        vm.IsEditable = true;
+        vm.SelectNode(root);
+
+        Assert.True(vm.NudgeSelected(10, 0));
+        Assert.Equal(new LayoutPoint(10, 0), root.Location);
+        Assert.True(vm.NudgeSelected(0, -50));
+        Assert.Equal(new LayoutPoint(10, -50), root.Location);
+    }
+
+    [Fact]
+    public void NudgeSelected_NotEditable_ReturnsFalse()
+    {
+        var (vm, root, _) = MakeChain();
+        vm.IsEditable = false; // read-only canvas (e.g. diff view) must not move nodes
+        vm.SelectNode(root);
+
+        Assert.False(vm.NudgeSelected(10, 0));
+        Assert.Equal(new LayoutPoint(0, 0), root.Location);
+    }
+
+    [Fact]
+    public void NudgeSelected_NothingSelected_ReturnsFalse()
+    {
+        var (vm, _, _) = MakeChain();
+        vm.IsEditable = true;
+        Assert.False(vm.NudgeSelected(10, 0));
     }
 }

@@ -422,6 +422,42 @@ public partial class ConversationViewModel : ObservableObject
         return true;
     }
 
+    public bool TryNavigate(CanvasNavDirection direction)
+    {
+        if (SelectedNode is null) return false;
+
+        var target = direction switch
+        {
+            CanvasNavDirection.Parent          => CanvasNavigationService.GetParent(SelectedNode, Nodes, Connections),
+            CanvasNavDirection.Child           => CanvasNavigationService.GetChild(SelectedNode, Nodes, Connections),
+            CanvasNavDirection.PreviousSibling => CanvasNavigationService.GetSibling(SelectedNode, -1, Nodes, Connections),
+            CanvasNavDirection.NextSibling     => CanvasNavigationService.GetSibling(SelectedNode, +1, Nodes, Connections),
+            _                                  => null,
+        };
+        if (target is null) return false;
+        SelectNode(target);
+        return true;
+    }
+
+    public bool TryCycle(bool forward)
+    {
+        var target = CanvasNavigationService.Cycle(SelectedNode, forward, Nodes);
+        if (target is null) return false;
+        SelectNode(target);
+        return true;
+    }
+
+    /// Keyboard nudge has drag-move semantics: a plain Location set, no undo
+    /// entry (drag moves are not individually undoable today; layout persists
+    /// via GetCurrentLayout at save). Gated on IsEditable so read-only canvases
+    /// (diff view) cannot be rearranged from the keyboard.
+    public bool NudgeSelected(double dx, double dy)
+    {
+        if (!IsEditable || SelectedNode is null) return false;
+        SelectedNode.Location = new LayoutPoint(SelectedNode.Location.X + dx, SelectedNode.Location.Y + dy);
+        return true;
+    }
+
     // ── Layout helpers ────────────────────────────────────────────────────
     public IReadOnlyDictionary<int, LayoutPoint> GetCurrentLayout() =>
         Nodes.ToDictionary(n => n.NodeId, n => n.Location);
