@@ -143,7 +143,8 @@
                                     Foreground="{DynamicResource Brush.Text.Muted}" FontSize="14"
                                     Padding="8,0" Margin="4,0,0,0"
                                     VerticalAlignment="Center"
-                                    ToolTip.Tip="{StaticResource ToolTip_FlowAnalytics_Navigate}"/>
+                                    ToolTip.Tip="{StaticResource ToolTip_FlowAnalytics_Navigate}"
+                                    AutomationProperties.Name="{StaticResource AutomationName_GoToNode}"/>
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>

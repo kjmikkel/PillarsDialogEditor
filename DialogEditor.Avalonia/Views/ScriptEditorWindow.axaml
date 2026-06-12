@@ -78,21 +78,24 @@
                                             CommandParameter="{Binding}"
                                             Background="Transparent" BorderThickness="0"
                                             Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="13" Padding="4"
-                                            ToolTip.Tip="{StaticResource ToolTip_MoveScriptUp}"/>
+                                            ToolTip.Tip="{StaticResource ToolTip_MoveScriptUp}"
+                                            AutomationProperties.Name="{StaticResource AutomationName_MoveScriptUp}"/>
                                     <Button Grid.Column="2" Content="↓"
                                             Command="{Binding DataContext.MoveDownCommand,
                                                       RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding}"
                                             Background="Transparent" BorderThickness="0"
                                             Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="13" Padding="4"
-                                            ToolTip.Tip="{StaticResource ToolTip_MoveScriptDown}"/>
+                                            ToolTip.Tip="{StaticResource ToolTip_MoveScriptDown}"
+                                            AutomationProperties.Name="{StaticResource AutomationName_MoveScriptDown}"/>
                                     <Button Grid.Column="3" Content="✕"
                                             Command="{Binding DataContext.DeleteRowCommand,
                                                       RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding}"
                                             Background="Transparent" BorderThickness="0"
                                             Foreground="{DynamicResource Brush.Severity.Error}" FontSize="13" Padding="4"
-                                            ToolTip.Tip="{StaticResource ToolTip_DeleteScriptRow}"/>
+                                            ToolTip.Tip="{StaticResource ToolTip_DeleteScriptRow}"
+                                            AutomationProperties.Name="{StaticResource AutomationName_RemoveScript}"/>
                                 </Grid>
                                 <!-- Parameters -->
                                 <ItemsControl ItemsSource="{Binding Parameters}"
@@ -116,7 +119,8 @@
                                                 <Button Grid.Column="2" Classes="type-hint"
                                                         Content="(?)"
                                                         ToolTip.Tip="{Binding TypeHint}"
-                                                        IsVisible="{Binding HasTypeHint}"/>
+                                                        IsVisible="{Binding HasTypeHint}"
+                                                        AutomationProperties.Name="{StaticResource AutomationName_ParameterHelp}"/>
                                             </Grid>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>

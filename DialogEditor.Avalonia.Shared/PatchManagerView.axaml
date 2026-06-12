@@ -113,21 +113,24 @@
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="13" Padding="4"
-                                                ToolTip.Tip="{StaticResource ToolTip_MoveEntryUp}"/>
+                                                ToolTip.Tip="{StaticResource ToolTip_MoveEntryUp}"
+                                                AutomationProperties.Name="{StaticResource AutomationName_MovePatchUp}"/>
                                         <Button Grid.Column="2" Content="↓"
                                                 Command="{Binding DataContext.MoveDownCommand,
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="13" Padding="4"
-                                                ToolTip.Tip="{StaticResource ToolTip_MoveEntryDown}"/>
+                                                ToolTip.Tip="{StaticResource ToolTip_MoveEntryDown}"
+                                                AutomationProperties.Name="{StaticResource AutomationName_MovePatchDown}"/>
                                         <Button Grid.Column="3" Content="✕"
                                                 Command="{Binding DataContext.RemoveEntryCommand,
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Foreground="{DynamicResource Brush.Severity.Error}" FontSize="13" Padding="4"
-                                                ToolTip.Tip="{StaticResource ToolTip_RemoveEntry}"/>
+                                                ToolTip.Tip="{StaticResource ToolTip_RemoveEntry}"
+                                                AutomationProperties.Name="{StaticResource AutomationName_RemovePatch}"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>

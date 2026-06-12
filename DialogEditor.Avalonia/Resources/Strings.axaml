@@ -939,4 +939,27 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Sample_CreatedHistoryPartial">Sample project created and opened, but its practice history couldn't be completed.</sys:String>
     <sys:String x:Key="Walkthrough_OpenFailed">Couldn't open the walkthrough. You can find it in the app's docs folder.</sys:String>
 
+    <!-- ─── Accessibility — screen-reader names for icon-only buttons ─────── -->
+    <sys:String x:Key="AutomationName_MoveConditionUp">Move condition up</sys:String>
+    <sys:String x:Key="AutomationName_MoveConditionDown">Move condition down</sys:String>
+    <sys:String x:Key="AutomationName_RemoveCondition">Remove condition</sys:String>
+    <sys:String x:Key="AutomationName_ParameterHelp">Parameter help</sys:String>
+    <sys:String x:Key="AutomationName_ZoomIn">Zoom in</sys:String>
+    <sys:String x:Key="AutomationName_ZoomOut">Zoom out</sys:String>
+    <sys:String x:Key="AutomationName_JumpToRoot">Jump to root node</sys:String>
+    <sys:String x:Key="AutomationName_ClearSearch">Clear search</sys:String>
+    <sys:String x:Key="AutomationName_GoToNode">Go to node</sys:String>
+    <sys:String x:Key="AutomationName_ClearFilter">Clear filter</sys:String>
+    <sys:String x:Key="AutomationName_ToggleHelp">Toggle help</sys:String>
+    <sys:String x:Key="AutomationName_Settings">Settings</sys:String>
+    <sys:String x:Key="AutomationName_PinBrowserPanel">Pin browser panel</sys:String>
+    <sys:String x:Key="AutomationName_ExpandAllFolders">Expand all folders</sys:String>
+    <sys:String x:Key="AutomationName_CollapseAllFolders">Collapse all folders</sys:String>
+    <sys:String x:Key="AutomationName_NewConversation">New conversation</sys:String>
+    <sys:String x:Key="AutomationName_CollapseDetailsPanel">Collapse details panel</sys:String>
+    <sys:String x:Key="AutomationName_ExpandDetailsPanel">Expand details panel</sys:String>
+    <sys:String x:Key="AutomationName_MoveScriptUp">Move script up</sys:String>
+    <sys:String x:Key="AutomationName_MoveScriptDown">Move script down</sys:String>
+    <sys:String x:Key="AutomationName_RemoveScript">Remove script</sys:String>
+
 </ResourceDictionary>
