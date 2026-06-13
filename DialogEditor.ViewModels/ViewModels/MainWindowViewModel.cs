@@ -100,6 +100,7 @@ public partial class MainWindowViewModel : ObservableObject
             : ConditionCatalogue.Instance.ForGame(_activeGameId);
 
     [ObservableProperty] private string              _statusText          = Loc.Get("Status_OpenFolder");
+    [ObservableProperty] private string              _focusHintText       = string.Empty;
     [ObservableProperty] private IReadOnlyList<string> _availableLanguages = [];
     [ObservableProperty] private string              _selectedLanguage    = string.Empty;
     [ObservableProperty] private bool                _isModified;
@@ -129,6 +130,15 @@ public partial class MainWindowViewModel : ObservableObject
                 : Loc.Get("App_Title") + project;
         }
     }
+
+    // ── Status bar shows the focused control's hint when present ──────────
+    /// <summary>
+    /// What the status bar TextBlock actually displays: the focused control's
+    /// AutomationProperties.HelpText (set by MainWindow's GotFocus handler) when
+    /// present, otherwise the last operation's StatusText.
+    /// </summary>
+    public string DisplayStatusText =>
+        string.IsNullOrEmpty(FocusHintText) ? StatusText : FocusHintText;
 
     // ── Unsaved-changes navigation guard ──────────────────────────────────
     private ConversationFile?              _pendingFile;
@@ -234,6 +244,12 @@ public partial class MainWindowViewModel : ObservableObject
 
     partial void OnIsModifiedChanged(bool value)
         => OnPropertyChanged(nameof(WindowTitle));
+
+    partial void OnStatusTextChanged(string value)
+        => OnPropertyChanged(nameof(DisplayStatusText));
+
+    partial void OnFocusHintTextChanged(string value)
+        => OnPropertyChanged(nameof(DisplayStatusText));
 
     // ── Constructor ───────────────────────────────────────────────────────
     public MainWindowViewModel(IDispatcher dispatcher, IFolderPicker folderPicker, IFilePicker filePicker)
