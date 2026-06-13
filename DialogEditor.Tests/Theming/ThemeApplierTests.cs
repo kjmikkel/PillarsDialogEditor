@@ -3,6 +3,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.Avalonia.Shared.Theming;
 using DialogEditor.ViewModels.Services;
 
@@ -27,7 +28,13 @@ public class ThemeApplierTests
     public void Available_ListsThePalettesInOrder()
     {
         var ids = new ThemeApplier().Available.Select(o => o.Id);
-        Assert.Equal(["Dark", "Light", "Colourblind", "HighContrast"], ids);
+        Assert.Equal(["Auto", "Dark", "Light", "Colourblind", "HighContrast"], ids);
+    }
+
+    [AvaloniaFact]
+    public void Theme_Name_Auto_ResourceResolves()
+    {
+        Assert.Equal("System Default", new AvaloniaStringProvider().Get("Theme_Name_Auto"));
     }
 
     [AvaloniaFact]

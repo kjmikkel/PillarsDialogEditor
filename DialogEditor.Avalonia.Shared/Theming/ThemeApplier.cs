@@ -40,8 +40,12 @@ public sealed class ThemeApplier : IThemeApplier
     private const string PaletteSentinel = "Palette.Neutral.80";
     private const string TokensSentinel  = "Brush.Surface.Window";
 
+    // "Auto" is a meta-choice resolved at apply-time by DetectOsThemeId — it has no palette
+    // file of its own, so it isn't a Catalog entry, but it's the first (default) choice.
     public IReadOnlyList<ThemeOption> Available { get; } =
-        Catalog.Select(e => new ThemeOption(e.Id, e.DisplayNameKey)).ToList();
+        new[] { new ThemeOption("Auto", "Theme_Name_Auto") }
+            .Concat(Catalog.Select(e => new ThemeOption(e.Id, e.DisplayNameKey)))
+            .ToList();
 
     /// <summary>
     /// Maps the OS-reported colour preferences to a catalog id. High-contrast wins outright
