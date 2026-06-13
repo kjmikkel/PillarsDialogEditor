@@ -190,7 +190,7 @@ git commit -m "feat(a11y): mirror ToolTip.Tip into AutomationProperties.HelpText
 **Files:**
 - Modify: `DialogEditor.Tests/ViewModels/MainWindowViewModelTests.cs`
 
-- [ ] **Step 1: Add the failing tests**
+- [x] **Step 1: Add the failing tests**
 
 Add these tests to `MainWindowViewModelTests` (uses the existing `MakeVm()` helper
 at line 39-40):
@@ -243,14 +243,14 @@ public void DisplayStatusText_RaisesPropertyChanged_WhenEitherSourceChanges()
 }
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail (RED)**
+- [x] **Step 2: Run the tests to verify they fail (RED)**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~MainWindowViewModelTests"`
 
 Expected: compile error — `FocusHintText` and `DisplayStatusText` do not exist on
 `MainWindowViewModel` yet. A compile error counts as RED.
 
-- [ ] **Step 3: Commit the failing tests**
+- [x] **Step 3: Commit the failing tests**
 
 ```bash
 git add DialogEditor.Tests/ViewModels/MainWindowViewModelTests.cs
@@ -264,7 +264,7 @@ git commit -m "test(a11y): MainWindowViewModel.DisplayStatusText falls back to S
 **Files:**
 - Modify: `DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs`
 
-- [ ] **Step 1: Add the `FocusHintText` observable property**
+- [x] **Step 1: Add the `FocusHintText` observable property**
 
 In `MainWindowViewModel.cs:102`, alongside the existing `_statusText` declaration:
 
@@ -274,7 +274,7 @@ In `MainWindowViewModel.cs:102`, alongside the existing `_statusText` declaratio
     [ObservableProperty] private IReadOnlyList<string> _availableLanguages = [];
 ```
 
-- [ ] **Step 2: Add the `DisplayStatusText` computed property**
+- [x] **Step 2: Add the `DisplayStatusText` computed property**
 
 Add next to `WindowTitle` (`MainWindowViewModel.cs:120-131`):
 
@@ -289,7 +289,7 @@ Add next to `WindowTitle` (`MainWindowViewModel.cs:120-131`):
         string.IsNullOrEmpty(FocusHintText) ? StatusText : FocusHintText;
 ```
 
-- [ ] **Step 3: Wire both sources to notify DisplayStatusText**
+- [x] **Step 3: Wire both sources to notify DisplayStatusText**
 
 Add next to the other partial hooks (`MainWindowViewModel.cs:223-233`):
 
@@ -301,13 +301,13 @@ Add next to the other partial hooks (`MainWindowViewModel.cs:223-233`):
         => OnPropertyChanged(nameof(DisplayStatusText));
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass (GREEN)**
+- [x] **Step 4: Run the tests to verify they pass (GREEN)**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~MainWindowViewModelTests"`
 
 Expected: PASS, including the 4 new tests from Task 3.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs
