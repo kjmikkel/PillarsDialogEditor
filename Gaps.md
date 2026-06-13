@@ -396,18 +396,21 @@ after the cheap wins. The rest are independent and can land in any order.
     render previews, a first-run flag in `AppSettings`, and whether it blocks the main
     window.
 
-16. **Focus-hint bar for small dialogs.** Split off from item 13, whose
-    `FocusHintBar` rollout is scoped to the 10 "workhorse" windows with many
-    controls (`SettingsWindow`, `ScriptEditorWindow`, `ConditionEditorWindow`,
-    `FindReplaceWindow`, `DiffWindow`, `BatchReplaceWindow`,
-    `ExportConversationsWindow`, `FlowAnalyticsWindow`, `BranchesWindow`,
-    `GitConflictResolutionWindow`). Seven small 1–3-control dialogs were left out:
-    `AboutWindow`, `BranchNameDialog`, `ChangelogWindow`, `CommitConsentDialog`,
-    `ConflictResolutionDialog`, `ForceDeleteDialog`, `HistoryWindow`. Their few
-    `HelpText` entries are mostly icon-only close/help buttons, where a hint bar
-    may be more clutter than value relative to these windows' small size — worth a
-    separate judgment call once item 13 has shipped and its UX can be assessed in
-    practice.
+16. **✅ IMPLEMENTED (2026-06-13).** Split off from item 13. Of the 7 small
+    1–3-control dialogs left out of the item-13 rollout, each control's
+    `AutomationProperties.HelpText` was compared against text already visible in
+    its dialog. Three dialogs had at least one control whose `HelpText` is a real
+    explanation beyond its visible label, and got a `FocusHintBar`:
+    `AboutWindow` (Open Repository / Open Docs buttons; also switched from a fixed
+    `Height` to `SizeToContent="Height"`, since its content is entirely
+    ViewModel-bound and a fixed height was already a latent clipping risk),
+    `ConflictResolutionDialog` (Cancel / Force Apply buttons), and `HistoryWindow`
+    (Compare button). The other 4 — `BranchNameDialog`, `CommitConsentDialog`,
+    `ChangelogWindow`, `ForceDeleteDialog` — deliberately do **not** get a
+    `FocusHintBar`: every `HelpText` value in these dialogs duplicates text already
+    on screen (an adjacent label, or the control's own caption), so a bar would
+    only echo the screen. See
+    docs/superpowers/specs/2026-06-13-focus-hint-bar-small-dialogs-design.md.
 
 ### UI Localisation Readiness (audit 2026-06-12)
 The localisation rule (no hard-coded user-visible text) has been followed, but the app
