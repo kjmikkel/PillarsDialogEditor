@@ -111,4 +111,30 @@ public class ThemeApplierTests
     {
         Assert.Equal("Dark", ThemeApplier.DetectOsThemeId(null));
     }
+
+    [AvaloniaFact]
+    public void Apply_Auto_ResolvesToDetectedPalette()
+    {
+        var app = Application.Current!;
+        var expectedId      = ThemeApplier.DetectOsThemeId(app.PlatformSettings?.GetColorValues());
+        var expectedVariant = expectedId == "Light" ? ThemeVariant.Light : ThemeVariant.Dark;
+        try
+        {
+            new ThemeApplier().Apply("Auto");
+            Assert.Equal(expectedVariant, app.RequestedThemeVariant);
+        }
+        finally { new ThemeApplier().Apply("Dark"); }
+    }
+
+    [AvaloniaFact]
+    public void Apply_Auto_BumpsRevision()
+    {
+        try
+        {
+            var before = ThemeService.Current.Revision;
+            new ThemeApplier().Apply("Auto");
+            Assert.Equal(before + 1, ThemeService.Current.Revision);
+        }
+        finally { new ThemeApplier().Apply("Dark"); }
+    }
 }
