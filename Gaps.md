@@ -317,6 +317,22 @@ after the cheap wins. The rest are independent and can land in any order.
     exemption is a clean win. (b) Several hit targets (20px-wide ✕ clear buttons, slim
     toolbar buttons) sit below the WCAG 2.5.8 24×24 minimum.
 
+12. **Info icons carry no tooltip/HelpText.** Item 5's sweep is scoped to *focusable*
+    controls — static info icons (legend swatches, inline "i"/help glyphs rendered as
+    `TextBlock`/`Border`) are skipped because they can't receive keyboard focus, so
+    `AutomationProperties.HelpText` would never be announced on them. Making these
+    operable (e.g. focusable `Button`-styled icons with both `ToolTip.Tip` and
+    `AutomationProperties.HelpText`) would let keyboard/screen-reader users reach the
+    same explanations sighted mouse users get.
+
+13. **Focused-control hint is MainWindow-only.** Item 5's status-bar hint (Part B)
+    depends on `MainWindow`'s status bar, which other windows/dialogs
+    (`SettingsWindow`, `ScriptEditorWindow`, `ConditionEditorWindow`, `FindReplaceWindow`,
+    `DiffWindow`, etc.) don't have — their `AutomationProperties.HelpText` (mirrored
+    solution-wide by item 5's Part A) is reachable by screen readers but has no
+    sighted-keyboard-user equivalent there. Worth a lightweight hint surface (e.g. a
+    bottom hint bar) for dialogs once item 5's pattern proves out.
+
 ### UI Localisation Readiness (audit 2026-06-12)
 The localisation rule (no hard-coded user-visible text) has been followed, but the app
 cannot yet actually *switch language*. The good news from the audit: the architecture is
