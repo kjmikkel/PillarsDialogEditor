@@ -187,7 +187,7 @@
                                         ZIndex="11"
                                         Background="{Binding DiffStatus, Converter={StaticResource DiffStatusToBrushConverter}}">
                                     <TextBlock Text="{Binding DiffStatus, Converter={StaticResource DiffStatusToGlyph}}"
-                                               Foreground="White" FontWeight="Bold" FontSize="11"
+                                               Foreground="{DynamicResource Brush.Text.OnAccent}" FontWeight="Bold" FontSize="11"
                                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
 
@@ -221,7 +221,7 @@
                                             </Path.Fill>
                                         </Path>
                                         <TextBlock Text="{Binding Title}"
-                                                   Foreground="White" FontWeight="Bold"
+                                                   Foreground="{DynamicResource Brush.Text.OnAccent}" FontWeight="Bold"
                                                    FontSize="10" Padding="0,3,6,3"
                                                    TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>

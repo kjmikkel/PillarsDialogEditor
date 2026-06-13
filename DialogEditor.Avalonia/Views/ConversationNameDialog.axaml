@@ -24,11 +24,11 @@
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
             <Button x:Name="CancelButton"
                     Content="Cancel"
-                    Background="{DynamicResource Brush.Surface.Header}" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
             <Button x:Name="OkButton"
                     Content="{StaticResource Dialog_NewConversation_Create}"
-                    Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
         </StackPanel>
 

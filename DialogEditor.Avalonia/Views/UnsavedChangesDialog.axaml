@@ -17,15 +17,15 @@
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
             <Button x:Name="CancelButton"
                     Content="{StaticResource UnsavedChanges_Cancel}"
-                    Background="{DynamicResource Brush.Surface.Header}" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
             <Button x:Name="DiscardButton"
                     Content="{StaticResource UnsavedChanges_Discard}"
-                    Background="{DynamicResource Brush.Surface.Header}" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
             <Button x:Name="SaveButton"
                     Content="{StaticResource UnsavedChanges_Save}"
-                    Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
         </StackPanel>
 

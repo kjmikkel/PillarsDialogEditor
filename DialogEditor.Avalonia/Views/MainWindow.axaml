@@ -349,7 +349,7 @@
                         IsVisible="{Binding HasPendingConflictResolution}"
                         ToolTip.Tip="{StaticResource MainWindow_ResolveConflictsTooltip}"
                         AutomationProperties.HelpText="{StaticResource MainWindow_ResolveConflictsTooltip}"
-                        Background="{DynamicResource Brush.Button.Caution.Background}" Foreground="White" BorderThickness="0"
+                        Background="{DynamicResource Brush.Button.Caution.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                         Padding="12,2" FontSize="11"/>
             </Grid>
         </Border>

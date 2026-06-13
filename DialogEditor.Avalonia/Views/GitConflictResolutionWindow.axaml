@@ -100,14 +100,14 @@
                     Content="{StaticResource GitConflictWindow_Cancel}"
                     ToolTip.Tip="{StaticResource GitConflictWindow_CancelTooltip}"
                     AutomationProperties.HelpText="{StaticResource GitConflictWindow_CancelTooltip}"
-                    Background="{DynamicResource Brush.Surface.Header}" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
             <Button x:Name="ApplyButton"
                     Content="{StaticResource GitConflictWindow_Apply}"
                     Command="{Binding ApplyCommand}"
                     ToolTip.Tip="{StaticResource GitConflictWindow_ApplyTooltip}"
                     AutomationProperties.HelpText="{StaticResource GitConflictWindow_ApplyTooltip}"
-                    Background="{DynamicResource Brush.Button.Confirm.Background}" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Button.Confirm.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
         </StackPanel>
 

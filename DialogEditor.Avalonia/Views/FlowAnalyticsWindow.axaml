@@ -120,7 +120,7 @@
                                     Background="{Binding Kind, Converter={StaticResource FlowIssueSeverityBrush}}"
                                     HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding Kind, Converter={StaticResource FlowIssueSeverityGlyph}}"
-                                           FontSize="10" Foreground="White"
+                                           FontSize="10" Foreground="{DynamicResource Brush.Text.OnAccent}"
                                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <!-- Kind label -->

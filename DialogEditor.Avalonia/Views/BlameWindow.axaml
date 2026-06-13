@@ -62,7 +62,7 @@
                     HorizontalAlignment="Right" Spacing="8" Margin="0,14,0,0">
             <Button x:Name="CloseButton"
                     Content="{StaticResource BlameWindow_Close}"
-                    Background="{DynamicResource Brush.Surface.Header}" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
         </StackPanel>
 
