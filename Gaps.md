@@ -369,13 +369,16 @@ after the cheap wins. The rest are independent and can land in any order.
     `AutomationProperties.HelpText`) would let keyboard/screen-reader users reach the
     same explanations sighted mouse users get.
 
-13. **Focused-control hint is MainWindow-only.** Item 5's status-bar hint (Part B)
-    depends on `MainWindow`'s status bar, which other windows/dialogs
-    (`SettingsWindow`, `ScriptEditorWindow`, `ConditionEditorWindow`, `FindReplaceWindow`,
-    `DiffWindow`, etc.) don't have — their `AutomationProperties.HelpText` (mirrored
-    solution-wide by item 5's Part A) is reachable by screen readers but has no
-    sighted-keyboard-user equivalent there. Worth a lightweight hint surface (e.g. a
-    bottom hint bar) for dialogs once item 5's pattern proves out.
+13. **✅ IMPLEMENTED (2026-06-13).** Focused-control hint is no longer MainWindow-only.
+    A new shared `FocusHintBar` control (`DialogEditor.Avalonia.Shared`) mirrors the
+    focused control's `AutomationProperties.HelpText` into a passive status-bar-styled
+    bar, the same way item 5 Part B's `MainWindow.OnAnyGotFocus` feeds the status bar.
+    Rolled out to the 10 "workhorse" windows: `SettingsWindow`, `ScriptEditorWindow`,
+    `ConditionEditorWindow`, `FindReplaceWindow`, `DiffWindow`, `BatchReplaceWindow`,
+    `ExportConversationsWindow`, `FlowAnalyticsWindow`, `BranchesWindow`,
+    `GitConflictResolutionWindow`. The remaining 7 small 1–3-control dialogs are
+    tracked separately as item 16. See
+    docs/superpowers/specs/2026-06-13-focus-hint-bar-design.md.
 
 14. **✅ IMPLEMENTED (2026-06-13).** Dark palette is now AA-checked. Split off from item
     11 — `PaletteContrastTests` previously grandfathered `Palette.Dark` out of its AA
