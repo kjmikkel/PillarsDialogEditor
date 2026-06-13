@@ -100,7 +100,7 @@
         <!-- Canvas -->
         <Grid Grid.Row="1">
             <nodify:NodifyEditor x:Name="Editor"
-                                 Background="{DynamicResource Brush.Accent.Badge}"
+                                 Background="{DynamicResource Brush.Canvas.Background}"
                                  ItemsSource="{Binding Nodes}"
                                  Connections="{Binding Connections}"
                                  PendingConnection="{Binding PendingConnection}"
