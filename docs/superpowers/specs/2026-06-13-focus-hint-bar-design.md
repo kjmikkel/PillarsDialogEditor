@@ -82,17 +82,17 @@ all of which have many controls (including icon-only buttons) and already carry
 
 ## Testing
 
-- **`FocusHintBarTests.cs`** (new, `DialogEditor.Tests/Controls` or
-  `DialogEditor.Tests/Views`) — the real TDD'd behaviour, covered once at the
-  component level:
+- **`FocusHintBarTests.cs`** (new, `DialogEditor.Tests/Controls`) — the real
+  TDD'd behaviour, covered once at the component level:
   - `[AvaloniaFact]` GotFocus on an element with `HelpText` → `Text` equals that
     `HelpText`.
   - `[AvaloniaFact]` GotFocus on an element without `HelpText` → `Text` is
     cleared to `""`.
 
-- **`FocusHintBarPresenceTests.cs`** (new, solution-wide scan, mirroring
-  `AutomationHelpTextTests`/`FakeWatermarkTests`'s anchored-on-`DialogEditor.slnx`
-  XML-scan pattern) — for exactly the 10 named `.axaml` files above, asserts a
+- **`FocusHintBarPresenceTests.cs`** (new, `DialogEditor.Tests/Accessibility`,
+  solution-wide scan, mirroring `AutomationHelpTextTests`/`FakeWatermarkTests`'s
+  anchored-on-`DialogEditor.slnx` XML-scan pattern) — for exactly the 10 named
+  `.axaml` files above, asserts a
   `FocusHintBar` element with `x:Name="HintBar"` is present. This is the RED
   before the XAML sweep; a future accidental removal would fail it too.
 
