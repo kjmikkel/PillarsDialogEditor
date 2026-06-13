@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Platform;
 using Avalonia.Styling;
 using DialogEditor.ViewModels.Services;
 
@@ -41,6 +42,20 @@ public sealed class ThemeApplier : IThemeApplier
 
     public IReadOnlyList<ThemeOption> Available { get; } =
         Catalog.Select(e => new ThemeOption(e.Id, e.DisplayNameKey)).ToList();
+
+    /// <summary>
+    /// Maps the OS-reported colour preferences to a catalog id. High-contrast wins outright
+    /// regardless of the reported light/dark variant — the <c>HighContrast</c> palette is
+    /// itself authored against <see cref="ThemeVariant.Dark"/> and isn't variant-aware.
+    /// <c>null</c> (no platform settings available) falls back to <c>"Dark"</c>, matching
+    /// the historical hardcoded default.
+    /// </summary>
+    internal static string DetectOsThemeId(PlatformColorValues? values)
+    {
+        if (values is null) return "Dark";
+        if (values.ContrastPreference == ColorContrastPreference.High) return "HighContrast";
+        return values.ThemeVariant == PlatformThemeVariant.Light ? "Light" : "Dark";
+    }
 
     public void Apply(string id)
     {
