@@ -36,7 +36,7 @@
         </Style>
     </Window.Styles>
 
-    <Grid RowDefinitions="*,Auto" Margin="16">
+    <Grid RowDefinitions="*,Auto,Auto" Margin="16">
 
         <StackPanel Grid.Row="0" Spacing="12">
 
@@ -81,6 +81,9 @@
                 Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
                 Padding="16,5" Margin="0,12,0,0"
                 Click="Close_Click"/>
+
+        <!-- Focus hint bar (Gaps item 13) -->
+        <shared:FocusHintBar Grid.Row="2" x:Name="HintBar"/>
 
     </Grid>
 </Window>
