@@ -63,9 +63,13 @@ public sealed class ThemeApplier : IThemeApplier
 
     public void Apply(string id)
     {
-        var entry = Catalog.FirstOrDefault(e => e.Id == id) ?? Catalog[0];
-        var app   = Application.Current
+        var app = Application.Current
             ?? throw new InvalidOperationException("No Application is running to apply a theme to.");
+
+        var resolvedId = id == "Auto"
+            ? DetectOsThemeId(app.PlatformSettings?.GetColorValues())
+            : id;
+        var entry = Catalog.FirstOrDefault(e => e.Id == resolvedId) ?? Catalog[0];
 
         var dicts = app.Resources.MergedDictionaries;
 
