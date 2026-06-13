@@ -30,7 +30,9 @@
              BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
              FontSize="12" Padding="6,4"
              AcceptsReturn="False"
-             ToolTip.Tip="{StaticResource CommitConsent_MessageLabel}"/>
+             ToolTip.Tip="{StaticResource CommitConsent_MessageLabel}"
+             AutomationProperties.HelpText="{StaticResource CommitConsent_MessageLabel}"
+             AutomationProperties.Name="{StaticResource CommitConsent_MessageLabel}"/>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
       <Button x:Name="CancelButton"
               Content="{StaticResource CommitConsent_Cancel}"

@@ -15,15 +15,19 @@
     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6" Margin="0,8,0,0">
       <Button x:Name="SwitchButton" Content="{StaticResource Branches_Switch}"
               ToolTip.Tip="{StaticResource Branches_SwitchTip}"
+              AutomationProperties.HelpText="{StaticResource Branches_SwitchTip}"
               Command="{Binding SwitchCommand}"/>
       <Button x:Name="NewButton" Content="{StaticResource Branches_New}"
               ToolTip.Tip="{StaticResource Branches_NewTip}"
+              AutomationProperties.HelpText="{StaticResource Branches_NewTip}"
               Command="{Binding CreateCommand}"/>
       <Button x:Name="RenameButton" Content="{StaticResource Branches_Rename}"
               ToolTip.Tip="{StaticResource Branches_RenameTip}"
+              AutomationProperties.HelpText="{StaticResource Branches_RenameTip}"
               Command="{Binding RenameCommand}"/>
       <Button x:Name="DeleteButton" Content="{StaticResource Branches_Delete}"
               ToolTip.Tip="{StaticResource Branches_DeleteTip}"
+              AutomationProperties.HelpText="{StaticResource Branches_DeleteTip}"
               Command="{Binding DeleteCommand}"/>
       <Button x:Name="CloseButton" Content="{StaticResource Branches_Close}"/>
     </StackPanel>

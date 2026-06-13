@@ -164,6 +164,10 @@ public partial class ConversationViewModel : ObservableObject
 
     partial void OnSelectedNodeChanged(NodeViewModel? value)
     {
+        // Remember the last real selection (mouse or keyboard) so keyboard focus
+        // can resume where the user left off (spec: entry = restore last selection).
+        if (value is not null) _lastSelection = value;
+
         foreach (var connection in Connections)
         {
             connection.IsHighlighted = value is not null &&
@@ -371,6 +375,87 @@ public partial class ConversationViewModel : ObservableObject
     private void DeleteConnectionCmd(ConnectionViewModel? connection)
     {
         if (connection is not null) DeleteConnection(connection);
+    }
+
+    // ── Keyboard selection & navigation (spec: 2026-06-12 canvas keyboard) ──
+    private NodeViewModel? _lastSelection;
+
+    /// Single selection path for mouse AND keyboard: clears other nodes'
+    /// IsSelected (Nodify renders the selection ring from it) and sets
+    /// SelectedNode (drives connection highlighting + the detail panel).
+    public void SelectNode(NodeViewModel node)
+    {
+        foreach (var n in Nodes)
+            if (!ReferenceEquals(n, node) && n.IsSelected)
+                n.IsSelected = false;
+        node.IsSelected = true; // OnSelected callback also sets SelectedNode
+        SelectedNode = node;    // ...but set explicitly for nodes lacking the callback
+    }
+
+    public bool Deselect()
+    {
+        if (SelectedNode is null) return false;
+        SelectedNode.IsSelected = false;
+        SelectedNode = null;
+        return true;
+    }
+
+    /// Keyboard focus arriving on an empty selection resumes at the last
+    /// selection; first focus (or a deleted last selection) starts at the root.
+    public bool EnsureKeyboardSelection()
+    {
+        if (SelectedNode is not null) return true;
+        if (Nodes.Count == 0) return false;
+
+        var target = _lastSelection is not null && Nodes.Contains(_lastSelection)
+            ? _lastSelection
+            : Nodes.FirstOrDefault(n => n.NodeId == 0) ?? Nodes[0];
+        SelectNode(target);
+        return true;
+    }
+
+    public bool TrySelectRoot()
+    {
+        var root = Nodes.FirstOrDefault(n => n.NodeId == 0) ?? Nodes.FirstOrDefault();
+        if (root is null) return false;
+        SelectNode(root);
+        return true;
+    }
+
+    public bool TryNavigate(CanvasNavDirection direction)
+    {
+        if (SelectedNode is null) return false;
+
+        var target = direction switch
+        {
+            CanvasNavDirection.Parent          => CanvasNavigationService.GetParent(SelectedNode, Nodes, Connections),
+            CanvasNavDirection.Child           => CanvasNavigationService.GetChild(SelectedNode, Nodes, Connections),
+            CanvasNavDirection.PreviousSibling => CanvasNavigationService.GetSibling(SelectedNode, -1, Nodes, Connections),
+            CanvasNavDirection.NextSibling     => CanvasNavigationService.GetSibling(SelectedNode, +1, Nodes, Connections),
+            _                                  => null,
+        };
+        if (target is null) return false;
+        SelectNode(target);
+        return true;
+    }
+
+    public bool TryCycle(bool forward)
+    {
+        var target = CanvasNavigationService.Cycle(SelectedNode, forward, Nodes);
+        if (target is null) return false;
+        SelectNode(target);
+        return true;
+    }
+
+    /// Keyboard nudge has drag-move semantics: a plain Location set, no undo
+    /// entry (drag moves are not individually undoable today; layout persists
+    /// via GetCurrentLayout at save). Gated on IsEditable so read-only canvases
+    /// (diff view) cannot be rearranged from the keyboard.
+    public bool NudgeSelected(double dx, double dy)
+    {
+        if (!IsEditable || SelectedNode is null) return false;
+        SelectedNode.Location = new LayoutPoint(SelectedNode.Location.X + dx, SelectedNode.Location.Y + dy);
+        return true;
     }
 
     // ── Layout helpers ────────────────────────────────────────────────────

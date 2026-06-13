@@ -34,7 +34,9 @@
                       x:Name="LeftPicker"
                       ItemsSource="{Binding EndpointOptions}"
                       SelectedItem="{Binding LeftEndpoint, Mode=TwoWay}"
-                      ToolTip.Tip="{StaticResource ToolTip_DiffLeftPicker}">
+                      ToolTip.Tip="{StaticResource ToolTip_DiffLeftPicker}"
+                      AutomationProperties.HelpText="{StaticResource ToolTip_DiffLeftPicker}"
+                      AutomationProperties.Name="{StaticResource DiffWindow_LeftLabel}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:EndpointOption}">
                         <TextBlock Text="{Binding Label}" Foreground="{DynamicResource Brush.Text.Emphasis}"/>
@@ -52,7 +54,9 @@
                       x:Name="RightPicker"
                       ItemsSource="{Binding EndpointOptions}"
                       SelectedItem="{Binding RightEndpoint, Mode=TwoWay}"
-                      ToolTip.Tip="{StaticResource ToolTip_DiffRightPicker}">
+                      ToolTip.Tip="{StaticResource ToolTip_DiffRightPicker}"
+                      AutomationProperties.HelpText="{StaticResource ToolTip_DiffRightPicker}"
+                      AutomationProperties.Name="{StaticResource DiffWindow_RightLabel}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:EndpointOption}">
                         <TextBlock Text="{Binding Label}" Foreground="{DynamicResource Brush.Text.Emphasis}"/>
@@ -74,16 +78,19 @@
             <DockPanel>
                 <Button DockPanel.Dock="Right" Content="{StaticResource Diff_BringInButton}"
                         Command="{Binding ApplyCommand}"
-                        ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"/>
+                        ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"
+                        AutomationProperties.HelpText="{StaticResource ToolTip_Diff_BringIn}"/>
                 <Button DockPanel.Dock="Right" Content="{StaticResource Diff_UndoBringIn}"
                         Click="UndoBringIn_Click" Margin="0,0,8,0"
-                        ToolTip.Tip="{StaticResource ToolTip_Diff_UndoBringIn}"/>
+                        ToolTip.Tip="{StaticResource ToolTip_Diff_UndoBringIn}"
+                        AutomationProperties.HelpText="{StaticResource ToolTip_Diff_UndoBringIn}"/>
                 <StackPanel>
                     <CheckBox x:Name="AutoPullCheck"
                               Content="{StaticResource Diff_AutoPullLabel}"
                               IsChecked="{Binding AutoPullDependencies, Mode=TwoWay}"
                               Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="11"
-                              ToolTip.Tip="{StaticResource ToolTip_Diff_AutoPull}"/>
+                              ToolTip.Tip="{StaticResource ToolTip_Diff_AutoPull}"
+                              AutomationProperties.HelpText="{StaticResource ToolTip_Diff_AutoPull}"/>
                     <TextBlock Text="{StaticResource Diff_Hint}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" VerticalAlignment="Center"/>
                 </StackPanel>
             </DockPanel>
@@ -95,7 +102,8 @@
                   Margin="0,6,0,0"
                   IsExpanded="False"
                   IsVisible="{Binding DanglingLinks.Count, Converter={StaticResource CountToVis}}"
-                  ToolTip.Tip="{StaticResource ToolTip_Diff_DanglingPanel}">
+                  ToolTip.Tip="{StaticResource ToolTip_Diff_DanglingPanel}"
+                  AutomationProperties.HelpText="{StaticResource ToolTip_Diff_DanglingPanel}">
             <Expander.Header>
                 <TextBlock Text="{Binding DanglingLinks.Count, StringFormat={StaticResource Diff_DanglingWarning}}"
                            Foreground="{DynamicResource Brush.Text.Status.Changed}" FontSize="11"/>
@@ -137,23 +145,27 @@
                              ItemsSource="{Binding Groups}"
                              SelectedItem="{Binding SelectedGroup, Mode=TwoWay}"
                              Background="Transparent"
-                             ToolTip.Tip="{StaticResource ToolTip_DiffChangedList}">
+                             ToolTip.Tip="{StaticResource ToolTip_DiffChangedList}"
+                             AutomationProperties.HelpText="{StaticResource ToolTip_DiffChangedList}">
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type vm:ConversationChangeViewModel}">
                                 <StackPanel Orientation="Vertical" Margin="2,2">
                                     <StackPanel Orientation="Horizontal">
                                         <CheckBox IsChecked="{Binding IsAllSelected, Mode=TwoWay}" IsThreeState="True"
-                                                  ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"/>
+                                                  ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"
+                                                  AutomationProperties.HelpText="{StaticResource ToolTip_Diff_BringIn}"/>
                                         <ToggleButton Content="{Binding Name}" IsChecked="{Binding IsExpanded, Mode=TwoWay}"
                                                       Background="Transparent" Foreground="{DynamicResource Brush.Text.Emphasis}" BorderThickness="0" Padding="4,0"
-                                                      ToolTip.Tip="{StaticResource ToolTip_Diff_ExpandConversation}"/>
+                                                      ToolTip.Tip="{StaticResource ToolTip_Diff_ExpandConversation}"
+                                                      AutomationProperties.HelpText="{StaticResource ToolTip_Diff_ExpandConversation}"/>
                                     </StackPanel>
                                     <ItemsControl ItemsSource="{Binding Nodes}" IsVisible="{Binding IsExpanded}" Margin="20,0,0,0">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate DataType="{x:Type vm:NodeChangeViewModel}">
                                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                                     <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                                              ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"/>
+                                                              ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"
+                                                              AutomationProperties.HelpText="{StaticResource ToolTip_Diff_BringIn}"/>
                                                     <Border Width="9" Height="9" VerticalAlignment="Center"
                                                             Background="{Binding Kind, Converter={StaticResource DiffStatusToBrushConverter}}"/>
                                                     <TextBlock Text="{Binding NodeId, StringFormat={StaticResource Diff_NodeLine}}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="11" VerticalAlignment="Center"/>
@@ -175,10 +187,12 @@
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,6">
                     <RadioButton GroupName="CanvasMode" Content="{StaticResource Diff_ViewChanges}"
                                  IsChecked="{Binding CanvasMode, Converter={StaticResource EnumToBool}, ConverterParameter=Changes, Mode=TwoWay}"
-                                 ToolTip.Tip="{StaticResource ToolTip_Diff_ViewToggle}"/>
+                                 ToolTip.Tip="{StaticResource ToolTip_Diff_ViewToggle}"
+                                 AutomationProperties.HelpText="{StaticResource ToolTip_Diff_ViewToggle}"/>
                     <RadioButton GroupName="CanvasMode" Content="{StaticResource Diff_ViewPreview}"
                                  IsChecked="{Binding CanvasMode, Converter={StaticResource EnumToBool}, ConverterParameter=AppliedPreview, Mode=TwoWay}"
-                                 ToolTip.Tip="{StaticResource ToolTip_Diff_ViewToggle}"/>
+                                 ToolTip.Tip="{StaticResource ToolTip_Diff_ViewToggle}"
+                                 AutomationProperties.HelpText="{StaticResource ToolTip_Diff_ViewToggle}"/>
                     <Border Width="10" Height="10" Background="{DynamicResource Brush.Text.Status.Added}" VerticalAlignment="Center"/>
                     <TextBlock Text="{StaticResource Diff_LegendAdded}" Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="10" VerticalAlignment="Center"/>
                     <Border Width="10" Height="10" Background="{DynamicResource Brush.Text.Status.Changed}" VerticalAlignment="Center"/>
@@ -186,7 +200,8 @@
                     <Border Width="10" Height="10" Background="{DynamicResource Brush.Text.Status.Removed}" VerticalAlignment="Center"/>
                     <TextBlock Text="{StaticResource Diff_LegendRemoved}" Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="10" VerticalAlignment="Center"/>
                     <Button Content="{StaticResource Diff_HelpButton}" Click="Help_Click"
-                            ToolTip.Tip="{StaticResource ToolTip_Diff_Help}"/>
+                            ToolTip.Tip="{StaticResource ToolTip_Diff_Help}"
+                            AutomationProperties.HelpText="{StaticResource ToolTip_Diff_Help}"/>
                 </StackPanel>
 
                 <!-- ── Before/after detail panel (per changed language) ── -->

@@ -47,11 +47,13 @@
             <Button x:Name="CancelButton"
                     Content="{StaticResource ConflictDialog_Cancel}"
                     ToolTip.Tip="{StaticResource ConflictDialog_CancelTooltip}"
+                    AutomationProperties.HelpText="{StaticResource ConflictDialog_CancelTooltip}"
                     Background="{DynamicResource Brush.Surface.Header}" Foreground="White" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
             <Button x:Name="ForceButton"
                     Content="{StaticResource ConflictDialog_Force}"
                     ToolTip.Tip="{StaticResource ConflictDialog_ForceTooltip}"
+                    AutomationProperties.HelpText="{StaticResource ConflictDialog_ForceTooltip}"
                     Background="{DynamicResource Brush.Button.Caution.Background}" Foreground="White" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
         </StackPanel>

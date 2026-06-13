@@ -62,6 +62,7 @@
                                      Content="{Binding MineLabel}"
                                      IsChecked="{Binding IsMineChosen, Mode=TwoWay}"
                                      ToolTip.Tip="{StaticResource GitConflictWindow_MineTooltip}"
+                                     AutomationProperties.HelpText="{StaticResource GitConflictWindow_MineTooltip}"
                                      Foreground="{DynamicResource Brush.Text.Primary}"/>
                     </StackPanel>
                 </Border>
@@ -85,6 +86,7 @@
                                      Content="{Binding TheirsLabel}"
                                      IsChecked="{Binding IsTheirsChosen, Mode=TwoWay}"
                                      ToolTip.Tip="{StaticResource GitConflictWindow_TheirsTooltip}"
+                                     AutomationProperties.HelpText="{StaticResource GitConflictWindow_TheirsTooltip}"
                                      Foreground="{DynamicResource Brush.Text.Primary}"/>
                     </StackPanel>
                 </Border>
@@ -97,12 +99,14 @@
             <Button x:Name="CancelButton"
                     Content="{StaticResource GitConflictWindow_Cancel}"
                     ToolTip.Tip="{StaticResource GitConflictWindow_CancelTooltip}"
+                    AutomationProperties.HelpText="{StaticResource GitConflictWindow_CancelTooltip}"
                     Background="{DynamicResource Brush.Surface.Header}" Foreground="White" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
             <Button x:Name="ApplyButton"
                     Content="{StaticResource GitConflictWindow_Apply}"
                     Command="{Binding ApplyCommand}"
                     ToolTip.Tip="{StaticResource GitConflictWindow_ApplyTooltip}"
+                    AutomationProperties.HelpText="{StaticResource GitConflictWindow_ApplyTooltip}"
                     Background="{DynamicResource Brush.Button.Confirm.Background}" Foreground="White" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
         </StackPanel>
