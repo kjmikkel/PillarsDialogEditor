@@ -68,9 +68,9 @@ public class PaletteContrastTests
         ("Palette.Line.Default", "Palette.Neutral.145"), // on Surface.Panel
         ("Palette.Line.Strong",  "Palette.Neutral.115"),
         // The pane GridSplitters (Brush.Border.Default) border the canvas backdrop on their
-        // canvas side (Brush.Accent.Badge → Palette.Mauve.500), not just the dark panels — so
-        // the divider must stay visible against the canvas too, or it vanishes into it.
-        ("Palette.Line.Default", "Palette.Mauve.500"),   // GridSplitter on the canvas backdrop
+        // canvas side (Brush.Canvas.Background → Palette.Neutral.520), not just the dark panels —
+        // so the divider must stay visible against the canvas too, or it vanishes into it.
+        ("Palette.Line.Default", "Palette.Neutral.520"), // GridSplitter on the canvas backdrop
     };
 
     // A highlighted connection (Brush.Connection.Highlighted = Palette.White) must stand out

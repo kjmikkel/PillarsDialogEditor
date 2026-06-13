@@ -63,7 +63,7 @@ public class TokenRegistryTests
         "Brush.Connection.Default","Brush.Connection.Always","Brush.Connection.Never",
         "Brush.Connection.Highlighted","Brush.Connection.Highlighted.Always","Brush.Connection.Highlighted.Never",
         "Brush.Text.Link","Brush.Text.Link.Subtle","Brush.Text.Info","Brush.Text.Highlight",
-        "Brush.Accent.Badge",
+        "Brush.Canvas.Background",
         "Brush.Text.Status.New","Brush.Text.Status.Added","Brush.Text.Status.Changed",
         "Brush.Text.Status.Removed","Brush.Text.Status.Success","Brush.Text.Status.Error",
         "Brush.Text.Status.Pending","Brush.Text.Meta.Commit",
