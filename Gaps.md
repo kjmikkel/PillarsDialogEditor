@@ -261,14 +261,20 @@ after the cheap wins. The rest are independent and can land in any order.
    future `FocusAdorner` override or Avalonia default change fails the build instead of
    silently blinding keyboard users.
 
-4. **Canvas is mouse-only (the big design task).** `MainWindow.axaml.cs` wires Delete and
-   global shortcuts, but there is no keyboard way to move focus between nodes, follow a
-   connection, move a node, start/complete a connection, or invoke the node context menu.
-   A keyboard-first or motor-impaired user can browse conversations but cannot edit the
-   graph. Minimal first slice: arrow keys traverse the selected node's connections,
-   Ctrl+arrows nudge the node, Enter focuses the detail panel, Menu key opens the context
-   menu. Full treatment (keyboard connection creation, focus ring on the canvas node)
-   needs a design pass — do after items 1–3.
+4. **Canvas keyboard editing. ✅ IMPLEMENTED (navigate + edit structure, 2026-06-12).**
+   The canvas is keyboard-operable: arrows traverse the conversation topologically
+   (→ child / ← parent, nearest-by-Y; ↑↓ siblings in visual order), PgUp/PgDn cycle
+   every node (orphan coverage), Home selects the root, Ctrl(+Shift)+arrows nudge the
+   selected node (drag-move semantics, gated on IsEditable), Enter focuses the detail
+   panel, Menu key / Shift+F10 opens the node context menu, Escape deselects; canvas
+   focus restores the last selection (root on first focus) and the viewport follows
+   every move. Pure logic in `CanvasNavigationService` + `ConversationViewModel`
+   (unit-tested); thin KeyDown glue in `ConversationView` (headless-tested); key map
+   documented in plain language in the Legend window (localized). Design:
+   `docs/superpowers/specs/2026-06-12-canvas-keyboard-editing-design.md`.
+   **Deferred follow-up:** keyboard *connection creation* ("connect mode" — pick
+   source, pick target, confirm) remains mouse-only; it needs its own interaction
+   design pass.
 
 5. **Tooltips are the sole explanation channel, and tooltips are hover-only.** Keyboard
    and screen-reader users never reach them. Mirror tooltip text into
