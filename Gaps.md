@@ -298,10 +298,16 @@ after the cheap wins. The rest are independent and can land in any order.
    the Layer 2.5 principle shipped elsewhere. A glyph or font-weight change alongside the
    colour would align it.
 
-8. **Status bar feedback is never announced.** `StatusText` (`MainWindow.axaml`) is the
-   sole feedback for many operations, rendered as 11px muted text, and screen readers
-   won't announce changes. Avalonia supports `AutomationProperties.LiveSetting` — mark the
-   status `TextBlock` as a polite live region so save/error results are spoken.
+8. **Status bar feedback is never announced. ✅ IMPLEMENTED (2026-06-13).** A
+   hidden `StatusLiveRegion` TextBlock in `MainWindow`'s status bar, bound only to
+   `StatusText` (not `DisplayStatusText`, so item 5's focus hints don't trigger
+   duplicate announcements when tabbing around) and marked
+   `AutomationProperties.LiveSetting="Polite"`, announces every operation result
+   (save/error/project-opened/etc.) to screen readers. A headless probe confirmed
+   `TextBlockAutomationPeer.GetName()` mirrors `Text` and automatically raises a
+   `PropertyChanged` notification on change — purely declarative, no manual
+   `RaisePropertyChangedEvent` call needed. Design:
+   `docs/superpowers/specs/2026-06-13-status-bar-live-region-design.md`.
 
 9. **Fake watermarks.** `ConversationView`'s SearchBox and `GameBrowserView`'s FilterBox
    simulate placeholders with overlay `TextBlock`s; the real `Watermark` property (already
