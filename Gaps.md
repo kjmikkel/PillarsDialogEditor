@@ -10,7 +10,7 @@
 ### ViewModel Test Coverage
 Significant coverage has been added: both `IGameDataProvider` implementations, `AutoLayoutService`, and several previously untested ViewModels (ConversationFolderViewModel, ConversationItemViewModel, PatchEntryViewModel, SettingsViewModel) now have tests. The remaining gaps are:
 
-- Views / Converters — mostly covered: all 14 converters have unit tests; `LanguageCodeDialog`, `LegendWindow`, `UnsavedChangesDialog`, `ConflictResolutionDialog`, and `ConversationNameDialog` have headless Avalonia integration tests. Remaining untested views (`MainWindow` wiring, `NodeDetailView` modal launchers, and the Nodify canvas controls) contain no testable logic beyond what is already covered at the ViewModel layer.
+- Views / Converters — mostly covered: all 13 converters have unit tests; `LanguageCodeDialog`, `LegendWindow`, `UnsavedChangesDialog`, `ConflictResolutionDialog`, and `ConversationNameDialog` have headless Avalonia integration tests. Remaining untested views (`MainWindow` wiring, `NodeDetailView` modal launchers, and the Nodify canvas controls) contain no testable logic beyond what is already covered at the ViewModel layer.
 
 ---
 
@@ -309,10 +309,17 @@ after the cheap wins. The rest are independent and can land in any order.
    `RaisePropertyChangedEvent` call needed. Design:
    `docs/superpowers/specs/2026-06-13-status-bar-live-region-design.md`.
 
-9. **Fake watermarks.** `ConversationView`'s SearchBox and `GameBrowserView`'s FilterBox
-   simulate placeholders with overlay `TextBlock`s; the real `Watermark` property (already
-   used in `NodeDetailView` and `SettingsWindow`) is exposed to the accessibility tree and
-   handles focus/IME properly. Easy swap.
+9. **Fake watermarks. ✅ IMPLEMENTED (2026-06-13).** `ConversationView`'s SearchBox and
+   `GameBrowserView`'s FilterBox now use the real `TextBox.Watermark` property (the same
+   pattern already used in `NodeDetailView` and `SettingsWindow`) instead of an overlay
+   `TextBlock` shown via an `IsVisible`/`StringIsEmpty` binding — `Watermark` is exposed to
+   the accessibility tree and handles focus/IME properly, where the overlay was purely
+   decorative. `StringIsEmptyConverter` was removed (its registration and tests) as it had
+   no remaining uses. Enforced by `FakeWatermarkTests`
+   (`DialogEditor.Tests/Accessibility`), a solution-wide scan mirroring
+   `AutomationNameTests`/`AutomationHelpTextTests` that fails if any `TextBlock` simulates
+   a placeholder via an `IsVisible="{Binding ..., Converter={StaticResource
+   StringIsEmpty}}"`-style binding.
 
 10. **Hard-coded `Foreground="White"`.** Node titles and the diff badge glyph in
     `ConversationView.axaml`, plus the Resolve Conflicts button in `MainWindow.axaml`,
