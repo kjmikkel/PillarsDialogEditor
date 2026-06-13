@@ -332,7 +332,7 @@
         <!-- Status bar -->
         <Border Grid.Row="2" Background="{DynamicResource Brush.Surface.Card}" Padding="8,4">
             <Grid ColumnDefinitions="*,Auto">
-                <TextBlock Grid.Column="0" Text="{Binding StatusText}"
+                <TextBlock Grid.Column="0" Text="{Binding DisplayStatusText}"
                            Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" VerticalAlignment="Center"/>
                 <Button Grid.Column="1"
                         Content="{StaticResource MainWindow_ResolveConflictsButton}"
