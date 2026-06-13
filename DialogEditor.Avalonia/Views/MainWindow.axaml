@@ -332,6 +332,15 @@
         <!-- Status bar -->
         <Border Grid.Row="2" Background="{DynamicResource Brush.Surface.Card}" Padding="8,4">
             <Grid ColumnDefinitions="*,Auto">
+                <!-- Hidden polite live region: announces StatusText (save/error/
+                     operation results) to screen readers. Deliberately NOT bound to
+                     DisplayStatusText — item 5's focus hints are already announced
+                     by the normal focus-description mechanism, and re-announcing
+                     them here on every Tab/arrow-key move would be duplicate
+                     chatter. See Gaps.md a11y item 8. -->
+                <TextBlock x:Name="StatusLiveRegion" Grid.Column="0" Text="{Binding StatusText}"
+                           Width="0" Height="0" Opacity="0" IsHitTestVisible="False" ClipToBounds="True"
+                           AutomationProperties.LiveSetting="Polite"/>
                 <TextBlock Grid.Column="0" Text="{Binding DisplayStatusText}"
                            Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" VerticalAlignment="Center"/>
                 <Button Grid.Column="1"
