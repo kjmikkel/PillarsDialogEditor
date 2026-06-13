@@ -151,5 +151,5 @@
     <SolidColorBrush x:Key="Brush.Text.Link.Subtle"  Color="{StaticResource Palette.Sky.350}"/>
     <SolidColorBrush x:Key="Brush.Text.Info"         Color="{StaticResource Palette.Sky.450}"/>
     <SolidColorBrush x:Key="Brush.Text.Highlight"    Color="{StaticResource Palette.Amber.520}"/>
-    <SolidColorBrush x:Key="Brush.Accent.Badge"      Color="{StaticResource Palette.Mauve.500}"/>
+    <SolidColorBrush x:Key="Brush.Canvas.Background" Color="{StaticResource Palette.Neutral.520}"/>
 </ResourceDictionary>
