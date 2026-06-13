@@ -339,13 +339,19 @@ after the cheap wins. The rest are independent and can land in any order.
     Enforced solution-wide by `NoNamedColourForegroundTests`
     (`DialogEditor.Tests/Theming`), mirroring `NoStrayHexTests`'s scope/exclusions.
 
-11. **Theme doesn't follow the OS; small hit targets.** Two smaller items: (a)
-    `RequestedThemeVariant="Dark"` is fixed — detecting the OS high-contrast/dark
-    preference for the *default* palette (Layer 2's `AppSettings.Theme` still overrides)
-    would help users who've already configured their system; relatedly, Dark is
-    "grandfathered" out of `PaletteContrastTests` AA — bringing it to AA and removing the
-    exemption is a clean win. (b) Several hit targets (20px-wide ✕ clear buttons, slim
-    toolbar buttons) sit below the WCAG 2.5.8 24×24 minimum.
+11. **Theme doesn't follow the OS.** `RequestedThemeVariant="Dark"` is fixed —
+    detecting the OS high-contrast/dark preference for the *default* palette (Layer 2's
+    `AppSettings.Theme` still overrides) would help users who've already configured their
+    system; relatedly, Dark is "grandfathered" out of `PaletteContrastTests` AA — bringing
+    it to AA and removing the exemption is a clean win.
+
+    **(b) Small hit targets. ✅ IMPLEMENTED (2026-06-13).** The two 20px-wide ✕ clear
+    buttons (`ConversationView.axaml`'s search box, `GameBrowserView.axaml`'s filter box)
+    are now 24x24, meeting the WCAG 2.5.8 minimum. Enforced solution-wide by
+    `HitTargetSizeTests` (`DialogEditor.Tests/Accessibility`), which fails on any
+    `<Button>` with an explicit `Width`/`Height` below 24 — a scan confirmed these were
+    the only two offenders; "slim toolbar buttons" size via padding+content rather than
+    explicit dimensions, so were not flagged.
 
 12. **Info icons carry no tooltip/HelpText.** Item 5's sweep is scoped to *focusable*
     controls — static info icons (legend swatches, inline "i"/help glyphs rendered as

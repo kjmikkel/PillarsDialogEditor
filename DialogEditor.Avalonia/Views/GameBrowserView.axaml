@@ -20,7 +20,7 @@
                          AutomationProperties.HelpText="{StaticResource ToolTip_FilterConversations}"
                          AutomationProperties.Name="{StaticResource Placeholder_FilterConversations}"/>
                 <Button Command="{Binding ClearFilterCommand}"
-                        HorizontalAlignment="Right" Width="20"
+                        HorizontalAlignment="Right" Width="24" Height="24"
                         Content="✕" VerticalAlignment="Center"
                         Background="Transparent" BorderThickness="0"
                         Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10" Cursor="Hand"
