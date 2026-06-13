@@ -393,6 +393,19 @@ after the cheap wins. The rest are independent and can land in any order.
     render previews, a first-run flag in `AppSettings`, and whether it blocks the main
     window.
 
+16. **Focus-hint bar for small dialogs.** Split off from item 13, whose
+    `FocusHintBar` rollout is scoped to the 10 "workhorse" windows with many
+    controls (`SettingsWindow`, `ScriptEditorWindow`, `ConditionEditorWindow`,
+    `FindReplaceWindow`, `DiffWindow`, `BatchReplaceWindow`,
+    `ExportConversationsWindow`, `FlowAnalyticsWindow`, `BranchesWindow`,
+    `GitConflictResolutionWindow`). Seven small 1–3-control dialogs were left out:
+    `AboutWindow`, `BranchNameDialog`, `ChangelogWindow`, `CommitConsentDialog`,
+    `ConflictResolutionDialog`, `ForceDeleteDialog`, `HistoryWindow`. Their few
+    `HelpText` entries are mostly icon-only close/help buttons, where a hint bar
+    may be more clutter than value relative to these windows' small size — worth a
+    separate judgment call once item 13 has shipped and its UX can be assessed in
+    practice.
+
 ### UI Localisation Readiness (audit 2026-06-12)
 The localisation rule (no hard-coded user-visible text) has been followed, but the app
 cannot yet actually *switch language*. The good news from the audit: the architecture is
