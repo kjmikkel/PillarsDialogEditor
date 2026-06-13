@@ -47,11 +47,13 @@
                         DockPanel.Dock="Right"
                         Content="{StaticResource Settings_Browse}"
                         Command="{Binding BrowseBackupDirectoryCommand}"
-                        ToolTip.Tip="{StaticResource Settings_BackupDirectoryTooltip}"/>
+                        ToolTip.Tip="{StaticResource Settings_BackupDirectoryTooltip}"
+                        AutomationProperties.HelpText="{StaticResource Settings_BackupDirectoryTooltip}"/>
                 <TextBox Classes="path"
                          Text="{Binding BackupDirectory}"
                          Watermark="{StaticResource Settings_PathNotSet}"
                          ToolTip.Tip="{StaticResource Settings_BackupDirectoryTooltip}"
+                         AutomationProperties.HelpText="{StaticResource Settings_BackupDirectoryTooltip}"
                          AutomationProperties.Name="{StaticResource Settings_BackupDirectory}"/>
             </DockPanel>
 

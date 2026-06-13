@@ -79,6 +79,7 @@
                                             Background="Transparent" BorderThickness="0"
                                             Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="13" Padding="4"
                                             ToolTip.Tip="{StaticResource ToolTip_MoveScriptUp}"
+                                            AutomationProperties.HelpText="{StaticResource ToolTip_MoveScriptUp}"
                                             AutomationProperties.Name="{StaticResource AutomationName_MoveScriptUp}"/>
                                     <Button Grid.Column="2" Content="↓"
                                             Command="{Binding DataContext.MoveDownCommand,
@@ -87,6 +88,7 @@
                                             Background="Transparent" BorderThickness="0"
                                             Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="13" Padding="4"
                                             ToolTip.Tip="{StaticResource ToolTip_MoveScriptDown}"
+                                            AutomationProperties.HelpText="{StaticResource ToolTip_MoveScriptDown}"
                                             AutomationProperties.Name="{StaticResource AutomationName_MoveScriptDown}"/>
                                     <Button Grid.Column="3" Content="✕"
                                             Command="{Binding DataContext.DeleteRowCommand,
@@ -95,6 +97,7 @@
                                             Background="Transparent" BorderThickness="0"
                                             Foreground="{DynamicResource Brush.Severity.Error}" FontSize="13" Padding="4"
                                             ToolTip.Tip="{StaticResource ToolTip_DeleteScriptRow}"
+                                            AutomationProperties.HelpText="{StaticResource ToolTip_DeleteScriptRow}"
                                             AutomationProperties.Name="{StaticResource AutomationName_RemoveScript}"/>
                                 </Grid>
                                 <!-- Parameters -->
@@ -147,12 +150,14 @@
                              Background="{DynamicResource Brush.Surface.Input}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                              FontSize="11" Padding="6,4" MinWidth="0"
                              ToolTip.Tip="{StaticResource ToolTip_ScriptPicker}"
+                             AutomationProperties.HelpText="{StaticResource ToolTip_ScriptPicker}"
                              AutomationProperties.Name="{StaticResource Placeholder_ScriptPicker}"/>
                     <Button Grid.Column="1" Content="+ Add"
                             Command="{Binding AddEnterScriptCommand}"
                             Background="{DynamicResource Brush.Node.Script.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
                             Padding="12,4" Margin="6,0,0,0" FontSize="11"
-                            ToolTip.Tip="{StaticResource ToolTip_AddScriptEnter}"/>
+                            ToolTip.Tip="{StaticResource ToolTip_AddScriptEnter}"
+                            AutomationProperties.HelpText="{StaticResource ToolTip_AddScriptEnter}"/>
                 </Grid>
 
                 <!-- ON EXIT -->
@@ -170,12 +175,14 @@
                              Background="{DynamicResource Brush.Surface.Input}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                              FontSize="11" Padding="6,4" MinWidth="0"
                              ToolTip.Tip="{StaticResource ToolTip_ScriptPicker}"
+                             AutomationProperties.HelpText="{StaticResource ToolTip_ScriptPicker}"
                              AutomationProperties.Name="{StaticResource Placeholder_ScriptPicker}"/>
                     <Button Grid.Column="1" Content="+ Add"
                             Command="{Binding AddExitScriptCommand}"
                             Background="{DynamicResource Brush.Node.Script.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
                             Padding="12,4" Margin="6,0,0,0" FontSize="11"
-                            ToolTip.Tip="{StaticResource ToolTip_AddScriptExit}"/>
+                            ToolTip.Tip="{StaticResource ToolTip_AddScriptExit}"
+                            AutomationProperties.HelpText="{StaticResource ToolTip_AddScriptExit}"/>
                 </Grid>
 
                 <!-- ON UPDATE -->
@@ -193,12 +200,14 @@
                              Background="{DynamicResource Brush.Surface.Input}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                              FontSize="11" Padding="6,4" MinWidth="0"
                              ToolTip.Tip="{StaticResource ToolTip_ScriptPicker}"
+                             AutomationProperties.HelpText="{StaticResource ToolTip_ScriptPicker}"
                              AutomationProperties.Name="{StaticResource Placeholder_ScriptPicker}"/>
                     <Button Grid.Column="1" Content="+ Add"
                             Command="{Binding AddUpdateScriptCommand}"
                             Background="{DynamicResource Brush.Node.Script.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
                             Padding="12,4" Margin="6,0,0,0" FontSize="11"
-                            ToolTip.Tip="{StaticResource ToolTip_AddScriptUpdate}"/>
+                            ToolTip.Tip="{StaticResource ToolTip_AddScriptUpdate}"
+                            AutomationProperties.HelpText="{StaticResource ToolTip_AddScriptUpdate}"/>
                 </Grid>
 
             </StackPanel>
@@ -209,10 +218,12 @@
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
                 <Button Classes="footer-btn" Content="Cancel"
                         Command="{Binding CancelCommand}"
-                        ToolTip.Tip="{StaticResource ToolTip_ScriptEditorCancel}"/>
+                        ToolTip.Tip="{StaticResource ToolTip_ScriptEditorCancel}"
+                        AutomationProperties.HelpText="{StaticResource ToolTip_ScriptEditorCancel}"/>
                 <Button Classes="footer-btn primary" Content="OK"
                         Command="{Binding ConfirmCommand}"
-                        ToolTip.Tip="{StaticResource ToolTip_ScriptEditorOK}"/>
+                        ToolTip.Tip="{StaticResource ToolTip_ScriptEditorOK}"
+                        AutomationProperties.HelpText="{StaticResource ToolTip_ScriptEditorOK}"/>
             </StackPanel>
         </Border>
 

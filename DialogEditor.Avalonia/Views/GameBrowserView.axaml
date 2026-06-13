@@ -16,6 +16,7 @@
                          VerticalContentAlignment="Center"
                          KeyDown="FilterBox_KeyDown"
                          ToolTip.Tip="{StaticResource ToolTip_FilterConversations}"
+                         AutomationProperties.HelpText="{StaticResource ToolTip_FilterConversations}"
                          AutomationProperties.Name="{StaticResource Placeholder_FilterConversations}"/>
                 <TextBlock Text="{StaticResource Placeholder_FilterConversations}"
                            Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10"
@@ -27,6 +28,7 @@
                         Background="Transparent" BorderThickness="0"
                         Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10" Cursor="Hand"
                         ToolTip.Tip="{StaticResource ToolTip_ClearFilter}"
+                        AutomationProperties.HelpText="{StaticResource ToolTip_ClearFilter}"
                         AutomationProperties.Name="{StaticResource AutomationName_ClearFilter}"/>
             </Grid>
         </Border>

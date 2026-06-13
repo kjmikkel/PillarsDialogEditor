@@ -15,6 +15,7 @@
              FontSize="12" Padding="6,4"
              AcceptsReturn="False"
              ToolTip.Tip="{StaticResource BranchName_Label}"
+             AutomationProperties.HelpText="{StaticResource BranchName_Label}"
              AutomationProperties.Name="{StaticResource BranchName_Label}"/>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
       <Button x:Name="CancelButton"

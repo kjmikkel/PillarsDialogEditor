@@ -47,6 +47,7 @@
                      Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      x:Name="SearchBox"
                      ToolTip.Tip="{StaticResource ToolTip_FindAll}"
+                     AutomationProperties.HelpText="{StaticResource ToolTip_FindAll}"
                      AutomationProperties.Name="{StaticResource FindReplace_FindLabel}"/>
         </Grid>
 
@@ -57,6 +58,7 @@
             <TextBox Grid.Column="1" Classes="find-box"
                      Text="{Binding ReplaceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      ToolTip.Tip="{StaticResource ToolTip_ReplaceAll}"
+                     AutomationProperties.HelpText="{StaticResource ToolTip_ReplaceAll}"
                      AutomationProperties.Name="{StaticResource FindReplace_ReplaceLabel}"/>
         </Grid>
 
@@ -65,7 +67,8 @@
             <CheckBox IsChecked="{Binding CaseSensitive, Mode=TwoWay}"
                       Content="{StaticResource FindReplace_CaseSensitive}"
                       Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="11"
-                      ToolTip.Tip="{StaticResource ToolTip_CaseSensitive}"/>
+                      ToolTip.Tip="{StaticResource ToolTip_CaseSensitive}"
+                      AutomationProperties.HelpText="{StaticResource ToolTip_CaseSensitive}"/>
             <TextBlock Text="{Binding StatusText}"
                        Foreground="{DynamicResource Brush.Text.Muted}" FontSize="10"
                        VerticalAlignment="Center"/>
@@ -76,23 +79,28 @@
             <Button Classes="action-btn" Margin="0,0,4,4"
                     Content="{StaticResource FindReplace_FindAll}"
                     Command="{Binding FindCommand}"
-                    ToolTip.Tip="{StaticResource ToolTip_FindAll}"/>
+                    ToolTip.Tip="{StaticResource ToolTip_FindAll}"
+                    AutomationProperties.HelpText="{StaticResource ToolTip_FindAll}"/>
             <Button Classes="action-btn" Margin="0,0,4,4"
                     Content="{StaticResource FindReplace_FindPrev}"
                     Command="{Binding FindPrevCommand}"
-                    ToolTip.Tip="{StaticResource ToolTip_FindPrev}"/>
+                    ToolTip.Tip="{StaticResource ToolTip_FindPrev}"
+                    AutomationProperties.HelpText="{StaticResource ToolTip_FindPrev}"/>
             <Button Classes="action-btn" Margin="0,0,4,4"
                     Content="{StaticResource FindReplace_FindNext}"
                     Command="{Binding FindNextCommand}"
-                    ToolTip.Tip="{StaticResource ToolTip_FindNext}"/>
+                    ToolTip.Tip="{StaticResource ToolTip_FindNext}"
+                    AutomationProperties.HelpText="{StaticResource ToolTip_FindNext}"/>
             <Button Classes="action-btn" Margin="0,0,4,4"
                     Content="{StaticResource FindReplace_ReplaceOne}"
                     Command="{Binding ReplaceCommand}"
-                    ToolTip.Tip="{StaticResource ToolTip_Replace}"/>
+                    ToolTip.Tip="{StaticResource ToolTip_Replace}"
+                    AutomationProperties.HelpText="{StaticResource ToolTip_Replace}"/>
             <Button Classes="primary-btn" Margin="0,0,4,4"
                     Content="{StaticResource FindReplace_ReplaceAll}"
                     Command="{Binding ReplaceAllCommand}"
-                    ToolTip.Tip="{StaticResource ToolTip_ReplaceAll}"/>
+                    ToolTip.Tip="{StaticResource ToolTip_ReplaceAll}"
+                    AutomationProperties.HelpText="{StaticResource ToolTip_ReplaceAll}"/>
         </WrapPanel>
 
     </Grid>
