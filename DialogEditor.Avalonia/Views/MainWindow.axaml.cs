@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel;
 using Avalonia;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -106,6 +107,7 @@ public partial class MainWindow : Window
         };
 
         AddHandler(KeyDownEvent, OnKeyDownTunnel, RoutingStrategies.Tunnel);
+        this.AddHandler(GotFocusEvent, OnAnyGotFocus, RoutingStrategies.Bubble);
     }
 
     private void OnVmPropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -157,6 +159,17 @@ public partial class MainWindow : Window
             if (outsidePanel)
                 vm.IsBrowserExpanded = false;
         }
+    }
+
+    // Mirrors the focused control's AutomationProperties.HelpText (set by item 5's
+    // Part A sweep) into the view model so the status bar can show it — giving
+    // sighted keyboard users the same explanation screen readers announce on focus.
+    private void OnAnyGotFocus(object? sender, GotFocusEventArgs e)
+    {
+        var vm = (MainWindowViewModel)DataContext!;
+        vm.FocusHintText = e.Source is StyledElement el
+            ? AutomationProperties.GetHelpText(el) ?? string.Empty
+            : string.Empty;
     }
 
     private void OnKeyDownTunnel(object? sender, KeyEventArgs e)
