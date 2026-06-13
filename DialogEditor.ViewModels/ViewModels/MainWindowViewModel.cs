@@ -132,11 +132,9 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     // ── Status bar shows the focused control's hint when present ──────────
-    /// <summary>
     /// What the status bar TextBlock actually displays: the focused control's
     /// AutomationProperties.HelpText (set by MainWindow's GotFocus handler) when
     /// present, otherwise the last operation's StatusText.
-    /// </summary>
     public string DisplayStatusText =>
         string.IsNullOrEmpty(FocusHintText) ? StatusText : FocusHintText;
 
