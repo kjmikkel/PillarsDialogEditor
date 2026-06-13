@@ -36,8 +36,9 @@ public class PaletteContrastTests
         new("Severity.Info / Surface.Panel",    "Palette.Sky.450",   "Palette.Neutral.145", false),
     };
 
-    // Dark is exempt (grandfathered baseline, spec §5). Thresholds: {normalText, largeUI}.
+    // Thresholds: {normalText, largeUI}.
     [AvaloniaTheory]
+    [InlineData("Palette.Dark", 4.5, 3.0)]
     [InlineData("Palette.Light", 4.5, 3.0)]
     [InlineData("Palette.Colourblind", 4.5, 3.0)]
     [InlineData("Palette.HighContrast", 7.0, 4.5)]

@@ -377,12 +377,13 @@ after the cheap wins. The rest are independent and can land in any order.
     sighted-keyboard-user equivalent there. Worth a lightweight hint surface (e.g. a
     bottom hint bar) for dialogs once item 5's pattern proves out.
 
-14. **Dark palette isn't AA-checked.** Split off from item 11 — `PaletteContrastTests`
-    explicitly grandfathers `Palette.Dark` out of its AA checks (4.5:1 normal / 3.0:1
-    large-UI). A few pairs sit below that today (e.g. `Severity.Error` on
-    `Surface.Panel` ≈ 2.8:1). Bringing Dark to AA and removing the exemption is iterative
-    palette-value tuning, likely with a golden-snapshot regeneration
-    (`PaletteGoldenTests`) once values settle.
+14. **✅ IMPLEMENTED (2026-06-13).** Dark palette is now AA-checked. Split off from item
+    11 — `PaletteContrastTests` previously grandfathered `Palette.Dark` out of its AA
+    checks (4.5:1 normal / 3.0:1 large-UI). Of the 24 curated pairs, only `Severity.Error`
+    on `Surface.Panel` failed (2.82:1). Brightened `Palette.Dark`'s `Red.500` from
+    `#FFC0392B` to `#FFD33F2F` (3.30:1, same hue), added `Palette.Dark` to
+    `PaletteMeetsContrastTargets`'s `[InlineData]`, and regenerated
+    `palette-golden.approved.txt`.
 
 15. **No first-run theme-picker onboarding.** Raised during item 11(a)'s brainstorm: the
     now-common "Light / Dark / System" first-launch picker (with live previews) would let

@@ -62,7 +62,7 @@ Palette.Dark	Palette.Parchment.100	#FFF5F0D0
 Palette.Dark	Palette.Parchment.200	#FFE8E0B0
 Palette.Dark	Palette.Red.300	#FFFF9C9C
 Palette.Dark	Palette.Red.450	#FFE74C3C
-Palette.Dark	Palette.Red.500	#FFC0392B
+Palette.Dark	Palette.Red.500	#FFD33F2F
 Palette.Dark	Palette.Red.550	#FFE05555
 Palette.Dark	Palette.Sky.250	#FF9CDCFE
 Palette.Dark	Palette.Sky.300	#FF9CC4FF
