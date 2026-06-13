@@ -57,7 +57,9 @@
     <Color x:Key="Palette.Crimson.700">#FF7B241C</Color>
     <Color x:Key="Palette.Maroon.800">#FF7A2A2A</Color>
     <Color x:Key="Palette.Maroon.900">#FF3A1A1A</Color>
-    <Color x:Key="Palette.Red.500">#FFC0392B</Color>
+    <!-- Brightened from #FFC0392B (2.82:1 on Surface.Panel) to clear the 3.0:1 AA large-UI
+         target for Brush.Severity.Error; same hue, ~10% brighter (Gaps item 14). -->
+    <Color x:Key="Palette.Red.500">#FFD33F2F</Color>
     <Color x:Key="Palette.Red.450">#FFE74C3C</Color>
     <Color x:Key="Palette.Red.550">#FFE05555</Color>
     <Color x:Key="Palette.Red.300">#FFFF9C9C</Color>

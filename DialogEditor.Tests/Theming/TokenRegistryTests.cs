@@ -21,7 +21,7 @@ public class TokenRegistryTests
     [InlineData("Brush.Node.Bark.Footer",        0xFF, 0xe8, 0xd0, 0x80)]
     [InlineData("Brush.Diff.Added.Fill",         0xFF, 0x3a, 0x7a, 0x3a)]
     [InlineData("Brush.Diff.Changed.Fill",       0xFF, 0xc0, 0x8a, 0x2a)]
-    [InlineData("Brush.Severity.Error",          0xFF, 0xc0, 0x39, 0x2b)]
+    [InlineData("Brush.Severity.Error",          0xFF, 0xd3, 0x3f, 0x2f)]
     [InlineData("Brush.Toolbar.Button.Background",0xFF, 0x33, 0x33, 0x33)]
     [InlineData("Brush.Surface.Window",          0xFF, 0x1e, 0x1e, 0x1e)]
     [InlineData("Brush.Border.Default",          0xFF, 0x33, 0x33, 0x33)]
