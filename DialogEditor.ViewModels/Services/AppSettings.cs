@@ -39,9 +39,11 @@ public static class AppSettings
         public double? LegendX                       { get; set; }
         public double? LegendY                       { get; set; }
         public string DefaultLocalizationFormat      { get; set; } = "Csv";
-        // Layer 2 (runtime theming): the selected palette id (see ThemeApplier catalog).
-        // Default "Dark" matches the historical hardcoded RequestedThemeVariant="Dark".
-        public string Theme                          { get; set; } = "Dark";
+        // Layer 2 (runtime theming): the selected palette id (see ThemeApplier catalog), or
+        // "Auto" to follow the OS dark/light/high-contrast preference (resolved by
+        // ThemeApplier.DetectOsThemeId). "Auto" is the default for fresh installs; existing
+        // installs keep whatever they already had persisted (e.g. the historical "Dark").
+        public string Theme                          { get; set; } = "Auto";
     }
 
     public static string? LastLanguage

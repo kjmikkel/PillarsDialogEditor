@@ -108,9 +108,9 @@ public class AppSettingsThemeTests : IDisposable
     }
 
     [Fact]
-    public void Theme_DefaultsToDark()
+    public void Theme_DefaultsToAuto()
     {
-        Assert.Equal("Dark", AppSettings.Theme);
+        Assert.Equal("Auto", AppSettings.Theme);
     }
 
     [Fact]
