@@ -329,11 +329,15 @@ after the cheap wins. The rest are independent and can land in any order.
    a placeholder via an `IsVisible="{Binding ..., Converter={StaticResource
    StringIsEmpty}}"`-style binding.
 
-10. **Hard-coded `Foreground="White"`.** Node titles and the diff badge glyph in
-    `ConversationView.axaml`, plus the Resolve Conflicts button in `MainWindow.axaml`,
-    bypass the palette system (named brushes evade `NoStrayHexTests`' hex check), so
-    High-Contrast cannot adjust them. Tokenise (e.g. `Brush.Text.OnAccent`), and consider
-    teaching `NoStrayHexTests` to also reject named-colour literals.
+10. **Hard-coded `Foreground="White"`. ✅ IMPLEMENTED (2026-06-13).** All 24
+    occurrences across 14 views (node titles and the diff badge glyph in
+    `ConversationView.axaml`, the Resolve Conflicts button in `MainWindow.axaml`, dialog
+    header bars and primary/confirm/caution/destructive buttons, the flow-analytics
+    severity glyph, and the test-mode overlay) now bind `{DynamicResource
+    Brush.Text.OnAccent}` instead of the literal `"White"` — same value
+    (`Palette.White` = `#FFFFFFFF` in every palette today) but now retintable per-theme.
+    Enforced solution-wide by `NoNamedColourForegroundTests`
+    (`DialogEditor.Tests/Theming`), mirroring `NoStrayHexTests`'s scope/exclusions.
 
 11. **Theme doesn't follow the OS; small hit targets.** Two smaller items: (a)
     `RequestedThemeVariant="Dark"` is fixed — detecting the OS high-contrast/dark

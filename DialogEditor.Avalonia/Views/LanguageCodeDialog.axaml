@@ -33,7 +33,7 @@
             <Button x:Name="OkButton"
                     Content="OK"
                     IsDefault="True"
-                    Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,5"
                     Click="OkButton_Click"/>
         </StackPanel>

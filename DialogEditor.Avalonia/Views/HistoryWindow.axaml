@@ -45,11 +45,11 @@
                     Command="{Binding CompareCommand}"
                     ToolTip.Tip="{StaticResource HistoryWindow_CompareTooltip}"
                     AutomationProperties.HelpText="{StaticResource HistoryWindow_CompareTooltip}"
-                    Background="{DynamicResource Brush.Button.Confirm.Background}" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Button.Confirm.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
             <Button x:Name="CloseButton"
                     Content="{StaticResource HistoryWindow_Close}"
-                    Background="{DynamicResource Brush.Surface.Header}" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
         </StackPanel>
 

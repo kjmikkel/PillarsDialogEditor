@@ -37,7 +37,7 @@
         <Button x:Name="OkButton"
                 Content="{StaticResource ImportWarnings_Ok}"
                 HorizontalAlignment="Right"
-                Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="White" BorderThickness="0"
+                Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                 Padding="20,6" FontSize="12"/>
 
     </StackPanel>
