@@ -33,7 +33,7 @@ Avalonia.Headless.XUnit (`[AvaloniaFact]`).
 **Files:**
 - Create: `DialogEditor.Tests/Accessibility/AutomationHelpTextTests.cs`
 
-- [ ] **Step 1: Create the test file**
+- [x] **Step 1: Create the test file**
 
 ```csharp
 using System.Xml;
@@ -116,7 +116,7 @@ public class AutomationHelpTextTests
 }
 ```
 
-- [ ] **Step 2: Run the test and capture the full offender list (RED)**
+- [x] **Step 2: Run the test and capture the full offender list (RED)**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~AutomationHelpTextTests"`
 
@@ -126,7 +126,7 @@ ToolTip.Tip={StaticResource X} but no AutomationProperties.HelpText` — this li
 `/tmp/helptext-offenders.txt` or similar) so Task 2 doesn't need to re-run the test
 to see it.
 
-- [ ] **Step 3: Commit the failing test**
+- [x] **Step 3: Commit the failing test**
 
 ```bash
 git add DialogEditor.Tests/Accessibility/AutomationHelpTextTests.cs
@@ -142,7 +142,7 @@ git commit -m "test(a11y): require AutomationProperties.HelpText to mirror ToolT
   views, ~40-50 elements — `Button`, `ToggleButton`, `CheckBox`, `RadioButton`,
   `TextBox`, `ComboBox`, etc.)
 
-- [ ] **Step 1: Apply the mechanical transformation**
+- [x] **Step 1: Apply the mechanical transformation**
 
 For **each** offender line of the form:
 
@@ -161,20 +161,20 @@ for the expected style).
 This is a pure copy of an existing attribute value to a new attribute name — no new
 resource strings are created, no values change, only the attribute is added.
 
-- [ ] **Step 2: Run the test again (GREEN)**
+- [x] **Step 2: Run the test again (GREEN)**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~AutomationHelpTextTests"`
 
 Expected: PASS (0 offenders). If any remain, repeat Step 1 for the remaining
 offenders — the assertion message always lists exactly what's left.
 
-- [ ] **Step 3: Run the full suite to confirm no regressions**
+- [x] **Step 3: Run the full suite to confirm no regressions**
 
 Run: `dotnet test DialogEditor.Tests`
 
 Expected: PASS, same total test count as before Task 1 plus the one new test.
 
-- [ ] **Step 4: Commit the sweep**
+- [x] **Step 4: Commit the sweep**
 
 ```bash
 git add -A
