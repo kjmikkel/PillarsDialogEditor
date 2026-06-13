@@ -37,7 +37,8 @@
                         Background="{DynamicResource Brush.Severity.Error}" Foreground="White"
                         BorderThickness="0"
                         Padding="24,8" FontSize="13"
-                        ToolTip.Tip="{StaticResource ToolTip_TestMode_Restore}"/>
+                        ToolTip.Tip="{StaticResource ToolTip_TestMode_Restore}"
+                        AutomationProperties.HelpText="{StaticResource ToolTip_TestMode_Restore}"/>
 
             </StackPanel>
         </Border>

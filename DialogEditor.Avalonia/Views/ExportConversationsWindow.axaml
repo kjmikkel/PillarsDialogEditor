@@ -22,7 +22,8 @@
                         Background="Transparent"
                         BorderThickness="0"
                         Foreground="{DynamicResource Brush.Text.Link}"
-                        ToolTip.Tip="{StaticResource ToolTip_ExportConversations_SelectAll}"/>
+                        ToolTip.Tip="{StaticResource ToolTip_ExportConversations_SelectAll}"
+                        AutomationProperties.HelpText="{StaticResource ToolTip_ExportConversations_SelectAll}"/>
                 <TextBlock Text=" / " Foreground="{DynamicResource Brush.Text.Muted}" VerticalAlignment="Center"/>
                 <Button x:Name="SelectNoneButton"
                         Content="{StaticResource ExportConversations_SelectNone}"
@@ -31,7 +32,8 @@
                         Background="Transparent"
                         BorderThickness="0"
                         Foreground="{DynamicResource Brush.Text.Link}"
-                        ToolTip.Tip="{StaticResource ToolTip_ExportConversations_SelectNone}"/>
+                        ToolTip.Tip="{StaticResource ToolTip_ExportConversations_SelectNone}"
+                        AutomationProperties.HelpText="{StaticResource ToolTip_ExportConversations_SelectNone}"/>
             </StackPanel>
             <Border Height="200" BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1" CornerRadius="4">
                 <ScrollViewer>
@@ -67,6 +69,7 @@
                     Content="{StaticResource ExportConversations_Export}"
                     Command="{Binding ExportCommand}"
                     ToolTip.Tip="{StaticResource ToolTip_ExportConversations_Export}"
+                    AutomationProperties.HelpText="{StaticResource ToolTip_ExportConversations_Export}"
                     MinWidth="80"/>
             <Button Grid.Column="3"
                     x:Name="CloseButton"
@@ -87,7 +90,8 @@
                              ConverterParameter=csv, Mode=TwoWay}"
                          Checked="FormatRadio_Checked"
                          Tag="csv"
-                         ToolTip.Tip="{StaticResource ToolTip_ExportConversations_Csv}"/>
+                         ToolTip.Tip="{StaticResource ToolTip_ExportConversations_Csv}"
+                         AutomationProperties.HelpText="{StaticResource ToolTip_ExportConversations_Csv}"/>
             <RadioButton Content="JSON"
                          GroupName="Format"
                          IsChecked="{Binding SelectedFormat,
@@ -95,7 +99,8 @@
                              ConverterParameter=json, Mode=TwoWay}"
                          Checked="FormatRadio_Checked"
                          Tag="json"
-                         ToolTip.Tip="{StaticResource ToolTip_ExportConversations_Json}"/>
+                         ToolTip.Tip="{StaticResource ToolTip_ExportConversations_Json}"
+                         AutomationProperties.HelpText="{StaticResource ToolTip_ExportConversations_Json}"/>
             <RadioButton Content="Yarn Spinner"
                          GroupName="Format"
                          IsChecked="{Binding SelectedFormat,
@@ -103,12 +108,14 @@
                              ConverterParameter=yarn, Mode=TwoWay}"
                          Checked="FormatRadio_Checked"
                          Tag="yarn"
-                         ToolTip.Tip="{StaticResource ToolTip_ExportConversations_Yarn}"/>
+                         ToolTip.Tip="{StaticResource ToolTip_ExportConversations_Yarn}"
+                         AutomationProperties.HelpText="{StaticResource ToolTip_ExportConversations_Yarn}"/>
             <RadioButton x:Name="ArticyRadioButton"
                          Content="Articy Draft XML"
                          GroupName="Format"
                          IsEnabled="False"
-                         ToolTip.Tip="{StaticResource ExportConversations_ArticyNote}"/>
+                         ToolTip.Tip="{StaticResource ExportConversations_ArticyNote}"
+                         AutomationProperties.HelpText="{StaticResource ExportConversations_ArticyNote}"/>
         </StackPanel>
 
     </DockPanel>

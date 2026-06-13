@@ -54,12 +54,15 @@
                 <TextBlock Classes="label" Text="{StaticResource BatchReplace_Find}"/>
                 <TextBox Grid.Column="1" Classes="find-box" Name="SearchBox"
                          Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         ToolTip.Tip="{StaticResource ToolTip_BatchReplace_Find}"/>
+                         ToolTip.Tip="{StaticResource ToolTip_BatchReplace_Find}"
+                         AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_Find}"
+                         AutomationProperties.Name="{StaticResource BatchReplace_Find}"/>
                 <CheckBox Grid.Column="2" Margin="10,0,0,0"
                           IsChecked="{Binding CaseSensitive, Mode=TwoWay}"
                           Content="{StaticResource BatchReplace_CaseSensitive}"
                           Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="11"
-                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_CaseSensitive}"/>
+                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_CaseSensitive}"
+                          AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_CaseSensitive}"/>
             </Grid>
 
             <!-- Replace row -->
@@ -67,7 +70,9 @@
                 <TextBlock Classes="label" Text="{StaticResource BatchReplace_Replace}"/>
                 <TextBox Grid.Column="1" Classes="find-box"
                          Text="{Binding ReplaceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         ToolTip.Tip="{StaticResource ToolTip_BatchReplace_Replace}"/>
+                         ToolTip.Tip="{StaticResource ToolTip_BatchReplace_Replace}"
+                         AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_Replace}"
+                         AutomationProperties.Name="{StaticResource BatchReplace_Replace}"/>
             </Grid>
 
             <!-- Search-in toggles -->
@@ -78,23 +83,28 @@
                 <CheckBox IsChecked="{Binding InNodeText, Mode=TwoWay}"
                           Content="{StaticResource BatchReplace_InNodeText}"
                           Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="11" Margin="0,0,10,0"
-                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InNodeText}"/>
+                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InNodeText}"
+                          AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_InNodeText}"/>
                 <CheckBox IsChecked="{Binding InSpeakerGuids, Mode=TwoWay}"
                           Content="{StaticResource BatchReplace_InSpeakerGuids}"
                           Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="11" Margin="0,0,10,0"
-                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InSpeakerGuids}"/>
+                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InSpeakerGuids}"
+                          AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_InSpeakerGuids}"/>
                 <CheckBox IsChecked="{Binding InScriptParams, Mode=TwoWay}"
                           Content="{StaticResource BatchReplace_InScriptParams}"
                           Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="11" Margin="0,0,10,0"
-                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InScriptParams}"/>
+                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InScriptParams}"
+                          AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_InScriptParams}"/>
                 <CheckBox IsChecked="{Binding InConditionParams, Mode=TwoWay}"
                           Content="{StaticResource BatchReplace_InConditionParams}"
                           Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="11" Margin="0,0,10,0"
-                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InConditionParams}"/>
+                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InConditionParams}"
+                          AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_InConditionParams}"/>
                 <CheckBox IsChecked="{Binding InLinkChoiceText, Mode=TwoWay}"
                           Content="{StaticResource BatchReplace_InLinkChoiceText}"
                           Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="11"
-                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InLinkChoiceText}"/>
+                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InLinkChoiceText}"
+                          AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_InLinkChoiceText}"/>
             </WrapPanel>
 
             <!-- Action buttons -->
@@ -102,11 +112,13 @@
                 <Button Classes="action-btn"
                         Content="{StaticResource BatchReplace_Preview}"
                         Command="{Binding PreviewCommand}"
-                        ToolTip.Tip="{StaticResource ToolTip_BatchReplace_Preview}"/>
+                        ToolTip.Tip="{StaticResource ToolTip_BatchReplace_Preview}"
+                        AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_Preview}"/>
                 <Button Classes="primary-btn"
                         Content="{StaticResource BatchReplace_Apply}"
                         Command="{Binding ApplyCommand}"
-                        ToolTip.Tip="{StaticResource ToolTip_BatchReplace_Apply}"/>
+                        ToolTip.Tip="{StaticResource ToolTip_BatchReplace_Apply}"
+                        AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_Apply}"/>
             </StackPanel>
 
             <Separator Background="{DynamicResource Brush.Border.Default}" Height="1"/>
@@ -126,7 +138,8 @@
                                     <CheckBox Grid.Column="0"
                                               IsChecked="{Binding IsSelected, Mode=TwoWay}"
                                               VerticalAlignment="Center"
-                                              ToolTip.Tip="{StaticResource ToolTip_BatchReplace_ConvCheckbox}"/>
+                                              ToolTip.Tip="{StaticResource ToolTip_BatchReplace_ConvCheckbox}"
+                                              AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_ConvCheckbox}"/>
                                     <TextBlock Grid.Column="1"
                                                Text="{Binding Name}"
                                                Foreground="{DynamicResource Brush.Text.Primary}" FontSize="13"

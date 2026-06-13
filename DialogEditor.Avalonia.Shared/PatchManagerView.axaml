@@ -47,12 +47,15 @@
             <TextBox Grid.Column="0" Classes="path-box"
                      Text="{Binding GameFolder}"
                      Watermark="{StaticResource PatchManager_GameFolderWatermark}"
-                     ToolTip.Tip="{StaticResource ToolTip_BrowseGameFolder}"/>
+                     ToolTip.Tip="{StaticResource ToolTip_BrowseGameFolder}"
+                     AutomationProperties.HelpText="{StaticResource ToolTip_BrowseGameFolder}"
+                     AutomationProperties.Name="{StaticResource PatchManager_GameFolder}"/>
             <Button Grid.Column="1" Classes="action-btn"
                     Content="{StaticResource PatchManager_BrowseGame}"
                     Command="{Binding BrowseGameFolderCommand}"
                     Margin="6,0,0,0"
-                    ToolTip.Tip="{StaticResource ToolTip_BrowseGameFolder}"/>
+                    ToolTip.Tip="{StaticResource ToolTip_BrowseGameFolder}"
+                    AutomationProperties.HelpText="{StaticResource ToolTip_BrowseGameFolder}"/>
         </Grid>
 
         <!-- ── Load Order ──────────────────────────────────────────── -->
@@ -66,15 +69,18 @@
                     <Button Classes="action-btn"
                             Content="{StaticResource PatchManager_SaveLoadOrder}"
                             Command="{Binding SaveLoadOrderCommand}"
-                            ToolTip.Tip="{StaticResource ToolTip_SaveLoadOrder}"/>
+                            ToolTip.Tip="{StaticResource ToolTip_SaveLoadOrder}"
+                            AutomationProperties.HelpText="{StaticResource ToolTip_SaveLoadOrder}"/>
                     <Button Classes="action-btn"
                             Content="{StaticResource PatchManager_LoadLoadOrder}"
                             Command="{Binding LoadLoadOrderCommand}"
-                            ToolTip.Tip="{StaticResource ToolTip_LoadLoadOrder}"/>
+                            ToolTip.Tip="{StaticResource ToolTip_LoadLoadOrder}"
+                            AutomationProperties.HelpText="{StaticResource ToolTip_LoadLoadOrder}"/>
                     <Button Classes="action-btn"
                             Content="{StaticResource PatchManager_AddProjects}"
                             Command="{Binding AddEntriesCommand}"
-                            ToolTip.Tip="{StaticResource ToolTip_AddProjects}"/>
+                            ToolTip.Tip="{StaticResource ToolTip_AddProjects}"
+                            AutomationProperties.HelpText="{StaticResource ToolTip_AddProjects}"/>
                 </StackPanel>
             </DockPanel>
 
@@ -113,21 +119,27 @@
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="13" Padding="4"
-                                                ToolTip.Tip="{StaticResource ToolTip_MoveEntryUp}"/>
+                                                ToolTip.Tip="{StaticResource ToolTip_MoveEntryUp}"
+                                                AutomationProperties.HelpText="{StaticResource ToolTip_MoveEntryUp}"
+                                                AutomationProperties.Name="{StaticResource AutomationName_MovePatchUp}"/>
                                         <Button Grid.Column="2" Content="↓"
                                                 Command="{Binding DataContext.MoveDownCommand,
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="13" Padding="4"
-                                                ToolTip.Tip="{StaticResource ToolTip_MoveEntryDown}"/>
+                                                ToolTip.Tip="{StaticResource ToolTip_MoveEntryDown}"
+                                                AutomationProperties.HelpText="{StaticResource ToolTip_MoveEntryDown}"
+                                                AutomationProperties.Name="{StaticResource AutomationName_MovePatchDown}"/>
                                         <Button Grid.Column="3" Content="✕"
                                                 Command="{Binding DataContext.RemoveEntryCommand,
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Foreground="{DynamicResource Brush.Severity.Error}" FontSize="13" Padding="4"
-                                                ToolTip.Tip="{StaticResource ToolTip_RemoveEntry}"/>
+                                                ToolTip.Tip="{StaticResource ToolTip_RemoveEntry}"
+                                                AutomationProperties.HelpText="{StaticResource ToolTip_RemoveEntry}"
+                                                AutomationProperties.Name="{StaticResource AutomationName_RemovePatch}"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
@@ -185,7 +197,8 @@
                     Content="{StaticResource PatchManager_Apply}"
                     Command="{Binding ApplyCommand}"
                     IsVisible="{Binding IsApplying, Converter={StaticResource InverseBoolToVis}}"
-                    ToolTip.Tip="{StaticResource ToolTip_ApplyPatches}"/>
+                    ToolTip.Tip="{StaticResource ToolTip_ApplyPatches}"
+                    AutomationProperties.HelpText="{StaticResource ToolTip_ApplyPatches}"/>
             <Button Grid.Column="1" Classes="primary-btn"
                     Content="{StaticResource PatchManager_Applying}"
                     IsEnabled="False"

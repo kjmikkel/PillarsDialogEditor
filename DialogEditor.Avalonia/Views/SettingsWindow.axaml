@@ -47,18 +47,22 @@
                         DockPanel.Dock="Right"
                         Content="{StaticResource Settings_Browse}"
                         Command="{Binding BrowseBackupDirectoryCommand}"
-                        ToolTip.Tip="{StaticResource Settings_BackupDirectoryTooltip}"/>
+                        ToolTip.Tip="{StaticResource Settings_BackupDirectoryTooltip}"
+                        AutomationProperties.HelpText="{StaticResource Settings_BackupDirectoryTooltip}"/>
                 <TextBox Classes="path"
                          Text="{Binding BackupDirectory}"
                          Watermark="{StaticResource Settings_PathNotSet}"
-                         ToolTip.Tip="{StaticResource Settings_BackupDirectoryTooltip}"/>
+                         ToolTip.Tip="{StaticResource Settings_BackupDirectoryTooltip}"
+                         AutomationProperties.HelpText="{StaticResource Settings_BackupDirectoryTooltip}"
+                         AutomationProperties.Name="{StaticResource Settings_BackupDirectory}"/>
             </DockPanel>
 
             <!-- Default localization format -->
             <DockPanel>
                 <TextBlock Classes="label" Text="{StaticResource Settings_LocalizationFormat}"/>
                 <ComboBox SelectedItem="{Binding LocalizationFormat, Mode=TwoWay}"
-                          MinWidth="120">
+                          MinWidth="120"
+                          AutomationProperties.Name="{StaticResource Settings_LocalizationFormat}">
                     <ComboBoxItem Content="Csv"/>
                     <ComboBoxItem Content="Json"/>
                     <ComboBoxItem Content="Xliff"/>

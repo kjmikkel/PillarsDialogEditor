@@ -207,6 +207,191 @@ same `Brush.*` keys in both apps. E.g. the **Canvas Annotations** gap draws regi
 correctly across the whole solution with the single Dark set that exists today — never blocked
 on, nor made wrong by, an upper layer that doesn't exist.
 
+### Accessibility — Assistive Technology & Keyboard (audit 2026-06-12)
+The project has invested heavily in **visual** accessibility — the Layer 1 palette sets
+(High-Contrast, Colourblind), `PaletteContrastTests` enforcing WCAG AA/AAA, the Layer 2.5
+non-colour encoding work, and the mandatory-tooltip rule — but **assistive-technology and
+keyboard accessibility are essentially absent**: there are zero `AutomationProperties` in
+the entire codebase, custom-templated controls have no focus visuals, and the canvas is
+mouse-only. The items below are ordered by the suggested tackle order (cheap, high-leverage
+fixes first; the canvas keyboard-editing design task last among the big ones).
+
+Recommended order rationale: **1 → 2 → 3** first — automation names and focus rings are
+mechanical sweeps that unlock screen-reader/keyboard use of everything *outside* the canvas,
+and each fits the project's test-first style (a failing test asserting the invariant, then
+the sweep). Canvas keyboard editing (**4**) is the one genuine design task and should come
+after the cheap wins. The rest are independent and can land in any order.
+
+1. **Screen-reader names for icon-only buttons. ✅ IMPLEMENTED (2026-06-12).**
+   Icon-only buttons (⚙, ?, 📌, ⊞, ⊟, ⊕, ⌂, ✕, +, −, ↑, ↓, →, (?)) exposed only their
+   glyph as the accessible name — a screen reader read "circled plus, button". Avalonia
+   does **not** use `ToolTip.Tip` as a name fallback, so the mandated tooltips didn't
+   help. All 26 such buttons across 8 views (editor + shared PatchManagerView) now carry
+   `AutomationProperties.Name` bound to short localized `AutomationName_*` resources
+   (19 strings in `Strings.axaml`/`SharedStrings.axaml`; names deliberately *short* —
+   "Zoom in" — while the tooltip keeps the long explanation). Enforced structurally by
+   `AutomationNameTests` (`DialogEditor.Tests/Accessibility`), mirroring `NoStrayHexTests`:
+   any Button/ToggleButton whose Content is a literal glyph (no letters/digits) must have
+   an `AutomationProperties.Name` that is a `{StaticResource}`/`{DynamicResource}`
+   reference — a hard-coded English name also fails, keeping the localisation rule
+   structural. Remaining follow-up idea: extend the CLAUDE.md tooltip rule to mention the
+   paired `AutomationProperties.Name` on new controls (the test already enforces it).
+
+2. **Form-field label association. ✅ IMPLEMENTED (2026-06-12).** Field labels were
+   adjacent `TextBlock`s with no programmatic association — every input read as an
+   unlabeled "edit" to a screen reader. All 43 TextBox/ComboBox/AutoCompleteBox/
+   NumericUpDown controls across 18 views now carry `AutomationProperties.Name`:
+   static forms reuse the *adjacent label's existing resource key* (no string
+   duplication); template-generated per-row fields (script/condition parameter
+   editors) bind the name to the row's label data (`{Binding Name}`); label-less
+   search/filter boxes reuse their placeholder resources. Only 3 new strings were
+   needed. Enforced by `AutomationNameTests.InputControlsCarryAccessibleLabels`:
+   every input control must have `AutomationProperties.Name` as a resource reference
+   or binding (hard-coded literals fail), or `AutomationProperties.LabeledBy`.
+
+3. **Focus indicators on custom-templated controls. ✅ VERIFIED — premise disproven,
+   no work needed (2026-06-12).** The audit assumed that replacing a button's template
+   (`ToolbarPlainButton`/`ToolbarPlainToggleButton` define only `:pointerover`/`:pressed`
+   styles) discards the focus visual. A headless probe disproved it: Avalonia's focus
+   adorner lives in the **adorner layer**, independent of the control template, and
+   renders a contrast-proof double ring (2px white outer + 1px semi-transparent black
+   inner) whenever `:focus-visible` is active — keyboard focus IS visible on the custom
+   toolbar buttons, in every palette, and likewise on all restyled-but-not-retemplated
+   buttons. Pinned by `FocusVisibilityTests` (`DialogEditor.Tests/Accessibility`) so a
+   future `FocusAdorner` override or Avalonia default change fails the build instead of
+   silently blinding keyboard users.
+
+4. **Canvas keyboard editing. ✅ IMPLEMENTED (navigate + edit structure, 2026-06-12).**
+   The canvas is keyboard-operable: arrows traverse the conversation topologically
+   (→ child / ← parent, nearest-by-Y; ↑↓ siblings in visual order), PgUp/PgDn cycle
+   every node (orphan coverage), Home selects the root, Ctrl(+Shift)+arrows nudge the
+   selected node (drag-move semantics, gated on IsEditable), Enter focuses the detail
+   panel, Menu key / Shift+F10 opens the node context menu, Escape deselects; canvas
+   focus restores the last selection (root on first focus) and the viewport follows
+   every move. Pure logic in `CanvasNavigationService` + `ConversationViewModel`
+   (unit-tested); thin KeyDown glue in `ConversationView` (headless-tested); key map
+   documented in plain language in the Legend window (localized). Design:
+   `docs/superpowers/specs/2026-06-12-canvas-keyboard-editing-design.md`.
+   **Deferred follow-up:** keyboard *connection creation* ("connect mode" — pick
+   source, pick target, confirm) remains mouse-only; it needs its own interaction
+   design pass.
+
+5. **Tooltips are the sole explanation channel. ✅ IMPLEMENTED (2026-06-13).** Every
+   focusable control's `ToolTip.Tip` is mirrored into `AutomationProperties.HelpText`
+   (enforced by `AutomationHelpTextTests`, solution-wide), and `MainWindow` mirrors the
+   focused control's `HelpText` into the status bar via
+   `MainWindowViewModel.DisplayStatusText` — sighted keyboard users now see the same
+   explanation screen readers announce on focus. Design:
+   `docs/superpowers/specs/2026-06-13-helptext-and-focus-hint-design.md`.
+   **Deferred follow-ups:** info icons on non-focusable elements (item 12), and a hint
+   surface for windows other than MainWindow (item 13).
+
+6. **Tiny fixed font sizes, no text scaling.** ~127 instances of 9–11px fonts across 19
+   views; `NodeDetailView` group headers are **FontSize 8**. There is no UI-scale setting,
+   and fixed-size windows (`SettingsWindow` is `CanResize="False" Height="220"`) will clip
+   under OS text scaling. Opportunity: move font sizes into `Tokens.axaml` as semantic
+   tokens (`FontSize.Caption`, `FontSize.Body`, …) — the Layer 0 token infrastructure and
+   its enforcement-test pattern already exist — then add a scale factor in Settings.
+
+7. **Colour-only "new conversation" indicator.** The browser tree marks new conversations
+   purely via `BoolToNewConversationBrush` (`GameBrowserView.axaml`) — this contradicts
+   the Layer 2.5 principle shipped elsewhere. A glyph or font-weight change alongside the
+   colour would align it.
+
+8. **Status bar feedback is never announced.** `StatusText` (`MainWindow.axaml`) is the
+   sole feedback for many operations, rendered as 11px muted text, and screen readers
+   won't announce changes. Avalonia supports `AutomationProperties.LiveSetting` — mark the
+   status `TextBlock` as a polite live region so save/error results are spoken.
+
+9. **Fake watermarks.** `ConversationView`'s SearchBox and `GameBrowserView`'s FilterBox
+   simulate placeholders with overlay `TextBlock`s; the real `Watermark` property (already
+   used in `NodeDetailView` and `SettingsWindow`) is exposed to the accessibility tree and
+   handles focus/IME properly. Easy swap.
+
+10. **Hard-coded `Foreground="White"`.** Node titles and the diff badge glyph in
+    `ConversationView.axaml`, plus the Resolve Conflicts button in `MainWindow.axaml`,
+    bypass the palette system (named brushes evade `NoStrayHexTests`' hex check), so
+    High-Contrast cannot adjust them. Tokenise (e.g. `Brush.Text.OnAccent`), and consider
+    teaching `NoStrayHexTests` to also reject named-colour literals.
+
+11. **Theme doesn't follow the OS; small hit targets.** Two smaller items: (a)
+    `RequestedThemeVariant="Dark"` is fixed — detecting the OS high-contrast/dark
+    preference for the *default* palette (Layer 2's `AppSettings.Theme` still overrides)
+    would help users who've already configured their system; relatedly, Dark is
+    "grandfathered" out of `PaletteContrastTests` AA — bringing it to AA and removing the
+    exemption is a clean win. (b) Several hit targets (20px-wide ✕ clear buttons, slim
+    toolbar buttons) sit below the WCAG 2.5.8 24×24 minimum.
+
+12. **Info icons carry no tooltip/HelpText.** Item 5's sweep is scoped to *focusable*
+    controls — static info icons (legend swatches, inline "i"/help glyphs rendered as
+    `TextBlock`/`Border`) are skipped because they can't receive keyboard focus, so
+    `AutomationProperties.HelpText` would never be announced on them. Making these
+    operable (e.g. focusable `Button`-styled icons with both `ToolTip.Tip` and
+    `AutomationProperties.HelpText`) would let keyboard/screen-reader users reach the
+    same explanations sighted mouse users get.
+
+13. **Focused-control hint is MainWindow-only.** Item 5's status-bar hint (Part B)
+    depends on `MainWindow`'s status bar, which other windows/dialogs
+    (`SettingsWindow`, `ScriptEditorWindow`, `ConditionEditorWindow`, `FindReplaceWindow`,
+    `DiffWindow`, etc.) don't have — their `AutomationProperties.HelpText` (mirrored
+    solution-wide by item 5's Part A) is reachable by screen readers but has no
+    sighted-keyboard-user equivalent there. Worth a lightweight hint surface (e.g. a
+    bottom hint bar) for dialogs once item 5's pattern proves out.
+
+### UI Localisation Readiness (audit 2026-06-12)
+The localisation rule (no hard-coded user-visible text) has been followed, but the app
+cannot yet actually *switch language*. The good news from the audit: the architecture is
+genuinely localisation-ready, and **restart-based** language switching is close — the
+work is a delivery mechanism and a translation workflow, not a rewrite.
+
+**Already in place (verified):**
+- Single funnel: all UI strings live in three XAML dictionaries (`Strings.axaml`,
+  `SharedStrings.axaml`, PatchManager's `Strings.axaml`); views make ~513
+  `{StaticResource}` string references and ViewModels ~216 `Loc.Get`/`Loc.Format` calls.
+  No class-init string caching found — lookups happen at display time.
+- `Loc` → `AvaloniaStringProvider` queries `Application.Current.TryGetResource` on every
+  call, so swapping the merged dictionary changes every subsequent C# lookup automatically.
+- Theme Layer 2 is the exact mechanism precedent: persisted `AppSettings` choice, shared
+  picker view, merged-dictionary swap applied in both apps' startup before the first
+  window. A `Strings.de.axaml` overlay is the same trick as `Palette.Light.axaml`.
+- Good hygiene: positional `{0}`/`{1}` placeholders via `Loc.Format` (no concatenation
+  patterns found), translator notes already at the top of `Strings.axaml`, and
+  `DialogEditor.Core`'s four strings already use `.resx`/`ResourceManager` with a
+  settable `CoreStrings.Culture` (satellite-assembly ready).
+
+**Work needed for restart-based switching (the recommended path).** Because all XAML
+string references resolve when each window loads, merging the chosen language dictionary
+at startup makes `StaticResource` work as-is — no reference sweep needed:
+1. Per-language dictionaries with **overlay merge**: English merged first, chosen
+   language merged last (last-merged wins), so untranslated keys fall back to English by
+   construction.
+2. `AppSettings.Language` + a Settings picker + a "takes effect after restart" note —
+   clone of the theme-picker pattern, hosted by both apps.
+3. Set `CoreStrings.Culture` at startup; add satellite `.resx` per language.
+4. **Translation workflow (the real cost):** `.axaml` is translator-hostile. An
+   export/import bridge to XLIFF or CSV is needed — the in-house
+   `LocalizationExportService`/`ImportService` pattern (built for game content) is the
+   template.
+5. **Layout elasticity audit:** German/French run ~30% longer; fixed label widths
+   (`Width="140"` in Settings), `CanResize="False"` fixed-height windows, and 200px node
+   cards will clip. Overlaps with Accessibility item 6 (font tokens / text scaling) —
+   do them together.
+6. Minor: naive pluralisation (`"{0} nodes"` breaks in languages with multiple plural
+   forms — usually accepted in tools); and the no-hardcoded-strings rule has **no
+   enforcement test** (honor-system today, and a translated build makes violations
+   invisible in English testing) — the `NoStrayHexTests`/`AutomationNameTests` structural
+   pattern extends naturally here.
+
+**Live switching (no restart) — deliberately out of scope.** It would additionally need
+the ~513 `StaticResource` string refs converted to `DynamicResource` plus a
+change-notification kick for the ~216 ViewModel lookups (the `ThemeService.Revision`
+tick is the precedent). Several times the effort for little gain; restart-on-change is
+the desktop norm.
+
+**Difficulty verdict:** the switching mechanism itself is roughly a day following the
+theme Layer 2 playbook; the honest costs are the translation file workflow (item 4) and
+the layout robustness pass (item 5).
+
 ### Barks System — Bark Preview
 Bark nodes now render with an amber color scheme on the canvas, carry bark-specific validation warnings (text too long, player-choice child), and those warnings surface in Flow Analytics. The remaining gap is an in-context preview of overhead floating text: writers cannot see how a bark will actually appear above an NPC's head without running the game. Implementing this requires investigating the game's bark rendering (font, line-wrapping, maximum visible width) before UI work can be designed.
 
