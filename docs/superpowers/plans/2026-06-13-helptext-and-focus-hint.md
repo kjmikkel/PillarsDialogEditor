@@ -321,7 +321,7 @@ git commit -m "feat(a11y): add FocusHintText and DisplayStatusText to MainWindow
 **Files:**
 - Create: `DialogEditor.Tests/Views/MainWindowFocusHintTests.cs`
 
-- [ ] **Step 1: Create the failing AvaloniaFact tests**
+- [x] **Step 1: Create the failing AvaloniaFact tests**
 
 ```csharp
 using Avalonia.Automation;
@@ -401,14 +401,14 @@ public class MainWindowFocusHintTests : IDisposable
 }
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail (RED)**
+- [x] **Step 2: Run the tests to verify they fail (RED)**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~MainWindowFocusHintTests"`
 
 Expected: FAIL — `vm.FocusHintText` stays `string.Empty` in the first test because
 nothing yet updates it on focus (no GotFocus handler wired).
 
-- [ ] **Step 3: Commit the failing tests**
+- [x] **Step 3: Commit the failing tests**
 
 ```bash
 git add DialogEditor.Tests/Views/MainWindowFocusHintTests.cs
@@ -423,7 +423,7 @@ git commit -m "test(a11y): MainWindow mirrors focused control's HelpText into Fo
 - Modify: `DialogEditor.Avalonia/Views/MainWindow.axaml.cs`
 - Modify: `DialogEditor.Avalonia/Views/MainWindow.axaml:307`
 
-- [ ] **Step 1: Add the `Avalonia.Automation` using**
+- [x] **Step 1: Add the `Avalonia.Automation` using**
 
 In `MainWindow.axaml.cs`, add to the using block (alongside the existing
 `Avalonia`, `Avalonia.Controls`, `Avalonia.Input`, `Avalonia.Interactivity` lines
@@ -433,7 +433,7 @@ at the top of the file):
 using Avalonia.Automation;
 ```
 
-- [ ] **Step 2: Subscribe to GotFocus in the constructor**
+- [x] **Step 2: Subscribe to GotFocus in the constructor**
 
 In `MainWindow.axaml.cs`, in the constructor (after `InitializeComponent();` and
 the `vm.PropertyChanged += OnVmPropertyChanged;` line, around line 47), add:
@@ -442,7 +442,7 @@ the `vm.PropertyChanged += OnVmPropertyChanged;` line, around line 47), add:
         this.AddHandler(GotFocusEvent, OnAnyGotFocus, RoutingStrategies.Bubble);
 ```
 
-- [ ] **Step 3: Add the handler method**
+- [x] **Step 3: Add the handler method**
 
 Add a new private method to `MainWindow` (near the other small event handlers,
 e.g. after `OnPointerPressed` around line 146-160):
@@ -462,7 +462,7 @@ e.g. after `OnPointerPressed` around line 146-160):
     }
 ```
 
-- [ ] **Step 4: Rebind the status bar TextBlock**
+- [x] **Step 4: Rebind the status bar TextBlock**
 
 In `MainWindow.axaml:307`, change:
 
@@ -476,19 +476,19 @@ to:
                 <TextBlock Grid.Column="0" Text="{Binding DisplayStatusText}"
 ```
 
-- [ ] **Step 5: Run the focus-hint tests (GREEN)**
+- [x] **Step 5: Run the focus-hint tests (GREEN)**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~MainWindowFocusHintTests"`
 
 Expected: PASS (both tests from Task 5).
 
-- [ ] **Step 6: Run the full suite to confirm no regressions**
+- [x] **Step 6: Run the full suite to confirm no regressions**
 
 Run: `dotnet test DialogEditor.Tests`
 
 Expected: PASS, total test count = baseline + 1 (Task 1) + 4 (Task 3) + 2 (Task 5).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add DialogEditor.Avalonia/Views/MainWindow.axaml DialogEditor.Avalonia/Views/MainWindow.axaml.cs
