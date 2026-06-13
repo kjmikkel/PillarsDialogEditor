@@ -293,10 +293,18 @@ after the cheap wins. The rest are independent and can land in any order.
    tokens (`FontSize.Caption`, `FontSize.Body`, …) — the Layer 0 token infrastructure and
    its enforcement-test pattern already exist — then add a scale factor in Settings.
 
-7. **Colour-only "new conversation" indicator.** The browser tree marks new conversations
-   purely via `BoolToNewConversationBrush` (`GameBrowserView.axaml`) — this contradicts
-   the Layer 2.5 principle shipped elsewhere. A glyph or font-weight change alongside the
-   colour would align it.
+7. **Colour-only "new conversation" indicator. ✅ VERIFIED — premise disproven, no work
+   needed (2026-06-13).** The audit assumed `BoolToNewConversationBrush`
+   (`GameBrowserView.axaml`) — a green tint — was the *only* cue marking a new
+   conversation, contradicting the Layer 2.5 non-colour-encoding principle. It isn't: new
+   conversations are grouped under their own dedicated `"(new)"` folder
+   (`Label_NewConversationsFolder`, inserted at the top of the tree by
+   `GameBrowserViewModel.Load`) and each item's `DisplayName` carries a textual
+   `" (new)"` suffix (`Label_NewConversation_Suffix`, existing since commit `b6191b5`,
+   2026-05-19). The green brush is a third, redundant cue layered on top of two
+   pre-existing non-colour ones. Pinned by `GameBrowserViewModelTests.Load_*` (dedicated
+   folder, expanded, item `IsNew`) and the existing `DisplayName_WhenNew_ContainsName`
+   (textual suffix).
 
 8. **Status bar feedback is never announced. ✅ IMPLEMENTED (2026-06-13).** A
    hidden `StatusLiveRegion` TextBlock in `MainWindow`'s status bar, bound only to
