@@ -78,6 +78,7 @@
                          Text="{Binding DefaultText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="52"
                          ToolTip.Tip="{StaticResource ToolTip_DefaultText}"
+                         AutomationProperties.HelpText="{StaticResource ToolTip_DefaultText}"
                          AutomationProperties.Name="{StaticResource Label_DefaultMaleText}"/>
 
                 <!-- ── Female text ─────────────────────────────────────── -->
@@ -87,6 +88,7 @@
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="36"
                          Watermark="{StaticResource Placeholder_FemaleText}"
                          ToolTip.Tip="{StaticResource ToolTip_FemaleText}"
+                         AutomationProperties.HelpText="{StaticResource ToolTip_FemaleText}"
                          AutomationProperties.Name="{StaticResource Label_FemaleText}"/>
 
                 <!-- ── Identity ────────────────────────────────────────── -->
@@ -97,6 +99,7 @@
                           ItemsSource="{x:Static vm:NodeDetailViewModel.NodeTypeOptions}"
                           SelectedItem="{Binding NodeTypeString, Mode=TwoWay}"
                           ToolTip.Tip="{StaticResource ToolTip_NodeType}"
+                          AutomationProperties.HelpText="{StaticResource ToolTip_NodeType}"
                           AutomationProperties.Name="{StaticResource PropertyRow_Type}"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_SpeakerCategory}"/>
@@ -104,6 +107,7 @@
                           ItemsSource="{x:Static vm:NodeDetailViewModel.SpeakerCategoryOptions}"
                           SelectedItem="{Binding SpeakerCategoryString, Mode=TwoWay}"
                           ToolTip.Tip="{StaticResource ToolTip_SpeakerCategory}"
+                          AutomationProperties.HelpText="{StaticResource ToolTip_SpeakerCategory}"
                           AutomationProperties.Name="{StaticResource PropertyRow_SpeakerCategory}"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_SpeakerGuid}"/>
@@ -115,11 +119,13 @@
                                  FilterMode="Contains"
                                  IsVisible="{Binding HasSpeakerData}"
                                  ToolTip.Tip="{StaticResource ToolTip_SpeakerPicker}"
+                                 AutomationProperties.HelpText="{StaticResource ToolTip_SpeakerPicker}"
                                  AutomationProperties.Name="{StaticResource PropertyRow_SpeakerGuid}"/>
                 <TextBox Classes="detail-field"
                          Text="{Binding SpeakerGuid, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          FontFamily="Consolas,Courier New,monospace"
                          ToolTip.Tip="{StaticResource ToolTip_SpeakerGuid}"
+                         AutomationProperties.HelpText="{StaticResource ToolTip_SpeakerGuid}"
                          AutomationProperties.Name="{StaticResource PropertyRow_SpeakerGuid}"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_ListenerGuid}"/>
@@ -131,11 +137,13 @@
                                  FilterMode="Contains"
                                  IsVisible="{Binding HasSpeakerData}"
                                  ToolTip.Tip="{StaticResource ToolTip_SpeakerPicker}"
+                                 AutomationProperties.HelpText="{StaticResource ToolTip_SpeakerPicker}"
                                  AutomationProperties.Name="{StaticResource PropertyRow_ListenerGuid}"/>
                 <TextBox Classes="detail-field"
                          Text="{Binding ListenerGuid, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          FontFamily="Consolas,Courier New,monospace"
                          ToolTip.Tip="{StaticResource ToolTip_ListenerGuid}"
+                         AutomationProperties.HelpText="{StaticResource ToolTip_ListenerGuid}"
                          AutomationProperties.Name="{StaticResource PropertyRow_ListenerGuid}"/>
 
                 <!-- ── Display ─────────────────────────────────────────── -->
@@ -146,6 +154,7 @@
                           ItemsSource="{x:Static vm:NodeDetailViewModel.DisplayTypeOptions}"
                           SelectedItem="{Binding DisplayType, Mode=TwoWay}"
                           ToolTip.Tip="{StaticResource ToolTip_DisplayType}"
+                          AutomationProperties.HelpText="{StaticResource ToolTip_DisplayType}"
                           AutomationProperties.Name="{StaticResource PropertyRow_DisplayType}"/>
 
                 <Border Background="{DynamicResource Brush.Bark.Detail.Background}" BorderBrush="{DynamicResource Brush.Bark.Detail.Border}" BorderThickness="1"
@@ -167,12 +176,14 @@
                           ItemsSource="{x:Static vm:NodeDetailViewModel.PersistenceOptions}"
                           SelectedItem="{Binding Persistence, Mode=TwoWay}"
                           ToolTip.Tip="{StaticResource ToolTip_Persistence}"
+                          AutomationProperties.HelpText="{StaticResource ToolTip_Persistence}"
                           AutomationProperties.Name="{StaticResource PropertyRow_Persistence}"/>
 
                 <TextBlock Classes="field-label" Text="{StaticResource PropertyRow_ActorDirection}"/>
                 <TextBox Classes="detail-field"
                          Text="{Binding ActorDirection, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          ToolTip.Tip="{StaticResource ToolTip_ActorDirection}"
+                         AutomationProperties.HelpText="{StaticResource ToolTip_ActorDirection}"
                          AutomationProperties.Name="{StaticResource PropertyRow_ActorDirection}"/>
 
                 <!-- ── Voice ───────────────────────────────────────────── -->
@@ -183,17 +194,20 @@
                          Text="{Binding ExternalVO, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          FontFamily="Consolas,Courier New,monospace"
                          ToolTip.Tip="{StaticResource ToolTip_ExternalVO}"
+                         AutomationProperties.HelpText="{StaticResource ToolTip_ExternalVO}"
                          AutomationProperties.Name="{StaticResource PropertyRow_ExternalVO}"/>
 
                 <CheckBox Classes="detail-check"
                           IsChecked="{Binding HasVO, Mode=TwoWay}"
                           Content="{StaticResource PropertyRow_HasVO}"
-                          ToolTip.Tip="{StaticResource ToolTip_HasVO}"/>
+                          ToolTip.Tip="{StaticResource ToolTip_HasVO}"
+                          AutomationProperties.HelpText="{StaticResource ToolTip_HasVO}"/>
 
                 <CheckBox Classes="detail-check"
                           IsChecked="{Binding HideSpeaker, Mode=TwoWay}"
                           Content="{StaticResource PropertyRow_HideSpeaker}"
-                          ToolTip.Tip="{StaticResource ToolTip_HideSpeaker}"/>
+                          ToolTip.Tip="{StaticResource ToolTip_HideSpeaker}"
+                          AutomationProperties.HelpText="{StaticResource ToolTip_HideSpeaker}"/>
 
                 <!-- ── Comments ────────────────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{StaticResource PropertyRow_Comments}"/>
@@ -201,6 +215,7 @@
                          Text="{Binding Comments, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30"
                          ToolTip.Tip="{StaticResource ToolTip_Comments}"
+                         AutomationProperties.HelpText="{StaticResource ToolTip_Comments}"
                          AutomationProperties.Name="{StaticResource PropertyRow_Comments}"/>
 
                 <!-- ── Translator note ────────────────────────────────── -->
@@ -209,6 +224,7 @@
                          Text="{Binding TranslatorNote, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30"
                          ToolTip.Tip="{StaticResource ToolTip_NodeDetail_TranslatorNote}"
+                         AutomationProperties.HelpText="{StaticResource ToolTip_NodeDetail_TranslatorNote}"
                          AutomationProperties.Name="{StaticResource NodeDetail_TranslatorNote}"/>
 
                 <!-- ── Scripts (edit in separate window) ─────────────── -->
@@ -224,7 +240,8 @@
                             Click="EditScripts_Click"
                             Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0"
                             Padding="8,3" FontSize="10"
-                            ToolTip.Tip="{StaticResource ToolTip_EditScripts}"/>
+                            ToolTip.Tip="{StaticResource ToolTip_EditScripts}"
+                            AutomationProperties.HelpText="{StaticResource ToolTip_EditScripts}"/>
                 </Grid>
 
                 <!-- ── Read-only groups (node ID) ─────────────────────── -->
@@ -255,7 +272,8 @@
                             Click="EditConditions_Click"
                             Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0"
                             Padding="8,3" FontSize="10"
-                            ToolTip.Tip="{StaticResource ToolTip_EditConditions}"/>
+                            ToolTip.Tip="{StaticResource ToolTip_EditConditions}"
+                            AutomationProperties.HelpText="{StaticResource ToolTip_EditConditions}"/>
                 </Grid>
 
                 <!-- ── Links ──────────────────────────────────────────── -->
@@ -284,7 +302,8 @@
                                             FontSize="10" Padding="3,1" Margin="0,0,2,0"
                                             Foreground="{Binding HasConditions,
                                                 Converter={StaticResource BoolToFemaleTextBrush}}"
-                                            ToolTip.Tip="{StaticResource ToolTip_LinkConditions_None}"/>
+                                            ToolTip.Tip="{StaticResource ToolTip_LinkConditions_None}"
+                                            AutomationProperties.HelpText="{StaticResource ToolTip_LinkConditions_None}"/>
                                     <Button Grid.Column="3"
                                             Content="{StaticResource Button_DeleteLink}"
                                             Command="{Binding DataContext.DeleteLinkCommand,
@@ -292,7 +311,8 @@
                                             CommandParameter="{Binding}"
                                             Background="Transparent" BorderThickness="0"
                                             Foreground="{DynamicResource Brush.Text.Muted}" FontSize="9" Padding="4,1"
-                                            ToolTip.Tip="{StaticResource ToolTip_DeleteLink}"/>
+                                            ToolTip.Tip="{StaticResource ToolTip_DeleteLink}"
+                                            AutomationProperties.HelpText="{StaticResource ToolTip_DeleteLink}"/>
                                 </Grid>
                                 <!-- Row 1: editable properties -->
                                 <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" Margin="12,2,0,0">
@@ -303,6 +323,7 @@
                                               BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                                               FontSize="10" Padding="3,1" Height="22"
                                               ToolTip.Tip="{StaticResource ToolTip_LinkQTD}"
+                                              AutomationProperties.HelpText="{StaticResource ToolTip_LinkQTD}"
                                               AutomationProperties.Name="{StaticResource AutomationName_LinkQTD}">
                                         <ComboBox.ItemTemplate>
                                             <DataTemplate>
@@ -325,6 +346,7 @@
                                                    ShowButtonSpinner="False"
                                                    ClipValueToMinMax="True"
                                                    ToolTip.Tip="{StaticResource ToolTip_LinkWeight}"
+                                                   AutomationProperties.HelpText="{StaticResource ToolTip_LinkWeight}"
                                                    AutomationProperties.Name="{StaticResource Label_LinkWeight}"/>
                                 </Grid>
                             </Grid>
@@ -341,13 +363,15 @@
                              BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                              FontSize="10" Padding="4,3"
                              ToolTip.Tip="{StaticResource ToolTip_AddLinkTargetId}"
+                             AutomationProperties.HelpText="{StaticResource ToolTip_AddLinkTargetId}"
                              AutomationProperties.Name="{StaticResource Placeholder_AddLinkTargetId}"/>
                     <Button Grid.Column="1"
                             Content="{StaticResource Button_AddLink}"
                             Command="{Binding AddLinkCommand}"
                             Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0"
                             Padding="6,2" Margin="4,0,0,0"
-                            ToolTip.Tip="{StaticResource ToolTip_AddLink}"/>
+                            ToolTip.Tip="{StaticResource ToolTip_AddLink}"
+                            AutomationProperties.HelpText="{StaticResource ToolTip_AddLink}"/>
                 </Grid>
 
             </StackPanel>

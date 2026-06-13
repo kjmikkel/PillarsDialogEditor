@@ -18,12 +18,14 @@
               Padding="16,6" FontSize="12"
               IsCancel="True"
               IsDefault="True"
-              ToolTip.Tip="{StaticResource ForceDelete_Cancel}"/>
+              ToolTip.Tip="{StaticResource ForceDelete_Cancel}"
+              AutomationProperties.HelpText="{StaticResource ForceDelete_Cancel}"/>
       <Button x:Name="ConfirmButton"
               Content="{StaticResource ForceDelete_Confirm}"
               Background="{DynamicResource Brush.Button.Destructive.Background}" Foreground="White" BorderThickness="0"
               Padding="16,6" FontSize="12"
-              ToolTip.Tip="{StaticResource ForceDelete_Confirm}"/>
+              ToolTip.Tip="{StaticResource ForceDelete_Confirm}"
+              AutomationProperties.HelpText="{StaticResource ForceDelete_Confirm}"/>
     </StackPanel>
   </StackPanel>
 </Window>

@@ -9,6 +9,7 @@
         <Button DockPanel.Dock="Bottom" HorizontalAlignment="Right" Margin="0,10,0,0"
                 Content="{StaticResource Changelog_Close}"
                 ToolTip.Tip="{StaticResource Changelog_Close}"
+                AutomationProperties.HelpText="{StaticResource Changelog_Close}"
                 Click="Close_Click"/>
 
         <TextBlock DockPanel.Dock="Top"
