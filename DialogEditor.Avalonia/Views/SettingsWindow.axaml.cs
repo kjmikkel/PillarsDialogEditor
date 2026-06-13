@@ -13,6 +13,7 @@ public partial class SettingsWindow : Window
         // The theme picker is self-contained: it owns its ViewModel + applier rather than
         // sharing the window's SettingsViewModel, so the same control drops into PatchManager.
         ThemePicker.DataContext = new ThemePickerViewModel(new ThemeApplier());
+        HintBar.AttachTo(this);
     }
 
     private void Close_Click(object? sender, RoutedEventArgs e) => Close();
