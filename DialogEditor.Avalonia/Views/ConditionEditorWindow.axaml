@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
         xmlns:types="clr-namespace:DialogEditor.ViewModels.Services;assembly=DialogEditor.ViewModels"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.ConditionEditorWindow"
         Title="{Binding WindowTitle}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
@@ -64,7 +65,7 @@
         </Style>
     </Window.Styles>
 
-    <Grid RowDefinitions="*,Auto">
+    <Grid RowDefinitions="*,Auto,Auto">
 
         <ScrollViewer Grid.Row="0" Padding="0">
             <StackPanel Margin="14,12,14,4" Spacing="6">
@@ -269,6 +270,9 @@
                         AutomationProperties.HelpText="{StaticResource ToolTip_ConditionEditorOK}"/>
             </StackPanel>
         </Border>
+
+        <!-- Focus hint bar (Gaps item 13) -->
+        <shared:FocusHintBar Grid.Row="2" x:Name="HintBar"/>
 
     </Grid>
 </Window>
