@@ -697,6 +697,54 @@ public class MainWindowViewModelTests : IDisposable
         Assert.False(string.IsNullOrEmpty(vm.StatusText));
     }
 
+    // ── DisplayStatusText / FocusHintText ───────────────────────────────────
+
+    [Fact]
+    public void DisplayStatusText_FallsBackToStatusText_WhenNoFocusHint()
+    {
+        var vm = MakeVm();
+        vm.StatusText = "Saved";
+
+        Assert.Equal("Saved", vm.DisplayStatusText);
+    }
+
+    [Fact]
+    public void DisplayStatusText_PrefersFocusHintText_WhenSet()
+    {
+        var vm = MakeVm();
+        vm.StatusText = "Saved";
+        vm.FocusHintText = "Opens the settings dialog";
+
+        Assert.Equal("Opens the settings dialog", vm.DisplayStatusText);
+    }
+
+    [Fact]
+    public void DisplayStatusText_RevertsToStatusText_WhenFocusHintCleared()
+    {
+        var vm = MakeVm();
+        vm.StatusText = "Saved";
+        vm.FocusHintText = "Opens the settings dialog";
+
+        vm.FocusHintText = "";
+
+        Assert.Equal("Saved", vm.DisplayStatusText);
+    }
+
+    [Fact]
+    public void DisplayStatusText_RaisesPropertyChanged_WhenEitherSourceChanges()
+    {
+        var vm = MakeVm();
+        var raised = new List<string?>();
+        vm.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        vm.FocusHintText = "Opens the settings dialog";
+        Assert.Contains(nameof(MainWindowViewModel.DisplayStatusText), raised);
+
+        raised.Clear();
+        vm.StatusText = "Saved";
+        Assert.Contains(nameof(MainWindowViewModel.DisplayStatusText), raised);
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────
 
     private static NodeViewModel MakeNode(int id)
