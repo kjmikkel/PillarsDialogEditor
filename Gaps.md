@@ -341,10 +341,14 @@ after the cheap wins. The rest are independent and can land in any order.
 
 11. **Theme doesn't follow the OS.** `RequestedThemeVariant="Dark"` is fixed.
 
-    **(a) Auto theme from OS preference. 📐 SPEC APPROVED (2026-06-13).** Add an `"Auto"`
-    `AppSettings.Theme` option (and new default for fresh installs) that resolves to the
-    OS's reported high-contrast/dark/light preference at apply-time — high-contrast wins
-    over light/dark, matching the existing `HighContrast` palette. See
+    **(a) Auto theme from OS preference. ✅ IMPLEMENTED (2026-06-13).** `"Auto"` ("System
+    Default") is now the first theme-picker entry and the default `AppSettings.Theme` for
+    fresh installs (existing users keep their saved choice). `ThemeApplier.Apply("Auto")`
+    resolves via `ThemeApplier.DetectOsThemeId`, which maps the OS's reported
+    `PlatformColorValues` to `"HighContrast"` / `"Light"` / `"Dark"` — high-contrast wins
+    over light/dark, matching the existing `HighContrast` palette; no platform settings
+    falls back to `"Dark"`. Resolution happens at apply-time (launch, or immediately on
+    picker selection), not via a live OS-change subscription. See
     `docs/superpowers/specs/2026-06-13-os-theme-detection-design.md`; the Dark AA-contrast
     half of this item and the first-run onboarding-dialog idea raised during brainstorming
     are split into items 14 and 15 below.
