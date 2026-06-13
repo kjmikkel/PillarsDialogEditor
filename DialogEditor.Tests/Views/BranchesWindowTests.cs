@@ -1,5 +1,8 @@
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
+using DialogEditor.Avalonia.Shared;
 using DialogEditor.Avalonia.Views;
 using DialogEditor.Patch.Diff;
 using DialogEditor.Tests.Helpers;
@@ -57,6 +60,26 @@ public class BranchesWindowTests
 
         vm.Selected = vm.Branches[1];                  // select a non-current branch (feature/x)
         Assert.True(btn.Command!.CanExecute(null));
+    }
+
+    [AvaloniaFact]
+    public void Tab_ToControlWithHelpText_UpdatesHintBar()
+    {
+        var vm = TwoBranchesVm();
+        var win = new BranchesWindow(vm);
+        win.Show();
+
+        var button = win.FindControl<Button>("SwitchButton")!;
+        var expectedHint = AutomationProperties.GetHelpText(button);
+        Assert.False(string.IsNullOrEmpty(expectedHint));
+
+        button.RaiseEvent(new GotFocusEventArgs
+        {
+            RoutedEvent = InputElement.GotFocusEvent,
+            NavigationMethod = NavigationMethod.Tab,
+        });
+
+        Assert.Equal(expectedHint, win.FindControl<FocusHintBar>("HintBar")!.Text);
     }
 
     [AvaloniaFact]
