@@ -502,7 +502,7 @@ git commit -m "feat(a11y): show the focused control's HelpText in MainWindow's s
 **Files:**
 - Modify: `Gaps.md` (item 5)
 
-- [ ] **Step 1: Mark item 5 as implemented**
+- [x] **Step 1: Mark item 5 as implemented**
 
 Replace the item 5 entry (currently):
 
@@ -527,13 +527,13 @@ with:
    surface for windows other than MainWindow (item 13).
 ```
 
-- [ ] **Step 2: Run the full suite one last time**
+- [x] **Step 2: Run the full suite one last time**
 
 Run: `dotnet test DialogEditor.Tests`
 
 Expected: PASS.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add Gaps.md
