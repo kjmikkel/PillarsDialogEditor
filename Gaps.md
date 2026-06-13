@@ -276,10 +276,15 @@ after the cheap wins. The rest are independent and can land in any order.
    source, pick target, confirm) remains mouse-only; it needs its own interaction
    design pass.
 
-5. **Tooltips are the sole explanation channel, and tooltips are hover-only.** Keyboard
-   and screen-reader users never reach them. Mirror tooltip text into
-   `AutomationProperties.HelpText` (can ride along with item 1's sweep), and consider
-   showing the focused control's hint in the status bar.
+5. **Tooltips are the sole explanation channel. ✅ IMPLEMENTED (2026-06-13).** Every
+   focusable control's `ToolTip.Tip` is mirrored into `AutomationProperties.HelpText`
+   (enforced by `AutomationHelpTextTests`, solution-wide), and `MainWindow` mirrors the
+   focused control's `HelpText` into the status bar via
+   `MainWindowViewModel.DisplayStatusText` — sighted keyboard users now see the same
+   explanation screen readers announce on focus. Design:
+   `docs/superpowers/specs/2026-06-13-helptext-and-focus-hint-design.md`.
+   **Deferred follow-ups:** info icons on non-focusable elements (item 12), and a hint
+   surface for windows other than MainWindow (item 13).
 
 6. **Tiny fixed font sizes, no text scaling.** ~127 instances of 9–11px fonts across 19
    views; `NodeDetailView` group headers are **FontSize 8**. There is no UI-scale setting,
