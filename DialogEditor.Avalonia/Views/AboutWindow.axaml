@@ -1,9 +1,10 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.AboutWindow"
         Title="{StaticResource About_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Width="420" Height="320" CanResize="False"
+        Width="420" SizeToContent="Height" CanResize="False"
         ShowInTaskbar="False" Background="{DynamicResource Brush.Surface.Info}">
     <StackPanel Margin="18,16,18,16" Spacing="8">
         <TextBlock Text="{Binding AppName}" Foreground="{DynamicResource Brush.Text.Primary}" FontSize="18" FontWeight="Bold"/>
@@ -33,5 +34,8 @@
                 ToolTip.Tip="{StaticResource About_Close}"
                 AutomationProperties.HelpText="{StaticResource About_Close}"
                 Click="Close_Click"/>
+
+        <!-- Focus hint bar (Gaps item 16) -->
+        <shared:FocusHintBar x:Name="HintBar"/>
     </StackPanel>
 </Window>
