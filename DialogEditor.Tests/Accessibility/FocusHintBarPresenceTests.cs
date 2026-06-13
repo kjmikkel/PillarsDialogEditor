@@ -25,6 +25,22 @@ public class FocusHintBarPresenceTests
         "GitConflictResolutionWindow.axaml",
     };
 
+    /// <summary>
+    /// Gaps.md a11y item 16: of the 7 small 1-3-control dialogs left out of item 13,
+    /// only these 3 have at least one AutomationProperties.HelpText value that adds
+    /// information beyond text already visible in the dialog (see design spec
+    /// docs/superpowers/specs/2026-06-13-focus-hint-bar-small-dialogs-design.md). The
+    /// other 4 (BranchNameDialog, CommitConsentDialog, ChangelogWindow,
+    /// ForceDeleteDialog) deliberately do NOT get a FocusHintBar — their HelpText
+    /// duplicates visible text, so a bar would only echo the screen.
+    /// </summary>
+    private static readonly string[] WindowsInScopeItem16 =
+    {
+        "AboutWindow.axaml",
+        "ConflictResolutionDialog.axaml",
+        "HistoryWindow.axaml",
+    };
+
     private static readonly XNamespace XamlNs = "http://schemas.microsoft.com/winfx/2006/xaml";
 
     private static string SolutionRoot()
@@ -41,11 +57,7 @@ public class FocusHintBarPresenceTests
         path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}") ||
         path.Contains($"{Path.DirectorySeparatorChar}.worktrees{Path.DirectorySeparatorChar}");
 
-    public static IEnumerable<object[]> WindowFiles() => WindowsInScope.Select(f => new object[] { f });
-
-    [Theory]
-    [MemberData(nameof(WindowFiles))]
-    public void WindowHasFocusHintBar(string fileName)
+    private static void AssertHasFocusHintBar(string fileName)
     {
         var root = SolutionRoot();
         var matches = Directory.EnumerateFiles(root, fileName, SearchOption.AllDirectories)
@@ -61,4 +73,16 @@ public class FocusHintBarPresenceTests
 
         Assert.True(hasHintBar, $"{fileName} is missing <shared:FocusHintBar x:Name=\"HintBar\"/>");
     }
+
+    public static IEnumerable<object[]> WindowFiles() => WindowsInScope.Select(f => new object[] { f });
+
+    public static IEnumerable<object[]> WindowFilesItem16() => WindowsInScopeItem16.Select(f => new object[] { f });
+
+    [Theory]
+    [MemberData(nameof(WindowFiles))]
+    public void WindowHasFocusHintBar(string fileName) => AssertHasFocusHintBar(fileName);
+
+    [Theory]
+    [MemberData(nameof(WindowFilesItem16))]
+    public void Item16WindowHasFocusHintBar(string fileName) => AssertHasFocusHintBar(fileName);
 }
