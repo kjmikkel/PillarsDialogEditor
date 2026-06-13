@@ -339,11 +339,15 @@ after the cheap wins. The rest are independent and can land in any order.
     Enforced solution-wide by `NoNamedColourForegroundTests`
     (`DialogEditor.Tests/Theming`), mirroring `NoStrayHexTests`'s scope/exclusions.
 
-11. **Theme doesn't follow the OS.** `RequestedThemeVariant="Dark"` is fixed —
-    detecting the OS high-contrast/dark preference for the *default* palette (Layer 2's
-    `AppSettings.Theme` still overrides) would help users who've already configured their
-    system; relatedly, Dark is "grandfathered" out of `PaletteContrastTests` AA — bringing
-    it to AA and removing the exemption is a clean win.
+11. **Theme doesn't follow the OS.** `RequestedThemeVariant="Dark"` is fixed.
+
+    **(a) Auto theme from OS preference. 📐 SPEC APPROVED (2026-06-13).** Add an `"Auto"`
+    `AppSettings.Theme` option (and new default for fresh installs) that resolves to the
+    OS's reported high-contrast/dark/light preference at apply-time — high-contrast wins
+    over light/dark, matching the existing `HighContrast` palette. See
+    `docs/superpowers/specs/2026-06-13-os-theme-detection-design.md`; the Dark AA-contrast
+    half of this item and the first-run onboarding-dialog idea raised during brainstorming
+    are split into items 14 and 15 below.
 
     **(b) Small hit targets. ✅ IMPLEMENTED (2026-06-13).** The two 20px-wide ✕ clear
     buttons (`ConversationView.axaml`'s search box, `GameBrowserView.axaml`'s filter box)
@@ -368,6 +372,21 @@ after the cheap wins. The rest are independent and can land in any order.
     solution-wide by item 5's Part A) is reachable by screen readers but has no
     sighted-keyboard-user equivalent there. Worth a lightweight hint surface (e.g. a
     bottom hint bar) for dialogs once item 5's pattern proves out.
+
+14. **Dark palette isn't AA-checked.** Split off from item 11 — `PaletteContrastTests`
+    explicitly grandfathers `Palette.Dark` out of its AA checks (4.5:1 normal / 3.0:1
+    large-UI). A few pairs sit below that today (e.g. `Severity.Error` on
+    `Surface.Panel` ≈ 2.8:1). Bringing Dark to AA and removing the exemption is iterative
+    palette-value tuning, likely with a golden-snapshot regeneration
+    (`PaletteGoldenTests`) once values settle.
+
+15. **No first-run theme-picker onboarding.** Raised during item 11(a)'s brainstorm: the
+    now-common "Light / Dark / System" first-launch picker (with live previews) would let
+    new users choose their palette immediately instead of discovering the Settings picker
+    later. Out of scope for 11(a) (which just makes "Auto" the silent default) — needs its
+    own brainstorm: which palettes to offer (all four? just Light/Dark/Auto?), how to
+    render previews, a first-run flag in `AppSettings`, and whether it blocks the main
+    window.
 
 ### UI Localisation Readiness (audit 2026-06-12)
 The localisation rule (no hard-coded user-visible text) has been followed, but the app
