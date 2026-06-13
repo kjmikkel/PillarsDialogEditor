@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
+using Avalonia.Platform;
 using Avalonia.Styling;
 using DialogEditor.Avalonia.Shared.Theming;
 using DialogEditor.ViewModels.Services;
@@ -84,5 +85,23 @@ public class ThemeApplierTests
         new ThemeApplier().Apply("Light");
         new ThemeApplier().Apply("Dark");
         Assert.Equal(dark, Resolve("Brush.Surface.Window"));
+    }
+
+    [Theory]
+    [InlineData(PlatformThemeVariant.Dark,  ColorContrastPreference.NoPreference, "Dark")]
+    [InlineData(PlatformThemeVariant.Light, ColorContrastPreference.NoPreference, "Light")]
+    [InlineData(PlatformThemeVariant.Dark,  ColorContrastPreference.High,         "HighContrast")]
+    [InlineData(PlatformThemeVariant.Light, ColorContrastPreference.High,         "HighContrast")]
+    public void DetectOsThemeId_MapsPlatformPreferences(
+        PlatformThemeVariant variant, ColorContrastPreference contrast, string expectedId)
+    {
+        var values = new PlatformColorValues { ThemeVariant = variant, ContrastPreference = contrast };
+        Assert.Equal(expectedId, ThemeApplier.DetectOsThemeId(values));
+    }
+
+    [Fact]
+    public void DetectOsThemeId_NullValues_FallsBackToDark()
+    {
+        Assert.Equal("Dark", ThemeApplier.DetectOsThemeId(null));
     }
 }
