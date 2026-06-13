@@ -100,7 +100,6 @@
             <converters:NullOrEmptyToBoolConverter      x:Key="NullOrEmptyToVis"/>
             <converters:CountToBoolConverter            x:Key="CountToVis"/>
             <converters:BoolToOpacityConverter          x:Key="SearchMatchOpacity"/>
-            <converters:StringIsEmptyConverter              x:Key="StringIsEmpty"/>
             <converters:StringEqualsBoolConverter           x:Key="StringEqualsBool"/>
             <converters:PropertyValueStyleToBrushConverter x:Key="PropertyValueStyleToBrush"/>
             <converters:FlowIssueKindToSeverityBrushConverter x:Key="FlowIssueSeverityBrush"/>

@@ -73,6 +73,7 @@
                 <Grid VerticalAlignment="Center" Margin="0,0,8,0">
                     <TextBox x:Name="SearchBox"
                              Text="{Binding SearchQuery}"
+                             Watermark="{StaticResource Placeholder_SearchNodes}"
                              AutomationProperties.Name="{StaticResource Placeholder_SearchNodes}"
                              Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" CaretBrush="{DynamicResource Brush.Text.Secondary}"
                              BorderBrush="{DynamicResource Brush.Border.Muted}" BorderThickness="1"
@@ -81,10 +82,6 @@
                              KeyDown="SearchBox_KeyDown"
                              ToolTip.Tip="{StaticResource ToolTip_SearchNodes}"
                              AutomationProperties.HelpText="{StaticResource ToolTip_SearchNodes}"/>
-                    <TextBlock Text="{StaticResource Placeholder_SearchNodes}"
-                               Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10"
-                               Padding="8,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"
-                               IsVisible="{Binding SearchQuery, Converter={StaticResource StringIsEmpty}}"/>
                     <Button Command="{Binding ClearSearchCommand}"
                             HorizontalAlignment="Right" Width="20"
                             Content="✕" VerticalAlignment="Center"
