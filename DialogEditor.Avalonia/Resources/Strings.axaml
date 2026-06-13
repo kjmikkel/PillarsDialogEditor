@@ -236,6 +236,27 @@
     <sys:String x:Key="Legend_Browser_Flyout">📌 unpinned</sys:String>
     <sys:String x:Key="Legend_Browser_Flyout_Desc">click the strip to open temporarily; closes on click-outside or selection</sys:String>
 
+    <!-- ─── Legend: canvas keyboard (plain language for non-technical writers) ── -->
+    <sys:String x:Key="Legend_CanvasKeys">Canvas keyboard</sys:String>
+    <sys:String x:Key="Legend_Key_Right">→</sys:String>
+    <sys:String x:Key="Legend_Key_Right_Desc">Move to the line that follows this one</sys:String>
+    <sys:String x:Key="Legend_Key_Left">←</sys:String>
+    <sys:String x:Key="Legend_Key_Left_Desc">Go back to the line this one responds to</sys:String>
+    <sys:String x:Key="Legend_Key_UpDown">↑ / ↓</sys:String>
+    <sys:String x:Key="Legend_Key_UpDown_Desc">Switch between sibling responses</sys:String>
+    <sys:String x:Key="Legend_Key_PageUpDown">Page Up / Down</sys:String>
+    <sys:String x:Key="Legend_Key_PageUpDown_Desc">Step through every node, including unconnected ones</sys:String>
+    <sys:String x:Key="Legend_Key_Home">Home</sys:String>
+    <sys:String x:Key="Legend_Key_Home_Desc">Jump back to the start of the conversation</sys:String>
+    <sys:String x:Key="Legend_Key_CtrlArrows">Ctrl + arrows</sys:String>
+    <sys:String x:Key="Legend_Key_CtrlArrows_Desc">Move the selected node a small step (add Shift for bigger steps)</sys:String>
+    <sys:String x:Key="Legend_Key_Enter">Enter</sys:String>
+    <sys:String x:Key="Legend_Key_Enter_Desc">Edit the selected node's text and details</sys:String>
+    <sys:String x:Key="Legend_Key_Menu">Menu key</sys:String>
+    <sys:String x:Key="Legend_Key_Menu_Desc">Open the selected node's right-click menu</sys:String>
+    <sys:String x:Key="Legend_Key_Escape">Esc</sys:String>
+    <sys:String x:Key="Legend_Key_Escape_Desc">Deselect the current node</sys:String>
+
     <!-- ─── Tooltips — toolbar ─────────────────────────────────────────── -->
     <sys:String x:Key="ToolTip_OpenFolder">Open a PoE1 or PoE2 game root folder</sys:String>
     <sys:String x:Key="ToolTip_Language">Switch the display language for dialogue text</sys:String>

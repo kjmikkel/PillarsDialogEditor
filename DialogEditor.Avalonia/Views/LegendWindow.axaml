@@ -161,6 +161,43 @@
                 <TextBlock Grid.Column="0" Text="{StaticResource Legend_Control_Escape}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12"/>
                 <TextBlock Grid.Column="1" Text="{StaticResource Legend_Control_Escape_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="12" TextWrapping="Wrap"/>
             </Grid>
+            <TextBlock Text="{StaticResource Legend_CanvasKeys}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="10" FontWeight="Bold" Margin="0,8,0,6"/>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Key_Right}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Key_Right_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="12" TextWrapping="Wrap"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Key_Left}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Key_Left_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="12" TextWrapping="Wrap"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Key_UpDown}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Key_UpDown_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="12" TextWrapping="Wrap"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Key_PageUpDown}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Key_PageUpDown_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="12" TextWrapping="Wrap"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Key_Home}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Key_Home_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="12" TextWrapping="Wrap"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Key_CtrlArrows}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Key_CtrlArrows_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="12" TextWrapping="Wrap"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Key_Enter}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Key_Enter_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="12" TextWrapping="Wrap"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Key_Menu}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Key_Menu_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="12" TextWrapping="Wrap"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Key_Escape}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Key_Escape_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="12" TextWrapping="Wrap"/>
+            </Grid>
         </StackPanel>
     </ScrollViewer>
 </Window>
