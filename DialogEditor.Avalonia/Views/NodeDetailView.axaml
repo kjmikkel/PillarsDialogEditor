@@ -9,7 +9,7 @@
     <UserControl.Styles>
         <Style Selector="TextBlock.group-header">
             <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Muted}"/>
-            <Setter Property="FontSize"   Value="{StaticResource FontSize.Micro}"/>
+            <Setter Property="FontSize"   Value="{StaticResource FontSize.Caption}"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Margin"     Value="0,10,0,3"/>
         </Style>

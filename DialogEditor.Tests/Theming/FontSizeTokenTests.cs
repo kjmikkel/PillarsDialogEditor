@@ -14,7 +14,6 @@ public class FontSizeTokenTests
     }
 
     [AvaloniaTheory]
-    [InlineData("FontSize.Micro", 8)]
     [InlineData("FontSize.Caption", 9)]
     [InlineData("FontSize.Small", 10)]
     [InlineData("FontSize.Label", 11)]
@@ -25,4 +24,8 @@ public class FontSizeTokenTests
     [InlineData("FontSize.Display", 32)]
     public void TokenResolvesToExpectedValue(string key, double expected)
         => Assert.Equal(expected, Size(key));
+
+    [AvaloniaFact]
+    public void Micro_WasRetired_NoLongerDefined()
+        => Assert.False(Application.Current!.TryGetResource("FontSize.Micro", Application.Current!.ActualThemeVariant, out _));
 }
