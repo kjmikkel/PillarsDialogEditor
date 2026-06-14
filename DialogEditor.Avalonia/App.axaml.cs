@@ -29,6 +29,12 @@ public partial class App : Application
             // Apply the persisted theme before the first window is shown (overrides the
             // design-time Dark default baked into App.axaml).
             new ThemeApplier().Apply(AppSettings.Theme);
+            // Scale FontSize.* tokens before any window is constructed, so every
+            // StaticResource FontSize binding (including dialogs opened later this
+            // session) resolves the scaled value. Must run after ThemeApplier, which
+            // reloads Tokens.axaml and would otherwise reset this. Restart-required:
+            // changing the setting mid-session does not re-run this (Gaps item 6 part B).
+            new FontScaleApplier().Apply(AppSettings.FontScale);
             desktop.MainWindow = new MainWindow();
         }
         base.OnFrameworkInitializationCompleted();
