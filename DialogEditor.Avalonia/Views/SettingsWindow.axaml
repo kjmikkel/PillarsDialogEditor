@@ -58,15 +58,15 @@
             </DockPanel>
 
             <!-- Default localization format -->
-            <DockPanel>
+            <DockPanel ToolTip.Tip="{StaticResource Settings_LocalizationFormatTooltip}">
                 <TextBlock Classes="label" Text="{StaticResource Settings_LocalizationFormat}"/>
-                <ComboBox SelectedItem="{Binding LocalizationFormat, Mode=TwoWay}"
+                <ComboBox x:Name="LocalizationFormatComboBox"
+                          ItemsSource="{Binding LocalizationFormatOptions}"
+                          SelectedItem="{Binding LocalizationFormat, Mode=TwoWay}"
                           MinWidth="120"
-                          AutomationProperties.Name="{StaticResource Settings_LocalizationFormat}">
-                    <ComboBoxItem Content="Csv"/>
-                    <ComboBoxItem Content="Json"/>
-                    <ComboBoxItem Content="Xliff"/>
-                </ComboBox>
+                          ToolTip.Tip="{StaticResource Settings_LocalizationFormatTooltip}"
+                          AutomationProperties.HelpText="{StaticResource Settings_LocalizationFormatTooltip}"
+                          AutomationProperties.Name="{StaticResource Settings_LocalizationFormat}"/>
             </DockPanel>
 
             <!-- Font scale (Gaps item 6 part B) -->
