@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
@@ -291,5 +292,63 @@ public class SettingsViewModelTests : IDisposable
         var vm = new SettingsViewModel("/game", new StubFolderPicker());
         vm.LocalizationFormat = "Json";
         Assert.Equal("Json", AppSettings.DefaultLocalizationFormat);
+    }
+
+    [Fact]
+    public void FontScaleOptions_ContainsExpectedPresets()
+    {
+        var vm = new SettingsViewModel("/game", new StubFolderPicker());
+        Assert.Equal([1.0, 1.25, 1.5, 1.75, 2.0], vm.FontScaleOptions);
+    }
+
+    [Fact]
+    public void SelectedFontScale_DefaultsToAppSettingsValue()
+    {
+        AppSettings.FontScale = 1.5;
+        var vm = new SettingsViewModel("/game", new StubFolderPicker());
+        Assert.Equal(1.5, vm.SelectedFontScale);
+    }
+
+    [Fact]
+    public void SelectedFontScale_RoundTripsViaAppSettings()
+    {
+        var vm = new SettingsViewModel("/game", new StubFolderPicker());
+        vm.SelectedFontScale = 1.75;
+        Assert.Equal(1.75, AppSettings.FontScale);
+    }
+
+    [Fact]
+    public void PreviewFontSizes_ScaleWithSelectedFontScale()
+    {
+        var vm = new SettingsViewModel("/game", new StubFolderPicker());
+        vm.SelectedFontScale = 1.5;
+        Assert.Equal(18, vm.PreviewBodyFontSize);
+        Assert.Equal(21, vm.PreviewSubtitleFontSize);
+        Assert.Equal(27, vm.PreviewTitleFontSize);
+    }
+
+    [Fact]
+    public void ShowRestartNotice_FalseInitially_TrueAfterChange()
+    {
+        AppSettings.FontScale = 1.0;
+        var vm = new SettingsViewModel("/game", new StubFolderPicker());
+        Assert.False(vm.ShowRestartNotice);
+        vm.SelectedFontScale = 1.25;
+        Assert.True(vm.ShowRestartNotice);
+    }
+
+    [Fact]
+    public void SelectedFontScale_Change_RaisesPreviewAndRestartNoticeNotifications()
+    {
+        var vm = new SettingsViewModel("/game", new StubFolderPicker());
+        var raised = new List<string?>();
+        vm.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        vm.SelectedFontScale = 1.25;
+
+        Assert.Contains(nameof(SettingsViewModel.PreviewBodyFontSize), raised);
+        Assert.Contains(nameof(SettingsViewModel.PreviewSubtitleFontSize), raised);
+        Assert.Contains(nameof(SettingsViewModel.PreviewTitleFontSize), raised);
+        Assert.Contains(nameof(SettingsViewModel.ShowRestartNotice), raised);
     }
 }
