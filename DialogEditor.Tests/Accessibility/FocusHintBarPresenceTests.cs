@@ -41,6 +41,17 @@ public class FocusHintBarPresenceTests
         "HistoryWindow.axaml",
     };
 
+    /// <summary>
+    /// Gaps.md a11y item 15: the first-run theme-onboarding window's ThemePickerView
+    /// ComboBox has a substantive AutomationProperties.HelpText (Settings_ThemeTooltip)
+    /// beyond its visible "Theme" label, so it gets a FocusHintBar too (see
+    /// docs/superpowers/specs/2026-06-14-theme-onboarding-design.md §3.2).
+    /// </summary>
+    private static readonly string[] WindowsInScopeItem15 =
+    {
+        "ThemeOnboardingWindow.axaml",
+    };
+
     private static readonly XNamespace XamlNs = "http://schemas.microsoft.com/winfx/2006/xaml";
 
     private static string SolutionRoot()
@@ -84,6 +95,8 @@ public class FocusHintBarPresenceTests
 
     public static IEnumerable<object[]> WindowFilesItem16() => WindowsInScopeItem16.Select(f => new object[] { f });
 
+    public static IEnumerable<object[]> WindowFilesItem15() => WindowsInScopeItem15.Select(f => new object[] { f });
+
     [Theory]
     [MemberData(nameof(WindowFiles))]
     public void WindowHasFocusHintBar(string fileName) => AssertHasFocusHintBar(fileName);
@@ -91,4 +104,8 @@ public class FocusHintBarPresenceTests
     [Theory]
     [MemberData(nameof(WindowFilesItem16))]
     public void Item16WindowHasFocusHintBar(string fileName) => AssertHasFocusHintBar(fileName);
+
+    [Theory]
+    [MemberData(nameof(WindowFilesItem15))]
+    public void Item15WindowHasFocusHintBar(string fileName) => AssertHasFocusHintBar(fileName);
 }
