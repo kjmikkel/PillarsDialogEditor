@@ -182,6 +182,17 @@
     <sys:String x:Key="Legend_Narrator">Narrator</sys:String>
     <sys:String x:Key="Legend_ScriptAction">Script / automated action</sys:String>
 
+    <!-- ─── Legend panel — swatch accessibility help text (Gaps item 12) ──── -->
+    <!-- Full-sentence explanations, shared across AutomationProperties.Name,
+         ToolTip.Tip, and AutomationProperties.HelpText for each focusable swatch row. -->
+    <sys:String x:Key="Legend_ShowOnce_Help">This colour marks connections that are shown to the player only once and hidden after they're selected.</sys:String>
+    <sys:String x:Key="Legend_Always_Help">This colour marks connections that remain available to the player even after selection.</sys:String>
+    <sys:String x:Key="Legend_Never_Help">This colour marks connections that are never shown to the player.</sys:String>
+    <sys:String x:Key="Legend_NpcLine_Help">This colour marks NPC dialogue lines on the canvas.</sys:String>
+    <sys:String x:Key="Legend_PlayerChoice_Help">This colour marks player choice options on the canvas, also marked with a ✦ symbol.</sys:String>
+    <sys:String x:Key="Legend_Narrator_Help">This colour marks narrator text nodes on the canvas.</sys:String>
+    <sys:String x:Key="Legend_ScriptAction_Help">This colour marks script and automated-action nodes on the canvas.</sys:String>
+
     <!-- ─── Legend panel — symbol descriptions ────────────────────────── -->
     <!-- "N" is a literal count, not a placeholder — leave it as-is -->
     <sys:String x:Key="Legend_Symbol_Conditions">node has N visibility conditions</sys:String>
