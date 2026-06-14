@@ -49,6 +49,12 @@ public static class AppSettings
         // this only persists the value; FontScaleApplier applies it once at the next
         // launch, so already-open windows are unaffected until restart.
         public double FontScale                      { get; set; } = 1.0;
+        // Whether the first-run theme-onboarding dialog (Gaps item 15) has been shown.
+        // Defaults to true so that EXISTING installs upgrading to this version (whose
+        // settings.json predates this field) silently treat onboarding as already-seen —
+        // only a genuinely fresh install (no settings.json yet, or a load failure) gets
+        // false, via Load().
+        public bool ThemeOnboardingSeen              { get; set; } = true;
     }
 
     public static string? LastLanguage
@@ -79,14 +85,14 @@ public static class AppSettings
     {
         try
         {
-            if (!File.Exists(SettingsPath)) return new();
+            if (!File.Exists(SettingsPath)) return new() { ThemeOnboardingSeen = false };
             var json = File.ReadAllText(SettingsPath);
             return JsonSerializer.Deserialize<SettingsData>(json) ?? new();
         }
         catch (Exception ex)
         {
             AppLog.Warn($"Failed to load settings from {SettingsPath}: {ex.Message}");
-            return new();
+            return new() { ThemeOnboardingSeen = false };
         }
     }
 
@@ -176,6 +182,12 @@ public static class AppSettings
     {
         get => Load().FontScale;
         set { var s = Load(); s.FontScale = value; Save(s); }
+    }
+
+    public static bool ThemeOnboardingSeen
+    {
+        get => Load().ThemeOnboardingSeen;
+        set { var s = Load(); s.ThemeOnboardingSeen = value; Save(s); }
     }
 
     public static string PickLanguage(IReadOnlyList<string> available, string? preferred)
