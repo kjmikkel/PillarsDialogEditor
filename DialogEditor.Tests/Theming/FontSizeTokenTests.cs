@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Headless.XUnit;
+using DialogEditor.Avalonia.Shared.Theming;
 
 namespace DialogEditor.Tests.Theming;
 
@@ -13,17 +14,12 @@ public class FontSizeTokenTests
         return Assert.IsType<double>(v);
     }
 
-    [AvaloniaTheory]
-    [InlineData("FontSize.Caption", 9)]
-    [InlineData("FontSize.Small", 10)]
-    [InlineData("FontSize.Label", 11)]
-    [InlineData("FontSize.Body", 12)]
-    [InlineData("FontSize.Medium", 13)]
-    [InlineData("FontSize.Subtitle", 14)]
-    [InlineData("FontSize.Title", 18)]
-    [InlineData("FontSize.Display", 32)]
-    public void TokenResolvesToExpectedValue(string key, double expected)
-        => Assert.Equal(expected, Size(key));
+    [AvaloniaFact]
+    public void AllTokens_ResolveToBaseValues()
+    {
+        foreach (var (key, expected) in FontSizeTokens.BaseValues)
+            Assert.Equal(expected, Size(key));
+    }
 
     [AvaloniaFact]
     public void Micro_WasRetired_NoLongerDefined()
