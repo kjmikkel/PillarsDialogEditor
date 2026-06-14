@@ -13,7 +13,7 @@
                    Foreground="{DynamicResource Brush.Text.Muted.Light}"
                    VerticalAlignment="Center"
                    Width="140"
-                   FontSize="11"/>
+                   FontSize="{StaticResource FontSize.Label}"/>
         <ComboBox ItemsSource="{Binding AvailableThemes}"
                   SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
                   MinWidth="160"
