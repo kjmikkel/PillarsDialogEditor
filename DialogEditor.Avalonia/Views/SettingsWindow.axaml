@@ -4,8 +4,8 @@
         x:Class="DialogEditor.Avalonia.Views.SettingsWindow"
         Title="{StaticResource Settings_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Width="500" Height="220"
-        CanResize="False"
+        Width="500" MinWidth="500" SizeToContent="Height"
+        CanResize="True"
         Background="{DynamicResource Brush.Surface.Window}"
         WindowStartupLocation="CenterOwner"
         x:CompileBindings="False">
@@ -36,7 +36,7 @@
         </Style>
     </Window.Styles>
 
-    <Grid RowDefinitions="*,Auto,Auto" Margin="16">
+    <Grid RowDefinitions="Auto,Auto,Auto" Margin="16">
 
         <StackPanel Grid.Row="0" Spacing="12">
 
@@ -68,6 +68,47 @@
                     <ComboBoxItem Content="Xliff"/>
                 </ComboBox>
             </DockPanel>
+
+            <!-- Font scale (Gaps item 6 part B) -->
+            <DockPanel ToolTip.Tip="{StaticResource Settings_FontScaleTooltip}">
+                <TextBlock Classes="label" Text="{StaticResource Settings_FontScale}"/>
+                <ComboBox ItemsSource="{Binding FontScaleOptions}"
+                          SelectedItem="{Binding SelectedFontScale, Mode=TwoWay}"
+                          MinWidth="120"
+                          ToolTip.Tip="{StaticResource Settings_FontScaleTooltip}"
+                          AutomationProperties.HelpText="{StaticResource Settings_FontScaleTooltip}"
+                          AutomationProperties.Name="{StaticResource Settings_FontScale}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource FontScaleToPercent}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </DockPanel>
+
+            <!-- Font scale live preview: independent of the static FontSize.* tokens,
+                 so it reflects the *selected* (not-yet-applied) scale immediately. -->
+            <Border BorderBrush="{DynamicResource Brush.Border.Default}" BorderThickness="1" CornerRadius="3"
+                    Padding="8" Background="{DynamicResource Brush.Surface.Inset}">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="{StaticResource Settings_FontScalePreviewBody}"
+                               FontSize="{Binding PreviewBodyFontSize}"
+                               Foreground="{DynamicResource Brush.Text.Primary}"/>
+                    <TextBlock Text="{StaticResource Settings_FontScalePreviewSubtitle}"
+                               FontSize="{Binding PreviewSubtitleFontSize}"
+                               Foreground="{DynamicResource Brush.Text.Primary}" FontWeight="SemiBold"/>
+                    <TextBlock Text="{StaticResource Settings_FontScalePreviewTitle}"
+                               FontSize="{Binding PreviewTitleFontSize}"
+                               Foreground="{DynamicResource Brush.Text.Primary}" FontWeight="Bold"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Restart notice: only shown once the selection differs from the scale
+                 actually applied at launch. -->
+            <TextBlock Text="{StaticResource Settings_FontScaleRestartNotice}"
+                       Foreground="{DynamicResource Brush.Text.Status.Changed}"
+                       FontSize="{StaticResource FontSize.Small}"
+                       IsVisible="{Binding ShowRestartNotice}"/>
 
             <!-- Theme picker (own DataContext set in code-behind; shared with PatchManager) -->
             <shared:ThemePickerView x:Name="ThemePicker"/>
