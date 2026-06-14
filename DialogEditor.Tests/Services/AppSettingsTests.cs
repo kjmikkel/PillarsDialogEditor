@@ -120,3 +120,29 @@ public class AppSettingsThemeTests : IDisposable
         Assert.Equal("HighContrast", AppSettings.Theme);
     }
 }
+
+public class AppSettingsFontScaleTests : IDisposable
+{
+    public AppSettingsFontScaleTests()
+        => AppSettings.SettingsPathOverride = Path.GetTempFileName();
+
+    public void Dispose()
+    {
+        var path = AppSettings.SettingsPathOverride;
+        AppSettings.SettingsPathOverride = null;
+        if (path is not null) File.Delete(path);
+    }
+
+    [Fact]
+    public void FontScale_DefaultsTo1()
+    {
+        Assert.Equal(1.0, AppSettings.FontScale);
+    }
+
+    [Fact]
+    public void FontScale_RoundTrips()
+    {
+        AppSettings.FontScale = 1.5;
+        Assert.Equal(1.5, AppSettings.FontScale);
+    }
+}

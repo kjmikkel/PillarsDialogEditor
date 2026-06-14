@@ -44,6 +44,11 @@ public static class AppSettings
         // ThemeApplier.DetectOsThemeId). "Auto" is the default for fresh installs; existing
         // installs keep whatever they already had persisted (e.g. the historical "Dark").
         public string Theme                          { get; set; } = "Auto";
+        // The font-scale multiplier applied to every FontSize.* token at next startup
+        // (Gaps item 6 part B). 1.0 = no scaling, the historical/default size. Changing
+        // this only persists the value; FontScaleApplier applies it once at the next
+        // launch, so already-open windows are unaffected until restart.
+        public double FontScale                      { get; set; } = 1.0;
     }
 
     public static string? LastLanguage
@@ -165,6 +170,12 @@ public static class AppSettings
     {
         get => Load().Theme;
         set { var s = Load(); s.Theme = value; Save(s); }
+    }
+
+    public static double FontScale
+    {
+        get => Load().FontScale;
+        set { var s = Load(); s.FontScale = value; Save(s); }
     }
 
     public static string PickLanguage(IReadOnlyList<string> available, string? preferred)
