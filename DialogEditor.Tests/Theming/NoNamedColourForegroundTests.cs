@@ -23,7 +23,8 @@ public class NoNamedColourForegroundTests
     private static bool IsExcluded(string path) =>
         path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}") ||
         path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}") ||
-        path.Contains($"{Path.DirectorySeparatorChar}.worktrees{Path.DirectorySeparatorChar}");
+        path.Contains($"{Path.DirectorySeparatorChar}.worktrees{Path.DirectorySeparatorChar}") ||
+        path.Contains($"{Path.DirectorySeparatorChar}worktrees{Path.DirectorySeparatorChar}");
 
     private static readonly Regex NamedWhite =
         new(@"Foreground\s*=\s*""[Ww]hite""", RegexOptions.Compiled);
