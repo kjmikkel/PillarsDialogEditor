@@ -97,6 +97,18 @@ public partial class ConversationView : UserControl
         // focus must not: clicking empty canvas is how mouse users deselect.
         if (e.NavigationMethod != NavigationMethod.Tab) return;
         if (DataContext is not ConversationViewModel vm) return;
+
+        // Tab order visits each node's connectors individually, independent
+        // of the logical SelectedNode. Pan to the connector that actually
+        // received focus so it stays on screen as Tab cycles through it.
+        // Unanimated: rapid Tab presses would otherwise queue up overlapping
+        // pan animations and lag behind the focus they're meant to track.
+        if (e.Source is Control { DataContext: ConnectorViewModel connector })
+        {
+            Editor.BringIntoView(new global::Avalonia.Point(connector.Anchor.X, connector.Anchor.Y), animated: false);
+            return;
+        }
+
         if (vm.EnsureKeyboardSelection())
             FollowSelection(vm);
     }
