@@ -52,17 +52,22 @@ public class FocusHintBarPresenceTests
         return dir!.FullName;
     }
 
-    private static bool IsExcluded(string path) =>
-        path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}") ||
-        path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}") ||
-        path.Contains($"{Path.DirectorySeparatorChar}.worktrees{Path.DirectorySeparatorChar}") ||
-        path.Contains($"{Path.DirectorySeparatorChar}worktrees{Path.DirectorySeparatorChar}");
+    // Checked relative to root, not the absolute path, so this doesn't misfire when root
+    // itself lives under a "worktrees" directory (e.g. when running from inside
+    // .claude/worktrees/<name>).
+    private static bool IsExcluded(string path, string root)
+    {
+        var segments = Path.GetRelativePath(root, path)
+            .Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        return segments.Contains("bin") || segments.Contains("obj")
+            || segments.Contains(".worktrees") || segments.Contains("worktrees");
+    }
 
     private static void AssertHasFocusHintBar(string fileName)
     {
         var root = SolutionRoot();
         var matches = Directory.EnumerateFiles(root, fileName, SearchOption.AllDirectories)
-            .Where(f => !IsExcluded(f))
+            .Where(f => !IsExcluded(f, root))
             .ToList();
 
         Assert.Single(matches);
