@@ -15,16 +15,16 @@
     <Window.Styles>
         <Style Selector="TextBlock.stat-label">
             <Setter Property="Foreground"  Value="{DynamicResource Brush.Text.Muted}"/>
-            <Setter Property="FontSize"    Value="10"/>
+            <Setter Property="FontSize"    Value="{StaticResource FontSize.Small}"/>
         </Style>
         <Style Selector="TextBlock.stat-value">
             <Setter Property="Foreground"  Value="{DynamicResource Brush.Text.Primary}"/>
-            <Setter Property="FontSize"    Value="14"/>
+            <Setter Property="FontSize"    Value="{StaticResource FontSize.Subtitle}"/>
             <Setter Property="FontWeight"  Value="SemiBold"/>
         </Style>
         <Style Selector="TextBlock.section-header">
             <Setter Property="Foreground"  Value="{DynamicResource Brush.Text.Muted}"/>
-            <Setter Property="FontSize"    Value="10"/>
+            <Setter Property="FontSize"    Value="{StaticResource FontSize.Small}"/>
             <Setter Property="FontWeight"  Value="Bold"/>
             <Setter Property="LetterSpacing" Value="1"/>
         </Style>
@@ -33,7 +33,7 @@
             <Setter Property="Foreground"      Value="{DynamicResource Brush.Text.Secondary}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"         Value="12,5"/>
-            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="FontSize"        Value="{StaticResource FontSize.Body}"/>
         </Style>
     </Window.Styles>
 
@@ -103,7 +103,7 @@
         <!-- ── No-data placeholder ────────────────────────────────────────── -->
         <TextBlock Grid.Row="0"
                    Text="{StaticResource FlowAnalytics_NoData}"
-                   Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="13" FontStyle="Italic"
+                   Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Medium}" FontStyle="Italic"
                    HorizontalAlignment="Center" VerticalAlignment="Center"
                    IsVisible="{Binding !HasData}"/>
 
@@ -121,19 +121,19 @@
                                     Background="{Binding Kind, Converter={StaticResource FlowIssueSeverityBrush}}"
                                     HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding Kind, Converter={StaticResource FlowIssueSeverityGlyph}}"
-                                           FontSize="10" Foreground="{DynamicResource Brush.Text.OnAccent}"
+                                           FontSize="{StaticResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.OnAccent}"
                                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <!-- Kind label -->
                             <TextBlock Grid.Column="1"
                                        Text="{Binding KindLabel}"
-                                       Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="10" FontWeight="Bold"
+                                       Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{StaticResource FontSize.Small}" FontWeight="Bold"
                                        VerticalAlignment="Center"
                                        Width="110" Margin="8,0,6,0"/>
                             <!-- Node snippet -->
                             <TextBlock Grid.Column="2"
                                        Text="{Binding DisplayText}"
-                                       Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="11"
+                                       Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}"
                                        VerticalAlignment="Center"
                                        TextTrimming="CharacterEllipsis"/>
                             <!-- Navigate button -->
@@ -141,7 +141,7 @@
                                     Content="→"
                                     Command="{Binding NavigateCommand}"
                                     Background="Transparent" BorderThickness="0"
-                                    Foreground="{DynamicResource Brush.Text.Muted}" FontSize="14"
+                                    Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Subtitle}"
                                     Padding="8,0" Margin="4,0,0,0"
                                     VerticalAlignment="Center"
                                     ToolTip.Tip="{StaticResource ToolTip_FlowAnalytics_Navigate}"
@@ -157,7 +157,7 @@
         <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
             <TextBlock Grid.Column="0"
                        Text="{Binding LastAnalysed}"
-                       Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10"
+                       Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Small}"
                        VerticalAlignment="Center"/>
             <Button Grid.Column="1" Classes="action-btn"
                     Content="{StaticResource FlowAnalytics_Refresh}"
