@@ -18,7 +18,8 @@
                   SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"
                   MinWidth="160"
                   ToolTip.Tip="{DynamicResource Settings_ThemeTooltip}"
-                  AutomationProperties.Name="{DynamicResource Settings_Theme}">
+                  AutomationProperties.Name="{DynamicResource Settings_Theme}"
+                  AutomationProperties.HelpText="{DynamicResource Settings_ThemeTooltip}">
             <ComboBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding DisplayName}"/>
