@@ -870,6 +870,14 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- ─── Settings — localization format ────────────────────────────── -->
     <sys:String x:Key="Settings_LocalizationFormat">Default localization format</sys:String>
 
+    <!-- ─── Settings — font scale (Gaps item 6 part B) ────────────────────── -->
+    <sys:String x:Key="Settings_FontScale">Font scale</sys:String>
+    <sys:String x:Key="Settings_FontScaleTooltip">Scales all text in the app. Takes effect after restarting the application.</sys:String>
+    <sys:String x:Key="Settings_FontScalePreviewBody">Body text sample</sys:String>
+    <sys:String x:Key="Settings_FontScalePreviewSubtitle">Subtitle text sample</sys:String>
+    <sys:String x:Key="Settings_FontScalePreviewTitle">Title text sample</sys:String>
+    <sys:String x:Key="Settings_FontScaleRestartNotice">Restart the application for the new font scale to take effect.</sys:String>
+
     <!-- PatchManager strings are in DialogEditor.Avalonia.Shared/Resources/SharedStrings.axaml -->
 
     <!-- ─── Branches window ────────────────────────────────────────────── -->
