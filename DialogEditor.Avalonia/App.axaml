@@ -110,6 +110,7 @@
             <converters:EnumToBoolConverter                      x:Key="EnumToBool"/>
             <converters:IsNullConverter                          x:Key="IsNull"/>
             <converters:IsNotNullConverter                       x:Key="IsNotNull"/>
+            <converters:FontScaleToPercentConverter              x:Key="FontScaleToPercent"/>
 
         </ResourceDictionary>
     </Application.Resources>
