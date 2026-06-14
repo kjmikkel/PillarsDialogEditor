@@ -869,6 +869,7 @@ Saving records your edits to the open project — game files are not touched unt
 
     <!-- ─── Settings — localization format ────────────────────────────── -->
     <sys:String x:Key="Settings_LocalizationFormat">Default localization format</sys:String>
+    <sys:String x:Key="Settings_LocalizationFormatTooltip">The file format used when exporting or importing localization entries (CSV, JSON, or XLIFF).</sys:String>
 
     <!-- ─── Settings — font scale (Gaps item 6 part B) ────────────────────── -->
     <sys:String x:Key="Settings_FontScale">Font scale</sys:String>

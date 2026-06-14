@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.ViewModels.Resources;
@@ -22,6 +21,9 @@ public partial class SettingsViewModel : ObservableObject
 
     /// Preset font-scale multipliers offered in Settings.
     public IReadOnlyList<double> FontScaleOptions { get; } = [1.0, 1.25, 1.5, 1.75, 2.0];
+
+    /// Localization formats offered for the "Default localization format" picker.
+    public IReadOnlyList<string> LocalizationFormatOptions { get; } = ["Csv", "Json", "Xliff"];
 
     // Live preview sizes, independent of the FontSize.* resource tokens (which stay
     // static until restart) — recomputed from SelectedFontScale as the user picks.
