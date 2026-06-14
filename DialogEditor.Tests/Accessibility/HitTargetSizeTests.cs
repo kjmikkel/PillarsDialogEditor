@@ -22,11 +22,16 @@ public class HitTargetSizeTests
         return dir!.FullName;
     }
 
-    private static bool IsExcluded(string path) =>
-        path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}") ||
-        path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}") ||
-        path.Contains($"{Path.DirectorySeparatorChar}.worktrees{Path.DirectorySeparatorChar}") ||
-        path.Contains($"{Path.DirectorySeparatorChar}worktrees{Path.DirectorySeparatorChar}");
+    // Checked relative to root, not the absolute path, so this doesn't misfire when root
+    // itself lives under a "worktrees" directory (e.g. when running from inside
+    // .claude/worktrees/<name>).
+    private static bool IsExcluded(string path, string root)
+    {
+        var segments = Path.GetRelativePath(root, path)
+            .Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        return segments.Contains("bin") || segments.Contains("obj")
+            || segments.Contains(".worktrees") || segments.Contains("worktrees");
+    }
 
     [Fact]
     public void NoButtonExplicitlySmallerThanMinimumHitTarget()
@@ -36,7 +41,7 @@ public class HitTargetSizeTests
 
         foreach (var file in Directory.EnumerateFiles(root, "*.axaml", SearchOption.AllDirectories))
         {
-            if (IsExcluded(file)) continue;
+            if (IsExcluded(file, root)) continue;
             var doc = XDocument.Load(file, LoadOptions.SetLineInfo);
 
             foreach (var el in doc.Descendants().Where(e => e.Name.LocalName == "Button"))

@@ -21,12 +21,16 @@ public class NoStrayFontSizeTests
 
     // Skip build output and other branches' working copies under .worktrees/ or
     // .claude/worktrees/ (gitignored, but Directory.EnumerateFiles doesn't honour
-    // .gitignore).
-    private static bool IsExcluded(string path) =>
-        path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}") ||
-        path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}") ||
-        path.Contains($"{Path.DirectorySeparatorChar}.worktrees{Path.DirectorySeparatorChar}") ||
-        path.Contains($"{Path.DirectorySeparatorChar}worktrees{Path.DirectorySeparatorChar}");
+    // .gitignore). Checked relative to root, not the absolute path, so this doesn't
+    // misfire when root itself lives under a "worktrees" directory (e.g. when running
+    // from inside .claude/worktrees/<name>).
+    private static bool IsExcluded(string path, string root)
+    {
+        var segments = Path.GetRelativePath(root, path)
+            .Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        return segments.Contains("bin") || segments.Contains("obj")
+            || segments.Contains(".worktrees") || segments.Contains("worktrees");
+    }
 
     // Inline attribute: FontSize="12"
     private static readonly Regex InlineFontSize = new(@"FontSize\s*=\s*""[0-9]", RegexOptions.Compiled);
@@ -43,7 +47,7 @@ public class NoStrayFontSizeTests
         var offenders = new List<string>();
         foreach (var file in Directory.EnumerateFiles(root, "*.axaml", SearchOption.AllDirectories))
         {
-            if (IsExcluded(file)) continue;
+            if (IsExcluded(file, root)) continue;
             if (Path.GetFileName(file).Equals("Tokens.axaml", StringComparison.OrdinalIgnoreCase)) continue;
             var lines = File.ReadAllLines(file);
             for (var i = 0; i < lines.Length; i++)
