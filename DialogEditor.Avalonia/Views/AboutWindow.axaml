@@ -7,14 +7,14 @@
         Width="420" SizeToContent="Height" CanResize="False"
         ShowInTaskbar="False" Background="{DynamicResource Brush.Surface.Info}">
     <StackPanel Margin="18,16,18,16" Spacing="8">
-        <TextBlock Text="{Binding AppName}" Foreground="{DynamicResource Brush.Text.Primary}" FontSize="18" FontWeight="Bold"/>
+        <TextBlock Text="{Binding AppName}" Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Title}" FontWeight="Bold"/>
         <StackPanel Orientation="Horizontal" Spacing="6">
-            <TextBlock Text="{StaticResource About_VersionLabel}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="12"/>
-            <TextBlock Text="{Binding Version}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12"/>
+            <TextBlock Text="{StaticResource About_VersionLabel}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Body}"/>
+            <TextBlock Text="{Binding Version}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Body}"/>
         </StackPanel>
-        <TextBlock Text="{Binding Description}" Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="12" TextWrapping="Wrap"/>
-        <TextBlock Text="{Binding License}" Foreground="{DynamicResource Brush.Text.Caption}" FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0"/>
-        <TextBlock Text="{Binding Credits}" Foreground="{DynamicResource Brush.Text.Caption}" FontSize="11" TextWrapping="Wrap"/>
+        <TextBlock Text="{Binding Description}" Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
+        <TextBlock Text="{Binding License}" Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{StaticResource FontSize.Label}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+        <TextBlock Text="{Binding Credits}" Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{StaticResource FontSize.Label}" TextWrapping="Wrap"/>
 
         <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
             <Button Content="{StaticResource About_OpenRepository}"
@@ -27,7 +27,7 @@
                     Command="{Binding OpenDocsCommand}"/>
         </StackPanel>
 
-        <TextBlock Text="{Binding Status}" Foreground="{DynamicResource Brush.Text.Status.Pending}" FontSize="11" TextWrapping="Wrap"/>
+        <TextBlock Text="{Binding Status}" Foreground="{DynamicResource Brush.Text.Status.Pending}" FontSize="{StaticResource FontSize.Label}" TextWrapping="Wrap"/>
 
         <Button HorizontalAlignment="Right" Margin="0,8,0,0"
                 Content="{StaticResource About_Close}"
