@@ -290,11 +290,16 @@ after the cheap wins. The rest are independent and can land in any order.
    ✅ Part A IMPLEMENTED (2026-06-14): all 349 literal `FontSize` values across 30
    `.axaml` files now bind a 9-entry `FontSize.*` token layer in `Tokens.axaml`
    (`NoStrayFontSizeTests` enforces this — see
-   `docs/superpowers/specs/2026-06-14-fontsize-token-foundation-design.md`). Remaining
-   (part B): there is still no UI-scale-factor setting, and fixed-size windows
-   (`SettingsWindow` is `CanResize="False" Height="220"`) will clip under OS text
-   scaling. Opportunity: add a scale factor in Settings that multiplies the
-   `FontSize.*` tokens, and make fixed-height windows resizable or auto-sizing.
+   `docs/superpowers/specs/2026-06-14-fontsize-token-foundation-design.md`).
+   ✅ Part B IMPLEMENTED (2026-06-14): added a restart-required `FontScale` setting
+   (100/125/150/175/200%) in `SettingsWindow`, with a live preview and restart notice,
+   applied to all `FontSize.*` tokens at startup via `FontScaleApplier`
+   (`AppSettings.FontScale`, `FontScaleApplierTests`). The 12 previously
+   `CanResize="False"` dialogs (including `SettingsWindow`, formerly
+   `Height="220"`) are now resizable with `MinWidth`/`SizeToContent="Height"`
+   (`ResizableDialogTests` enforces this) — see
+   `docs/superpowers/specs/2026-06-14-fontsize-scale-setting-design.md` and
+   `docs/superpowers/plans/2026-06-14-fontsize-scale-setting.md`.
 
 7. **Colour-only "new conversation" indicator. ✅ VERIFIED — premise disproven, no work
    needed (2026-06-13).** The audit assumed `BoolToNewConversationBrush`
