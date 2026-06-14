@@ -19,12 +19,14 @@ public class NoStrayFontSizeTests
         return dir!.FullName;
     }
 
-    // Skip build output and other branches' working copies under .worktrees/ (gitignored,
-    // but Directory.EnumerateFiles doesn't honour .gitignore).
+    // Skip build output and other branches' working copies under .worktrees/ or
+    // .claude/worktrees/ (gitignored, but Directory.EnumerateFiles doesn't honour
+    // .gitignore).
     private static bool IsExcluded(string path) =>
         path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}") ||
         path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}") ||
-        path.Contains($"{Path.DirectorySeparatorChar}.worktrees{Path.DirectorySeparatorChar}");
+        path.Contains($"{Path.DirectorySeparatorChar}.worktrees{Path.DirectorySeparatorChar}") ||
+        path.Contains($"{Path.DirectorySeparatorChar}worktrees{Path.DirectorySeparatorChar}");
 
     // Inline attribute: FontSize="12"
     private static readonly Regex InlineFontSize = new(@"FontSize\s*=\s*""[0-9]", RegexOptions.Compiled);
