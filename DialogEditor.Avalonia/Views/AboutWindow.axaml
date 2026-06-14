@@ -4,7 +4,7 @@
         x:Class="DialogEditor.Avalonia.Views.AboutWindow"
         Title="{StaticResource About_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Width="420" SizeToContent="Height" CanResize="False"
+        Width="420" MinWidth="420" SizeToContent="Height" CanResize="True"
         ShowInTaskbar="False" Background="{DynamicResource Brush.Surface.Info}">
     <StackPanel Margin="18,16,18,16" Spacing="8">
         <TextBlock Text="{Binding AppName}" Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Title}" FontWeight="Bold"/>
