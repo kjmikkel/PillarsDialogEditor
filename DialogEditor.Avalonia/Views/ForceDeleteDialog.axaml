@@ -9,13 +9,13 @@
         Background="{DynamicResource Brush.Surface.Panel}">
   <StackPanel Margin="20" Spacing="12">
     <TextBlock x:Name="MessageText"
-               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12"
+               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Body}"
                TextWrapping="Wrap"/>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
       <Button x:Name="CancelButton"
               Content="{StaticResource ForceDelete_Cancel}"
               Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
-              Padding="16,6" FontSize="12"
+              Padding="16,6" FontSize="{StaticResource FontSize.Body}"
               IsCancel="True"
               IsDefault="True"
               ToolTip.Tip="{StaticResource ForceDelete_Cancel}"
@@ -23,7 +23,7 @@
       <Button x:Name="ConfirmButton"
               Content="{StaticResource ForceDelete_Confirm}"
               Background="{DynamicResource Brush.Button.Destructive.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
-              Padding="16,6" FontSize="12"
+              Padding="16,6" FontSize="{StaticResource FontSize.Body}"
               ToolTip.Tip="{StaticResource ForceDelete_Confirm}"
               AutomationProperties.HelpText="{StaticResource ForceDelete_Confirm}"/>
     </StackPanel>

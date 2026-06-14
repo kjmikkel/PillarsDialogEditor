@@ -10,7 +10,7 @@
     <Border Background="{DynamicResource Brush.Surface.Card}" Padding="8,4">
         <TextBlock x:Name="HintText"
                    Text=""
-                   FontSize="11"
+                   FontSize="{StaticResource FontSize.Label}"
                    Foreground="{DynamicResource Brush.Text.Muted}"/>
     </Border>
 </UserControl>
