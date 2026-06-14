@@ -402,7 +402,7 @@ after the cheap wins. The rest are independent and can land in any order.
     `PaletteMeetsContrastTargets`'s `[InlineData]`, and regenerated
     `palette-golden.approved.txt`.
 
-15. **No first-run theme-picker onboarding.** Raised during item 11(a)'s brainstorm: the
+15. **✅ IMPLEMENTED (2026-06-14).** Raised during item 11(a)'s brainstorm: the
     now-common "Light / Dark / System" first-launch picker (with live previews) would let
     new users choose their palette immediately instead of discovering the Settings picker
     later. Out of scope for 11(a) (which just makes "Auto" the silent default) — needs its
