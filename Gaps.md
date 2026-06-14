@@ -286,12 +286,15 @@ after the cheap wins. The rest are independent and can land in any order.
    **Deferred follow-ups:** info icons on non-focusable elements (item 12), and a hint
    surface for windows other than MainWindow (item 13).
 
-6. **Tiny fixed font sizes, no text scaling.** ~127 instances of 9–11px fonts across 19
-   views; `NodeDetailView` group headers are **FontSize 8**. There is no UI-scale setting,
-   and fixed-size windows (`SettingsWindow` is `CanResize="False" Height="220"`) will clip
-   under OS text scaling. Opportunity: move font sizes into `Tokens.axaml` as semantic
-   tokens (`FontSize.Caption`, `FontSize.Body`, …) — the Layer 0 token infrastructure and
-   its enforcement-test pattern already exist — then add a scale factor in Settings.
+6. **No UI-scale setting; fixed-size windows will clip under OS text scaling.**
+   ✅ Part A IMPLEMENTED (2026-06-14): all 349 literal `FontSize` values across 30
+   `.axaml` files now bind a 9-entry `FontSize.*` token layer in `Tokens.axaml`
+   (`NoStrayFontSizeTests` enforces this — see
+   `docs/superpowers/specs/2026-06-14-fontsize-token-foundation-design.md`). Remaining
+   (part B): there is still no UI-scale-factor setting, and fixed-size windows
+   (`SettingsWindow` is `CanResize="False" Height="220"`) will clip under OS text
+   scaling. Opportunity: add a scale factor in Settings that multiplies the
+   `FontSize.*` tokens, and make fixed-height windows resizable or auto-sizing.
 
 7. **Colour-only "new conversation" indicator. ✅ VERIFIED — premise disproven, no work
    needed (2026-06-13).** The audit assumed `BoolToNewConversationBrush`
