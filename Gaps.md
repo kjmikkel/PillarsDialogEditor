@@ -361,13 +361,19 @@ after the cheap wins. The rest are independent and can land in any order.
     the only two offenders; "slim toolbar buttons" size via padding+content rather than
     explicit dimensions, so were not flagged.
 
-12. **Info icons carry no tooltip/HelpText.** Item 5's sweep is scoped to *focusable*
-    controls — static info icons (legend swatches, inline "i"/help glyphs rendered as
-    `TextBlock`/`Border`) are skipped because they can't receive keyboard focus, so
-    `AutomationProperties.HelpText` would never be announced on them. Making these
-    operable (e.g. focusable `Button`-styled icons with both `ToolTip.Tip` and
-    `AutomationProperties.HelpText`) would let keyboard/screen-reader users reach the
-    same explanations sighted mouse users get.
+12. **✅ IMPLEMENTED (2026-06-14).** The 7 legend swatches in `LegendWindow`'s
+    "Connections" (Show Once, Always, Never) and "Node Types" (NPC line, Player
+    choice, Narrator, Script/automated action) sections are now wrapped in
+    borderless, transparent `Button.legendRow` elements — keyboard-focusable tab
+    stops carrying `AutomationProperties.Name`, `ToolTip.Tip`, and
+    `AutomationProperties.HelpText`, all three set to the same new full-sentence
+    `Legend_*_Help` resource. `AutomationHelpTextTests` now auto-enforces the
+    Tip/HelpText mirroring on these rows. `DiffWindow`/`DiffHelpWindow`/
+    `FlowAnalyticsWindow` swatches were surveyed but deferred — `DiffWindow`'s
+    legend sits next to an already-accessible Help button with the full
+    explanation, and `FlowAnalyticsWindow`'s per-row icons are a different "many
+    tab stops in a list" problem. See
+    docs/superpowers/specs/2026-06-14-legend-swatch-accessibility-design.md.
 
 13. **✅ IMPLEMENTED (2026-06-13).** Focused-control hint is no longer MainWindow-only.
     A new shared `FocusHintBar` control (`DialogEditor.Avalonia.Shared`) mirrors the
