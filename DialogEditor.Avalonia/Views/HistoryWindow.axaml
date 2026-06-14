@@ -12,7 +12,7 @@
 
         <TextBlock Grid.Row="0"
                    Text="{Binding StatusText}"
-                   Foreground="{DynamicResource Brush.Text.Meta.Commit}" FontSize="13" TextWrapping="Wrap"
+                   Foreground="{DynamicResource Brush.Text.Meta.Commit}" FontSize="{StaticResource FontSize.Medium}" TextWrapping="Wrap"
                    IsVisible="{Binding !HasCommits}"
                    VerticalAlignment="Top"/>
 
@@ -27,13 +27,13 @@
                         <TextBlock Grid.Column="0"
                                    Text="{Binding Date, Converter={StaticResource CommitDate}}"
                                    ToolTip.Tip="{Binding Date}"
-                                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12"/>
+                                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Body}"/>
                         <TextBlock Grid.Column="1" Text="{Binding Author}"
-                                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Body}" TextTrimming="CharacterEllipsis"/>
                         <TextBlock Grid.Column="2" Text="{Binding ShortSha}"
-                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="12" FontFamily="Consolas,monospace"/>
+                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Body}" FontFamily="Consolas,monospace"/>
                         <TextBlock Grid.Column="3" Text="{Binding Subject}"
-                                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12" TextWrapping="Wrap"/>
+                                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
@@ -47,11 +47,11 @@
                     ToolTip.Tip="{StaticResource HistoryWindow_CompareTooltip}"
                     AutomationProperties.HelpText="{StaticResource HistoryWindow_CompareTooltip}"
                     Background="{DynamicResource Brush.Button.Confirm.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
-                    Padding="16,6" FontSize="12"/>
+                    Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
             <Button x:Name="CloseButton"
                     Content="{StaticResource HistoryWindow_Close}"
                     Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
-                    Padding="16,6" FontSize="12"/>
+                    Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
         </StackPanel>
 
         <!-- Focus hint bar (Gaps item 16) -->
