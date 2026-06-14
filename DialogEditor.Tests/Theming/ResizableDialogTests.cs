@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using DialogEditor.Avalonia.Shared;
 using DialogEditor.Avalonia.Views;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels.Resources;
@@ -36,5 +37,6 @@ public class ResizableDialogTests
     [AvaloniaFact] public void ImportWarningsDialog_IsResizable() => AssertResizable(new ImportWarningsDialog(), 440);
     [AvaloniaFact] public void LanguageCodeDialog_IsResizable() => AssertResizable(new LanguageCodeDialog(), 340);
     [AvaloniaFact] public void SettingsWindow_IsResizable() => AssertResizable(new SettingsWindow(), 500);
+    [AvaloniaFact] public void ThemeOnboardingWindow_IsResizable() => AssertResizable(new ThemeOnboardingWindow(), 480);
     [AvaloniaFact] public void UnsavedChangesDialog_IsResizable() => AssertResizable(new UnsavedChangesDialog(), 420);
 }
