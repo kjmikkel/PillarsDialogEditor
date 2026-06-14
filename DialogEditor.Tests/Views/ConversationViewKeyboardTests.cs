@@ -8,6 +8,7 @@ using DialogEditor.Tests.Helpers;
 using DialogEditor.Tests.ViewModels;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
+using Nodify;
 
 namespace DialogEditor.Tests.Views;
 
@@ -150,6 +151,43 @@ public class ConversationViewKeyboardTests
             NavigationMethod = NavigationMethod.Tab,
         });
         Assert.Same(child, vm.SelectedNode);
+    }
+
+    [AvaloniaFact]
+    public void TabFocus_OnConnector_PansCameraToConnectorAnchor()
+    {
+        // Child is far enough away that its connectors sit outside the
+        // initial 800px-wide viewport, which stays centred on the root.
+        var vm = new ConversationViewModel(new StubDispatcher()) { IsEditable = true };
+        var root  = CanvasNavigationServiceTests.MakeNode(0, 0, 0);
+        var child = CanvasNavigationServiceTests.MakeNode(1, 2000, 0);
+        root.OnSelected  = n => vm.SelectedNode = n;
+        child.OnSelected = n => vm.SelectedNode = n;
+        vm.Nodes.Add(root);
+        vm.Nodes.Add(child);
+        vm.Connections.Add(CanvasNavigationServiceTests.Connect(root, child));
+        vm.SelectNode(root);
+
+        var view = new ConversationView { DataContext = vm };
+        var window = new Window { Content = view, Width = 800, Height = 600 };
+        window.Show();
+
+        var editor = (NodifyEditor)view.FindControl<Control>("Editor")!;
+
+        // Simulate Tab moving Avalonia's keyboard focus to the child node's
+        // "in" connector, as Nodify does once Tab order reaches that node.
+        var childInput = ((global::Avalonia.Visual)editor).GetVisualDescendants()
+            .OfType<NodeInput>()
+            .First(i => ReferenceEquals(i.DataContext, child.Input));
+        childInput.RaiseEvent(new GotFocusEventArgs
+        {
+            RoutedEvent = InputElement.GotFocusEvent,
+            NavigationMethod = NavigationMethod.Tab,
+            Source = childInput,
+        });
+
+        var anchor = child.Input.Anchor;
+        Assert.InRange(anchor.X, editor.ViewportLocation.X, editor.ViewportLocation.X + editor.ViewportSize.Width);
     }
 
     [AvaloniaFact]
