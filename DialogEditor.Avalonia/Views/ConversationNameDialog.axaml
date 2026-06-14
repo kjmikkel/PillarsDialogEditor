@@ -2,8 +2,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="DialogEditor.Avalonia.Views.ConversationNameDialog"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Width="460" SizeToContent="Height"
-        CanResize="False"
+        Width="460" MinWidth="460" SizeToContent="Height"
+        CanResize="True"
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource Brush.Surface.Panel}">
 

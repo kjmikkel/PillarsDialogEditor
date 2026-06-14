@@ -5,9 +5,9 @@
         x:Class="DialogEditor.Avalonia.Views.ExportConversationsWindow"
         Title="{StaticResource ExportConversations_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Width="480" Height="520"
+        Width="480" MinWidth="480" SizeToContent="Height"
         Background="{DynamicResource Brush.Surface.Window}"
-        CanResize="False"
+        CanResize="True"
         WindowStartupLocation="CenterOwner"
         x:CompileBindings="False">
 
