@@ -12,34 +12,34 @@
     <StackPanel Margin="20">
 
         <TextBlock Text="{StaticResource ConflictDialog_Intro}"
-                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="13"
+                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Medium}"
                    TextWrapping="Wrap" Margin="0,0,0,14"/>
 
         <Border Background="{DynamicResource Brush.Surface.Card}" CornerRadius="4" Padding="12,8" Margin="0,0,0,16">
             <StackPanel>
                 <Grid ColumnDefinitions="120,*" Margin="0,3">
                     <TextBlock Text="{StaticResource ConflictDialog_NodeLabel}"
-                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" VerticalAlignment="Center"/>
+                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" VerticalAlignment="Center"/>
                     <TextBlock x:Name="NodeIdBlock" Grid.Column="1"
-                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12" TextWrapping="Wrap"/>
+                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
                 </Grid>
                 <Grid ColumnDefinitions="120,*" Margin="0,3">
                     <TextBlock Text="{StaticResource ConflictDialog_FieldLabel}"
-                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" VerticalAlignment="Center"/>
+                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" VerticalAlignment="Center"/>
                     <TextBlock x:Name="FieldNameBlock" Grid.Column="1"
-                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12" TextWrapping="Wrap"/>
+                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
                 </Grid>
                 <Grid ColumnDefinitions="120,*" Margin="0,3">
                     <TextBlock Text="{StaticResource ConflictDialog_ExpectedLabel}"
-                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" VerticalAlignment="Center"/>
+                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" VerticalAlignment="Center"/>
                     <TextBlock x:Name="ExpectedBlock" Grid.Column="1"
-                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12" TextWrapping="Wrap"/>
+                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
                 </Grid>
                 <Grid ColumnDefinitions="120,*" Margin="0,3">
                     <TextBlock Text="{StaticResource ConflictDialog_ActualLabel}"
-                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" VerticalAlignment="Center"/>
+                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" VerticalAlignment="Center"/>
                     <TextBlock x:Name="ActualBlock" Grid.Column="1"
-                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12" TextWrapping="Wrap"/>
+                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
                 </Grid>
             </StackPanel>
         </Border>
@@ -50,13 +50,13 @@
                     ToolTip.Tip="{StaticResource ConflictDialog_CancelTooltip}"
                     AutomationProperties.HelpText="{StaticResource ConflictDialog_CancelTooltip}"
                     Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
-                    Padding="16,6" FontSize="12"/>
+                    Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
             <Button x:Name="ForceButton"
                     Content="{StaticResource ConflictDialog_Force}"
                     ToolTip.Tip="{StaticResource ConflictDialog_ForceTooltip}"
                     AutomationProperties.HelpText="{StaticResource ConflictDialog_ForceTooltip}"
                     Background="{DynamicResource Brush.Button.Caution.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
-                    Padding="16,6" FontSize="12"/>
+                    Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
         </StackPanel>
 
         <!-- Focus hint bar (Gaps item 16) -->

@@ -68,7 +68,7 @@
                 </StackPanel>
                 <TextBlock DockPanel.Dock="Left"
                            Text="{Binding StatisticsText}"
-                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="10" VerticalAlignment="Center" Margin="0,0,8,0"
+                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}" VerticalAlignment="Center" Margin="0,0,8,0"
                            ToolTip.Tip="{Binding StatisticsTooltip}"/>
                 <Grid VerticalAlignment="Center" Margin="0,0,8,0">
                     <TextBox x:Name="SearchBox"
@@ -77,7 +77,7 @@
                              AutomationProperties.Name="{StaticResource Placeholder_SearchNodes}"
                              Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" CaretBrush="{DynamicResource Brush.Text.Secondary}"
                              BorderBrush="{DynamicResource Brush.Border.Muted}" BorderThickness="1"
-                             Padding="6,2,24,2" FontSize="12" Height="26"
+                             Padding="6,2,24,2" FontSize="{StaticResource FontSize.Body}" Height="26"
                              VerticalContentAlignment="Center"
                              KeyDown="SearchBox_KeyDown"
                              ToolTip.Tip="{StaticResource ToolTip_SearchNodes}"
@@ -86,7 +86,7 @@
                             HorizontalAlignment="Right" Width="24" Height="24"
                             Content="✕" VerticalAlignment="Center"
                             Background="Transparent" BorderThickness="0"
-                            Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10" Cursor="Hand"
+                            Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Small}" Cursor="Hand"
                             ToolTip.Tip="{StaticResource ToolTip_ClearSearch}"
                             AutomationProperties.HelpText="{StaticResource ToolTip_ClearSearch}"
                             AutomationProperties.Name="{StaticResource AutomationName_ClearSearch}"/>
@@ -187,7 +187,7 @@
                                         ZIndex="11"
                                         Background="{Binding DiffStatus, Converter={StaticResource DiffStatusToBrushConverter}}">
                                     <TextBlock Text="{Binding DiffStatus, Converter={StaticResource DiffStatusToGlyph}}"
-                                               Foreground="{DynamicResource Brush.Text.OnAccent}" FontWeight="Bold" FontSize="11"
+                                               Foreground="{DynamicResource Brush.Text.OnAccent}" FontWeight="Bold" FontSize="{StaticResource FontSize.Label}"
                                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
 
@@ -222,7 +222,7 @@
                                         </Path>
                                         <TextBlock Text="{Binding Title}"
                                                    Foreground="{DynamicResource Brush.Text.OnAccent}" FontWeight="Bold"
-                                                   FontSize="10" Padding="0,3,6,3"
+                                                   FontSize="{StaticResource FontSize.Small}" Padding="0,3,6,3"
                                                    TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
                                 </Border>
@@ -239,7 +239,7 @@
                                     </Border.Background>
                                     <TextBlock Text="{Binding TextPreview}"
                                                TextWrapping="Wrap"
-                                               Padding="6,4" FontSize="10"
+                                               Padding="6,4" FontSize="{StaticResource FontSize.Small}"
                                                Foreground="{DynamicResource Brush.Text.OnLight}" MaxHeight="70"/>
                                 </Border>
 
@@ -253,7 +253,7 @@
                                             <Binding Source="{x:Static theming:ThemeService.Current}" Path="Revision"/>
                                         </MultiBinding>
                                     </Border.Background>
-                                    <TextBlock Text="{Binding FooterText}" FontSize="9" Foreground="{DynamicResource Brush.Text.OnLight.Muted}"/>
+                                    <TextBlock Text="{Binding FooterText}" FontSize="{StaticResource FontSize.Caption}" Foreground="{DynamicResource Brush.Text.OnLight.Muted}"/>
                                 </Border>
 
                             </Grid>
