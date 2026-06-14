@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using DialogEditor.Avalonia.Shared;
 using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.Avalonia.Shared.Theming;
 using DialogEditor.Avalonia.Views;
@@ -35,7 +36,24 @@ public partial class App : Application
             // reloads Tokens.axaml and would otherwise reset this. Restart-required:
             // changing the setting mid-session does not re-run this (Gaps item 6 part B).
             new FontScaleApplier().Apply(AppSettings.FontScale);
-            desktop.MainWindow = new MainWindow();
+
+            if (!AppSettings.ThemeOnboardingSeen)
+            {
+                var onboarding = new ThemeOnboardingWindow();
+                desktop.MainWindow = onboarding;
+                onboarding.Closed += (_, _) =>
+                {
+                    AppSettings.ThemeOnboardingSeen = true;
+                    var main = new MainWindow();
+                    desktop.MainWindow = main;
+                    main.Show();
+                };
+                onboarding.Show();
+            }
+            else
+            {
+                desktop.MainWindow = new MainWindow();
+            }
         }
         base.OnFrameworkInitializationCompleted();
     }
