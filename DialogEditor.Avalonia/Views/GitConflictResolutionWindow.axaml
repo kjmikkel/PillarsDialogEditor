@@ -12,14 +12,14 @@
 
         <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
                    Text="{StaticResource GitConflictWindow_Intro}"
-                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="13"
+                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Medium}"
                    TextWrapping="Wrap" Margin="0,0,0,14"/>
 
         <!-- Conflict list -->
         <DockPanel Grid.Row="1" Grid.Column="0" Margin="0,0,12,0">
             <TextBlock DockPanel.Dock="Top"
                        Text="{StaticResource GitConflictWindow_ListHeader}"
-                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" Margin="0,0,0,4"/>
+                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" Margin="0,0,0,4"/>
             <ListBox x:Name="ConflictList"
                      ItemsSource="{Binding Conflicts}"
                      SelectedItem="{Binding Selected, Mode=TwoWay}"
@@ -28,9 +28,9 @@
                     <DataTemplate>
                         <StackPanel Margin="0,2">
                             <TextBlock Text="{Binding Title}"
-                                       Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12" TextWrapping="Wrap"/>
+                                       Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
                             <TextBlock Text="{StaticResource GitConflictWindow_Unresolved}"
-                                       Foreground="{DynamicResource Brush.Text.Meta.Commit}" FontSize="10"
+                                       Foreground="{DynamicResource Brush.Text.Meta.Commit}" FontSize="{StaticResource FontSize.Small}"
                                        IsVisible="{Binding IsUnresolved}"/>
                         </StackPanel>
                     </DataTemplate>
@@ -47,17 +47,17 @@
                         Padding="12" Margin="0,0,6,0">
                     <StackPanel Spacing="8">
                         <TextBlock Text="{StaticResource GitConflictWindow_MineHeader}"
-                                   Foreground="{DynamicResource Brush.Conflict.Mine.Foreground}" FontSize="12" FontWeight="Bold"/>
+                                   Foreground="{DynamicResource Brush.Conflict.Mine.Foreground}" FontSize="{StaticResource FontSize.Body}" FontWeight="Bold"/>
                         <TextBlock Text="{StaticResource GitConflict_DefaultTextLabel}"
-                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="10"
+                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}"
                                    IsVisible="{Binding HasFemaleRow}"/>
                         <TextBlock x:Name="MineDiffText"
-                                   FontSize="12" TextWrapping="Wrap"/>
+                                   FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
                         <TextBlock Text="{StaticResource GitConflict_FemaleTextLabel}"
-                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="10"
+                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}"
                                    IsVisible="{Binding HasFemaleRow}"/>
                         <TextBlock x:Name="MineFemaleDiffText"
-                                   FontSize="12" TextWrapping="Wrap"
+                                   FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"
                                    IsVisible="{Binding HasFemaleRow}"/>
                         <RadioButton x:Name="MineRadio" GroupName="Choice"
                                      Content="{Binding MineLabel}"
@@ -71,17 +71,17 @@
                         Padding="12" Margin="6,0,0,0">
                     <StackPanel Spacing="8">
                         <TextBlock Text="{StaticResource GitConflictWindow_TheirsHeader}"
-                                   Foreground="{DynamicResource Brush.Conflict.Theirs.Foreground}" FontSize="12" FontWeight="Bold"/>
+                                   Foreground="{DynamicResource Brush.Conflict.Theirs.Foreground}" FontSize="{StaticResource FontSize.Body}" FontWeight="Bold"/>
                         <TextBlock Text="{StaticResource GitConflict_DefaultTextLabel}"
-                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="10"
+                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}"
                                    IsVisible="{Binding HasFemaleRow}"/>
                         <TextBlock x:Name="TheirsDiffText"
-                                   FontSize="12" TextWrapping="Wrap"/>
+                                   FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
                         <TextBlock Text="{StaticResource GitConflict_FemaleTextLabel}"
-                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="10"
+                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}"
                                    IsVisible="{Binding HasFemaleRow}"/>
                         <TextBlock x:Name="TheirsFemaleDiffText"
-                                   FontSize="12" TextWrapping="Wrap"
+                                   FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"
                                    IsVisible="{Binding HasFemaleRow}"/>
                         <RadioButton x:Name="TheirsRadio" GroupName="Choice"
                                      Content="{Binding TheirsLabel}"
@@ -102,14 +102,14 @@
                     ToolTip.Tip="{StaticResource GitConflictWindow_CancelTooltip}"
                     AutomationProperties.HelpText="{StaticResource GitConflictWindow_CancelTooltip}"
                     Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
-                    Padding="16,6" FontSize="12"/>
+                    Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
             <Button x:Name="ApplyButton"
                     Content="{StaticResource GitConflictWindow_Apply}"
                     Command="{Binding ApplyCommand}"
                     ToolTip.Tip="{StaticResource GitConflictWindow_ApplyTooltip}"
                     AutomationProperties.HelpText="{StaticResource GitConflictWindow_ApplyTooltip}"
                     Background="{DynamicResource Brush.Button.Confirm.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
-                    Padding="16,6" FontSize="12"/>
+                    Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
         </StackPanel>
 
         <!-- Focus hint bar (Gaps item 13) -->
