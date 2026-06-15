@@ -145,6 +145,11 @@
                                               CommandParameter="{Binding}"
                                               ToolTip.Tip="{StaticResource ToolTip_AddConnectedNode}"
                                               AutomationProperties.HelpText="{StaticResource ToolTip_AddConnectedNode}"/>
+                                    <MenuItem Header="{StaticResource Menu_ConnectToNode}"
+                                              Command="{Binding $parent[UserControl].DataContext.BeginConnectCmdCommand}"
+                                              CommandParameter="{Binding}"
+                                              ToolTip.Tip="{StaticResource ToolTip_ConnectToNode}"
+                                              AutomationProperties.HelpText="{StaticResource ToolTip_ConnectToNode}"/>
                                 </ContextMenu>
                             </nodify:Node.ContextMenu>
 
@@ -188,6 +193,34 @@
                                         Background="{Binding DiffStatus, Converter={StaticResource DiffStatusToBrushConverter}}">
                                     <TextBlock Text="{Binding DiffStatus, Converter={StaticResource DiffStatusToGlyph}}"
                                                Foreground="{DynamicResource Brush.Text.OnAccent}" FontWeight="Bold" FontSize="{StaticResource FontSize.Label}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+
+                                <!-- Connect-mode source highlight — dashed amber border + 🔗
+                                     badge, top-left (opposite the diff badge's top-right corner
+                                     so the two never collide). Transparent/invisible when this
+                                     node isn't the connect-mode source (Layer 2.5), reusing
+                                     Brush.Severity.Warning so no new colour token is needed. -->
+                                <Rectangle Grid.Row="0" Grid.RowSpan="3"
+                                           IsHitTestVisible="False"
+                                           ZIndex="10"
+                                           Stretch="Fill"
+                                           StrokeThickness="3"
+                                           StrokeDashArray="6,3"
+                                           Stroke="{DynamicResource Brush.Severity.Warning}"
+                                           IsVisible="{Binding IsConnectionSource}"/>
+
+                                <Border x:Name="ConnectionSourceBadge"
+                                        Grid.Row="0" Grid.RowSpan="3"
+                                        Width="18" Height="18" CornerRadius="9"
+                                        HorizontalAlignment="Left" VerticalAlignment="Top"
+                                        Margin="-9,-9,0,0"
+                                        IsHitTestVisible="False"
+                                        ZIndex="11"
+                                        Background="{DynamicResource Brush.Severity.Warning}"
+                                        IsVisible="{Binding IsConnectionSource}">
+                                    <TextBlock Text="🔗"
+                                               FontSize="{StaticResource FontSize.Label}"
                                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
 
