@@ -247,6 +247,13 @@ public partial class NodeViewModel : ObservableObject
     [ObservableProperty] private bool        _isSelected;
     [ObservableProperty] private bool        _isSearchMatch = true;
 
+    /// <summary>
+    /// True only for the node currently acting as the source in keyboard "connect
+    /// mode" (Ctrl+L). Drives the dashed-border + 🔗-badge overlay in
+    /// ConversationView.axaml; see docs/superpowers/specs/2026-06-15-connect-mode-design.md.
+    /// </summary>
+    [ObservableProperty] private bool        _isConnectionSource;
+
     internal Action<NodeViewModel>? OnSelected { get; set; }
 
     partial void OnIsSelectedChanged(bool value)
