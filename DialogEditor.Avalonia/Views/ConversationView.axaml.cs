@@ -37,6 +37,7 @@ public partial class ConversationView : UserControl
             Key.Left  when ctrl => vm.NudgeSelected(-step, 0),
             Key.Up    when ctrl => vm.NudgeSelected(0, -step),
             Key.Down  when ctrl => vm.NudgeSelected(0, step),
+            Key.L     when ctrl => vm.TryBeginConnect(),
 
             Key.Right when none => vm.TryNavigate(CanvasNavDirection.Child),
             Key.Left  when none => vm.TryNavigate(CanvasNavDirection.Parent),
@@ -47,12 +48,16 @@ public partial class ConversationView : UserControl
             Key.PageUp   when none => vm.TryCycle(forward: false),
             Key.Home     when none => vm.TrySelectRoot(),
 
+            // Order matters: connect-mode arms must win over the unconditional
+            // SelectedNode-based arms below (same Key, both `when none`).
+            Key.Enter when none && vm.IsConnecting => vm.TryConfirmConnection(),
             Key.Enter when none && vm.SelectedNode is not null => RaiseFocusDetail(),
 
             Key.Apps                                          => OpenSelectedNodeContextMenu(vm),
             Key.F10 when e.KeyModifiers == KeyModifiers.Shift => OpenSelectedNodeContextMenu(vm),
 
-            Key.Escape when none => vm.Deselect(),
+            Key.Escape when none && vm.IsConnecting => vm.CancelConnect(),
+            Key.Escape when none                    => vm.Deselect(),
 
             _ => false,
         };
