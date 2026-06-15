@@ -13,22 +13,22 @@
         <Grid Grid.Row="0" ColumnDefinitions="160,60,130,110,90,*"
               Margin="0,0,0,6" IsVisible="{Binding HasData}">
             <TextBlock Grid.Column="0" Text="{StaticResource BlameWindow_ColConversation}"
-                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="12" FontWeight="Bold"/>
+                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{StaticResource FontSize.Body}" FontWeight="Bold"/>
             <TextBlock Grid.Column="1" Text="{StaticResource BlameWindow_ColNode}"
-                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="12" FontWeight="Bold"/>
+                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{StaticResource FontSize.Body}" FontWeight="Bold"/>
             <TextBlock Grid.Column="2" Text="{StaticResource BlameWindow_ColAuthor}"
-                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="12" FontWeight="Bold"/>
+                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{StaticResource FontSize.Body}" FontWeight="Bold"/>
             <TextBlock Grid.Column="3" Text="{StaticResource BlameWindow_ColDate}"
-                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="12" FontWeight="Bold"/>
+                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{StaticResource FontSize.Body}" FontWeight="Bold"/>
             <TextBlock Grid.Column="4" Text="{StaticResource BlameWindow_ColCommit}"
-                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="12" FontWeight="Bold"/>
+                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{StaticResource FontSize.Body}" FontWeight="Bold"/>
             <TextBlock Grid.Column="5" Text="{StaticResource BlameWindow_ColMessage}"
-                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="12" FontWeight="Bold"/>
+                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{StaticResource FontSize.Body}" FontWeight="Bold"/>
         </Grid>
 
         <TextBlock Grid.Row="1"
                    Text="{Binding StatusText}"
-                   Foreground="{DynamicResource Brush.Text.Meta.Commit}" FontSize="13" TextWrapping="Wrap"
+                   Foreground="{DynamicResource Brush.Text.Meta.Commit}" FontSize="{StaticResource FontSize.Medium}" TextWrapping="Wrap"
                    IsVisible="{Binding !HasData}"
                    VerticalAlignment="Top"/>
 
@@ -40,19 +40,19 @@
                 <DataTemplate>
                     <Grid ColumnDefinitions="160,60,130,110,90,*" Margin="0,3">
                         <TextBlock Grid.Column="0" Text="{Binding ConversationName}"
-                                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Body}" TextTrimming="CharacterEllipsis"/>
                         <TextBlock Grid.Column="1" Text="{Binding NodeId}"
-                                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12"/>
+                                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Body}"/>
                         <TextBlock Grid.Column="2" Text="{Binding Author}"
-                                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Body}" TextTrimming="CharacterEllipsis"/>
                         <TextBlock Grid.Column="3"
                                    Text="{Binding Date, Converter={StaticResource CommitDate}}"
                                    ToolTip.Tip="{Binding Date}"
-                                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="12"/>
+                                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Body}"/>
                         <TextBlock Grid.Column="4" Text="{Binding ShortSha}"
-                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="12" FontFamily="Consolas,monospace"/>
+                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Body}" FontFamily="Consolas,monospace"/>
                         <TextBlock Grid.Column="5" Text="{Binding Subject}"
-                                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12" TextWrapping="Wrap"/>
+                                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
@@ -62,8 +62,8 @@
                     HorizontalAlignment="Right" Spacing="8" Margin="0,14,0,0">
             <Button x:Name="CloseButton"
                     Content="{StaticResource BlameWindow_Close}"
-                    Background="{DynamicResource Brush.Surface.Header}" Foreground="White" BorderThickness="0"
-                    Padding="16,6" FontSize="12"/>
+                    Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
+                    Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
         </StackPanel>
 
     </Grid>

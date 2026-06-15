@@ -108,9 +108,9 @@ public class AppSettingsThemeTests : IDisposable
     }
 
     [Fact]
-    public void Theme_DefaultsToDark()
+    public void Theme_DefaultsToAuto()
     {
-        Assert.Equal("Dark", AppSettings.Theme);
+        Assert.Equal("Auto", AppSettings.Theme);
     }
 
     [Fact]
@@ -118,5 +118,72 @@ public class AppSettingsThemeTests : IDisposable
     {
         AppSettings.Theme = "HighContrast";
         Assert.Equal("HighContrast", AppSettings.Theme);
+    }
+}
+
+public class AppSettingsFontScaleTests : IDisposable
+{
+    public AppSettingsFontScaleTests()
+        => AppSettings.SettingsPathOverride = Path.GetTempFileName();
+
+    public void Dispose()
+    {
+        var path = AppSettings.SettingsPathOverride;
+        AppSettings.SettingsPathOverride = null;
+        if (path is not null) File.Delete(path);
+    }
+
+    [Fact]
+    public void FontScale_DefaultsTo1()
+    {
+        Assert.Equal(1.0, AppSettings.FontScale);
+    }
+
+    [Fact]
+    public void FontScale_RoundTrips()
+    {
+        AppSettings.FontScale = 1.5;
+        Assert.Equal(1.5, AppSettings.FontScale);
+    }
+}
+
+public class AppSettingsThemeOnboardingTests : IDisposable
+{
+    public void Dispose()
+    {
+        var path = AppSettings.SettingsPathOverride;
+        AppSettings.SettingsPathOverride = null;
+        if (path is not null && File.Exists(path)) File.Delete(path);
+    }
+
+    [Fact]
+    public void ThemeOnboardingSeen_DefaultsToFalse_WhenNoSettingsFile()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"settings-{Guid.NewGuid():N}.json");
+        AppSettings.SettingsPathOverride = path;
+
+        Assert.False(AppSettings.ThemeOnboardingSeen);
+    }
+
+    [Fact]
+    public void ThemeOnboardingSeen_DefaultsToTrue_WhenExistingSettingsFileLacksKey()
+    {
+        var path = Path.GetTempFileName();
+        File.WriteAllText(path, "{}");
+        AppSettings.SettingsPathOverride = path;
+
+        Assert.True(AppSettings.ThemeOnboardingSeen);
+    }
+
+    [Fact]
+    public void ThemeOnboardingSeen_RoundTrips()
+    {
+        AppSettings.SettingsPathOverride = Path.GetTempFileName();
+
+        AppSettings.ThemeOnboardingSeen = true;
+        Assert.True(AppSettings.ThemeOnboardingSeen);
+
+        AppSettings.ThemeOnboardingSeen = false;
+        Assert.False(AppSettings.ThemeOnboardingSeen);
     }
 }

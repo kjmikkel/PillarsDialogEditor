@@ -33,7 +33,6 @@ Palette.Dark	Palette.Line.Subtle	#FF2D2D2D
 Palette.Dark	Palette.Magenta.500	#FFEE00AA
 Palette.Dark	Palette.Maroon.800	#FF7A2A2A
 Palette.Dark	Palette.Maroon.900	#FF3A1A1A
-Palette.Dark	Palette.Mauve.500	#FF7A6A8E
 Palette.Dark	Palette.Navy.100	#FF1A1A2A
 Palette.Dark	Palette.Navy.150	#FF1A2738
 Palette.Dark	Palette.Neutral.100	#FF1A1A1A
@@ -47,6 +46,7 @@ Palette.Dark	Palette.Neutral.265	#FF444444
 Palette.Dark	Palette.Neutral.290	#FF4A4A4A
 Palette.Dark	Palette.Neutral.335	#FF555555
 Palette.Dark	Palette.Neutral.400	#FF666666
+Palette.Dark	Palette.Neutral.520	#FF838585
 Palette.Dark	Palette.Neutral.535	#FF888888
 Palette.Dark	Palette.Neutral.600	#FF999999
 Palette.Dark	Palette.Neutral.665	#FFAAAAAA
@@ -62,7 +62,7 @@ Palette.Dark	Palette.Parchment.100	#FFF5F0D0
 Palette.Dark	Palette.Parchment.200	#FFE8E0B0
 Palette.Dark	Palette.Red.300	#FFFF9C9C
 Palette.Dark	Palette.Red.450	#FFE74C3C
-Palette.Dark	Palette.Red.500	#FFC0392B
+Palette.Dark	Palette.Red.500	#FFD33F2F
 Palette.Dark	Palette.Red.550	#FFE05555
 Palette.Dark	Palette.Sky.250	#FF9CDCFE
 Palette.Dark	Palette.Sky.300	#FF9CC4FF
@@ -109,7 +109,6 @@ Palette.Light	Palette.Line.Subtle	#FFDEDEDC
 Palette.Light	Palette.Magenta.500	#FFB8007F
 Palette.Light	Palette.Maroon.800	#FFF3D2CD
 Palette.Light	Palette.Maroon.900	#FFF5DEDC
-Palette.Light	Palette.Mauve.500	#FF7A6A8E
 Palette.Light	Palette.Navy.100	#FFEAEAF2
 Palette.Light	Palette.Navy.150	#FFDCE7F5
 Palette.Light	Palette.Neutral.100	#FFFFFFFF
@@ -123,6 +122,7 @@ Palette.Light	Palette.Neutral.265	#FFC2C2C0
 Palette.Light	Palette.Neutral.290	#FFB6B6B4
 Palette.Light	Palette.Neutral.335	#FF9A9A9A
 Palette.Light	Palette.Neutral.400	#FFAFAFAF
+Palette.Light	Palette.Neutral.520	#FF838585
 Palette.Light	Palette.Neutral.535	#FF6B6B6B
 Palette.Light	Palette.Neutral.600	#FF595959
 Palette.Light	Palette.Neutral.665	#FF4F4F4F
@@ -185,7 +185,6 @@ Palette.Colourblind	Palette.Line.Subtle	#FF2D2D2D
 Palette.Colourblind	Palette.Magenta.500	#FFEE00AA
 Palette.Colourblind	Palette.Maroon.800	#FFD55E00
 Palette.Colourblind	Palette.Maroon.900	#FF3A1A1A
-Palette.Colourblind	Palette.Mauve.500	#FF7A6A8E
 Palette.Colourblind	Palette.Navy.100	#FF1A1A2A
 Palette.Colourblind	Palette.Navy.150	#FF1A2738
 Palette.Colourblind	Palette.Neutral.100	#FF1A1A1A
@@ -199,6 +198,7 @@ Palette.Colourblind	Palette.Neutral.265	#FF444444
 Palette.Colourblind	Palette.Neutral.290	#FF4A4A4A
 Palette.Colourblind	Palette.Neutral.335	#FF555555
 Palette.Colourblind	Palette.Neutral.400	#FF666666
+Palette.Colourblind	Palette.Neutral.520	#FF838585
 Palette.Colourblind	Palette.Neutral.535	#FF888888
 Palette.Colourblind	Palette.Neutral.600	#FF999999
 Palette.Colourblind	Palette.Neutral.665	#FFAAAAAA
@@ -261,7 +261,6 @@ Palette.HighContrast	Palette.Line.Subtle	#FF8C8C8C
 Palette.HighContrast	Palette.Magenta.500	#FFFF5BD0
 Palette.HighContrast	Palette.Maroon.800	#FFFF8080
 Palette.HighContrast	Palette.Maroon.900	#FF2A0000
-Palette.HighContrast	Palette.Mauve.500	#FF332A47
 Palette.HighContrast	Palette.Navy.100	#FF000000
 Palette.HighContrast	Palette.Navy.150	#FF001A33
 Palette.HighContrast	Palette.Neutral.100	#FF000000
@@ -275,6 +274,7 @@ Palette.HighContrast	Palette.Neutral.265	#FF5D5D5D
 Palette.HighContrast	Palette.Neutral.290	#FF6D6D6D
 Palette.HighContrast	Palette.Neutral.335	#FF9A9A9A
 Palette.HighContrast	Palette.Neutral.400	#FFB8B8B8
+Palette.HighContrast	Palette.Neutral.520	#FF3A3A3A
 Palette.HighContrast	Palette.Neutral.535	#FFD4D4D4
 Palette.HighContrast	Palette.Neutral.600	#FFDCDCDC
 Palette.HighContrast	Palette.Neutral.665	#FFFFFFFF

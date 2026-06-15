@@ -7,7 +7,11 @@ namespace DialogEditor.Avalonia.Views;
 
 public partial class ConditionEditorWindow : Window
 {
-    public ConditionEditorWindow() => InitializeComponent();
+    public ConditionEditorWindow()
+    {
+        InitializeComponent();
+        HintBar.AttachTo(this);
+    }
 
     public ConditionEditorWindow(ConditionEditorViewModel vm) : this()
     {

@@ -54,7 +54,7 @@ public class BrushConverterTests
     // ── FlowIssueKindToSeverityBrushConverter ─────────────────────────────
 
     [AvaloniaTheory]
-    [InlineData(FlowIssueKind.Unreachable,              0xc0, 0x39, 0x2b)] // Red
+    [InlineData(FlowIssueKind.Unreachable,              0xd3, 0x3f, 0x2f)] // Red
     [InlineData(FlowIssueKind.PlayerDeadEnd,            0xb8, 0x76, 0x0a)] // Amber
     [InlineData(FlowIssueKind.EmptyText,                0xb8, 0x76, 0x0a)]
     [InlineData(FlowIssueKind.NoIncomingLinks,          0xb8, 0x76, 0x0a)]

@@ -1,6 +1,9 @@
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Interactivity;
+using DialogEditor.Avalonia.Shared;
 using DialogEditor.Avalonia.Views;
 using DialogEditor.Patch;
 
@@ -38,5 +41,24 @@ public class ConflictResolutionDialogTests
         Assert.Equal("DefaultText", dialog.FindControl<TextBlock>("FieldNameBlock")!.Text);
         Assert.Equal("old value", dialog.FindControl<TextBlock>("ExpectedBlock")!.Text);
         Assert.Equal("new value", dialog.FindControl<TextBlock>("ActualBlock")!.Text);
+    }
+
+    [AvaloniaFact]
+    public void Tab_ToControlWithHelpText_UpdatesHintBar()
+    {
+        var dialog = new ConflictResolutionDialog(MakeEx());
+        dialog.Show();
+
+        var button = dialog.FindControl<Button>("ForceButton")!;
+        var expectedHint = AutomationProperties.GetHelpText(button);
+        Assert.False(string.IsNullOrEmpty(expectedHint));
+
+        button.RaiseEvent(new GotFocusEventArgs
+        {
+            RoutedEvent = InputElement.GotFocusEvent,
+            NavigationMethod = NavigationMethod.Tab,
+        });
+
+        Assert.Equal(expectedHint, dialog.FindControl<FocusHintBar>("HintBar")!.Text);
     }
 }

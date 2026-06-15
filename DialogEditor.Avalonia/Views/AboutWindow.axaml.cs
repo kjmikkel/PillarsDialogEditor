@@ -6,7 +6,11 @@ namespace DialogEditor.Avalonia.Views;
 
 public partial class AboutWindow : Window
 {
-    public AboutWindow() => InitializeComponent();
+    public AboutWindow()
+    {
+        InitializeComponent();
+        HintBar.AttachTo(this);
+    }
 
     public AboutWindow(AboutViewModel viewModel) : this()
         => DataContext = viewModel;

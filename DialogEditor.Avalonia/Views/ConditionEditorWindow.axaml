@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
         xmlns:types="clr-namespace:DialogEditor.ViewModels.Services;assembly=DialogEditor.ViewModels"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.ConditionEditorWindow"
         Title="{Binding WindowTitle}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
@@ -14,7 +15,7 @@
     <Window.Styles>
         <Style Selector="TextBlock.param-label">
             <Setter Property="Foreground"        Value="{DynamicResource Brush.Text.Muted}"/>
-            <Setter Property="FontSize"          Value="11"/>
+            <Setter Property="FontSize"          Value="{StaticResource FontSize.Label}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="MinWidth"          Value="110"/>
         </Style>
@@ -22,7 +23,7 @@
             <Setter Property="Background"        Value="Transparent"/>
             <Setter Property="BorderThickness"   Value="0"/>
             <Setter Property="Foreground"        Value="{DynamicResource Brush.Text.Muted}"/>
-            <Setter Property="FontSize"          Value="11"/>
+            <Setter Property="FontSize"          Value="{StaticResource FontSize.Label}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Margin"            Value="4,0,0,0"/>
             <Setter Property="Padding"           Value="2,0"/>
@@ -37,7 +38,7 @@
             <Setter Property="Foreground"       Value="{DynamicResource Brush.Text.Primary}"/>
             <Setter Property="BorderBrush"      Value="{DynamicResource Brush.Border.Strong}"/>
             <Setter Property="BorderThickness"  Value="1"/>
-            <Setter Property="FontSize"         Value="12"/>
+            <Setter Property="FontSize"         Value="{StaticResource FontSize.Body}"/>
             <Setter Property="Padding"          Value="6,4"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
@@ -46,7 +47,7 @@
             <Setter Property="Foreground"       Value="{DynamicResource Brush.Text.Primary}"/>
             <Setter Property="BorderBrush"      Value="{DynamicResource Brush.Border.Strong}"/>
             <Setter Property="BorderThickness"  Value="1"/>
-            <Setter Property="FontSize"         Value="12"/>
+            <Setter Property="FontSize"         Value="{StaticResource FontSize.Body}"/>
             <Setter Property="Padding"          Value="6,4"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
@@ -55,7 +56,7 @@
             <Setter Property="Foreground"      Value="{DynamicResource Brush.Text.Secondary}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"         Value="20,6"/>
-            <Setter Property="FontSize"        Value="12"/>
+            <Setter Property="FontSize"        Value="{StaticResource FontSize.Body}"/>
             <Setter Property="MinWidth"        Value="90"/>
         </Style>
         <Style Selector="Button.footer-btn.primary">
@@ -64,7 +65,7 @@
         </Style>
     </Window.Styles>
 
-    <Grid RowDefinitions="*,Auto">
+    <Grid RowDefinitions="*,Auto,Auto">
 
         <ScrollViewer Grid.Row="0" Padding="0">
             <StackPanel Margin="14,12,14,4" Spacing="6">
@@ -84,18 +85,20 @@
                                                   ItemsSource="{x:Static vm:ConditionRowViewModel.OperatorOptions}"
                                                   SelectedItem="{Binding Operator, Mode=TwoWay}"
                                                   Background="{DynamicResource Brush.Surface.Card}" BorderBrush="{DynamicResource Brush.Border.Muted}"
-                                                  BorderThickness="1" FontSize="11" Padding="4,2"/>
+                                                  BorderThickness="1" FontSize="{StaticResource FontSize.Label}" Padding="4,2"
+                                                  AutomationProperties.Name="{StaticResource AutomationName_ConditionOperator}"/>
                                         <!-- NOT toggle -->
                                         <CheckBox Grid.Column="1"
                                                   IsChecked="{Binding Not, Mode=TwoWay}"
                                                   Content="{StaticResource Label_Condition_NOT}"
-                                                  Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="11"
+                                                  Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Label}"
                                                   Margin="8,0,8,0" VerticalAlignment="Center"
-                                                  ToolTip.Tip="{StaticResource ToolTip_ConditionNot}"/>
+                                                  ToolTip.Tip="{StaticResource ToolTip_ConditionNot}"
+                                                  AutomationProperties.HelpText="{StaticResource ToolTip_ConditionNot}"/>
                                         <!-- Display name (leaves) -->
                                         <TextBlock Grid.Column="2"
                                                    Text="{Binding DisplayName}"
-                                                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="13"
+                                                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Medium}"
                                                    FontWeight="SemiBold"
                                                    VerticalAlignment="Center"
                                                    IsVisible="{Binding IsLeaf}"/>
@@ -110,12 +113,12 @@
                                               VerticalAlignment="Center"
                                               IsVisible="{Binding IsBranch}">
                                             <TextBlock Grid.Column="0" Text="⚙"
-                                                       Foreground="{DynamicResource Brush.Text.Highlight}" FontSize="13"
+                                                       Foreground="{DynamicResource Brush.Text.Highlight}" FontSize="{StaticResource FontSize.Medium}"
                                                        VerticalAlignment="Center"
                                                        Margin="0,0,6,0"
                                                        ToolTip.Tip="{StaticResource ToolTip_ConditionBranch}"/>
                                             <TextBlock Grid.Column="1" Text="{Binding DisplayName}"
-                                                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="12"
+                                                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Body}"
                                                        TextTrimming="CharacterEllipsis"
                                                        VerticalAlignment="Center"
                                                        ToolTip.Tip="{Binding DisplayName}"/>
@@ -124,9 +127,10 @@
                                                     Tag="{Binding}"
                                                     Click="EditBranchGroup_Click"
                                                     Background="{DynamicResource Brush.Node.Script.Header}" Foreground="{DynamicResource Brush.Text.Secondary}"
-                                                    BorderThickness="0" Padding="8,2" FontSize="10"
+                                                    BorderThickness="0" Padding="8,2" FontSize="{StaticResource FontSize.Small}"
                                                     Margin="6,0,0,0"
-                                                    ToolTip.Tip="{StaticResource ToolTip_EditBranchGroup}"/>
+                                                    ToolTip.Tip="{StaticResource ToolTip_EditBranchGroup}"
+                                                    AutomationProperties.HelpText="{StaticResource ToolTip_EditBranchGroup}"/>
                                         </Grid>
                                         <!-- Move up -->
                                         <Button Grid.Column="3" Content="↑"
@@ -134,24 +138,30 @@
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
-                                                Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="13" Padding="4"
-                                                ToolTip.Tip="{StaticResource ToolTip_MoveConditionUp}"/>
+                                                Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Medium}" Padding="4"
+                                                ToolTip.Tip="{StaticResource ToolTip_MoveConditionUp}"
+                                                AutomationProperties.HelpText="{StaticResource ToolTip_MoveConditionUp}"
+                                                AutomationProperties.Name="{StaticResource AutomationName_MoveConditionUp}"/>
                                         <!-- Move down -->
                                         <Button Grid.Column="4" Content="↓"
                                                 Command="{Binding DataContext.MoveDownCommand,
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
-                                                Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="13" Padding="4"
-                                                ToolTip.Tip="{StaticResource ToolTip_MoveConditionDown}"/>
+                                                Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Medium}" Padding="4"
+                                                ToolTip.Tip="{StaticResource ToolTip_MoveConditionDown}"
+                                                AutomationProperties.HelpText="{StaticResource ToolTip_MoveConditionDown}"
+                                                AutomationProperties.Name="{StaticResource AutomationName_MoveConditionDown}"/>
                                         <!-- Delete -->
                                         <Button Grid.Column="5" Content="✕"
                                                 Command="{Binding DataContext.DeleteRowCommand,
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
-                                                Foreground="{DynamicResource Brush.Severity.Error}" FontSize="13" Padding="4"
-                                                ToolTip.Tip="{StaticResource ToolTip_DeleteCondition}"/>
+                                                Foreground="{DynamicResource Brush.Severity.Error}" FontSize="{StaticResource FontSize.Medium}" Padding="4"
+                                                ToolTip.Tip="{StaticResource ToolTip_DeleteCondition}"
+                                                AutomationProperties.HelpText="{StaticResource ToolTip_DeleteCondition}"
+                                                AutomationProperties.Name="{StaticResource AutomationName_RemoveCondition}"/>
                                     </Grid>
 
                                     <!-- Parameters (hidden for branch rows) -->
@@ -170,7 +180,8 @@
                                                              Classes="param-input"
                                                              Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                                              IsVisible="{Binding IsText}"
-                                                             ToolTip.Tip="{Binding TypeHint}"/>
+                                                             ToolTip.Tip="{Binding TypeHint}"
+                                                             AutomationProperties.Name="{Binding Name}"/>
                                                     <!-- Enum/Operator AutoCompleteBox — supports both
                                                          free-text and filtering for large option lists -->
                                                     <AutoCompleteBox Grid.Column="1"
@@ -180,13 +191,15 @@
                                                               FilterMode="Contains"
                                                               MinimumPrefixLength="0"
                                                               IsVisible="{Binding IsEnum}"
-                                                              ToolTip.Tip="{Binding TypeHint}"/>
+                                                              ToolTip.Tip="{Binding TypeHint}"
+                                                              AutomationProperties.Name="{Binding Name}"/>
                                                     <!-- Type hint (?) — Button for reliable tooltip on hover -->
                                                     <Button Grid.Column="2"
                                                             Classes="type-hint"
                                                             Content="(?)"
                                                             ToolTip.Tip="{Binding TypeHint}"
-                                                            IsVisible="{Binding HasTypeHint}"/>
+                                                            IsVisible="{Binding HasTypeHint}"
+                                                            AutomationProperties.Name="{StaticResource AutomationName_ParameterHelp}"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
@@ -206,15 +219,17 @@
                                   SelectedItem="{Binding SelectedNewCondition, Mode=TwoWay}"
                                   PlaceholderText="{StaticResource Placeholder_PickCondition}"
                                   Background="{DynamicResource Brush.Surface.Input}" BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
-                                  FontSize="12" Padding="6,4"
-                                  ToolTip.Tip="{StaticResource ToolTip_PickCondition}">
+                                  FontSize="{StaticResource FontSize.Body}" Padding="6,4"
+                                  ToolTip.Tip="{StaticResource ToolTip_PickCondition}"
+                                  AutomationProperties.HelpText="{StaticResource ToolTip_PickCondition}"
+                                  AutomationProperties.Name="{StaticResource Placeholder_PickCondition}">
                             <ComboBox.ItemTemplate>
                                 <DataTemplate DataType="types:ConditionEntry">
                                     <StackPanel Orientation="Horizontal" Spacing="8">
                                         <TextBlock Text="{Binding DisplayName}"
-                                                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12"/>
+                                                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Body}"/>
                                         <TextBlock Text="{Binding Category}"
-                                                   Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10"
+                                                   Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Small}"
                                                    VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </DataTemplate>
@@ -224,14 +239,16 @@
                                 Content="+ Add"
                                 Command="{Binding AddSelectedConditionCommand}"
                                 Background="{DynamicResource Brush.Node.Script.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
-                                Padding="14,6" Margin="8,0,0,0" FontSize="12"
-                                ToolTip.Tip="{StaticResource ToolTip_AddCondition}"/>
+                                Padding="14,6" Margin="8,0,0,0" FontSize="{StaticResource FontSize.Body}"
+                                ToolTip.Tip="{StaticResource ToolTip_AddCondition}"
+                                AutomationProperties.HelpText="{StaticResource ToolTip_AddCondition}"/>
                         <Button Grid.Column="2"
                                 Content="{StaticResource Button_NewGroup}"
                                 Command="{Binding AddGroupCommand}"
                                 Background="{DynamicResource Brush.Node.Script.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
-                                Padding="14,6" Margin="6,0,0,0" FontSize="12"
-                                ToolTip.Tip="{StaticResource ToolTip_NewGroup}"/>
+                                Padding="14,6" Margin="6,0,0,0" FontSize="{StaticResource FontSize.Body}"
+                                ToolTip.Tip="{StaticResource ToolTip_NewGroup}"
+                                AutomationProperties.HelpText="{StaticResource ToolTip_NewGroup}"/>
                     </Grid>
                 </Border>
 
@@ -244,13 +261,18 @@
                 <Button Classes="footer-btn"
                         Content="Cancel"
                         Command="{Binding CancelCommand}"
-                        ToolTip.Tip="{StaticResource ToolTip_ConditionEditorCancel}"/>
+                        ToolTip.Tip="{StaticResource ToolTip_ConditionEditorCancel}"
+                        AutomationProperties.HelpText="{StaticResource ToolTip_ConditionEditorCancel}"/>
                 <Button Classes="footer-btn primary"
                         Content="OK"
                         Command="{Binding ConfirmCommand}"
-                        ToolTip.Tip="{StaticResource ToolTip_ConditionEditorOK}"/>
+                        ToolTip.Tip="{StaticResource ToolTip_ConditionEditorOK}"
+                        AutomationProperties.HelpText="{StaticResource ToolTip_ConditionEditorOK}"/>
             </StackPanel>
         </Border>
+
+        <!-- Focus hint bar (Gaps item 13) -->
+        <shared:FocusHintBar Grid.Row="2" x:Name="HintBar"/>
 
     </Grid>
 </Window>

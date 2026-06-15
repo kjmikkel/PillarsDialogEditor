@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml.Styling;
+using Avalonia.Platform;
 using Avalonia.Styling;
 using DialogEditor.ViewModels.Services;
 
@@ -39,14 +40,36 @@ public sealed class ThemeApplier : IThemeApplier
     private const string PaletteSentinel = "Palette.Neutral.80";
     private const string TokensSentinel  = "Brush.Surface.Window";
 
+    // "Auto" is a meta-choice resolved at apply-time by DetectOsThemeId — it has no palette
+    // file of its own, so it isn't a Catalog entry, but it's the first (default) choice.
     public IReadOnlyList<ThemeOption> Available { get; } =
-        Catalog.Select(e => new ThemeOption(e.Id, e.DisplayNameKey)).ToList();
+        new[] { new ThemeOption("Auto", "Theme_Name_Auto") }
+            .Concat(Catalog.Select(e => new ThemeOption(e.Id, e.DisplayNameKey)))
+            .ToList();
+
+    /// <summary>
+    /// Maps the OS-reported colour preferences to a catalog id. High-contrast wins outright
+    /// regardless of the reported light/dark variant — the <c>HighContrast</c> palette is
+    /// itself authored against <see cref="ThemeVariant.Dark"/> and isn't variant-aware.
+    /// <c>null</c> (no platform settings available) falls back to <c>"Dark"</c>, matching
+    /// the historical hardcoded default.
+    /// </summary>
+    internal static string DetectOsThemeId(PlatformColorValues? values)
+    {
+        if (values is null) return "Dark";
+        if (values.ContrastPreference == ColorContrastPreference.High) return "HighContrast";
+        return values.ThemeVariant == PlatformThemeVariant.Light ? "Light" : "Dark";
+    }
 
     public void Apply(string id)
     {
-        var entry = Catalog.FirstOrDefault(e => e.Id == id) ?? Catalog[0];
-        var app   = Application.Current
+        var app = Application.Current
             ?? throw new InvalidOperationException("No Application is running to apply a theme to.");
+
+        var resolvedId = id == "Auto"
+            ? DetectOsThemeId(app.PlatformSettings?.GetColorValues())
+            : id;
+        var entry = Catalog.FirstOrDefault(e => e.Id == resolvedId) ?? Catalog[0];
 
         var dicts = app.Resources.MergedDictionaries;
 

@@ -45,43 +45,51 @@
                     <Button Content="{StaticResource Legend_Control_Fit}"
                             Click="FitToScreen_Click"
                             Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2"
-                            ToolTip.Tip="{StaticResource ToolTip_FitToScreen}"/>
+                            ToolTip.Tip="{StaticResource ToolTip_FitToScreen}"
+                            AutomationProperties.HelpText="{StaticResource ToolTip_FitToScreen}"/>
                     <Button Content="+"
                             Click="ZoomIn_Click"
                             Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2" Margin="4,0,0,0"
-                            ToolTip.Tip="{StaticResource ToolTip_ZoomIn}"/>
+                            ToolTip.Tip="{StaticResource ToolTip_ZoomIn}"
+                            AutomationProperties.HelpText="{StaticResource ToolTip_ZoomIn}"
+                            AutomationProperties.Name="{StaticResource AutomationName_ZoomIn}"/>
                     <Button Content="−"
                             Click="ZoomOut_Click"
                             Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2" Margin="2,0,0,0"
-                            ToolTip.Tip="{StaticResource ToolTip_ZoomOut}"/>
+                            ToolTip.Tip="{StaticResource ToolTip_ZoomOut}"
+                            AutomationProperties.HelpText="{StaticResource ToolTip_ZoomOut}"
+                            AutomationProperties.Name="{StaticResource AutomationName_ZoomOut}"/>
                     <Button Content="⌂"
                             Click="CenterOnRoot_Click"
                             Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2" Margin="8,0,0,0"
-                            ToolTip.Tip="{StaticResource ToolTip_JumpToRoot}"/>
+                            ToolTip.Tip="{StaticResource ToolTip_JumpToRoot}"
+                            AutomationProperties.HelpText="{StaticResource ToolTip_JumpToRoot}"
+                            AutomationProperties.Name="{StaticResource AutomationName_JumpToRoot}"/>
                 </StackPanel>
                 <TextBlock DockPanel.Dock="Left"
                            Text="{Binding StatisticsText}"
-                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="10" VerticalAlignment="Center" Margin="0,0,8,0"
+                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}" VerticalAlignment="Center" Margin="0,0,8,0"
                            ToolTip.Tip="{Binding StatisticsTooltip}"/>
                 <Grid VerticalAlignment="Center" Margin="0,0,8,0">
                     <TextBox x:Name="SearchBox"
                              Text="{Binding SearchQuery}"
+                             Watermark="{StaticResource Placeholder_SearchNodes}"
+                             AutomationProperties.Name="{StaticResource Placeholder_SearchNodes}"
                              Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" CaretBrush="{DynamicResource Brush.Text.Secondary}"
                              BorderBrush="{DynamicResource Brush.Border.Muted}" BorderThickness="1"
-                             Padding="6,2,24,2" FontSize="12" Height="26"
+                             Padding="6,2,24,2" FontSize="{StaticResource FontSize.Body}" Height="26"
                              VerticalContentAlignment="Center"
                              KeyDown="SearchBox_KeyDown"
-                             ToolTip.Tip="{StaticResource ToolTip_SearchNodes}"/>
-                    <TextBlock Text="{StaticResource Placeholder_SearchNodes}"
-                               Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10"
-                               Padding="8,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"
-                               IsVisible="{Binding SearchQuery, Converter={StaticResource StringIsEmpty}}"/>
+                             ToolTip.Tip="{StaticResource ToolTip_SearchNodes}"
+                             AutomationProperties.HelpText="{StaticResource ToolTip_SearchNodes}"/>
                     <Button Command="{Binding ClearSearchCommand}"
-                            HorizontalAlignment="Right" Width="20"
+                            HorizontalAlignment="Right" Width="24" Height="24"
                             Content="✕" VerticalAlignment="Center"
                             Background="Transparent" BorderThickness="0"
-                            Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10" Cursor="Hand"
-                            ToolTip.Tip="{StaticResource ToolTip_ClearSearch}"/>
+                            Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Small}" Cursor="Hand"
+                            ToolTip.Tip="{StaticResource ToolTip_ClearSearch}"
+                            AutomationProperties.HelpText="{StaticResource ToolTip_ClearSearch}"
+                            AutomationProperties.Name="{StaticResource AutomationName_ClearSearch}"/>
                 </Grid>
             </DockPanel>
         </Border>
@@ -89,11 +97,13 @@
         <!-- Canvas -->
         <Grid Grid.Row="1">
             <nodify:NodifyEditor x:Name="Editor"
-                                 Background="{DynamicResource Brush.Accent.Badge}"
+                                 Background="{DynamicResource Brush.Canvas.Background}"
                                  ItemsSource="{Binding Nodes}"
                                  Connections="{Binding Connections}"
                                  PendingConnection="{Binding PendingConnection}"
-                                 DoubleTapped="Editor_DoubleTapped">
+                                 DoubleTapped="Editor_DoubleTapped"
+                                 KeyDown="Editor_KeyDown"
+                                 GotFocus="Editor_GotFocus">
 
                 <!-- Drag-to-connect: the PendingConnection control MUST live inside
                      PendingConnectionTemplate (not be assigned to the PendingConnection
@@ -128,11 +138,13 @@
                                     <MenuItem Header="{StaticResource Menu_DeleteNode}"
                                               Command="{Binding $parent[UserControl].DataContext.DeleteNodeCmdCommand}"
                                               CommandParameter="{Binding}"
-                                              ToolTip.Tip="{StaticResource ToolTip_DeleteNode}"/>
+                                              ToolTip.Tip="{StaticResource ToolTip_DeleteNode}"
+                                              AutomationProperties.HelpText="{StaticResource ToolTip_DeleteNode}"/>
                                     <MenuItem Header="{StaticResource Menu_AddConnectedNode}"
                                               Command="{Binding $parent[UserControl].DataContext.AddConnectedNodeCmdCommand}"
                                               CommandParameter="{Binding}"
-                                              ToolTip.Tip="{StaticResource ToolTip_AddConnectedNode}"/>
+                                              ToolTip.Tip="{StaticResource ToolTip_AddConnectedNode}"
+                                              AutomationProperties.HelpText="{StaticResource ToolTip_AddConnectedNode}"/>
                                 </ContextMenu>
                             </nodify:Node.ContextMenu>
 
@@ -175,7 +187,7 @@
                                         ZIndex="11"
                                         Background="{Binding DiffStatus, Converter={StaticResource DiffStatusToBrushConverter}}">
                                     <TextBlock Text="{Binding DiffStatus, Converter={StaticResource DiffStatusToGlyph}}"
-                                               Foreground="White" FontWeight="Bold" FontSize="11"
+                                               Foreground="{DynamicResource Brush.Text.OnAccent}" FontWeight="Bold" FontSize="{StaticResource FontSize.Label}"
                                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
 
@@ -209,8 +221,8 @@
                                             </Path.Fill>
                                         </Path>
                                         <TextBlock Text="{Binding Title}"
-                                                   Foreground="White" FontWeight="Bold"
-                                                   FontSize="10" Padding="0,3,6,3"
+                                                   Foreground="{DynamicResource Brush.Text.OnAccent}" FontWeight="Bold"
+                                                   FontSize="{StaticResource FontSize.Small}" Padding="0,3,6,3"
                                                    TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
                                 </Border>
@@ -227,7 +239,7 @@
                                     </Border.Background>
                                     <TextBlock Text="{Binding TextPreview}"
                                                TextWrapping="Wrap"
-                                               Padding="6,4" FontSize="10"
+                                               Padding="6,4" FontSize="{StaticResource FontSize.Small}"
                                                Foreground="{DynamicResource Brush.Text.OnLight}" MaxHeight="70"/>
                                 </Border>
 
@@ -241,7 +253,7 @@
                                             <Binding Source="{x:Static theming:ThemeService.Current}" Path="Revision"/>
                                         </MultiBinding>
                                     </Border.Background>
-                                    <TextBlock Text="{Binding FooterText}" FontSize="9" Foreground="{DynamicResource Brush.Text.OnLight.Muted}"/>
+                                    <TextBlock Text="{Binding FooterText}" FontSize="{StaticResource FontSize.Caption}" Foreground="{DynamicResource Brush.Text.OnLight.Muted}"/>
                                 </Border>
 
                             </Grid>
@@ -263,7 +275,8 @@
                                     <MenuItem Header="{StaticResource Menu_DeleteConnection}"
                                               Command="{Binding $parent[UserControl].DataContext.DeleteConnectionCmdCommand}"
                                               CommandParameter="{Binding}"
-                                              ToolTip.Tip="{StaticResource ToolTip_DeleteConnection}"/>
+                                              ToolTip.Tip="{StaticResource ToolTip_DeleteConnection}"
+                                              AutomationProperties.HelpText="{StaticResource ToolTip_DeleteConnection}"/>
                                 </ContextMenu>
                             </nodify:Connection.ContextMenu>
                         </nodify:Connection>

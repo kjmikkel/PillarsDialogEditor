@@ -1,7 +1,9 @@
 using Avalonia;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
+using Avalonia.Platform;
 using Avalonia.Styling;
+using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.Avalonia.Shared.Theming;
 using DialogEditor.ViewModels.Services;
 
@@ -26,7 +28,13 @@ public class ThemeApplierTests
     public void Available_ListsThePalettesInOrder()
     {
         var ids = new ThemeApplier().Available.Select(o => o.Id);
-        Assert.Equal(["Dark", "Light", "Colourblind", "HighContrast"], ids);
+        Assert.Equal(["Auto", "Dark", "Light", "Colourblind", "HighContrast"], ids);
+    }
+
+    [AvaloniaFact]
+    public void Theme_Name_Auto_ResourceResolves()
+    {
+        Assert.Equal("System Default", new AvaloniaStringProvider().Get("Theme_Name_Auto"));
     }
 
     [AvaloniaFact]
@@ -84,5 +92,49 @@ public class ThemeApplierTests
         new ThemeApplier().Apply("Light");
         new ThemeApplier().Apply("Dark");
         Assert.Equal(dark, Resolve("Brush.Surface.Window"));
+    }
+
+    [Theory]
+    [InlineData(PlatformThemeVariant.Dark,  ColorContrastPreference.NoPreference, "Dark")]
+    [InlineData(PlatformThemeVariant.Light, ColorContrastPreference.NoPreference, "Light")]
+    [InlineData(PlatformThemeVariant.Dark,  ColorContrastPreference.High,         "HighContrast")]
+    [InlineData(PlatformThemeVariant.Light, ColorContrastPreference.High,         "HighContrast")]
+    public void DetectOsThemeId_MapsPlatformPreferences(
+        PlatformThemeVariant variant, ColorContrastPreference contrast, string expectedId)
+    {
+        var values = new PlatformColorValues { ThemeVariant = variant, ContrastPreference = contrast };
+        Assert.Equal(expectedId, ThemeApplier.DetectOsThemeId(values));
+    }
+
+    [Fact]
+    public void DetectOsThemeId_NullValues_FallsBackToDark()
+    {
+        Assert.Equal("Dark", ThemeApplier.DetectOsThemeId(null));
+    }
+
+    [AvaloniaFact]
+    public void Apply_Auto_ResolvesToDetectedPalette()
+    {
+        var app = Application.Current!;
+        var expectedId      = ThemeApplier.DetectOsThemeId(app.PlatformSettings?.GetColorValues());
+        var expectedVariant = expectedId == "Light" ? ThemeVariant.Light : ThemeVariant.Dark;
+        try
+        {
+            new ThemeApplier().Apply("Auto");
+            Assert.Equal(expectedVariant, app.RequestedThemeVariant);
+        }
+        finally { new ThemeApplier().Apply("Dark"); }
+    }
+
+    [AvaloniaFact]
+    public void Apply_Auto_BumpsRevision()
+    {
+        try
+        {
+            var before = ThemeService.Current.Revision;
+            new ThemeApplier().Apply("Auto");
+            Assert.Equal(before + 1, ThemeService.Current.Revision);
+        }
+        finally { new ThemeApplier().Apply("Dark"); }
     }
 }

@@ -21,7 +21,7 @@ public class TokenRegistryTests
     [InlineData("Brush.Node.Bark.Footer",        0xFF, 0xe8, 0xd0, 0x80)]
     [InlineData("Brush.Diff.Added.Fill",         0xFF, 0x3a, 0x7a, 0x3a)]
     [InlineData("Brush.Diff.Changed.Fill",       0xFF, 0xc0, 0x8a, 0x2a)]
-    [InlineData("Brush.Severity.Error",          0xFF, 0xc0, 0x39, 0x2b)]
+    [InlineData("Brush.Severity.Error",          0xFF, 0xd3, 0x3f, 0x2f)]
     [InlineData("Brush.Toolbar.Button.Background",0xFF, 0x33, 0x33, 0x33)]
     [InlineData("Brush.Surface.Window",          0xFF, 0x1e, 0x1e, 0x1e)]
     [InlineData("Brush.Border.Default",          0xFF, 0x33, 0x33, 0x33)]
@@ -63,7 +63,7 @@ public class TokenRegistryTests
         "Brush.Connection.Default","Brush.Connection.Always","Brush.Connection.Never",
         "Brush.Connection.Highlighted","Brush.Connection.Highlighted.Always","Brush.Connection.Highlighted.Never",
         "Brush.Text.Link","Brush.Text.Link.Subtle","Brush.Text.Info","Brush.Text.Highlight",
-        "Brush.Accent.Badge",
+        "Brush.Canvas.Background",
         "Brush.Text.Status.New","Brush.Text.Status.Added","Brush.Text.Status.Changed",
         "Brush.Text.Status.Removed","Brush.Text.Status.Success","Brush.Text.Status.Error",
         "Brush.Text.Status.Pending","Brush.Text.Meta.Commit",

@@ -4,6 +4,7 @@
         xmlns:diff="clr-namespace:DialogEditor.Patch.Diff;assembly=DialogEditor.Patch"
         xmlns:views="clr-namespace:DialogEditor.Avalonia.Views"
         xmlns:controls="clr-namespace:DialogEditor.Avalonia.Controls"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.DiffWindow"
         Title="{StaticResource DiffWindow_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
@@ -34,7 +35,9 @@
                       x:Name="LeftPicker"
                       ItemsSource="{Binding EndpointOptions}"
                       SelectedItem="{Binding LeftEndpoint, Mode=TwoWay}"
-                      ToolTip.Tip="{StaticResource ToolTip_DiffLeftPicker}">
+                      ToolTip.Tip="{StaticResource ToolTip_DiffLeftPicker}"
+                      AutomationProperties.HelpText="{StaticResource ToolTip_DiffLeftPicker}"
+                      AutomationProperties.Name="{StaticResource DiffWindow_LeftLabel}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:EndpointOption}">
                         <TextBlock Text="{Binding Label}" Foreground="{DynamicResource Brush.Text.Emphasis}"/>
@@ -52,7 +55,9 @@
                       x:Name="RightPicker"
                       ItemsSource="{Binding EndpointOptions}"
                       SelectedItem="{Binding RightEndpoint, Mode=TwoWay}"
-                      ToolTip.Tip="{StaticResource ToolTip_DiffRightPicker}">
+                      ToolTip.Tip="{StaticResource ToolTip_DiffRightPicker}"
+                      AutomationProperties.HelpText="{StaticResource ToolTip_DiffRightPicker}"
+                      AutomationProperties.Name="{StaticResource DiffWindow_RightLabel}">
                 <ComboBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:EndpointOption}">
                         <TextBlock Text="{Binding Label}" Foreground="{DynamicResource Brush.Text.Emphasis}"/>
@@ -65,7 +70,7 @@
         <Border DockPanel.Dock="Bottom" Background="{DynamicResource Brush.Surface.Card}" Padding="8,4" Margin="0,8,0,0">
             <TextBlock Text="{Binding StatusText}"
                        Foreground="{DynamicResource Brush.Text.Muted}"
-                       FontSize="11"
+                       FontSize="{StaticResource FontSize.Label}"
                        VerticalAlignment="Center"/>
         </Border>
 
@@ -74,17 +79,20 @@
             <DockPanel>
                 <Button DockPanel.Dock="Right" Content="{StaticResource Diff_BringInButton}"
                         Command="{Binding ApplyCommand}"
-                        ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"/>
+                        ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"
+                        AutomationProperties.HelpText="{StaticResource ToolTip_Diff_BringIn}"/>
                 <Button DockPanel.Dock="Right" Content="{StaticResource Diff_UndoBringIn}"
                         Click="UndoBringIn_Click" Margin="0,0,8,0"
-                        ToolTip.Tip="{StaticResource ToolTip_Diff_UndoBringIn}"/>
+                        ToolTip.Tip="{StaticResource ToolTip_Diff_UndoBringIn}"
+                        AutomationProperties.HelpText="{StaticResource ToolTip_Diff_UndoBringIn}"/>
                 <StackPanel>
                     <CheckBox x:Name="AutoPullCheck"
                               Content="{StaticResource Diff_AutoPullLabel}"
                               IsChecked="{Binding AutoPullDependencies, Mode=TwoWay}"
-                              Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="11"
-                              ToolTip.Tip="{StaticResource ToolTip_Diff_AutoPull}"/>
-                    <TextBlock Text="{StaticResource Diff_Hint}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" VerticalAlignment="Center"/>
+                              Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}"
+                              ToolTip.Tip="{StaticResource ToolTip_Diff_AutoPull}"
+                              AutomationProperties.HelpText="{StaticResource ToolTip_Diff_AutoPull}"/>
+                    <TextBlock Text="{StaticResource Diff_Hint}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" VerticalAlignment="Center"/>
                 </StackPanel>
             </DockPanel>
         </Border>
@@ -95,23 +103,27 @@
                   Margin="0,6,0,0"
                   IsExpanded="False"
                   IsVisible="{Binding DanglingLinks.Count, Converter={StaticResource CountToVis}}"
-                  ToolTip.Tip="{StaticResource ToolTip_Diff_DanglingPanel}">
+                  ToolTip.Tip="{StaticResource ToolTip_Diff_DanglingPanel}"
+                  AutomationProperties.HelpText="{StaticResource ToolTip_Diff_DanglingPanel}">
             <Expander.Header>
                 <TextBlock Text="{Binding DanglingLinks.Count, StringFormat={StaticResource Diff_DanglingWarning}}"
-                           Foreground="{DynamicResource Brush.Text.Status.Changed}" FontSize="11"/>
+                           Foreground="{DynamicResource Brush.Text.Status.Changed}" FontSize="{StaticResource FontSize.Label}"/>
             </Expander.Header>
             <StackPanel Margin="8,4,0,4" Spacing="2">
                 <TextBlock Text="{StaticResource Diff_DanglingHeader}"
-                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" TextWrapping="Wrap"/>
+                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" TextWrapping="Wrap"/>
                 <ItemsControl x:Name="DanglingList" ItemsSource="{Binding DanglingLinkDescriptions}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="11" Margin="0,1,0,0"/>
+                            <TextBlock Text="{Binding}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}" Margin="0,1,0,0"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </StackPanel>
         </Expander>
+
+        <!-- Focus hint bar (Gaps item 13) -->
+        <shared:FocusHintBar DockPanel.Dock="Bottom" x:Name="HintBar"/>
 
         <!-- ── Main area: list + detail ───────────────────────────────── -->
         <Grid>
@@ -126,7 +138,7 @@
                 <TextBlock Grid.Row="0"
                            Text="{StaticResource DiffWindow_ChangedHeader}"
                            Foreground="{DynamicResource Brush.Text.Muted}"
-                           FontSize="10"
+                           FontSize="{StaticResource FontSize.Small}"
                            FontWeight="Bold"
                            Margin="0,0,0,4"/>
                 <Border Grid.Row="1"
@@ -137,26 +149,30 @@
                              ItemsSource="{Binding Groups}"
                              SelectedItem="{Binding SelectedGroup, Mode=TwoWay}"
                              Background="Transparent"
-                             ToolTip.Tip="{StaticResource ToolTip_DiffChangedList}">
+                             ToolTip.Tip="{StaticResource ToolTip_DiffChangedList}"
+                             AutomationProperties.HelpText="{StaticResource ToolTip_DiffChangedList}">
                         <ListBox.ItemTemplate>
                             <DataTemplate DataType="{x:Type vm:ConversationChangeViewModel}">
                                 <StackPanel Orientation="Vertical" Margin="2,2">
                                     <StackPanel Orientation="Horizontal">
                                         <CheckBox IsChecked="{Binding IsAllSelected, Mode=TwoWay}" IsThreeState="True"
-                                                  ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"/>
+                                                  ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"
+                                                  AutomationProperties.HelpText="{StaticResource ToolTip_Diff_BringIn}"/>
                                         <ToggleButton Content="{Binding Name}" IsChecked="{Binding IsExpanded, Mode=TwoWay}"
                                                       Background="Transparent" Foreground="{DynamicResource Brush.Text.Emphasis}" BorderThickness="0" Padding="4,0"
-                                                      ToolTip.Tip="{StaticResource ToolTip_Diff_ExpandConversation}"/>
+                                                      ToolTip.Tip="{StaticResource ToolTip_Diff_ExpandConversation}"
+                                                      AutomationProperties.HelpText="{StaticResource ToolTip_Diff_ExpandConversation}"/>
                                     </StackPanel>
                                     <ItemsControl ItemsSource="{Binding Nodes}" IsVisible="{Binding IsExpanded}" Margin="20,0,0,0">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate DataType="{x:Type vm:NodeChangeViewModel}">
                                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                                     <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                                              ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"/>
+                                                              ToolTip.Tip="{StaticResource ToolTip_Diff_BringIn}"
+                                                              AutomationProperties.HelpText="{StaticResource ToolTip_Diff_BringIn}"/>
                                                     <Border Width="9" Height="9" VerticalAlignment="Center"
                                                             Background="{Binding Kind, Converter={StaticResource DiffStatusToBrushConverter}}"/>
-                                                    <TextBlock Text="{Binding NodeId, StringFormat={StaticResource Diff_NodeLine}}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="11" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding NodeId, StringFormat={StaticResource Diff_NodeLine}}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}" VerticalAlignment="Center"/>
                                                 </StackPanel>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
@@ -175,18 +191,21 @@
                 <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,6">
                     <RadioButton GroupName="CanvasMode" Content="{StaticResource Diff_ViewChanges}"
                                  IsChecked="{Binding CanvasMode, Converter={StaticResource EnumToBool}, ConverterParameter=Changes, Mode=TwoWay}"
-                                 ToolTip.Tip="{StaticResource ToolTip_Diff_ViewToggle}"/>
+                                 ToolTip.Tip="{StaticResource ToolTip_Diff_ViewToggle}"
+                                 AutomationProperties.HelpText="{StaticResource ToolTip_Diff_ViewToggle}"/>
                     <RadioButton GroupName="CanvasMode" Content="{StaticResource Diff_ViewPreview}"
                                  IsChecked="{Binding CanvasMode, Converter={StaticResource EnumToBool}, ConverterParameter=AppliedPreview, Mode=TwoWay}"
-                                 ToolTip.Tip="{StaticResource ToolTip_Diff_ViewToggle}"/>
+                                 ToolTip.Tip="{StaticResource ToolTip_Diff_ViewToggle}"
+                                 AutomationProperties.HelpText="{StaticResource ToolTip_Diff_ViewToggle}"/>
                     <Border Width="10" Height="10" Background="{DynamicResource Brush.Text.Status.Added}" VerticalAlignment="Center"/>
-                    <TextBlock Text="{StaticResource Diff_LegendAdded}" Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="10" VerticalAlignment="Center"/>
+                    <TextBlock Text="{StaticResource Diff_LegendAdded}" Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Small}" VerticalAlignment="Center"/>
                     <Border Width="10" Height="10" Background="{DynamicResource Brush.Text.Status.Changed}" VerticalAlignment="Center"/>
-                    <TextBlock Text="{StaticResource Diff_LegendChanged}" Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="10" VerticalAlignment="Center"/>
+                    <TextBlock Text="{StaticResource Diff_LegendChanged}" Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Small}" VerticalAlignment="Center"/>
                     <Border Width="10" Height="10" Background="{DynamicResource Brush.Text.Status.Removed}" VerticalAlignment="Center"/>
-                    <TextBlock Text="{StaticResource Diff_LegendRemoved}" Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="10" VerticalAlignment="Center"/>
+                    <TextBlock Text="{StaticResource Diff_LegendRemoved}" Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Small}" VerticalAlignment="Center"/>
                     <Button Content="{StaticResource Diff_HelpButton}" Click="Help_Click"
-                            ToolTip.Tip="{StaticResource ToolTip_Diff_Help}"/>
+                            ToolTip.Tip="{StaticResource ToolTip_Diff_Help}"
+                            AutomationProperties.HelpText="{StaticResource ToolTip_Diff_Help}"/>
                 </StackPanel>
 
                 <!-- ── Before/after detail panel (per changed language) ── -->
@@ -199,10 +218,10 @@
                         ToolTip.Tip="{StaticResource ToolTip_Diff_Detail}">
                     <DockPanel DataContext="{Binding SelectedNodeDetail}">
                         <TextBlock DockPanel.Dock="Top" Text="{Binding HeaderText}"
-                                   Foreground="{DynamicResource Brush.Text.Emphasis}" FontWeight="Bold" FontSize="12"/>
+                                   Foreground="{DynamicResource Brush.Text.Emphasis}" FontWeight="Bold" FontSize="{StaticResource FontSize.Body}"/>
                         <TextBlock DockPanel.Dock="Top"
                                    Text="{StaticResource Diff_Detail_StructuralOnly}"
-                                   Foreground="{DynamicResource Brush.Text.Status.Changed}" FontSize="11" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource Brush.Text.Status.Changed}" FontSize="{StaticResource FontSize.Label}" TextWrapping="Wrap"
                                    IsVisible="{Binding IsStructuralOnly}"/>
                         <ScrollViewer MaxHeight="180" IsVisible="{Binding ShowSections}">
                             <ItemsControl x:Name="SectionsList" ItemsSource="{Binding Sections}">
@@ -211,45 +230,45 @@
                                         <StackPanel Spacing="2" Margin="0,6,0,0">
                                             <StackPanel Orientation="Horizontal" Spacing="4">
                                                 <TextBlock Text="{Binding LanguageName}"
-                                                           Foreground="{DynamicResource Brush.Text.Tertiary}" FontWeight="SemiBold" FontSize="11"/>
+                                                           Foreground="{DynamicResource Brush.Text.Tertiary}" FontWeight="SemiBold" FontSize="{StaticResource FontSize.Label}"/>
                                                 <TextBlock Text="{StaticResource Diff_Detail_PrimaryMarker}"
-                                                           Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="10"
+                                                           Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Small}"
                                                            IsVisible="{Binding IsPrimary}"/>
                                             </StackPanel>
 
                                             <TextBlock Text="{StaticResource Diff_Detail_DefaultTextLabel}"
-                                                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="10"/>
+                                                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}"/>
                                             <Grid ColumnDefinitions="Auto,*">
                                                 <TextBlock Grid.Column="0" Text="{StaticResource Diff_Detail_BeforeLabel}"
-                                                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" Margin="0,0,6,0"/>
+                                                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" Margin="0,0,6,0"/>
                                                 <controls:InlineDiffTextBlock Grid.Column="1"
                                                            Before="{Binding DefaultBefore}" After="{Binding DefaultAfter}"
-                                                           ShowAfter="False" Foreground="{DynamicResource Brush.Text.Emphasis}" FontSize="12" TextWrapping="Wrap"/>
+                                                           ShowAfter="False" Foreground="{DynamicResource Brush.Text.Emphasis}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
                                             </Grid>
                                             <Grid ColumnDefinitions="Auto,*">
                                                 <TextBlock Grid.Column="0" Text="{StaticResource Diff_Detail_AfterLabel}"
-                                                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" Margin="0,0,6,0"/>
+                                                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" Margin="0,0,6,0"/>
                                                 <controls:InlineDiffTextBlock Grid.Column="1"
                                                            Before="{Binding DefaultBefore}" After="{Binding DefaultAfter}"
-                                                           ShowAfter="True" Foreground="{DynamicResource Brush.Text.Emphasis}" FontSize="12" TextWrapping="Wrap"/>
+                                                           ShowAfter="True" Foreground="{DynamicResource Brush.Text.Emphasis}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
                                             </Grid>
 
                                             <StackPanel Spacing="2" IsVisible="{Binding HasFemaleRow}">
                                                 <TextBlock Text="{StaticResource Diff_Detail_FemaleTextLabel}"
-                                                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="10"/>
+                                                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}"/>
                                                 <Grid ColumnDefinitions="Auto,*">
                                                     <TextBlock Grid.Column="0" Text="{StaticResource Diff_Detail_BeforeLabel}"
-                                                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" Margin="0,0,6,0"/>
+                                                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" Margin="0,0,6,0"/>
                                                     <controls:InlineDiffTextBlock Grid.Column="1"
                                                                Before="{Binding FemaleBefore}" After="{Binding FemaleAfter}"
-                                                               ShowAfter="False" Foreground="{DynamicResource Brush.Text.Emphasis}" FontSize="12" TextWrapping="Wrap"/>
+                                                               ShowAfter="False" Foreground="{DynamicResource Brush.Text.Emphasis}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
                                                 </Grid>
                                                 <Grid ColumnDefinitions="Auto,*">
                                                     <TextBlock Grid.Column="0" Text="{StaticResource Diff_Detail_AfterLabel}"
-                                                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="11" Margin="0,0,6,0"/>
+                                                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" Margin="0,0,6,0"/>
                                                     <controls:InlineDiffTextBlock Grid.Column="1"
                                                                Before="{Binding FemaleBefore}" After="{Binding FemaleAfter}"
-                                                               ShowAfter="True" Foreground="{DynamicResource Brush.Text.Emphasis}" FontSize="12" TextWrapping="Wrap"/>
+                                                               ShowAfter="True" Foreground="{DynamicResource Brush.Text.Emphasis}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
                                                 </Grid>
                                             </StackPanel>
                                         </StackPanel>
@@ -273,13 +292,13 @@
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                             <TextBlock Text="{Binding Selected.Name}"
                                        Foreground="{DynamicResource Brush.Text.Secondary}"
-                                       FontSize="14"
+                                       FontSize="{StaticResource FontSize.Subtitle}"
                                        HorizontalAlignment="Center"
                                        Margin="0,0,0,8"
                                        IsVisible="{Binding Selected, Converter={StaticResource IsNotNull}}"/>
                             <TextBlock Text="{Binding CanvasHint}"
                                        Foreground="{DynamicResource Brush.Text.Disabled}"
-                                       FontSize="11"
+                                       FontSize="{StaticResource FontSize.Label}"
                                        HorizontalAlignment="Center"
                                        TextWrapping="Wrap"
                                        TextAlignment="Center"
@@ -287,7 +306,7 @@
                                        IsVisible="{Binding CanvasHint, Converter={StaticResource NullOrEmptyToVis}}"/>
                             <TextBlock Text="{StaticResource DiffWindow_SelectHint}"
                                        Foreground="{DynamicResource Brush.Text.Disabled}"
-                                       FontSize="11"
+                                       FontSize="{StaticResource FontSize.Label}"
                                        HorizontalAlignment="Center"
                                        TextWrapping="Wrap"
                                        TextAlignment="Center"
