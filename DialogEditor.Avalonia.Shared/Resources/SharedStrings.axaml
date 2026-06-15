@@ -42,12 +42,35 @@
     <!-- FileType descriptions (used by file pickers) -->
     <sys:String x:Key="FileType_PatchList">Patch list (*.patchlist)</sys:String>
 
+    <!-- ─── Accessibility — screen-reader names for icon-only buttons ─────────── -->
+    <sys:String x:Key="AutomationName_MovePatchUp">Move patch up</sys:String>
+    <sys:String x:Key="AutomationName_MovePatchDown">Move patch down</sys:String>
+    <sys:String x:Key="AutomationName_RemovePatch">Remove patch</sys:String>
+
     <!-- ─── Theme picker (Layer 2) — shared by editor and standalone PatchManager ── -->
     <sys:String x:Key="Settings_Theme">Theme</sys:String>
     <sys:String x:Key="Settings_ThemeTooltip">Choose the colour theme for the whole application. The change is applied immediately and remembered for next time. High Contrast and Colourblind improve readability for low vision and colour-vision deficiency.</sys:String>
+    <sys:String x:Key="Theme_Name_Auto">System Default</sys:String>
     <sys:String x:Key="Theme_Name_Dark">Dark</sys:String>
     <sys:String x:Key="Theme_Name_Light">Light</sys:String>
     <sys:String x:Key="Theme_Name_Colourblind">Colourblind</sys:String>
     <sys:String x:Key="Theme_Name_HighContrast">High Contrast</sys:String>
+
+    <!-- ─── First-run theme onboarding (Gaps item 15) — shared by editor and standalone PatchManager ── -->
+    <sys:String x:Key="ThemeOnboarding_Title">Choose a Theme</sys:String>
+    <sys:String x:Key="ThemeOnboarding_Intro">Pick a colour theme below — you can change this anytime later in Settings.</sys:String>
+    <sys:String x:Key="ThemeOnboarding_PreviewLabel">Preview</sys:String>
+    <sys:String x:Key="ThemeOnboarding_Continue">Continue</sys:String>
+    <sys:String x:Key="ThemeOnboarding_Card_Npc">NPC</sys:String>
+    <sys:String x:Key="ThemeOnboarding_Card_Player">Player</sys:String>
+    <sys:String x:Key="ThemeOnboarding_Card_Narrator">Narrator</sys:String>
+    <sys:String x:Key="ThemeOnboarding_Sample_Npc">"The road north is closed," the guard says.</sys:String>
+    <sys:String x:Key="ThemeOnboarding_Sample_Player">[Persuade] Let us through — it's urgent.</sys:String>
+    <sys:String x:Key="ThemeOnboarding_Sample_Narrator">The guard eyes you warily, hand on his sword.</sys:String>
+    <sys:String x:Key="ThemeOnboarding_Badge_Warning">Warning</sys:String>
+    <sys:String x:Key="ThemeOnboarding_Badge_Error">Error</sys:String>
+    <sys:String x:Key="ThemeOnboarding_Button_Primary">Primary</sys:String>
+    <sys:String x:Key="ThemeOnboarding_Button_Destructive">Destructive</sys:String>
+    <sys:String x:Key="ThemeOnboarding_Button_Plain">Plain</sys:String>
 
 </ResourceDictionary>

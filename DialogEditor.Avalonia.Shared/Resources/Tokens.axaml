@@ -1,5 +1,22 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Font sizes — semantic type-scale layer (mirrors the Brush.* token layer below).
+         Every view binds these keys; no bare FontSize="N" literal may appear outside
+         this file. See docs/superpowers/specs/2026-06-14-fontsize-token-foundation-design.md.
+         FontSize.Micro (8) was retired: its only use (NodeDetailView group-header style)
+         is now FontSize.Caption — bold weight + muted colour already distinguish group
+         headers from field labels at the same size, and 8px was flagged as too small to
+         read comfortably. -->
+    <x:Double x:Key="FontSize.Caption">9</x:Double>
+    <x:Double x:Key="FontSize.Small">10</x:Double>
+    <x:Double x:Key="FontSize.Label">11</x:Double>
+    <x:Double x:Key="FontSize.Body">12</x:Double>
+    <x:Double x:Key="FontSize.Medium">13</x:Double>
+    <x:Double x:Key="FontSize.Subtitle">14</x:Double>
+    <x:Double x:Key="FontSize.Title">18</x:Double>
+    <x:Double x:Key="FontSize.Display">32</x:Double>
+
     <!--  TOKENS — semantic brush layer (Layer 0, public contract).
           Every view, converter, and dependent gap binds THESE keys (never Palette.*).
           Each brush references exactly one Palette.* colour; two tokens may share a
@@ -151,5 +168,5 @@
     <SolidColorBrush x:Key="Brush.Text.Link.Subtle"  Color="{StaticResource Palette.Sky.350}"/>
     <SolidColorBrush x:Key="Brush.Text.Info"         Color="{StaticResource Palette.Sky.450}"/>
     <SolidColorBrush x:Key="Brush.Text.Highlight"    Color="{StaticResource Palette.Amber.520}"/>
-    <SolidColorBrush x:Key="Brush.Accent.Badge"      Color="{StaticResource Palette.Mauve.500}"/>
+    <SolidColorBrush x:Key="Brush.Canvas.Background" Color="{StaticResource Palette.Neutral.520}"/>
 </ResourceDictionary>

@@ -25,28 +25,6 @@ public class StringConverterTests
     public void NullOrEmptyToBool_NonStringObject_ReturnsFalse()
         => Assert.Equal(false, new NullOrEmptyToBoolConverter().Convert(42, typeof(bool), null, Inv));
 
-    // ── StringIsEmptyConverter ────────────────────────────────────────────
-
-    [Fact]
-    public void StringIsEmpty_Null_ReturnsTrue()
-        => Assert.Equal(true, new StringIsEmptyConverter().Convert(null, typeof(bool), null, Inv));
-
-    [Fact]
-    public void StringIsEmpty_EmptyString_ReturnsTrue()
-        => Assert.Equal(true, new StringIsEmptyConverter().Convert("", typeof(bool), null, Inv));
-
-    [Fact]
-    public void StringIsEmpty_NonEmptyString_ReturnsFalse()
-        => Assert.Equal(false, new StringIsEmptyConverter().Convert("hello", typeof(bool), null, Inv));
-
-    [Fact]
-    public void StringIsEmpty_NonStringObject_ReturnsTrue()
-    {
-        // value is not string → treated as empty
-        var result = new StringIsEmptyConverter().Convert(42, typeof(bool), null, Inv);
-        Assert.Equal(true, result);
-    }
-
     // ── QTDDisplayConverter ───────────────────────────────────────────────
 
     [Fact]

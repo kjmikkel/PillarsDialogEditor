@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="DialogEditor.Avalonia.Shared.FocusHintBar"
+             x:CompileBindings="False">
+
+    <!-- Gaps.md a11y item 13: passive display of the focused control's HelpText for
+         sighted keyboard users, mirroring MainWindow's status bar styling exactly.
+         Always visible (even when empty) to avoid layout shift on the first Tab press;
+         no ToolTip/live-region — see design spec §"Explicitly not included". -->
+    <Border Background="{DynamicResource Brush.Surface.Card}" Padding="8,4">
+        <TextBlock x:Name="HintText"
+                   Text=""
+                   FontSize="{StaticResource FontSize.Label}"
+                   Foreground="{DynamicResource Brush.Text.Muted}"/>
+    </Border>
+</UserControl>

@@ -3,30 +3,30 @@
         x:Class="DialogEditor.Avalonia.Views.UnsavedChangesDialog"
         Title="{StaticResource UnsavedChanges_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Width="420" SizeToContent="Height"
-        CanResize="False"
+        Width="420" MinWidth="420" SizeToContent="Height"
+        CanResize="True"
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource Brush.Surface.Panel}">
 
     <StackPanel Margin="20">
 
         <TextBlock x:Name="MessageBlock"
-                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="13"
+                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Medium}"
                    TextWrapping="Wrap" Margin="0,0,0,20"/>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
             <Button x:Name="CancelButton"
                     Content="{StaticResource UnsavedChanges_Cancel}"
-                    Background="{DynamicResource Brush.Surface.Header}" Foreground="White" BorderThickness="0"
-                    Padding="16,6" FontSize="12"/>
+                    Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
+                    Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
             <Button x:Name="DiscardButton"
                     Content="{StaticResource UnsavedChanges_Discard}"
-                    Background="{DynamicResource Brush.Surface.Header}" Foreground="White" BorderThickness="0"
-                    Padding="16,6" FontSize="12"/>
+                    Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
+                    Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
             <Button x:Name="SaveButton"
                     Content="{StaticResource UnsavedChanges_Save}"
-                    Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="White" BorderThickness="0"
-                    Padding="16,6" FontSize="12"/>
+                    Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
+                    Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
         </StackPanel>
 
     </StackPanel>

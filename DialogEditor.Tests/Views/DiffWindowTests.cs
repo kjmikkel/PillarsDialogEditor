@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
+using DialogEditor.Avalonia.Shared;
 using DialogEditor.Avalonia.Views;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
@@ -286,6 +289,35 @@ public class DiffWindowTests : IDisposable
 
         vm.AutoPullDependencies = false;
         Assert.False(cb.IsChecked);
+    }
+
+    [AvaloniaFact]
+    public void Tab_ToControlWithHelpText_UpdatesHintBar()
+    {
+        var disk = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [Node(1), Node(2)], [], []));
+        var refp = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [Node(1)], [], []));
+
+        var path = WriteTempProject(disk);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(refp));
+        var vm   = new DiffViewModel(git, new StubDispatcher(), path);
+
+        var window = new DiffWindow(vm);
+        window.Show();
+
+        var checkbox = window.FindControl<CheckBox>("AutoPullCheck")!;
+        var expectedHint = AutomationProperties.GetHelpText(checkbox);
+        Assert.False(string.IsNullOrEmpty(expectedHint));
+
+        checkbox.RaiseEvent(new GotFocusEventArgs
+        {
+            RoutedEvent = InputElement.GotFocusEvent,
+            NavigationMethod = NavigationMethod.Tab,
+        });
+
+        Assert.Equal(expectedHint, window.FindControl<FocusHintBar>("HintBar")!.Text);
     }
 
     private sealed class FakeGit(Func<string[], GitResult> handler) : IGitRunner

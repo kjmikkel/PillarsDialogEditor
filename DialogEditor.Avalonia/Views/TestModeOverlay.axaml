@@ -20,13 +20,13 @@
 
                 <!-- Icon + heading -->
                 <TextBlock Text="⚗"
-                           FontSize="32"
+                           FontSize="{StaticResource FontSize.Display}"
                            HorizontalAlignment="Center"
                            Foreground="{DynamicResource Brush.Text.Highlight}"/>
 
                 <TextBlock Text="{StaticResource TestMode_Message}"
                            Foreground="{DynamicResource Brush.Text.Primary}"
-                           FontSize="13"
+                           FontSize="{StaticResource FontSize.Medium}"
                            TextWrapping="Wrap"
                            TextAlignment="Center"
                            MaxWidth="380"/>
@@ -34,10 +34,11 @@
                 <Button Content="{StaticResource TestMode_Restore}"
                         Command="{Binding RestoreConversationCommand}"
                         HorizontalAlignment="Center"
-                        Background="{DynamicResource Brush.Severity.Error}" Foreground="White"
+                        Background="{DynamicResource Brush.Severity.Error}" Foreground="{DynamicResource Brush.Text.OnAccent}"
                         BorderThickness="0"
-                        Padding="24,8" FontSize="13"
-                        ToolTip.Tip="{StaticResource ToolTip_TestMode_Restore}"/>
+                        Padding="24,8" FontSize="{StaticResource FontSize.Medium}"
+                        ToolTip.Tip="{StaticResource ToolTip_TestMode_Restore}"
+                        AutomationProperties.HelpText="{StaticResource ToolTip_TestMode_Restore}"/>
 
             </StackPanel>
         </Border>

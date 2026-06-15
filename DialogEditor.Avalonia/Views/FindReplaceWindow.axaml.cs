@@ -5,7 +5,11 @@ namespace DialogEditor.Avalonia.Views;
 
 public partial class FindReplaceWindow : Window
 {
-    public FindReplaceWindow() => InitializeComponent();
+    public FindReplaceWindow()
+    {
+        InitializeComponent();
+        HintBar.AttachTo(this);
+    }
 
     public FindReplaceWindow(FindReplaceViewModel vm) : this()
     {

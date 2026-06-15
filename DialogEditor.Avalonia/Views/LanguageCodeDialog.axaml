@@ -3,8 +3,8 @@
         x:Class="DialogEditor.Avalonia.Views.LanguageCodeDialog"
         Title="{StaticResource Localization_LanguageCodeDialog_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Width="340" Height="160"
-        CanResize="False"
+        Width="340" MinWidth="340" SizeToContent="Height"
+        CanResize="True"
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource Brush.Surface.Window}"
         x:CompileBindings="False">
@@ -12,16 +12,17 @@
     <StackPanel Margin="16" Spacing="10">
 
         <TextBlock Text="{StaticResource Localization_LanguageCodeDialog_Prompt}"
-                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="12" TextWrapping="Wrap"/>
+                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
 
         <TextBox x:Name="LanguageCodeBox"
                  Background="{DynamicResource Brush.Surface.Input}"
                  Foreground="{DynamicResource Brush.Text.Primary}"
                  BorderBrush="{DynamicResource Brush.Border.Strong}"
                  BorderThickness="1"
-                 FontSize="12"
+                 FontSize="{StaticResource FontSize.Body}"
                  Padding="6,4"
-                 AcceptsReturn="False"/>
+                 AcceptsReturn="False"
+                 AutomationProperties.Name="{StaticResource Localization_LanguageCodeDialog_Prompt}"/>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
             <Button x:Name="CancelButton"
@@ -32,7 +33,7 @@
             <Button x:Name="OkButton"
                     Content="OK"
                     IsDefault="True"
-                    Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="White" BorderThickness="0"
+                    Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,5"
                     Click="OkButton_Click"/>
         </StackPanel>

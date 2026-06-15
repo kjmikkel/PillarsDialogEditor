@@ -19,6 +19,7 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Resources\SharedStrings.axaml"/>
+    <AvaloniaResource Include="Assets\**"/>
   </ItemGroup>
 
 </Project>

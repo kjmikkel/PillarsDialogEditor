@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Connect mode — source node highlight options</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, sans-serif; background: #1e1b24; color: #ddd; padding: 24px; }
+  h1 { font-size: 18px; }
+  h2 { font-size: 14px; color: #aaa; margin-top: 36px; }
+  p.note { color: #999; font-size: 13px; max-width: 640px; }
+  .row { display: flex; gap: 32px; margin-top: 16px; flex-wrap: wrap; }
+  .node { width: 200px; border-radius: 4px; background: #2c2836; position: relative; }
+  .node .header { background: #3a3548; color: #cfc8d8; font-size: 12px; padding: 6px 8px; border-radius: 4px 4px 0 0; }
+  .node .body { padding: 10px 8px; font-size: 12px; color: #bbb; min-height: 50px; }
+  .label { margin-top: 8px; font-size: 12px; color: #ccc; text-align: center; }
+
+  /* Normal selection ring (existing) */
+  .selected { outline: 2px solid #6fa8ff; outline-offset: 2px; }
+
+  /* Option A: dashed amber border + link-glyph badge (top-left, opposite diff badge corner) */
+  .connsrc-a { outline: 3px dashed #e0a830; outline-offset: 3px; }
+  .badge-a {
+    position: absolute; top: -10px; left: -10px; width: 20px; height: 20px;
+    border-radius: 50%; background: #e0a830; color: #2c2836;
+    font-size: 12px; display: flex; align-items: center; justify-content: center;
+    font-weight: bold;
+  }
+
+  /* Option B: thick dotted ring + corner ribbon banner with text */
+  .connsrc-b { outline: 3px dotted #7fd0c0; outline-offset: 3px; }
+  .ribbon-b {
+    position: absolute; top: -9px; left: 8px; background: #7fd0c0; color: #1e1b24;
+    font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 3px;
+    letter-spacing: 0.5px;
+  }
+
+  /* Option C: double-thickness solid border (different from selection's outline) + corner glyph badge */
+  .connsrc-c { border: 3px solid #c98bd6 !important; }
+  .badge-c {
+    position: absolute; bottom: -10px; right: -10px; width: 20px; height: 20px;
+    border-radius: 50%; background: #c98bd6; color: #1e1b24;
+    font-size: 11px; display: flex; align-items: center; justify-content: center;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+<h1>Connect mode — distinguishing the "connection source" node from the normal selection</h1>
+<p class="note">
+  In connect mode, two nodes need distinct highlights at once: the fixed <strong>source</strong>
+  node (where the new connection will start) and the <strong>target candidate</strong> (the
+  currently-selected node, which still gets the normal blue selection ring as arrow keys move it).
+  Per the project's non-colour-encoding rule, the source highlight needs a shape/pattern cue, not
+  just a different hue — so it stays legible in Colourblind and High-Contrast palettes too.
+</p>
+
+<h2>Option A — Dashed border + 🔗 badge (top-left)</h2>
+<p class="note">Mirrors the existing diff-status pattern (coloured border + corner glyph badge), but dashed instead of solid, and placed top-left so it never collides with the diff badge (top-right).</p>
+<div class="row">
+  <div>
+    <div class="node connsrc-a">
+      <div class="badge-a">🔗</div>
+      <div class="header">Node 12 — Aloth</div>
+      <div class="body">"I suppose that's one way to look at it..."</div>
+    </div>
+    <div class="label">Source node (fixed)</div>
+  </div>
+  <div>
+    <div class="node selected">
+      <div class="header">Node 15 — Eder</div>
+      <div class="body">"Careful with that, friend."</div>
+    </div>
+    <div class="label">Target candidate (moves with arrow keys)</div>
+  </div>
+</div>
+
+<h2>Option B — Dotted ring + "FROM" text ribbon</h2>
+<p class="note">A small text ribbon is the most explicit (reads correctly even with no glyph literacy), but adds a string to localize and a bit more visual clutter on a 200px-wide card.</p>
+<div class="row">
+  <div>
+    <div class="node connsrc-b">
+      <div class="ribbon-b">FROM</div>
+      <div class="header">Node 12 — Aloth</div>
+      <div class="body">"I suppose that's one way to look at it..."</div>
+    </div>
+    <div class="label">Source node (fixed)</div>
+  </div>
+  <div>
+    <div class="node selected">
+      <div class="header">Node 15 — Eder</div>
+      <div class="body">"Careful with that, friend."</div>
+    </div>
+    <div class="label">Target candidate (moves with arrow keys)</div>
+  </div>
+</div>
+
+<h2>Option C — Thick solid border (different weight) + corner badge (bottom-right)</h2>
+<p class="note">Avoids dash patterns entirely (less visual noise alongside dashed "Always/Never" connection lines), but a thicker solid border is the subtlest difference from the selection ring at a glance.</p>
+<div class="row">
+  <div>
+    <div class="node connsrc-c">
+      <div class="badge-c">→</div>
+      <div class="header">Node 12 — Aloth</div>
+      <div class="body">"I suppose that's one way to look at it..."</div>
+    </div>
+    <div class="label">Source node (fixed)</div>
+  </div>
+  <div>
+    <div class="node selected">
+      <div class="header">Node 15 — Eder</div>
+      <div class="body">"Careful with that, friend."</div>
+    </div>
+    <div class="label">Target candidate (moves with arrow keys)</div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -141,6 +141,35 @@ public class GameBrowserViewModelTests
         Assert.All(vm.Folders, f => Assert.False(f.IsExpanded));
     }
 
+    // ── Load — new-conversation grouping ─────────────────────────────────
+
+    [Fact]
+    public void Load_WithNewConversationNames_InsertsDedicatedFolderAtTop()
+    {
+        var vm       = MakeVm();
+        var provider = new FakeGameDataProvider("test-game", "en");
+
+        vm.Load(provider, ["new_scene"]);
+
+        var newFolder = vm.Folders[0];
+        Assert.Equal(Loc.Get("Label_NewConversationsFolder"), newFolder.DisplayName);
+        Assert.True(newFolder.IsExpanded);
+        Assert.Single(newFolder.Items);
+        Assert.True(newFolder.Items[0].IsNew);
+        Assert.Equal("new_scene", newFolder.Items[0].Name);
+    }
+
+    [Fact]
+    public void Load_WithoutNewConversationNames_DoesNotAddNewFolder()
+    {
+        var vm       = MakeVm();
+        var provider = new FakeGameDataProvider("test-game", "en");
+
+        vm.Load(provider);
+
+        Assert.DoesNotContain(vm.Folders, f => f.DisplayName == Loc.Get("Label_NewConversationsFolder"));
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────
 
     private static ConversationItemViewModel MakeItem(string name)

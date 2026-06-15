@@ -182,6 +182,17 @@
     <sys:String x:Key="Legend_Narrator">Narrator</sys:String>
     <sys:String x:Key="Legend_ScriptAction">Script / automated action</sys:String>
 
+    <!-- ─── Legend panel — swatch accessibility help text (Gaps item 12) ──── -->
+    <!-- Full-sentence explanations, shared across AutomationProperties.Name,
+         ToolTip.Tip, and AutomationProperties.HelpText for each focusable swatch row. -->
+    <sys:String x:Key="Legend_ShowOnce_Help">This colour marks connections that are shown to the player only once and hidden after they're selected.</sys:String>
+    <sys:String x:Key="Legend_Always_Help">This colour marks connections that remain available to the player even after selection.</sys:String>
+    <sys:String x:Key="Legend_Never_Help">This colour marks connections that are never shown to the player.</sys:String>
+    <sys:String x:Key="Legend_NpcLine_Help">This colour marks NPC dialogue lines on the canvas.</sys:String>
+    <sys:String x:Key="Legend_PlayerChoice_Help">This colour marks player choice options on the canvas, also marked with a ✦ symbol.</sys:String>
+    <sys:String x:Key="Legend_Narrator_Help">This colour marks narrator text nodes on the canvas.</sys:String>
+    <sys:String x:Key="Legend_ScriptAction_Help">This colour marks script and automated-action nodes on the canvas.</sys:String>
+
     <!-- ─── Legend panel — symbol descriptions ────────────────────────── -->
     <!-- "N" is a literal count, not a placeholder — leave it as-is -->
     <sys:String x:Key="Legend_Symbol_Conditions">node has N visibility conditions</sys:String>
@@ -235,6 +246,27 @@
     <sys:String x:Key="Legend_Browser_Pin_Desc">panel stays open; click 📌 to switch to flyout mode</sys:String>
     <sys:String x:Key="Legend_Browser_Flyout">📌 unpinned</sys:String>
     <sys:String x:Key="Legend_Browser_Flyout_Desc">click the strip to open temporarily; closes on click-outside or selection</sys:String>
+
+    <!-- ─── Legend: canvas keyboard (plain language for non-technical writers) ── -->
+    <sys:String x:Key="Legend_CanvasKeys">Canvas keyboard</sys:String>
+    <sys:String x:Key="Legend_Key_Right">→</sys:String>
+    <sys:String x:Key="Legend_Key_Right_Desc">Move to the line that follows this one</sys:String>
+    <sys:String x:Key="Legend_Key_Left">←</sys:String>
+    <sys:String x:Key="Legend_Key_Left_Desc">Go back to the line this one responds to</sys:String>
+    <sys:String x:Key="Legend_Key_UpDown">↑ / ↓</sys:String>
+    <sys:String x:Key="Legend_Key_UpDown_Desc">Switch between sibling responses</sys:String>
+    <sys:String x:Key="Legend_Key_PageUpDown">Page Up / Down</sys:String>
+    <sys:String x:Key="Legend_Key_PageUpDown_Desc">Step through every node, including unconnected ones</sys:String>
+    <sys:String x:Key="Legend_Key_Home">Home</sys:String>
+    <sys:String x:Key="Legend_Key_Home_Desc">Jump back to the start of the conversation</sys:String>
+    <sys:String x:Key="Legend_Key_CtrlArrows">Ctrl + arrows</sys:String>
+    <sys:String x:Key="Legend_Key_CtrlArrows_Desc">Move the selected node a small step (add Shift for bigger steps)</sys:String>
+    <sys:String x:Key="Legend_Key_Enter">Enter</sys:String>
+    <sys:String x:Key="Legend_Key_Enter_Desc">Edit the selected node's text and details</sys:String>
+    <sys:String x:Key="Legend_Key_Menu">Menu key</sys:String>
+    <sys:String x:Key="Legend_Key_Menu_Desc">Open the selected node's right-click menu</sys:String>
+    <sys:String x:Key="Legend_Key_Escape">Esc</sys:String>
+    <sys:String x:Key="Legend_Key_Escape_Desc">Deselect the current node</sys:String>
 
     <!-- ─── Tooltips — toolbar ─────────────────────────────────────────── -->
     <sys:String x:Key="ToolTip_OpenFolder">Open a PoE1 or PoE2 game root folder</sys:String>
@@ -837,6 +869,15 @@ Saving records your edits to the open project — game files are not touched unt
 
     <!-- ─── Settings — localization format ────────────────────────────── -->
     <sys:String x:Key="Settings_LocalizationFormat">Default localization format</sys:String>
+    <sys:String x:Key="Settings_LocalizationFormatTooltip">The file format used when exporting or importing localization entries (CSV, JSON, or XLIFF).</sys:String>
+
+    <!-- ─── Settings — font scale (Gaps item 6 part B) ────────────────────── -->
+    <sys:String x:Key="Settings_FontScale">Font scale</sys:String>
+    <sys:String x:Key="Settings_FontScaleTooltip">Scales all text in the app. Takes effect after restarting the application.</sys:String>
+    <sys:String x:Key="Settings_FontScalePreviewBody">Body text sample</sys:String>
+    <sys:String x:Key="Settings_FontScalePreviewSubtitle">Subtitle text sample</sys:String>
+    <sys:String x:Key="Settings_FontScalePreviewTitle">Title text sample</sys:String>
+    <sys:String x:Key="Settings_FontScaleRestartNotice">Restart the application for the new font scale to take effect.</sys:String>
 
     <!-- PatchManager strings are in DialogEditor.Avalonia.Shared/Resources/SharedStrings.axaml -->
 
@@ -938,5 +979,33 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Sample_CreatedNoGit">Sample project created and opened. Install Git to try the version-control tools.</sys:String>
     <sys:String x:Key="Sample_CreatedHistoryPartial">Sample project created and opened, but its practice history couldn't be completed.</sys:String>
     <sys:String x:Key="Walkthrough_OpenFailed">Couldn't open the walkthrough. You can find it in the app's docs folder.</sys:String>
+
+    <!-- ─── Accessibility — screen-reader names for icon-only buttons ─────── -->
+    <sys:String x:Key="AutomationName_MoveConditionUp">Move condition up</sys:String>
+    <sys:String x:Key="AutomationName_MoveConditionDown">Move condition down</sys:String>
+    <sys:String x:Key="AutomationName_RemoveCondition">Remove condition</sys:String>
+    <sys:String x:Key="AutomationName_ParameterHelp">Parameter help</sys:String>
+    <sys:String x:Key="AutomationName_ZoomIn">Zoom in</sys:String>
+    <sys:String x:Key="AutomationName_ZoomOut">Zoom out</sys:String>
+    <sys:String x:Key="AutomationName_JumpToRoot">Jump to root node</sys:String>
+    <sys:String x:Key="AutomationName_ClearSearch">Clear search</sys:String>
+    <sys:String x:Key="AutomationName_GoToNode">Go to node</sys:String>
+    <sys:String x:Key="AutomationName_ClearFilter">Clear filter</sys:String>
+    <sys:String x:Key="AutomationName_ToggleHelp">Toggle help</sys:String>
+    <sys:String x:Key="AutomationName_Settings">Settings</sys:String>
+    <sys:String x:Key="AutomationName_PinBrowserPanel">Pin browser panel</sys:String>
+    <sys:String x:Key="AutomationName_ExpandAllFolders">Expand all folders</sys:String>
+    <sys:String x:Key="AutomationName_CollapseAllFolders">Collapse all folders</sys:String>
+    <sys:String x:Key="AutomationName_NewConversation">New conversation</sys:String>
+    <sys:String x:Key="AutomationName_CollapseDetailsPanel">Collapse details panel</sys:String>
+    <sys:String x:Key="AutomationName_ExpandDetailsPanel">Expand details panel</sys:String>
+    <sys:String x:Key="AutomationName_MoveScriptUp">Move script up</sys:String>
+    <sys:String x:Key="AutomationName_MoveScriptDown">Move script down</sys:String>
+    <sys:String x:Key="AutomationName_RemoveScript">Remove script</sys:String>
+
+    <!-- ─── Accessibility — screen-reader names for input fields ──────────── -->
+    <sys:String x:Key="AutomationName_ConditionOperator">Combine with previous row using AND or OR</sys:String>
+    <sys:String x:Key="AutomationName_LinkQTD">Question node text display option for this link</sys:String>
+    <sys:String x:Key="AutomationName_ConversationName">New conversation file name</sys:String>
 
 </ResourceDictionary>

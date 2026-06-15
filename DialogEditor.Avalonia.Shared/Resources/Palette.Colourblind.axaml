@@ -94,7 +94,7 @@
     <Color x:Key="Palette.Parchment.100">#FFF5F0D0</Color>
     <Color x:Key="Palette.Parchment.200">#FFE8E0B0</Color>
     <Color x:Key="Palette.Cream.100">#FFFFF8DC</Color>
-    <Color x:Key="Palette.Mauve.500">#FF7A6A8E</Color>
+    <Color x:Key="Palette.Neutral.520">#FF838585</Color>
     <Color x:Key="Palette.Magenta.500">#FFEE00AA</Color>
 
     <!-- Alpha / effect primitives (overlays + shadow live here so hex stays confined) -->

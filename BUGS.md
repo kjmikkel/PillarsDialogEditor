@@ -41,6 +41,27 @@ _None yet._
 
 ## Fixed
 
+### B-003 — Default localization format in Settings doesn't persist/display
+- **Area:** Settings window — "Default localization format" picker (`SettingsWindow.axaml`)
+- **Severity:** minor
+- **Repro:**
+  1. Open Settings, change "Default localization format" to Json or Xliff.
+  2. Close Settings, reopen it.
+- **Expected:** The picker shows the previously selected format.
+- **Actual:** The picker always appears blank/unselected, and the choice is never saved
+  (`AppSettings.DefaultLocalizationFormat` stays "Csv" regardless of selection).
+- **Notes:** The ComboBox bound `SelectedItem="{Binding LocalizationFormat, Mode=TwoWay}"`
+  (a `string` VM property) against static `<ComboBoxItem Content="Csv"/>` etc. children —
+  the `Items` collection held `ComboBoxItem` objects, not strings, so the binding's type
+  mismatch broke it in both directions. The sibling `FontScale` picker uses the correct
+  `ItemsSource`/`SelectedItem` pattern with matching types.
+- **Fixed:** `576d109` — added `LocalizationFormatOptions` (`IReadOnlyList<string>`)
+  to `SettingsViewModel` mirroring `FontScaleOptions`, and changed the XAML to
+  `ItemsSource="{Binding LocalizationFormatOptions}"` + `SelectedItem="{Binding
+  LocalizationFormat, Mode=TwoWay}"` (both `string`-typed), also adding a tooltip and
+  `AutomationProperties.HelpText`. Covered by new headless tests in
+  `DialogEditor.Tests/Views/SettingsWindowTests.cs`.
+
 ### B-002 — No visible in-progress line when making a node connection
 - **Area:** Conversation canvas — connection-making (`ConversationView.axaml`, `PendingConnectionViewModel`)
 - **Severity:** minor
