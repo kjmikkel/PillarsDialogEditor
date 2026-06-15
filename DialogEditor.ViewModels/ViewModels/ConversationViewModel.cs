@@ -114,6 +114,20 @@ public partial class ConversationViewModel : ObservableObject
     [ObservableProperty]
     private NodeViewModel? _selectedNode;
 
+    // ── Keyboard "connect mode" (Gaps.md Accessibility item 4 follow-up) ──────
+    [ObservableProperty]
+    private bool _isConnecting;
+
+    [ObservableProperty]
+    private NodeViewModel? _connectionSource;
+
+    /// <summary>
+    /// Raised when keyboard connect mode starts, completes with a new connection, or
+    /// is cancelled. <see cref="MainWindowViewModel"/> turns this into a
+    /// <c>StatusText</c> announcement for the existing live region.
+    /// </summary>
+    public event EventHandler<ConnectModeEventArgs>? ConnectModeChanged;
+
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(ClearSearchCommand))]
     private string _searchQuery = string.Empty;
@@ -312,6 +326,10 @@ public partial class ConversationViewModel : ObservableObject
 
     public void DeleteNode(NodeViewModel node)
     {
+        // Connect mode cannot reference a deleted node.
+        if (node == ConnectionSource)
+            CancelConnect();
+
         var removed = Connections
             .Where(c => c.Source.Owner == node || c.Target.Owner == node)
             .ToList();
@@ -362,6 +380,12 @@ public partial class ConversationViewModel : ObservableObject
     private void DeleteNodeCmd(NodeViewModel? node)
     {
         if (node is not null) DeleteNode(node);
+    }
+
+    [RelayCommand(CanExecute = nameof(IsEditable))]
+    private void BeginConnectCmd(NodeViewModel? node)
+    {
+        if (node is not null) BeginConnect(node);
     }
 
     [RelayCommand(CanExecute = nameof(IsEditable))]
@@ -456,6 +480,82 @@ public partial class ConversationViewModel : ObservableObject
         if (!IsEditable || SelectedNode is null) return false;
         SelectedNode.Location = new LayoutPoint(SelectedNode.Location.X + dx, SelectedNode.Location.Y + dy);
         return true;
+    }
+
+    // ── Keyboard connect mode ────────────────────────────────────────────────
+    /// <summary>
+    /// Starts connect mode with <paramref name="node"/> as the source. The source
+    /// becomes the initial target-candidate too — arrow keys then move the target
+    /// candidate away from it (spec decision: entry = SelectNode(source)).
+    /// No-op (returns false) if the canvas isn't editable or connect mode is already
+    /// active — the user must confirm or cancel the current session first.
+    /// </summary>
+    public bool BeginConnect(NodeViewModel node)
+    {
+        if (!IsEditable || IsConnecting) return false;
+
+        SelectNode(node);
+        ConnectionSource = node;
+        node.IsConnectionSource = true;
+        IsConnecting = true;
+
+        ConnectModeChanged?.Invoke(this, new ConnectModeEventArgs(ConnectModeChange.Started, node, null));
+        return true;
+    }
+
+    /// <summary>Starts connect mode using <see cref="SelectedNode"/> as the source.</summary>
+    public bool TryBeginConnect()
+    {
+        if (SelectedNode is null) return false;
+        return BeginConnect(SelectedNode);
+    }
+
+    /// <summary>
+    /// Confirms the connection from <see cref="ConnectionSource"/> to the current
+    /// target candidate (<see cref="SelectedNode"/>), called only while
+    /// <see cref="IsConnecting"/>. If the target is the source itself or a node
+    /// already connected to the source's output, this is a silent no-op and connect
+    /// mode remains active (spec decision 2 — matches
+    /// <see cref="PendingConnectionViewModel.Complete"/>'s self/duplicate handling).
+    /// Always returns true: the key is consumed either way.
+    /// </summary>
+    public bool TryConfirmConnection()
+    {
+        var source = ConnectionSource!;
+        var target = SelectedNode;
+
+        var isSelf      = target == source;
+        var isDuplicate = target is not null &&
+            Connections.Any(c => c.Source == source.Output && c.Target == target.Input);
+
+        if (target is not null && !isSelf && !isDuplicate)
+        {
+            AddConnection(source.Output, target.Input);
+            ExitConnectMode();
+            ConnectModeChanged?.Invoke(this, new ConnectModeEventArgs(ConnectModeChange.Connected, source, target));
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Cancels connect mode without creating a connection (selection unchanged).
+    /// Called only while <see cref="IsConnecting"/>. Always returns true.
+    /// </summary>
+    public bool CancelConnect()
+    {
+        var source = ConnectionSource!;
+        ExitConnectMode();
+        ConnectModeChanged?.Invoke(this, new ConnectModeEventArgs(ConnectModeChange.Cancelled, source, null));
+        return true;
+    }
+
+    private void ExitConnectMode()
+    {
+        if (ConnectionSource is not null)
+            ConnectionSource.IsConnectionSource = false;
+        ConnectionSource = null;
+        IsConnecting     = false;
     }
 
     // ── Layout helpers ────────────────────────────────────────────────────
