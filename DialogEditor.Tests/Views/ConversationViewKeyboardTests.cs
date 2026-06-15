@@ -222,4 +222,58 @@ public class ConversationViewKeyboardTests
         var box = detail.FindControl<TextBox>("DefaultTextBox")!;
         Assert.True(box.IsFocused);
     }
+
+    [AvaloniaFact]
+    public void CtrlL_StartsConnectMode()
+    {
+        var (_, view, vm, root, _) = Setup();
+        vm.SelectNode(root);
+
+        Press(view, Key.L, KeyModifiers.Control);
+
+        Assert.True(vm.IsConnecting);
+        Assert.Same(root, vm.ConnectionSource);
+    }
+
+    [AvaloniaFact]
+    public void CtrlL_WithoutSelection_DoesNotStartConnectMode()
+    {
+        var (_, view, vm, _, _) = Setup();
+
+        Press(view, Key.L, KeyModifiers.Control);
+
+        Assert.False(vm.IsConnecting);
+    }
+
+    [AvaloniaFact]
+    public void Enter_WhileConnecting_ConfirmsInsteadOfFocusingDetail()
+    {
+        var (_, view, vm, root, _) = Setup();
+        var target = CanvasNavigationServiceTests.MakeNode(2, 800, 0);
+        target.OnSelected = n => vm.SelectedNode = n;
+        vm.Nodes.Add(target);
+
+        vm.BeginConnect(root);
+        vm.SelectNode(target);
+
+        var raised = false;
+        view.FocusDetailRequested += (_, _) => raised = true;
+        Press(view, Key.Enter);
+
+        Assert.False(raised);
+        Assert.False(vm.IsConnecting);
+        Assert.Contains(vm.Connections, c => c.Source == root.Output && c.Target == target.Input);
+    }
+
+    [AvaloniaFact]
+    public void Escape_WhileConnecting_CancelsInsteadOfDeselecting()
+    {
+        var (_, view, vm, root, _) = Setup();
+        vm.BeginConnect(root);
+
+        Press(view, Key.Escape);
+
+        Assert.False(vm.IsConnecting);
+        Assert.Same(root, vm.SelectedNode); // selection unchanged, per spec decision 2
+    }
 }
