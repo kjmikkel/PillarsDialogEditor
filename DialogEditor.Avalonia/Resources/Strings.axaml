@@ -321,6 +321,7 @@
     <!-- ─── Editing — canvas context menus ──────────────────────────────── -->
     <sys:String x:Key="Menu_DeleteNode">Delete node</sys:String>
     <sys:String x:Key="Menu_AddConnectedNode">Add connected node</sys:String>
+    <sys:String x:Key="Menu_ConnectToNode">Connect to…</sys:String>
     <sys:String x:Key="Menu_DeleteConnection">Delete connection</sys:String>
 
     <!-- ─── Editing — status messages ───────────────────────────────────── -->
@@ -445,6 +446,7 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- ─── Canvas context menus ──────────────────────────────────────────── -->
     <sys:String x:Key="ToolTip_DeleteNode">Remove this node and all its connections from the conversation</sys:String>
     <sys:String x:Key="ToolTip_AddConnectedNode">Create a new node and link it from this one</sys:String>
+    <sys:String x:Key="ToolTip_ConnectToNode">Start connecting this node to another one. Use the arrow keys to pick the destination, Enter to confirm, or Escape to cancel. (Shortcut: Ctrl+L)</sys:String>
     <sys:String x:Key="ToolTip_DeleteConnection">Remove the link between these two nodes</sys:String>
 
     <!-- ─── Script editor row buttons ─────────────────────────────────────── -->

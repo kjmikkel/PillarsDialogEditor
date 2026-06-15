@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
@@ -275,5 +276,47 @@ public class ConversationViewKeyboardTests
 
         Assert.False(vm.IsConnecting);
         Assert.Same(root, vm.SelectedNode); // selection unchanged, per spec decision 2
+    }
+
+    [AvaloniaFact]
+    public void ConnectToNode_MenuItem_StartsConnectMode()
+    {
+        var (_, view, vm, root, _) = Setup();
+        vm.SelectNode(root);
+
+        Press(view, Key.Apps);
+
+        var editor = view.FindControl<Control>("Editor")!;
+        var menu = ((global::Avalonia.Visual)editor).GetVisualDescendants()
+            .OfType<Control>()
+            .Select(c => c.ContextMenu)
+            .FirstOrDefault(m => m is not null);
+        Assert.NotNull(menu);
+
+        var connectHeader = (string)Application.Current!.FindResource("Menu_ConnectToNode")!;
+        var connectItem = menu!.Items
+            .OfType<MenuItem>()
+            .First(i => Equals(i.Header, connectHeader));
+        connectItem.Command!.Execute(root);
+
+        Assert.True(vm.IsConnecting);
+        Assert.Same(root, vm.ConnectionSource);
+    }
+
+    [AvaloniaFact]
+    public void ConnectionSourceOverlay_VisibleOnlyForConnectionSource()
+    {
+        var (_, view, vm, root, child) = Setup();
+        vm.BeginConnect(root);
+
+        var editor = view.FindControl<Control>("Editor")!;
+        var overlays = ((global::Avalonia.Visual)editor).GetVisualDescendants()
+            .OfType<Border>()
+            .Where(b => b.Name == "ConnectionSourceBadge")
+            .ToList();
+
+        Assert.Equal(2, overlays.Count); // one per realized node container
+        Assert.True(root.IsConnectionSource);
+        Assert.False(child.IsConnectionSource);
     }
 }
