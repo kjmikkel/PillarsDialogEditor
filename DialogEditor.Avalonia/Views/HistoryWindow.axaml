@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.HistoryWindow"
-        Title="{StaticResource HistoryWindow_Title}"
+        Title="{DynamicResource HistoryWindow_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="720" Height="480"
         WindowStartupLocation="CenterOwner"
@@ -42,14 +42,14 @@
         <StackPanel Grid.Row="1" Orientation="Horizontal"
                     HorizontalAlignment="Right" Spacing="8" Margin="0,14,0,0">
             <Button x:Name="CompareButton"
-                    Content="{StaticResource HistoryWindow_CompareButton}"
+                    Content="{DynamicResource HistoryWindow_CompareButton}"
                     Command="{Binding CompareCommand}"
-                    ToolTip.Tip="{StaticResource HistoryWindow_CompareTooltip}"
-                    AutomationProperties.HelpText="{StaticResource HistoryWindow_CompareTooltip}"
+                    ToolTip.Tip="{DynamicResource HistoryWindow_CompareTooltip}"
+                    AutomationProperties.HelpText="{DynamicResource HistoryWindow_CompareTooltip}"
                     Background="{DynamicResource Brush.Button.Confirm.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
             <Button x:Name="CloseButton"
-                    Content="{StaticResource HistoryWindow_Close}"
+                    Content="{DynamicResource HistoryWindow_Close}"
                     Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
         </StackPanel>

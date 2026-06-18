@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="DialogEditor.Avalonia.Views.UnsavedChangesDialog"
-        Title="{StaticResource UnsavedChanges_Title}"
+        Title="{DynamicResource UnsavedChanges_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="420" MinWidth="420" SizeToContent="Height"
         CanResize="True"
@@ -16,15 +16,15 @@
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
             <Button x:Name="CancelButton"
-                    Content="{StaticResource UnsavedChanges_Cancel}"
+                    Content="{DynamicResource UnsavedChanges_Cancel}"
                     Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
             <Button x:Name="DiscardButton"
-                    Content="{StaticResource UnsavedChanges_Discard}"
+                    Content="{DynamicResource UnsavedChanges_Discard}"
                     Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
             <Button x:Name="SaveButton"
-                    Content="{StaticResource UnsavedChanges_Save}"
+                    Content="{DynamicResource UnsavedChanges_Save}"
                     Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
         </StackPanel>

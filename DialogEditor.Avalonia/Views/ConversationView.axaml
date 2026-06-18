@@ -42,29 +42,29 @@
                 BorderBrush="{DynamicResource Brush.Border.Default}" BorderThickness="0,0,0,1">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                    <Button Content="{StaticResource Legend_Control_Fit}"
+                    <Button Content="{DynamicResource Legend_Control_Fit}"
                             Click="FitToScreen_Click"
                             Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2"
-                            ToolTip.Tip="{StaticResource ToolTip_FitToScreen}"
-                            AutomationProperties.HelpText="{StaticResource ToolTip_FitToScreen}"/>
+                            ToolTip.Tip="{DynamicResource ToolTip_FitToScreen}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_FitToScreen}"/>
                     <Button Content="+"
                             Click="ZoomIn_Click"
                             Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2" Margin="4,0,0,0"
-                            ToolTip.Tip="{StaticResource ToolTip_ZoomIn}"
-                            AutomationProperties.HelpText="{StaticResource ToolTip_ZoomIn}"
-                            AutomationProperties.Name="{StaticResource AutomationName_ZoomIn}"/>
+                            ToolTip.Tip="{DynamicResource ToolTip_ZoomIn}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_ZoomIn}"
+                            AutomationProperties.Name="{DynamicResource AutomationName_ZoomIn}"/>
                     <Button Content="−"
                             Click="ZoomOut_Click"
                             Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2" Margin="2,0,0,0"
-                            ToolTip.Tip="{StaticResource ToolTip_ZoomOut}"
-                            AutomationProperties.HelpText="{StaticResource ToolTip_ZoomOut}"
-                            AutomationProperties.Name="{StaticResource AutomationName_ZoomOut}"/>
+                            ToolTip.Tip="{DynamicResource ToolTip_ZoomOut}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_ZoomOut}"
+                            AutomationProperties.Name="{DynamicResource AutomationName_ZoomOut}"/>
                     <Button Content="⌂"
                             Click="CenterOnRoot_Click"
                             Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2" Margin="8,0,0,0"
-                            ToolTip.Tip="{StaticResource ToolTip_JumpToRoot}"
-                            AutomationProperties.HelpText="{StaticResource ToolTip_JumpToRoot}"
-                            AutomationProperties.Name="{StaticResource AutomationName_JumpToRoot}"/>
+                            ToolTip.Tip="{DynamicResource ToolTip_JumpToRoot}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_JumpToRoot}"
+                            AutomationProperties.Name="{DynamicResource AutomationName_JumpToRoot}"/>
                 </StackPanel>
                 <TextBlock DockPanel.Dock="Left"
                            Text="{Binding StatisticsText}"
@@ -73,23 +73,23 @@
                 <Grid VerticalAlignment="Center" Margin="0,0,8,0">
                     <TextBox x:Name="SearchBox"
                              Text="{Binding SearchQuery}"
-                             Watermark="{StaticResource Placeholder_SearchNodes}"
-                             AutomationProperties.Name="{StaticResource Placeholder_SearchNodes}"
+                             Watermark="{DynamicResource Placeholder_SearchNodes}"
+                             AutomationProperties.Name="{DynamicResource Placeholder_SearchNodes}"
                              Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" CaretBrush="{DynamicResource Brush.Text.Secondary}"
                              BorderBrush="{DynamicResource Brush.Border.Muted}" BorderThickness="1"
                              Padding="6,2,24,2" FontSize="{StaticResource FontSize.Body}" Height="26"
                              VerticalContentAlignment="Center"
                              KeyDown="SearchBox_KeyDown"
-                             ToolTip.Tip="{StaticResource ToolTip_SearchNodes}"
-                             AutomationProperties.HelpText="{StaticResource ToolTip_SearchNodes}"/>
+                             ToolTip.Tip="{DynamicResource ToolTip_SearchNodes}"
+                             AutomationProperties.HelpText="{DynamicResource ToolTip_SearchNodes}"/>
                     <Button Command="{Binding ClearSearchCommand}"
                             HorizontalAlignment="Right" Width="24" Height="24"
                             Content="✕" VerticalAlignment="Center"
                             Background="Transparent" BorderThickness="0"
                             Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Small}" Cursor="Hand"
-                            ToolTip.Tip="{StaticResource ToolTip_ClearSearch}"
-                            AutomationProperties.HelpText="{StaticResource ToolTip_ClearSearch}"
-                            AutomationProperties.Name="{StaticResource AutomationName_ClearSearch}"/>
+                            ToolTip.Tip="{DynamicResource ToolTip_ClearSearch}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_ClearSearch}"
+                            AutomationProperties.Name="{DynamicResource AutomationName_ClearSearch}"/>
                 </Grid>
             </DockPanel>
         </Border>
@@ -135,21 +135,21 @@
 
                             <nodify:Node.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="{StaticResource Menu_DeleteNode}"
+                                    <MenuItem Header="{DynamicResource Menu_DeleteNode}"
                                               Command="{Binding $parent[UserControl].DataContext.DeleteNodeCmdCommand}"
                                               CommandParameter="{Binding}"
-                                              ToolTip.Tip="{StaticResource ToolTip_DeleteNode}"
-                                              AutomationProperties.HelpText="{StaticResource ToolTip_DeleteNode}"/>
-                                    <MenuItem Header="{StaticResource Menu_AddConnectedNode}"
+                                              ToolTip.Tip="{DynamicResource ToolTip_DeleteNode}"
+                                              AutomationProperties.HelpText="{DynamicResource ToolTip_DeleteNode}"/>
+                                    <MenuItem Header="{DynamicResource Menu_AddConnectedNode}"
                                               Command="{Binding $parent[UserControl].DataContext.AddConnectedNodeCmdCommand}"
                                               CommandParameter="{Binding}"
-                                              ToolTip.Tip="{StaticResource ToolTip_AddConnectedNode}"
-                                              AutomationProperties.HelpText="{StaticResource ToolTip_AddConnectedNode}"/>
-                                    <MenuItem Header="{StaticResource Menu_ConnectToNode}"
+                                              ToolTip.Tip="{DynamicResource ToolTip_AddConnectedNode}"
+                                              AutomationProperties.HelpText="{DynamicResource ToolTip_AddConnectedNode}"/>
+                                    <MenuItem Header="{DynamicResource Menu_ConnectToNode}"
                                               Command="{Binding $parent[UserControl].DataContext.BeginConnectCmdCommand}"
                                               CommandParameter="{Binding}"
-                                              ToolTip.Tip="{StaticResource ToolTip_ConnectToNode}"
-                                              AutomationProperties.HelpText="{StaticResource ToolTip_ConnectToNode}"/>
+                                              ToolTip.Tip="{DynamicResource ToolTip_ConnectToNode}"
+                                              AutomationProperties.HelpText="{DynamicResource ToolTip_ConnectToNode}"/>
                                 </ContextMenu>
                             </nodify:Node.ContextMenu>
 
@@ -305,11 +305,11 @@
                             Classes.highlighted="{Binding IsHighlighted}">
                             <nodify:Connection.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="{StaticResource Menu_DeleteConnection}"
+                                    <MenuItem Header="{DynamicResource Menu_DeleteConnection}"
                                               Command="{Binding $parent[UserControl].DataContext.DeleteConnectionCmdCommand}"
                                               CommandParameter="{Binding}"
-                                              ToolTip.Tip="{StaticResource ToolTip_DeleteConnection}"
-                                              AutomationProperties.HelpText="{StaticResource ToolTip_DeleteConnection}"/>
+                                              ToolTip.Tip="{DynamicResource ToolTip_DeleteConnection}"
+                                              AutomationProperties.HelpText="{DynamicResource ToolTip_DeleteConnection}"/>
                                 </ContextMenu>
                             </nodify:Connection.ContextMenu>
                         </nodify:Connection>
@@ -327,7 +327,7 @@
                 ItemsSource="{Binding Nodes}"
                 ViewportLocation="{Binding ViewportLocation, ElementName=Editor, Mode=TwoWay}"
                 ViewportSize="{Binding ViewportSize, ElementName=Editor}"
-                ToolTip.Tip="{StaticResource ToolTip_Minimap}">
+                ToolTip.Tip="{DynamicResource ToolTip_Minimap}">
                 <nodify:Minimap.ItemContainerTheme>
                     <ControlTheme TargetType="nodify:MinimapItem"
                                   BasedOn="{StaticResource {x:Type nodify:MinimapItem}}">

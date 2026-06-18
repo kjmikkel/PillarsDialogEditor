@@ -42,20 +42,20 @@
 
         <!-- ── Game folder ─────────────────────────────────────────── -->
         <TextBlock Grid.Row="0" Classes="section-label"
-                   Text="{StaticResource PatchManager_GameFolder}"/>
+                   Text="{DynamicResource PatchManager_GameFolder}"/>
         <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
             <TextBox Grid.Column="0" Classes="path-box"
                      Text="{Binding GameFolder}"
-                     Watermark="{StaticResource PatchManager_GameFolderWatermark}"
-                     ToolTip.Tip="{StaticResource ToolTip_BrowseGameFolder}"
-                     AutomationProperties.HelpText="{StaticResource ToolTip_BrowseGameFolder}"
-                     AutomationProperties.Name="{StaticResource PatchManager_GameFolder}"/>
+                     Watermark="{DynamicResource PatchManager_GameFolderWatermark}"
+                     ToolTip.Tip="{DynamicResource ToolTip_BrowseGameFolder}"
+                     AutomationProperties.HelpText="{DynamicResource ToolTip_BrowseGameFolder}"
+                     AutomationProperties.Name="{DynamicResource PatchManager_GameFolder}"/>
             <Button Grid.Column="1" Classes="action-btn"
-                    Content="{StaticResource PatchManager_BrowseGame}"
+                    Content="{DynamicResource PatchManager_BrowseGame}"
                     Command="{Binding BrowseGameFolderCommand}"
                     Margin="6,0,0,0"
-                    ToolTip.Tip="{StaticResource ToolTip_BrowseGameFolder}"
-                    AutomationProperties.HelpText="{StaticResource ToolTip_BrowseGameFolder}"/>
+                    ToolTip.Tip="{DynamicResource ToolTip_BrowseGameFolder}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_BrowseGameFolder}"/>
         </Grid>
 
         <!-- ── Load Order ──────────────────────────────────────────── -->
@@ -64,23 +64,23 @@
             <DockPanel Grid.Row="0" Margin="0,0,0,6">
                 <TextBlock Classes="section-label" DockPanel.Dock="Left"
                            VerticalAlignment="Center"
-                           Text="{StaticResource PatchManager_LoadOrder}"/>
+                           Text="{DynamicResource PatchManager_LoadOrder}"/>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4">
                     <Button Classes="action-btn"
-                            Content="{StaticResource PatchManager_SaveLoadOrder}"
+                            Content="{DynamicResource PatchManager_SaveLoadOrder}"
                             Command="{Binding SaveLoadOrderCommand}"
-                            ToolTip.Tip="{StaticResource ToolTip_SaveLoadOrder}"
-                            AutomationProperties.HelpText="{StaticResource ToolTip_SaveLoadOrder}"/>
+                            ToolTip.Tip="{DynamicResource ToolTip_SaveLoadOrder}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_SaveLoadOrder}"/>
                     <Button Classes="action-btn"
-                            Content="{StaticResource PatchManager_LoadLoadOrder}"
+                            Content="{DynamicResource PatchManager_LoadLoadOrder}"
                             Command="{Binding LoadLoadOrderCommand}"
-                            ToolTip.Tip="{StaticResource ToolTip_LoadLoadOrder}"
-                            AutomationProperties.HelpText="{StaticResource ToolTip_LoadLoadOrder}"/>
+                            ToolTip.Tip="{DynamicResource ToolTip_LoadLoadOrder}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_LoadLoadOrder}"/>
                     <Button Classes="action-btn"
-                            Content="{StaticResource PatchManager_AddProjects}"
+                            Content="{DynamicResource PatchManager_AddProjects}"
                             Command="{Binding AddEntriesCommand}"
-                            ToolTip.Tip="{StaticResource ToolTip_AddProjects}"
-                            AutomationProperties.HelpText="{StaticResource ToolTip_AddProjects}"/>
+                            ToolTip.Tip="{DynamicResource ToolTip_AddProjects}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_AddProjects}"/>
                 </StackPanel>
             </DockPanel>
 
@@ -102,7 +102,7 @@
                                                            Foreground="{DynamicResource Brush.Severity.Warning}" FontSize="{StaticResource FontSize.Body}"
                                                            VerticalAlignment="Center"
                                                            IsVisible="{Binding HasConflict}"
-                                                           ToolTip.Tip="{StaticResource PatchManager_EntryConflictDetail}"/>
+                                                           ToolTip.Tip="{DynamicResource PatchManager_EntryConflictDetail}"/>
                                                 <TextBlock Text="⚠"
                                                            Foreground="{DynamicResource Brush.Severity.Error}" FontSize="{StaticResource FontSize.Body}"
                                                            VerticalAlignment="Center"
@@ -119,34 +119,34 @@
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Medium}" Padding="4"
-                                                ToolTip.Tip="{StaticResource ToolTip_MoveEntryUp}"
-                                                AutomationProperties.HelpText="{StaticResource ToolTip_MoveEntryUp}"
-                                                AutomationProperties.Name="{StaticResource AutomationName_MovePatchUp}"/>
+                                                ToolTip.Tip="{DynamicResource ToolTip_MoveEntryUp}"
+                                                AutomationProperties.HelpText="{DynamicResource ToolTip_MoveEntryUp}"
+                                                AutomationProperties.Name="{DynamicResource AutomationName_MovePatchUp}"/>
                                         <Button Grid.Column="2" Content="↓"
                                                 Command="{Binding DataContext.MoveDownCommand,
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Medium}" Padding="4"
-                                                ToolTip.Tip="{StaticResource ToolTip_MoveEntryDown}"
-                                                AutomationProperties.HelpText="{StaticResource ToolTip_MoveEntryDown}"
-                                                AutomationProperties.Name="{StaticResource AutomationName_MovePatchDown}"/>
+                                                ToolTip.Tip="{DynamicResource ToolTip_MoveEntryDown}"
+                                                AutomationProperties.HelpText="{DynamicResource ToolTip_MoveEntryDown}"
+                                                AutomationProperties.Name="{DynamicResource AutomationName_MovePatchDown}"/>
                                         <Button Grid.Column="3" Content="✕"
                                                 Command="{Binding DataContext.RemoveEntryCommand,
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
                                                 Foreground="{DynamicResource Brush.Severity.Error}" FontSize="{StaticResource FontSize.Medium}" Padding="4"
-                                                ToolTip.Tip="{StaticResource ToolTip_RemoveEntry}"
-                                                AutomationProperties.HelpText="{StaticResource ToolTip_RemoveEntry}"
-                                                AutomationProperties.Name="{StaticResource AutomationName_RemovePatch}"/>
+                                                ToolTip.Tip="{DynamicResource ToolTip_RemoveEntry}"
+                                                AutomationProperties.HelpText="{DynamicResource ToolTip_RemoveEntry}"
+                                                AutomationProperties.Name="{DynamicResource AutomationName_RemovePatch}"/>
                                     </Grid>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
-                <TextBlock Text="{StaticResource PatchManager_EmptyHint}"
+                <TextBlock Text="{DynamicResource PatchManager_EmptyHint}"
                            Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Label}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"
                            IsVisible="{Binding HasEntries,
@@ -154,7 +154,7 @@
             </Grid>
 
             <TextBlock Grid.Row="2"
-                       Text="{StaticResource PatchManager_OrderHint}"
+                       Text="{DynamicResource PatchManager_OrderHint}"
                        Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Caption}"
                        HorizontalAlignment="Center" Margin="0,4,0,0"/>
         </Grid>
@@ -194,13 +194,13 @@
                        IsVisible="{Binding HasConflicts,
                                    Converter={StaticResource InverseBoolToVis}}"/>
             <Button Grid.Column="1" Classes="primary-btn"
-                    Content="{StaticResource PatchManager_Apply}"
+                    Content="{DynamicResource PatchManager_Apply}"
                     Command="{Binding ApplyCommand}"
                     IsVisible="{Binding IsApplying, Converter={StaticResource InverseBoolToVis}}"
-                    ToolTip.Tip="{StaticResource ToolTip_ApplyPatches}"
-                    AutomationProperties.HelpText="{StaticResource ToolTip_ApplyPatches}"/>
+                    ToolTip.Tip="{DynamicResource ToolTip_ApplyPatches}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_ApplyPatches}"/>
             <Button Grid.Column="1" Classes="primary-btn"
-                    Content="{StaticResource PatchManager_Applying}"
+                    Content="{DynamicResource PatchManager_Applying}"
                     IsEnabled="False"
                     IsVisible="{Binding IsApplying}"/>
         </Grid>

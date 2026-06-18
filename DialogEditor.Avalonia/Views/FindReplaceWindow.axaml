@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.FindReplaceWindow"
-        Title="{StaticResource FindReplace_Title}"
+        Title="{DynamicResource FindReplace_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="420" MinWidth="420" SizeToContent="Height"
         CanResize="True"
@@ -42,34 +42,34 @@
 
         <!-- Find row -->
         <Grid Grid.Row="0" ColumnDefinitions="70,*" Margin="0,0,0,6">
-            <TextBlock Grid.Column="0" Text="{StaticResource FindReplace_FindLabel}"
+            <TextBlock Grid.Column="0" Text="{DynamicResource FindReplace_FindLabel}"
                        Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Label}" VerticalAlignment="Center"/>
             <TextBox Grid.Column="1" Classes="find-box"
                      Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      x:Name="SearchBox"
-                     ToolTip.Tip="{StaticResource ToolTip_FindAll}"
-                     AutomationProperties.HelpText="{StaticResource ToolTip_FindAll}"
-                     AutomationProperties.Name="{StaticResource FindReplace_FindLabel}"/>
+                     ToolTip.Tip="{DynamicResource ToolTip_FindAll}"
+                     AutomationProperties.HelpText="{DynamicResource ToolTip_FindAll}"
+                     AutomationProperties.Name="{DynamicResource FindReplace_FindLabel}"/>
         </Grid>
 
         <!-- Replace row -->
         <Grid Grid.Row="1" ColumnDefinitions="70,*" Margin="0,0,0,8">
-            <TextBlock Grid.Column="0" Text="{StaticResource FindReplace_ReplaceLabel}"
+            <TextBlock Grid.Column="0" Text="{DynamicResource FindReplace_ReplaceLabel}"
                        Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Label}" VerticalAlignment="Center"/>
             <TextBox Grid.Column="1" Classes="find-box"
                      Text="{Binding ReplaceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                     ToolTip.Tip="{StaticResource ToolTip_ReplaceAll}"
-                     AutomationProperties.HelpText="{StaticResource ToolTip_ReplaceAll}"
-                     AutomationProperties.Name="{StaticResource FindReplace_ReplaceLabel}"/>
+                     ToolTip.Tip="{DynamicResource ToolTip_ReplaceAll}"
+                     AutomationProperties.HelpText="{DynamicResource ToolTip_ReplaceAll}"
+                     AutomationProperties.Name="{DynamicResource FindReplace_ReplaceLabel}"/>
         </Grid>
 
         <!-- Options row -->
         <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12" Margin="0,0,0,8">
             <CheckBox IsChecked="{Binding CaseSensitive, Mode=TwoWay}"
-                      Content="{StaticResource FindReplace_CaseSensitive}"
+                      Content="{DynamicResource FindReplace_CaseSensitive}"
                       Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}"
-                      ToolTip.Tip="{StaticResource ToolTip_CaseSensitive}"
-                      AutomationProperties.HelpText="{StaticResource ToolTip_CaseSensitive}"/>
+                      ToolTip.Tip="{DynamicResource ToolTip_CaseSensitive}"
+                      AutomationProperties.HelpText="{DynamicResource ToolTip_CaseSensitive}"/>
             <TextBlock Text="{Binding StatusText}"
                        Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}"
                        VerticalAlignment="Center"/>
@@ -78,30 +78,30 @@
         <!-- Buttons -->
         <WrapPanel Grid.Row="3" Orientation="Horizontal" ItemWidth="88">
             <Button Classes="action-btn" Margin="0,0,4,4"
-                    Content="{StaticResource FindReplace_FindAll}"
+                    Content="{DynamicResource FindReplace_FindAll}"
                     Command="{Binding FindCommand}"
-                    ToolTip.Tip="{StaticResource ToolTip_FindAll}"
-                    AutomationProperties.HelpText="{StaticResource ToolTip_FindAll}"/>
+                    ToolTip.Tip="{DynamicResource ToolTip_FindAll}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_FindAll}"/>
             <Button Classes="action-btn" Margin="0,0,4,4"
-                    Content="{StaticResource FindReplace_FindPrev}"
+                    Content="{DynamicResource FindReplace_FindPrev}"
                     Command="{Binding FindPrevCommand}"
-                    ToolTip.Tip="{StaticResource ToolTip_FindPrev}"
-                    AutomationProperties.HelpText="{StaticResource ToolTip_FindPrev}"/>
+                    ToolTip.Tip="{DynamicResource ToolTip_FindPrev}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_FindPrev}"/>
             <Button Classes="action-btn" Margin="0,0,4,4"
-                    Content="{StaticResource FindReplace_FindNext}"
+                    Content="{DynamicResource FindReplace_FindNext}"
                     Command="{Binding FindNextCommand}"
-                    ToolTip.Tip="{StaticResource ToolTip_FindNext}"
-                    AutomationProperties.HelpText="{StaticResource ToolTip_FindNext}"/>
+                    ToolTip.Tip="{DynamicResource ToolTip_FindNext}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_FindNext}"/>
             <Button Classes="action-btn" Margin="0,0,4,4"
-                    Content="{StaticResource FindReplace_ReplaceOne}"
+                    Content="{DynamicResource FindReplace_ReplaceOne}"
                     Command="{Binding ReplaceCommand}"
-                    ToolTip.Tip="{StaticResource ToolTip_Replace}"
-                    AutomationProperties.HelpText="{StaticResource ToolTip_Replace}"/>
+                    ToolTip.Tip="{DynamicResource ToolTip_Replace}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_Replace}"/>
             <Button Classes="primary-btn" Margin="0,0,4,4"
-                    Content="{StaticResource FindReplace_ReplaceAll}"
+                    Content="{DynamicResource FindReplace_ReplaceAll}"
                     Command="{Binding ReplaceAllCommand}"
-                    ToolTip.Tip="{StaticResource ToolTip_ReplaceAll}"
-                    AutomationProperties.HelpText="{StaticResource ToolTip_ReplaceAll}"/>
+                    ToolTip.Tip="{DynamicResource ToolTip_ReplaceAll}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_ReplaceAll}"/>
         </WrapPanel>
 
         <!-- Focus hint bar (Gaps item 13) -->

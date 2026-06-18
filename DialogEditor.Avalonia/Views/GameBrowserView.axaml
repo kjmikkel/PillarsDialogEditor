@@ -10,23 +10,23 @@
             <Grid>
                 <TextBox x:Name="FilterBox"
                          Text="{Binding FilterText}"
-                         Watermark="{StaticResource Placeholder_FilterConversations}"
+                         Watermark="{DynamicResource Placeholder_FilterConversations}"
                          Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" CaretBrush="{DynamicResource Brush.Text.Secondary}"
                          BorderBrush="{DynamicResource Brush.Border.Muted}" BorderThickness="1"
                          Padding="6,3,24,3" FontSize="{StaticResource FontSize.Body}" Height="26"
                          VerticalContentAlignment="Center"
                          KeyDown="FilterBox_KeyDown"
-                         ToolTip.Tip="{StaticResource ToolTip_FilterConversations}"
-                         AutomationProperties.HelpText="{StaticResource ToolTip_FilterConversations}"
-                         AutomationProperties.Name="{StaticResource Placeholder_FilterConversations}"/>
+                         ToolTip.Tip="{DynamicResource ToolTip_FilterConversations}"
+                         AutomationProperties.HelpText="{DynamicResource ToolTip_FilterConversations}"
+                         AutomationProperties.Name="{DynamicResource Placeholder_FilterConversations}"/>
                 <Button Command="{Binding ClearFilterCommand}"
                         HorizontalAlignment="Right" Width="24" Height="24"
                         Content="✕" VerticalAlignment="Center"
                         Background="Transparent" BorderThickness="0"
                         Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Small}" Cursor="Hand"
-                        ToolTip.Tip="{StaticResource ToolTip_ClearFilter}"
-                        AutomationProperties.HelpText="{StaticResource ToolTip_ClearFilter}"
-                        AutomationProperties.Name="{StaticResource AutomationName_ClearFilter}"/>
+                        ToolTip.Tip="{DynamicResource ToolTip_ClearFilter}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_ClearFilter}"
+                        AutomationProperties.Name="{DynamicResource AutomationName_ClearFilter}"/>
             </Grid>
         </Border>
 

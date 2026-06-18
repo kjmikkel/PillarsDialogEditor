@@ -3,7 +3,7 @@
         xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
         xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.BatchReplaceWindow"
-        Title="{StaticResource BatchReplace_Title}"
+        Title="{DynamicResource BatchReplace_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="720" Height="560" MinWidth="560" MinHeight="360"
         CanResize="True"
@@ -52,74 +52,74 @@
 
             <!-- Find row -->
             <Grid ColumnDefinitions="70,*,Auto">
-                <TextBlock Classes="label" Text="{StaticResource BatchReplace_Find}"/>
+                <TextBlock Classes="label" Text="{DynamicResource BatchReplace_Find}"/>
                 <TextBox Grid.Column="1" Classes="find-box" Name="SearchBox"
                          Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         ToolTip.Tip="{StaticResource ToolTip_BatchReplace_Find}"
-                         AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_Find}"
-                         AutomationProperties.Name="{StaticResource BatchReplace_Find}"/>
+                         ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_Find}"
+                         AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_Find}"
+                         AutomationProperties.Name="{DynamicResource BatchReplace_Find}"/>
                 <CheckBox Grid.Column="2" Margin="10,0,0,0"
                           IsChecked="{Binding CaseSensitive, Mode=TwoWay}"
-                          Content="{StaticResource BatchReplace_CaseSensitive}"
+                          Content="{DynamicResource BatchReplace_CaseSensitive}"
                           Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Label}"
-                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_CaseSensitive}"
-                          AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_CaseSensitive}"/>
+                          ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_CaseSensitive}"
+                          AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_CaseSensitive}"/>
             </Grid>
 
             <!-- Replace row -->
             <Grid ColumnDefinitions="70,*">
-                <TextBlock Classes="label" Text="{StaticResource BatchReplace_Replace}"/>
+                <TextBlock Classes="label" Text="{DynamicResource BatchReplace_Replace}"/>
                 <TextBox Grid.Column="1" Classes="find-box"
                          Text="{Binding ReplaceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                         ToolTip.Tip="{StaticResource ToolTip_BatchReplace_Replace}"
-                         AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_Replace}"
-                         AutomationProperties.Name="{StaticResource BatchReplace_Replace}"/>
+                         ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_Replace}"
+                         AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_Replace}"
+                         AutomationProperties.Name="{DynamicResource BatchReplace_Replace}"/>
             </Grid>
 
             <!-- Search-in toggles -->
             <WrapPanel Orientation="Horizontal">
-                <TextBlock Text="{StaticResource BatchReplace_SearchIn}"
+                <TextBlock Text="{DynamicResource BatchReplace_SearchIn}"
                            Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}"
                            VerticalAlignment="Center" Margin="0,0,8,0"/>
                 <CheckBox IsChecked="{Binding InNodeText, Mode=TwoWay}"
-                          Content="{StaticResource BatchReplace_InNodeText}"
+                          Content="{DynamicResource BatchReplace_InNodeText}"
                           Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}" Margin="0,0,10,0"
-                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InNodeText}"
-                          AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_InNodeText}"/>
+                          ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_InNodeText}"
+                          AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_InNodeText}"/>
                 <CheckBox IsChecked="{Binding InSpeakerGuids, Mode=TwoWay}"
-                          Content="{StaticResource BatchReplace_InSpeakerGuids}"
+                          Content="{DynamicResource BatchReplace_InSpeakerGuids}"
                           Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}" Margin="0,0,10,0"
-                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InSpeakerGuids}"
-                          AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_InSpeakerGuids}"/>
+                          ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_InSpeakerGuids}"
+                          AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_InSpeakerGuids}"/>
                 <CheckBox IsChecked="{Binding InScriptParams, Mode=TwoWay}"
-                          Content="{StaticResource BatchReplace_InScriptParams}"
+                          Content="{DynamicResource BatchReplace_InScriptParams}"
                           Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}" Margin="0,0,10,0"
-                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InScriptParams}"
-                          AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_InScriptParams}"/>
+                          ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_InScriptParams}"
+                          AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_InScriptParams}"/>
                 <CheckBox IsChecked="{Binding InConditionParams, Mode=TwoWay}"
-                          Content="{StaticResource BatchReplace_InConditionParams}"
+                          Content="{DynamicResource BatchReplace_InConditionParams}"
                           Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}" Margin="0,0,10,0"
-                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InConditionParams}"
-                          AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_InConditionParams}"/>
+                          ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_InConditionParams}"
+                          AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_InConditionParams}"/>
                 <CheckBox IsChecked="{Binding InLinkChoiceText, Mode=TwoWay}"
-                          Content="{StaticResource BatchReplace_InLinkChoiceText}"
+                          Content="{DynamicResource BatchReplace_InLinkChoiceText}"
                           Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}"
-                          ToolTip.Tip="{StaticResource ToolTip_BatchReplace_InLinkChoiceText}"
-                          AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_InLinkChoiceText}"/>
+                          ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_InLinkChoiceText}"
+                          AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_InLinkChoiceText}"/>
             </WrapPanel>
 
             <!-- Action buttons -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
                 <Button Classes="action-btn"
-                        Content="{StaticResource BatchReplace_Preview}"
+                        Content="{DynamicResource BatchReplace_Preview}"
                         Command="{Binding PreviewCommand}"
-                        ToolTip.Tip="{StaticResource ToolTip_BatchReplace_Preview}"
-                        AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_Preview}"/>
+                        ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_Preview}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_Preview}"/>
                 <Button Classes="primary-btn"
-                        Content="{StaticResource BatchReplace_Apply}"
+                        Content="{DynamicResource BatchReplace_Apply}"
                         Command="{Binding ApplyCommand}"
-                        ToolTip.Tip="{StaticResource ToolTip_BatchReplace_Apply}"
-                        AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_Apply}"/>
+                        ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_Apply}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_Apply}"/>
             </StackPanel>
 
             <Separator Background="{DynamicResource Brush.Border.Default}" Height="1"/>
@@ -139,8 +139,8 @@
                                     <CheckBox Grid.Column="0"
                                               IsChecked="{Binding IsSelected, Mode=TwoWay}"
                                               VerticalAlignment="Center"
-                                              ToolTip.Tip="{StaticResource ToolTip_BatchReplace_ConvCheckbox}"
-                                              AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace_ConvCheckbox}"/>
+                                              ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_ConvCheckbox}"
+                                              AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_ConvCheckbox}"/>
                                     <TextBlock Grid.Column="1"
                                                Text="{Binding Name}"
                                                Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Medium}"

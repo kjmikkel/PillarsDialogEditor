@@ -20,17 +20,17 @@
                               IsChecked="False"
                               IsCheckedChanged="HelpToggle_IsCheckedChanged"
                               Theme="{StaticResource ToolbarPlainToggleButton}"
-                              ToolTip.Tip="{StaticResource ToolTip_HelpToggle}"
-                              AutomationProperties.HelpText="{StaticResource ToolTip_HelpToggle}"
-                              AutomationProperties.Name="{StaticResource AutomationName_ToggleHelp}"/>
+                              ToolTip.Tip="{DynamicResource ToolTip_HelpToggle}"
+                              AutomationProperties.HelpText="{DynamicResource ToolTip_HelpToggle}"
+                              AutomationProperties.Name="{DynamicResource AutomationName_ToggleHelp}"/>
                 <Button DockPanel.Dock="Right"
                         x:Name="SettingsButton"
                         Content="⚙"
                         Click="SettingsButton_Click"
                         Theme="{StaticResource ToolbarPlainButton}"
-                        ToolTip.Tip="{StaticResource ToolTip_Settings}"
-                        AutomationProperties.HelpText="{StaticResource ToolTip_Settings}"
-                        AutomationProperties.Name="{StaticResource AutomationName_Settings}"/>
+                        ToolTip.Tip="{DynamicResource ToolTip_Settings}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_Settings}"
+                        AutomationProperties.Name="{DynamicResource AutomationName_Settings}"/>
 
                 <!-- Menu bar -->
                 <Menu DockPanel.Dock="Left"
@@ -39,128 +39,128 @@
                       Foreground="{DynamicResource Brush.Text.Secondary}"
                       Margin="4,0,8,0">
 
-                    <MenuItem Header="{StaticResource Menu_File}">
-                        <MenuItem Header="{StaticResource Menu_NewProject}"
+                    <MenuItem Header="{DynamicResource Menu_File}">
+                        <MenuItem Header="{DynamicResource Menu_NewProject}"
                                   Command="{Binding NewProjectCommand}"
                                   InputGesture="Ctrl+N"/>
-                        <MenuItem Header="{StaticResource Menu_OpenProject}"
+                        <MenuItem Header="{DynamicResource Menu_OpenProject}"
                                   Command="{Binding OpenProjectCommand}"
                                   InputGesture="Ctrl+O"/>
-                        <MenuItem Header="{StaticResource Menu_SaveProject}"
+                        <MenuItem Header="{DynamicResource Menu_SaveProject}"
                                   Command="{Binding SaveProjectCommand}"
                                   InputGesture="Ctrl+S"/>
-                        <MenuItem Header="{StaticResource Menu_MergeProjects}"
+                        <MenuItem Header="{DynamicResource Menu_MergeProjects}"
                                   Command="{Binding MergeProjectsCommand}"
-                                  ToolTip.Tip="{StaticResource ToolTip_MergeProjects}"
-                                  AutomationProperties.HelpText="{StaticResource ToolTip_MergeProjects}"/>
+                                  ToolTip.Tip="{DynamicResource ToolTip_MergeProjects}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_MergeProjects}"/>
                         <Separator/>
-                        <MenuItem Header="{StaticResource Button_OpenFolder}"
+                        <MenuItem Header="{DynamicResource Button_OpenFolder}"
                                   Command="{Binding OpenFolderCommand}"
                                   InputGesture="Ctrl+Shift+O"/>
                         <Separator/>
-                        <MenuItem Header="{StaticResource PatchManager_Title}"
+                        <MenuItem Header="{DynamicResource PatchManager_Title}"
                                   Click="PatchManager_Click"
-                                  ToolTip.Tip="{StaticResource ToolTip_PatchManagerOpen}"
-                                  AutomationProperties.HelpText="{StaticResource ToolTip_PatchManagerOpen}"/>
+                                  ToolTip.Tip="{DynamicResource ToolTip_PatchManagerOpen}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_PatchManagerOpen}"/>
                         <Separator/>
-                        <MenuItem Header="{StaticResource Menu_ImportConversation}"
+                        <MenuItem Header="{DynamicResource Menu_ImportConversation}"
                                   Command="{Binding ImportConversationCommand}"
-                                  ToolTip.Tip="{StaticResource ToolTip_ImportConversation}"
-                                  AutomationProperties.HelpText="{StaticResource ToolTip_ImportConversation}"/>
-                        <MenuItem Header="{StaticResource Menu_ExportConversation}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_ImportConversation}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_ImportConversation}"/>
+                        <MenuItem Header="{DynamicResource Menu_ExportConversation}"
                                   Command="{Binding ExportConversationsCommand}"
-                                  ToolTip.Tip="{StaticResource ToolTip_ExportConversation}"
-                                  AutomationProperties.HelpText="{StaticResource ToolTip_ExportConversation}"/>
+                                  ToolTip.Tip="{DynamicResource ToolTip_ExportConversation}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_ExportConversation}"/>
                         <Separator/>
-                        <MenuItem Header="{StaticResource Menu_ExportForTranslation}"
+                        <MenuItem Header="{DynamicResource Menu_ExportForTranslation}"
                                   Command="{Binding ExportForTranslationCommand}"
-                                  ToolTip.Tip="{StaticResource ToolTip_ExportForTranslation}"
-                                  AutomationProperties.HelpText="{StaticResource ToolTip_ExportForTranslation}"/>
-                        <MenuItem Header="{StaticResource Menu_ImportTranslation}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_ExportForTranslation}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_ExportForTranslation}"/>
+                        <MenuItem Header="{DynamicResource Menu_ImportTranslation}"
                                   Command="{Binding ImportTranslationCommand}"
-                                  ToolTip.Tip="{StaticResource ToolTip_ImportTranslation}"
-                                  AutomationProperties.HelpText="{StaticResource ToolTip_ImportTranslation}"/>
+                                  ToolTip.Tip="{DynamicResource ToolTip_ImportTranslation}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_ImportTranslation}"/>
                         <Separator/>
-                        <MenuItem Header="{StaticResource Menu_Settings}"
+                        <MenuItem Header="{DynamicResource Menu_Settings}"
                                   Click="SettingsButton_Click"
                                   InputGesture="Ctrl+,"/>
                     </MenuItem>
 
-                    <MenuItem Header="{StaticResource Menu_Edit}">
-                        <MenuItem Header="{StaticResource Button_Undo}"
+                    <MenuItem Header="{DynamicResource Menu_Edit}">
+                        <MenuItem Header="{DynamicResource Button_Undo}"
                                   Command="{Binding Canvas.UndoCommand}"
                                   InputGesture="Ctrl+Z"/>
-                        <MenuItem Header="{StaticResource Button_Redo}"
+                        <MenuItem Header="{DynamicResource Button_Redo}"
                                   Command="{Binding Canvas.RedoCommand}"
                                   InputGesture="Ctrl+Y"/>
                         <Separator/>
-                        <MenuItem Header="{StaticResource Menu_FindReplace}"
+                        <MenuItem Header="{DynamicResource Menu_FindReplace}"
                                   Click="FindReplace_Click"
                                   InputGesture="Ctrl+H"
-                                  ToolTip.Tip="{StaticResource ToolTip_FindReplace}"
-                                  AutomationProperties.HelpText="{StaticResource ToolTip_FindReplace}"/>
-                        <MenuItem Header="{StaticResource Menu_BatchReplace}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_FindReplace}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_FindReplace}"/>
+                        <MenuItem Header="{DynamicResource Menu_BatchReplace}"
                                   Click="BatchReplace_Click"
                                   InputGesture="Ctrl+Shift+H"
-                                  ToolTip.Tip="{StaticResource ToolTip_BatchReplace}"
-                                  AutomationProperties.HelpText="{StaticResource ToolTip_BatchReplace}"/>
-                        <MenuItem Header="{StaticResource Menu_FlowAnalytics}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_BatchReplace}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace}"/>
+                        <MenuItem Header="{DynamicResource Menu_FlowAnalytics}"
                                   Click="FlowAnalytics_Click"
                                   InputGesture="F7"
-                                  ToolTip.Tip="{StaticResource ToolTip_FlowAnalytics}"
-                                  AutomationProperties.HelpText="{StaticResource ToolTip_FlowAnalytics}"/>
-                        <MenuItem Header="{StaticResource Menu_CompareVersions}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_FlowAnalytics}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_FlowAnalytics}"/>
+                        <MenuItem Header="{DynamicResource Menu_CompareVersions}"
                                   Click="CompareVersions_Click"
                                   IsEnabled="{Binding IsProjectOpen}"
-                                  ToolTip.Tip="{StaticResource ToolTip_CompareVersions}"
-                                  AutomationProperties.HelpText="{StaticResource ToolTip_CompareVersions}"/>
-                        <MenuItem Header="{StaticResource Menu_History}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_CompareVersions}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_CompareVersions}"/>
+                        <MenuItem Header="{DynamicResource Menu_History}"
                                   Click="History_Click"
                                   IsEnabled="{Binding IsProjectOpen}"
-                                  ToolTip.Tip="{StaticResource ToolTip_History}"
-                                  AutomationProperties.HelpText="{StaticResource ToolTip_History}"/>
-                        <MenuItem Header="{StaticResource Menu_Attribution}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_History}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_History}"/>
+                        <MenuItem Header="{DynamicResource Menu_Attribution}"
                                   Click="Attribution_Click"
                                   IsEnabled="{Binding IsProjectOpen}"
-                                  ToolTip.Tip="{StaticResource ToolTip_Attribution}"
-                                  AutomationProperties.HelpText="{StaticResource ToolTip_Attribution}"/>
-                        <MenuItem Header="{StaticResource Menu_Branches}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_Attribution}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_Attribution}"/>
+                        <MenuItem Header="{DynamicResource Menu_Branches}"
                                   Click="OnOpenBranches"
                                   IsEnabled="{Binding IsProjectOpen}"
-                                  ToolTip.Tip="{StaticResource Menu_BranchesTip}"
-                                  AutomationProperties.HelpText="{StaticResource Menu_BranchesTip}"/>
+                                  ToolTip.Tip="{DynamicResource Menu_BranchesTip}"
+                                  AutomationProperties.HelpText="{DynamicResource Menu_BranchesTip}"/>
                     </MenuItem>
 
-                    <MenuItem Header="{StaticResource Menu_Test}">
-                        <MenuItem Header="{StaticResource Button_TestPatch}"
+                    <MenuItem Header="{DynamicResource Menu_Test}">
+                        <MenuItem Header="{DynamicResource Button_TestPatch}"
                                   Command="{Binding TestPatchCommand}"
                                   InputGesture="F5"/>
-                        <MenuItem Header="{StaticResource TestMode_Restore}"
+                        <MenuItem Header="{DynamicResource TestMode_Restore}"
                                   Command="{Binding RestoreConversationCommand}"
                                   InputGesture="F6"/>
                         <Separator/>
-                        <MenuItem Header="{StaticResource Button_RestoreBackup}"
+                        <MenuItem Header="{DynamicResource Button_RestoreBackup}"
                                   Command="{Binding RestoreBackupCommand}"
                                   InputGesture="Ctrl+Shift+B"/>
                     </MenuItem>
 
-                    <MenuItem Header="{StaticResource Menu_Help}">
-                        <MenuItem Header="{StaticResource Menu_CreateSample}"
-                                  ToolTip.Tip="{StaticResource Menu_CreateSampleTip}"
-                                  AutomationProperties.HelpText="{StaticResource Menu_CreateSampleTip}"
+                    <MenuItem Header="{DynamicResource Menu_Help}">
+                        <MenuItem Header="{DynamicResource Menu_CreateSample}"
+                                  ToolTip.Tip="{DynamicResource Menu_CreateSampleTip}"
+                                  AutomationProperties.HelpText="{DynamicResource Menu_CreateSampleTip}"
                                   Command="{Binding CreateSampleProjectCommand}"/>
-                        <MenuItem Header="{StaticResource Menu_OpenWalkthrough}"
-                                  ToolTip.Tip="{StaticResource Menu_OpenWalkthroughTip}"
-                                  AutomationProperties.HelpText="{StaticResource Menu_OpenWalkthroughTip}"
+                        <MenuItem Header="{DynamicResource Menu_OpenWalkthrough}"
+                                  ToolTip.Tip="{DynamicResource Menu_OpenWalkthroughTip}"
+                                  AutomationProperties.HelpText="{DynamicResource Menu_OpenWalkthroughTip}"
                                   Command="{Binding OpenWalkthroughCommand}"/>
                         <Separator/>
-                        <MenuItem Header="{StaticResource Menu_Changelog}"
-                                  ToolTip.Tip="{StaticResource Menu_ChangelogTip}"
-                                  AutomationProperties.HelpText="{StaticResource Menu_ChangelogTip}"
+                        <MenuItem Header="{DynamicResource Menu_Changelog}"
+                                  ToolTip.Tip="{DynamicResource Menu_ChangelogTip}"
+                                  AutomationProperties.HelpText="{DynamicResource Menu_ChangelogTip}"
                                   Command="{Binding ChangelogCommand}"/>
-                        <MenuItem Header="{StaticResource Menu_About}"
-                                  ToolTip.Tip="{StaticResource Menu_AboutTip}"
-                                  AutomationProperties.HelpText="{StaticResource Menu_AboutTip}"
+                        <MenuItem Header="{DynamicResource Menu_About}"
+                                  ToolTip.Tip="{DynamicResource Menu_AboutTip}"
+                                  AutomationProperties.HelpText="{DynamicResource Menu_AboutTip}"
                                   Command="{Binding AboutCommand}"/>
                     </MenuItem>
 
@@ -169,15 +169,15 @@
                 <!-- Language selector -->
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal"
                             VerticalAlignment="Center" Margin="4,0,0,0">
-                    <TextBlock Text="{StaticResource Label_Language}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}"
+                    <TextBlock Text="{DynamicResource Label_Language}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}"
                                VerticalAlignment="Center" Margin="0,0,6,0"
                                IsVisible="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}"/>
                     <ComboBox ItemsSource="{Binding AvailableLanguages}"
                               SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
                               MinWidth="60"
-                              ToolTip.Tip="{StaticResource ToolTip_Language}"
-                              AutomationProperties.HelpText="{StaticResource ToolTip_Language}"
-                              AutomationProperties.Name="{StaticResource Label_Language}"
+                              ToolTip.Tip="{DynamicResource ToolTip_Language}"
+                              AutomationProperties.HelpText="{DynamicResource ToolTip_Language}"
+                              AutomationProperties.Name="{DynamicResource Label_Language}"
                               IsVisible="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}"/>
                 </StackPanel>
             </DockPanel>
@@ -217,31 +217,31 @@
                                           IsChecked="{Binding IsBrowserPinned, Mode=TwoWay}"
                                           Content="📌"
                                           Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="6,2"
-                                          ToolTip.Tip="{StaticResource ToolTip_PinPanel}"
-                                          AutomationProperties.HelpText="{StaticResource ToolTip_PinPanel}"
-                                          AutomationProperties.Name="{StaticResource AutomationName_PinBrowserPanel}"/>
+                                          ToolTip.Tip="{DynamicResource ToolTip_PinPanel}"
+                                          AutomationProperties.HelpText="{DynamicResource ToolTip_PinPanel}"
+                                          AutomationProperties.Name="{DynamicResource AutomationName_PinBrowserPanel}"/>
                           <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="{StaticResource Browser_Header}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}" FontWeight="Bold"/>
+                            <TextBlock Text="{DynamicResource Browser_Header}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}" FontWeight="Bold"/>
                           </StackPanel>
                           <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,6,0">
                                 <Button Command="{Binding Browser.ExpandAllCommand}" Content="⊞"
                                         Background="Transparent" BorderThickness="0" Foreground="{DynamicResource Brush.Text.Disabled}"
                                         FontSize="{StaticResource FontSize.Small}" Cursor="Hand"
-                                        ToolTip.Tip="{StaticResource ToolTip_ExpandAll}"
-                                        AutomationProperties.HelpText="{StaticResource ToolTip_ExpandAll}"
-                                        AutomationProperties.Name="{StaticResource AutomationName_ExpandAllFolders}"/>
+                                        ToolTip.Tip="{DynamicResource ToolTip_ExpandAll}"
+                                        AutomationProperties.HelpText="{DynamicResource ToolTip_ExpandAll}"
+                                        AutomationProperties.Name="{DynamicResource AutomationName_ExpandAllFolders}"/>
                                 <Button Command="{Binding Browser.CollapseAllCommand}" Content="⊟" Margin="2,0,0,0"
                                         Background="Transparent" BorderThickness="0" Foreground="{DynamicResource Brush.Text.Disabled}"
                                         FontSize="{StaticResource FontSize.Small}" Cursor="Hand"
-                                        ToolTip.Tip="{StaticResource ToolTip_CollapseAll}"
-                                        AutomationProperties.HelpText="{StaticResource ToolTip_CollapseAll}"
-                                        AutomationProperties.Name="{StaticResource AutomationName_CollapseAllFolders}"/>
+                                        ToolTip.Tip="{DynamicResource ToolTip_CollapseAll}"
+                                        AutomationProperties.HelpText="{DynamicResource ToolTip_CollapseAll}"
+                                        AutomationProperties.Name="{DynamicResource AutomationName_CollapseAllFolders}"/>
                                 <Button Command="{Binding NewConversationCommand}" Content="⊕" Margin="4,0,0,0"
                                         Background="Transparent" BorderThickness="0" Foreground="{DynamicResource Brush.Text.Status.New}"
                                         FontSize="{StaticResource FontSize.Body}" Cursor="Hand"
-                                        ToolTip.Tip="{StaticResource ToolTip_NewConversation}"
-                                        AutomationProperties.HelpText="{StaticResource ToolTip_NewConversation}"
-                                        AutomationProperties.Name="{StaticResource AutomationName_NewConversation}"/>
+                                        ToolTip.Tip="{DynamicResource ToolTip_NewConversation}"
+                                        AutomationProperties.HelpText="{DynamicResource ToolTip_NewConversation}"
+                                        AutomationProperties.Name="{DynamicResource AutomationName_NewConversation}"/>
                             </StackPanel>
                         </DockPanel>
                     </Border>
@@ -256,20 +256,20 @@
                                   IsChecked="{Binding IsBrowserPinned, Mode=TwoWay}"
                                   Content="📌"
                                   Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="6,2"
-                                  ToolTip.Tip="{StaticResource ToolTip_PinPanel}"
-                                  AutomationProperties.HelpText="{StaticResource ToolTip_PinPanel}"
-                                  AutomationProperties.Name="{StaticResource AutomationName_PinBrowserPanel}"/>
+                                  ToolTip.Tip="{DynamicResource ToolTip_PinPanel}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_PinPanel}"
+                                  AutomationProperties.Name="{DynamicResource AutomationName_PinBrowserPanel}"/>
                     <Button Grid.Row="1" Grid.RowSpan="2"
                             Background="Transparent" BorderThickness="0"
                             Cursor="Hand"
                             Click="CollapsedBrowserTitle_Click"
-                            ToolTip.Tip="{StaticResource ToolTip_TogglePanel}"
-                            AutomationProperties.HelpText="{StaticResource ToolTip_TogglePanel}">
+                            ToolTip.Tip="{DynamicResource ToolTip_TogglePanel}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_TogglePanel}">
                         <LayoutTransformControl Margin="0,10,0,0">
                             <LayoutTransformControl.LayoutTransform>
                                 <RotateTransform Angle="90"/>
                             </LayoutTransformControl.LayoutTransform>
-                            <TextBlock Text="{StaticResource Browser_Header}"
+                            <TextBlock Text="{DynamicResource Browser_Header}"
                                        Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Small}" FontWeight="Bold"/>
                         </LayoutTransformControl>
                     </Button>
@@ -290,11 +290,11 @@
                                     Content="−"
                                     Click="ToggleDetail_Click"
                                     Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="6,2"
-                                    ToolTip.Tip="{StaticResource ToolTip_TogglePanel}"
-                                    AutomationProperties.HelpText="{StaticResource ToolTip_TogglePanel}"
-                                    AutomationProperties.Name="{StaticResource AutomationName_CollapseDetailsPanel}"/>
+                                    ToolTip.Tip="{DynamicResource ToolTip_TogglePanel}"
+                                    AutomationProperties.HelpText="{DynamicResource ToolTip_TogglePanel}"
+                                    AutomationProperties.Name="{DynamicResource AutomationName_CollapseDetailsPanel}"/>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="{StaticResource Label_NodeDetails}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}" FontWeight="Bold"/>
+                                <TextBlock Text="{DynamicResource Label_NodeDetails}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}" FontWeight="Bold"/>
                                 <TextBlock Text="{Binding CurrentConversationName}"
                                            Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Small}" Margin="6,0,0,0"
                                            IsVisible="{Binding CurrentConversationName, Converter={StaticResource NullOrEmptyToVis}}"/>
@@ -312,15 +312,15 @@
                             Content="+"
                             Click="ToggleDetail_Click"
                             Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="6,2"
-                            ToolTip.Tip="{StaticResource ToolTip_TogglePanel}"
-                            AutomationProperties.HelpText="{StaticResource ToolTip_TogglePanel}"
-                            AutomationProperties.Name="{StaticResource AutomationName_ExpandDetailsPanel}"/>
+                            ToolTip.Tip="{DynamicResource ToolTip_TogglePanel}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_TogglePanel}"
+                            AutomationProperties.Name="{DynamicResource AutomationName_ExpandDetailsPanel}"/>
                     <LayoutTransformControl Grid.Row="1" Margin="0,10,0,0"
                                             HorizontalAlignment="Center" VerticalAlignment="Top">
                         <LayoutTransformControl.LayoutTransform>
                             <RotateTransform Angle="90"/>
                         </LayoutTransformControl.LayoutTransform>
-                        <TextBlock Text="{StaticResource Label_NodeDetails}"
+                        <TextBlock Text="{DynamicResource Label_NodeDetails}"
                                    Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Small}" FontWeight="Bold"/>
                     </LayoutTransformControl>
                 </Grid>
@@ -344,11 +344,11 @@
                 <TextBlock Grid.Column="0" Text="{Binding DisplayStatusText}"
                            Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" VerticalAlignment="Center"/>
                 <Button Grid.Column="1"
-                        Content="{StaticResource MainWindow_ResolveConflictsButton}"
+                        Content="{DynamicResource MainWindow_ResolveConflictsButton}"
                         Command="{Binding ResolveConflictsCommand}"
                         IsVisible="{Binding HasPendingConflictResolution}"
-                        ToolTip.Tip="{StaticResource MainWindow_ResolveConflictsTooltip}"
-                        AutomationProperties.HelpText="{StaticResource MainWindow_ResolveConflictsTooltip}"
+                        ToolTip.Tip="{DynamicResource MainWindow_ResolveConflictsTooltip}"
+                        AutomationProperties.HelpText="{DynamicResource MainWindow_ResolveConflictsTooltip}"
                         Background="{DynamicResource Brush.Button.Caution.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                         Padding="12,2" FontSize="{StaticResource FontSize.Label}"/>
             </Grid>

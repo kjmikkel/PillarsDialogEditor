@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.SettingsWindow"
-        Title="{StaticResource Settings_Title}"
+        Title="{DynamicResource Settings_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="500" MinWidth="500" SizeToContent="Height"
         CanResize="True"
@@ -41,43 +41,43 @@
         <StackPanel Grid.Row="0" Spacing="12">
 
             <!-- Backup directory -->
-            <DockPanel ToolTip.Tip="{StaticResource Settings_BackupDirectoryTooltip}">
-                <TextBlock Classes="label" Text="{StaticResource Settings_BackupDirectory}"/>
+            <DockPanel ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}">
+                <TextBlock Classes="label" Text="{DynamicResource Settings_BackupDirectory}"/>
                 <Button Classes="browse"
                         DockPanel.Dock="Right"
-                        Content="{StaticResource Settings_Browse}"
+                        Content="{DynamicResource Settings_Browse}"
                         Command="{Binding BrowseBackupDirectoryCommand}"
-                        ToolTip.Tip="{StaticResource Settings_BackupDirectoryTooltip}"
-                        AutomationProperties.HelpText="{StaticResource Settings_BackupDirectoryTooltip}"/>
+                        ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}"
+                        AutomationProperties.HelpText="{DynamicResource Settings_BackupDirectoryTooltip}"/>
                 <TextBox Classes="path"
                          Text="{Binding BackupDirectory}"
-                         Watermark="{StaticResource Settings_PathNotSet}"
-                         ToolTip.Tip="{StaticResource Settings_BackupDirectoryTooltip}"
-                         AutomationProperties.HelpText="{StaticResource Settings_BackupDirectoryTooltip}"
-                         AutomationProperties.Name="{StaticResource Settings_BackupDirectory}"/>
+                         Watermark="{DynamicResource Settings_PathNotSet}"
+                         ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}"
+                         AutomationProperties.HelpText="{DynamicResource Settings_BackupDirectoryTooltip}"
+                         AutomationProperties.Name="{DynamicResource Settings_BackupDirectory}"/>
             </DockPanel>
 
             <!-- Default localization format -->
-            <DockPanel ToolTip.Tip="{StaticResource Settings_LocalizationFormatTooltip}">
-                <TextBlock Classes="label" Text="{StaticResource Settings_LocalizationFormat}"/>
+            <DockPanel ToolTip.Tip="{DynamicResource Settings_LocalizationFormatTooltip}">
+                <TextBlock Classes="label" Text="{DynamicResource Settings_LocalizationFormat}"/>
                 <ComboBox x:Name="LocalizationFormatComboBox"
                           ItemsSource="{Binding LocalizationFormatOptions}"
                           SelectedItem="{Binding LocalizationFormat, Mode=TwoWay}"
                           MinWidth="120"
-                          ToolTip.Tip="{StaticResource Settings_LocalizationFormatTooltip}"
-                          AutomationProperties.HelpText="{StaticResource Settings_LocalizationFormatTooltip}"
-                          AutomationProperties.Name="{StaticResource Settings_LocalizationFormat}"/>
+                          ToolTip.Tip="{DynamicResource Settings_LocalizationFormatTooltip}"
+                          AutomationProperties.HelpText="{DynamicResource Settings_LocalizationFormatTooltip}"
+                          AutomationProperties.Name="{DynamicResource Settings_LocalizationFormat}"/>
             </DockPanel>
 
             <!-- Font scale (Gaps item 6 part B) -->
-            <DockPanel ToolTip.Tip="{StaticResource Settings_FontScaleTooltip}">
-                <TextBlock Classes="label" Text="{StaticResource Settings_FontScale}"/>
+            <DockPanel ToolTip.Tip="{DynamicResource Settings_FontScaleTooltip}">
+                <TextBlock Classes="label" Text="{DynamicResource Settings_FontScale}"/>
                 <ComboBox ItemsSource="{Binding FontScaleOptions}"
                           SelectedItem="{Binding SelectedFontScale, Mode=TwoWay}"
                           MinWidth="120"
-                          ToolTip.Tip="{StaticResource Settings_FontScaleTooltip}"
-                          AutomationProperties.HelpText="{StaticResource Settings_FontScaleTooltip}"
-                          AutomationProperties.Name="{StaticResource Settings_FontScale}">
+                          ToolTip.Tip="{DynamicResource Settings_FontScaleTooltip}"
+                          AutomationProperties.HelpText="{DynamicResource Settings_FontScaleTooltip}"
+                          AutomationProperties.Name="{DynamicResource Settings_FontScale}">
                     <ComboBox.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding Converter={StaticResource FontScaleToPercent}}"/>
@@ -91,13 +91,13 @@
             <Border BorderBrush="{DynamicResource Brush.Border.Default}" BorderThickness="1" CornerRadius="3"
                     Padding="8" Background="{DynamicResource Brush.Surface.Inset}">
                 <StackPanel Spacing="4">
-                    <TextBlock Text="{StaticResource Settings_FontScalePreviewBody}"
+                    <TextBlock Text="{DynamicResource Settings_FontScalePreviewBody}"
                                FontSize="{Binding PreviewBodyFontSize}"
                                Foreground="{DynamicResource Brush.Text.Primary}"/>
-                    <TextBlock Text="{StaticResource Settings_FontScalePreviewSubtitle}"
+                    <TextBlock Text="{DynamicResource Settings_FontScalePreviewSubtitle}"
                                FontSize="{Binding PreviewSubtitleFontSize}"
                                Foreground="{DynamicResource Brush.Text.Primary}" FontWeight="SemiBold"/>
-                    <TextBlock Text="{StaticResource Settings_FontScalePreviewTitle}"
+                    <TextBlock Text="{DynamicResource Settings_FontScalePreviewTitle}"
                                FontSize="{Binding PreviewTitleFontSize}"
                                Foreground="{DynamicResource Brush.Text.Primary}" FontWeight="Bold"/>
                 </StackPanel>
@@ -105,7 +105,7 @@
 
             <!-- Restart notice: only shown once the selection differs from the scale
                  actually applied at launch. -->
-            <TextBlock Text="{StaticResource Settings_FontScaleRestartNotice}"
+            <TextBlock Text="{DynamicResource Settings_FontScaleRestartNotice}"
                        Foreground="{DynamicResource Brush.Text.Status.Changed}"
                        FontSize="{StaticResource FontSize.Small}"
                        IsVisible="{Binding ShowRestartNotice}"/>
@@ -120,7 +120,7 @@
 
         <!-- Close button -->
         <Button Grid.Row="1"
-                Content="{StaticResource Settings_Close}"
+                Content="{DynamicResource Settings_Close}"
                 HorizontalAlignment="Right"
                 Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
                 Padding="16,5" Margin="0,12,0,0"

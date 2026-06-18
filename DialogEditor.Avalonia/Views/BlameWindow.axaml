@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="DialogEditor.Avalonia.Views.BlameWindow"
-        Title="{StaticResource BlameWindow_Title}"
+        Title="{DynamicResource BlameWindow_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="780" Height="520"
         WindowStartupLocation="CenterOwner"
@@ -12,17 +12,17 @@
         <!-- Column headers (shown only when there are rows) -->
         <Grid Grid.Row="0" ColumnDefinitions="160,60,130,110,90,*"
               Margin="0,0,0,6" IsVisible="{Binding HasData}">
-            <TextBlock Grid.Column="0" Text="{StaticResource BlameWindow_ColConversation}"
+            <TextBlock Grid.Column="0" Text="{DynamicResource BlameWindow_ColConversation}"
                        Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{StaticResource FontSize.Body}" FontWeight="Bold"/>
-            <TextBlock Grid.Column="1" Text="{StaticResource BlameWindow_ColNode}"
+            <TextBlock Grid.Column="1" Text="{DynamicResource BlameWindow_ColNode}"
                        Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{StaticResource FontSize.Body}" FontWeight="Bold"/>
-            <TextBlock Grid.Column="2" Text="{StaticResource BlameWindow_ColAuthor}"
+            <TextBlock Grid.Column="2" Text="{DynamicResource BlameWindow_ColAuthor}"
                        Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{StaticResource FontSize.Body}" FontWeight="Bold"/>
-            <TextBlock Grid.Column="3" Text="{StaticResource BlameWindow_ColDate}"
+            <TextBlock Grid.Column="3" Text="{DynamicResource BlameWindow_ColDate}"
                        Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{StaticResource FontSize.Body}" FontWeight="Bold"/>
-            <TextBlock Grid.Column="4" Text="{StaticResource BlameWindow_ColCommit}"
+            <TextBlock Grid.Column="4" Text="{DynamicResource BlameWindow_ColCommit}"
                        Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{StaticResource FontSize.Body}" FontWeight="Bold"/>
-            <TextBlock Grid.Column="5" Text="{StaticResource BlameWindow_ColMessage}"
+            <TextBlock Grid.Column="5" Text="{DynamicResource BlameWindow_ColMessage}"
                        Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{StaticResource FontSize.Body}" FontWeight="Bold"/>
         </Grid>
 
@@ -61,7 +61,7 @@
         <StackPanel Grid.Row="2" Orientation="Horizontal"
                     HorizontalAlignment="Right" Spacing="8" Margin="0,14,0,0">
             <Button x:Name="CloseButton"
-                    Content="{StaticResource BlameWindow_Close}"
+                    Content="{DynamicResource BlameWindow_Close}"
                     Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
         </StackPanel>

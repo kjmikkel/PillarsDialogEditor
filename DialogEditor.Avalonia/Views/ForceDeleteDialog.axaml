@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="DialogEditor.Avalonia.Views.ForceDeleteDialog"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Title="{StaticResource ForceDelete_Title}"
+        Title="{DynamicResource ForceDelete_Title}"
         Width="420" MinWidth="420" SizeToContent="Height"
         CanResize="True"
         WindowStartupLocation="CenterOwner"
@@ -13,19 +13,19 @@
                TextWrapping="Wrap"/>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
       <Button x:Name="CancelButton"
-              Content="{StaticResource ForceDelete_Cancel}"
+              Content="{DynamicResource ForceDelete_Cancel}"
               Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
               Padding="16,6" FontSize="{StaticResource FontSize.Body}"
               IsCancel="True"
               IsDefault="True"
-              ToolTip.Tip="{StaticResource ForceDelete_Cancel}"
-              AutomationProperties.HelpText="{StaticResource ForceDelete_Cancel}"/>
+              ToolTip.Tip="{DynamicResource ForceDelete_Cancel}"
+              AutomationProperties.HelpText="{DynamicResource ForceDelete_Cancel}"/>
       <Button x:Name="ConfirmButton"
-              Content="{StaticResource ForceDelete_Confirm}"
+              Content="{DynamicResource ForceDelete_Confirm}"
               Background="{DynamicResource Brush.Button.Destructive.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
               Padding="16,6" FontSize="{StaticResource FontSize.Body}"
-              ToolTip.Tip="{StaticResource ForceDelete_Confirm}"
-              AutomationProperties.HelpText="{StaticResource ForceDelete_Confirm}"/>
+              ToolTip.Tip="{DynamicResource ForceDelete_Confirm}"
+              AutomationProperties.HelpText="{DynamicResource ForceDelete_Confirm}"/>
     </StackPanel>
   </StackPanel>
 </Window>
