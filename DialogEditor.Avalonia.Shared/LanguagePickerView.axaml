@@ -1,0 +1,29 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+             x:Class="DialogEditor.Avalonia.Shared.LanguagePickerView"
+             x:CompileBindings="False">
+
+    <!-- Language picker. Shared so the editor's Settings window and the standalone
+         PatchManager host the exact same control, ViewModel, and localised strings.
+         Strings use DynamicResource so they resolve at runtime and update live on language change. -->
+    <DockPanel ToolTip.Tip="{DynamicResource Settings_LanguageTooltip}">
+        <TextBlock Text="{DynamicResource Settings_Language}"
+                   Foreground="{DynamicResource Brush.Text.Muted.Light}"
+                   VerticalAlignment="Center"
+                   Width="140"
+                   FontSize="{StaticResource FontSize.Label}"/>
+        <ComboBox ItemsSource="{Binding AvailableLanguages}"
+                  SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
+                  MinWidth="160"
+                  ToolTip.Tip="{DynamicResource Settings_LanguageTooltip}"
+                  AutomationProperties.Name="{DynamicResource Settings_Language}"
+                  AutomationProperties.HelpText="{DynamicResource Settings_LanguageTooltip}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding DisplayName}"/>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+    </DockPanel>
+</UserControl>
