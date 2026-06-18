@@ -1,0 +1,48 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
+        x:Class="DialogEditor.PatchManager.PatchManagerSettingsWindow"
+        Title="{DynamicResource PatchManager_SettingsTitle}"
+        Icon="avares://DialogEditor.PatchManager/Assets/app.ico"
+        Width="400" MinWidth="400" SizeToContent="Height"
+        CanResize="True"
+        Background="{DynamicResource Brush.Surface.Window}"
+        WindowStartupLocation="CenterOwner"
+        x:CompileBindings="False">
+
+    <Window.Styles>
+        <Style Selector="TextBlock.sectionHeader">
+            <Setter Property="Foreground"  Value="{DynamicResource Brush.Text.Secondary}"/>
+            <Setter Property="FontSize"    Value="{StaticResource FontSize.Small}"/>
+            <Setter Property="FontWeight"  Value="SemiBold"/>
+            <Setter Property="Margin"      Value="0,0,0,4"/>
+        </Style>
+    </Window.Styles>
+
+    <StackPanel Margin="16" Spacing="16">
+
+        <!-- Appearance -->
+        <StackPanel Spacing="8">
+            <TextBlock Classes="sectionHeader" Text="{DynamicResource Settings_AppearanceSection}"/>
+            <shared:ThemePickerView x:Name="ThemePicker"/>
+        </StackPanel>
+
+        <!-- Language -->
+        <StackPanel Spacing="8">
+            <TextBlock Classes="sectionHeader" Text="{DynamicResource Settings_LanguageSection}"/>
+            <shared:LanguagePickerView x:Name="LanguagePicker"/>
+        </StackPanel>
+
+        <!-- Close -->
+        <Button Content="{DynamicResource Settings_Close}"
+                HorizontalAlignment="Right"
+                Background="{DynamicResource Brush.Surface.Header}"
+                Foreground="{DynamicResource Brush.Text.Secondary}"
+                BorderThickness="0"
+                Padding="16,5"
+                Click="Close_Click"/>
+
+        <shared:FocusHintBar x:Name="HintBar"/>
+
+    </StackPanel>
+</Window>

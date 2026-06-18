@@ -8,4 +8,10 @@
     <sys:String x:Key="FileType_DialogProject">Dialog Project (*.dialogproject)</sys:String>
     <sys:String x:Key="Status_FolderNotRecognized">Folder not recognised as PoE1 or PoE2 root.</sys:String>
 
+    <!-- Settings window -->
+    <sys:String x:Key="PatchManager_SettingsTitle">Patch Manager — Settings</sys:String>
+    <sys:String x:Key="PatchManager_SettingsButton">⚙ Settings…</sys:String>
+    <sys:String x:Key="PatchManager_SettingsTooltip">Open settings to change the colour theme and application language</sys:String>
+    <sys:String x:Key="AutomationName_PatchManagerSettings">Settings</sys:String>
+
 </ResourceDictionary>
