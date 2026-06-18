@@ -33,6 +33,12 @@ public class NoStaticStringResourceTests
         path.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}") ||
         path.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}");
 
+    // Sibling worktrees share the same solution root but are independent branches;
+    // violations there are the responsibility of those branches.
+    private static bool IsWorktree(string path) =>
+        path.Contains($"{Path.DirectorySeparatorChar}.worktrees{Path.DirectorySeparatorChar}") ||
+        path.Contains($"{Path.DirectorySeparatorChar}worktrees{Path.DirectorySeparatorChar}");
+
     // Resource dict files are allowed to use StaticResource for internal cross-references.
     private static bool IsResourceDict(string path)
     {
@@ -58,6 +64,7 @@ public class NoStaticStringResourceTests
         foreach (var file in Directory.EnumerateFiles(root, "*.axaml", SearchOption.AllDirectories))
         {
             if (IsBuildArtifact(file)) continue;
+            if (IsWorktree(file))      continue;
             if (IsResourceDict(file))  continue;
 
             var lines = File.ReadAllLines(file);
