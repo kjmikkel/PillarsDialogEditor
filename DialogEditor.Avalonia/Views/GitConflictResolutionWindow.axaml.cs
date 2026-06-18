@@ -22,7 +22,11 @@ public partial class GitConflictResolutionWindow : Window
 
     // Parameterless constructor required so the XAML compiler embeds this type
     // (avoids AVLN3000 wiping precompiled resources on a clean build).
-    public GitConflictResolutionWindow() => InitializeComponent();
+    public GitConflictResolutionWindow()
+    {
+        InitializeComponent();
+        HintBar.AttachTo(this);
+    }
 
     public GitConflictResolutionWindow(GitConflictResolutionViewModel vm)
     {

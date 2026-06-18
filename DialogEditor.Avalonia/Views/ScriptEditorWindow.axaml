@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.ScriptEditorWindow"
         Title="{Binding WindowTitle}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
@@ -55,7 +56,7 @@
         </Style>
     </Window.Styles>
 
-    <Grid RowDefinitions="*,Auto">
+    <Grid RowDefinitions="*,Auto,Auto">
 
         <ScrollViewer Grid.Row="0">
             <StackPanel Margin="14,8,14,4" Spacing="0">
@@ -226,6 +227,8 @@
                         AutomationProperties.HelpText="{StaticResource ToolTip_ScriptEditorOK}"/>
             </StackPanel>
         </Border>
+
+        <shared:FocusHintBar Grid.Row="2" x:Name="HintBar"/>
 
     </Grid>
 </Window>

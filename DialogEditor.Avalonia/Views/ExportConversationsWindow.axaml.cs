@@ -6,7 +6,11 @@ namespace DialogEditor.Avalonia.Views;
 
 public partial class ExportConversationsWindow : Window
 {
-    public ExportConversationsWindow() => InitializeComponent();
+    public ExportConversationsWindow()
+    {
+        InitializeComponent();
+        HintBar.AttachTo(this);
+    }
 
     public ExportConversationsWindow(ExportConversationsViewModel vm)
     {

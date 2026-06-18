@@ -1,9 +1,10 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.FindReplaceWindow"
         Title="{StaticResource FindReplace_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Width="420" Height="200"
+        Width="420" Height="226"
         CanResize="False"
         ShowInTaskbar="False"
         Background="{DynamicResource Brush.Surface.Window}"
@@ -37,7 +38,7 @@
         </Style>
     </Window.Styles>
 
-    <Grid RowDefinitions="Auto,Auto,Auto,Auto" Margin="14,10,14,10">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="14,10,14,10">
 
         <!-- Find row -->
         <Grid Grid.Row="0" ColumnDefinitions="70,*" Margin="0,0,0,6">
@@ -102,6 +103,8 @@
                     ToolTip.Tip="{StaticResource ToolTip_ReplaceAll}"
                     AutomationProperties.HelpText="{StaticResource ToolTip_ReplaceAll}"/>
         </WrapPanel>
+
+        <shared:FocusHintBar Grid.Row="4" x:Name="HintBar"/>
 
     </Grid>
 </Window>

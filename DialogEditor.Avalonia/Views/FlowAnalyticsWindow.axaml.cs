@@ -5,7 +5,11 @@ namespace DialogEditor.Avalonia.Views;
 
 public partial class FlowAnalyticsWindow : Window
 {
-    public FlowAnalyticsWindow() => InitializeComponent();
+    public FlowAnalyticsWindow()
+    {
+        InitializeComponent();
+        HintBar.AttachTo(this);
+    }
 
     public FlowAnalyticsWindow(FlowAnalyticsViewModel vm) : this()
     {
