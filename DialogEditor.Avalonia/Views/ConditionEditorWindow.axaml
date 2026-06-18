@@ -193,6 +193,19 @@
                                                               IsVisible="{Binding IsEnum}"
                                                               ToolTip.Tip="{Binding TypeHint}"
                                                               AutomationProperties.Name="{Binding Name}"/>
+                                                    <!-- GUID AutoCompleteBox — "Name — GUID" suggestions from
+                                                         SpeakerNameService; filters on name AND raw GUID fragment;
+                                                         OnValueChanged normalises "Name — GUID" → bare GUID -->
+                                                    <AutoCompleteBox Grid.Column="1"
+                                                              Classes="param-input"
+                                                              ItemsSource="{Binding GuidSuggestions}"
+                                                              Text="{Binding Value, Mode=TwoWay}"
+                                                              FilterMode="Contains"
+                                                              MinimumPrefixLength="0"
+                                                              IsVisible="{Binding IsGuidType}"
+                                                              ToolTip.Tip="{Binding TypeHint}"
+                                                              AutomationProperties.HelpText="{Binding TypeHint}"
+                                                              AutomationProperties.Name="{Binding Name}"/>
                                                     <!-- Type hint (?) — Button for reliable tooltip on hover -->
                                                     <Button Grid.Column="2"
                                                             Classes="type-hint"
