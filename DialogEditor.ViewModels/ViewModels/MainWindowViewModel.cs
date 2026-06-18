@@ -303,6 +303,17 @@ public partial class MainWindowViewModel : ObservableObject
                     conn.PropertyChanged += (_, _) => Canvas.IsModified = true;
         };
 
+        Canvas.ConnectModeChanged += (_, e) =>
+        {
+            StatusText = e.Change switch
+            {
+                ConnectModeChange.Started   => Loc.Format("Status_ConnectMode_Started",   e.Source.NodeId),
+                ConnectModeChange.Connected => Loc.Format("Status_ConnectMode_Connected", e.Source.NodeId, e.Target!.NodeId),
+                ConnectModeChange.Cancelled => Loc.Get("Status_ConnectMode_Cancelled"),
+                _ => StatusText,
+            };
+        };
+
         var last = AppSettings.LastGameDirectory;
         if (!string.IsNullOrEmpty(last) && Directory.Exists(last))
             LoadDirectory(last);
