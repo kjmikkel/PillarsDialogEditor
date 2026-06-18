@@ -745,6 +745,58 @@ public class MainWindowViewModelTests : IDisposable
         Assert.Contains(nameof(MainWindowViewModel.DisplayStatusText), raised);
     }
 
+    // ── ConnectMode StatusText ────────────────────────────────────────────
+
+    private static void WireNode(ConversationViewModel canvas, NodeViewModel n)
+    {
+        n.OnSelected = node => canvas.SelectedNode = node;
+        canvas.Nodes.Add(n);
+    }
+
+    [Fact]
+    public void ConnectModeStarted_SetsStatusText()
+    {
+        var vm = MakeVm();
+        vm.Canvas.IsEditable = true;
+        var src = CanvasNavigationServiceTests.MakeNode(0);
+        WireNode(vm.Canvas, src);
+
+        vm.Canvas.BeginConnect(src);
+
+        Assert.Equal("Status_ConnectMode_Started", vm.StatusText);
+    }
+
+    [Fact]
+    public void ConnectModeConnected_SetsStatusText()
+    {
+        var vm = MakeVm();
+        vm.Canvas.IsEditable = true;
+        var src = CanvasNavigationServiceTests.MakeNode(0, 0, 0);
+        var tgt = CanvasNavigationServiceTests.MakeNode(1, 400, 0);
+        WireNode(vm.Canvas, src);
+        WireNode(vm.Canvas, tgt);
+
+        vm.Canvas.BeginConnect(src);
+        vm.Canvas.SelectNode(tgt);
+        vm.Canvas.TryConfirmConnection();
+
+        Assert.Equal("Status_ConnectMode_Connected", vm.StatusText);
+    }
+
+    [Fact]
+    public void ConnectModeCancelled_SetsStatusText()
+    {
+        var vm = MakeVm();
+        vm.Canvas.IsEditable = true;
+        var src = CanvasNavigationServiceTests.MakeNode(0);
+        WireNode(vm.Canvas, src);
+
+        vm.Canvas.BeginConnect(src);
+        vm.Canvas.CancelConnect();
+
+        Assert.Equal("Status_ConnectMode_Cancelled", vm.StatusText);
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────
 
     private static NodeViewModel MakeNode(int id)
