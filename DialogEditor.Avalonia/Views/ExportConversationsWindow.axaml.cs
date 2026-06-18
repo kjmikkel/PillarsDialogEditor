@@ -12,11 +12,9 @@ public partial class ExportConversationsWindow : Window
         HintBar.AttachTo(this);
     }
 
-    public ExportConversationsWindow(ExportConversationsViewModel vm)
+    public ExportConversationsWindow(ExportConversationsViewModel vm) : this()
     {
-        InitializeComponent();
         DataContext = vm;
-        HintBar.AttachTo(this);
     }
 
     private void FormatRadio_Checked(object? sender, RoutedEventArgs e)
