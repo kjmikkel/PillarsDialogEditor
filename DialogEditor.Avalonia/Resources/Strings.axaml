@@ -268,6 +268,17 @@
     <sys:String x:Key="Legend_Key_Escape">Esc</sys:String>
     <sys:String x:Key="Legend_Key_Escape_Desc">Deselect the current node</sys:String>
 
+    <!-- ─── Legend: connect mode ─────────────────────────────────────────── -->
+    <sys:String x:Key="Legend_Key_CtrlL">Ctrl + L</sys:String>
+    <sys:String x:Key="Legend_Key_CtrlL_Desc">Start connecting the selected node to another. Use arrow keys to pick the target, Enter to confirm, Escape to cancel. Also available via the right-click menu as 'Connect to…'.</sys:String>
+    <sys:String x:Key="Legend_ConnectMode_WhileConnecting">While connecting</sys:String>
+    <sys:String x:Key="Legend_ConnectMode_WhileConnecting_Desc">Arrow keys move the target candidate; Enter confirms the connection (self-connections and duplicates are ignored); Escape cancels.</sys:String>
+
+    <!-- ─── Connect mode status messages ─────────────────────────── -->
+    <sys:String x:Key="Status_ConnectMode_Started">Connecting: select target node, then press Enter to confirm or Escape to cancel.</sys:String>
+    <sys:String x:Key="Status_ConnectMode_Connected">Connected node {0} → {1}.</sys:String>
+    <sys:String x:Key="Status_ConnectMode_Cancelled">Connect mode cancelled.</sys:String>
+
     <!-- ─── Tooltips — toolbar ─────────────────────────────────────────── -->
     <sys:String x:Key="ToolTip_OpenFolder">Open a PoE1 or PoE2 game root folder</sys:String>
     <sys:String x:Key="ToolTip_Language">Switch the display language for dialogue text</sys:String>
