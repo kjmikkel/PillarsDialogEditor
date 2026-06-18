@@ -10,12 +10,19 @@
         Background="{DynamicResource Brush.Surface.Window}"
         x:CompileBindings="False">
     <DockPanel>
-        <!-- Standalone-only theme bar. Lives here (not in the shared PatchManagerView, which
-             the editor also hosts) so it appears only in the standalone PatchManager. -->
+        <!-- Standalone-only settings bar. Lives here (not in the shared PatchManagerView)
+             so it appears only in the standalone PatchManager. -->
         <Border DockPanel.Dock="Top"
                 Background="{DynamicResource Brush.Surface.Header}"
                 Padding="8,6">
-            <shared:ThemePickerView x:Name="ThemePicker" HorizontalAlignment="Left"/>
+            <Button Content="{DynamicResource PatchManager_SettingsButton}"
+                    Click="Settings_Click"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Padding="6,2"
+                    ToolTip.Tip="{DynamicResource PatchManager_SettingsTooltip}"
+                    AutomationProperties.Name="{DynamicResource AutomationName_PatchManagerSettings}"
+                    AutomationProperties.HelpText="{DynamicResource PatchManager_SettingsTooltip}"/>
         </Border>
         <shared:PatchManagerView/>
     </DockPanel>
