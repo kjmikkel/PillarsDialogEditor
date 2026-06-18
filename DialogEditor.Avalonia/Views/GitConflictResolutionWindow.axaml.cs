@@ -28,9 +28,8 @@ public partial class GitConflictResolutionWindow : Window
         HintBar.AttachTo(this);
     }
 
-    public GitConflictResolutionWindow(GitConflictResolutionViewModel vm)
+    public GitConflictResolutionWindow(GitConflictResolutionViewModel vm) : this()
     {
-        InitializeComponent();
         _vm = vm;
         DataContext = vm;
         vm.RequestClose += Close;
