@@ -497,48 +497,19 @@ tour** (highlighting controls step-by-step), deferred — see the sample/tutoria
 ### Voice-Over Integration
 An "External VO" field exists but there is no path validation, lip-sync metadata support, or audio preview. Mods that add or replace voiced lines have no tooling support. Note: actual voice-over audio is stored in a proprietary archive format — requires investigation before tooling can be designed.
 
-### GUID Parameter Readability
-Script and conditional parameters that are GUID-typed (`ObjectGuid`, `Guid`,
-`GameData`) currently render as a plain `TextBox`, so the writer sees only opaque
-strings — `b1a7e800-0000-0000-0000-000000000000` gives no clue that it refers to a
-party member, let alone which one. We should identify the most-used GUID parameter
-types in PoE2 and expose each value's human-readable meaning at the point of entry.
+### ~~GUID Parameter Readability~~ ✓ Implemented (first pass)
 
-The target UX: keep free-text entry (any GUID can still be typed/pasted), but back
-GUID inputs with a filtered suggestion list that matches on **both** the raw GUID
-and the readable name (so typing "Aloth", "Edér", or part of the GUID surfaces the
-right entry). This is the `AutoCompleteBox` pattern already used for enum params and
-the script/condition pickers, applied to GUID-typed parameters instead of the plain
-`TextBox`.
+`ObjectGuid` and `Guid` parameters in the condition and script editors now show an
+`AutoCompleteBox` backed by `SpeakerNameService.All` instead of a plain `TextBox`.
+Suggestions are formatted "Name — GUID" so `FilterMode=Contains` matches on both the
+speaker name and the raw GUID fragment. Selecting a suggestion writes only the bare
+GUID back to the stored value (`OnValueChanged` normalises "Name — GUID" → GUID).
+Free-text entry of any raw GUID is preserved. Built-in entries (Player, Narrator)
+are always available; game-specific companions appear once a game folder is opened.
+Works identically for PoE1 and PoE2 — both register into the same `SpeakerNameService`.
 
-Most of the infrastructure exists, **for both games**. `SpeakerNameService` is the
-single GUID→name registry, fed by whichever `IGameDataProvider` is loaded
-(`MainWindowViewModel` registers `provider.LoadSpeakerNames()` on game load). PoE2
-gets explicit names from `speakers.gamedatabundle`; PoE1 derives them via
-`Poe1SpeakerNameParser` (maps `CharacterMapping` GUID→InstanceTag from the
-`.conversation` files, resolves the tag against `characters.stringtable`, with
-codename overrides like `GGP`→Durance). Both games also use GUID-typed parameters in
-scripts/conditionals (e.g. PoE1 has 36 `ObjectGuid` condition params), so the feature
-is equally relevant to both. The remaining work:
-
-- Route `ObjectGuid`/`Guid` parameters to a suggestion-backed input sourced from
-  `SpeakerNameService.All`, while preserving free text. Because both games normalise
-  to the same registry, this is **game-agnostic** — building it once covers PoE1 and
-  PoE2 with no game-specific branch.
-- Make the suggestion filter match the GUID as well as the name (`SpeakerEntry.ToString()`
-  currently returns only the name, so the GUID isn't searchable — needs a combined
-  display string or a custom item filter), and show both ("Edér — b1a7e801-…") so the
-  mapping is visible at a glance.
-- For `GameData` / quest / item GUIDs there is no lookup table yet; identifying and
-  loading the most common ones is a larger, deferred follow-up. A first pass can
-  cover party/companion `ObjectGuid` params, which are the most common and already
-  resolvable.
-
-Caveat on PoE1 coverage: PoE1 names are *derived* heuristically rather than read from
-an explicit speaker table, so resolution is good but imperfect (unmatched tags fall
-back to the normalised instance tag). This is existing `SpeakerNameService` behaviour,
-not extra work for this feature — it just means PoE1 suggestions may occasionally show
-a tag-like name instead of a polished display name.
+**Deferred (second pass):** `GameData`, quest, and item GUIDs have no lookup table;
+the "Parameter Readability — Beyond Characters" gap tracks that follow-up survey.
 
 ### Parameter Readability — Beyond Characters (PoE2 survey)
 **Follow-up to GUID Parameter Readability; do this after the character case ships.**

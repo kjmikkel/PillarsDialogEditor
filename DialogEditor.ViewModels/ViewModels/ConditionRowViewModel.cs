@@ -36,8 +36,18 @@ public partial class ParameterValueViewModel : ObservableObject
     // For the condition editor window
     public bool IsEnum
         => (Options is { Count: > 0 }) || Type == "Operator" || Type == "Boolean";
-    public bool   IsText      => !IsEnum;
+
+    // ObjectGuid and Guid parameters get an AutoCompleteBox backed by SpeakerNameService.
+    // GameData GUIDs are excluded — no lookup table is available for quest/item GUIDs yet.
+    public bool IsGuidType => Type is "ObjectGuid" or "Guid";
+
+    public bool   IsText      => !IsEnum && !IsGuidType;
     public bool   HasTypeHint => !string.IsNullOrEmpty(TypeHint);
+
+    // Suggestions for GUID-typed parameters: "Name — GUID" strings so the AutoCompleteBox
+    // FilterMode=Contains matches on both the speaker name and the raw GUID.
+    public IReadOnlyList<string> GuidSuggestions =>
+        SpeakerNameService.All.Select(s => $"{s.Name} — {s.Guid}").ToList();
 
     public IReadOnlyList<string> EnumOptions
     {
@@ -64,9 +74,10 @@ public partial class ParameterValueViewModel : ObservableObject
                           + "GreaterThanOrEqualTo, LessThanOrEqualTo",
         "GlobalVariable" => "Name of a global integer flag (e.g. npc_met_edér). "
                           + "Check GlobalVariables.csv for valid names.",
-        "ObjectGuid"     => "GUID of an in-scene game object "
-                          + "(e.g. 7d150000-0000-0000-0000-000000000000). "
-                          + "Use the default companion GUIDs or an in-scene object GUID.",
+        "ObjectGuid"     => "GUID of an in-scene game object. Type a name or GUID prefix "
+                          + "to search the companion list, or paste any GUID directly.",
+        "Guid"           => "GUID value. Type a name or GUID prefix to search the companion "
+                          + "list, or paste any GUID directly.",
         "Conversation"   => "Conversation filename without extension (e.g. edér)",
         "Quest"          => "Quest filename without extension",
         "GameData"       => "Asset GUID — check the game data files for the correct value",
@@ -74,6 +85,19 @@ public partial class ParameterValueViewModel : ObservableObject
             $"Enum value — type: {Type["Enum:".Length..].Replace('+', '.')}",
         _ => string.IsNullOrEmpty(Type) ? string.Empty : $"Type: {Type}"
     };
+
+    // When the user selects a suggestion from the AutoCompleteBox, Text is set to the
+    // display string "Name — GUID". Normalise it back to just the GUID so the stored
+    // value is always the raw identifier, never the display label.
+    partial void OnValueChanged(string value)
+    {
+        if (!IsGuidType) return;
+        var sep = value.LastIndexOf(" — ");
+        if (sep < 0) return;
+        var candidate = value[(sep + 3)..];
+        if (Guid.TryParse(candidate, out _))
+            Value = candidate;
+    }
 }
 
 public partial class ConditionRowViewModel : ObservableObject
