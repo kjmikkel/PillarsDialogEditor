@@ -257,6 +257,14 @@
                 <TextBlock Grid.Column="0" Text="{StaticResource Legend_Key_Escape}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Body}"/>
                 <TextBlock Grid.Column="1" Text="{StaticResource Legend_Key_Escape_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
             </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_Key_CtrlL}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Body}"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_Key_CtrlL_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
+            </Grid>
+            <Grid ColumnDefinitions="110,*" Margin="0,0,0,3">
+                <TextBlock Grid.Column="0" Text="{StaticResource Legend_ConnectMode_WhileConnecting}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Body}"/>
+                <TextBlock Grid.Column="1" Text="{StaticResource Legend_ConnectMode_WhileConnecting_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
+            </Grid>
         </StackPanel>
     </ScrollViewer>
 </Window>
