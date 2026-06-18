@@ -28,16 +28,14 @@ public partial class GitConflictResolutionWindow : Window
         HintBar.AttachTo(this);
     }
 
-    public GitConflictResolutionWindow(GitConflictResolutionViewModel vm)
+    public GitConflictResolutionWindow(GitConflictResolutionViewModel vm) : this()
     {
-        InitializeComponent();
         _vm = vm;
         DataContext = vm;
         vm.RequestClose += Close;
         CancelButton.Click += (_, _) => Close();
         vm.PropertyChanged += OnVmPropertyChanged;
         UpdateDiff(vm.Selected);
-        HintBar.AttachTo(this);
     }
 
     protected override void OnClosed(EventArgs e)

@@ -14,11 +14,9 @@ public partial class DiffWindow : Window
         HintBar.AttachTo(this);
     }
 
-    public DiffWindow(DiffViewModel vm)
+    public DiffWindow(DiffViewModel vm) : this()
     {
-        InitializeComponent();
         DataContext = vm;
-        HintBar.AttachTo(this);
     }
 
     private void Help_Click(object? sender, RoutedEventArgs e)
