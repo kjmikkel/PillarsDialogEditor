@@ -1,6 +1,9 @@
 using System.Collections.Generic;
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
+using DialogEditor.Avalonia.Shared;
 using DialogEditor.Avalonia.Views;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
@@ -286,6 +289,30 @@ public class DiffWindowTests : IDisposable
 
         vm.AutoPullDependencies = false;
         Assert.False(cb.IsChecked);
+    }
+
+    [AvaloniaFact]
+    public void HintBar_UpdatesText_WhenFocusMovesToControlWithHelpText()
+    {
+        var disk   = DialogProject.Empty("p");
+        var path   = WriteTempProject(disk);
+        var dir    = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git    = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(disk));
+        var vm     = new DiffViewModel(git, new StubDispatcher(), path);
+        var window = new DiffWindow(vm);
+        window.Show();
+
+        var picker      = window.FindControl<ComboBox>("LeftPicker")!;
+        var expectedHint = AutomationProperties.GetHelpText(picker);
+        Assert.False(string.IsNullOrEmpty(expectedHint));
+
+        picker.RaiseEvent(new GotFocusEventArgs
+        {
+            RoutedEvent        = InputElement.GotFocusEvent,
+            NavigationMethod   = NavigationMethod.Tab,
+        });
+
+        Assert.Equal(expectedHint, window.FindControl<FocusHintBar>("HintBar")!.Text);
     }
 
     private sealed class FakeGit(Func<string[], GitResult> handler) : IGitRunner

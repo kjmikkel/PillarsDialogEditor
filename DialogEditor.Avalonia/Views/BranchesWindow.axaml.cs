@@ -12,9 +12,8 @@ public partial class BranchesWindow : Window
         HintBar.AttachTo(this);
     }
 
-    public BranchesWindow(BranchesViewModel vm)
+    public BranchesWindow(BranchesViewModel vm) : this()
     {
-        InitializeComponent();
         DataContext = vm;
         CloseButton.Click += (_, _) => Close();
     }

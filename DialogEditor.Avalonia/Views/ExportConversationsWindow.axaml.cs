@@ -12,9 +12,8 @@ public partial class ExportConversationsWindow : Window
         HintBar.AttachTo(this);
     }
 
-    public ExportConversationsWindow(ExportConversationsViewModel vm)
+    public ExportConversationsWindow(ExportConversationsViewModel vm) : this()
     {
-        InitializeComponent();
         DataContext = vm;
     }
 
