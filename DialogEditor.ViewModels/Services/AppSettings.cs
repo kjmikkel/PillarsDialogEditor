@@ -55,6 +55,10 @@ public static class AppSettings
         // only a genuinely fresh install (no settings.json yet, or a load failure) gets
         // false, via Load().
         public bool ThemeOnboardingSeen              { get; set; } = true;
+        // UI language code (BCP-47, e.g. "en", "de"). Defaults to "en" (English).
+        // TODO: add "Auto" (OS locale detection) once a non-English translation ships —
+        //       would resolve via CultureInfo.CurrentUICulture and fall back to "en".
+        public string UiLanguage                     { get; set; } = "en";
     }
 
     public static string? LastLanguage
@@ -188,6 +192,12 @@ public static class AppSettings
     {
         get => Load().ThemeOnboardingSeen;
         set { var s = Load(); s.ThemeOnboardingSeen = value; Save(s); }
+    }
+
+    public static string UiLanguage
+    {
+        get => Load().UiLanguage;
+        set { var s = Load(); s.UiLanguage = value; Save(s); }
     }
 
     public static string PickLanguage(IReadOnlyList<string> available, string? preferred)
