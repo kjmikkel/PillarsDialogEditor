@@ -7,24 +7,24 @@
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource Brush.Surface.Panel}">
   <StackPanel Margin="20" Spacing="8">
-    <TextBlock Text="{StaticResource BranchName_Label}"
+    <TextBlock Text="{DynamicResource BranchName_Label}"
                Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Body}"/>
     <TextBox x:Name="NameBox"
              Background="{DynamicResource Brush.Surface.Input}" Foreground="{DynamicResource Brush.Text.Primary}"
              BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
              FontSize="{StaticResource FontSize.Body}" Padding="6,4"
              AcceptsReturn="False"
-             ToolTip.Tip="{StaticResource BranchName_Label}"
-             AutomationProperties.HelpText="{StaticResource BranchName_Label}"
-             AutomationProperties.Name="{StaticResource BranchName_Label}"/>
+             ToolTip.Tip="{DynamicResource BranchName_Label}"
+             AutomationProperties.HelpText="{DynamicResource BranchName_Label}"
+             AutomationProperties.Name="{DynamicResource BranchName_Label}"/>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
       <Button x:Name="CancelButton"
-              Content="{StaticResource BranchName_Cancel}"
+              Content="{DynamicResource BranchName_Cancel}"
               Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
               Padding="16,6" FontSize="{StaticResource FontSize.Body}"
               IsCancel="True"/>
       <Button x:Name="OkButton"
-              Content="{StaticResource BranchName_Ok}"
+              Content="{DynamicResource BranchName_Ok}"
               Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
               Padding="16,6" FontSize="{StaticResource FontSize.Body}"
               IsDefault="True"/>

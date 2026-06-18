@@ -1,7 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="DialogEditor.Avalonia.Views.ImportWarningsDialog"
-        Title="{StaticResource ImportWarnings_Title}"
+        Title="{DynamicResource ImportWarnings_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="440" MinWidth="440" SizeToContent="Height" MaxHeight="520"
         CanResize="True"
@@ -11,7 +11,7 @@
 
     <StackPanel Margin="20">
 
-        <TextBlock Text="{StaticResource ImportWarnings_Body}"
+        <TextBlock Text="{DynamicResource ImportWarnings_Body}"
                    Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Body}"
                    TextWrapping="Wrap" Margin="0,0,0,12"/>
 
@@ -30,12 +30,12 @@
             </ScrollViewer>
         </Border>
 
-        <TextBlock Text="{StaticResource ImportWarnings_Footer}"
+        <TextBlock Text="{DynamicResource ImportWarnings_Footer}"
                    Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}"
                    TextWrapping="Wrap" Margin="0,0,0,16"/>
 
         <Button x:Name="OkButton"
-                Content="{StaticResource ImportWarnings_Ok}"
+                Content="{DynamicResource ImportWarnings_Ok}"
                 HorizontalAlignment="Right"
                 Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                 Padding="20,6" FontSize="{StaticResource FontSize.Body}"/>

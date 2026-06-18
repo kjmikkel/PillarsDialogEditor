@@ -5,7 +5,7 @@
         x:Class="DialogEditor.Avalonia.Views.BranchesWindow"
         x:DataType="vm:BranchesViewModel"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Title="{StaticResource Branches_WindowTitle}"
+        Title="{DynamicResource Branches_WindowTitle}"
         Width="420" Height="380"
         WindowStartupLocation="CenterOwner">
   <DockPanel Margin="12">
@@ -14,23 +14,23 @@
                Margin="0,8,0,0"/>
 
     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="6" Margin="0,8,0,0">
-      <Button x:Name="SwitchButton" Content="{StaticResource Branches_Switch}"
-              ToolTip.Tip="{StaticResource Branches_SwitchTip}"
-              AutomationProperties.HelpText="{StaticResource Branches_SwitchTip}"
+      <Button x:Name="SwitchButton" Content="{DynamicResource Branches_Switch}"
+              ToolTip.Tip="{DynamicResource Branches_SwitchTip}"
+              AutomationProperties.HelpText="{DynamicResource Branches_SwitchTip}"
               Command="{Binding SwitchCommand}"/>
-      <Button x:Name="NewButton" Content="{StaticResource Branches_New}"
-              ToolTip.Tip="{StaticResource Branches_NewTip}"
-              AutomationProperties.HelpText="{StaticResource Branches_NewTip}"
+      <Button x:Name="NewButton" Content="{DynamicResource Branches_New}"
+              ToolTip.Tip="{DynamicResource Branches_NewTip}"
+              AutomationProperties.HelpText="{DynamicResource Branches_NewTip}"
               Command="{Binding CreateCommand}"/>
-      <Button x:Name="RenameButton" Content="{StaticResource Branches_Rename}"
-              ToolTip.Tip="{StaticResource Branches_RenameTip}"
-              AutomationProperties.HelpText="{StaticResource Branches_RenameTip}"
+      <Button x:Name="RenameButton" Content="{DynamicResource Branches_Rename}"
+              ToolTip.Tip="{DynamicResource Branches_RenameTip}"
+              AutomationProperties.HelpText="{DynamicResource Branches_RenameTip}"
               Command="{Binding RenameCommand}"/>
-      <Button x:Name="DeleteButton" Content="{StaticResource Branches_Delete}"
-              ToolTip.Tip="{StaticResource Branches_DeleteTip}"
-              AutomationProperties.HelpText="{StaticResource Branches_DeleteTip}"
+      <Button x:Name="DeleteButton" Content="{DynamicResource Branches_Delete}"
+              ToolTip.Tip="{DynamicResource Branches_DeleteTip}"
+              AutomationProperties.HelpText="{DynamicResource Branches_DeleteTip}"
               Command="{Binding DeleteCommand}"/>
-      <Button x:Name="CloseButton" Content="{StaticResource Branches_Close}"/>
+      <Button x:Name="CloseButton" Content="{DynamicResource Branches_Close}"/>
     </StackPanel>
 
     <shared:FocusHintBar DockPanel.Dock="Bottom" x:Name="HintBar"/>
@@ -41,7 +41,7 @@
         <DataTemplate x:DataType="vm:BranchRowViewModel">
           <StackPanel Orientation="Horizontal" Spacing="6">
             <TextBlock Text="{Binding Name}"/>
-            <TextBlock Text="{StaticResource Branches_CurrentTag}" Opacity="0.7"
+            <TextBlock Text="{DynamicResource Branches_CurrentTag}" Opacity="0.7"
                        IsVisible="{Binding IsCurrent}"/>
           </StackPanel>
         </DataTemplate>

@@ -3,7 +3,7 @@
         xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
         xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.ExportConversationsWindow"
-        Title="{StaticResource ExportConversations_Title}"
+        Title="{DynamicResource ExportConversations_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="480" MinWidth="480" SizeToContent="Height"
         Background="{DynamicResource Brush.Surface.Window}"
@@ -17,24 +17,24 @@
         <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
             <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                 <Button x:Name="SelectAllButton"
-                        Content="{StaticResource ExportConversations_SelectAll}"
+                        Content="{DynamicResource ExportConversations_SelectAll}"
                         Command="{Binding SelectAllCommand}"
                         Padding="0"
                         Background="Transparent"
                         BorderThickness="0"
                         Foreground="{DynamicResource Brush.Text.Link}"
-                        ToolTip.Tip="{StaticResource ToolTip_ExportConversations_SelectAll}"
-                        AutomationProperties.HelpText="{StaticResource ToolTip_ExportConversations_SelectAll}"/>
+                        ToolTip.Tip="{DynamicResource ToolTip_ExportConversations_SelectAll}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_ExportConversations_SelectAll}"/>
                 <TextBlock Text=" / " Foreground="{DynamicResource Brush.Text.Muted}" VerticalAlignment="Center"/>
                 <Button x:Name="SelectNoneButton"
-                        Content="{StaticResource ExportConversations_SelectNone}"
+                        Content="{DynamicResource ExportConversations_SelectNone}"
                         Command="{Binding SelectNoneCommand}"
                         Padding="0"
                         Background="Transparent"
                         BorderThickness="0"
                         Foreground="{DynamicResource Brush.Text.Link}"
-                        ToolTip.Tip="{StaticResource ToolTip_ExportConversations_SelectNone}"
-                        AutomationProperties.HelpText="{StaticResource ToolTip_ExportConversations_SelectNone}"/>
+                        ToolTip.Tip="{DynamicResource ToolTip_ExportConversations_SelectNone}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_ExportConversations_SelectNone}"/>
             </StackPanel>
             <Border Height="200" BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1" CornerRadius="4">
                 <ScrollViewer>
@@ -67,14 +67,14 @@
                        TextWrapping="Wrap"/>
             <Button Grid.Column="1"
                     x:Name="ExportButton"
-                    Content="{StaticResource ExportConversations_Export}"
+                    Content="{DynamicResource ExportConversations_Export}"
                     Command="{Binding ExportCommand}"
-                    ToolTip.Tip="{StaticResource ToolTip_ExportConversations_Export}"
-                    AutomationProperties.HelpText="{StaticResource ToolTip_ExportConversations_Export}"
+                    ToolTip.Tip="{DynamicResource ToolTip_ExportConversations_Export}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_ExportConversations_Export}"
                     MinWidth="80"/>
             <Button Grid.Column="3"
                     x:Name="CloseButton"
-                    Content="{StaticResource ExportConversations_Close}"
+                    Content="{DynamicResource ExportConversations_Close}"
                     Click="CloseButton_Click"
                     MinWidth="80"/>
         </Grid>
@@ -84,7 +84,7 @@
 
         <!-- ── Format selector ───────────────────────────────────────── -->
         <StackPanel Margin="0,0,0,12">
-            <TextBlock Text="{StaticResource ExportConversations_Format}"
+            <TextBlock Text="{DynamicResource ExportConversations_Format}"
                        Foreground="{DynamicResource Brush.Text.Muted.Light}"
                        Margin="0,0,0,6"/>
             <RadioButton Content="CSV"
@@ -94,8 +94,8 @@
                              ConverterParameter=csv, Mode=TwoWay}"
                          Checked="FormatRadio_Checked"
                          Tag="csv"
-                         ToolTip.Tip="{StaticResource ToolTip_ExportConversations_Csv}"
-                         AutomationProperties.HelpText="{StaticResource ToolTip_ExportConversations_Csv}"/>
+                         ToolTip.Tip="{DynamicResource ToolTip_ExportConversations_Csv}"
+                         AutomationProperties.HelpText="{DynamicResource ToolTip_ExportConversations_Csv}"/>
             <RadioButton Content="JSON"
                          GroupName="Format"
                          IsChecked="{Binding SelectedFormat,
@@ -103,8 +103,8 @@
                              ConverterParameter=json, Mode=TwoWay}"
                          Checked="FormatRadio_Checked"
                          Tag="json"
-                         ToolTip.Tip="{StaticResource ToolTip_ExportConversations_Json}"
-                         AutomationProperties.HelpText="{StaticResource ToolTip_ExportConversations_Json}"/>
+                         ToolTip.Tip="{DynamicResource ToolTip_ExportConversations_Json}"
+                         AutomationProperties.HelpText="{DynamicResource ToolTip_ExportConversations_Json}"/>
             <RadioButton Content="Yarn Spinner"
                          GroupName="Format"
                          IsChecked="{Binding SelectedFormat,
@@ -112,14 +112,14 @@
                              ConverterParameter=yarn, Mode=TwoWay}"
                          Checked="FormatRadio_Checked"
                          Tag="yarn"
-                         ToolTip.Tip="{StaticResource ToolTip_ExportConversations_Yarn}"
-                         AutomationProperties.HelpText="{StaticResource ToolTip_ExportConversations_Yarn}"/>
+                         ToolTip.Tip="{DynamicResource ToolTip_ExportConversations_Yarn}"
+                         AutomationProperties.HelpText="{DynamicResource ToolTip_ExportConversations_Yarn}"/>
             <RadioButton x:Name="ArticyRadioButton"
                          Content="Articy Draft XML"
                          GroupName="Format"
                          IsEnabled="False"
-                         ToolTip.Tip="{StaticResource ExportConversations_ArticyNote}"
-                         AutomationProperties.HelpText="{StaticResource ExportConversations_ArticyNote}"/>
+                         ToolTip.Tip="{DynamicResource ExportConversations_ArticyNote}"
+                         AutomationProperties.HelpText="{DynamicResource ExportConversations_ArticyNote}"/>
         </StackPanel>
 
     </DockPanel>

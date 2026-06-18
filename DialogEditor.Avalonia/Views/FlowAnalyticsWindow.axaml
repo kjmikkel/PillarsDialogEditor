@@ -3,7 +3,7 @@
         xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
         xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.FlowAnalyticsWindow"
-        Title="{StaticResource FlowAnalytics_Title}"
+        Title="{DynamicResource FlowAnalytics_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="500" Height="460" MinWidth="400" MinHeight="340"
         CanResize="True"
@@ -43,20 +43,20 @@
         <StackPanel Grid.Row="0" Spacing="6" IsVisible="{Binding HasData}">
 
             <TextBlock Classes="section-header"
-                       Text="{StaticResource FlowAnalytics_Statistics}"/>
+                       Text="{DynamicResource FlowAnalytics_Statistics}"/>
 
             <!-- Row 1: Nodes, Words, Max depth -->
             <Grid ColumnDefinitions="*,*,*">
                 <StackPanel Grid.Column="0">
-                    <TextBlock Classes="stat-label" Text="{StaticResource FlowAnalytics_Stat_Nodes}"/>
+                    <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_Nodes}"/>
                     <TextBlock Classes="stat-value" Text="{Binding Statistics.TotalNodes}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1">
-                    <TextBlock Classes="stat-label" Text="{StaticResource FlowAnalytics_Stat_Words}"/>
+                    <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_Words}"/>
                     <TextBlock Classes="stat-value" Text="{Binding Statistics.WordCount}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="2">
-                    <TextBlock Classes="stat-label" Text="{StaticResource FlowAnalytics_Stat_MaxDepth}"/>
+                    <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_MaxDepth}"/>
                     <TextBlock Classes="stat-value" Text="{Binding Statistics.MaxDepth}"/>
                 </StackPanel>
             </Grid>
@@ -64,15 +64,15 @@
             <!-- Row 2: Player, NPC, Narrator -->
             <Grid ColumnDefinitions="*,*,*">
                 <StackPanel Grid.Column="0">
-                    <TextBlock Classes="stat-label" Text="{StaticResource FlowAnalytics_Stat_Player}"/>
+                    <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_Player}"/>
                     <TextBlock Classes="stat-value" Text="{Binding Statistics.PlayerCount}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1">
-                    <TextBlock Classes="stat-label" Text="{StaticResource FlowAnalytics_Stat_NPC}"/>
+                    <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_NPC}"/>
                     <TextBlock Classes="stat-value" Text="{Binding Statistics.NpcCount}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="2">
-                    <TextBlock Classes="stat-label" Text="{StaticResource FlowAnalytics_Stat_Narrator}"/>
+                    <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_Narrator}"/>
                     <TextBlock Classes="stat-value" Text="{Binding Statistics.NarratorCount}"/>
                 </StackPanel>
             </Grid>
@@ -80,15 +80,15 @@
             <!-- Row 3: Script, Avg links/node, Conditional links -->
             <Grid ColumnDefinitions="*,*,*">
                 <StackPanel Grid.Column="0">
-                    <TextBlock Classes="stat-label" Text="{StaticResource FlowAnalytics_Stat_Script}"/>
+                    <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_Script}"/>
                     <TextBlock Classes="stat-value" Text="{Binding Statistics.ScriptCount}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="1">
-                    <TextBlock Classes="stat-label" Text="{StaticResource FlowAnalytics_Stat_AvgLinks}"/>
+                    <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_AvgLinks}"/>
                     <TextBlock Classes="stat-value" Text="{Binding Statistics.AvgLinksPerNode, StringFormat='{}{0:F1}'}"/>
                 </StackPanel>
                 <StackPanel Grid.Column="2">
-                    <TextBlock Classes="stat-label" Text="{StaticResource FlowAnalytics_Stat_ConditionalLinks}"/>
+                    <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_ConditionalLinks}"/>
                     <TextBlock Classes="stat-value" Text="{Binding ConditionalLinksDisplay}"/>
                 </StackPanel>
             </Grid>
@@ -102,7 +102,7 @@
 
         <!-- ── No-data placeholder ────────────────────────────────────────── -->
         <TextBlock Grid.Row="0"
-                   Text="{StaticResource FlowAnalytics_NoData}"
+                   Text="{DynamicResource FlowAnalytics_NoData}"
                    Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Medium}" FontStyle="Italic"
                    HorizontalAlignment="Center" VerticalAlignment="Center"
                    IsVisible="{Binding !HasData}"/>
@@ -144,9 +144,9 @@
                                     Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Subtitle}"
                                     Padding="8,0" Margin="4,0,0,0"
                                     VerticalAlignment="Center"
-                                    ToolTip.Tip="{StaticResource ToolTip_FlowAnalytics_Navigate}"
-                                    AutomationProperties.HelpText="{StaticResource ToolTip_FlowAnalytics_Navigate}"
-                                    AutomationProperties.Name="{StaticResource AutomationName_GoToNode}"/>
+                                    ToolTip.Tip="{DynamicResource ToolTip_FlowAnalytics_Navigate}"
+                                    AutomationProperties.HelpText="{DynamicResource ToolTip_FlowAnalytics_Navigate}"
+                                    AutomationProperties.Name="{DynamicResource AutomationName_GoToNode}"/>
                         </Grid>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
@@ -160,10 +160,10 @@
                        Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Small}"
                        VerticalAlignment="Center"/>
             <Button Grid.Column="1" Classes="action-btn"
-                    Content="{StaticResource FlowAnalytics_Refresh}"
+                    Content="{DynamicResource FlowAnalytics_Refresh}"
                     Command="{Binding RefreshCommand}"
-                    ToolTip.Tip="{StaticResource ToolTip_FlowAnalytics_Refresh}"
-                    AutomationProperties.HelpText="{StaticResource ToolTip_FlowAnalytics_Refresh}"/>
+                    ToolTip.Tip="{DynamicResource ToolTip_FlowAnalytics_Refresh}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_FlowAnalytics_Refresh}"/>
         </Grid>
 
         <!-- Focus hint bar (Gaps item 13) -->

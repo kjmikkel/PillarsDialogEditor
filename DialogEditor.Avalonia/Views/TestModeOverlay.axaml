@@ -24,21 +24,21 @@
                            HorizontalAlignment="Center"
                            Foreground="{DynamicResource Brush.Text.Highlight}"/>
 
-                <TextBlock Text="{StaticResource TestMode_Message}"
+                <TextBlock Text="{DynamicResource TestMode_Message}"
                            Foreground="{DynamicResource Brush.Text.Primary}"
                            FontSize="{StaticResource FontSize.Medium}"
                            TextWrapping="Wrap"
                            TextAlignment="Center"
                            MaxWidth="380"/>
 
-                <Button Content="{StaticResource TestMode_Restore}"
+                <Button Content="{DynamicResource TestMode_Restore}"
                         Command="{Binding RestoreConversationCommand}"
                         HorizontalAlignment="Center"
                         Background="{DynamicResource Brush.Severity.Error}" Foreground="{DynamicResource Brush.Text.OnAccent}"
                         BorderThickness="0"
                         Padding="24,8" FontSize="{StaticResource FontSize.Medium}"
-                        ToolTip.Tip="{StaticResource ToolTip_TestMode_Restore}"
-                        AutomationProperties.HelpText="{StaticResource ToolTip_TestMode_Restore}"/>
+                        ToolTip.Tip="{DynamicResource ToolTip_TestMode_Restore}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_TestMode_Restore}"/>
 
             </StackPanel>
         </Border>

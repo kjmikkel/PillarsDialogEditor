@@ -48,8 +48,10 @@ public class LegendSwatchAccessibilityTests
             var tip = row.Attribute("ToolTip.Tip")?.Value;
             var help = row.Attribute("AutomationProperties.HelpText")?.Value;
 
-            Assert.True(name is not null && name.StartsWith("{StaticResource ", StringComparison.Ordinal),
-                $"LegendWindow.axaml:{line}: legendRow Button must have AutomationProperties.Name set to a {{StaticResource ...}} reference");
+            Assert.True(name is not null
+                    && (name.StartsWith("{StaticResource ", StringComparison.Ordinal)
+                        || name.StartsWith("{DynamicResource ", StringComparison.Ordinal)),
+                $"LegendWindow.axaml:{line}: legendRow Button must have AutomationProperties.Name set to a resource reference ({{StaticResource ...}} or {{DynamicResource ...}})");
             Assert.Equal(name, tip);
             Assert.Equal(name, help);
 

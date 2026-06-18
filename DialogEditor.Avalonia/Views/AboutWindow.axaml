@@ -2,14 +2,14 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.AboutWindow"
-        Title="{StaticResource About_Title}"
+        Title="{DynamicResource About_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="420" MinWidth="420" SizeToContent="Height" CanResize="True"
         ShowInTaskbar="False" Background="{DynamicResource Brush.Surface.Info}">
     <StackPanel Margin="18,16,18,16" Spacing="8">
         <TextBlock Text="{Binding AppName}" Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Title}" FontWeight="Bold"/>
         <StackPanel Orientation="Horizontal" Spacing="6">
-            <TextBlock Text="{StaticResource About_VersionLabel}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Body}"/>
+            <TextBlock Text="{DynamicResource About_VersionLabel}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Body}"/>
             <TextBlock Text="{Binding Version}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Body}"/>
         </StackPanel>
         <TextBlock Text="{Binding Description}" Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
@@ -17,22 +17,22 @@
         <TextBlock Text="{Binding Credits}" Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{StaticResource FontSize.Label}" TextWrapping="Wrap"/>
 
         <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
-            <Button Content="{StaticResource About_OpenRepository}"
-                    ToolTip.Tip="{StaticResource About_OpenRepositoryTip}"
-                    AutomationProperties.HelpText="{StaticResource About_OpenRepositoryTip}"
+            <Button Content="{DynamicResource About_OpenRepository}"
+                    ToolTip.Tip="{DynamicResource About_OpenRepositoryTip}"
+                    AutomationProperties.HelpText="{DynamicResource About_OpenRepositoryTip}"
                     Command="{Binding OpenRepositoryCommand}"/>
-            <Button Content="{StaticResource About_OpenDocs}"
-                    ToolTip.Tip="{StaticResource About_OpenDocsTip}"
-                    AutomationProperties.HelpText="{StaticResource About_OpenDocsTip}"
+            <Button Content="{DynamicResource About_OpenDocs}"
+                    ToolTip.Tip="{DynamicResource About_OpenDocsTip}"
+                    AutomationProperties.HelpText="{DynamicResource About_OpenDocsTip}"
                     Command="{Binding OpenDocsCommand}"/>
         </StackPanel>
 
         <TextBlock Text="{Binding Status}" Foreground="{DynamicResource Brush.Text.Status.Pending}" FontSize="{StaticResource FontSize.Label}" TextWrapping="Wrap"/>
 
         <Button HorizontalAlignment="Right" Margin="0,8,0,0"
-                Content="{StaticResource About_Close}"
-                ToolTip.Tip="{StaticResource About_Close}"
-                AutomationProperties.HelpText="{StaticResource About_Close}"
+                Content="{DynamicResource About_Close}"
+                ToolTip.Tip="{DynamicResource About_Close}"
+                AutomationProperties.HelpText="{DynamicResource About_Close}"
                 Click="Close_Click"/>
 
         <!-- Focus hint bar (Gaps item 16) -->

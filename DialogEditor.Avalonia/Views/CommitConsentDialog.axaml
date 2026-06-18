@@ -2,13 +2,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="DialogEditor.Avalonia.Views.CommitConsentDialog"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Title="{StaticResource CommitConsent_Title}"
+        Title="{DynamicResource CommitConsent_Title}"
         Width="460" MinWidth="460" SizeToContent="Height"
         CanResize="True"
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource Brush.Surface.Panel}">
   <StackPanel Margin="14" Spacing="8">
-    <TextBlock Text="{StaticResource CommitConsent_Intro}"
+    <TextBlock Text="{DynamicResource CommitConsent_Intro}"
                Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Body}"
                TextWrapping="Wrap"/>
     <Border BorderBrush="{DynamicResource Brush.Border.OnDark}" BorderThickness="1" CornerRadius="3" Padding="6" MaxHeight="160">
@@ -23,24 +23,24 @@
         </ItemsControl>
       </ScrollViewer>
     </Border>
-    <TextBlock Text="{StaticResource CommitConsent_MessageLabel}"
+    <TextBlock Text="{DynamicResource CommitConsent_MessageLabel}"
                Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Body}"/>
     <TextBox x:Name="MessageBox"
              Background="{DynamicResource Brush.Surface.Input}" Foreground="{DynamicResource Brush.Text.Primary}"
              BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
              FontSize="{StaticResource FontSize.Body}" Padding="6,4"
              AcceptsReturn="False"
-             ToolTip.Tip="{StaticResource CommitConsent_MessageLabel}"
-             AutomationProperties.HelpText="{StaticResource CommitConsent_MessageLabel}"
-             AutomationProperties.Name="{StaticResource CommitConsent_MessageLabel}"/>
+             ToolTip.Tip="{DynamicResource CommitConsent_MessageLabel}"
+             AutomationProperties.HelpText="{DynamicResource CommitConsent_MessageLabel}"
+             AutomationProperties.Name="{DynamicResource CommitConsent_MessageLabel}"/>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
       <Button x:Name="CancelButton"
-              Content="{StaticResource CommitConsent_Cancel}"
+              Content="{DynamicResource CommitConsent_Cancel}"
               Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
               Padding="16,6" FontSize="{StaticResource FontSize.Body}"
               IsCancel="True"/>
       <Button x:Name="CommitButton"
-              Content="{StaticResource CommitConsent_Commit}"
+              Content="{DynamicResource CommitConsent_Commit}"
               Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
               Padding="16,6" FontSize="{StaticResource FontSize.Body}"
               IsDefault="True"/>

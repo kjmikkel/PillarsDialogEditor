@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.PatchManager.MainWindow"
-        Title="{StaticResource PatchManager_WindowTitle}"
+        Title="{DynamicResource PatchManager_WindowTitle}"
         Icon="avares://DialogEditor.PatchManager/Assets/app.ico"
         Width="640" Height="580" MinWidth="500" MinHeight="420"
         CanResize="True"
