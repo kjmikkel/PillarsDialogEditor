@@ -425,6 +425,18 @@ after the cheap wins. The rest are independent and can land in any order.
     docs/superpowers/specs/2026-06-13-focus-hint-bar-small-dialogs-design.md.
 
 ### UI Localisation Readiness (audit 2026-06-12)
+
+**Items 1–3 IMPLEMENTED (2026-06-18):** `LanguageApplier` (overlay-merge mechanism,
+English no-op, `_LanguageOverlayMarker` sentinel for stateless live switching),
+`LocaleService` revision tick (in `DialogEditor.ViewModels.Services`),
+`AppSettings.UiLanguage` ("en" default; TODO Auto once a translation ships),
+`CoreLocale.SetCulture` facade, `LanguagePickerViewModel`/`LanguagePickerView` (live, no
+restart required), editor `SettingsWindow` Language row, `PatchManagerSettingsWindow`
+(Appearance + Language, replaces the top-bar theme picker). All `{StaticResource <string
+key>}` in views converted to `{DynamicResource}`; `NoStaticStringResourceTests` enforces
+the invariant. `AboutViewModel`, `ChangelogViewModel`, `ConversationViewModel` subscribe
+to `LocaleService.Revision` for live getter refresh. Remaining items (4–6) are unchanged.
+
 The localisation rule (no hard-coded user-visible text) has been followed, but the app
 cannot yet actually *switch language*. The good news from the audit: the architecture is
 genuinely localisation-ready, and **restart-based** language switching is close — the
@@ -432,9 +444,9 @@ work is a delivery mechanism and a translation workflow, not a rewrite.
 
 **Already in place (verified):**
 - Single funnel: all UI strings live in three XAML dictionaries (`Strings.axaml`,
-  `SharedStrings.axaml`, PatchManager's `Strings.axaml`); views make ~513
-  `{StaticResource}` string references and ViewModels ~216 `Loc.Get`/`Loc.Format` calls.
-  No class-init string caching found — lookups happen at display time.
+  `SharedStrings.axaml`, PatchManager's `Strings.axaml`); all views now use
+  `{DynamicResource}` for string references; ViewModels use ~216 `Loc.Get`/`Loc.Format`
+  calls. No class-init string caching found — lookups happen at display time.
 - `Loc` → `AvaloniaStringProvider` queries `Application.Current.TryGetResource` on every
   call, so swapping the merged dictionary changes every subsequent C# lookup automatically.
 - Theme Layer 2 is the exact mechanism precedent: persisted `AppSettings` choice, shared
@@ -444,16 +456,9 @@ work is a delivery mechanism and a translation workflow, not a rewrite.
   patterns found), translator notes already at the top of `Strings.axaml`, and
   `DialogEditor.Core`'s four strings already use `.resx`/`ResourceManager` with a
   settable `CoreStrings.Culture` (satellite-assembly ready).
+- `NoStaticStringResourceTests` enforces `{DynamicResource}` for all string keys.
 
-**Work needed for restart-based switching (the recommended path).** Because all XAML
-string references resolve when each window loads, merging the chosen language dictionary
-at startup makes `StaticResource` work as-is — no reference sweep needed:
-1. Per-language dictionaries with **overlay merge**: English merged first, chosen
-   language merged last (last-merged wins), so untranslated keys fall back to English by
-   construction.
-2. `AppSettings.Language` + a Settings picker + a "takes effect after restart" note —
-   clone of the theme-picker pattern, hosted by both apps.
-3. Set `CoreStrings.Culture` at startup; add satellite `.resx` per language.
+**Work needed (items 4–6):**
 4. **Translation workflow (the real cost):** `.axaml` is translator-hostile. An
    export/import bridge to XLIFF or CSV is needed — the in-house
    `LocalizationExportService`/`ImportService` pattern (built for game content) is the
@@ -463,20 +468,7 @@ at startup makes `StaticResource` work as-is — no reference sweep needed:
    cards will clip. Overlaps with Accessibility item 6 (font tokens / text scaling) —
    do them together.
 6. Minor: naive pluralisation (`"{0} nodes"` breaks in languages with multiple plural
-   forms — usually accepted in tools); and the no-hardcoded-strings rule has **no
-   enforcement test** (honor-system today, and a translated build makes violations
-   invisible in English testing) — the `NoStrayHexTests`/`AutomationNameTests` structural
-   pattern extends naturally here.
-
-**Live switching (no restart) — deliberately out of scope.** It would additionally need
-the ~513 `StaticResource` string refs converted to `DynamicResource` plus a
-change-notification kick for the ~216 ViewModel lookups (the `ThemeService.Revision`
-tick is the precedent). Several times the effort for little gain; restart-on-change is
-the desktop norm.
-
-**Difficulty verdict:** the switching mechanism itself is roughly a day following the
-theme Layer 2 playbook; the honest costs are the translation file workflow (item 4) and
-the layout robustness pass (item 5).
+   forms — usually accepted in tools).
 
 ### Barks System — Bark Preview
 Bark nodes now render with an amber color scheme on the canvas, carry bark-specific validation warnings (text too long, player-choice child), and those warnings surface in Flow Analytics. The remaining gap is an in-context preview of overhead floating text: writers cannot see how a bark will actually appear above an NPC's head without running the game. Implementing this requires investigating the game's bark rendering (font, line-wrapping, maximum visible width) before UI work can be designed.
@@ -584,3 +576,20 @@ Output of the survey should be one or more concrete follow-up gaps (e.g. "Quest 
 readability", "Item GUID readability", "GlobalVariable autocomplete"), each scoped to a
 single game-data kind with an identified name source — so they can be implemented the same
 way the character case was.
+
+### Font Scale Live Switching
+
+**Deferred from UI Localisation Readiness items 1–3.** `FontScaleApplier` currently runs
+once at startup (restart-required). Making font scaling live requires:
+
+- Converting `{StaticResource FontSize.*}` → `{DynamicResource FontSize.*}` in all views
+  (~349 occurrences across 30 `.axaml` files).
+- Making `FontScaleApplier.Apply` callable at runtime, not just at startup.
+- A `FontScaleService.Revision` tick (mirroring `ThemeService`/`LocaleService`) so
+  text-measurement-dependent layouts reflow when the scale changes.
+- Removing the "takes effect after restart" notice from the font-scale picker in
+  `SettingsWindow`.
+
+The `NoStaticStringResourceTests` enforcer (added in UI Localisation items 1–3) excludes
+`FontSize.*` from its scan (dots are excluded by the underscore heuristic), so this gap
+has a clean path: convert, add the service tick, remove the restart notice.
