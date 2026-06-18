@@ -8,7 +8,11 @@ public partial class DiffWindow : Window
 {
     private DiffHelpWindow? _helpWindow;
 
-    public DiffWindow() => InitializeComponent();
+    public DiffWindow()
+    {
+        InitializeComponent();
+        HintBar.AttachTo(this);
+    }
 
     public DiffWindow(DiffViewModel vm)
     {

@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.GitConflictResolutionWindow"
         Title="{StaticResource GitConflictWindow_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
@@ -7,7 +8,7 @@
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource Brush.Surface.Panel}">
 
-    <Grid Margin="16" RowDefinitions="Auto,*,Auto" ColumnDefinitions="260,*">
+    <Grid Margin="16" RowDefinitions="Auto,*,Auto,Auto" ColumnDefinitions="260,*">
 
         <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
                    Text="{StaticResource GitConflictWindow_Intro}"
@@ -110,6 +111,8 @@
                     Background="{DynamicResource Brush.Button.Confirm.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="12"/>
         </StackPanel>
+
+        <shared:FocusHintBar Grid.Row="3" Grid.ColumnSpan="2" x:Name="HintBar"/>
 
     </Grid>
 

@@ -5,7 +5,11 @@ namespace DialogEditor.Avalonia.Views;
 
 public partial class BatchReplaceWindow : Window
 {
-    public BatchReplaceWindow() => InitializeComponent();
+    public BatchReplaceWindow()
+    {
+        InitializeComponent();
+        HintBar.AttachTo(this);
+    }
 
     public BatchReplaceWindow(BatchReplaceViewModel vm) : this()
     {

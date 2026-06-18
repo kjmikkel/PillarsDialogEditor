@@ -5,7 +5,11 @@ namespace DialogEditor.Avalonia.Views;
 
 public partial class ScriptEditorWindow : Window
 {
-    public ScriptEditorWindow() => InitializeComponent();
+    public ScriptEditorWindow()
+    {
+        InitializeComponent();
+        HintBar.AttachTo(this);
+    }
 
     public ScriptEditorWindow(ScriptEditorViewModel vm) : this()
     {

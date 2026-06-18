@@ -1,10 +1,11 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.ExportConversationsWindow"
         Title="{StaticResource ExportConversations_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Width="480" Height="520"
+        Width="480" Height="546"
         Background="{DynamicResource Brush.Surface.Window}"
         CanResize="False"
         WindowStartupLocation="CenterOwner"
@@ -77,6 +78,8 @@
                     Click="CloseButton_Click"
                     MinWidth="80"/>
         </Grid>
+
+        <shared:FocusHintBar DockPanel.Dock="Bottom" x:Name="HintBar"/>
 
         <!-- ── Format selector ───────────────────────────────────────── -->
         <StackPanel Margin="0,0,0,12">
