@@ -13,7 +13,7 @@
     <Window.Styles>
         <Style Selector="TextBlock.sectionHeader">
             <Setter Property="Foreground"  Value="{DynamicResource Brush.Text.Secondary}"/>
-            <Setter Property="FontSize"    Value="{StaticResource FontSize.Small}"/>
+            <Setter Property="FontSize"    Value="{DynamicResource FontSize.Small}"/>
             <Setter Property="FontWeight"  Value="SemiBold"/>
             <Setter Property="Margin"      Value="0,0,0,4"/>
         </Style>

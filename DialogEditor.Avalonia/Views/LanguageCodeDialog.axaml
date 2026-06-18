@@ -12,14 +12,14 @@
     <StackPanel Margin="16" Spacing="10">
 
         <TextBlock Text="{DynamicResource Localization_LanguageCodeDialog_Prompt}"
-                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
+                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
 
         <TextBox x:Name="LanguageCodeBox"
                  Background="{DynamicResource Brush.Surface.Input}"
                  Foreground="{DynamicResource Brush.Text.Primary}"
                  BorderBrush="{DynamicResource Brush.Border.Strong}"
                  BorderThickness="1"
-                 FontSize="{StaticResource FontSize.Body}"
+                 FontSize="{DynamicResource FontSize.Body}"
                  Padding="6,4"
                  AcceptsReturn="False"
                  AutomationProperties.Name="{DynamicResource Localization_LanguageCodeDialog_Prompt}"/>

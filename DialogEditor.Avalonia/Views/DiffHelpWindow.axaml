@@ -7,20 +7,20 @@
         ShowInTaskbar="False" Background="{DynamicResource Brush.Surface.Info}">
     <ScrollViewer>
         <StackPanel Margin="14,12,14,16" Spacing="6">
-            <TextBlock Text="{DynamicResource DiffHelp_ColourKeyHeader}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}" FontWeight="Bold"/>
-            <StackPanel Orientation="Horizontal" Spacing="8"><Border Width="12" Height="12" Background="{DynamicResource Brush.Text.Status.Added}" VerticalAlignment="Center"/><TextBlock Text="{DynamicResource DiffHelp_Added}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Body}"/></StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="8"><Border Width="12" Height="12" Background="{DynamicResource Brush.Text.Status.Changed}" VerticalAlignment="Center"/><TextBlock Text="{DynamicResource DiffHelp_Changed}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Body}"/></StackPanel>
-            <StackPanel Orientation="Horizontal" Spacing="8"><Border Width="12" Height="12" Background="{DynamicResource Brush.Text.Status.Removed}" VerticalAlignment="Center"/><TextBlock Text="{DynamicResource DiffHelp_Removed}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Body}"/></StackPanel>
-            <TextBlock Text="{DynamicResource DiffHelp_CompareHeader}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}" FontWeight="Bold" Margin="0,8,0,0"/>
-            <TextBlock Text="{DynamicResource DiffHelp_CompareBody}" Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
-            <TextBlock Text="{DynamicResource DiffHelp_ViewsHeader}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}" FontWeight="Bold" Margin="0,8,0,0"/>
-            <TextBlock Text="{DynamicResource DiffHelp_ViewsBody}" Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
-            <TextBlock Text="{DynamicResource DiffHelp_BringInHeader}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}" FontWeight="Bold" Margin="0,8,0,0"/>
-            <TextBlock Text="{DynamicResource DiffHelp_BringInBody}" Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
-            <TextBlock Text="{DynamicResource DiffHelp_UndoHeader}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}" FontWeight="Bold" Margin="0,8,0,0"/>
-            <TextBlock Text="{DynamicResource DiffHelp_UndoBody}" Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
-            <TextBlock Text="{DynamicResource DiffHelp_LinksHeader}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}" FontWeight="Bold" Margin="0,8,0,0"/>
-            <TextBlock Text="{DynamicResource DiffHelp_LinksBody}" Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
+            <TextBlock Text="{DynamicResource DiffHelp_ColourKeyHeader}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"/>
+            <StackPanel Orientation="Horizontal" Spacing="8"><Border Width="12" Height="12" Background="{DynamicResource Brush.Text.Status.Added}" VerticalAlignment="Center"/><TextBlock Text="{DynamicResource DiffHelp_Added}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"/></StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8"><Border Width="12" Height="12" Background="{DynamicResource Brush.Text.Status.Changed}" VerticalAlignment="Center"/><TextBlock Text="{DynamicResource DiffHelp_Changed}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"/></StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="8"><Border Width="12" Height="12" Background="{DynamicResource Brush.Text.Status.Removed}" VerticalAlignment="Center"/><TextBlock Text="{DynamicResource DiffHelp_Removed}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"/></StackPanel>
+            <TextBlock Text="{DynamicResource DiffHelp_CompareHeader}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold" Margin="0,8,0,0"/>
+            <TextBlock Text="{DynamicResource DiffHelp_CompareBody}" Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
+            <TextBlock Text="{DynamicResource DiffHelp_ViewsHeader}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold" Margin="0,8,0,0"/>
+            <TextBlock Text="{DynamicResource DiffHelp_ViewsBody}" Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
+            <TextBlock Text="{DynamicResource DiffHelp_BringInHeader}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold" Margin="0,8,0,0"/>
+            <TextBlock Text="{DynamicResource DiffHelp_BringInBody}" Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
+            <TextBlock Text="{DynamicResource DiffHelp_UndoHeader}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold" Margin="0,8,0,0"/>
+            <TextBlock Text="{DynamicResource DiffHelp_UndoBody}" Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
+            <TextBlock Text="{DynamicResource DiffHelp_LinksHeader}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold" Margin="0,8,0,0"/>
+            <TextBlock Text="{DynamicResource DiffHelp_LinksBody}" Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
         </StackPanel>
     </ScrollViewer>
 </Window>

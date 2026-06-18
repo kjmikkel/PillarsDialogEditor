@@ -9,13 +9,13 @@
     <UserControl.Styles>
         <Style Selector="TextBlock.group-header">
             <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Muted}"/>
-            <Setter Property="FontSize"   Value="{StaticResource FontSize.Caption}"/>
+            <Setter Property="FontSize"   Value="{DynamicResource FontSize.Caption}"/>
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Margin"     Value="0,10,0,3"/>
         </Style>
         <Style Selector="TextBlock.field-label">
             <Setter Property="Foreground"  Value="{DynamicResource Brush.Text.Caption}"/>
-            <Setter Property="FontSize"    Value="{StaticResource FontSize.Caption}"/>
+            <Setter Property="FontSize"    Value="{DynamicResource FontSize.Caption}"/>
             <Setter Property="Margin"      Value="0,4,0,2"/>
         </Style>
         <Style Selector="TextBox.detail-field">
@@ -23,7 +23,7 @@
             <Setter Property="Foreground"      Value="{DynamicResource Brush.Text.Primary}"/>
             <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Border.Strong}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontSize"        Value="{StaticResource FontSize.Small}"/>
+            <Setter Property="FontSize"        Value="{DynamicResource FontSize.Small}"/>
             <Setter Property="Padding"         Value="4,3"/>
             <Setter Property="Margin"          Value="0,0,0,4"/>
         </Style>
@@ -31,14 +31,14 @@
             <Setter Property="Background"          Value="{DynamicResource Brush.Surface.Card}"/>
             <Setter Property="Foreground"          Value="{DynamicResource Brush.Text.Primary}"/>
             <Setter Property="BorderBrush"         Value="{DynamicResource Brush.Border.Strong}"/>
-            <Setter Property="FontSize"            Value="{StaticResource FontSize.Small}"/>
+            <Setter Property="FontSize"            Value="{DynamicResource FontSize.Small}"/>
             <Setter Property="Padding"             Value="4,2"/>
             <Setter Property="Margin"              Value="0,0,0,4"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
         </Style>
         <Style Selector="CheckBox.detail-check">
             <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}"/>
-            <Setter Property="FontSize"   Value="{StaticResource FontSize.Small}"/>
+            <Setter Property="FontSize"   Value="{DynamicResource FontSize.Small}"/>
             <Setter Property="Margin"     Value="0,0,0,4"/>
         </Style>
     </UserControl.Styles>
@@ -47,17 +47,17 @@
         <DataTemplate x:Key="ReadOnlyRowTemplate" DataType="models:PropertyRow">
             <Grid ColumnDefinitions="110,*" Margin="0,1,0,1">
                 <TextBlock Grid.Column="0" Text="{Binding Label}"
-                           Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{StaticResource FontSize.Small}" VerticalAlignment="Top"/>
+                           Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Small}" VerticalAlignment="Top"/>
                 <TextBlock Grid.Column="1" Text="{Binding Value}"
                            Foreground="{Binding Style, Converter={StaticResource PropertyValueStyleToBrush}}"
-                           FontSize="{StaticResource FontSize.Small}" TextWrapping="Wrap" LineHeight="15"/>
+                           FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap" LineHeight="15"/>
             </Grid>
         </DataTemplate>
     </UserControl.Resources>
 
     <Grid>
         <TextBlock Text="{DynamicResource Label_SelectNode}"
-                   Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Label}"
+                   Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Label}"
                    HorizontalAlignment="Center" VerticalAlignment="Center"
                    IsVisible="{Binding HasContent, Converter={StaticResource InverseBoolToVis}}"/>
 
@@ -69,7 +69,7 @@
                     <TextBlock Classes="group-header" Text="{DynamicResource NodeDetail_LastEditedLabel}"/>
                     <TextBlock Text="{Binding LastEditedSummary}"
                                ToolTip.Tip="{Binding LastEditedTooltip}"
-                               Foreground="{DynamicResource Brush.Node.Quotidian.Note}" FontSize="{StaticResource FontSize.Small}" TextWrapping="Wrap"/>
+                               Foreground="{DynamicResource Brush.Node.Quotidian.Note}" FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
                 </StackPanel>
 
                 <!-- ── Default / Male text ─────────────────────────────── -->
@@ -165,7 +165,7 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <TextBlock Text="{Binding}" Foreground="{DynamicResource Brush.Bark.Detail.Text}"
-                                           FontSize="{StaticResource FontSize.Small}" TextWrapping="Wrap"/>
+                                           FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -232,14 +232,14 @@
                 <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
                     <TextBlock Grid.Column="0"
                                Text="{Binding ScriptSummary}"
-                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}"
+                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
                                VerticalAlignment="Center"
                                TextTrimming="CharacterEllipsis"/>
                     <Button Grid.Column="1"
                             Content="{DynamicResource Button_EditScripts}"
                             Click="EditScripts_Click"
                             Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0"
-                            Padding="8,3" FontSize="{StaticResource FontSize.Small}"
+                            Padding="8,3" FontSize="{DynamicResource FontSize.Small}"
                             ToolTip.Tip="{DynamicResource ToolTip_EditScripts}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_EditScripts}"/>
                 </Grid>
@@ -263,7 +263,7 @@
                     <!-- Summary: show count + first condition names -->
                     <TextBlock Grid.Column="0"
                                Text="{Binding ConditionSummary}"
-                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}"
+                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
                                VerticalAlignment="Center"
                                TextTrimming="CharacterEllipsis"/>
                     <Button Grid.Column="1"
@@ -271,7 +271,7 @@
                             Content="{DynamicResource Button_EditConditions}"
                             Click="EditConditions_Click"
                             Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0"
-                            Padding="8,3" FontSize="{StaticResource FontSize.Small}"
+                            Padding="8,3" FontSize="{DynamicResource FontSize.Small}"
                             ToolTip.Tip="{DynamicResource ToolTip_EditConditions}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_EditConditions}"/>
                 </Grid>
@@ -286,11 +286,11 @@
                                 <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto">
                                     <TextBlock Grid.Column="0"
                                                Text="{DynamicResource Link_Arrow}"
-                                               Foreground="{DynamicResource Brush.Text.Info}" FontSize="{StaticResource FontSize.Small}"
+                                               Foreground="{DynamicResource Brush.Text.Info}" FontSize="{DynamicResource FontSize.Small}"
                                                VerticalAlignment="Center" Margin="0,0,4,0"/>
                                     <TextBlock Grid.Column="1"
                                                Text="{Binding Target.Owner.NodeId}"
-                                               Foreground="{DynamicResource Brush.Text.Info}" FontSize="{StaticResource FontSize.Small}"
+                                               Foreground="{DynamicResource Brush.Text.Info}" FontSize="{DynamicResource FontSize.Small}"
                                                VerticalAlignment="Center"/>
                                     <!-- Condition editor button — dim when no conditions, accent when present -->
                                     <Button Grid.Column="2"
@@ -299,7 +299,7 @@
                                             Click="LinkConditions_Click"
                                             Tag="{Binding}"
                                             Background="Transparent" BorderThickness="0"
-                                            FontSize="{StaticResource FontSize.Small}" Padding="3,1" Margin="0,0,2,0"
+                                            FontSize="{DynamicResource FontSize.Small}" Padding="3,1" Margin="0,0,2,0"
                                             Foreground="{Binding HasConditions,
                                                 Converter={StaticResource BoolToFemaleTextBrush}}"
                                             ToolTip.Tip="{DynamicResource ToolTip_LinkConditions_None}"
@@ -310,7 +310,7 @@
                                                       RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             CommandParameter="{Binding}"
                                             Background="Transparent" BorderThickness="0"
-                                            Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Caption}" Padding="4,1"
+                                            Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Caption}" Padding="4,1"
                                             ToolTip.Tip="{DynamicResource ToolTip_DeleteLink}"
                                             AutomationProperties.HelpText="{DynamicResource ToolTip_DeleteLink}"/>
                                 </Grid>
@@ -321,7 +321,7 @@
                                               ItemsSource="{x:Static vm:ConnectionViewModel.QTDOptions}"
                                               Background="{DynamicResource Brush.Surface.Card}" Foreground="{DynamicResource Brush.Text.Secondary}"
                                               BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
-                                              FontSize="{StaticResource FontSize.Small}" Padding="3,1" Height="22"
+                                              FontSize="{DynamicResource FontSize.Small}" Padding="3,1" Height="22"
                                               ToolTip.Tip="{DynamicResource ToolTip_LinkQTD}"
                                               AutomationProperties.HelpText="{DynamicResource ToolTip_LinkQTD}"
                                               AutomationProperties.Name="{DynamicResource AutomationName_LinkQTD}">
@@ -334,7 +334,7 @@
                                     </ComboBox>
                                     <TextBlock Grid.Column="1"
                                                Text="{DynamicResource Label_LinkWeight}"
-                                               Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Small}"
+                                               Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Small}"
                                                VerticalAlignment="Center" Margin="6,0,4,0"/>
                                     <NumericUpDown Grid.Column="2"
                                                    Value="{Binding RandomWeight, Mode=TwoWay, Converter={StaticResource FloatDecimal}}"
@@ -342,7 +342,7 @@
                                                    Increment="0.1" FormatString="0.##"
                                                    Background="{DynamicResource Brush.Surface.Card}" Foreground="{DynamicResource Brush.Text.Secondary}"
                                                    BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
-                                                   FontSize="{StaticResource FontSize.Small}" Padding="2,0" Width="72"
+                                                   FontSize="{DynamicResource FontSize.Small}" Padding="2,0" Width="72"
                                                    ShowButtonSpinner="False"
                                                    ClipValueToMinMax="True"
                                                    ToolTip.Tip="{DynamicResource ToolTip_LinkWeight}"
@@ -361,7 +361,7 @@
                              Watermark="{DynamicResource Placeholder_AddLinkTargetId}"
                              Background="{DynamicResource Brush.Surface.Card}" Foreground="{DynamicResource Brush.Text.Primary}"
                              BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
-                             FontSize="{StaticResource FontSize.Small}" Padding="4,3"
+                             FontSize="{DynamicResource FontSize.Small}" Padding="4,3"
                              ToolTip.Tip="{DynamicResource ToolTip_AddLinkTargetId}"
                              AutomationProperties.HelpText="{DynamicResource ToolTip_AddLinkTargetId}"
                              AutomationProperties.Name="{DynamicResource Placeholder_AddLinkTargetId}"/>

@@ -17,7 +17,7 @@
             <Setter Property="Foreground"       Value="{DynamicResource Brush.Text.Primary}"/>
             <Setter Property="BorderBrush"      Value="{DynamicResource Brush.Border.Strong}"/>
             <Setter Property="BorderThickness"  Value="1"/>
-            <Setter Property="FontSize"         Value="{StaticResource FontSize.Body}"/>
+            <Setter Property="FontSize"         Value="{DynamicResource FontSize.Body}"/>
             <Setter Property="Padding"          Value="6,3"/>
         </Style>
         <Style Selector="Button.action-btn">
@@ -25,7 +25,7 @@
             <Setter Property="Foreground"      Value="{DynamicResource Brush.Text.Secondary}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"         Value="10,4"/>
-            <Setter Property="FontSize"        Value="{StaticResource FontSize.Label}"/>
+            <Setter Property="FontSize"        Value="{DynamicResource FontSize.Label}"/>
             <Setter Property="MinWidth"        Value="80"/>
         </Style>
         <Style Selector="Button.primary-btn">
@@ -33,7 +33,7 @@
             <Setter Property="Foreground"      Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"         Value="10,4"/>
-            <Setter Property="FontSize"        Value="{StaticResource FontSize.Label}"/>
+            <Setter Property="FontSize"        Value="{DynamicResource FontSize.Label}"/>
             <Setter Property="MinWidth"        Value="80"/>
         </Style>
     </Window.Styles>
@@ -43,7 +43,7 @@
         <!-- Find row -->
         <Grid Grid.Row="0" ColumnDefinitions="70,*" Margin="0,0,0,6">
             <TextBlock Grid.Column="0" Text="{DynamicResource FindReplace_FindLabel}"
-                       Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Label}" VerticalAlignment="Center"/>
+                       Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
             <TextBox Grid.Column="1" Classes="find-box"
                      Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      x:Name="SearchBox"
@@ -55,7 +55,7 @@
         <!-- Replace row -->
         <Grid Grid.Row="1" ColumnDefinitions="70,*" Margin="0,0,0,8">
             <TextBlock Grid.Column="0" Text="{DynamicResource FindReplace_ReplaceLabel}"
-                       Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Label}" VerticalAlignment="Center"/>
+                       Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
             <TextBox Grid.Column="1" Classes="find-box"
                      Text="{Binding ReplaceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                      ToolTip.Tip="{DynamicResource ToolTip_ReplaceAll}"
@@ -67,11 +67,11 @@
         <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="12" Margin="0,0,0,8">
             <CheckBox IsChecked="{Binding CaseSensitive, Mode=TwoWay}"
                       Content="{DynamicResource FindReplace_CaseSensitive}"
-                      Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}"
+                      Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Label}"
                       ToolTip.Tip="{DynamicResource ToolTip_CaseSensitive}"
                       AutomationProperties.HelpText="{DynamicResource ToolTip_CaseSensitive}"/>
             <TextBlock Text="{Binding StatusText}"
-                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}"
+                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
                        VerticalAlignment="Center"/>
         </StackPanel>
 

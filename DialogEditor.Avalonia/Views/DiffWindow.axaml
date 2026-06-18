@@ -70,7 +70,7 @@
         <Border DockPanel.Dock="Bottom" Background="{DynamicResource Brush.Surface.Card}" Padding="8,4" Margin="0,8,0,0">
             <TextBlock Text="{Binding StatusText}"
                        Foreground="{DynamicResource Brush.Text.Muted}"
-                       FontSize="{StaticResource FontSize.Label}"
+                       FontSize="{DynamicResource FontSize.Label}"
                        VerticalAlignment="Center"/>
         </Border>
 
@@ -89,10 +89,10 @@
                     <CheckBox x:Name="AutoPullCheck"
                               Content="{DynamicResource Diff_AutoPullLabel}"
                               IsChecked="{Binding AutoPullDependencies, Mode=TwoWay}"
-                              Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}"
+                              Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Label}"
                               ToolTip.Tip="{DynamicResource ToolTip_Diff_AutoPull}"
                               AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_AutoPull}"/>
-                    <TextBlock Text="{DynamicResource Diff_Hint}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{DynamicResource Diff_Hint}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
                 </StackPanel>
             </DockPanel>
         </Border>
@@ -107,15 +107,15 @@
                   AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_DanglingPanel}">
             <Expander.Header>
                 <TextBlock Text="{Binding DanglingLinks.Count, StringFormat={StaticResource Diff_DanglingWarning}}"
-                           Foreground="{DynamicResource Brush.Text.Status.Changed}" FontSize="{StaticResource FontSize.Label}"/>
+                           Foreground="{DynamicResource Brush.Text.Status.Changed}" FontSize="{DynamicResource FontSize.Label}"/>
             </Expander.Header>
             <StackPanel Margin="8,4,0,4" Spacing="2">
                 <TextBlock Text="{DynamicResource Diff_DanglingHeader}"
-                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" TextWrapping="Wrap"/>
+                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap"/>
                 <ItemsControl x:Name="DanglingList" ItemsSource="{Binding DanglingLinkDescriptions}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock Text="{Binding}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}" Margin="0,1,0,0"/>
+                            <TextBlock Text="{Binding}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Label}" Margin="0,1,0,0"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
@@ -138,7 +138,7 @@
                 <TextBlock Grid.Row="0"
                            Text="{DynamicResource DiffWindow_ChangedHeader}"
                            Foreground="{DynamicResource Brush.Text.Muted}"
-                           FontSize="{StaticResource FontSize.Small}"
+                           FontSize="{DynamicResource FontSize.Small}"
                            FontWeight="Bold"
                            Margin="0,0,0,4"/>
                 <Border Grid.Row="1"
@@ -172,7 +172,7 @@
                                                               AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_BringIn}"/>
                                                     <Border Width="9" Height="9" VerticalAlignment="Center"
                                                             Background="{Binding Kind, Converter={StaticResource DiffStatusToBrushConverter}}"/>
-                                                    <TextBlock Text="{Binding NodeId, StringFormat={StaticResource Diff_NodeLine}}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding NodeId, StringFormat={StaticResource Diff_NodeLine}}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
                                                 </StackPanel>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
@@ -198,11 +198,11 @@
                                  ToolTip.Tip="{DynamicResource ToolTip_Diff_ViewToggle}"
                                  AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_ViewToggle}"/>
                     <Border Width="10" Height="10" Background="{DynamicResource Brush.Text.Status.Added}" VerticalAlignment="Center"/>
-                    <TextBlock Text="{DynamicResource Diff_LegendAdded}" Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Small}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{DynamicResource Diff_LegendAdded}" Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Small}" VerticalAlignment="Center"/>
                     <Border Width="10" Height="10" Background="{DynamicResource Brush.Text.Status.Changed}" VerticalAlignment="Center"/>
-                    <TextBlock Text="{DynamicResource Diff_LegendChanged}" Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Small}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{DynamicResource Diff_LegendChanged}" Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Small}" VerticalAlignment="Center"/>
                     <Border Width="10" Height="10" Background="{DynamicResource Brush.Text.Status.Removed}" VerticalAlignment="Center"/>
-                    <TextBlock Text="{DynamicResource Diff_LegendRemoved}" Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Small}" VerticalAlignment="Center"/>
+                    <TextBlock Text="{DynamicResource Diff_LegendRemoved}" Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Small}" VerticalAlignment="Center"/>
                     <Button Content="{DynamicResource Diff_HelpButton}" Click="Help_Click"
                             ToolTip.Tip="{DynamicResource ToolTip_Diff_Help}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_Help}"/>
@@ -218,10 +218,10 @@
                         ToolTip.Tip="{DynamicResource ToolTip_Diff_Detail}">
                     <DockPanel DataContext="{Binding SelectedNodeDetail}">
                         <TextBlock DockPanel.Dock="Top" Text="{Binding HeaderText}"
-                                   Foreground="{DynamicResource Brush.Text.Emphasis}" FontWeight="Bold" FontSize="{StaticResource FontSize.Body}"/>
+                                   Foreground="{DynamicResource Brush.Text.Emphasis}" FontWeight="Bold" FontSize="{DynamicResource FontSize.Body}"/>
                         <TextBlock DockPanel.Dock="Top"
                                    Text="{DynamicResource Diff_Detail_StructuralOnly}"
-                                   Foreground="{DynamicResource Brush.Text.Status.Changed}" FontSize="{StaticResource FontSize.Label}" TextWrapping="Wrap"
+                                   Foreground="{DynamicResource Brush.Text.Status.Changed}" FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap"
                                    IsVisible="{Binding IsStructuralOnly}"/>
                         <ScrollViewer MaxHeight="180" IsVisible="{Binding ShowSections}">
                             <ItemsControl x:Name="SectionsList" ItemsSource="{Binding Sections}">
@@ -230,45 +230,45 @@
                                         <StackPanel Spacing="2" Margin="0,6,0,0">
                                             <StackPanel Orientation="Horizontal" Spacing="4">
                                                 <TextBlock Text="{Binding LanguageName}"
-                                                           Foreground="{DynamicResource Brush.Text.Tertiary}" FontWeight="SemiBold" FontSize="{StaticResource FontSize.Label}"/>
+                                                           Foreground="{DynamicResource Brush.Text.Tertiary}" FontWeight="SemiBold" FontSize="{DynamicResource FontSize.Label}"/>
                                                 <TextBlock Text="{DynamicResource Diff_Detail_PrimaryMarker}"
-                                                           Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Small}"
+                                                           Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Small}"
                                                            IsVisible="{Binding IsPrimary}"/>
                                             </StackPanel>
 
                                             <TextBlock Text="{DynamicResource Diff_Detail_DefaultTextLabel}"
-                                                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}"/>
+                                                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"/>
                                             <Grid ColumnDefinitions="Auto,*">
                                                 <TextBlock Grid.Column="0" Text="{DynamicResource Diff_Detail_BeforeLabel}"
-                                                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" Margin="0,0,6,0"/>
+                                                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}" Margin="0,0,6,0"/>
                                                 <controls:InlineDiffTextBlock Grid.Column="1"
                                                            Before="{Binding DefaultBefore}" After="{Binding DefaultAfter}"
-                                                           ShowAfter="False" Foreground="{DynamicResource Brush.Text.Emphasis}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
+                                                           ShowAfter="False" Foreground="{DynamicResource Brush.Text.Emphasis}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
                                             </Grid>
                                             <Grid ColumnDefinitions="Auto,*">
                                                 <TextBlock Grid.Column="0" Text="{DynamicResource Diff_Detail_AfterLabel}"
-                                                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" Margin="0,0,6,0"/>
+                                                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}" Margin="0,0,6,0"/>
                                                 <controls:InlineDiffTextBlock Grid.Column="1"
                                                            Before="{Binding DefaultBefore}" After="{Binding DefaultAfter}"
-                                                           ShowAfter="True" Foreground="{DynamicResource Brush.Text.Emphasis}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
+                                                           ShowAfter="True" Foreground="{DynamicResource Brush.Text.Emphasis}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
                                             </Grid>
 
                                             <StackPanel Spacing="2" IsVisible="{Binding HasFemaleRow}">
                                                 <TextBlock Text="{DynamicResource Diff_Detail_FemaleTextLabel}"
-                                                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}"/>
+                                                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"/>
                                                 <Grid ColumnDefinitions="Auto,*">
                                                     <TextBlock Grid.Column="0" Text="{DynamicResource Diff_Detail_BeforeLabel}"
-                                                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" Margin="0,0,6,0"/>
+                                                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}" Margin="0,0,6,0"/>
                                                     <controls:InlineDiffTextBlock Grid.Column="1"
                                                                Before="{Binding FemaleBefore}" After="{Binding FemaleAfter}"
-                                                               ShowAfter="False" Foreground="{DynamicResource Brush.Text.Emphasis}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
+                                                               ShowAfter="False" Foreground="{DynamicResource Brush.Text.Emphasis}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
                                                 </Grid>
                                                 <Grid ColumnDefinitions="Auto,*">
                                                     <TextBlock Grid.Column="0" Text="{DynamicResource Diff_Detail_AfterLabel}"
-                                                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" Margin="0,0,6,0"/>
+                                                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}" Margin="0,0,6,0"/>
                                                     <controls:InlineDiffTextBlock Grid.Column="1"
                                                                Before="{Binding FemaleBefore}" After="{Binding FemaleAfter}"
-                                                               ShowAfter="True" Foreground="{DynamicResource Brush.Text.Emphasis}" FontSize="{StaticResource FontSize.Body}" TextWrapping="Wrap"/>
+                                                               ShowAfter="True" Foreground="{DynamicResource Brush.Text.Emphasis}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
                                                 </Grid>
                                             </StackPanel>
                                         </StackPanel>
@@ -292,13 +292,13 @@
                         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
                             <TextBlock Text="{Binding Selected.Name}"
                                        Foreground="{DynamicResource Brush.Text.Secondary}"
-                                       FontSize="{StaticResource FontSize.Subtitle}"
+                                       FontSize="{DynamicResource FontSize.Subtitle}"
                                        HorizontalAlignment="Center"
                                        Margin="0,0,0,8"
                                        IsVisible="{Binding Selected, Converter={StaticResource IsNotNull}}"/>
                             <TextBlock Text="{Binding CanvasHint}"
                                        Foreground="{DynamicResource Brush.Text.Disabled}"
-                                       FontSize="{StaticResource FontSize.Label}"
+                                       FontSize="{DynamicResource FontSize.Label}"
                                        HorizontalAlignment="Center"
                                        TextWrapping="Wrap"
                                        TextAlignment="Center"
@@ -306,7 +306,7 @@
                                        IsVisible="{Binding CanvasHint, Converter={StaticResource NullOrEmptyToVis}}"/>
                             <TextBlock Text="{DynamicResource DiffWindow_SelectHint}"
                                        Foreground="{DynamicResource Brush.Text.Disabled}"
-                                       FontSize="{StaticResource FontSize.Label}"
+                                       FontSize="{DynamicResource FontSize.Label}"
                                        HorizontalAlignment="Center"
                                        TextWrapping="Wrap"
                                        TextAlignment="Center"

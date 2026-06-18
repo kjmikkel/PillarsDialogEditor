@@ -7,13 +7,9 @@ namespace DialogEditor.ViewModels;
 
 public partial class SettingsViewModel : ObservableObject
 {
-    private readonly string        _gameDirectory;
-    private readonly IFolderPicker _picker;
-
-    // The scale that FontScaleApplier actually applied at this session's startup —
-    // captured once so ShowRestartNotice can detect when the user picks a different
-    // value (Gaps item 6 part B).
-    private readonly double _appliedFontScale;
+    private readonly string           _gameDirectory;
+    private readonly IFolderPicker    _picker;
+    private readonly IFontScaleApplier _fontScaleApplier;
 
     [ObservableProperty] private string _backupDirectory;
     [ObservableProperty] private string _localizationFormat;
@@ -25,23 +21,20 @@ public partial class SettingsViewModel : ObservableObject
     /// Localization formats offered for the "Default localization format" picker.
     public IReadOnlyList<string> LocalizationFormatOptions { get; } = ["Csv", "Json", "Xliff"];
 
-    // Live preview sizes, independent of the FontSize.* resource tokens (which stay
-    // static until restart) — recomputed from SelectedFontScale as the user picks.
+    // Live preview sizes — recomputed from SelectedFontScale as the user picks.
     public double PreviewBodyFontSize     => SelectedFontScale * 12;
     public double PreviewSubtitleFontSize => SelectedFontScale * 14;
     public double PreviewTitleFontSize    => SelectedFontScale * 18;
 
-    /// True once the selected scale differs from the one applied at launch.
-    public bool ShowRestartNotice => SelectedFontScale != _appliedFontScale;
-
-    public SettingsViewModel(string gameDirectory, IFolderPicker picker)
+    public SettingsViewModel(string gameDirectory, IFolderPicker picker,
+                             IFontScaleApplier? fontScaleApplier = null)
     {
         _gameDirectory      = gameDirectory;
         _picker             = picker;
+        _fontScaleApplier   = fontScaleApplier ?? new NullFontScaleApplier();
         _backupDirectory    = AppSettings.GetBackupPath(gameDirectory) ?? string.Empty;
         _localizationFormat = AppSettings.DefaultLocalizationFormat;
-        _appliedFontScale   = AppSettings.FontScale;
-        _selectedFontScale  = _appliedFontScale;
+        _selectedFontScale  = AppSettings.FontScale;
     }
 
     partial void OnLocalizationFormatChanged(string value)
@@ -50,10 +43,16 @@ public partial class SettingsViewModel : ObservableObject
     partial void OnSelectedFontScaleChanged(double value)
     {
         AppSettings.FontScale = value;
+        _fontScaleApplier.Apply(value);
         OnPropertyChanged(nameof(PreviewBodyFontSize));
         OnPropertyChanged(nameof(PreviewSubtitleFontSize));
         OnPropertyChanged(nameof(PreviewTitleFontSize));
-        OnPropertyChanged(nameof(ShowRestartNotice));
+    }
+
+    // No-op applier so the ViewModel is testable without injecting one explicitly.
+    private sealed class NullFontScaleApplier : IFontScaleApplier
+    {
+        public void Apply(double scale) { }
     }
 
     [RelayCommand]

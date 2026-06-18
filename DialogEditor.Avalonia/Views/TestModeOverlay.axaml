@@ -20,13 +20,13 @@
 
                 <!-- Icon + heading -->
                 <TextBlock Text="⚗"
-                           FontSize="{StaticResource FontSize.Display}"
+                           FontSize="{DynamicResource FontSize.Display}"
                            HorizontalAlignment="Center"
                            Foreground="{DynamicResource Brush.Text.Highlight}"/>
 
                 <TextBlock Text="{DynamicResource TestMode_Message}"
                            Foreground="{DynamicResource Brush.Text.Primary}"
-                           FontSize="{StaticResource FontSize.Medium}"
+                           FontSize="{DynamicResource FontSize.Medium}"
                            TextWrapping="Wrap"
                            TextAlignment="Center"
                            MaxWidth="380"/>
@@ -36,7 +36,7 @@
                         HorizontalAlignment="Center"
                         Background="{DynamicResource Brush.Severity.Error}" Foreground="{DynamicResource Brush.Text.OnAccent}"
                         BorderThickness="0"
-                        Padding="24,8" FontSize="{StaticResource FontSize.Medium}"
+                        Padding="24,8" FontSize="{DynamicResource FontSize.Medium}"
                         ToolTip.Tip="{DynamicResource ToolTip_TestMode_Restore}"
                         AutomationProperties.HelpText="{DynamicResource ToolTip_TestMode_Restore}"/>
 

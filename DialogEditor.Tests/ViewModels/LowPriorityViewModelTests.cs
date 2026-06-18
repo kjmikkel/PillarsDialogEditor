@@ -10,6 +10,12 @@ using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.ViewModels;
 
+file sealed class StubFontScaleApplier : IFontScaleApplier
+{
+    public double? LastApplied { get; private set; }
+    public void Apply(double scale) => LastApplied = scale;
+}
+
 // ── ConnectorViewModel ────────────────────────────────────────────────────────
 
 public class ConnectorViewModelTests
@@ -328,17 +334,16 @@ public class SettingsViewModelTests : IDisposable
     }
 
     [Fact]
-    public void ShowRestartNotice_FalseInitially_TrueAfterChange()
+    public void SelectedFontScale_Change_CallsApplier()
     {
-        AppSettings.FontScale = 1.0;
-        var vm = new SettingsViewModel("/game", new StubFolderPicker());
-        Assert.False(vm.ShowRestartNotice);
-        vm.SelectedFontScale = 1.25;
-        Assert.True(vm.ShowRestartNotice);
+        var applier = new StubFontScaleApplier();
+        var vm = new SettingsViewModel("/game", new StubFolderPicker(), applier);
+        vm.SelectedFontScale = 1.5;
+        Assert.Equal(1.5, applier.LastApplied);
     }
 
     [Fact]
-    public void SelectedFontScale_Change_RaisesPreviewAndRestartNoticeNotifications()
+    public void SelectedFontScale_Change_RaisesPreviewNotifications()
     {
         var vm = new SettingsViewModel("/game", new StubFolderPicker());
         var raised = new List<string?>();
@@ -349,6 +354,5 @@ public class SettingsViewModelTests : IDisposable
         Assert.Contains(nameof(SettingsViewModel.PreviewBodyFontSize), raised);
         Assert.Contains(nameof(SettingsViewModel.PreviewSubtitleFontSize), raised);
         Assert.Contains(nameof(SettingsViewModel.PreviewTitleFontSize), raised);
-        Assert.Contains(nameof(SettingsViewModel.ShowRestartNotice), raised);
     }
 }

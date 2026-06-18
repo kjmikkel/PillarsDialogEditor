@@ -22,14 +22,14 @@
 
             <TextBlock Text="{DynamicResource ThemeOnboarding_Intro}"
                        Foreground="{DynamicResource Brush.Text.Primary}"
-                       FontSize="{StaticResource FontSize.Body}"
+                       FontSize="{DynamicResource FontSize.Body}"
                        TextWrapping="Wrap"/>
 
             <shared:ThemePickerView x:Name="ThemePicker"/>
 
             <TextBlock Text="{DynamicResource ThemeOnboarding_PreviewLabel}"
                        Foreground="{DynamicResource Brush.Text.Muted.Light}"
-                       FontSize="{StaticResource FontSize.Label}" FontWeight="SemiBold"/>
+                       FontSize="{DynamicResource FontSize.Label}" FontWeight="SemiBold"/>
 
             <Border BorderBrush="{DynamicResource Brush.Border.Default}" BorderThickness="1" CornerRadius="3"
                     Padding="8" Background="{DynamicResource Brush.Surface.Inset}">
@@ -48,13 +48,13 @@
                                               Width="9" Height="9" Stretch="Uniform" VerticalAlignment="Center"/>
                                         <TextBlock Text="{DynamicResource ThemeOnboarding_Card_Npc}"
                                                    Foreground="{DynamicResource Brush.Text.OnAccent}"
-                                                   FontSize="{StaticResource FontSize.Label}" FontWeight="SemiBold"/>
+                                                   FontSize="{DynamicResource FontSize.Label}" FontWeight="SemiBold"/>
                                     </StackPanel>
                                 </Border>
                                 <Border Background="{DynamicResource Brush.Node.Npc.Body}" Padding="6">
                                     <TextBlock Text="{DynamicResource ThemeOnboarding_Sample_Npc}"
                                                Foreground="{DynamicResource Brush.Text.OnLight}"
-                                               FontSize="{StaticResource FontSize.Small}" TextWrapping="Wrap"/>
+                                               FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
                                 </Border>
                             </StackPanel>
                         </Border>
@@ -67,13 +67,13 @@
                                               Width="9" Height="9" Stretch="Uniform" VerticalAlignment="Center"/>
                                         <TextBlock Text="{DynamicResource ThemeOnboarding_Card_Player}"
                                                    Foreground="{DynamicResource Brush.Text.OnAccent}"
-                                                   FontSize="{StaticResource FontSize.Label}" FontWeight="SemiBold"/>
+                                                   FontSize="{DynamicResource FontSize.Label}" FontWeight="SemiBold"/>
                                     </StackPanel>
                                 </Border>
                                 <Border Background="{DynamicResource Brush.Node.Player.Body}" Padding="6">
                                     <TextBlock Text="{DynamicResource ThemeOnboarding_Sample_Player}"
                                                Foreground="{DynamicResource Brush.Text.OnLight}"
-                                               FontSize="{StaticResource FontSize.Small}" TextWrapping="Wrap"/>
+                                               FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
                                 </Border>
                             </StackPanel>
                         </Border>
@@ -86,13 +86,13 @@
                                               Width="9" Height="9" Stretch="Uniform" VerticalAlignment="Center"/>
                                         <TextBlock Text="{DynamicResource ThemeOnboarding_Card_Narrator}"
                                                    Foreground="{DynamicResource Brush.Text.OnAccent}"
-                                                   FontSize="{StaticResource FontSize.Label}" FontWeight="SemiBold"/>
+                                                   FontSize="{DynamicResource FontSize.Label}" FontWeight="SemiBold"/>
                                     </StackPanel>
                                 </Border>
                                 <Border Background="{DynamicResource Brush.Node.Narrator.Body}" Padding="6">
                                     <TextBlock Text="{DynamicResource ThemeOnboarding_Sample_Narrator}"
                                                Foreground="{DynamicResource Brush.Text.OnLight}"
-                                               FontSize="{StaticResource FontSize.Small}" TextWrapping="Wrap"/>
+                                               FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
                                 </Border>
                             </StackPanel>
                         </Border>
@@ -103,14 +103,14 @@
                     <StackPanel Orientation="Horizontal" Spacing="8">
                         <Border Background="{DynamicResource Brush.Severity.Warning}" CornerRadius="10" Padding="8,3">
                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                <TextBlock Text="⚠" Foreground="{DynamicResource Brush.Text.OnAccent}" FontSize="{StaticResource FontSize.Label}"/>
-                                <TextBlock Text="{DynamicResource ThemeOnboarding_Badge_Warning}" Foreground="{DynamicResource Brush.Text.OnAccent}" FontSize="{StaticResource FontSize.Label}"/>
+                                <TextBlock Text="⚠" Foreground="{DynamicResource Brush.Text.OnAccent}" FontSize="{DynamicResource FontSize.Label}"/>
+                                <TextBlock Text="{DynamicResource ThemeOnboarding_Badge_Warning}" Foreground="{DynamicResource Brush.Text.OnAccent}" FontSize="{DynamicResource FontSize.Label}"/>
                             </StackPanel>
                         </Border>
                         <Border Background="{DynamicResource Brush.Severity.Error}" CornerRadius="10" Padding="8,3">
                             <StackPanel Orientation="Horizontal" Spacing="4">
-                                <TextBlock Text="⛔" Foreground="{DynamicResource Brush.Text.OnAccent}" FontSize="{StaticResource FontSize.Label}"/>
-                                <TextBlock Text="{DynamicResource ThemeOnboarding_Badge_Error}" Foreground="{DynamicResource Brush.Text.OnAccent}" FontSize="{StaticResource FontSize.Label}"/>
+                                <TextBlock Text="⛔" Foreground="{DynamicResource Brush.Text.OnAccent}" FontSize="{DynamicResource FontSize.Label}"/>
+                                <TextBlock Text="{DynamicResource ThemeOnboarding_Badge_Error}" Foreground="{DynamicResource Brush.Text.OnAccent}" FontSize="{DynamicResource FontSize.Label}"/>
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -122,17 +122,17 @@
                         <Button Content="{DynamicResource ThemeOnboarding_Button_Primary}"
                                 Background="{DynamicResource Brush.Button.Primary.Background}"
                                 Foreground="{DynamicResource Brush.Text.OnAccent}"
-                                BorderThickness="0" Padding="12,5" FontSize="{StaticResource FontSize.Label}"
+                                BorderThickness="0" Padding="12,5" FontSize="{DynamicResource FontSize.Label}"
                                 IsEnabled="False"/>
                         <Button Content="{DynamicResource ThemeOnboarding_Button_Destructive}"
                                 Background="{DynamicResource Brush.Button.Destructive.Background}"
                                 Foreground="{DynamicResource Brush.Text.OnAccent}"
-                                BorderThickness="0" Padding="12,5" FontSize="{StaticResource FontSize.Label}"
+                                BorderThickness="0" Padding="12,5" FontSize="{DynamicResource FontSize.Label}"
                                 IsEnabled="False"/>
                         <Button Content="{DynamicResource ThemeOnboarding_Button_Plain}"
                                 Background="{DynamicResource Brush.Toolbar.Button.Background}"
                                 Foreground="{DynamicResource Brush.Toolbar.Button.Foreground}"
-                                BorderThickness="0" Padding="12,5" FontSize="{StaticResource FontSize.Label}"
+                                BorderThickness="0" Padding="12,5" FontSize="{DynamicResource FontSize.Label}"
                                 IsEnabled="False"/>
                     </StackPanel>
 
