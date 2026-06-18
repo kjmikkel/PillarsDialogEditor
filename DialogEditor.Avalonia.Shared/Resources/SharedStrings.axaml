@@ -56,6 +56,16 @@
     <sys:String x:Key="Theme_Name_Colourblind">Colourblind</sys:String>
     <sys:String x:Key="Theme_Name_HighContrast">High Contrast</sys:String>
 
+    <!-- ─── Language picker — shared by editor and standalone PatchManager ──────── -->
+    <sys:String x:Key="Settings_Language">Language</sys:String>
+    <sys:String x:Key="Settings_LanguageTooltip">Choose the application language. The change is applied immediately and remembered for next time.</sys:String>
+    <sys:String x:Key="Settings_Language_English">English</sys:String>
+
+    <!-- ─── Settings section headers — shared by editor and PatchManagerSettingsWindow ── -->
+    <sys:String x:Key="Settings_AppearanceSection">Appearance</sys:String>
+    <sys:String x:Key="Settings_LanguageSection">Language</sys:String>
+    <sys:String x:Key="Settings_Close">Close</sys:String>
+
     <!-- ─── First-run theme onboarding (Gaps item 15) — shared by editor and standalone PatchManager ── -->
     <sys:String x:Key="ThemeOnboarding_Title">Choose a Theme</sys:String>
     <sys:String x:Key="ThemeOnboarding_Intro">Pick a colour theme below — you can change this anytime later in Settings.</sys:String>
