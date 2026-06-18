@@ -577,19 +577,11 @@ readability", "Item GUID readability", "GlobalVariable autocomplete"), each scop
 single game-data kind with an identified name source — so they can be implemented the same
 way the character case was.
 
-### Font Scale Live Switching
+### ~~Font Scale Live Switching~~ ✓ Implemented
 
-**Deferred from UI Localisation Readiness items 1–3.** `FontScaleApplier` currently runs
-once at startup (restart-required). Making font scaling live requires:
-
-- Converting `{StaticResource FontSize.*}` → `{DynamicResource FontSize.*}` in all views
-  (~349 occurrences across 30 `.axaml` files).
-- Making `FontScaleApplier.Apply` callable at runtime, not just at startup.
-- A `FontScaleService.Revision` tick (mirroring `ThemeService`/`LocaleService`) so
-  text-measurement-dependent layouts reflow when the scale changes.
-- Removing the "takes effect after restart" notice from the font-scale picker in
-  `SettingsWindow`.
-
-The `NoStaticStringResourceTests` enforcer (added in UI Localisation items 1–3) excludes
-`FontSize.*` from its scan (dots are excluded by the underscore heuristic), so this gap
-has a clean path: convert, add the service tick, remove the restart notice.
+Converted 371 `{StaticResource FontSize.*}` → `{DynamicResource FontSize.*}` across 33
+`.axaml` files. Added `FontScaleService.Revision` ticker (mirrors `ThemeService`/
+`LocaleService`). `FontScaleApplier` now implements `IFontScaleApplier` and bumps the
+service on every call. `SettingsViewModel` injects `IFontScaleApplier`, calls it on
+scale change, and the restart notice is removed. `NoStaticFontSizeResourceTests` enforcer
+added to prevent regressions.

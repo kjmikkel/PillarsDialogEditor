@@ -14,13 +14,13 @@
     <Window.Styles>
         <Style Selector="TextBlock.section-header">
             <Setter Property="Foreground"  Value="{DynamicResource Brush.Text.Muted}"/>
-            <Setter Property="FontSize"    Value="{StaticResource FontSize.Small}"/>
+            <Setter Property="FontSize"    Value="{DynamicResource FontSize.Small}"/>
             <Setter Property="FontWeight"  Value="Bold"/>
             <Setter Property="Margin"      Value="0,10,0,4"/>
         </Style>
         <Style Selector="TextBlock.param-label">
             <Setter Property="Foreground"        Value="{DynamicResource Brush.Text.Muted}"/>
-            <Setter Property="FontSize"          Value="{StaticResource FontSize.Label}"/>
+            <Setter Property="FontSize"          Value="{DynamicResource FontSize.Label}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="MinWidth"          Value="110"/>
         </Style>
@@ -29,7 +29,7 @@
             <Setter Property="Foreground"       Value="{DynamicResource Brush.Text.Primary}"/>
             <Setter Property="BorderBrush"      Value="{DynamicResource Brush.Border.Strong}"/>
             <Setter Property="BorderThickness"  Value="1"/>
-            <Setter Property="FontSize"         Value="{StaticResource FontSize.Body}"/>
+            <Setter Property="FontSize"         Value="{DynamicResource FontSize.Body}"/>
             <Setter Property="Padding"          Value="6,4"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
@@ -38,7 +38,7 @@
             <Setter Property="Foreground"       Value="{DynamicResource Brush.Text.Primary}"/>
             <Setter Property="BorderBrush"      Value="{DynamicResource Brush.Border.Strong}"/>
             <Setter Property="BorderThickness"  Value="1"/>
-            <Setter Property="FontSize"         Value="{StaticResource FontSize.Body}"/>
+            <Setter Property="FontSize"         Value="{DynamicResource FontSize.Body}"/>
             <Setter Property="Padding"          Value="6,4"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
@@ -47,7 +47,7 @@
             <Setter Property="Foreground"      Value="{DynamicResource Brush.Text.Secondary}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"         Value="20,6"/>
-            <Setter Property="FontSize"        Value="{StaticResource FontSize.Body}"/>
+            <Setter Property="FontSize"        Value="{DynamicResource FontSize.Body}"/>
             <Setter Property="MinWidth"        Value="90"/>
         </Style>
         <Style Selector="Button.footer-btn.primary">
@@ -70,7 +70,7 @@
                                 <Grid ColumnDefinitions="*,28,28,28">
                                     <TextBlock Grid.Column="0"
                                                Text="{Binding DisplayName}"
-                                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Medium}"
+                                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Medium}"
                                                FontWeight="SemiBold"
                                                VerticalAlignment="Center"/>
                                     <Button Grid.Column="1" Content="↑"
@@ -78,7 +78,7 @@
                                                       RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding}"
                                             Background="Transparent" BorderThickness="0"
-                                            Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Medium}" Padding="4"
+                                            Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Medium}" Padding="4"
                                             ToolTip.Tip="{DynamicResource ToolTip_MoveScriptUp}"
                                             AutomationProperties.HelpText="{DynamicResource ToolTip_MoveScriptUp}"
                                             AutomationProperties.Name="{DynamicResource AutomationName_MoveScriptUp}"/>
@@ -87,7 +87,7 @@
                                                       RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding}"
                                             Background="Transparent" BorderThickness="0"
-                                            Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Medium}" Padding="4"
+                                            Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Medium}" Padding="4"
                                             ToolTip.Tip="{DynamicResource ToolTip_MoveScriptDown}"
                                             AutomationProperties.HelpText="{DynamicResource ToolTip_MoveScriptDown}"
                                             AutomationProperties.Name="{DynamicResource AutomationName_MoveScriptDown}"/>
@@ -96,7 +96,7 @@
                                                       RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding}"
                                             Background="Transparent" BorderThickness="0"
-                                            Foreground="{DynamicResource Brush.Severity.Error}" FontSize="{StaticResource FontSize.Medium}" Padding="4"
+                                            Foreground="{DynamicResource Brush.Severity.Error}" FontSize="{DynamicResource FontSize.Medium}" Padding="4"
                                             ToolTip.Tip="{DynamicResource ToolTip_DeleteScriptRow}"
                                             AutomationProperties.HelpText="{DynamicResource ToolTip_DeleteScriptRow}"
                                             AutomationProperties.Name="{DynamicResource AutomationName_RemoveScript}"/>
@@ -149,14 +149,14 @@
                              MinimumPrefixLength="0"
                              Watermark="{DynamicResource Placeholder_ScriptPicker}"
                              Background="{DynamicResource Brush.Surface.Input}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
-                             FontSize="{StaticResource FontSize.Label}" Padding="6,4" MinWidth="0"
+                             FontSize="{DynamicResource FontSize.Label}" Padding="6,4" MinWidth="0"
                              ToolTip.Tip="{DynamicResource ToolTip_ScriptPicker}"
                              AutomationProperties.HelpText="{DynamicResource ToolTip_ScriptPicker}"
                              AutomationProperties.Name="{DynamicResource Placeholder_ScriptPicker}"/>
                     <Button Grid.Column="1" Content="+ Add"
                             Command="{Binding AddEnterScriptCommand}"
                             Background="{DynamicResource Brush.Node.Script.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
-                            Padding="12,4" Margin="6,0,0,0" FontSize="{StaticResource FontSize.Label}"
+                            Padding="12,4" Margin="6,0,0,0" FontSize="{DynamicResource FontSize.Label}"
                             ToolTip.Tip="{DynamicResource ToolTip_AddScriptEnter}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_AddScriptEnter}"/>
                 </Grid>
@@ -174,14 +174,14 @@
                              MinimumPrefixLength="0"
                              Watermark="{DynamicResource Placeholder_ScriptPicker}"
                              Background="{DynamicResource Brush.Surface.Input}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
-                             FontSize="{StaticResource FontSize.Label}" Padding="6,4" MinWidth="0"
+                             FontSize="{DynamicResource FontSize.Label}" Padding="6,4" MinWidth="0"
                              ToolTip.Tip="{DynamicResource ToolTip_ScriptPicker}"
                              AutomationProperties.HelpText="{DynamicResource ToolTip_ScriptPicker}"
                              AutomationProperties.Name="{DynamicResource Placeholder_ScriptPicker}"/>
                     <Button Grid.Column="1" Content="+ Add"
                             Command="{Binding AddExitScriptCommand}"
                             Background="{DynamicResource Brush.Node.Script.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
-                            Padding="12,4" Margin="6,0,0,0" FontSize="{StaticResource FontSize.Label}"
+                            Padding="12,4" Margin="6,0,0,0" FontSize="{DynamicResource FontSize.Label}"
                             ToolTip.Tip="{DynamicResource ToolTip_AddScriptExit}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_AddScriptExit}"/>
                 </Grid>
@@ -199,14 +199,14 @@
                              MinimumPrefixLength="0"
                              Watermark="{DynamicResource Placeholder_ScriptPicker}"
                              Background="{DynamicResource Brush.Surface.Input}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
-                             FontSize="{StaticResource FontSize.Label}" Padding="6,4" MinWidth="0"
+                             FontSize="{DynamicResource FontSize.Label}" Padding="6,4" MinWidth="0"
                              ToolTip.Tip="{DynamicResource ToolTip_ScriptPicker}"
                              AutomationProperties.HelpText="{DynamicResource ToolTip_ScriptPicker}"
                              AutomationProperties.Name="{DynamicResource Placeholder_ScriptPicker}"/>
                     <Button Grid.Column="1" Content="+ Add"
                             Command="{Binding AddUpdateScriptCommand}"
                             Background="{DynamicResource Brush.Node.Script.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
-                            Padding="12,4" Margin="6,0,0,0" FontSize="{StaticResource FontSize.Label}"
+                            Padding="12,4" Margin="6,0,0,0" FontSize="{DynamicResource FontSize.Label}"
                             ToolTip.Tip="{DynamicResource ToolTip_AddScriptUpdate}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_AddScriptUpdate}"/>
                 </Grid>

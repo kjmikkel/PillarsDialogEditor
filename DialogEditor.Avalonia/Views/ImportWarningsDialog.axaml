@@ -12,7 +12,7 @@
     <StackPanel Margin="20">
 
         <TextBlock Text="{DynamicResource ImportWarnings_Body}"
-                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Body}"
+                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"
                    TextWrapping="Wrap" Margin="0,0,0,12"/>
 
         <Border BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1" CornerRadius="4"
@@ -22,7 +22,7 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <TextBlock Text="{Binding}"
-                                       Foreground="{DynamicResource Brush.Text.Emphasis}" FontSize="{StaticResource FontSize.Body}"
+                                       Foreground="{DynamicResource Brush.Text.Emphasis}" FontSize="{DynamicResource FontSize.Body}"
                                        Padding="8,4"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
@@ -31,14 +31,14 @@
         </Border>
 
         <TextBlock Text="{DynamicResource ImportWarnings_Footer}"
-                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}"
+                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}"
                    TextWrapping="Wrap" Margin="0,0,0,16"/>
 
         <Button x:Name="OkButton"
                 Content="{DynamicResource ImportWarnings_Ok}"
                 HorizontalAlignment="Right"
                 Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
-                Padding="20,6" FontSize="{StaticResource FontSize.Body}"/>
+                Padding="20,6" FontSize="{DynamicResource FontSize.Body}"/>
 
     </StackPanel>
 

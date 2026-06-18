@@ -379,8 +379,8 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     // ── Settings ──────────────────────────────────────────────────────────
-    public SettingsViewModel CreateSettingsViewModel()
-        => new(_currentGameDirectory, _folderPicker);
+    public SettingsViewModel CreateSettingsViewModel(IFontScaleApplier? fontScaleApplier = null)
+        => new(_currentGameDirectory, _folderPicker, fontScaleApplier);
 
     // ── Project — New / Open / Save ───────────────────────────────────────
     [RelayCommand]

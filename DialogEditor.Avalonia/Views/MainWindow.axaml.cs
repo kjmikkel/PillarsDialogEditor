@@ -9,6 +9,7 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using DialogEditor.Avalonia.Services;
 using DialogEditor.Avalonia.Shared.Services;
+using DialogEditor.Avalonia.Shared.Theming;
 using DialogEditor.Patch.Diff;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
@@ -429,7 +430,7 @@ public partial class MainWindow : Window
         var vm = (MainWindowViewModel)DataContext!;
         var settings = new SettingsWindow
         {
-            DataContext = vm.CreateSettingsViewModel()
+            DataContext = vm.CreateSettingsViewModel(new FontScaleApplier())
         };
         await settings.ShowDialog(this);
     }

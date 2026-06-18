@@ -39,4 +39,16 @@ public class FontScaleApplierTests
         foreach (var (key, baseValue) in FontSizeTokens.BaseValues)
             Assert.Equal(baseValue, Size(key));
     }
+
+    [AvaloniaFact]
+    public void Apply_BumpsServiceRevision()
+    {
+        var before = FontScaleService.Current.Revision;
+        try
+        {
+            new FontScaleApplier().Apply(1.25);
+            Assert.True(FontScaleService.Current.Revision > before);
+        }
+        finally { new FontScaleApplier().Apply(1.0); }
+    }
 }

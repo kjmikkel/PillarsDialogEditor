@@ -8,7 +8,7 @@
     <UserControl.Styles>
         <Style Selector="TextBlock.section-label">
             <Setter Property="Foreground"  Value="{DynamicResource Brush.Text.Muted}"/>
-            <Setter Property="FontSize"    Value="{StaticResource FontSize.Small}"/>
+            <Setter Property="FontSize"    Value="{DynamicResource FontSize.Small}"/>
             <Setter Property="FontWeight"  Value="Bold"/>
             <Setter Property="Margin"      Value="0,0,0,4"/>
         </Style>
@@ -17,14 +17,14 @@
             <Setter Property="Foreground"      Value="{DynamicResource Brush.Text.Secondary}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"         Value="10,4"/>
-            <Setter Property="FontSize"        Value="{StaticResource FontSize.Label}"/>
+            <Setter Property="FontSize"        Value="{DynamicResource FontSize.Label}"/>
         </Style>
         <Style Selector="Button.primary-btn">
             <Setter Property="Background"      Value="{DynamicResource Brush.Button.Primary.Background}"/>
             <Setter Property="Foreground"      Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"         Value="20,6"/>
-            <Setter Property="FontSize"        Value="{StaticResource FontSize.Body}"/>
+            <Setter Property="FontSize"        Value="{DynamicResource FontSize.Body}"/>
             <Setter Property="MinWidth"        Value="120"/>
         </Style>
         <Style Selector="TextBox.path-box">
@@ -32,7 +32,7 @@
             <Setter Property="Foreground"      Value="{DynamicResource Brush.Text.Primary}"/>
             <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Border.Strong}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontSize"        Value="{StaticResource FontSize.Label}"/>
+            <Setter Property="FontSize"        Value="{DynamicResource FontSize.Label}"/>
             <Setter Property="Padding"         Value="6,3"/>
             <Setter Property="IsReadOnly"      Value="True"/>
         </Style>
@@ -96,29 +96,29 @@
                                         <StackPanel Grid.Column="0" Spacing="2">
                                             <StackPanel Orientation="Horizontal" Spacing="6">
                                                 <TextBlock Text="{Binding ProjectName}"
-                                                           Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Body}"
+                                                           Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"
                                                            FontWeight="SemiBold"/>
                                                 <TextBlock Text="⚠"
-                                                           Foreground="{DynamicResource Brush.Severity.Warning}" FontSize="{StaticResource FontSize.Body}"
+                                                           Foreground="{DynamicResource Brush.Severity.Warning}" FontSize="{DynamicResource FontSize.Body}"
                                                            VerticalAlignment="Center"
                                                            IsVisible="{Binding HasConflict}"
                                                            ToolTip.Tip="{DynamicResource PatchManager_EntryConflictDetail}"/>
                                                 <TextBlock Text="⚠"
-                                                           Foreground="{DynamicResource Brush.Severity.Error}" FontSize="{StaticResource FontSize.Body}"
+                                                           Foreground="{DynamicResource Brush.Severity.Error}" FontSize="{DynamicResource FontSize.Body}"
                                                            VerticalAlignment="Center"
                                                            IsVisible="{Binding LoadError,
                                                                        Converter={StaticResource NullOrEmptyToVis}}"
                                                            ToolTip.Tip="{Binding LoadError}"/>
                                             </StackPanel>
                                             <TextBlock Text="{Binding DisplayPath}"
-                                                       Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Small}"/>
+                                                       Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Small}"/>
                                         </StackPanel>
                                         <Button Grid.Column="1" Content="↑"
                                                 Command="{Binding DataContext.MoveUpCommand,
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
-                                                Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Medium}" Padding="4"
+                                                Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Medium}" Padding="4"
                                                 ToolTip.Tip="{DynamicResource ToolTip_MoveEntryUp}"
                                                 AutomationProperties.HelpText="{DynamicResource ToolTip_MoveEntryUp}"
                                                 AutomationProperties.Name="{DynamicResource AutomationName_MovePatchUp}"/>
@@ -127,7 +127,7 @@
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
-                                                Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Medium}" Padding="4"
+                                                Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Medium}" Padding="4"
                                                 ToolTip.Tip="{DynamicResource ToolTip_MoveEntryDown}"
                                                 AutomationProperties.HelpText="{DynamicResource ToolTip_MoveEntryDown}"
                                                 AutomationProperties.Name="{DynamicResource AutomationName_MovePatchDown}"/>
@@ -136,7 +136,7 @@
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
                                                 Background="Transparent" BorderThickness="0"
-                                                Foreground="{DynamicResource Brush.Severity.Error}" FontSize="{StaticResource FontSize.Medium}" Padding="4"
+                                                Foreground="{DynamicResource Brush.Severity.Error}" FontSize="{DynamicResource FontSize.Medium}" Padding="4"
                                                 ToolTip.Tip="{DynamicResource ToolTip_RemoveEntry}"
                                                 AutomationProperties.HelpText="{DynamicResource ToolTip_RemoveEntry}"
                                                 AutomationProperties.Name="{DynamicResource AutomationName_RemovePatch}"/>
@@ -147,7 +147,7 @@
                     </ItemsControl>
                 </ScrollViewer>
                 <TextBlock Text="{DynamicResource PatchManager_EmptyHint}"
-                           Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Label}"
+                           Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Label}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"
                            IsVisible="{Binding HasEntries,
                                        Converter={StaticResource InverseBoolToVis}}"/>
@@ -155,7 +155,7 @@
 
             <TextBlock Grid.Row="2"
                        Text="{DynamicResource PatchManager_OrderHint}"
-                       Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Caption}"
+                       Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Caption}"
                        HorizontalAlignment="Center" Margin="0,4,0,0"/>
         </Grid>
 
@@ -165,11 +165,11 @@
                 IsVisible="{Binding HasConflicts}">
             <StackPanel Spacing="4">
                 <TextBlock Text="{Binding StatusText}"
-                           Foreground="{DynamicResource Brush.Severity.Warning}" FontSize="{StaticResource FontSize.Label}" FontWeight="SemiBold"/>
+                           Foreground="{DynamicResource Brush.Severity.Warning}" FontSize="{DynamicResource FontSize.Label}" FontWeight="SemiBold"/>
                 <ItemsControl ItemsSource="{Binding Conflicts}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock FontSize="{StaticResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.Muted.Light}">
+                            <TextBlock FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.Muted.Light}">
                                 <TextBlock.Text>
                                     <MultiBinding StringFormat="  conversation '{0}' · node {1} · {2}">
                                         <Binding Path="ConversationName"/>
@@ -188,7 +188,7 @@
         <Grid Grid.Row="4" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
             <TextBlock Grid.Column="0"
                        Text="{Binding StatusText}"
-                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}"
+                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
                        VerticalAlignment="Center"
                        TextTrimming="CharacterEllipsis"
                        IsVisible="{Binding HasConflicts,

@@ -3,6 +3,67 @@ using System.Text.RegularExpressions;
 namespace DialogEditor.Tests.Theming;
 
 /// <summary>
+/// Enforces that all FontSize.* token references use <c>{DynamicResource}</c> so live font-scale
+/// switching retranslates them without a restart (Gaps item 6 part B).
+/// </summary>
+public class NoStaticFontSizeResourceTests
+{
+    private static string SolutionRoot()
+    {
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "DialogEditor.slnx")))
+            dir = dir.Parent;
+        Assert.NotNull(dir);
+        return dir!.FullName;
+    }
+
+    private static bool IsExcluded(string path, string root)
+    {
+        var segments = Path.GetRelativePath(root, path)
+            .Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+        return segments.Contains("bin") || segments.Contains("obj")
+            || segments.Contains(".worktrees") || segments.Contains("worktrees");
+    }
+
+    // Resource dictionaries may use StaticResource internally for cross-references.
+    private static bool IsResourceDict(string path)
+    {
+        var name = Path.GetFileName(path);
+        return name.Contains("Tokens",   StringComparison.OrdinalIgnoreCase)
+            || name.Contains("Strings",  StringComparison.OrdinalIgnoreCase)
+            || name.StartsWith("Palette",StringComparison.OrdinalIgnoreCase)
+            || name.Equals("App.axaml",  StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static readonly Regex StaticFontSizeRef =
+        new(@"\{StaticResource FontSize\.\w+\}", RegexOptions.Compiled);
+
+    [Fact]
+    public void FontSizeTokensMustUseDynamicResource()
+    {
+        var root      = SolutionRoot();
+        var offenders = new List<string>();
+
+        foreach (var file in Directory.EnumerateFiles(root, "*.axaml", SearchOption.AllDirectories))
+        {
+            if (IsExcluded(file, root)) continue;
+            if (IsResourceDict(file))   continue;
+
+            var lines = File.ReadAllLines(file);
+            for (var i = 0; i < lines.Length; i++)
+                if (StaticFontSizeRef.IsMatch(lines[i]))
+                    offenders.Add($"{Path.GetRelativePath(root, file)}:{i + 1}:  {lines[i].Trim()}");
+        }
+
+        Assert.True(offenders.Count == 0,
+            "FontSize.* tokens must use {DynamicResource} so live font-scale switching works. Offenders:\n" +
+            string.Join("\n", offenders));
+    }
+}
+
+
+
+/// <summary>
 /// The FontSize-token contract enforcer. Bare numeric FontSize values may only appear
 /// in Tokens.axaml (where the FontSize.* tokens are defined); every view, control theme,
 /// and style must bind {StaticResource FontSize.*} instead. See

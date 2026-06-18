@@ -169,7 +169,7 @@
                 <!-- Language selector -->
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal"
                             VerticalAlignment="Center" Margin="4,0,0,0">
-                    <TextBlock Text="{DynamicResource Label_Language}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}"
+                    <TextBlock Text="{DynamicResource Label_Language}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}"
                                VerticalAlignment="Center" Margin="0,0,6,0"
                                IsVisible="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}"/>
                     <ComboBox ItemsSource="{Binding AvailableLanguages}"
@@ -221,24 +221,24 @@
                                           AutomationProperties.HelpText="{DynamicResource ToolTip_PinPanel}"
                                           AutomationProperties.Name="{DynamicResource AutomationName_PinBrowserPanel}"/>
                           <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <TextBlock Text="{DynamicResource Browser_Header}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}" FontWeight="Bold"/>
+                            <TextBlock Text="{DynamicResource Browser_Header}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"/>
                           </StackPanel>
                           <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="0,0,6,0">
                                 <Button Command="{Binding Browser.ExpandAllCommand}" Content="⊞"
                                         Background="Transparent" BorderThickness="0" Foreground="{DynamicResource Brush.Text.Disabled}"
-                                        FontSize="{StaticResource FontSize.Small}" Cursor="Hand"
+                                        FontSize="{DynamicResource FontSize.Small}" Cursor="Hand"
                                         ToolTip.Tip="{DynamicResource ToolTip_ExpandAll}"
                                         AutomationProperties.HelpText="{DynamicResource ToolTip_ExpandAll}"
                                         AutomationProperties.Name="{DynamicResource AutomationName_ExpandAllFolders}"/>
                                 <Button Command="{Binding Browser.CollapseAllCommand}" Content="⊟" Margin="2,0,0,0"
                                         Background="Transparent" BorderThickness="0" Foreground="{DynamicResource Brush.Text.Disabled}"
-                                        FontSize="{StaticResource FontSize.Small}" Cursor="Hand"
+                                        FontSize="{DynamicResource FontSize.Small}" Cursor="Hand"
                                         ToolTip.Tip="{DynamicResource ToolTip_CollapseAll}"
                                         AutomationProperties.HelpText="{DynamicResource ToolTip_CollapseAll}"
                                         AutomationProperties.Name="{DynamicResource AutomationName_CollapseAllFolders}"/>
                                 <Button Command="{Binding NewConversationCommand}" Content="⊕" Margin="4,0,0,0"
                                         Background="Transparent" BorderThickness="0" Foreground="{DynamicResource Brush.Text.Status.New}"
-                                        FontSize="{StaticResource FontSize.Body}" Cursor="Hand"
+                                        FontSize="{DynamicResource FontSize.Body}" Cursor="Hand"
                                         ToolTip.Tip="{DynamicResource ToolTip_NewConversation}"
                                         AutomationProperties.HelpText="{DynamicResource ToolTip_NewConversation}"
                                         AutomationProperties.Name="{DynamicResource AutomationName_NewConversation}"/>
@@ -270,7 +270,7 @@
                                 <RotateTransform Angle="90"/>
                             </LayoutTransformControl.LayoutTransform>
                             <TextBlock Text="{DynamicResource Browser_Header}"
-                                       Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Small}" FontWeight="Bold"/>
+                                       Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"/>
                         </LayoutTransformControl>
                     </Button>
                 </Grid>
@@ -294,9 +294,9 @@
                                     AutomationProperties.HelpText="{DynamicResource ToolTip_TogglePanel}"
                                     AutomationProperties.Name="{DynamicResource AutomationName_CollapseDetailsPanel}"/>
                             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <TextBlock Text="{DynamicResource Label_NodeDetails}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Small}" FontWeight="Bold"/>
+                                <TextBlock Text="{DynamicResource Label_NodeDetails}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"/>
                                 <TextBlock Text="{Binding CurrentConversationName}"
-                                           Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Small}" Margin="6,0,0,0"
+                                           Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Small}" Margin="6,0,0,0"
                                            IsVisible="{Binding CurrentConversationName, Converter={StaticResource NullOrEmptyToVis}}"/>
                             </StackPanel>
                         </DockPanel>
@@ -321,7 +321,7 @@
                             <RotateTransform Angle="90"/>
                         </LayoutTransformControl.LayoutTransform>
                         <TextBlock Text="{DynamicResource Label_NodeDetails}"
-                                   Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{StaticResource FontSize.Small}" FontWeight="Bold"/>
+                                   Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"/>
                     </LayoutTransformControl>
                 </Grid>
             </Grid>
@@ -342,7 +342,7 @@
                            Width="0" Height="0" Opacity="0" IsHitTestVisible="False" ClipToBounds="True"
                            AutomationProperties.LiveSetting="Polite"/>
                 <TextBlock Grid.Column="0" Text="{Binding DisplayStatusText}"
-                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}" VerticalAlignment="Center"/>
+                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
                 <Button Grid.Column="1"
                         Content="{DynamicResource MainWindow_ResolveConflictsButton}"
                         Command="{Binding ResolveConflictsCommand}"
@@ -350,7 +350,7 @@
                         ToolTip.Tip="{DynamicResource MainWindow_ResolveConflictsTooltip}"
                         AutomationProperties.HelpText="{DynamicResource MainWindow_ResolveConflictsTooltip}"
                         Background="{DynamicResource Brush.Button.Caution.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
-                        Padding="12,2" FontSize="{StaticResource FontSize.Label}"/>
+                        Padding="12,2" FontSize="{DynamicResource FontSize.Label}"/>
             </Grid>
         </Border>
     </Grid>

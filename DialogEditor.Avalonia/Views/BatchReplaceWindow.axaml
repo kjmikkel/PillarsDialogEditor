@@ -18,7 +18,7 @@
             <Setter Property="Foreground"      Value="{DynamicResource Brush.Text.Primary}"/>
             <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Border.Strong}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="FontSize"        Value="{StaticResource FontSize.Body}"/>
+            <Setter Property="FontSize"        Value="{DynamicResource FontSize.Body}"/>
             <Setter Property="Padding"         Value="6,3"/>
         </Style>
         <Style Selector="Button.action-btn">
@@ -26,7 +26,7 @@
             <Setter Property="Foreground"      Value="{DynamicResource Brush.Text.Secondary}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"         Value="12,5"/>
-            <Setter Property="FontSize"        Value="{StaticResource FontSize.Body}"/>
+            <Setter Property="FontSize"        Value="{DynamicResource FontSize.Body}"/>
             <Setter Property="MinWidth"        Value="80"/>
         </Style>
         <Style Selector="Button.primary-btn">
@@ -34,12 +34,12 @@
             <Setter Property="Foreground"      Value="White"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"         Value="14,5"/>
-            <Setter Property="FontSize"        Value="{StaticResource FontSize.Body}"/>
+            <Setter Property="FontSize"        Value="{DynamicResource FontSize.Body}"/>
             <Setter Property="MinWidth"        Value="80"/>
         </Style>
         <Style Selector="TextBlock.label">
             <Setter Property="Foreground"        Value="{DynamicResource Brush.Text.Muted}"/>
-            <Setter Property="FontSize"          Value="{StaticResource FontSize.Label}"/>
+            <Setter Property="FontSize"          Value="{DynamicResource FontSize.Label}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="MinWidth"          Value="70"/>
         </Style>
@@ -61,7 +61,7 @@
                 <CheckBox Grid.Column="2" Margin="10,0,0,0"
                           IsChecked="{Binding CaseSensitive, Mode=TwoWay}"
                           Content="{DynamicResource BatchReplace_CaseSensitive}"
-                          Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Label}"
+                          Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Label}"
                           ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_CaseSensitive}"
                           AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_CaseSensitive}"/>
             </Grid>
@@ -79,31 +79,31 @@
             <!-- Search-in toggles -->
             <WrapPanel Orientation="Horizontal">
                 <TextBlock Text="{DynamicResource BatchReplace_SearchIn}"
-                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}"
+                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}"
                            VerticalAlignment="Center" Margin="0,0,8,0"/>
                 <CheckBox IsChecked="{Binding InNodeText, Mode=TwoWay}"
                           Content="{DynamicResource BatchReplace_InNodeText}"
-                          Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}" Margin="0,0,10,0"
+                          Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Label}" Margin="0,0,10,0"
                           ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_InNodeText}"
                           AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_InNodeText}"/>
                 <CheckBox IsChecked="{Binding InSpeakerGuids, Mode=TwoWay}"
                           Content="{DynamicResource BatchReplace_InSpeakerGuids}"
-                          Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}" Margin="0,0,10,0"
+                          Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Label}" Margin="0,0,10,0"
                           ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_InSpeakerGuids}"
                           AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_InSpeakerGuids}"/>
                 <CheckBox IsChecked="{Binding InScriptParams, Mode=TwoWay}"
                           Content="{DynamicResource BatchReplace_InScriptParams}"
-                          Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}" Margin="0,0,10,0"
+                          Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Label}" Margin="0,0,10,0"
                           ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_InScriptParams}"
                           AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_InScriptParams}"/>
                 <CheckBox IsChecked="{Binding InConditionParams, Mode=TwoWay}"
                           Content="{DynamicResource BatchReplace_InConditionParams}"
-                          Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}" Margin="0,0,10,0"
+                          Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Label}" Margin="0,0,10,0"
                           ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_InConditionParams}"
                           AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_InConditionParams}"/>
                 <CheckBox IsChecked="{Binding InLinkChoiceText, Mode=TwoWay}"
                           Content="{DynamicResource BatchReplace_InLinkChoiceText}"
-                          Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{StaticResource FontSize.Label}"
+                          Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Label}"
                           ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_InLinkChoiceText}"
                           AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_InLinkChoiceText}"/>
             </WrapPanel>
@@ -143,12 +143,12 @@
                                               AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_ConvCheckbox}"/>
                                     <TextBlock Grid.Column="1"
                                                Text="{Binding Name}"
-                                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Medium}"
+                                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Medium}"
                                                FontWeight="SemiBold"
                                                VerticalAlignment="Center" Margin="6,0,0,0"/>
                                     <TextBlock Grid.Column="2"
                                                Text="{Binding MatchCount, StringFormat='{}{0} match(es)'}"
-                                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}"
+                                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}"
                                                VerticalAlignment="Center"/>
                                 </Grid>
 
@@ -159,25 +159,25 @@
                                             <Border Padding="6,4" Margin="0,1">
                                                 <StackPanel Spacing="2">
                                                     <TextBlock Text="{Binding FieldPath, StringFormat='Node {NodeId} — {FieldPath}'}"
-                                                               Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{StaticResource FontSize.Label}"/>
+                                                               Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Label}"/>
                                                     <Grid ColumnDefinitions="Auto,*">
                                                         <TextBlock Grid.Column="0"
                                                                    Text="Before: "
-                                                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}"
+                                                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}"
                                                                    VerticalAlignment="Top"/>
                                                         <TextBlock Grid.Column="1"
                                                                    Text="{Binding Before}"
-                                                                   Foreground="{DynamicResource Brush.Text.Status.Error}" FontSize="{StaticResource FontSize.Label}"
+                                                                   Foreground="{DynamicResource Brush.Text.Status.Error}" FontSize="{DynamicResource FontSize.Label}"
                                                                    TextWrapping="Wrap"/>
                                                     </Grid>
                                                     <Grid ColumnDefinitions="Auto,*">
                                                         <TextBlock Grid.Column="0"
                                                                    Text="After:  "
-                                                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}"
+                                                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}"
                                                                    VerticalAlignment="Top"/>
                                                         <TextBlock Grid.Column="1"
                                                                    Text="{Binding After}"
-                                                                   Foreground="{DynamicResource Brush.Text.Status.Success}" FontSize="{StaticResource FontSize.Label}"
+                                                                   Foreground="{DynamicResource Brush.Text.Status.Success}" FontSize="{DynamicResource FontSize.Label}"
                                                                    TextWrapping="Wrap"/>
                                                     </Grid>
                                                 </StackPanel>
@@ -196,7 +196,7 @@
         <!-- ── Status bar ────────────────────────────────────────────────── -->
         <TextBlock Grid.Row="2"
                    Text="{Binding StatusText}"
-                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{StaticResource FontSize.Label}"
+                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}"
                    VerticalAlignment="Center"/>
 
         <!-- Focus hint bar (Gaps item 13) -->

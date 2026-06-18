@@ -11,22 +11,22 @@
     <StackPanel Margin="20">
 
         <TextBlock x:Name="MessageBlock"
-                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{StaticResource FontSize.Medium}"
+                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Medium}"
                    TextWrapping="Wrap" Margin="0,0,0,20"/>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
             <Button x:Name="CancelButton"
                     Content="{DynamicResource UnsavedChanges_Cancel}"
                     Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
-                    Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
+                    Padding="16,6" FontSize="{DynamicResource FontSize.Body}"/>
             <Button x:Name="DiscardButton"
                     Content="{DynamicResource UnsavedChanges_Discard}"
                     Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
-                    Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
+                    Padding="16,6" FontSize="{DynamicResource FontSize.Body}"/>
             <Button x:Name="SaveButton"
                     Content="{DynamicResource UnsavedChanges_Save}"
                     Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
-                    Padding="16,6" FontSize="{StaticResource FontSize.Body}"/>
+                    Padding="16,6" FontSize="{DynamicResource FontSize.Body}"/>
         </StackPanel>
 
     </StackPanel>

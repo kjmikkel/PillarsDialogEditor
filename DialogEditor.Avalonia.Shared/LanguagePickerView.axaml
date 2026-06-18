@@ -12,7 +12,7 @@
                    Foreground="{DynamicResource Brush.Text.Muted.Light}"
                    VerticalAlignment="Center"
                    Width="140"
-                   FontSize="{StaticResource FontSize.Label}"/>
+                   FontSize="{DynamicResource FontSize.Label}"/>
         <ComboBox ItemsSource="{Binding AvailableLanguages}"
                   SelectedItem="{Binding SelectedLanguage, Mode=TwoWay}"
                   MinWidth="160"
