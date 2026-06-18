@@ -272,9 +272,7 @@ after the cheap wins. The rest are independent and can land in any order.
    (unit-tested); thin KeyDown glue in `ConversationView` (headless-tested); key map
    documented in plain language in the Legend window (localized). Design:
    `docs/superpowers/specs/2026-06-12-canvas-keyboard-editing-design.md`.
-   **Deferred follow-up:** keyboard *connection creation* ("connect mode" — pick
-   source, pick target, confirm) remains mouse-only; it needs its own interaction
-   design pass.
+   **Deferred follow-up: ✅ IMPLEMENTED (keyboard connect mode, 2026-06-15).** Ctrl+L or the "Connect to…" context-menu item enters connect mode; arrow keys choose the target; Enter confirms (self/duplicate → silent no-op); Escape cancels; source node shows a dashed border + 🔗 badge (top-left); status bar announces each transition. Design: `docs/superpowers/specs/2026-06-15-connect-mode-design.md`.
 
 5. **Tooltips are the sole explanation channel. ✅ IMPLEMENTED (2026-06-13).** Every
    focusable control's `ToolTip.Tip` is mirrored into `AutomationProperties.HelpText`
