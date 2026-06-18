@@ -478,7 +478,6 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Settings_PatchDirectory">Patch output directory</sys:String>
     <sys:String x:Key="Settings_PatchDirectoryTooltip">Folder where .patch files are written when you save a conversation</sys:String>
     <sys:String x:Key="Settings_Browse">Browse…</sys:String>
-    <sys:String x:Key="Settings_Close">Close</sys:String>
     <sys:String x:Key="Settings_PathNotSet">(not set)</sys:String>
     <sys:String x:Key="Settings_BackupDirectoryTitle">Select backup destination folder</sys:String>
     <sys:String x:Key="Settings_PatchDirectoryTitle">Select patch output folder</sys:String>

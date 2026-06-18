@@ -110,6 +110,9 @@
                        FontSize="{StaticResource FontSize.Small}"
                        IsVisible="{Binding ShowRestartNotice}"/>
 
+            <!-- Language picker (own DataContext set in code-behind; shared with PatchManager) -->
+            <shared:LanguagePickerView x:Name="LanguagePicker"/>
+
             <!-- Theme picker (own DataContext set in code-behind; shared with PatchManager) -->
             <shared:ThemePickerView x:Name="ThemePicker"/>
 
