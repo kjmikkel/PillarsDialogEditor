@@ -4,6 +4,7 @@ using Avalonia.Markup.Xaml;
 using DialogEditor.Avalonia.Shared;
 using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.Avalonia.Shared.Theming;
+using DialogEditor.Core.Resources;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
 
@@ -24,6 +25,12 @@ public partial class App : Application
             // Honour the theme the user picked in the editor (or here) on the previous run,
             // before the first window is built (overrides App.axaml's Dark default).
             new ThemeApplier().Apply(AppSettings.Theme);
+            // Apply the persisted language before the first window is shown.
+            new LanguageApplier(
+                "avares://DialogEditor.Avalonia.Shared/Resources/SharedStrings.{0}.axaml",
+                "avares://DialogEditor.PatchManager/Resources/Strings.{0}.axaml"
+            ).Apply(AppSettings.UiLanguage);
+            CoreLocale.SetCulture(AppSettings.UiLanguage);
 
             // If a .patchlist was passed as a command-line argument, open it immediately
             var args = desktop.Args ?? [];
