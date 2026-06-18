@@ -5,6 +5,7 @@ using DialogEditor.Avalonia.Shared;
 using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.Avalonia.Shared.Theming;
 using DialogEditor.Avalonia.Views;
+using DialogEditor.Core.Resources;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
 
@@ -30,6 +31,12 @@ public partial class App : Application
             // Apply the persisted theme before the first window is shown (overrides the
             // design-time Dark default baked into App.axaml).
             new ThemeApplier().Apply(AppSettings.Theme);
+            // Apply the persisted language before the first window is shown.
+            new LanguageApplier(
+                "avares://DialogEditor.Avalonia.Shared/Resources/SharedStrings.{0}.axaml",
+                "avares://DialogEditor.Avalonia/Resources/Strings.{0}.axaml"
+            ).Apply(AppSettings.UiLanguage);
+            CoreLocale.SetCulture(AppSettings.UiLanguage);
             // Scale FontSize.* tokens before any window is constructed, so every
             // StaticResource FontSize binding (including dialogs opened later this
             // session) resolves the scaled value. Must run after ThemeApplier, which
