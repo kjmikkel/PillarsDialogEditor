@@ -28,6 +28,11 @@ public sealed partial class AboutViewModel : ObservableObject
         Version = version;
         RepositoryUrl = repositoryUrl;
         DocsUrl = docsUrl;
+        LocaleService.Current.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(LocaleService.Revision))
+                OnPropertyChanged(string.Empty);
+        };
     }
 
     [RelayCommand] private void OpenRepository() => Open(RepositoryUrl);

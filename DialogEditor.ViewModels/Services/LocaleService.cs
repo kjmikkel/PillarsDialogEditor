@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace DialogEditor.Avalonia.Shared.Theming;
+namespace DialogEditor.ViewModels.Services;
 
 /// <summary>
 /// Process-wide "the language just changed" ticker. <see cref="Revision"/> is bumped on
@@ -17,5 +17,5 @@ public sealed partial class LocaleService : ObservableObject
 
     [ObservableProperty] private int _revision;
 
-    internal void Bump() => Revision++;
+    public void Bump() => Revision++;
 }
