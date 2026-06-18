@@ -24,6 +24,11 @@ public partial class ConversationViewModel : ObservableObject
     {
         _dispatcher       = dispatcher;
         PendingConnection = new PendingConnectionViewModel(this);
+        LocaleService.Current.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(LocaleService.Revision))
+                OnPropertyChanged(string.Empty);
+        };
         Nodes.CollectionChanged += (_, args) =>
         {
             if (args.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)

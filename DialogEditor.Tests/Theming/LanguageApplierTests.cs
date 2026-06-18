@@ -2,6 +2,7 @@ using Avalonia;
 using Avalonia.Headless.XUnit;
 using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.Avalonia.Shared.Theming;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.Theming;
 
