@@ -123,11 +123,11 @@
                                                               ToolTip.Tip="{Binding TypeHint}"
                                                               AutomationProperties.Name="{Binding Name}"/>
                                                 <AutoCompleteBox Grid.Column="1" Classes="param-input"
-                                                              ItemsSource="{Binding GuidSuggestions}"
+                                                              ItemsSource="{Binding Suggestions}"
                                                               Text="{Binding Value, Mode=TwoWay}"
                                                               FilterMode="Contains"
                                                               MinimumPrefixLength="0"
-                                                              IsVisible="{Binding IsGuidType}"
+                                                              IsVisible="{Binding HasLookup}"
                                                               ToolTip.Tip="{Binding TypeHint}"
                                                               AutomationProperties.HelpText="{Binding TypeHint}"
                                                               AutomationProperties.Name="{Binding Name}"/>
