@@ -13,6 +13,7 @@
       {
         "name": "Tag",
         "type": "GlobalVariable",
+        "lookupKind": "GlobalVariable",
         "description": "Name of the global variable to set.",
         "default": "GlobalTag"
       },
@@ -55,6 +56,7 @@
       {
         "name": "Quest GUID",
         "type": "Guid",
+        "lookupKind": "Quest",
         "description": "GameData GUID of the quest to start.",
         "default": ""
       }
@@ -91,6 +93,7 @@
       {
         "name": "Quest GUID",
         "type": "Guid",
+        "lookupKind": "Quest",
         "description": "GameData GUID of the quest to advance.",
         "default": ""
       }
@@ -133,6 +136,7 @@
       {
         "name": "Quest GUID",
         "type": "Guid",
+        "lookupKind": "Quest",
         "description": "GameData GUID of the quest.",
         "default": ""
       },
@@ -181,6 +185,7 @@
       {
         "name": "Quest GUID",
         "type": "Guid",
+        "lookupKind": "Quest",
         "description": "GameData GUID of the quest.",
         "default": ""
       },
@@ -243,6 +248,7 @@
       {
         "name": "Item Name",
         "type": "String",
+        "lookupKind": "Item",
         "description": "Internal prefab name of the item.",
         "default": "ItemName"
       },
@@ -267,6 +273,7 @@
       {
         "name": "Item GUID",
         "type": "Guid",
+        "lookupKind": "Item",
         "description": "GameData GUID of the item to give.",
         "default": ""
       },
@@ -291,6 +298,7 @@
       {
         "name": "Item Name",
         "type": "String",
+        "lookupKind": "Item",
         "description": "Internal prefab name of the item to remove.",
         "default": "ItemName"
       }
@@ -309,6 +317,7 @@
       {
         "name": "Item Name",
         "type": "String",
+        "lookupKind": "Item",
         "description": "Internal prefab name of the item to remove.",
         "default": "ItemName"
       },
@@ -333,6 +342,7 @@
       {
         "name": "Item GUID",
         "type": "Guid",
+        "lookupKind": "Item",
         "description": "GameData GUID of the item to remove.",
         "default": ""
       },
@@ -438,6 +448,7 @@
       {
         "name": "Disposition GUID",
         "type": "Guid",
+        "lookupKind": "Disposition",
         "description": "GameData GUID of the disposition type.",
         "default": ""
       },
@@ -524,6 +535,7 @@
       {
         "name": "Conversation GUID",
         "type": "Guid",
+        "lookupKind": "Conversation",
         "description": "GameData GUID of the conversation.",
         "default": ""
       },
@@ -992,6 +1004,7 @@
       {
         "name": "Map GUID",
         "type": "Guid",
+        "lookupKind": "Map",
         "description": "GameData GUID of the destination area (find in the game data files).",
         "default": ""
       },
@@ -1383,6 +1396,7 @@
       {
         "name": "Speaker",
         "type": "ObjectGuid",
+        "lookupKind": "Speaker",
         "description": "GUID of the NPC who will speak.",
         "default": ""
       },
@@ -1413,12 +1427,14 @@
       {
         "name": "Speaker",
         "type": "ObjectGuid",
+        "lookupKind": "Speaker",
         "description": "GUID of the NPC who will speak.",
         "default": ""
       },
       {
         "name": "Conversation GUID",
         "type": "Guid",
+        "lookupKind": "Conversation",
         "description": "GameData GUID of the conversation asset.",
         "default": ""
       },
@@ -1443,6 +1459,7 @@
       {
         "name": "Speaker",
         "type": "ObjectGuid",
+        "lookupKind": "Speaker",
         "description": "GUID of the NPC who will speak.",
         "default": ""
       },
@@ -1473,12 +1490,14 @@
       {
         "name": "Speaker",
         "type": "ObjectGuid",
+        "lookupKind": "Speaker",
         "description": "GUID of the NPC who will speak.",
         "default": ""
       },
       {
         "name": "Conversation GUID",
         "type": "Guid",
+        "lookupKind": "Conversation",
         "description": "GameData GUID of the conversation asset.",
         "default": ""
       },
