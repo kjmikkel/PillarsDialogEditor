@@ -14,7 +14,8 @@
         "name": "Tag",
         "type": "GlobalVariable",
         "description": "Name of the global variable to query.",
-        "default": "GlobalTag"
+        "default": "GlobalTag",
+        "lookupKind": "GlobalVariable"
       },
       {
         "name": "Operator",
@@ -45,7 +46,8 @@
         "name": "Global 1",
         "type": "GlobalVariable",
         "description": "First global variable.",
-        "default": "GlobalTag1"
+        "default": "GlobalTag1",
+        "lookupKind": "GlobalVariable"
       },
       {
         "name": "Operator",
@@ -57,7 +59,8 @@
         "name": "Global 2",
         "type": "GlobalVariable",
         "description": "Second global variable.",
-        "default": "GlobalTag2"
+        "default": "GlobalTag2",
+        "lookupKind": "GlobalVariable"
       }
     ]
   },
@@ -214,7 +217,8 @@
         "name": "Companion",
         "type": "ObjectGuid",
         "description": "GUID of the companion object.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       }
     ]
   },
@@ -245,7 +249,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "GUID of the object to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       }
     ]
   },
@@ -294,7 +299,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Class",
@@ -533,7 +539,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Skill Type",
@@ -577,13 +584,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": "b1a8e901-0000-0000-0000-000000000000"
+        "default": "b1a8e901-0000-0000-0000-000000000000",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Skill Type",
         "type": "GameData",
         "description": "Skill GameData GUID (e.g. 90b913bb-960f-4f6c-8394-d01796148367 for Athletics).",
-        "default": "90b913bb-960f-4f6c-8394-d01796148367"
+        "default": "90b913bb-960f-4f6c-8394-d01796148367",
+        "lookupKind": "Skill"
       },
       {
         "name": "Operator",
@@ -687,7 +696,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Operator",
@@ -717,7 +727,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Ability Name",
@@ -741,7 +752,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Deity",
@@ -772,7 +784,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Order",
@@ -1016,7 +1029,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Item Name",
@@ -1234,7 +1248,8 @@
         "name": "Skill Type",
         "type": "GameData",
         "description": "Skill GameData GUID (e.g. 90b913bb-960f-4f6c-8394-d01796148367 for Athletics).",
-        "default": "90b913bb-960f-4f6c-8394-d01796148367"
+        "default": "90b913bb-960f-4f6c-8394-d01796148367",
+        "lookupKind": "Skill"
       },
       {
         "name": "Skill Operator",
@@ -1343,13 +1358,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Keyword",
         "type": "GameData",
         "description": "Keyword GUID.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Keyword"
       }
     ]
   },
@@ -1367,13 +1384,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Status Effect",
         "type": "GameData",
         "description": "Status effect GUID.",
-        "default": ""
+        "default": "",
+        "lookupKind": "StatusEffect"
       }
     ]
   },
@@ -1442,7 +1461,8 @@
         "name": "Quest GUID",
         "type": "Guid",
         "description": "GameData GUID of the quest.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Quest"
       },
       {
         "name": "Node ID",
@@ -1466,7 +1486,8 @@
         "name": "Quest GUID",
         "type": "Guid",
         "description": "GameData GUID of the quest.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Quest"
       },
       {
         "name": "Event ID",
@@ -1490,7 +1511,8 @@
         "name": "Quest GUID",
         "type": "Guid",
         "description": "GameData GUID of the quest.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Quest"
       },
       {
         "name": "Addendum ID",
@@ -1514,7 +1536,8 @@
         "name": "Quest GUID",
         "type": "Guid",
         "description": "GameData GUID of the quest.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Quest"
       },
       {
         "name": "End State ID",
@@ -1538,7 +1561,8 @@
         "name": "Quest GUID",
         "type": "Guid",
         "description": "GameData GUID of the quest.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Quest"
       }
     ]
   },
@@ -1556,7 +1580,8 @@
         "name": "Quest GUID",
         "type": "Guid",
         "description": "GameData GUID of the quest.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Quest"
       }
     ]
   },
@@ -1574,7 +1599,8 @@
         "name": "Quest GUID",
         "type": "Guid",
         "description": "GameData GUID of the quest.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Quest"
       }
     ]
   },
@@ -1592,7 +1618,8 @@
         "name": "Quest GUID",
         "type": "Guid",
         "description": "GameData GUID of the quest.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Quest"
       }
     ]
   },
@@ -1610,7 +1637,8 @@
         "name": "Conversation GUID",
         "type": "Guid",
         "description": "GameData GUID of the conversation.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Conversation"
       },
       {
         "name": "Node ID",
@@ -1634,7 +1662,8 @@
         "name": "Item GUID",
         "type": "Guid",
         "description": "GameData GUID of the item.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Item"
       },
       {
         "name": "Operator",
@@ -1664,13 +1693,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Item GUID",
         "type": "Guid",
         "description": "GameData GUID of the item.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Item"
       }
     ]
   },
@@ -1688,13 +1719,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Class GUID",
         "type": "GameData",
         "description": "GameData GUID of the class.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Class"
       }
     ]
   },
@@ -1712,13 +1745,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Race GUID",
         "type": "GameData",
         "description": "GameData GUID of the race.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Race"
       }
     ]
   },
@@ -1736,13 +1771,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Ability GUID",
         "type": "GameData",
         "description": "GameData GUID of the ability.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Ability"
       }
     ]
   },
@@ -1760,7 +1797,8 @@
         "name": "Disposition GUID",
         "type": "GameData",
         "description": "GameData GUID of the disposition type.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Disposition"
       },
       {
         "name": "Rank",
@@ -1810,7 +1848,8 @@
           "1346f12d-ca42-4add-9599-aa3fe72f5e53",
           "0e5d53f8-8d15-4b45-9565-dc063cb24d30",
           "08abadbb-1d2e-4a3c-a8ca-0dbb19379428"
-        ]
+        ],
+        "lookupKind": "Faction"
       },
       {
         "name": "Rank Type",
@@ -1852,7 +1891,8 @@
         "name": "Companion",
         "type": "ObjectGuid",
         "description": "GUID of the companion to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       }
     ]
   },
@@ -1870,7 +1910,8 @@
         "name": "Companion",
         "type": "ObjectGuid",
         "description": "GUID of the companion to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       }
     ]
   },
@@ -1954,7 +1995,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Gender",
@@ -1983,13 +2025,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Deity GUID",
         "type": "GameData",
         "description": "GameData GUID of the deity.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Deity"
       }
     ]
   },
@@ -2007,7 +2051,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Order GUID",
@@ -2055,7 +2100,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Attribute",
@@ -2705,13 +2751,15 @@
         "name": "Object 1",
         "type": "ObjectGuid",
         "description": "First object GUID.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Object 2",
         "type": "ObjectGuid",
         "description": "Second object GUID.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       }
     ]
   },
@@ -2768,7 +2816,8 @@
         "name": "Companion",
         "type": "ObjectGuid",
         "description": "GUID of the companion to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Slot",
@@ -2793,7 +2842,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Object to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       }
     ]
   },
@@ -2812,7 +2862,8 @@
         "name": "Perceiver",
         "type": "ObjectGuid",
         "description": "Object that is doing the perceiving.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Check Any Party Member",
@@ -2837,13 +2888,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Object to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Collider Object",
         "type": "ObjectGuid",
         "description": "Volume collider to test against.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       }
     ]
   },
@@ -2881,13 +2934,15 @@
         "name": "Object A",
         "type": "ObjectGuid",
         "description": "First object.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Object B",
         "type": "ObjectGuid",
         "description": "Second object.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Operator",
@@ -2956,7 +3011,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Operator",
@@ -2987,7 +3043,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Operator",
@@ -3017,7 +3074,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Operator",
@@ -3047,7 +3105,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Operator",
@@ -3077,7 +3136,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character or container to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Item Name",
@@ -3113,7 +3173,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Weapon Type",
@@ -3165,7 +3226,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Armor Type",
@@ -3235,13 +3297,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character or container to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Item GUID",
         "type": "GameData",
         "description": "GameData GUID of the item.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Item"
       },
       {
         "name": "Operator",
@@ -3271,13 +3335,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Weapon Type",
         "type": "GameData",
         "description": "GameData GUID of the weapon type.",
-        "default": ""
+        "default": "",
+        "lookupKind": "WeaponType"
       }
     ]
   },
@@ -3295,13 +3361,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Armor Type",
         "type": "GameData",
         "description": "GameData GUID of the armor type.",
-        "default": ""
+        "default": "",
+        "lookupKind": "ArmorType"
       }
     ]
   },
@@ -3319,7 +3387,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Attribute",
@@ -3407,7 +3476,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Defense Type",
@@ -3485,7 +3555,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Skill",
@@ -3632,7 +3703,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Check Index",
@@ -3656,7 +3728,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Race",
@@ -3693,7 +3766,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Subrace",
@@ -3736,7 +3810,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Gender",
@@ -3795,7 +3870,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Culture",
@@ -3832,7 +3908,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Background",
@@ -3898,7 +3975,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Ability Name String ID",
@@ -3946,7 +4024,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Operator",
@@ -3976,13 +4055,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "First character.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Object 2",
         "type": "ObjectGuid",
         "description": "Second character to compare against.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Operator",
@@ -4006,13 +4087,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "First character.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Object 2",
         "type": "ObjectGuid",
         "description": "Second character to compare against.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Operator",
@@ -4036,13 +4119,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Skill Type",
         "type": "GameData",
         "description": "Skill GameData GUID.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Skill"
       },
       {
         "name": "Operator",
@@ -4084,13 +4169,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Subrace GUID",
         "type": "GameData",
         "description": "GameData GUID of the subrace.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Subrace"
       }
     ]
   },
@@ -4108,7 +4195,8 @@
         "name": "Subrace GUID",
         "type": "GameData",
         "description": "GameData GUID of the subrace.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Subrace"
       }
     ]
   },
@@ -4126,7 +4214,8 @@
         "name": "Race GUID",
         "type": "GameData",
         "description": "GameData GUID of the race.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Race"
       }
     ]
   },
@@ -4167,13 +4256,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Culture GUID",
         "type": "GameData",
         "description": "GameData GUID of the culture.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Culture"
       }
     ]
   },
@@ -4191,13 +4282,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Background GUID",
         "type": "GameData",
         "description": "GameData GUID of the background.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Background"
       }
     ]
   },
@@ -4215,7 +4308,8 @@
         "name": "Background GUID",
         "type": "GameData",
         "description": "GameData GUID of the background.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Background"
       }
     ]
   },
@@ -4233,7 +4327,8 @@
         "name": "Culture GUID",
         "type": "GameData",
         "description": "GameData GUID of the culture.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Culture"
       }
     ]
   },
@@ -4251,13 +4346,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Phrase",
         "type": "GameData",
         "description": "GameData GUID of the phrase.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Phrase"
       }
     ]
   },
@@ -4293,7 +4390,8 @@
         "name": "Ability",
         "type": "GameData",
         "description": "GameData GUID of the ability.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Ability"
       }
     ]
   },
@@ -4311,13 +4409,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Creature Type",
         "type": "GameData",
         "description": "GameData GUID of the creature type.",
-        "default": ""
+        "default": "",
+        "lookupKind": "CreatureType"
       }
     ]
   },
@@ -4335,7 +4435,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       }
     ]
   },
@@ -4353,7 +4454,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Chanter to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Operator",
@@ -4383,7 +4485,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Ranger character.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Operator",
@@ -4413,7 +4516,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Ranger character.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       }
     ]
   },
@@ -4431,7 +4535,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       }
     ]
   },
@@ -4449,13 +4554,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Class",
         "type": "GameData",
         "description": "GameData GUID of the class.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Class"
       },
       {
         "name": "Operator",
@@ -4485,13 +4592,15 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Character to test.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Class",
         "type": "GameData",
         "description": "GameData GUID of the class.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Class"
       },
       {
         "name": "Operator",
@@ -4559,7 +4668,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Faction object to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Axis",
@@ -4594,7 +4704,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Faction object to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Axis",
@@ -4736,7 +4847,8 @@
         "name": "Schedule Character",
         "type": "ObjectGuid",
         "description": "Character whose schedule to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Speaker"
       },
       {
         "name": "Time Slice Name",
