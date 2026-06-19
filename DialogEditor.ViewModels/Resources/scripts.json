@@ -456,7 +456,8 @@
         "name": "Strength GUID",
         "type": "Guid",
         "description": "GameData GUID of the strength entry.",
-        "default": ""
+        "default": "",
+        "lookupKind": "DispositionStrength"
       }
     ]
   },
