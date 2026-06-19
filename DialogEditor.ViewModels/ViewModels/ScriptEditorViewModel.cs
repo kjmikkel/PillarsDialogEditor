@@ -33,6 +33,7 @@ public partial class ScriptRowViewModel : ObservableObject
                     Description = p.Description,
                     Type        = p.Type,
                     Options     = p.Options,
+                    LookupKind  = p.LookupKind ?? string.Empty,
                     Value       = i < call.Parameters.Count ? call.Parameters[i] : p.Default,
                 }));
         }

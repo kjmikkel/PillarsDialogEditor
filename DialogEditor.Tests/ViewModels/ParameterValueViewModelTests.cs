@@ -1,109 +1,93 @@
+// DialogEditor.Tests/ViewModels/ParameterValueViewModelTests.cs
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Services;
+using Xunit;
 
 namespace DialogEditor.Tests.ViewModels;
 
-/// <summary>
-/// Tests for <see cref="ParameterValueViewModel"/> GUID-type behaviour:
-/// <c>IsGuidType</c>, <c>GuidSuggestions</c>, and display-string normalisation.
-/// </summary>
 public class ParameterValueViewModelTests : IDisposable
 {
-    // Reset speaker data after each test so static state doesn't bleed between tests.
-    public void Dispose() => SpeakerNameService.Register(new Dictionary<string, string>());
-
-    private static ParameterValueViewModel Make(string type, string value = "") =>
-        new() { Name = "p", Description = "", Type = type, Value = value };
-
-    // ── IsGuidType ────────────────────────────────────────────────────────────
-
-    [Fact]
-    public void IsGuidType_True_ForObjectGuidType()
-        => Assert.True(Make("ObjectGuid").IsGuidType);
-
-    [Fact]
-    public void IsGuidType_True_ForGuidType()
-        => Assert.True(Make("Guid").IsGuidType);
-
-    [Fact]
-    public void IsGuidType_False_ForGameDataType()
-        => Assert.False(Make("GameData").IsGuidType);
-
-    [Fact]
-    public void IsGuidType_False_ForStringType()
-        => Assert.False(Make("String").IsGuidType);
-
-    // ── IsText excludes GUID types ────────────────────────────────────────────
-
-    [Fact]
-    public void IsText_False_ForObjectGuidType()
-        => Assert.False(Make("ObjectGuid").IsText);
-
-    [Fact]
-    public void IsText_False_ForGuidType()
-        => Assert.False(Make("Guid").IsText);
-
-    // ── GuidSuggestions ───────────────────────────────────────────────────────
-
-    [Fact]
-    public void GuidSuggestions_ContainsBuiltInPlayer()
+    public void Dispose()
     {
-        var vm = Make("ObjectGuid");
-        Assert.Contains(vm.GuidSuggestions, s => s.Contains("Player"));
+        SpeakerNameService.Register(new Dictionary<string, string>());
+        GameDataNameService.Clear();
+    }
+
+    private static ParameterValueViewModel Make(
+        string type, string lookupKind = "", string value = "") =>
+        new() { Name = "p", Description = "", Type = type,
+                LookupKind = lookupKind, Value = value };
+
+    // ── HasLookup ──────────────────────────────────────────────────────────
+
+    [Fact]
+    public void HasLookup_EmptyLookupKind_ReturnsFalse()
+        => Assert.False(Make("Guid").HasLookup);
+
+    [Fact]
+    public void HasLookup_NonEmptyLookupKind_ReturnsTrue()
+        => Assert.True(Make("Guid", "Quest").HasLookup);
+
+    // ── IsText ─────────────────────────────────────────────────────────────
+
+    [Fact]
+    public void IsText_True_WhenNoLookupAndNotEnum()
+        => Assert.True(Make("String").IsText);
+
+    [Fact]
+    public void IsText_False_WhenHasLookup()
+        => Assert.False(Make("GlobalVariable", "GlobalVariable").IsText);
+
+    [Fact]
+    public void IsText_False_WhenEnum()
+        => Assert.False(Make("Boolean").IsText);
+
+    // ── Suggestions ────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Suggestions_EmptyWhenNoLookup()
+        => Assert.Empty(Make("Guid").Suggestions);
+
+    [Fact]
+    public void Suggestions_ReturnsDisplayNames_FromRegisteredKind()
+    {
+        GameDataNameService.Register("Quest",
+            [new NamedEntry("A Quest — cccccccc-0000-0000-0000-000000000003",
+                            "cccccccc-0000-0000-0000-000000000003")]);
+        Assert.Equal(
+            ["A Quest — cccccccc-0000-0000-0000-000000000003"],
+            Make("Guid", "Quest").Suggestions);
     }
 
     [Fact]
-    public void GuidSuggestions_ContainsBuiltInNarrator()
-    {
-        var vm = Make("ObjectGuid");
-        Assert.Contains(vm.GuidSuggestions, s => s.Contains("Narrator"));
-    }
+    public void Suggestions_EmptyWhenKindNotRegistered()
+        => Assert.Empty(Make("Guid", "Quest").Suggestions);
+
+    // ── OnValueChanged normalisation ───────────────────────────────────────
 
     [Fact]
-    public void GuidSuggestions_FormatContainsBothNameAndGuid()
+    public void Value_WritesStoredValue_WhenDisplayNameSelected()
     {
-        SpeakerNameService.Register(new Dictionary<string, string>
-        {
-            { "aaaaaaaa-0000-0000-0000-000000000001", "Edér" },
-        });
-        var vm = Make("ObjectGuid");
-        var match = vm.GuidSuggestions.Single(s => s.Contains("Edér"));
-        Assert.Contains("aaaaaaaa-0000-0000-0000-000000000001", match);
-    }
-
-    [Fact]
-    public void GuidSuggestions_SearchableByGuidFragment()
-    {
-        SpeakerNameService.Register(new Dictionary<string, string>
-        {
-            { "aaaaaaaa-0000-0000-0000-000000000001", "Edér" },
-        });
-        var vm = Make("ObjectGuid");
-        // The suggestion string must contain the GUID so filtering by GUID prefix works
-        Assert.Contains(vm.GuidSuggestions, s => s.Contains("aaaaaaaa"));
-    }
-
-    // ── Value normalisation ───────────────────────────────────────────────────
-
-    [Fact]
-    public void Value_NormalizesDisplayStringToGuid_WhenGuidType()
-    {
-        var vm = Make("ObjectGuid");
-        vm.Value = "Player — b1a8e901-0000-0000-0000-000000000000";
-        Assert.Equal("b1a8e901-0000-0000-0000-000000000000", vm.Value);
-    }
-
-    [Fact]
-    public void Value_NotNormalized_WhenRawGuid()
-    {
-        var vm = Make("ObjectGuid");
-        var guid = "b1a8e901-0000-0000-0000-000000000000";
-        vm.Value = guid;
+        const string guid = "cccccccc-0000-0000-0000-000000000003";
+        GameDataNameService.Register("Quest",
+            [new NamedEntry($"A Quest — {guid}", guid)]);
+        var vm = Make("Guid", "Quest");
+        vm.Value = $"A Quest — {guid}";
         Assert.Equal(guid, vm.Value);
     }
 
     [Fact]
-    public void Value_NotNormalized_ForNonGuidType()
+    public void Value_PreservesRaw_WhenNoMatchingEntry()
+    {
+        GameDataNameService.Register("Quest",
+            [new NamedEntry("A Quest — abc", "abc")]);
+        var vm = Make("Guid", "Quest");
+        vm.Value = "00000000-0000-0000-0000-999999999999";
+        Assert.Equal("00000000-0000-0000-0000-999999999999", vm.Value);
+    }
+
+    [Fact]
+    public void Value_Unchanged_WhenNoLookup()
     {
         var vm = Make("String");
         vm.Value = "Something — not-a-guid";
@@ -111,10 +95,27 @@ public class ParameterValueViewModelTests : IDisposable
     }
 
     [Fact]
-    public void Value_NotNormalized_WhenSeparatorButInvalidGuid()
+    public void Value_WritesStoredValue_ForStringKind()
     {
-        var vm = Make("ObjectGuid");
-        vm.Value = "Player — not-actually-a-guid";
-        Assert.Equal("Player — not-actually-a-guid", vm.Value);
+        // For GlobalVariable: DisplayName == StoredValue, so lookup is identity.
+        GameDataNameService.Register("GlobalVariable",
+            [new NamedEntry("npc_met_eder", "npc_met_eder")]);
+        var vm = Make("GlobalVariable", "GlobalVariable");
+        vm.Value = "npc_met_eder";
+        Assert.Equal("npc_met_eder", vm.Value);
+    }
+
+    // ── Speaker lookup ─────────────────────────────────────────────────────
+
+    [Fact]
+    public void Suggestions_ContainsBuiltins_WhenSpeakerKindRegistered()
+    {
+        var speakers = SpeakerNameService.All
+            .Select(s => new NamedEntry($"{s.Name} — {s.Guid}", s.Guid))
+            .ToList();
+        GameDataNameService.Register("Speaker", speakers);
+        var vm = Make("ObjectGuid", "Speaker");
+        Assert.Contains(vm.Suggestions, s => s.Contains("Player"));
+        Assert.Contains(vm.Suggestions, s => s.Contains("Narrator"));
     }
 }
