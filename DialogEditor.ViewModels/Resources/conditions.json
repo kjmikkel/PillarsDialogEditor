@@ -2058,7 +2058,8 @@
         "name": "Order GUID",
         "type": "GameData",
         "description": "GameData GUID of the Paladin order.",
-        "default": ""
+        "default": "",
+        "lookupKind": "PaladinOrder"
       }
     ]
   },
