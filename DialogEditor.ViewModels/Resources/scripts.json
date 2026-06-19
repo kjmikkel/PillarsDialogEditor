@@ -248,7 +248,6 @@
       {
         "name": "Item Name",
         "type": "String",
-        "lookupKind": "Item",
         "description": "Internal prefab name of the item.",
         "default": "ItemName"
       },
@@ -298,7 +297,6 @@
       {
         "name": "Item Name",
         "type": "String",
-        "lookupKind": "Item",
         "description": "Internal prefab name of the item to remove.",
         "default": "ItemName"
       }
@@ -317,7 +315,6 @@
       {
         "name": "Item Name",
         "type": "String",
-        "lookupKind": "Item",
         "description": "Internal prefab name of the item to remove.",
         "default": "ItemName"
       },
