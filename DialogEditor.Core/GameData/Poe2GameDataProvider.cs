@@ -74,6 +74,10 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
             ? Poe2SpeakerNameParser.ParseFile(SpeakersBundle)
             : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
+    // Stub: real implementation will parse gamedatabundle files per LookupKind.
+    public IReadOnlyDictionary<string, IReadOnlyList<GameDataEntry>> LoadGameDataNames()
+        => new Dictionary<string, IReadOnlyList<GameDataEntry>>();
+
     public (string ConversationsRoot, string StringTablesRoot) GetBackupRoots()
         => (ConversationsRoot, StringTablesRoot);
 

@@ -9,8 +9,9 @@ public record ConditionParameter(
     string Type,
     string Description,
     string Default,
-    IReadOnlyList<string>? Options = null,
-    IReadOnlyList<string>? Values  = null);
+    IReadOnlyList<string>? Options    = null,
+    IReadOnlyList<string>? Values     = null,
+    string?                LookupKind = null);
 
 public record ConditionEntry(
     string MethodName,

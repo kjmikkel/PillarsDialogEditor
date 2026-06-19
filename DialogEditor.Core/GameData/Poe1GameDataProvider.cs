@@ -74,6 +74,10 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
     public IReadOnlyDictionary<string, string> LoadSpeakerNames() =>
         Poe1SpeakerNameParser.ParseFromDisk(ConversationsRoot, CharactersStringtablePath);
 
+    // Stub: real implementation will parse PoE1 game data files per LookupKind.
+    public IReadOnlyDictionary<string, IReadOnlyList<GameDataEntry>> LoadGameDataNames()
+        => new Dictionary<string, IReadOnlyList<GameDataEntry>>();
+
     public (string ConversationsRoot, string StringTablesRoot) GetBackupRoots()
         => (ConversationsRoot, StringTablesRoot);
 
