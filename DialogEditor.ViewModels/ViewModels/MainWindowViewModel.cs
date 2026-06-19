@@ -1008,6 +1008,26 @@ public partial class MainWindowViewModel : ObservableObject
             _provider = provider;
             CurrentConversationName = null;
             SpeakerNameService.Register(provider.LoadSpeakerNames());
+
+            // Populate GameDataNameService for all lookup kinds.
+            // Speaker kind is populated from the already-loaded speaker data to avoid re-parsing.
+            GameDataNameService.Clear();
+            var speakerEntries = SpeakerNameService.All
+                .Select(s => new NamedEntry($"{s.Name} — {s.Guid}", s.Guid))
+                .ToList();
+            GameDataNameService.Register("Speaker", speakerEntries);
+
+            foreach (var (kind, entries) in provider.LoadGameDataNames())
+            {
+                var namedEntries = entries
+                    .Select(e => string.IsNullOrEmpty(e.Id)
+                        ? new NamedEntry(e.Name, e.Name)
+                        : new NamedEntry($"{e.Name} — {e.Id}", e.Id))
+                    .OrderBy(ne => ne.DisplayName)
+                    .ToList();
+                GameDataNameService.Register(kind, namedEntries);
+            }
+
             _activeGameId = provider.GameId;
             Detail.ActiveGameId = provider.GameId;
             AvailableLanguages = provider.AvailableLanguages;
