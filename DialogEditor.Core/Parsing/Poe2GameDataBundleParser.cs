@@ -34,7 +34,8 @@ public static class Poe2GameDataBundleParser
         Func<string, string>? cleanName = null)
     {
         if (!File.Exists(path)) return [];
-        var text = File.ReadAllText(path);
+        var text = File.ReadAllText(path,
+            new System.Text.UTF8Encoding(true));
         return Parse(text, cleanName);
     }
 }
