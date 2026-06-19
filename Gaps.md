@@ -511,42 +511,41 @@ Works identically for PoE1 and PoE2 — both register into the same `SpeakerName
 **Deferred (second pass):** `GameData`, quest, and item GUIDs have no lookup table;
 the "Parameter Readability — Beyond Characters" gap tracks that follow-up survey.
 
-### Parameter Readability — Beyond Characters (PoE2 survey)
-**Follow-up to GUID Parameter Readability; do this after the character case ships.**
-Resolving character GUIDs (`ObjectGuid` → `SpeakerNameService`) is only the first slice.
-Many other script/condition parameters are equally opaque, and before we can give them
-the same name-suggestion treatment we need to know *what kinds of values they are* and
-*where the readable names would come from*. The catalogue's `Type` field is coarse — it
-flattens many distinct game-data kinds into `Guid`/`GameData` — so this gap's first step
-is a **survey**, not implementation.
+### ~~Parameter Readability — Beyond Characters~~ ✓ Implemented
 
-First step (the actual deliverable here): go through `scripts.json` and `conditions.json`
-and, per parameter, record (a) its declared `Type`, (b) the concrete game-data kind it
-actually points at (quest, item, ability, faction, global flag, map, …), and (c) where a
-human-readable name for that kind could be sourced. The flattened types hide this — e.g.
-a `Guid` param on `StartQuest` points at a quest, while a `GameData` param elsewhere
-points at an item or ability, but both read as the same type today.
+Implemented across commits `ccc27af..0e3ef19` (Tasks 1–9 of the implementation plan at
+`docs/superpowers/plans/2026-06-19-parameter-readability-beyond-characters.md`).
 
-Current PoE2 type inventory (from the catalogues, to seed the survey):
+**What shipped:**
+- `GameDataNameService` — static registry (kind → `IReadOnlyList<NamedEntry>`) replacing
+  the old hard-wired `SpeakerNameService` path. Registered at game-folder-open from
+  `MainWindowViewModel.LoadDirectory`.
+- `Poe2GameDataBundleParser` — parses `{GameDataObjects:[{ID,DebugName}]}` bundles; used
+  by `Poe2GameDataProvider.LoadGameDataNames()`.
+- `GlobalVariablesCsvParser` — parses `GlobalVariables.csv` variable-name column.
+- `ParameterValueViewModel` refactored: `HasLookup`/`Suggestions` replace
+  `IsGuidType`/`GuidSuggestions`; `OnValueChanged` resolves `DisplayName → StoredValue`
+  via the registry.
+- `ConditionParameter.LookupKind` added (nullable string); `IGameDataProvider`
+  extended with `LoadGameDataNames()` (default empty-dict impl preserves test-stub compat).
+- 133 `"lookupKind"` annotations across `scripts.json` and `conditions.json`, covering
+  Speaker, Quest, Item, Ability, Class, Race, Subrace, Background, Culture, Deity,
+  PaladinOrder, Faction, Disposition, DispositionStrength, Skill, Phrase, Keyword,
+  StatusEffect, CreatureType, Map, Conversation, WeaponType, ArmorType, GlobalVariable.
+- `LookupKindWhitelistTests` build-time guard: any typo in a `"lookupKind"` value
+  triggers a failing test.
 
-- **Already readable / no work:** `Boolean`, `Operator`, and all `Enum:*` types already
-  render as Options-backed suggestion lists. `Int32`/`Single` are plain numbers.
-- **Character GUIDs:** `ObjectGuid` (≈51 condition + 2 script params) — handled by the
-  GUID Parameter Readability gap above.
-- **Opaque game-data GUIDs (the real follow-up targets):** `Guid` (≈30) and `GameData`
-  (≈28) point at non-character assets — quests, items, abilities, factions, etc. Each
-  distinct kind needs its own GUID→name lookup table sourced from the relevant
-  `*.gamedatabundle`, mirroring what `Poe2SpeakerNameParser`/`SpeakerNameService` did for
-  characters. They can't be tackled until the survey establishes which params map to which
-  kind.
-- **Other opaque-but-not-GUID:** `GlobalVariable` flag names (its `TypeHint` already points
-  at `GlobalVariables.csv`, an obvious autocomplete source) and free-form `String` params
-  (context-dependent — flag/item/conversation names — and may not generalise).
-
-Output of the survey should be one or more concrete follow-up gaps (e.g. "Quest GUID
-readability", "Item GUID readability", "GlobalVariable autocomplete"), each scoped to a
-single game-data kind with an identified name source — so they can be implemented the same
-way the character case was.
+**Deferred (requires real game installation — Tasks 7–8 from plan):**
+- `Poe2GameDataProvider.LoadGameDataNames()` — real implementation that walks the
+  confirmed `.gamedatabundle` filenames in `exported/design/gamedata/`. The stubs are in
+  place; implement after confirming filenames against a live PoE2 install.
+- `Poe1GameDataProvider.LoadGameDataNames()` — PoE1 uses XML-based data files; structure
+  and field names need confirmation against a live PoE1 install before parsers can be
+  written.
+- Three parameters intentionally left without a `lookupKind` because no suitable game-data
+  source was identified: `"Unlockable"` (PartyHasAbility — spans Ability/Phrase/Talent),
+  and generic scene-object GUID params (`"Object GUID"`, `"Collider Object"` in ObjectGuid
+  scripts) where the Speaker kind is applied but a scene-object lookup table doesn't exist.
 
 ### ~~Font Scale Live Switching~~ ✓ Implemented
 
