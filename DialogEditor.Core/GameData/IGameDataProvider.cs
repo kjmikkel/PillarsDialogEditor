@@ -15,6 +15,12 @@ public interface IGameDataProvider
     ConversationFile? FindConversation(string name) =>
         EnumerateConversations().FirstOrDefault(f => f.Name == name);
     IReadOnlyDictionary<string, string> LoadSpeakerNames();
+
+    /// Returns named entries grouped by lookup kind (e.g. "Quest", "Item", "GlobalVariable").
+    /// Called once when a game folder is opened. Returns empty dict when no data is available.
+    /// Default returns empty; override in providers that supply game data.
+    IReadOnlyDictionary<string, IReadOnlyList<GameDataEntry>> LoadGameDataNames()
+        => new Dictionary<string, IReadOnlyList<GameDataEntry>>();
     void   SaveConversation(ConversationFile file, ConversationEditSnapshot snapshot);
     string GetStringTablePath(ConversationFile file);
     string GetStringTablePath(ConversationFile file, string language);
