@@ -193,9 +193,9 @@
                                                               IsVisible="{Binding IsEnum}"
                                                               ToolTip.Tip="{Binding TypeHint}"
                                                               AutomationProperties.Name="{Binding Name}"/>
-                                                    <!-- GUID AutoCompleteBox — "Name — GUID" suggestions from
-                                                         SpeakerNameService; filters on name AND raw GUID fragment;
-                                                         OnValueChanged normalises "Name — GUID" → bare GUID -->
+                                                    <!-- Lookup AutoCompleteBox — "DisplayName — StoredValue" suggestions
+                                                         from GameDataNameService.Get(LookupKind); FilterMode=Contains
+                                                         lets the user search by display name or raw stored value -->
                                                     <AutoCompleteBox Grid.Column="1"
                                                               Classes="param-input"
                                                               ItemsSource="{Binding Suggestions}"
