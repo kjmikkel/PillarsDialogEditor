@@ -74,9 +74,20 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
     public IReadOnlyDictionary<string, string> LoadSpeakerNames() =>
         Poe1SpeakerNameParser.ParseFromDisk(ConversationsRoot, CharactersStringtablePath);
 
-    // Stub: real implementation will parse PoE1 game data files per LookupKind.
+    private string GlobalVariablesPath =>
+        Path.Combine(DataRoot, "design", "global", "game.globalvariables");
+
     public IReadOnlyDictionary<string, IReadOnlyList<GameDataEntry>> LoadGameDataNames()
-        => new Dictionary<string, IReadOnlyList<GameDataEntry>>();
+    {
+        var result = new Dictionary<string, IReadOnlyList<GameDataEntry>>();
+
+        // PoE1 conditions/scripts use only two lookup kinds: Speaker (served by
+        // LoadSpeakerNames) and GlobalVariable (the Tag string stored in conditions).
+        var vars = Poe1GlobalVariablesParser.ParseFile(GlobalVariablesPath);
+        if (vars.Count > 0) result["GlobalVariable"] = vars;
+
+        return result;
+    }
 
     public (string ConversationsRoot, string StringTablesRoot) GetBackupRoots()
         => (ConversationsRoot, StringTablesRoot);

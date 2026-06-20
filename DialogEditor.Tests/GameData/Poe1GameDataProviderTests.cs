@@ -245,4 +245,38 @@ public class Poe1GameDataProviderTests : IDisposable
         var stAfter  = File.Exists(stPath) ? File.ReadAllText(stPath) : null;
         Assert.Equal(stBefore, stAfter);
     }
+
+    private const string TwoVarXml = """
+        <?xml version="1.0" encoding="utf-8"?>
+        <GlobalVariablesData>
+          <Folders />
+          <GlobalVariables>
+            <GlobalVariable><Tag>bBanterDisabled</Tag><FolderGuid>00000000-0000-0000-0000-000000000000</FolderGuid><InitialValue>0</InitialValue><Comments /><CreatedBy /></GlobalVariable>
+            <GlobalVariable><Tag>npc_met_eder</Tag><FolderGuid>00000000-0000-0000-0000-000000000000</FolderGuid><InitialValue>0</InitialValue><Comments /><CreatedBy /></GlobalVariable>
+          </GlobalVariables>
+        </GlobalVariablesData>
+        """;
+
+    [Fact]
+    public void LoadGameDataNames_IncludesGlobalVariableKind()
+    {
+        var designDir = Path.Combine(_root, "PillarsOfEternity_Data", "data", "design", "global");
+        Directory.CreateDirectory(designDir);
+        File.WriteAllText(Path.Combine(designDir, "game.globalvariables"), TwoVarXml);
+
+        var names = _provider.LoadGameDataNames();
+
+        Assert.True(names.ContainsKey("GlobalVariable"));
+        var vars = names["GlobalVariable"];
+        Assert.Equal(2, vars.Count);
+        Assert.Contains(vars, e => e.Name == "bBanterDisabled");
+        Assert.Contains(vars, e => e.Name == "npc_met_eder");
+    }
+
+    [Fact]
+    public void LoadGameDataNames_NoGlobalVariablesFile_ReturnsEmptyDict()
+    {
+        var names = _provider.LoadGameDataNames();
+        Assert.Empty(names);
+    }
 }

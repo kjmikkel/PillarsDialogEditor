@@ -561,10 +561,14 @@ Implemented across commits `ccc27af..0e3ef19` (Tasks 1–9 of the implementation
   `Conversations[0].ID` as the stored GUID, with the filename-without-extension as the
   display name. Registered under `"Conversation"` kind.
 
+**Poe1GameDataProvider.LoadGameDataNames() implemented:**
+- PoE1 conditions and scripts use only two lookup kinds: `Speaker` (served by
+  `LoadSpeakerNames`) and `GlobalVariable`. The `GlobalVariable` kind is now populated
+  from `design/global/game.globalvariables` (XML) via the new `Poe1GlobalVariablesParser`.
+  No other lookup kinds appear in PoE1 conditions/scripts — Class, Race, Item, etc. are
+  PoE2-only in the annotations.
+
 **Still deferred:**
-- `Poe1GameDataProvider.LoadGameDataNames()` — PoE1 uses XML-based data files; structure
-  and field names need confirmation against a live PoE1 install before parsers can be
-  written.
 - `ArmorType` — the PoE2 condition `IsArmorTypeEquipped(Guid, Guid)` references armor-type
   GUIDs, but no `ArmorTypeGameData` bundle was found in any PoE2 `.gamedatabundle`, and the
   condition is unused in all shipped `.conversationbundle` files. Falls back to plain-text
