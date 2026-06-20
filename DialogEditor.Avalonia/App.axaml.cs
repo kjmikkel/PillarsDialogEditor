@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Threading;
 using DialogEditor.Avalonia.Shared;
 using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.Avalonia.Shared.Theming;
@@ -20,8 +21,20 @@ public partial class App : Application
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             AppLog.Info("DialogEditor.Avalonia started");
+
+            // Catch exceptions thrown on the Avalonia UI dispatcher thread.
+            // Without this, any unhandled exception in event handlers (e.g. the
+            // AutoCompleteBox selection-model crash) propagates all the way to Main
+            // and kills the process. e.Handled = true keeps the application alive.
+            Dispatcher.UIThread.UnhandledException += (_, e) =>
+            {
+                AppLog.Error("Unhandled UI dispatcher exception", e.Exception);
+                e.Handled = true;
+            };
+
+            // Background/Task exceptions and OS-level throws that bypass the dispatcher.
             AppDomain.CurrentDomain.UnhandledException += (_, e) =>
-                AppLog.Error("Unhandled exception", e.ExceptionObject as Exception);
+                AppLog.Error("Unhandled domain exception", e.ExceptionObject as Exception);
             TaskScheduler.UnobservedTaskException += (_, e) =>
             {
                 AppLog.Error("Unobserved task exception", e.Exception);
