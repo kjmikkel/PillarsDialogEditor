@@ -550,13 +550,26 @@ Implemented across commits `ccc27af..0e3ef19` (Tasks 1–9 of the implementation
 - `LookupKindWhitelistTests` build-time guard: any typo in a `"lookupKind"` value
   triggers a failing test.
 
-**Deferred (requires real game installation — Tasks 7–8 from plan):**
-- `Poe2GameDataProvider.LoadGameDataNames()` — real implementation that walks the
-  confirmed `.gamedatabundle` filenames in `exported/design/gamedata/`. The stubs are in
-  place; implement after confirming filenames against a live PoE2 install.
+**Implemented since (PoE2 continued):**
+- `Poe2GameDataProvider.LoadGameDataNames()` fully implemented — walks all confirmed
+  `.gamedatabundle` filenames (items, abilities, statuseffects, factions, characters, global,
+  worldmap, gui) plus quests, GlobalVariables.csv, and Speakers.
+- `Class` lookup now filtered to `IsPlayerClass:"true"` entries via a `componentFilter`
+  predicate on the `Components` array, keeping only playable classes and excluding NPC
+  creature archetypes.
+- `Conversation` lookup implemented: enumerates all `.conversationbundle` files and extracts
+  `Conversations[0].ID` as the stored GUID, with the filename-without-extension as the
+  display name. Registered under `"Conversation"` kind.
+
+**Still deferred:**
 - `Poe1GameDataProvider.LoadGameDataNames()` — PoE1 uses XML-based data files; structure
   and field names need confirmation against a live PoE1 install before parsers can be
   written.
+- `ArmorType` — the PoE2 condition `IsArmorTypeEquipped(Guid, Guid)` references armor-type
+  GUIDs, but no `ArmorTypeGameData` bundle was found in any PoE2 `.gamedatabundle`, and the
+  condition is unused in all shipped `.conversationbundle` files. Falls back to plain-text
+  GUID input.
+- `CreatureType` — likewise; `CreatureTypeGameData` absent from all bundles.
 - Three parameters intentionally left without a `lookupKind` because no suitable game-data
   source was identified: `"Unlockable"` (PartyHasAbility — spans Ability/Phrase/Talent),
   and generic scene-object GUID params (`"Object GUID"`, `"Collider Object"` in ObjectGuid

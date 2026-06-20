@@ -1,3 +1,4 @@
+using System.Text.Json;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Core.Parsing;
@@ -90,8 +91,14 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
         void FactionBundle(string kind, string typeFilter, Func<string, string>? clean = null)
             => Bundle(kind, "factions.gamedatabundle", clean, typeFilter);
 
-        void CharBundle(string kind, string typeFilter, Func<string, string>? clean = null)
-            => Bundle(kind, "characters.gamedatabundle", clean, typeFilter);
+        void CharBundle(string kind, string typeFilter,
+                        Func<string, string>? clean = null,
+                        Func<IReadOnlyList<JsonElement>, bool>? componentFilter = null)
+        {
+            var entries = Poe2GameDataBundleParser.ParseFile(
+                Path.Combine(gdRoot, "characters.gamedatabundle"), clean, typeFilter, componentFilter);
+            if (entries.Count > 0) result[kind] = entries;
+        }
 
         // ── Single-kind bundles ──────────────────────────────────────────────
         Bundle("Item",         "items.gamedatabundle");
@@ -119,7 +126,8 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
         // ── characters.gamedatabundle — multi-kind ───────────────────────────
         // Confirmed: Class=BaseStatsGameData, Race=RaceGameData.
         // Subrace/Background/Culture $type names inferred; return empty if wrong (plain text fallback).
-        CharBundle("Class",      "BaseStatsGameData");
+        // BaseStatsGameData also includes NPC creature archetypes — filter to IsPlayerClass:"true".
+        CharBundle("Class", "BaseStatsGameData", componentFilter: IsPlayerClassComponent);
         CharBundle("Race",       "RaceGameData");
         CharBundle("Subrace",    "SubraceGameData");
         CharBundle("Background", "BackgroundGameData");
@@ -145,14 +153,35 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
         var vars = GlobalVariablesCsvParser.ParseFile(Path.Combine(gdRoot, "GlobalVariables.csv"));
         if (vars.Count > 0) result["GlobalVariable"] = vars;
 
+        // ── Conversations ─────────────────────────────────────────────────────
+        // Each .conversationbundle has a root Conversations[0].ID GUID — parse all
+        // bundles and expose the filename (without extension) as the display name.
+        if (Directory.Exists(ConversationsRoot))
+        {
+            var conversations = Directory
+                .EnumerateFiles(ConversationsRoot, "*.conversationbundle", SearchOption.AllDirectories)
+                .Select(path => (
+                    id:   Poe2ConversationParser.ParseRootId(File.ReadAllText(path)),
+                    name: Path.GetFileNameWithoutExtension(path)))
+                .Where(t => !string.IsNullOrWhiteSpace(t.id))
+                .Select(t => new GameDataEntry(Id: t.id!, Name: t.name))
+                .OrderBy(e => e.Name)
+                .ToList();
+            if (conversations.Count > 0) result["Conversation"] = conversations;
+        }
+
         // Deferred — no data source located:
-        // ArmorType:    conditions store enum string (e.g. "Heavy") but no ArmorTypeGameData found.
+        // ArmorType:    GUID-keyed but ArmorTypeGameData absent from all bundles; condition unused in game.
         // CreatureType: GUID-keyed but CreatureTypeGameData absent from all bundles.
-        // Conversation: would require parsing each .conversationbundle for its root ID.
         // Parameters for these kinds fall back to plain-text input.
 
         return result;
     }
+
+    private static bool IsPlayerClassComponent(IReadOnlyList<JsonElement> components) =>
+        components.Any(c =>
+            c.TryGetProperty("IsPlayerClass", out var p) &&
+            p.GetString()?.Equals("true", StringComparison.OrdinalIgnoreCase) == true);
 
     public (string ConversationsRoot, string StringTablesRoot) GetBackupRoots()
         => (ConversationsRoot, StringTablesRoot);

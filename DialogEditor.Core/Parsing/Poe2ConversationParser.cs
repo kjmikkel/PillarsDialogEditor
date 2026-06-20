@@ -19,6 +19,14 @@ public static class Poe2ConversationParser
         return SpeakerCategory.Npc;
     }
 
+    public static string? ParseRootId(string json)
+    {
+        var root = JsonNode.Parse(json);
+        var conversations = root?["Conversations"]?.AsArray();
+        if (conversations is null || conversations.Count == 0) return null;
+        return conversations[0]?["ID"]?.GetValue<string>();
+    }
+
     public static IReadOnlyList<ConversationNode> ParseFile(string path)
         => ParseJson(File.ReadAllText(path));
 
