@@ -21,16 +21,30 @@ public partial class ParameterValueViewModel : ObservableObject
     public bool IsLabeledEnum => Values is { Count: > 0 } && Options is { Count: > 0 }
                                && Values.Count == Options.Count;
 
-    /// The value to serialise into the condition node. For labeled enums this is
-    /// the entry from Values[] that corresponds to the currently selected label;
-    /// for all other types it is Value itself.
+    /// The value to serialise into the condition node.
+    /// - Labeled enums: the Values[] entry matching the currently displayed label.
+    /// - Lookup kinds:  the StoredValue for the displayed DisplayName (e.g. the raw
+    ///   GUID when Value contains "Mercenary — guid"). Falls back to Value if not found.
+    ///   This translation happens here rather than in OnValueChanged so that the
+    ///   AutoCompleteBox text is never changed mid-navigation (which would shrink the
+    ///   filtered list and crash the selection model's SelectedIndexIncrement).
+    /// - All other types: Value itself.
     public string EffectiveValue
     {
         get
         {
-            if (!IsLabeledEnum) return Value;
-            var idx = Options!.ToList().IndexOf(Value);
-            return idx >= 0 ? Values![idx] : Value;
+            if (IsLabeledEnum)
+            {
+                var idx = Options!.ToList().IndexOf(Value);
+                return idx >= 0 ? Values![idx] : Value;
+            }
+            if (HasLookup)
+            {
+                var entry = GameDataNameService.Get(LookupKind)
+                    .FirstOrDefault(e => e.DisplayName == Value);
+                return entry?.StoredValue ?? Value;
+            }
+            return Value;
         }
     }
 
@@ -85,17 +99,6 @@ public partial class ParameterValueViewModel : ObservableObject
         _ => string.IsNullOrEmpty(Type) ? string.Empty : $"Type: {Type}"
     };
 
-    // When the user selects a suggestion from the AutoCompleteBox, Text is set to the
-    // display string (DisplayName). Normalise it back to the StoredValue so the persisted
-    // value is always the raw identifier, never the display label.
-    partial void OnValueChanged(string value)
-    {
-        if (!HasLookup) return;
-        var entry = GameDataNameService.Get(LookupKind)
-            .FirstOrDefault(e => e.DisplayName == value);
-        if (entry is not null)
-            Value = entry.StoredValue;
-    }
 }
 
 public partial class ConditionRowViewModel : ObservableObject
@@ -162,11 +165,26 @@ public partial class ConditionRowViewModel : ObservableObject
             Parameters = new(catalogueEntry.Parameters
                 .Select((p, i) =>
                 {
-                    var stored = i < leaf.Parameters.Count ? leaf.Parameters[i] : p.Default;
-                    // For labeled enums, display the label rather than the stored value
-                    var display = (p.Values is { Count: > 0 } && p.Options is { Count: > 0 })
-                        ? LookupLabel(stored, p.Options, p.Values) ?? stored
-                        : stored;
+                    var stored     = i < leaf.Parameters.Count ? leaf.Parameters[i] : p.Default;
+                    var lookupKind = p.LookupKind ?? string.Empty;
+                    string display;
+                    if (lookupKind.Length > 0)
+                    {
+                        // Initialise the text box with the human-readable DisplayName so the
+                        // user immediately sees "Mercenary — guid" rather than a raw GUID.
+                        // EffectiveValue translates back to StoredValue on save.
+                        display = GameDataNameService.Get(lookupKind)
+                            .FirstOrDefault(e => e.StoredValue == stored)?.DisplayName ?? stored;
+                    }
+                    else if (p.Values is { Count: > 0 } && p.Options is { Count: > 0 })
+                    {
+                        // For labeled enums, display the label rather than the stored value
+                        display = LookupLabel(stored, p.Options, p.Values) ?? stored;
+                    }
+                    else
+                    {
+                        display = stored;
+                    }
                     return new ParameterValueViewModel
                     {
                         Name        = p.Name,
@@ -174,7 +192,7 @@ public partial class ConditionRowViewModel : ObservableObject
                         Type        = p.Type,
                         Options     = p.Options,
                         Values      = p.Values,
-                        LookupKind  = p.LookupKind ?? string.Empty,
+                        LookupKind  = lookupKind,
                         Value       = display,
                     };
                 }));

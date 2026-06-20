@@ -27,14 +27,23 @@ public partial class ScriptRowViewModel : ObservableObject
         if (entry is not null)
         {
             Parameters = new(entry.Parameters
-                .Select((p, i) => new ParameterValueViewModel
+                .Select((p, i) =>
                 {
-                    Name        = p.Name,
-                    Description = p.Description,
-                    Type        = p.Type,
-                    Options     = p.Options,
-                    LookupKind  = p.LookupKind ?? string.Empty,
-                    Value       = i < call.Parameters.Count ? call.Parameters[i] : p.Default,
+                    var stored     = i < call.Parameters.Count ? call.Parameters[i] : p.Default;
+                    var lookupKind = p.LookupKind ?? string.Empty;
+                    var display    = lookupKind.Length > 0
+                        ? GameDataNameService.Get(lookupKind)
+                              .FirstOrDefault(e => e.StoredValue == stored)?.DisplayName ?? stored
+                        : stored;
+                    return new ParameterValueViewModel
+                    {
+                        Name        = p.Name,
+                        Description = p.Description,
+                        Type        = p.Type,
+                        Options     = p.Options,
+                        LookupKind  = lookupKind,
+                        Value       = display,
+                    };
                 }));
         }
         else
@@ -44,8 +53,9 @@ public partial class ScriptRowViewModel : ObservableObject
         }
     }
 
+    // EffectiveValue translates DisplayName back to StoredValue for lookup kinds.
     public ScriptCall ToCall() =>
-        new(FullName, Parameters.Select(p => p.Value).ToList(), Category);
+        new(FullName, Parameters.Select(p => p.EffectiveValue).ToList(), Category);
 }
 
 /// Edits the script lists on a node (Enter / Exit / Update).

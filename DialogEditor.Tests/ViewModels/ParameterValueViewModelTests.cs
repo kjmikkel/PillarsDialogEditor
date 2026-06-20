@@ -63,17 +63,23 @@ public class ParameterValueViewModelTests : IDisposable
     public void Suggestions_EmptyWhenKindNotRegistered()
         => Assert.Empty(Make("Guid", "Quest").Suggestions);
 
-    // ── OnValueChanged normalisation ───────────────────────────────────────
+    // ── Value must not normalise mid-navigation ────────────────────────────
+    // Setting Value to a DisplayName must NOT rewrite it to the StoredValue.
+    // The old OnValueChanged normalisation caused Value (and therefore the
+    // AutoCompleteBox.Text two-way binding) to change from "Friendly — guid" to
+    // "guid" while the user was still navigating the dropdown with arrow keys.
+    // That collapsed the filtered list, making the SelectedIndex out of range on
+    // the next key press → ArgumentOutOfRangeException.
 
     [Fact]
-    public void Value_WritesStoredValue_WhenDisplayNameSelected()
+    public void Value_DoesNotNormalise_WhenDisplayNameSet()
     {
-        const string guid = "cccccccc-0000-0000-0000-000000000003";
-        GameDataNameService.Register("Quest",
-            [new NamedEntry($"A Quest — {guid}", guid)]);
+        const string guid        = "cccccccc-0000-0000-0000-000000000003";
+        const string displayName = $"A Quest — {guid}";
+        GameDataNameService.Register("Quest", [new NamedEntry(displayName, guid)]);
         var vm = Make("Guid", "Quest");
-        vm.Value = $"A Quest — {guid}";
-        Assert.Equal(guid, vm.Value);
+        vm.Value = displayName;
+        Assert.Equal(displayName, vm.Value);   // must NOT be rewritten to guid
     }
 
     [Fact]
@@ -95,14 +101,36 @@ public class ParameterValueViewModelTests : IDisposable
     }
 
     [Fact]
-    public void Value_WritesStoredValue_ForStringKind()
+    public void Value_Unchanged_ForStringKind_WhenDisplayNameEqualsStoredValue()
     {
-        // For GlobalVariable: DisplayName == StoredValue, so lookup is identity.
+        // GlobalVariable: DisplayName == StoredValue, so no difference between normalised and not.
         GameDataNameService.Register("GlobalVariable",
             [new NamedEntry("npc_met_eder", "npc_met_eder")]);
         var vm = Make("GlobalVariable", "GlobalVariable");
         vm.Value = "npc_met_eder";
         Assert.Equal("npc_met_eder", vm.Value);
+    }
+
+    // ── EffectiveValue does the DisplayName → StoredValue translation ──────
+
+    [Fact]
+    public void EffectiveValue_ReturnsStoredValue_WhenValueIsDisplayName()
+    {
+        const string guid        = "cccccccc-0000-0000-0000-000000000003";
+        const string displayName = $"A Quest — {guid}";
+        GameDataNameService.Register("Quest", [new NamedEntry(displayName, guid)]);
+        var vm = Make("Guid", "Quest", displayName);
+        Assert.Equal(guid, vm.EffectiveValue);
+    }
+
+    [Fact]
+    public void EffectiveValue_ReturnsRawValue_WhenValueIsNotAKnownDisplayName()
+    {
+        const string guid = "cccccccc-0000-0000-0000-000000000003";
+        GameDataNameService.Register("Quest",
+            [new NamedEntry($"A Quest — {guid}", guid)]);
+        var vm = Make("Guid", "Quest", guid);   // raw guid, not the display name
+        Assert.Equal(guid, vm.EffectiveValue);  // falls back to Value as-is
     }
 
     // ── Speaker lookup ─────────────────────────────────────────────────────
