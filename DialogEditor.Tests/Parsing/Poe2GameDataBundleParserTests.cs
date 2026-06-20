@@ -184,4 +184,74 @@ public class Poe2GameDataBundleParserTests
         Assert.Single(entries);
         Assert.Equal("Hostile", entries[0].Name);
     }
+
+    // ── componentFilter (BaseStatsGameData IsPlayerClass support) ──────────
+
+    private const string PlayerClassFixture = """
+        {
+          "GameDataObjects": [
+            {
+              "$type": "Game.GameData.BaseStatsGameData, Assembly-CSharp",
+              "ID": "player-class-01",
+              "DebugName": "Paladin",
+              "Components": [
+                {"$type": "Game.GameData.BaseStatsComponent, Assembly-CSharp", "IsPlayerClass": "true"}
+              ]
+            },
+            {
+              "$type": "Game.GameData.BaseStatsGameData, Assembly-CSharp",
+              "ID": "npc-creature-01",
+              "DebugName": "AdraDragon",
+              "Components": [
+                {"$type": "Game.GameData.BaseStatsComponent, Assembly-CSharp", "IsPlayerClass": "false"}
+              ]
+            }
+          ]
+        }
+        """;
+
+    [Fact]
+    public void Parse_ComponentFilter_Null_ReturnsAllMatchingTypeFilter()
+    {
+        var entries = Poe2GameDataBundleParser.Parse(PlayerClassFixture, typeFilter: "BaseStatsGameData");
+        Assert.Equal(2, entries.Count);
+    }
+
+    [Fact]
+    public void Parse_ComponentFilter_ExcludesEntriesWherePredicateReturnsFalse()
+    {
+        var entries = Poe2GameDataBundleParser.Parse(PlayerClassFixture,
+            typeFilter: "BaseStatsGameData",
+            componentFilter: comps => comps.Any(c =>
+                c.TryGetProperty("IsPlayerClass", out var p) &&
+                p.GetString()?.Equals("true", StringComparison.OrdinalIgnoreCase) == true));
+
+        Assert.Single(entries);
+        Assert.Equal("Paladin", entries[0].Name);
+        Assert.Equal("player-class-01", entries[0].Id);
+    }
+
+    [Fact]
+    public void Parse_ComponentFilter_EntryWithNoComponents_IsExcluded()
+    {
+        const string json = """
+            {
+              "GameDataObjects": [
+                {
+                  "$type": "Game.GameData.BaseStatsGameData, Assembly-CSharp",
+                  "ID": "no-components-01",
+                  "DebugName": "NoComponents"
+                }
+              ]
+            }
+            """;
+
+        var entries = Poe2GameDataBundleParser.Parse(json,
+            typeFilter: "BaseStatsGameData",
+            componentFilter: comps => comps.Any(c =>
+                c.TryGetProperty("IsPlayerClass", out var p) &&
+                p.GetString()?.Equals("true", StringComparison.OrdinalIgnoreCase) == true));
+
+        Assert.Empty(entries);
+    }
 }

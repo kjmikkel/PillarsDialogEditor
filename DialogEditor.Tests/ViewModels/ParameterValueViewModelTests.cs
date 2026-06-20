@@ -7,6 +7,14 @@ namespace DialogEditor.Tests.ViewModels;
 
 public class ParameterValueViewModelTests : IDisposable
 {
+    // Clear shared static state before AND after each test so test ordering cannot leak
+    // data registered by MainWindowViewModelApplyTests (which auto-loads the real game).
+    public ParameterValueViewModelTests()
+    {
+        SpeakerNameService.Register(new Dictionary<string, string>());
+        GameDataNameService.Clear();
+    }
+
     public void Dispose()
     {
         SpeakerNameService.Register(new Dictionary<string, string>());

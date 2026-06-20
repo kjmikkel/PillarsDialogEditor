@@ -213,4 +213,31 @@ public class Poe2GameDataProviderTests : IDisposable
         var stAfter  = File.Exists(stPath) ? File.ReadAllText(stPath) : null;
         Assert.Equal(stBefore, stAfter);
     }
+
+    [Fact]
+    public void LoadGameDataNames_IncludesConversationKind_WithFilenameAsName()
+    {
+        WriteBundle("testconv", TwoNodeJson);
+
+        var names = _provider.LoadGameDataNames();
+
+        Assert.True(names.ContainsKey("Conversation"));
+        var conv = names["Conversation"];
+        Assert.Single(conv);
+        Assert.Equal("testconv", conv[0].Name);
+        Assert.Equal("daa2b624-875f-49bb-a041-ded56da97bea", conv[0].Id);
+    }
+
+    [Fact]
+    public void LoadGameDataNames_Conversation_SkipsBundleWithNoId()
+    {
+        WriteBundle("noid", """{"Conversations":[{}]}""");
+        WriteBundle("valid", TwoNodeJson);
+
+        var names = _provider.LoadGameDataNames();
+
+        var conv = names["Conversation"];
+        Assert.Single(conv);
+        Assert.Equal("valid", conv[0].Name);
+    }
 }

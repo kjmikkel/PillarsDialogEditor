@@ -350,4 +350,27 @@ public class Poe2ConversationParserTests
         var nodes = Poe2ConversationParser.ParseJson(TwoNodeJson);
         Assert.Equal("IsGlobalValue(some_flag, EqualTo, 1)", nodes[1].ConditionExpression);
     }
+
+    // ── ParseRootId ───────────────────────────────────────────────────────
+
+    [Fact]
+    public void ParseRootId_ReturnsFirstConversationId()
+    {
+        var id = Poe2ConversationParser.ParseRootId(TwoNodeJson);
+        Assert.Equal("daa2b624-875f-49bb-a041-ded56da97bea", id);
+    }
+
+    [Fact]
+    public void ParseRootId_MissingIdField_ReturnsNull()
+    {
+        var id = Poe2ConversationParser.ParseRootId("""{"Conversations":[{}]}""");
+        Assert.Null(id);
+    }
+
+    [Fact]
+    public void ParseRootId_EmptyConversationsArray_ReturnsNull()
+    {
+        var id = Poe2ConversationParser.ParseRootId("""{"Conversations":[]}""");
+        Assert.Null(id);
+    }
 }
