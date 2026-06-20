@@ -44,6 +44,11 @@ public static class Poe2SpeakerNameParser
         if (start < tokens.Length && CategoryPrefixes.Contains(tokens[start]))
             start++;
 
-        return string.Join(" ", tokens[start..]);
+        var name = string.Join(" ", tokens[start..]);
+        // If stripping consumed all tokens (e.g. "SPK_Mercenary"), fall back to the last
+        // stripped token rather than returning "", which would produce " — <guid>" suggestions.
+        if (name.Length == 0 && start > 0)
+            name = tokens[start - 1];
+        return name;
     }
 }

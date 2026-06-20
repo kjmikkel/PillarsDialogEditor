@@ -86,4 +86,102 @@ public class Poe2GameDataBundleParserTests
     [Fact]
     public void ParseFile_NonExistentPath_ReturnsEmpty()
         => Assert.Empty(Poe2GameDataBundleParser.ParseFile(@"C:\does\not\exist.gamedatabundle"));
+
+    // ── typeFilter (characters.gamedatabundle multi-kind support) ──────────
+
+    private const string MixedTypeFixture = """
+        {
+          "GameDataObjects": [
+            { "$type": "Game.GameData.RaceGameData, Assembly-CSharp", "ID": "race-0001", "DebugName": "Human" },
+            { "$type": "Game.GameData.BaseStatsGameData, Assembly-CSharp", "ID": "class-0001", "DebugName": "Paladin" },
+            { "$type": "Game.GameData.PaladinSubClassGameData, Assembly-CSharp", "ID": "order-0001", "DebugName": "Paladin_DarcozziPaladini" }
+          ]
+        }
+        """;
+
+    [Fact]
+    public void Parse_TypeFilter_Null_ReturnsAll()
+    {
+        var entries = Poe2GameDataBundleParser.Parse(MixedTypeFixture);
+        Assert.Equal(3, entries.Count);
+    }
+
+    [Fact]
+    public void Parse_TypeFilter_ReturnsOnlyMatchingType()
+    {
+        var races = Poe2GameDataBundleParser.Parse(MixedTypeFixture, typeFilter: "RaceGameData");
+        Assert.Single(races);
+        Assert.Equal("Human", races[0].Name);
+    }
+
+    [Fact]
+    public void Parse_TypeFilter_IsCaseInsensitive()
+    {
+        var races = Poe2GameDataBundleParser.Parse(MixedTypeFixture, typeFilter: "racegamedata");
+        Assert.Single(races);
+    }
+
+    [Fact]
+    public void Parse_TypeFilter_NoMatch_ReturnsEmpty()
+    {
+        var entries = Poe2GameDataBundleParser.Parse(MixedTypeFixture, typeFilter: "NonExistentType");
+        Assert.Empty(entries);
+    }
+
+    [Fact]
+    public void Parse_TypeFilter_WithCleanName_BothApplied()
+    {
+        Func<string, string> stripPrefix = n =>
+            n.StartsWith("Paladin_", StringComparison.OrdinalIgnoreCase) ? n[8..] : n;
+
+        var orders = Poe2GameDataBundleParser.Parse(
+            MixedTypeFixture,
+            cleanName:  stripPrefix,
+            typeFilter: "PaladinSubClassGameData");
+
+        Assert.Single(orders);
+        Assert.Equal("DarcozziPaladini", orders[0].Name);
+        Assert.Equal("order-0001", orders[0].Id);
+    }
+
+    [Fact]
+    public void Parse_TypeFilter_EntriesWithoutTypeField_IncludedWhenFilterIsNull()
+    {
+        // Existing fixtures have no $type — must still parse without typeFilter.
+        var entries = Poe2GameDataBundleParser.Parse(QuestFixture, typeFilter: null);
+        Assert.Equal(2, entries.Count);
+    }
+
+    [Fact]
+    public void Parse_TypeFilter_EntriesWithoutTypeField_ExcludedWhenFilterSet()
+    {
+        // Objects with no $type field don't match any typeFilter.
+        var entries = Poe2GameDataBundleParser.Parse(QuestFixture, typeFilter: "Quest");
+        Assert.Empty(entries);
+    }
+
+    [Fact]
+    public void Parse_CleanNameProducesEmptyString_EntryIsDropped()
+    {
+        // If a cleanName transform returns "" (e.g. DispositionGameData entry whose DebugName IS
+        // exactly "Disposition"), the resulting entry has no displayable name and must be dropped.
+        // Allowing it through produces " — <guid>" suggestions that crash the AutoCompleteBox.
+        const string json = """
+            {
+              "GameDataObjects": [
+                { "ID": "aaa00001-0000-0000-0000-000000000000", "DebugName": "Disposition" },
+                { "ID": "aaa00002-0000-0000-0000-000000000000", "DebugName": "HostileDisposition" }
+              ]
+            }
+            """;
+        Func<string, string> stripSuffix = n =>
+            n.EndsWith("Disposition", StringComparison.Ordinal) ? n[..^"Disposition".Length].TrimEnd() : n;
+
+        var entries = Poe2GameDataBundleParser.Parse(json, cleanName: stripSuffix);
+
+        // "Disposition" → "" → dropped
+        // "HostileDisposition" → "Hostile" → kept
+        Assert.Single(entries);
+        Assert.Equal("Hostile", entries[0].Name);
+    }
 }

@@ -94,4 +94,24 @@ public class Poe2SpeakerNameParserTests
         var result = Poe2SpeakerNameParser.Parse(json);
         Assert.True(result.ContainsKey("5529e4b7-42dc-4895-b9f8-23375a945413"));
     }
+
+    [Fact]
+    public void Parse_CategoryOnlyName_FallsBackToCategory()
+    {
+        // SPK_Mercenary: stripping SPK and then Mercenary (a CategoryPrefix) consumes all tokens.
+        // Must fall back to the category name rather than returning an empty string,
+        // which would produce a malformed " — <guid>" suggestion that crashes the AutoCompleteBox.
+        var json = MakeJson(("0218a8ec-dcd8-48d5-bfbc-469b2cd0b08e", "SPK_Mercenary"));
+        var result = Poe2SpeakerNameParser.Parse(json);
+        Assert.Equal("Mercenary", result["0218a8ec-dcd8-48d5-bfbc-469b2cd0b08e"]);
+    }
+
+    [Fact]
+    public void Parse_CategoryOnlyName_NpcOnly_FallsBackToCategory()
+    {
+        // SPK_NPC with no character name after it — same edge case as SPK_Mercenary.
+        var json = MakeJson(("aaaaaaaa-0000-0000-0000-000000000099", "SPK_NPC"));
+        var result = Poe2SpeakerNameParser.Parse(json);
+        Assert.Equal("NPC", result["aaaaaaaa-0000-0000-0000-000000000099"]);
+    }
 }
