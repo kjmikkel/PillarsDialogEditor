@@ -74,9 +74,85 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
             ? Poe2SpeakerNameParser.ParseFile(SpeakersBundle)
             : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-    // Stub: real implementation will parse gamedatabundle files per LookupKind.
+    private string GameDataRoot => Path.Combine(ExportedRoot, "design", "gamedata");
+
     public IReadOnlyDictionary<string, IReadOnlyList<GameDataEntry>> LoadGameDataNames()
-        => new Dictionary<string, IReadOnlyList<GameDataEntry>>();
+    {
+        var result = new Dictionary<string, IReadOnlyList<GameDataEntry>>();
+        var gdRoot = GameDataRoot;
+
+        void Bundle(string kind, string filename, Func<string, string>? clean = null, string? typeFilter = null)
+        {
+            var entries = Poe2GameDataBundleParser.ParseFile(Path.Combine(gdRoot, filename), clean, typeFilter);
+            if (entries.Count > 0) result[kind] = entries;
+        }
+
+        void FactionBundle(string kind, string typeFilter, Func<string, string>? clean = null)
+            => Bundle(kind, "factions.gamedatabundle", clean, typeFilter);
+
+        void CharBundle(string kind, string typeFilter, Func<string, string>? clean = null)
+            => Bundle(kind, "characters.gamedatabundle", clean, typeFilter);
+
+        // ── Single-kind bundles ──────────────────────────────────────────────
+        Bundle("Item",         "items.gamedatabundle");
+        Bundle("Ability",      "abilities.gamedatabundle");
+        Bundle("StatusEffect", "statuseffects.gamedatabundle");
+        // abilities.gamedatabundle also contains phrases — register separately with $type filter.
+        Bundle("Phrase",  "abilities.gamedatabundle", typeFilter: "PhraseGameData");
+        Bundle("Keyword", "gui.gamedatabundle",       typeFilter: "KeywordGameData");
+        Bundle("Map",     "worldmap.gamedatabundle",  typeFilter: "MapGameData");
+
+        // ── factions.gamedatabundle — multi-kind ─────────────────────────────
+        // All share the file; a $type filter extracts each kind independently.
+        FactionBundle("Faction",             "FactionGameData");
+        FactionBundle("Deity",               "DeityGameData");
+        // Disposition DebugName format: "<Name>Disposition" — strip the suffix.
+        FactionBundle("Disposition",         "DispositionGameData",
+                      n => n.EndsWith("Disposition", StringComparison.Ordinal)
+                           ? n[..^"Disposition".Length].TrimEnd() : n);
+        // DispositionStrength is stored as ChangeStrengthGameData (DebugName: "Average" etc.)
+        FactionBundle("DispositionStrength", "ChangeStrengthGameData");
+        // PaladinOrder DebugName format: "Bleak_Walkers" — replace underscores.
+        FactionBundle("PaladinOrder",        "PaladinOrderGameData",
+                      n => n.Replace('_', ' '));
+
+        // ── characters.gamedatabundle — multi-kind ───────────────────────────
+        // Confirmed: Class=BaseStatsGameData, Race=RaceGameData.
+        // Subrace/Background/Culture $type names inferred; return empty if wrong (plain text fallback).
+        CharBundle("Class",      "BaseStatsGameData");
+        CharBundle("Race",       "RaceGameData");
+        CharBundle("Subrace",    "SubraceGameData");
+        CharBundle("Background", "BackgroundGameData");
+        CharBundle("Culture",    "CultureGameData");
+
+        // ── global.gamedatabundle ────────────────────────────────────────────
+        Bundle("Skill", "global.gamedatabundle", typeFilter: "SkillGameData");
+        // WeaponType conditions store DebugName (e.g. "Unarmed"), not the GUID → strip Id.
+        var weaponEntries = Poe2GameDataBundleParser
+            .ParseFile(Path.Combine(gdRoot, "global.gamedatabundle"), typeFilter: "WeaponTypeGameData")
+            .Select(e => new GameDataEntry(Id: string.Empty, Name: e.Name))
+            .ToList();
+        if (weaponEntries.Count > 0) result["WeaponType"] = weaponEntries;
+
+        // ── Quest ────────────────────────────────────────────────────────────
+        // quests.questbundle lives in design/quests/, not design/gamedata/, and uses a
+        // different JSON envelope {Hash, Quests:[{ID, Filename}]} — requires its own parser.
+        var quests = Poe2QuestBundleParser.ParseFile(
+            Path.Combine(ExportedRoot, "design", "quests", "quests.questbundle"));
+        if (quests.Count > 0) result["Quest"] = quests;
+
+        // ── GlobalVariables.csv ──────────────────────────────────────────────
+        var vars = GlobalVariablesCsvParser.ParseFile(Path.Combine(gdRoot, "GlobalVariables.csv"));
+        if (vars.Count > 0) result["GlobalVariable"] = vars;
+
+        // Deferred — no data source located:
+        // ArmorType:    conditions store enum string (e.g. "Heavy") but no ArmorTypeGameData found.
+        // CreatureType: GUID-keyed but CreatureTypeGameData absent from all bundles.
+        // Conversation: would require parsing each .conversationbundle for its root ID.
+        // Parameters for these kinds fall back to plain-text input.
+
+        return result;
+    }
 
     public (string ConversationsRoot, string StringTablesRoot) GetBackupRoots()
         => (ConversationsRoot, StringTablesRoot);

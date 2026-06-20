@@ -1014,6 +1014,7 @@ public partial class MainWindowViewModel : ObservableObject
             GameDataNameService.Clear();
             var speakerEntries = SpeakerNameService.All
                 .Select(s => new NamedEntry($"{s.Name} — {s.Guid}", s.Guid))
+                .Where(ne => !string.IsNullOrWhiteSpace(ne.DisplayName))
                 .ToList();
             GameDataNameService.Register("Speaker", speakerEntries);
 
@@ -1023,6 +1024,7 @@ public partial class MainWindowViewModel : ObservableObject
                     .Select(e => string.IsNullOrEmpty(e.Id)
                         ? new NamedEntry(e.Name, e.Name)
                         : new NamedEntry($"{e.Name} — {e.Id}", e.Id))
+                    .Where(ne => !string.IsNullOrWhiteSpace(ne.DisplayName))
                     .OrderBy(ne => ne.DisplayName)
                     .ToList();
                 GameDataNameService.Register(kind, namedEntries);
