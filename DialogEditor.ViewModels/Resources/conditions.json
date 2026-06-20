@@ -4373,7 +4373,8 @@
         "name": "Unlockable",
         "type": "GameData",
         "description": "GameData GUID of the ability/talent/phrase.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Ability"
       }
     ]
   },
