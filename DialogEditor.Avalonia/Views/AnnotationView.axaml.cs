@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
@@ -83,6 +84,20 @@ public partial class AnnotationView : UserControl
     {
         if (DataContext is AnnotationViewModel vm)
             vm.IsEditing = false;
+    }
+
+    // ── Colour picker ─────────────────────────────────────────────────────
+
+    private void ColorPickerButton_Click(object? sender, RoutedEventArgs e)
+    {
+        FlyoutBase.ShowAttachedFlyout(ColorPickerButton);
+    }
+
+    private void ColorSwatch_Click(object? sender, RoutedEventArgs e)
+    {
+        if (sender is Button { Tag: string colorKey } && DataContext is AnnotationViewModel vm)
+            vm.ColorKey = colorKey;
+        ColorPickerButton.Flyout?.Hide();
     }
 
     // ── Delete ────────────────────────────────────────────────────────────

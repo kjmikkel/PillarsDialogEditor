@@ -45,9 +45,75 @@
                         <Binding Path="ColorKey"/>
                     </MultiBinding>
                 </Border.Background>
-                <Grid ColumnDefinitions="*,Auto,Auto">
+                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                    <!-- Colour swatch — always visible; opens flyout with 7 swatches -->
+                    <Button Grid.Column="0"
+                            x:Name="ColorPickerButton"
+                            Width="18" Height="18"
+                            Padding="0" Margin="0,0,6,0"
+                            BorderThickness="1"
+                            BorderBrush="{DynamicResource Brush.Text.OnAccent}"
+                            Cursor="Hand"
+                            VerticalAlignment="Center"
+                            Click="ColorPickerButton_Click"
+                            ToolTip.Tip="{DynamicResource ToolTip_AnnotationColorPicker}"
+                            AutomationProperties.Name="{DynamicResource AutomationName_AnnotationColorPicker}">
+                        <Button.Background>
+                            <MultiBinding Converter="{StaticResource AnnotationColor}" ConverterParameter="Stroke">
+                                <Binding Path="ColorKey"/>
+                            </MultiBinding>
+                        </Button.Background>
+                        <Button.Flyout>
+                            <Flyout Placement="BottomEdgeAlignedLeft">
+                                <StackPanel Orientation="Horizontal" Spacing="4" Margin="4">
+                                    <Button Width="18" Height="18" Padding="0" Cursor="Hand"
+                                            Tag="Yellow" BorderThickness="0"
+                                            Background="{StaticResource Brush.Annotation.Yellow.Stroke}"
+                                            Click="ColorSwatch_Click"
+                                            ToolTip.Tip="{DynamicResource ColorName_Yellow}"
+                                            AutomationProperties.Name="{DynamicResource ColorName_Yellow}"/>
+                                    <Button Width="18" Height="18" Padding="0" Cursor="Hand"
+                                            Tag="Red" BorderThickness="0"
+                                            Background="{StaticResource Brush.Annotation.Red.Stroke}"
+                                            Click="ColorSwatch_Click"
+                                            ToolTip.Tip="{DynamicResource ColorName_Red}"
+                                            AutomationProperties.Name="{DynamicResource ColorName_Red}"/>
+                                    <Button Width="18" Height="18" Padding="0" Cursor="Hand"
+                                            Tag="Green" BorderThickness="0"
+                                            Background="{StaticResource Brush.Annotation.Green.Stroke}"
+                                            Click="ColorSwatch_Click"
+                                            ToolTip.Tip="{DynamicResource ColorName_Green}"
+                                            AutomationProperties.Name="{DynamicResource ColorName_Green}"/>
+                                    <Button Width="18" Height="18" Padding="0" Cursor="Hand"
+                                            Tag="Blue" BorderThickness="0"
+                                            Background="{StaticResource Brush.Annotation.Blue.Stroke}"
+                                            Click="ColorSwatch_Click"
+                                            ToolTip.Tip="{DynamicResource ColorName_Blue}"
+                                            AutomationProperties.Name="{DynamicResource ColorName_Blue}"/>
+                                    <Button Width="18" Height="18" Padding="0" Cursor="Hand"
+                                            Tag="Purple" BorderThickness="0"
+                                            Background="{StaticResource Brush.Annotation.Purple.Stroke}"
+                                            Click="ColorSwatch_Click"
+                                            ToolTip.Tip="{DynamicResource ColorName_Purple}"
+                                            AutomationProperties.Name="{DynamicResource ColorName_Purple}"/>
+                                    <Button Width="18" Height="18" Padding="0" Cursor="Hand"
+                                            Tag="Teal" BorderThickness="0"
+                                            Background="{StaticResource Brush.Annotation.Teal.Stroke}"
+                                            Click="ColorSwatch_Click"
+                                            ToolTip.Tip="{DynamicResource ColorName_Teal}"
+                                            AutomationProperties.Name="{DynamicResource ColorName_Teal}"/>
+                                    <Button Width="18" Height="18" Padding="0" Cursor="Hand"
+                                            Tag="Orange" BorderThickness="0"
+                                            Background="{StaticResource Brush.Annotation.Orange.Stroke}"
+                                            Click="ColorSwatch_Click"
+                                            ToolTip.Tip="{DynamicResource ColorName_Orange}"
+                                            AutomationProperties.Name="{DynamicResource ColorName_Orange}"/>
+                                </StackPanel>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
                     <!-- Title — TextBlock when idle, TextBox when editing -->
-                    <TextBlock Grid.Column="0"
+                    <TextBlock Grid.Column="1"
                                x:Name="TitleDisplay"
                                Text="{Binding Title}"
                                Foreground="{DynamicResource Brush.Text.OnAccent}"
@@ -58,7 +124,7 @@
                                VerticalAlignment="Center"
                                ToolTip.Tip="{DynamicResource ToolTip_AnnotationTitle}"
                                AutomationProperties.HelpText="{DynamicResource ToolTip_AnnotationTitle}"/>
-                    <TextBox Grid.Column="0"
+                    <TextBox Grid.Column="1"
                              x:Name="TitleEdit"
                              Text="{Binding Title}"
                              IsVisible="{Binding IsEditing}"
@@ -72,7 +138,7 @@
                              LostFocus="TitleEdit_LostFocus"
                              KeyDown="TitleEdit_KeyDown"/>
                     <!-- Edit button — hidden while editing -->
-                    <Button Grid.Column="1"
+                    <Button Grid.Column="2"
                             x:Name="EditButton"
                             Content="Edit"
                             IsVisible="{Binding !IsEditing}"
@@ -86,7 +152,7 @@
                             AutomationProperties.HelpText="{DynamicResource ToolTip_EditAnnotation}"
                             AutomationProperties.Name="{DynamicResource AutomationName_EditAnnotation}"/>
                     <!-- Delete button -->
-                    <Button Grid.Column="2"
+                    <Button Grid.Column="3"
                             x:Name="DeleteButton"
                             Content="✕"
                             Background="Transparent" BorderThickness="0"

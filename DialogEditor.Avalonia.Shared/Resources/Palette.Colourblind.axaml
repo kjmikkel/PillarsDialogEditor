@@ -113,6 +113,13 @@
     <Color x:Key="Palette.Annotation.Purple.Fill">#50CC79A7</Color>
     <Color x:Key="Palette.Annotation.Purple.Header">#A0844070</Color>
     <Color x:Key="Palette.Annotation.Purple.Stroke">#FFCC79A7</Color>
+    <!-- Teal → Okabe-Ito Sky Blue (#56B4E9); Orange → Okabe-Ito Orange (#E69F00) -->
+    <Color x:Key="Palette.Annotation.Teal.Fill">#5056B4E9</Color>
+    <Color x:Key="Palette.Annotation.Teal.Header">#A02470A0</Color>
+    <Color x:Key="Palette.Annotation.Teal.Stroke">#FF56B4E9</Color>
+    <Color x:Key="Palette.Annotation.Orange.Fill">#50E69F00</Color>
+    <Color x:Key="Palette.Annotation.Orange.Header">#A09B6800</Color>
+    <Color x:Key="Palette.Annotation.Orange.Stroke">#FFE69F00</Color>
 
     <!-- Alpha / effect primitives (overlays + shadow live here so hex stays confined) -->
     <Color x:Key="Palette.Alpha.Scrim">#BB000000</Color>

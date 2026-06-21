@@ -112,6 +112,12 @@
     <Color x:Key="Palette.Annotation.Purple.Fill">#40880077</Color>
     <Color x:Key="Palette.Annotation.Purple.Header">#FF880077</Color>
     <Color x:Key="Palette.Annotation.Purple.Stroke">#FF550055</Color>
+    <Color x:Key="Palette.Annotation.Teal.Fill">#40008577</Color>
+    <Color x:Key="Palette.Annotation.Teal.Header">#FF008577</Color>
+    <Color x:Key="Palette.Annotation.Teal.Stroke">#FF006B60</Color>
+    <Color x:Key="Palette.Annotation.Orange.Fill">#40C05800</Color>
+    <Color x:Key="Palette.Annotation.Orange.Header">#FFC05800</Color>
+    <Color x:Key="Palette.Annotation.Orange.Stroke">#FF9A4400</Color>
 
     <!-- Alpha / effect primitives (overlays + shadow live here so hex stays confined) -->
     <Color x:Key="Palette.Alpha.Scrim">#BB000000</Color>
