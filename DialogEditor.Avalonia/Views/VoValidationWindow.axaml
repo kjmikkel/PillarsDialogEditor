@@ -57,7 +57,7 @@
                             <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,3" Height="28">
                                 <!-- Node ID -->
                                 <TextBlock Grid.Column="0"
-                                           Text="{Binding NodeId, StringFormat='Node {0}'}"
+                                           Text="{Binding NodeLabel}"
                                            Foreground="{DynamicResource Brush.Text.Muted}"
                                            FontSize="{DynamicResource FontSize.Small}"
                                            Width="70" VerticalAlignment="Center"/>

@@ -341,9 +341,13 @@ public partial class MainWindow : Window
 
     private void ValidateVO_Click(object? sender, RoutedEventArgs e)
     {
+        if (_voValidationWindow is not null && _voValidationWindow.IsVisible)
+        {
+            _voValidationWindow.Activate();
+            return;
+        }
         var vm = ((MainWindowViewModel)DataContext!).CreateVoValidationViewModel();
         if (vm is null) return;
-
         _voValidationWindow = new VoValidationWindow(vm);
         _voValidationWindow.Closed += (_, _) => _voValidationWindow = null;
         _voValidationWindow.Show(this);
