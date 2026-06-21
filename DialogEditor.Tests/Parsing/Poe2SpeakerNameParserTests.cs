@@ -114,4 +114,70 @@ public class Poe2SpeakerNameParserTests
         var result = Poe2SpeakerNameParser.Parse(json);
         Assert.Equal("NPC", result["aaaaaaaa-0000-0000-0000-000000000099"]);
     }
+
+    // ── ParseChatterPrefixes ────────────────────────────────────────────────
+
+    private static string MakeChatterJson(params (string id, string prefix)[] entries)
+    {
+        var objects = string.Join(",", entries.Select(e =>
+            $$$"""
+            {"ID":"{{{e.id}}}","DebugName":"SPK_Test","Components":[{"$type":"SpeakerComponent","ChatterPrefix":"{{{e.prefix}}}"}]}
+            """));
+        return $$$"""{"GameDataObjects":[{{{objects}}}]}""";
+    }
+
+    [Fact]
+    public void ParseChatterPrefixes_EmptyBundle_ReturnsEmptyDict()
+    {
+        var result = Poe2SpeakerNameParser.ParseChatterPrefixes("""{"GameDataObjects":[]}""");
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public void ParseChatterPrefixes_SingleEntry_ReturnsPrefixKeyedByGuid()
+    {
+        var json = MakeChatterJson(("9c5f12c9-e93d-4952-9f1a-726c9498f8fb", "eder"));
+        var result = Poe2SpeakerNameParser.ParseChatterPrefixes(json);
+        Assert.Equal("eder", result["9c5f12c9-e93d-4952-9f1a-726c9498f8fb"]);
+    }
+
+    [Fact]
+    public void ParseChatterPrefixes_NullOrEmptyPrefix_Skipped()
+    {
+        var objects = """
+            {"ID":"aaaa-0000","DebugName":"X","Components":[{"ChatterPrefix":""}]},
+            {"ID":"bbbb-0000","DebugName":"Y","Components":[{}]}
+            """;
+        var json = $$$"""{"GameDataObjects":[{{{objects}}}]}""";
+        var result = Poe2SpeakerNameParser.ParseChatterPrefixes(json);
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public void ParseChatterPrefixes_MultipleEntries_AllPresent()
+    {
+        var json = MakeChatterJson(
+            ("9c5f12c9-e93d-4952-9f1a-726c9498f8fb", "eder"),
+            ("5529e4b7-42dc-4895-b9f8-23375a945413", "aloth"));
+        var result = Poe2SpeakerNameParser.ParseChatterPrefixes(json);
+        Assert.Equal(2, result.Count);
+        Assert.Equal("eder",  result["9c5f12c9-e93d-4952-9f1a-726c9498f8fb"]);
+        Assert.Equal("aloth", result["5529e4b7-42dc-4895-b9f8-23375a945413"]);
+    }
+
+    [Fact]
+    public void ParseChatterPrefixes_LookupIsCaseInsensitive()
+    {
+        var json = MakeChatterJson(("9C5F12C9-E93D-4952-9F1A-726C9498F8FB", "eder"));
+        var result = Poe2SpeakerNameParser.ParseChatterPrefixes(json);
+        Assert.True(result.ContainsKey("9c5f12c9-e93d-4952-9f1a-726c9498f8fb"));
+    }
+
+    [Fact]
+    public void ParseChatterPrefixes_EntryWithNoComponents_Skipped()
+    {
+        var json = """{"GameDataObjects":[{"ID":"aaaa-0000","DebugName":"X","Components":[]}]}""";
+        var result = Poe2SpeakerNameParser.ParseChatterPrefixes(json);
+        Assert.Empty(result);
+    }
 }

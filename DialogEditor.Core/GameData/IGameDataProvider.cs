@@ -16,6 +16,9 @@ public interface IGameDataProvider
         EnumerateConversations().FirstOrDefault(f => f.Name == name);
     IReadOnlyDictionary<string, string> LoadSpeakerNames();
 
+    /// Returns a GUID → ChatterPrefix map for PoE2. Default returns empty; PoE1 unaffected.
+    IReadOnlyDictionary<string, string> LoadChatterPrefixes() => new Dictionary<string, string>();
+
     /// Returns named entries grouped by lookup kind (e.g. "Quest", "Item", "GlobalVariable").
     /// Called once when a game folder is opened. Returns empty dict when no data is available.
     /// Default returns empty; override in providers that supply game data.
