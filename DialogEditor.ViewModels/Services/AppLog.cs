@@ -9,7 +9,7 @@ namespace DialogEditor.ViewModels.Services;
 /// </summary>
 public static class AppLog
 {
-    private static readonly string LogPath = Path.Combine(
+    public static readonly string LogPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "PillarsDialogEditor", "app.log");
 

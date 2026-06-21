@@ -1190,7 +1190,8 @@ public partial class MainWindowViewModel : ObservableObject
 
     // ── About (Help menu) ─────────────────────────────────────────────────
     public const string RepositoryUrl = "https://github.com/kjmikkel/PillarsDialogEditor";
-    public const string DocsUrl = "https://github.com/kjmikkel/PillarsDialogEditor#readme";
+    public const string IssuesUrl     = "https://github.com/kjmikkel/PillarsDialogEditor/issues";
+    public const string DocsUrl       = "https://github.com/kjmikkel/PillarsDialogEditor#readme";
 
     /// Set by the UI layer to open the About window.
     public Action<AboutViewModel>? ShowAbout { get; set; }

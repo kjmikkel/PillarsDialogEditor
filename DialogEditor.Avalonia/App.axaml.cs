@@ -7,6 +7,7 @@ using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.Avalonia.Shared.Theming;
 using DialogEditor.Avalonia.Views;
 using DialogEditor.Core.Resources;
+using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
 
@@ -14,6 +15,9 @@ namespace DialogEditor.Avalonia;
 
 public partial class App : Application
 {
+    // One report window per exception type — avoids a cascade of windows for repeated errors.
+    private readonly HashSet<string> _reportedExceptionTypes = [];
+
     public override void Initialize() => AvaloniaXamlLoader.Load(this);
 
     public override void OnFrameworkInitializationCompleted()
@@ -29,16 +33,23 @@ public partial class App : Application
             Dispatcher.UIThread.UnhandledException += (_, e) =>
             {
                 AppLog.Error("Unhandled UI dispatcher exception", e.Exception);
+                ShowExceptionReport(e.Exception);
                 e.Handled = true;
             };
 
             // Background/Task exceptions and OS-level throws that bypass the dispatcher.
             AppDomain.CurrentDomain.UnhandledException += (_, e) =>
-                AppLog.Error("Unhandled domain exception", e.ExceptionObject as Exception);
+            {
+                var ex = e.ExceptionObject as Exception;
+                AppLog.Error("Unhandled domain exception", ex);
+                if (ex is not null)
+                    Dispatcher.UIThread.Post(() => ShowExceptionReport(ex));
+            };
             TaskScheduler.UnobservedTaskException += (_, e) =>
             {
                 AppLog.Error("Unobserved task exception", e.Exception);
                 e.SetObserved();
+                Dispatcher.UIThread.Post(() => ShowExceptionReport(e.Exception));
             };
             Loc.Configure(new AvaloniaStringProvider());
             // Apply the persisted theme before the first window is shown (overrides the
@@ -76,5 +87,17 @@ public partial class App : Application
             }
         }
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private void ShowExceptionReport(Exception ex)
+    {
+        // Show at most one window per exception type to avoid flooding the desktop.
+        var typeName = ex.GetType().Name;
+        if (!_reportedExceptionTypes.Add(typeName)) return;
+
+        var vm = new ExceptionReportViewModel(ex, AppLog.LogPath, MainWindowViewModel.IssuesUrl);
+        var window = new ExceptionReportWindow(vm);
+        window.Closed += (_, _) => _reportedExceptionTypes.Remove(typeName);
+        window.Show();
     }
 }

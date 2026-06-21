@@ -49,7 +49,7 @@
                     <!-- Colour swatch — always visible; opens flyout with 7 swatches -->
                     <Button Grid.Column="0"
                             x:Name="ColorPickerButton"
-                            Width="18" Height="18"
+                            Width="24" Height="24"
                             Padding="0" Margin="0,0,6,0"
                             BorderThickness="1"
                             BorderBrush="{DynamicResource Brush.Text.OnAccent}"
@@ -66,43 +66,43 @@
                         <Button.Flyout>
                             <Flyout Placement="BottomEdgeAlignedLeft">
                                 <StackPanel Orientation="Horizontal" Spacing="4" Margin="4">
-                                    <Button Width="18" Height="18" Padding="0" Cursor="Hand"
+                                    <Button Width="24" Height="24" Padding="0" Cursor="Hand"
                                             Tag="Yellow" BorderThickness="0"
                                             Background="{StaticResource Brush.Annotation.Yellow.Stroke}"
                                             Click="ColorSwatch_Click"
                                             ToolTip.Tip="{DynamicResource ColorName_Yellow}"
                                             AutomationProperties.Name="{DynamicResource ColorName_Yellow}"/>
-                                    <Button Width="18" Height="18" Padding="0" Cursor="Hand"
+                                    <Button Width="24" Height="24" Padding="0" Cursor="Hand"
                                             Tag="Red" BorderThickness="0"
                                             Background="{StaticResource Brush.Annotation.Red.Stroke}"
                                             Click="ColorSwatch_Click"
                                             ToolTip.Tip="{DynamicResource ColorName_Red}"
                                             AutomationProperties.Name="{DynamicResource ColorName_Red}"/>
-                                    <Button Width="18" Height="18" Padding="0" Cursor="Hand"
+                                    <Button Width="24" Height="24" Padding="0" Cursor="Hand"
                                             Tag="Green" BorderThickness="0"
                                             Background="{StaticResource Brush.Annotation.Green.Stroke}"
                                             Click="ColorSwatch_Click"
                                             ToolTip.Tip="{DynamicResource ColorName_Green}"
                                             AutomationProperties.Name="{DynamicResource ColorName_Green}"/>
-                                    <Button Width="18" Height="18" Padding="0" Cursor="Hand"
+                                    <Button Width="24" Height="24" Padding="0" Cursor="Hand"
                                             Tag="Blue" BorderThickness="0"
                                             Background="{StaticResource Brush.Annotation.Blue.Stroke}"
                                             Click="ColorSwatch_Click"
                                             ToolTip.Tip="{DynamicResource ColorName_Blue}"
                                             AutomationProperties.Name="{DynamicResource ColorName_Blue}"/>
-                                    <Button Width="18" Height="18" Padding="0" Cursor="Hand"
+                                    <Button Width="24" Height="24" Padding="0" Cursor="Hand"
                                             Tag="Purple" BorderThickness="0"
                                             Background="{StaticResource Brush.Annotation.Purple.Stroke}"
                                             Click="ColorSwatch_Click"
                                             ToolTip.Tip="{DynamicResource ColorName_Purple}"
                                             AutomationProperties.Name="{DynamicResource ColorName_Purple}"/>
-                                    <Button Width="18" Height="18" Padding="0" Cursor="Hand"
+                                    <Button Width="24" Height="24" Padding="0" Cursor="Hand"
                                             Tag="Teal" BorderThickness="0"
                                             Background="{StaticResource Brush.Annotation.Teal.Stroke}"
                                             Click="ColorSwatch_Click"
                                             ToolTip.Tip="{DynamicResource ColorName_Teal}"
                                             AutomationProperties.Name="{DynamicResource ColorName_Teal}"/>
-                                    <Button Width="18" Height="18" Padding="0" Cursor="Hand"
+                                    <Button Width="24" Height="24" Padding="0" Cursor="Hand"
                                             Tag="Orange" BorderThickness="0"
                                             Background="{StaticResource Brush.Annotation.Orange.Stroke}"
                                             Click="ColorSwatch_Click"
