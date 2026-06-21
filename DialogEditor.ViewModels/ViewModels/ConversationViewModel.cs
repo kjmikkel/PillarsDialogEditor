@@ -57,8 +57,9 @@ public partial class ConversationViewModel : ObservableObject
         };
     }
 
-    public ObservableCollection<NodeViewModel>      Nodes       { get; } = [];
+    public ObservableCollection<NodeViewModel>       Nodes       { get; } = [];
     public ObservableCollection<ConnectionViewModel> Connections { get; } = [];
+    public ObservableCollection<AnnotationViewModel> Annotations { get; } = [];
 
     private void OnNodeTextChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
@@ -273,6 +274,7 @@ public partial class ConversationViewModel : ObservableObject
         IsModified  = false;
         Nodes.Clear();
         Connections.Clear();
+        Annotations.Clear();
         SelectedNode = null;
         SearchQuery  = string.Empty;
         BaseSnapshot = null;
@@ -572,6 +574,34 @@ public partial class ConversationViewModel : ObservableObject
         foreach (var node in Nodes)
             if (positions.TryGetValue(node.NodeId, out var pos))
                 node.Location = pos;
+    }
+
+    // ── Annotation helpers ────────────────────────────────────────────────
+    public void AddAnnotation(AnnotationViewModel annotation)
+    {
+        annotation.UndoStack = _undoStack;
+        _undoStack.Execute(new AddAnnotationCommand(this, annotation));
+        IsModified = true;
+    }
+
+    public void DeleteAnnotation(AnnotationViewModel annotation)
+    {
+        _undoStack.Execute(new DeleteAnnotationCommand(this, annotation));
+        IsModified = true;
+    }
+
+    public IReadOnlyList<Core.Editing.AnnotationSnapshot> GetCurrentAnnotations() =>
+        [.. Annotations.Select(a => a.ToSnapshot())];
+
+    public void RestoreAnnotations(IReadOnlyList<Core.Editing.AnnotationSnapshot> snapshots)
+    {
+        Annotations.Clear();
+        foreach (var s in snapshots)
+        {
+            var vm = AnnotationViewModel.FromSnapshot(s);
+            vm.UndoStack = _undoStack;
+            Annotations.Add(vm);
+        }
     }
 
     // ── Snapshot for save ─────────────────────────────────────────────────

@@ -430,6 +430,63 @@ binary reports this version at runtime via `--version`.
 
 ---
 
+## PoE1 vs. PoE2 — What's different
+
+The editor supports both games, but the two were built with different technology and
+store their data in different ways. This creates some visible differences — none of
+them are bugs.
+
+### Autocomplete and lookup dropdowns
+
+When you edit a condition or script parameter, the editor can offer a searchable
+dropdown populated from the game's own data files (Quests, Abilities, Items, Classes,
+and so on). **PoE2 has far more of these dropdowns than PoE1.** Here's why and what
+to expect in each game:
+
+| Parameter type | PoE2 | PoE1 |
+|----------------|------|------|
+| Global variable name | Searchable list from game data | Searchable list from game data |
+| Speaker / Listener | Searchable list built from loaded conversations | Searchable list built from loaded conversations |
+| Quest, Item, Ability, Class, Race, Subrace, Background, Culture, Faction, Deity, Skill, Status effect, Weapon type, Map, Phrase, Keyword, Conversation | Searchable list from game data | **Type manually** (see note below) |
+| Enum values (difficulty, disposition, attack type, …) | Dropdown | Dropdown |
+
+**Why is PoE1's list shorter?**
+
+PoE2 stores almost all of its game data in plain JSON files that sit alongside the
+conversation files — the editor can read those files directly to build its
+suggestion lists. PoE1 stores the same kind of data inside Unity binary asset
+bundles (`.assets` files), which are a compiled, proprietary format. Decoding them
+reliably requires Unity's own toolchain, which the editor does not bundle. The only
+PoE1 data files that are plain text and readable without special tools are the
+global-variables file and the speaker names embedded in the conversation files
+themselves — so those are the only ones with live suggestions.
+
+**What to do when there's no dropdown**
+
+For parameters that require manual entry in PoE1 (Quest names, Item names, etc.)
+you will need to type the internal string name exactly as it appears in the game
+files. These strings follow a predictable naming convention — for example,
+`07_qst_buried_secrets` for a quest or `NPC_Eder` for a character tag. You can
+find the correct strings by opening the relevant `.conversation` files in the
+editor and reading how the existing conditions are written, or by consulting the
+[PoE modding wiki](https://pillarsofeternity.gamepedia.com/Modding).
+
+### File formats
+
+PoE1 conversations are stored as `.conversation` XML files. PoE2 conversations
+use `.conversationbundle` JSON files. The editor reads and writes both; you never
+need to handle the raw files yourself.
+
+### Parameter types for the same condition
+
+Several conditions exist in both games but accept different parameter types. For
+example, `CheckFactionStanding` takes a plain string faction name in PoE1 and a
+GUID in PoE2. The editor shows both variants in the catalogue and automatically
+filters to the one that matches your loaded game, so you will never accidentally
+add a PoE2-only condition to a PoE1 conversation.
+
+---
+
 ## Keyboard Shortcuts
 
 Press **`?`** in the editor to open the floating Legend window, which lists all

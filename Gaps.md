@@ -66,7 +66,7 @@ The Version Control Integration section is now essentially complete.
 > **Deferred idea (revisit) — first-run intro for the compare/apply window.** A one-time, dismissible explanatory panel shown the first time a writer opens the compare window, to orient non-technical users. Deferred from the selective-apply design (`docs/superpowers/specs/2026-05-30-selective-apply-design.md`) because it needs persisted "seen" state; the always-on in-context cues (colour-key strip, one-line hint, plain-language tooltips, Help window) cover the immediate need. Worth reconsidering after selective apply ships.
 
 ### Canvas Annotations (Sticky Notes & Regions)
-**Deferred feature.** Writers should be able to leave free-floating annotations on the
+**✅ IMPLEMENTED (2026-06-21).** Writers can leave free-floating annotations on the
 conversation canvas — short reminders ("tighten this up, too many NPC nodes in a row") and
 at-a-glance area labels ("the critical romance path", "locked into combat from here", "the
 trauma conversation"). These serve both solo reminders and team communication.

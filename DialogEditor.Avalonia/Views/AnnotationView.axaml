@@ -1,0 +1,153 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+             xmlns:conv="clr-namespace:DialogEditor.Avalonia.Converters"
+             x:Class="DialogEditor.Avalonia.Views.AnnotationView"
+             x:CompileBindings="False"
+             x:DataType="vm:AnnotationViewModel">
+
+    <UserControl.Resources>
+        <conv:AnnotationColorConverter x:Key="AnnotationColor"/>
+    </UserControl.Resources>
+
+    <!-- Outer grid layers the decorative border (non-hit-testable) behind the interactive
+         content. This allows pointer events on the body area to fall through to nodes
+         beneath when not in edit mode, while the fill/stroke still renders. -->
+    <Grid>
+
+        <!-- Visual decoration only — never intercepts pointer events -->
+        <Border IsHitTestVisible="False"
+                CornerRadius="4"
+                BorderThickness="2">
+            <Border.BorderBrush>
+                <MultiBinding Converter="{StaticResource AnnotationColor}" ConverterParameter="Stroke">
+                    <Binding Path="ColorKey"/>
+                </MultiBinding>
+            </Border.BorderBrush>
+            <Border.Background>
+                <MultiBinding Converter="{StaticResource AnnotationColor}" ConverterParameter="Fill">
+                    <Binding Path="ColorKey"/>
+                </MultiBinding>
+            </Border.Background>
+        </Border>
+
+        <!-- Interactive content — each row controls its own hit-testability -->
+        <Grid RowDefinitions="Auto,*,Auto">
+
+            <!-- Title bar — coloured header, drag target, edit button, delete button -->
+            <Border Grid.Row="0"
+                    x:Name="TitleBar"
+                    CornerRadius="2,2,0,0"
+                    Padding="8,4"
+                    Cursor="SizeAll">
+                <Border.Background>
+                    <MultiBinding Converter="{StaticResource AnnotationColor}" ConverterParameter="Header">
+                        <Binding Path="ColorKey"/>
+                    </MultiBinding>
+                </Border.Background>
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                    <!-- Title — TextBlock when idle, TextBox when editing -->
+                    <TextBlock Grid.Column="0"
+                               x:Name="TitleDisplay"
+                               Text="{Binding Title}"
+                               Foreground="{DynamicResource Brush.Text.OnAccent}"
+                               FontWeight="SemiBold"
+                               FontSize="{DynamicResource FontSize.Body}"
+                               IsVisible="{Binding !IsEditing}"
+                               TextTrimming="CharacterEllipsis"
+                               VerticalAlignment="Center"
+                               ToolTip.Tip="{DynamicResource ToolTip_AnnotationTitle}"
+                               AutomationProperties.HelpText="{DynamicResource ToolTip_AnnotationTitle}"/>
+                    <TextBox Grid.Column="0"
+                             x:Name="TitleEdit"
+                             Text="{Binding Title}"
+                             IsVisible="{Binding IsEditing}"
+                             FontSize="{DynamicResource FontSize.Body}"
+                             Background="Transparent" BorderThickness="0"
+                             Foreground="{DynamicResource Brush.Text.OnAccent}"
+                             CaretBrush="{DynamicResource Brush.Text.OnAccent}"
+                             VerticalContentAlignment="Center"
+                             Watermark="{DynamicResource Placeholder_AnnotationTitle}"
+                             AutomationProperties.Name="{DynamicResource Placeholder_AnnotationTitle}"
+                             LostFocus="TitleEdit_LostFocus"
+                             KeyDown="TitleEdit_KeyDown"/>
+                    <!-- Edit button — hidden while editing -->
+                    <Button Grid.Column="1"
+                            x:Name="EditButton"
+                            Content="Edit"
+                            IsVisible="{Binding !IsEditing}"
+                            Background="Transparent" BorderThickness="0"
+                            Foreground="{DynamicResource Brush.Text.OnAccent}"
+                            FontSize="{DynamicResource FontSize.Small}"
+                            Padding="4,0" Margin="4,0,0,0"
+                            Cursor="Hand"
+                            Click="Edit_Click"
+                            ToolTip.Tip="{DynamicResource ToolTip_EditAnnotation}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_EditAnnotation}"
+                            AutomationProperties.Name="{DynamicResource AutomationName_EditAnnotation}"/>
+                    <!-- Delete button -->
+                    <Button Grid.Column="2"
+                            x:Name="DeleteButton"
+                            Content="✕"
+                            Background="Transparent" BorderThickness="0"
+                            Foreground="{DynamicResource Brush.Text.OnAccent}"
+                            FontSize="{DynamicResource FontSize.Small}"
+                            Padding="4,0" Margin="4,0,0,0"
+                            Cursor="Hand"
+                            Click="Delete_Click"
+                            ToolTip.Tip="{DynamicResource ToolTip_DeleteAnnotation}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_DeleteAnnotation}"
+                            AutomationProperties.Name="{DynamicResource AutomationName_DeleteAnnotation}"/>
+                </Grid>
+            </Border>
+
+            <!-- Body text area — not hit-testable when idle so pointer events reach nodes
+                 beneath; becomes hit-testable once IsEditing to allow TextBox interaction. -->
+            <Grid Grid.Row="1" Margin="8,6" IsHitTestVisible="{Binding IsEditing}">
+                <TextBlock x:Name="BodyDisplay"
+                           Text="{Binding Body}"
+                           Foreground="{DynamicResource Brush.Text.Primary}"
+                           FontSize="{DynamicResource FontSize.Small}"
+                           TextWrapping="Wrap"
+                           IsVisible="{Binding !IsEditing}"
+                           ToolTip.Tip="{DynamicResource ToolTip_AnnotationBody}"
+                           AutomationProperties.HelpText="{DynamicResource ToolTip_AnnotationBody}"/>
+                <TextBox x:Name="BodyEdit"
+                         Text="{Binding Body}"
+                         IsVisible="{Binding IsEditing}"
+                         AcceptsReturn="True"
+                         TextWrapping="Wrap"
+                         FontSize="{DynamicResource FontSize.Small}"
+                         Background="Transparent" BorderThickness="0"
+                         Foreground="{DynamicResource Brush.Text.Primary}"
+                         CaretBrush="{DynamicResource Brush.Text.Primary}"
+                         Watermark="{DynamicResource Placeholder_AnnotationBody}"
+                         AutomationProperties.Name="{DynamicResource Placeholder_AnnotationBody}"
+                         LostFocus="BodyEdit_LostFocus"
+                         KeyDown="BodyEdit_KeyDown"/>
+            </Grid>
+
+            <!-- Resize handle — bottom-right corner grip -->
+            <Border Grid.Row="2"
+                    x:Name="ResizeHandle"
+                    HorizontalAlignment="Right"
+                    Width="16" Height="16"
+                    Margin="0,0,2,2"
+                    Cursor="BottomRightCorner"
+                    Background="Transparent"
+                    ToolTip.Tip="{DynamicResource ToolTip_ResizeAnnotation}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_ResizeAnnotation}">
+                <!-- Three diagonal lines resize indicator -->
+                <Path Data="M 2,14 L 14,2 M 6,14 L 14,6 M 10,14 L 14,10"
+                      StrokeThickness="1.5" Stretch="None">
+                    <Path.Stroke>
+                        <MultiBinding Converter="{StaticResource AnnotationColor}" ConverterParameter="Stroke">
+                            <Binding Path="ColorKey"/>
+                        </MultiBinding>
+                    </Path.Stroke>
+                </Path>
+            </Border>
+
+        </Grid>
+    </Grid>
+</UserControl>

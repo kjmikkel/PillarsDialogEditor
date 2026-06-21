@@ -99,6 +99,24 @@
     <Color x:Key="Palette.Neutral.520">#FF838585</Color>
     <Color x:Key="Palette.Magenta.500">#FFEE00AA</Color>
 
+    <!-- Annotation box colours — semi-transparent fill + title header + solid stroke.
+         All hex lives here; Tokens.axaml references these via StaticResource. -->
+    <Color x:Key="Palette.Annotation.Yellow.Fill">#50F0A830</Color>
+    <Color x:Key="Palette.Annotation.Yellow.Header">#A0B8760A</Color>
+    <Color x:Key="Palette.Annotation.Yellow.Stroke">#FFF0A830</Color>
+    <Color x:Key="Palette.Annotation.Red.Fill">#50D33F2F</Color>
+    <Color x:Key="Palette.Annotation.Red.Header">#A07B241C</Color>
+    <Color x:Key="Palette.Annotation.Red.Stroke">#FFD33F2F</Color>
+    <Color x:Key="Palette.Annotation.Green.Fill">#505DB55D</Color>
+    <Color x:Key="Palette.Annotation.Green.Header">#A02D6A2D</Color>
+    <Color x:Key="Palette.Annotation.Green.Stroke">#FF5DB55D</Color>
+    <Color x:Key="Palette.Annotation.Blue.Fill">#504A9EFF</Color>
+    <Color x:Key="Palette.Annotation.Blue.Header">#A01A5276</Color>
+    <Color x:Key="Palette.Annotation.Blue.Stroke">#FF4A9EFF</Color>
+    <Color x:Key="Palette.Annotation.Purple.Fill">#50CC44AA</Color>
+    <Color x:Key="Palette.Annotation.Purple.Header">#A06B2F8E</Color>
+    <Color x:Key="Palette.Annotation.Purple.Stroke">#FFCC44AA</Color>
+
     <!-- Alpha / effect primitives (overlays + shadow live here so hex stays confined) -->
     <Color x:Key="Palette.Alpha.Scrim">#BB000000</Color>
     <Color x:Key="Palette.Alpha.Shadow">#A0000000</Color>

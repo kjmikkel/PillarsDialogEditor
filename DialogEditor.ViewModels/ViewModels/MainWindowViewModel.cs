@@ -762,6 +762,9 @@ public partial class MainWindowViewModel : ObservableObject
         var savedLayout = _project?.GetLayout(file.Name);
         if (savedLayout is not null) Canvas.RestoreLayout(savedLayout);
 
+        var savedAnnotations = _project?.GetAnnotations(file.Name);
+        if (savedAnnotations is not null) Canvas.RestoreAnnotations(savedAnnotations);
+
         Detail.Canvas = Canvas;
         var existingComments2 = _project?.Patches.TryGetValue(file.Name, out var p2) == true
             ? p2.NodeComments
@@ -787,8 +790,10 @@ public partial class MainWindowViewModel : ObservableObject
             {
                 var patch  = DiffEngine.Diff(_currentFile.Name, Canvas.BaseSnapshot, Canvas.BuildSnapshot(), _provider!.Language);
                 patch = patch with { NodeComments = Canvas.NodeComments };
-                var layout = Canvas.GetCurrentLayout();
-                SetProject(_project!.WithPatch(patch).WithLayout(_currentFile.Name, layout));
+                var layout      = Canvas.GetCurrentLayout();
+                var annotations = Canvas.GetCurrentAnnotations();
+                SetProject(_project!.WithPatch(patch).WithLayout(_currentFile.Name, layout)
+                    .WithAnnotations(_currentFile.Name, annotations));
             }
             DialogProjectSerializer.SaveToFile(_projectPath, _project!);
             Canvas.IsModified = false;
@@ -1486,6 +1491,10 @@ public partial class MainWindowViewModel : ObservableObject
             var savedLayout = _project?.GetLayout(file.Name);
             if (savedLayout is not null)
                 Canvas.RestoreLayout(savedLayout);
+
+            var savedAnnotations2 = _project?.GetAnnotations(file.Name);
+            if (savedAnnotations2 is not null)
+                Canvas.RestoreAnnotations(savedAnnotations2);
 
             Detail.Canvas = Canvas;
             var existingComments = _project?.Patches.TryGetValue(file.Name, out var p) == true

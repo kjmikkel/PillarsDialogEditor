@@ -293,6 +293,27 @@
     <!-- Ctrl+F shortcut is mentioned here so it appears in the hover tooltip -->
     <sys:String x:Key="ToolTip_SearchNodes">Search nodes by ID, dialogue text, or speaker name (Ctrl+F)</sys:String>
     <sys:String x:Key="ToolTip_ClearSearch">Clear search</sys:String>
+    <!-- Toolbar label and tooltip for the "add annotation" button -->
+    <sys:String x:Key="Label_AddAnnotation">+ Note / Region</sys:String>
+    <sys:String x:Key="ToolTip_AddAnnotation">Add annotation — places a sticky note or region box at the centre of the viewport. Click ✏ to edit; drag the title bar to move; drag the corner handle to resize. Right-click the canvas to add one at the cursor instead.</sys:String>
+    <!-- Canvas right-click context menu -->
+    <sys:String x:Key="Menu_Canvas_AddNodeHere">Add node here</sys:String>
+    <sys:String x:Key="ToolTip_Menu_Canvas_AddNodeHere">Create a new dialogue node at the right-clicked position (same as double-clicking the canvas background)</sys:String>
+    <sys:String x:Key="Menu_Canvas_AddAnnotationHere">Add note / region here</sys:String>
+    <sys:String x:Key="ToolTip_Menu_Canvas_AddAnnotationHere">Place a sticky-note or region box at the right-clicked position. Make it small for a reminder, large to label an area of the canvas.</sys:String>
+    <!-- AnnotationView: title field placeholder and tooltip -->
+    <sys:String x:Key="Placeholder_AnnotationTitle">Title (optional)</sys:String>
+    <sys:String x:Key="ToolTip_AnnotationTitle">Title for this annotation — shown in the header bar and visible at any size</sys:String>
+    <!-- AnnotationView: ✏ edit button -->
+    <sys:String x:Key="ToolTip_EditAnnotation">Edit this annotation — Tab moves from title to notes</sys:String>
+    <sys:String x:Key="AutomationName_EditAnnotation">Edit annotation</sys:String>
+    <!-- AnnotationView: body field placeholder and tooltip -->
+    <sys:String x:Key="Placeholder_AnnotationBody">Notes… (Tab)</sys:String>
+    <sys:String x:Key="ToolTip_AnnotationBody">Body text for this annotation — longer notes or reminders about this area of the conversation</sys:String>
+    <!-- AnnotationView: ✕ delete button -->
+    <sys:String x:Key="ToolTip_DeleteAnnotation">Delete this annotation (cannot be undone via Ctrl+Z)</sys:String>
+    <!-- AnnotationView: resize corner grip -->
+    <sys:String x:Key="ToolTip_ResizeAnnotation">Drag to resize the annotation box</sys:String>
     <!-- Minimap overlay in the bottom-right corner of the canvas -->
     <sys:String x:Key="ToolTip_Minimap">Canvas overview — drag to pan</sys:String>
 
@@ -1000,6 +1021,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="AutomationName_ZoomIn">Zoom in</sys:String>
     <sys:String x:Key="AutomationName_ZoomOut">Zoom out</sys:String>
     <sys:String x:Key="AutomationName_JumpToRoot">Jump to root node</sys:String>
+    <sys:String x:Key="AutomationName_AddAnnotation">Add annotation</sys:String>
+    <sys:String x:Key="AutomationName_DeleteAnnotation">Delete annotation</sys:String>
     <sys:String x:Key="AutomationName_ClearSearch">Clear search</sys:String>
     <sys:String x:Key="AutomationName_GoToNode">Go to node</sys:String>
     <sys:String x:Key="AutomationName_ClearFilter">Clear filter</sys:String>

@@ -1,4 +1,3 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -8,12 +7,82 @@ using DialogEditor.Core.Layout;
 using DialogEditor.Core.Models;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Services;
+using System.Collections.Specialized;
+using System.ComponentModel;
 
 namespace DialogEditor.Avalonia.Views;
 
 public partial class ConversationView : UserControl
 {
-    public ConversationView() => InitializeComponent();
+    // Exposed so AnnotationView can divide drag deltas by zoom.
+    internal double EditorZoom => Editor.ViewportZoom;
+
+    private ConversationViewModel? _annotationVm;
+
+    public ConversationView()
+    {
+        InitializeComponent();
+
+        Editor.PropertyChanged += (_, e) =>
+        {
+            if (e.Property.Name is nameof(Editor.ViewportZoom) or nameof(Editor.ViewportLocation))
+                SyncAllAnnotations();
+        };
+
+        DataContextChanged += (_, _) => ResubscribeAnnotations();
+        Loaded += (_, _) => { ResubscribeAnnotations(); SyncAllAnnotations(); };
+    }
+
+    private void ResubscribeAnnotations()
+    {
+        if (_annotationVm is not null)
+        {
+            _annotationVm.Annotations.CollectionChanged -= OnAnnotationsChanged;
+            foreach (var ann in _annotationVm.Annotations)
+                ann.PropertyChanged -= OnAnnotationWorldChanged;
+        }
+
+        _annotationVm = DataContext as ConversationViewModel;
+
+        if (_annotationVm is not null)
+        {
+            _annotationVm.Annotations.CollectionChanged += OnAnnotationsChanged;
+            foreach (var ann in _annotationVm.Annotations)
+                ann.PropertyChanged += OnAnnotationWorldChanged;
+        }
+
+        SyncAllAnnotations();
+    }
+
+    private void OnAnnotationsChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.OldItems is not null)
+            foreach (AnnotationViewModel ann in e.OldItems)
+                ann.PropertyChanged -= OnAnnotationWorldChanged;
+        if (e.NewItems is not null)
+            foreach (AnnotationViewModel ann in e.NewItems)
+                ann.PropertyChanged += OnAnnotationWorldChanged;
+        SyncAllAnnotations();
+    }
+
+    private void OnAnnotationWorldChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (sender is AnnotationViewModel ann &&
+            e.PropertyName is nameof(AnnotationViewModel.X) or nameof(AnnotationViewModel.Y)
+                          or nameof(AnnotationViewModel.Width) or nameof(AnnotationViewModel.Height))
+        {
+            ann.SyncScreen(Editor.ViewportZoom, Editor.ViewportLocation.X, Editor.ViewportLocation.Y);
+        }
+    }
+
+    private void SyncAllAnnotations()
+    {
+        if (DataContext is not ConversationViewModel vm) return;
+        var zoom = Editor.ViewportZoom;
+        var loc  = Editor.ViewportLocation;
+        foreach (var ann in vm.Annotations)
+            ann.SyncScreen(zoom, loc.X, loc.Y);
+    }
 
     /// Raised when the user presses Enter on a selected node — MainWindow owns
     /// the detail panel and moves focus there (keyboard path into text editing).
@@ -152,6 +221,67 @@ public partial class ConversationView : UserControl
         var root = vm.Nodes.FirstOrDefault(n => n.NodeId == 0);
         if (root is not null)
             Editor.BringIntoView(new global::Avalonia.Point(root.Location.X, root.Location.Y));
+    }
+
+    // ── Annotation handlers ───────────────────────────────────────────────
+
+    // Canvas coords captured on right-click (PointerPressed fires before the context menu
+    // opens, so the position is still accurate when a MenuItem.Click eventually fires).
+    private global::Avalonia.Point _contextMenuCanvasPos;
+
+    private void Editor_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        if (!e.GetCurrentPoint(Editor).Properties.IsRightButtonPressed) return;
+        var screenPos = e.GetPosition(Editor);
+        var zoom      = Editor.ViewportZoom;
+        var origin    = Editor.ViewportLocation;
+        var (cx, cy)  = CanvasMath.ScreenToCanvas(screenPos.X, screenPos.Y, zoom, origin.X, origin.Y);
+        _contextMenuCanvasPos = new global::Avalonia.Point(cx, cy);
+    }
+
+    private void AddAnnotation_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not ConversationViewModel vm) return;
+
+        // Place at the centre of the current viewport.
+        var zoom  = Editor.ViewportZoom;
+        var loc   = Editor.ViewportLocation;
+        var cx    = loc.X + (Editor.Bounds.Width  / 2) / zoom;
+        var cy    = loc.Y + (Editor.Bounds.Height / 2) / zoom;
+
+        var annotation = new AnnotationViewModel { X = cx - 120, Y = cy - 70 };
+        vm.AddAnnotation(annotation);
+    }
+
+    private void CanvasMenu_AddNode_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not ConversationViewModel vm) return;
+
+        var newId   = NodeIdAllocator.Next(vm.Nodes.Select(n => n.NodeId));
+        var newNode = new NodeViewModel(
+            new ConversationNode(newId, false, SpeakerCategory.Npc,
+                string.Empty, string.Empty, [], [], [], "Conversation", "None"),
+            new StringEntry(newId, string.Empty, string.Empty));
+
+        vm.AddNode(newNode, new LayoutPoint((int)_contextMenuCanvasPos.X, (int)_contextMenuCanvasPos.Y));
+    }
+
+    private void CanvasMenu_AddAnnotation_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not ConversationViewModel vm) return;
+
+        var annotation = new AnnotationViewModel
+        {
+            X = _contextMenuCanvasPos.X - 120,
+            Y = _contextMenuCanvasPos.Y - 70,
+        };
+        vm.AddAnnotation(annotation);
+    }
+
+    private void Annotation_DeleteRequested(object? sender, AnnotationViewModel annotation)
+    {
+        if (DataContext is ConversationViewModel vm)
+            vm.DeleteAnnotation(annotation);
     }
 
     private void Editor_DoubleTapped(object? sender, TappedEventArgs e)

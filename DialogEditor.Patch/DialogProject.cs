@@ -1,3 +1,4 @@
+using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 
 namespace DialogEditor.Patch;
@@ -11,7 +12,10 @@ public record DialogProject(
     IReadOnlyDictionary<string, IReadOnlyDictionary<int, LayoutPoint>>? Layouts = null,
     // Names of conversations that don't yet exist on disk.
     // Nullable for back-compat with old .dialogproject files.
-    IReadOnlyList<string>? NewConversations = null)
+    IReadOnlyList<string>? NewConversations = null,
+    // Canvas annotations per conversation — editor metadata only, never in game files.
+    // Nullable for back-compat with old .dialogproject files.
+    IReadOnlyDictionary<string, IReadOnlyList<AnnotationSnapshot>>? Annotations = null)
 {
     public static readonly int CurrentSchemaVersion = 1;
 
@@ -60,7 +64,24 @@ public record DialogProject(
             .Concat(other.NewConversations ?? [])
             .Distinct()
             .ToList();
-        return result with { NewConversations = combined.Count > 0 ? combined : null };
+        result = result with { NewConversations = combined.Count > 0 ? combined : null };
+
+        var allAnnotationConvs = (Annotations?.Keys ?? [])
+            .Concat(other.Annotations?.Keys ?? [])
+            .Distinct();
+        foreach (var convName in allAnnotationConvs)
+        {
+            var mine   = Annotations?.GetValueOrDefault(convName);
+            var theirs = other.Annotations?.GetValueOrDefault(convName);
+            if (mine is not null && theirs is not null)
+                result = result.MergeAnnotations(convName, theirs);
+            else if (mine is not null)
+                result = result.WithAnnotations(convName, mine);
+            else
+                result = result.WithAnnotations(convName, theirs!);
+        }
+
+        return result;
     }
 
     public DialogProject WithPatch(ConversationPatch patch) =>
@@ -82,6 +103,36 @@ public record DialogProject(
 
     public IReadOnlyDictionary<int, LayoutPoint>? GetLayout(string conversationName) =>
         Layouts?.GetValueOrDefault(conversationName);
+
+    public DialogProject WithAnnotations(
+        string conversationName,
+        IReadOnlyList<AnnotationSnapshot> annotations) =>
+        this with
+        {
+            Annotations = new Dictionary<string, IReadOnlyList<AnnotationSnapshot>>(
+                Annotations ?? new Dictionary<string, IReadOnlyList<AnnotationSnapshot>>())
+                { [conversationName] = annotations }
+        };
+
+    public IReadOnlyList<AnnotationSnapshot>? GetAnnotations(string conversationName) =>
+        Annotations?.GetValueOrDefault(conversationName);
+
+    /// Merges <paramref name="incoming"/> annotations into the existing set for
+    /// <paramref name="conversationName"/>. Incoming wins on any ID collision;
+    /// annotations present only in the existing set are preserved.
+    public DialogProject MergeAnnotations(
+        string conversationName,
+        IReadOnlyList<AnnotationSnapshot> incoming)
+    {
+        var existing = Annotations?.GetValueOrDefault(conversationName)
+                       ?? (IReadOnlyList<AnnotationSnapshot>)[];
+
+        var merged = existing.ToDictionary(s => s.Id);
+        foreach (var s in incoming)
+            merged[s.Id] = s;
+
+        return WithAnnotations(conversationName, [.. merged.Values]);
+    }
 
     /// <summary>
     /// Merges <paramref name="incoming"/> positions into the existing layout for
