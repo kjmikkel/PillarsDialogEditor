@@ -119,15 +119,24 @@ public partial class VoValidationViewModel : ObservableObject
             // Deliberate cancellation — swallow silently per project convention.
             cancelled = true;
         }
+        catch (Exception ex)
+        {
+            // Unexpected failure (e.g. IOException from VoPathResolver.Check).
+            // Log it and treat the run as cancelled so the UI recovers cleanly.
+            AppLog.Error("VO validation scan failed unexpectedly", ex);
+            cancelled = true;
+        }
+        finally
+        {
+            // Apply results on the caller's thread (UI thread in production; test thread in tests).
+            foreach (var issue in batch)
+                Results.Add(issue);
 
-        // Apply results on the caller's thread (UI thread in production; test thread in tests).
-        foreach (var issue in batch)
-            Results.Add(issue);
-
-        IsRunning   = false;
-        SummaryText = cancelled
-            ? Loc.Format("VoValidation_Cancelled", checked_, missing)
-            : Loc.Format("VoValidation_Summary",   checked_, missing);
+            IsRunning   = false;
+            SummaryText = cancelled
+                ? Loc.Format("VoValidation_Cancelled", checked_, missing)
+                : Loc.Format("VoValidation_Summary",   checked_, missing);
+        }
     }
 
     private static string BuildPreview(string text)
