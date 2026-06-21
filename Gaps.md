@@ -460,10 +460,14 @@ work is a delivery mechanism and a translation workflow, not a rewrite.
 - `NoStaticStringResourceTests` enforces `{DynamicResource}` for all string keys.
 
 **Work needed (items 4–6):**
-4. **Translation workflow (the real cost):** `.axaml` is translator-hostile. An
-   export/import bridge to XLIFF or CSV is needed — the in-house
-   `LocalizationExportService`/`ImportService` pattern (built for game content) is the
-   template.
+4. **Translation workflow. ✓ Implemented.** `UiStringExportService` reads the two embedded
+   AXAML dictionaries (`Strings.axaml`, `SharedStrings.axaml`) and writes a four-column CSV
+   (Key, Source, Translation, File). `UiStringImportService` reads a completed CSV and writes
+   one `*.{lang}.axaml` overlay per source file, including the `_LanguageOverlayMarker`
+   sentinel required by `LanguageApplier`. Both are wired to **Help ▸ Export UI strings…**
+   and **Help ▸ Import translated UI strings…** in the main menu. Language code is
+   auto-detected from the CSV filename (`ui-strings.de.csv` → `de`) or prompted via the
+   `LanguageCodeDialog` if not detectable.
 5. **Layout elasticity audit. ✓ Implemented.** Fixed: `SettingsWindow` label style `Width="140"` → `MinWidth="140"` (labels now grow to fit longer translated text); `FindReplaceWindow` label columns `70px` → `Auto` (grow with translated "Find:"/"Replace:" labels); added `MinWidth`/`MinHeight` to six large windows that had neither (BranchesWindow, HistoryWindow, BlameWindow, DiffWindow, GitConflictResolutionWindow, LegendWindow). Node cards (200px), table column trimming, and canvas-area `MaxHeight` constraints are intentional fixed-space layouts — left as-is.
 6. Minor: naive pluralisation (`"{0} nodes"` breaks in languages with multiple plural
    forms — usually accepted in tools).
