@@ -3,7 +3,7 @@
         x:Class="DialogEditor.Avalonia.Views.BlameWindow"
         Title="{DynamicResource BlameWindow_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Width="780" Height="520"
+        Width="780" Height="520" MinWidth="620" MinHeight="380"
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource Brush.Surface.Panel}">
 

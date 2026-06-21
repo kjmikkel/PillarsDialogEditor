@@ -8,7 +8,7 @@
         x:Class="DialogEditor.Avalonia.Views.DiffWindow"
         Title="{DynamicResource DiffWindow_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Width="820" Height="560"
+        Width="820" Height="560" MinWidth="640" MinHeight="420"
         Background="{DynamicResource Brush.Surface.Panel}"
         WindowStartupLocation="CenterOwner"
         x:CompileBindings="False">

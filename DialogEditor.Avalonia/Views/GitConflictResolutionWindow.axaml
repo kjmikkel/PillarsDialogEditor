@@ -4,7 +4,7 @@
         x:Class="DialogEditor.Avalonia.Views.GitConflictResolutionWindow"
         Title="{DynamicResource GitConflictWindow_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Width="780" Height="500"
+        Width="780" Height="500" MinWidth="620" MinHeight="380"
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource Brush.Surface.Panel}">
 

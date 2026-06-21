@@ -464,10 +464,7 @@ work is a delivery mechanism and a translation workflow, not a rewrite.
    export/import bridge to XLIFF or CSV is needed — the in-house
    `LocalizationExportService`/`ImportService` pattern (built for game content) is the
    template.
-5. **Layout elasticity audit:** German/French run ~30% longer; fixed label widths
-   (`Width="140"` in Settings), `CanResize="False"` fixed-height windows, and 200px node
-   cards will clip. Overlaps with Accessibility item 6 (font tokens / text scaling) —
-   do them together.
+5. **Layout elasticity audit. ✓ Implemented.** Fixed: `SettingsWindow` label style `Width="140"` → `MinWidth="140"` (labels now grow to fit longer translated text); `FindReplaceWindow` label columns `70px` → `Auto` (grow with translated "Find:"/"Replace:" labels); added `MinWidth`/`MinHeight` to six large windows that had neither (BranchesWindow, HistoryWindow, BlameWindow, DiffWindow, GitConflictResolutionWindow, LegendWindow). Node cards (200px), table column trimming, and canvas-area `MaxHeight` constraints are intentional fixed-space layouts — left as-is.
 6. Minor: naive pluralisation (`"{0} nodes"` breaks in languages with multiple plural
    forms — usually accepted in tools).
 

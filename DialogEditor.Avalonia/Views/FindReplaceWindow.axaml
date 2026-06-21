@@ -41,7 +41,7 @@
     <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="14,10,14,10">
 
         <!-- Find row -->
-        <Grid Grid.Row="0" ColumnDefinitions="70,*" Margin="0,0,0,6">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,6">
             <TextBlock Grid.Column="0" Text="{DynamicResource FindReplace_FindLabel}"
                        Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
             <TextBox Grid.Column="1" Classes="find-box"
@@ -53,7 +53,7 @@
         </Grid>
 
         <!-- Replace row -->
-        <Grid Grid.Row="1" ColumnDefinitions="70,*" Margin="0,0,0,8">
+        <Grid Grid.Row="1" ColumnDefinitions="Auto,*" Margin="0,0,0,8">
             <TextBlock Grid.Column="0" Text="{DynamicResource FindReplace_ReplaceLabel}"
                        Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
             <TextBox Grid.Column="1" Classes="find-box"
