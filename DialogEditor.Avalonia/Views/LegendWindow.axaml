@@ -3,7 +3,7 @@
         x:Class="DialogEditor.Avalonia.Views.LegendWindow"
         Title="{DynamicResource Legend_WindowTitle}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Width="360" Height="640" MinHeight="300" MaxHeight="840"
+        Width="360" Height="640" MinWidth="300" MinHeight="300" MaxHeight="840"
         CanResize="True"
         ShowInTaskbar="False"
         Background="{DynamicResource Brush.Surface.Info}">

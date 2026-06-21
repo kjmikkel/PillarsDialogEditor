@@ -6,7 +6,7 @@
         x:DataType="vm:BranchesViewModel"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Title="{DynamicResource Branches_WindowTitle}"
-        Width="420" Height="380"
+        Width="420" Height="380" MinWidth="340" MinHeight="280"
         WindowStartupLocation="CenterOwner">
   <DockPanel Margin="12">
     <TextBlock DockPanel.Dock="Bottom" Text="{Binding StatusText}" TextWrapping="Wrap"
