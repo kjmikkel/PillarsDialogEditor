@@ -10,10 +10,8 @@
 ### Exception Report Window ✓ implemented
 Non-blocking `ExceptionReportWindow` shows exception type, message, scrollable monospace stack trace, a **Copy to clipboard** button, a clickable GitHub Issues link, and the log file path. Deduplicates per exception type per session (one window per type; re-shows after the window is closed). Wired into all three exception hooks in `App.axaml.cs`.
 
-### ViewModel Test Coverage
-Significant coverage has been added: both `IGameDataProvider` implementations, `AutoLayoutService`, and several previously untested ViewModels (ConversationFolderViewModel, ConversationItemViewModel, PatchEntryViewModel, SettingsViewModel) now have tests. The remaining gaps are:
-
-- Views / Converters — mostly covered: all 13 converters have unit tests; `LanguageCodeDialog`, `LegendWindow`, `UnsavedChangesDialog`, `ConflictResolutionDialog`, and `ConversationNameDialog` have headless Avalonia integration tests. Remaining untested views (`MainWindow` wiring, `NodeDetailView` modal launchers, and the Nodify canvas controls) contain no testable logic beyond what is already covered at the ViewModel layer.
+### ViewModel Test Coverage ✓ implemented
+All ViewModels with non-trivial logic now have tests. Added: `AnnotationViewModelTests` (minimum-size clamping, `SyncScreen` math, snapshot round-trip, undo integration), `ConversationChangeViewModelTests` (tri-state `IsAllSelected`, `SelectedNodeIds`, `AutoPull` dependency closure), and `NodeChangeViewModelTests` (`SelectionChanged` event). Pure pass-through rows (`CommitRowViewModel`, `NodeBlameRowViewModel`) have no logic worth testing. Remaining untested views (`MainWindow` wiring, `NodeDetailView` modal launchers, Nodify canvas controls) contain no testable logic beyond what is already covered at the ViewModel layer.
 
 ---
 
