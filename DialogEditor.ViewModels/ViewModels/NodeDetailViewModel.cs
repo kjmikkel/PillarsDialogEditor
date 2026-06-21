@@ -19,6 +19,9 @@ public partial class NodeDetailViewModel : ObservableObject
     /// Set by MainWindowViewModel when a game folder is opened.
     public string ActiveGameId { get; set; } = string.Empty;
 
+    /// Set by MainWindowViewModel when a game folder is opened.
+    public string GameRoot { get; set; } = string.Empty;
+
     /// Set by MainWindowViewModel when a conversation is loaded.
     public ConversationViewModel? Canvas { get; set; }
 
@@ -130,6 +133,21 @@ public partial class NodeDetailViewModel : ObservableObject
         get => _node?.HideSpeaker ?? false;
         set { if (_node != null) _node.HideSpeaker = value; }
     }
+
+    // ── VO file status (PoE2 only) ────────────────────────────────────
+    private VoCheckResult? _voCheck;
+
+    public bool HasVoStatus     => _voCheck is { Status: not VoPresence.NotApplicable };
+    public bool VoStatusIsFound => _voCheck?.Status == VoPresence.Found;
+
+    public string VoStatusGlyph => _voCheck?.Status == VoPresence.Found ? "✓" : "✗";
+
+    public string VoStatusText => _voCheck switch
+    {
+        { Status: VoPresence.Found, FemaleVariantFound: true }  => Loc.Get("VoStatus_FoundWithFem"),
+        { Status: VoPresence.Found, FemaleVariantFound: false } => Loc.Get("VoStatus_Found"),
+        _ => Loc.Get("VoStatus_Missing"),
+    };
 
     public IReadOnlyList<string> BarkWarnings
     {
@@ -289,6 +307,15 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(SelectedSpeakerEntry));
         OnPropertyChanged(nameof(SelectedListenerEntry));
         OnPropertyChanged(nameof(BarkWarnings));
+
+        _voCheck = _node is null ? null
+            : VoPathResolver.Check(
+                _node.SpeakerGuid, _node.HasVO, _node.ExternalVO, _node.NodeId,
+                Canvas?.ConversationName ?? "", GameRoot, ActiveGameId);
+        OnPropertyChanged(nameof(HasVoStatus));
+        OnPropertyChanged(nameof(VoStatusGlyph));
+        OnPropertyChanged(nameof(VoStatusText));
+        OnPropertyChanged(nameof(VoStatusIsFound));
     }
 
     // ── Speaker / Listener name picker ───────────────────────────────────

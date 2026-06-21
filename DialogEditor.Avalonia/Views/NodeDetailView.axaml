@@ -203,6 +203,21 @@
                           ToolTip.Tip="{DynamicResource ToolTip_HasVO}"
                           AutomationProperties.HelpText="{DynamicResource ToolTip_HasVO}"/>
 
+                <!-- VO file status — PoE2 only; shown when HasVO or ExternalVO set -->
+                <StackPanel Orientation="Horizontal" Margin="0,2,0,4"
+                            IsVisible="{Binding HasVoStatus}"
+                            ToolTip.Tip="{Binding VoStatusText}"
+                            AutomationProperties.HelpText="{Binding VoStatusText}">
+                    <TextBlock Text="{Binding VoStatusGlyph}"
+                               Foreground="{Binding VoStatusIsFound, Converter={StaticResource BoolToVoStatusBrush}}"
+                               FontSize="{DynamicResource FontSize.Small}"
+                               VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <TextBlock Text="{Binding VoStatusText}"
+                               Foreground="{Binding VoStatusIsFound, Converter={StaticResource BoolToVoStatusBrush}}"
+                               FontSize="{DynamicResource FontSize.Small}"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+
                 <CheckBox Classes="detail-check"
                           IsChecked="{Binding HideSpeaker, Mode=TwoWay}"
                           Content="{DynamicResource PropertyRow_HideSpeaker}"
