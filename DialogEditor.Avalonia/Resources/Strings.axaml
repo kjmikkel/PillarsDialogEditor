@@ -1053,4 +1053,18 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="AutomationName_LinkQTD">Question node text display option for this link</sys:String>
     <sys:String x:Key="AutomationName_ConversationName">New conversation file name</sys:String>
 
+    <!-- ─── Exception Report Window ──────────────────────────────────────── -->
+    <sys:String x:Key="ExceptionReport_WindowTitle">Unhandled Error</sys:String>
+    <sys:String x:Key="ExceptionReport_Header">An unexpected error occurred</sys:String>
+    <!-- {0} = exception type name, {1} = exception message -->
+    <sys:String x:Key="ExceptionReport_Summary">{0}: {1}</sys:String>
+    <sys:String x:Key="ExceptionReport_StackTraceLabel">Stack trace</sys:String>
+    <sys:String x:Key="ExceptionReport_ReportPrompt">Please report this issue so it can be fixed:</sys:String>
+    <sys:String x:Key="ExceptionReport_LogLabel">Log file:</sys:String>
+    <sys:String x:Key="ExceptionReport_Copy">Copy to clipboard</sys:String>
+    <sys:String x:Key="ExceptionReport_Close">Close</sys:String>
+    <sys:String x:Key="ToolTip_ExceptionReport_Copy">Copy the error details to the clipboard so you can paste them into a bug report.</sys:String>
+    <sys:String x:Key="ToolTip_ExceptionReport_IssuesLink">Open the GitHub Issues page to file a bug report for this error.</sys:String>
+    <sys:String x:Key="AutomationName_ExceptionReport_IssuesLink">Open GitHub Issues page</sys:String>
+
 </ResourceDictionary>

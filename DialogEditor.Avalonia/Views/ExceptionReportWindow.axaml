@@ -1,0 +1,99 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+        x:Class="DialogEditor.Avalonia.Views.ExceptionReportWindow"
+        x:DataType="vm:ExceptionReportViewModel"
+        Title="{DynamicResource ExceptionReport_WindowTitle}"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="560" MinWidth="400" Height="460" MinHeight="300"
+        CanResize="True" ShowInTaskbar="False">
+
+    <Grid RowDefinitions="Auto,*,Auto" Margin="16">
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Spacing="4" Margin="0,0,0,12">
+            <TextBlock Text="{DynamicResource ExceptionReport_Header}"
+                       FontSize="{DynamicResource FontSize.Title}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource Brush.Text.Primary}"/>
+            <TextBlock Text="{Binding Message}"
+                       FontSize="{DynamicResource FontSize.Body}"
+                       Foreground="{DynamicResource Brush.Text.Secondary}"
+                       TextWrapping="Wrap"/>
+        </StackPanel>
+
+        <!-- Stack trace — scrollable, monospace -->
+        <Border Grid.Row="1"
+                BorderThickness="1"
+                BorderBrush="{DynamicResource Brush.Border.Default}"
+                CornerRadius="4"
+                Margin="0,0,0,12">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top"
+                           Text="{DynamicResource ExceptionReport_StackTraceLabel}"
+                           FontSize="{DynamicResource FontSize.Label}"
+                           Foreground="{DynamicResource Brush.Text.Muted}"
+                           Margin="8,6,8,4"/>
+                <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto">
+                    <TextBlock Text="{Binding StackTrace}"
+                               FontFamily="Consolas, Courier New, monospace"
+                               FontSize="{DynamicResource FontSize.Label}"
+                               Foreground="{DynamicResource Brush.Text.Primary}"
+                               TextWrapping="NoWrap"
+                               Margin="8,0,8,8"/>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <!-- Footer: report prompt, issues link, log path, action buttons -->
+        <StackPanel Grid.Row="2" Spacing="8">
+
+            <!-- Report prompt + clickable issues link -->
+            <WrapPanel Orientation="Horizontal">
+                <TextBlock Text="{DynamicResource ExceptionReport_ReportPrompt}"
+                           FontSize="{DynamicResource FontSize.Body}"
+                           Foreground="{DynamicResource Brush.Text.Primary}"
+                           Margin="0,0,4,0"
+                           VerticalAlignment="Center"/>
+                <Button x:Name="IssuesLinkButton"
+                        FontSize="{DynamicResource FontSize.Body}"
+                        Padding="0" Margin="0"
+                        BorderThickness="0"
+                        Background="Transparent"
+                        Foreground="{DynamicResource Brush.Text.Link}"
+                        Cursor="Hand"
+                        Content="{Binding IssuesUrl}"
+                        ToolTip.Tip="{DynamicResource ToolTip_ExceptionReport_IssuesLink}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_ExceptionReport_IssuesLink}"
+                        AutomationProperties.Name="{DynamicResource AutomationName_ExceptionReport_IssuesLink}"
+                        Click="IssuesLink_Click"/>
+            </WrapPanel>
+
+            <!-- Log path -->
+            <StackPanel Orientation="Horizontal" Spacing="4">
+                <TextBlock Text="{DynamicResource ExceptionReport_LogLabel}"
+                           FontSize="{DynamicResource FontSize.Label}"
+                           Foreground="{DynamicResource Brush.Text.Muted}"
+                           VerticalAlignment="Center"/>
+                <TextBlock Text="{Binding LogPath}"
+                           FontFamily="Consolas, Courier New, monospace"
+                           FontSize="{DynamicResource FontSize.Label}"
+                           Foreground="{DynamicResource Brush.Text.Secondary}"
+                           VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Buttons -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                <Button x:Name="CopyButton"
+                        Content="{DynamicResource ExceptionReport_Copy}"
+                        ToolTip.Tip="{DynamicResource ToolTip_ExceptionReport_Copy}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_ExceptionReport_Copy}"
+                        Click="Copy_Click"/>
+                <Button Content="{DynamicResource ExceptionReport_Close}"
+                        Click="Close_Click"/>
+            </StackPanel>
+
+        </StackPanel>
+    </Grid>
+</Window>

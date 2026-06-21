@@ -7,20 +7,8 @@
 
 ## Structural (Code Quality)
 
-### Exception Report Window
-When an unhandled exception slips through, the app currently logs it to `%LOCALAPPDATA%\PillarsDialogEditor\app.log` and swallows it (via `Dispatcher.UIThread.UnhandledException` with `e.Handled = true`). The user has no in-app feedback that anything went wrong and no obvious way to report it.
-
-Desired: a small, non-blocking window that appears when an exception is caught, showing:
-- Exception type and message (human-readable summary)
-- Full stack trace (scrollable, monospace)
-- A **Copy to clipboard** button that copies the complete text
-- A brief "please report this at [GitHub Issues URL]" instruction so the user knows how to follow up
-
-Design notes:
-- Should be non-modal so the user can keep working after copying the details
-- The window title is the exception type (e.g. "ArgumentOutOfRangeException")
-- Only show once per exception type per session — deduplicate if the same exception fires repeatedly
-- Log path displayed at the bottom so the user can also attach the log file
+### Exception Report Window ✓ implemented
+Non-blocking `ExceptionReportWindow` shows exception type, message, scrollable monospace stack trace, a **Copy to clipboard** button, a clickable GitHub Issues link, and the log file path. Deduplicates per exception type per session (one window per type; re-shows after the window is closed). Wired into all three exception hooks in `App.axaml.cs`.
 
 ### ViewModel Test Coverage
 Significant coverage has been added: both `IGameDataProvider` implementations, `AutoLayoutService`, and several previously untested ViewModels (ConversationFolderViewModel, ConversationItemViewModel, PatchEntryViewModel, SettingsViewModel) now have tests. The remaining gaps are:
