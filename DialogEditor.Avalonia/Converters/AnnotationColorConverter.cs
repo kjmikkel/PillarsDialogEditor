@@ -14,7 +14,7 @@ namespace DialogEditor.Avalonia.Converters;
 public sealed class AnnotationColorConverter : IMultiValueConverter
 {
     private static readonly HashSet<string> ValidKeys =
-        ["Yellow", "Red", "Green", "Blue", "Purple"];
+        ["Yellow", "Red", "Green", "Blue", "Purple", "Teal", "Orange"];
 
     public object Convert(IList<object?> values, Type targetType, object? parameter, CultureInfo culture)
     {

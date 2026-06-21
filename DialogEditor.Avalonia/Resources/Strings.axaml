@@ -310,6 +310,16 @@
     <!-- AnnotationView: body field placeholder and tooltip -->
     <sys:String x:Key="Placeholder_AnnotationBody">Notes… (Tab)</sys:String>
     <sys:String x:Key="ToolTip_AnnotationBody">Body text for this annotation — longer notes or reminders about this area of the conversation</sys:String>
+    <!-- AnnotationView: colour picker button and flyout swatches -->
+    <sys:String x:Key="ToolTip_AnnotationColorPicker">Change annotation colour — click to open colour picker</sys:String>
+    <sys:String x:Key="AutomationName_AnnotationColorPicker">Annotation colour</sys:String>
+    <sys:String x:Key="ColorName_Yellow">Yellow</sys:String>
+    <sys:String x:Key="ColorName_Red">Red</sys:String>
+    <sys:String x:Key="ColorName_Green">Green</sys:String>
+    <sys:String x:Key="ColorName_Blue">Blue</sys:String>
+    <sys:String x:Key="ColorName_Purple">Purple</sys:String>
+    <sys:String x:Key="ColorName_Teal">Teal</sys:String>
+    <sys:String x:Key="ColorName_Orange">Orange</sys:String>
     <!-- AnnotationView: ✕ delete button -->
     <sys:String x:Key="ToolTip_DeleteAnnotation">Delete this annotation (cannot be undone via Ctrl+Z)</sys:String>
     <!-- AnnotationView: resize corner grip -->

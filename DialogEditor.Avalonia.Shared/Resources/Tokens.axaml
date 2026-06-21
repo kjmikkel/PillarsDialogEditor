@@ -163,7 +163,7 @@
     <SolidColorBrush x:Key="Brush.Node.Bark.Outline"     Color="{StaticResource Palette.Amber.520}"/>
     <SolidColorBrush x:Key="Brush.Node.Quotidian.Note"   Color="{StaticResource Palette.Olive.500}"/>
 
-    <!-- Annotation boxes — five curated colours, each with Fill/Header/Stroke.
+    <!-- Annotation boxes — seven curated colours, each with Fill/Header/Stroke.
          AnnotationColorConverter resolves "Brush.Annotation.{ColorKey}.{zone}" at runtime. -->
     <SolidColorBrush x:Key="Brush.Annotation.Yellow.Fill"   Color="{StaticResource Palette.Annotation.Yellow.Fill}"/>
     <SolidColorBrush x:Key="Brush.Annotation.Yellow.Header" Color="{StaticResource Palette.Annotation.Yellow.Header}"/>
@@ -180,6 +180,12 @@
     <SolidColorBrush x:Key="Brush.Annotation.Purple.Fill"   Color="{StaticResource Palette.Annotation.Purple.Fill}"/>
     <SolidColorBrush x:Key="Brush.Annotation.Purple.Header" Color="{StaticResource Palette.Annotation.Purple.Header}"/>
     <SolidColorBrush x:Key="Brush.Annotation.Purple.Stroke" Color="{StaticResource Palette.Annotation.Purple.Stroke}"/>
+    <SolidColorBrush x:Key="Brush.Annotation.Teal.Fill"     Color="{StaticResource Palette.Annotation.Teal.Fill}"/>
+    <SolidColorBrush x:Key="Brush.Annotation.Teal.Header"   Color="{StaticResource Palette.Annotation.Teal.Header}"/>
+    <SolidColorBrush x:Key="Brush.Annotation.Teal.Stroke"   Color="{StaticResource Palette.Annotation.Teal.Stroke}"/>
+    <SolidColorBrush x:Key="Brush.Annotation.Orange.Fill"   Color="{StaticResource Palette.Annotation.Orange.Fill}"/>
+    <SolidColorBrush x:Key="Brush.Annotation.Orange.Header" Color="{StaticResource Palette.Annotation.Orange.Header}"/>
+    <SolidColorBrush x:Key="Brush.Annotation.Orange.Stroke" Color="{StaticResource Palette.Annotation.Orange.Stroke}"/>
 
     <!-- Links, info text, highlight, badge (accent foregrounds) -->
     <SolidColorBrush x:Key="Brush.Text.Link"         Color="{StaticResource Palette.Sky.400}"/>
