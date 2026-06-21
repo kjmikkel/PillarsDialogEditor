@@ -1,0 +1,89 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
+        x:Class="DialogEditor.Avalonia.Views.VoValidationWindow"
+        Title="{DynamicResource VoValidation_Title}"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="500" Height="420" MinWidth="420" MinHeight="280"
+        CanResize="True"
+        ShowInTaskbar="False"
+        Background="{DynamicResource Brush.Surface.Window}"
+        WindowStartupLocation="CenterOwner"
+        x:CompileBindings="False">
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Margin="14,12,14,12">
+
+        <!-- Summary text -->
+        <TextBlock Grid.Row="0"
+                   Text="{Binding SummaryText}"
+                   Foreground="{DynamicResource Brush.Text.Primary}"
+                   FontSize="{DynamicResource FontSize.Body}"
+                   Margin="0,0,0,6"/>
+
+        <!-- Progress bar (visible while running) -->
+        <ProgressBar Grid.Row="1"
+                     IsIndeterminate="True"
+                     IsVisible="{Binding IsRunning}"
+                     Height="4" Margin="0,0,0,8"/>
+
+        <!-- Button row -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="8" Margin="0,0,0,8">
+            <Button Content="{DynamicResource Button_Cancel}"
+                    Command="{Binding CancelCommand}"
+                    IsVisible="{Binding IsRunning}"
+                    ToolTip.Tip="{DynamicResource Button_Cancel}"
+                    AutomationProperties.HelpText="{DynamicResource Button_Cancel}"/>
+            <Button Content="{DynamicResource Button_RunAgain}"
+                    Command="{Binding RunAgainCommand}"
+                    IsVisible="{Binding IsRunning, Converter={StaticResource InverseBoolToVis}}"
+                    ToolTip.Tip="{DynamicResource Button_RunAgain}"
+                    AutomationProperties.HelpText="{DynamicResource Button_RunAgain}"/>
+        </StackPanel>
+
+        <!-- Results list -->
+        <ScrollViewer Grid.Row="3" Margin="0,0,0,6">
+            <Panel>
+                <!-- Empty-state message shown after a completed scan with no issues -->
+                <TextBlock Text="{DynamicResource VoValidation_AllFound}"
+                           Foreground="{DynamicResource Brush.Text.Disabled}"
+                           FontStyle="Italic"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           IsVisible="{Binding ShowAllFound}"/>
+
+                <ItemsControl ItemsSource="{Binding Results}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="vm:VoValidationIssue">
+                            <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,3" Height="28">
+                                <!-- Node ID -->
+                                <TextBlock Grid.Column="0"
+                                           Text="{Binding NodeId, StringFormat='Node {0}'}"
+                                           Foreground="{DynamicResource Brush.Text.Muted}"
+                                           FontSize="{DynamicResource FontSize.Small}"
+                                           Width="70" VerticalAlignment="Center"/>
+                                <!-- Text preview -->
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding TextPreview}"
+                                           Foreground="{DynamicResource Brush.Text.Secondary}"
+                                           FontSize="{DynamicResource FontSize.Label}"
+                                           TextTrimming="CharacterEllipsis"
+                                           VerticalAlignment="Center"/>
+                                <!-- Missing badge -->
+                                <TextBlock Grid.Column="2"
+                                           Text="{DynamicResource VoValidation_MissingBadge}"
+                                           Foreground="{DynamicResource Brush.Severity.Error}"
+                                           FontSize="{DynamicResource FontSize.Small}"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center" Margin="8,0,0,0"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Panel>
+        </ScrollViewer>
+
+        <!-- Focus hint bar -->
+        <shared:FocusHintBar Grid.Row="4" x:Name="HintBar"/>
+
+    </Grid>
+</Window>

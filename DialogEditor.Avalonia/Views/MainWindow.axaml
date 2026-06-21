@@ -142,6 +142,12 @@
                         <MenuItem Header="{DynamicResource Button_RestoreBackup}"
                                   Command="{Binding RestoreBackupCommand}"
                                   InputGesture="Ctrl+Shift+B"/>
+                        <Separator/>
+                        <MenuItem Header="{DynamicResource Menu_ValidateVO}"
+                                  Click="ValidateVO_Click"
+                                  IsEnabled="{Binding CanValidateVO}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_ValidateVO}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_ValidateVO}"/>
                     </MenuItem>
 
                     <MenuItem Header="{DynamicResource Menu_Help}">

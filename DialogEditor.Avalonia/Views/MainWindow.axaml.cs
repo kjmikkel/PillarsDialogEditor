@@ -27,6 +27,7 @@ public partial class MainWindow : Window
     private FindReplaceWindow?     _findReplaceWindow;
     private BatchReplaceWindow?    _batchReplaceWindow;
     private FlowAnalyticsWindow?   _flowAnalyticsWindow;
+    private VoValidationWindow?    _voValidationWindow;
 
     // Set to true immediately before a programmatic Close() call so that
     // the re-entrant OnClosing doesn't show the dirty-close dialog again.
@@ -336,6 +337,17 @@ public partial class MainWindow : Window
 
         _flowAnalyticsWindow.Show();
         _flowAnalyticsWindow.Activate();
+    }
+
+    private void ValidateVO_Click(object? sender, RoutedEventArgs e)
+    {
+        var vm = ((MainWindowViewModel)DataContext!).CreateVoValidationViewModel();
+        if (vm is null) return;
+
+        _voValidationWindow = new VoValidationWindow(vm);
+        _voValidationWindow.Closed += (_, _) => _voValidationWindow = null;
+        _voValidationWindow.Show(this);
+        _ = vm.RunAsync();
     }
 
     private void CompareVersions_Click(object? sender, RoutedEventArgs e)
