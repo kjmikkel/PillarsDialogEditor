@@ -21,7 +21,7 @@ public partial class FlowIssueViewModel : ObservableObject
         FlowIssueKind.PlayerDeadEnd             => Loc.Get("FlowAnalytics_Issue_PlayerDeadEnd"),
         FlowIssueKind.EmptyText                 => Loc.Get("FlowAnalytics_Issue_EmptyText"),
         FlowIssueKind.NoIncomingLinks           => Loc.Get("FlowAnalytics_Issue_NoIncomingLinks"),
-        FlowIssueKind.BarkTextTooLong           => Loc.Get("FlowAnalytics_Issue_BarkTextTooLong"),
+        FlowIssueKind.BarkTextTooLong           => Loc.Format("FlowAnalytics_Issue_BarkTextTooLong", BarkConstants.TextLengthWarningThreshold),
         FlowIssueKind.BarkHasPlayerChoiceChild  => Loc.Get("FlowAnalytics_Issue_BarkHasPlayerChoiceChild"),
         _                                       => Kind.ToString()
     };
