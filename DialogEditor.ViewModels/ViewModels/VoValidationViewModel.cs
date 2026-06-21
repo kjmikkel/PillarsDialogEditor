@@ -10,7 +10,13 @@ namespace DialogEditor.ViewModels;
 /// <summary>
 /// Represents a single node whose VO file could not be found on disk.
 /// </summary>
-public record VoValidationIssue(int NodeId, string TextPreview, bool IsMissing);
+public record VoValidationIssue(int NodeId, string TextPreview, bool IsMissing)
+{
+    /// Localised "Node {0}" label used in the VoValidationWindow results list.
+    /// Populated via Loc.Format so the format string comes from Strings.axaml
+    /// rather than being hard-coded in XAML (CLAUDE.md localisation rule).
+    public string NodeLabel => Loc.Format("VoValidation_NodeRow", NodeId);
+}
 
 /// <summary>
 /// Async scan ViewModel that checks every VO-enabled node in a conversation against

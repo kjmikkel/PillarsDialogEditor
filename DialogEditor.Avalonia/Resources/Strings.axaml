@@ -1093,6 +1093,7 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Menu_ValidateVO">Validate Voice-Over…</sys:String>
     <sys:String x:Key="ToolTip_ValidateVO">Scan the open conversation for nodes that are flagged as voiced (HasVO or ExternalVO set) but whose audio file could not be found on disk. Only available for Pillars of Eternity II with a game folder open.</sys:String>
     <sys:String x:Key="Button_RunAgain">Run Again</sys:String>
+    <sys:String x:Key="Button_Cancel">Cancel</sys:String>
     <sys:String x:Key="VoValidation_NodeRow">Node {0}</sys:String>
     <sys:String x:Key="VoValidation_MissingBadge">✗ Missing</sys:String>
 
