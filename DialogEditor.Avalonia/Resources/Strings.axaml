@@ -1081,4 +1081,19 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_ExceptionReport_IssuesLink">Open the GitHub Issues page to file a bug report for this error.</sys:String>
     <sys:String x:Key="AutomationName_ExceptionReport_IssuesLink">Open GitHub Issues page</sys:String>
 
+    <!-- ── Voice-Over validation ───────────────────────────────────────── -->
+    <sys:String x:Key="VoStatus_Found">VO file found</sys:String>
+    <sys:String x:Key="VoStatus_FoundWithFem">VO file found (+ female variant)</sys:String>
+    <sys:String x:Key="VoStatus_Missing">VO file missing</sys:String>
+    <sys:String x:Key="VoValidation_Title">Voice-Over Validation</sys:String>
+    <sys:String x:Key="VoValidation_Running">Checking…</sys:String>
+    <sys:String x:Key="VoValidation_Summary">Checked {0} nodes — {1} missing</sys:String>
+    <sys:String x:Key="VoValidation_AllFound">All voice-over files found.</sys:String>
+    <sys:String x:Key="VoValidation_Cancelled">Cancelled. Checked {0} nodes — {1} missing so far.</sys:String>
+    <sys:String x:Key="Menu_ValidateVO">Validate Voice-Over…</sys:String>
+    <sys:String x:Key="ToolTip_ValidateVO">Scan the open conversation for nodes that are flagged as voiced (HasVO or ExternalVO set) but whose audio file could not be found on disk. Only available for Pillars of Eternity II with a game folder open.</sys:String>
+    <sys:String x:Key="Button_RunAgain">Run Again</sys:String>
+    <sys:String x:Key="VoValidation_NodeRow">Node {0}</sys:String>
+    <sys:String x:Key="VoValidation_MissingBadge">✗ Missing</sys:String>
+
 </ResourceDictionary>

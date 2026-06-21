@@ -95,6 +95,7 @@
             <converters:NodeColorConverter              x:Key="NodeColorConverter"/>
             <converters:NodeTypeShapeConverter          x:Key="NodeTypeShape"/>
             <converters:BoolToFemaleTextBrushConverter      x:Key="BoolToFemaleTextBrush"/>
+            <converters:BoolToVoStatusBrushConverter         x:Key="BoolToVoStatusBrush"/>
             <converters:BoolToNewConversationBrushConverter x:Key="BoolToNewConversationBrush"/>
             <converters:InverseBoolConverter            x:Key="InverseBoolToVis"/>
             <converters:NullOrEmptyToBoolConverter      x:Key="NullOrEmptyToVis"/>
