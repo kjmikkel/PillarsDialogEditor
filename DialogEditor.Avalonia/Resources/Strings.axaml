@@ -1053,6 +1053,20 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="AutomationName_LinkQTD">Question node text display option for this link</sys:String>
     <sys:String x:Key="AutomationName_ConversationName">New conversation file name</sys:String>
 
+    <!-- ─── UI string translation workflow ──────────────────────────────── -->
+    <sys:String x:Key="Menu_ExportUiStrings">Export UI strings for translation…</sys:String>
+    <sys:String x:Key="Menu_ExportUiStringsTip">Export all user-visible UI strings to a CSV file that a translator can fill in.</sys:String>
+    <sys:String x:Key="Menu_ImportUiStrings">Import translated UI strings…</sys:String>
+    <sys:String x:Key="Menu_ImportUiStringsTip">Import a completed translation CSV and write the AXAML overlay files for a language.</sys:String>
+    <!-- {0} = output file path -->
+    <sys:String x:Key="UiExport_Success">UI strings exported to {0}</sys:String>
+    <sys:String x:Key="UiExport_Cancelled">Export cancelled.</sys:String>
+    <!-- {0} = language code, {1} = output directory -->
+    <sys:String x:Key="UiImport_Success">Imported translation for "{0}" into {1}</sys:String>
+    <sys:String x:Key="UiImport_Cancelled">Import cancelled.</sys:String>
+    <sys:String x:Key="UiImport_LanguagePrompt">Enter the BCP-47 language code for this translation (e.g. de, fr, pl):</sys:String>
+    <sys:String x:Key="UiImport_FolderTitle">Select the folder where overlay files will be written</sys:String>
+
     <!-- ─── Exception Report Window ──────────────────────────────────────── -->
     <sys:String x:Key="ExceptionReport_WindowTitle">Unhandled Error</sys:String>
     <sys:String x:Key="ExceptionReport_Header">An unexpected error occurred</sys:String>

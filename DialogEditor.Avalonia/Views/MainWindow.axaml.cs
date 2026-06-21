@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Automation;
+using Avalonia.Platform;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -526,6 +527,72 @@ public partial class MainWindow : Window
         var dialog = new ConflictResolutionDialog(ex);
         await dialog.ShowDialog(this);
         return dialog.ForceApply;
+    }
+
+    // ── UI string translation workflow ────────────────────────────────────
+    private async void ExportUiStrings_Click(object? sender, RoutedEventArgs e)
+    {
+        var vm = (MainWindowViewModel)DataContext!;
+        var picker = new AvaloniaFilePicker(this);
+        var path = await picker.PickSaveFileAsync(
+            Loc.Get("Menu_ExportUiStrings"), "ui-strings.csv", ".csv", "CSV files");
+        if (path is null) { vm.StatusText = Loc.Get("UiExport_Cancelled"); return; }
+
+        var assetUris = new[]
+        {
+            ("Strings.axaml",       new Uri("avares://DialogEditor.Avalonia/Resources/Strings.axaml")),
+            ("SharedStrings.axaml", new Uri("avares://DialogEditor.Avalonia.Shared/Resources/SharedStrings.axaml")),
+        };
+        var streams = assetUris
+            .Select(a => (a.Item1, AssetLoader.Open(a.Item2)))
+            .ToList();
+        try
+        {
+            UiStringExportService.Export(streams, path);
+            vm.StatusText = Loc.Format("UiExport_Success", path);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error("UI string export failed", ex);
+            vm.StatusText = ex.Message;
+        }
+        finally
+        {
+            foreach (var (_, stream) in streams) stream.Dispose();
+        }
+    }
+
+    private async void ImportUiStrings_Click(object? sender, RoutedEventArgs e)
+    {
+        var vm = (MainWindowViewModel)DataContext!;
+        var filePicker = new AvaloniaFilePicker(this);
+        var csvPath = await filePicker.PickOpenFileAsync(
+            Loc.Get("Menu_ImportUiStrings"), ".csv", "CSV files");
+        if (csvPath is null) { vm.StatusText = Loc.Get("UiImport_Cancelled"); return; }
+
+        var lang = UiStringImportService.DetectLanguage(csvPath);
+        if (lang is null)
+        {
+            var dialog = new LanguageCodeDialog(null);
+            await dialog.ShowDialog(this);
+            lang = dialog.Result;
+        }
+        if (lang is null) { vm.StatusText = Loc.Get("UiImport_Cancelled"); return; }
+
+        var folderPicker = new AvaloniaFolderPicker(this);
+        var outputDir = await folderPicker.PickFolderAsync(Loc.Get("UiImport_FolderTitle"));
+        if (outputDir is null) { vm.StatusText = Loc.Get("UiImport_Cancelled"); return; }
+
+        try
+        {
+            UiStringImportService.Import(csvPath, lang, outputDir);
+            vm.StatusText = Loc.Format("UiImport_Success", lang, outputDir);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error("UI string import failed", ex);
+            vm.StatusText = ex.Message;
+        }
     }
 
     // ── New conversation name dialog ──────────────────────────────────────

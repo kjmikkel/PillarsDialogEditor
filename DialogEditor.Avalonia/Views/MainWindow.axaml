@@ -154,6 +154,15 @@
                                   AutomationProperties.HelpText="{DynamicResource Menu_OpenWalkthroughTip}"
                                   Command="{Binding OpenWalkthroughCommand}"/>
                         <Separator/>
+                        <MenuItem Header="{DynamicResource Menu_ExportUiStrings}"
+                                  ToolTip.Tip="{DynamicResource Menu_ExportUiStringsTip}"
+                                  AutomationProperties.HelpText="{DynamicResource Menu_ExportUiStringsTip}"
+                                  Click="ExportUiStrings_Click"/>
+                        <MenuItem Header="{DynamicResource Menu_ImportUiStrings}"
+                                  ToolTip.Tip="{DynamicResource Menu_ImportUiStringsTip}"
+                                  AutomationProperties.HelpText="{DynamicResource Menu_ImportUiStringsTip}"
+                                  Click="ImportUiStrings_Click"/>
+                        <Separator/>
                         <MenuItem Header="{DynamicResource Menu_Changelog}"
                                   ToolTip.Tip="{DynamicResource Menu_ChangelogTip}"
                                   AutomationProperties.HelpText="{DynamicResource Menu_ChangelogTip}"
