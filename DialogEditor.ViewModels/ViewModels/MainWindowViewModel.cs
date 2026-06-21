@@ -208,6 +208,13 @@ public partial class MainWindowViewModel : ObservableObject
     // ── Project open state ────────────────────────────────────────────────
     public bool IsProjectOpen => _project is not null;
 
+    /// True when a PoE2 game folder is loaded and a conversation with nodes is open.
+    /// Guards the Validate VO menu item and CreateVoValidationViewModel().
+    public bool CanValidateVO =>
+        !string.IsNullOrEmpty(_currentGameDirectory)
+        && string.Equals(_activeGameId, "poe2", StringComparison.OrdinalIgnoreCase)
+        && Canvas.Nodes.Count > 0;
+
     private void SetProject(DialogProject? project)
     {
         var prevNew  = _project?.NewConversations;
@@ -381,6 +388,17 @@ public partial class MainWindowViewModel : ObservableObject
     // ── Settings ──────────────────────────────────────────────────────────
     public SettingsViewModel CreateSettingsViewModel(IFontScaleApplier? fontScaleApplier = null)
         => new(_currentGameDirectory, _folderPicker, fontScaleApplier);
+
+    /// Returns a ready-to-run VoValidationViewModel for the current conversation,
+    /// or null if CanValidateVO is false (e.g. wrong game, no nodes loaded).
+    public VoValidationViewModel? CreateVoValidationViewModel()
+    {
+        if (!CanValidateVO) return null;
+        var snapshot = Canvas.BuildSnapshot();
+        return new VoValidationViewModel(
+            snapshot.Nodes, Canvas.ConversationName,
+            _currentGameDirectory, _activeGameId);
+    }
 
     // ── Project — New / Open / Save ───────────────────────────────────────
     [RelayCommand]
@@ -1037,6 +1055,9 @@ public partial class MainWindowViewModel : ObservableObject
 
             _activeGameId = provider.GameId;
             Detail.ActiveGameId = provider.GameId;
+            Detail.GameRoot = path;
+            ChatterPrefixService.Register(provider.LoadChatterPrefixes());
+            OnPropertyChanged(nameof(CanValidateVO));
             AvailableLanguages = provider.AvailableLanguages;
             SelectedLanguage   = AppSettings.PickLanguage(AvailableLanguages, AppSettings.LastLanguage);
             Browser.Load(provider, _project?.NewConversations);
@@ -1506,6 +1527,7 @@ public partial class MainWindowViewModel : ObservableObject
             Detail.Clear();
             IsModified = false;
             CurrentConversationName = file.Name;
+            OnPropertyChanged(nameof(CanValidateVO));
             if (!IsBrowserPinned) IsBrowserExpanded = false;
             if (_project is null)
                 StatusText = Loc.Get("Status_NoProjectReadOnly");

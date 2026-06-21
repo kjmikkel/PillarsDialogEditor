@@ -37,11 +37,20 @@ public partial class VoValidationViewModel : ObservableObject
 
     // Cancelled and replaced at the start of each RunAsync call.
     private CancellationTokenSource _cts = new();
+    private bool _ranAtLeastOnce;
 
     [ObservableProperty] private bool   _isRunning;
     [ObservableProperty] private string _summaryText = string.Empty;
 
     public ObservableCollection<VoValidationIssue> Results { get; } = [];
+
+    /// True once at least one missing-VO issue exists in Results.
+    /// Drives the empty-state ("all found") visibility in the window.
+    public bool HasResults => Results.Count > 0;
+
+    /// True when the scan has finished at least once and found zero issues — drives
+    /// the "all VO files found" empty-state message in VoValidationWindow.
+    public bool ShowAllFound => _ranAtLeastOnce && !IsRunning && !HasResults;
 
     public IRelayCommand CancelCommand   { get; }
     public IRelayCommand RunAgainCommand { get; }
@@ -60,12 +69,15 @@ public partial class VoValidationViewModel : ObservableObject
         CancelCommand   = new RelayCommand(() => _cts.Cancel(), () => IsRunning);
         // RelayCommand does not support async lambdas; call RunAsync() via fire-and-discard.
         RunAgainCommand = new RelayCommand(() => _ = RunAsync(), () => !IsRunning);
+
+        Results.CollectionChanged += (_, _) => OnPropertyChanged(nameof(HasResults));
     }
 
     partial void OnIsRunningChanged(bool value)
     {
         CancelCommand.NotifyCanExecuteChanged();
         RunAgainCommand.NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(ShowAllFound));
     }
 
     /// <summary>
@@ -132,10 +144,12 @@ public partial class VoValidationViewModel : ObservableObject
             foreach (var issue in batch)
                 Results.Add(issue);
 
+            _ranAtLeastOnce = true;
             IsRunning   = false;
             SummaryText = cancelled
                 ? Loc.Format("VoValidation_Cancelled", checked_, missing)
                 : Loc.Format("VoValidation_Summary",   checked_, missing);
+            OnPropertyChanged(nameof(ShowAllFound));
         }
     }
 
