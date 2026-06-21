@@ -137,7 +137,7 @@ public partial class NodeViewModel : ObservableObject
             if (!IsBark) return [];
             var warnings = new List<string>();
             if (_defaultText.Length > BarkConstants.TextLengthWarningThreshold)
-                warnings.Add(string.Format(Loc.Get("Bark_Warning_TextTooLong"), BarkConstants.TextLengthWarningThreshold));
+                warnings.Add(string.Format(Loc.Get("Bark_Warning_TextTooLong"), BarkConstants.TextLengthWarningThreshold, _defaultText.Length));
             return warnings;
         }
     }

@@ -473,7 +473,7 @@ work is a delivery mechanism and a translation workflow, not a rewrite.
    forms — usually accepted in tools).
 
 ### Barks System — Bark Preview
-Bark nodes now render with an amber color scheme on the canvas, carry bark-specific validation warnings (text too long, player-choice child), and those warnings surface in Flow Analytics. The remaining gap is an in-context preview of overhead floating text: writers cannot see how a bark will actually appear above an NPC's head without running the game. Implementing this requires investigating the game's bark rendering (font, line-wrapping, maximum visible width) before UI work can be designed.
+Bark nodes now render with an amber color scheme on the canvas, carry bark-specific validation warnings (text too long, player-choice child), and those warnings surface in Flow Analytics. The text-length threshold is 324 characters — the longest bark in either shipped game (PoE1 `14_cv_iovara.conversation` node 73) — and warnings include the actual character count and an explanation of the yardstick. The remaining gap is an in-context preview of overhead floating text: writers cannot see how a bark will actually appear above an NPC's head without running the game. Implementing this requires investigating the game's bark rendering (font, line-wrapping, maximum visible width) before UI work can be designed. Pixel dimensions are not available from source code alone (they are stored in Unity prefab/scene files); a test run against the game itself would be needed to calibrate any visual preview.
 
 ### About / Version Info
 **Implemented.** **Help ▸ About…** shows the application name, version, licence, credits,
