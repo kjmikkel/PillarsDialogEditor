@@ -90,6 +90,23 @@
     <Color x:Key="Palette.Neutral.520">#FF3A3A3A</Color>  <!-- canvas backdrop (Brush.Canvas.Background): neutral grey matching Dark/Light/Colourblind's tone, dark enough that Line.Default GridSplitters (~4.8:1) and white node cards stay visible against the near-black chrome -->
     <Color x:Key="Palette.Magenta.500">#FFFF5BD0</Color>  <!-- about-window status text -->
 
+    <!-- Annotation box colours — high contrast variants (bright strokes, low fill opacity). -->
+    <Color x:Key="Palette.Annotation.Yellow.Fill">#20FFC04D</Color>
+    <Color x:Key="Palette.Annotation.Yellow.Header">#60FFC04D</Color>
+    <Color x:Key="Palette.Annotation.Yellow.Stroke">#FFFFCA00</Color>
+    <Color x:Key="Palette.Annotation.Red.Fill">#20FF6B6B</Color>
+    <Color x:Key="Palette.Annotation.Red.Header">#60FF3333</Color>
+    <Color x:Key="Palette.Annotation.Red.Stroke">#FFFF6B6B</Color>
+    <Color x:Key="Palette.Annotation.Green.Fill">#205BFF8F</Color>
+    <Color x:Key="Palette.Annotation.Green.Header">#604BCC73</Color>
+    <Color x:Key="Palette.Annotation.Green.Stroke">#FF5BFF8F</Color>
+    <Color x:Key="Palette.Annotation.Blue.Fill">#206BB6FF</Color>
+    <Color x:Key="Palette.Annotation.Blue.Header">#604490CC</Color>
+    <Color x:Key="Palette.Annotation.Blue.Stroke">#FF6BB6FF</Color>
+    <Color x:Key="Palette.Annotation.Purple.Fill">#20EE00AA</Color>
+    <Color x:Key="Palette.Annotation.Purple.Header">#60BB0088</Color>
+    <Color x:Key="Palette.Annotation.Purple.Stroke">#FFEE00AA</Color>
+
     <!-- Alpha / effect primitives (overlays + shadow) -->
     <Color x:Key="Palette.Alpha.Scrim">#BB000000</Color>
     <Color x:Key="Palette.Alpha.Shadow">#A0000000</Color>

@@ -4,6 +4,7 @@
              xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
              xmlns:models="clr-namespace:DialogEditor.Core.Models;assembly=DialogEditor.Core"
              xmlns:theming="clr-namespace:DialogEditor.Avalonia.Shared.Theming;assembly=DialogEditor.Avalonia.Shared"
+             xmlns:local="clr-namespace:DialogEditor.Avalonia.Views"
              x:Class="DialogEditor.Avalonia.Views.ConversationView" x:CompileBindings="False">
 
     <UserControl.Styles>
@@ -59,6 +60,13 @@
                             ToolTip.Tip="{DynamicResource ToolTip_ZoomOut}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_ZoomOut}"
                             AutomationProperties.Name="{DynamicResource AutomationName_ZoomOut}"/>
+                    <Button Content="{DynamicResource Label_AddAnnotation}"
+                            Click="AddAnnotation_Click"
+                            IsVisible="{Binding IsEditable}"
+                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2" Margin="4,0,0,0"
+                            ToolTip.Tip="{DynamicResource ToolTip_AddAnnotation}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_AddAnnotation}"
+                            AutomationProperties.Name="{DynamicResource AutomationName_AddAnnotation}"/>
                     <Button Content="⌂"
                             Click="CenterOnRoot_Click"
                             Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2" Margin="8,0,0,0"
@@ -95,7 +103,7 @@
         </Border>
 
         <!-- Canvas -->
-        <Grid Grid.Row="1">
+        <Grid Grid.Row="1" ClipToBounds="True">
             <nodify:NodifyEditor x:Name="Editor"
                                  Background="{DynamicResource Brush.Canvas.Background}"
                                  ItemsSource="{Binding Nodes}"
@@ -103,7 +111,22 @@
                                  PendingConnection="{Binding PendingConnection}"
                                  DoubleTapped="Editor_DoubleTapped"
                                  KeyDown="Editor_KeyDown"
-                                 GotFocus="Editor_GotFocus">
+                                 GotFocus="Editor_GotFocus"
+                                 PointerPressed="Editor_PointerPressed">
+                <nodify:NodifyEditor.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="{DynamicResource Menu_Canvas_AddNodeHere}"
+                                  Click="CanvasMenu_AddNode_Click"
+                                  IsVisible="{Binding IsEditable}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_Menu_Canvas_AddNodeHere}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_Canvas_AddNodeHere}"/>
+                        <MenuItem Header="{DynamicResource Menu_Canvas_AddAnnotationHere}"
+                                  Click="CanvasMenu_AddAnnotation_Click"
+                                  IsVisible="{Binding IsEditable}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_Menu_Canvas_AddAnnotationHere}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_Canvas_AddAnnotationHere}"/>
+                    </ContextMenu>
+                </nodify:NodifyEditor.ContextMenu>
 
                 <!-- Drag-to-connect: the PendingConnection control MUST live inside
                      PendingConnectionTemplate (not be assigned to the PendingConnection
@@ -352,6 +375,41 @@
                     </ControlTheme>
                 </nodify:Minimap.ItemContainerTheme>
             </nodify:Minimap>
+
+            <!-- Annotation overlay — above the NodifyEditor in stacking order.
+                 ItemsControl background is null so empty-canvas areas are not hit-tested;
+                 only the rendered annotation boxes intercept pointer events.
+                 Body area within each AnnotationView is IsHitTestVisible=False so clicks
+                 on the body fall through to nodes beneath.
+                 RenderTransform (set in code-behind) mirrors the NodifyEditor viewport. -->
+            <!-- Annotation overlay — screen-coordinate positioned (not world-coordinate +
+                 RenderTransform) so items are always within Canvas layout bounds and cannot
+                 be clipped by Avalonia's implicit per-element render rect.  ConversationView
+                 code-behind recomputes ScreenX/Y/Width/Height on every viewport change and
+                 on every world-position change (drag/resize).  The parent Grid's
+                 ClipToBounds="True" provides the natural viewport boundary. -->
+            <ItemsControl x:Name="AnnotationLayer"
+                          ItemsSource="{Binding Annotations}"
+                          IsHitTestVisible="{Binding IsEditable}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:AnnotationViewModel}">
+                        <local:AnnotationView DeleteRequested="Annotation_DeleteRequested"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+                <ItemsControl.ItemContainerTheme>
+                    <ControlTheme TargetType="ContentPresenter">
+                        <Setter Property="Canvas.Left" Value="{Binding ScreenX}"/>
+                        <Setter Property="Canvas.Top"  Value="{Binding ScreenY}"/>
+                        <Setter Property="Width"       Value="{Binding ScreenWidth}"/>
+                        <Setter Property="Height"      Value="{Binding ScreenHeight}"/>
+                    </ControlTheme>
+                </ItemsControl.ItemContainerTheme>
+            </ItemsControl>
 
         </Grid>
     </Grid>

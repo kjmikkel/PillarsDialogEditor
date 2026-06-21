@@ -97,6 +97,23 @@
     <Color x:Key="Palette.Neutral.520">#FF838585</Color>
     <Color x:Key="Palette.Magenta.500">#FFEE00AA</Color>
 
+    <!-- Annotation box colours — Okabe-Ito remapped where needed (Red→Vermilion, Green→Bluish-green, Purple→Reddish-purple). -->
+    <Color x:Key="Palette.Annotation.Yellow.Fill">#50F0A830</Color>
+    <Color x:Key="Palette.Annotation.Yellow.Header">#A0B8760A</Color>
+    <Color x:Key="Palette.Annotation.Yellow.Stroke">#FFF0A830</Color>
+    <Color x:Key="Palette.Annotation.Red.Fill">#50D55E00</Color>
+    <Color x:Key="Palette.Annotation.Red.Header">#A07B3A00</Color>
+    <Color x:Key="Palette.Annotation.Red.Stroke">#FFD55E00</Color>
+    <Color x:Key="Palette.Annotation.Green.Fill">#50009E73</Color>
+    <Color x:Key="Palette.Annotation.Green.Header">#A0006B50</Color>
+    <Color x:Key="Palette.Annotation.Green.Stroke">#FF009E73</Color>
+    <Color x:Key="Palette.Annotation.Blue.Fill">#500072B2</Color>
+    <Color x:Key="Palette.Annotation.Blue.Header">#A0004070</Color>
+    <Color x:Key="Palette.Annotation.Blue.Stroke">#FF0072B2</Color>
+    <Color x:Key="Palette.Annotation.Purple.Fill">#50CC79A7</Color>
+    <Color x:Key="Palette.Annotation.Purple.Header">#A0844070</Color>
+    <Color x:Key="Palette.Annotation.Purple.Stroke">#FFCC79A7</Color>
+
     <!-- Alpha / effect primitives (overlays + shadow live here so hex stays confined) -->
     <Color x:Key="Palette.Alpha.Scrim">#BB000000</Color>
     <Color x:Key="Palette.Alpha.Shadow">#A0000000</Color>
