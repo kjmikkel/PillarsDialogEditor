@@ -75,6 +75,11 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
             ? Poe2SpeakerNameParser.ParseFile(SpeakersBundle)
             : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
+    public IReadOnlyDictionary<string, string> LoadChatterPrefixes() =>
+        File.Exists(SpeakersBundle)
+            ? Poe2SpeakerNameParser.ParseChatterPrefixesFile(SpeakersBundle)
+            : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
     private string GameDataRoot => Path.Combine(ExportedRoot, "design", "gamedata");
 
     public IReadOnlyDictionary<string, IReadOnlyList<GameDataEntry>> LoadGameDataNames()
