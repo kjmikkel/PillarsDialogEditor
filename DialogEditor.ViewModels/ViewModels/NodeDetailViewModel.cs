@@ -362,7 +362,7 @@ public partial class NodeDetailViewModel : ObservableObject
     {
         // Stop without firing PlaybackStopped; reset state explicitly.
         _player.Stop();
-        _currentlyPlaying = Playing.None;
+        SetPlaying(Playing.None);
 
         OnPropertyChanged(nameof(DefaultText));
         OnPropertyChanged(nameof(FemaleText));
@@ -399,12 +399,6 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(VoStatusIsFound));
         OnPropertyChanged(nameof(CanPlayAudio));
         OnPropertyChanged(nameof(CanPlayFem));
-        OnPropertyChanged(nameof(IsPlayingPrimary));
-        OnPropertyChanged(nameof(IsPlayingFem));
-        OnPropertyChanged(nameof(PlayPrimaryGlyph));
-        OnPropertyChanged(nameof(PlayFemGlyph));
-        OnPropertyChanged(nameof(PlayPrimaryTooltip));
-        OnPropertyChanged(nameof(PlayFemTooltip));
     }
 
     // ── Speaker / Listener name picker ───────────────────────────────────
