@@ -16,6 +16,13 @@ original game files directly, making the workflow safe, reversible, and shareabl
 
 ---
 
+## Third-party software
+
+The editor bundles `vgmstream-cli.exe` for PoE2 voice-over audio preview.
+Full copyright notices and license terms are in [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
+
+---
+
 ## Workflow
 
 ### 1 — Open your game folder
