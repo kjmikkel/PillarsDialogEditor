@@ -14,6 +14,7 @@
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.14" />
     <PackageReference Include="NodifyAvalonia" Version="6.6.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="NAudio" Version="2.2.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -36,6 +37,14 @@
     </Content>
     <!-- Ship the changelog next to the executable so Help > Changelog finds it. -->
     <Content Include="..\CHANGELOG.md" Link="CHANGELOG.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- Bundle vgmstream-cli for PoE2 .wem audio preview. Attribution: THIRD_PARTY_LICENSES.md -->
+    <Content Include="tools\vgmstream-cli.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <!-- vgmstream-cli runtime dependencies (codec DLLs shipped alongside the CLI) -->
+    <Content Include="tools\*.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
