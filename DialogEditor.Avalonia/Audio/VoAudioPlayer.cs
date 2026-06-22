@@ -29,7 +29,7 @@ public sealed class VoAudioPlayer : IVoAudioPlayer, IDisposable
     private string? _tempFile;
     private bool _manualStop;
     // Incremented on every Play/Stop to cancel in-flight background work.
-    private int _generation;
+    private volatile int _generation;
 
     public void Play(string wemPath)
     {
