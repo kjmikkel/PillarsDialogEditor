@@ -497,7 +497,14 @@ tour** (highlighting controls step-by-step), deferred — see the sample/tutoria
 "Future enhancements".
 
 ### Voice-Over Integration
-An "External VO" field exists but there is no path validation, lip-sync metadata support, or audio preview. Mods that add or replace voiced lines have no tooling support. Note: actual voice-over audio is stored in a proprietary archive format — requires investigation before tooling can be designed.
+
+**PoE2 path validation ✓ implemented (2026-06-21):** per-node status indicator in the detail panel and a batch "Validate Voice-Over…" window under Test menu. Resolves `ChatterPrefix` from `speakers.gamedatabundle` via `ChatterPrefixService`; handles `ExternalVO` override paths and Narrator GUID; detects female variants. PoE1 remains out of scope (Unity asset archives).
+
+Remaining gaps:
+- **Audio playback** — requires `vgmstream-cli` or similar; packaging/licensing TBD, ship separately.
+- **PoE1 VO** — Unity asset archives; deferred indefinitely.
+- **Lip-sync metadata** — no tooling support.
+- **Mod VO** — mods that add/replace voiced lines have no tooling support.
 
 ### ~~GUID Parameter Readability~~ ✓ Implemented (first pass)
 
