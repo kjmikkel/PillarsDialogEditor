@@ -209,8 +209,8 @@ public class VoPathResolverTests : IDisposable
             "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", 1, "test_conv", _gameRoot, "poe2");
 
         Assert.NotNull(result!.PrimaryWemPath);
-        Assert.True(result.PrimaryWemPath!.EndsWith("test_conv_0001.wem",
-            StringComparison.OrdinalIgnoreCase));
+        Assert.EndsWith("test_conv_0001.wem", result.PrimaryWemPath!,
+            StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -238,8 +238,8 @@ public class VoPathResolverTests : IDisposable
             "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", 1, "test_conv", _gameRoot, "poe2");
 
         Assert.NotNull(result!.FemWemPath);
-        Assert.True(result.FemWemPath!.EndsWith("test_conv_0001_fem.wem",
-            StringComparison.OrdinalIgnoreCase));
+        Assert.EndsWith("test_conv_0001_fem.wem", result.FemWemPath!,
+            StringComparison.OrdinalIgnoreCase);
     }
 
     [Fact]
@@ -282,7 +282,7 @@ public class VoPathResolverTests : IDisposable
             "unknown-guid", false, "eder/00_cv_test_0153", 999, "anything", _gameRoot, "poe2");
 
         Assert.NotNull(result!.PrimaryWemPath);
-        Assert.True(result.PrimaryWemPath!.EndsWith("00_cv_test_0153.wem",
-            StringComparison.OrdinalIgnoreCase));
+        Assert.EndsWith("00_cv_test_0153.wem", result.PrimaryWemPath!,
+            StringComparison.OrdinalIgnoreCase);
     }
 }
