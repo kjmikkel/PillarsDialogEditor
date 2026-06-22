@@ -503,7 +503,6 @@ tour** (highlighting controls step-by-step), deferred — see the sample/tutoria
 Remaining gaps:
 - **Audio playback** — requires `vgmstream-cli` or similar; packaging/licensing TBD, ship separately.
 - **PoE1 VO** — Unity asset archives; deferred indefinitely.
-- **Lip-sync metadata** — no tooling support.
 - **Mod VO** — mods that add/replace voiced lines have no tooling support.
 
 ### ~~GUID Parameter Readability~~ ✓ Implemented (first pass)
