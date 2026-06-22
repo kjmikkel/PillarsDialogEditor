@@ -176,8 +176,9 @@ public partial class NodeDetailViewModel : ObservableObject
         }
         else
         {
+            if (_voCheck?.PrimaryWemPath is null || !_player.IsAvailable) return;
             _player.Stop();
-            _player.Play(_voCheck!.PrimaryWemPath!);
+            _player.Play(_voCheck.PrimaryWemPath);
             SetPlaying(Playing.Primary);
         }
     }
@@ -192,8 +193,9 @@ public partial class NodeDetailViewModel : ObservableObject
         }
         else
         {
+            if (_voCheck?.FemWemPath is null || !_player.IsAvailable) return;
             _player.Stop();
-            _player.Play(_voCheck!.FemWemPath!);
+            _player.Play(_voCheck.FemWemPath);
             SetPlaying(Playing.Female);
         }
     }
