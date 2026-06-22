@@ -137,6 +137,81 @@ public partial class NodeDetailViewModel : ObservableObject
     // ── VO file status (PoE2 only) ────────────────────────────────────
     private VoCheckResult? _voCheck;
 
+    // ── Audio playback ────────────────────────────────────────────────────
+    private enum Playing { None, Primary, Female }
+    private Playing _currentlyPlaying = Playing.None;
+    private IVoAudioPlayer _player = NullVoAudioPlayer.Instance;
+
+    public IVoAudioPlayer Player
+    {
+        get => _player;
+        set
+        {
+            _player.PlaybackStopped -= OnPlaybackStopped;
+            _player = value;
+            _player.PlaybackStopped += OnPlaybackStopped;
+            OnPropertyChanged(nameof(CanPlayAudio));
+        }
+    }
+
+    public bool IsPlayingPrimary => _currentlyPlaying == Playing.Primary;
+    public bool IsPlayingFem     => _currentlyPlaying == Playing.Female;
+    public bool CanPlayAudio     => _player.IsAvailable && VoStatusIsFound;
+    public bool CanPlayFem       => CanPlayAudio && (_voCheck?.FemaleVariantFound ?? false);
+
+    public string PlayPrimaryGlyph   => _currentlyPlaying == Playing.Primary ? "■" : "▶";
+    public string PlayFemGlyph       => _currentlyPlaying == Playing.Female  ? "■" : "▶";
+    public string PlayPrimaryTooltip => _currentlyPlaying == Playing.Primary
+        ? Loc.Get("ToolTip_StopVO") : Loc.Get("ToolTip_PlayVO");
+    public string PlayFemTooltip => _currentlyPlaying == Playing.Female
+        ? Loc.Get("ToolTip_StopFemVO") : Loc.Get("ToolTip_PlayFemVO");
+
+    [RelayCommand]
+    private void PlayPrimary()
+    {
+        if (_currentlyPlaying == Playing.Primary)
+        {
+            _player.Stop();
+            SetPlaying(Playing.None);
+        }
+        else
+        {
+            _player.Stop();
+            _player.Play(_voCheck!.PrimaryWemPath!);
+            SetPlaying(Playing.Primary);
+        }
+    }
+
+    [RelayCommand]
+    private void PlayFem()
+    {
+        if (_currentlyPlaying == Playing.Female)
+        {
+            _player.Stop();
+            SetPlaying(Playing.None);
+        }
+        else
+        {
+            _player.Stop();
+            _player.Play(_voCheck!.FemWemPath!);
+            SetPlaying(Playing.Female);
+        }
+    }
+
+    private void SetPlaying(Playing p)
+    {
+        _currentlyPlaying = p;
+        OnPropertyChanged(nameof(IsPlayingPrimary));
+        OnPropertyChanged(nameof(IsPlayingFem));
+        OnPropertyChanged(nameof(PlayPrimaryGlyph));
+        OnPropertyChanged(nameof(PlayFemGlyph));
+        OnPropertyChanged(nameof(PlayPrimaryTooltip));
+        OnPropertyChanged(nameof(PlayFemTooltip));
+    }
+
+    // Called when a track ends naturally — Stop() does NOT trigger this.
+    private void OnPlaybackStopped() => SetPlaying(Playing.None);
+
     public bool HasVoStatus     => _voCheck is { Status: not VoPresence.NotApplicable };
     public bool VoStatusIsFound => _voCheck?.Status == VoPresence.Found;
 
@@ -283,6 +358,10 @@ public partial class NodeDetailViewModel : ObservableObject
 
     private void NotifyAllProxies()
     {
+        // Stop without firing PlaybackStopped; reset state explicitly.
+        _player.Stop();
+        _currentlyPlaying = Playing.None;
+
         OnPropertyChanged(nameof(DefaultText));
         OnPropertyChanged(nameof(FemaleText));
         OnPropertyChanged(nameof(SpeakerCategoryString));
@@ -316,6 +395,14 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(VoStatusGlyph));
         OnPropertyChanged(nameof(VoStatusText));
         OnPropertyChanged(nameof(VoStatusIsFound));
+        OnPropertyChanged(nameof(CanPlayAudio));
+        OnPropertyChanged(nameof(CanPlayFem));
+        OnPropertyChanged(nameof(IsPlayingPrimary));
+        OnPropertyChanged(nameof(IsPlayingFem));
+        OnPropertyChanged(nameof(PlayPrimaryGlyph));
+        OnPropertyChanged(nameof(PlayFemGlyph));
+        OnPropertyChanged(nameof(PlayPrimaryTooltip));
+        OnPropertyChanged(nameof(PlayFemTooltip));
     }
 
     // ── Speaker / Listener name picker ───────────────────────────────────

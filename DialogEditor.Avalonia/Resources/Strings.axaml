@@ -1097,4 +1097,10 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="VoValidation_NodeRow">Node {0}</sys:String>
     <sys:String x:Key="VoValidation_MissingBadge">✗ Missing</sys:String>
 
+    <!-- ── Voice-Over playback ─────────────────────────────────────────── -->
+    <sys:String x:Key="ToolTip_PlayVO">Play primary voice-over track for this node</sys:String>
+    <sys:String x:Key="ToolTip_StopVO">Stop playback of the primary voice-over track</sys:String>
+    <sys:String x:Key="ToolTip_PlayFemVO">Play female variant voice-over track for this node</sys:String>
+    <sys:String x:Key="ToolTip_StopFemVO">Stop playback of the female variant voice-over track</sys:String>
+
 </ResourceDictionary>
