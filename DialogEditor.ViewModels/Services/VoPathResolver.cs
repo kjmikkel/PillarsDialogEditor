@@ -44,7 +44,7 @@ public static class VoPathResolver
 
         // Node carries no VO information — nothing to check.
         if (!hasVO && string.IsNullOrEmpty(externalVO))
-            return new VoCheckResult(VoPresence.NotApplicable, false);
+            return new VoCheckResult(VoPresence.NotApplicable, false, null, null);
 
         var voRoot = Path.Combine(gameRoot,
             "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
@@ -66,7 +66,7 @@ public static class VoPathResolver
                                 : ChatterPrefixService.GetPrefix(speakerGuid);
 
             if (string.IsNullOrEmpty(chatterPrefix))
-                return new VoCheckResult(VoPresence.Missing, false);
+                return new VoCheckResult(VoPresence.Missing, false, null, null);
 
             // Conversation name is lowercased to match the VO pipeline file naming.
             // Node ID is zero-padded to four digits.
@@ -75,12 +75,13 @@ public static class VoPathResolver
                 $"{conversationName.ToLowerInvariant()}_{nodeId:0000}");
         }
 
-        var primary = basePath + ".wem";
-        var fem     = basePath + "_fem.wem";
-
+        var primary   = basePath + ".wem";
+        var fem       = basePath + "_fem.wem";
+        var femExists = File.Exists(fem);
         return new VoCheckResult(
             File.Exists(primary) ? VoPresence.Found : VoPresence.Missing,
-            // _fem.wem presence is informational and does not affect Status.
-            File.Exists(fem));
+            femExists,
+            primary,            // always set when speaker is known; file may or may not exist
+            femExists ? fem : null);
     }
 }
