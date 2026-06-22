@@ -8,6 +8,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using DialogEditor.Avalonia.Audio;
 using DialogEditor.Avalonia.Services;
 using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.Avalonia.Shared.Theming;
@@ -91,6 +92,10 @@ public partial class MainWindow : Window
             await dialog.ShowDialog(this);
             return dialog.Result;
         };
+
+        var audioPlayer = new VoAudioPlayer();
+        vm.Detail.Player = audioPlayer;
+        Closed += (_, _) => audioPlayer.Dispose();
 
         if (!vm.IsBrowserExpanded)
         {

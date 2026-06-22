@@ -216,6 +216,19 @@
                                Foreground="{Binding VoStatusIsFound, Converter={StaticResource BoolToVoStatusBrush}}"
                                FontSize="{DynamicResource FontSize.Small}"
                                VerticalAlignment="Center"/>
+                    <!-- Play buttons — only when vgmstream-cli is present and the file is found -->
+                    <Button Content="{Binding PlayPrimaryGlyph}"
+                            Command="{Binding PlayPrimaryCommand}"
+                            IsVisible="{Binding CanPlayAudio}"
+                            ToolTip.Tip="{Binding PlayPrimaryTooltip}"
+                            AutomationProperties.HelpText="{Binding PlayPrimaryTooltip}"
+                            Margin="8,0,0,0" Padding="6,2"/>
+                    <Button Content="{Binding PlayFemGlyph}"
+                            Command="{Binding PlayFemCommand}"
+                            IsVisible="{Binding CanPlayFem}"
+                            ToolTip.Tip="{Binding PlayFemTooltip}"
+                            AutomationProperties.HelpText="{Binding PlayFemTooltip}"
+                            Margin="4,0,0,0" Padding="6,2"/>
                 </StackPanel>
 
                 <CheckBox Classes="detail-check"
