@@ -23,4 +23,15 @@ public enum VoPresence
 /// True when a <c>_fem.wem</c> companion file also exists alongside the primary file.
 /// Informational only — does not affect <see cref="Status"/>.
 /// </param>
-public record VoCheckResult(VoPresence Status, bool FemaleVariantFound);
+/// <param name="PrimaryWemPath">
+/// Full path to the primary <c>.wem</c> file, or <c>null</c> when the path cannot be
+/// resolved (NotApplicable nodes, or nodes with an unknown speaker GUID).
+/// </param>
+/// <param name="FemWemPath">
+/// Full path to the <c>_fem.wem</c> companion file, or <c>null</c> if it does not exist.
+/// </param>
+public record VoCheckResult(
+    VoPresence Status,
+    bool       FemaleVariantFound,
+    string?    PrimaryWemPath,
+    string?    FemWemPath);

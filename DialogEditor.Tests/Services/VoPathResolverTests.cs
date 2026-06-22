@@ -195,4 +195,94 @@ public class VoPathResolverTests : IDisposable
 
         Assert.Equal(VoPresence.Found, result!.Status);
     }
+
+    // ── PrimaryWemPath and FemWemPath ─────────────────────────────────────
+
+    [Fact]
+    public void Check_KnownSpeaker_PrimaryWemPathContainsExpectedFilename()
+    {
+        var dir = Path.Combine(_voRoot, "eder");
+        Directory.CreateDirectory(dir);
+        File.WriteAllText(Path.Combine(dir, "test_conv_0001.wem"), "");
+
+        var result = VoPathResolver.Check(
+            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", 1, "test_conv", _gameRoot, "poe2");
+
+        Assert.NotNull(result!.PrimaryWemPath);
+        Assert.True(result.PrimaryWemPath!.EndsWith("test_conv_0001.wem",
+            StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Check_NoFemVariant_FemWemPathIsNull()
+    {
+        var dir = Path.Combine(_voRoot, "eder");
+        Directory.CreateDirectory(dir);
+        File.WriteAllText(Path.Combine(dir, "test_conv_0001.wem"), "");
+
+        var result = VoPathResolver.Check(
+            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", 1, "test_conv", _gameRoot, "poe2");
+
+        Assert.Null(result!.FemWemPath);
+    }
+
+    [Fact]
+    public void Check_FemVariantExists_FemWemPathSet()
+    {
+        var dir = Path.Combine(_voRoot, "eder");
+        Directory.CreateDirectory(dir);
+        File.WriteAllText(Path.Combine(dir, "test_conv_0001.wem"),     "");
+        File.WriteAllText(Path.Combine(dir, "test_conv_0001_fem.wem"), "");
+
+        var result = VoPathResolver.Check(
+            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", 1, "test_conv", _gameRoot, "poe2");
+
+        Assert.NotNull(result!.FemWemPath);
+        Assert.True(result.FemWemPath!.EndsWith("test_conv_0001_fem.wem",
+            StringComparison.OrdinalIgnoreCase));
+    }
+
+    [Fact]
+    public void Check_NotApplicable_BothPathsNull()
+    {
+        var result = VoPathResolver.Check("any-guid", false, "", 1, "conv", _gameRoot, "poe2");
+        Assert.Null(result!.PrimaryWemPath);
+        Assert.Null(result.FemWemPath);
+    }
+
+    [Fact]
+    public void Check_UnknownSpeaker_PrimaryWemPathIsNull()
+    {
+        // Unknown speaker → we cannot resolve the folder, so the path stays null
+        var result = VoPathResolver.Check("unknown-guid", true, "", 1, "conv", _gameRoot, "poe2");
+        Assert.Null(result!.PrimaryWemPath);
+        Assert.Null(result.FemWemPath);
+    }
+
+    [Fact]
+    public void Check_PrimaryFileMissing_PrimaryWemPathStillSet()
+    {
+        // Even when the file doesn't exist, PrimaryWemPath holds the expected location —
+        // the player needs it to attempt playback (and fail gracefully).
+        var result = VoPathResolver.Check(
+            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", 1, "test_conv", _gameRoot, "poe2");
+
+        Assert.Equal(VoPresence.Missing, result!.Status);
+        Assert.NotNull(result.PrimaryWemPath);
+    }
+
+    [Fact]
+    public void Check_ExternalVO_PrimaryWemPathSet()
+    {
+        var dir = Path.Combine(_voRoot, "eder");
+        Directory.CreateDirectory(dir);
+        File.WriteAllText(Path.Combine(dir, "00_cv_test_0153.wem"), "");
+
+        var result = VoPathResolver.Check(
+            "unknown-guid", false, "eder/00_cv_test_0153", 999, "anything", _gameRoot, "poe2");
+
+        Assert.NotNull(result!.PrimaryWemPath);
+        Assert.True(result.PrimaryWemPath!.EndsWith("00_cv_test_0153.wem",
+            StringComparison.OrdinalIgnoreCase));
+    }
 }
