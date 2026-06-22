@@ -118,6 +118,8 @@ public sealed class VoAudioPlayer : IVoAudioPlayer, IDisposable
         var output   = _output;   _output   = null;
         var reader   = _reader;   _reader   = null;
         var tempFile = _tempFile; _tempFile = null;
+        if (output is not null)
+            output.PlaybackStopped -= OnNaturalPlaybackStopped; // unsubscribe before dispose
         output?.Dispose();
         reader?.Dispose();
         TryDeleteTemp(tempFile);
@@ -126,7 +128,7 @@ public sealed class VoAudioPlayer : IVoAudioPlayer, IDisposable
     private static void TryDeleteTemp(string? path)
     {
         if (path is null) return;
-        try { File.Delete(path); } catch { /* best-effort; file may still be open */ }
+        try { File.Delete(path); } catch (Exception) { /* best-effort; file may still be open */ }
     }
 
     public void Dispose()
