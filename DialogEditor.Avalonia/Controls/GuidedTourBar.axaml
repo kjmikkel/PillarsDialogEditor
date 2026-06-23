@@ -1,0 +1,69 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="DialogEditor.Avalonia.Controls.GuidedTourBar"
+             x:CompileBindings="False">
+
+    <!-- Tour bar: docked between the canvas row and the status bar in MainWindow.
+         DataContext is set to MainWindowViewModel.Tour (a GuidedTourViewModel)
+         by MainWindow.axaml.
+         The hidden live-region TextBlock announces step changes to screen readers. -->
+    <Panel>
+
+        <Border Background="{DynamicResource Brush.Surface.Panel}"
+                BorderBrush="{DynamicResource Brush.Border.Default}"
+                BorderThickness="0,1,0,0"
+                Padding="8,6">
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+
+                <!-- Step counter: "Step 2 of 4" -->
+                <TextBlock Grid.Column="0"
+                           Text="{Binding CounterText}"
+                           Foreground="{DynamicResource Brush.Text.Muted}"
+                           FontSize="{DynamicResource FontSize.Label}"
+                           VerticalAlignment="Center"
+                           Margin="0,0,10,0"/>
+
+                <!-- Back button — disabled at step 0 via BackCommand.CanExecute -->
+                <Button Grid.Column="1"
+                        Content="{DynamicResource Tour_Back}"
+                        Command="{Binding BackCommand}"
+                        ToolTip.Tip="{DynamicResource ToolTip_Tour_Back}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_Tour_Back}"
+                        Margin="0,0,6,0"/>
+
+                <!-- Step description — fills remaining space -->
+                <TextBlock Grid.Column="2"
+                           Text="{Binding CurrentStepText}"
+                           Foreground="{DynamicResource Brush.Text.Primary}"
+                           FontSize="{DynamicResource FontSize.Label}"
+                           TextWrapping="Wrap"
+                           VerticalAlignment="Center"
+                           Margin="0,0,10,0"/>
+
+                <!-- Next / Finish button — label and tooltip switch on IsLastStep -->
+                <Button Grid.Column="3"
+                        Content="{Binding NextButtonLabel}"
+                        Command="{Binding NextCommand}"
+                        ToolTip.Tip="{Binding NextButtonTooltip}"
+                        AutomationProperties.HelpText="{Binding NextButtonTooltip}"
+                        Margin="0,0,6,0"/>
+
+                <!-- Dismiss button — icon-only (✕), needs AutomationProperties.Name -->
+                <Button Grid.Column="4"
+                        Content="✕"
+                        Command="{Binding DismissCommand}"
+                        ToolTip.Tip="{DynamicResource ToolTip_Tour_Dismiss}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_Tour_Dismiss}"
+                        AutomationProperties.Name="{DynamicResource AutomationName_Tour_Dismiss}"/>
+
+            </Grid>
+        </Border>
+
+        <!-- Hidden live region: announces each step description to screen readers.
+             Same pattern as StatusLiveRegion in MainWindow.axaml. -->
+        <TextBlock Text="{Binding CurrentStepText}"
+                   AutomationProperties.LiveSetting="Polite"
+                   IsVisible="False"/>
+
+    </Panel>
+</UserControl>
