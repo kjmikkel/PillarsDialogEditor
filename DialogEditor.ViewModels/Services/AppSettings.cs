@@ -55,6 +55,11 @@ public static class AppSettings
         // only a genuinely fresh install (no settings.json yet, or a load failure) gets
         // false, via Load().
         public bool ThemeOnboardingSeen              { get; set; } = true;
+        // Whether the in-app guided tour has been seen (or deliberately dismissed).
+        // Defaults to true so that EXISTING installs upgrading to this version silently
+        // treat the tour as already-seen — only a genuinely fresh install (no settings.json
+        // yet, or a load failure) gets false, via Load().
+        public bool GuidedTourSeen                   { get; set; } = true;
         // UI language code (BCP-47, e.g. "en", "de"). Defaults to "en" (English).
         // TODO: add "Auto" (OS locale detection) once a non-English translation ships —
         //       would resolve via CultureInfo.CurrentUICulture and fall back to "en".
@@ -89,14 +94,14 @@ public static class AppSettings
     {
         try
         {
-            if (!File.Exists(SettingsPath)) return new() { ThemeOnboardingSeen = false };
+            if (!File.Exists(SettingsPath)) return new() { ThemeOnboardingSeen = false, GuidedTourSeen = false };
             var json = File.ReadAllText(SettingsPath);
             return JsonSerializer.Deserialize<SettingsData>(json) ?? new();
         }
         catch (Exception ex)
         {
             AppLog.Warn($"Failed to load settings from {SettingsPath}: {ex.Message}");
-            return new() { ThemeOnboardingSeen = false };
+            return new() { ThemeOnboardingSeen = false, GuidedTourSeen = false };
         }
     }
 
@@ -192,6 +197,12 @@ public static class AppSettings
     {
         get => Load().ThemeOnboardingSeen;
         set { var s = Load(); s.ThemeOnboardingSeen = value; Save(s); }
+    }
+
+    public static bool GuidedTourSeen
+    {
+        get => Load().GuidedTourSeen;
+        set { var s = Load(); s.GuidedTourSeen = value; Save(s); }
     }
 
     public static string UiLanguage
