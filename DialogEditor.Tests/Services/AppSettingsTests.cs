@@ -187,3 +187,44 @@ public class AppSettingsThemeOnboardingTests : IDisposable
         Assert.False(AppSettings.ThemeOnboardingSeen);
     }
 }
+
+public class AppSettingsGuidedTourTests : IDisposable
+{
+    public void Dispose()
+    {
+        var path = AppSettings.SettingsPathOverride;
+        AppSettings.SettingsPathOverride = null;
+        if (path is not null && File.Exists(path)) File.Delete(path);
+    }
+
+    [Fact]
+    public void GuidedTourSeen_DefaultsToFalse_WhenNoSettingsFile()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"settings-{Guid.NewGuid():N}.json");
+        AppSettings.SettingsPathOverride = path;
+
+        Assert.False(AppSettings.GuidedTourSeen);
+    }
+
+    [Fact]
+    public void GuidedTourSeen_DefaultsToTrue_WhenExistingSettingsFileLacksKey()
+    {
+        var path = Path.GetTempFileName();
+        File.WriteAllText(path, "{}");
+        AppSettings.SettingsPathOverride = path;
+
+        Assert.True(AppSettings.GuidedTourSeen);
+    }
+
+    [Fact]
+    public void GuidedTourSeen_RoundTrips()
+    {
+        AppSettings.SettingsPathOverride = Path.GetTempFileName();
+
+        AppSettings.GuidedTourSeen = true;
+        Assert.True(AppSettings.GuidedTourSeen);
+
+        AppSettings.GuidedTourSeen = false;
+        Assert.False(AppSettings.GuidedTourSeen);
+    }
+}
