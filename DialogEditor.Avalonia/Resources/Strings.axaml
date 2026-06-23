@@ -1103,4 +1103,24 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_PlayFemVO">Play female variant voice-over track for this node</sys:String>
     <sys:String x:Key="ToolTip_StopFemVO">Stop playback of the female variant voice-over track</sys:String>
 
+    <!-- ── Guided tour ────────────────────────────────────────────────── -->
+    <sys:String x:Key="Menu_StartGuidedTour">Start Guided Tour</sys:String>
+
+    <sys:String x:Key="Tour_Counter">Step {0} of {1}</sys:String>
+    <sys:String x:Key="Tour_Back">← Back</sys:String>
+    <sys:String x:Key="Tour_Next">Next →</sys:String>
+    <sys:String x:Key="Tour_Finish">Finish</sys:String>
+    <sys:String x:Key="Tour_Dismiss">Dismiss tour</sys:String>
+
+    <sys:String x:Key="ToolTip_Tour_Back">Go to the previous step</sys:String>
+    <sys:String x:Key="ToolTip_Tour_Next">Go to the next step</sys:String>
+    <sys:String x:Key="ToolTip_Tour_Finish">Close the guided tour</sys:String>
+    <sys:String x:Key="ToolTip_Tour_Dismiss">Close the guided tour without finishing</sys:String>
+    <sys:String x:Key="AutomationName_Tour_Dismiss">Dismiss tour</sys:String>
+
+    <sys:String x:Key="Tour_Step1_Text">The conversation browser lists every conversation in your game folder. Click one to open it on the canvas.</sys:String>
+    <sys:String x:Key="Tour_Step2_Text">The canvas shows the node graph for the open conversation. Click a node to select it; double-click empty space to add a new one.</sys:String>
+    <sys:String x:Key="Tour_Step3_Text">The detail panel shows the selected node's text, speaker, and conditions. Edit here to change what characters say.</sys:String>
+    <sys:String x:Key="Tour_Step4_Text">The ? button shows a hint for whatever you focus. Help ▸ Open Walkthrough has the full beginner guide.</sys:String>
+
 </ResourceDictionary>
