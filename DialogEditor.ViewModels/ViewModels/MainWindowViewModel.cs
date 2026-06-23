@@ -28,6 +28,7 @@ public partial class MainWindowViewModel : ObservableObject
     public GameBrowserViewModel  Browser { get; }
     public ConversationViewModel Canvas  { get; }
     public NodeDetailViewModel   Detail  { get; } = new();
+    public GuidedTourViewModel   Tour    { get; } = new();
 
     // ── Active project ────────────────────────────────────────────────────
     private DialogProject? _project;
@@ -1173,6 +1174,10 @@ public partial class MainWindowViewModel : ObservableObject
         }
         return false;
     }
+
+    // ── Guided tour (Help menu) ───────────────────────────────────────────
+    [RelayCommand]
+    private void StartGuidedTour() => Tour.Start();
 
     // ── Changelog (Help menu) ─────────────────────────────────────────────
     private const string ChangelogFileName = "CHANGELOG.md";

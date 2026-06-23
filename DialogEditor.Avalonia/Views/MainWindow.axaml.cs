@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Automation;
+using Avalonia.Controls.Primitives;
 using Avalonia.Platform;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -9,6 +10,7 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using DialogEditor.Avalonia.Audio;
+using DialogEditor.Avalonia.Controls;
 using DialogEditor.Avalonia.Services;
 using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.Avalonia.Shared.Theming;
@@ -30,6 +32,10 @@ public partial class MainWindow : Window
     private FlowAnalyticsWindow?   _flowAnalyticsWindow;
     private VoValidationWindow?    _voValidationWindow;
 
+    // Tour adorner state — one adorner on one target at a time.
+    private TourHighlightAdorner? _tourAdorner;
+    private Control?              _tourTarget;
+
     // Set to true immediately before a programmatic Close() call so that
     // the re-entrant OnClosing doesn't show the dirty-close dialog again.
     private bool _closingConfirmed = false;
@@ -49,6 +55,7 @@ public partial class MainWindow : Window
             new AvaloniaFilePicker(this));
 
         var vm = (MainWindowViewModel)DataContext;
+        vm.Tour.StepChanged += OnTourStepChanged;
         vm.PropertyChanged += OnVmPropertyChanged;
         vm.UnsavedChangesRequested += () => _ = ShowUnsavedChangesDialogAsync(vm);
         vm.TestModeEntered += () => TestOverlay.IsVisible = true;
@@ -496,7 +503,10 @@ public partial class MainWindow : Window
         base.OnOpened(e);
         if (_startupDone) return;
         _startupDone = true;
-        ((MainWindowViewModel)DataContext!).ReopenLastProjectOnStartup();
+        var vm = (MainWindowViewModel)DataContext!;
+        vm.ReopenLastProjectOnStartup();
+        if (!AppSettings.GuidedTourSeen)
+            vm.Tour.Start();
     }
 
     // ── App-close guard ───────────────────────────────────────────────────
@@ -622,5 +632,47 @@ public partial class MainWindow : Window
         var dialog = new ConversationNameDialog(defaultValue);
         await dialog.ShowDialog(this);
         return dialog.Result;
+    }
+
+    // ── Guided tour adorner ───────────────────────────────────────────────
+    private void OnTourStepChanged()
+    {
+        RemoveTourAdorner();
+
+        var vm = (MainWindowViewModel)DataContext!;
+        if (!vm.Tour.IsVisible) return;
+
+        var step   = vm.Tour.CurrentStep;
+        var target = this.FindControl<Control>(step.TargetName);
+        if (target is null) return;
+
+        EnsureTourPanelVisible(step.TargetName);
+
+        var layer = AdornerLayer.GetAdornerLayer(target);
+        if (layer is null) return;
+
+        _tourAdorner = new TourHighlightAdorner();
+        AdornerLayer.SetAdornedElement(_tourAdorner, target);
+        layer.Children.Add(_tourAdorner);
+        _tourTarget = target;
+    }
+
+    private void RemoveTourAdorner()
+    {
+        if (_tourTarget is null || _tourAdorner is null) return;
+        AdornerLayer.GetAdornerLayer(_tourTarget)?.Children.Remove(_tourAdorner);
+        _tourTarget  = null;
+        _tourAdorner = null;
+    }
+
+    private void EnsureTourPanelVisible(string targetName)
+    {
+        var vm = (MainWindowViewModel)DataContext!;
+        // Expand collapsed panels before the adorner tries to highlight them.
+        // CanvasView and HelpToggle are always visible — no action needed for them.
+        if (targetName == "BrowserPanel" && !vm.IsBrowserExpanded)
+            vm.IsBrowserExpanded = true;
+        else if (targetName == "DetailPanel" && !vm.IsDetailExpanded)
+            vm.IsDetailExpanded  = true;
     }
 }
