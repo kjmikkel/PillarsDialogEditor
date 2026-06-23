@@ -55,7 +55,9 @@ The Version Control Integration section is now essentially complete.
 **✅ IMPLEMENTED (2026-06-21).** Writers can leave free-floating annotations on the
 conversation canvas — short reminders ("tighten this up, too many NPC nodes in a row") and
 at-a-glance area labels ("the critical romance path", "locked into combat from here", "the
-trauma conversation"). These serve both solo reminders and team communication.
+trauma conversation"). These serve both solo reminders and team communication. Includes a
+7-colour flyout swatch picker (commit `12d5fa8`). Files: `AnnotationViewModel`,
+`AnnotationView.axaml`, `AnnotationColorConverter`, `AnnotationSnapshot`.
 
 **Design (settled):** sticky notes and coloured regions are **one primitive**, not two
 features. It is a titled, optionally coloured **box** placed at canvas coordinates. "Note"
@@ -473,7 +475,19 @@ work is a delivery mechanism and a translation workflow, not a rewrite.
    forms — usually accepted in tools).
 
 ### Barks System — Bark Preview
-Bark nodes now render with an amber color scheme on the canvas, carry bark-specific validation warnings (text too long, player-choice child), and those warnings surface in Flow Analytics. The text-length threshold is 324 characters — the longest bark in either shipped game (PoE1 `14_cv_iovara.conversation` node 73) — and warnings include the actual character count and an explanation of the yardstick. The remaining gap is an in-context preview of overhead floating text: writers cannot see how a bark will actually appear above an NPC's head without running the game. Implementing this requires investigating the game's bark rendering (font, line-wrapping, maximum visible width) before UI work can be designed. Pixel dimensions are not available from source code alone (they are stored in Unity prefab/scene files); a test run against the game itself would be needed to calibrate any visual preview.
+**✅ IMPLEMENTED (barks rendering + validation, 2026-06-21).** Bark nodes render with an
+amber colour scheme on the canvas, carry bark-specific validation warnings (text too long,
+player-choice child), and those warnings surface in Flow Analytics. The text-length
+threshold is 324 characters — the longest bark in either shipped game (PoE1
+`14_cv_iovara.conversation` node 73) — and warnings include the actual character count
+and an explanation of the yardstick. Files: `BarkConstants`, `NodeColorConverter` (amber
+palette), bark warning box in `NodeDetailView`.
+
+**Deferred — in-context overhead-text preview:** writers cannot see how a bark will
+actually appear above an NPC's head without running the game. Implementing this requires
+investigating the game's bark rendering (font, line-wrapping, maximum visible width) before
+UI work can be designed. Pixel dimensions are stored in Unity prefab/scene files; a test
+run against the game is needed to calibrate any visual preview.
 
 ### About / Version Info
 **Implemented.** **Help ▸ About…** shows the application name, version, licence, credits,
@@ -501,7 +515,7 @@ tour** (highlighting controls step-by-step), deferred — see the sample/tutoria
 **PoE2 path validation ✓ implemented (2026-06-21):** per-node status indicator in the detail panel and a batch "Validate Voice-Over…" window under Test menu. Resolves `ChatterPrefix` from `speakers.gamedatabundle` via `ChatterPrefixService`; handles `ExternalVO` override paths and Narrator GUID; detects female variants. PoE1 remains out of scope (Unity asset archives).
 
 Remaining gaps:
-- **Audio playback** — requires `vgmstream-cli` or similar; packaging/licensing TBD, ship separately.
+- **Audio playback ✓ implemented (2026-06-22):** bundled `vgmstream-cli` r2117 + NAudio; play/stop toggle buttons in node detail panel; female variant support; `THIRD_PARTY_LICENSES.md` updated.
 - **PoE1 VO** — Unity asset archives; deferred indefinitely.
 - **Mod VO** — mods that add/replace voiced lines have no tooling support.
 
