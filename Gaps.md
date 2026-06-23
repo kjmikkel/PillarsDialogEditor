@@ -403,13 +403,15 @@ after the cheap wins. The rest are independent and can land in any order.
     `PaletteMeetsContrastTargets`'s `[InlineData]`, and regenerated
     `palette-golden.approved.txt`.
 
-15. **✅ IMPLEMENTED (2026-06-14).** Raised during item 11(a)'s brainstorm: the
-    now-common "Light / Dark / System" first-launch picker (with live previews) would let
-    new users choose their palette immediately instead of discovering the Settings picker
-    later. Out of scope for 11(a) (which just makes "Auto" the silent default) — needs its
-    own brainstorm: which palettes to offer (all four? just Light/Dark/Auto?), how to
-    render previews, a first-run flag in `AppSettings`, and whether it blocks the main
-    window.
+15. **✅ IMPLEMENTED (commit `7b7af3e`).** First-run theme-onboarding dialog.
+    `ThemeOnboardingWindow` (in `DialogEditor.Avalonia.Shared`) shows on fresh install
+    (`AppSettings.ThemeOnboardingSeen = false`), hosts the existing `ThemePickerView`
+    unmodified, and displays a live-retint preview panel (NPC/Player/Narrator node cards
+    with Layer 2.5 shape glyphs, severity badges, button samples) — all via
+    `{DynamicResource}` so selecting a palette retints the preview instantly. Continue
+    button sets `ThemeOnboardingSeen = true` and closes; both `App.axaml.cs` files wire
+    the window as `desktop.MainWindow` before `MainWindow` is created. Design:
+    `docs/superpowers/specs/2026-06-14-theme-onboarding-design.md`.
 
 16. **✅ IMPLEMENTED (2026-06-13).** Split off from item 13. Of the 7 small
     1–3-control dialogs left out of the item-13 rollout, each control's
