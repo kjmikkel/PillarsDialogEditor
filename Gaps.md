@@ -508,9 +508,11 @@ layer remains a future enhancement — see the design spec.
 ### Onboarding
 A **Create Sample Project** command (Help menu) plus a shipped **beginner walkthrough**
 (`docs/walkthrough.md`) now give newcomers a safe, install-matched sandbox for learning the
-editor and the version-control tools. The remaining onboarding idea is an **in-app guided
-tour** (highlighting controls step-by-step), deferred — see the sample/tutorial spec's
-"Future enhancements".
+editor and the version-control tools.
+
+**In-app guided tour ✓ implemented (2026-06-23):** four-step tour bar + adorner ring
+highlighting BrowserPanel → CanvasView → DetailPanel → HelpToggle. Auto-triggers on
+fresh install; re-accessible via Help ▸ Start Guided Tour.
 
 ### Voice-Over Integration
 

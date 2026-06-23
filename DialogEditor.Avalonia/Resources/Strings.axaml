@@ -1105,6 +1105,7 @@ Saving records your edits to the open project — game files are not touched unt
 
     <!-- ── Guided tour ────────────────────────────────────────────────── -->
     <sys:String x:Key="Menu_StartGuidedTour">Start Guided Tour</sys:String>
+    <sys:String x:Key="ToolTip_Menu_StartGuidedTour">Start the in-app guided tour, which highlights the main panels of the editor one at a time.</sys:String>
 
     <sys:String x:Key="Tour_Counter">Step {0} of {1}</sys:String>
     <sys:String x:Key="Tour_Back">← Back</sys:String>

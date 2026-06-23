@@ -1,13 +1,14 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:views="clr-namespace:DialogEditor.Avalonia.Views"
+        xmlns:controls="clr-namespace:DialogEditor.Avalonia.Controls"
         x:Class="DialogEditor.Avalonia.Views.MainWindow"
         Title="{Binding WindowTitle}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="1400" Height="850"
         Background="{DynamicResource Brush.Surface.Window}" x:CompileBindings="False">
 
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto,*,Auto,Auto">
 
         <!-- Menu bar + slim toolbar -->
         <Border Grid.Row="0" Background="{DynamicResource Brush.Surface.Panel}" Padding="0">
@@ -159,6 +160,10 @@
                                   ToolTip.Tip="{DynamicResource Menu_OpenWalkthroughTip}"
                                   AutomationProperties.HelpText="{DynamicResource Menu_OpenWalkthroughTip}"
                                   Command="{Binding OpenWalkthroughCommand}"/>
+                        <MenuItem Header="{DynamicResource Menu_StartGuidedTour}"
+                                  Command="{Binding StartGuidedTourCommand}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_Menu_StartGuidedTour}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_StartGuidedTour}"/>
                         <Separator/>
                         <MenuItem Header="{DynamicResource Menu_ExportUiStrings}"
                                   ToolTip.Tip="{DynamicResource Menu_ExportUiStringsTip}"
@@ -344,8 +349,14 @@
             <!-- Legend is now LegendWindow (floating); toggled from MainWindow.axaml.cs -->
         </Grid>
 
+        <!-- Guided tour bar — sits above the status bar; hidden until a tour is active -->
+        <controls:GuidedTourBar x:Name="TourBar"
+                                Grid.Row="2"
+                                DataContext="{Binding Tour}"
+                                IsVisible="{Binding IsVisible}"/>
+
         <!-- Status bar -->
-        <Border Grid.Row="2" Background="{DynamicResource Brush.Surface.Card}" Padding="8,4">
+        <Border Grid.Row="3" Background="{DynamicResource Brush.Surface.Card}" Padding="8,4">
             <Grid ColumnDefinitions="*,Auto">
                 <!-- Hidden polite live region: announces StatusText (save/error/
                      operation results) to screen readers. Deliberately NOT bound to
