@@ -227,4 +227,23 @@ public class AppSettingsGuidedTourTests : IDisposable
         AppSettings.GuidedTourSeen = false;
         Assert.False(AppSettings.GuidedTourSeen);
     }
+
+    [Fact]
+    public void DiffWindowSeen_DefaultsToFalse_WhenNoSettingsFile()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"settings-{Guid.NewGuid():N}.json");
+        AppSettings.SettingsPathOverride = path;
+
+        Assert.False(AppSettings.DiffWindowSeen);
+    }
+
+    [Fact]
+    public void DiffWindowSeen_DefaultsToTrue_WhenExistingSettingsFileLacksKey()
+    {
+        var path = Path.GetTempFileName();
+        File.WriteAllText(path, "{}");
+        AppSettings.SettingsPathOverride = path;
+
+        Assert.True(AppSettings.DiffWindowSeen);
+    }
 }

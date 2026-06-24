@@ -66,6 +66,33 @@
             </ComboBox>
         </Grid>
 
+        <!-- ── First-run intro banner ────────────────────────────────────
+             Hidden by default (IsVisible="False"); shown once for fresh installs
+             in DiffWindow constructor via AppSettings.DiffWindowSeen. -->
+        <Border x:Name="IntroBanner"
+                DockPanel.Dock="Top"
+                IsVisible="False"
+                Background="{DynamicResource Brush.Surface.Card}"
+                BorderBrush="{DynamicResource Brush.Border.Default}"
+                BorderThickness="0,0,0,1"
+                Padding="12,8"
+                Margin="0,0,0,10">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBlock Grid.Column="0"
+                           Text="{DynamicResource DiffIntro_Text}"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource Brush.Text.Primary}"
+                           FontSize="{DynamicResource FontSize.Label}"
+                           VerticalAlignment="Center"/>
+                <Button Grid.Column="1"
+                        Content="{DynamicResource DiffIntro_GotIt}"
+                        Click="IntroBanner_GotIt_Click"
+                        ToolTip.Tip="{DynamicResource ToolTip_DiffIntro_GotIt}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_DiffIntro_GotIt}"
+                        Margin="12,0,0,0"/>
+            </Grid>
+        </Border>
+
         <!-- ── Status bar ─────────────────────────────────────────────── -->
         <Border DockPanel.Dock="Bottom" Background="{DynamicResource Brush.Surface.Card}" Padding="8,4" Margin="0,8,0,0">
             <TextBlock Text="{Binding StatusText}"
