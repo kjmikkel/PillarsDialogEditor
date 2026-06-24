@@ -1124,4 +1124,9 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Tour_Step3_Text">The detail panel shows the selected node's text, speaker, and conditions. Edit here to change what characters say.</sys:String>
     <sys:String x:Key="Tour_Step4_Text">The ? button shows a hint for whatever you focus. Help ▸ Open Walkthrough has the full beginner guide.</sys:String>
 
+    <!-- ── Diff window first-run intro banner ───────────────────────────── -->
+    <sys:String x:Key="DiffIntro_Text">This window shows what's different between two versions of your dialogue. Use the list on the left to see changed conversations — tick what you want to keep, then press Bring in. Nothing in your file changes until you press that button.</sys:String>
+    <sys:String x:Key="DiffIntro_GotIt">Got it</sys:String>
+    <sys:String x:Key="ToolTip_DiffIntro_GotIt">Dismiss this introduction. You can re-read it any time via the ? Help button.</sys:String>
+
 </ResourceDictionary>

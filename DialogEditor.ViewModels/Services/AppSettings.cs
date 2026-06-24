@@ -60,6 +60,9 @@ public static class AppSettings
         // treat the tour as already-seen — only a genuinely fresh install (no settings.json
         // yet, or a load failure) gets false, via Load().
         public bool GuidedTourSeen                   { get; set; } = true;
+        // Defaults to true so existing users upgrading never see the banner;
+        // Load() overrides to false for a fresh install (no settings.json).
+        public bool DiffWindowSeen                   { get; set; } = true;
         // UI language code (BCP-47, e.g. "en", "de"). Defaults to "en" (English).
         // TODO: add "Auto" (OS locale detection) once a non-English translation ships —
         //       would resolve via CultureInfo.CurrentUICulture and fall back to "en".
@@ -94,14 +97,14 @@ public static class AppSettings
     {
         try
         {
-            if (!File.Exists(SettingsPath)) return new() { ThemeOnboardingSeen = false, GuidedTourSeen = false };
+            if (!File.Exists(SettingsPath)) return new() { ThemeOnboardingSeen = false, GuidedTourSeen = false, DiffWindowSeen = false };
             var json = File.ReadAllText(SettingsPath);
             return JsonSerializer.Deserialize<SettingsData>(json) ?? new();
         }
         catch (Exception ex)
         {
             AppLog.Warn($"Failed to load settings from {SettingsPath}: {ex.Message}");
-            return new() { ThemeOnboardingSeen = false, GuidedTourSeen = false };
+            return new() { ThemeOnboardingSeen = false, GuidedTourSeen = false, DiffWindowSeen = false };
         }
     }
 
@@ -203,6 +206,12 @@ public static class AppSettings
     {
         get => Load().GuidedTourSeen;
         set { var s = Load(); s.GuidedTourSeen = value; Save(s); }
+    }
+
+    public static bool DiffWindowSeen
+    {
+        get => Load().DiffWindowSeen;
+        set { var s = Load(); s.DiffWindowSeen = value; Save(s); }
     }
 
     public static string UiLanguage
