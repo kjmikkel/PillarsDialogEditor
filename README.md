@@ -435,6 +435,15 @@ binary reports this version at runtime via `--version`.
 | Backup directory | The folder chosen during first-time setup where the original game files are stored. Used for full disaster recovery via **Test › Restore Backup** (`Ctrl+Shift+B`). Can be changed here if you want to move the backup to a different location. |
 | Default localization format | File format used by **File › Export for Translation…** — `Csv`, `Json`, or `Xliff`. All three formats are always selectable in the save dialog; this setting controls which is offered first. |
 
+Settings are stored in:
+
+```
+%LOCALAPPDATA%\PillarsDialogEditor\settings.json
+```
+
+Deleting this file resets all settings to defaults (including first-run prompts such as the theme picker and the guided tour).
+The log file (`app.log`) lives in the same folder.
+
 ---
 
 ## PoE1 vs. PoE2 — What's different
