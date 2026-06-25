@@ -48,7 +48,7 @@ public partial class PatchManagerViewModel : ObservableObject
         var paths = await _filePicker.PickOpenFilesAsync(
             Loc.Get("PatchManager_AddProjects"),
             ".dialogproject",
-            Loc.Get("FileType_DialogProject"));
+            Loc.Get("FileType_DialogProjectOrPack"));
 
         foreach (var path in paths)
         {
@@ -58,12 +58,25 @@ public partial class PatchManagerViewModel : ObservableObject
             PatchEntryViewModel entry;
             try
             {
-                var project = DialogProjectSerializer.LoadFromFile(path);
-                entry = new PatchEntryViewModel(path, project);
+                string projectFilePath = path;
+                string? voFolder = null;
+
+                if (DialogPackHelper.IsDialogPack(path))
+                {
+                    // Extract the pack to a temp directory; TempDir is intentionally kept alive
+                    // until the patch is applied (vo/ folder is needed at apply time).
+                    var extracted   = DialogPackHelper.Extract(path);
+                    projectFilePath = extracted.ProjectFilePath;
+                    voFolder        = extracted.VoFolderPath;
+                }
+
+                var project = DialogProjectSerializer.LoadFromFile(projectFilePath);
+                entry = new PatchEntryViewModel(path, project, voFolder);
             }
+            catch (OperationCanceledException) { throw; }
             catch (Exception ex)
             {
-                AppLog.Error($"Failed to load project '{path}'", ex);
+                AppLog.Error($"Failed to load '{path}'", ex);
                 entry = new PatchEntryViewModel(path, ex.Message);
             }
             Entries.Add(entry);
@@ -285,6 +298,25 @@ public partial class PatchManagerViewModel : ObservableObject
             var baseSnap     = ConversationSnapshotBuilder.Build(conversation);
             var applied      = PatchApplier.Apply(baseSnap, merged);
             provider.SaveConversation(file, applied);
+        }
+
+        // Copy any VO files from .dialogpack entries
+        var gameVoRoot = Path.Combine(GameFolder,
+            "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
+
+        foreach (var entry in Entries.Where(e => e.IsLoaded && e.VoFolder is not null))
+        {
+            try
+            {
+                DialogPackHelper.CopyVoToGame(entry.VoFolder!, gameVoRoot);
+                AppLog.Info($"Copied VO files from: {entry.FullPath}");
+            }
+            catch (OperationCanceledException) { throw; }
+            catch (Exception ex)
+            {
+                AppLog.Error($"Failed to copy VO from '{entry.FullPath}': {ex.Message}", ex);
+                throw; // surface to caller
+            }
         }
     }
 }
