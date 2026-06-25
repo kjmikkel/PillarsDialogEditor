@@ -72,24 +72,33 @@ public static class VoPackExporter
 
         await Task.Run(() =>
         {
-            using var zip = ZipFile.Open(outputPath, ZipArchiveMode.Create);
-
-            // project.dialogproject → root of the archive as "project.dialogproject"
-            zip.CreateEntryFromFile(projectPath, "project.dialogproject",
-                CompressionLevel.Optimal);
-
-            // _vo/ → vo/ inside the archive
-            foreach (var file in Directory.EnumerateFiles(voFolder, "*", SearchOption.AllDirectories))
+            try
             {
-                ct.ThrowIfCancellationRequested();
-                var relative = Path.GetRelativePath(voFolder, file).Replace('\\', '/');
-                zip.CreateEntryFromFile(file, $"vo/{relative}", CompressionLevel.Optimal);
-            }
+                using var zip = ZipFile.Open(outputPath, ZipArchiveMode.Create);
 
-            // FORMAT.md
-            var formatEntry = zip.CreateEntry("FORMAT.md", CompressionLevel.Optimal);
-            using var writer = new StreamWriter(formatEntry.Open());
-            writer.Write(FormatMdContent);
+                // project.dialogproject → root of the archive as "project.dialogproject"
+                zip.CreateEntryFromFile(projectPath, "project.dialogproject",
+                    CompressionLevel.Optimal);
+
+                // _vo/ → vo/ inside the archive
+                foreach (var file in Directory.EnumerateFiles(voFolder, "*", SearchOption.AllDirectories))
+                {
+                    ct.ThrowIfCancellationRequested();
+                    var relative = Path.GetRelativePath(voFolder, file).Replace('\\', '/');
+                    zip.CreateEntryFromFile(file, $"vo/{relative}", CompressionLevel.Optimal);
+                }
+
+                // FORMAT.md
+                var formatEntry = zip.CreateEntry("FORMAT.md", CompressionLevel.Optimal);
+                using var writer = new StreamWriter(formatEntry.Open());
+                writer.Write(FormatMdContent);
+            }
+            catch
+            {
+                // Delete the partial output so the caller doesn't see a corrupt archive.
+                try { if (File.Exists(outputPath)) File.Delete(outputPath); } catch { /* best-effort */ }
+                throw;
+            }
         }, ct);
     }
 }

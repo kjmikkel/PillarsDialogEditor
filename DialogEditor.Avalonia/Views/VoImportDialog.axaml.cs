@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
+using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Avalonia.Views;
@@ -84,15 +85,15 @@ public partial class VoImportDialog : Window
     {
         var options = new FilePickerOpenOptions
         {
-            Title          = "Pick voice-over file",
+            Title          = Loc.Get("VoImport_PickerTitle"),
             AllowMultiple  = false,
             FileTypeFilter =
             [
-                new FilePickerFileType("WEM or WAV")
+                new FilePickerFileType(Loc.Get("VoImport_FileType_All"))
                     { Patterns = ["*.wem", "*.wav"] },
-                new FilePickerFileType("Pre-encoded WEM")
+                new FilePickerFileType(Loc.Get("VoImport_FileType_Wem"))
                     { Patterns = ["*.wem"] },
-                new FilePickerFileType("WAV (requires Wwise)")
+                new FilePickerFileType(Loc.Get("VoImport_FileType_Wav"))
                     { Patterns = ["*.wav"] },
             ],
         };
