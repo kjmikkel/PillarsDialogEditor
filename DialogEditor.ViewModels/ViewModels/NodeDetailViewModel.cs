@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Models;
@@ -152,6 +153,65 @@ public partial class NodeDetailViewModel : ObservableObject
             _player.PlaybackStopped += OnPlaybackStopped;
             OnPropertyChanged(nameof(CanPlayAudio));
         }
+    }
+
+    // ── VO import ────────────────────────────────────────────────────────
+    private IVoImporter _importer = NullVoImporter.Instance;
+
+    public IVoImporter Importer
+    {
+        get => _importer;
+        set
+        {
+            _importer = value;
+            OnPropertyChanged(nameof(CanImportVo));
+        }
+    }
+
+    private string? _projectPath;
+
+    /// Set by MainWindowViewModel whenever a project is opened, created, or saved-as.
+    /// Null when no project has been saved to disk yet.
+    public string? ProjectPath
+    {
+        get => _projectPath;
+        set
+        {
+            _projectPath = value;
+            OnPropertyChanged(nameof(CanImportVo));
+        }
+    }
+
+    /// Set by MainWindow.axaml.cs — shows VoImportDialog and returns user selections or null if cancelled.
+    public Func<VoImportPaths, Task<VoImportDialogResult?>>? ShowImportDialog { get; set; }
+
+    /// True when this node has a resolvable VO path AND the project has been saved to disk.
+    public bool CanImportVo => HasVoStatus && ProjectPath is not null;
+
+    [RelayCommand]
+    private async Task ImportVo()
+    {
+        if (!CanImportVo || _voCheck?.PrimaryWemPath is null
+            || ProjectPath is null || ShowImportDialog is null) return;
+
+        var voRoot = Path.Combine(GameRoot,
+            "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
+        var voDir       = Path.Combine(Path.GetDirectoryName(ProjectPath)!, "_vo");
+        var rel         = Path.GetRelativePath(voRoot, _voCheck.PrimaryWemPath);
+        var destPrimary = Path.Combine(voDir, rel);
+        var destFem     = Path.Combine(voDir, rel[..^4] + "_fem.wem");
+
+        var selection = await ShowImportDialog(new VoImportPaths(destPrimary, destFem));
+        if (selection is null) return;
+
+        var result = await Importer.ImportAsync(
+            new VoImportRequest(destPrimary, selection.PrimarySourcePath,
+                                destFem, selection.FemSourcePath), default);
+
+        if (!result.Success)
+            AppLog.Error($"VO import failed: {result.ErrorMessage}");
+
+        NotifyAllProxies(); // always refresh so UI reflects current reality
     }
 
     public bool IsPlayingPrimary => _currentlyPlaying == Playing.Primary;
@@ -393,12 +453,34 @@ public partial class NodeDetailViewModel : ObservableObject
             : VoPathResolver.Check(
                 _node.SpeakerGuid, _node.HasVO, _node.ExternalVO, _node.NodeId,
                 Canvas?.ConversationName ?? "", GameRoot, ActiveGameId);
+
+        // If the game file is absent but a _vo/ local copy exists, treat it as Found.
+        // This lets the status row flip to ✓ immediately after import without waiting for F5.
+        if (_voCheck?.Status == VoPresence.Missing
+            && ProjectPath is not null
+            && _voCheck.PrimaryWemPath is not null
+            && !string.IsNullOrEmpty(GameRoot))
+        {
+            var voRoot = Path.Combine(GameRoot,
+                "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
+            var rel          = Path.GetRelativePath(voRoot, _voCheck.PrimaryWemPath);
+            var localPrimary = Path.Combine(Path.GetDirectoryName(ProjectPath)!, "_vo", rel);
+            if (File.Exists(localPrimary))
+            {
+                var localFem  = localPrimary[..^4] + "_fem.wem";
+                var femExists = File.Exists(localFem);
+                _voCheck = new VoCheckResult(VoPresence.Found, femExists,
+                    _voCheck.PrimaryWemPath, femExists ? localFem : null);
+            }
+        }
+
         OnPropertyChanged(nameof(HasVoStatus));
         OnPropertyChanged(nameof(VoStatusGlyph));
         OnPropertyChanged(nameof(VoStatusText));
         OnPropertyChanged(nameof(VoStatusIsFound));
         OnPropertyChanged(nameof(CanPlayAudio));
         OnPropertyChanged(nameof(CanPlayFem));
+        OnPropertyChanged(nameof(CanImportVo));
     }
 
     // ── Speaker / Listener name picker ───────────────────────────────────
