@@ -1380,6 +1380,15 @@ public partial class MainWindowViewModel : ObservableObject
             // Persist restore info before writing game files (crash safety)
             AppSettings.SetPendingRestores(restoreEntries);
 
+            // Copy _vo/ files to the game's VO directory (PoE2 only) and append their
+            // backup entries so that F6 can restore or remove them.
+            if (string.Equals(_activeGameId, "poe2", StringComparison.OrdinalIgnoreCase))
+            {
+                SyncVoToGame(restoreEntries);
+                // Re-persist so the VO entries survive a crash between here and the patch writes.
+                AppSettings.SetPendingRestores(restoreEntries);
+            }
+
             foreach (var (convName, patch) in _project.Patches)
             {
                 var file = _provider.FindConversation(convName)
@@ -1439,10 +1448,66 @@ public partial class MainWindowViewModel : ObservableObject
     {
         foreach (var r in entries)
         {
-            if (File.Exists(r.BackupConvPath))
+            // Restore the original file if a backup exists, or remove the file that was
+            // added by the patch (e.g. a new VO .wem) when there was no original to back up.
+            if (!string.IsNullOrEmpty(r.BackupConvPath) && File.Exists(r.BackupConvPath))
                 File.Copy(r.BackupConvPath, r.OriginalConvPath, overwrite: true);
-            if (File.Exists(r.BackupStPath))
+            else if (string.IsNullOrEmpty(r.BackupConvPath) && File.Exists(r.OriginalConvPath))
+                File.Delete(r.OriginalConvPath); // VO file added by patch — remove on restore
+
+            if (!string.IsNullOrEmpty(r.BackupStPath) && File.Exists(r.BackupStPath)
+                && !string.IsNullOrEmpty(r.OriginalStPath))
                 File.Copy(r.BackupStPath, r.OriginalStPath, overwrite: true);
+        }
+    }
+
+    /// <summary>
+    /// Copies every .wem file in the project's <c>_vo/</c> folder to the game's VO root,
+    /// backing up any existing game file first. A <see cref="PendingRestoreEntry"/> is
+    /// appended to <paramref name="restoreEntries"/> for each file so that F6 can
+    /// restore the original (or delete the newly added file when there was no original).
+    /// </summary>
+    /// <remarks>
+    /// Only called when <c>_activeGameId</c> is "poe2" — the VO path is PoE2-specific.
+    /// <c>BackupConvPath</c> stores the backup path (or empty string when no original
+    /// existed); <c>OriginalConvPath</c> stores the game destination path. String-table
+    /// fields are left empty because audio files have no associated string table.
+    /// </remarks>
+    private void SyncVoToGame(IList<PendingRestoreEntry> restoreEntries)
+    {
+        if (ProjectPath is null) return;
+
+        var voFolder = Path.Combine(Path.GetDirectoryName(ProjectPath)!, "_vo");
+        if (!Directory.Exists(voFolder)) return;
+
+        var gameVoRoot = Path.Combine(_currentGameDirectory,
+            "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
+
+        foreach (var localFile in Directory.EnumerateFiles(voFolder, "*.wem", SearchOption.AllDirectories))
+        {
+            var relative  = Path.GetRelativePath(voFolder, localFile).Replace('\\', '/');
+            var gameDest  = Path.Combine(gameVoRoot, relative);
+            var backupDir = Path.Combine(Path.GetTempPath(), "PillarsDialogEditor",
+                "vobackup", Guid.NewGuid().ToString("N")[..8]);
+
+            Directory.CreateDirectory(Path.GetDirectoryName(gameDest)!);
+            Directory.CreateDirectory(backupDir);
+
+            var backupPath = Path.Combine(backupDir, Path.GetFileName(gameDest));
+
+            // Back up the existing game file if present; otherwise backupPath won't exist
+            // and F6 will delete the file rather than restore it.
+            if (File.Exists(gameDest))
+                File.Copy(gameDest, backupPath);
+
+            File.Copy(localFile, gameDest, overwrite: true);
+            AppLog.Info($"VO sync: {relative} → {gameDest}");
+
+            restoreEntries.Add(new PendingRestoreEntry(
+                File.Exists(backupPath) ? backupPath : string.Empty,
+                string.Empty,
+                gameDest,
+                string.Empty));
         }
     }
 
@@ -1459,10 +1524,18 @@ public partial class MainWindowViewModel : ObservableObject
             var tempDirsToDelete = new HashSet<string>();
             foreach (var r in entries)
             {
-                File.Copy(r.BackupConvPath, r.OriginalConvPath, overwrite: true);
-                if (File.Exists(r.BackupStPath))
+                // Restore the backed-up file, or remove a file that was newly added by the patch.
+                if (!string.IsNullOrEmpty(r.BackupConvPath) && File.Exists(r.BackupConvPath))
+                {
+                    File.Copy(r.BackupConvPath, r.OriginalConvPath, overwrite: true);
+                    tempDirsToDelete.Add(Path.GetDirectoryName(r.BackupConvPath)!);
+                }
+                else if (string.IsNullOrEmpty(r.BackupConvPath) && File.Exists(r.OriginalConvPath))
+                    File.Delete(r.OriginalConvPath); // VO file added by patch — remove on restore
+
+                if (!string.IsNullOrEmpty(r.BackupStPath) && File.Exists(r.BackupStPath)
+                    && !string.IsNullOrEmpty(r.OriginalStPath))
                     File.Copy(r.BackupStPath, r.OriginalStPath, overwrite: true);
-                tempDirsToDelete.Add(Path.GetDirectoryName(r.BackupConvPath)!);
             }
 
             foreach (var dir in tempDirsToDelete)
