@@ -521,7 +521,7 @@ fresh install; re-accessible via Help ▸ Start Guided Tour.
 Remaining gaps:
 - **Audio playback ✓ implemented (2026-06-22):** bundled `vgmstream-cli` r2117 + NAudio; play/stop toggle buttons in node detail panel; female variant support; `THIRD_PARTY_LICENSES.md` updated.
 - **PoE1 VO** — Unity asset archives; deferred indefinitely.
-- **Mod VO** — mods that add/replace voiced lines have no tooling support.
+- **Mod VO ✓ implemented (2026-06-25):** per-node 🎤 import button and canvas context-menu item open `VoImportDialog` (primary + female `.wem`/`.wav` slots; Wwise detection; "Download Wwise" link). Imported files land in `_vo/` next to the `.dialogproject`; VO status row flips to ✓ immediately. F5 syncs `_vo/` to the game's VO directory with per-file backup; F6 removes/restores. "File › Export Mod Bundle…" packages the project and `_vo/` into a `.dialogpack` (ZIP). Patch Manager and CLI detect `.dialogpack`, extract to temp, apply dialog diff, and copy `vo/` to the game. Known limitation: `.wav` → `.wem` encoding via Wwise CLI is not yet implemented (requires a bundled `.wproj` template — users should pre-encode to `.wem` with the Wwise authoring tool and import the `.wem` directly).
 
 ### ~~GUID Parameter Readability~~ ✓ Implemented (first pass)
 

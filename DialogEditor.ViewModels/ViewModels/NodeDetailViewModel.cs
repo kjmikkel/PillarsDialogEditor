@@ -185,6 +185,9 @@ public partial class NodeDetailViewModel : ObservableObject
     /// Set by MainWindow.axaml.cs — shows VoImportDialog and returns user selections or null if cancelled.
     public Func<VoImportPaths, Task<VoImportDialogResult?>>? ShowImportDialog { get; set; }
 
+    /// Set by MainWindowViewModel — receives one-line status messages to display in the status bar.
+    public Action<string>? ReportStatus { get; set; }
+
     /// True when this node has a resolvable VO path AND the project has been saved to disk.
     public bool CanImportVo => HasVoStatus && ProjectPath is not null;
 
@@ -213,8 +216,16 @@ public partial class NodeDetailViewModel : ObservableObject
             new VoImportRequest(destPrimary, selection.PrimarySourcePath,
                                 destFem, selection.FemSourcePath), default);
 
-        if (!result.Success)
+        if (result.Success)
+        {
+            ReportStatus?.Invoke(Loc.Format("Status_VoImportSuccess",
+                Path.GetFileName(selection.PrimarySourcePath)));
+        }
+        else
+        {
             AppLog.Error($"VO import failed: {result.ErrorMessage}");
+            ReportStatus?.Invoke(Loc.Format("Status_VoImportFailed", result.ErrorMessage ?? "unknown error"));
+        }
 
         NotifyAllProxies(); // always refresh so UI reflects current reality
     }

@@ -1156,6 +1156,10 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- {0} = exception message -->
     <sys:String x:Key="Status_ExportModBundleError">Export failed: {0}</sys:String>
     <!-- VO import file picker (code-behind) -->
+    <!-- {0} = filename of the imported file -->
+    <sys:String x:Key="Status_VoImportSuccess">Voice-over imported: {0}</sys:String>
+    <!-- {0} = error message -->
+    <sys:String x:Key="Status_VoImportFailed">Voice-over import failed: {0}</sys:String>
     <sys:String x:Key="VoImport_PickerTitle">Pick voice-over file</sys:String>
     <sys:String x:Key="VoImport_FileType_All">WEM or WAV</sys:String>
     <sys:String x:Key="VoImport_FileType_Wem">Pre-encoded WEM</sys:String>
