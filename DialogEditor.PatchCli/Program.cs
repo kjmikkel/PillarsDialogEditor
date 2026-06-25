@@ -183,6 +183,7 @@ try
 }
 catch (PatchConflictException ex)
 {
+    CleanupTempDirs(tempDirs);
     Console.Error.WriteLine();
     Console.Error.WriteLine("Patch conflict detected:");
     Console.Error.WriteLine($"  Node ID:  {ex.NodeId}");
@@ -196,6 +197,7 @@ catch (PatchConflictException ex)
 }
 catch (Exception ex)
 {
+    CleanupTempDirs(tempDirs);
     Error($"Unexpected error: {ex.Message}");
     if (verbose)
         Console.Error.WriteLine(ex.ToString());
