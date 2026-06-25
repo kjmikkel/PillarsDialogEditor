@@ -1528,7 +1528,7 @@ public partial class MainWindowViewModel : ObservableObject
                 Canvas.RestoreAnnotations(savedAnnotations2);
 
             Detail.Canvas = Canvas;
-        Canvas.Detail = Detail;
+            Canvas.Detail = Detail;
             var existingComments = _project?.Patches.TryGetValue(file.Name, out var p) == true
                 ? p.NodeComments
                 : new Dictionary<int, string>();
