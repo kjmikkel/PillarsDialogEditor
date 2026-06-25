@@ -1485,29 +1485,43 @@ public partial class MainWindowViewModel : ObservableObject
 
         foreach (var localFile in Directory.EnumerateFiles(voFolder, "*.wem", SearchOption.AllDirectories))
         {
-            var relative  = Path.GetRelativePath(voFolder, localFile).Replace('\\', '/');
-            var gameDest  = Path.Combine(gameVoRoot, relative);
-            var backupDir = Path.Combine(Path.GetTempPath(), "PillarsDialogEditor",
-                "vobackup", Guid.NewGuid().ToString("N")[..8]);
+            try
+            {
+                var relative  = Path.GetRelativePath(voFolder, localFile).Replace('\\', '/');
+                var gameDest  = Path.Combine(gameVoRoot, relative);
+                var backupDir = Path.Combine(Path.GetTempPath(), "PillarsDialogEditor",
+                    "vobackup", Guid.NewGuid().ToString("N")[..8]);
 
-            Directory.CreateDirectory(Path.GetDirectoryName(gameDest)!);
-            Directory.CreateDirectory(backupDir);
+                Directory.CreateDirectory(Path.GetDirectoryName(gameDest)!);
 
-            var backupPath = Path.Combine(backupDir, Path.GetFileName(gameDest));
+                var backupPath = Path.Combine(backupDir, Path.GetFileName(gameDest));
 
-            // Back up the existing game file if present; otherwise backupPath won't exist
-            // and F6 will delete the file rather than restore it.
-            if (File.Exists(gameDest))
-                File.Copy(gameDest, backupPath);
+                // Back up the existing game file if present; otherwise backupPath won't exist
+                // and F6 will delete the file rather than restore it.
+                if (File.Exists(gameDest))
+                {
+                    Directory.CreateDirectory(backupDir);
+                    File.Copy(gameDest, backupPath);
+                }
 
-            File.Copy(localFile, gameDest, overwrite: true);
-            AppLog.Info($"VO sync: {relative} → {gameDest}");
+                File.Copy(localFile, gameDest, overwrite: true);
+                AppLog.Info($"VO sync: {relative} → {gameDest}");
 
-            restoreEntries.Add(new PendingRestoreEntry(
-                File.Exists(backupPath) ? backupPath : string.Empty,
-                string.Empty,
-                gameDest,
-                string.Empty));
+                restoreEntries.Add(new PendingRestoreEntry(
+                    File.Exists(backupPath) ? backupPath : string.Empty,
+                    string.Empty,
+                    gameDest,
+                    string.Empty));
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error($"SyncVoToGame: failed to copy '{localFile}'", ex);
+                // Continue with remaining files — partial sync is better than aborting
+            }
         }
     }
 
