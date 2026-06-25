@@ -1504,14 +1504,16 @@ public partial class MainWindowViewModel : ObservableObject
                     File.Copy(gameDest, backupPath);
                 }
 
-                File.Copy(localFile, gameDest, overwrite: true);
-                AppLog.Info($"VO sync: {relative} → {gameDest}");
-
+                // Record BEFORE writing — if File.Copy fails mid-write the entry already
+                // exists so F6 can restore or remove the file even on a partial write.
                 restoreEntries.Add(new PendingRestoreEntry(
                     File.Exists(backupPath) ? backupPath : string.Empty,
                     string.Empty,
                     gameDest,
                     string.Empty));
+
+                File.Copy(localFile, gameDest, overwrite: true);
+                AppLog.Info($"VO sync: {relative} → {gameDest}");
             }
             catch (OperationCanceledException)
             {
