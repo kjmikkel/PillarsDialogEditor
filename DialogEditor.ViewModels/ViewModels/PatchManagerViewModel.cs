@@ -61,17 +61,18 @@ public partial class PatchManagerViewModel : ObservableObject
                 string projectFilePath = path;
                 string? voFolder = null;
 
+                string? tempDir = null;
                 if (DialogPackHelper.IsDialogPack(path))
                 {
-                    // Extract the pack to a temp directory; TempDir is intentionally kept alive
-                    // until the patch is applied (vo/ folder is needed at apply time).
+                    // TempDir is kept alive until apply (vo/ is needed) or removal.
                     var extracted   = DialogPackHelper.Extract(path);
                     projectFilePath = extracted.ProjectFilePath;
                     voFolder        = extracted.VoFolderPath;
+                    tempDir         = extracted.TempDir;
                 }
 
                 var project = DialogProjectSerializer.LoadFromFile(projectFilePath);
-                entry = new PatchEntryViewModel(path, project, voFolder);
+                entry = new PatchEntryViewModel(path, project, voFolder, tempDir);
             }
             catch (OperationCanceledException) { throw; }
             catch (Exception ex)
@@ -86,7 +87,13 @@ public partial class PatchManagerViewModel : ObservableObject
     [RelayCommand]
     private void RemoveEntry(PatchEntryViewModel? entry)
     {
-        if (entry is not null) Entries.Remove(entry);
+        if (entry is null) return;
+        Entries.Remove(entry);
+        if (entry.TempDir is not null)
+        {
+            try { Directory.Delete(entry.TempDir, recursive: true); }
+            catch (Exception ex) { AppLog.Warn($"PatchManager: failed to delete temp dir '{entry.TempDir}': {ex.Message}"); }
+        }
     }
 
     [RelayCommand]

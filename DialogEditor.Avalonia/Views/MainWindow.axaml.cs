@@ -112,6 +112,7 @@ public partial class MainWindow : Window
             await dialog.ShowDialog(this);
             return dialog.Result;
         };
+        vm.Detail.ReportStatus = msg => vm.StatusText = msg;
 
         if (!vm.IsBrowserExpanded)
         {

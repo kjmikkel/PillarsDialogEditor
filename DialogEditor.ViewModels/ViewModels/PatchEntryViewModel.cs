@@ -11,12 +11,15 @@ public partial class PatchEntryViewModel : ObservableObject
     public int            PatchCount   { get; }
     public DialogProject? Project      { get; }
     public string?        LoadError    { get; }
-    // Path to the extracted vo/ folder when this entry was loaded from a .dialogpack; null otherwise.
+    // Paths for .dialogpack entries: VoFolder is the extracted vo/ subdirectory;
+    // TempDir is its parent temp directory and must be deleted when the entry is removed.
     public string?        VoFolder     { get; }
+    public string?        TempDir      { get; }
 
     [ObservableProperty] private bool _hasConflict;
 
-    public PatchEntryViewModel(string fullPath, DialogProject project, string? voFolder = null)
+    public PatchEntryViewModel(string fullPath, DialogProject project,
+        string? voFolder = null, string? tempDir = null)
     {
         FullPath    = fullPath;
         DisplayPath = Path.GetFileName(fullPath);
@@ -24,6 +27,7 @@ public partial class PatchEntryViewModel : ObservableObject
         ProjectName = project.Name;
         PatchCount  = project.Patches.Count;
         VoFolder    = voFolder;
+        TempDir     = tempDir;
     }
 
     public PatchEntryViewModel(string fullPath, string errorMessage)

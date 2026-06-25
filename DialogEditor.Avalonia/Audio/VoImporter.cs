@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Microsoft.Win32;
 using DialogEditor.ViewModels.Services;
 
@@ -63,26 +62,17 @@ public sealed class VoImporter : IVoImporter
             throw new InvalidOperationException(
                 "Wwise not found. Install Wwise or use a pre-encoded .wem file.");
 
-        // NOTE: The exact WwiseCLI.exe flags for WAV→WEM conversion must be verified against
-        // a real Wwise installation during implementation. The command below is a placeholder
-        // that encodes a WAV to WEM using the default conversion settings.
-        // Expected usage: WwiseCLI.exe <wav> -output <dest.wem>
-        // Implementer: test with a real Wwise install and update the arguments accordingly.
-        var psi = new ProcessStartInfo(_wwiseCliPath!, $"\"{sourcePath}\" -output \"{destPath}\"")
-        {
-            CreateNoWindow  = true,
-            UseShellExecute = false,
-            RedirectStandardError = true,
-        };
-        using var proc = Process.Start(psi)!;
-        await proc.WaitForExitAsync(ct);
-
-        if (proc.ExitCode != 0)
-        {
-            var err = await proc.StandardError.ReadToEndAsync(ct);
-            throw new InvalidOperationException(
-                $"WwiseCLI exited {proc.ExitCode}: {err}");
-        }
+        // WwiseCLI.exe requires a .wproj project file and a .wsources XML input to
+        // convert WAV → WEM; standalone single-file conversion is not supported.
+        // To implement this the editor would need to bundle a minimal Wwise project
+        // template (.wproj with Vorbis conversion settings) and generate a temporary
+        // .wsources file for each call. Deferred until a bundled template ships.
+        // Users should convert WAV → WEM with the Wwise authoring tool and import
+        // the resulting .wem directly.
+        throw new NotSupportedException(
+            "WAV → WEM encoding requires a bundled Wwise project template that is not yet " +
+            "included with this release. Convert your file to .wem using the Wwise authoring " +
+            "tool and import the .wem directly.");
     }
 
     private static string? DetectWwiseCli()
