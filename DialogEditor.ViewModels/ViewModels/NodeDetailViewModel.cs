@@ -188,6 +188,11 @@ public partial class NodeDetailViewModel : ObservableObject
     /// True when this node has a resolvable VO path AND the project has been saved to disk.
     public bool CanImportVo => HasVoStatus && ProjectPath is not null;
 
+    /// Tooltip for the import button — explains why it may be disabled.
+    public string ImportVoTooltip => CanImportVo
+        ? Loc.Get("ToolTip_VoImport")
+        : Loc.Get("ToolTip_VoImport_Unsaved");
+
     [RelayCommand]
     private async Task ImportVo()
     {
@@ -481,6 +486,7 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(CanPlayAudio));
         OnPropertyChanged(nameof(CanPlayFem));
         OnPropertyChanged(nameof(CanImportVo));
+        OnPropertyChanged(nameof(ImportVoTooltip));
     }
 
     // ── Speaker / Listener name picker ───────────────────────────────────

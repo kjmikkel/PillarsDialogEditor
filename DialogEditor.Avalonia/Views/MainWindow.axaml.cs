@@ -104,6 +104,15 @@ public partial class MainWindow : Window
         vm.Detail.Player = audioPlayer;
         Closed += (_, _) => audioPlayer.Dispose();
 
+        var voImporter = new VoImporter();
+        vm.Detail.Importer = voImporter;
+        vm.Detail.ShowImportDialog = async paths =>
+        {
+            var dialog = new VoImportDialog(voImporter, paths);
+            await dialog.ShowDialog(this);
+            return dialog.Result;
+        };
+
         if (!vm.IsBrowserExpanded)
         {
             BrowserColumn.MinWidth = 34;
