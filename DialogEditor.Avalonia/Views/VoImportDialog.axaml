@@ -1,0 +1,80 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DialogEditor.Avalonia.Views.VoImportDialog"
+        Title="{DynamicResource VoImport_DialogTitle}"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="480" Height="220"
+        MinWidth="400" MinHeight="200"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        SizeToContent="Height">
+
+    <StackPanel Margin="16">
+
+        <!-- Primary slot -->
+        <Grid ColumnDefinitions="120,*,Auto,Auto" Margin="0,0,0,8">
+            <TextBlock Grid.Column="0" Text="{DynamicResource VoImport_PrimaryLabel}"
+                       VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="1" x:Name="PrimaryLabel"
+                       Text="—" VerticalAlignment="Center"
+                       TextTrimming="CharacterEllipsis"/>
+            <Button    Grid.Column="2" x:Name="BrowsePrimaryButton"
+                       Content="{DynamicResource VoImport_Browse}"
+                       Click="BrowsePrimary_Click"
+                       ToolTip.Tip="{DynamicResource ToolTip_VoImportBrowse_Primary}"
+                       AutomationProperties.HelpText="{DynamicResource ToolTip_VoImportBrowse_Primary}"
+                       Margin="8,0,4,0"/>
+            <Button    Grid.Column="3" x:Name="ClearPrimaryButton"
+                       Content="{DynamicResource VoImport_Clear}"
+                       Click="ClearPrimary_Click"
+                       IsVisible="False"
+                       ToolTip.Tip="{DynamicResource ToolTip_VoImportClear_Primary}"
+                       AutomationProperties.HelpText="{DynamicResource ToolTip_VoImportClear_Primary}"/>
+        </Grid>
+
+        <!-- Female (optional) slot -->
+        <Grid ColumnDefinitions="120,*,Auto,Auto" Margin="0,0,0,16">
+            <TextBlock Grid.Column="0" Text="{DynamicResource VoImport_FemaleLabel}"
+                       VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="1" x:Name="FemLabel"
+                       Text="—" VerticalAlignment="Center"
+                       TextTrimming="CharacterEllipsis"/>
+            <Button    Grid.Column="2" x:Name="BrowseFemButton"
+                       Content="{DynamicResource VoImport_Browse}"
+                       Click="BrowseFem_Click"
+                       ToolTip.Tip="{DynamicResource ToolTip_VoImportBrowse_Fem}"
+                       AutomationProperties.HelpText="{DynamicResource ToolTip_VoImportBrowse_Fem}"
+                       Margin="8,0,4,0"/>
+            <Button    Grid.Column="3" x:Name="ClearFemButton"
+                       Content="{DynamicResource VoImport_Clear}"
+                       Click="ClearFem_Click"
+                       IsVisible="False"
+                       ToolTip.Tip="{DynamicResource ToolTip_VoImportClear_Fem}"
+                       AutomationProperties.HelpText="{DynamicResource ToolTip_VoImportClear_Fem}"/>
+        </Grid>
+
+        <!-- Wwise warning (only visible when WAV chosen and Wwise absent).
+             Uses Brush.Severity.Warning (Amber.500) — the semantic token for
+             warning-level messages. Brush.Text.Warning does not exist in Tokens.axaml. -->
+        <StackPanel x:Name="WwiseWarningPanel" IsVisible="False" Margin="0,0,0,12">
+            <TextBlock Text="{DynamicResource VoImport_NoWwise}"
+                       Foreground="{DynamicResource Brush.Severity.Warning}"
+                       FontSize="{DynamicResource FontSize.Small}"/>
+            <Button    x:Name="DownloadWwiseButton"
+                       Content="{DynamicResource VoImport_DownloadWwise}"
+                       Click="DownloadWwise_Click"
+                       HorizontalAlignment="Left"
+                       ToolTip.Tip="{DynamicResource ToolTip_VoImportDownloadWwise}"
+                       AutomationProperties.HelpText="{DynamicResource ToolTip_VoImportDownloadWwise}"
+                       Margin="0,4,0,0"/>
+        </StackPanel>
+
+        <!-- OK / Cancel -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button Content="Cancel" Click="Cancel_Click"/>
+            <Button x:Name="OkButton" Content="OK"
+                    Click="Ok_Click" IsDefault="True" IsEnabled="False"/>
+        </StackPanel>
+
+    </StackPanel>
+</Window>

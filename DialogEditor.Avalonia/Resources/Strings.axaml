@@ -1129,4 +1129,26 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="DiffIntro_GotIt">Got it</sys:String>
     <sys:String x:Key="ToolTip_DiffIntro_GotIt">Dismiss this introduction. You can re-read it any time via the ? Help button.</sys:String>
 
+    <!-- ── VO import ──────────────────────────────────────────────────────── -->
+    <sys:String x:Key="VoImport_DialogTitle">Import Voice-Over</sys:String>
+    <sys:String x:Key="VoImport_PrimaryLabel">Primary</sys:String>
+    <sys:String x:Key="VoImport_FemaleLabel">Female (optional)</sys:String>
+    <sys:String x:Key="VoImport_Browse">Browse…</sys:String>
+    <sys:String x:Key="VoImport_Clear">✕</sys:String>
+    <sys:String x:Key="VoImport_NoWwise">⚠ Wwise not found — WAV files cannot be encoded.</sys:String>
+    <sys:String x:Key="VoImport_DownloadWwise">Download Wwise</sys:String>
+    <sys:String x:Key="VoImport_UnsavedProject">Save the project first — the _vo/ folder needs a location on disk.</sys:String>
+    <sys:String x:Key="ToolTip_VoImport">Import a voice-over file (.wem or .wav) for this node.</sys:String>
+    <sys:String x:Key="ToolTip_VoImport_Unsaved">Save the project before importing voice-over files.</sys:String>
+    <sys:String x:Key="AutomationName_VoImport">Import voice-over</sys:String>
+    <sys:String x:Key="ToolTip_VoImportClear_Primary">Clear the selected primary voice-over file.</sys:String>
+    <sys:String x:Key="ToolTip_VoImportClear_Fem">Clear the selected female voice-over file.</sys:String>
+    <sys:String x:Key="ToolTip_VoImportBrowse_Primary">Browse for a .wem or .wav file for the primary (male) voice-over slot.</sys:String>
+    <sys:String x:Key="ToolTip_VoImportBrowse_Fem">Browse for a .wem or .wav file for the female voice-over slot (optional).</sys:String>
+    <sys:String x:Key="ToolTip_VoImportDownloadWwise">Open the Audiokinetic website to download Wwise, required for encoding .wav files.</sys:String>
+    <sys:String x:Key="Menu_ImportVo">Import voice-over…</sys:String>
+    <sys:String x:Key="ToolTip_Menu_ImportVo">Import a .wem or .wav voice-over file for the selected node.</sys:String>
+    <sys:String x:Key="Menu_ExportModBundle">Export Mod Bundle…</sys:String>
+    <sys:String x:Key="ToolTip_Menu_ExportModBundle">Package this project and its voice-over files into a single distributable .dialogpack file.</sys:String>
+
 </ResourceDictionary>
