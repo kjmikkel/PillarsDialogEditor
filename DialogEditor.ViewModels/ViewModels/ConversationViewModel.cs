@@ -18,6 +18,9 @@ public partial class ConversationViewModel : ObservableObject
 
     public PendingConnectionViewModel PendingConnection { get; }
 
+    /// Set by MainWindowViewModel so the node context menu can reach the import/vo commands.
+    public NodeDetailViewModel? Detail { get; set; }
+
     private readonly HashSet<NodeViewModel> _subscribedNodes = [];
 
     public ConversationViewModel(IDispatcher dispatcher)

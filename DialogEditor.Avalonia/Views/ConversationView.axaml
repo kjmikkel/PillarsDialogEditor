@@ -173,6 +173,12 @@
                                               CommandParameter="{Binding}"
                                               ToolTip.Tip="{DynamicResource ToolTip_ConnectToNode}"
                                               AutomationProperties.HelpText="{DynamicResource ToolTip_ConnectToNode}"/>
+                                    <Separator IsVisible="{Binding $parent[UserControl].DataContext.Detail.HasVoStatus}"/>
+                                    <MenuItem Header="{DynamicResource Menu_ImportVo}"
+                                              Command="{Binding $parent[UserControl].DataContext.Detail.ImportVoCommand}"
+                                              IsVisible="{Binding $parent[UserControl].DataContext.Detail.HasVoStatus}"
+                                              ToolTip.Tip="{DynamicResource ToolTip_Menu_ImportVo}"
+                                              AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_ImportVo}"/>
                                 </ContextMenu>
                             </nodify:Node.ContextMenu>
 

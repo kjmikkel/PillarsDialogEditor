@@ -417,6 +417,7 @@ public partial class MainWindowViewModel : ObservableObject
         var name = Path.GetFileNameWithoutExtension(path);
         SetProject(DialogProject.Empty(name));
         _projectPath = path;
+        Detail.ProjectPath = _projectPath;
         DialogProjectSerializer.SaveToFile(path, _project!);
         AppSettings.LastProjectPath = path;
         CurrentProjectName = name;
@@ -456,6 +457,7 @@ public partial class MainWindowViewModel : ObservableObject
             AppLog.Info($"Project file not present on current branch: {path}");
             SetProject(null);
             _projectPath = null;
+            Detail.ProjectPath = null;
             CurrentProjectName = null;
             IsModified = false;        // nothing open → not dirty
             _attributionPath = null;   // force attribution rebuild next time
@@ -579,6 +581,7 @@ public partial class MainWindowViewModel : ObservableObject
     {
         SetProject(loaded);
         _projectPath = path;
+        Detail.ProjectPath = _projectPath;
         AppSettings.LastProjectPath = path;
         CurrentProjectName = loaded.Name;
         AppLog.Info($"Opened project: {path}");
@@ -785,6 +788,7 @@ public partial class MainWindowViewModel : ObservableObject
         if (savedAnnotations is not null) Canvas.RestoreAnnotations(savedAnnotations);
 
         Detail.Canvas = Canvas;
+        Canvas.Detail = Detail;
         var existingComments2 = _project?.Patches.TryGetValue(file.Name, out var p2) == true
             ? p2.NodeComments
             : new Dictionary<int, string>();
@@ -1524,6 +1528,7 @@ public partial class MainWindowViewModel : ObservableObject
                 Canvas.RestoreAnnotations(savedAnnotations2);
 
             Detail.Canvas = Canvas;
+        Canvas.Detail = Detail;
             var existingComments = _project?.Patches.TryGetValue(file.Name, out var p) == true
                 ? p.NodeComments
                 : new Dictionary<int, string>();
