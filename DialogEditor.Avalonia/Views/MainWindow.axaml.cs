@@ -635,6 +635,30 @@ public partial class MainWindow : Window
         }
     }
 
+    // ── Mod bundle export ─────────────────────────────────────────────────
+    private async void ExportModBundle_Click(object? sender, RoutedEventArgs e)
+    {
+        var vm = (MainWindowViewModel)DataContext!;
+        if (vm.ProjectPath is null) return;
+
+        var picker        = new AvaloniaFilePicker(this);
+        var suggestedName = Path.GetFileNameWithoutExtension(vm.ProjectPath) + ".dialogpack";
+        var outputPath    = await picker.PickSaveFileAsync(
+            Loc.Get("Menu_ExportModBundle"), suggestedName, ".dialogpack", "Dialog Pack");
+        if (outputPath is null) return;
+
+        try
+        {
+            await VoPackExporter.ExportAsync(vm.ProjectPath, outputPath);
+            vm.StatusText = Loc.Format("Status_ExportModBundleSuccess", outputPath);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error("Export mod bundle failed", ex);
+            vm.StatusText = Loc.Format("Status_ExportModBundleError", ex.Message);
+        }
+    }
+
     // ── New conversation name dialog ──────────────────────────────────────
     private async Task<string?> PromptConversationNameAsync(string? defaultValue = null)
     {

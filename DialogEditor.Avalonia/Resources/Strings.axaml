@@ -1150,5 +1150,9 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_Menu_ImportVo">Import a .wem or .wav voice-over file for the selected node.</sys:String>
     <sys:String x:Key="Menu_ExportModBundle">Export Mod Bundle…</sys:String>
     <sys:String x:Key="ToolTip_Menu_ExportModBundle">Package this project and its voice-over files into a single distributable .dialogpack file.</sys:String>
+    <!-- {0} = output file path -->
+    <sys:String x:Key="Status_ExportModBundleSuccess">Mod bundle exported to {0}</sys:String>
+    <!-- {0} = exception message -->
+    <sys:String x:Key="Status_ExportModBundleError">Export failed: {0}</sys:String>
 
 </ResourceDictionary>

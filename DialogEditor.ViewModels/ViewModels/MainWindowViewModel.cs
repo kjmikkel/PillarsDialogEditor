@@ -216,6 +216,12 @@ public partial class MainWindowViewModel : ObservableObject
         && string.Equals(_activeGameId, "poe2", StringComparison.OrdinalIgnoreCase)
         && Canvas.Nodes.Count > 0;
 
+    /// True when a _vo/ folder exists next to the open project file.
+    /// Guards the "Export Mod Bundle…" menu item.
+    public bool HasLocalVoFolder =>
+        ProjectPath is not null &&
+        Directory.Exists(Path.Combine(Path.GetDirectoryName(ProjectPath)!, "_vo"));
+
     private void SetProject(DialogProject? project)
     {
         var prevNew  = _project?.NewConversations;
@@ -418,6 +424,7 @@ public partial class MainWindowViewModel : ObservableObject
         SetProject(DialogProject.Empty(name));
         _projectPath = path;
         Detail.ProjectPath = _projectPath;
+        OnPropertyChanged(nameof(HasLocalVoFolder));
         DialogProjectSerializer.SaveToFile(path, _project!);
         AppSettings.LastProjectPath = path;
         CurrentProjectName = name;
@@ -458,6 +465,7 @@ public partial class MainWindowViewModel : ObservableObject
             SetProject(null);
             _projectPath = null;
             Detail.ProjectPath = null;
+            OnPropertyChanged(nameof(HasLocalVoFolder));
             CurrentProjectName = null;
             IsModified = false;        // nothing open → not dirty
             _attributionPath = null;   // force attribution rebuild next time
@@ -582,6 +590,7 @@ public partial class MainWindowViewModel : ObservableObject
         SetProject(loaded);
         _projectPath = path;
         Detail.ProjectPath = _projectPath;
+        OnPropertyChanged(nameof(HasLocalVoFolder));
         AppSettings.LastProjectPath = path;
         CurrentProjectName = loaded.Name;
         AppLog.Info($"Opened project: {path}");
