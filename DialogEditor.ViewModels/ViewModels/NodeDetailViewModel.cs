@@ -164,7 +164,7 @@ public partial class NodeDetailViewModel : ObservableObject
         set
         {
             _importer = value;
-            OnPropertyChanged(nameof(CanImportVo));
+            ImportVoCommand.NotifyCanExecuteChanged();
         }
     }
 
@@ -178,7 +178,7 @@ public partial class NodeDetailViewModel : ObservableObject
         set
         {
             _projectPath = value;
-            OnPropertyChanged(nameof(CanImportVo));
+            ImportVoCommand.NotifyCanExecuteChanged();
         }
     }
 
@@ -193,7 +193,7 @@ public partial class NodeDetailViewModel : ObservableObject
         ? Loc.Get("ToolTip_VoImport")
         : Loc.Get("ToolTip_VoImport_Unsaved");
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(CanImportVo))]
     private async Task ImportVo()
     {
         if (!CanImportVo || _voCheck?.PrimaryWemPath is null
@@ -485,7 +485,7 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(VoStatusIsFound));
         OnPropertyChanged(nameof(CanPlayAudio));
         OnPropertyChanged(nameof(CanPlayFem));
-        OnPropertyChanged(nameof(CanImportVo));
+        ImportVoCommand.NotifyCanExecuteChanged();
         OnPropertyChanged(nameof(ImportVoTooltip));
     }
 
