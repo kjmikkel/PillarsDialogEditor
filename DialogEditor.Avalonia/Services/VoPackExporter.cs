@@ -34,6 +34,18 @@ public static class VoPackExporter
         ```
         dialog-patcher <game-dir> mymod.dialogpack
         ```
+
+        ## Voice-over directory structure
+
+        `vo/` mirrors `PillarsOfEternityII_Data/StreamingAssets/Audio/Windows/Voices/English(US)/`:
+        ```
+        vo/
+          eder/
+            my_line_0001.wem
+            my_line_0001_fem.wem
+          narrator/
+            my_line_0002.wem
+        ```
         """;
 
     /// <summary>

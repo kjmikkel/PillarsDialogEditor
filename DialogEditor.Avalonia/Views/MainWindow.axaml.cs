@@ -652,6 +652,10 @@ public partial class MainWindow : Window
             await VoPackExporter.ExportAsync(vm.ProjectPath, outputPath);
             vm.StatusText = Loc.Format("Status_ExportModBundleSuccess", outputPath);
         }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
         catch (Exception ex)
         {
             AppLog.Error("Export mod bundle failed", ex);
