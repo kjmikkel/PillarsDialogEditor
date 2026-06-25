@@ -1,6 +1,7 @@
 using System.Reflection;
 using DialogEditor.Core.GameData;
 using DialogEditor.Patch;
+using DialogEditor.ViewModels.Services;
 
 var Version = AppVersion.FromAssembly(Assembly.GetExecutingAssembly());
 
@@ -12,7 +13,7 @@ const string Help = """
 
   Arguments:
     game-dir                Root directory of a PoE1 or PoE2 installation.
-    project.dialogproject   One or more .dialogproject files to apply.
+    project.dialogproject   One or more .dialogproject or .dialogpack files to apply.
                             When multiple projects are given they are merged in
                             order (later projects win on any contested field).
 
@@ -86,18 +87,34 @@ Info($"Game:    {provider.GameName}");
 
 // ── Load projects ─────────────────────────────────────────────────────────────
 
-var projects = new List<DialogProject>();
+var tempDirs  = new List<string>();
+var voFolders = new List<string?>();
+var projects  = new List<DialogProject>();
+
 foreach (var path in projectPaths)
 {
     try
     {
-        var p = DialogProjectSerializer.LoadFromFile(path);
+        string effectivePath = path;
+        string? voFolder     = null;
+
+        if (DialogPackHelper.IsDialogPack(path))
+        {
+            var extracted = DialogPackHelper.Extract(path);
+            effectivePath = extracted.ProjectFilePath;
+            voFolder      = extracted.VoFolderPath;
+            tempDirs.Add(extracted.TempDir);
+        }
+
+        var p = DialogProjectSerializer.LoadFromFile(effectivePath);
         projects.Add(p);
+        voFolders.Add(voFolder);
         Info($"Project: {p.Name}  ({p.Patches.Count} patch(es))  [{path}]");
     }
     catch (Exception ex)
     {
-        Error($"Could not load project '{path}': {ex.Message}");
+        Error($"Could not load '{path}': {ex.Message}");
+        CleanupTempDirs(tempDirs);
         return 2;
     }
 }
@@ -193,6 +210,27 @@ if (skipped > 0)
 else
     Info($"Done: {applied} conversation(s) patched successfully{suffix}.");
 
+// ── Copy VO files from any .dialogpack entries ────────────────────────────────
+
+var gameVoRoot = Path.Combine(gameDir,
+    "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
+
+for (int i = 0; i < projects.Count; i++)
+{
+    if (voFolders[i] is null) continue;
+    if (!dryRun)
+    {
+        DialogPackHelper.CopyVoToGame(voFolders[i]!, gameVoRoot);
+        Info($"Copied VO files from: {projectPaths[i]}");
+    }
+    else
+    {
+        Info($"Dry run: would copy VO files from: {projectPaths[i]}");
+    }
+}
+
+CleanupTempDirs(tempDirs);
+
 return 0;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -201,3 +239,12 @@ bool Has(params string[] flags) => flags.Any(f => args.Contains(f));
 void Info(string msg)    { if (!quiet) Console.WriteLine(msg); }
 void Verbose(string msg) { if (verbose && !quiet) Console.WriteLine(msg); }
 void Error(string msg)   => Console.Error.WriteLine($"Error: {msg}");
+
+void CleanupTempDirs(IEnumerable<string> dirs)
+{
+    foreach (var d in dirs)
+    {
+        try { Directory.Delete(d, recursive: true); }
+        catch (Exception ex) { AppLog.Warn($"Failed to clean up temp dir '{d}': {ex.Message}"); }
+    }
+}
