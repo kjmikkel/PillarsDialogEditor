@@ -82,6 +82,12 @@
                                   ToolTip.Tip="{DynamicResource ToolTip_ImportTranslation}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_ImportTranslation}"/>
                         <Separator/>
+                        <MenuItem Header="{DynamicResource Menu_ExportModBundle}"
+                                  Click="ExportModBundle_Click"
+                                  IsEnabled="{Binding HasLocalVoFolder}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_Menu_ExportModBundle}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_ExportModBundle}"/>
+                        <Separator/>
                         <MenuItem Header="{DynamicResource Menu_Settings}"
                                   Click="SettingsButton_Click"
                                   InputGesture="Ctrl+,"/>
