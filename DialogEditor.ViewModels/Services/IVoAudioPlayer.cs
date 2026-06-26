@@ -13,7 +13,7 @@ public interface IVoAudioPlayer
     /// Always raised on the UI thread.
     event Action? PlaybackStopped;
 
-    void Play(string wemPath);
+    void Play(string path);
 
     /// Stops any current playback. Does NOT fire PlaybackStopped.
     void Stop();
@@ -28,6 +28,6 @@ public sealed class NullVoAudioPlayer : IVoAudioPlayer
 
     public bool IsAvailable => false;
     public event Action? PlaybackStopped;
-    public void Play(string wemPath) { }
+    public void Play(string path) { }
     public void Stop() { }
 }

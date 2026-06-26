@@ -31,18 +31,37 @@ public sealed class VoAudioPlayer : IVoAudioPlayer, IDisposable
     // Incremented on every Play/Stop to cancel in-flight background work.
     private volatile int _generation;
 
-    public void Play(string wemPath)
+    public void Play(string path)
     {
         StopAndCleanup();        // increments _generation, cleans up previous
         _manualStop = false;
         var gen = ++_generation; // this play's identity token
+
+        if (path.EndsWith(".wav", StringComparison.OrdinalIgnoreCase))
+        {
+            // .wav: no decode step needed — open directly with NAudio on the calling UI thread.
+            try
+            {
+                _reader = new AudioFileReader(path);
+                _output = new WaveOutEvent();
+                _output.PlaybackStopped += OnNaturalPlaybackStopped;
+                _output.Init(_reader);
+                // _tempFile stays null — no temp file to clean up for direct WAV playback.
+                _output.Play();
+            }
+            catch (Exception ex)
+            {
+                AppLog.Error("VoAudioPlayer: NAudio failed to start WAV", ex);
+            }
+            return;
+        }
 
         _ = Task.Run(async () =>
         {
             var tempFile = Path.Combine(Path.GetTempPath(), $"vo_{Guid.NewGuid():N}.wav");
             try
             {
-                var psi = new ProcessStartInfo(ToolPath, $"-o \"{tempFile}\" \"{wemPath}\"")
+                var psi = new ProcessStartInfo(ToolPath, $"-o \"{tempFile}\" \"{path}\"")
                 {
                     CreateNoWindow  = true,
                     UseShellExecute = false,
@@ -52,7 +71,7 @@ public sealed class VoAudioPlayer : IVoAudioPlayer, IDisposable
 
                 if (proc.ExitCode != 0)
                 {
-                    AppLog.Warn($"vgmstream-cli exited {proc.ExitCode} for: {wemPath}");
+                    AppLog.Warn($"vgmstream-cli exited {proc.ExitCode} for: {path}");
                     TryDeleteTemp(tempFile);
                     return;
                 }
@@ -82,7 +101,7 @@ public sealed class VoAudioPlayer : IVoAudioPlayer, IDisposable
             }
             catch (Exception ex)
             {
-                AppLog.Error($"VoAudioPlayer.Play failed for: {wemPath}", ex);
+                AppLog.Error($"VoAudioPlayer.Play failed for: {path}", ex);
                 TryDeleteTemp(tempFile);
             }
         });
