@@ -8,10 +8,14 @@ namespace DialogEditor.Avalonia.Views;
 
 public partial class VoImportDialog : Window
 {
-    private readonly IVoImporter _importer = null!;
+    private enum PlayingSlot { None, Primary, Fem }
 
-    private string? _primarySource;
-    private string? _femSource;
+    private readonly IVoImporter    _importer = null!;
+    private readonly IVoAudioPlayer _player   = null!;
+
+    private string?     _primarySource;
+    private string?     _femSource;
+    private PlayingSlot _playingSlot = PlayingSlot.None;
 
     /// Set to non-null when the user clicks OK.
     public VoImportDialogResult? Result { get; private set; }
@@ -19,16 +23,78 @@ public partial class VoImportDialog : Window
     // Parameterless ctor so the XAML compiler can embed the type (avoids AVLN3001).
     public VoImportDialog() => InitializeComponent();
 
-    public VoImportDialog(IVoImporter importer, VoImportPaths paths)
+    public VoImportDialog(IVoImporter importer, VoImportPaths paths, IVoAudioPlayer player)
     {
         InitializeComponent();
         _importer = importer;
+        _player   = player;
 
-        // Show destination paths as hints in the labels (dimmed placeholder)
+        _player.PlaybackStopped += OnPlaybackStopped;
+        Closed += (_, _) =>
+        {
+            _player.PlaybackStopped -= OnPlaybackStopped;
+            _player.Stop();
+        };
+
         PrimaryLabel.Text = Path.GetFileName(paths.PrimaryDestinationPath);
         if (paths.FemDestinationPath is not null)
             FemLabel.Text = Path.GetFileName(paths.FemDestinationPath);
     }
+
+    // ── Play buttons ─────────────────────────────────────────────────────
+
+    private void PlayPrimary_Click(object? sender, RoutedEventArgs e)
+    {
+        if (_primarySource is null) return;
+        if (_playingSlot == PlayingSlot.Primary)
+        {
+            _player.Stop();
+            _playingSlot = PlayingSlot.None;
+        }
+        else
+        {
+            _player.Play(_primarySource);
+            _playingSlot = PlayingSlot.Primary;
+        }
+        UpdatePlayGlyphs();
+    }
+
+    private void PlayFem_Click(object? sender, RoutedEventArgs e)
+    {
+        if (_femSource is null) return;
+        if (_playingSlot == PlayingSlot.Fem)
+        {
+            _player.Stop();
+            _playingSlot = PlayingSlot.None;
+        }
+        else
+        {
+            _player.Play(_femSource);
+            _playingSlot = PlayingSlot.Fem;
+        }
+        UpdatePlayGlyphs();
+    }
+
+    private void OnPlaybackStopped()
+    {
+        _playingSlot = PlayingSlot.None;
+        UpdatePlayGlyphs();
+    }
+
+    private void UpdatePlayGlyphs()
+    {
+        PlayPrimaryButton.Content = _playingSlot == PlayingSlot.Primary ? "■" : "▶";
+        PlayFemButton.Content     = _playingSlot == PlayingSlot.Fem     ? "■" : "▶";
+
+        ToolTip.SetTip(PlayPrimaryButton, _playingSlot == PlayingSlot.Primary
+            ? Loc.Get("ToolTip_VoPreviewStop")
+            : Loc.Get("ToolTip_VoPreviewPlay_Primary"));
+        ToolTip.SetTip(PlayFemButton, _playingSlot == PlayingSlot.Fem
+            ? Loc.Get("ToolTip_VoPreviewStop")
+            : Loc.Get("ToolTip_VoPreviewPlay_Fem"));
+    }
+
+    // ── Browse / Clear ───────────────────────────────────────────────────
 
     private async void BrowsePrimary_Click(object? sender, RoutedEventArgs e)
     {
@@ -37,15 +103,19 @@ public partial class VoImportDialog : Window
         _primarySource               = path;
         PrimaryLabel.Text            = Path.GetFileName(path);
         ClearPrimaryButton.IsVisible = true;
+        PlayPrimaryButton.IsVisible  = true;
         UpdateWwiseWarning();
         UpdateOkButton();
     }
 
     private void ClearPrimary_Click(object? sender, RoutedEventArgs e)
     {
+        if (_playingSlot == PlayingSlot.Primary) { _player.Stop(); _playingSlot = PlayingSlot.None; }
         _primarySource               = null;
         PrimaryLabel.Text            = "—";
         ClearPrimaryButton.IsVisible = false;
+        PlayPrimaryButton.IsVisible  = false;
+        UpdatePlayGlyphs();
         UpdateWwiseWarning();
         UpdateOkButton();
     }
@@ -54,19 +124,25 @@ public partial class VoImportDialog : Window
     {
         var path = await PickVoFileAsync();
         if (path is null) return;
-        _femSource            = path;
-        FemLabel.Text         = Path.GetFileName(path);
+        _femSource               = path;
+        FemLabel.Text            = Path.GetFileName(path);
         ClearFemButton.IsVisible = true;
+        PlayFemButton.IsVisible  = true;
         UpdateWwiseWarning();
     }
 
     private void ClearFem_Click(object? sender, RoutedEventArgs e)
     {
+        if (_playingSlot == PlayingSlot.Fem) { _player.Stop(); _playingSlot = PlayingSlot.None; }
         _femSource               = null;
         FemLabel.Text            = "—";
         ClearFemButton.IsVisible = false;
+        PlayFemButton.IsVisible  = false;
+        UpdatePlayGlyphs();
         UpdateWwiseWarning();
     }
+
+    // ── OK / Cancel ──────────────────────────────────────────────────────
 
     private void Ok_Click(object? sender, RoutedEventArgs e)
     {
@@ -80,6 +156,8 @@ public partial class VoImportDialog : Window
     private void DownloadWwise_Click(object? sender, RoutedEventArgs e)
         => System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(
             "https://www.audiokinetic.com/en/products/wwise/") { UseShellExecute = true });
+
+    // ── Helpers ──────────────────────────────────────────────────────────
 
     private async Task<string?> PickVoFileAsync()
     {
@@ -103,14 +181,12 @@ public partial class VoImportDialog : Window
 
     private void UpdateOkButton()
     {
-        // OK enabled when primary is set AND (it's a .wem OR Wwise is available).
         var isWav = _primarySource?.EndsWith(".wav", StringComparison.OrdinalIgnoreCase) == true;
         OkButton.IsEnabled = _primarySource is not null && (!isWav || _importer.IsWwiseAvailable);
     }
 
     private void UpdateWwiseWarning()
     {
-        // Show warning if any selected file is .wav and Wwise is absent.
         var anyWav =
             (_primarySource?.EndsWith(".wav", StringComparison.OrdinalIgnoreCase) == true) ||
             (_femSource?.EndsWith(".wav", StringComparison.OrdinalIgnoreCase) == true);

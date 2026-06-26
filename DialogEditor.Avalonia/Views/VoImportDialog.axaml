@@ -12,19 +12,27 @@
     <StackPanel Margin="16">
 
         <!-- Primary slot -->
-        <Grid ColumnDefinitions="120,*,Auto,Auto" Margin="0,0,0,8">
+        <Grid ColumnDefinitions="120,*,Auto,Auto,Auto" Margin="0,0,0,8">
             <TextBlock Grid.Column="0" Text="{DynamicResource VoImport_PrimaryLabel}"
                        VerticalAlignment="Center"/>
             <TextBlock Grid.Column="1" x:Name="PrimaryLabel"
                        Text="—" VerticalAlignment="Center"
                        TextTrimming="CharacterEllipsis"/>
-            <Button    Grid.Column="2" x:Name="BrowsePrimaryButton"
+            <Button    Grid.Column="2" x:Name="PlayPrimaryButton"
+                       Content="▶"
+                       Click="PlayPrimary_Click"
+                       IsVisible="False"
+                       ToolTip.Tip="{DynamicResource ToolTip_VoPreviewPlay_Primary}"
+                       AutomationProperties.Name="{DynamicResource AutomationName_VoPreviewPlay_Primary}"
+                       AutomationProperties.HelpText="{DynamicResource ToolTip_VoPreviewPlay_Primary}"
+                       Margin="8,0,4,0" Padding="6,2"/>
+            <Button    Grid.Column="3" x:Name="BrowsePrimaryButton"
                        Content="{DynamicResource VoImport_Browse}"
                        Click="BrowsePrimary_Click"
                        ToolTip.Tip="{DynamicResource ToolTip_VoImportBrowse_Primary}"
                        AutomationProperties.HelpText="{DynamicResource ToolTip_VoImportBrowse_Primary}"
-                       Margin="8,0,4,0"/>
-            <Button    Grid.Column="3" x:Name="ClearPrimaryButton"
+                       Margin="0,0,4,0"/>
+            <Button    Grid.Column="4" x:Name="ClearPrimaryButton"
                        Content="{DynamicResource VoImport_Clear}"
                        Click="ClearPrimary_Click"
                        IsVisible="False"
@@ -33,19 +41,27 @@
         </Grid>
 
         <!-- Female (optional) slot -->
-        <Grid ColumnDefinitions="120,*,Auto,Auto" Margin="0,0,0,16">
+        <Grid ColumnDefinitions="120,*,Auto,Auto,Auto" Margin="0,0,0,16">
             <TextBlock Grid.Column="0" Text="{DynamicResource VoImport_FemaleLabel}"
                        VerticalAlignment="Center"/>
             <TextBlock Grid.Column="1" x:Name="FemLabel"
                        Text="—" VerticalAlignment="Center"
                        TextTrimming="CharacterEllipsis"/>
-            <Button    Grid.Column="2" x:Name="BrowseFemButton"
+            <Button    Grid.Column="2" x:Name="PlayFemButton"
+                       Content="▶"
+                       Click="PlayFem_Click"
+                       IsVisible="False"
+                       ToolTip.Tip="{DynamicResource ToolTip_VoPreviewPlay_Fem}"
+                       AutomationProperties.Name="{DynamicResource AutomationName_VoPreviewPlay_Fem}"
+                       AutomationProperties.HelpText="{DynamicResource ToolTip_VoPreviewPlay_Fem}"
+                       Margin="8,0,4,0" Padding="6,2"/>
+            <Button    Grid.Column="3" x:Name="BrowseFemButton"
                        Content="{DynamicResource VoImport_Browse}"
                        Click="BrowseFem_Click"
                        ToolTip.Tip="{DynamicResource ToolTip_VoImportBrowse_Fem}"
                        AutomationProperties.HelpText="{DynamicResource ToolTip_VoImportBrowse_Fem}"
-                       Margin="8,0,4,0"/>
-            <Button    Grid.Column="3" x:Name="ClearFemButton"
+                       Margin="0,0,4,0"/>
+            <Button    Grid.Column="4" x:Name="ClearFemButton"
                        Content="{DynamicResource VoImport_Clear}"
                        Click="ClearFem_Click"
                        IsVisible="False"
