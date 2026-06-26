@@ -79,18 +79,23 @@ public partial class BatchVoImportViewModel : ObservableObject
     private readonly IVoImporter _importer;
     private CancellationTokenSource _cts = new();
 
-    public IReadOnlyList<BatchVoRowViewModel>        AllRows    { get; }
+    public IReadOnlyList<BatchVoRowViewModel>        AllRows     { get; }
     public ObservableCollection<BatchVoRowViewModel> VisibleRows { get; } = [];
+
+    /// When true the Conversation column is hidden — all rows share the same conversation.
+    public bool IsSingleConversation { get; }
 
     [ObservableProperty] private bool       _showOnlyMissing = true;
     [ObservableProperty] private WemQuality _quality         = WemQuality.Medium;
     [ObservableProperty] private bool       _isImporting;
     [ObservableProperty] private string     _progressText    = string.Empty;
 
-    public BatchVoImportViewModel(IReadOnlyList<BatchVoRowViewModel> rows, IVoImporter importer)
+    public BatchVoImportViewModel(IReadOnlyList<BatchVoRowViewModel> rows, IVoImporter importer,
+        bool isSingleConversation = true)
     {
-        AllRows   = rows;
-        _importer = importer;
+        AllRows              = rows;
+        _importer            = importer;
+        IsSingleConversation = isSingleConversation;
         RefreshVisibleRows();
     }
 

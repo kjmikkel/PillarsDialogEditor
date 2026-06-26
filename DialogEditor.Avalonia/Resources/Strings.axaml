@@ -1158,6 +1158,40 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="VoImport_Quality_Medium">Medium</sys:String>
     <sys:String x:Key="VoImport_Quality_High">High</sys:String>
     <sys:String x:Key="ToolTip_VoQuality">Encoding quality for WAV files. Low uses less disk space; High preserves more detail. Has no effect on pre-encoded .wem files.</sys:String>
+
+    <!-- ── Batch VO import dialog ──────────────────────────────────────── -->
+    <!-- {0} = conversation name -->
+    <sys:String x:Key="BatchVoImport_Title_Single">Batch VO Import — {0}</sys:String>
+    <sys:String x:Key="BatchVoImport_Title_All">Batch VO Import — All Conversations</sys:String>
+    <sys:String x:Key="BatchVoImport_ShowOnlyMissing">Show only missing</sys:String>
+    <sys:String x:Key="BatchVoImport_ImportButton">Import</sys:String>
+    <sys:String x:Key="BatchVoImport_CancelButton">Cancel</sys:String>
+    <sys:String x:Key="BatchVoImport_ConversationColumn">Conversation</sys:String>
+    <sys:String x:Key="BatchVoImport_NodeColumn">Node</sys:String>
+    <sys:String x:Key="BatchVoImport_TextColumn">Text</sys:String>
+    <sys:String x:Key="BatchVoImport_StatusColumn">Status</sys:String>
+    <sys:String x:Key="BatchVoImport_PrimaryColumn">Primary</sys:String>
+    <sys:String x:Key="BatchVoImport_FemColumn">Female</sys:String>
+    <sys:String x:Key="BatchVoImport_RowStatusColumn">Result</sys:String>
+    <!-- {0} = visible count, {1} = total count -->
+    <sys:String x:Key="BatchVoImport_RowCount">{0} of {1} rows</sys:String>
+    <!-- {0} = done count, {1} = total count -->
+    <sys:String x:Key="BatchVoImport_Progress">{0} / {1}</sys:String>
+    <sys:String x:Key="BatchVoImport_QualityLabel">Quality (WAV only)</sys:String>
+    <sys:String x:Key="ToolTip_BatchVoImport">Open the batch VO import dialog for this conversation.</sys:String>
+    <sys:String x:Key="ToolTip_BatchVoImportAll">Open the batch VO import dialog for all conversations in the project.</sys:String>
+    <sys:String x:Key="ToolTip_BatchBrowsePrimary">Browse for a .wem or .wav source file for the primary (default) VO slot.</sys:String>
+    <sys:String x:Key="ToolTip_BatchBrowseFem">Browse for a .wem or .wav source file for the female VO slot.</sys:String>
+    <sys:String x:Key="ToolTip_BatchClearPrimary">Clear the primary source file selection for this row.</sys:String>
+    <sys:String x:Key="ToolTip_BatchClearFem">Clear the female source file selection for this row.</sys:String>
+    <sys:String x:Key="ToolTip_BatchPlayPrimary">Play or stop the selected primary source file.</sys:String>
+    <sys:String x:Key="ToolTip_BatchPlayFem">Play or stop the selected female source file.</sys:String>
+    <sys:String x:Key="ToolTip_BatchShowOnlyMissing">When checked, hides rows that already have a VO file present in the game folder.</sys:String>
+    <sys:String x:Key="Menu_BatchImportVo">Batch import VO…</sys:String>
+    <sys:String x:Key="Menu_BatchImportVoAll">Batch import VO (all conversations)…</sys:String>
+    <sys:String x:Key="ToolTip_Menu_BatchImportVo">Open the batch voice-over import dialog for this conversation.</sys:String>
+    <sys:String x:Key="ToolTip_Menu_BatchImportVoAll">Open the batch voice-over import dialog for all conversations in the project.</sys:String>
+
     <sys:String x:Key="Menu_ImportVo">Import voice-over…</sys:String>
     <sys:String x:Key="ToolTip_Menu_ImportVo">Import a .wem or .wav voice-over file for the selected node.</sys:String>
     <sys:String x:Key="Menu_ExportModBundle">Export Mod Bundle…</sys:String>
