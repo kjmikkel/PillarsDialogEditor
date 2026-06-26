@@ -1,0 +1,215 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+        x:Class="DialogEditor.Avalonia.Views.BatchVoImportDialog"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="940" Height="560"
+        MinWidth="700" MinHeight="400"
+        WindowStartupLocation="CenterOwner"
+        Title="{DynamicResource BatchVoImport_Title_Single}">
+
+    <DockPanel Margin="8">
+
+        <!-- ── Header bar: ShowOnlyMissing + quality ─────────────────────── -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="16" Margin="0,0,0,8">
+
+            <CheckBox IsChecked="{Binding ShowOnlyMissing}"
+                      Content="{DynamicResource BatchVoImport_ShowOnlyMissing}"
+                      ToolTip.Tip="{DynamicResource ToolTip_BatchShowOnlyMissing}"
+                      AutomationProperties.HelpText="{DynamicResource ToolTip_BatchShowOnlyMissing}"
+                      VerticalAlignment="Center"/>
+
+            <Separator Width="1" Background="{DynamicResource Brush.Border}" Margin="0,4"/>
+
+            <TextBlock Text="{DynamicResource BatchVoImport_QualityLabel}"
+                       VerticalAlignment="Center"/>
+
+            <RadioButton x:Name="QualityLow"
+                         Content="{DynamicResource VoImport_Quality_Low}"
+                         GroupName="BatchWemQuality"
+                         Checked="QualityLow_Checked"
+                         ToolTip.Tip="{DynamicResource ToolTip_VoQuality}"
+                         AutomationProperties.HelpText="{DynamicResource ToolTip_VoQuality}"
+                         VerticalAlignment="Center"/>
+            <RadioButton x:Name="QualityMedium"
+                         Content="{DynamicResource VoImport_Quality_Medium}"
+                         GroupName="BatchWemQuality"
+                         IsChecked="True"
+                         Checked="QualityMedium_Checked"
+                         ToolTip.Tip="{DynamicResource ToolTip_VoQuality}"
+                         AutomationProperties.HelpText="{DynamicResource ToolTip_VoQuality}"
+                         VerticalAlignment="Center"/>
+            <RadioButton x:Name="QualityHigh"
+                         Content="{DynamicResource VoImport_Quality_High}"
+                         GroupName="BatchWemQuality"
+                         Checked="QualityHigh_Checked"
+                         ToolTip.Tip="{DynamicResource ToolTip_VoQuality}"
+                         AutomationProperties.HelpText="{DynamicResource ToolTip_VoQuality}"
+                         VerticalAlignment="Center"/>
+
+        </StackPanel>
+
+        <!-- ── Footer: progress + Import + Cancel ───────────────────────── -->
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
+
+            <TextBlock Text="{Binding ProgressText}"
+                       VerticalAlignment="Center"
+                       Margin="0,0,8,0"/>
+
+            <Button Content="{DynamicResource BatchVoImport_ImportButton}"
+                    Command="{Binding ImportCommand}"
+                    IsDefault="True"
+                    ToolTip.Tip="{DynamicResource ToolTip_BatchVoImport}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_BatchVoImport}"/>
+
+            <Button Content="{DynamicResource BatchVoImport_CancelButton}"
+                    Click="Cancel_Click"/>
+
+        </StackPanel>
+
+        <!-- ── Column header row ─────────────────────────────────────────── -->
+        <!-- Widths must match the ItemTemplate grid below (Conv=140, Node=60, Text=*, Status=50, Primary=220, Fem=220, Result=50) -->
+        <Grid DockPanel.Dock="Top"
+              ColumnDefinitions="140,60,*,50,220,220,50"
+              Margin="8,0,0,2">
+            <TextBlock Grid.Column="0"
+                       Text="{DynamicResource BatchVoImport_ConversationColumn}"
+                       IsVisible="{Binding !IsSingleConversation}"
+                       FontSize="{DynamicResource FontSize.Small}"
+                       Foreground="{DynamicResource Brush.Text.Secondary}"/>
+            <TextBlock Grid.Column="1"
+                       Text="{DynamicResource BatchVoImport_NodeColumn}"
+                       FontSize="{DynamicResource FontSize.Small}"
+                       Foreground="{DynamicResource Brush.Text.Secondary}"/>
+            <TextBlock Grid.Column="2"
+                       Text="{DynamicResource BatchVoImport_TextColumn}"
+                       FontSize="{DynamicResource FontSize.Small}"
+                       Foreground="{DynamicResource Brush.Text.Secondary}"/>
+            <TextBlock Grid.Column="3"
+                       Text="{DynamicResource BatchVoImport_StatusColumn}"
+                       FontSize="{DynamicResource FontSize.Small}"
+                       Foreground="{DynamicResource Brush.Text.Secondary}"/>
+            <TextBlock Grid.Column="4"
+                       Text="{DynamicResource BatchVoImport_PrimaryColumn}"
+                       FontSize="{DynamicResource FontSize.Small}"
+                       Foreground="{DynamicResource Brush.Text.Secondary}"/>
+            <TextBlock Grid.Column="5"
+                       Text="{DynamicResource BatchVoImport_FemColumn}"
+                       FontSize="{DynamicResource FontSize.Small}"
+                       Foreground="{DynamicResource Brush.Text.Secondary}"/>
+            <TextBlock Grid.Column="6"
+                       Text="{DynamicResource BatchVoImport_RowStatusColumn}"
+                       FontSize="{DynamicResource FontSize.Small}"
+                       Foreground="{DynamicResource Brush.Text.Secondary}"/>
+        </Grid>
+
+        <!-- ── Row list ──────────────────────────────────────────────────── -->
+        <ListBox ItemsSource="{Binding VisibleRows}"
+                 IsEnabled="{Binding !IsImporting}"
+                 BorderThickness="0"
+                 Background="{DynamicResource Brush.Surface.Panel}">
+            <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:BatchVoRowViewModel">
+                    <!-- Widths must match the header row above -->
+                    <Grid ColumnDefinitions="140,60,*,50,220,220,50" Margin="0,2">
+
+                        <!-- Conversation name — hidden in single-conversation mode -->
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding ConversationName}"
+                                   IsVisible="{Binding DataContext.IsSingleConversation,
+                                       RelativeSource={RelativeSource AncestorType=Window},
+                                       Converter={StaticResource InverseBoolToVis}}"
+                                   TextTrimming="CharacterEllipsis"
+                                   VerticalAlignment="Center"/>
+
+                        <!-- Node ID -->
+                        <TextBlock Grid.Column="1"
+                                   Text="{Binding NodeId}"
+                                   VerticalAlignment="Center"/>
+
+                        <!-- Text preview -->
+                        <TextBlock Grid.Column="2"
+                                   Text="{Binding TextPreview}"
+                                   TextTrimming="CharacterEllipsis"
+                                   VerticalAlignment="Center"/>
+
+                        <!-- Existing VO status glyph -->
+                        <TextBlock Grid.Column="3"
+                                   Text="{Binding VoStatusGlyph}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+
+                        <!-- Primary slot: filename + play + browse + clear -->
+                        <Grid Grid.Column="4" ColumnDefinitions="*,Auto,Auto,Auto" Margin="2,0">
+                            <TextBlock Grid.Column="0"
+                                       Text="{Binding PrimaryFileLabel}"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <Button Grid.Column="1"
+                                    Content="{Binding PrimaryPlayGlyph}"
+                                    Click="PlayPrimary_Click"
+                                    IsVisible="{Binding HasPrimarySource}"
+                                    ToolTip.Tip="{DynamicResource ToolTip_BatchPlayPrimary}"
+                                    AutomationProperties.HelpText="{DynamicResource ToolTip_BatchPlayPrimary}"
+                                    Padding="4,1" Margin="2,0"/>
+                            <Button Grid.Column="2"
+                                    Content="…"
+                                    Click="BrowsePrimary_Click"
+                                    ToolTip.Tip="{DynamicResource ToolTip_BatchBrowsePrimary}"
+                                    AutomationProperties.Name="{DynamicResource ToolTip_BatchBrowsePrimary}"
+                                    AutomationProperties.HelpText="{DynamicResource ToolTip_BatchBrowsePrimary}"
+                                    Padding="4,1" Margin="2,0"/>
+                            <Button Grid.Column="3"
+                                    Content="✕"
+                                    Click="ClearPrimary_Click"
+                                    IsVisible="{Binding HasPrimarySource}"
+                                    ToolTip.Tip="{DynamicResource ToolTip_BatchClearPrimary}"
+                                    AutomationProperties.Name="{DynamicResource ToolTip_BatchClearPrimary}"
+                                    AutomationProperties.HelpText="{DynamicResource ToolTip_BatchClearPrimary}"
+                                    Padding="4,1" Margin="2,0"/>
+                        </Grid>
+
+                        <!-- Female slot: filename + play + browse + clear -->
+                        <Grid Grid.Column="5" ColumnDefinitions="*,Auto,Auto,Auto" Margin="2,0">
+                            <TextBlock Grid.Column="0"
+                                       Text="{Binding FemFileLabel}"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <Button Grid.Column="1"
+                                    Content="{Binding FemPlayGlyph}"
+                                    Click="PlayFem_Click"
+                                    IsVisible="{Binding FemSourcePath, Converter={StaticResource NullOrEmptyToVis}}"
+                                    ToolTip.Tip="{DynamicResource ToolTip_BatchPlayFem}"
+                                    AutomationProperties.HelpText="{DynamicResource ToolTip_BatchPlayFem}"
+                                    Padding="4,1" Margin="2,0"/>
+                            <Button Grid.Column="2"
+                                    Content="…"
+                                    Click="BrowseFem_Click"
+                                    ToolTip.Tip="{DynamicResource ToolTip_BatchBrowseFem}"
+                                    AutomationProperties.Name="{DynamicResource ToolTip_BatchBrowseFem}"
+                                    AutomationProperties.HelpText="{DynamicResource ToolTip_BatchBrowseFem}"
+                                    Padding="4,1" Margin="2,0"/>
+                            <Button Grid.Column="3"
+                                    Content="✕"
+                                    Click="ClearFem_Click"
+                                    IsVisible="{Binding FemSourcePath, Converter={StaticResource NullOrEmptyToVis}}"
+                                    ToolTip.Tip="{DynamicResource ToolTip_BatchClearFem}"
+                                    AutomationProperties.Name="{DynamicResource ToolTip_BatchClearFem}"
+                                    AutomationProperties.HelpText="{DynamicResource ToolTip_BatchClearFem}"
+                                    Padding="4,1" Margin="2,0"/>
+                        </Grid>
+
+                        <!-- Import result glyph -->
+                        <TextBlock Grid.Column="6"
+                                   Text="{Binding RowStatusGlyph}"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"/>
+
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+    </DockPanel>
+</Window>
