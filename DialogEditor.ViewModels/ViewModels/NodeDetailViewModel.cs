@@ -214,7 +214,8 @@ public partial class NodeDetailViewModel : ObservableObject
 
         var result = await Importer.ImportAsync(
             new VoImportRequest(destPrimary, selection.PrimarySourcePath,
-                                destFem, selection.FemSourcePath), default);
+                                destFem, selection.FemSourcePath,
+                                selection.Quality), default);
 
         if (result.Success)
         {
