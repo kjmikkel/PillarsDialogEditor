@@ -1,3 +1,4 @@
+using Avalonia.Platform;
 using Microsoft.Win32;
 using DialogEditor.ViewModels.Services;
 
@@ -16,6 +17,9 @@ public sealed class VoImporter : IVoImporter
 {
     private readonly string? _wwiseCliPath;
 
+    // Cached path of the template.wproj extracted to %TEMP% on first encode.
+    private static string? _cachedWprojPath;
+
     public bool IsWwiseAvailable => _wwiseCliPath is not null;
 
     public VoImporter()
@@ -28,11 +32,13 @@ public sealed class VoImporter : IVoImporter
         try
         {
             await ProcessSlotAsync(request.PrimarySourcePath,
-                                   request.PrimaryDestinationPath, ct);
+                                   request.PrimaryDestinationPath,
+                                   request.Quality, ct);
 
             if (request.FemSourcePath is not null && request.FemDestinationPath is not null)
                 await ProcessSlotAsync(request.FemSourcePath,
-                                       request.FemDestinationPath, ct);
+                                       request.FemDestinationPath,
+                                       request.Quality, ct);
 
             return new VoImportResult(true, null);
         }
@@ -47,7 +53,8 @@ public sealed class VoImporter : IVoImporter
         }
     }
 
-    private async Task ProcessSlotAsync(string sourcePath, string destPath, CancellationToken ct)
+    private async Task ProcessSlotAsync(
+        string sourcePath, string destPath, WemQuality quality, CancellationToken ct)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(destPath)!);
 
@@ -57,22 +64,106 @@ public sealed class VoImporter : IVoImporter
             return;
         }
 
-        // .wav → .wem via Wwise CLI
         if (!IsWwiseAvailable)
             throw new InvalidOperationException(
                 "Wwise not found. Install Wwise or use a pre-encoded .wem file.");
 
-        // WwiseCLI.exe requires a .wproj project file and a .wsources XML input to
-        // convert WAV → WEM; standalone single-file conversion is not supported.
-        // To implement this the editor would need to bundle a minimal Wwise project
-        // template (.wproj with Vorbis conversion settings) and generate a temporary
-        // .wsources file for each call. Deferred until a bundled template ships.
-        // Users should convert WAV → WEM with the Wwise authoring tool and import
-        // the resulting .wem directly.
-        throw new NotSupportedException(
-            "WAV → WEM encoding requires a bundled Wwise project template that is not yet " +
-            "included with this release. Convert your file to .wem using the Wwise authoring " +
-            "tool and import the .wem directly.");
+        await EncodeWavToWemAsync(sourcePath, destPath, quality, ct);
+    }
+
+    private async Task EncodeWavToWemAsync(
+        string sourcePath, string destPath, WemQuality quality, CancellationToken ct)
+    {
+        var wprojPath = GetOrExtractTemplateWproj();
+        var tempDir   = Path.Combine(Path.GetTempPath(), "PillarsDialogEditor",
+                                     "wwise", $"encode_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(tempDir);
+
+        try
+        {
+            var wsourcesPath = Path.Combine(tempDir, "sources.wsources");
+            await File.WriteAllTextAsync(wsourcesPath,
+                GenerateWsourcesXml(sourcePath, destPath, quality), ct);
+
+            // WwiseCLI writes the encoded .wem to:
+            //   <wprojDir>\GeneratedSoundBanks\Windows\<destNameWithoutExtension>.wem
+            // VERIFICATION: Confirm this output path against a real Wwise install.
+            var psi = new System.Diagnostics.ProcessStartInfo(
+                _wwiseCliPath!,
+                $"\"{wprojPath}\" -Platform Windows -ConvertExternalSources \"{wsourcesPath}\"")
+            {
+                CreateNoWindow        = true,
+                UseShellExecute       = false,
+                RedirectStandardError = true,
+            };
+            using var proc = System.Diagnostics.Process.Start(psi)!;
+            await proc.WaitForExitAsync(ct);
+
+            if (proc.ExitCode != 0)
+            {
+                var err = await proc.StandardError.ReadToEndAsync(ct);
+                throw new InvalidOperationException(
+                    $"WwiseCLI exited {proc.ExitCode}: {err}");
+            }
+
+            var wprojDir   = Path.GetDirectoryName(wprojPath)!;
+            var outputName = Path.GetFileNameWithoutExtension(destPath) + ".wem";
+            var outputWem  = Path.Combine(wprojDir, "GeneratedSoundBanks", "Windows", outputName);
+
+            if (!File.Exists(outputWem))
+                throw new FileNotFoundException(
+                    $"WwiseCLI did not produce expected output at: {outputWem}");
+
+            File.Move(outputWem, destPath, overwrite: true);
+        }
+        finally
+        {
+            try { Directory.Delete(tempDir, recursive: true); } catch { }
+        }
+    }
+
+    /// <summary>
+    /// Generates a .wsources XML string for a single WAV→WEM conversion.
+    /// Pure (no I/O) — the primary unit-test target for this class.
+    /// </summary>
+    internal static string GenerateWsourcesXml(
+        string sourcePath, string destPath, WemQuality quality)
+    {
+        var presetName = quality switch
+        {
+            WemQuality.Low  => "VorbisLow",
+            WemQuality.High => "VorbisHigh",
+            _               => "VorbisMedium",
+        };
+
+        var sourceDir  = Path.GetDirectoryName(sourcePath)!.Replace('\\', '/');
+        var sourceName = Path.GetFileName(sourcePath);
+        var destName   = Path.GetFileNameWithoutExtension(destPath);
+
+        return $"""
+            <ExternalSourcesList SchemaVersion="1" Root="{sourceDir}">
+              <Source Path="{sourceName}"
+                      Destination="{destName}"
+                      Conversion="{presetName}"/>
+            </ExternalSourcesList>
+            """;
+    }
+
+    private static string GetOrExtractTemplateWproj()
+    {
+        if (_cachedWprojPath is not null) return _cachedWprojPath;
+
+        var destPath = Path.Combine(Path.GetTempPath(), "PillarsDialogEditor",
+                                    "wwise", "template.wproj");
+        Directory.CreateDirectory(Path.GetDirectoryName(destPath)!);
+
+        var uri    = new Uri("avares://DialogEditor.Avalonia/Assets/Wwise/template.wproj");
+        using var stream = AssetLoader.Open(uri);
+        using var fs     = File.Create(destPath);
+        stream.CopyTo(fs);
+
+        _cachedWprojPath = destPath;
+        return destPath;
     }
 
     private static string? DetectWwiseCli()
@@ -111,7 +202,7 @@ public sealed class VoImporter : IVoImporter
             AppLog.Warn($"VoImporter: registry lookup failed: {ex.Message}");
         }
 
-        // 3. Common install-path fallback (try a few recent versions)
+        // 3. Common install-path fallback
         var commonRoot = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
             "Audiokinetic");
