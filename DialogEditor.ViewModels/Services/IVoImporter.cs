@@ -27,16 +27,23 @@ public sealed class NullVoImporter : IVoImporter
 /// <param name="PrimarySourcePath">.wav or .wem picked by the user for the primary slot.</param>
 /// <param name="FemDestinationPath">Expected .wem path inside _vo/ for the female slot (null = not applicable).</param>
 /// <param name="FemSourcePath">.wav or .wem picked by the user for the female slot (null = not provided).</param>
+/// <param name="Quality">Encoding quality used when source is .wav. Ignored for .wem (already encoded).</param>
 public record VoImportRequest(
-    string  PrimaryDestinationPath,
-    string  PrimarySourcePath,
-    string? FemDestinationPath,
-    string? FemSourcePath);
+    string     PrimaryDestinationPath,
+    string     PrimarySourcePath,
+    string?    FemDestinationPath,
+    string?    FemSourcePath,
+    WemQuality Quality = WemQuality.Medium);
 
 public record VoImportResult(bool Success, string? ErrorMessage);
+
+public enum WemQuality { Low, Medium, High }
 
 /// Passed to ShowImportDialog so the dialog knows where files will be saved.
 public record VoImportPaths(string PrimaryDestinationPath, string? FemDestinationPath);
 
 /// Returned by ShowImportDialog with the user's source-file selections.
-public record VoImportDialogResult(string PrimarySourcePath, string? FemSourcePath);
+public record VoImportDialogResult(
+    string     PrimarySourcePath,
+    string?    FemSourcePath,
+    WemQuality Quality = WemQuality.Medium);
