@@ -423,7 +423,8 @@ public partial class MainWindowViewModel : ObservableObject
         var name = Path.GetFileNameWithoutExtension(path);
         SetProject(DialogProject.Empty(name));
         _projectPath = path;
-        Detail.ProjectPath = _projectPath;
+        Detail.ProjectPath  = _projectPath;
+        Canvas.ProjectPath  = _projectPath;
         OnPropertyChanged(nameof(HasLocalVoFolder));
         DialogProjectSerializer.SaveToFile(path, _project!);
         AppSettings.LastProjectPath = path;
@@ -464,7 +465,8 @@ public partial class MainWindowViewModel : ObservableObject
             AppLog.Info($"Project file not present on current branch: {path}");
             SetProject(null);
             _projectPath = null;
-            Detail.ProjectPath = null;
+            Detail.ProjectPath  = null;
+            Canvas.ProjectPath  = null;
             OnPropertyChanged(nameof(HasLocalVoFolder));
             CurrentProjectName = null;
             IsModified = false;        // nothing open → not dirty
@@ -589,7 +591,8 @@ public partial class MainWindowViewModel : ObservableObject
     {
         SetProject(loaded);
         _projectPath = path;
-        Detail.ProjectPath = _projectPath;
+        Detail.ProjectPath  = _projectPath;
+        Canvas.ProjectPath  = _projectPath;
         OnPropertyChanged(nameof(HasLocalVoFolder));
         AppSettings.LastProjectPath = path;
         CurrentProjectName = loaded.Name;

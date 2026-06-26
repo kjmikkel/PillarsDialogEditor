@@ -501,6 +501,8 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(ImportVoTooltip));
     }
 
+    public void Refresh() => NotifyAllProxies();
+
     // ── Speaker / Listener name picker ───────────────────────────────────
 
     /// True when the loaded game has speaker name data (PoE2); hides picker for PoE1.

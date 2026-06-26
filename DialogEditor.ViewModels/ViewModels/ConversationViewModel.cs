@@ -21,6 +21,26 @@ public partial class ConversationViewModel : ObservableObject
     /// Set by MainWindowViewModel so the node context menu can reach the import/vo commands.
     public NodeDetailViewModel? Detail { get; set; }
 
+    private string? _projectPath;
+    public string? ProjectPath
+    {
+        get => _projectPath;
+        set { _projectPath = value; BatchImportVoCommand.NotifyCanExecuteChanged(); }
+    }
+
+    public Func<Task>? ShowBatchVoImport { get; set; }
+
+    public bool CanBatchImportVo =>
+        ProjectPath is not null && ShowBatchVoImport is not null &&
+        Nodes.Any(n => n.HasVO || !string.IsNullOrEmpty(n.ExternalVO));
+
+    [RelayCommand(CanExecute = nameof(CanBatchImportVo))]
+    private async Task BatchImportVo()
+    {
+        if (ShowBatchVoImport is not null)
+            await ShowBatchVoImport();
+    }
+
     private readonly HashSet<NodeViewModel> _subscribedNodes = [];
 
     public ConversationViewModel(IDispatcher dispatcher)
@@ -57,6 +77,7 @@ public partial class ConversationViewModel : ObservableObject
                     }
             }
             RefreshStatistics();
+            BatchImportVoCommand.NotifyCanExecuteChanged();
         };
     }
 
@@ -623,4 +644,38 @@ public partial class ConversationViewModel : ObservableObject
                 .ToList();
             return n.ToSnapshot(links);
         }).ToList());
+
+    public IReadOnlyList<BatchVoRowViewModel> BuildBatchVoRows(string gameRoot, string activeGameId)
+    {
+        if (ProjectPath is null) return [];
+
+        var voRoot = Path.Combine(gameRoot,
+            "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
+        var voDir  = Path.Combine(Path.GetDirectoryName(ProjectPath)!, "_vo");
+
+        var rows = new List<BatchVoRowViewModel>();
+        foreach (var node in Nodes)
+        {
+            var check = VoPathResolver.Check(
+                node.SpeakerGuid, node.HasVO, node.ExternalVO,
+                node.NodeId, ConversationName, gameRoot, activeGameId);
+
+            if (check is null || check.Status == VoPresence.NotApplicable) continue;
+            if (check.PrimaryWemPath is null) continue;
+
+            var rel         = Path.GetRelativePath(voRoot, check.PrimaryWemPath);
+            var destPrimary = Path.Combine(voDir, rel);
+            var destFem     = Path.Combine(voDir, rel[..^4] + "_fem.wem");
+
+            var raw     = node.DefaultText.Trim();
+            var preview = raw.Length == 0  ? $"Node {node.NodeId}"
+                        : raw.Length <= 60 ? raw
+                                           : raw[..60] + "…";
+
+            rows.Add(new BatchVoRowViewModel(
+                ConversationName, node.NodeId, preview, check.Status, destPrimary, destFem));
+        }
+
+        return rows.OrderBy(r => r.NodeId).ToList();
+    }
 }
