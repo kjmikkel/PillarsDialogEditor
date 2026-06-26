@@ -1153,6 +1153,11 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="AutomationName_VoPreviewPlay_Primary">Play primary voice-over</sys:String>
     <sys:String x:Key="AutomationName_VoPreviewPlay_Fem">Play female voice-over</sys:String>
     <sys:String x:Key="AutomationName_VoPreviewStop">Stop voice-over preview</sys:String>
+    <sys:String x:Key="VoImport_QualityLabel">Quality (WAV only)</sys:String>
+    <sys:String x:Key="VoImport_Quality_Low">Low</sys:String>
+    <sys:String x:Key="VoImport_Quality_Medium">Medium</sys:String>
+    <sys:String x:Key="VoImport_Quality_High">High</sys:String>
+    <sys:String x:Key="ToolTip_VoQuality">Encoding quality for WAV files. Low uses less disk space; High preserves more detail. Has no effect on pre-encoded .wem files.</sys:String>
     <sys:String x:Key="Menu_ImportVo">Import voice-over…</sys:String>
     <sys:String x:Key="ToolTip_Menu_ImportVo">Import a .wem or .wav voice-over file for the selected node.</sys:String>
     <sys:String x:Key="Menu_ExportModBundle">Export Mod Bundle…</sys:String>

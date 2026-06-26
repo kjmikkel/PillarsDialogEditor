@@ -16,6 +16,7 @@ public partial class VoImportDialog : Window
     private string?     _primarySource;
     private string?     _femSource;
     private PlayingSlot _playingSlot = PlayingSlot.None;
+    private WemQuality  _quality     = WemQuality.Medium;
 
     /// Set to non-null when the user clicks OK.
     public VoImportDialogResult? Result { get; private set; }
@@ -94,6 +95,12 @@ public partial class VoImportDialog : Window
             : Loc.Get("ToolTip_VoPreviewPlay_Fem"));
     }
 
+    // ── Quality ──────────────────────────────────────────────────────────
+
+    private void QualityLow_Checked(object?    sender, RoutedEventArgs e) => _quality = WemQuality.Low;
+    private void QualityMedium_Checked(object? sender, RoutedEventArgs e) => _quality = WemQuality.Medium;
+    private void QualityHigh_Checked(object?   sender, RoutedEventArgs e) => _quality = WemQuality.High;
+
     // ── Browse / Clear ───────────────────────────────────────────────────
 
     private async void BrowsePrimary_Click(object? sender, RoutedEventArgs e)
@@ -147,7 +154,7 @@ public partial class VoImportDialog : Window
     private void Ok_Click(object? sender, RoutedEventArgs e)
     {
         if (_primarySource is null) return;
-        Result = new VoImportDialogResult(_primarySource, _femSource);
+        Result = new VoImportDialogResult(_primarySource, _femSource, _quality);
         Close();
     }
 
@@ -191,5 +198,6 @@ public partial class VoImportDialog : Window
             (_primarySource?.EndsWith(".wav", StringComparison.OrdinalIgnoreCase) == true) ||
             (_femSource?.EndsWith(".wav", StringComparison.OrdinalIgnoreCase) == true);
         WwiseWarningPanel.IsVisible = anyWav && !_importer.IsWwiseAvailable;
+        QualityPanel.IsEnabled      = anyWav;
     }
 }
