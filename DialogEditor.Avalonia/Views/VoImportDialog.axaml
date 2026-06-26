@@ -69,6 +69,34 @@
                        AutomationProperties.HelpText="{DynamicResource ToolTip_VoImportClear_Fem}"/>
         </Grid>
 
+        <!-- Encoding quality (WAV->WEM only; disabled when no .wav is selected) -->
+        <Grid ColumnDefinitions="120,*" Margin="0,0,0,12">
+            <TextBlock Grid.Column="0" Text="{DynamicResource VoImport_QualityLabel}"
+                       VerticalAlignment="Center"/>
+            <StackPanel Grid.Column="1" x:Name="QualityPanel"
+                        Orientation="Horizontal" Spacing="16" IsEnabled="False">
+                <RadioButton x:Name="QualityLow"
+                             Content="{DynamicResource VoImport_Quality_Low}"
+                             GroupName="WemQuality"
+                             Checked="QualityLow_Checked"
+                             ToolTip.Tip="{DynamicResource ToolTip_VoQuality}"
+                             AutomationProperties.HelpText="{DynamicResource ToolTip_VoQuality}"/>
+                <RadioButton x:Name="QualityMedium"
+                             Content="{DynamicResource VoImport_Quality_Medium}"
+                             GroupName="WemQuality"
+                             IsChecked="True"
+                             Checked="QualityMedium_Checked"
+                             ToolTip.Tip="{DynamicResource ToolTip_VoQuality}"
+                             AutomationProperties.HelpText="{DynamicResource ToolTip_VoQuality}"/>
+                <RadioButton x:Name="QualityHigh"
+                             Content="{DynamicResource VoImport_Quality_High}"
+                             GroupName="WemQuality"
+                             Checked="QualityHigh_Checked"
+                             ToolTip.Tip="{DynamicResource ToolTip_VoQuality}"
+                             AutomationProperties.HelpText="{DynamicResource ToolTip_VoQuality}"/>
+            </StackPanel>
+        </Grid>
+
         <!-- Wwise warning (only visible when WAV chosen and Wwise absent).
              Uses Brush.Severity.Warning (Amber.500) — the semantic token for
              warning-level messages. Brush.Text.Warning does not exist in Tokens.axaml. -->
