@@ -125,6 +125,12 @@
                                   IsVisible="{Binding IsEditable}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Menu_Canvas_AddAnnotationHere}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_Canvas_AddAnnotationHere}"/>
+                        <Separator IsVisible="{Binding CanBatchImportVo}"/>
+                        <MenuItem Header="{DynamicResource Menu_BatchImportVo}"
+                                  Command="{Binding BatchImportVoCommand}"
+                                  IsVisible="{Binding CanBatchImportVo}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_Menu_BatchImportVo}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_BatchImportVo}"/>
                     </ContextMenu>
                 </nodify:NodifyEditor.ContextMenu>
 

@@ -114,6 +114,16 @@ public partial class MainWindow : Window
         };
         vm.Detail.ReportStatus = msg => vm.StatusText = msg;
 
+        vm.Canvas.ShowBatchVoImport = async () =>
+        {
+            var rows = vm.Canvas.BuildBatchVoRows(vm.Detail.GameRoot, vm.Detail.ActiveGameId);
+            if (rows.Count == 0) return;
+            var batchVm = new BatchVoImportViewModel(rows, voImporter, isSingleConversation: true);
+            var dlg     = new BatchVoImportDialog(batchVm, audioPlayer);
+            await dlg.ShowDialog(this);
+            vm.Detail.Refresh();
+        };
+
         if (!vm.IsBrowserExpanded)
         {
             BrowserColumn.MinWidth = 34;
