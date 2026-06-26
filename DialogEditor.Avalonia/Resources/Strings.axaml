@@ -1147,6 +1147,12 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_VoImportBrowse_Primary">Browse for a .wem or .wav file for the primary (male) voice-over slot.</sys:String>
     <sys:String x:Key="ToolTip_VoImportBrowse_Fem">Browse for a .wem or .wav file for the female voice-over slot (optional).</sys:String>
     <sys:String x:Key="ToolTip_VoImportDownloadWwise">Open the Audiokinetic website to download Wwise, required for encoding .wav files.</sys:String>
+    <sys:String x:Key="ToolTip_VoPreviewPlay_Primary">Play the selected primary voice-over file.</sys:String>
+    <sys:String x:Key="ToolTip_VoPreviewPlay_Fem">Play the selected female voice-over file.</sys:String>
+    <sys:String x:Key="ToolTip_VoPreviewStop">Stop playback.</sys:String>
+    <sys:String x:Key="AutomationName_VoPreviewPlay_Primary">Play primary voice-over</sys:String>
+    <sys:String x:Key="AutomationName_VoPreviewPlay_Fem">Play female voice-over</sys:String>
+    <sys:String x:Key="AutomationName_VoPreviewStop">Stop voice-over preview</sys:String>
     <sys:String x:Key="Menu_ImportVo">Import voice-over…</sys:String>
     <sys:String x:Key="ToolTip_Menu_ImportVo">Import a .wem or .wav voice-over file for the selected node.</sys:String>
     <sys:String x:Key="Menu_ExportModBundle">Export Mod Bundle…</sys:String>

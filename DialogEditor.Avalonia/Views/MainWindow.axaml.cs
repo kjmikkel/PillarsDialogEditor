@@ -108,7 +108,7 @@ public partial class MainWindow : Window
         vm.Detail.Importer = voImporter;
         vm.Detail.ShowImportDialog = async paths =>
         {
-            var dialog = new VoImportDialog(voImporter, paths);
+            var dialog = new VoImportDialog(voImporter, paths, audioPlayer);
             await dialog.ShowDialog(this);
             return dialog.Result;
         };
