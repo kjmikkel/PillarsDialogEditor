@@ -86,12 +86,11 @@ public sealed class VoImporter : IVoImporter
             await File.WriteAllTextAsync(wsourcesPath,
                 GenerateWsourcesXml(sourcePath, destPath, quality), ct);
 
-            // WwiseCLI writes the encoded .wem to:
+            // WwiseConsole writes the encoded .wem to:
             //   <wprojDir>\GeneratedSoundBanks\Windows\<destNameWithoutExtension>.wem
-            // VERIFICATION: Confirm this output path against a real Wwise install.
             var psi = new System.Diagnostics.ProcessStartInfo(
                 _wwiseCliPath!,
-                $"\"{wprojPath}\" -Platform Windows -ConvertExternalSources \"{wsourcesPath}\"")
+                $"convert-external-source \"{wprojPath}\" --platform Windows --source-file \"{wsourcesPath}\"")
             {
                 CreateNoWindow        = true,
                 UseShellExecute       = false,
@@ -104,7 +103,7 @@ public sealed class VoImporter : IVoImporter
             {
                 var err = await proc.StandardError.ReadToEndAsync(ct);
                 throw new InvalidOperationException(
-                    $"WwiseCLI exited {proc.ExitCode}: {err}");
+                    $"WwiseConsole exited {proc.ExitCode}: {err}");
             }
 
             var wprojDir   = Path.GetDirectoryName(wprojPath)!;
@@ -113,7 +112,7 @@ public sealed class VoImporter : IVoImporter
 
             if (!File.Exists(outputWem))
                 throw new FileNotFoundException(
-                    $"WwiseCLI did not produce expected output at: {outputWem}");
+                    $"WwiseConsole did not produce expected output at: {outputWem}");
 
             File.Move(outputWem, destPath, overwrite: true);
         }
@@ -181,11 +180,13 @@ public sealed class VoImporter : IVoImporter
 
     private static string? DetectWwiseCli()
     {
+        const string ExeName = "WwiseConsole.exe"; // renamed from WwiseCLI.exe in Wwise 2019.1
+
         // 1. WWISEROOT environment variable
         var wwiseRoot = Environment.GetEnvironmentVariable("WWISEROOT");
         if (!string.IsNullOrEmpty(wwiseRoot))
         {
-            var candidate = Path.Combine(wwiseRoot, "Authoring", "x64", "Release", "bin", "WwiseCLI.exe");
+            var candidate = Path.Combine(wwiseRoot, "Authoring", "x64", "Release", "bin", ExeName);
             if (File.Exists(candidate)) return candidate;
         }
 
@@ -205,7 +206,7 @@ public sealed class VoImporter : IVoImporter
                     var installDir = verKey?.GetValue("InstallDir") as string;
                     if (string.IsNullOrEmpty(installDir)) continue;
                     var candidate = Path.Combine(installDir,
-                        "Authoring", "x64", "Release", "bin", "WwiseCLI.exe");
+                        "Authoring", "x64", "Release", "bin", ExeName);
                     if (File.Exists(candidate)) return candidate;
                 }
             }
@@ -215,16 +216,21 @@ public sealed class VoImporter : IVoImporter
             AppLog.Warn($"VoImporter: registry lookup failed: {ex.Message}");
         }
 
-        // 3. Common install-path fallback
-        var commonRoot = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
-            "Audiokinetic");
-        if (Directory.Exists(commonRoot))
+        // 3. Common install-path fallback — check both the default Program Files location
+        //    and C:\Audiokinetic\ (the Wwise Launcher's non-standard default on some systems)
+        var searchRoots = new[]
         {
-            foreach (var dir in Directory.GetDirectories(commonRoot, "Wwise*")
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "Audiokinetic"),
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),    "Audiokinetic"),
+            @"C:\Audiokinetic",
+        };
+        foreach (var root in searchRoots)
+        {
+            if (!Directory.Exists(root)) continue;
+            foreach (var dir in Directory.GetDirectories(root, "Wwise*")
                                          .OrderByDescending(d => d))
             {
-                var candidate = Path.Combine(dir, "Authoring", "x64", "Release", "bin", "WwiseCLI.exe");
+                var candidate = Path.Combine(dir, "Authoring", "x64", "Release", "bin", ExeName);
                 if (File.Exists(candidate)) return candidate;
             }
         }
