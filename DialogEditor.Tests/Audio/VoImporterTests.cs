@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using DialogEditor.Avalonia.Audio;
 using DialogEditor.ViewModels.Services;
 
@@ -52,5 +53,60 @@ public class VoImporterTests
             WemQuality.Medium);
 
         Assert.DoesNotContain('\\', xml);
+    }
+
+    [Fact]
+    public void ExtractTemplateZip_CreatesWprojFile()
+    {
+        using var ms = CreateStubZip();
+        var destDir = Path.Combine(Path.GetTempPath(), $"VoImporterTest_{Guid.NewGuid():N}");
+        try
+        {
+            var result = VoImporter.ExtractTemplateZip(ms, destDir);
+            Assert.True(File.Exists(result));
+        }
+        finally
+        {
+            if (Directory.Exists(destDir))
+                Directory.Delete(destDir, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void ExtractTemplateZip_ReturnsPathEndingWithTemplateWproj()
+    {
+        using var ms = CreateStubZip();
+        var destDir = Path.Combine(Path.GetTempPath(), $"VoImporterTest_{Guid.NewGuid():N}");
+        try
+        {
+            var result = VoImporter.ExtractTemplateZip(ms, destDir);
+            Assert.EndsWith("template.wproj", result, StringComparison.OrdinalIgnoreCase);
+        }
+        finally
+        {
+            if (Directory.Exists(destDir))
+                Directory.Delete(destDir, recursive: true);
+        }
+    }
+
+    // ── helpers ──────────────────────────────────────────────────────────────────
+
+    private static MemoryStream CreateStubZip()
+    {
+        var ms = new MemoryStream();
+        using (var archive = new ZipArchive(ms, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            WriteEntry(archive, "template/template.wproj",                   "<stub/>");
+            WriteEntry(archive, "template/Conversion Settings/Factory.wwu",  "<stub/>");
+        }
+        ms.Position = 0;
+        return ms;
+    }
+
+    private static void WriteEntry(ZipArchive archive, string entryName, string content)
+    {
+        var entry = archive.CreateEntry(entryName);
+        using var writer = new StreamWriter(entry.Open());
+        writer.Write(content);
     }
 }

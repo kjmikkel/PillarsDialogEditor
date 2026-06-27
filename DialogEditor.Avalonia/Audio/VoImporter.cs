@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using Avalonia.Platform;
 using Microsoft.Win32;
 using DialogEditor.ViewModels.Services;
@@ -17,7 +18,7 @@ public sealed class VoImporter : IVoImporter
 {
     private readonly string? _wwiseCliPath;
 
-    // Cached path of the template.wproj extracted to %TEMP% on first encode.
+    // Cached path of the template.wproj extracted from template.wwise.zip on first encode.
     private static string? _cachedWprojPath;
 
     public bool IsWwiseAvailable => _wwiseCliPath is not null;
@@ -153,17 +154,29 @@ public sealed class VoImporter : IVoImporter
     {
         if (_cachedWprojPath is not null) return _cachedWprojPath;
 
-        var destPath = Path.Combine(Path.GetTempPath(), "PillarsDialogEditor",
-                                    "wwise", "template.wproj");
-        Directory.CreateDirectory(Path.GetDirectoryName(destPath)!);
-
-        var uri    = new Uri("avares://DialogEditor.Avalonia/Assets/Wwise/template.wproj");
+        var uri = new Uri("avares://DialogEditor.Avalonia/Assets/Wwise/template.wwise.zip");
         using var stream = AssetLoader.Open(uri);
-        using var fs     = File.Create(destPath);
-        stream.CopyTo(fs);
+        _cachedWprojPath = ExtractTemplateZip(stream);
+        return _cachedWprojPath;
+    }
 
-        _cachedWprojPath = destPath;
-        return destPath;
+    /// <summary>
+    /// Extracts the Wwise project ZIP to a temp directory and returns the path to template.wproj.
+    /// Internal for testing — production callers use GetOrExtractTemplateWproj().
+    /// </summary>
+    internal static string ExtractTemplateZip(Stream zipStream, string? destDir = null)
+    {
+        // ZIP contains a root "template/" folder; extract one level above so it lands at
+        // destDir/template/template.wproj rather than destDir/template.wproj.
+        destDir ??= Path.Combine(
+            Path.GetTempPath(), "PillarsDialogEditor", "wwise");
+
+        Directory.CreateDirectory(destDir);
+
+        using var zip = new ZipArchive(zipStream, ZipArchiveMode.Read);
+        zip.ExtractToDirectory(destDir, overwriteFiles: true);
+
+        return Path.Combine(destDir, "template", "template.wproj");
     }
 
     private static string? DetectWwiseCli()
