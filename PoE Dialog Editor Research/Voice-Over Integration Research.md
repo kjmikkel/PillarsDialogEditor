@@ -320,8 +320,8 @@ The `speakerChatterPrefix` is the `ChatterPrefix` field from the speaker's entry
 
 | Option | Tooling | Notes |
 |---|---|---|
-| **Wwise authoring** (recommended) | Wwise 2017.1.x + minimal `.wproj` | Guaranteed format compatibility. Free for indie use. Produces exact match to game's format. |
-| **Wwise CLI** | `WwiseCLI.exe` with a project template | Same quality as above; Dialog Editor can invoke automatically if Wwise is installed. |
+| **Wwise CLI** (recommended) | `WwiseConsole.exe` (Wwise 2019.1+) or `WwiseCLI.exe` (pre-2019) with a project template | Verified: exit code 0, output codec 0xFFFF, 48000 Hz. Dialog Editor invokes automatically if Wwise is installed. |
+| **Wwise authoring (manual)** | Wwise authoring application | Same encoding quality; useful for one-off verification. |
 | **Third-party** | `ffmpeg` + custom Vorbis-in-RIFF packer | Brittle. Wwise's `.wem` has non-standard extended fmt chunk that simple Vorbis packers don't produce correctly. Not recommended. |
 
 ### Minimal Wwise project for encoding
@@ -336,8 +336,12 @@ The Dialog Editor can generate a ready-to-use minimal `.wproj` scaffold with the
 ### Identifying the correct Wwise version
 
 - Wwise BKHD version **120** = **Wwise 2017.1.x**
-- For `.wem`-only encoding (no `.bnk` needed), any modern Wwise version works because `.wem` files are not versioned the same way `.bnk` files are — the Vorbis format inside is stable
+- For `.wem`-only encoding (no `.bnk` needed), any modern Wwise version is expected to work — `.wem` Vorbis is more stable across versions than `.bnk` (see open questions)
 - For `.bnk` authoring (chatter/SFX mods), must use **Wwise 2017.1.x** to generate version-120 banks
+- **CLI executable rename:** `WwiseCLI.exe` was renamed to `WwiseConsole.exe` in Wwise 2019.1. The Dialog Editor detects either name. Wwise 2022.1 LTS (used for the bundled template) ships only `WwiseConsole.exe`.
+- **Command syntax change:** `WwiseConsole.exe` uses subcommands — `convert-external-source <proj> --platform Windows --source-file <wsources>` — instead of the legacy `-ConvertExternalSources` flag.
+- **Confirmed output path:** `{wprojDir}\GeneratedSoundBanks\Windows\{destName}.wem` (verified against Wwise 2022.1.19.8584).
+- **Non-standard install root:** The Wwise Launcher sometimes installs to `C:\Audiokinetic\` rather than `C:\Program Files (x86)\Audiokinetic\`. The Dialog Editor searches both.
 
 ### Event naming convention for mods
 
@@ -365,7 +369,7 @@ For each conversation node with a custom VO assignment:
 - [x] **Does the Dialog Editor's data model currently persist `TalkNode.ExternalVO`?** ✅ Yes. `ConversationNode` (`DialogEditor.Core/Models/ConversationNode.cs`) has both `ExternalVO = ""` (string) and `HasVO = false` (bool) as named parameters. `Poe2ConversationParser` reads them at lines 67–68.
 - [x] **What is the exact mapping from `SpeakerGuid` → `ChatterPrefix`?** ✅ Resolved. `ChatterPrefix` lives in `Components[0]` of each `SpeakerGameData` entry in `speakers.gamedatabundle`. `Poe2SpeakerNameParser` does NOT currently read it — requires a parser extension (see implementation path above).
 - [ ] Can `vgmstream-cli` be redistributed freely? (It is MIT-licensed — check binary distribution rules.)
-- [ ] **Are `.wem` files encoded by Wwise 2022.1 LTS compatible with Deadfire's 2017.1.x Wwise runtime?** The `.bnk` version gate (v120) is well understood, but `.wem` Vorbis compatibility is less certain. Wwise uses packed codebooks whose format has evolved between SDK versions — if the 2022.1 encoder produces a codebook variant the game's decoder doesn't recognise, audio will be silent or crash. Counterevidence: community VO mods on Nexus Mods appear to work, suggesting cross-version encoding is viable in practice. **Must verify during implementation:** encode a test WAV with the 2022.1 template, patch it into a vanilla conversation, confirm it plays in-game before shipping the template.
+- [ ] **Are `.wem` files encoded by Wwise 2022.1 LTS compatible with Deadfire's 2017.1.x Wwise runtime?** ⚠️ *Partially resolved — in-game test still pending.* End-to-end encode confirmed: Wwise 2022.1.19.8584 produces codec `0xFFFF` (Vorbis), 48000 Hz output from the bundled template (test file `file_example_WAV_1MG.wav`, VorbisMedium preset). The remaining risk is the packed-codebook variant — if the 2022.1 encoder uses a format the game's 2017.1.x decoder doesn't recognise, audio will be silent or crash. **Still needs:** copy the produced `.wem` into a vanilla conversation's VO folder, trigger in-game, confirm it plays. If in-game playback fails, fallback is to re-author the template in Wwise 2019.2 LTS.
 - [x] **Is there a known case in shipped conversations where `ExternalVO` is populated?** ✅ Yes — extensively. **193 of 1130 conversations** contain non-empty `ExternalVO`; **1000 nodes** across the game use it. Two main patterns: (1) **cross-conversation VO reuse** — a node in conversation A uses audio originally recorded for conversation B (e.g., `03_cv_deiko` reuses lines from `03_cv_aenalys`); (2) **`sh_` shared cutscene lines** — companion reactions to a shared cutscene event stored in the speaker's own folder but named `sh_{speaker}_{cutscene}_{nodeId}`. ExternalVO values never end in `.wem` — the game appends `.wem` at path-construction time (confirmed across all 1000 occurrences).
 - [ ] For PoE1: is there a subset of installations where loose `.ogg` files are present? Worth checking the GOG/Steam install to see if `vocalization\vo wav files\` exists.
 
