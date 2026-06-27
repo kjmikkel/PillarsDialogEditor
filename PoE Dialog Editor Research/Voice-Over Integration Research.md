@@ -1,8 +1,8 @@
 ---
 tags: [research, audio, voice-over, poe1, poe2]
-status: second-pass
+status: third-pass
 date: 2026-06-21
-updated: 2026-06-21
+updated: 2026-06-27
 ---
 
 # Voice-Over Integration Research
@@ -40,7 +40,7 @@ Research into how Pillars of Eternity 1 and 2 store, reference, and play voiced 
 | Format | Game | Role |
 |---|---|---|
 | `.bnk` | PoE2 | Wwise SoundBanks — SFX and music. **Not used for story VO.** |
-| `.wem` | PoE2 | Wwise Encoded Media — all voice-over lines, stored loose on disk. Vorbis codec (idCodec = 4). |
+| `.wem` | PoE2 | Wwise Encoded Media — all voice-over lines, stored loose on disk. Vorbis codec (idCodec = 4, RIFF tag 0xFFFF). **48000 Hz, mono for story dialogue.** |
 | Unity `VOAsset` | PoE1 | ScriptableObject wrapping a `VOBankClip` (Unity `AudioClip`). Packed inside Unity `Resources`. |
 
 PoE1 does **not** use `.wem` files. The audio is inside Unity's compiled asset archive.
@@ -269,11 +269,103 @@ A VO preview feature for PoE2 would require:
 
 ---
 
+## Confirmed .wem Audio Format (from binary inspection)
+
+Inspected 11 story VO `.wem` files across multiple speakers and conversations (GOG install, 2026-06-27).
+
+| Property | Value | Notes |
+|---|---|---|
+| Container | RIFF/WAVE | Standard RIFF header |
+| RIFF codec tag | `0xFFFF` (65535) | Wwise's RIFF-level tag for Vorbis |
+| AkCodecID (game source) | `4` | Used in `AkExternalSourceInfo`; maps to Vorbis |
+| Sample rate | **48000 Hz** | Consistent across all inspected files |
+| Channels | **1 (mono)** for story dialogue | Narrator endgame slides and player chatter use 2 (stereo) |
+| fmt chunk size | 66 bytes | 18 standard + 48 Wwise-extended bytes |
+| Wwise bank version | **120** | From `BKHD` section of `voice.bnk` and `abl_acid.bnk` — consistent across all banks |
+
+> [!important]
+> **Sample rate is 48000 Hz, not 44100 Hz.** Encoding new VO at 44100 Hz would cause the game to pitch-shift audio during playback. Mod authors must target 48000 Hz.
+
+> [!important]
+> **Wwise bank version 120 = Wwise 2017.1.x.** The game's runtime cannot load banks compiled with a newer Wwise SDK. For mod `.bnk` authoring (SFX/music mods), the author must use Wwise ≤ 2017.1.x. Story dialogue VO does **not** require a `.bnk` at all — see below.
+
+---
+
+## Mod VO Authoring Pipeline
+
+This section describes the pipeline for mod authors who want to ship custom voice-over for new dialogue written in the Dialog Editor.
+
+### Key insight: story dialogue VO requires no `.bnk`
+
+Story VO is loaded via Wwise external sources (`AkExternalSourceInfo`) — the game resolves the path at runtime and streams the file directly. No `.bnk` is needed to register new story dialogue events. A mod only needs to place correctly named and encoded `.wem` files at the right path.
+
+The `.bnk` is only required for **chatter/ambient events** that must be registered with the Wwise event system. For story dialogue, skip it.
+
+### Pipeline for story dialogue VO
+
+```
+1. Record or produce audio as .wav (or any lossless/uncompressed format)
+2. Convert .wav → .wem  (see encoding options below)
+3. Name the file:  {conversationName}_{nodeId:0000}.wem
+   e.g.:  my_mod_conversation_0003.wem
+4. Place under mod's audio folder:
+   Voices\English(US)\{speakerChatterPrefix}\{filename}.wem
+5. Mod package makes this path available at game root:
+   PillarsOfEternityII_Data\StreamingAssets\Audio\Windows\Voices\English(US)\...
+```
+
+The `speakerChatterPrefix` is the `ChatterPrefix` field from the speaker's entry in `speakers.gamedatabundle` (see Speaker Name Resolution section). For existing vanilla speakers this is known; for new NPC speakers introduced by a mod it must be chosen by the mod author and registered in a custom `speakers.gamedatabundle`.
+
+### .wem encoding options
+
+| Option | Tooling | Notes |
+|---|---|---|
+| **Wwise authoring** (recommended) | Wwise 2017.1.x + minimal `.wproj` | Guaranteed format compatibility. Free for indie use. Produces exact match to game's format. |
+| **Wwise CLI** | `WwiseCLI.exe` with a project template | Same quality as above; Dialog Editor can invoke automatically if Wwise is installed. |
+| **Third-party** | `ffmpeg` + custom Vorbis-in-RIFF packer | Brittle. Wwise's `.wem` has non-standard extended fmt chunk that simple Vorbis packers don't produce correctly. Not recommended. |
+
+### Minimal Wwise project for encoding
+
+A fresh Wwise project needs only:
+- **Platform:** Windows
+- **Conversion settings:** Vorbis, 48000 Hz, mono (for speech), quality ~6–7 (matches game's avg ~85 kbps for mono dialogue)
+- **No events, banks, or hierarchy needed** for external-source VO conversion — just set the conversion settings and run the file conversion tool
+
+The Dialog Editor can generate a ready-to-use minimal `.wproj` scaffold with the correct platform/codec settings pre-filled, so mod authors with Wwise installed can click "Generate" without understanding Wwise's project structure.
+
+### Identifying the correct Wwise version
+
+- Wwise BKHD version **120** = **Wwise 2017.1.x**
+- For `.wem`-only encoding (no `.bnk` needed), any modern Wwise version works because `.wem` files are not versioned the same way `.bnk` files are — the Vorbis format inside is stable
+- For `.bnk` authoring (chatter/SFX mods), must use **Wwise 2017.1.x** to generate version-120 banks
+
+### Event naming convention for mods
+
+To avoid colliding with vanilla Wwise event IDs (FNV-1 hashes of event names), mod events should use a clearly namespaced prefix:
+
+```
+\Voice\{mod_prefix}\{conversationName}_{nodeId:0000}
+```
+
+e.g.: `\Voice\mymod\my_mod_conversation_0003`
+
+The numeric event ID = FNV-1 hash of the name string. This can be computed in C# without Wwise. Collision with vanilla is unlikely but worth namespacing defensively.
+
+### What the Dialog Editor needs to generate
+
+For each conversation node with a custom VO assignment:
+1. The expected `.wem` file path (deterministic from speaker + conversation name + node ID)
+2. A manifest of `(eventName, eventId, sourceWav, targetWem)` tuples for the encoder step
+3. Optionally: a minimal `.wproj` template with correct conversion settings
+
+---
+
 ## Open Questions
 
 - [x] **Does the Dialog Editor's data model currently persist `TalkNode.ExternalVO`?** ✅ Yes. `ConversationNode` (`DialogEditor.Core/Models/ConversationNode.cs`) has both `ExternalVO = ""` (string) and `HasVO = false` (bool) as named parameters. `Poe2ConversationParser` reads them at lines 67–68.
 - [x] **What is the exact mapping from `SpeakerGuid` → `ChatterPrefix`?** ✅ Resolved. `ChatterPrefix` lives in `Components[0]` of each `SpeakerGameData` entry in `speakers.gamedatabundle`. `Poe2SpeakerNameParser` does NOT currently read it — requires a parser extension (see implementation path above).
 - [ ] Can `vgmstream-cli` be redistributed freely? (It is MIT-licensed — check binary distribution rules.)
+- [ ] **Are `.wem` files encoded by Wwise 2022.1 LTS compatible with Deadfire's 2017.1.x Wwise runtime?** The `.bnk` version gate (v120) is well understood, but `.wem` Vorbis compatibility is less certain. Wwise uses packed codebooks whose format has evolved between SDK versions — if the 2022.1 encoder produces a codebook variant the game's decoder doesn't recognise, audio will be silent or crash. Counterevidence: community VO mods on Nexus Mods appear to work, suggesting cross-version encoding is viable in practice. **Must verify during implementation:** encode a test WAV with the 2022.1 template, patch it into a vanilla conversation, confirm it plays in-game before shipping the template.
 - [x] **Is there a known case in shipped conversations where `ExternalVO` is populated?** ✅ Yes — extensively. **193 of 1130 conversations** contain non-empty `ExternalVO`; **1000 nodes** across the game use it. Two main patterns: (1) **cross-conversation VO reuse** — a node in conversation A uses audio originally recorded for conversation B (e.g., `03_cv_deiko` reuses lines from `03_cv_aenalys`); (2) **`sh_` shared cutscene lines** — companion reactions to a shared cutscene event stored in the speaker's own folder but named `sh_{speaker}_{cutscene}_{nodeId}`. ExternalVO values never end in `.wem` — the game appends `.wem` at path-construction time (confirmed across all 1000 occurrences).
 - [ ] For PoE1: is there a subset of installations where loose `.ogg` files are present? Worth checking the GOG/Steam install to see if `vocalization\vo wav files\` exists.
 
