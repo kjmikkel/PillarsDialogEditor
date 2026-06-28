@@ -514,6 +514,7 @@ public partial class NodeDetailViewModel : ObservableObject
         }
 
         OnPropertyChanged(nameof(IsVoImportVisible));
+        OnPropertyChanged(nameof(CanImportVo));
         OnPropertyChanged(nameof(HasVoStatus));
         OnPropertyChanged(nameof(VoStatusGlyph));
         OnPropertyChanged(nameof(VoStatusText));

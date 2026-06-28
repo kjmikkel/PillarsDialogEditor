@@ -236,7 +236,6 @@
                 <Button Content="🎤"
                         Command="{Binding ImportVoCommand}"
                         IsVisible="{Binding IsVoImportVisible}"
-                        IsEnabled="{Binding CanImportVo}"
                         ToolTip.Tip="{Binding ImportVoTooltip}"
                         AutomationProperties.Name="{DynamicResource AutomationName_VoImport}"
                         AutomationProperties.HelpText="{Binding ImportVoTooltip}"
