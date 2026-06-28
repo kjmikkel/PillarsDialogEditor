@@ -78,11 +78,12 @@ public class NodeDetailViewModelImportTests : IDisposable
     }
 
     [Fact]
-    public void CanImportVo_FalseWhenProjectPathIsNull()
+    public void CanImportVo_TrueEvenWhenProjectPathIsNull()
     {
+        // The button stays enabled; clicking it with no project reports status and exits early.
         _vm.ProjectPath = null;
         LoadNode();
-        Assert.False(_vm.CanImportVo);
+        Assert.True(_vm.CanImportVo);
     }
 
     [Fact]
@@ -139,6 +140,20 @@ public class NodeDetailViewModelImportTests : IDisposable
     }
 
     // ── ImportVoCommand — disabled guard ─────────────────────────────────
+
+    [Fact]
+    public async Task ImportVoCommand_ReportsStatus_WhenProjectNotSaved()
+    {
+        _vm.ProjectPath = null;
+        LoadNode();
+        string? reported = null;
+        _vm.ReportStatus = msg => reported = msg;
+        _vm.ShowImportDialog = _ => throw new Exception("dialog must not open");
+
+        await _vm.ImportVoCommand.ExecuteAsync(null);
+
+        Assert.NotNull(reported);
+    }
 
     [Fact]
     public async Task ImportVoCommand_DoesNothing_WhenShowImportDialogIsNull()

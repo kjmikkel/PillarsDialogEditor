@@ -192,18 +192,23 @@ public partial class NodeDetailViewModel : ObservableObject
     /// Independent of HasVO/ExternalVO so the button appears on fresh nodes too.
     public bool IsVoImportVisible => _voCheck is not null;
 
-    /// True when a VO import can be initiated (project saved and PoE2 node loaded).
-    public bool CanImportVo => _voCheck is not null && ProjectPath is not null;
+    /// True when a VO import can be initiated: PoE2 node loaded (project save is checked at runtime).
+    public bool CanImportVo => _voCheck is not null;
 
-    /// Tooltip for the import button — explains why it may be disabled.
-    public string ImportVoTooltip => CanImportVo
-        ? Loc.Get("ToolTip_VoImport")
-        : Loc.Get("ToolTip_VoImport_Unsaved");
+    /// Tooltip for the import button.
+    public string ImportVoTooltip => Loc.Get("ToolTip_VoImport");
 
     [RelayCommand(CanExecute = nameof(CanImportVo))]
     private async Task ImportVo()
     {
-        if (ProjectPath is null || ShowImportDialog is null) return;
+        if (ShowImportDialog is null) return;
+
+        // Project must be saved so we know where the _vo/ folder lives.
+        if (ProjectPath is null)
+        {
+            ReportStatus?.Invoke(Loc.Get("VoImport_UnsavedProject"));
+            return;
+        }
 
         // Clicking import on a fresh node (HasVO=false, no ExternalVO) implies the user
         // wants to add VO — set HasVO automatically so the path can be resolved.
@@ -217,7 +222,7 @@ public partial class NodeDetailViewModel : ObservableObject
                 Canvas?.ConversationName ?? "", GameRoot, ActiveGameId);
         }
 
-        if (_voCheck?.PrimaryWemPath is null || !CanImportVo) return;
+        if (_voCheck?.PrimaryWemPath is null) return;
 
         var voRoot = Path.Combine(GameRoot,
             "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
