@@ -53,6 +53,22 @@ public class NodeDetailViewModelImportTests : IDisposable
         _vm.Load(new NodeViewModel(node, new StringEntry(1, "Test", "")));
     }
 
+    // ── helpers ──────────────────────────────────────────────────────────
+
+    // Loads a plain node with HasVO=false and no ExternalVO (the "fresh node" case).
+    private void LoadFreshNode()
+    {
+        var node = new ConversationNode(
+            NodeId: 99, IsPlayerChoice: false, SpeakerCategory: SpeakerCategory.Npc,
+            SpeakerGuid: "6a99a109-0000-0000-0000-000000000000" /* Narrator */,
+            ListenerGuid: "",
+            Links: [], Conditions: [], Scripts: [],
+            DisplayType: "Conversation", Persistence: "None",
+            ActorDirection: "", Comments: "",
+            ExternalVO: "", HasVO: false, HideSpeaker: false);
+        _vm.Load(new NodeViewModel(node, new StringEntry(99, "Hello", "")));
+    }
+
     // ── CanImportVo ──────────────────────────────────────────────────────
 
     [Fact]
@@ -74,6 +90,52 @@ public class NodeDetailViewModelImportTests : IDisposable
     {
         LoadNode();
         Assert.True(_vm.CanImportVo);
+    }
+
+    [Fact]
+    public void CanImportVo_TrueWhenFreshNodeWithoutHasVO()
+    {
+        // A node with HasVO=false should still be importable — the command auto-sets HasVO.
+        LoadFreshNode();
+        Assert.True(_vm.CanImportVo);
+    }
+
+    // ── IsVoImportVisible ────────────────────────────────────────────────
+
+    [Fact]
+    public void IsVoImportVisible_FalseWhenNoNode()
+    {
+        Assert.False(_vm.IsVoImportVisible);
+    }
+
+    [Fact]
+    public void IsVoImportVisible_TrueForPoE2NodeWithoutHasVO()
+    {
+        // Button must be visible even on a fresh node so users can discover it.
+        LoadFreshNode();
+        Assert.True(_vm.IsVoImportVisible);
+    }
+
+    [Fact]
+    public void IsVoImportVisible_TrueForPoE2NodeWithHasVO()
+    {
+        LoadNode();
+        Assert.True(_vm.IsVoImportVisible);
+    }
+
+    // ── ImportVoCommand — auto-set HasVO ──────────────────────────────────
+
+    [Fact]
+    public async Task ImportVoCommand_SetsHasVO_WhenNodeHasNoVoConfigured()
+    {
+        LoadFreshNode();
+        _vm.Importer        = new StubVoImporter();
+        _vm.ShowImportDialog = _ => Task.FromResult<VoImportDialogResult?>(null); // cancel dialog
+
+        await _vm.ImportVoCommand.ExecuteAsync(null);
+
+        // HasVO should be set to true before the dialog is shown.
+        Assert.True(_vm.HasVO);
     }
 
     // ── ImportVoCommand — disabled guard ─────────────────────────────────

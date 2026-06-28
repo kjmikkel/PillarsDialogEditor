@@ -188,8 +188,12 @@ public partial class NodeDetailViewModel : ObservableObject
     /// Set by MainWindowViewModel — receives one-line status messages to display in the status bar.
     public Action<string>? ReportStatus { get; set; }
 
-    /// True when this node has a resolvable VO path AND the project has been saved to disk.
-    public bool CanImportVo => HasVoStatus && ProjectPath is not null;
+    /// True when the VO import button should be visible: PoE2 with a game root and a loaded node.
+    /// Independent of HasVO/ExternalVO so the button appears on fresh nodes too.
+    public bool IsVoImportVisible => _voCheck is not null;
+
+    /// True when a VO import can be initiated (project saved and PoE2 node loaded).
+    public bool CanImportVo => _voCheck is not null && ProjectPath is not null;
 
     /// Tooltip for the import button — explains why it may be disabled.
     public string ImportVoTooltip => CanImportVo
@@ -199,8 +203,21 @@ public partial class NodeDetailViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanImportVo))]
     private async Task ImportVo()
     {
-        if (!CanImportVo || _voCheck?.PrimaryWemPath is null
-            || ProjectPath is null || ShowImportDialog is null) return;
+        if (ProjectPath is null || ShowImportDialog is null) return;
+
+        // Clicking import on a fresh node (HasVO=false, no ExternalVO) implies the user
+        // wants to add VO — set HasVO automatically so the path can be resolved.
+        if (_node is not null && !_node.HasVO && string.IsNullOrEmpty(_node.ExternalVO))
+        {
+            _node.HasVO = true;
+            // Re-evaluate _voCheck inline so PrimaryWemPath is available immediately
+            // (NotifyAllProxies will also run via OnNodePropertyChanged, which is fine).
+            _voCheck = VoPathResolver.Check(
+                _node.SpeakerGuid, true, _node.ExternalVO, _node.NodeId,
+                Canvas?.ConversationName ?? "", GameRoot, ActiveGameId);
+        }
+
+        if (_voCheck?.PrimaryWemPath is null || !CanImportVo) return;
 
         var voRoot = Path.Combine(GameRoot,
             "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
@@ -491,6 +508,7 @@ public partial class NodeDetailViewModel : ObservableObject
             }
         }
 
+        OnPropertyChanged(nameof(IsVoImportVisible));
         OnPropertyChanged(nameof(HasVoStatus));
         OnPropertyChanged(nameof(VoStatusGlyph));
         OnPropertyChanged(nameof(VoStatusText));

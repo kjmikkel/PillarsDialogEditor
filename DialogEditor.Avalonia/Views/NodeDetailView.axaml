@@ -229,17 +229,18 @@
                             ToolTip.Tip="{Binding PlayFemTooltip}"
                             AutomationProperties.HelpText="{Binding PlayFemTooltip}"
                             Margin="4,0,0,0" Padding="6,2"/>
-                    <!-- Import button — always visible when VO status row is shown;
-                         disabled (not hidden) when unsaved so the tooltip explains why. -->
-                    <Button Content="🎤"
-                            Command="{Binding ImportVoCommand}"
-                            IsVisible="{Binding HasVoStatus}"
-                            IsEnabled="{Binding CanImportVo}"
-                            ToolTip.Tip="{Binding ImportVoTooltip}"
-                            AutomationProperties.Name="{DynamicResource AutomationName_VoImport}"
-                            AutomationProperties.HelpText="{Binding ImportVoTooltip}"
-                            Margin="4,0,0,0" Padding="6,2"/>
                 </StackPanel>
+
+                <!-- Import button — visible for all PoE2 nodes (even before HasVO is set);
+                     disabled when the project is unsaved so the tooltip explains why. -->
+                <Button Content="🎤"
+                        Command="{Binding ImportVoCommand}"
+                        IsVisible="{Binding IsVoImportVisible}"
+                        IsEnabled="{Binding CanImportVo}"
+                        ToolTip.Tip="{Binding ImportVoTooltip}"
+                        AutomationProperties.Name="{DynamicResource AutomationName_VoImport}"
+                        AutomationProperties.HelpText="{Binding ImportVoTooltip}"
+                        Margin="0,2,0,4" Padding="8,3"/>
 
                 <CheckBox Classes="detail-check"
                           IsChecked="{Binding HideSpeaker, Mode=TwoWay}"
