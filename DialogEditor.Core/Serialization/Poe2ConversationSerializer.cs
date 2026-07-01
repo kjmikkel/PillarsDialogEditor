@@ -97,6 +97,8 @@ public static class Poe2ConversationSerializer
     private static JsonNode BuildNewNode(NodeEditSnapshot snap)
     {
         var node = BuildNewNodeBase(snap);
+        // No original JSON to merge with — every link on a brand-new node is new.
+        node["Links"]           = BuildLinks(snap.Links, null);
         node["Conditionals"]    = BuildConditionJson(snap.Conditions);
         node["OnEnterScripts"]  = BuildScriptListJson(snap.Scripts, ScriptCategory.Enter);
         node["OnExitScripts"]   = BuildScriptListJson(snap.Scripts, ScriptCategory.Exit);

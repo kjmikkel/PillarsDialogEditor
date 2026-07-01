@@ -103,7 +103,8 @@ public static class Poe1ConversationSerializer
         new XElement("NodeID",       snap.NodeId),
         new XElement("SpeakerGuid",  snap.SpeakerGuid),
         new XElement("ListenerGuid", snap.ListenerGuid),
-        new XElement("Links"),
+        // No original XML to merge with — every link on a brand-new node is new.
+        new XElement("Links", snap.Links.Select(BuildNewLink)),
         new XElement("Conditionals",
             new XElement("Components",
                 snap.Conditions.Select(c => BuildConditionXml(c)))),
