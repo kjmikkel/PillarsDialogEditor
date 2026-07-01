@@ -1394,10 +1394,30 @@ public partial class MainWindowViewModel : ObservableObject
                     var backupSt   = Path.Combine(tempDir, convName + ".stringtable.bak");
 
                     File.Copy(origConv, backupConv);
+                    // An empty BackupStPath means "no original existed" — restore then
+                    // deletes the stringtable the patch created instead of copying back.
                     if (File.Exists(origSt)) File.Copy(origSt, backupSt);
+                    else backupSt = string.Empty;
                     restoreEntries.Add(new PendingRestoreEntry(backupConv, backupSt, origConv, origSt));
                 }
                 // else: new conversation — nothing to back up
+
+                // The apply loop below also writes stringtables for every *other*
+                // installed language carried by the patch (TranslationApplier) —
+                // back those up too, as stringtable-only entries.
+                var installed = _provider.AvailableLanguages.ToHashSet(StringComparer.OrdinalIgnoreCase);
+                foreach (var lang in patch.Translations.Keys)
+                {
+                    if (string.Equals(lang, _provider.Language, StringComparison.OrdinalIgnoreCase)
+                        || !installed.Contains(lang))
+                        continue;
+                    var langSt       = _provider.GetStringTablePath(file, lang);
+                    var backupLangSt = Path.Combine(tempDir, $"{convName}.{lang}.stringtable.bak");
+                    if (File.Exists(langSt)) File.Copy(langSt, backupLangSt);
+                    else backupLangSt = string.Empty;
+                    restoreEntries.Add(new PendingRestoreEntry(
+                        string.Empty, backupLangSt, string.Empty, langSt));
+                }
             }
 
             // Persist restore info before writing game files (crash safety)
@@ -1431,6 +1451,10 @@ public partial class MainWindowViewModel : ObservableObject
                 var baseSnap     = ConversationSnapshotBuilder.Build(conversation);
                 var merged       = PatchApplier.Apply(baseSnap, patch, ignoreConflicts);
                 _provider.SaveConversation(file, merged);
+                // The bundle/XML above only carries structure — node text lives in the
+                // per-language stringtables. Without this, added or edited lines are
+                // invisible in-game (B-005). Mirrors the dialog-patcher CLI.
+                TranslationApplier.WriteTranslations(file, patch, _provider);
             }
 
             AppLog.Info($"Test: applied {_project.Patches.Count} patch(es) from project '{_project.Name}'");
@@ -1481,6 +1505,9 @@ public partial class MainWindowViewModel : ObservableObject
             if (!string.IsNullOrEmpty(r.BackupStPath) && File.Exists(r.BackupStPath)
                 && !string.IsNullOrEmpty(r.OriginalStPath))
                 File.Copy(r.BackupStPath, r.OriginalStPath, overwrite: true);
+            else if (string.IsNullOrEmpty(r.BackupStPath) && !string.IsNullOrEmpty(r.OriginalStPath)
+                && File.Exists(r.OriginalStPath))
+                File.Delete(r.OriginalStPath); // stringtable created by the patch — remove on restore
         }
     }
 
@@ -1575,6 +1602,9 @@ public partial class MainWindowViewModel : ObservableObject
                 if (!string.IsNullOrEmpty(r.BackupStPath) && File.Exists(r.BackupStPath)
                     && !string.IsNullOrEmpty(r.OriginalStPath))
                     File.Copy(r.BackupStPath, r.OriginalStPath, overwrite: true);
+                else if (string.IsNullOrEmpty(r.BackupStPath) && !string.IsNullOrEmpty(r.OriginalStPath)
+                    && File.Exists(r.OriginalStPath))
+                    File.Delete(r.OriginalStPath); // stringtable created by the patch — remove on restore
             }
 
             foreach (var dir in tempDirsToDelete)

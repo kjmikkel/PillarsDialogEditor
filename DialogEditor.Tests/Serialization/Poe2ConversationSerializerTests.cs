@@ -94,6 +94,22 @@ public class Poe2ConversationSerializerTests
     }
 
     [Fact]
+    public void Serialize_AddsNewNode_KeepsItsOutgoingLinks()
+    {
+        // Regression (B-005): a node added by the editor (absent from the original
+        // JSON) must be written with its outgoing links, or it is a dead end in-game.
+        var links    = new[] { new LinkEditSnapshot(99, 1, 1f, "", false) };
+        var snapshot = new ConversationEditSnapshot([Node(0), Node(1), Node(99, links: links)]);
+
+        var result = Poe2ConversationSerializer.Serialize(TwoNodeJson, snapshot);
+
+        var nodes = Poe2ConversationParser.ParseJson(result);
+        var added = nodes.Single(n => n.NodeId == 99);
+        var link  = Assert.Single(added.Links);
+        Assert.Equal(1, link.ToNodeId);
+    }
+
+    [Fact]
     public void Serialize_RebuildLinks()
     {
         var links = new[] { new LinkEditSnapshot(0, 1, 1f, "ShowOnce", false) };
