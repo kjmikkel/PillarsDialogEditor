@@ -738,6 +738,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Status_PatchConflictCancelled">Test cancelled — conflict on node {0} field '{1}'.</sys:String>
     <!-- {0} = conversation name, {1} = error message -->
     <sys:String x:Key="Status_TestApplyError">Test apply failed for {0}: {1}</sys:String>
+    <!-- {0} = conversation name. Shown when a saved patch no longer matches the game files (e.g. after a game update) and was force-applied for display. -->
+    <sys:String x:Key="Status_PatchBaselineMismatch">The game files for {0} have changed since this patch was saved — your edits are shown, but review them before testing (F5 will report the exact conflicts).</sys:String>
 
     <!-- ─── Conflict resolution dialog ──────────────────────────────────── -->
     <sys:String x:Key="ConflictDialog_Title">Patch Conflict</sys:String>
