@@ -120,6 +120,63 @@ public class ConversationViewModelEditTests
         Assert.Equal(2, node1Snap.Links[0].ToNodeId);
     }
 
+    // ── Load with explicit diff baseline ──────────────────────────────────
+
+    [Fact]
+    public void Load_WithExplicitBaseline_UsesItAsBaseSnapshot()
+    {
+        var vm   = MakeVm();
+        var node = new ConversationNode(1, false, SpeakerCategory.Npc, "", "", [],
+            [], [], "Conversation", "None");
+        var vanillaBaseline = new DialogEditor.Core.Editing.ConversationEditSnapshot([]);
+
+        vm.Load(new Conversation("test", [node], StringTable.Empty), vanillaBaseline);
+
+        Assert.Same(vanillaBaseline, vm.BaseSnapshot);
+    }
+
+    [Fact]
+    public void Load_WithoutBaseline_SnapshotsLoadedState()
+    {
+        var vm   = MakeVm();
+        var node = new ConversationNode(1, false, SpeakerCategory.Npc, "", "", [],
+            [], [], "Conversation", "None");
+
+        vm.Load(new Conversation("test", [node], StringTable.Empty));
+
+        Assert.NotNull(vm.BaseSnapshot);
+        Assert.Single(vm.BaseSnapshot!.Nodes);
+    }
+
+    // ── Dirty tracking on node field edits ────────────────────────────────
+
+    [Fact]
+    public void EditingNodeText_OnLoadedConversation_SetsIsModified()
+    {
+        var vm   = MakeVm();
+        var node = new ConversationNode(1, false, SpeakerCategory.Npc, "", "", [],
+            [], [], "Conversation", "None");
+        vm.Load(new Conversation("test", [node], StringTable.Empty));
+        Assert.False(vm.IsModified);
+
+        vm.Nodes[0].DefaultText = "changed line";
+
+        Assert.True(vm.IsModified);
+    }
+
+    [Fact]
+    public void EditingNodeSpeakerGuid_OnLoadedConversation_SetsIsModified()
+    {
+        var vm   = MakeVm();
+        var node = new ConversationNode(1, false, SpeakerCategory.Npc, "", "", [],
+            [], [], "Conversation", "None");
+        vm.Load(new Conversation("test", [node], StringTable.Empty));
+
+        vm.Nodes[0].SpeakerGuid = "new-guid";
+
+        Assert.True(vm.IsModified);
+    }
+
     // ── NodeComments ──────────────────────────────────────────────────────
 
     [Fact]

@@ -786,7 +786,11 @@ public partial class MainWindowViewModel : ObservableObject
             var translations = existingPatch.Translations
                 .GetValueOrDefault(_provider?.Language ?? "en");
             var restored     = ConversationSnapshotBuilder.ToConversation(file.Name, appliedSnap, translations);
-            Canvas.Load(restored);
+            // Baseline must stay the *empty* snapshot: SaveProject re-diffs baseline →
+            // canvas, and F5 applies the result to a blank template. A patched baseline
+            // would shrink the saved patch to this session's delta, dropping the nodes
+            // created in earlier sessions.
+            Canvas.Load(restored, baseSnap);
         }
         else
         {
@@ -825,6 +829,22 @@ public partial class MainWindowViewModel : ObservableObject
             {
                 var patch  = DiffEngine.Diff(_currentFile.Name, Canvas.BaseSnapshot, Canvas.BuildSnapshot(), _provider!.Language);
                 patch = patch with { NodeComments = Canvas.NodeComments };
+
+                // WithPatch replaces the stored patch wholesale, but the diff only knows
+                // the canvas language — carry over imported translations for every other
+                // language, or they would be silently erased on each save. The current
+                // language always takes the freshly diffed value (including "no entry"
+                // when the text was reverted to vanilla).
+                if (_project.Patches.TryGetValue(_currentFile.Name, out var prior)
+                    && prior.Translations.Count > 0)
+                {
+                    var mergedTranslations =
+                        new Dictionary<string, IReadOnlyList<NodeTranslation>>(prior.Translations);
+                    mergedTranslations.Remove(_provider.Language);
+                    foreach (var (lang, entries) in patch.Translations)
+                        mergedTranslations[lang] = entries;
+                    patch = patch with { Translations = mergedTranslations };
+                }
                 var layout      = Canvas.GetCurrentLayout();
                 var annotations = Canvas.GetCurrentAnnotations();
                 SetProject(_project!.WithPatch(patch).WithLayout(_currentFile.Name, layout)
@@ -1616,7 +1636,38 @@ public partial class MainWindowViewModel : ObservableObject
         {
             _currentFile = file;
             var conversation = _provider.LoadConversation(file);
-            Canvas.Load(conversation);
+
+            // Reapply this conversation's saved patch so the canvas shows the user's
+            // edits, not the vanilla game file. BaseSnapshot must stay the *vanilla*
+            // state: SaveProject re-diffs BaseSnapshot → canvas and replaces the stored
+            // patch wholesale, so a patched baseline would silently erase every edit
+            // made in earlier sessions (and F5 applies patches against vanilla).
+            if (_project?.Patches.TryGetValue(file.Name, out var storedPatch) == true)
+            {
+                var vanillaSnap = ConversationSnapshotBuilder.Build(conversation);
+                ConversationEditSnapshot patchedSnap;
+                try
+                {
+                    patchedSnap = PatchApplier.Apply(vanillaSnap, storedPatch);
+                }
+                catch (PatchConflictException conflict)
+                {
+                    // Game file changed underneath the patch (e.g. a game update).
+                    // Still show the user's edits — force-apply for display and surface
+                    // the mismatch; F5 keeps its strict conflict flow for real writes.
+                    AppLog.Warn($"Patch for '{file.Name}' no longer matches game data " +
+                        $"(node {conflict.NodeId}, field '{conflict.FieldName}'); forcing apply for display");
+                    patchedSnap = PatchApplier.Apply(vanillaSnap, storedPatch, ignoreConflicts: true);
+                    StatusText = Loc.Format("Status_PatchBaselineMismatch", file.Name);
+                }
+                var translations = storedPatch.Translations.GetValueOrDefault(_provider.Language);
+                var patched = ConversationSnapshotBuilder.ToConversation(file.Name, patchedSnap, translations);
+                Canvas.Load(patched, vanillaSnap);
+            }
+            else
+            {
+                Canvas.Load(conversation);
+            }
 
             // Restore saved layout if the project has positions for this conversation.
             // Runs after AutoLayout so it always wins over the algorithmic positions.

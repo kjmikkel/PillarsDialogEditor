@@ -47,6 +47,9 @@ public partial class ConversationViewModel : ObservableObject
     {
         _dispatcher       = dispatcher;
         PendingConnection = new PendingConnectionViewModel(this);
+        // Node field edits from the detail pane reach the stack via NodeViewModel.Push
+        // without passing through any canvas method, so dirty-flag centrally here.
+        _undoStack.CommandExecuted += () => IsModified = true;
         LocaleService.Current.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(LocaleService.Revision))
@@ -290,7 +293,14 @@ public partial class ConversationViewModel : ObservableObject
     /// Name of the currently loaded conversation; used to key per-node git attribution.
     public string ConversationName { get; private set; } = "";
 
-    public void Load(Conversation conversation)
+    /// <param name="baseSnapshot">
+    /// Optional explicit diff baseline. When the canvas displays a *patched* state
+    /// (project edits applied on top of the vanilla game file), the baseline must be
+    /// the vanilla snapshot — not the displayed state — so SaveProject's re-diff
+    /// reproduces the full patch instead of only this session's delta. Null keeps
+    /// the old behaviour: baseline = the loaded state itself.
+    /// </param>
+    public void Load(Conversation conversation, ConversationEditSnapshot? baseSnapshot = null)
     {
         ConversationName = conversation.Name;
         _searchCts?.Cancel();
@@ -339,7 +349,7 @@ public partial class ConversationViewModel : ObservableObject
                 }
             }
         }
-        BaseSnapshot = BuildSnapshot();
+        BaseSnapshot = baseSnapshot ?? BuildSnapshot();
     }
 
     // ── Structural edit methods ───────────────────────────────────────────
