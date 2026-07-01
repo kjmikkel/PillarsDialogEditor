@@ -41,6 +41,18 @@ _None yet._
 
 ## Fixed
 
+### B-004 — Conversation edits lost across save/load cycles (four related defects)
+- **Area:** Project persistence — `MainWindowViewModel` save/load, `ConversationViewModel` dirty tracking
+- **Severity:** blocker (silent data loss)
+- **Repro:**
+  1. Open a project, open a conversation, edit only node text/fields in the detail pane → `Ctrl+S` stays disabled ("unable to save").
+  2. Or: save an edit, reopen the project, click the conversation → canvas shows vanilla game content ("edits not restored").
+  3. Then make any new edit and save → the previously saved edits are silently erased from the `.dialogproject` file.
+- **Expected:** Detail-pane edits enable Save Project; reopening a patched conversation shows the saved edits; saving never discards earlier sessions' work.
+- **Actual:** Four root causes: (1) detail-pane field edits never set `Canvas.IsModified`, so `CanSaveProject()` stayed false; (2) `LoadConversationFile` never applied the stored patch — canvas showed vanilla; (3) with a vanilla canvas, the next save re-diffed vanilla→current and `WithPatch` replaced the stored patch, erasing prior edits (same class: `LoadNewConversation` used the patched state as diff baseline, dropping created nodes on re-save); (4) `SaveProject` rebuilt `Translations` for the canvas language only, erasing imported translations for other languages.
+- **Notes:** Core invariant: stored patches are always *vanilla → edited* (F5 applies them against vanilla), so the canvas may display the patched state but `BaseSnapshot` must stay vanilla/empty.
+- **Fixed:** `7c0f3de` — `UndoRedoStack.CommandExecuted` now dirty-flags the canvas; `Canvas.Load` gained an explicit-baseline overload; `LoadConversationFile` applies the stored patch (force-apply + `Status_PatchBaselineMismatch` warning if the game files changed); `LoadNewConversation` diffs against the empty snapshot; `SaveProject` carries over other-language translations. Guarded by `MainWindowViewModelPersistenceTests` and new `ConversationViewModelEditTests` cases.
+
 ### B-003 — Default localization format in Settings doesn't persist/display
 - **Area:** Settings window — "Default localization format" picker (`SettingsWindow.axaml`)
 - **Severity:** minor
