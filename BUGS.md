@@ -41,6 +41,17 @@ _None yet._
 
 ## Fixed
 
+### B-005 — Added node is invisible and a dead end in-game (PoE2)
+- **Area:** Test Patch (F5/F6) — `MainWindowViewModel.DoTestPatch`; `Poe1ConversationSerializer` / `Poe2ConversationSerializer`
+- **Severity:** blocker
+- **Repro:**
+  1. Add a node to an existing PoE2 conversation, give it text, link it onward to another node.
+  2. Save, press `F5`, trigger the node in-game.
+- **Expected:** The node shows its text and continues to the linked node.
+- **Actual:** No text (its stringtable entry was never written — F5 wrote only the conversation bundle; `TranslationApplier` was called by the dialog-patcher CLI but not by the editor), and the conversation dead-ends (both serializers emitted brand-new nodes with an empty `Links` element, dropping outgoing connections — the incoming link survived because it lives on an existing, modified node).
+- **Notes:** Verified against the real project (`MyMod.dialogproject`, node 107 in `21_si_pallid_knight`): the patch JSON contained both the link (107→25) and the text; only the F5 write path lost them.
+- **Fixed:** `21397b3` — `DoTestPatch` now calls `TranslationApplier.WriteTranslations` for every installed language in the patch, backs up each stringtable per language (empty-backup sentinel ⇒ F6 deletes stringtables the patch created), and both serializers build `Links` from the snapshot for new nodes. Guarded by `MainWindowViewModelTestPatchTests` and `Serialize_AddsNewNode_KeepsItsOutgoingLinks` in both serializer test suites.
+
 ### B-004 — Conversation edits lost across save/load cycles (four related defects)
 - **Area:** Project persistence — `MainWindowViewModel` save/load, `ConversationViewModel` dirty tracking
 - **Severity:** blocker (silent data loss)
