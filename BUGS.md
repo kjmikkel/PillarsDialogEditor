@@ -41,6 +41,16 @@ _None yet._
 
 ## Fixed
 
+### B-006 — Validate Voice-Over reports imported VO as missing
+- **Area:** Test › Validate Voice-Over — `VoValidationViewModel`
+- **Severity:** minor (false positive; no data loss)
+- **Repro:**
+  1. Import a VO for a node (file lands in the project's `_vo/` folder), F5, F6.
+  2. Run **Test › Validate Voice-Over**.
+- **Expected:** The node's VO counts as present — it plays in the editor and is re-synced to the game on every F5.
+- **Actual:** Reported missing. The scan checked only the game's Voices folder, and F6 removes the synced copy; the detail pane's `_vo/` fallback was never applied in the scan.
+- **Fixed:** `32efaee` — extracted the fallback into `VoPathResolver.WithLocalVoFallback` and applied it in both the detail pane and the validation scan (`projectPath` now passed to `VoValidationViewModel`). Guarded by `RunAsync_FileOnlyInProjectVoFolder_NotReportedMissing`.
+
 ### B-005 — Added node is invisible and a dead end in-game (PoE2)
 - **Area:** Test Patch (F5/F6) — `MainWindowViewModel.DoTestPatch`; `Poe1ConversationSerializer` / `Poe2ConversationSerializer`
 - **Severity:** blocker
