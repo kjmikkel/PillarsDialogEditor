@@ -49,31 +49,10 @@ public static class VoPathResolver
         var voRoot = Path.Combine(gameRoot,
             "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
 
-        string basePath;
-        if (!string.IsNullOrEmpty(externalVO))
-        {
-            // ExternalVO ships with '/' separators; Path.Combine normalises on Windows.
-            // Example: "eder/00_cv_test_0153" → "<voRoot>\eder\00_cv_test_0153"
-            basePath = Path.Combine(voRoot, externalVO);
-        }
-        else
-        {
-            // Resolve the chatter prefix: Narrator is hardcoded; all others come from
-            // ChatterPrefixService (loaded from speakers.gamedatabundle).
-            var chatterPrefix = string.Equals(speakerGuid, NarratorGuid,
-                                    StringComparison.OrdinalIgnoreCase)
-                                ? "narrator"
-                                : ChatterPrefixService.GetPrefix(speakerGuid);
-
-            if (string.IsNullOrEmpty(chatterPrefix))
-                return new VoCheckResult(VoPresence.Missing, false, null, null);
-
-            // Conversation name is lowercased to match the VO pipeline file naming.
-            // Node ID is zero-padded to four digits.
-            basePath = Path.Combine(voRoot,
-                chatterPrefix.ToLowerInvariant(),
-                $"{conversationName.ToLowerInvariant()}_{nodeId:0000}");
-        }
+        var relBase = ExpectedRelativePath(speakerGuid, externalVO, nodeId, conversationName);
+        if (relBase is null)
+            return new VoCheckResult(VoPresence.Missing, false, null, null);
+        var basePath = Path.Combine(voRoot, relBase);
 
         var primary   = basePath + ".wem";
         var fem       = basePath + "_fem.wem";
@@ -83,6 +62,29 @@ public static class VoPathResolver
             femExists,
             primary,            // always set when speaker is known; file may or may not exist
             femExists ? fem : null);
+    }
+
+    /// <summary>
+    /// Canonical _vo/-relative base path (no extension) for a node's VO:
+    /// <c>ExternalVO</c> verbatim when set, otherwise
+    /// <c>&lt;chatterPrefix&gt;/&lt;conversation&gt;_&lt;nodeId:0000&gt;</c>.
+    /// Null when the speaker prefix is unknown and no ExternalVO is set.
+    /// </summary>
+    public static string? ExpectedRelativePath(
+        string speakerGuid, string externalVO, int nodeId, string conversationName)
+    {
+        if (!string.IsNullOrEmpty(externalVO))
+            return Path.Combine(externalVO.Split('/', '\\'));
+
+        var chatterPrefix = string.Equals(speakerGuid, NarratorGuid,
+                                StringComparison.OrdinalIgnoreCase)
+                            ? "narrator"
+                            : ChatterPrefixService.GetPrefix(speakerGuid);
+        if (string.IsNullOrEmpty(chatterPrefix)) return null;
+
+        return Path.Combine(
+            chatterPrefix.ToLowerInvariant(),
+            $"{conversationName.ToLowerInvariant()}_{nodeId:0000}");
     }
 
     /// <summary>
