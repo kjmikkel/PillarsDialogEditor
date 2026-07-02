@@ -178,4 +178,78 @@ public class VoValidationViewModelTests : IDisposable
 
         Assert.Empty(vm.Results);
     }
+
+    // ── Orphan scan + cleanup ─────────────────────────────────────────────
+
+    private (VoValidationViewModel Vm, string VoDir, string OrphanPath) MakeVmWithOrphan()
+    {
+        var voDir  = Path.Combine(_gameRoot, "proj", "_vo");
+        var subDir = Path.Combine(voDir, "eder");
+        Directory.CreateDirectory(subDir);
+        var orphan = Path.Combine(subDir, "conv_0042.wem");
+        File.WriteAllText(orphan, "");
+
+        var vm = new VoValidationViewModel([], "test_conv", _gameRoot, "poe2")
+        {
+            VoRootPath    = voDir,
+            OrphanScanner = _ => Directory.Exists(voDir)
+                ? Directory.EnumerateFiles(voDir, "*.wem", SearchOption.AllDirectories).ToList()
+                : [],
+        };
+        return (vm, voDir, orphan);
+    }
+
+    [Fact]
+    public async Task RunAsync_OrphanScannerResults_PopulateOrphanResults()
+    {
+        var (vm, _, orphan) = MakeVmWithOrphan();
+
+        await vm.RunAsync();
+
+        var issue = Assert.Single(vm.OrphanResults);
+        Assert.Equal(orphan, issue.FullPath);
+        Assert.Equal(Path.Combine("eder", "conv_0042.wem"), issue.RelativePath);
+        Assert.True(vm.HasOrphans);
+    }
+
+    [Fact]
+    public async Task CleanUp_FirstClickArms_DoesNotDelete()
+    {
+        var (vm, _, orphan) = MakeVmWithOrphan();
+        await vm.RunAsync();
+
+        vm.CleanUpCommand.Execute(null);
+
+        Assert.True(vm.IsCleanUpArmed);
+        Assert.True(File.Exists(orphan));
+    }
+
+    [Fact]
+    public async Task ConfirmCleanUp_DeletesOrphansAndPrunesEmptyDirs()
+    {
+        var (vm, voDir, orphan) = MakeVmWithOrphan();
+        await vm.RunAsync();
+        vm.CleanUpCommand.Execute(null);
+
+        vm.ConfirmCleanUpCommand.Execute(null);
+
+        Assert.False(File.Exists(orphan));
+        Assert.False(Directory.Exists(Path.Combine(voDir, "eder")));  // pruned
+        Assert.True(Directory.Exists(voDir));                          // root stays
+        Assert.False(vm.IsCleanUpArmed);
+        Assert.Empty(vm.OrphanResults);
+    }
+
+    [Fact]
+    public async Task CancelCleanUp_DisarmsWithoutDeleting()
+    {
+        var (vm, _, orphan) = MakeVmWithOrphan();
+        await vm.RunAsync();
+        vm.CleanUpCommand.Execute(null);
+
+        vm.CancelCleanUpCommand.Execute(null);
+
+        Assert.False(vm.IsCleanUpArmed);
+        Assert.True(File.Exists(orphan));
+    }
 }
