@@ -109,7 +109,7 @@ public class NodeDetailViewModelPlaybackTests : IDisposable
     {
         PlantAndLoad();
         _vm.PlayPrimaryCommand.Execute(null);
-        Assert.Equal("■", _vm.PlayPrimaryGlyph);
+        Assert.Equal("■ VoPlay_MaleLetter", _vm.PlayPrimaryLabel);
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public class NodeDetailViewModelPlaybackTests : IDisposable
         _vm.PlayPrimaryCommand.Execute(null); // start
         _vm.PlayPrimaryCommand.Execute(null); // toggle off
         Assert.False(_vm.IsPlayingPrimary);
-        Assert.Equal("▶", _vm.PlayPrimaryGlyph);
+        Assert.Equal("▶ VoPlay_MaleLetter", _vm.PlayPrimaryLabel);
         Assert.Equal(1, _stub.PlayCallCount); // only played once
     }
 
@@ -185,6 +185,36 @@ public class NodeDetailViewModelPlaybackTests : IDisposable
         Assert.Equal(1, _stub.PlayCallCount);
     }
 
+    // ── Variant letter labels (2026-07-02 spec) ──────────────────────────
+    // The two play buttons are otherwise identical; each face carries a
+    // localised variant letter so users can tell primary (M) from female (F).
+
+    [Fact]
+    public void PlayPrimaryLabel_Idle_ShowsPlayGlyphWithMaleLetter()
+    {
+        PlantAndLoad(withFem: true);
+        Assert.Equal("▶ VoPlay_MaleLetter", _vm.PlayPrimaryLabel);
+        Assert.Equal("▶ VoPlay_FemaleLetter", _vm.PlayFemLabel);
+    }
+
+    [Fact]
+    public void PlayPrimaryLabel_WhilePlayingPrimary_ShowsStopGlyph_FemUnaffected()
+    {
+        PlantAndLoad(withFem: true);
+        _vm.PlayPrimaryCommand.Execute(null);
+        Assert.Equal("■ VoPlay_MaleLetter", _vm.PlayPrimaryLabel);
+        Assert.Equal("▶ VoPlay_FemaleLetter", _vm.PlayFemLabel);
+    }
+
+    [Fact]
+    public void PlayFemLabel_WhilePlayingFem_ShowsStopGlyph_PrimaryUnaffected()
+    {
+        PlantAndLoad(withFem: true);
+        _vm.PlayFemCommand.Execute(null);
+        Assert.Equal("■ VoPlay_FemaleLetter", _vm.PlayFemLabel);
+        Assert.Equal("▶ VoPlay_MaleLetter", _vm.PlayPrimaryLabel);
+    }
+
     // ── PlaybackStopped (natural end) ────────────────────────────────────
 
     [Fact]
@@ -194,7 +224,7 @@ public class NodeDetailViewModelPlaybackTests : IDisposable
         _vm.PlayPrimaryCommand.Execute(null);
         _stub.FirePlaybackStopped(); // simulate track ending naturally
         Assert.False(_vm.IsPlayingPrimary);
-        Assert.Equal("▶", _vm.PlayPrimaryGlyph);
+        Assert.Equal("▶ VoPlay_MaleLetter", _vm.PlayPrimaryLabel);
     }
 
     [Fact]
@@ -204,7 +234,7 @@ public class NodeDetailViewModelPlaybackTests : IDisposable
         _vm.PlayFemCommand.Execute(null);
         _stub.FirePlaybackStopped();
         Assert.False(_vm.IsPlayingFem);
-        Assert.Equal("▶", _vm.PlayFemGlyph);
+        Assert.Equal("▶ VoPlay_FemaleLetter", _vm.PlayFemLabel);
     }
 
     // ── Node navigation stops playback ───────────────────────────────────
