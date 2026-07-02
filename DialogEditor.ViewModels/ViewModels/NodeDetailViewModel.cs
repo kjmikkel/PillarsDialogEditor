@@ -285,8 +285,10 @@ public partial class NodeDetailViewModel : ObservableObject
         else
         {
             if (_voCheck?.PrimaryWemPath is null || !_player.IsAvailable) return;
+            // LocalPrimaryWemPath is only set when the game copy is absent and the
+            // project's _vo/ staging copy exists — play the file that is really there.
             _player.Stop();
-            _player.Play(_voCheck.PrimaryWemPath);
+            _player.Play(_voCheck.LocalPrimaryWemPath ?? _voCheck.PrimaryWemPath);
             SetPlaying(Playing.Primary);
         }
     }

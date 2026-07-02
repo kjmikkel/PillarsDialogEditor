@@ -123,6 +123,34 @@ public class NodeDetailViewModelPlaybackTests : IDisposable
         Assert.Equal(1, _stub.PlayCallCount); // only played once
     }
 
+    [Fact]
+    public void PlayPrimaryCommand_FileOnlyInProjectVoFolder_PlaysLocalCopy()
+    {
+        // After F6 the synced game copy is gone; the VO lives in the project's
+        // _vo/ folder. The status row shows ✓ via the fallback — the play button
+        // must target the file that actually exists, not the removed game copy.
+        var projectDir = Path.Combine(_gameRoot, "proj");
+        var localDir   = Path.Combine(projectDir, "_vo", "eder");
+        Directory.CreateDirectory(localDir);
+        var localWem = Path.Combine(localDir, "testline_0001.wem");
+        File.WriteAllText(localWem, "");
+        _vm.ProjectPath = Path.Combine(projectDir, "test.dialogproject");
+
+        // Load the node without planting the game copy.
+        var node = new ConversationNode(
+            NodeId: 1, IsPlayerChoice: false, SpeakerCategory: SpeakerCategory.Npc,
+            SpeakerGuid: "", ListenerGuid: "",
+            Links: [], Conditions: [], Scripts: [],
+            DisplayType: "Conversation", Persistence: "None",
+            ActorDirection: "", Comments: "",
+            ExternalVO: "eder/testline_0001", HasVO: false, HideSpeaker: false);
+        _vm.Load(new NodeViewModel(node, new StringEntry(1, "Test line", "")));
+
+        Assert.True(_vm.CanPlayAudio);
+        _vm.PlayPrimaryCommand.Execute(null);
+        Assert.Equal(localWem, _stub.LastPlayPath);
+    }
+
     // ── PlayFemCommand ────────────────────────────────────────────────────
 
     [Fact]

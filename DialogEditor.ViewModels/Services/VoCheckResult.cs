@@ -34,4 +34,14 @@ public record VoCheckResult(
     VoPresence Status,
     bool       FemaleVariantFound,
     string?    PrimaryWemPath,
-    string?    FemWemPath);
+    string?    FemWemPath)
+{
+    /// <summary>
+    /// Path to the copy staged in the project's <c>_vo/</c> folder, set only when the
+    /// game copy is absent and <see cref="VoPathResolver.WithLocalVoFallback"/> found
+    /// the file there. Playback should prefer this over <see cref="PrimaryWemPath"/>,
+    /// which stays the canonical game path (import/batch code derives destination
+    /// paths from it and must not receive a project-relative path).
+    /// </summary>
+    public string? LocalPrimaryWemPath { get; init; }
+}
