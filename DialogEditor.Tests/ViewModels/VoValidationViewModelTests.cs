@@ -252,4 +252,52 @@ public class VoValidationViewModelTests : IDisposable
         Assert.False(vm.IsCleanUpArmed);
         Assert.True(File.Exists(orphan));
     }
+
+    [Fact]
+    public async Task RunAsync_CancelledScan_KeepsPriorOrphanResults()
+    {
+        var (vm, _, orphan) = MakeVmWithOrphan();
+        await vm.RunAsync();
+        Assert.Single(vm.OrphanResults);
+
+        // Second run: the scanner triggers a real cancellation via CancelCommand
+        // (the same mechanism the UI's Cancel button uses) and then observes it
+        // through the token, exactly like a real long-running scanner would.
+        vm.OrphanScanner = ct =>
+        {
+            vm.CancelCommand.Execute(null);
+            ct.ThrowIfCancellationRequested();
+            return [];
+        };
+
+        await vm.RunAsync();
+
+        // A cancelled scan must not wipe out orphan results collected by a
+        // previous completed run.
+        Assert.Single(vm.OrphanResults);
+    }
+
+    [Fact]
+    public async Task ConfirmCleanUp_PartialFailure_SetsCleanUpPartialSummary()
+    {
+        var (vm, _, orphan) = MakeVmWithOrphan();
+        await vm.RunAsync();
+        vm.CleanUpCommand.Execute(null);
+
+        var summaries = new List<string>();
+        vm.PropertyChanged += (_, e) =>
+        {
+            if (e.PropertyName == nameof(vm.SummaryText))
+                summaries.Add(vm.SummaryText);
+        };
+
+        // Hold the orphan file open with no sharing so File.Delete fails inside
+        // ExecuteCleanUp, exercising the partial-failure summary branch.
+        using (File.Open(orphan, FileMode.Open, FileAccess.Read, FileShare.None))
+        {
+            vm.ConfirmCleanUpCommand.Execute(null);
+        }
+
+        Assert.Contains(summaries, s => s.Contains("VoValidation_CleanUpPartial"));
+    }
 }
