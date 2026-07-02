@@ -267,8 +267,12 @@ public partial class NodeDetailViewModel : ObservableObject
     public bool CanPlayAudio     => _player.IsAvailable && VoStatusIsFound;
     public bool CanPlayFem       => CanPlayAudio && (_voCheck?.FemaleVariantFound ?? false);
 
-    public string PlayPrimaryGlyph   => _currentlyPlaying == Playing.Primary ? "■" : "▶";
-    public string PlayFemGlyph       => _currentlyPlaying == Playing.Female  ? "■" : "▶";
+    // Button faces carry a localised variant letter (M/F) because the two play
+    // buttons sit side by side and are otherwise identical (2026-07-02 spec).
+    public string PlayPrimaryLabel => (_currentlyPlaying == Playing.Primary ? "■ " : "▶ ")
+                                      + Loc.Get("VoPlay_MaleLetter");
+    public string PlayFemLabel     => (_currentlyPlaying == Playing.Female  ? "■ " : "▶ ")
+                                      + Loc.Get("VoPlay_FemaleLetter");
     public string PlayPrimaryTooltip => _currentlyPlaying == Playing.Primary
         ? Loc.Get("ToolTip_StopVO") : Loc.Get("ToolTip_PlayVO");
     public string PlayFemTooltip => _currentlyPlaying == Playing.Female
@@ -315,8 +319,8 @@ public partial class NodeDetailViewModel : ObservableObject
         _currentlyPlaying = p;
         OnPropertyChanged(nameof(IsPlayingPrimary));
         OnPropertyChanged(nameof(IsPlayingFem));
-        OnPropertyChanged(nameof(PlayPrimaryGlyph));
-        OnPropertyChanged(nameof(PlayFemGlyph));
+        OnPropertyChanged(nameof(PlayPrimaryLabel));
+        OnPropertyChanged(nameof(PlayFemLabel));
         OnPropertyChanged(nameof(PlayPrimaryTooltip));
         OnPropertyChanged(nameof(PlayFemTooltip));
     }

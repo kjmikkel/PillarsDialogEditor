@@ -1190,6 +1190,9 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="VoImport_NoCurrentFile">—</sys:String>
     <sys:String x:Key="AutomationName_VoImportClear_Primary">Clear chosen primary file</sys:String>
     <sys:String x:Key="AutomationName_VoImportClear_Fem">Clear chosen female file</sys:String>
+    <!-- Variant letters shown inside the detail-panel play buttons (▶ M / ▶ F) -->
+    <sys:String x:Key="VoPlay_MaleLetter">M</sys:String>
+    <sys:String x:Key="VoPlay_FemaleLetter">F</sys:String>
 
     <!-- ── Batch VO import dialog ──────────────────────────────────────── -->
     <!-- {0} = conversation name -->
