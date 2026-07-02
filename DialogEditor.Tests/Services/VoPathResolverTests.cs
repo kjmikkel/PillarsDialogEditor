@@ -311,4 +311,29 @@ public class VoPathResolverTests : IDisposable
         Assert.EndsWith("00_cv_test_0153.wem", result.PrimaryWemPath!,
             StringComparison.OrdinalIgnoreCase);
     }
+
+    // ── ExpectedRelativePath — canonical _vo/-relative naming ─────────────
+
+    [Fact]
+    public void ExpectedRelativePath_KnownPrefix_BuildsPrefixConvIdPath()
+    {
+        var rel = VoPathResolver.ExpectedRelativePath(
+            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", "", 7, "My_Conv");
+        Assert.Equal(Path.Combine("eder", "my_conv_0007"), rel);
+    }
+
+    [Fact]
+    public void ExpectedRelativePath_ExternalVO_UsedVerbatim()
+    {
+        var rel = VoPathResolver.ExpectedRelativePath(
+            "unknown-guid", "eder/custom_line", 7, "My_Conv");
+        Assert.Equal(Path.Combine("eder", "custom_line"), rel);
+    }
+
+    [Fact]
+    public void ExpectedRelativePath_UnknownPrefixNoExternal_ReturnsNull()
+    {
+        var rel = VoPathResolver.ExpectedRelativePath("unknown-guid", "", 7, "conv");
+        Assert.Null(rel);
+    }
 }
