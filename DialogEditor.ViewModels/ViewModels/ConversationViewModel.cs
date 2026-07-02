@@ -667,7 +667,7 @@ public partial class ConversationViewModel : ObservableObject
         foreach (var node in Nodes)
         {
             var check = VoPathResolver.Check(
-                node.SpeakerGuid, node.HasVO, node.ExternalVO,
+                node.SpeakerGuid, node.HasVO, node.ExternalVO, node.HasFemaleText,
                 node.NodeId, ConversationName, gameRoot, activeGameId);
 
             if (check is null || check.Status == VoPresence.NotApplicable) continue;

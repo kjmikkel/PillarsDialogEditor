@@ -32,6 +32,7 @@ public static class VoPathResolver
         string speakerGuid,
         bool   hasVO,
         string externalVO,
+        bool   hasFemaleText,
         int    nodeId,
         string conversationName,
         string gameRoot,
@@ -56,7 +57,7 @@ public static class VoPathResolver
 
         var primary   = basePath + ".wem";
         var fem       = basePath + "_fem.wem";
-        var femExists = File.Exists(fem);
+        var femExists = hasFemaleText && File.Exists(fem);
         return new VoCheckResult(
             File.Exists(primary) ? VoPresence.Found : VoPresence.Missing,
             femExists,
@@ -96,7 +97,8 @@ public static class VoPathResolver
     public static VoCheckResult WithLocalVoFallback(
         VoCheckResult result,
         string? projectPath,
-        string gameRoot)
+        string gameRoot,
+        bool hasFemaleText)
     {
         if (result.Status != VoPresence.Missing
             || projectPath is null
@@ -111,7 +113,7 @@ public static class VoPathResolver
         if (!File.Exists(localPrimary)) return result;
 
         var localFem  = localPrimary[..^4] + "_fem.wem";
-        var femExists = File.Exists(localFem);
+        var femExists = hasFemaleText && File.Exists(localFem);
         return new VoCheckResult(VoPresence.Found, femExists,
             result.PrimaryWemPath, femExists ? localFem : null)
             { LocalPrimaryWemPath = localPrimary };

@@ -50,7 +50,7 @@ public class NodeDetailViewModelPlaybackTests : IDisposable
             DisplayType: "Conversation", Persistence: "None",
             ActorDirection: "", Comments: "",
             ExternalVO: "eder/testline_0001", HasVO: false, HideSpeaker: false);
-        _vm.Load(new NodeViewModel(node, new StringEntry(1, "Test line", "")));
+        _vm.Load(new NodeViewModel(node, new StringEntry(1, "Test line", withFem ? "Fem line" : "")));
     }
 
     // ── CanPlayAudio / CanPlayFem ─────────────────────────────────────────
