@@ -402,9 +402,23 @@ public partial class MainWindowViewModel : ObservableObject
     {
         if (!CanValidateVO) return null;
         var snapshot = Canvas.BuildSnapshot();
-        return new VoValidationViewModel(
+        var vm = new VoValidationViewModel(
             snapshot.Nodes, Canvas.ConversationName,
             _currentGameDirectory, _activeGameId, _projectPath);
+
+        // Orphan section only makes sense with a saved project (the _vo/ folder
+        // lives next to the project file).
+        if (_project is not null && _provider is not null && _projectPath is not null)
+        {
+            var project     = _project;
+            var provider    = _provider;
+            var projectPath = _projectPath;
+            var convName    = Canvas.ConversationName;
+            vm.VoRootPath    = Path.Combine(Path.GetDirectoryName(projectPath)!, "_vo");
+            vm.OrphanScanner = _ => VoOrphanScanner.FindOrphans(
+                project, provider, projectPath, convName, snapshot);
+        }
+        return vm;
     }
 
     // ── Project — New / Open / Save ───────────────────────────────────────
