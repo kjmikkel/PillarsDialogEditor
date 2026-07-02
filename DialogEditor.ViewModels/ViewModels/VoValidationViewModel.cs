@@ -243,10 +243,21 @@ public partial class VoValidationViewModel : ObservableObject
             foreach (var issue in batch)
                 Results.Add(issue);
 
-            OrphanResults.Clear();
-            foreach (var issue in orphanBatch)
-                OrphanResults.Add(issue);
-            IsCleanUpArmed = false;
+            // Only replace orphan results when the scan actually completed — a
+            // cancelled run's orphanBatch is empty (cancellation happens either
+            // during the node loop, before the orphan scan starts, or mid-scan),
+            // and wiping OrphanResults here would discard a prior completed run's
+            // results for no reason. This mirrors the stated intent that "a
+            // cancelled scan keeps prior results consistent with the existing
+            // pattern" (unlike Results/batch, which reset unconditionally because
+            // Results.Clear() already ran up-front at the start of this method).
+            if (!cancelled)
+            {
+                OrphanResults.Clear();
+                foreach (var issue in orphanBatch)
+                    OrphanResults.Add(issue);
+                IsCleanUpArmed = false;
+            }
 
             _ranAtLeastOnce = true;
             IsRunning   = false;
