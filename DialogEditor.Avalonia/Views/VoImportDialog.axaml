@@ -3,31 +3,81 @@
         x:Class="DialogEditor.Avalonia.Views.VoImportDialog"
         Title="{DynamicResource VoImport_DialogTitle}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Width="480" Height="220"
-        MinWidth="400" MinHeight="200"
+        Width="500"
+        MinWidth="420"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         SizeToContent="Height">
 
     <StackPanel Margin="16">
 
-        <!-- Primary slot -->
-        <Grid ColumnDefinitions="120,*,Auto,Auto,Auto" Margin="0,0,0,8">
+        <!-- ── Current voice-over (shown only when at least one .wem exists in _vo/) ── -->
+        <StackPanel x:Name="CurrentVoSection" IsVisible="False" Margin="0,0,0,12">
+            <TextBlock Text="{DynamicResource VoImport_CurrentSection}"
+                       FontWeight="SemiBold" Margin="0,0,0,6"/>
+
+            <!-- Primary current file -->
+            <Grid ColumnDefinitions="80,*,Auto" Margin="0,0,0,4">
+                <TextBlock Grid.Column="0" Text="{DynamicResource VoImport_PrimaryLabel}"
+                           VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" x:Name="CurrentPrimaryLabel"
+                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                           Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                <Button    Grid.Column="2" x:Name="PlayCurrentPrimaryButton"
+                           Content="▶"
+                           Click="PlayCurrentPrimary_Click"
+                           ToolTip.Tip="{DynamicResource ToolTip_VoCurrentPlay_Primary}"
+                           AutomationProperties.Name="{DynamicResource AutomationName_VoCurrentPlay_Primary}"
+                           AutomationProperties.HelpText="{DynamicResource ToolTip_VoCurrentPlay_Primary}"
+                           Margin="8,0,0,0" Padding="6,2"/>
+            </Grid>
+
+            <!-- Female current file (only when FemDestinationPath is not null AND file exists) -->
+            <Grid ColumnDefinitions="80,*,Auto" x:Name="CurrentFemRow" IsVisible="False">
+                <TextBlock Grid.Column="0" Text="{DynamicResource VoImport_FemaleLabel}"
+                           VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" x:Name="CurrentFemLabel"
+                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                           Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                <Button    Grid.Column="2" x:Name="PlayCurrentFemButton"
+                           Content="▶"
+                           Click="PlayCurrentFem_Click"
+                           IsVisible="False"
+                           ToolTip.Tip="{DynamicResource ToolTip_VoCurrentPlay_Fem}"
+                           AutomationProperties.Name="{DynamicResource AutomationName_VoCurrentPlay_Fem}"
+                           AutomationProperties.HelpText="{DynamicResource ToolTip_VoCurrentPlay_Fem}"
+                           Margin="8,0,0,0" Padding="6,2"/>
+            </Grid>
+
+            <Separator Margin="0,10,0,0"/>
+        </StackPanel>
+
+        <!-- ── Import section ── -->
+        <TextBlock Text="{DynamicResource VoImport_ImportSection}"
+                   FontWeight="SemiBold" Margin="0,0,0,4"/>
+        <TextBlock Text="{DynamicResource VoImport_ImportInstruction}"
+                   FontStyle="Italic"
+                   Foreground="{DynamicResource Brush.Text.Secondary}"
+                   FontSize="{DynamicResource FontSize.Small}"
+                   TextWrapping="Wrap" Margin="0,0,0,10"/>
+
+        <!-- Primary source slot -->
+        <Grid ColumnDefinitions="80,*,Auto,Auto,Auto" Margin="0,0,0,8">
             <TextBlock Grid.Column="0" Text="{DynamicResource VoImport_PrimaryLabel}"
                        VerticalAlignment="Center"/>
-            <TextBlock Grid.Column="1" x:Name="PrimaryLabel"
-                       Text="—" VerticalAlignment="Center"
-                       TextTrimming="CharacterEllipsis"/>
-            <Button    Grid.Column="2" x:Name="PlayPrimaryButton"
+            <TextBlock Grid.Column="1" x:Name="PrimarySourceLabel"
+                       Text="{DynamicResource VoImport_NoFileChosen}"
+                       Foreground="{DynamicResource Brush.Text.Secondary}"
+                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+            <Button    Grid.Column="2" x:Name="PlaySourcePrimaryButton"
                        Content="▶"
-                       Click="PlayPrimary_Click"
+                       Click="PlaySourcePrimary_Click"
                        IsVisible="False"
                        ToolTip.Tip="{DynamicResource ToolTip_VoPreviewPlay_Primary}"
                        AutomationProperties.Name="{DynamicResource AutomationName_VoPreviewPlay_Primary}"
                        AutomationProperties.HelpText="{DynamicResource ToolTip_VoPreviewPlay_Primary}"
                        Margin="8,0,4,0" Padding="6,2"/>
-            <Button    Grid.Column="3" x:Name="BrowsePrimaryButton"
-                       Content="{DynamicResource VoImport_Browse}"
+            <Button    Grid.Column="3" Content="{DynamicResource VoImport_Browse}"
                        Click="BrowsePrimary_Click"
                        ToolTip.Tip="{DynamicResource ToolTip_VoImportBrowse_Primary}"
                        AutomationProperties.HelpText="{DynamicResource ToolTip_VoImportBrowse_Primary}"
@@ -40,23 +90,24 @@
                        AutomationProperties.HelpText="{DynamicResource ToolTip_VoImportClear_Primary}"/>
         </Grid>
 
-        <!-- Female (optional) slot -->
-        <Grid ColumnDefinitions="120,*,Auto,Auto,Auto" Margin="0,0,0,16">
+        <!-- Female source slot (only shown when the node has female text) -->
+        <Grid ColumnDefinitions="80,*,Auto,Auto,Auto" Margin="0,0,0,12"
+              x:Name="FemSourceRow" IsVisible="False">
             <TextBlock Grid.Column="0" Text="{DynamicResource VoImport_FemaleLabel}"
                        VerticalAlignment="Center"/>
-            <TextBlock Grid.Column="1" x:Name="FemLabel"
-                       Text="—" VerticalAlignment="Center"
-                       TextTrimming="CharacterEllipsis"/>
-            <Button    Grid.Column="2" x:Name="PlayFemButton"
+            <TextBlock Grid.Column="1" x:Name="FemSourceLabel"
+                       Text="{DynamicResource VoImport_NoFileChosen}"
+                       Foreground="{DynamicResource Brush.Text.Secondary}"
+                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+            <Button    Grid.Column="2" x:Name="PlaySourceFemButton"
                        Content="▶"
-                       Click="PlayFem_Click"
+                       Click="PlaySourceFem_Click"
                        IsVisible="False"
                        ToolTip.Tip="{DynamicResource ToolTip_VoPreviewPlay_Fem}"
                        AutomationProperties.Name="{DynamicResource AutomationName_VoPreviewPlay_Fem}"
                        AutomationProperties.HelpText="{DynamicResource ToolTip_VoPreviewPlay_Fem}"
                        Margin="8,0,4,0" Padding="6,2"/>
-            <Button    Grid.Column="3" x:Name="BrowseFemButton"
-                       Content="{DynamicResource VoImport_Browse}"
+            <Button    Grid.Column="3" Content="{DynamicResource VoImport_Browse}"
                        Click="BrowseFem_Click"
                        ToolTip.Tip="{DynamicResource ToolTip_VoImportBrowse_Fem}"
                        AutomationProperties.HelpText="{DynamicResource ToolTip_VoImportBrowse_Fem}"
@@ -69,12 +120,12 @@
                        AutomationProperties.HelpText="{DynamicResource ToolTip_VoImportClear_Fem}"/>
         </Grid>
 
-        <!-- Encoding quality (WAV->WEM only; disabled when no .wav is selected) -->
-        <Grid ColumnDefinitions="120,*" Margin="0,0,0,12">
+        <!-- Encoding quality — only visible when a .wav source file is selected -->
+        <Grid ColumnDefinitions="80,*" Margin="0,0,0,12"
+              x:Name="QualityPanel" IsVisible="False">
             <TextBlock Grid.Column="0" Text="{DynamicResource VoImport_QualityLabel}"
                        VerticalAlignment="Center"/>
-            <StackPanel Grid.Column="1" x:Name="QualityPanel"
-                        Orientation="Horizontal" Spacing="16" IsEnabled="False">
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16">
                 <RadioButton x:Name="QualityLow"
                              Content="{DynamicResource VoImport_Quality_Low}"
                              GroupName="WemQuality"
@@ -97,9 +148,7 @@
             </StackPanel>
         </Grid>
 
-        <!-- Wwise warning (only visible when WAV chosen and Wwise absent).
-             Uses Brush.Severity.Warning (Amber.500) — the semantic token for
-             warning-level messages. Brush.Text.Warning does not exist in Tokens.axaml. -->
+        <!-- Wwise warning — only visible when a .wav is selected and Wwise is absent -->
         <StackPanel x:Name="WwiseWarningPanel" IsVisible="False" Margin="0,0,0,12">
             <TextBlock Text="{DynamicResource VoImport_NoWwise}"
                        Foreground="{DynamicResource Brush.Severity.Warning}"
@@ -116,7 +165,8 @@
         <!-- OK / Cancel -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
             <Button Content="Cancel" Click="Cancel_Click"/>
-            <Button x:Name="OkButton" Content="OK"
+            <Button x:Name="OkButton"
+                    Content="{DynamicResource VoImport_ImportButton}"
                     Click="Ok_Click" IsDefault="True" IsEnabled="False"/>
         </StackPanel>
 
