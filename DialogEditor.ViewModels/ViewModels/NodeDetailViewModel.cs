@@ -495,23 +495,8 @@ public partial class NodeDetailViewModel : ObservableObject
 
         // If the game file is absent but a _vo/ local copy exists, treat it as Found.
         // This lets the status row flip to ✓ immediately after import without waiting for F5.
-        if (_voCheck?.Status == VoPresence.Missing
-            && ProjectPath is not null
-            && _voCheck.PrimaryWemPath is not null
-            && !string.IsNullOrEmpty(GameRoot))
-        {
-            var voRoot = Path.Combine(GameRoot,
-                "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
-            var rel          = Path.GetRelativePath(voRoot, _voCheck.PrimaryWemPath);
-            var localPrimary = Path.Combine(Path.GetDirectoryName(ProjectPath)!, "_vo", rel);
-            if (File.Exists(localPrimary))
-            {
-                var localFem  = localPrimary[..^4] + "_fem.wem";
-                var femExists = File.Exists(localFem);
-                _voCheck = new VoCheckResult(VoPresence.Found, femExists,
-                    _voCheck.PrimaryWemPath, femExists ? localFem : null);
-            }
-        }
+        if (_voCheck is not null && !string.IsNullOrEmpty(GameRoot))
+            _voCheck = VoPathResolver.WithLocalVoFallback(_voCheck, ProjectPath, GameRoot);
 
         OnPropertyChanged(nameof(IsVoImportVisible));
         OnPropertyChanged(nameof(CanImportVo));

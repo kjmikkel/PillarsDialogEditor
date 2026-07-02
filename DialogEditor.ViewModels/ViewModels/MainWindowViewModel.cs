@@ -404,7 +404,7 @@ public partial class MainWindowViewModel : ObservableObject
         var snapshot = Canvas.BuildSnapshot();
         return new VoValidationViewModel(
             snapshot.Nodes, Canvas.ConversationName,
-            _currentGameDirectory, _activeGameId);
+            _currentGameDirectory, _activeGameId, _projectPath);
     }
 
     // ── Project — New / Open / Save ───────────────────────────────────────

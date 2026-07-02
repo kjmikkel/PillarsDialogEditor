@@ -150,6 +150,25 @@ public class VoValidationViewModelTests : IDisposable
     }
 
     [Fact]
+    public async Task RunAsync_FileOnlyInProjectVoFolder_NotReportedMissing()
+    {
+        // Regression (B-006): after F6 the synced game copy is gone, but the VO is
+        // still staged in the project's _vo/ folder and will be re-synced on F5 —
+        // validation must treat it as present, matching the detail pane's fallback.
+        var projectDir = Path.Combine(_gameRoot, "proj");
+        Directory.CreateDirectory(Path.Combine(projectDir, "_vo", "eder"));
+        File.WriteAllText(Path.Combine(projectDir, "_vo", "eder", "test_conv_0001.wem"), "");
+        var projectPath = Path.Combine(projectDir, "test.dialogproject");
+
+        var nodes = new[] { MakeNode(1, hasVO: true) };
+        var vm    = new VoValidationViewModel(nodes, "test_conv", _gameRoot, "poe2", projectPath);
+
+        await vm.RunAsync();
+
+        Assert.Empty(vm.Results);
+    }
+
+    [Fact]
     public async Task RunAsync_Poe1GameId_ResultsEmpty()
     {
         var nodes = new[] { MakeNode(1, hasVO: true) };
