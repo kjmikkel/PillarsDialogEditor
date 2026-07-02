@@ -394,9 +394,32 @@ public partial class ConversationViewModel : ObservableObject
         RefreshUndoRedo();
     }
 
+    /// Next free node ID, skipping IDs that still own a _vo/ voice-over file —
+    /// reusing such an ID would silently attach the deleted node's audio to the
+    /// new node (file names are <conversation>_<id:0000>.wem).
+    public int NextNodeId() =>
+        NodeIdAllocator.Next(Nodes.Select(n => n.NodeId), IsNodeIdReservedByVo);
+
+    private bool IsNodeIdReservedByVo(int id)
+    {
+        if (ProjectPath is null || string.IsNullOrEmpty(ConversationName)) return false;
+        var voDir = Path.Combine(Path.GetDirectoryName(ProjectPath)!, "_vo");
+        if (!Directory.Exists(voDir)) return false;
+        var fileName = $"{ConversationName.ToLowerInvariant()}_{id:0000}.wem";
+        try
+        {
+            return Directory.EnumerateFiles(voDir, fileName, SearchOption.AllDirectories).Any();
+        }
+        catch (Exception ex)
+        {
+            AppLog.Warn($"VO reservation check failed for id {id}: {ex.Message}");
+            return false;
+        }
+    }
+
     public void AddConnectedNode(NodeViewModel parent, LayoutPoint position)
     {
-        var newId  = NodeIdAllocator.Next(Nodes.Select(n => n.NodeId));
+        var newId  = NextNodeId();
         var newNode = new NodeViewModel(
             new ConversationNode(newId, false, parent.SpeakerCategory,
                 parent.SpeakerGuid, parent.ListenerGuid, [], [], [],

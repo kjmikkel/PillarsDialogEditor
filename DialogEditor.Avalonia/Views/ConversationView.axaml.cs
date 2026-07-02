@@ -257,7 +257,7 @@ public partial class ConversationView : UserControl
     {
         if (DataContext is not ConversationViewModel vm) return;
 
-        var newId   = NodeIdAllocator.Next(vm.Nodes.Select(n => n.NodeId));
+        var newId   = vm.NextNodeId();
         var newNode = new NodeViewModel(
             new ConversationNode(newId, false, SpeakerCategory.Npc,
                 string.Empty, string.Empty, [], [], [], "Conversation", "None"),
@@ -298,7 +298,7 @@ public partial class ConversationView : UserControl
         var (cx, cy)   = CanvasMath.ScreenToCanvas(screenPos.X, screenPos.Y, zoom, origin.X, origin.Y);
         var canvasPos  = new global::Avalonia.Point(cx, cy);
 
-        var newId  = NodeIdAllocator.Next(vm.Nodes.Select(n => n.NodeId));
+        var newId  = vm.NextNodeId();
         var newNode = new NodeViewModel(
             new ConversationNode(newId, false, SpeakerCategory.Npc,
                 string.Empty, string.Empty, [], [], [], "Conversation", "None"),

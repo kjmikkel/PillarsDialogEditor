@@ -474,4 +474,31 @@ public class ConversationViewModelEditTests
         vm.Undo(); // undoes AddNode(2); AddNode(1) still in history
         Assert.True(vm.IsModified);
     }
+
+    // ── NextNodeId / VO reservation ─────────────────────────────────────────
+
+    [Fact]
+    public void NextNodeId_SkipsIdWithLeftoverVoFile()
+    {
+        var projectDir = Path.Combine(Path.GetTempPath(), $"NidTest_{Guid.NewGuid():N}");
+        var voDir      = Path.Combine(projectDir, "_vo", "eder");
+        Directory.CreateDirectory(voDir);
+        try
+        {
+            var vm   = MakeVm();
+            var node = new ConversationNode(1, false, SpeakerCategory.Npc, "", "", [],
+                [], [], "Conversation", "None");
+            vm.Load(new Conversation("conv", [node], StringTable.Empty));
+            vm.ProjectPath = Path.Combine(projectDir, "p.dialogproject");
+
+            // ID 2 would be next, but a leftover VO file reserves it.
+            File.WriteAllText(Path.Combine(voDir, "conv_0002.wem"), "");
+
+            Assert.Equal(3, vm.NextNodeId());
+        }
+        finally
+        {
+            try { Directory.Delete(projectDir, recursive: true); } catch (Exception) { /* best-effort */ }
+        }
+    }
 }
