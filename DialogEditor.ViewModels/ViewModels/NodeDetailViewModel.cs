@@ -218,7 +218,7 @@ public partial class NodeDetailViewModel : ObservableObject
             // Re-evaluate _voCheck inline so PrimaryWemPath is available immediately
             // (NotifyAllProxies will also run via OnNodePropertyChanged, which is fine).
             _voCheck = VoPathResolver.Check(
-                _node.SpeakerGuid, true, _node.ExternalVO, _node.NodeId,
+                _node.SpeakerGuid, true, _node.ExternalVO, _node.HasFemaleText, _node.NodeId,
                 Canvas?.ConversationName ?? "", GameRoot, ActiveGameId);
         }
 
@@ -501,13 +501,14 @@ public partial class NodeDetailViewModel : ObservableObject
 
         _voCheck = _node is null ? null
             : VoPathResolver.Check(
-                _node.SpeakerGuid, _node.HasVO, _node.ExternalVO, _node.NodeId,
+                _node.SpeakerGuid, _node.HasVO, _node.ExternalVO, _node.HasFemaleText, _node.NodeId,
                 Canvas?.ConversationName ?? "", GameRoot, ActiveGameId);
 
         // If the game file is absent but a _vo/ local copy exists, treat it as Found.
         // This lets the status row flip to ✓ immediately after import without waiting for F5.
         if (_voCheck is not null && !string.IsNullOrEmpty(GameRoot))
-            _voCheck = VoPathResolver.WithLocalVoFallback(_voCheck, ProjectPath, GameRoot);
+            _voCheck = VoPathResolver.WithLocalVoFallback(_voCheck, ProjectPath, GameRoot,
+                _node?.HasFemaleText ?? false);
 
         OnPropertyChanged(nameof(IsVoImportVisible));
         OnPropertyChanged(nameof(CanImportVo));

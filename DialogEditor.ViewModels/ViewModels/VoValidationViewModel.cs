@@ -118,8 +118,8 @@ public partial class VoValidationViewModel : ObservableObject
                     token.ThrowIfCancellationRequested();
 
                     var result = VoPathResolver.Check(
-                        node.SpeakerGuid, node.HasVO, node.ExternalVO, node.NodeId,
-                        _conversationName, _gameRoot, _activeGameId);
+                        node.SpeakerGuid, node.HasVO, node.ExternalVO, node.FemaleText.Length > 0,
+                        node.NodeId, _conversationName, _gameRoot, _activeGameId);
 
                     // null  → feature not applicable for this game ID
                     // NotApplicable → node carries no VO information
@@ -128,7 +128,8 @@ public partial class VoValidationViewModel : ObservableObject
 
                     // A file staged in the project's _vo/ folder counts as present —
                     // F6 removes the game copy, but F5 will re-sync it (B-006).
-                    result = VoPathResolver.WithLocalVoFallback(result, _projectPath, _gameRoot);
+                    result = VoPathResolver.WithLocalVoFallback(result, _projectPath, _gameRoot,
+                        node.FemaleText.Length > 0);
 
                     checked_++;
                     if (result.Status == VoPresence.Missing)

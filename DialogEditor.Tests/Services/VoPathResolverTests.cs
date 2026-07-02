@@ -44,10 +44,10 @@ public class VoPathResolverTests : IDisposable
         var projectPath = Path.Combine(projectDir, "test.dialogproject");
 
         var missing = VoPathResolver.Check(
-            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", 1, "conv", _gameRoot, "poe2")!;
+            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", false, 1, "conv", _gameRoot, "poe2")!;
         Assert.Equal(VoPresence.Missing, missing.Status);
 
-        var result = VoPathResolver.WithLocalVoFallback(missing, projectPath, _gameRoot);
+        var result = VoPathResolver.WithLocalVoFallback(missing, projectPath, _gameRoot, false);
 
         Assert.Equal(VoPresence.Found, result.Status);
         Assert.Equal(localWem, result.LocalPrimaryWemPath);
@@ -59,14 +59,14 @@ public class VoPathResolverTests : IDisposable
     [Fact]
     public void Check_Poe1GameId_ReturnsNull()
     {
-        var result = VoPathResolver.Check("any-guid", true, "", 1, "conv", _gameRoot, "poe1");
+        var result = VoPathResolver.Check("any-guid", true, "", false, 1, "conv", _gameRoot, "poe1");
         Assert.Null(result);
     }
 
     [Fact]
     public void Check_EmptyGameRoot_ReturnsNull()
     {
-        var result = VoPathResolver.Check("any-guid", true, "", 1, "conv", "", "poe2");
+        var result = VoPathResolver.Check("any-guid", true, "", false, 1, "conv", "", "poe2");
         Assert.Null(result);
     }
 
@@ -75,7 +75,7 @@ public class VoPathResolverTests : IDisposable
     [Fact]
     public void Check_NoHasVO_NoExternalVO_ReturnsNotApplicable()
     {
-        var result = VoPathResolver.Check("any-guid", false, "", 1, "conv", _gameRoot, "poe2");
+        var result = VoPathResolver.Check("any-guid", false, "", false, 1, "conv", _gameRoot, "poe2");
         Assert.NotNull(result);
         Assert.Equal(VoPresence.NotApplicable, result!.Status);
     }
@@ -85,7 +85,7 @@ public class VoPathResolverTests : IDisposable
     [Fact]
     public void Check_HasVO_UnknownSpeaker_ReturnsMissing()
     {
-        var result = VoPathResolver.Check("unknown-guid", true, "", 1, "conv", _gameRoot, "poe2");
+        var result = VoPathResolver.Check("unknown-guid", true, "", false, 1, "conv", _gameRoot, "poe2");
         Assert.Equal(VoPresence.Missing, result!.Status);
     }
 
@@ -96,7 +96,7 @@ public class VoPathResolverTests : IDisposable
     {
         var narratorGuid = "6a99a109-0000-0000-0000-000000000000";
         // File does not exist — result should be Missing (not null, not NotApplicable)
-        var result = VoPathResolver.Check(narratorGuid, true, "", 5, "test_conv", _gameRoot, "poe2");
+        var result = VoPathResolver.Check(narratorGuid, true, "", false, 5, "test_conv", _gameRoot, "poe2");
         Assert.Equal(VoPresence.Missing, result!.Status);
     }
 
@@ -108,7 +108,7 @@ public class VoPathResolverTests : IDisposable
         Directory.CreateDirectory(dir);
         File.WriteAllText(Path.Combine(dir, "test_conv_0005.wem"), "");
 
-        var result = VoPathResolver.Check(narratorGuid, true, "", 5, "test_conv", _gameRoot, "poe2");
+        var result = VoPathResolver.Check(narratorGuid, true, "", false, 5, "test_conv", _gameRoot, "poe2");
 
         Assert.Equal(VoPresence.Found, result!.Status);
         Assert.False(result.FemaleVariantFound);
@@ -124,7 +124,7 @@ public class VoPathResolverTests : IDisposable
         File.WriteAllText(Path.Combine(dir, "test_conv_0001.wem"), "");
 
         var result = VoPathResolver.Check(
-            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", 1, "test_conv", _gameRoot, "poe2");
+            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", false, 1, "test_conv", _gameRoot, "poe2");
 
         Assert.Equal(VoPresence.Found, result!.Status);
         Assert.False(result.FemaleVariantFound);
@@ -134,7 +134,7 @@ public class VoPathResolverTests : IDisposable
     public void Check_HasVO_KnownSpeaker_FileMissing_ReturnsMissing()
     {
         var result = VoPathResolver.Check(
-            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", 1, "test_conv", _gameRoot, "poe2");
+            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", false, 1, "test_conv", _gameRoot, "poe2");
         Assert.Equal(VoPresence.Missing, result!.Status);
     }
 
@@ -147,7 +147,7 @@ public class VoPathResolverTests : IDisposable
         File.WriteAllText(Path.Combine(dir, "test_conv_0001_fem.wem"), "");
 
         var result = VoPathResolver.Check(
-            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", 1, "test_conv", _gameRoot, "poe2");
+            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", true, 1, "test_conv", _gameRoot, "poe2");
 
         Assert.Equal(VoPresence.Found, result!.Status);
         Assert.True(result.FemaleVariantFound);
@@ -161,7 +161,7 @@ public class VoPathResolverTests : IDisposable
         File.WriteAllText(Path.Combine(dir, "test_conv_0042.wem"), "");
 
         var result = VoPathResolver.Check(
-            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", 42, "test_conv", _gameRoot, "poe2");
+            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", false, 42, "test_conv", _gameRoot, "poe2");
 
         Assert.Equal(VoPresence.Found, result!.Status);
     }
@@ -175,7 +175,7 @@ public class VoPathResolverTests : IDisposable
         File.WriteAllText(Path.Combine(dir, "my_conv_0001.wem"), "");
 
         var result = VoPathResolver.Check(
-            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", 1, "My_Conv", _gameRoot, "poe2");
+            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", false, 1, "My_Conv", _gameRoot, "poe2");
 
         Assert.Equal(VoPresence.Found, result!.Status);
     }
@@ -191,7 +191,7 @@ public class VoPathResolverTests : IDisposable
         File.WriteAllText(Path.Combine(dir, "00_cv_test_0153.wem"), "");
 
         var result = VoPathResolver.Check(
-            "unknown-guid", false, "eder/00_cv_test_0153", 999, "anything", _gameRoot, "poe2");
+            "unknown-guid", false, "eder/00_cv_test_0153", false, 999, "anything", _gameRoot, "poe2");
 
         Assert.Equal(VoPresence.Found, result!.Status);
     }
@@ -200,7 +200,7 @@ public class VoPathResolverTests : IDisposable
     public void Check_ExternalVO_FileAbsent_ReturnsMissing()
     {
         var result = VoPathResolver.Check(
-            "any-guid", false, "eder/00_cv_missing_0001", 1, "conv", _gameRoot, "poe2");
+            "any-guid", false, "eder/00_cv_missing_0001", false, 1, "conv", _gameRoot, "poe2");
         Assert.Equal(VoPresence.Missing, result!.Status);
     }
 
@@ -216,6 +216,7 @@ public class VoPathResolverTests : IDisposable
             "9c5f12c9-e93d-4952-9f1a-726c9498f8fb",
             hasVO: true,
             externalVO: "eder/override_0001",
+            hasFemaleText: false,
             nodeId: 99, conversationName: "conv",
             _gameRoot, "poe2");
 
@@ -232,7 +233,7 @@ public class VoPathResolverTests : IDisposable
         File.WriteAllText(Path.Combine(dir, "test_conv_0001.wem"), "");
 
         var result = VoPathResolver.Check(
-            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", 1, "test_conv", _gameRoot, "poe2");
+            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", false, 1, "test_conv", _gameRoot, "poe2");
 
         Assert.NotNull(result!.PrimaryWemPath);
         Assert.EndsWith("test_conv_0001.wem", result.PrimaryWemPath!,
@@ -247,7 +248,7 @@ public class VoPathResolverTests : IDisposable
         File.WriteAllText(Path.Combine(dir, "test_conv_0001.wem"), "");
 
         var result = VoPathResolver.Check(
-            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", 1, "test_conv", _gameRoot, "poe2");
+            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", false, 1, "test_conv", _gameRoot, "poe2");
 
         Assert.Null(result!.FemWemPath);
     }
@@ -261,7 +262,7 @@ public class VoPathResolverTests : IDisposable
         File.WriteAllText(Path.Combine(dir, "test_conv_0001_fem.wem"), "");
 
         var result = VoPathResolver.Check(
-            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", 1, "test_conv", _gameRoot, "poe2");
+            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", true, 1, "test_conv", _gameRoot, "poe2");
 
         Assert.NotNull(result!.FemWemPath);
         Assert.EndsWith("test_conv_0001_fem.wem", result.FemWemPath!,
@@ -271,7 +272,7 @@ public class VoPathResolverTests : IDisposable
     [Fact]
     public void Check_NotApplicable_BothPathsNull()
     {
-        var result = VoPathResolver.Check("any-guid", false, "", 1, "conv", _gameRoot, "poe2");
+        var result = VoPathResolver.Check("any-guid", false, "", false, 1, "conv", _gameRoot, "poe2");
         Assert.Null(result!.PrimaryWemPath);
         Assert.Null(result.FemWemPath);
     }
@@ -280,7 +281,7 @@ public class VoPathResolverTests : IDisposable
     public void Check_UnknownSpeaker_PrimaryWemPathIsNull()
     {
         // Unknown speaker → we cannot resolve the folder, so the path stays null
-        var result = VoPathResolver.Check("unknown-guid", true, "", 1, "conv", _gameRoot, "poe2");
+        var result = VoPathResolver.Check("unknown-guid", true, "", false, 1, "conv", _gameRoot, "poe2");
         Assert.Null(result!.PrimaryWemPath);
         Assert.Null(result.FemWemPath);
     }
@@ -291,7 +292,7 @@ public class VoPathResolverTests : IDisposable
         // Even when the file doesn't exist, PrimaryWemPath holds the expected location —
         // the player needs it to attempt playback (and fail gracefully).
         var result = VoPathResolver.Check(
-            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", 1, "test_conv", _gameRoot, "poe2");
+            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", false, 1, "test_conv", _gameRoot, "poe2");
 
         Assert.Equal(VoPresence.Missing, result!.Status);
         Assert.NotNull(result.PrimaryWemPath);
@@ -305,7 +306,7 @@ public class VoPathResolverTests : IDisposable
         File.WriteAllText(Path.Combine(dir, "00_cv_test_0153.wem"), "");
 
         var result = VoPathResolver.Check(
-            "unknown-guid", false, "eder/00_cv_test_0153", 999, "anything", _gameRoot, "poe2");
+            "unknown-guid", false, "eder/00_cv_test_0153", false, 999, "anything", _gameRoot, "poe2");
 
         Assert.NotNull(result!.PrimaryWemPath);
         Assert.EndsWith("00_cv_test_0153.wem", result.PrimaryWemPath!,
@@ -313,6 +314,25 @@ public class VoPathResolverTests : IDisposable
     }
 
     // ── ExpectedRelativePath — canonical _vo/-relative naming ─────────────
+
+    [Fact]
+    public void Check_FemFileExistsButNoFemaleText_FemVariantNotReported()
+    {
+        // Regression: a leftover _fem.wem must not be advertised as the node's
+        // female variant when the node has no female text (design 2026-07-02).
+        var dir = Path.Combine(_voRoot, "eder");
+        Directory.CreateDirectory(dir);
+        File.WriteAllText(Path.Combine(dir, "conv_0001.wem"), "");
+        File.WriteAllText(Path.Combine(dir, "conv_0001_fem.wem"), "");
+
+        var result = VoPathResolver.Check(
+            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", hasFemaleText: false,
+            1, "conv", _gameRoot, "poe2")!;
+
+        Assert.Equal(VoPresence.Found, result.Status);
+        Assert.False(result.FemaleVariantFound);
+        Assert.Null(result.FemWemPath);
+    }
 
     [Fact]
     public void ExpectedRelativePath_KnownPrefix_BuildsPrefixConvIdPath()
