@@ -12,7 +12,7 @@
         WindowStartupLocation="CenterOwner"
         x:CompileBindings="False">
 
-    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Margin="14,12,14,12">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto" Margin="14,12,14,12">
 
         <!-- Summary text -->
         <TextBlock Grid.Row="0"
@@ -82,8 +82,60 @@
             </Panel>
         </ScrollViewer>
 
+        <!-- Orphaned _vo/ files + armed cleanup -->
+        <StackPanel Grid.Row="4" IsVisible="{Binding HasOrphans}" Margin="0,0,0,6">
+            <TextBlock Text="{DynamicResource VoValidation_OrphanSection}"
+                       FontWeight="SemiBold"
+                       Foreground="{DynamicResource Brush.Text.Primary}"
+                       Margin="0,4,0,4"/>
+            <ScrollViewer MaxHeight="120">
+                <ItemsControl ItemsSource="{Binding OrphanResults}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="vm:VoOrphanIssue">
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                <TextBlock Grid.Column="0" Text="{Binding RelativePath}"
+                                           Foreground="{DynamicResource Brush.Text.Secondary}"
+                                           FontSize="{DynamicResource FontSize.Label}"
+                                           TextTrimming="CharacterEllipsis"
+                                           VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1"
+                                           Text="{DynamicResource VoValidation_OrphanBadge}"
+                                           Foreground="{DynamicResource Brush.Severity.Warning}"
+                                           FontSize="{DynamicResource FontSize.Small}"
+                                           FontWeight="Bold"
+                                           VerticalAlignment="Center" Margin="8,0,0,0"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+            <Button Content="{DynamicResource Button_CleanUp}"
+                    Command="{Binding CleanUpCommand}"
+                    IsVisible="{Binding IsCleanUpArmed, Converter={StaticResource InverseBoolToVis}}"
+                    ToolTip.Tip="{DynamicResource ToolTip_CleanUp}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_CleanUp}"
+                    Margin="0,6,0,0"/>
+
+            <StackPanel Orientation="Vertical" IsVisible="{Binding IsCleanUpArmed}" Margin="0,6,0,0" Spacing="6">
+                <TextBlock Text="{Binding CleanUpConfirmText}"
+                           Foreground="{DynamicResource Brush.Severity.Warning}"
+                           TextWrapping="Wrap"/>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Content="{DynamicResource Button_ConfirmCleanUp}"
+                            Command="{Binding ConfirmCleanUpCommand}"
+                            ToolTip.Tip="{DynamicResource ToolTip_ConfirmCleanUp}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_ConfirmCleanUp}"/>
+                    <Button Content="{DynamicResource Button_CancelCleanUp}"
+                            Command="{Binding CancelCleanUpCommand}"
+                            ToolTip.Tip="{DynamicResource ToolTip_CancelCleanUp}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_CancelCleanUp}"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+
         <!-- Focus hint bar -->
-        <shared:FocusHintBar Grid.Row="4" x:Name="HintBar"/>
+        <shared:FocusHintBar Grid.Row="5" x:Name="HintBar"/>
 
     </Grid>
 </Window>

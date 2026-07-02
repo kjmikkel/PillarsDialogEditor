@@ -1100,6 +1100,22 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="VoValidation_NodeRow">Node {0}</sys:String>
     <sys:String x:Key="VoValidation_MissingBadge">✗ Missing</sys:String>
 
+    <!-- ── VO validation — orphaned files section ────────────────────────── -->
+    <sys:String x:Key="VoValidation_OrphanSection">Orphaned voice-over files</sys:String>
+    <sys:String x:Key="VoValidation_OrphanBadge">ORPHAN</sys:String>
+    <sys:String x:Key="Button_CleanUp">Clean up…</sys:String>
+    <sys:String x:Key="ToolTip_CleanUp">Delete the orphaned .wem files listed above from the project's _vo folder. They belong to deleted nodes, removed conversations, or female slots whose node no longer has female text. You will be asked to confirm; game files are never touched.</sys:String>
+    <!-- {0} = number of files -->
+    <sys:String x:Key="VoValidation_CleanUpConfirm">Delete {0} orphaned file(s) from the _vo folder? The editor cannot undo this — re-import the source audio to restore a file.</sys:String>
+    <sys:String x:Key="Button_ConfirmCleanUp">Delete files</sys:String>
+    <sys:String x:Key="ToolTip_ConfirmCleanUp">Permanently delete the listed orphaned files from the _vo folder.</sys:String>
+    <sys:String x:Key="Button_CancelCleanUp">Keep files</sys:String>
+    <sys:String x:Key="ToolTip_CancelCleanUp">Close the confirmation without deleting anything.</sys:String>
+    <!-- {0} = files deleted -->
+    <sys:String x:Key="VoValidation_CleanedUp">Deleted {0} orphaned file(s).</sys:String>
+    <!-- {0} = files deleted, {1} = failures -->
+    <sys:String x:Key="VoValidation_CleanUpPartial">Deleted {0} file(s); {1} could not be deleted — see the log.</sys:String>
+
     <!-- ── Voice-Over playback ─────────────────────────────────────────── -->
     <sys:String x:Key="ToolTip_PlayVO">Play primary voice-over track for this node</sys:String>
     <sys:String x:Key="ToolTip_StopVO">Stop playback of the primary voice-over track</sys:String>
