@@ -1,3 +1,5 @@
+using Avalonia.Headless.XUnit;
+using Avalonia.Threading;
 using DialogEditor.Avalonia.Audio;
 
 namespace DialogEditor.Tests.Audio;
@@ -5,17 +7,70 @@ namespace DialogEditor.Tests.Audio;
 public class VoAudioPlayerTests : IDisposable
 {
     private readonly string _wavPath;
+    private readonly string _longWavPath;
 
     public VoAudioPlayerTests()
     {
-        // Write a minimal valid PCM WAV (44-byte RIFF header, 0 audio frames).
-        _wavPath = Path.Combine(Path.GetTempPath(), $"votest_{Guid.NewGuid():N}.wav");
+        // Write a minimal valid PCM WAV (44-byte RIFF header, 0 audio frames)
+        // plus a ~1 s silence WAV for tests that need playback to still be
+        // in progress while something else happens.
+        _wavPath     = Path.Combine(Path.GetTempPath(), $"votest_{Guid.NewGuid():N}.wav");
+        _longWavPath = Path.Combine(Path.GetTempPath(), $"votest_{Guid.NewGuid():N}_long.wav");
         WriteMinimalWav(_wavPath);
+        WriteMinimalWav(_longWavPath, dataBytes: 176_400); // 1 s of 16-bit stereo 44.1 kHz silence
     }
 
     public void Dispose()
     {
         try { File.Delete(_wavPath); } catch { }
+        try { File.Delete(_longWavPath); } catch { }
+    }
+
+    // B-001: a PlaybackStopped notification raised by a superseded output must be
+    // ignored. Sequence: track A finishes naturally → NAudio raises its stopped
+    // event → the handler posts to the UI thread. Before that post runs, the user
+    // starts track B. Processing the stale post used to dispose B's fresh output
+    // and raise a spurious PlaybackStopped (resetting ▶/■ glyphs while B plays).
+    //
+    // [AvaloniaFact] runs on the headless UI thread, so Dispatcher posts queue up
+    // until RunJobs() — making the race deterministic: A's stale post is guaranteed
+    // to execute only AFTER Play(B).
+    [AvaloniaFact]
+    public void StaleStopFromSupersededTrack_DoesNotRaisePlaybackStopped()
+    {
+        using var player = new VoAudioPlayer();
+        var stopped = 0;
+        player.PlaybackStopped += () => stopped++;
+
+        player.Play(_wavPath);          // A: zero frames — finishes ~instantly
+        Thread.Sleep(300);              // let NAudio raise A's stopped event (post queues, we aren't pumping)
+
+        player.Play(_longWavPath);      // B: still playing when the stale post runs
+        Dispatcher.UIThread.RunJobs();  // execute A's stale posted handler
+
+        Assert.Equal(0, stopped);
+    }
+
+    // Companion guard: natural completion of the CURRENT track must still raise
+    // PlaybackStopped exactly once — the stale-event suppression must not
+    // over-suppress the legitimate case.
+    [AvaloniaFact]
+    public void NaturalCompletionOfCurrentTrack_RaisesPlaybackStopped()
+    {
+        using var player = new VoAudioPlayer();
+        var stopped = 0;
+        player.PlaybackStopped += () => stopped++;
+
+        player.Play(_wavPath);          // zero frames — finishes ~instantly
+
+        var deadline = DateTime.UtcNow.AddSeconds(5);
+        while (stopped == 0 && DateTime.UtcNow < deadline)
+        {
+            Dispatcher.UIThread.RunJobs();
+            Thread.Sleep(25);
+        }
+
+        Assert.Equal(1, stopped);
     }
 
     // Before the fix, Play() on a .wav file always attempts to spawn vgmstream-cli.exe.
@@ -46,12 +101,12 @@ public class VoAudioPlayerTests : IDisposable
         Assert.True(completed, "PlaybackStopped did not fire — .wav may still be routed through vgmstream");
     }
 
-    private static void WriteMinimalWav(string path)
+    private static void WriteMinimalWav(string path, int dataBytes = 0)
     {
-        // 44-byte RIFF/PCM header, 0 data bytes, 16-bit stereo 44100 Hz
+        // 44-byte RIFF/PCM header + dataBytes of silence, 16-bit stereo 44100 Hz
         using var fs = File.OpenWrite(path);
         using var w  = new BinaryWriter(fs);
-        w.Write("RIFF"u8); w.Write(36);          // chunk size (header only, 0 data)
+        w.Write("RIFF"u8); w.Write(36 + dataBytes); // chunk size
         w.Write("WAVE"u8);
         w.Write("fmt "u8); w.Write(16);           // subchunk1 size
         w.Write((short)1);                         // PCM
@@ -60,6 +115,8 @@ public class VoAudioPlayerTests : IDisposable
         w.Write(176400);                           // byte rate
         w.Write((short)4);                         // block align
         w.Write((short)16);                        // bits per sample
-        w.Write("data"u8); w.Write(0);             // 0 bytes of audio data
+        w.Write("data"u8); w.Write(dataBytes);     // audio data (silence)
+        if (dataBytes > 0)
+            w.Write(new byte[dataBytes]);
     }
 }

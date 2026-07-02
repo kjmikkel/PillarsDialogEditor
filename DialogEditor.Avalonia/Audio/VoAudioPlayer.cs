@@ -13,7 +13,10 @@ namespace DialogEditor.Avalonia.Audio;
 ///
 /// PlaybackStopped is always raised on the UI thread so NodeDetailViewModel
 /// (which has no Avalonia reference) can call SetPlaying() directly.
-/// Stop() does NOT raise PlaybackStopped — only natural track completion does.
+/// Stop() does NOT raise PlaybackStopped — only natural track completion of the
+/// still-current output does. This is enforced by a sender-identity check in the
+/// stop handler (see OnNaturalPlaybackStopped), not by unsubscription alone,
+/// because NAudio's event can already be in flight when Play/Stop supersedes it.
 /// </summary>
 public sealed class VoAudioPlayer : IVoAudioPlayer, IDisposable
 {
@@ -27,14 +30,12 @@ public sealed class VoAudioPlayer : IVoAudioPlayer, IDisposable
     private WaveOutEvent?   _output;
     private AudioFileReader? _reader;
     private string? _tempFile;
-    private bool _manualStop;
     // Incremented on every Play/Stop to cancel in-flight background work.
     private volatile int _generation;
 
     public void Play(string path)
     {
         StopAndCleanup();        // increments _generation, cleans up previous
-        _manualStop = false;
         var gen = ++_generation; // this play's identity token
 
         if (path.EndsWith(".wav", StringComparison.OrdinalIgnoreCase))
@@ -109,7 +110,8 @@ public sealed class VoAudioPlayer : IVoAudioPlayer, IDisposable
 
     public void Stop()
     {
-        _manualStop = true;
+        // No PlaybackStopped is raised for a manual stop: Cleanup() nulls _output,
+        // so any in-flight stop notification fails the sender-identity check.
         StopAndCleanup();
     }
 
@@ -125,9 +127,17 @@ public sealed class VoAudioPlayer : IVoAudioPlayer, IDisposable
         // NAudio calls this from its own thread; marshal to UI before notifying ViewModel.
         Dispatcher.UIThread.Post(() =>
         {
+            // B-001: only act if this event belongs to the still-current output.
+            // A stale notification — from an output that a newer Play() or Stop()
+            // has already replaced or cleared — must be ignored: processing it
+            // would dispose the NEW playback's resources and raise a spurious
+            // PlaybackStopped, resetting play/stop UI state while audio plays.
+            // (The unsubscribe in Cleanup() cannot prevent this: the event may
+            // already have fired with its UI post still in flight.)
+            if (!ReferenceEquals(sender, _output))
+                return;
             Cleanup();
-            if (!_manualStop)
-                PlaybackStopped?.Invoke();
+            PlaybackStopped?.Invoke();
         });
     }
 
@@ -150,9 +160,5 @@ public sealed class VoAudioPlayer : IVoAudioPlayer, IDisposable
         try { File.Delete(path); } catch (Exception) { /* best-effort; file may still be open */ }
     }
 
-    public void Dispose()
-    {
-        _manualStop = true;
-        StopAndCleanup();
-    }
+    public void Dispose() => StopAndCleanup();
 }
