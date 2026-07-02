@@ -1135,12 +1135,13 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- ── VO import ──────────────────────────────────────────────────────── -->
     <sys:String x:Key="VoImport_DialogTitle">Import Voice-Over</sys:String>
     <sys:String x:Key="VoImport_PrimaryLabel">Primary</sys:String>
-    <sys:String x:Key="VoImport_FemaleLabel">Female (optional)</sys:String>
+    <sys:String x:Key="VoImport_FemaleLabel">Female</sys:String>
     <sys:String x:Key="VoImport_Browse">Browse…</sys:String>
     <sys:String x:Key="VoImport_Clear">✕</sys:String>
     <sys:String x:Key="VoImport_NoWwise">⚠ Wwise not found — WAV files cannot be encoded.</sys:String>
     <sys:String x:Key="VoImport_DownloadWwise">Download Wwise</sys:String>
     <sys:String x:Key="VoImport_UnsavedProject">Save the project first — the _vo/ folder needs a location on disk.</sys:String>
+    <sys:String x:Key="Status_VoImport_NoSpeaker">Set the Speaker field to a known NPC before importing voice-over.</sys:String>
     <sys:String x:Key="ToolTip_VoImport">Import a voice-over file (.wem or .wav) for this node.</sys:String>
     <sys:String x:Key="ToolTip_VoImport_Unsaved">Save the project before importing voice-over files.</sys:String>
     <sys:String x:Key="AutomationName_VoImport">Import voice-over</sys:String>
@@ -1160,6 +1161,15 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="VoImport_Quality_Medium">Medium</sys:String>
     <sys:String x:Key="VoImport_Quality_High">High</sys:String>
     <sys:String x:Key="ToolTip_VoQuality">Encoding quality for WAV files. Low uses less disk space; High preserves more detail. Has no effect on pre-encoded .wem files.</sys:String>
+    <sys:String x:Key="VoImport_CurrentSection">Current voice-over</sys:String>
+    <sys:String x:Key="VoImport_ImportSection">Import voice-over</sys:String>
+    <sys:String x:Key="VoImport_ImportInstruction">Select a .wav file to encode (requires Wwise) or a pre-encoded .wem.</sys:String>
+    <sys:String x:Key="VoImport_NoFileChosen">No file chosen</sys:String>
+    <sys:String x:Key="VoImport_ImportButton">Import</sys:String>
+    <sys:String x:Key="ToolTip_VoCurrentPlay_Primary">Play the existing primary voice-over from _vo/.</sys:String>
+    <sys:String x:Key="ToolTip_VoCurrentPlay_Fem">Play the existing female voice-over from _vo/.</sys:String>
+    <sys:String x:Key="AutomationName_VoCurrentPlay_Primary">Play existing primary voice-over</sys:String>
+    <sys:String x:Key="AutomationName_VoCurrentPlay_Fem">Play existing female voice-over</sys:String>
 
     <!-- ── Batch VO import dialog ──────────────────────────────────────── -->
     <!-- {0} = conversation name -->

@@ -222,14 +222,23 @@ public partial class NodeDetailViewModel : ObservableObject
                 Canvas?.ConversationName ?? "", GameRoot, ActiveGameId);
         }
 
-        if (_voCheck?.PrimaryWemPath is null) return;
+        AppLog.Info($"ImportVo: status={_voCheck?.Status}, path={_voCheck?.PrimaryWemPath ?? "(null)"}, speaker={_node?.SpeakerGuid ?? "(null)"}");
+
+        if (_voCheck?.PrimaryWemPath is null)
+        {
+            AppLog.Warn("ImportVo: PrimaryWemPath is null — speaker GUID not in ChatterPrefixService or empty");
+            ReportStatus?.Invoke(Loc.Get("Status_VoImport_NoSpeaker"));
+            return;
+        }
 
         var voRoot = Path.Combine(GameRoot,
             "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
         var voDir       = Path.Combine(Path.GetDirectoryName(ProjectPath)!, "_vo");
         var rel         = Path.GetRelativePath(voRoot, _voCheck.PrimaryWemPath);
         var destPrimary = Path.Combine(voDir, rel);
-        var destFem     = Path.Combine(voDir, rel[..^4] + "_fem.wem");
+        var destFem     = HasFemaleText
+            ? Path.Combine(voDir, rel[..^4] + "_fem.wem")
+            : null;
 
         var selection = await ShowImportDialog(new VoImportPaths(destPrimary, destFem));
         if (selection is null) return;

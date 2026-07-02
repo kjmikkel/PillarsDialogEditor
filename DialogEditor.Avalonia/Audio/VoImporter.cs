@@ -184,9 +184,11 @@ public sealed class VoImporter : IVoImporter
 
         // 1. WWISEROOT environment variable
         var wwiseRoot = Environment.GetEnvironmentVariable("WWISEROOT");
+        AppLog.Info($"[DetectWwise] WWISEROOT={(wwiseRoot ?? "(not set)")}");
         if (!string.IsNullOrEmpty(wwiseRoot))
         {
             var candidate = Path.Combine(wwiseRoot, "Authoring", "x64", "Release", "bin", ExeName);
+            AppLog.Info($"[DetectWwise] env candidate: {candidate} exists={File.Exists(candidate)}");
             if (File.Exists(candidate)) return candidate;
         }
 
@@ -195,11 +197,13 @@ public sealed class VoImporter : IVoImporter
         {
             using var key = Registry.LocalMachine.OpenSubKey(
                 @"SOFTWARE\Audiokinetic\Wwise\");
+            AppLog.Info($"[DetectWwise] registry key SOFTWARE\\Audiokinetic\\Wwise\\ found={key is not null}");
             if (key is not null)
             {
                 var versions = key.GetSubKeyNames()
                     .OrderByDescending(v => v)
                     .ToList();
+                AppLog.Info($"[DetectWwise] registry versions: [{string.Join(", ", versions)}]");
                 foreach (var version in versions)
                 {
                     using var verKey = key.OpenSubKey(version);
@@ -207,6 +211,7 @@ public sealed class VoImporter : IVoImporter
                     if (string.IsNullOrEmpty(installDir)) continue;
                     var candidate = Path.Combine(installDir,
                         "Authoring", "x64", "Release", "bin", ExeName);
+                    AppLog.Info($"[DetectWwise] registry candidate: {candidate} exists={File.Exists(candidate)}");
                     if (File.Exists(candidate)) return candidate;
                 }
             }
@@ -226,15 +231,18 @@ public sealed class VoImporter : IVoImporter
         };
         foreach (var root in searchRoots)
         {
+            AppLog.Info($"[DetectWwise] fallback root: {root} exists={Directory.Exists(root)}");
             if (!Directory.Exists(root)) continue;
             foreach (var dir in Directory.GetDirectories(root, "Wwise*")
                                          .OrderByDescending(d => d))
             {
                 var candidate = Path.Combine(dir, "Authoring", "x64", "Release", "bin", ExeName);
+                AppLog.Info($"[DetectWwise] fallback candidate: {candidate} exists={File.Exists(candidate)}");
                 if (File.Exists(candidate)) return candidate;
             }
         }
 
+        AppLog.Warn("[DetectWwise] WwiseConsole.exe not found — WAV encoding unavailable");
         return null;
     }
 }

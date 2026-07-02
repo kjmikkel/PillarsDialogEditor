@@ -8,17 +8,18 @@ namespace DialogEditor.Avalonia.Views;
 
 public partial class VoImportDialog : Window
 {
-    private enum PlayingSlot { None, Primary, Fem }
+    private enum PlayingSlot { None, CurrentPrimary, CurrentFem, SourcePrimary, SourceFem }
 
     private readonly IVoImporter    _importer = null!;
     private readonly IVoAudioPlayer _player   = null!;
+    private readonly VoImportPaths  _paths    = null!;
 
     private string?     _primarySource;
     private string?     _femSource;
     private PlayingSlot _playingSlot = PlayingSlot.None;
     private WemQuality  _quality     = WemQuality.Medium;
 
-    /// Set to non-null when the user clicks OK.
+    /// Set to non-null when the user clicks Import.
     public VoImportDialogResult? Result { get; private set; }
 
     // Parameterless ctor so the XAML compiler can embed the type (avoids AVLN3001).
@@ -28,6 +29,7 @@ public partial class VoImportDialog : Window
     {
         InitializeComponent();
         _importer = importer;
+        _paths    = paths;
         _player   = player;
 
         _player.PlaybackStopped += OnPlaybackStopped;
@@ -37,41 +39,59 @@ public partial class VoImportDialog : Window
             _player.Stop();
         };
 
-        PrimaryLabel.Text = Path.GetFileName(paths.PrimaryDestinationPath);
+        // ── Current voice-over section ──
+        var primaryExists = File.Exists(paths.PrimaryDestinationPath);
+        var femExists     = paths.FemDestinationPath is not null
+                         && File.Exists(paths.FemDestinationPath);
+
+        if (primaryExists || femExists)
+        {
+            CurrentVoSection.IsVisible    = true;
+            CurrentPrimaryLabel.Text      = Path.GetFileName(paths.PrimaryDestinationPath);
+            PlayCurrentPrimaryButton.IsVisible = primaryExists;
+
+            if (paths.FemDestinationPath is not null)
+            {
+                CurrentFemRow.IsVisible        = true;
+                CurrentFemLabel.Text           = Path.GetFileName(paths.FemDestinationPath);
+                PlayCurrentFemButton.IsVisible = femExists;
+            }
+        }
+
+        // Female source row visible only when the node has female text (FemDestinationPath not null).
         if (paths.FemDestinationPath is not null)
-            FemLabel.Text = Path.GetFileName(paths.FemDestinationPath);
+            FemSourceRow.IsVisible = true;
     }
 
-    // ── Play buttons ─────────────────────────────────────────────────────
+    // ── Current VO play buttons ───────────────────────────────────────────
 
-    private void PlayPrimary_Click(object? sender, RoutedEventArgs e)
+    private void PlayCurrentPrimary_Click(object? sender, RoutedEventArgs e)
+        => TogglePlay(PlayingSlot.CurrentPrimary, _paths.PrimaryDestinationPath);
+
+    private void PlayCurrentFem_Click(object? sender, RoutedEventArgs e)
+        => TogglePlay(PlayingSlot.CurrentFem, _paths.FemDestinationPath!);
+
+    // ── Source preview play buttons ───────────────────────────────────────
+
+    private void PlaySourcePrimary_Click(object? sender, RoutedEventArgs e)
+        => TogglePlay(PlayingSlot.SourcePrimary, _primarySource!);
+
+    private void PlaySourceFem_Click(object? sender, RoutedEventArgs e)
+        => TogglePlay(PlayingSlot.SourceFem, _femSource!);
+
+    private void TogglePlay(PlayingSlot slot, string path)
     {
-        if (_primarySource is null) return;
-        if (_playingSlot == PlayingSlot.Primary)
+        if (_playingSlot == slot)
         {
             _player.Stop();
             _playingSlot = PlayingSlot.None;
         }
         else
         {
-            _player.Play(_primarySource);
-            _playingSlot = PlayingSlot.Primary;
-        }
-        UpdatePlayGlyphs();
-    }
-
-    private void PlayFem_Click(object? sender, RoutedEventArgs e)
-    {
-        if (_femSource is null) return;
-        if (_playingSlot == PlayingSlot.Fem)
-        {
-            _player.Stop();
-            _playingSlot = PlayingSlot.None;
-        }
-        else
-        {
-            _player.Play(_femSource);
-            _playingSlot = PlayingSlot.Fem;
+            // player.Play() calls StopAndCleanup() internally, so any in-progress
+            // playback is stopped before the new track starts.
+            _player.Play(path);
+            _playingSlot = slot;
         }
         UpdatePlayGlyphs();
     }
@@ -84,15 +104,21 @@ public partial class VoImportDialog : Window
 
     private void UpdatePlayGlyphs()
     {
-        PlayPrimaryButton.Content = _playingSlot == PlayingSlot.Primary ? "■" : "▶";
-        PlayFemButton.Content     = _playingSlot == PlayingSlot.Fem     ? "■" : "▶";
+        SetPlayGlyph(PlayCurrentPrimaryButton, PlayingSlot.CurrentPrimary,
+            "ToolTip_VoCurrentPlay_Primary");
+        SetPlayGlyph(PlayCurrentFemButton,     PlayingSlot.CurrentFem,
+            "ToolTip_VoCurrentPlay_Fem");
+        SetPlayGlyph(PlaySourcePrimaryButton,  PlayingSlot.SourcePrimary,
+            "ToolTip_VoPreviewPlay_Primary");
+        SetPlayGlyph(PlaySourceFemButton,      PlayingSlot.SourceFem,
+            "ToolTip_VoPreviewPlay_Fem");
+    }
 
-        ToolTip.SetTip(PlayPrimaryButton, _playingSlot == PlayingSlot.Primary
-            ? Loc.Get("ToolTip_VoPreviewStop")
-            : Loc.Get("ToolTip_VoPreviewPlay_Primary"));
-        ToolTip.SetTip(PlayFemButton, _playingSlot == PlayingSlot.Fem
-            ? Loc.Get("ToolTip_VoPreviewStop")
-            : Loc.Get("ToolTip_VoPreviewPlay_Fem"));
+    private void SetPlayGlyph(Button btn, PlayingSlot slot, string playTooltipKey)
+    {
+        var playing = _playingSlot == slot;
+        btn.Content = playing ? "■" : "▶";
+        ToolTip.SetTip(btn, Loc.Get(playing ? "ToolTip_VoPreviewStop" : playTooltipKey));
     }
 
     // ── Quality ──────────────────────────────────────────────────────────
@@ -107,23 +133,23 @@ public partial class VoImportDialog : Window
     {
         var path = await PickVoFileAsync();
         if (path is null) return;
-        _primarySource               = path;
-        PrimaryLabel.Text            = Path.GetFileName(path);
-        ClearPrimaryButton.IsVisible = true;
-        PlayPrimaryButton.IsVisible  = true;
-        UpdateWwiseWarning();
+        _primarySource                    = path;
+        PrimarySourceLabel.Text           = Path.GetFileName(path);
+        PlaySourcePrimaryButton.IsVisible = true;
+        ClearPrimaryButton.IsVisible      = true;
+        UpdateQualityAndWarning();
         UpdateOkButton();
     }
 
     private void ClearPrimary_Click(object? sender, RoutedEventArgs e)
     {
-        if (_playingSlot == PlayingSlot.Primary) { _player.Stop(); _playingSlot = PlayingSlot.None; }
-        _primarySource               = null;
-        PrimaryLabel.Text            = "—";
-        ClearPrimaryButton.IsVisible = false;
-        PlayPrimaryButton.IsVisible  = false;
+        if (_playingSlot == PlayingSlot.SourcePrimary) { _player.Stop(); _playingSlot = PlayingSlot.None; }
+        _primarySource                    = null;
+        PrimarySourceLabel.Text           = Loc.Get("VoImport_NoFileChosen");
+        PlaySourcePrimaryButton.IsVisible = false;
+        ClearPrimaryButton.IsVisible      = false;
         UpdatePlayGlyphs();
-        UpdateWwiseWarning();
+        UpdateQualityAndWarning();
         UpdateOkButton();
     }
 
@@ -131,22 +157,22 @@ public partial class VoImportDialog : Window
     {
         var path = await PickVoFileAsync();
         if (path is null) return;
-        _femSource               = path;
-        FemLabel.Text            = Path.GetFileName(path);
-        ClearFemButton.IsVisible = true;
-        PlayFemButton.IsVisible  = true;
-        UpdateWwiseWarning();
+        _femSource                    = path;
+        FemSourceLabel.Text           = Path.GetFileName(path);
+        PlaySourceFemButton.IsVisible = true;
+        ClearFemButton.IsVisible      = true;
+        UpdateQualityAndWarning();
     }
 
     private void ClearFem_Click(object? sender, RoutedEventArgs e)
     {
-        if (_playingSlot == PlayingSlot.Fem) { _player.Stop(); _playingSlot = PlayingSlot.None; }
-        _femSource               = null;
-        FemLabel.Text            = "—";
-        ClearFemButton.IsVisible = false;
-        PlayFemButton.IsVisible  = false;
+        if (_playingSlot == PlayingSlot.SourceFem) { _player.Stop(); _playingSlot = PlayingSlot.None; }
+        _femSource                    = null;
+        FemSourceLabel.Text           = Loc.Get("VoImport_NoFileChosen");
+        PlaySourceFemButton.IsVisible = false;
+        ClearFemButton.IsVisible      = false;
         UpdatePlayGlyphs();
-        UpdateWwiseWarning();
+        UpdateQualityAndWarning();
     }
 
     // ── OK / Cancel ──────────────────────────────────────────────────────
@@ -192,12 +218,13 @@ public partial class VoImportDialog : Window
         OkButton.IsEnabled = _primarySource is not null && (!isWav || _importer.IsWwiseAvailable);
     }
 
-    private void UpdateWwiseWarning()
+    private void UpdateQualityAndWarning()
     {
         var anyWav =
             (_primarySource?.EndsWith(".wav", StringComparison.OrdinalIgnoreCase) == true) ||
-            (_femSource?.EndsWith(".wav", StringComparison.OrdinalIgnoreCase) == true);
+            (_femSource?.EndsWith(".wav",     StringComparison.OrdinalIgnoreCase) == true);
+        QualityPanel.IsVisible      = anyWav;
         WwiseWarningPanel.IsVisible = anyWav && !_importer.IsWwiseAvailable;
-        QualityPanel.IsEnabled      = anyWav;
     }
+
 }
