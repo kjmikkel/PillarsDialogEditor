@@ -41,6 +41,17 @@ _None yet._
 
 ## Fixed
 
+### B-007 — Primary VO play button silent when only the _vo/ staging copy exists
+- **Area:** Detail pane VO playback — `NodeDetailViewModel`, `VoPathResolver.WithLocalVoFallback`
+- **Severity:** minor
+- **Repro:**
+  1. Import a VO, F5, F6 (game copy removed; `_vo/` copy remains; status row shows ✓ via fallback).
+  2. Click ▶ on the primary VO in the detail pane.
+- **Expected:** The staged `_vo/` copy plays (the female variant already did).
+- **Actual:** Nothing plays — the button targeted the canonical game path, which F6 removed.
+- **Notes:** `PrimaryWemPath` must stay the canonical game path (ImportVo and batch VO derive destination paths from it), so the fix surfaces the playable copy separately rather than rewriting it.
+- **Fixed:** `7161aa2` — `VoCheckResult.LocalPrimaryWemPath` (set only by `WithLocalVoFallback`); playback prefers it. Guarded by `PlayPrimaryCommand_FileOnlyInProjectVoFolder_PlaysLocalCopy` and `WithLocalVoFallback_GameCopyMissing_SetsLocalPrimaryWemPath`.
+
 ### B-006 — Validate Voice-Over reports imported VO as missing
 - **Area:** Test › Validate Voice-Over — `VoValidationViewModel`
 - **Severity:** minor (false positive; no data loss)
