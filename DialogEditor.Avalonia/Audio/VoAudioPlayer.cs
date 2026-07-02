@@ -127,7 +127,7 @@ public sealed class VoAudioPlayer : IVoAudioPlayer, IDisposable
         // NAudio calls this from its own thread; marshal to UI before notifying ViewModel.
         Dispatcher.UIThread.Post(() =>
         {
-            // B-001: only act if this event belongs to the still-current output.
+            // B-008: only act if this event belongs to the still-current output.
             // A stale notification — from an output that a newer Play() or Stop()
             // has already replaced or cleared — must be ignored: processing it
             // would dispose the NEW playback's resources and raise a spurious

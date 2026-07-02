@@ -41,6 +41,17 @@ _None yet._
 
 ## Fixed
 
+### B-008 — VO play buttons: stale PlaybackStopped desyncs ▶/■ glyphs and kills new playback
+- **Area:** VO audio playback — `VoAudioPlayer`, affects `VoImportDialog` and detail-pane play buttons
+- **Severity:** major
+- **Repro:**
+  1. In Import Voice-Over (or the detail pane), play a VO file and let it finish — or interrupt it.
+  2. Quickly click another ▶ button.
+- **Expected:** The new track plays and its button shows ■; no other button changes.
+- **Actual:** Sometimes the new button never flips to ■ while audio plays; sometimes the new playback is killed outright (first track stops, second never starts).
+- **Notes:** Root cause: NAudio raises `PlaybackStopped` on its playback thread and the handler posts to the UI thread; when a newer `Play()`/`Stop()` superseded that output while the post was in flight, the posted lambda still ran `Cleanup()` (disposing the *new* output) and raised a spurious `PlaybackStopped` (`_manualStop` had been reset by the new `Play()`). Unsubscription in `Cleanup()` cannot recall an already-posted event.
+- **Fixed:** `f5a9900` — the posted handler now ignores events whose sender is no longer the current output (`ReferenceEquals(sender, _output)`); `_manualStop` removed as redundant. Guarded by `StaleStopFromSupersededTrack_DoesNotRaisePlaybackStopped` and `NaturalCompletionOfCurrentTrack_RaisesPlaybackStopped`. (The fixing commit's message says "B-001" — the ID was misassigned; this entry is authoritative.)
+
 ### B-007 — Primary VO play button silent when only the _vo/ staging copy exists
 - **Area:** Detail pane VO playback — `NodeDetailViewModel`, `VoPathResolver.WithLocalVoFallback`
 - **Severity:** minor

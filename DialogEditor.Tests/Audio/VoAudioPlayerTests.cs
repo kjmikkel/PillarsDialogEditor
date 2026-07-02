@@ -26,7 +26,7 @@ public class VoAudioPlayerTests : IDisposable
         try { File.Delete(_longWavPath); } catch { }
     }
 
-    // B-001: a PlaybackStopped notification raised by a superseded output must be
+    // B-008: a PlaybackStopped notification raised by a superseded output must be
     // ignored. Sequence: track A finishes naturally → NAudio raises its stopped
     // event → the handler posts to the UI thread. Before that post runs, the user
     // starts track B. Processing the stale post used to dispose B's fresh output
