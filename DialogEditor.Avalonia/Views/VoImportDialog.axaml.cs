@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Platform.Storage;
@@ -39,28 +40,46 @@ public partial class VoImportDialog : Window
             _player.Stop();
         };
 
-        // ── Current voice-over section ──
+        // ── Current → New grid state (2026-07-02 layout spec) ──
+        // The Current column exists only when a current file is on disk at open
+        // time; visibility and window width are fixed per-open because files
+        // cannot appear while the dialog is up.
         var primaryExists = File.Exists(paths.PrimaryDestinationPath);
         var femExists     = paths.FemDestinationPath is not null
                          && File.Exists(paths.FemDestinationPath);
+        var hasCurrent    = primaryExists || femExists;
 
-        if (primaryExists || femExists)
+        if (hasCurrent)
         {
-            CurrentVoSection.IsVisible    = true;
-            CurrentPrimaryLabel.Text      = Path.GetFileName(paths.PrimaryDestinationPath);
+            // Three columns need more room than the collapsed 500px default.
+            Width = 640;
+            CurrentPrimaryLabel.Text = primaryExists
+                ? Path.GetFileName(paths.PrimaryDestinationPath)
+                : Loc.Get("VoImport_NoCurrentFile");
             PlayCurrentPrimaryButton.IsVisible = primaryExists;
+        }
+        else
+        {
+            VariantGrid.ColumnDefinitions[1].Width = new GridLength(0);
+            CurrentHeader.IsVisible      = false;
+            NewHeader.IsVisible          = false;
+            CurrentPrimaryCell.IsVisible = false;
+        }
 
-            if (paths.FemDestinationPath is not null)
+        // Female row visible only when the node has female text.
+        if (paths.FemDestinationPath is not null)
+        {
+            FemRowLabel.IsVisible   = true;
+            FemSourceCell.IsVisible = true;
+            if (hasCurrent)
             {
-                CurrentFemRow.IsVisible        = true;
-                CurrentFemLabel.Text           = Path.GetFileName(paths.FemDestinationPath);
+                CurrentFemCell.IsVisible = true;
+                CurrentFemLabel.Text = femExists
+                    ? Path.GetFileName(paths.FemDestinationPath)
+                    : Loc.Get("VoImport_NoCurrentFile");
                 PlayCurrentFemButton.IsVisible = femExists;
             }
         }
-
-        // Female source row visible only when the node has female text (FemDestinationPath not null).
-        if (paths.FemDestinationPath is not null)
-            FemSourceRow.IsVisible = true;
     }
 
     // ── Current VO play buttons ───────────────────────────────────────────
