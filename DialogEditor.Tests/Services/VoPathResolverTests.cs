@@ -28,6 +28,32 @@ public class VoPathResolverTests : IDisposable
             Directory.Delete(_gameRoot, recursive: true);
     }
 
+    // ── _vo/ fallback exposes a playable local path ───────────────────────
+
+    [Fact]
+    public void WithLocalVoFallback_GameCopyMissing_SetsLocalPrimaryWemPath()
+    {
+        // The canonical PrimaryWemPath must stay the game path (import/batch code
+        // derives destination paths from it), so the playable local copy is
+        // surfaced separately.
+        var projectDir = Path.Combine(_gameRoot, "proj");
+        var localDir   = Path.Combine(projectDir, "_vo", "eder");
+        Directory.CreateDirectory(localDir);
+        var localWem = Path.Combine(localDir, "conv_0001.wem");
+        File.WriteAllText(localWem, "");
+        var projectPath = Path.Combine(projectDir, "test.dialogproject");
+
+        var missing = VoPathResolver.Check(
+            "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", true, "", 1, "conv", _gameRoot, "poe2")!;
+        Assert.Equal(VoPresence.Missing, missing.Status);
+
+        var result = VoPathResolver.WithLocalVoFallback(missing, projectPath, _gameRoot);
+
+        Assert.Equal(VoPresence.Found, result.Status);
+        Assert.Equal(localWem, result.LocalPrimaryWemPath);
+        Assert.Equal(missing.PrimaryWemPath, result.PrimaryWemPath);   // canonical path untouched
+    }
+
     // ── Returns null for non-PoE2 ─────────────────────────────────────────
 
     [Fact]

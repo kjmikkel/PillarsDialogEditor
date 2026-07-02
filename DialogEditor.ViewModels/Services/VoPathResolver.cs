@@ -111,6 +111,7 @@ public static class VoPathResolver
         var localFem  = localPrimary[..^4] + "_fem.wem";
         var femExists = File.Exists(localFem);
         return new VoCheckResult(VoPresence.Found, femExists,
-            result.PrimaryWemPath, femExists ? localFem : null);
+            result.PrimaryWemPath, femExists ? localFem : null)
+            { LocalPrimaryWemPath = localPrimary };
     }
 }
