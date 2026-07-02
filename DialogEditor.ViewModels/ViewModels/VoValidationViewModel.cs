@@ -40,6 +40,7 @@ public partial class VoValidationViewModel : ObservableObject
     private readonly string _conversationName;
     private readonly string _gameRoot;
     private readonly string _activeGameId;
+    private readonly string? _projectPath;
 
     // Cancelled and replaced at the start of each RunAsync call.
     private CancellationTokenSource _cts = new();
@@ -65,12 +66,14 @@ public partial class VoValidationViewModel : ObservableObject
         IReadOnlyList<NodeEditSnapshot> nodes,
         string conversationName,
         string gameRoot,
-        string activeGameId)
+        string activeGameId,
+        string? projectPath = null)
     {
         _nodes            = nodes;
         _conversationName = conversationName;
         _gameRoot         = gameRoot;
         _activeGameId     = activeGameId;
+        _projectPath      = projectPath;
 
         CancelCommand   = new RelayCommand(() => _cts.Cancel(), () => IsRunning);
         // RelayCommand does not support async lambdas; call RunAsync() via fire-and-discard.
@@ -122,6 +125,10 @@ public partial class VoValidationViewModel : ObservableObject
                     // NotApplicable → node carries no VO information
                     if (result is null || result.Status == VoPresence.NotApplicable)
                         continue;
+
+                    // A file staged in the project's _vo/ folder counts as present —
+                    // F6 removes the game copy, but F5 will re-sync it (B-006).
+                    result = VoPathResolver.WithLocalVoFallback(result, _projectPath, _gameRoot);
 
                     checked_++;
                     if (result.Status == VoPresence.Missing)

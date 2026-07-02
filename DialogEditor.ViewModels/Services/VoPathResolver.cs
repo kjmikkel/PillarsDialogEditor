@@ -84,4 +84,33 @@ public static class VoPathResolver
             primary,            // always set when speaker is known; file may or may not exist
             femExists ? fem : null);
     }
+
+    /// <summary>
+    /// If the game copy is missing but the project's <c>_vo/</c> staging folder holds
+    /// the file, report it as Found: staged files are synced to the game folder on F5
+    /// and removed again by F6, so "only in _vo/" means present from the modder's view.
+    /// Returns <paramref name="result"/> unchanged in every other case.
+    /// </summary>
+    public static VoCheckResult WithLocalVoFallback(
+        VoCheckResult result,
+        string? projectPath,
+        string gameRoot)
+    {
+        if (result.Status != VoPresence.Missing
+            || projectPath is null
+            || result.PrimaryWemPath is null
+            || string.IsNullOrEmpty(gameRoot))
+            return result;
+
+        var voRoot = Path.Combine(gameRoot,
+            "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
+        var rel          = Path.GetRelativePath(voRoot, result.PrimaryWemPath);
+        var localPrimary = Path.Combine(Path.GetDirectoryName(projectPath)!, "_vo", rel);
+        if (!File.Exists(localPrimary)) return result;
+
+        var localFem  = localPrimary[..^4] + "_fem.wem";
+        var femExists = File.Exists(localFem);
+        return new VoCheckResult(VoPresence.Found, femExists,
+            result.PrimaryWemPath, femExists ? localFem : null);
+    }
 }
