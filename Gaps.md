@@ -17,6 +17,20 @@ All ViewModels with non-trivial logic now have tests. Added: `AnnotationViewMode
 
 ## Feature Gaps
 
+### VO import over an ExternalVO alias silently overwrites shared audio
+`ExternalVO` (PoE2 only; ~1,000 shipped nodes across 193 conversations) redirects a node's
+VO to *another* line's `.wem` (`<speaker folder>/<conversation>_<nodeid>`, resolved under
+`Voices/<language>/`), frequently shared across nodes and even across conversation files.
+The resolution chain (`VoPathResolver.Check`/`ExpectedRelativePath` → status row, ▶ play,
+single-node 🎤 import, batch import, VO validation, orphan scanner) consistently honours
+the alias — audited 2026-07-03, all shipped value shapes resolve. The gap: **importing VO
+on an aliased node writes to the shared target path with no warning**, so an F5 sync
+replaces audio still referenced by every other aliasing node (blast radius invisible to
+the user). Fix idea: when `ExternalVO` is set, warn on import (name the target and, if
+cheap, the other referencing nodes) or offer to clear the alias and import to the node's
+own canonical path. PoE1 note: `<VOFilename />` is empty on all 40,991 shipped nodes —
+the External VO box can never populate from PoE1 data.
+
 ### Version Control Integration
 Git **merge-conflict resolution** for `.dialogproject` files is now implemented: opening a conflicted file reconstructs the mine/theirs sides, presents a dedicated resolution window (field-level merge for same-node edits, **per-language text/translation conflicts**, binary keep-mine/keep-theirs for structural conflicts, **a whole-conversation fallback when a conversation diverges beyond per-node merge**, word-level inline highlighting of text changes), and loads the merged result as an unsaved project. Canvas **layout positions** and the **new-conversation list** are auto-merged (layouts union per node with theirs winning on overlap; new-conversation lists are unioned).
 
