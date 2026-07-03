@@ -16,12 +16,15 @@ public class NodeDetailViewModelPaneTests
         // SpeakerNameService is a process-wide static; earlier tests in the serial
         // suite may have registered names. Reset so HasSpeakerData is false here.
         SpeakerNameService.Register(new Dictionary<string, string>());
+        // VoAliasIndexService is a process-wide static too; reset so
+        // VoAliasSharedCount tests start from "index not ready".
+        VoAliasIndexService.Clear();
     }
 
     // StubStringProvider echoes keys, so the localised separator appears as its key.
     private const string Sep = "NodeDetail_HeaderSeparator";
 
-    private void LoadNode(int id = 1, bool playerChoice = false)
+    private void LoadNode(int id = 1, bool playerChoice = false, string externalVO = "")
     {
         var node = new ConversationNode(
             NodeId: id, IsPlayerChoice: playerChoice,
@@ -30,8 +33,20 @@ public class NodeDetailViewModelPaneTests
             Links: [], Conditions: [], Scripts: [],
             DisplayType: "Conversation", Persistence: "None",
             ActorDirection: "", Comments: "",
-            ExternalVO: "", HasVO: false, HideSpeaker: false);
+            ExternalVO: externalVO, HasVO: false, HideSpeaker: false);
         _vm.Load(new NodeViewModel(node, new StringEntry(id, "Test line", "")));
+    }
+
+    // Sets up PoE2 game context (mirrors NodeDetailViewModelPlaybackTests) so
+    // _voCheck is non-null and the alias surface becomes reachable, then loads
+    // a node carrying the given ExternalVO alias.
+    private void LoadPoe2Node(string externalVO)
+    {
+        var gameRoot = Path.Combine(Path.GetTempPath(), $"VoAliasTest_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(gameRoot);
+        _vm.GameRoot     = gameRoot;
+        _vm.ActiveGameId = "poe2";
+        LoadNode(externalVO: externalVO);
     }
 
     // ── NodeHeaderSummary ────────────────────────────────────────────────
@@ -144,5 +159,119 @@ public class NodeDetailViewModelPaneTests
         {
             NodeDetailViewModel.ResetExpanderStateForTests();
         }
+    }
+
+    // ── ExternalVO alias surface (2026-07-03 alias UX) ───────────────────
+
+    [Fact]
+    public void HasVoAlias_FalseWithoutAlias_TrueWithAlias()
+    {
+        LoadPoe2Node(externalVO: "");
+        Assert.False(_vm.HasVoAlias);
+        LoadPoe2Node(externalVO: "narrator/other_conv_0005");
+        Assert.True(_vm.HasVoAlias);
+    }
+
+    [Fact]
+    public void VoAliasDescription_ParseableAlias_UsesFriendlyKey()
+    {
+        LoadPoe2Node(externalVO: "narrator/other_conv_0005");
+        // StubStringProvider echoes the Loc.Format key.
+        Assert.StartsWith("NodeDetail_AliasDescription", _vm.VoAliasDescription);
+    }
+
+    [Fact]
+    public void VoAliasDescription_UnparseableAlias_FallsBackToRawKey()
+    {
+        LoadPoe2Node(externalVO: "narrator/no_digits_here");
+        Assert.StartsWith("NodeDetail_AliasRaw", _vm.VoAliasDescription);
+    }
+
+    [Fact]
+    public void VoAliasSharedCount_NullBeforeIndexReady()
+    {
+        LoadPoe2Node(externalVO: "narrator/other_conv_0005");
+        Assert.Null(_vm.VoAliasSharedCount);
+        Assert.Equal(string.Empty, _vm.VoAliasSharedText);
+    }
+
+    [Fact]
+    public void VoAliasSharedCount_CountsOthers_ExcludingSelf()
+    {
+        try
+        {
+            VoAliasIndexService.RegisterForTests(new Dictionary<string, IReadOnlyList<VoAliasRef>>
+            {
+                ["narrator/other_conv_0005"] =
+                [
+                    new VoAliasRef("conv_a", 3),
+                    new VoAliasRef("conv_b", 9),
+                ]
+            });
+            LoadPoe2Node(externalVO: "narrator/other_conv_0005");
+            Assert.Equal(2, _vm.VoAliasSharedCount);
+            Assert.StartsWith("NodeDetail_AliasSharedCount", _vm.VoAliasSharedText);
+        }
+        finally { VoAliasIndexService.Clear(); }
+    }
+
+    [Fact]
+    public void VoAliasSharedCount_OverlayShadowsDiskEntries()
+    {
+        try
+        {
+            VoAliasIndexService.RegisterForTests(new Dictionary<string, IReadOnlyList<VoAliasRef>>
+            {
+                ["narrator/other_conv_0005"] = [new VoAliasRef("conv_a", 3)]
+            });
+            // In-memory state says conv_a node 3 no longer aliases this path,
+            // but conv_c node 4 now does.
+            _vm.ProjectAliasOverlay = () =>
+            [
+                new VoAliasUse("conv_a", 3, ""),
+                new VoAliasUse("conv_c", 4, "narrator/other_conv_0005"),
+            ];
+            LoadPoe2Node(externalVO: "narrator/other_conv_0005");
+            Assert.Equal(1, _vm.VoAliasSharedCount);
+        }
+        finally { VoAliasIndexService.Clear(); }
+    }
+
+    [Fact]
+    public void ClearVoAlias_EmptiesExternalVO()
+    {
+        LoadPoe2Node(externalVO: "narrator/other_conv_0005");
+        _vm.ClearVoAliasCommand.Execute(null);
+        Assert.False(_vm.HasVoAlias);
+        Assert.Equal(string.Empty, _vm.ExternalVO);
+    }
+
+    [Fact]
+    public async Task PickVoAlias_WritesPickerResult()
+    {
+        LoadPoe2Node(externalVO: "");
+        _vm.ShowAliasPicker = _ => Task.FromResult<string?>("eder/some_conv_0042");
+        await _vm.PickVoAliasCommand.ExecuteAsync(null);
+        Assert.Equal("eder/some_conv_0042", _vm.ExternalVO);
+        Assert.True(_vm.HasVoAlias);
+    }
+
+    [Fact]
+    public async Task PickVoAlias_NullResult_LeavesAliasUnchanged()
+    {
+        LoadPoe2Node(externalVO: "narrator/keep_me_0001");
+        _vm.ShowAliasPicker = _ => Task.FromResult<string?>(null);
+        await _vm.PickVoAliasCommand.ExecuteAsync(null);
+        Assert.Equal("narrator/keep_me_0001", _vm.ExternalVO);
+    }
+
+    [Fact]
+    public void HasVoAlias_Poe1_AlwaysFalse()
+    {
+        // No PoE2 context (default test state): _voCheck is null → alias UI hidden
+        // even if the data somehow carried a value.
+        LoadNode();
+        Assert.False(_vm.HasVoAlias);
+        Assert.False(_vm.CanStartVoAliasPick);
     }
 }

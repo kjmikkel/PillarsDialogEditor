@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DialogEditor.Core.Audio;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch.Diff;
 using DialogEditor.ViewModels.Resources;
@@ -540,6 +541,92 @@ public partial class NodeDetailViewModel : ObservableObject
         => _identityExpanded = _displayExpanded = _voiceExpanded
          = _logicExpanded = _notesExpanded = false;
 
+    // ── ExternalVO alias surface (2026-07-03 alias UX) ───────────────────
+    // ExternalVO redirects this node's VO to ANOTHER line's recording — shipped
+    // PoE2 data aliases 1,000 nodes this way, often across conversation files.
+    // The pane therefore explains the alias instead of exposing a raw textbox;
+    // edits go through the node picker so the value is always derivable.
+
+    /// PoE2-gated: _voCheck is null on PoE1/no game root, hiding the alias UI there.
+    public bool HasVoAlias =>
+        _voCheck is not null && !string.IsNullOrEmpty(_node?.ExternalVO);
+
+    public string VoAliasRawPath => _node?.ExternalVO ?? string.Empty;
+
+    /// "Plays the recording of <conv> node <id>" — or the raw path when unparseable.
+    public string VoAliasDescription
+    {
+        get
+        {
+            if (!HasVoAlias) return string.Empty;
+            var t = VoAliasParse.TryParse(_node!.ExternalVO);
+            return t is null
+                ? Loc.Format("NodeDetail_AliasRaw", _node.ExternalVO)
+                : Loc.Format("NodeDetail_AliasDescription", t.Conversation, t.NodeId);
+        }
+    }
+
+    /// Set by MainWindowViewModel — current in-memory (conversation, nodeId, alias)
+    /// triples from the open project; these shadow the disk index so mid-session
+    /// edits are reflected before F5 writes them to the game folder.
+    public Func<IReadOnlyList<VoAliasUse>>? ProjectAliasOverlay { get; set; }
+
+    /// Other nodes sharing this alias (self excluded); null while the background
+    /// index scan has not finished.
+    public int? VoAliasSharedCount
+    {
+        get
+        {
+            if (!HasVoAlias || !VoAliasIndexService.IsReady || _node is null) return null;
+            var alias   = _node.ExternalVO;
+            var selfConv = (Canvas?.ConversationName ?? string.Empty).ToLowerInvariant();
+            var overlay = ProjectAliasOverlay?.Invoke() ?? [];
+            var shadowed = overlay
+                .Select(u => (Conv: u.Conversation.ToLowerInvariant(), u.NodeId))
+                .ToHashSet();
+
+            var effective = VoAliasIndexService.GetReferences(alias)
+                .Select(r => (Conv: r.Conversation.ToLowerInvariant(), r.NodeId))
+                .Where(r => !shadowed.Contains(r))
+                .Concat(overlay
+                    .Where(u => string.Equals(u.AliasPath, alias, StringComparison.OrdinalIgnoreCase))
+                    .Select(u => (Conv: u.Conversation.ToLowerInvariant(), u.NodeId)))
+                .Distinct()
+                .Count(r => !(r.Conv == selfConv && r.NodeId == _node.NodeId));
+            return effective;
+        }
+    }
+
+    public string VoAliasSharedText => VoAliasSharedCount switch
+    {
+        null => string.Empty,
+        0    => Loc.Get("NodeDetail_AliasNotShared"),
+        var n => Loc.Format("NodeDetail_AliasSharedCount", n),
+    };
+
+    /// "Reuse another line's VO…" visibility: PoE2 node loaded, no alias yet.
+    public bool CanStartVoAliasPick => _voCheck is not null && !HasVoAlias;
+
+    /// Set by MainWindow.axaml.cs — opens the picker (current alias in, chosen
+    /// alias out, null = cancelled).
+    public Func<string?, Task<string?>>? ShowAliasPicker { get; set; }
+
+    [RelayCommand]
+    private async Task PickVoAlias()
+    {
+        if (_node is null || ShowAliasPicker is null) return;
+        var result = await ShowAliasPicker(HasVoAlias ? _node.ExternalVO : null);
+        if (result is not null)
+            _node.ExternalVO = result;   // undoable via NodeViewModel.Push
+    }
+
+    [RelayCommand]
+    private void ClearVoAlias()
+    {
+        if (_node is not null)
+            _node.ExternalVO = string.Empty;   // undoable via NodeViewModel.Push
+    }
+
     [ObservableProperty] private IReadOnlyList<ConnectionViewModel> _links           = [];
     [ObservableProperty] private string                             _addLinkTargetId = string.Empty;
 
@@ -662,6 +749,13 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(VoiceSummary));
         OnPropertyChanged(nameof(LogicSummary));
         OnPropertyChanged(nameof(NotesSummary));
+
+        OnPropertyChanged(nameof(HasVoAlias));
+        OnPropertyChanged(nameof(VoAliasRawPath));
+        OnPropertyChanged(nameof(VoAliasDescription));
+        OnPropertyChanged(nameof(VoAliasSharedCount));
+        OnPropertyChanged(nameof(VoAliasSharedText));
+        OnPropertyChanged(nameof(CanStartVoAliasPick));
     }
 
     public void Refresh() => NotifyAllProxies();
@@ -821,3 +915,8 @@ public partial class NodeDetailViewModel : ObservableObject
         _node.Conditions = ConditionRows.Select(r => r.ToNode()).ToList();
     }
 }
+
+/// One (conversation, nodeId) entry that currently sets ExternalVO to AliasPath —
+/// used by NodeDetailViewModel.ProjectAliasOverlay to shadow the on-disk VoAliasIndexService
+/// with the in-memory state of the currently-open project (mid-session edits not yet on disk).
+public record VoAliasUse(string Conversation, int NodeId, string AliasPath);
