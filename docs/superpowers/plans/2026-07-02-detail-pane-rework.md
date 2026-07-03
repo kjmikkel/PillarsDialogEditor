@@ -623,7 +623,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
   - `bool IsIdentityExpanded`, `IsDisplayExpanded`, `IsVoiceExpanded`, `IsLogicExpanded`, `IsNotesExpanded` — settable, backed by **static** fields (session-wide), default false.
   - `internal static void ResetExpanderStateForTests()`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Append to `NodeDetailViewModelPaneTests.cs` (inside the class):
 
@@ -695,12 +695,12 @@ Append to `NodeDetailViewModelPaneTests.cs` (inside the class):
     }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~NodeDetailViewModelPaneTests"`
 Expected: **build failure** — `error CS1061 ... 'IdentitySummary'`.
 
-- [ ] **Step 3: Implement the ViewModel changes**
+- [x] **Step 3: Implement the ViewModel changes**
 
 Add to `NodeDetailViewModel.cs`, directly after the GUID-toggle block from Task 1:
 
@@ -813,7 +813,7 @@ Then wire refresh notifications:
 
 Note: `InternalsVisibleTo` — check `DialogEditor.ViewModels.csproj`/`AssemblyInfo` for an existing `InternalsVisibleTo("DialogEditor.Tests")`; if absent, make `ResetExpanderStateForTests` `public` instead (with the same doc comment).
 
-- [ ] **Step 4: Add the Task 2 strings**
+- [x] **Step 4: Add the Task 2 strings**
 
 Append to the pane-rework block in `Strings.axaml`:
 
@@ -830,7 +830,7 @@ Append to the pane-rework block in `Strings.axaml`:
     <sys:String x:Key="ToolTip_GroupExpander">Expand or collapse this section. The open/closed state is remembered while the app runs.</sys:String>
 ```
 
-- [ ] **Step 5: Wrap the five groups in Expanders**
+- [x] **Step 5: Wrap the five groups in Expanders**
 
 In `NodeDetailView.axaml`, add one style to `UserControl.Styles`:
 
@@ -878,7 +878,7 @@ The five mappings (delete each group's `group-header` TextBlock — the Expander
 | Logic (scripts row + conditions row; keep the two inner `group-header`/`field-label` captions for Scripts vs Conditions — change the two inner `group-header` TextBlocks to `field-label` class) | `Label_GroupLogic` | `LogicSummary` | `IsLogicExpanded` |
 | Notes (comments + translator note; change their two `group-header` TextBlocks to `field-label` class) | `Label_GroupNotes` | `NotesSummary` | `IsNotesExpanded` |
 
-- [ ] **Step 6: Build, test, commit**
+- [x] **Step 6: Build, test, commit**
 
 ```
 dotnet build && dotnet test --nologo

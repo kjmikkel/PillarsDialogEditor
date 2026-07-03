@@ -1233,6 +1233,16 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_GuidToggle">Show or hide the raw GUID box for manual editing. The picker above sets it automatically.</sys:String>
     <sys:String x:Key="AutomationName_GuidToggle_Speaker">Toggle raw speaker GUID field</sys:String>
     <sys:String x:Key="AutomationName_GuidToggle_Listener">Toggle raw listener GUID field</sys:String>
+    <sys:String x:Key="Label_GroupNotes">Notes</sys:String>
+    <sys:String x:Key="NodeDetail_PersistsPrefix">persists:</sys:String>
+    <sys:String x:Key="NodeDetail_VoFound">✓ found</sys:String>
+    <sys:String x:Key="NodeDetail_VoFoundWithFem">✓ found · M+F</sys:String>
+    <sys:String x:Key="NodeDetail_VoMissing">✗ missing</sys:String>
+    <sys:String x:Key="NodeDetail_NoneShort">—</sys:String>
+    <sys:String x:Key="NodeDetail_ConditionsWord">conditions</sys:String>
+    <sys:String x:Key="NodeDetail_ScriptsWord">scripts</sys:String>
+    <sys:String x:Key="NodeDetail_NotesWord">note(s)</sys:String>
+    <sys:String x:Key="ToolTip_GroupExpander">Expand or collapse this section. The open/closed state is remembered while the app runs.</sys:String>
 
     <sys:String x:Key="Menu_ImportVo">Import voice-over…</sys:String>
     <sys:String x:Key="ToolTip_Menu_ImportVo">Import a .wem or .wav voice-over file for the selected node.</sys:String>
