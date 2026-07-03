@@ -706,7 +706,8 @@ public partial class ConversationViewModel : ObservableObject
                                            : raw[..60] + "…";
 
             rows.Add(new BatchVoRowViewModel(
-                ConversationName, node.NodeId, preview, check.Status, destPrimary, destFem));
+                ConversationName, node.NodeId, preview, check.Status, destPrimary, destFem,
+                isAliased: !string.IsNullOrEmpty(node.ExternalVO)));
         }
 
         return rows.OrderBy(r => r.NodeId).ToList();

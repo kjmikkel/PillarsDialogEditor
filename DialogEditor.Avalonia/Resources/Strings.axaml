@@ -1211,6 +1211,9 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- {0} = done count, {1} = total count -->
     <sys:String x:Key="BatchVoImport_Progress">{0} / {1}</sys:String>
     <sys:String x:Key="BatchVoImport_QualityLabel">Quality (WAV only)</sys:String>
+    <!-- Status column is 50px wide — keep this short in every translation. -->
+    <sys:String x:Key="BatchVoImport_AliasedStatus">shared</sys:String>
+    <sys:String x:Key="ToolTip_BatchAliasedRow">This node plays a recording shared with other nodes (ExternalVO alias). Batch import skips it — use the node's own import button to deliberately replace or detach the shared audio.</sys:String>
     <sys:String x:Key="ToolTip_BatchVoImport">Open the batch VO import dialog for this conversation.</sys:String>
     <sys:String x:Key="ToolTip_BatchVoImportAll">Open the batch VO import dialog for all conversations in the project.</sys:String>
     <sys:String x:Key="ToolTip_BatchBrowsePrimary">Browse for a .wem or .wav source file for the primary (default) VO slot.</sys:String>

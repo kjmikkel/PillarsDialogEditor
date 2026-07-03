@@ -134,11 +134,13 @@
                                    TextTrimming="CharacterEllipsis"
                                    VerticalAlignment="Center"/>
 
-                        <!-- Existing VO status glyph -->
+                        <!-- Existing VO status glyph, or "shared" marker for ExternalVO-aliased
+                             nodes — those rows are skipped by batch import (see StatusDisplay). -->
                         <TextBlock Grid.Column="3"
-                                   Text="{Binding VoStatusGlyph}"
+                                   Text="{Binding StatusDisplay}"
                                    HorizontalAlignment="Center"
-                                   VerticalAlignment="Center"/>
+                                   VerticalAlignment="Center"
+                                   ToolTip.Tip="{DynamicResource ToolTip_BatchAliasedRow}"/>
 
                         <!-- Primary slot: filename + play + browse + clear -->
                         <Grid Grid.Column="4" ColumnDefinitions="*,Auto,Auto,Auto" Margin="2,0">
@@ -156,6 +158,7 @@
                             <Button Grid.Column="2"
                                     Content="…"
                                     Click="BrowsePrimary_Click"
+                                    IsEnabled="{Binding !IsAliased}"
                                     ToolTip.Tip="{DynamicResource ToolTip_BatchBrowsePrimary}"
                                     AutomationProperties.Name="{DynamicResource ToolTip_BatchBrowsePrimary}"
                                     AutomationProperties.HelpText="{DynamicResource ToolTip_BatchBrowsePrimary}"
@@ -186,6 +189,7 @@
                             <Button Grid.Column="2"
                                     Content="…"
                                     Click="BrowseFem_Click"
+                                    IsEnabled="{Binding !IsAliased}"
                                     ToolTip.Tip="{DynamicResource ToolTip_BatchBrowseFem}"
                                     AutomationProperties.Name="{DynamicResource ToolTip_BatchBrowseFem}"
                                     AutomationProperties.HelpText="{DynamicResource ToolTip_BatchBrowseFem}"
