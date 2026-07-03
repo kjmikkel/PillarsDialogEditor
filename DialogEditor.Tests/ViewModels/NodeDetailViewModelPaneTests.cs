@@ -24,12 +24,12 @@ public class NodeDetailViewModelPaneTests
     // StubStringProvider echoes keys, so the localised separator appears as its key.
     private const string Sep = "NodeDetail_HeaderSeparator";
 
-    private void LoadNode(int id = 1, bool playerChoice = false, string externalVO = "")
+    private void LoadNode(int id = 1, bool playerChoice = false, string externalVO = "", string speakerGuid = "")
     {
         var node = new ConversationNode(
             NodeId: id, IsPlayerChoice: playerChoice,
             SpeakerCategory: playerChoice ? SpeakerCategory.Player : SpeakerCategory.Npc,
-            SpeakerGuid: "", ListenerGuid: "",
+            SpeakerGuid: speakerGuid, ListenerGuid: "",
             Links: [], Conditions: [], Scripts: [],
             DisplayType: "Conversation", Persistence: "None",
             ActorDirection: "", Comments: "",
@@ -39,14 +39,15 @@ public class NodeDetailViewModelPaneTests
 
     // Sets up PoE2 game context (mirrors NodeDetailViewModelPlaybackTests) so
     // _voCheck is non-null and the alias surface becomes reachable, then loads
-    // a node carrying the given ExternalVO alias.
-    private void LoadPoe2Node(string externalVO)
+    // a node carrying the given ExternalVO alias. speakerGuid lets Task 8's
+    // import-guard tests exercise the "own path" resolution after clearing an alias.
+    private void LoadPoe2Node(string externalVO, string speakerGuid = "")
     {
         var gameRoot = Path.Combine(Path.GetTempPath(), $"VoAliasTest_{Guid.NewGuid():N}");
         Directory.CreateDirectory(gameRoot);
         _vm.GameRoot     = gameRoot;
         _vm.ActiveGameId = "poe2";
-        LoadNode(externalVO: externalVO);
+        LoadNode(externalVO: externalVO, speakerGuid: speakerGuid);
     }
 
     // ── NodeHeaderSummary ────────────────────────────────────────────────
@@ -273,5 +274,95 @@ public class NodeDetailViewModelPaneTests
         LoadNode();
         Assert.False(_vm.HasVoAlias);
         Assert.False(_vm.CanStartVoAliasPick);
+    }
+
+    // ── Import guard on aliased nodes ────────────────────────────────────
+
+    private sealed class RecordingImporter : IVoImporter
+    {
+        public bool IsWwiseAvailable => true;
+        public VoImportRequest? LastRequest;
+        public Task<VoImportResult> ImportAsync(VoImportRequest request, CancellationToken ct)
+        {
+            LastRequest = request;
+            return Task.FromResult(new VoImportResult(true, null));
+        }
+    }
+
+    // Arranges a PoE2 node aliased to "narrator/other_conv_0005" (or the given
+    // externalVO), a saved project path so ImportVo proceeds past its unsaved-
+    // project guard, a registered speaker prefix so the ClearAliasImportOwn path
+    // can resolve an "own" .wem location, a recording fake importer standing in
+    // for Wwise, and a fake import-source picker returning a fixed source file.
+    private RecordingImporter ArrangeAliasedImport(
+        out List<VoAliasImportPrompt> prompts,
+        string externalVO = "narrator/other_conv_0005")
+    {
+        prompts = [];
+
+        var projectDir = Path.Combine(Path.GetTempPath(), $"VoAliasImportTest_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(projectDir);
+        _vm.ProjectPath = Path.Combine(projectDir, "project.dlgproj");
+
+        var speakerGuid = Guid.NewGuid().ToString();
+        ChatterPrefixService.Register(new Dictionary<string, string> { [speakerGuid] = "eder" });
+
+        var importer = new RecordingImporter();
+        _vm.Importer = importer;
+        _vm.ShowImportDialog = _ => Task.FromResult<VoImportDialogResult?>(
+            new VoImportDialogResult(Path.Combine(projectDir, "source.wav"), null, WemQuality.Medium));
+
+        LoadPoe2Node(externalVO: externalVO, speakerGuid: speakerGuid);
+
+        return importer;
+    }
+
+    [Fact]
+    public async Task ImportVo_Aliased_CancelChoice_DoesNotImport()
+    {
+        var importer = ArrangeAliasedImport(out var prompts);
+        _vm.ConfirmAliasedImport = p => { prompts.Add(p); return Task.FromResult(VoAliasImportChoice.Cancel); };
+
+        await _vm.ImportVoCommand.ExecuteAsync(null);
+
+        Assert.Single(prompts);
+        Assert.Null(importer.LastRequest);
+    }
+
+    [Fact]
+    public async Task ImportVo_Aliased_OverwriteChoice_ImportsToSharedPath()
+    {
+        var importer = ArrangeAliasedImport(out _);
+        _vm.ConfirmAliasedImport = _ => Task.FromResult(VoAliasImportChoice.OverwriteShared);
+
+        await _vm.ImportVoCommand.ExecuteAsync(null);
+
+        Assert.NotNull(importer.LastRequest);
+        Assert.Contains("other_conv_0005", importer.LastRequest!.PrimaryDestinationPath);
+    }
+
+    [Fact]
+    public async Task ImportVo_Aliased_ClearChoice_ClearsAliasAndImportsOwnPath()
+    {
+        var importer = ArrangeAliasedImport(out _);
+        _vm.ConfirmAliasedImport = _ => Task.FromResult(VoAliasImportChoice.ClearAliasImportOwn);
+
+        await _vm.ImportVoCommand.ExecuteAsync(null);
+
+        Assert.False(_vm.HasVoAlias);
+        Assert.NotNull(importer.LastRequest);
+        Assert.DoesNotContain("other_conv_0005", importer.LastRequest!.PrimaryDestinationPath);
+    }
+
+    [Fact]
+    public async Task ImportVo_NotAliased_NoPromptShown()
+    {
+        var importer = ArrangeAliasedImport(out var prompts, externalVO: "");
+        _vm.ConfirmAliasedImport = p => { prompts.Add(p); return Task.FromResult(VoAliasImportChoice.Cancel); };
+
+        await _vm.ImportVoCommand.ExecuteAsync(null);
+
+        Assert.Empty(prompts);
+        Assert.NotNull(importer.LastRequest);
     }
 }

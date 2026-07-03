@@ -186,6 +186,10 @@ public partial class NodeDetailViewModel : ObservableObject
     /// Set by MainWindow.axaml.cs — shows VoImportDialog and returns user selections or null if cancelled.
     public Func<VoImportPaths, Task<VoImportDialogResult?>>? ShowImportDialog { get; set; }
 
+    /// Set by MainWindow.axaml.cs — asks the user what to do when importing over
+    /// an ExternalVO alias (the target file is shared with other nodes).
+    public Func<VoAliasImportPrompt, Task<VoAliasImportChoice>>? ConfirmAliasedImport { get; set; }
+
     /// Set by MainWindowViewModel — receives one-line status messages to display in the status bar.
     public Action<string>? ReportStatus { get; set; }
 
@@ -209,6 +213,26 @@ public partial class NodeDetailViewModel : ObservableObject
         {
             ReportStatus?.Invoke(Loc.Get("VoImport_UnsavedProject"));
             return;
+        }
+
+        // Guard: the alias target is shared audio — importing overwrites it for
+        // every node that aliases it (audit 2026-07-03: up to 11 nodes share one
+        // file in shipped data). Confirm, or clear the alias and give this node
+        // its own recording.
+        if (HasVoAlias && ConfirmAliasedImport is not null)
+        {
+            var choice = await ConfirmAliasedImport(new VoAliasImportPrompt(
+                _node!.ExternalVO, VoAliasSharedCount ?? 0));
+            if (choice == VoAliasImportChoice.Cancel) return;
+            if (choice == VoAliasImportChoice.ClearAliasImportOwn)
+            {
+                _node.ExternalVO = string.Empty;   // undoable
+                _node.HasVO = true;
+                // Re-resolve inline so the destination below uses the own path.
+                _voCheck = VoPathResolver.Check(
+                    _node.SpeakerGuid, true, _node.ExternalVO, _node.HasFemaleText, _node.NodeId,
+                    Canvas?.ConversationName ?? "", GameRoot, ActiveGameId);
+            }
         }
 
         // Clicking import on a fresh node (HasVO=false, no ExternalVO) implies the user
@@ -920,3 +944,11 @@ public partial class NodeDetailViewModel : ObservableObject
 /// used by NodeDetailViewModel.ProjectAliasOverlay to shadow the on-disk VoAliasIndexService
 /// with the in-memory state of the currently-open project (mid-session edits not yet on disk).
 public record VoAliasUse(string Conversation, int NodeId, string AliasPath);
+
+/// Outcome of the aliased-import confirmation (2026-07-03 import-guard spec):
+/// importing over an ExternalVO alias overwrites shared audio for every other
+/// node that aliases the same file, so the user must be asked before it happens.
+public enum VoAliasImportChoice { Cancel, OverwriteShared, ClearAliasImportOwn }
+
+/// What the confirmation dialog shows: the shared target and its blast radius.
+public record VoAliasImportPrompt(string TargetPath, int SharedWithOthers);
