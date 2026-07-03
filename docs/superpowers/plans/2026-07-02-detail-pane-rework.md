@@ -906,7 +906,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Consumes: `ConnectionViewModel.ConditionCount` / `HasConditions` (existing, already raise change notifications), `Target.Owner.TextPreview` (existing `NodeViewModel` property).
 - Produces: `string ConditionCountLabel` on `ConnectionViewModel` — `"<glyph> <count>"`, refreshed whenever `ConditionCount` changes.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Check for an existing `ConnectionViewModelTests.cs` under `DialogEditor.Tests` (`ls DialogEditor.Tests/ViewModels | grep -i connection`); extend it, or create with this shape (adjust construction to match how existing tests build a `ConnectionViewModel` — look at any test referencing it before inventing a constructor):
 
@@ -922,12 +922,12 @@ Check for an existing `ConnectionViewModelTests.cs` under `DialogEditor.Tests` (
 
 If no test currently constructs a `ConnectionViewModel` in isolation, put the test in `NodeDetailViewModelPaneTests` instead, driving it through `_vm.Links` after wiring a canvas — whichever existing pattern is cheapest. The assertion stays the same.
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~ConditionCountLabel"`
 Expected: **build failure** — `'ConnectionViewModel' does not contain a definition for 'ConditionCountLabel'`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 In `ConnectionViewModel.cs`, add near `ConditionCount`:
 
@@ -1053,7 +1053,7 @@ Note: the condition button's `AutomationProperties.Name` above reuses `Automatio
 
 and set `AutomationProperties.Name="{DynamicResource AutomationName_LinkConditions}"` on the condition button.
 
-- [ ] **Step 4: Build, test, commit**
+- [x] **Step 4: Build, test, commit**
 
 ```
 dotnet build && dotnet test --nologo

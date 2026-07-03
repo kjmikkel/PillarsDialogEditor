@@ -96,75 +96,94 @@
                 <ItemsControl ItemsSource="{Binding Links}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="vm:ConnectionViewModel">
-                            <Grid RowDefinitions="Auto,Auto" Margin="0,2,0,2">
-                                <!-- Row 0: target + delete -->
-                                <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto">
-                                    <TextBlock Grid.Column="0"
-                                               Text="{DynamicResource Link_Arrow}"
-                                               Foreground="{DynamicResource Brush.Text.Info}" FontSize="{DynamicResource FontSize.Small}"
-                                               VerticalAlignment="Center" Margin="0,0,4,0"/>
-                                    <TextBlock Grid.Column="1"
-                                               Text="{Binding Target.Owner.NodeId}"
-                                               Foreground="{DynamicResource Brush.Text.Info}" FontSize="{DynamicResource FontSize.Small}"
-                                               VerticalAlignment="Center"/>
-                                    <!-- Condition editor button — dim when no conditions, accent when present -->
-                                    <Button Grid.Column="2"
-                                            Content="{Binding ConditionCount,
-                                                StringFormat='⚙{0}'}"
-                                            Click="LinkConditions_Click"
-                                            Tag="{Binding}"
-                                            Background="Transparent" BorderThickness="0"
-                                            FontSize="{DynamicResource FontSize.Small}" Padding="3,1" Margin="0,0,2,0"
-                                            Foreground="{Binding HasConditions,
-                                                Converter={StaticResource BoolToFemaleTextBrush}}"
-                                            ToolTip.Tip="{DynamicResource ToolTip_LinkConditions_None}"
-                                            AutomationProperties.HelpText="{DynamicResource ToolTip_LinkConditions_None}"/>
-                                    <Button Grid.Column="3"
-                                            Content="{DynamicResource Button_DeleteLink}"
-                                            Command="{Binding DataContext.DeleteLinkCommand,
-                                                      RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                            CommandParameter="{Binding}"
-                                            Background="Transparent" BorderThickness="0"
-                                            Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Caption}" Padding="4,1"
-                                            ToolTip.Tip="{DynamicResource ToolTip_DeleteLink}"
-                                            AutomationProperties.HelpText="{DynamicResource ToolTip_DeleteLink}"/>
+                            <!-- Link card: accent left edge, target text snippet, labelled controls -->
+                            <Border BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
+                                    CornerRadius="3" Margin="0,2,0,2"
+                                    Background="{DynamicResource Brush.Surface.Card}">
+                                <Grid ColumnDefinitions="3,*">
+                                    <Rectangle Fill="{DynamicResource Brush.Text.Info}"/>
+                                    <StackPanel Grid.Column="1" Margin="6,4">
+                                        <!-- Row 0: target id + text snippet + delete -->
+                                        <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+                                            <TextBlock Grid.Column="0"
+                                                       Text="{DynamicResource Link_Arrow}"
+                                                       Foreground="{DynamicResource Brush.Text.Info}" FontSize="{DynamicResource FontSize.Small}"
+                                                       VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding Target.Owner.NodeId}"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{DynamicResource Brush.Text.Info}" FontSize="{DynamicResource FontSize.Small}"
+                                                       VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                            <TextBlock Grid.Column="2"
+                                                       Text="{Binding Target.Owner.TextPreview}"
+                                                       FontStyle="Italic"
+                                                       Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Small}"
+                                                       VerticalAlignment="Center"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            <Button Grid.Column="3"
+                                                    Content="{DynamicResource Button_DeleteLink}"
+                                                    Command="{Binding DataContext.DeleteLinkCommand,
+                                                              RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                                    CommandParameter="{Binding}"
+                                                    Background="Transparent" BorderThickness="0"
+                                                    Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Caption}" Padding="4,1"
+                                                    ToolTip.Tip="{DynamicResource ToolTip_DeleteLink}"
+                                                    AutomationProperties.HelpText="{DynamicResource ToolTip_DeleteLink}"/>
+                                        </Grid>
+                                        <!-- Row 1: labelled controls -->
+                                        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" Margin="0,3,0,0">
+                                            <!-- Condition editor button — dim when no conditions, accent when present -->
+                                            <Button Grid.Column="0"
+                                                    Content="{Binding ConditionCountLabel}"
+                                                    Click="LinkConditions_Click"
+                                                    Tag="{Binding}"
+                                                    Background="Transparent" BorderThickness="0"
+                                                    FontSize="{DynamicResource FontSize.Small}" Padding="3,1" Margin="0,0,8,0"
+                                                    Foreground="{Binding HasConditions,
+                                                        Converter={StaticResource BoolToFemaleTextBrush}}"
+                                                    ToolTip.Tip="{DynamicResource ToolTip_LinkConditions_None}"
+                                                    AutomationProperties.Name="{DynamicResource AutomationName_LinkConditions}"
+                                                    AutomationProperties.HelpText="{DynamicResource ToolTip_LinkConditions_None}"/>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{DynamicResource Link_DisplayLabel}"
+                                                       Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Caption}"
+                                                       VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                            <ComboBox Grid.Column="2"
+                                                      SelectedItem="{Binding QuestionNodeTextDisplay, Mode=TwoWay}"
+                                                      ItemsSource="{x:Static vm:ConnectionViewModel.QTDOptions}"
+                                                      Background="{DynamicResource Brush.Surface.Card}" Foreground="{DynamicResource Brush.Text.Secondary}"
+                                                      BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
+                                                      FontSize="{DynamicResource FontSize.Small}" Padding="3,1" Height="22"
+                                                      ToolTip.Tip="{DynamicResource ToolTip_LinkQTD}"
+                                                      AutomationProperties.HelpText="{DynamicResource ToolTip_LinkQTD}"
+                                                      AutomationProperties.Name="{DynamicResource AutomationName_LinkQTD}">
+                                                <ComboBox.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding Converter={StaticResource QTDDisplay},
+                                                                          ConverterParameter={DynamicResource Option_QTD_Default}}"/>
+                                                    </DataTemplate>
+                                                </ComboBox.ItemTemplate>
+                                            </ComboBox>
+                                            <TextBlock Grid.Column="3"
+                                                       Text="{DynamicResource Label_LinkWeight}"
+                                                       Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Caption}"
+                                                       VerticalAlignment="Center" Margin="6,0,4,0"/>
+                                            <NumericUpDown Grid.Column="4"
+                                                           Value="{Binding RandomWeight, Mode=TwoWay, Converter={StaticResource FloatDecimal}}"
+                                                           Minimum="0" Maximum="100"
+                                                           Increment="0.1" FormatString="0.##"
+                                                           Background="{DynamicResource Brush.Surface.Card}" Foreground="{DynamicResource Brush.Text.Secondary}"
+                                                           BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
+                                                           FontSize="{DynamicResource FontSize.Small}" Padding="2,0" Width="72"
+                                                           ShowButtonSpinner="False"
+                                                           ClipValueToMinMax="True"
+                                                           ToolTip.Tip="{DynamicResource ToolTip_LinkWeight}"
+                                                           AutomationProperties.HelpText="{DynamicResource ToolTip_LinkWeight}"
+                                                           AutomationProperties.Name="{DynamicResource Label_LinkWeight}"/>
+                                        </Grid>
+                                    </StackPanel>
                                 </Grid>
-                                <!-- Row 1: editable properties -->
-                                <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" Margin="12,2,0,0">
-                                    <ComboBox Grid.Column="0"
-                                              SelectedItem="{Binding QuestionNodeTextDisplay, Mode=TwoWay}"
-                                              ItemsSource="{x:Static vm:ConnectionViewModel.QTDOptions}"
-                                              Background="{DynamicResource Brush.Surface.Card}" Foreground="{DynamicResource Brush.Text.Secondary}"
-                                              BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
-                                              FontSize="{DynamicResource FontSize.Small}" Padding="3,1" Height="22"
-                                              ToolTip.Tip="{DynamicResource ToolTip_LinkQTD}"
-                                              AutomationProperties.HelpText="{DynamicResource ToolTip_LinkQTD}"
-                                              AutomationProperties.Name="{DynamicResource AutomationName_LinkQTD}">
-                                        <ComboBox.ItemTemplate>
-                                            <DataTemplate>
-                                                <TextBlock Text="{Binding Converter={StaticResource QTDDisplay},
-                                                                  ConverterParameter={DynamicResource Option_QTD_Default}}"/>
-                                            </DataTemplate>
-                                        </ComboBox.ItemTemplate>
-                                    </ComboBox>
-                                    <TextBlock Grid.Column="1"
-                                               Text="{DynamicResource Label_LinkWeight}"
-                                               Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Small}"
-                                               VerticalAlignment="Center" Margin="6,0,4,0"/>
-                                    <NumericUpDown Grid.Column="2"
-                                                   Value="{Binding RandomWeight, Mode=TwoWay, Converter={StaticResource FloatDecimal}}"
-                                                   Minimum="0" Maximum="100"
-                                                   Increment="0.1" FormatString="0.##"
-                                                   Background="{DynamicResource Brush.Surface.Card}" Foreground="{DynamicResource Brush.Text.Secondary}"
-                                                   BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
-                                                   FontSize="{DynamicResource FontSize.Small}" Padding="2,0" Width="72"
-                                                   ShowButtonSpinner="False"
-                                                   ClipValueToMinMax="True"
-                                                   ToolTip.Tip="{DynamicResource ToolTip_LinkWeight}"
-                                                   AutomationProperties.HelpText="{DynamicResource ToolTip_LinkWeight}"
-                                                   AutomationProperties.Name="{DynamicResource Label_LinkWeight}"/>
-                                </Grid>
-                            </Grid>
+                            </Border>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
