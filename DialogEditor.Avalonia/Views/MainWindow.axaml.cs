@@ -129,6 +129,14 @@ public partial class MainWindow : Window
             return picker.ResultAlias;
         };
 
+        // Task 9: confirm before importing over a shared (aliased) recording.
+        vm.Detail.ConfirmAliasedImport = async prompt =>
+        {
+            var dlg = new AliasImportConfirmDialog(prompt);
+            await dlg.ShowDialog(this);
+            return dlg.Choice;
+        };
+
         vm.Canvas.ShowBatchVoImport = async () =>
         {
             var rows = vm.Canvas.BuildBatchVoRows(vm.Detail.GameRoot, vm.Detail.ActiveGameId);
