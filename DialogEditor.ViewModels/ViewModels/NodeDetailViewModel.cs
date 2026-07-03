@@ -6,7 +6,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch.Diff;
-using DialogEditor.ViewModels.Models;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
 
@@ -407,7 +406,50 @@ public partial class NodeDetailViewModel : ObservableObject
 
     public bool HasFemaleText => _node?.HasFemaleText ?? false;
 
-    [ObservableProperty] private IReadOnlyList<PropertyGroup>      _propertyGroups  = [];
+    // ── Pane header + GUID toggles (2026-07-02 pane rework) ─────────────
+
+    /// Bold identity line at the top of the pane: "#42 · NPC · Talk[ · Edér]".
+    /// Replaces the old read-only PropertyGroups block (which held only the ID).
+    public string NodeHeaderSummary
+    {
+        get
+        {
+            if (_node is null) return string.Empty;
+            var sep = Loc.Get("NodeDetail_HeaderSeparator");
+            var s = $"#{_node.NodeId}{sep}{SpeakerCategoryString}{sep}{NodeTypeString}";
+            var speaker = SpeakerNameService.FindByGuid(_node.SpeakerGuid)?.Name;
+            return speaker is null ? s : s + sep + speaker;
+        }
+    }
+
+    // Raw GUID boxes double every picker field, so they hide behind a {} toggle
+    // when friendly speaker data exists. Without speaker data (PoE1) they are the
+    // only editing surface and stay visible unconditionally.
+    private bool _showSpeakerGuidBox;
+    public bool ShowSpeakerGuidBox
+    {
+        get => _showSpeakerGuidBox;
+        set
+        {
+            if (SetProperty(ref _showSpeakerGuidBox, value))
+                OnPropertyChanged(nameof(IsSpeakerGuidBoxVisible));
+        }
+    }
+
+    private bool _showListenerGuidBox;
+    public bool ShowListenerGuidBox
+    {
+        get => _showListenerGuidBox;
+        set
+        {
+            if (SetProperty(ref _showListenerGuidBox, value))
+                OnPropertyChanged(nameof(IsListenerGuidBoxVisible));
+        }
+    }
+
+    public bool IsSpeakerGuidBoxVisible  => !HasSpeakerData || ShowSpeakerGuidBox;
+    public bool IsListenerGuidBoxVisible => !HasSpeakerData || ShowListenerGuidBox;
+
     [ObservableProperty] private IReadOnlyList<ConnectionViewModel> _links           = [];
     [ObservableProperty] private string                             _addLinkTargetId = string.Empty;
 
@@ -448,7 +490,6 @@ public partial class NodeDetailViewModel : ObservableObject
         if (node is null) { HasContent = false; ConditionRows.Clear(); return; }
 
         node.PropertyChanged += OnNodePropertyChanged;
-        RefreshReadOnlyGroups(node);
         RebuildConditionRows(node);
         HasContent = true;
         _translatorNote = Canvas?.GetNodeComment(node.NodeId) ?? string.Empty;
@@ -461,15 +502,10 @@ public partial class NodeDetailViewModel : ObservableObject
     private void OnNodePropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         NotifyAllProxies();
-        if (_node is not null)
-            RefreshReadOnlyGroups(_node);
         if (e.PropertyName == nameof(NodeViewModel.Conditions))
             OnPropertyChanged(nameof(ConditionSummary));
         if (e.PropertyName == nameof(NodeViewModel.Scripts))
-        {
-            if (_node is not null) RefreshReadOnlyGroups(_node);
             OnPropertyChanged(nameof(ScriptSummary));
-        }
     }
 
     private void NotifyAllProxies()
@@ -524,6 +560,7 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(CanPlayFem));
         ImportVoCommand.NotifyCanExecuteChanged();
         OnPropertyChanged(nameof(ImportVoTooltip));
+        OnPropertyChanged(nameof(NodeHeaderSummary));
     }
 
     public void Refresh() => NotifyAllProxies();
@@ -557,19 +594,6 @@ public partial class NodeDetailViewModel : ObservableObject
             if (SetProperty(ref _selectedListenerEntry, value) && value is not null)
                 ListenerGuid = value.Guid;
         }
-    }
-
-    private void RefreshReadOnlyGroups(NodeViewModel node)
-    {
-        var none = Loc.Get("NodeDetail_None");
-        PropertyGroups =
-        [
-            new PropertyGroup(Loc.Get("Label_GroupIdentity"),
-            [
-                new PropertyRow(Loc.Get("PropertyRow_NodeId"), node.NodeId.ToString()),
-            ]),
-            // Scripts and Conditions each have their own editable panel sections.
-        ];
     }
 
     public void RefreshLinks(IEnumerable<ConnectionViewModel> connections)

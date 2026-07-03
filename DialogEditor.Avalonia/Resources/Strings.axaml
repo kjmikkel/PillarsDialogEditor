@@ -1227,6 +1227,13 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_Menu_BatchImportVo">Open the batch voice-over import dialog for this conversation.</sys:String>
     <sys:String x:Key="ToolTip_Menu_BatchImportVoAll">Open the batch voice-over import dialog for all conversations in the project.</sys:String>
 
+    <!-- ── Node detail pane rework (2026-07-02) ─────────────────────────── -->
+    <sys:String x:Key="NodeDetail_HeaderSeparator"> · </sys:String>
+    <sys:String x:Key="NodeDetail_GuidToggleGlyph">{}</sys:String>
+    <sys:String x:Key="ToolTip_GuidToggle">Show or hide the raw GUID box for manual editing. The picker above sets it automatically.</sys:String>
+    <sys:String x:Key="AutomationName_GuidToggle_Speaker">Toggle raw speaker GUID field</sys:String>
+    <sys:String x:Key="AutomationName_GuidToggle_Listener">Toggle raw listener GUID field</sys:String>
+
     <sys:String x:Key="Menu_ImportVo">Import voice-over…</sys:String>
     <sys:String x:Key="ToolTip_Menu_ImportVo">Import a .wem or .wav voice-over file for the selected node.</sys:String>
     <sys:String x:Key="Menu_ExportModBundle">Export Mod Bundle…</sys:String>
