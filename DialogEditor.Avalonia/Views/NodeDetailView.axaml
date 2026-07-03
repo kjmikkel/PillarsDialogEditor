@@ -389,19 +389,56 @@
                     </Expander.Header>
                     <StackPanel>
 
-                <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_ExternalVO}"/>
-                <TextBox Classes="detail-field"
-                         Text="{Binding ExternalVO, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         FontFamily="Consolas,Courier New,monospace"
-                         ToolTip.Tip="{DynamicResource ToolTip_ExternalVO}"
-                         AutomationProperties.HelpText="{DynamicResource ToolTip_ExternalVO}"
-                         AutomationProperties.Name="{DynamicResource PropertyRow_ExternalVO}"/>
-
                 <CheckBox Classes="detail-check"
                           IsChecked="{Binding HasVO, Mode=TwoWay}"
                           Content="{DynamicResource PropertyRow_HasVO}"
                           ToolTip.Tip="{DynamicResource ToolTip_HasVO}"
                           AutomationProperties.HelpText="{DynamicResource ToolTip_HasVO}"/>
+
+                <!-- ── ExternalVO alias (2026-07-03 alias UX) ──────────────
+                     The alias redirects playback to ANOTHER line's recording;
+                     shipped PoE2 data does this on 1,000 nodes. The raw path is
+                     readonly — edits go through the node picker so the value is
+                     always derivable and the shared-count below stays honest. -->
+                <StackPanel IsVisible="{Binding HasVoAlias}">
+                    <TextBlock Text="{Binding VoAliasDescription}"
+                               Foreground="{DynamicResource Brush.Text.Secondary}"
+                               FontSize="{DynamicResource FontSize.Small}"
+                               TextWrapping="Wrap"
+                               ToolTip.Tip="{Binding VoAliasDescription}"/>
+                    <SelectableTextBlock Text="{Binding VoAliasRawPath}"
+                               FontFamily="Consolas,Courier New,monospace"
+                               Foreground="{DynamicResource Brush.Text.Muted}"
+                               FontSize="{DynamicResource FontSize.Caption}"
+                               ToolTip.Tip="{DynamicResource ToolTip_AliasRawPath}"
+                               Margin="0,1,0,0"/>
+                    <TextBlock Text="{Binding VoAliasSharedText}"
+                               Foreground="{DynamicResource Brush.Text.Muted}"
+                               FontSize="{DynamicResource FontSize.Caption}"
+                               ToolTip.Tip="{DynamicResource ToolTip_AliasShared}"
+                               Margin="0,1,0,2"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                        <Button Content="{DynamicResource NodeDetail_AliasChange}"
+                                Command="{Binding PickVoAliasCommand}"
+                                Padding="6,2"
+                                ToolTip.Tip="{DynamicResource ToolTip_AliasChange}"
+                                AutomationProperties.HelpText="{DynamicResource ToolTip_AliasChange}"/>
+                        <Button Content="{DynamicResource NodeDetail_AliasClear}"
+                                Command="{Binding ClearVoAliasCommand}"
+                                Padding="6,2" Margin="4,0,0,0"
+                                ToolTip.Tip="{DynamicResource ToolTip_AliasClear}"
+                                AutomationProperties.HelpText="{DynamicResource ToolTip_AliasClear}"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Entry point when no alias is set (PoE2 only — hidden on PoE1
+                     where ExternalVO is empty on all 40,991 shipped nodes). -->
+                <Button Content="{DynamicResource NodeDetail_ReuseVoButton}"
+                        Command="{Binding PickVoAliasCommand}"
+                        IsVisible="{Binding CanStartVoAliasPick}"
+                        Padding="6,2" Margin="0,2,0,4"
+                        ToolTip.Tip="{DynamicResource ToolTip_ReuseVo}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_ReuseVo}"/>
 
                 <!-- VO file status — PoE2 only; shown when HasVO or ExternalVO set -->
                 <StackPanel Orientation="Horizontal" Margin="0,2,0,4"

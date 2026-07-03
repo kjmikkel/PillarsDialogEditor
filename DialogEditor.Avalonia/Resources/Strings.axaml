@@ -146,7 +146,6 @@
     <sys:String x:Key="PropertyRow_Conditions">Conditions</sys:String>
     <sys:String x:Key="PropertyRow_Scripts">Scripts</sys:String>
     <sys:String x:Key="PropertyRow_Comments">Comments</sys:String>
-    <sys:String x:Key="PropertyRow_ExternalVO">External VO</sys:String>
     <sys:String x:Key="PropertyRow_HasVO">Has VO</sys:String>
     <sys:String x:Key="PropertyRow_HideSpeaker">Hide Speaker</sys:String>
 
@@ -477,7 +476,6 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_BarkWarnings">Bark-specific validation warnings. These do not block saving — they help writers avoid common mistakes.</sys:String>
     <sys:String x:Key="ToolTip_Persistence">OnceEver hides this node after it has been shown once, even across saves</sys:String>
     <sys:String x:Key="ToolTip_ActorDirection">Optional director's note for the voice actor — not shown to players</sys:String>
-    <sys:String x:Key="ToolTip_ExternalVO">External voice-over file path or identifier</sys:String>
     <sys:String x:Key="ToolTip_HasVO">Check if a voice-over recording exists for this line</sys:String>
     <sys:String x:Key="ToolTip_HideSpeaker">Hide the speaker name label during dialogue playback</sys:String>
     <sys:String x:Key="ToolTip_Comments">Internal developer notes — not shown to players</sys:String>
@@ -1264,5 +1262,22 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="VoImport_FileType_All">WEM or WAV</sys:String>
     <sys:String x:Key="VoImport_FileType_Wem">Pre-encoded WEM</sys:String>
     <sys:String x:Key="VoImport_FileType_Wav">WAV (requires Wwise)</sys:String>
+
+    <!-- ── ExternalVO alias UX (2026-07-03) ─────────────────────────────── -->
+    <!-- {0} = conversation name, {1} = node id -->
+    <sys:String x:Key="NodeDetail_AliasDescription">Plays the recording of {0} node {1}</sys:String>
+    <!-- {0} = raw alias path -->
+    <sys:String x:Key="NodeDetail_AliasRaw">Plays external recording: {0}</sys:String>
+    <sys:String x:Key="NodeDetail_AliasNotShared">Not shared with other nodes</sys:String>
+    <!-- {0} = count of other nodes using the same recording -->
+    <sys:String x:Key="NodeDetail_AliasSharedCount">Also used by {0} other node(s)</sys:String>
+    <sys:String x:Key="NodeDetail_ReuseVoButton">Reuse another line's VO…</sys:String>
+    <sys:String x:Key="NodeDetail_AliasChange">Change…</sys:String>
+    <sys:String x:Key="NodeDetail_AliasClear">Clear</sys:String>
+    <sys:String x:Key="ToolTip_ReuseVo">Point this node's voice-over at another line's recording instead of its own file. Opens a picker listing every conversation and node.</sys:String>
+    <sys:String x:Key="ToolTip_AliasChange">Choose a different node whose recording this node should play.</sys:String>
+    <sys:String x:Key="ToolTip_AliasClear">Remove the alias. The node goes back to its own voice-over file, named after this conversation and node ID.</sys:String>
+    <sys:String x:Key="ToolTip_AliasRawPath">The stored ExternalVO path, relative to the game's Voices folder. Edit it via Change…; it cannot be typed directly.</sys:String>
+    <sys:String x:Key="ToolTip_AliasShared">How many other nodes play this same recording. Overwriting the file affects all of them.</sys:String>
 
 </ResourceDictionary>
