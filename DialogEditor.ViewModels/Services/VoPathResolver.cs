@@ -18,6 +18,11 @@ public static class VoPathResolver
 {
     private const string NarratorGuid = "6a99a109-0000-0000-0000-000000000000";
 
+    /// Canonical Voices root for a PoE2 game folder — single definition so the
+    /// picker, importer, and resolver can never disagree on the layout.
+    public static string VoicesRoot(string gameRoot) => Path.Combine(gameRoot,
+        "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
+
     /// <summary>
     /// Checks whether the VO file for <paramref name="nodeId"/> in
     /// <paramref name="conversationName"/> exists on disk.
@@ -47,8 +52,7 @@ public static class VoPathResolver
         if (!hasVO && string.IsNullOrEmpty(externalVO))
             return new VoCheckResult(VoPresence.NotApplicable, false, null, null);
 
-        var voRoot = Path.Combine(gameRoot,
-            "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
+        var voRoot = VoicesRoot(gameRoot);
 
         var relBase = ExpectedRelativePath(speakerGuid, externalVO, nodeId, conversationName);
         if (relBase is null)
@@ -106,8 +110,7 @@ public static class VoPathResolver
             || string.IsNullOrEmpty(gameRoot))
             return result;
 
-        var voRoot = Path.Combine(gameRoot,
-            "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
+        var voRoot = VoicesRoot(gameRoot);
         var rel          = Path.GetRelativePath(voRoot, result.PrimaryWemPath);
         var localPrimary = Path.Combine(Path.GetDirectoryName(projectPath)!, "_vo", rel);
         if (!File.Exists(localPrimary)) return result;
