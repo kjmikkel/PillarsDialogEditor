@@ -3,7 +3,6 @@ using DialogEditor.Patch.Diff;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
-using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.ViewModels;
 
@@ -108,23 +107,8 @@ public class NodeDetailViewModelTests
         Assert.Null(exception);
     }
 
-    // ── Read-only property groups (Identity = NodeId; Logic = conditions/scripts) ──
-
-    [Fact]
-    public void Load_PropertyGroups_HasIdentityGroup()
-    {
-        _vm.Load(MakeNode());
-        Assert.Single(_vm.PropertyGroups);   // Scripts/Conditions now have dedicated panels
-    }
-
-    [Fact]
-    public void Load_IdentityGroup_ContainsNodeIdRow()
-    {
-        _vm.Load(MakeNode(id: 42));
-        var identity = _vm.PropertyGroups[0];
-        Assert.Single(identity.Rows);
-        Assert.Equal("42", identity.Rows[0].Value);
-    }
+    // Node ID display moved from PropertyGroups to NodeHeaderSummary —
+    // covered by NodeDetailViewModelPaneTests (2026-07-02 pane rework).
 
     [Fact]
     public void Load_ScriptSummary_EmptyWhenNoScripts()

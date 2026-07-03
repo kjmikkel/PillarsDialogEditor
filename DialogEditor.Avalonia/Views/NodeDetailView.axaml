@@ -1,6 +1,5 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:models="clr-namespace:DialogEditor.ViewModels.Models;assembly=DialogEditor.ViewModels"
              xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
              xmlns:types="clr-namespace:DialogEditor.ViewModels.Services;assembly=DialogEditor.ViewModels"
              x:Class="DialogEditor.Avalonia.Views.NodeDetailView"
@@ -43,18 +42,6 @@
         </Style>
     </UserControl.Styles>
 
-    <UserControl.Resources>
-        <DataTemplate x:Key="ReadOnlyRowTemplate" DataType="models:PropertyRow">
-            <Grid ColumnDefinitions="110,*" Margin="0,1,0,1">
-                <TextBlock Grid.Column="0" Text="{Binding Label}"
-                           Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Small}" VerticalAlignment="Top"/>
-                <TextBlock Grid.Column="1" Text="{Binding Value}"
-                           Foreground="{Binding Style, Converter={StaticResource PropertyValueStyleToBrush}}"
-                           FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap" LineHeight="15"/>
-            </Grid>
-        </DataTemplate>
-    </UserControl.Resources>
-
     <Grid>
         <TextBlock Text="{DynamicResource Label_SelectNode}"
                    Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Label}"
@@ -62,15 +49,23 @@
                    IsVisible="{Binding HasContent, Converter={StaticResource InverseBoolToVis}}"/>
 
         <ScrollViewer Background="{DynamicResource Brush.Surface.Subtle}" IsVisible="{Binding HasContent}">
+            <!-- Hot-first order (2026-07-02 pane rework spec): identity header, then the
+                 two constantly-used areas (dialogue text, links), then secondary groups.
+                 Task 2 wraps the secondary groups in collapsed Expanders. -->
             <StackPanel Margin="8">
 
-                <!-- ── Attribution (git: who last edited this node) ────── -->
-                <StackPanel IsVisible="{Binding HasAttribution}">
-                    <TextBlock Classes="group-header" Text="{DynamicResource NodeDetail_LastEditedLabel}"/>
-                    <TextBlock Text="{Binding LastEditedSummary}"
-                               ToolTip.Tip="{Binding LastEditedTooltip}"
-                               Foreground="{DynamicResource Brush.Node.Quotidian.Note}" FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
-                </StackPanel>
+                <!-- ── Node header: replaces the old read-only node-ID group ── -->
+                <TextBlock Text="{Binding NodeHeaderSummary}"
+                           FontWeight="Bold" FontSize="{DynamicResource FontSize.Small}"
+                           Foreground="{DynamicResource Brush.Text.Primary}"
+                           TextTrimming="CharacterEllipsis"
+                           ToolTip.Tip="{Binding NodeHeaderSummary}"/>
+                <TextBlock IsVisible="{Binding HasAttribution}"
+                           Text="{Binding LastEditedSummary}"
+                           ToolTip.Tip="{Binding LastEditedTooltip}"
+                           Foreground="{DynamicResource Brush.Text.Muted}"
+                           FontSize="{DynamicResource FontSize.Caption}"
+                           TextWrapping="Wrap" Margin="0,1,0,2"/>
 
                 <!-- ── Default / Male text ─────────────────────────────── -->
                 <TextBlock Classes="group-header" Text="{DynamicResource Label_DefaultMaleText}"/>
@@ -91,230 +86,7 @@
                          AutomationProperties.HelpText="{DynamicResource ToolTip_FemaleText}"
                          AutomationProperties.Name="{DynamicResource Label_FemaleText}"/>
 
-                <!-- ── Identity ────────────────────────────────────────── -->
-                <TextBlock Classes="group-header" Text="{DynamicResource Label_GroupIdentity}"/>
-
-                <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_Type}"/>
-                <ComboBox Classes="detail-combo"
-                          ItemsSource="{x:Static vm:NodeDetailViewModel.NodeTypeOptions}"
-                          SelectedItem="{Binding NodeTypeString, Mode=TwoWay}"
-                          ToolTip.Tip="{DynamicResource ToolTip_NodeType}"
-                          AutomationProperties.HelpText="{DynamicResource ToolTip_NodeType}"
-                          AutomationProperties.Name="{DynamicResource PropertyRow_Type}"/>
-
-                <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_SpeakerCategory}"/>
-                <ComboBox Classes="detail-combo"
-                          ItemsSource="{x:Static vm:NodeDetailViewModel.SpeakerCategoryOptions}"
-                          SelectedItem="{Binding SpeakerCategoryString, Mode=TwoWay}"
-                          ToolTip.Tip="{DynamicResource ToolTip_SpeakerCategory}"
-                          AutomationProperties.HelpText="{DynamicResource ToolTip_SpeakerCategory}"
-                          AutomationProperties.Name="{DynamicResource PropertyRow_SpeakerCategory}"/>
-
-                <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_SpeakerGuid}"/>
-                <!-- Name picker — visible when speaker data is loaded (PoE2) -->
-                <AutoCompleteBox Classes="detail-field"
-                                 ItemsSource="{Binding AvailableSpeakers}"
-                                 SelectedItem="{Binding SelectedSpeakerEntry, Mode=TwoWay}"
-                                 Watermark="{DynamicResource Placeholder_SpeakerSearch}"
-                                 FilterMode="Contains"
-                                 IsVisible="{Binding HasSpeakerData}"
-                                 ToolTip.Tip="{DynamicResource ToolTip_SpeakerPicker}"
-                                 AutomationProperties.HelpText="{DynamicResource ToolTip_SpeakerPicker}"
-                                 AutomationProperties.Name="{DynamicResource PropertyRow_SpeakerGuid}"/>
-                <TextBox Classes="detail-field"
-                         Text="{Binding SpeakerGuid, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         FontFamily="Consolas,Courier New,monospace"
-                         ToolTip.Tip="{DynamicResource ToolTip_SpeakerGuid}"
-                         AutomationProperties.HelpText="{DynamicResource ToolTip_SpeakerGuid}"
-                         AutomationProperties.Name="{DynamicResource PropertyRow_SpeakerGuid}"/>
-
-                <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_ListenerGuid}"/>
-                <!-- Name picker — visible when speaker data is loaded (PoE2) -->
-                <AutoCompleteBox Classes="detail-field"
-                                 ItemsSource="{Binding AvailableSpeakers}"
-                                 SelectedItem="{Binding SelectedListenerEntry, Mode=TwoWay}"
-                                 Watermark="{DynamicResource Placeholder_SpeakerSearch}"
-                                 FilterMode="Contains"
-                                 IsVisible="{Binding HasSpeakerData}"
-                                 ToolTip.Tip="{DynamicResource ToolTip_SpeakerPicker}"
-                                 AutomationProperties.HelpText="{DynamicResource ToolTip_SpeakerPicker}"
-                                 AutomationProperties.Name="{DynamicResource PropertyRow_ListenerGuid}"/>
-                <TextBox Classes="detail-field"
-                         Text="{Binding ListenerGuid, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         FontFamily="Consolas,Courier New,monospace"
-                         ToolTip.Tip="{DynamicResource ToolTip_ListenerGuid}"
-                         AutomationProperties.HelpText="{DynamicResource ToolTip_ListenerGuid}"
-                         AutomationProperties.Name="{DynamicResource PropertyRow_ListenerGuid}"/>
-
-                <!-- ── Display ─────────────────────────────────────────── -->
-                <TextBlock Classes="group-header" Text="{DynamicResource Label_GroupDisplay}"/>
-
-                <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_DisplayType}"/>
-                <ComboBox Classes="detail-combo"
-                          ItemsSource="{x:Static vm:NodeDetailViewModel.DisplayTypeOptions}"
-                          SelectedItem="{Binding DisplayType, Mode=TwoWay}"
-                          ToolTip.Tip="{DynamicResource ToolTip_DisplayType}"
-                          AutomationProperties.HelpText="{DynamicResource ToolTip_DisplayType}"
-                          AutomationProperties.Name="{DynamicResource PropertyRow_DisplayType}"/>
-
-                <Border Background="{DynamicResource Brush.Bark.Detail.Background}" BorderBrush="{DynamicResource Brush.Bark.Detail.Border}" BorderThickness="1"
-                        CornerRadius="2" Padding="6,4" Margin="0,0,0,4"
-                        IsVisible="{Binding BarkWarnings.Count, Converter={StaticResource CountToVis}}"
-                        ToolTip.Tip="{DynamicResource ToolTip_BarkWarnings}">
-                    <ItemsControl ItemsSource="{Binding BarkWarnings}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}" Foreground="{DynamicResource Brush.Bark.Detail.Text}"
-                                           FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Border>
-
-                <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_Persistence}"/>
-                <ComboBox Classes="detail-combo"
-                          ItemsSource="{x:Static vm:NodeDetailViewModel.PersistenceOptions}"
-                          SelectedItem="{Binding Persistence, Mode=TwoWay}"
-                          ToolTip.Tip="{DynamicResource ToolTip_Persistence}"
-                          AutomationProperties.HelpText="{DynamicResource ToolTip_Persistence}"
-                          AutomationProperties.Name="{DynamicResource PropertyRow_Persistence}"/>
-
-                <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_ActorDirection}"/>
-                <TextBox Classes="detail-field"
-                         Text="{Binding ActorDirection, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         ToolTip.Tip="{DynamicResource ToolTip_ActorDirection}"
-                         AutomationProperties.HelpText="{DynamicResource ToolTip_ActorDirection}"
-                         AutomationProperties.Name="{DynamicResource PropertyRow_ActorDirection}"/>
-
-                <!-- ── Voice ───────────────────────────────────────────── -->
-                <TextBlock Classes="group-header" Text="{DynamicResource Label_GroupVoice}"/>
-
-                <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_ExternalVO}"/>
-                <TextBox Classes="detail-field"
-                         Text="{Binding ExternalVO, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         FontFamily="Consolas,Courier New,monospace"
-                         ToolTip.Tip="{DynamicResource ToolTip_ExternalVO}"
-                         AutomationProperties.HelpText="{DynamicResource ToolTip_ExternalVO}"
-                         AutomationProperties.Name="{DynamicResource PropertyRow_ExternalVO}"/>
-
-                <CheckBox Classes="detail-check"
-                          IsChecked="{Binding HasVO, Mode=TwoWay}"
-                          Content="{DynamicResource PropertyRow_HasVO}"
-                          ToolTip.Tip="{DynamicResource ToolTip_HasVO}"
-                          AutomationProperties.HelpText="{DynamicResource ToolTip_HasVO}"/>
-
-                <!-- VO file status — PoE2 only; shown when HasVO or ExternalVO set -->
-                <StackPanel Orientation="Horizontal" Margin="0,2,0,4"
-                            IsVisible="{Binding HasVoStatus}"
-                            ToolTip.Tip="{Binding VoStatusText}"
-                            AutomationProperties.HelpText="{Binding VoStatusText}">
-                    <TextBlock Text="{Binding VoStatusGlyph}"
-                               Foreground="{Binding VoStatusIsFound, Converter={StaticResource BoolToVoStatusBrush}}"
-                               FontSize="{DynamicResource FontSize.Small}"
-                               VerticalAlignment="Center" Margin="0,0,4,0"/>
-                    <TextBlock Text="{Binding VoStatusText}"
-                               Foreground="{Binding VoStatusIsFound, Converter={StaticResource BoolToVoStatusBrush}}"
-                               FontSize="{DynamicResource FontSize.Small}"
-                               VerticalAlignment="Center"/>
-                    <!-- Play buttons — only when vgmstream-cli is present and the file is found -->
-                    <Button Content="{Binding PlayPrimaryLabel}"
-                            Command="{Binding PlayPrimaryCommand}"
-                            IsVisible="{Binding CanPlayAudio}"
-                            ToolTip.Tip="{Binding PlayPrimaryTooltip}"
-                            AutomationProperties.HelpText="{Binding PlayPrimaryTooltip}"
-                            Margin="8,0,0,0" Padding="6,2"/>
-                    <Button Content="{Binding PlayFemLabel}"
-                            Command="{Binding PlayFemCommand}"
-                            IsVisible="{Binding CanPlayFem}"
-                            ToolTip.Tip="{Binding PlayFemTooltip}"
-                            AutomationProperties.HelpText="{Binding PlayFemTooltip}"
-                            Margin="4,0,0,0" Padding="6,2"/>
-                </StackPanel>
-
-                <!-- Import button — visible for all PoE2 nodes (even before HasVO is set);
-                     disabled when the project is unsaved so the tooltip explains why. -->
-                <Button Content="🎤"
-                        Command="{Binding ImportVoCommand}"
-                        IsVisible="{Binding IsVoImportVisible}"
-                        ToolTip.Tip="{Binding ImportVoTooltip}"
-                        AutomationProperties.Name="{DynamicResource AutomationName_VoImport}"
-                        AutomationProperties.HelpText="{Binding ImportVoTooltip}"
-                        Margin="0,2,0,4" Padding="8,3"/>
-
-                <CheckBox Classes="detail-check"
-                          IsChecked="{Binding HideSpeaker, Mode=TwoWay}"
-                          Content="{DynamicResource PropertyRow_HideSpeaker}"
-                          ToolTip.Tip="{DynamicResource ToolTip_HideSpeaker}"
-                          AutomationProperties.HelpText="{DynamicResource ToolTip_HideSpeaker}"/>
-
-                <!-- ── Comments ────────────────────────────────────────── -->
-                <TextBlock Classes="group-header" Text="{DynamicResource PropertyRow_Comments}"/>
-                <TextBox Classes="detail-field"
-                         Text="{Binding Comments, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30"
-                         ToolTip.Tip="{DynamicResource ToolTip_Comments}"
-                         AutomationProperties.HelpText="{DynamicResource ToolTip_Comments}"
-                         AutomationProperties.Name="{DynamicResource PropertyRow_Comments}"/>
-
-                <!-- ── Translator note ────────────────────────────────── -->
-                <TextBlock Classes="group-header" Text="{DynamicResource NodeDetail_TranslatorNote}"/>
-                <TextBox Classes="detail-field"
-                         Text="{Binding TranslatorNote, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
-                         AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30"
-                         ToolTip.Tip="{DynamicResource ToolTip_NodeDetail_TranslatorNote}"
-                         AutomationProperties.HelpText="{DynamicResource ToolTip_NodeDetail_TranslatorNote}"
-                         AutomationProperties.Name="{DynamicResource NodeDetail_TranslatorNote}"/>
-
-                <!-- ── Scripts (edit in separate window) ─────────────── -->
-                <TextBlock Classes="group-header" Text="{DynamicResource Label_GroupLogic}"/>
-                <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
-                    <TextBlock Grid.Column="0"
-                               Text="{Binding ScriptSummary}"
-                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
-                               VerticalAlignment="Center"
-                               TextTrimming="CharacterEllipsis"/>
-                    <Button Grid.Column="1"
-                            Content="{DynamicResource Button_EditScripts}"
-                            Click="EditScripts_Click"
-                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0"
-                            Padding="8,3" FontSize="{DynamicResource FontSize.Small}"
-                            ToolTip.Tip="{DynamicResource ToolTip_EditScripts}"
-                            AutomationProperties.HelpText="{DynamicResource ToolTip_EditScripts}"/>
-                </Grid>
-
-                <!-- ── Read-only groups (node ID) ─────────────────────── -->
-                <ItemsControl ItemsSource="{Binding PropertyGroups}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel>
-                                <TextBlock Classes="group-header" Text="{Binding Name}"/>
-                                <ItemsControl ItemsSource="{Binding Rows}"
-                                              ItemTemplate="{StaticResource ReadOnlyRowTemplate}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-
-                <!-- ── Conditions (edit in separate window) ───────────── -->
-                <TextBlock Classes="group-header" Text="{DynamicResource Label_GroupConditions}"/>
-                <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
-                    <!-- Summary: show count + first condition names -->
-                    <TextBlock Grid.Column="0"
-                               Text="{Binding ConditionSummary}"
-                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
-                               VerticalAlignment="Center"
-                               TextTrimming="CharacterEllipsis"/>
-                    <Button Grid.Column="1"
-                            x:Name="EditConditionsButton"
-                            Content="{DynamicResource Button_EditConditions}"
-                            Click="EditConditions_Click"
-                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0"
-                            Padding="8,3" FontSize="{DynamicResource FontSize.Small}"
-                            ToolTip.Tip="{DynamicResource ToolTip_EditConditions}"
-                            AutomationProperties.HelpText="{DynamicResource ToolTip_EditConditions}"/>
-                </Grid>
-
-                <!-- ── Links ──────────────────────────────────────────── -->
+                <!-- ── Links (hot: moved above all secondary groups) ───── -->
                 <TextBlock Classes="group-header" Text="{DynamicResource Label_GroupLinks}"/>
                 <ItemsControl ItemsSource="{Binding Links}">
                     <ItemsControl.ItemTemplate>
@@ -411,6 +183,236 @@
                             ToolTip.Tip="{DynamicResource ToolTip_AddLink}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_AddLink}"/>
                 </Grid>
+
+                <!-- ── Speaker & Identity ──────────────────────────────── -->
+                <TextBlock Classes="group-header" Text="{DynamicResource Label_GroupIdentity}"/>
+
+                <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_Type}"/>
+                <ComboBox Classes="detail-combo"
+                          ItemsSource="{x:Static vm:NodeDetailViewModel.NodeTypeOptions}"
+                          SelectedItem="{Binding NodeTypeString, Mode=TwoWay}"
+                          ToolTip.Tip="{DynamicResource ToolTip_NodeType}"
+                          AutomationProperties.HelpText="{DynamicResource ToolTip_NodeType}"
+                          AutomationProperties.Name="{DynamicResource PropertyRow_Type}"/>
+
+                <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_SpeakerCategory}"/>
+                <ComboBox Classes="detail-combo"
+                          ItemsSource="{x:Static vm:NodeDetailViewModel.SpeakerCategoryOptions}"
+                          SelectedItem="{Binding SpeakerCategoryString, Mode=TwoWay}"
+                          ToolTip.Tip="{DynamicResource ToolTip_SpeakerCategory}"
+                          AutomationProperties.HelpText="{DynamicResource ToolTip_SpeakerCategory}"
+                          AutomationProperties.Name="{DynamicResource PropertyRow_SpeakerCategory}"/>
+
+                <!-- Speaker: friendly picker; raw GUID box behind a {} toggle when picker data exists -->
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_SpeakerGuid}"/>
+                    <ToggleButton Grid.Column="1"
+                                  Content="{DynamicResource NodeDetail_GuidToggleGlyph}"
+                                  IsChecked="{Binding ShowSpeakerGuidBox, Mode=TwoWay}"
+                                  IsVisible="{Binding HasSpeakerData}"
+                                  FontSize="{DynamicResource FontSize.Caption}" Padding="4,0"
+                                  ToolTip.Tip="{DynamicResource ToolTip_GuidToggle}"
+                                  AutomationProperties.Name="{DynamicResource AutomationName_GuidToggle_Speaker}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_GuidToggle}"/>
+                </Grid>
+                <AutoCompleteBox Classes="detail-field"
+                                 ItemsSource="{Binding AvailableSpeakers}"
+                                 SelectedItem="{Binding SelectedSpeakerEntry, Mode=TwoWay}"
+                                 Watermark="{DynamicResource Placeholder_SpeakerSearch}"
+                                 FilterMode="Contains"
+                                 IsVisible="{Binding HasSpeakerData}"
+                                 ToolTip.Tip="{DynamicResource ToolTip_SpeakerPicker}"
+                                 AutomationProperties.HelpText="{DynamicResource ToolTip_SpeakerPicker}"
+                                 AutomationProperties.Name="{DynamicResource PropertyRow_SpeakerGuid}"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding SpeakerGuid, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         FontFamily="Consolas,Courier New,monospace"
+                         IsVisible="{Binding IsSpeakerGuidBoxVisible}"
+                         ToolTip.Tip="{DynamicResource ToolTip_SpeakerGuid}"
+                         AutomationProperties.HelpText="{DynamicResource ToolTip_SpeakerGuid}"
+                         AutomationProperties.Name="{DynamicResource PropertyRow_SpeakerGuid}"/>
+
+                <!-- Listener: same pattern -->
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_ListenerGuid}"/>
+                    <ToggleButton Grid.Column="1"
+                                  Content="{DynamicResource NodeDetail_GuidToggleGlyph}"
+                                  IsChecked="{Binding ShowListenerGuidBox, Mode=TwoWay}"
+                                  IsVisible="{Binding HasSpeakerData}"
+                                  FontSize="{DynamicResource FontSize.Caption}" Padding="4,0"
+                                  ToolTip.Tip="{DynamicResource ToolTip_GuidToggle}"
+                                  AutomationProperties.Name="{DynamicResource AutomationName_GuidToggle_Listener}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_GuidToggle}"/>
+                </Grid>
+                <AutoCompleteBox Classes="detail-field"
+                                 ItemsSource="{Binding AvailableSpeakers}"
+                                 SelectedItem="{Binding SelectedListenerEntry, Mode=TwoWay}"
+                                 Watermark="{DynamicResource Placeholder_SpeakerSearch}"
+                                 FilterMode="Contains"
+                                 IsVisible="{Binding HasSpeakerData}"
+                                 ToolTip.Tip="{DynamicResource ToolTip_SpeakerPicker}"
+                                 AutomationProperties.HelpText="{DynamicResource ToolTip_SpeakerPicker}"
+                                 AutomationProperties.Name="{DynamicResource PropertyRow_ListenerGuid}"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding ListenerGuid, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         FontFamily="Consolas,Courier New,monospace"
+                         IsVisible="{Binding IsListenerGuidBoxVisible}"
+                         ToolTip.Tip="{DynamicResource ToolTip_ListenerGuid}"
+                         AutomationProperties.HelpText="{DynamicResource ToolTip_ListenerGuid}"
+                         AutomationProperties.Name="{DynamicResource PropertyRow_ListenerGuid}"/>
+
+                <!-- ── Display (HideSpeaker moved here from Voice) ─────── -->
+                <TextBlock Classes="group-header" Text="{DynamicResource Label_GroupDisplay}"/>
+
+                <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_DisplayType}"/>
+                <ComboBox Classes="detail-combo"
+                          ItemsSource="{x:Static vm:NodeDetailViewModel.DisplayTypeOptions}"
+                          SelectedItem="{Binding DisplayType, Mode=TwoWay}"
+                          ToolTip.Tip="{DynamicResource ToolTip_DisplayType}"
+                          AutomationProperties.HelpText="{DynamicResource ToolTip_DisplayType}"
+                          AutomationProperties.Name="{DynamicResource PropertyRow_DisplayType}"/>
+
+                <Border Background="{DynamicResource Brush.Bark.Detail.Background}" BorderBrush="{DynamicResource Brush.Bark.Detail.Border}" BorderThickness="1"
+                        CornerRadius="2" Padding="6,4" Margin="0,0,0,4"
+                        IsVisible="{Binding BarkWarnings.Count, Converter={StaticResource CountToVis}}"
+                        ToolTip.Tip="{DynamicResource ToolTip_BarkWarnings}">
+                    <ItemsControl ItemsSource="{Binding BarkWarnings}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Foreground="{DynamicResource Brush.Bark.Detail.Text}"
+                                           FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+
+                <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_Persistence}"/>
+                <ComboBox Classes="detail-combo"
+                          ItemsSource="{x:Static vm:NodeDetailViewModel.PersistenceOptions}"
+                          SelectedItem="{Binding Persistence, Mode=TwoWay}"
+                          ToolTip.Tip="{DynamicResource ToolTip_Persistence}"
+                          AutomationProperties.HelpText="{DynamicResource ToolTip_Persistence}"
+                          AutomationProperties.Name="{DynamicResource PropertyRow_Persistence}"/>
+
+                <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_ActorDirection}"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding ActorDirection, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         ToolTip.Tip="{DynamicResource ToolTip_ActorDirection}"
+                         AutomationProperties.HelpText="{DynamicResource ToolTip_ActorDirection}"
+                         AutomationProperties.Name="{DynamicResource PropertyRow_ActorDirection}"/>
+
+                <CheckBox Classes="detail-check"
+                          IsChecked="{Binding HideSpeaker, Mode=TwoWay}"
+                          Content="{DynamicResource PropertyRow_HideSpeaker}"
+                          ToolTip.Tip="{DynamicResource ToolTip_HideSpeaker}"
+                          AutomationProperties.HelpText="{DynamicResource ToolTip_HideSpeaker}"/>
+
+                <!-- ── Voice ───────────────────────────────────────────── -->
+                <TextBlock Classes="group-header" Text="{DynamicResource Label_GroupVoice}"/>
+
+                <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_ExternalVO}"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding ExternalVO, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         FontFamily="Consolas,Courier New,monospace"
+                         ToolTip.Tip="{DynamicResource ToolTip_ExternalVO}"
+                         AutomationProperties.HelpText="{DynamicResource ToolTip_ExternalVO}"
+                         AutomationProperties.Name="{DynamicResource PropertyRow_ExternalVO}"/>
+
+                <CheckBox Classes="detail-check"
+                          IsChecked="{Binding HasVO, Mode=TwoWay}"
+                          Content="{DynamicResource PropertyRow_HasVO}"
+                          ToolTip.Tip="{DynamicResource ToolTip_HasVO}"
+                          AutomationProperties.HelpText="{DynamicResource ToolTip_HasVO}"/>
+
+                <!-- VO file status — PoE2 only; shown when HasVO or ExternalVO set -->
+                <StackPanel Orientation="Horizontal" Margin="0,2,0,4"
+                            IsVisible="{Binding HasVoStatus}"
+                            ToolTip.Tip="{Binding VoStatusText}"
+                            AutomationProperties.HelpText="{Binding VoStatusText}">
+                    <TextBlock Text="{Binding VoStatusGlyph}"
+                               Foreground="{Binding VoStatusIsFound, Converter={StaticResource BoolToVoStatusBrush}}"
+                               FontSize="{DynamicResource FontSize.Small}"
+                               VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <TextBlock Text="{Binding VoStatusText}"
+                               Foreground="{Binding VoStatusIsFound, Converter={StaticResource BoolToVoStatusBrush}}"
+                               FontSize="{DynamicResource FontSize.Small}"
+                               VerticalAlignment="Center"/>
+                    <!-- Play buttons — only when vgmstream-cli is present and the file is found -->
+                    <Button Content="{Binding PlayPrimaryLabel}"
+                            Command="{Binding PlayPrimaryCommand}"
+                            IsVisible="{Binding CanPlayAudio}"
+                            ToolTip.Tip="{Binding PlayPrimaryTooltip}"
+                            AutomationProperties.HelpText="{Binding PlayPrimaryTooltip}"
+                            Margin="8,0,0,0" Padding="6,2"/>
+                    <Button Content="{Binding PlayFemLabel}"
+                            Command="{Binding PlayFemCommand}"
+                            IsVisible="{Binding CanPlayFem}"
+                            ToolTip.Tip="{Binding PlayFemTooltip}"
+                            AutomationProperties.HelpText="{Binding PlayFemTooltip}"
+                            Margin="4,0,0,0" Padding="6,2"/>
+                </StackPanel>
+
+                <!-- Import button — visible for all PoE2 nodes (even before HasVO is set);
+                     disabled when the project is unsaved so the tooltip explains why. -->
+                <Button Content="🎤"
+                        Command="{Binding ImportVoCommand}"
+                        IsVisible="{Binding IsVoImportVisible}"
+                        ToolTip.Tip="{Binding ImportVoTooltip}"
+                        AutomationProperties.Name="{DynamicResource AutomationName_VoImport}"
+                        AutomationProperties.HelpText="{Binding ImportVoTooltip}"
+                        Margin="0,2,0,4" Padding="8,3"/>
+
+                <!-- ── Logic (scripts + conditions, merged) ────────────── -->
+                <TextBlock Classes="group-header" Text="{DynamicResource Label_GroupLogic}"/>
+                <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding ScriptSummary}"
+                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"/>
+                    <Button Grid.Column="1"
+                            Content="{DynamicResource Button_EditScripts}"
+                            Click="EditScripts_Click"
+                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0"
+                            Padding="8,3" FontSize="{DynamicResource FontSize.Small}"
+                            ToolTip.Tip="{DynamicResource ToolTip_EditScripts}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_EditScripts}"/>
+                </Grid>
+
+                <TextBlock Classes="group-header" Text="{DynamicResource Label_GroupConditions}"/>
+                <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
+                    <!-- Summary: show count + first condition names -->
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding ConditionSummary}"
+                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis"/>
+                    <Button Grid.Column="1"
+                            x:Name="EditConditionsButton"
+                            Content="{DynamicResource Button_EditConditions}"
+                            Click="EditConditions_Click"
+                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0"
+                            Padding="8,3" FontSize="{DynamicResource FontSize.Small}"
+                            ToolTip.Tip="{DynamicResource ToolTip_EditConditions}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_EditConditions}"/>
+                </Grid>
+
+                <!-- ── Notes (comments + translator note) ──────────────── -->
+                <TextBlock Classes="group-header" Text="{DynamicResource PropertyRow_Comments}"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding Comments, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30"
+                         ToolTip.Tip="{DynamicResource ToolTip_Comments}"
+                         AutomationProperties.HelpText="{DynamicResource ToolTip_Comments}"
+                         AutomationProperties.Name="{DynamicResource PropertyRow_Comments}"/>
+
+                <TextBlock Classes="group-header" Text="{DynamicResource NodeDetail_TranslatorNote}"/>
+                <TextBox Classes="detail-field"
+                         Text="{Binding TranslatorNote, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                         AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30"
+                         ToolTip.Tip="{DynamicResource ToolTip_NodeDetail_TranslatorNote}"
+                         AutomationProperties.HelpText="{DynamicResource ToolTip_NodeDetail_TranslatorNote}"
+                         AutomationProperties.Name="{DynamicResource NodeDetail_TranslatorNote}"/>
 
             </StackPanel>
         </ScrollViewer>
