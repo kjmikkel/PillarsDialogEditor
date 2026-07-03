@@ -73,7 +73,7 @@ public class VoAliasPickerViewModelTests : IDisposable
         var row = Assert.Single(vm.VisibleRows);
         Assert.Equal(42, row.NodeId);
         Assert.True(row.IsPickable);
-        Assert.Equal(Path.Combine("eder", "some_conv_0042"), row.DerivedAlias);
+        Assert.Equal("eder/some_conv_0042", row.DerivedAlias);
         Assert.Equal("line 42", row.TextPreview);
         Assert.False(row.WemExists);
     }
@@ -142,7 +142,7 @@ public class VoAliasPickerViewModelTests : IDisposable
 
         Assert.Equal("some_conv", vm.SelectedConversation?.Name);
         Assert.Equal(9, vm.SelectedRow?.NodeId);
-        Assert.Equal(Path.Combine("eder", "some_conv_0009"), vm.ResultAlias);
+        Assert.Equal("eder/some_conv_0009", vm.ResultAlias);
     }
 
     [Fact]
