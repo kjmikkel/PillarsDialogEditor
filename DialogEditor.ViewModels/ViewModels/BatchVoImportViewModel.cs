@@ -18,6 +18,12 @@ public partial class BatchVoRowViewModel : ObservableObject
     public string     DestPrimaryPath  { get; }
     public string     DestFemPath      { get; }
 
+    /// True when the node plays a recording shared with other nodes via
+    /// ExternalVO alias. Batch import must not silently overwrite the
+    /// shared file — only the single-node import flow (with its confirm
+    /// dialog, see Task 8) may replace or detach the shared audio.
+    public bool       IsAliased        { get; }
+
     // ── Observable ───────────────────────────────────────────────────────
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(HasPrimarySource))]
@@ -51,6 +57,12 @@ public partial class BatchVoRowViewModel : ObservableObject
     public string FemFileLabel     => FemSourcePath is not null
         ? Path.GetFileName(FemSourcePath) : "—";
     public string VoStatusGlyph    => VoStatus == VoPresence.Found ? "✓" : "✗";
+
+    /// Status cell: aliased rows are excluded from batch import — the target
+    /// file is shared with other nodes; the single-node flow has the confirm.
+    public string StatusDisplay => IsAliased
+        ? Loc.Get("BatchVoImport_AliasedStatus")
+        : VoStatusGlyph;
     public string RowStatusGlyph   => RowStatus switch
     {
         BatchRowStatus.Done      => "✓",
@@ -63,7 +75,8 @@ public partial class BatchVoRowViewModel : ObservableObject
 
     public BatchVoRowViewModel(
         string conversationName, int nodeId, string textPreview,
-        VoPresence voStatus, string destPrimaryPath, string destFemPath)
+        VoPresence voStatus, string destPrimaryPath, string destFemPath,
+        bool isAliased = false)
     {
         ConversationName = conversationName;
         NodeId           = nodeId;
@@ -71,6 +84,7 @@ public partial class BatchVoRowViewModel : ObservableObject
         VoStatus         = voStatus;
         DestPrimaryPath  = destPrimaryPath;
         DestFemPath      = destFemPath;
+        IsAliased        = isAliased;
     }
 }
 
@@ -124,7 +138,7 @@ public partial class BatchVoImportViewModel : ObservableObject
         IsImporting = true;
         ImportCommand.NotifyCanExecuteChanged();
 
-        var toImport = AllRows.Where(r => r.HasPrimarySource).ToList();
+        var toImport = AllRows.Where(r => r.HasPrimarySource && !r.IsAliased).ToList();
         var done     = 0;
         ProgressText = Loc.Format("BatchVoImport_Progress", done, toImport.Count);
 

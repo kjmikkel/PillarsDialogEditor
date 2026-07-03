@@ -105,6 +105,43 @@ public class BatchVoImportViewModelTests
         Assert.Equal(BatchRowStatus.Pending, row2.RowStatus);
     }
 
+    // ── Aliased rows ─────────────────────────────────────────────────────
+
+    [Fact]
+    public void AliasedRow_StatusDisplay_ShowsAliasedMarker()
+    {
+        var row = new BatchVoRowViewModel("conv", 1, "text",
+            VoPresence.Missing, "p.wem", "f.wem", isAliased: true);
+        Assert.True(row.IsAliased);
+        Assert.Equal("BatchVoImport_AliasedStatus", row.StatusDisplay);
+    }
+
+    [Fact]
+    public void NonAliasedRow_StatusDisplay_ShowsGlyph()
+    {
+        var row = new BatchVoRowViewModel("conv", 1, "text",
+            VoPresence.Found, "p.wem", "f.wem", isAliased: false);
+        Assert.Equal("✓", row.StatusDisplay);
+    }
+
+    [Fact]
+    public async Task Import_SkipsAliasedRows()
+    {
+        var aliased = new BatchVoRowViewModel("conv", 1, "t",
+            VoPresence.Missing, "p1.wem", "f1.wem", isAliased: true)
+            { PrimarySourcePath = "src1.wav" };
+        var normal = new BatchVoRowViewModel("conv", 2, "t",
+            VoPresence.Missing, "p2.wem", "f2.wem", isAliased: false)
+            { PrimarySourcePath = "src2.wav" };
+        var stub = new StubImporter(success: true);
+        var vm   = new BatchVoImportViewModel([aliased, normal], stub);
+
+        await vm.ImportCommand.ExecuteAsync(null);
+
+        Assert.Equal(["p2.wem"], stub.Destinations);
+        Assert.Equal(BatchRowStatus.Pending, aliased.RowStatus);   // untouched
+    }
+
     // ── Stub ─────────────────────────────────────────────────────────────
 
     private sealed class StubImporter : IVoImporter
@@ -112,6 +149,7 @@ public class BatchVoImportViewModelTests
         private readonly bool    _success;
         private readonly Action? _onCall;
         public int CallCount { get; private set; }
+        public List<string> Destinations { get; } = [];
 
         public StubImporter(bool success = true, Action? onCall = null)
         {
@@ -124,6 +162,7 @@ public class BatchVoImportViewModelTests
         public Task<VoImportResult> ImportAsync(VoImportRequest request, CancellationToken ct)
         {
             CallCount++;
+            Destinations.Add(request.PrimaryDestinationPath);
             _onCall?.Invoke();
             return Task.FromResult(new VoImportResult(_success,
                 _success ? null : "Stub failure"));
