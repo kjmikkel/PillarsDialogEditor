@@ -1108,6 +1108,19 @@ public partial class MainWindowViewModel : ObservableObject
             Detail.ActiveGameId = provider.GameId;
             Detail.GameRoot = path;
             ChatterPrefixService.Register(provider.LoadChatterPrefixes());
+
+            // Reverse alias index for the detail pane's "also used by N nodes"
+            // line. Disk-only and PoE2-only; a few seconds in the background.
+            VoAliasIndexService.Clear();
+            if (string.Equals(provider.GameId, "poe2", StringComparison.OrdinalIgnoreCase))
+            {
+                var aliasScanRoot = path;
+                _ = Task.Run(() =>
+                {
+                    try { VoAliasIndexService.Rebuild(aliasScanRoot); }
+                    catch (Exception ex) { AppLog.Error($"VO alias index rebuild failed: {ex.Message}"); }
+                });
+            }
             OnPropertyChanged(nameof(CanValidateVO));
             AvailableLanguages = provider.AvailableLanguages;
             SelectedLanguage   = AppSettings.PickLanguage(AvailableLanguages, AppSettings.LastLanguage);
