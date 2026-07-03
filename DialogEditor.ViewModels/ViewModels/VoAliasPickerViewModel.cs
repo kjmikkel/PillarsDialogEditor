@@ -83,7 +83,13 @@ public partial class VoAliasPickerViewModel : ObservableObject
                     var speaker = SpeakerNameService.FindByGuid(n.SpeakerGuid)?.Name
                                   ?? n.SpeakerCategory.ToString();
                     var text = conv.Strings.Get(n.NodeId)?.DefaultText ?? string.Empty;
-                    return new VoAliasPickerRow(n.NodeId, speaker, text, derived, wem);
+                    // ExpectedRelativePath uses Path.Combine, which yields '\' on
+                    // Windows. Shipped PoE2 ExternalVO values — and the alias-index /
+                    // shared-count logic that compares alias strings literally — always
+                    // use '/'. Normalize here so aliases picked on Windows match their
+                    // forward-slash siblings once persisted into ExternalVO.
+                    var alias = derived?.Replace('\\', '/');
+                    return new VoAliasPickerRow(n.NodeId, speaker, text, alias, wem);
                 }).ToList();
             }
             catch (Exception ex)
