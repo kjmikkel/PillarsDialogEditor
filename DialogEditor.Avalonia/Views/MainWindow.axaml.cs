@@ -114,6 +114,21 @@ public partial class MainWindow : Window
         };
         vm.Detail.ReportStatus = msg => vm.StatusText = msg;
 
+        // Task 7: ExternalVO alias picker (reuse another line's recording).
+        // Note: the design brief asked for a new `MainWindowViewModel.CurrentProvider`
+        // property, but `Provider => _provider` already exists at MainWindowViewModel.cs:56
+        // exposing the same read-only game-data provider, so we reuse it rather than add
+        // a duplicate public property with identical semantics.
+        vm.Detail.ShowAliasPicker = async currentAlias =>
+        {
+            if (vm.Provider is null || vm.Detail.GameRoot is not { Length: > 0 } root)
+                return null;
+            var picker = new VoAliasPickerWindow(
+                new VoAliasPickerViewModel(vm.Provider, root, currentAlias));
+            await picker.ShowDialog(this);
+            return picker.ResultAlias;
+        };
+
         vm.Canvas.ShowBatchVoImport = async () =>
         {
             var rows = vm.Canvas.BuildBatchVoRows(vm.Detail.GameRoot, vm.Detail.ActiveGameId);

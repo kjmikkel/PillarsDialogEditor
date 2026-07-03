@@ -1280,4 +1280,22 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_AliasRawPath">The stored ExternalVO path, relative to the game's Voices folder. Edit it via Change…; it cannot be typed directly.</sys:String>
     <sys:String x:Key="ToolTip_AliasShared">How many other nodes play this same recording. Overwriting the file affects all of them.</sys:String>
 
+    <!-- Task 7: VoAliasPickerWindow strings (node/conversation picker used by ToolTip_ReuseVo) -->
+    <sys:String x:Key="AliasPicker_Title">Reuse a Voice-Over Recording</sys:String>
+    <sys:String x:Key="AliasPicker_ConversationsHeader">Conversation</sys:String>
+    <sys:String x:Key="AliasPicker_NodesHeader">Nodes</sys:String>
+    <sys:String x:Key="AliasPicker_NodeColumn">Node</sys:String>
+    <sys:String x:Key="AliasPicker_SpeakerColumn">Speaker</sys:String>
+    <sys:String x:Key="AliasPicker_TextColumn">Text</sys:String>
+    <sys:String x:Key="AliasPicker_WemColumn">VO file</sys:String>
+    <sys:String x:Key="AliasPicker_OkButton">Use this recording</sys:String>
+    <sys:String x:Key="AliasPicker_CancelButton">Cancel</sys:String>
+    <sys:String x:Key="Placeholder_AliasPickerConvFilter">Filter conversations…</sys:String>
+    <sys:String x:Key="Placeholder_AliasPickerNodeFilter">Filter nodes by text or ID…</sys:String>
+    <sys:String x:Key="ToolTip_AliasPickerConvList">Pick the conversation containing the line whose recording you want to reuse.</sys:String>
+    <sys:String x:Key="ToolTip_AliasPickerNodeList">Pick the line whose recording this node should play. Greyed-out rows belong to speakers with no known voice folder. ✓/✗ shows whether the recording file exists.</sys:String>
+    <sys:String x:Key="ToolTip_AliasPickerOk">Set this node's ExternalVO to the selected line's recording.</sys:String>
+    <sys:String x:Key="ToolTip_AliasPickerConvFilter">Type to narrow the conversation list.</sys:String>
+    <sys:String x:Key="ToolTip_AliasPickerNodeFilter">Type to narrow the node list by dialogue text or node ID.</sys:String>
+
 </ResourceDictionary>

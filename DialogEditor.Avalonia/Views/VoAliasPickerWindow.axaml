@@ -1,0 +1,105 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+        x:Class="DialogEditor.Avalonia.Views.VoAliasPickerWindow"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="820" Height="520" MinWidth="640" MinHeight="380"
+        WindowStartupLocation="CenterOwner"
+        Title="{DynamicResource AliasPicker_Title}">
+
+    <Grid ColumnDefinitions="260,8,*" RowDefinitions="Auto,*,Auto" Margin="8">
+
+        <!-- Conversation pane -->
+        <TextBox Grid.Row="0" Grid.Column="0"
+                 Text="{Binding ConversationFilter, Mode=TwoWay}"
+                 Watermark="{DynamicResource Placeholder_AliasPickerConvFilter}"
+                 ToolTip.Tip="{DynamicResource ToolTip_AliasPickerConvFilter}"
+                 AutomationProperties.Name="{DynamicResource Placeholder_AliasPickerConvFilter}"
+                 AutomationProperties.HelpText="{DynamicResource ToolTip_AliasPickerConvFilter}"
+                 Margin="0,0,0,4"/>
+        <ListBox Grid.Row="1" Grid.Column="0"
+                 ItemsSource="{Binding VisibleConversations}"
+                 SelectedItem="{Binding SelectedConversation, Mode=TwoWay}"
+                 ToolTip.Tip="{DynamicResource ToolTip_AliasPickerConvList}"
+                 AutomationProperties.Name="{DynamicResource AliasPicker_ConversationsHeader}"
+                 AutomationProperties.HelpText="{DynamicResource ToolTip_AliasPickerConvList}">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Node pane -->
+        <TextBox Grid.Row="0" Grid.Column="2"
+                 Text="{Binding NodeFilter, Mode=TwoWay}"
+                 Watermark="{DynamicResource Placeholder_AliasPickerNodeFilter}"
+                 ToolTip.Tip="{DynamicResource ToolTip_AliasPickerNodeFilter}"
+                 AutomationProperties.Name="{DynamicResource Placeholder_AliasPickerNodeFilter}"
+                 AutomationProperties.HelpText="{DynamicResource ToolTip_AliasPickerNodeFilter}"
+                 Margin="0,0,0,4"/>
+        <DockPanel Grid.Row="1" Grid.Column="2">
+            <!-- Column headers; widths must match the row template below -->
+            <Grid DockPanel.Dock="Top" ColumnDefinitions="60,140,*,60" Margin="8,0,0,2">
+                <TextBlock Grid.Column="0" Text="{DynamicResource AliasPicker_NodeColumn}"
+                           FontSize="{DynamicResource FontSize.Small}"
+                           Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                <TextBlock Grid.Column="1" Text="{DynamicResource AliasPicker_SpeakerColumn}"
+                           FontSize="{DynamicResource FontSize.Small}"
+                           Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                <TextBlock Grid.Column="2" Text="{DynamicResource AliasPicker_TextColumn}"
+                           FontSize="{DynamicResource FontSize.Small}"
+                           Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                <TextBlock Grid.Column="3" Text="{DynamicResource AliasPicker_WemColumn}"
+                           FontSize="{DynamicResource FontSize.Small}"
+                           Foreground="{DynamicResource Brush.Text.Secondary}"/>
+            </Grid>
+            <!--
+                Row dim/enable for unpickable rows: the app-wide converter resources
+                register BoolToOpacityConverter under the key "SearchMatchOpacity"
+                (see App.axaml), not "BoolToOpacity" as the design draft assumed.
+                Rather than add a second registration of the same converter under a
+                new alias, we use the documented fallback: IsEnabled on the row Grid.
+                Unpickable rows (no known voice folder) render disabled/greyed by the
+                theme and remain listbox-selectable; the OK button's own
+                IsEnabled="{Binding SelectedRow.IsPickable}" binding below is the real
+                enforcement gate either way.
+            -->
+            <ListBox ItemsSource="{Binding VisibleRows}"
+                     SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
+                     DoubleTapped="Rows_DoubleTapped"
+                     ToolTip.Tip="{DynamicResource ToolTip_AliasPickerNodeList}"
+                     AutomationProperties.Name="{DynamicResource AliasPicker_NodesHeader}"
+                     AutomationProperties.HelpText="{DynamicResource ToolTip_AliasPickerNodeList}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:VoAliasPickerRow">
+                        <Grid ColumnDefinitions="60,140,*,60" Margin="0,1"
+                              IsEnabled="{Binding IsPickable}">
+                            <TextBlock Grid.Column="0" Text="{Binding NodeId}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding SpeakerName}"
+                                       TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="2" Text="{Binding TextPreview}"
+                                       TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="3" Text="{Binding WemGlyph}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+
+        <!-- Footer -->
+        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3"
+                    Orientation="Horizontal" HorizontalAlignment="Right"
+                    Spacing="8" Margin="0,8,0,0">
+            <Button x:Name="OkButton"
+                    Content="{DynamicResource AliasPicker_OkButton}"
+                    Click="Ok_Click" IsDefault="True"
+                    IsEnabled="{Binding SelectedRow.IsPickable, FallbackValue=False}"
+                    ToolTip.Tip="{DynamicResource ToolTip_AliasPickerOk}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_AliasPickerOk}"/>
+            <Button Content="{DynamicResource AliasPicker_CancelButton}"
+                    Click="Cancel_Click" IsCancel="True"/>
+        </StackPanel>
+    </Grid>
+</Window>
