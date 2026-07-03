@@ -118,6 +118,27 @@ public class ConnectionViewModelTests
         Assert.Equal(1, conn.ConditionCount);
     }
 
+    // ── ConditionCountLabel (link-card button face, 2026-07-02 pane rework) ──
+
+    [Fact]
+    public void ConditionCountLabel_ComposesGlyphAndCount()
+    {
+        var conn = MakeConn();
+        // StubStringProvider echoes keys → the localised glyph appears as its key.
+        Assert.Equal("Link_ConditionGlyph 0", conn.ConditionCountLabel);
+    }
+
+    [Fact]
+    public void SetConditions_RaisesConditionCountLabelChange()
+    {
+        var conn    = MakeConn();
+        var changed = new List<string?>();
+        conn.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+        conn.Conditions = [new ConditionLeaf("Boolean A()", [], false, "And")];
+        Assert.Contains(nameof(conn.ConditionCountLabel), changed);
+        Assert.Equal("Link_ConditionGlyph 1", conn.ConditionCountLabel);
+    }
+
     [Fact]
     public void SetConditions_WithUndoStack_IsUndoable()
     {

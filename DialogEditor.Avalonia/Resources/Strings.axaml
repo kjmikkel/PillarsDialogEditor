@@ -1243,6 +1243,9 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="NodeDetail_ScriptsWord">scripts</sys:String>
     <sys:String x:Key="NodeDetail_NotesWord">note(s)</sys:String>
     <sys:String x:Key="ToolTip_GroupExpander">Expand or collapse this section. The open/closed state is remembered while the app runs.</sys:String>
+    <sys:String x:Key="Link_ConditionGlyph">⚙</sys:String>
+    <sys:String x:Key="Link_DisplayLabel">Display</sys:String>
+    <sys:String x:Key="AutomationName_LinkConditions">Edit conditions on this link</sys:String>
 
     <sys:String x:Key="Menu_ImportVo">Import voice-over…</sys:String>
     <sys:String x:Key="ToolTip_Menu_ImportVo">Import a .wem or .wav voice-over file for the selected node.</sys:String>

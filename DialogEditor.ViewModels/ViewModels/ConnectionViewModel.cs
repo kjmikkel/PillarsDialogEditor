@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
+using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.ViewModels;
 
@@ -40,13 +41,17 @@ public partial class ConnectionViewModel : ObservableObject
         set => Push(_conditions, value, "Edit link conditions",
             v => { _conditions = v; OnPropertyChanged(nameof(Conditions));
                    OnPropertyChanged(nameof(HasConditions));
-                   OnPropertyChanged(nameof(ConditionCount)); });
+                   OnPropertyChanged(nameof(ConditionCount));
+                   OnPropertyChanged(nameof(ConditionCountLabel)); });
     }
 
     public bool IsAlways      => _questionNodeTextDisplay == "Always";
     public bool IsNever       => _questionNodeTextDisplay == "Never";
     public bool HasConditions => _conditions.Count > 0;
     public int  ConditionCount => _conditions.Count;
+
+    /// Button face for the link-conditions editor: localised glyph + live count.
+    public string ConditionCountLabel => $"{Loc.Get("Link_ConditionGlyph")} {ConditionCount}";
 
     [ObservableProperty] private bool _isHighlighted;
 
