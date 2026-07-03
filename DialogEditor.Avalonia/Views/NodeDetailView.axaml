@@ -40,6 +40,11 @@
             <Setter Property="FontSize"   Value="{DynamicResource FontSize.Small}"/>
             <Setter Property="Margin"     Value="0,0,0,4"/>
         </Style>
+        <Style Selector="Expander.detail-group">
+            <Setter Property="Margin"  Value="0,6,0,0"/>
+            <Setter Property="Padding" Value="4"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
     </UserControl.Styles>
 
     <Grid>
@@ -185,7 +190,24 @@
                 </Grid>
 
                 <!-- ── Speaker & Identity ──────────────────────────────── -->
-                <TextBlock Classes="group-header" Text="{DynamicResource Label_GroupIdentity}"/>
+                <Expander Classes="detail-group"
+                          IsExpanded="{Binding IsIdentityExpanded, Mode=TwoWay}"
+                          ToolTip.Tip="{DynamicResource ToolTip_GroupExpander}"
+                          AutomationProperties.Name="{DynamicResource Label_GroupIdentity}"
+                          AutomationProperties.HelpText="{Binding IdentitySummary}">
+                    <Expander.Header>
+                        <Grid ColumnDefinitions="Auto,*">
+                            <TextBlock Text="{DynamicResource Label_GroupIdentity}"
+                                       FontWeight="SemiBold" FontSize="{DynamicResource FontSize.Caption}"
+                                       Foreground="{DynamicResource Brush.Text.Muted}"/>
+                            <TextBlock Grid.Column="1" Text="{Binding IdentitySummary}"
+                                       FontSize="{DynamicResource FontSize.Caption}"
+                                       Foreground="{DynamicResource Brush.Text.Caption}"
+                                       HorizontalAlignment="Right" Margin="8,0,0,0"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                    </Expander.Header>
+                    <StackPanel>
 
                 <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_Type}"/>
                 <ComboBox Classes="detail-combo"
@@ -260,9 +282,28 @@
                          ToolTip.Tip="{DynamicResource ToolTip_ListenerGuid}"
                          AutomationProperties.HelpText="{DynamicResource ToolTip_ListenerGuid}"
                          AutomationProperties.Name="{DynamicResource PropertyRow_ListenerGuid}"/>
+                    </StackPanel>
+                </Expander>
 
                 <!-- ── Display (HideSpeaker moved here from Voice) ─────── -->
-                <TextBlock Classes="group-header" Text="{DynamicResource Label_GroupDisplay}"/>
+                <Expander Classes="detail-group"
+                          IsExpanded="{Binding IsDisplayExpanded, Mode=TwoWay}"
+                          ToolTip.Tip="{DynamicResource ToolTip_GroupExpander}"
+                          AutomationProperties.Name="{DynamicResource Label_GroupDisplay}"
+                          AutomationProperties.HelpText="{Binding DisplaySummary}">
+                    <Expander.Header>
+                        <Grid ColumnDefinitions="Auto,*">
+                            <TextBlock Text="{DynamicResource Label_GroupDisplay}"
+                                       FontWeight="SemiBold" FontSize="{DynamicResource FontSize.Caption}"
+                                       Foreground="{DynamicResource Brush.Text.Muted}"/>
+                            <TextBlock Grid.Column="1" Text="{Binding DisplaySummary}"
+                                       FontSize="{DynamicResource FontSize.Caption}"
+                                       Foreground="{DynamicResource Brush.Text.Caption}"
+                                       HorizontalAlignment="Right" Margin="8,0,0,0"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                    </Expander.Header>
+                    <StackPanel>
 
                 <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_DisplayType}"/>
                 <ComboBox Classes="detail-combo"
@@ -306,9 +347,28 @@
                           Content="{DynamicResource PropertyRow_HideSpeaker}"
                           ToolTip.Tip="{DynamicResource ToolTip_HideSpeaker}"
                           AutomationProperties.HelpText="{DynamicResource ToolTip_HideSpeaker}"/>
+                    </StackPanel>
+                </Expander>
 
                 <!-- ── Voice ───────────────────────────────────────────── -->
-                <TextBlock Classes="group-header" Text="{DynamicResource Label_GroupVoice}"/>
+                <Expander Classes="detail-group"
+                          IsExpanded="{Binding IsVoiceExpanded, Mode=TwoWay}"
+                          ToolTip.Tip="{DynamicResource ToolTip_GroupExpander}"
+                          AutomationProperties.Name="{DynamicResource Label_GroupVoice}"
+                          AutomationProperties.HelpText="{Binding VoiceSummary}">
+                    <Expander.Header>
+                        <Grid ColumnDefinitions="Auto,*">
+                            <TextBlock Text="{DynamicResource Label_GroupVoice}"
+                                       FontWeight="SemiBold" FontSize="{DynamicResource FontSize.Caption}"
+                                       Foreground="{DynamicResource Brush.Text.Muted}"/>
+                            <TextBlock Grid.Column="1" Text="{Binding VoiceSummary}"
+                                       FontSize="{DynamicResource FontSize.Caption}"
+                                       Foreground="{DynamicResource Brush.Text.Caption}"
+                                       HorizontalAlignment="Right" Margin="8,0,0,0"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                    </Expander.Header>
+                    <StackPanel>
 
                 <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_ExternalVO}"/>
                 <TextBox Classes="detail-field"
@@ -361,9 +421,29 @@
                         AutomationProperties.Name="{DynamicResource AutomationName_VoImport}"
                         AutomationProperties.HelpText="{Binding ImportVoTooltip}"
                         Margin="0,2,0,4" Padding="8,3"/>
+                    </StackPanel>
+                </Expander>
 
                 <!-- ── Logic (scripts + conditions, merged) ────────────── -->
-                <TextBlock Classes="group-header" Text="{DynamicResource Label_GroupLogic}"/>
+                <Expander Classes="detail-group"
+                          IsExpanded="{Binding IsLogicExpanded, Mode=TwoWay}"
+                          ToolTip.Tip="{DynamicResource ToolTip_GroupExpander}"
+                          AutomationProperties.Name="{DynamicResource Label_GroupLogic}"
+                          AutomationProperties.HelpText="{Binding LogicSummary}">
+                    <Expander.Header>
+                        <Grid ColumnDefinitions="Auto,*">
+                            <TextBlock Text="{DynamicResource Label_GroupLogic}"
+                                       FontWeight="SemiBold" FontSize="{DynamicResource FontSize.Caption}"
+                                       Foreground="{DynamicResource Brush.Text.Muted}"/>
+                            <TextBlock Grid.Column="1" Text="{Binding LogicSummary}"
+                                       FontSize="{DynamicResource FontSize.Caption}"
+                                       Foreground="{DynamicResource Brush.Text.Caption}"
+                                       HorizontalAlignment="Right" Margin="8,0,0,0"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                    </Expander.Header>
+                    <StackPanel>
+                <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_Scripts}"/>
                 <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
                     <TextBlock Grid.Column="0"
                                Text="{Binding ScriptSummary}"
@@ -379,7 +459,7 @@
                             AutomationProperties.HelpText="{DynamicResource ToolTip_EditScripts}"/>
                 </Grid>
 
-                <TextBlock Classes="group-header" Text="{DynamicResource Label_GroupConditions}"/>
+                <TextBlock Classes="field-label" Text="{DynamicResource Label_GroupConditions}"/>
                 <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
                     <!-- Summary: show count + first condition names -->
                     <TextBlock Grid.Column="0"
@@ -396,9 +476,29 @@
                             ToolTip.Tip="{DynamicResource ToolTip_EditConditions}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_EditConditions}"/>
                 </Grid>
+                    </StackPanel>
+                </Expander>
 
                 <!-- ── Notes (comments + translator note) ──────────────── -->
-                <TextBlock Classes="group-header" Text="{DynamicResource PropertyRow_Comments}"/>
+                <Expander Classes="detail-group"
+                          IsExpanded="{Binding IsNotesExpanded, Mode=TwoWay}"
+                          ToolTip.Tip="{DynamicResource ToolTip_GroupExpander}"
+                          AutomationProperties.Name="{DynamicResource Label_GroupNotes}"
+                          AutomationProperties.HelpText="{Binding NotesSummary}">
+                    <Expander.Header>
+                        <Grid ColumnDefinitions="Auto,*">
+                            <TextBlock Text="{DynamicResource Label_GroupNotes}"
+                                       FontWeight="SemiBold" FontSize="{DynamicResource FontSize.Caption}"
+                                       Foreground="{DynamicResource Brush.Text.Muted}"/>
+                            <TextBlock Grid.Column="1" Text="{Binding NotesSummary}"
+                                       FontSize="{DynamicResource FontSize.Caption}"
+                                       Foreground="{DynamicResource Brush.Text.Caption}"
+                                       HorizontalAlignment="Right" Margin="8,0,0,0"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                    </Expander.Header>
+                    <StackPanel>
+                <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_Comments}"/>
                 <TextBox Classes="detail-field"
                          Text="{Binding Comments, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30"
@@ -406,13 +506,15 @@
                          AutomationProperties.HelpText="{DynamicResource ToolTip_Comments}"
                          AutomationProperties.Name="{DynamicResource PropertyRow_Comments}"/>
 
-                <TextBlock Classes="group-header" Text="{DynamicResource NodeDetail_TranslatorNote}"/>
+                <TextBlock Classes="field-label" Text="{DynamicResource NodeDetail_TranslatorNote}"/>
                 <TextBox Classes="detail-field"
                          Text="{Binding TranslatorNote, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="30"
                          ToolTip.Tip="{DynamicResource ToolTip_NodeDetail_TranslatorNote}"
                          AutomationProperties.HelpText="{DynamicResource ToolTip_NodeDetail_TranslatorNote}"
                          AutomationProperties.Name="{DynamicResource NodeDetail_TranslatorNote}"/>
+                    </StackPanel>
+                </Expander>
 
             </StackPanel>
         </ScrollViewer>

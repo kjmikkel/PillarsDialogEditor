@@ -54,6 +54,7 @@ public partial class NodeDetailViewModel : ObservableObject
             if (_translatorNote == value) return;
             _translatorNote = value;
             OnPropertyChanged();
+            OnPropertyChanged(nameof(NotesSummary));
             if (_node is not null)
                 Canvas?.SetNodeComment(_node.NodeId, value);
         }
@@ -450,6 +451,95 @@ public partial class NodeDetailViewModel : ObservableObject
     public bool IsSpeakerGuidBoxVisible  => !HasSpeakerData || ShowSpeakerGuidBox;
     public bool IsListenerGuidBoxVisible => !HasSpeakerData || ShowListenerGuidBox;
 
+    // ── Expander summaries (collapsed headers still answer most glances) ──
+
+    /// e.g. "NPC · Edér → Player" — speaker/listener names only when resolvable.
+    public string IdentitySummary
+    {
+        get
+        {
+            if (_node is null) return string.Empty;
+            var sep      = Loc.Get("NodeDetail_HeaderSeparator");
+            var speaker  = SpeakerNameService.FindByGuid(_node.SpeakerGuid)?.Name;
+            var listener = SpeakerNameService.FindByGuid(_node.ListenerGuid)?.Name;
+            if (speaker is null) return SpeakerCategoryString;
+            var pair = listener is null ? speaker : $"{speaker} → {listener}";
+            return SpeakerCategoryString + sep + pair;
+        }
+    }
+
+    /// e.g. "Conversation · persists: None".
+    public string DisplaySummary => _node is null
+        ? string.Empty
+        : $"{DisplayType}{Loc.Get("NodeDetail_HeaderSeparator")}{Loc.Get("NodeDetail_PersistsPrefix")} {Persistence}";
+
+    /// e.g. "✓ found · M+F" / "✗ missing" / "—" (VO not applicable).
+    public string VoiceSummary => _voCheck switch
+    {
+        null or { Status: VoPresence.NotApplicable }            => Loc.Get("NodeDetail_NoneShort"),
+        { Status: VoPresence.Found, FemaleVariantFound: true }  => Loc.Get("NodeDetail_VoFoundWithFem"),
+        { Status: VoPresence.Found }                            => Loc.Get("NodeDetail_VoFound"),
+        _                                                       => Loc.Get("NodeDetail_VoMissing"),
+    };
+
+    /// e.g. "2 conditions · 1 script" (words are localised fragments).
+    public string LogicSummary => _node is null
+        ? string.Empty
+        : $"{_node.Conditions.Count} {Loc.Get("NodeDetail_ConditionsWord")}"
+          + Loc.Get("NodeDetail_HeaderSeparator")
+          + $"{_node.Scripts.Count} {Loc.Get("NodeDetail_ScriptsWord")}";
+
+    /// e.g. "1 note(s)" counting non-empty comment + translator note, "—" when none.
+    public string NotesSummary
+    {
+        get
+        {
+            if (_node is null) return string.Empty;
+            var n = (string.IsNullOrWhiteSpace(Comments) ? 0 : 1)
+                  + (string.IsNullOrWhiteSpace(TranslatorNote) ? 0 : 1);
+            return n == 0
+                ? Loc.Get("NodeDetail_NoneShort")
+                : $"{n} {Loc.Get("NodeDetail_NotesWord")}";
+        }
+    }
+
+    // ── Session-wide expander state ──────────────────────────────────────
+    // Static so a VO pass keeps Voice open across node selections; resets on
+    // app restart (deliberately NOT persisted to AppSettings — YAGNI per spec).
+    private static bool _identityExpanded, _displayExpanded, _voiceExpanded,
+                        _logicExpanded, _notesExpanded;
+
+    public bool IsIdentityExpanded
+    {
+        get => _identityExpanded;
+        set { _identityExpanded = value; OnPropertyChanged(); }
+    }
+    public bool IsDisplayExpanded
+    {
+        get => _displayExpanded;
+        set { _displayExpanded = value; OnPropertyChanged(); }
+    }
+    public bool IsVoiceExpanded
+    {
+        get => _voiceExpanded;
+        set { _voiceExpanded = value; OnPropertyChanged(); }
+    }
+    public bool IsLogicExpanded
+    {
+        get => _logicExpanded;
+        set { _logicExpanded = value; OnPropertyChanged(); }
+    }
+    public bool IsNotesExpanded
+    {
+        get => _notesExpanded;
+        set { _notesExpanded = value; OnPropertyChanged(); }
+    }
+
+    /// Test hook: static state leaks across serially-run tests otherwise.
+    internal static void ResetExpanderStateForTests()
+        => _identityExpanded = _displayExpanded = _voiceExpanded
+         = _logicExpanded = _notesExpanded = false;
+
     [ObservableProperty] private IReadOnlyList<ConnectionViewModel> _links           = [];
     [ObservableProperty] private string                             _addLinkTargetId = string.Empty;
 
@@ -503,9 +593,15 @@ public partial class NodeDetailViewModel : ObservableObject
     {
         NotifyAllProxies();
         if (e.PropertyName == nameof(NodeViewModel.Conditions))
+        {
             OnPropertyChanged(nameof(ConditionSummary));
+            OnPropertyChanged(nameof(LogicSummary));
+        }
         if (e.PropertyName == nameof(NodeViewModel.Scripts))
+        {
             OnPropertyChanged(nameof(ScriptSummary));
+            OnPropertyChanged(nameof(LogicSummary));
+        }
     }
 
     private void NotifyAllProxies()
@@ -561,6 +657,11 @@ public partial class NodeDetailViewModel : ObservableObject
         ImportVoCommand.NotifyCanExecuteChanged();
         OnPropertyChanged(nameof(ImportVoTooltip));
         OnPropertyChanged(nameof(NodeHeaderSummary));
+        OnPropertyChanged(nameof(IdentitySummary));
+        OnPropertyChanged(nameof(DisplaySummary));
+        OnPropertyChanged(nameof(VoiceSummary));
+        OnPropertyChanged(nameof(LogicSummary));
+        OnPropertyChanged(nameof(NotesSummary));
     }
 
     public void Refresh() => NotifyAllProxies();
