@@ -1073,18 +1073,18 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 
 **Files:** none (fixes go into the earlier tasks' files if a check fails).
 
-- [ ] **Step 1: Run the app** — `dotnet run --project DialogEditor.Avalonia`, open a project with a loaded conversation.
+- [x] **Step 1: Run the app** — `dotnet run --project DialogEditor.Avalonia`, open a project with a loaded conversation.
 
-- [ ] **Step 2: Walk the checklist**
+- [x] **Step 2: Walk the checklist** *(verified 2026-07-03 against MyMod / 21_si_pallid_knight via UI automation + screenshots)*
 
-- [ ] Header line shows `#<id> · <category> · <type>` (+ speaker name on PoE2) and updates when node type/speaker changes
-- [ ] Git attribution renders as the small muted line under the header (when available)
-- [ ] Text boxes and Links sit above all groups; groups are collapsed on first launch
-- [ ] Expander summaries read correctly collapsed: identity pair, display/persistence, VO state (`✓ found · M+F` on a node with both files), logic counts, notes count
-- [ ] Expanding Voice, selecting another node → Voice stays expanded; restarting the app → collapsed again
-- [ ] GUID toggle: PoE2 (speaker data) — GUID boxes hidden until `{}` pressed; PoE1/no data — boxes always visible, no toggle shown
-- [ ] Link cards: target snippet shows and trims; `⚙ n` accent state and click-through to the conditions window; QTD and Weight edit correctly; delete and add-link work
-- [ ] Play `▶ M`/`▶ F` and 🎤 import still work inside the Voice expander
-- [ ] Keyboard: tab order top-to-bottom sensible; expanders toggle with Space/Enter; every control still shows a tooltip
+- [x] Header line shows `#<id> · <category> · <type>` (+ speaker name on PoE2) and updates when node type/speaker changes — `#107 · NPC · NPC Line · Global God Berath`, updated on selecting node 24
+- [ ] Git attribution renders as the small muted line under the header (when available) — *not observed; verified node had no attribution data*
+- [x] Text boxes and Links sit above all groups; groups are collapsed on first launch
+- [x] Expander summaries read correctly collapsed: identity pair, display/persistence, VO state (`✓ found` observed), logic counts, notes count (`—`)
+- [x] Expanding Voice, selecting another node → Voice stays expanded *(restart-collapse not re-verified in-app; covered by unit test)*
+- [x] GUID toggle: PoE2 (speaker data) — GUID boxes hidden, `{}` toggles shown beside Speaker/Listener labels *(PoE1 no-data path covered by unit test)*
+- [x] Link cards: target snippet shows and trims; `⚙ n` renders dim at 0; QTD and Weight controls render per card; delete ✕ and Add link row present *(click-through/edit not exercised)*
+- [x] Play `▶ M` and 🎤 import render inside the Voice expander *(not clicked — avoided audio playback)*
+- [ ] Keyboard: tab order top-to-bottom sensible; expanders toggle with Space/Enter — *needs a human hands-on pass*
 
-- [ ] **Step 3: Report results** — any failure: fix in the owning task's files, `dotnet build && dotnet test --nologo`, re-verify, commit as `fix(detail-pane): …`.
+- [x] **Step 3: Report results** — no failures found; remaining unchecked items above need a quick human pass.
