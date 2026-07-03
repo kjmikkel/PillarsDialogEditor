@@ -1,0 +1,27 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DialogEditor.Avalonia.Views.AliasImportConfirmDialog"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="480" SizeToContent="Height" CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Title="{DynamicResource AliasImport_Title}">
+    <StackPanel Margin="16" Spacing="12">
+        <TextBlock x:Name="MessageText" TextWrapping="Wrap"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button Content="{DynamicResource AliasImport_Overwrite}"
+                    Click="Overwrite_Click"
+                    ToolTip.Tip="{DynamicResource ToolTip_AliasImport_Overwrite}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_AliasImport_Overwrite}"/>
+            <Button Content="{DynamicResource AliasImport_ClearAndOwn}"
+                    Click="ClearAndOwn_Click"
+                    ToolTip.Tip="{DynamicResource ToolTip_AliasImport_ClearAndOwn}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_AliasImport_ClearAndOwn}"/>
+            <!-- Cancel is deliberately IsDefault (as well as IsCancel): pressing Enter in this
+                 dialog must never overwrite a recording shared by other nodes. The two
+                 consequence-bearing choices above require an explicit click. OK/Cancel-style
+                 buttons are self-explanatory per project tooltip rules, so Cancel carries none. -->
+            <Button Content="{DynamicResource AliasImport_Cancel}"
+                    Click="Cancel_Click" IsCancel="True" IsDefault="True"/>
+        </StackPanel>
+    </StackPanel>
+</Window>
