@@ -292,6 +292,15 @@ public partial class MainWindowViewModel : ObservableObject
 
         Detail.AttributionLookup = LookupAttribution;
 
+        // Feeds the detail-pane's alias shared-count: the open project's patched
+        // ExternalVO values (added + modified nodes) with the live canvas nodes
+        // winning for the currently-open conversation, so an in-progress edit is
+        // reflected immediately rather than only after the next diff/save.
+        Detail.ProjectAliasOverlay = () => VoAliasOverlayBuilder.Build(
+            _project?.Patches,
+            CurrentConversationName,
+            Canvas.Nodes.Select(n => (n.NodeId, n.ExternalVO)));
+
         Canvas.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(ConversationViewModel.SelectedNode))
