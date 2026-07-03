@@ -1280,6 +1280,16 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_AliasRawPath">The stored ExternalVO path, relative to the game's Voices folder. Edit it via Change…; it cannot be typed directly.</sys:String>
     <sys:String x:Key="ToolTip_AliasShared">How many other nodes play this same recording. Overwriting the file affects all of them.</sys:String>
 
+    <!-- Task 8/9: aliased-import confirmation dialog (importing over a shared recording) -->
+    <sys:String x:Key="AliasImport_Title">Shared Recording</sys:String>
+    <!-- {0} = alias path, {1} = count of other nodes -->
+    <sys:String x:Key="AliasImport_Message">This node plays a shared recording ({0}), also used by {1} other node(s). Importing will replace that recording for all of them.</sys:String>
+    <sys:String x:Key="AliasImport_Overwrite">Overwrite the shared recording</sys:String>
+    <sys:String x:Key="AliasImport_ClearAndOwn">Give this node its own recording</sys:String>
+    <sys:String x:Key="AliasImport_Cancel">Cancel</sys:String>
+    <sys:String x:Key="ToolTip_AliasImport_Overwrite">Replace the shared file. Every node aliasing it will play the new audio.</sys:String>
+    <sys:String x:Key="ToolTip_AliasImport_ClearAndOwn">Remove the alias from this node and import to its own canonical file. Other nodes keep the shared recording.</sys:String>
+
     <!-- Task 7: VoAliasPickerWindow strings (node/conversation picker used by ToolTip_ReuseVo) -->
     <sys:String x:Key="AliasPicker_Title">Reuse a Voice-Over Recording</sys:String>
     <sys:String x:Key="AliasPicker_ConversationsHeader">Conversation</sys:String>
