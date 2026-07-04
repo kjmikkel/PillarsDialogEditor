@@ -451,12 +451,13 @@ restart required), editor `SettingsWindow` Language row, `PatchManagerSettingsWi
 (Appearance + Language, replaces the top-bar theme picker). All `{StaticResource <string
 key>}` in views converted to `{DynamicResource}`; `NoStaticStringResourceTests` enforces
 the invariant. `AboutViewModel`, `ChangelogViewModel`, `ConversationViewModel` subscribe
-to `LocaleService.Revision` for live getter refresh. Remaining items (4–6) are unchanged.
+to `LocaleService.Revision` for live getter refresh.
 
-The localisation rule (no hard-coded user-visible text) has been followed, but the app
-cannot yet actually *switch language*. The good news from the audit: the architecture is
-genuinely localisation-ready, and **restart-based** language switching is close — the
-work is a delivery mechanism and a translation workflow, not a rewrite.
+**Items 4–5 also implemented (see below). The section is complete except item 6**
+(naive pluralisation), a minor accepted limitation until a translation in a
+multi-plural-form language actually ships. Live language switching, the translation
+CSV round-trip, and the layout-elasticity fixes are all in place — what is missing
+is not mechanism but content: no translation overlay has been authored yet.
 
 **Already in place (verified):**
 - Single funnel: all UI strings live in three XAML dictionaries (`Strings.axaml`,
