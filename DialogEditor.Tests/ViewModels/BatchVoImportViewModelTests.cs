@@ -20,6 +20,38 @@ public class BatchVoImportViewModelTests
         new("conv", 1, "hello", status, "C:/dest/a.wem", "C:/dest/a_fem.wem")
             { PrimarySourcePath = primarySrc };
 
+    // ── Window title ─────────────────────────────────────────────────────
+
+    private sealed class MapProvider(Dictionary<string, string> map) : IStringProvider
+    {
+        public string Get(string key) => map.TryGetValue(key, out var v) ? v : $"[{key}]";
+        public bool TryGet(string key, out string value)
+        {
+            if (map.TryGetValue(key, out var v)) { value = v; return true; }
+            value = string.Empty; return false;
+        }
+    }
+
+    [Fact]
+    public void WindowTitle_SingleConversation_NamesTheConversation()
+    {
+        // Pins the {0} substitution — the title once showed a literal "{0}"
+        // because XAML bound the resource string without formatting it.
+        Loc.Configure(new MapProvider(new()
+        {
+            ["BatchVoImport_Title_Single"] = "Batch VO Import — {0}",
+        }));
+        var vm = new BatchVoImportViewModel([MakeRow()], new StubImporter(), isSingleConversation: true);
+        Assert.Equal("Batch VO Import — conv", vm.WindowTitle);
+    }
+
+    [Fact]
+    public void WindowTitle_AllConversations_IsGeneric()
+    {
+        var vm = new BatchVoImportViewModel([MakeRow()], new StubImporter(), isSingleConversation: false);
+        Assert.Equal("BatchVoImport_Title_All", vm.WindowTitle);   // stub echoes the key
+    }
+
     // ── ShowOnlyMissing ──────────────────────────────────────────────────
 
     [Fact]
