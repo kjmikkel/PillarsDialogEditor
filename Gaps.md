@@ -224,20 +224,17 @@ same `Brush.*` keys in both apps. E.g. the **Canvas Annotations** gap draws regi
 correctly across the whole solution with the single Dark set that exists today — never blocked
 on, nor made wrong by, an upper layer that doesn't exist.
 
-### Accessibility — Assistive Technology & Keyboard (audit 2026-06-12)
-The project has invested heavily in **visual** accessibility — the Layer 1 palette sets
-(High-Contrast, Colourblind), `PaletteContrastTests` enforcing WCAG AA/AAA, the Layer 2.5
-non-colour encoding work, and the mandatory-tooltip rule — but **assistive-technology and
-keyboard accessibility are essentially absent**: there are zero `AutomationProperties` in
-the entire codebase, custom-templated controls have no focus visuals, and the canvas is
-mouse-only. The items below are ordered by the suggested tackle order (cheap, high-leverage
-fixes first; the canvas keyboard-editing design task last among the big ones).
-
-Recommended order rationale: **1 → 2 → 3** first — automation names and focus rings are
-mechanical sweeps that unlock screen-reader/keyboard use of everything *outside* the canvas,
-and each fits the project's test-first style (a failing test asserting the invariant, then
-the sweep). Canvas keyboard editing (**4**) is the one genuine design task and should come
-after the cheap wins. The rest are independent and can land in any order.
+### Accessibility — Assistive Technology & Keyboard (audit 2026-06-12) — ✅ SECTION COMPLETE
+**All 16 items below are resolved (2026-06-12 → 2026-06-15):** implemented, or the audit
+premise was disproven by a headless probe (items 3 and 7). The audit's opening claim —
+"zero `AutomationProperties` in the entire codebase, no focus visuals, mouse-only canvas" —
+described the state **at audit time** and is long obsolete: automation names/HelpText are
+now mandatory and structurally enforced (`AutomationNameTests`, `AutomationHelpTextTests`),
+the canvas is fully keyboard-operable including connect mode, and live-region/status
+announcements, focus-hint bars, hit-target sizes, and AA-checked palettes are all in place.
+The items are kept below as the record of what was done and where the pinning tests live.
+Only explicitly-deferred fragments remain open (noted inline where they occur — e.g.
+`DiffWindow`/`FlowAnalyticsWindow` legend swatches in item 12).
 
 1. **Screen-reader names for icon-only buttons. ✅ IMPLEMENTED (2026-06-12).**
    Icon-only buttons (⚙, ?, 📌, ⊞, ⊟, ⊕, ⌂, ✕, +, −, ↑, ↓, →, (?)) exposed only their
