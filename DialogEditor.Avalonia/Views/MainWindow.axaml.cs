@@ -390,6 +390,12 @@ public partial class MainWindow : Window
             };
         }
 
+        // Analyse immediately on every summon (mirrors ValidateVO_Click's RunAsync):
+        // the window used to open empty until the user pressed Refresh, and the
+        // ConversationSaved hook alone misses conversation switches between summons.
+        // Refresh is null-snapshot-safe, so this is harmless with nothing loaded.
+        ((FlowAnalyticsViewModel)_flowAnalyticsWindow.DataContext!).RefreshCommand.Execute(null);
+
         _flowAnalyticsWindow.Show();
         _flowAnalyticsWindow.Activate();
     }
