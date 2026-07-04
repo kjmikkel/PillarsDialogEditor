@@ -100,4 +100,19 @@ public class FlowAnalyticsViewModelTests
 
         Assert.Equal(2, navigatedId);
     }
+
+    // ── Severity tier as text (2026-07-04) ───────────────────────────────
+
+    [Theory]
+    [InlineData(FlowIssueKind.Unreachable,              "FlowAnalytics_Severity_Error")]
+    [InlineData(FlowIssueKind.PlayerDeadEnd,            "FlowAnalytics_Severity_Warning")]
+    [InlineData(FlowIssueKind.EmptyText,                "FlowAnalytics_Severity_Warning")]
+    [InlineData(FlowIssueKind.NoIncomingLinks,          "FlowAnalytics_Severity_Warning")]
+    [InlineData(FlowIssueKind.BarkTextTooLong,          "FlowAnalytics_Severity_Warning")]
+    [InlineData(FlowIssueKind.BarkHasPlayerChoiceChild, "FlowAnalytics_Severity_Warning")]
+    public void SeverityLabel_MapsKindToTierKey(FlowIssueKind kind, string expectedKey)
+    {
+        var vm = new FlowIssueViewModel(new FlowIssue(1, kind), "snippet", _ => { });
+        Assert.Equal(expectedKey, vm.SeverityLabel);   // StubStringProvider echoes keys
+    }
 }

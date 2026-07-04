@@ -26,6 +26,14 @@ public partial class FlowIssueViewModel : ObservableObject
         _                                       => Kind.ToString()
     };
 
+    /// Severity tier as text — the icon's colour/glyph carry it visually; this is
+    /// the screen-reader/tooltip equivalent. Same binary rule as
+    /// FlowIssueKindToSeverityGlyphConverter (each pinned by its own test so they
+    /// cannot drift apart silently).
+    public string SeverityLabel => Kind == FlowIssueKind.Unreachable
+        ? Loc.Get("FlowAnalytics_Severity_Error")
+        : Loc.Get("FlowAnalytics_Severity_Warning");
+
     public string DisplayText => $"Node {NodeId} — {NodeSnippet}";
 
     public FlowIssueViewModel(FlowIssue issue, string nodeSnippet, Action<int> navigate)

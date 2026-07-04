@@ -119,6 +119,8 @@
                                     Width="16" Height="16"
                                     CornerRadius="3"
                                     Background="{Binding Kind, Converter={StaticResource FlowIssueSeverityBrush}}"
+                                    ToolTip.Tip="{Binding SeverityLabel}"
+                                    AutomationProperties.Name="{Binding SeverityLabel}"
                                     HorizontalAlignment="Center" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding Kind, Converter={StaticResource FlowIssueSeverityGlyph}}"
                                            FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.OnAccent}"
