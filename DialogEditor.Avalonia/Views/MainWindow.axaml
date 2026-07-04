@@ -155,6 +155,17 @@
                                   IsEnabled="{Binding CanValidateVO}"
                                   ToolTip.Tip="{DynamicResource ToolTip_ValidateVO}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_ValidateVO}"/>
+                        <!-- Batch VO import entry point (2026-07-04): previously only in the
+                             canvas context menu, which hides the item when it can't run —
+                             invisible to users who never right-click at the right moment.
+                             Deliberately NO IsEnabled/IsVisible binding: the MenuItem
+                             auto-disables from BatchImportVoCommand.CanExecuteChanged
+                             (visible-but-disabled is the discoverability point), and the
+                             command gate stays the single source of truth. -->
+                        <MenuItem Header="{DynamicResource Menu_BatchImportVo}"
+                                  Command="{Binding Canvas.BatchImportVoCommand}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_Menu_BatchImportVo_Main}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_BatchImportVo_Main}"/>
                     </MenuItem>
 
                     <MenuItem Header="{DynamicResource Menu_Help}">
