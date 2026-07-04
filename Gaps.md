@@ -23,12 +23,12 @@ VO to *another* line's `.wem` (`<speaker folder>/<conversation>_<nodeid>`, resol
 `Voices/<language>/`), frequently shared across nodes and even across conversation files.
 The resolution chain (`VoPathResolver.Check`/`ExpectedRelativePath` → status row, ▶ play,
 single-node 🎤 import, batch import, VO validation, orphan scanner) consistently honours
-the alias — audited 2026-07-03, all shipped value shapes resolve. The gap: **importing VO
-on an aliased node writes to the shared target path with no warning**, so an F5 sync
-replaces audio still referenced by every other aliasing node (blast radius invisible to
-the user). Fix idea: when `ExternalVO` is set, warn on import (name the target and, if
-cheap, the other referencing nodes) or offer to clear the alias and import to the node's
-own canonical path. PoE1 note: `<VOFilename />` is empty on all 40,991 shipped nodes —
+the alias — audited 2026-07-03, all shipped value shapes resolve. **Resolved 2026-07-03:**
+single-node import shows a three-way confirm (overwrite shared / clear alias and import to
+the node's own path / cancel) naming the target and its shared-count; batch import excludes
+aliased rows entirely; alias edits go through the node picker (raw path readonly), and the
+Voice group shows the alias target plus "also used by N other node(s)" from a background
+disk index. PoE1 note: `<VOFilename />` is empty on all 40,991 shipped nodes —
 the External VO box can never populate from PoE1 data.
 
 ### Version Control Integration
