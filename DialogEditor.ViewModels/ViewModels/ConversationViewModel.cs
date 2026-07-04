@@ -701,7 +701,7 @@ public partial class ConversationViewModel : ObservableObject
             var destFem     = Path.Combine(voDir, rel[..^4] + "_fem.wem");
 
             var raw     = node.DefaultText.Trim();
-            var preview = raw.Length == 0  ? $"Node {node.NodeId}"
+            var preview = raw.Length == 0  ? Loc.Format("BatchVoImport_NodeFallback", node.NodeId)
                         : raw.Length <= 60 ? raw
                                            : raw[..60] + "…";
 
