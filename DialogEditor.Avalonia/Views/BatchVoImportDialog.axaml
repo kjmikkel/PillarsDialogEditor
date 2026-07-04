@@ -6,7 +6,7 @@
         Width="940" Height="560"
         MinWidth="700" MinHeight="400"
         WindowStartupLocation="CenterOwner"
-        Title="{DynamicResource BatchVoImport_Title_Single}">
+        Title="{Binding WindowTitle}">
 
     <DockPanel Margin="8">
 

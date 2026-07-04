@@ -99,6 +99,15 @@ public partial class BatchVoImportViewModel : ObservableObject
     /// When true the Conversation column is hidden — all rows share the same conversation.
     public bool IsSingleConversation { get; }
 
+    /// Window title: the single-conversation variant names the conversation
+    /// (all rows share it); the project-wide variant is generic. Lives here,
+    /// not in XAML, because the single title needs {0} formatting, which a raw
+    /// DynamicResource Title binding can't do (it showed a literal "{0}").
+    public string WindowTitle => IsSingleConversation
+        ? Loc.Format("BatchVoImport_Title_Single",
+            AllRows.Count > 0 ? AllRows[0].ConversationName : string.Empty)
+        : Loc.Get("BatchVoImport_Title_All");
+
     [ObservableProperty] private bool       _showOnlyMissing = true;
     [ObservableProperty] private WemQuality _quality         = WemQuality.Medium;
     [ObservableProperty] private bool       _isImporting;
