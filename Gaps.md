@@ -456,11 +456,10 @@ key>}` in views converted to `{DynamicResource}`; `NoStaticStringResourceTests` 
 the invariant. `AboutViewModel`, `ChangelogViewModel`, `ConversationViewModel` subscribe
 to `LocaleService.Revision` for live getter refresh.
 
-**Items 4–5 also implemented (see below). The section is complete except item 6**
-(naive pluralisation), a minor accepted limitation until a translation in a
-multi-plural-form language actually ships. Live language switching, the translation
-CSV round-trip, and the layout-elasticity fixes are all in place — what is missing
-is not mechanism but content: no translation overlay has been authored yet.
+**Items 4–6 also implemented (see below) — the section is complete.** Live language
+switching, the translation CSV round-trip, the layout-elasticity fixes, and CLDR
+plural-category support are all in place — what is missing is not mechanism but
+content: no translation overlay has been authored yet.
 
 **Already in place (verified):**
 - Single funnel: all UI strings live in three XAML dictionaries (`Strings.axaml`,
@@ -488,8 +487,13 @@ is not mechanism but content: no translation overlay has been authored yet.
    auto-detected from the CSV filename (`ui-strings.de.csv` → `de`) or prompted via the
    `LanguageCodeDialog` if not detectable.
 5. **Layout elasticity audit. ✓ Implemented.** Fixed: `SettingsWindow` label style `Width="140"` → `MinWidth="140"` (labels now grow to fit longer translated text); `FindReplaceWindow` label columns `70px` → `Auto` (grow with translated "Find:"/"Replace:" labels); added `MinWidth`/`MinHeight` to six large windows that had neither (BranchesWindow, HistoryWindow, BlameWindow, DiffWindow, GitConflictResolutionWindow, LegendWindow). Node cards (200px), table column trimming, and canvas-area `MaxHeight` constraints are intentional fixed-space layouts — left as-is.
-6. Minor: naive pluralisation (`"{0} nodes"` breaks in languages with multiple plural
-   forms — usually accepted in tools).
+6. **Pluralisation ✓ implemented (2026-07-04):** `Loc.FormatCount` resolves CLDR
+   plural-category key suffixes (`_One`/`_Few`/`_Many`/`_Other`…) with rules shipped
+   for en/de/fr/pl/ru/ar (en fallback for unknown languages) and a fallback chain
+   `_Category` → `_Other` → bare key. All 24 naive "(s)" strings migrated
+   (`NoNaivePluralTests` bans the idiom); two-count lines compose pre-pluralised
+   fragments; CSV import accepts translator-added category rows (pinned by test).
+   Spec: docs/superpowers/specs/2026-07-04-pluralisation-design.md.
 
 ### Barks System — Bark Preview
 **✅ IMPLEMENTED (barks rendering + validation, 2026-06-21).** Bark nodes render with an

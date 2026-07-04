@@ -202,4 +202,22 @@ public class UiStringImportServiceTests : IDisposable
     {
         Assert.Equal(expected, UiStringImportService.OverlayFileName(fileId, lang));
     }
+
+    [Fact]
+    public void Import_AcceptsPluralCategoryRows_AbsentFromEnglishSource()
+    {
+        // A Polish translator adds _Few/_Many rows that English never ships
+        // (see the 2026-07-04 pluralisation spec) — the importer must write
+        // every translated row, not just keys present in the English export.
+        var csv = WriteCsv("""
+            Key,Source,Translation,File
+            X_One,1 file,1 plik,Strings.axaml
+            X_Few,,{0} pliki,Strings.axaml
+            X_Many,,{0} plików,Strings.axaml
+            """);
+        UiStringImportService.Import(csv, "pl", _tempDir);
+        var overlay = ReadOverlay(Path.Combine(_tempDir, "Strings.pl.axaml"));
+        Assert.Equal("{0} pliki",  overlay["X_Few"]);
+        Assert.Equal("{0} plików", overlay["X_Many"]);
+    }
 }

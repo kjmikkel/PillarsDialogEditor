@@ -14,6 +14,11 @@
         • Script-prefix tokens ([Enter], [Exit], [Update]) and the condition
           operator "NOT" originate in DialogEditor.Core, which has no UI
           dependency. They are a known localisation gap.
+        • Plurals: keys ending _One/_Few/_Many/_Other (etc.) are CLDR plural
+          forms selected by count at runtime. Translate each form your language
+          uses; add rows for categories your language needs that English lacks
+          (e.g. Polish _Few/_Many) — the CSV import accepts them. {0} is always
+          the count.
     -->
 
     <!-- ─── Status bar ─────────────────────────────────────────────────── -->
