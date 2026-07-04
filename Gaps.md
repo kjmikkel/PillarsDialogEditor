@@ -541,6 +541,13 @@ Remaining gaps:
   context-menu item ("Batch import VO…", gated by `CanBatchImportVo`) is wired. Either
   wire an all-conversations command (rows built across every project conversation, same
   `BatchVoImportDialog` with `isSingleConversation: false`) or delete the two orphaned keys.
+- **Batch VO import is only reachable via canvas right-click** — the per-conversation
+  "Batch import VO…" item lives solely in the canvas context menu (`ConversationView.axaml`),
+  which is poor discoverability for a feature this significant: context menus are invisible
+  until explored, and the item hides itself entirely when `CanBatchImportVo` is false, so
+  users may never learn it exists. Add a persistent entry point — a main-menu item (e.g.
+  under the same menu as Validate Voice-Over) and/or a button in the batch/VO tooling area —
+  with the context-menu item kept as a shortcut.
 - **VO file lifecycle ✓ implemented (2026-07-02):** female-VO reporting is intent-driven (a leftover `_fem.wem` is no longer advertised when the node has no female text); **Validate Voice-Over** gains a project-wide orphaned-files section (files in `_vo/` no VO-enabled node references — deleted nodes, removed conversations, stale female slots) with an armed two-click cleanup that deletes the files and prunes empty prefix folders; and new node IDs never reuse an ID whose `_vo/` file still exists, so a new node can't silently inherit a deleted node's audio (B-005 hazard family). Spec: `docs/superpowers/specs/2026-07-02-vo-lifecycle-design.md`.
 - **Mod VO ✓ implemented (2026-06-25):** per-node 🎤 import button and canvas context-menu item open `VoImportDialog` (primary + female `.wem`/`.wav` slots; Wwise detection; "Download Wwise" link). Imported files land in `_vo/` next to the `.dialogproject`; VO status row flips to ✓ immediately. F5 syncs `_vo/` to the game's VO directory with per-file backup; F6 removes/restores. "File › Export Mod Bundle…" packages the project and `_vo/` into a `.dialogpack` (ZIP). Patch Manager and CLI detect `.dialogpack`, extract to temp, apply dialog diff, and copy `vo/` to the game. Known limitation: `.wav` → `.wem` encoding via Wwise CLI is not yet implemented (requires a bundled `.wproj` template — users should pre-encode to `.wem` with the Wwise authoring tool and import the `.wem` directly).
 
