@@ -27,7 +27,7 @@
 - Consumes: existing `Menu_BatchImportVo` string key; `MainWindowViewModel.Canvas` (a `ConversationViewModel`) and its `BatchImportVoCommand`.
 - Produces: string key `ToolTip_Menu_BatchImportVo_Main` (Task 2's Gaps text references the feature, not the key).
 
-- [ ] **Step 1: Add the tooltip string**
+- [x] **Step 1: Add the tooltip string**
 
 In `DialogEditor.Avalonia/Resources/Strings.axaml`, directly below the line
 
@@ -43,7 +43,7 @@ add:
     <sys:String x:Key="ToolTip_Menu_BatchImportVo_Main">Open the batch voice-over import dialog for this conversation. Requires an open project and a conversation with at least one voiced node.</sys:String>
 ```
 
-- [ ] **Step 2: Add the menu item**
+- [x] **Step 2: Add the menu item**
 
 In `DialogEditor.Avalonia/Views/MainWindow.axaml`, inside the Test menu, directly after
 
@@ -71,12 +71,12 @@ and before the closing `</MenuItem>` of the Test menu, add:
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_BatchImportVo_Main}"/>
 ```
 
-- [ ] **Step 3: Build and run the full test suite**
+- [x] **Step 3: Build and run the full test suite**
 
 Run: `dotnet build && dotnet test --nologo`
 Expected: build success (no `AVLN` XAML errors), all tests pass (1800 as of plan date).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add "DialogEditor.Avalonia/Views/MainWindow.axaml" "DialogEditor.Avalonia/Resources/Strings.axaml"
@@ -96,7 +96,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Consumes: Task 1's menu item (feature must be merged/present in the working copy).
 - Produces: nothing downstream.
 
-- [ ] **Step 1: Rewrite the Gaps.md bullet**
+- [x] **Step 1: Rewrite the Gaps.md bullet**
 
 Replace the bullet beginning `- **Batch VO import is only reachable via canvas right-click**` (keep the bullet, rewrite its text) with:
 
@@ -109,7 +109,7 @@ Replace the bullet beginning `- **Batch VO import is only reachable via canvas r
   2026-07-04).
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add Gaps.md
@@ -118,12 +118,15 @@ git commit -m "docs(gaps): mark batch VO import entry-point gap resolved
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ```
 
-- [ ] **Step 3: Manual verification checklist** — `dotnet run --project DialogEditor.Avalonia`, open the Deadfire game folder.
+- [x] **Step 3: Manual verification checklist** — `dotnet run --project DialogEditor.Avalonia`, open the Deadfire game folder.
 
-- [ ] Test menu shows "Batch import VO…" directly after Validate Voice-Over
-- [ ] With no project open: item visible but disabled; tooltip shows and names the conditions
-- [ ] Open the project + `08_cv_atsura`: item enabled; clicking opens the batch import dialog (aliased rows still show "shared")
-- [ ] Open a conversation with no voiced nodes (any PoE1 conversation, or a new empty one): item disabled
-- [ ] Canvas right-click "Batch import VO…" still works unchanged
+- [x] Test menu shows "Batch import VO…" directly after Validate Voice-Over
+- [x] With no project open: item visible but disabled; tooltip shows and names the conditions
+- [x] Open the project + `08_cv_atsura`: item enabled; clicking opens the batch import dialog (aliased rows still show "shared")
+- [x] Open a conversation with no voiced nodes (any PoE1 conversation, or a new empty one): item disabled
+- [x] Canvas right-click "Batch import VO…" still works unchanged
 
-- [ ] **Step 4: Report results** — any failure: fix, `dotnet build && dotnet test --nologo`, re-verify, commit as `fix(vo): …`.
+- [x] **Step 4: Report results** — any failure: fix, `dotnet build && dotnet test --nologo`, re-verify, commit as `fix(vo): …`.
+
+**Manual verification results (2026-07-04):** all five checklist items confirmed by hand
+in the running app — no defects found.
