@@ -540,18 +540,23 @@ fresh install; re-accessible via Help ▸ Start Guided Tour.
 Remaining gaps:
 - **Audio playback ✓ implemented (2026-06-22):** bundled `vgmstream-cli` r2117 + NAudio; play/stop toggle buttons in node detail panel; female variant support; `THIRD_PARTY_LICENSES.md` updated.
 - **PoE1 VO** — Unity asset archives; deferred indefinitely.
-- **Project-wide batch VO import has no entry point** — the strings `Menu_BatchImportVoAll`
-  / `ToolTip_Menu_BatchImportVoAll` ("Batch import VO (all conversations)…") exist in
-  `Strings.axaml` but nothing references them; only the per-conversation canvas
-  context-menu item ("Batch import VO…", gated by `CanBatchImportVo`) is wired. Either
-  wire an all-conversations command (rows built across every project conversation, same
-  `BatchVoImportDialog` with `isSingleConversation: false`) or delete the two orphaned keys.
+- **Project-wide batch VO import ✓ implemented (2026-07-04):** "Batch import VO
+  (all conversations)…" in the Test menu (the formerly orphaned
+  `Menu_BatchImportVoAll` strings) scans every patched conversation via
+  `ProjectVoRowScanner` (live canvas snapshot for the open conversation;
+  unreadable conversations warned and skipped) and opens the existing
+  `BatchVoImportDialog` in its multi-conversation mode
+  (`isSingleConversation: false`, Conversation column visible). Scope is the
+  project's patched conversations only — a VO-only change to an untouched
+  vanilla conversation uses the per-conversation flow. Aliased rows stay
+  listed-but-excluded. Empty scan reports via the status bar; gate requires an
+  open, saved project and a PoE2 game folder.
+  Spec: docs/superpowers/specs/2026-07-04-batch-vo-all-conversations-design.md.
 - **Batch VO import entry point ✓ resolved (2026-07-04):** "Batch import VO…" now sits in
   the Test menu after Validate Voice-Over, auto-disabling via the command gate when no
   project is open or the conversation has no voiced nodes (visible-but-disabled for
   discoverability; tooltip names the conditions). The canvas context-menu item remains as
-  a shortcut. The separate "all conversations" gap above stays open (scope decision
-  2026-07-04).
+  a shortcut.
 - **VO file lifecycle ✓ implemented (2026-07-02):** female-VO reporting is intent-driven (a leftover `_fem.wem` is no longer advertised when the node has no female text); **Validate Voice-Over** gains a project-wide orphaned-files section (files in `_vo/` no VO-enabled node references — deleted nodes, removed conversations, stale female slots) with an armed two-click cleanup that deletes the files and prunes empty prefix folders; and new node IDs never reuse an ID whose `_vo/` file still exists, so a new node can't silently inherit a deleted node's audio (B-005 hazard family). Spec: `docs/superpowers/specs/2026-07-02-vo-lifecycle-design.md`.
 - **Mod VO ✓ implemented (2026-06-25):** per-node 🎤 import button and canvas context-menu item open `VoImportDialog` (primary + female `.wem`/`.wav` slots; Wwise detection; "Download Wwise" link). Imported files land in `_vo/` next to the `.dialogproject`; VO status row flips to ✓ immediately. F5 syncs `_vo/` to the game's VO directory with per-file backup; F6 removes/restores. "File › Export Mod Bundle…" packages the project and `_vo/` into a `.dialogpack` (ZIP). Patch Manager and CLI detect `.dialogpack`, extract to temp, apply dialog diff, and copy `vo/` to the game. Known limitation: `.wav` → `.wem` encoding via Wwise CLI is not yet implemented (requires a bundled `.wproj` template — users should pre-encode to `.wem` with the Wwise authoring tool and import the `.wem` directly).
 

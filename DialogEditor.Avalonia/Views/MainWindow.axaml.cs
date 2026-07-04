@@ -147,6 +147,15 @@ public partial class MainWindow : Window
             vm.Detail.Refresh();
         };
 
+        // Project-wide variant: the VM scans and reports; this delegate only
+        // hosts the dialog (multi-conversation mode shows the Conversation column).
+        vm.ShowBatchVoImportAll = async rows =>
+        {
+            var batchVm = new BatchVoImportViewModel(rows, voImporter, isSingleConversation: false);
+            var dlg     = new BatchVoImportDialog(batchVm, audioPlayer);
+            await dlg.ShowDialog(this);
+        };
+
         if (!vm.IsBrowserExpanded)
         {
             BrowserColumn.MinWidth = 34;
