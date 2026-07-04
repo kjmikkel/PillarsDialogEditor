@@ -34,7 +34,7 @@
   - `static IReadOnlyList<BatchVoRowViewModel> ProjectVoRowScanner.BuildRows(DialogProject project, IGameDataProvider provider, string projectPath, string gameRoot, string activeGameId, string? openConversationName = null, ConversationEditSnapshot? openSnapshot = null)`
   - String key `BatchVoImport_NodeFallback` = `Node {0}`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `DialogEditor.Tests/Services/ProjectVoRowScannerTests.cs`. The fixture mirrors `VoOrphanScannerTests` (same file, same helpers) but adds a fake **game root** because `VoPathResolver.Check` probes `<gameRoot>/PillarsOfEternityII_Data/StreamingAssets/Audio/Windows/Voices/English(US)/`:
 
@@ -268,12 +268,12 @@ Notes for the implementer:
 - `NodeEditSnapshot`'s positional parameters are `(NodeId, IsPlayerChoice, SpeakerCategory, SpeakerGuid, ListenerGuid, DefaultText, FemaleText, DisplayType, Persistence, ActorDirection, Comments, ExternalVO, HasVO, HideSpeaker, Links, Conditions, Scripts)` — see `DialogEditor.Core/Editing/ConversationEditSnapshot.cs:17`. Verify the argument order above compiles against it before running.
 - If `DialogProject.WithPatch` chaining differs (see its definition in `DialogEditor.Patch`), match how `VoOrphanScannerTests.ProjectWithConvPatch` builds projects.
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~ProjectVoRowScannerTests"`
 Expected: **build failure** — `'ProjectVoRowScanner' could not be found`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Add to `DialogEditor.Avalonia/Resources/Strings.axaml`, next to the other `BatchVoImport_*` keys:
 
@@ -392,12 +392,12 @@ In `DialogEditor.ViewModels/ViewModels/ConversationViewModel.cs:704`, replace th
 
 (add `using DialogEditor.ViewModels.Resources;` if not already present — it almost certainly is, for the other `Loc` calls in the file).
 
-- [ ] **Step 4: Run tests, then full suite**
+- [x] **Step 4: Run tests, then full suite**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~ProjectVoRowScannerTests"` → PASS (8 tests).
 Run: `dotnet test --nologo` → all pass. If a pre-existing test asserted the old literal `"Node {id}"` preview from `BuildBatchVoRows`, update that assertion to the stub echo `"BatchVoImport_NodeFallback"` (per the StubStringProvider constraint) — no other assertion changes.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add DialogEditor.ViewModels/Services/ProjectVoRowScanner.cs DialogEditor.Tests/Services/ProjectVoRowScannerTests.cs DialogEditor.Avalonia/Resources/Strings.axaml DialogEditor.ViewModels/ViewModels/ConversationViewModel.cs
@@ -422,7 +422,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
   - `Func<IReadOnlyList<BatchVoRowViewModel>, Task>? MainWindowViewModel.ShowBatchVoImportAll { get; set; }`
   - String keys `Status_BatchImportVoAllEmpty`, `Status_BatchImportVoAllFailed`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Append to `DialogEditor.Tests/ViewModels/MainWindowViewModelTests.cs` (the file already has `MakeVm`, `InjectProject`, `InjectProvider`; add the private-field helper if absent):
 
@@ -531,12 +531,12 @@ Append to `DialogEditor.Tests/ViewModels/MainWindowViewModelTests.cs` (the file 
 
 (If `MakeVoAllReadyVm`'s `Path.GetTempPath()` game directory triggers nothing — it doesn't need to exist for gating; `VoPathResolver.Check` only probes it with `File.Exists`, which is false → rows report `Missing`, which is fine for the delegate test.)
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~MainWindowViewModelTests.BatchImportVoAll"`
 Expected: **build failure** — `'MainWindowViewModel' does not contain a definition for 'BatchImportVoAllCommand'`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Add to `DialogEditor.Avalonia/Resources/Strings.axaml`, next to the other `Status_*` keys:
 
@@ -622,12 +622,12 @@ Raise `BatchImportVoAllCommand.NotifyCanExecuteChanged();` everywhere the gate's
 
 If `Canvas.ConversationName` or `Canvas.BuildSnapshot()` differ in name, mirror exactly what `CreateVoValidationViewModel` (line ~410) uses — same live-snapshot semantics.
 
-- [ ] **Step 4: Run tests, then full suite**
+- [x] **Step 4: Run tests, then full suite**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~MainWindowViewModelTests"` → PASS (all, including the 6 new).
 Run: `dotnet test --nologo` → all pass.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs DialogEditor.Avalonia/Resources/Strings.axaml DialogEditor.Tests/ViewModels/MainWindowViewModelTests.cs
@@ -649,7 +649,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Consumes: Task 2 `BatchImportVoAllCommand`, `ShowBatchVoImportAll`; existing `BatchVoImportViewModel(rows, importer, isSingleConversation: false)` and `BatchVoImportDialog(batchVm, audioPlayer)`.
 - Produces: nothing downstream — this is the final integration.
 
-- [ ] **Step 1: Add the menu item**
+- [x] **Step 1: Add the menu item**
 
 In `MainWindow.axaml`, directly after the per-conversation `Menu_BatchImportVo` item (line ~165–168), add:
 
@@ -664,7 +664,7 @@ In `MainWindow.axaml`, directly after the per-conversation `Menu_BatchImportVo` 
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_BatchImportVoAll}"/>
 ```
 
-- [ ] **Step 2: Wire the delegate**
+- [x] **Step 2: Wire the delegate**
 
 In `MainWindow.axaml.cs`, directly after the `vm.Canvas.ShowBatchVoImport = …` block (line ~140–148; the `voImporter` and `audioPlayer` locals are already in scope there):
 
@@ -677,12 +677,12 @@ In `MainWindow.axaml.cs`, directly after the `vm.Canvas.ShowBatchVoImport = …`
         };
 ```
 
-- [ ] **Step 3: Build and run the full suite**
+- [x] **Step 3: Build and run the full suite**
 
 Run: `dotnet build --nologo && dotnet test --nologo`
 Expected: build clean; all tests pass (the structural suites — `AutomationHelpTextTests` etc. — validate the new menu item's Tip/HelpText mirroring automatically).
 
-- [ ] **Step 4: Update Gaps.md**
+- [x] **Step 4: Update Gaps.md**
 
 In the Voice-Over Integration "Remaining gaps" list, replace the bullet
 "**Project-wide batch VO import has no entry point** …" (keep the later
@@ -705,13 +705,13 @@ decision 2026-07-04).`) with:
   Spec: docs/superpowers/specs/2026-07-04-batch-vo-all-conversations-design.md.
 ```
 
-- [ ] **Step 5: Manual verification** — `dotnet run --project DialogEditor.Avalonia`:
+- [x] **Step 5: Manual verification** — `dotnet run --project DialogEditor.Avalonia`:
 
 - [ ] Test menu shows "Batch import VO (all conversations)…" after the per-conversation item; disabled with no project open; tooltip names the conditions.
 - [ ] With a PoE2 folder + project open: the item enables; invoking it opens the dialog with the Conversation column visible and rows from every patched conversation.
 - [ ] A project whose patches contain no voiced nodes reports "No voiced nodes found in this project's conversations." in the status bar instead of opening the dialog.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add DialogEditor.Avalonia/Views/MainWindow.axaml DialogEditor.Avalonia/Views/MainWindow.axaml.cs Gaps.md
