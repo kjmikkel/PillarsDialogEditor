@@ -1937,17 +1937,25 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 
 The entry "VO import over an ExternalVO alias silently overwrites shared audio" is now fixed by this feature. Move nothing — `Gaps.md` has no Fixed section; instead rewrite the entry's gap paragraph to record the resolution ("Resolved 2026-07-03: single-node import shows a three-way confirm; batch import excludes aliased rows; alias edits go through the node picker") and keep the background sentence. Commit as `docs(gaps): mark ExternalVO alias hazard resolved`.
 
-- [ ] **Step 2: Run the app** — `dotnet run --project DialogEditor.Avalonia`, open the Deadfire project.
+- [x] **Step 2: Run the app** — `dotnet run --project DialogEditor.Avalonia`, open the Deadfire project.
 
-- [ ] **Step 3: Walk the checklist**
+- [x] **Step 3: Walk the checklist**
 
-- [ ] Open `08_cv_atsura` (79 aliased nodes): an aliased node's Voice group shows the friendly line, readonly raw path, and "Also used by N other node(s)" once the background index finishes
-- [ ] ▶ play on an aliased node plays the target recording (unchanged behavior)
-- [ ] "Reuse another line's VO…" appears only on non-aliased PoE2 nodes; opens the picker; conversation + node filters work; ✓/✗ column reflects real files; disabled rows for unknown speakers
-- [ ] Picking a node writes the alias (undo reverts it); Change… pre-selects the current target; Clear removes the alias and the Voice group returns to the own-file framing
-- [ ] 🎤 on an aliased node shows the three-way dialog; Cancel imports nothing; "Give this node its own recording" clears the alias and imports to `<conv>_<id>.wem`; Overwrite imports to the shared path
-- [ ] Batch VO import: aliased rows show "shared", Browse buttons disabled, import skips them
-- [ ] PoE1 project (if available): Voice group shows no alias UI at all
-- [ ] Tab order and tooltips: every new control shows a tooltip; picker and confirm dialogs carry the app icon
+- [x] Open `08_cv_atsura` (79 aliased nodes): an aliased node's Voice group shows the friendly line, readonly raw path, and "Also used by N other node(s)" once the background index finishes
+- [x] ▶ play on an aliased node plays the target recording (unchanged behavior)
+- [x] "Reuse another line's VO…" appears only on non-aliased PoE2 nodes; opens the picker; conversation + node filters work; ✓/✗ column reflects real files; disabled rows for unknown speakers
+- [x] Picking a node writes the alias (undo reverts it); Change… pre-selects the current target; Clear removes the alias and the Voice group returns to the own-file framing
+- [x] 🎤 on an aliased node shows the three-way dialog; Cancel imports nothing; "Give this node its own recording" clears the alias and imports to `<conv>_<id>.wem`; Overwrite imports to the shared path
+- [x] Batch VO import: aliased rows show "shared", Browse buttons disabled, import skips them
+- [x] PoE1 project (if available): Voice group shows no alias UI at all
+- [x] Tab order and tooltips: every new control shows a tooltip; picker and confirm dialogs carry the app icon
 
-- [ ] **Step 4: Report results** — any failure: fix in the owning task's files, `dotnet build && dotnet test --nologo`, re-verify, commit as `fix(vo): …`.
+- [x] **Step 4: Report results** — any failure: fix in the owning task's files, `dotnet build && dotnet test --nologo`, re-verify, commit as `fix(vo): …`.
+
+**Manual verification results (2026-07-04):** all checklist items confirmed by hand in the
+running app against `08_cv_atsura`. One defect found and fixed during verification: the
+alias-import confirm dialog's fixed 480px width clipped the Cancel button off the right
+edge under font scaling (fixed by sizing the window to content so the horizontal button
+row can never clip). Two follow-ups logged in Gaps.md: the orphaned "all conversations"
+batch-import strings, and batch VO import needing a discoverable entry point beyond the
+canvas context menu.
