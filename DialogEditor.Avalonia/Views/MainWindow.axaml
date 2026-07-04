@@ -166,6 +166,14 @@
                                   Command="{Binding Canvas.BatchImportVoCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Menu_BatchImportVo_Main}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_BatchImportVo_Main}"/>
+                        <!-- Project-wide variant (2026-07-04): scans every patched
+                             conversation. Same visible-but-disabled discoverability
+                             pattern as its per-conversation sibling above — the
+                             MenuItem auto-disables from CanExecuteChanged. -->
+                        <MenuItem Header="{DynamicResource Menu_BatchImportVoAll}"
+                                  Command="{Binding BatchImportVoAllCommand}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_Menu_BatchImportVoAll}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_BatchImportVoAll}"/>
                     </MenuItem>
 
                     <MenuItem Header="{DynamicResource Menu_Help}">
