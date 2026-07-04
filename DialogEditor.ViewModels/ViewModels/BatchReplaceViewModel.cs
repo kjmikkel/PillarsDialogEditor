@@ -131,7 +131,10 @@ public partial class BatchReplaceViewModel : ObservableObject
         ApplyCommand.NotifyCanExecuteChanged();
 
         var totalMatches = selected.Sum(r => r.Matches.Count);
-        StatusText = Loc.Format("BatchReplace_StatusApplied", totalMatches, selected.Count);
+        // Wrapper + pre-pluralised fragments: each count pluralises independently.
+        StatusText = Loc.Format("BatchReplace_StatusApplied",
+            Loc.FormatCount("BatchReplace_ReplacementCount", totalMatches),
+            Loc.FormatCount("BatchReplace_ConversationCount", selected.Count));
         IsBusy = false;
     }
 
@@ -148,7 +151,9 @@ public partial class BatchReplaceViewModel : ObservableObject
     private string BuildStatusText(int matchCount, int convCount, int skipped)
     {
         var msg = matchCount > 0
-            ? Loc.Format("BatchReplace_StatusMatches", matchCount, convCount)
+            ? Loc.Format("BatchReplace_StatusMatches",
+                Loc.FormatCount("BatchReplace_MatchCount", matchCount),
+                Loc.FormatCount("BatchReplace_ConversationCount", convCount))
             : Loc.Get("BatchReplace_StatusNoMatches");
         if (skipped > 0)
             msg += " " + Loc.FormatCount("BatchReplace_StatusSkipped", skipped);

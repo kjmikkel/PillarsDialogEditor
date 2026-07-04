@@ -524,7 +524,7 @@ public partial class NodeDetailViewModel : ObservableObject
                   + (string.IsNullOrWhiteSpace(TranslatorNote) ? 0 : 1);
             return n == 0
                 ? Loc.Get("NodeDetail_NoneShort")
-                : $"{n} {Loc.Get("NodeDetail_NotesWord")}";
+                : Loc.FormatCount("NodeDetail_NotesCount", n);
         }
     }
 

@@ -1,7 +1,7 @@
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using DialogEditor.Core.Import;
+using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.Avalonia.Views;
 
@@ -15,10 +15,8 @@ public partial class ImportWarningsDialog : Window
     {
         InitializeComponent();
 
-        var suffix = Application.Current!.FindResource("ImportWarnings_OccurrenceSuffix") as string
-                     ?? "occurrence(s)";
         WarningsList.ItemsSource = warnings
-            .Select(w => $"<<{w.Construct}>> — {w.Count} {suffix}")
+            .Select(w => $"<<{w.Construct}>> — {Loc.FormatCount("ImportWarnings_OccurrenceCount", w.Count)}")
             .ToList();
 
         OkButton.Click += (_, _) => Close();
