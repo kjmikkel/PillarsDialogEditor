@@ -164,9 +164,15 @@ git commit -m "docs(gaps): flow analytics severity icons resolved (item 12)
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ```
 
-- [ ] **Step 3: Manual verification** — `dotnet run --project DialogEditor.Avalonia`, open a conversation with issues (Edit ▸ Flow Analytics):
+- [x] **Step 3: Manual verification** — `dotnet run --project DialogEditor.Avalonia`, open a conversation with issues (Edit ▸ Flow Analytics):
 
-- [ ] Hovering an issue row's severity icon shows "Error" (unreachable) or "Warning" (others)
-- [ ] Rows look visually unchanged (no layout shift)
+- [x] Hovering an issue row's severity icon shows "Error" (unreachable) or "Warning" (others)
+- [x] Rows look visually unchanged (no layout shift)
 
-- [ ] **Step 4: Report results** — any failure: fix, `dotnet build && dotnet test --nologo`, re-verify, commit as `fix(a11y): …`.
+- [x] **Step 4: Report results** — any failure: fix, `dotnet build && dotnet test --nologo`, re-verify, commit as `fix(a11y): …`.
+
+**Manual verification results (2026-07-04):** confirmed by hand — severity tooltips show
+"Error"/"Warning", no layout shift. Two findings during verification, both addressed:
+the plan's checklist wrongly said Test ▸ Flow Analytics (it is Edit ▸; text corrected),
+and the window opened empty until Refresh was pressed — fixed in 13ce243 (analysis now
+runs on every summon, also covering conversation switches between summons).
