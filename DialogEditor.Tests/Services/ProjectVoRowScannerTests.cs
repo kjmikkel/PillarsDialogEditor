@@ -182,6 +182,26 @@ public class ProjectVoRowScannerTests : IDisposable
     }
 
     [Fact]
+    public void AddedNodeWithNullTexts_FromDeserializedProject_DoesNotCrash()
+    {
+        // DefaultText/FemaleText are [JsonIgnore] — a patch loaded from a saved
+        // .dialogproject materialises AddedNodes with NULL texts, not "".
+        // Found live 2026-07-04: the first scan of a real project NRE'd here.
+        var added = new NodeEditSnapshot(
+            9, false, SpeakerCategory.Npc, SpeakerGuid, "", null!, null!,
+            "Conversation", "None", "", "", "", true, false, [], [], []);
+        var patch = new ConversationPatch("newconv", ConversationPatch.CurrentSchemaVersion,
+            [added], [], []);
+        var provider = new FakeGameDataProvider("poe2", "en");
+        var project  = DialogProject.Empty("P").WithPatch(patch);
+
+        var rows = Scan(project, provider);
+
+        var row = Assert.Single(rows);
+        Assert.Equal("BatchVoImport_NodeFallback", row.TextPreview);   // stub echoes the key
+    }
+
+    [Fact]
     public void NonPoe2Game_ReturnsNoRows()
     {
         var provider = new FakeGameDataProvider("poe1", "en",

@@ -60,12 +60,15 @@ public static class ProjectVoRowScanner
 
             foreach (var node in snap.Nodes)
             {
-                var femaleText = node.FemaleText.Length > 0 ? node.FemaleText
+                // DefaultText/FemaleText are [JsonIgnore]: a patch deserialized
+                // from disk materialises AddedNodes with NULL texts, not "".
+                var femaleText = !string.IsNullOrEmpty(node.FemaleText) ? node.FemaleText
                     : translations.TryGetValue(node.NodeId, out var ft) ? ft.FemaleText
                     : string.Empty;
 
                 var check = VoPathResolver.Check(
-                    node.SpeakerGuid, node.HasVO, node.ExternalVO, femaleText.Length > 0,
+                    node.SpeakerGuid, node.HasVO, node.ExternalVO,
+                    !string.IsNullOrEmpty(femaleText),
                     node.NodeId, convName, gameRoot, activeGameId);
 
                 if (check is null || check.Status == VoPresence.NotApplicable) continue;
@@ -75,9 +78,9 @@ public static class ProjectVoRowScanner
                 var destPrimary = Path.Combine(voDir, rel);
                 var destFem     = Path.Combine(voDir, rel[..^4] + "_fem.wem");
 
-                var text = node.DefaultText.Trim();
+                var text = (node.DefaultText ?? string.Empty).Trim();
                 if (text.Length == 0 && translations.TryGetValue(node.NodeId, out var tr))
-                    text = tr.DefaultText.Trim();
+                    text = (tr.DefaultText ?? string.Empty).Trim();
                 var preview = text.Length == 0  ? Loc.Format("BatchVoImport_NodeFallback", node.NodeId)
                             : text.Length <= 60 ? text
                                                 : text[..60] + "…";
