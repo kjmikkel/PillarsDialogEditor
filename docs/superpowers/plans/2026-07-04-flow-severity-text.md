@@ -29,7 +29,7 @@
 - Consumes: `FlowIssueViewModel(FlowIssue issue, string nodeSnippet, Action<int> navigate)`; `FlowIssue(int NodeId, FlowIssueKind Kind)`; `Loc.Get` (test constructor already runs `Loc.Configure(new StubStringProvider())`, which echoes keys).
 - Produces: `string FlowIssueViewModel.SeverityLabel`; string keys `FlowAnalytics_Severity_Error`, `FlowAnalytics_Severity_Warning`.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Append inside the class in `DialogEditor.Tests/ViewModels/FlowAnalyticsViewModelTests.cs`:
 
@@ -52,12 +52,12 @@ Append inside the class in `DialogEditor.Tests/ViewModels/FlowAnalyticsViewModel
 
 If `FlowIssueKind`/`FlowIssue` are not already in scope, add `using DialogEditor.Core.Analytics;` to the file's usings.
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~FlowAnalyticsViewModelTests"`
 Expected: **build failure** — `'FlowIssueViewModel' does not contain a definition for 'SeverityLabel'`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 In `FlowAnalyticsViewModel.cs`, directly below the `KindLabel` property in `FlowIssueViewModel`, add:
 
@@ -79,12 +79,12 @@ In `DialogEditor.Avalonia/Resources/Strings.axaml`, inside the Flow Analytics bl
     <sys:String x:Key="FlowAnalytics_Severity_Warning">Warning</sys:String>
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~FlowAnalyticsViewModelTests"`
 Expected: PASS (6 new tests green).
 
-- [ ] **Step 5: Bind in the view**
+- [x] **Step 5: Bind in the view**
 
 In `DialogEditor.Avalonia/Views/FlowAnalyticsWindow.axaml`, the severity icon `Border` (~line 118) currently reads:
 
@@ -108,7 +108,7 @@ Change it to (two added lines; the inner glyph `TextBlock` stays untouched):
                                     HorizontalAlignment="Center" VerticalAlignment="Center">
 ```
 
-- [ ] **Step 6: Full build + test, commit**
+- [x] **Step 6: Full build + test, commit**
 
 Run: `dotnet build && dotnet test --nologo`
 Expected: build success, all tests pass.
@@ -131,7 +131,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Consumes: Task 1's shipped behaviour.
 - Produces: nothing downstream.
 
-- [ ] **Step 1: Update the item-12 deferral sentence**
+- [x] **Step 1: Update the item-12 deferral sentence**
 
 In `Gaps.md` item 12, the current text reads:
 
@@ -155,7 +155,7 @@ Replace with:
     docs/superpowers/specs/2026-07-04-flow-severity-text-design.md). See
 ```
 
-- [ ] **Step 2: Commit**
+- [x] **Step 2: Commit**
 
 ```bash
 git add Gaps.md
@@ -164,7 +164,7 @@ git commit -m "docs(gaps): flow analytics severity icons resolved (item 12)
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ```
 
-- [ ] **Step 3: Manual verification** — `dotnet run --project DialogEditor.Avalonia`, open a conversation with issues (Test ▸ Flow Analytics):
+- [ ] **Step 3: Manual verification** — `dotnet run --project DialogEditor.Avalonia`, open a conversation with issues (Edit ▸ Flow Analytics):
 
 - [ ] Hovering an issue row's severity icon shows "Error" (unreachable) or "Warning" (others)
 - [ ] Rows look visually unchanged (no layout shift)
