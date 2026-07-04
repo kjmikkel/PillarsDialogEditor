@@ -542,10 +542,12 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_FindPrev">Select the previous matching node</sys:String>
     <sys:String x:Key="ToolTip_Replace">Replace the current match and find the next one</sys:String>
     <sys:String x:Key="ToolTip_ReplaceAll">Replace every match in the current conversation</sys:String>
-    <sys:String x:Key="FindReplace_Matches">{0} match(es)</sys:String>
+    <sys:String x:Key="FindReplace_Matches_One">1 match</sys:String>
+    <sys:String x:Key="FindReplace_Matches_Other">{0} matches</sys:String>
     <sys:String x:Key="FindReplace_NoMatches">No matches</sys:String>
     <sys:String x:Key="FindReplace_Navigation">{0} / {1}</sys:String>
-    <sys:String x:Key="FindReplace_Replaced">Replaced {0} match(es)</sys:String>
+    <sys:String x:Key="FindReplace_Replaced_One">Replaced 1 match</sys:String>
+    <sys:String x:Key="FindReplace_Replaced_Other">Replaced {0} matches</sys:String>
     <sys:String x:Key="FindReplace_NothingReplaced">Nothing replaced</sys:String>
     <!-- ─── Batch Find / Replace ─────────────────────────────────────────── -->
     <sys:String x:Key="Menu_BatchReplace">Batch Find / Replace…</sys:String>
@@ -565,7 +567,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="BatchReplace_StatusMatches">{0} match(es) across {1} conversation(s)</sys:String>
     <sys:String x:Key="BatchReplace_StatusNoMatches">No matches found</sys:String>
     <sys:String x:Key="BatchReplace_StatusApplied">Applied {0} replacement(s) across {1} conversation(s)</sys:String>
-    <sys:String x:Key="BatchReplace_StatusSkipped">{0} open conversation(s) skipped — save them first</sys:String>
+    <sys:String x:Key="BatchReplace_StatusSkipped_One">1 open conversation skipped — save it first</sys:String>
+    <sys:String x:Key="BatchReplace_StatusSkipped_Other">{0} open conversations skipped — save them first</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace_Find">Text to search for across all conversations</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace_Replace">Replacement text</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace_CaseSensitive">Match exact capitalisation</sys:String>
@@ -589,7 +592,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_CompareVersions">Compare two versions of your dialogue (such as a branch or an earlier save) and see what changed in each conversation.</sys:String>
     <sys:String x:Key="Diff_WorkingCopy">Your copy</sys:String>
     <!-- {0} = changed conversation count -->
-    <sys:String x:Key="Status_DiffComputed">{0} changed conversation(s)</sys:String>
+    <sys:String x:Key="Status_DiffComputed_One">1 changed conversation</sys:String>
+    <sys:String x:Key="Status_DiffComputed_Other">{0} changed conversations</sys:String>
     <!-- Shown when the folder is not a git repository or git is not installed -->
     <sys:String x:Key="Status_DiffNoRepo">This folder isn't a git repository, or git isn't installed.</sys:String>
     <!-- {0} = endpoint label (branch name, commit, etc.) -->
@@ -605,7 +609,8 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- Shown in the canvas hint area when the diff canvas cannot be built -->
     <sys:String x:Key="DiffWindow_CanvasError">Couldn't build the comparison view for this conversation.</sys:String>
     <!-- {0} = number of changes brought in -->
-    <sys:String x:Key="Status_BroughtIn">Brought in {0} change(s) to your copy.</sys:String>
+    <sys:String x:Key="Status_BroughtIn_One">Brought in 1 change to your copy.</sys:String>
+    <sys:String x:Key="Status_BroughtIn_Other">Brought in {0} changes to your copy.</sys:String>
     <!-- {0} = error message -->
     <sys:String x:Key="Status_BringInError">Couldn't bring in the changes: {0}</sys:String>
     <!-- {0} = project name -->
@@ -620,7 +625,8 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- {0} = node ID integer -->
     <sys:String x:Key="Diff_NodeLine">Line {0}</sys:String>
     <!-- {0} = number of dangling links -->
-    <sys:String x:Key="Diff_DanglingWarning">{0} link(s) may not lead anywhere</sys:String>
+    <sys:String x:Key="Diff_DanglingWarning_One">1 link may not lead anywhere</sys:String>
+    <sys:String x:Key="Diff_DanglingWarning_Other">{0} links may not lead anywhere</sys:String>
     <sys:String x:Key="Diff_ViewChanges">Changes</sys:String>
     <sys:String x:Key="Diff_ViewPreview">Applied preview</sys:String>
     <sys:String x:Key="Diff_LegendAdded">Added</sys:String>
@@ -760,7 +766,9 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- {0} = project name -->
     <sys:String x:Key="Status_ProjectNew">New project: {0}</sys:String>
     <!-- {0} = project name, {1} = patch count -->
-    <sys:String x:Key="Status_ProjectOpened">Opened project '{0}' ({1} patch(es))</sys:String>
+    <!-- {1} = project name (count moved to {0} for FormatCount) -->
+    <sys:String x:Key="Status_ProjectOpened_One">Opened project '{1}' (1 patch)</sys:String>
+    <sys:String x:Key="Status_ProjectOpened_Other">Opened project '{1}' ({0} patches)</sys:String>
     <!-- {0} = project name -->
     <sys:String x:Key="Status_ProjectSaved">Project saved: {0}</sys:String>
     <!-- Shown when Ctrl+S is pressed with no project open -->
@@ -770,14 +778,16 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- {0} = path, {1} = error message -->
     <sys:String x:Key="Status_ProjectOpenError">Could not open project '{0}': {1}</sys:String>
     <!-- Git conflict resolution. {0} = path, {1} = conflict count -->
-    <sys:String x:Key="Status_ProjectGitConflictDetected">'{0}' has {1} unresolved git merge conflict(s). Resolve them to open the project.</sys:String>
+    <sys:String x:Key="Status_ProjectGitConflictDetected_One">'{1}' has 1 unresolved git merge conflict. Resolve it to open the project.</sys:String>
+    <sys:String x:Key="Status_ProjectGitConflictDetected_Other">'{1}' has {0} unresolved git merge conflicts. Resolve them to open the project.</sys:String>
     <!-- {0} = path -->
     <sys:String x:Key="Status_ProjectGitConflictUnparseable">'{0}' has git merge conflicts too complex to resolve here — resolve them in your git tool, then reopen.</sys:String>
     <!-- {0} = project name -->
     <sys:String x:Key="Status_ProjectGitConflictResolved">Resolved git conflicts in '{0}'. Review and save to write the merged project to disk.</sys:String>
     <sys:String x:Key="Status_ProjectGitConflictCancelled">Conflict resolution cancelled — project not opened.</sys:String>
     <!-- Startup deferral: {0} = path, {1} = conflict count -->
-    <sys:String x:Key="Status_ProjectGitConflictPending">'{0}' has {1} unresolved git merge conflict(s). Click Resolve to fix them.</sys:String>
+    <sys:String x:Key="Status_ProjectGitConflictPending_One">'{1}' has 1 unresolved git merge conflict. Click Resolve to fix it.</sys:String>
+    <sys:String x:Key="Status_ProjectGitConflictPending_Other">'{1}' has {0} unresolved git merge conflicts. Click Resolve to fix them.</sys:String>
     <sys:String x:Key="MainWindow_ResolveConflictsButton">Resolve…</sys:String>
     <sys:String x:Key="MainWindow_ResolveConflictsTooltip">Open the conflict resolution dialog for the project that was reopened with unresolved git merge conflicts.</sys:String>
     <!-- Git conflict resolution row titles. {0} = conversation, {1} = node id, {2} = field / kind -->
@@ -853,7 +863,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Menu_MergeProjects">Merge Projects…</sys:String>
     <sys:String x:Key="ToolTip_MergeProjects">Merge one or more other .dialogproject files into the current project. Later projects win on conflict.</sys:String>
     <sys:String x:Key="Dialog_MergeProjects">Select projects to merge into the current project</sys:String>
-    <sys:String x:Key="Status_MergeComplete">Merged {0} project(s) into '{1}'</sys:String>
+    <sys:String x:Key="Status_MergeComplete_One">Merged 1 project into '{1}'</sys:String>
+    <sys:String x:Key="Status_MergeComplete_Other">Merged {0} projects into '{1}'</sys:String>
     <sys:String x:Key="Status_MergeError">Merge failed: {0}</sys:String>
 
     <!-- ─── Import Conversation (from external formats) ─────────────────── -->
@@ -897,7 +908,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_ExportConversations_Json">Export to JSON. Round-trips cleanly through Import Conversation.</sys:String>
     <sys:String x:Key="ToolTip_ExportConversations_Yarn">Export to Yarn Spinner .yarn format. Conditions, scripts, and female text are omitted.</sys:String>
     <!-- {0} = count, {1} = path or folder -->
-    <sys:String x:Key="Status_ExportConversationsSaved">Exported {0} conversation(s) to {1}.</sys:String>
+    <sys:String x:Key="Status_ExportConversationsSaved_One">Exported 1 conversation to {1}.</sys:String>
+    <sys:String x:Key="Status_ExportConversationsSaved_Other">Exported {0} conversations to {1}.</sys:String>
     <!-- {0} = error message -->
     <sys:String x:Key="Status_ExportConversationsError">Export failed: {0}</sys:String>
 
@@ -1107,15 +1119,18 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Button_CleanUp">Clean up…</sys:String>
     <sys:String x:Key="ToolTip_CleanUp">Delete the orphaned .wem files listed above from the project's _vo folder. They belong to deleted nodes, removed conversations, or female slots whose node no longer has female text. You will be asked to confirm; game files are never touched.</sys:String>
     <!-- {0} = number of files -->
-    <sys:String x:Key="VoValidation_CleanUpConfirm">Delete {0} orphaned file(s) from the _vo folder? The editor cannot undo this — re-import the source audio to restore a file.</sys:String>
+    <sys:String x:Key="VoValidation_CleanUpConfirm_One">Delete 1 orphaned file from the _vo folder? The editor cannot undo this — re-import the source audio to restore a file.</sys:String>
+    <sys:String x:Key="VoValidation_CleanUpConfirm_Other">Delete {0} orphaned files from the _vo folder? The editor cannot undo this — re-import the source audio to restore a file.</sys:String>
     <sys:String x:Key="Button_ConfirmCleanUp">Delete files</sys:String>
     <sys:String x:Key="ToolTip_ConfirmCleanUp">Permanently delete the listed orphaned files from the _vo folder.</sys:String>
     <sys:String x:Key="Button_CancelCleanUp">Keep files</sys:String>
     <sys:String x:Key="ToolTip_CancelCleanUp">Close the confirmation without deleting anything.</sys:String>
     <!-- {0} = files deleted -->
-    <sys:String x:Key="VoValidation_CleanedUp">Deleted {0} orphaned file(s).</sys:String>
+    <sys:String x:Key="VoValidation_CleanedUp_One">Deleted 1 orphaned file.</sys:String>
+    <sys:String x:Key="VoValidation_CleanedUp_Other">Deleted {0} orphaned files.</sys:String>
     <!-- {0} = files deleted, {1} = failures -->
-    <sys:String x:Key="VoValidation_CleanUpPartial">Deleted {0} file(s); {1} could not be deleted — see the log.</sys:String>
+    <sys:String x:Key="VoValidation_CleanUpPartial_One">Deleted 1 file; {1} could not be deleted — see the log.</sys:String>
+    <sys:String x:Key="VoValidation_CleanUpPartial_Other">Deleted {0} files; {1} could not be deleted — see the log.</sys:String>
 
     <!-- ── Voice-Over playback ─────────────────────────────────────────── -->
     <sys:String x:Key="ToolTip_PlayVO">Play primary voice-over track for this node</sys:String>
@@ -1279,7 +1294,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="NodeDetail_AliasRaw">Plays external recording: {0}</sys:String>
     <sys:String x:Key="NodeDetail_AliasNotShared">Not shared with other nodes</sys:String>
     <!-- {0} = count of other nodes using the same recording -->
-    <sys:String x:Key="NodeDetail_AliasSharedCount">Also used by {0} other node(s)</sys:String>
+    <sys:String x:Key="NodeDetail_AliasSharedCount_One">Also used by 1 other node</sys:String>
+    <sys:String x:Key="NodeDetail_AliasSharedCount_Other">Also used by {0} other nodes</sys:String>
     <sys:String x:Key="NodeDetail_ReuseVoButton">Reuse another line's VO…</sys:String>
     <sys:String x:Key="NodeDetail_AliasChange">Change…</sys:String>
     <sys:String x:Key="NodeDetail_AliasClear">Clear</sys:String>
@@ -1292,7 +1308,9 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- Task 8/9: aliased-import confirmation dialog (importing over a shared recording) -->
     <sys:String x:Key="AliasImport_Title">Shared Recording</sys:String>
     <!-- {0} = alias path, {1} = count of other nodes -->
-    <sys:String x:Key="AliasImport_Message">This node plays a shared recording ({0}), also used by {1} other node(s). Importing will replace that recording for all of them.</sys:String>
+    <!-- {1} = raw alias path (count moved to {0} for FormatCount) -->
+    <sys:String x:Key="AliasImport_Message_One">This node plays a shared recording ({1}), also used by 1 other node. Importing will replace that recording for both.</sys:String>
+    <sys:String x:Key="AliasImport_Message_Other">This node plays a shared recording ({1}), also used by {0} other nodes. Importing will replace that recording for all of them.</sys:String>
     <sys:String x:Key="AliasImport_Overwrite">Overwrite the shared recording</sys:String>
     <sys:String x:Key="AliasImport_ClearAndOwn">Give this node its own recording</sys:String>
     <sys:String x:Key="AliasImport_Cancel">Cancel</sys:String>

@@ -151,7 +151,7 @@ public partial class BatchReplaceViewModel : ObservableObject
             ? Loc.Format("BatchReplace_StatusMatches", matchCount, convCount)
             : Loc.Get("BatchReplace_StatusNoMatches");
         if (skipped > 0)
-            msg += " " + Loc.Format("BatchReplace_StatusSkipped", skipped);
+            msg += " " + Loc.FormatCount("BatchReplace_StatusSkipped", skipped);
         return msg;
     }
 }

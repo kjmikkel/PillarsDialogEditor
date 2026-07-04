@@ -581,7 +581,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         if (ShowGitConflictResolution is null)   // no resolution UI wired — guide the user
         {
-            StatusText = Loc.Format("Status_ProjectGitConflictDetected", path, conflicts.Count);
+            StatusText = Loc.FormatCount("Status_ProjectGitConflictDetected", conflicts.Count, path);
             return;
         }
 
@@ -589,7 +589,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             _pendingConflictPath        = path;
             HasPendingConflictResolution = true;
-            StatusText = Loc.Format("Status_ProjectGitConflictPending", path, conflicts.Count);
+            StatusText = Loc.FormatCount("Status_ProjectGitConflictPending", conflicts.Count, path);
             return;
         }
 
@@ -620,7 +620,7 @@ public partial class MainWindowViewModel : ObservableObject
         AppSettings.LastProjectPath = path;
         CurrentProjectName = loaded.Name;
         AppLog.Info($"Opened project: {path}");
-        StatusText = Loc.Format("Status_ProjectOpened", loaded.Name, loaded.Patches.Count);
+        StatusText = Loc.FormatCount("Status_ProjectOpened", loaded.Patches.Count, loaded.Name);
     }
 
     // ── New conversation ──────────────────────────────────────────────────
@@ -983,7 +983,7 @@ public partial class MainWindowViewModel : ObservableObject
             // open-conversation edit state is preserved.
             DialogProjectSerializer.SaveToFile(_projectPath!, merged);
             AppLog.Info($"Merged {paths.Count} project(s) into '{merged.Name}'");
-            StatusText = Loc.Format("Status_MergeComplete", paths.Count, merged.Name);
+            StatusText = Loc.FormatCount("Status_MergeComplete", paths.Count, merged.Name);
         }
         catch (Exception ex)
         {

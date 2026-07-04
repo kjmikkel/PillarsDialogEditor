@@ -16,8 +16,8 @@ public partial class AliasImportConfirmDialog : Window
     public AliasImportConfirmDialog() => InitializeComponent();   // XAML previewer
 
     public AliasImportConfirmDialog(VoAliasImportPrompt prompt) : this()
-        => MessageText.Text = Loc.Format("AliasImport_Message",
-            prompt.TargetPath, prompt.SharedWithOthers);
+        => MessageText.Text = Loc.FormatCount("AliasImport_Message",
+            prompt.SharedWithOthers, prompt.TargetPath);
 
     private void Overwrite_Click(object? s, RoutedEventArgs e)
         { Choice = VoAliasImportChoice.OverwriteShared; Close(); }

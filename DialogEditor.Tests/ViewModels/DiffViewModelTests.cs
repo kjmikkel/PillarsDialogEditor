@@ -268,7 +268,7 @@ public class DiffViewModelTests : IDisposable
 
         Assert.Empty(vm.Changes);
         // StatusText should contain key string (StubStringProvider returns key)
-        Assert.Equal("Status_DiffComputed", vm.StatusText);
+        Assert.Equal("Status_DiffComputed_Other", vm.StatusText);   // count 0 → Other
     }
 
     [Fact]
