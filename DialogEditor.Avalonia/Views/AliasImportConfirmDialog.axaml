@@ -7,13 +7,18 @@
         Title="{DynamicResource AliasImport_Title}">
     <StackPanel Margin="16" Spacing="12">
         <TextBlock x:Name="MessageText" TextWrapping="Wrap"/>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+        <!-- Buttons stack vertically (task-dialog style): the option labels are long
+             and grow further under font scaling and translation — a horizontal row
+             clipped the Cancel button off the fixed-width window's right edge. -->
+        <StackPanel Spacing="8">
             <Button Content="{DynamicResource AliasImport_Overwrite}"
                     Click="Overwrite_Click"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                     ToolTip.Tip="{DynamicResource ToolTip_AliasImport_Overwrite}"
                     AutomationProperties.HelpText="{DynamicResource ToolTip_AliasImport_Overwrite}"/>
             <Button Content="{DynamicResource AliasImport_ClearAndOwn}"
                     Click="ClearAndOwn_Click"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                     ToolTip.Tip="{DynamicResource ToolTip_AliasImport_ClearAndOwn}"
                     AutomationProperties.HelpText="{DynamicResource ToolTip_AliasImport_ClearAndOwn}"/>
             <!-- Cancel is deliberately IsDefault (as well as IsCancel): pressing Enter in this
@@ -21,7 +26,8 @@
                  consequence-bearing choices above require an explicit click. OK/Cancel-style
                  buttons are self-explanatory per project tooltip rules, so Cancel carries none. -->
             <Button Content="{DynamicResource AliasImport_Cancel}"
-                    Click="Cancel_Click" IsCancel="True" IsDefault="True"/>
+                    Click="Cancel_Click" IsCancel="True" IsDefault="True"
+                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
         </StackPanel>
     </StackPanel>
 </Window>
