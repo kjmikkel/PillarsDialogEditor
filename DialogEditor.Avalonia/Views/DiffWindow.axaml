@@ -133,7 +133,7 @@
                   ToolTip.Tip="{DynamicResource ToolTip_Diff_DanglingPanel}"
                   AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_DanglingPanel}">
             <Expander.Header>
-                <TextBlock Text="{Binding DanglingLinks.Count, StringFormat={StaticResource Diff_DanglingWarning}}"
+                <TextBlock Text="{Binding DanglingWarningText}"
                            Foreground="{DynamicResource Brush.Text.Status.Changed}" FontSize="{DynamicResource FontSize.Label}"/>
             </Expander.Header>
             <StackPanel Margin="8,4,0,4" Spacing="2">

@@ -80,7 +80,7 @@ public partial class VoValidationViewModel : ObservableObject
     [ObservableProperty] private bool _isCleanUpArmed;
 
     /// Localised "Delete {0} file(s)…" confirmation line for the armed state.
-    public string CleanUpConfirmText => Loc.Format("VoValidation_CleanUpConfirm", OrphanResults.Count);
+    public string CleanUpConfirmText => Loc.FormatCount("VoValidation_CleanUpConfirm", OrphanResults.Count);
 
     public IRelayCommand CleanUpCommand        { get; }
     public IRelayCommand ConfirmCleanUpCommand { get; }
@@ -144,8 +144,8 @@ public partial class VoValidationViewModel : ObservableObject
         IsCleanUpArmed = false;
         OrphanResults.Clear();
         SummaryText = failed == 0
-            ? Loc.Format("VoValidation_CleanedUp", files.Count)
-            : Loc.Format("VoValidation_CleanUpPartial", files.Count - failed, failed);
+            ? Loc.FormatCount("VoValidation_CleanedUp", files.Count)
+            : Loc.FormatCount("VoValidation_CleanUpPartial", files.Count - failed, failed);
         _ = RunAsync();   // refresh both sections against reality
     }
 

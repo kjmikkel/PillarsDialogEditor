@@ -58,7 +58,7 @@ public partial class FindReplaceViewModel : ObservableObject
         Results       = results;
         CurrentIndex  = results.Count > 0 ? 0 : -1;
         StatusText = results.Count > 0
-            ? Loc.Format("FindReplace_Matches", results.Count)
+            ? Loc.FormatCount("FindReplace_Matches", results.Count)
             : Loc.Get("FindReplace_NoMatches");
 
         OnPropertyChanged(nameof(Results));
@@ -121,7 +121,7 @@ public partial class FindReplaceViewModel : ObservableObject
         Results      = [];
         CurrentIndex = -1;
         StatusText = count > 0
-            ? Loc.Format("FindReplace_Replaced", count)
+            ? Loc.FormatCount("FindReplace_Replaced", count)
             : Loc.Get("FindReplace_NothingReplaced");
 
         OnPropertyChanged(nameof(Results));

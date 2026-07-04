@@ -20,8 +20,10 @@
 
     <!-- Status and error messages (used via Loc.Get/Format) -->
     <sys:String x:Key="PatchManager_NoConflicts">No conflicts detected.</sys:String>
-    <sys:String x:Key="PatchManager_ConflictsFound">{0} conflict(s) detected — reorder so the version you want is lowest in the list.</sys:String>
-    <sys:String x:Key="PatchManager_ApplySuccess">Applied {0} patch(es) to {1}.</sys:String>
+    <sys:String x:Key="PatchManager_ConflictsFound_One">1 conflict detected — reorder so the version you want is lowest in the list.</sys:String>
+    <sys:String x:Key="PatchManager_ConflictsFound_Other">{0} conflicts detected — reorder so the version you want is lowest in the list.</sys:String>
+    <sys:String x:Key="PatchManager_ApplySuccess_One">Applied 1 patch to {1}.</sys:String>
+    <sys:String x:Key="PatchManager_ApplySuccess_Other">Applied {0} patches to {1}.</sys:String>
     <sys:String x:Key="PatchManager_ApplyError">Apply failed: {0}</sys:String>
     <sys:String x:Key="PatchManager_LoadError">Could not load '{0}': {1}</sys:String>
     <sys:String x:Key="PatchManager_EntryConflict">⚠ conflicts with another project</sys:String>

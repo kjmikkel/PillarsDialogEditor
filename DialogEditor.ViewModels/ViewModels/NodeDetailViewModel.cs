@@ -625,7 +625,7 @@ public partial class NodeDetailViewModel : ObservableObject
     {
         null => string.Empty,
         0    => Loc.Get("NodeDetail_AliasNotShared"),
-        var n => Loc.Format("NodeDetail_AliasSharedCount", n),
+        int n => Loc.FormatCount("NodeDetail_AliasSharedCount", n),
     };
 
     /// "Reuse another line's VO…" visibility: PoE2 node loaded, no alias yet.

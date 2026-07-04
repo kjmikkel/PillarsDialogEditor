@@ -72,6 +72,10 @@ public partial class DiffViewModel : ObservableObject
 
     public ObservableCollection<string> DanglingLinkDescriptions { get; } = [];
 
+    /// XAML previously formatted DanglingLinks.Count via StringFormat, which
+    /// cannot pluralise; the text lives here now so FormatCount can.
+    public string DanglingWarningText => Loc.FormatCount("Diff_DanglingWarning", DanglingLinks.Count);
+
     [RelayCommand(CanExecute = nameof(CanApply))]
     private void Apply()
     {
@@ -102,9 +106,10 @@ public partial class DiffViewModel : ObservableObject
             DanglingLinkDescriptions.Add(
                 Loc.Format("Diff_DanglingRow", d.Conversation, d.FromNode, d.ToNode));
         }
+        OnPropertyChanged(nameof(DanglingWarningText));
 
         CommitApply?.Invoke(result);
-        StatusText = Loc.Format("Status_BroughtIn", selection.Count);
+        StatusText = Loc.FormatCount("Status_BroughtIn", selection.Count);
     }
 
     public DiffViewModel(
@@ -282,7 +287,7 @@ public partial class DiffViewModel : ObservableObject
         }
         OnPropertyChanged(nameof(CanApply));
 
-        StatusText = Loc.Format("Status_DiffComputed", Changes.Count);
+        StatusText = Loc.FormatCount("Status_DiffComputed", Changes.Count);
 
         // Reset canvas when endpoints change
         BuildDiffCanvas();

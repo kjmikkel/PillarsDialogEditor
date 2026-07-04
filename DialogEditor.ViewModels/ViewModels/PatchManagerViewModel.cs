@@ -141,7 +141,7 @@ public partial class PatchManagerViewModel : ObservableObject
             Entries[i].HasConflict = conflictedEntries.Contains(i);
 
         StatusText = HasConflicts
-            ? Loc.Format("PatchManager_ConflictsFound", Conflicts.Count)
+            ? Loc.FormatCount("PatchManager_ConflictsFound", Conflicts.Count)
             : Entries.Count > 0 ? Loc.Get("PatchManager_NoConflicts") : string.Empty;
     }
 
@@ -245,7 +245,7 @@ public partial class PatchManagerViewModel : ObservableObject
             var convCount = Entries.Where(e => e.IsLoaded)
                                    .Sum(e => e.Project!.Patches.Count);
             AppLog.Info($"Applied {convCount} patch(es) from {Entries.Count} project(s)");
-            StatusText = Loc.Format("PatchManager_ApplySuccess", convCount, GameFolder);
+            StatusText = Loc.FormatCount("PatchManager_ApplySuccess", convCount, GameFolder);
         }
         catch (Exception ex)
         {
