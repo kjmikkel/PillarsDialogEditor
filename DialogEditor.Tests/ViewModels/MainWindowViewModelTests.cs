@@ -809,4 +809,105 @@ public class MainWindowViewModelTests : IDisposable
             DisplayType: "Conversation", Persistence: "None");
         return new NodeViewModel(node, new DialogEditor.Core.Models.StringEntry(id, "text", ""));
     }
+
+    // ── BatchImportVoAllCommand ───────────────────────────────────────────
+
+    /// <summary>Sets a private string field (e.g. _projectPath, _activeGameId) via reflection.</summary>
+    private static void SetPrivateField(MainWindowViewModel vm, string field, object? value)
+    {
+        var fi = typeof(MainWindowViewModel)
+            .GetField(field, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+        fi.SetValue(vm, value);
+    }
+
+    private static MainWindowViewModel MakeVoAllReadyVm(FakeGameDataProvider provider)
+    {
+        var vm = MakeVm();
+        InjectProject(vm, DialogProject.Empty("P"));
+        InjectProvider(vm, provider);
+        SetPrivateField(vm, "_projectPath", Path.Combine(Path.GetTempPath(), "p.dialogproject"));
+        SetPrivateField(vm, "_currentGameDirectory", Path.GetTempPath());
+        SetPrivateField(vm, "_activeGameId", "poe2");
+        return vm;
+    }
+
+    [Fact]
+    public void BatchImportVoAll_DisabledWithoutProject()
+    {
+        var vm = MakeVm();
+        Assert.False(vm.BatchImportVoAllCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void BatchImportVoAll_DisabledWithoutPoe2GameFolder()
+    {
+        var vm = MakeVoAllReadyVm(new FakeGameDataProvider("poe1", "en"));
+        SetPrivateField(vm, "_activeGameId", "poe1");
+        Assert.False(vm.BatchImportVoAllCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void BatchImportVoAll_DisabledWithoutSavedProjectPath()
+    {
+        var vm = MakeVoAllReadyVm(new FakeGameDataProvider("poe2", "en"));
+        SetPrivateField(vm, "_projectPath", null);
+        Assert.False(vm.BatchImportVoAllCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void BatchImportVoAll_EnabledWithProjectAndPoe2Folder()
+    {
+        var vm = MakeVoAllReadyVm(new FakeGameDataProvider("poe2", "en"));
+        Assert.True(vm.BatchImportVoAllCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public async Task BatchImportVoAll_EmptyScan_ReportsViaStatusBar_AndSkipsDialog()
+    {
+        // Project has no patches at all → scanner returns zero rows.
+        var vm = MakeVoAllReadyVm(new FakeGameDataProvider("poe2", "en"));
+        var dialogShown = false;
+        vm.ShowBatchVoImportAll = _ => { dialogShown = true; return Task.CompletedTask; };
+
+        await vm.BatchImportVoAllCommand.ExecuteAsync(null);
+
+        Assert.False(dialogShown);
+        Assert.Equal("Status_BatchImportVoAllEmpty", vm.StatusText);
+    }
+
+    [Fact]
+    public async Task BatchImportVoAll_WithVoicedNodes_HandsRowsToDialogDelegate()
+    {
+        ChatterPrefixService.Register(new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            { "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", "eder" }
+        });
+        try
+        {
+            var node = new ConversationNode(
+                1, false, SpeakerCategory.Npc, "9c5f12c9-e93d-4952-9f1a-726c9498f8fb", "", [],
+                [], [], "Conversation", "None",
+                ActorDirection: "", Comments: "", ExternalVO: "",
+                HasVO: true, HideSpeaker: false);
+            var conv = new Conversation("conv", [node],
+                new StringTable([new StringEntry(1, "line", "")]));
+            var vm = MakeVoAllReadyVm(new FakeGameDataProvider("poe2", "en", conv));
+            InjectProject(vm, DialogProject.Empty("P").WithPatch(
+                new ConversationPatch("conv", ConversationPatch.CurrentSchemaVersion, [], [], [])));
+
+            IReadOnlyList<BatchVoRowViewModel>? received = null;
+            vm.ShowBatchVoImportAll = rows => { received = rows; return Task.CompletedTask; };
+
+            await vm.BatchImportVoAllCommand.ExecuteAsync(null);
+
+            Assert.NotNull(received);
+            var row = Assert.Single(received!);
+            Assert.Equal("conv", row.ConversationName);
+            Assert.Equal(1, row.NodeId);
+        }
+        finally
+        {
+            ChatterPrefixService.Clear();
+        }
+    }
 }

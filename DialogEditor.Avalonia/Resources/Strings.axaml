@@ -1260,10 +1260,14 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Menu_BatchImportVo">Batch import VO…</sys:String>
     <sys:String x:Key="Menu_BatchImportVoAll">Batch import VO (all conversations)…</sys:String>
     <sys:String x:Key="ToolTip_Menu_BatchImportVo">Open the batch voice-over import dialog for this conversation.</sys:String>
-    <sys:String x:Key="ToolTip_Menu_BatchImportVoAll">Open the batch voice-over import dialog for all conversations in the project.</sys:String>
+    <!-- The all-conversations Test-menu item disables (rather than hides), so its
+         tooltip must explain the enablement conditions. -->
+    <sys:String x:Key="ToolTip_Menu_BatchImportVoAll">Open the batch voice-over import dialog covering every conversation in the project. Requires an open, saved project and a Pillars of Eternity II game folder.</sys:String>
     <!-- Main-menu variant: the Test-menu item disables (rather than hides), so its
          tooltip must explain the enablement conditions. -->
     <sys:String x:Key="ToolTip_Menu_BatchImportVo_Main">Open the batch voice-over import dialog for this conversation. Requires an open project and a conversation with at least one voiced node.</sys:String>
+    <sys:String x:Key="Status_BatchImportVoAllEmpty">No voiced nodes found in this project's conversations.</sys:String>
+    <sys:String x:Key="Status_BatchImportVoAllFailed">Could not scan the project's conversations for voice-over — see the log.</sys:String>
 
     <!-- ── Node detail pane rework (2026-07-02) ─────────────────────────── -->
     <sys:String x:Key="NodeDetail_HeaderSeparator"> · </sys:String>
