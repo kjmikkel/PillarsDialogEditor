@@ -30,7 +30,7 @@
   - `enum PluralCategory { Zero, One, Two, Few, Many, Other }`
   - `static PluralCategory PluralRules.Category(string langTwoLetter, int n)`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `DialogEditor.Tests/Localisation/PluralRulesTests.cs`:
 
@@ -101,12 +101,12 @@ public class PluralRulesTests
 }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~PluralRulesTests"`
 Expected: **build failure** — `'PluralRules' could not be found`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Create `DialogEditor.ViewModels/Services/PluralRules.cs`:
 
@@ -162,11 +162,11 @@ public static class PluralRules
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~PluralRulesTests"` → PASS (28 cases).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add DialogEditor.ViewModels/Services/PluralRules.cs DialogEditor.Tests/Localisation/PluralRulesTests.cs
@@ -192,7 +192,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
   - `bool IStringProvider.TryGet(string key, out string value)`
   - `static string Loc.FormatCount(string key, int count, params object[] extraArgs)`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `DialogEditor.Tests/Localisation/LocFormatCountTests.cs`:
 
@@ -278,12 +278,12 @@ public class LocFormatCountTests : IDisposable
 }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~LocFormatCountTests"`
 Expected: **build failure** — `'IStringProvider' does not contain a definition for 'TryGet'` / `'Loc' does not contain a definition for 'FormatCount'`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 `IStringProvider.cs` — add below `Get`:
 
@@ -350,12 +350,12 @@ public sealed class StubStringProvider : IStringProvider
 
 (`Loc.cs` already has `using DialogEditor.ViewModels.Services;` for `IStringProvider` — `PluralRules` resolves from the same namespace.)
 
-- [ ] **Step 4: Run tests, then full suite**
+- [x] **Step 4: Run tests, then full suite**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~LocFormatCountTests"` → PASS (5 tests).
 Run: `dotnet test --nologo` → all pass (nothing calls FormatCount yet; TryGet additions compile everywhere — if any other `IStringProvider` implementation exists, the build error names it; give it the same TryGet shape).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add DialogEditor.ViewModels/Services/IStringProvider.cs DialogEditor.Avalonia.Shared/Services/AvaloniaStringProvider.cs DialogEditor.Tests/Helpers/StubStringProvider.cs DialogEditor.ViewModels/Resources/Loc.cs DialogEditor.Tests/Localisation/LocFormatCountTests.cs
@@ -379,7 +379,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Consumes: Task 2 `Loc.FormatCount`.
 - Produces: the `_One`/`_Other` key pairs below (Task 5's guard test relies on the old values being gone).
 
-- [ ] **Step 1: Replace the 16 single-count string definitions**
+- [x] **Step 1: Replace the 16 single-count string definitions**
 
 In the dictionaries, replace each single `<sys:String>` with a `_One`/`_Other` pair (delete the old key — the bare-key fallback is for future stragglers, not dead keys). New values (count is `{0}`; renamed args noted):
 
@@ -431,7 +431,7 @@ In the dictionaries, replace each single `<sys:String>` with a `_One`/`_Other` p
     <sys:String x:Key="PatchManager_ApplySuccess_Other">Applied {0} patches to {1}.</sys:String>
 ```
 
-- [ ] **Step 2: Update the call sites**
+- [x] **Step 2: Update the call sites**
 
 For each key, find the `Loc.Format("<key>", …)` call in the file listed and transform (`grep -rn 'Loc.Format("<key>"' DialogEditor.ViewModels DialogEditor.Avalonia`):
 
@@ -479,12 +479,12 @@ with:
                 <TextBlock Text="{Binding DanglingWarningText}"
 ```
 
-- [ ] **Step 3: Build, fix key-suffix assertion breaks, full suite**
+- [x] **Step 3: Build, fix key-suffix assertion breaks, full suite**
 
 Run: `dotnet build && dotnet test --nologo`
 Expected: build succeeds; some tests fail asserting bare keys (e.g. expecting `"NodeDetail_AliasSharedCount"` where the stub now yields `"NodeDetail_AliasSharedCount_Other"`). Fix per Global Constraints (append the correct suffix for the asserted count), re-run to green.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add -A DialogEditor.ViewModels DialogEditor.Avalonia DialogEditor.Avalonia.Shared DialogEditor.Tests
@@ -507,7 +507,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Consumes: Task 2 `Loc.FormatCount`.
 - Produces: fragment/wrapper keys below.
 
-- [ ] **Step 1: Two-count strings (BatchReplace)**
+- [x] **Step 1: Two-count strings (BatchReplace)**
 
 Replace `BatchReplace_StatusMatches` and `BatchReplace_StatusApplied` definitions with:
 
@@ -541,7 +541,7 @@ Loc.Format("BatchReplace_StatusApplied",
 
 (match the local variable names at each site).
 
-- [ ] **Step 2: Bare noun suffixes**
+- [x] **Step 2: Bare noun suffixes**
 
 `NodeDetail_NotesWord` (value "note(s)", used as `$"{n} {Loc.Get("NodeDetail_NotesWord")}"` at `NodeDetailViewModel.cs:527`): replace key with
 
@@ -568,12 +568,12 @@ and the code-behind with (add `using DialogEditor.ViewModels.Resources;` if miss
 
 (keep the rest of the statement — ordering/ToList — as it is; delete the old `suffix` lookup lines.)
 
-- [ ] **Step 3: Non-count stragglers**
+- [x] **Step 3: Non-count stragglers**
 
 - `PatchManager_AddProjects` ("Add project(s)…") is a button label/file-picker title, no count exists — reword the value to `Add projects…` (key and both usages unchanged).
 - `ToolTip_LinkConditions_Some` — zero references anywhere (verified 2026-07-04): delete the key.
 
-- [ ] **Step 4: Build, fix suffix assertions, full suite, commit**
+- [x] **Step 4: Build, fix suffix assertions, full suite, commit**
 
 Run: `dotnet build && dotnet test --nologo` → green after mechanical suffix fixes.
 
@@ -597,7 +597,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 **Interfaces:**
 - Consumes: Tasks 3–4 migration must be complete (the guard test fails otherwise).
 
-- [ ] **Step 1: Write the guard test (fails only if migration missed something)**
+- [x] **Step 1: Write the guard test (fails only if migration missed something)**
 
 Create `DialogEditor.Tests/Localisation/NoNaivePluralTests.cs`, mirroring the file-scanning pattern of `DialogEditor.Tests/Accessibility/AutomationNameTests.cs` — copy that file's solution-root discovery helper verbatim, then:
 
@@ -621,7 +621,7 @@ Create `DialogEditor.Tests/Localisation/NoNaivePluralTests.cs`, mirroring the fi
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~NoNaivePluralTests"` → PASS if Tasks 3–4 were complete (if it fails, the failure lists the missed keys — migrate them the same way before proceeding).
 
-- [ ] **Step 2: Pin translator-added plural rows in CSV import**
+- [x] **Step 2: Pin translator-added plural rows in CSV import**
 
 Append to `UiStringImportServiceTests`:
 
@@ -645,7 +645,7 @@ Append to `UiStringImportServiceTests`:
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~UiStringImportServiceTests"` → expected PASS (the importer already writes all translated rows; if it fails, the importer filters unknown keys — remove that filter, this test is the spec).
 
-- [ ] **Step 3: Translator notes + Gaps.md**
+- [x] **Step 3: Translator notes + Gaps.md**
 
 In `Strings.axaml`'s translator-notes comment block at the top, append:
 
@@ -669,7 +669,7 @@ In `Gaps.md`, UI Localisation Readiness item 6, replace the item text:
    Spec: docs/superpowers/specs/2026-07-04-pluralisation-design.md.
 ```
 
-- [ ] **Step 4: Full suite, commit**
+- [x] **Step 4: Full suite, commit**
 
 Run: `dotnet build && dotnet test --nologo` → all pass.
 
@@ -680,11 +680,15 @@ git commit -m "test(l10n): ban naive plurals; pin translator-added category rows
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 ```
 
-- [ ] **Step 5: Manual verification** — `dotnet run --project DialogEditor.Avalonia`:
+- [x] **Step 5: Verification (2026-07-04)** — two-part, replacing the eyeball-only pass:
 
-- [ ] Find/Replace: search matching exactly one node shows "1 match"; several show "N matches"
-- [ ] Batch Replace: status shows composed "N matches across M conversations"
-- [ ] Node detail: a node with one note shows "1 note"; alias shared-count singular/plural reads correctly
-- [ ] Open a project: status bar "Opened project '…' (N patches)" with correct singular at N=1
+  1. `PluralResourceEndToEndTests` (headless, real `App` resources through the real
+     `AvaloniaStringProvider`) pins the checklist strings: "1 match"/"3 matches",
+     composed "2 matches across 1 conversation" / "1 match across 5 conversations",
+     "1 note"/"4 notes", "Opened project 'Foo' (1 patch)"/"(3 patches)", and the
+     SharedStrings key "Applied 1 patch to Foo." — 10 cases, all green.
+  2. Live run: `dotnet run --project DialogEditor.Avalonia` — main window screenshot
+     shows the status bar rendering "Opened project 'MyMod' (3 patches)" from the
+     migrated keys; app boots cleanly with no resource errors.
 
-- [ ] **Step 6: Report results** — any failure: fix, `dotnet build && dotnet test --nologo`, re-verify, commit as `fix(l10n): …`.
+- [x] **Step 6: Report results** — no failures; verification committed as the test above.
