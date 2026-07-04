@@ -216,6 +216,17 @@ public partial class MainWindowViewModel : ObservableObject
         && string.Equals(_activeGameId, "poe2", StringComparison.OrdinalIgnoreCase)
         && Canvas.Nodes.Count > 0;
 
+    /// True when a saved project is open and a PoE2 game folder is loaded.
+    /// Guards the project-wide "Batch import VO (all conversations)…" menu item.
+    /// _projectPath is required because row destinations live in _vo/ next to
+    /// the project file — an unsaved new project cannot batch-import.
+    public bool CanBatchImportVoAll =>
+        _project is not null
+        && _provider is not null
+        && _projectPath is not null
+        && !string.IsNullOrEmpty(_currentGameDirectory)
+        && string.Equals(_activeGameId, "poe2", StringComparison.OrdinalIgnoreCase);
+
     /// True when a _vo/ folder exists next to the open project file.
     /// Guards the "Export Mod Bundle…" menu item.
     public bool HasLocalVoFolder =>
@@ -236,6 +247,7 @@ public partial class MainWindowViewModel : ObservableObject
         MergeProjectsCommand.NotifyCanExecuteChanged();
         ExportForTranslationCommand.NotifyCanExecuteChanged();
         ImportTranslationCommand.NotifyCanExecuteChanged();
+        BatchImportVoAllCommand.NotifyCanExecuteChanged();
         // Only re-scan the game folder when NewConversations actually changes —
         // not on every patch save, which would re-enumerate all conversations.
         if (_provider is not null && !ReferenceEquals(prevNew, nextNew))
@@ -430,6 +442,46 @@ public partial class MainWindowViewModel : ObservableObject
         return vm;
     }
 
+    /// Opens the batch VO import dialog in multi-conversation mode.
+    /// Wired by MainWindow.axaml.cs; null in unit tests that don't need the dialog.
+    public Func<IReadOnlyList<BatchVoRowViewModel>, Task>? ShowBatchVoImportAll { get; set; }
+
+    [RelayCommand(CanExecute = nameof(CanBatchImportVoAll))]
+    private async Task BatchImportVoAll()
+    {
+        if (_project is null || _provider is null || _projectPath is null) return;
+        // Capture locals: the scan runs on a worker thread and the fields are mutable.
+        var project     = _project;
+        var provider    = _provider;
+        var projectPath = _projectPath;
+        var gameRoot    = _currentGameDirectory;
+        var gameId      = _activeGameId;
+        var openName    = Canvas.Nodes.Count > 0 ? Canvas.ConversationName : null;
+        var snapshot    = openName is not null ? Canvas.BuildSnapshot() : null;
+
+        try
+        {
+            var rows = await Task.Run(() => ProjectVoRowScanner.BuildRows(
+                project, provider, projectPath, gameRoot, gameId, openName, snapshot));
+
+            if (rows.Count == 0)
+            {
+                StatusText = Loc.Get("Status_BatchImportVoAllEmpty");
+                return;
+            }
+
+            if (ShowBatchVoImportAll is not null)
+                await ShowBatchVoImportAll(rows);
+            Detail.Refresh();   // the selected node's VO status row may have flipped to ✓
+        }
+        catch (OperationCanceledException) { /* deliberate cancellation — swallow silently */ }
+        catch (Exception ex)
+        {
+            AppLog.Error("Project-wide batch VO scan failed", ex);
+            StatusText = Loc.Get("Status_BatchImportVoAllFailed");
+        }
+    }
+
     // ── Project — New / Open / Save ───────────────────────────────────────
     [RelayCommand]
     private void NewProject()
@@ -449,6 +501,7 @@ public partial class MainWindowViewModel : ObservableObject
         Detail.ProjectPath  = _projectPath;
         Canvas.ProjectPath  = _projectPath;
         OnPropertyChanged(nameof(HasLocalVoFolder));
+        BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
         DialogProjectSerializer.SaveToFile(path, _project!);
         AppSettings.LastProjectPath = path;
         CurrentProjectName = name;
@@ -491,6 +544,7 @@ public partial class MainWindowViewModel : ObservableObject
             Detail.ProjectPath  = null;
             Canvas.ProjectPath  = null;
             OnPropertyChanged(nameof(HasLocalVoFolder));
+        BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
             CurrentProjectName = null;
             IsModified = false;        // nothing open → not dirty
             _attributionPath = null;   // force attribution rebuild next time
@@ -617,6 +671,7 @@ public partial class MainWindowViewModel : ObservableObject
         Detail.ProjectPath  = _projectPath;
         Canvas.ProjectPath  = _projectPath;
         OnPropertyChanged(nameof(HasLocalVoFolder));
+        BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
         AppSettings.LastProjectPath = path;
         CurrentProjectName = loaded.Name;
         AppLog.Info($"Opened project: {path}");
@@ -1131,6 +1186,7 @@ public partial class MainWindowViewModel : ObservableObject
                 });
             }
             OnPropertyChanged(nameof(CanValidateVO));
+            BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on game folder + id
             AvailableLanguages = provider.AvailableLanguages;
             SelectedLanguage   = AppSettings.PickLanguage(AvailableLanguages, AppSettings.LastLanguage);
             Browser.Load(provider, _project?.NewConversations);
