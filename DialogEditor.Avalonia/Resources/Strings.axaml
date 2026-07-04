@@ -455,7 +455,6 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- ─── Detail panel — link condition button ────────────────────────── -->
     <sys:String x:Key="Button_LinkConditions">⚙</sys:String>
     <sys:String x:Key="ToolTip_LinkConditions_None">No conditions — click to add</sys:String>
-    <sys:String x:Key="ToolTip_LinkConditions_Some">{0} condition(s) — click to edit</sys:String>
 
     <!-- ─── Detail panel — link property labels and tooltips ───────────── -->
     <sys:String x:Key="Label_LinkWeight">Wt.</sys:String>
@@ -564,9 +563,18 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="BatchReplace_InLinkChoiceText">Link choice text</sys:String>
     <sys:String x:Key="BatchReplace_Preview">Preview</sys:String>
     <sys:String x:Key="BatchReplace_Apply">Apply</sys:String>
-    <sys:String x:Key="BatchReplace_StatusMatches">{0} match(es) across {1} conversation(s)</sys:String>
+    <!-- Composed two-count status lines: wrapper takes two pre-pluralised
+         fragments. Translators: translate fragments with their own plural
+         forms; the wrapper only arranges them. -->
+    <sys:String x:Key="BatchReplace_MatchCount_One">1 match</sys:String>
+    <sys:String x:Key="BatchReplace_MatchCount_Other">{0} matches</sys:String>
+    <sys:String x:Key="BatchReplace_ReplacementCount_One">1 replacement</sys:String>
+    <sys:String x:Key="BatchReplace_ReplacementCount_Other">{0} replacements</sys:String>
+    <sys:String x:Key="BatchReplace_ConversationCount_One">1 conversation</sys:String>
+    <sys:String x:Key="BatchReplace_ConversationCount_Other">{0} conversations</sys:String>
+    <sys:String x:Key="BatchReplace_StatusMatches">{0} across {1}</sys:String>
     <sys:String x:Key="BatchReplace_StatusNoMatches">No matches found</sys:String>
-    <sys:String x:Key="BatchReplace_StatusApplied">Applied {0} replacement(s) across {1} conversation(s)</sys:String>
+    <sys:String x:Key="BatchReplace_StatusApplied">Applied {0} across {1}</sys:String>
     <sys:String x:Key="BatchReplace_StatusSkipped_One">1 open conversation skipped — save it first</sys:String>
     <sys:String x:Key="BatchReplace_StatusSkipped_Other">{0} open conversations skipped — save them first</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace_Find">Text to search for across all conversations</sys:String>
@@ -888,7 +896,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ImportWarnings_Title">Import Warnings</sys:String>
     <sys:String x:Key="ImportWarnings_Body">Some constructs in this file could not be imported and were skipped. The conversation structure was imported, but the following were dropped:</sys:String>
     <sys:String x:Key="ImportWarnings_Footer">Open the original file to handle these manually if needed.</sys:String>
-    <sys:String x:Key="ImportWarnings_OccurrenceSuffix">occurrence(s)</sys:String>
+    <sys:String x:Key="ImportWarnings_OccurrenceCount_One">1 occurrence</sys:String>
+    <sys:String x:Key="ImportWarnings_OccurrenceCount_Other">{0} occurrences</sys:String>
     <sys:String x:Key="ImportWarnings_Ok">OK</sys:String>
 
     <!-- ─── Export Conversation (to external formats) ──────────────────── -->
@@ -1263,7 +1272,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="NodeDetail_NoneShort">—</sys:String>
     <sys:String x:Key="NodeDetail_ConditionsWord">conditions</sys:String>
     <sys:String x:Key="NodeDetail_ScriptsWord">scripts</sys:String>
-    <sys:String x:Key="NodeDetail_NotesWord">note(s)</sys:String>
+    <sys:String x:Key="NodeDetail_NotesCount_One">1 note</sys:String>
+    <sys:String x:Key="NodeDetail_NotesCount_Other">{0} notes</sys:String>
     <sys:String x:Key="ToolTip_GroupExpander">Expand or collapse this section. The open/closed state is remembered while the app runs.</sys:String>
     <sys:String x:Key="Link_ConditionGlyph">⚙</sys:String>
     <sys:String x:Key="Link_DisplayLabel">Display</sys:String>

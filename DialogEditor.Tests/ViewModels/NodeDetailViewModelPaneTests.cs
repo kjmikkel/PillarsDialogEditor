@@ -138,7 +138,7 @@ public class NodeDetailViewModelPaneTests
     {
         LoadNode();
         _vm.Comments = "watch the pacing here";
-        Assert.Equal("1 NodeDetail_NotesWord", _vm.NotesSummary);
+        Assert.Equal("NodeDetail_NotesCount_One", _vm.NotesSummary);   // count 1 → One (stub echoes keys)
     }
 
     // ── Session-static expander state ────────────────────────────────────

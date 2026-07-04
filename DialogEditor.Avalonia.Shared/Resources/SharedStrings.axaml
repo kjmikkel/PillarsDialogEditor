@@ -12,7 +12,7 @@
     <sys:String x:Key="PatchManager_LoadOrder">Load Order</sys:String>
     <sys:String x:Key="PatchManager_SaveLoadOrder">Save load order…</sys:String>
     <sys:String x:Key="PatchManager_LoadLoadOrder">Load load order…</sys:String>
-    <sys:String x:Key="PatchManager_AddProjects">Add project(s)…</sys:String>
+    <sys:String x:Key="PatchManager_AddProjects">Add projects…</sys:String>
     <sys:String x:Key="PatchManager_Apply">Apply patches</sys:String>
     <sys:String x:Key="PatchManager_Applying">Applying…</sys:String>
     <sys:String x:Key="PatchManager_EmptyHint">Add .dialogproject files above. Lower entries win on conflict.</sys:String>
