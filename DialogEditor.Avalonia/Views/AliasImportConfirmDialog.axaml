@@ -2,23 +2,25 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="DialogEditor.Avalonia.Views.AliasImportConfirmDialog"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Width="480" SizeToContent="Height" CanResize="False"
+        SizeToContent="WidthAndHeight" MinWidth="480" CanResize="False"
         WindowStartupLocation="CenterOwner"
         Title="{DynamicResource AliasImport_Title}">
     <StackPanel Margin="16" Spacing="12">
-        <TextBlock x:Name="MessageText" TextWrapping="Wrap"/>
-        <!-- Buttons stack vertically (task-dialog style): the option labels are long
-             and grow further under font scaling and translation — a horizontal row
-             clipped the Cancel button off the fixed-width window's right edge. -->
-        <StackPanel Spacing="8">
+        <!-- MaxWidth keeps the message wrapping instead of driving the window wide;
+             the window's width is decided by the button row below. -->
+        <TextBlock x:Name="MessageText" TextWrapping="Wrap" MaxWidth="560"
+                   HorizontalAlignment="Left"/>
+        <!-- The window is SizeToContent="WidthAndHeight" (no fixed Width): a fixed
+             480px window clipped the Cancel button off the right edge once font
+             scaling widened the long option labels. Sizing to content keeps the
+             row horizontal and un-clippable at any font scale or translation. -->
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
             <Button Content="{DynamicResource AliasImport_Overwrite}"
                     Click="Overwrite_Click"
-                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                     ToolTip.Tip="{DynamicResource ToolTip_AliasImport_Overwrite}"
                     AutomationProperties.HelpText="{DynamicResource ToolTip_AliasImport_Overwrite}"/>
             <Button Content="{DynamicResource AliasImport_ClearAndOwn}"
                     Click="ClearAndOwn_Click"
-                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
                     ToolTip.Tip="{DynamicResource ToolTip_AliasImport_ClearAndOwn}"
                     AutomationProperties.HelpText="{DynamicResource ToolTip_AliasImport_ClearAndOwn}"/>
             <!-- Cancel is deliberately IsDefault (as well as IsCancel): pressing Enter in this
@@ -26,8 +28,7 @@
                  consequence-bearing choices above require an explicit click. OK/Cancel-style
                  buttons are self-explanatory per project tooltip rules, so Cancel carries none. -->
             <Button Content="{DynamicResource AliasImport_Cancel}"
-                    Click="Cancel_Click" IsCancel="True" IsDefault="True"
-                    HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"/>
+                    Click="Cancel_Click" IsCancel="True" IsDefault="True"/>
         </StackPanel>
     </StackPanel>
 </Window>
