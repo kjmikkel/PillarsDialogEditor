@@ -36,7 +36,7 @@
   - `record VoAliasTarget(string SpeakerFolder, string Conversation, int NodeId)`
   - `static VoAliasTarget? VoAliasParse.TryParse(string? aliasPath)`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `DialogEditor.Tests/Audio/VoAliasParseTests.cs`:
 
@@ -109,12 +109,12 @@ public class VoAliasParseTests
 }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~VoAliasParseTests"`
 Expected: **build failure** — `error CS0246: The type or namespace name 'DialogEditor.Core.Audio' could not be found`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Create `DialogEditor.Core/Audio/VoAliasParse.cs`:
 
@@ -158,12 +158,12 @@ public static class VoAliasParse
 }
 ```
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~VoAliasParseTests"`
 Expected: PASS (14 tests).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add DialogEditor.Core/Audio/VoAliasParse.cs DialogEditor.Tests/Audio/VoAliasParseTests.cs
@@ -191,7 +191,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
     - `void RegisterForTests(IReadOnlyDictionary<string, IReadOnlyList<VoAliasRef>> refs)`
     - `void Clear()`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `DialogEditor.Tests/Services/VoAliasIndexServiceTests.cs`. Fixture pattern copied from `VoPathResolverTests` (temp game root, cleanup in `Dispose`):
 
@@ -307,12 +307,12 @@ public class VoAliasIndexServiceTests : IDisposable
 }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~VoAliasIndexServiceTests"`
 Expected: **build failure** — `'VoAliasIndexService' could not be found`.
 
-- [ ] **Step 3: Implement the service**
+- [x] **Step 3: Implement the service**
 
 Create `DialogEditor.ViewModels/Services/VoAliasIndexService.cs` (copy the `using` set of `VoOrphanScanner.cs` so `AppLog` resolves, plus `System.Text.Json`):
 
@@ -417,12 +417,12 @@ public static class VoAliasIndexService
 
 Note: if `AppLog` is not in the `DialogEditor.ViewModels.Services` namespace, add the same `using` line `VoOrphanScanner.cs` has for it.
 
-- [ ] **Step 4: Run tests to verify they pass**
+- [x] **Step 4: Run tests to verify they pass**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~VoAliasIndexServiceTests"`
 Expected: PASS (6 tests).
 
-- [ ] **Step 5: Wire the rebuild into game-folder open**
+- [x] **Step 5: Wire the rebuild into game-folder open**
 
 In `DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs`, directly after the line
 `ChatterPrefixService.Register(provider.LoadChatterPrefixes());` (~1110), add:
@@ -444,7 +444,7 @@ In `DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs`, directly after t
 
 (`path` is the game-root local already in scope there — the same value passed to `SpeakerNameService`-adjacent calls; verify the local's name at the insertion point and use it.)
 
-- [ ] **Step 6: Full build + test, commit**
+- [x] **Step 6: Full build + test, commit**
 
 ```
 dotnet build && dotnet test --nologo
@@ -477,7 +477,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
   - `Func<string?, Task<string?>>? ShowAliasPicker { get; set; }`
   - `IRelayCommand PickVoAliasCommand`, `IRelayCommand ClearVoAliasCommand` (generated from `[RelayCommand]` methods `PickVoAlias`/`ClearVoAlias`)
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Append to `DialogEditor.Tests/ViewModels/NodeDetailViewModelPaneTests.cs` (inside the class). Also add `VoAliasIndexService.Clear();` to the constructor (below the `SpeakerNameService.Register` line) and note the class needs no `IDisposable` — each test that registers index data must clear it in a `finally`.
 
@@ -601,12 +601,12 @@ The `LoadNode` helper creates nodes with `ExternalVO: ""`; add an optional param
 
 Add a `LoadPoe2Node(string externalVO)` helper next to `LoadNode` that sets PoE2 context (game id + a temp game root directory) before calling `LoadNode(externalVO: externalVO)` — mirror the arrangement in `NodeDetailViewModelPlaybackTests.cs`, including any cleanup it does.
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~NodeDetailViewModelPaneTests"`
 Expected: **build failure** — `'NodeDetailViewModel' does not contain a definition for 'HasVoAlias'`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 In `NodeDetailViewModel.cs`, add `using DialogEditor.Core.Audio;` and, after the expander-state block from the pane rework, add:
 
@@ -711,7 +711,7 @@ At the end of `NotifyAllProxies()` (after the summary notifications) add:
         OnPropertyChanged(nameof(CanStartVoAliasPick));
 ```
 
-- [ ] **Step 4: Run tests, fix, commit**
+- [x] **Step 4: Run tests, fix, commit**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~NodeDetailViewModelPaneTests"` → PASS, then `dotnet test --nologo` → all pass.
 
@@ -735,7 +735,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Produces: `static class VoAliasOverlayBuilder` with
   `IReadOnlyList<VoAliasUse> Build(IReadOnlyDictionary<string, ConversationPatch>? patches, string? openConversation, IEnumerable<(int NodeId, string ExternalVO)>? openNodes)`
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `DialogEditor.Tests/Services/VoAliasOverlayBuilderTests.cs`:
 
@@ -814,13 +814,13 @@ public class VoAliasOverlayBuilderTests
 }
 ```
 
-- [ ] **Step 2: Run test to verify it fails**
+- [x] **Step 2: Run test to verify it fails**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~VoAliasOverlayBuilderTests"`
 Expected: **build failure** — `'VoAliasOverlayBuilder' could not be found`.
 (If the `NodeEditSnapshot`/`NodeModification` constructions themselves fail to compile, adjust the test's construction to the real signatures — they are `DialogEditor.Core.Editing.NodeEditSnapshot` (17 positional params as of this writing) and `DialogEditor.Patch.NodeModification`'s 4-arg convenience constructor.)
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 Create `DialogEditor.ViewModels/Services/VoAliasOverlayBuilder.cs`:
 
@@ -865,11 +865,11 @@ public static class VoAliasOverlayBuilder
 }
 ```
 
-- [ ] **Step 4: Run test to verify it passes**
+- [x] **Step 4: Run test to verify it passes**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~VoAliasOverlayBuilderTests"` → PASS.
 
-- [ ] **Step 5: Wire into MainWindowViewModel**
+- [x] **Step 5: Wire into MainWindowViewModel**
 
 In `MainWindowViewModel`, wherever `Detail` delegates are first assigned (search for `Detail.AttributionLookup =` or the constructor block assigning `Detail.` members), add:
 
@@ -882,7 +882,7 @@ In `MainWindowViewModel`, wherever `Detail` delegates are first assigned (search
 
 `CurrentConversationName` exists (seen at ~line 1083); the canvas property may be named `Conversation` or similar — find the `ConversationViewModel`-typed property on `MainWindowViewModel` (the one whose `ConversationName`/`Nodes` are used elsewhere, e.g. wherever `RefreshLinks` or `Nodes.Any(` is called from) and use its actual name. If `_project` is not the project field's name, match the field used in `MainWindowViewModelApplyTests`-covered code.
 
-- [ ] **Step 6: Full build + test, commit**
+- [x] **Step 6: Full build + test, commit**
 
 ```
 dotnet build && dotnet test --nologo
@@ -906,7 +906,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 **Interfaces:**
 - Consumes: Task 3 properties/commands (exact names above).
 
-- [ ] **Step 1: Add the strings**
+- [x] **Step 1: Add the strings**
 
 Append inside the `<!-- ── Node detail pane rework (2026-07-02) ── -->` block of `Strings.axaml`:
 
@@ -929,7 +929,7 @@ Append inside the `<!-- ── Node detail pane rework (2026-07-02) ── -->` 
     <sys:String x:Key="ToolTip_AliasShared">How many other nodes play this same recording. Overwriting the file affects all of them.</sys:String>
 ```
 
-- [ ] **Step 2: Rework the Voice expander content**
+- [x] **Step 2: Rework the Voice expander content**
 
 In `NodeDetailView.axaml`, inside the Voice `Expander`'s inner `StackPanel`, **delete** these two elements:
 
@@ -995,7 +995,7 @@ and insert, directly after the `HasVO` CheckBox:
 Note: `PropertyRow_ExternalVO`/`ToolTip_ExternalVO` string keys stay in `Strings.axaml` if referenced elsewhere — run
 `grep -rn "PropertyRow_ExternalVO\|ToolTip_ExternalVO" DialogEditor.Avalonia DialogEditor.ViewModels` and delete the keys only if this was the sole reference.
 
-- [ ] **Step 3: Build, test, commit**
+- [x] **Step 3: Build, test, commit**
 
 ```
 dotnet build && dotnet test --nologo
@@ -1025,7 +1025,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
   - `record VoAliasPickerRow(int NodeId, string SpeakerName, string TextPreview, string? DerivedAlias, bool WemExists)` with `bool IsPickable => DerivedAlias is not null;` and `string WemGlyph => WemExists ? "✓" : "✗";`
   - `class VoAliasPickerViewModel` with: `IReadOnlyList<ConversationFile> AllConversations`, `ObservableCollection<ConversationFile> VisibleConversations`, `string ConversationFilter`, `ConversationFile? SelectedConversation`, `ObservableCollection<VoAliasPickerRow> VisibleRows`, `string NodeFilter`, `VoAliasPickerRow? SelectedRow`, `string? ResultAlias`, ctor `(IGameDataProvider provider, string gameRoot, string? currentAlias)`.
 
-- [ ] **Step 1: Refactor helper under green**
+- [x] **Step 1: Refactor helper under green**
 
 In `VoPathResolver.cs`, both `Check` and `WithLocalVoFallback` build the same Voices path. Extract:
 
@@ -1038,7 +1038,7 @@ In `VoPathResolver.cs`, both `Check` and `WithLocalVoFallback` build the same Vo
 
 Replace both inline `Path.Combine(gameRoot, "PillarsOfEternityII_Data", ...)` occurrences with `VoicesRoot(gameRoot)`. Run `dotnet test --nologo --filter "FullyQualifiedName~VoPathResolverTests"` → all pass (pure refactor).
 
-- [ ] **Step 2: Write the failing tests**
+- [x] **Step 2: Write the failing tests**
 
 Create `DialogEditor.Tests/ViewModels/VoAliasPickerViewModelTests.cs`:
 
@@ -1201,12 +1201,12 @@ public class VoAliasPickerViewModelTests : IDisposable
 
 Note: `ConversationFile`'s constructor may differ from `new(name, path, folder)` — check `DialogEditor.Core/GameData/ConversationFile.cs` and match its real shape in `BuildNewConversationFile`.
 
-- [ ] **Step 3: Run tests to verify they fail**
+- [x] **Step 3: Run tests to verify they fail**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~VoAliasPickerViewModelTests"`
 Expected: **build failure** — `'VoAliasPickerViewModel' could not be found`.
 
-- [ ] **Step 4: Implement**
+- [x] **Step 4: Implement**
 
 Create `DialogEditor.ViewModels/ViewModels/VoAliasPickerViewModel.cs`:
 
@@ -1326,7 +1326,7 @@ public partial class VoAliasPickerViewModel : ObservableObject
 
 (If `AppLog` needs a `using`, copy it from another ViewModels file.)
 
-- [ ] **Step 5: Run tests, fix, run full suite, commit**
+- [x] **Step 5: Run tests, fix, run full suite, commit**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~VoAliasPickerViewModelTests"` → PASS (7 tests), then `dotnet test --nologo` → all pass.
 
@@ -1352,7 +1352,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 - Consumes: Task 6 `VoAliasPickerViewModel`, Task 3 `Detail.ShowAliasPicker`.
 - Produces: `MainWindowViewModel.CurrentProvider` (`IGameDataProvider?`, get-only, returns the private provider field).
 
-- [ ] **Step 1: Add strings**
+- [x] **Step 1: Add strings**
 
 Append to the alias block in `Strings.axaml`:
 
@@ -1375,7 +1375,7 @@ Append to the alias block in `Strings.axaml`:
     <sys:String x:Key="ToolTip_AliasPickerNodeFilter">Type to narrow the node list by dialogue text or node ID.</sys:String>
 ```
 
-- [ ] **Step 2: Create the window**
+- [x] **Step 2: Create the window**
 
 `DialogEditor.Avalonia/Views/VoAliasPickerWindow.axaml`:
 
@@ -1513,7 +1513,7 @@ public partial class VoAliasPickerWindow : Window
 }
 ```
 
-- [ ] **Step 3: Expose the provider and wire the delegate**
+- [x] **Step 3: Expose the provider and wire the delegate**
 
 In `MainWindowViewModel.cs`, next to the other public properties, add:
 
@@ -1540,7 +1540,7 @@ In `MainWindow.axaml.cs`, directly after the `vm.Detail.ShowImportDialog = async
 
 (`Detail.GameRoot` is the property set at ~`MainWindowViewModel.cs:1109`; if its accessibility differs, thread the root the same way `ShowImportDialog`'s wiring obtains paths.)
 
-- [ ] **Step 4: Build, test, commit**
+- [x] **Step 4: Build, test, commit**
 
 ```
 dotnet build && dotnet test --nologo
@@ -1569,7 +1569,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
   - `record VoAliasImportPrompt(string TargetPath, int SharedWithOthers)`
   - `Func<VoAliasImportPrompt, Task<VoAliasImportChoice>>? ConfirmAliasedImport { get; set; }` on `NodeDetailViewModel`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Append to `NodeDetailViewModelPaneTests.cs`. The tests need a recording fake importer and import dialog; follow the fakes used by `NodeDetailViewModelPlaybackTests.cs` if present, otherwise define locally:
 
@@ -1638,12 +1638,12 @@ Append to `NodeDetailViewModelPaneTests.cs`. The tests need a recording fake imp
 
 `ArrangeAliasedImport` is a private helper to add in the test class: sets PoE2 context (as in Task 3's `LoadPoe2Node`), a saved `ProjectPath` (temp file path — check which member `ImportVo` reads, `ProjectPath` is referenced at `NodeDetailViewModel.cs:207`), a speaker GUID registered in `ChatterPrefixService` so the clear-alias path resolves, `Importer = new RecordingImporter()`, and `ShowImportDialog = _ => Task.FromResult<VoImportDialogResult?>(new VoImportDialogResult(<primary source>, null, WemQuality.Medium))` (match the record's real shape — read its definition first), then `LoadPoe2Node(externalVO: externalVO)` with default `"narrator/other_conv_0005"`. It returns the importer and outputs an empty prompt list.
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~NodeDetailViewModelPaneTests"`
 Expected: **build failure** — `'VoAliasImportChoice' could not be found`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 In `NodeDetailViewModel.cs` (file scope, next to `VoAliasUse`):
 
@@ -1700,7 +1700,7 @@ Add strings to `Strings.axaml` (alias block) for Task 9's dialog now so keys exi
     <sys:String x:Key="ToolTip_AliasImport_ClearAndOwn">Remove the alias from this node and import to its own canonical file. Other nodes keep the shared recording.</sys:String>
 ```
 
-- [ ] **Step 4: Run tests, full suite, commit**
+- [x] **Step 4: Run tests, full suite, commit**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~NodeDetailViewModelPaneTests"` → PASS, then `dotnet test --nologo` → all pass.
 
@@ -1723,7 +1723,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 **Interfaces:**
 - Consumes: Task 8 `VoAliasImportChoice`, `VoAliasImportPrompt`, `Detail.ConfirmAliasedImport`.
 
-- [ ] **Step 1: Create the dialog**
+- [x] **Step 1: Create the dialog**
 
 `DialogEditor.Avalonia/Views/AliasImportConfirmDialog.axaml`:
 
@@ -1786,7 +1786,7 @@ public partial class AliasImportConfirmDialog : Window
 
 (If `VoAliasImportChoice`/`VoAliasImportPrompt` ended up in a namespace other than `DialogEditor.ViewModels`, fix the `using`. If `Loc` lives elsewhere, match other dialog code-behind files' usings.)
 
-- [ ] **Step 2: Wire in MainWindow.axaml.cs**
+- [x] **Step 2: Wire in MainWindow.axaml.cs**
 
 Next to the Task 7 `ShowAliasPicker` wiring:
 
@@ -1799,7 +1799,7 @@ Next to the Task 7 `ShowAliasPicker` wiring:
         };
 ```
 
-- [ ] **Step 3: Build, test, commit**
+- [x] **Step 3: Build, test, commit**
 
 ```
 dotnet build && dotnet test --nologo
@@ -1826,7 +1826,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 **Interfaces:**
 - Produces: `BatchVoRowViewModel.IsAliased` (`bool`, init via ctor param `bool isAliased`), `BatchVoRowViewModel.StatusDisplay` (`string` — glyph, or the aliased marker).
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 In the batch tests file (create `DialogEditor.Tests/ViewModels/BatchVoImportViewModelTests.cs` if absent, with `Loc.Configure(new StubStringProvider());` in the constructor):
 
@@ -1869,12 +1869,12 @@ In the batch tests file (create `DialogEditor.Tests/ViewModels/BatchVoImportView
 
 (`RecordingBatchImporter` records `request.DestPrimaryPath` into `Destinations`; match `IVoImporter`'s real member names when writing it.)
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~BatchVoImportViewModelTests"`
 Expected: **build failure** — no ctor overload with `isAliased`.
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 In `BatchVoRowViewModel`:
 - Add `public bool IsAliased { get; }` and a trailing ctor parameter `bool isAliased = false`, assigned in the body.
@@ -1915,7 +1915,7 @@ Add strings (batch block of `Strings.axaml`):
 
 Note: the status column is 50px — "shared" fits; keep the key's value short in translations too (comment in `Strings.axaml` if needed).
 
-- [ ] **Step 4: Run tests, full suite, commit**
+- [x] **Step 4: Run tests, full suite, commit**
 
 Run: `dotnet test --nologo --filter "FullyQualifiedName~BatchVoImportViewModelTests"` → PASS, then `dotnet build && dotnet test --nologo` → all pass.
 
@@ -1933,7 +1933,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"
 **Files:**
 - Modify: `Gaps.md` (the "VO import over an ExternalVO alias" entry)
 
-- [ ] **Step 1: Update Gaps.md**
+- [x] **Step 1: Update Gaps.md**
 
 The entry "VO import over an ExternalVO alias silently overwrites shared audio" is now fixed by this feature. Move nothing — `Gaps.md` has no Fixed section; instead rewrite the entry's gap paragraph to record the resolution ("Resolved 2026-07-03: single-node import shows a three-way confirm; batch import excludes aliased rows; alias edits go through the node picker") and keep the background sentence. Commit as `docs(gaps): mark ExternalVO alias hazard resolved`.
 
