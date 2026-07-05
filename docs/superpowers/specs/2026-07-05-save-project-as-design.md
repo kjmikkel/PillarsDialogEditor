@@ -47,8 +47,12 @@ batch operation, or moving a project. (See the *No "Save As…"* entry in `Gaps.
 2. **Picker**: `_filePicker.PickSaveFileAsync(title, suggestedName: current filename,
    ".dialogproject", …)` — same call shape as `DoNewProject`. Cancel → silent no-op.
 3. **Same path chosen** → delegate to the plain save; nothing rebinds.
-4. **Different path**: rename `_project` (`with { Name = Path.GetFileNameWithoutExtension(newPath) }`),
-   rebind `_projectPath`, then run the existing fold-canvas-and-write logic. To avoid
+4. **Different path**: rename the in-memory project
+   (`with { Name = Path.GetFileNameWithoutExtension(newPath) }`) so the serialized file
+   carries the new name, fold canvas edits, and write to the **new** path. Only after
+   the write succeeds is `_projectPath` rebound; on failure the `Name` change is
+   reverted and the editor stays bound to the original file (see Error handling).
+   To avoid
    duplicating that logic, `SaveProject()`'s body is extracted into a private core
    (fold + serialize + dirty-flag reset) that both commands call; `SaveProject()` keeps
    its current observable behaviour byte-for-byte.
@@ -70,10 +74,10 @@ No hard-coded text anywhere (localisation rule).
 ## Error handling
 
 - Serialization failure: existing `SaveProject` catch pattern — `AppLog.Error` +
-  `Status_SaveError`. On failure **before** anything was written, `_projectPath` and
-  `Name` must not remain rebound to a file that doesn't exist — rebind only after the
-  write succeeds (write first to the new path, then swap the fields; the fold happens
-  on `_project` which is path-independent).
+  `Status_SaveError`. The editor must not end up bound to a file that was never
+  written: `_projectPath` is rebound only after the write succeeds, and the in-memory
+  `Name` change (applied pre-write so the file carries the new name) is reverted on
+  failure.
 - `_vo/` copy failure: save stands; log + distinct status message (see above).
 - `OperationCanceledException`: swallowed silently per project rule (picker cancel is a
   `null` return, not an exception, but the rule applies to any await in the chain).
