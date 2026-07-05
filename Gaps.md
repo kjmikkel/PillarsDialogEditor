@@ -46,13 +46,16 @@ with the branch-switch vanished-file path, which keeps its distinct semantics: n
 and clears `AppSettings.LastProjectPath` so the next launch starts projectless.
 Spec: docs/superpowers/specs/2026-07-05-close-project-design.md.
 
-### Export Mod Bundle without VO
-**File ▸ Export Mod Bundle…** always packages the project *and* the entire `_vo/` folder
-into the `.dialogpack` ZIP. VO files are large; a text-only mod update (or a project whose
-VO is distributed separately) has no lightweight option. Consider an export choice —
-with VO / without VO — at export time. Raised during the Save As design discussion
-(2026-07-05); the guiding principle is "no loose files", so the *default* should remain
-the complete bundle.
+### ~~Export Mod Bundle without VO~~ ✓ Resolved by descoping (2026-07-05)
+Use-case analysis rejected the proposed with-VO/without-VO export choice: the only
+compelling case was that a text-only project (no `_vo/`) could not export a
+`.dialogpack` at all — a gating defect, not a missing option. Fixed by making
+**File ▸ Export Mod Bundle…** available for any saved project
+(`CanExportModBundle`, formerly `HasLocalVoFolder`); the pack contains `vo/`
+exactly when `_vo/` exists (consumers always treated `vo/` as optional). The
+"exclude my existing VO" cases (small updates to voiced mods, separately
+distributed VO) stay unserved until real demand appears.
+Spec: docs/superpowers/specs/2026-07-05-export-without-vo-design.md.
 
 ### VO import over an ExternalVO alias silently overwrites shared audio
 `ExternalVO` (PoE2 only; ~1,000 shipped nodes across 193 conversations) redirects a node's
