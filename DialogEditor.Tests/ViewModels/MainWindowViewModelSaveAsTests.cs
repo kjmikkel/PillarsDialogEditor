@@ -208,4 +208,100 @@ public class MainWindowViewModelSaveAsTests : IDisposable
         Assert.Equal(target, AppSettings.LastProjectPath);
         Assert.False(vm.IsModified);
     }
+
+    // ── ReportSaveError delegate (save-error visibility spec) ─────────────
+
+    /// Returns a Save As target whose parent "directory" is actually a file,
+    /// so DialogProjectSerializer.SaveToFile deterministically throws.
+    private string BlockedSaveTarget()
+    {
+        var blocker = Path.Combine(_tempDir, "blocked");
+        File.WriteAllText(blocker, "not a directory");
+        return Path.Combine(blocker, "forked.dialogproject");
+    }
+
+    [Fact]
+    public async Task SaveAs_WriteFailure_InvokesReportSaveError_AndStaysBoundToOriginal()
+    {
+        var orig = WriteProject("orig.dialogproject");
+        var vm   = await OpenVm(orig, BlockedSaveTarget());
+        Exception? reported = null;
+        vm.ReportSaveError = ex => reported = ex;
+
+        await vm.SaveProjectAsCommand.ExecuteAsync(null);
+
+        Assert.NotNull(reported);
+        Assert.Equal(orig, AppSettings.LastProjectPath);   // rebind must not have happened
+        Assert.Equal("orig", vm.CurrentProjectName);
+    }
+
+    [Fact]
+    public async Task SaveAs_WriteFailure_NullDelegate_DoesNotThrow()
+    {
+        var orig = WriteProject("orig.dialogproject");
+        var vm   = await OpenVm(orig, BlockedSaveTarget());
+        // ReportSaveError deliberately left null.
+
+        await vm.SaveProjectAsCommand.ExecuteAsync(null);   // must not throw
+
+        Assert.Equal(orig, AppSettings.LastProjectPath);
+    }
+
+    [Fact]
+    public async Task SaveAs_Success_DoesNotInvokeReportSaveError()
+    {
+        var orig = WriteProject("orig.dialogproject");
+        var vm   = await OpenVm(orig, Path.Combine(_tempDir, "forked.dialogproject"));
+        Exception? reported = null;
+        vm.ReportSaveError = ex => reported = ex;
+
+        await vm.SaveProjectAsCommand.ExecuteAsync(null);
+
+        Assert.Null(reported);
+    }
+
+    [Fact]
+    public async Task SaveAs_VoCopyFailure_InvokesReportSaveError_AndStillSaves()
+    {
+        var orig = WriteProject("orig.dialogproject");
+        var voFile = Path.Combine(_tempDir, "_vo", "a.wem");
+        Directory.CreateDirectory(Path.GetDirectoryName(voFile)!);
+        File.WriteAllBytes(voFile, [1]);
+
+        var forkDir = Path.Combine(_tempDir, "fork");
+        Directory.CreateDirectory(forkDir);
+        File.WriteAllText(Path.Combine(forkDir, "_vo"), "blocker");   // file blocks dir creation
+
+        var target = Path.Combine(forkDir, "forked.dialogproject");
+        var vm = await OpenVm(orig, target);
+        Exception? reported = null;
+        vm.ReportSaveError = ex => reported = ex;
+
+        await vm.SaveProjectAsCommand.ExecuteAsync(null);
+
+        Assert.NotNull(reported);                          // partial failure surfaced
+        Assert.True(File.Exists(target), "the save itself must not be rolled back.");
+    }
+
+    [Fact]
+    public async Task PlainSave_WriteFailure_InvokesReportSaveError()
+    {
+        var orig = WriteProject("orig.dialogproject");
+        var vm   = await OpenVm(orig, saveAsTarget: null);
+        Exception? reported = null;
+        vm.ReportSaveError = ex => reported = ex;
+
+        // Make the open project file read-only so SaveToFile throws.
+        File.SetAttributes(orig, FileAttributes.ReadOnly);
+        try
+        {
+            vm.IsModified = true;
+            vm.SaveProjectCommand.Execute(null);
+            Assert.NotNull(reported);
+        }
+        finally
+        {
+            File.SetAttributes(orig, FileAttributes.Normal);   // or Dispose can't delete _tempDir
+        }
+    }
 }
