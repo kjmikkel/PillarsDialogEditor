@@ -94,6 +94,10 @@ public partial class MainWindowViewModel : ObservableObject
     /// Set by the UI layer to open the Export Conversations window.
     public Action<ExportConversationsViewModel>? ShowExportConversations { get; set; }
 
+    /// Set by the UI layer to surface a caught save exception in the exception
+    /// report window (status-bar text alone is too easy to miss for a failed save).
+    public Action<Exception>? ReportSaveError { get; set; }
+
     /// Conditions from the catalogue filtered to the currently loaded game.
     public IReadOnlyList<ConditionEntry> ActiveConditions
         => string.IsNullOrEmpty(_activeGameId)
@@ -919,6 +923,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             AppLog.Error($"Failed to save project", ex);
             StatusText = Loc.Format("Status_SaveError", _project?.Name ?? "?", ex.Message);
+            ReportSaveError?.Invoke(ex);
         }
     }
 
@@ -961,6 +966,7 @@ public partial class MainWindowViewModel : ObservableObject
             SetProject(_project! with { Name = oldName });
             AppLog.Error($"Failed to save project as '{path}'", ex);
             StatusText = Loc.Format("Status_SaveError", oldName, ex.Message);
+            ReportSaveError?.Invoke(ex);
             return;
         }
 
@@ -969,6 +975,8 @@ public partial class MainWindowViewModel : ObservableObject
         Canvas.ProjectPath  = path;
 
         var voCopyError = CopyVoFolder(oldPath, path);
+        if (voCopyError is not null)
+            ReportSaveError?.Invoke(voCopyError);
 
         Canvas.IsModified = false;
         IsModified = false;
@@ -982,7 +990,7 @@ public partial class MainWindowViewModel : ObservableObject
         AppLog.Info($"Project saved as: {path}");
         StatusText = voCopyError is null
             ? Loc.Format("Status_ProjectSavedAs", _project!.Name)
-            : Loc.Format("Status_SaveAsVoCopyFailed", _project!.Name, voCopyError);
+            : Loc.Format("Status_SaveAsVoCopyFailed", _project!.Name, voCopyError.Message);
         ConversationSaved?.Invoke();
     }
 
@@ -991,9 +999,9 @@ public partial class MainWindowViewModel : ObservableObject
 
     /// Copies the _vo/ sidecar folder next to the new project file when the
     /// directory changed (same directory → the folder is already adjacent).
-    /// Returns null on success or nothing-to-copy, else the failure message —
+    /// Returns null on success or nothing-to-copy, else the exception —
     /// a failed copy must not roll back the already-written project file.
-    private static string? CopyVoFolder(string oldPath, string newPath)
+    private static Exception? CopyVoFolder(string oldPath, string newPath)
     {
         try
         {
@@ -1010,7 +1018,7 @@ public partial class MainWindowViewModel : ObservableObject
         catch (Exception ex)
         {
             AppLog.Error("Save As: copying the _vo/ sidecar folder failed", ex);
-            return ex.Message;
+            return ex;
         }
     }
 
