@@ -247,6 +247,7 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(IsProjectOpen));
         SaveProjectCommand.NotifyCanExecuteChanged();
         SaveProjectAsCommand.NotifyCanExecuteChanged();
+        CloseProjectCommand.NotifyCanExecuteChanged();
         NewConversationCommand.NotifyCanExecuteChanged();
         ImportConversationCommand.NotifyCanExecuteChanged();
         ExportConversationsCommand.NotifyCanExecuteChanged();
@@ -531,6 +532,26 @@ public partial class MainWindowViewModel : ObservableObject
         LoadProject(path);
     }
 
+    [RelayCommand(CanExecute = nameof(IsProjectOpen))]
+    private void CloseProject()
+        => GuardDirtyThen(DoCloseProject);
+
+    private void DoCloseProject()
+    {
+        var name = CurrentProjectName ?? "?";
+        AppLog.Info($"Closed project: {_projectPath}");
+        CloseProjectCore(Loc.Format("Status_ProjectClosed", name));
+        // User-intent extras the branch-switch teardown must not do: the canvas may
+        // show patched content that exists nowhere after close, and a deliberate
+        // close should stick across restarts (no auto-reopen of this project).
+        Canvas.Clear();
+        Detail.Clear();
+        CurrentConversationName = null;
+        _currentFile = null;
+        OnPropertyChanged(nameof(CanValidateVO));
+        AppSettings.LastProjectPath = null;
+    }
+
     // Explicit opens (File > Open) resolve conflicts immediately; startup re-open
     // defers to a "Resolve…" prompt (offerDeferred: true) so we don't slam a modal
     // over a freshly shown window.
@@ -547,23 +568,33 @@ public partial class MainWindowViewModel : ObservableObject
         if (!File.Exists(path))
         {
             AppLog.Info($"Project file not present on current branch: {path}");
-            SetProject(null);
-            _projectPath = null;
-            Detail.ProjectPath  = null;
-            Canvas.ProjectPath  = null;
-            OnPropertyChanged(nameof(HasLocalVoFolder));
-        BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
-            CurrentProjectName = null;
-            IsModified = false;        // nothing open → not dirty
-            _attributionPath = null;   // force attribution rebuild next time
-            StatusText = Loc.Format("Status_ProjectNotOnBranch", path);
-            SaveProjectCommand.NotifyCanExecuteChanged();
-            SaveProjectAsCommand.NotifyCanExecuteChanged();
+            CloseProjectCore(Loc.Format("Status_ProjectNotOnBranch", path));
             return;
         }
 
         _attributionPath = null;       // HEAD moved → stale blame
         _ = LoadProjectAsync(path, offerDeferred: false);
+    }
+
+    /// Shared project-state teardown, used by the Close Project command and by
+    /// ReloadCurrentProjectFromDisk when the file vanished on a branch switch.
+    /// Deliberately does NOT clear AppSettings.LastProjectPath or the canvas:
+    /// on a branch switch the file may reappear on switching back, and that path
+    /// keeps the canvas as-is. The user command layers those two on top.
+    private void CloseProjectCore(string statusText)
+    {
+        SetProject(null);
+        _projectPath = null;
+        Detail.ProjectPath  = null;
+        Canvas.ProjectPath  = null;
+        OnPropertyChanged(nameof(HasLocalVoFolder));
+        BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
+        CurrentProjectName = null;
+        IsModified = false;        // nothing open → not dirty
+        _attributionPath = null;   // force attribution rebuild next time
+        StatusText = statusText;
+        SaveProjectCommand.NotifyCanExecuteChanged();
+        SaveProjectAsCommand.NotifyCanExecuteChanged();
     }
 
     // Per-node attribution for the node detail panel. Built lazily on first lookup after
