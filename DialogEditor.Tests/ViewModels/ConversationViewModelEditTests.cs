@@ -59,7 +59,7 @@ public class ConversationViewModelEditTests
     {
         // A node must never carry two links to the same target: DiffEngine keys
         // links by ToNodeId, so a duplicate makes every save of the conversation
-        // throw (B-006). The drag and keyboard paths already guard; AddConnection
+        // throw (B-009). The drag and keyboard paths already guard; AddConnection
         // is the funnel that must protect the remaining callers (detail panel).
         var vm = MakeVm();
         var n1 = MakeNode(1);

@@ -41,6 +41,18 @@ _None yet._
 
 ## Fixed
 
+### B-009 — Duplicate link via detail panel makes every save silently write nothing
+- **Area:** Canvas connections / save — `ConversationViewModel.AddConnection`, `DiffEngine.DiffNode`
+- **Severity:** major
+- **Repro:**
+  1. Open a conversation; select a node that already has a canvas connection to some target node.
+  2. In the node detail panel, add a link to that same target (the add-link path had no duplicate check, unlike drag and keyboard connect).
+  3. Ctrl+S or File ▸ Save Project As….
+- **Expected:** The project saves (Save As writes the file at the chosen location).
+- **Actual:** No file is written; the status bar shows a save error. AppLog: `ArgumentException: An item with the same key has already been added. Key: <nodeid>` from `DiffEngine.DiffNode` (`Links.ToDictionary(l => l.ToNodeId)` — the patch format keys a node's links by target, so duplicates are unrepresentable).
+- **Notes:** Discovered while smoke-testing Save Project As, but plain save was equally affected. The duplicate existed only in-session — a project with the duplicate could never be saved, so no on-disk projects are corrupted.
+- **Fixed:** `dbfcf3c` — `AddConnection` (the single funnel every creation path goes through) now silently ignores a source→target pair that already exists, and pushes no undo entry for the no-op. Guarded by `AddConnection_Duplicate_IsIgnored` and `AddConnection_DuplicateIgnored_DoesNotPushUndoEntry`.
+
 ### B-008 — VO play buttons: stale PlaybackStopped desyncs ▶/■ glyphs and kills new playback
 - **Area:** VO audio playback — `VoAudioPlayer`, affects `VoImportDialog` and detail-pane play buttons
 - **Severity:** major
