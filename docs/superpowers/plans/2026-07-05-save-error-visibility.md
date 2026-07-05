@@ -31,7 +31,7 @@
 - Consumes: existing `SaveProject()`, `SaveProjectAs()`, `CopyVoFolder(string, string)` (currently `string?`-returning), and the `MainWindowViewModelSaveAsTests` helpers (`WriteProject`, `OpenVm`, `MakeVm`, `InvokeLoadProjectAsync`).
 - Produces: `public Action<Exception>? ReportSaveError { get; set; }` on `MainWindowViewModel`; `CopyVoFolder` now returns `Exception?`. Task 2 wires the delegate in the UI layer.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Append inside the class in `DialogEditor.Tests\ViewModels\MainWindowViewModelSaveAsTests.cs`:
 
@@ -133,12 +133,12 @@ Append inside the class in `DialogEditor.Tests\ViewModels\MainWindowViewModelSav
     }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~MainWindowViewModelSaveAsTests"`
 Expected: FAIL to compile — `ReportSaveError` does not exist (compile error is the red state).
 
-- [ ] **Step 3: Implement**
+- [x] **Step 3: Implement**
 
 (a) In `DialogEditor.ViewModels\ViewModels\MainWindowViewModel.cs`, next to the other UI-layer delegates (after `ShowImportWarnings`, ~line 92):
 
@@ -217,7 +217,7 @@ and at the end of the method:
             : Loc.Format("Status_SaveAsVoCopyFailed", _project!.Name, voCopyError.Message);
 ```
 
-- [ ] **Step 4: Run the Save As tests, then the full suite**
+- [x] **Step 4: Run the Save As tests, then the full suite**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~MainWindowViewModelSaveAsTests"`
 Expected: PASS (14).
@@ -225,7 +225,7 @@ Expected: PASS (14).
 Run: `dotnet test DialogEditor.Tests`
 Expected: PASS (all).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs DialogEditor.Tests/ViewModels/MainWindowViewModelSaveAsTests.cs
@@ -253,7 +253,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 - Consumes: `ReportSaveError` (Task 1); `App.ShowExceptionReport(Exception)`.
 - Produces: user-facing behaviour only; nothing downstream.
 
-- [ ] **Step 1: Make `App.ShowExceptionReport` public**
+- [x] **Step 1: Make `App.ShowExceptionReport` public**
 
 In `DialogEditor.Avalonia\App.axaml.cs` line 92:
 
@@ -263,7 +263,7 @@ In `DialogEditor.Avalonia\App.axaml.cs` line 92:
 
 (body unchanged).
 
-- [ ] **Step 2: Wire the delegate in MainWindow**
+- [x] **Step 2: Wire the delegate in MainWindow**
 
 In `DialogEditor.Avalonia\Views\MainWindow.axaml.cs`, directly after the `vm.ShowImportWarnings = ...` block (line 89):
 
@@ -274,7 +274,7 @@ In `DialogEditor.Avalonia\Views\MainWindow.axaml.cs`, directly after the `vm.Sho
 
 If `Application` is unresolved, add `using Avalonia;` to the file's usings.
 
-- [ ] **Step 3: Fix the bare catch in ExceptionReportWindow**
+- [x] **Step 3: Fix the bare catch in ExceptionReportWindow**
 
 In `DialogEditor.Avalonia\Views\ExceptionReportWindow.axaml.cs`, replace `IssuesLink_Click`:
 
@@ -289,7 +289,7 @@ In `DialogEditor.Avalonia\Views\ExceptionReportWindow.axaml.cs`, replace `Issues
 
 Add `using DialogEditor.ViewModels.Services;` to the file's usings (for `AppLog`).
 
-- [ ] **Step 4: Full suite + solution build**
+- [x] **Step 4: Full suite + solution build**
 
 Run: `dotnet test DialogEditor.Tests`
 Expected: PASS (all).
@@ -299,7 +299,7 @@ Expected: Build succeeded, 0 errors.
 
 Manual smoke check when convenient: make the open `.dialogproject` read-only, Ctrl+S → the exception report window appears (once per exception type) alongside the status-bar error.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add DialogEditor.Avalonia/App.axaml.cs DialogEditor.Avalonia/Views/MainWindow.axaml.cs DialogEditor.Avalonia/Views/ExceptionReportWindow.axaml.cs
