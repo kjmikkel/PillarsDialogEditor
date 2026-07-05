@@ -486,6 +486,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             AppLog.Error("Project-wide batch VO scan failed", ex);
             StatusText = Loc.Get("Status_BatchImportVoAllFailed");
+            ReportError?.Invoke(ex);
         }
     }
 
@@ -612,6 +613,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             AppLog.Error($"Failed to open project '{path}'", ex);
             StatusText = Loc.Format("Status_ProjectOpenError", path, ex.Message);
+            ReportError?.Invoke(ex);
         }
     }
 
@@ -756,6 +758,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             AppLog.Error($"Failed to import conversation from '{path}'", ex);
             StatusText = Loc.Format("Status_ImportConversationError", Path.GetFileName(path), ex.Message);
+            ReportError?.Invoke(ex);
             return;
         }
 
@@ -1095,6 +1098,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             AppLog.Error("ApplyFromDiff: save failed", ex);
             StatusText = Loc.Format("Status_SaveError", applied.Name, ex.Message);
+            ReportError?.Invoke(ex);
             return;
         }
         UndoApplyCommand.NotifyCanExecuteChanged();
@@ -1121,6 +1125,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             AppLog.Error("UndoApply: save failed", ex);
             StatusText = Loc.Format("Status_SaveError", previous.Name, ex.Message);
+            ReportError?.Invoke(ex);
             return;
         }
         UndoApplyCommand.NotifyCanExecuteChanged();
@@ -1160,6 +1165,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             AppLog.Error("Merge projects failed", ex);
             StatusText = Loc.Format("Status_MergeError", ex.Message);
+            ReportError?.Invoke(ex);
         }
     }
 
@@ -1298,7 +1304,11 @@ public partial class MainWindowViewModel : ObservableObject
                 _ = Task.Run(() =>
                 {
                     try { VoAliasIndexService.Rebuild(aliasScanRoot); }
-                    catch (Exception ex) { AppLog.Error($"VO alias index rebuild failed: {ex.Message}"); }
+                    catch (Exception ex)
+                    {
+                        AppLog.Error($"VO alias index rebuild failed: {ex.Message}");
+                        ReportError?.Invoke(ex);
+                    }
                 });
             }
             OnPropertyChanged(nameof(CanValidateVO));
@@ -1318,6 +1328,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             AppLog.Error($"Failed to initialise game data from {path}", ex);
             StatusText = Loc.Format("Status_LoadError", path, ex.Message);
+            ReportError?.Invoke(ex);
         }
     }
 
@@ -1356,6 +1367,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             AppLog.Error($"Create sample: build failed: {ex}");
             StatusText = Loc.Get("Sample_BuildFailed");
+            ReportError?.Invoke(ex);
             return;
         }
 
@@ -1491,6 +1503,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             AppLog.Error("Backup failed", ex);
             StatusText = Loc.Format("Status_BackupError", ex.Message);
+            ReportError?.Invoke(ex);
         }
     }
 
@@ -1536,6 +1549,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             AppLog.Error("Restore failed", ex);
             StatusText = Loc.Format("Status_RestoreError", ex.Message);
+            ReportError?.Invoke(ex);
         }
     }
 
@@ -1670,6 +1684,9 @@ public partial class MainWindowViewModel : ObservableObject
         }
         catch (PatchConflictException ex)
         {
+            // error-window-exempt: a patch conflict is a domain condition with its own
+            // interactive recovery (RequestConflictResolution dialog / detailed status),
+            // not an unexpected failure — the report window would stack on that dialog.
             AppLog.Error($"Patch conflict testing project '{_project.Name}'", ex);
 
             if (!ignoreConflicts && RequestConflictResolution is not null)
@@ -1696,6 +1713,7 @@ public partial class MainWindowViewModel : ObservableObject
             AppSettings.ClearPendingRestores();
             AppLog.Error($"Failed to test project '{_project?.Name}'", ex);
             StatusText = Loc.Format("Status_TestApplyError", _project!.Name, ex.Message);
+            ReportError?.Invoke(ex);
         }
     }
 
@@ -1780,7 +1798,9 @@ public partial class MainWindowViewModel : ObservableObject
             catch (Exception ex)
             {
                 AppLog.Error($"SyncVoToGame: failed to copy '{localFile}'", ex);
-                // Continue with remaining files — partial sync is better than aborting
+                // Continue with remaining files — partial sync is better than aborting;
+                // the window's per-type dedupe keeps repeated per-file failures to one report.
+                ReportError?.Invoke(ex);
             }
         }
     }
@@ -1846,6 +1866,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             AppLog.Error("Failed to restore conversations", ex);
             StatusText = Loc.Format("Status_SaveError", _project?.Name ?? "?", ex.Message);
+            ReportError?.Invoke(ex);
         }
     }
 
@@ -1938,6 +1959,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             AppLog.Error($"Failed to load conversation '{file.Name}'", ex);
             StatusText = Loc.Format("Status_LoadError", file.Name, ex.Message);
+            ReportError?.Invoke(ex);
         }
     }
 }
