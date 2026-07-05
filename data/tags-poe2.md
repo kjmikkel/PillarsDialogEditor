@@ -4,6 +4,11 @@ Extracted by scanning all 1,073 English conversation `.stringtable` files
 (`exported/localized/en/text/conversations`, GOG 5.0) for `[...]` and `<...>`
 markup. Counts are occurrences across `DefaultText` + `FemaleText`.
 
+**Token list verified against decompiled engine code (2026-07-05):**
+`Assembly-CSharp\Game\Conversation.cs` (~lines 789–901) and
+`Game\ShipDuelManager.cs` (~lines 959–996). Tokens with count 0 exist in the
+engine but never occur in shipped dialog — still valid for mod text.
+
 Three different mechanisms share the bracket syntax:
 
 1. **Substitution tokens** — `[Token]` is replaced by the engine at runtime.
@@ -28,7 +33,16 @@ The engine replaces these with dynamic values. Usable in mod dialog text.
 | `[Player Culture]` | 7 | The Watcher's culture (e.g. "Aedyr") |
 | `[Player Subrace]` | 1 | The Watcher's subrace (e.g. "wood elf") |
 | `[Player Deity]` | 1 | The priest player's chosen deity |
-| `[player class]` | 1 | The Watcher's class — sic, lowercase in `06_cv_ateira.stringtable`; the token appears to be case-insensitive |
+| `[Player Class]` | 1* | The Watcher's class (*shipped use is the lowercase variant, `06_cv_ateira.stringtable`) |
+| `[Player Background]` | 0 | The Watcher's background (engine-only) |
+| `[Player Paladin Order]` | 0 | The paladin player's order, gendered form (engine-only) |
+
+**Lowercase variants:** matching is by exact-case pairs, **not**
+case-insensitive. The engine does a second replace for `[player race]`,
+`[player subrace]`, `[player class]`, `[player culture]`, and
+`[player background]`, substituting the lower-cased value (for mid-sentence
+use). No lowercase pair exists for Name, Ship, Animal Companion, Deity, or
+Paladin Order — any other casing renders literally.
 
 ### Character-reference tokens
 
@@ -36,7 +50,7 @@ The engine replaces these with dynamic values. Usable in mod dialog text.
 |---|---|---|
 | `[Specified 0]` … `[Specified 5]` | 752 / 394 / 179 / 131 / 162 / 51 | The character bound to the node's Specified Speaker slot *n* (script-selected, e.g. a specific companion) |
 | `[SkillCheck 0]`, `[SkillCheck 1]` | 79 / 4 | The party member selected by skill-check node *n* (highest relevant skill) |
-| `[Slot 0]`, `[Slot 2]` | 3 / 1 | The character in party slot *n* |
+| `[Slot 0]`, `[Slot 2]` | 3 / 1 | The character in party slot *n* — engine supports the full `[Slot 0]`…`[Slot 5]` range (shipped text only uses 0 and 2) |
 
 ### Ship-duel tokens (`re_si_ship_combat.stringtable`)
 
@@ -50,9 +64,22 @@ The engine replaces these with dynamic values. Usable in mod dialog text.
 | `[ShipDuel_PlayerFullSailDist]` | 1 | Distance at full sail |
 | `[ShipDuel_PlayerHalfSailDist]` | 1 | Distance at half sail |
 | `[ShipDuel_BraceChance]` | 1 | Brace success chance |
+| `[ShipDuel_Player]` | 0 | Player captain's name (engine-only) |
+| `[ShipDuel_FleeChance]` | 0 | Flee success chance (engine-only) |
 
 `[ERROR]` (3 uses, same file) is a literal fallback shown when the ship AI
 takes an unrecognized action — not a token to reuse.
+
+### Other engine tokens
+
+| Token | Count | Replaced with |
+|---|---|---|
+| `[Interaction Ability]` | 0 | Display name of the ability granted by a scripted interaction |
+| `[NPCBacker]` | 0 | Backer NPC description text |
+| `[God_Boon]` | 0 | Name of the god's boon being granted |
+
+`[Temp]` is appended by the engine to nodes with missing text — a developer
+marker, not a token to use.
 
 ---
 
