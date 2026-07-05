@@ -32,12 +32,12 @@
 - Consumes: existing `SaveProject()` body.
 - Produces: `private void FoldCanvasIntoProject()` — folds open-canvas edits into `_project` via `SetProject(...)`; no-op when no conversation is open. Task 2 calls it.
 
-- [ ] **Step 1: Confirm the suite is green before refactoring**
+- [x] **Step 1: Confirm the suite is green before refactoring**
 
 Run: `dotnet test DialogEditor.Tests`
 Expected: PASS (all tests).
 
-- [ ] **Step 2: Extract the fold block**
+- [x] **Step 2: Extract the fold block**
 
 In `MainWindowViewModel.cs`, replace `SaveProject()` (lines 897–945) with:
 
@@ -99,12 +99,12 @@ In `MainWindowViewModel.cs`, replace `SaveProject()` (lines 897–945) with:
 
 The comment block and fold logic are moved **verbatim** — only the `if` guard inverts (early-return instead of wrapping).
 
-- [ ] **Step 3: Verify still green**
+- [x] **Step 3: Verify still green**
 
 Run: `dotnet test DialogEditor.Tests`
 Expected: PASS — behaviour unchanged (persistence tests in `MainWindowViewModelPersistenceTests` cover the fold path).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```powershell
 git add DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs
@@ -131,7 +131,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 - Consumes: `FoldCanvasIntoProject()` (Task 1); `IFilePicker.PickSaveFileAsync(string title, string suggestedName, string extension, string extensionDescription)` (`DialogEditor.ViewModels\Services\IFilePicker.cs:15`); `StubFilePicker(saveResult: …)` (`DialogEditor.Tests\Helpers\StubFilePicker.cs`).
 - Produces: `SaveProjectAsCommand` (generated `IAsyncRelayCommand`), `private bool CanSaveProjectAs()`. Task 3 extends the command with the `_vo/` copy; Task 4 binds the command in XAML/key handler.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `DialogEditor.Tests\ViewModels\MainWindowViewModelSaveAsTests.cs`:
 
@@ -292,12 +292,12 @@ public class MainWindowViewModelSaveAsTests : IDisposable
 }
 ```
 
-- [ ] **Step 2: Run tests to verify they fail**
+- [x] **Step 2: Run tests to verify they fail**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~MainWindowViewModelSaveAsTests"`
 Expected: FAIL to **compile** — `SaveProjectAsCommand` does not exist. (A compile error is the red state here.)
 
-- [ ] **Step 3: Add the strings**
+- [x] **Step 3: Add the strings**
 
 In `DialogEditor.Avalonia\Resources\Strings.axaml`, after `Menu_SaveProject` (line 734):
 
@@ -321,7 +321,7 @@ After `Status_ProjectSaved` (line 786):
 
 (`Status_SaveAsVoCopyFailed` is consumed in Task 3 but added here so the strings land in one commit.)
 
-- [ ] **Step 4: Implement the command**
+- [x] **Step 4: Implement the command**
 
 In `MainWindowViewModel.cs`, directly after `CanSaveProject()` (~line 948):
 
@@ -389,17 +389,17 @@ In `MainWindowViewModel.cs`, directly after `CanSaveProject()` (~line 948):
 
 Then add `SaveProjectAsCommand.NotifyCanExecuteChanged();` immediately after **every** existing `SaveProjectCommand.NotifyCanExecuteChanged();` call (5 sites — lines 243, 327, 552, 663, and the one inside `SaveProject()`; find them with `Grep "SaveProjectCommand.NotifyCanExecuteChanged"`).
 
-- [ ] **Step 5: Run the Save As tests**
+- [x] **Step 5: Run the Save As tests**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~MainWindowViewModelSaveAsTests"`
 Expected: PASS (all 6).
 
-- [ ] **Step 6: Run the full suite**
+- [x] **Step 6: Run the full suite**
 
 Run: `dotnet test DialogEditor.Tests`
 Expected: PASS — note `NoStrayHexTests`/`AutomationHelpTextTests` etc. are structural scans; the new strings/commands must not trip them (no hex, no hard-coded UI text).
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```powershell
 git add DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs DialogEditor.Avalonia/Resources/Strings.axaml DialogEditor.Tests/ViewModels/MainWindowViewModelSaveAsTests.cs
@@ -427,7 +427,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 - Consumes: `SaveProjectAs()` from Task 2.
 - Produces: `private static string? CopyVoFolder(string oldPath, string newPath)` — returns `null` on success/nothing-to-copy, else the failure message. Used only by `SaveProjectAs`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Append to `MainWindowViewModelSaveAsTests.cs` (inside the class):
 
@@ -490,12 +490,12 @@ Append to `MainWindowViewModelSaveAsTests.cs` (inside the class):
     }
 ```
 
-- [ ] **Step 2: Run tests to verify the copy tests fail**
+- [x] **Step 2: Run tests to verify the copy tests fail**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~MainWindowViewModelSaveAsTests"`
 Expected: `SaveAs_DifferentDirectory_CopiesVoFolderRecursively` FAILS (no copy happens yet); `SaveAs_NoVoFolder_CopiesNothing` and `SaveAs_VoCopyFailure_*` may already pass — that's fine, the copy test is the red driver.
 
-- [ ] **Step 3: Implement the copy**
+- [x] **Step 3: Implement the copy**
 
 In `SaveProjectAs()` (Task 2), insert **after** the three rebind lines (`_projectPath`/`Detail.ProjectPath`/`Canvas.ProjectPath`) and **before** `Canvas.IsModified = false;`:
 
@@ -549,12 +549,12 @@ Add the helpers after `CanSaveProjectAs()`:
     }
 ```
 
-- [ ] **Step 4: Run the Save As tests**
+- [x] **Step 4: Run the Save As tests**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~MainWindowViewModelSaveAsTests"`
 Expected: PASS (all 9).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs DialogEditor.Tests/ViewModels/MainWindowViewModelSaveAsTests.cs
@@ -581,7 +581,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 - Consumes: `SaveProjectAsCommand` (Task 2), string keys `Menu_SaveProjectAs`/`ToolTip_SaveProjectAs` (Task 2).
 - Produces: user-facing menu entry + shortcut. Nothing downstream consumes this.
 
-- [ ] **Step 1: Add the menu item**
+- [x] **Step 1: Add the menu item**
 
 In `MainWindow.axaml`, directly after the Save Project `MenuItem` (line 52):
 
@@ -595,7 +595,7 @@ In `MainWindow.axaml`, directly after the Save Project `MenuItem` (line 52):
 
 (`InputGesture` is display-only in Avalonia — the real binding is Step 2. `ToolTip.Tip` + `HelpText` mirroring is mandatory per CLAUDE.md and enforced by `AutomationHelpTextTests`.)
 
-- [ ] **Step 2: Add the key case**
+- [x] **Step 2: Add the key case**
 
 In `MainWindow.axaml.cs`'s `OnKeyDownTunnel` switch, directly **before** the existing `case Key.S when e.KeyModifiers == KeyModifiers.Control:` (line 313 — exact-equality matching means order is not load-bearing, but keep the more specific chord first for readability):
 
@@ -608,19 +608,19 @@ In `MainWindow.axaml.cs`'s `OnKeyDownTunnel` switch, directly **before** the exi
                 break;
 ```
 
-- [ ] **Step 3: Run the full suite (structural enforcers cover the new XAML)**
+- [x] **Step 3: Run the full suite (structural enforcers cover the new XAML)**
 
 Run: `dotnet test DialogEditor.Tests`
 Expected: PASS — `AutomationHelpTextTests`, `NoStaticStringResourceTests`, `NoStrayHexTests` all scan `MainWindow.axaml` and must stay green.
 
-- [ ] **Step 4: Build and launch the app for a manual smoke check**
+- [x] **Step 4: Build and launch the app for a manual smoke check**
 
 Run: `dotnet build DialogEditor.slnx`
 Expected: Build succeeded.
 
 Manual check (or via the `verify`/`run` skill): open a project → File menu shows "Save Project As…" with Ctrl+Shift+S; the item is disabled with no project open; Ctrl+Shift+S opens the save picker; saving to a new folder rebinds the window title and copies `_vo/` if present.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add DialogEditor.Avalonia/Views/MainWindow.axaml DialogEditor.Avalonia/Views/MainWindow.axaml.cs
@@ -640,7 +640,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 
 **Interfaces:** none — documentation only.
 
-- [ ] **Step 1: Mark the gap implemented**
+- [x] **Step 1: Mark the gap implemented**
 
 Replace the `### No "Save As…"` entry body in `Gaps.md` with:
 
@@ -655,12 +655,12 @@ whenever a project is open — no dirty-state requirement, so forking a clean pr
 works. Spec: docs/superpowers/specs/2026-07-05-save-project-as-design.md.
 ```
 
-- [ ] **Step 2: Full suite one last time**
+- [x] **Step 2: Full suite one last time**
 
 Run: `dotnet test DialogEditor.Tests`
 Expected: PASS.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```powershell
 git add Gaps.md
