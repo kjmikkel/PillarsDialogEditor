@@ -46,6 +46,32 @@ with the branch-switch vanished-file path, which keeps its distinct semantics: n
 and clears `AppSettings.LastProjectPath` so the next launch starts projectless.
 Spec: docs/superpowers/specs/2026-07-05-close-project-design.md.
 
+### Dialog text tag reference window
+The tag vocabulary of both games is now documented in `data/tags-poe2.md` /
+`data/tags-poe1.md` (from a full stringtable scan, 2026-07-05: substitution tokens
+like `[Player Name]`/`[Specified 0]`, rich-text markup like `<i>`/`<ispeech>`/`<link>`,
+and literal writing conventions like `[Say nothing.]`). Mod authors currently have to
+find those files on disk. Add an in-app reference window (like the condition reference)
+fed from these files — game-aware (PoE1 vs PoE2 vocabularies differ; ship-duel tokens
+and all rich-text markup are PoE2-only), searchable, with the counts/examples the docs
+already carry. Research note with raw inventories:
+`PoE Dialog Editor Research/Dialog Text Tags Research.md`.
+
+### Token autocomplete and validation in node text editing
+The node text editor treats `[Player Name]`, `<i>…</i>`, etc. as plain text. Two
+assists, both game-aware and driven by the same vocabulary as the reference window:
+- **Autocomplete** — typing `[` (or `<`) in a text field offers the known substitution
+  tokens (respecting the open game: no `[ShipDuel_*]` for PoE1) and markup tags.
+- **Validation** — warn on *identifier-shaped* unknown tokens (e.g. `[Player Nmae]`)
+  and unbalanced markup pairs (`<i>` without `</i>`). Must NOT flag free-text stage
+  directions (`[Say nothing.]`, `[Draw your weapons and attack.]`) or language markers
+  (`[Vailian]`) — sentence-like bracket content is a writing convention, ~1,300 distinct
+  values in shipped data. Shipped data also contains malformed `<link>` attributes
+  (missing closing quote), so validation of vanilla text must stay lenient/informational.
+Open question feeding both: decompile the PoE2 token-replacement class in
+`Assembly-CSharp` to confirm the exact token list and case-insensitivity
+(`[player class]` occurs lowercase in shipped data) instead of inferring from text.
+
 ### ~~Export Mod Bundle without VO~~ ✓ Resolved by descoping (2026-07-05)
 Use-case analysis rejected the proposed with-VO/without-VO export choice: the only
 compelling case was that a text-only project (no `_vo/`) could not export a
