@@ -55,6 +55,43 @@ public class ConversationViewModelEditTests
     }
 
     [Fact]
+    public void AddConnection_Duplicate_IsIgnored()
+    {
+        // A node must never carry two links to the same target: DiffEngine keys
+        // links by ToNodeId, so a duplicate makes every save of the conversation
+        // throw (B-006). The drag and keyboard paths already guard; AddConnection
+        // is the funnel that must protect the remaining callers (detail panel).
+        var vm = MakeVm();
+        var n1 = MakeNode(1);
+        var n2 = MakeNode(2);
+        vm.AddNode(n1, new LayoutPoint(0, 0));
+        vm.AddNode(n2, new LayoutPoint(200, 0));
+
+        vm.AddConnection(n1.Output, n2.Input);
+        vm.AddConnection(n1.Output, n2.Input);   // duplicate — must be a no-op
+
+        Assert.Single(vm.Connections);
+    }
+
+    [Fact]
+    public void AddConnection_DuplicateIgnored_DoesNotPushUndoEntry()
+    {
+        // The ignored duplicate must not leave a ghost undo step: undoing once
+        // after the no-op removes the real connection.
+        var vm = MakeVm();
+        var n1 = MakeNode(1);
+        var n2 = MakeNode(2);
+        vm.AddNode(n1, new LayoutPoint(0, 0));
+        vm.AddNode(n2, new LayoutPoint(200, 0));
+
+        vm.AddConnection(n1.Output, n2.Input);
+        vm.AddConnection(n1.Output, n2.Input);   // no-op
+        vm.Undo();
+
+        Assert.Empty(vm.Connections);
+    }
+
+    [Fact]
     public void DeleteNode_RemovesNodeAndItsConnections()
     {
         var vm = MakeVm();
