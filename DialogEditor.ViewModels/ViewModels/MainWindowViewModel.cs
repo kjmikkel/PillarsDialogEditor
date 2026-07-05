@@ -94,9 +94,10 @@ public partial class MainWindowViewModel : ObservableObject
     /// Set by the UI layer to open the Export Conversations window.
     public Action<ExportConversationsViewModel>? ShowExportConversations { get; set; }
 
-    /// Set by the UI layer to surface a caught save exception in the exception
-    /// report window (status-bar text alone is too easy to miss for a failed save).
-    public Action<Exception>? ReportSaveError { get; set; }
+    /// Set by the UI layer to surface a caught operation failure (save, open,
+    /// import, …) in the exception report window — status-bar text alone is too
+    /// easy to miss for a failed operation.
+    public Action<Exception>? ReportError { get; set; }
 
     /// Conditions from the catalogue filtered to the currently loaded game.
     public IReadOnlyList<ConditionEntry> ActiveConditions
@@ -923,7 +924,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             AppLog.Error($"Failed to save project", ex);
             StatusText = Loc.Format("Status_SaveError", _project?.Name ?? "?", ex.Message);
-            ReportSaveError?.Invoke(ex);
+            ReportError?.Invoke(ex);
         }
     }
 
@@ -966,7 +967,7 @@ public partial class MainWindowViewModel : ObservableObject
             SetProject(_project! with { Name = oldName });
             AppLog.Error($"Failed to save project as '{path}'", ex);
             StatusText = Loc.Format("Status_SaveError", oldName, ex.Message);
-            ReportSaveError?.Invoke(ex);
+            ReportError?.Invoke(ex);
             return;
         }
 
@@ -976,7 +977,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         var voCopyError = CopyVoFolder(oldPath, path);
         if (voCopyError is not null)
-            ReportSaveError?.Invoke(voCopyError);
+            ReportError?.Invoke(voCopyError);
 
         Canvas.IsModified = false;
         IsModified = false;

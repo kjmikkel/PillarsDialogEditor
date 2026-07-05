@@ -209,7 +209,7 @@ public class MainWindowViewModelSaveAsTests : IDisposable
         Assert.False(vm.IsModified);
     }
 
-    // ── ReportSaveError delegate (save-error visibility spec) ─────────────
+    // ── ReportError delegate (save-error visibility spec) ─────────────
 
     /// Returns a Save As target whose parent "directory" is actually a file,
     /// so DialogProjectSerializer.SaveToFile deterministically throws.
@@ -221,12 +221,12 @@ public class MainWindowViewModelSaveAsTests : IDisposable
     }
 
     [Fact]
-    public async Task SaveAs_WriteFailure_InvokesReportSaveError_AndStaysBoundToOriginal()
+    public async Task SaveAs_WriteFailure_InvokesReportError_AndStaysBoundToOriginal()
     {
         var orig = WriteProject("orig.dialogproject");
         var vm   = await OpenVm(orig, BlockedSaveTarget());
         Exception? reported = null;
-        vm.ReportSaveError = ex => reported = ex;
+        vm.ReportError = ex => reported = ex;
 
         await vm.SaveProjectAsCommand.ExecuteAsync(null);
 
@@ -240,7 +240,7 @@ public class MainWindowViewModelSaveAsTests : IDisposable
     {
         var orig = WriteProject("orig.dialogproject");
         var vm   = await OpenVm(orig, BlockedSaveTarget());
-        // ReportSaveError deliberately left null.
+        // ReportError deliberately left null.
 
         await vm.SaveProjectAsCommand.ExecuteAsync(null);   // must not throw
 
@@ -248,12 +248,12 @@ public class MainWindowViewModelSaveAsTests : IDisposable
     }
 
     [Fact]
-    public async Task SaveAs_Success_DoesNotInvokeReportSaveError()
+    public async Task SaveAs_Success_DoesNotInvokeReportError()
     {
         var orig = WriteProject("orig.dialogproject");
         var vm   = await OpenVm(orig, Path.Combine(_tempDir, "forked.dialogproject"));
         Exception? reported = null;
-        vm.ReportSaveError = ex => reported = ex;
+        vm.ReportError = ex => reported = ex;
 
         await vm.SaveProjectAsCommand.ExecuteAsync(null);
 
@@ -261,7 +261,7 @@ public class MainWindowViewModelSaveAsTests : IDisposable
     }
 
     [Fact]
-    public async Task SaveAs_VoCopyFailure_InvokesReportSaveError_AndStillSaves()
+    public async Task SaveAs_VoCopyFailure_InvokesReportError_AndStillSaves()
     {
         var orig = WriteProject("orig.dialogproject");
         var voFile = Path.Combine(_tempDir, "_vo", "a.wem");
@@ -275,7 +275,7 @@ public class MainWindowViewModelSaveAsTests : IDisposable
         var target = Path.Combine(forkDir, "forked.dialogproject");
         var vm = await OpenVm(orig, target);
         Exception? reported = null;
-        vm.ReportSaveError = ex => reported = ex;
+        vm.ReportError = ex => reported = ex;
 
         await vm.SaveProjectAsCommand.ExecuteAsync(null);
 
@@ -284,12 +284,12 @@ public class MainWindowViewModelSaveAsTests : IDisposable
     }
 
     [Fact]
-    public async Task PlainSave_WriteFailure_InvokesReportSaveError()
+    public async Task PlainSave_WriteFailure_InvokesReportError()
     {
         var orig = WriteProject("orig.dialogproject");
         var vm   = await OpenVm(orig, saveAsTarget: null);
         Exception? reported = null;
-        vm.ReportSaveError = ex => reported = ex;
+        vm.ReportError = ex => reported = ex;
 
         // Make the open project file read-only so SaveToFile throws.
         File.SetAttributes(orig, FileAttributes.ReadOnly);
