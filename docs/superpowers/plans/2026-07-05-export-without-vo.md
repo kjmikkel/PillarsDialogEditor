@@ -30,7 +30,7 @@
 - Consumes: `DialogProjectSerializer.SaveToFile` (DialogEditor.Patch), `DialogPackHelper.Extract` (DialogEditor.ViewModels.Services) — both already referenced by the Tests project.
 - Produces: `VoPackExporter.ExportAsync(projectPath, outputPath)` that succeeds without a `_vo/` folder. Task 2's gate rename relies on this behaviour existing.
 
-- [ ] **Step 1: Write the tests (one red, one already-green pin)**
+- [x] **Step 1: Write the tests (one red, one already-green pin)**
 
 Create `DialogEditor.Tests\Services\VoPackExporterTests.cs`:
 
@@ -110,7 +110,7 @@ public class VoPackExporterTests : IDisposable
 }
 ```
 
-- [ ] **Step 2: Run to verify red**
+- [x] **Step 2: Run to verify red**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~VoPackExporterTests"`
 Expected: `Export_WithVoFolder_IncludesVoEntries` PASSES (pins existing behaviour);
@@ -118,7 +118,7 @@ Expected: `Export_WithVoFolder_IncludesVoEntries` PASSES (pins existing behaviou
 `Directory.EnumerateFiles` on the missing `_vo` folder and throws
 `DirectoryNotFoundException`.
 
-- [ ] **Step 3: Make `vo/` optional in `ExportAsync`, update `FORMAT.md`, delete dead `CanExport`**
+- [x] **Step 3: Make `vo/` optional in `ExportAsync`, update `FORMAT.md`, delete dead `CanExport`**
 
 In `DialogEditor.Avalonia\Services\VoPackExporter.cs`:
 
@@ -165,7 +165,7 @@ Also update the class doc comment's first line to:
 /// .dialogpack file (ZIP with custom extension).
 ```
 
-- [ ] **Step 4: Run the new tests, then the full suite**
+- [x] **Step 4: Run the new tests, then the full suite**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~VoPackExporterTests"`
 Expected: PASS (2).
@@ -173,7 +173,7 @@ Expected: PASS (2).
 Run: `dotnet test DialogEditor.Tests`
 Expected: PASS (1903).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add DialogEditor.Avalonia/Services/VoPackExporter.cs DialogEditor.Tests/Services/VoPackExporterTests.cs
@@ -202,7 +202,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 - Consumes: `ExportAsync` without `_vo/` (Task 1); existing test helpers in `MainWindowViewModelCloseProjectTests` (`MakeVm`, `WriteProject`, `InvokeLoadProjectAsync`).
 - Produces: `public bool CanExportModBundle` on `MainWindowViewModel` — nothing downstream; this completes the feature.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Add to `DialogEditor.Tests\ViewModels\MainWindowViewModelCloseProjectTests.cs` (it has
 every helper this test needs, and the close-clears-the-gate assertion belongs with the
@@ -224,12 +224,12 @@ close tests):
     }
 ```
 
-- [ ] **Step 2: Run to verify red**
+- [x] **Step 2: Run to verify red**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~MainWindowViewModelCloseProjectTests"`
 Expected: FAIL to compile — `'MainWindowViewModel' does not contain a definition for 'CanExportModBundle'`.
 
-- [ ] **Step 3: Rename the gate and change its semantics**
+- [x] **Step 3: Rename the gate and change its semantics**
 
 **(a)** In `DialogEditor.ViewModels\ViewModels\MainWindowViewModel.cs`, replace the
 property (~line 235):
@@ -268,7 +268,7 @@ tooltip:
     <sys:String x:Key="ToolTip_Menu_ExportModBundle">Package this project into a single distributable .dialogpack file. Voice-over files (the _vo folder) are bundled when the project has them.</sys:String>
 ```
 
-- [ ] **Step 4: Run the new test, then the full suite**
+- [x] **Step 4: Run the new test, then the full suite**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~MainWindowViewModelCloseProjectTests"`
 Expected: PASS (6).
@@ -276,7 +276,7 @@ Expected: PASS (6).
 Run: `dotnet test DialogEditor.Tests`
 Expected: PASS (1904).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs DialogEditor.Avalonia/Views/MainWindow.axaml DialogEditor.Avalonia/Resources/Strings.axaml DialogEditor.Tests/ViewModels/MainWindowViewModelCloseProjectTests.cs
@@ -300,7 +300,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 
 **Interfaces:** none — documentation only.
 
-- [ ] **Step 1: Mark the gap resolved (recording the descope)**
+- [x] **Step 1: Mark the gap resolved (recording the descope)**
 
 Replace the entry body with:
 
@@ -317,12 +317,12 @@ distributed VO) stay unserved until real demand appears.
 Spec: docs/superpowers/specs/2026-07-05-export-without-vo-design.md.
 ```
 
-- [ ] **Step 2: Full suite**
+- [x] **Step 2: Full suite**
 
 Run: `dotnet test DialogEditor.Tests`
 Expected: PASS (1904).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```powershell
 git add Gaps.md
