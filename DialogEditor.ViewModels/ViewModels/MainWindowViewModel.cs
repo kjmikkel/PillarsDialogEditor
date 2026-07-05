@@ -232,11 +232,10 @@ public partial class MainWindowViewModel : ObservableObject
         && !string.IsNullOrEmpty(_currentGameDirectory)
         && string.Equals(_activeGameId, "poe2", StringComparison.OrdinalIgnoreCase);
 
-    /// True when a _vo/ folder exists next to the open project file.
-    /// Guards the "Export Mod Bundle…" menu item.
-    public bool HasLocalVoFolder =>
-        ProjectPath is not null &&
-        Directory.Exists(Path.Combine(Path.GetDirectoryName(ProjectPath)!, "_vo"));
+    /// True when a saved project is open — gates the "Export Mod Bundle…" menu
+    /// item. The pack includes vo/ exactly when _vo/ exists (see VoPackExporter),
+    /// so export is meaningful for any saved project, voiced or text-only.
+    public bool CanExportModBundle => ProjectPath is not null;
 
     private void SetProject(DialogProject? project)
     {
@@ -509,7 +508,7 @@ public partial class MainWindowViewModel : ObservableObject
         _projectPath = path;
         Detail.ProjectPath  = _projectPath;
         Canvas.ProjectPath  = _projectPath;
-        OnPropertyChanged(nameof(HasLocalVoFolder));
+        OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
         DialogProjectSerializer.SaveToFile(path, _project!);
         AppSettings.LastProjectPath = path;
@@ -587,7 +586,7 @@ public partial class MainWindowViewModel : ObservableObject
         _projectPath = null;
         Detail.ProjectPath  = null;
         Canvas.ProjectPath  = null;
-        OnPropertyChanged(nameof(HasLocalVoFolder));
+        OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
         CurrentProjectName = null;
         IsModified = false;        // nothing open → not dirty
@@ -712,7 +711,7 @@ public partial class MainWindowViewModel : ObservableObject
         _projectPath = path;
         Detail.ProjectPath  = _projectPath;
         Canvas.ProjectPath  = _projectPath;
-        OnPropertyChanged(nameof(HasLocalVoFolder));
+        OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
         AppSettings.LastProjectPath = path;
         CurrentProjectName = loaded.Name;
@@ -1018,7 +1017,7 @@ public partial class MainWindowViewModel : ObservableObject
         SaveCommand.NotifyCanExecuteChanged();
         SaveProjectCommand.NotifyCanExecuteChanged();
         SaveProjectAsCommand.NotifyCanExecuteChanged();
-        OnPropertyChanged(nameof(HasLocalVoFolder));
+        OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();
         AppSettings.LastProjectPath = path;
         CurrentProjectName = _project!.Name;

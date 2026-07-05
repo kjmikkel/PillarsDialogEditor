@@ -94,7 +94,7 @@
                         <Separator/>
                         <MenuItem Header="{DynamicResource Menu_ExportModBundle}"
                                   Click="ExportModBundle_Click"
-                                  IsEnabled="{Binding HasLocalVoFolder}"
+                                  IsEnabled="{Binding CanExportModBundle}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Menu_ExportModBundle}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_ExportModBundle}"/>
                         <Separator/>
