@@ -89,7 +89,7 @@ public partial class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
-    private void ShowExceptionReport(Exception ex)
+    public void ShowExceptionReport(Exception ex)
     {
         // Show at most one window per exception type to avoid flooding the desktop.
         var typeName = ex.GetType().Name;
