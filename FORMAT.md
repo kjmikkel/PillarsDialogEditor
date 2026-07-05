@@ -8,8 +8,9 @@ inspect or extract its contents with any archive tool.
 - `project.dialogproject` — the dialog diff (JSON); apply with the
   Pillars Dialog Editor Patch Manager or the `dialog-patcher` CLI.
 - `vo/` — voice-over audio files in Wwise `.wem` format, laid out to
-  mirror the game's VO directory structure. The Patch Manager and CLI
-  copy these to the correct game folder location when applying the pack.
+  mirror the game's VO directory structure. Present only when the mod
+  contains voice-over; the Patch Manager and CLI copy these to the
+  correct game folder location when applying the pack.
 - `FORMAT.md` — this file.
 
 ## Applying a .dialogpack
