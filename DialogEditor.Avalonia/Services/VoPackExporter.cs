@@ -3,7 +3,8 @@ using System.IO.Compression;
 namespace DialogEditor.Avalonia.Services;
 
 /// <summary>
-/// Packages a .dialogproject and its _vo/ folder into a .dialogpack file (ZIP with custom extension).
+/// Packages a .dialogproject — and its _vo/ folder, when one exists — into a
+/// .dialogpack file (ZIP with custom extension).
 /// Users can rename .dialogpack to .zip to inspect the contents with any archive tool.
 /// </summary>
 public static class VoPackExporter
@@ -21,8 +22,9 @@ public static class VoPackExporter
         - `project.dialogproject` — the dialog diff (JSON); apply with the
           Pillars Dialog Editor Patch Manager or the `dialog-patcher` CLI.
         - `vo/` — voice-over audio files in Wwise `.wem` format, laid out to
-          mirror the game's VO directory structure. The Patch Manager and CLI
-          copy these to the correct game folder location when applying the pack.
+          mirror the game's VO directory structure. Present only when the mod
+          contains voice-over; the Patch Manager and CLI copy these to the
+          correct game folder location when applying the pack.
         - `FORMAT.md` — this file.
 
         ## Applying a .dialogpack
@@ -49,16 +51,6 @@ public static class VoPackExporter
         """;
 
     /// <summary>
-    /// Returns true when a _vo/ folder exists next to the project file (i.e. export is meaningful).
-    /// </summary>
-    public static bool CanExport(string? projectPath)
-    {
-        if (string.IsNullOrEmpty(projectPath)) return false;
-        var voFolder = Path.Combine(Path.GetDirectoryName(projectPath)!, "_vo");
-        return Directory.Exists(voFolder);
-    }
-
-    /// <summary>
     /// Creates a .dialogpack at <paramref name="outputPath"/> containing:
     ///   project.dialogproject, vo/ (contents of _vo/), FORMAT.md.
     /// </summary>
@@ -80,12 +72,16 @@ public static class VoPackExporter
                 zip.CreateEntryFromFile(projectPath, "project.dialogproject",
                     CompressionLevel.Optimal);
 
-                // _vo/ → vo/ inside the archive
-                foreach (var file in Directory.EnumerateFiles(voFolder, "*", SearchOption.AllDirectories))
+                // _vo/ → vo/ inside the archive — present exactly when the project
+                // has voice-over; a text-only project exports a valid VO-less pack.
+                if (Directory.Exists(voFolder))
                 {
-                    ct.ThrowIfCancellationRequested();
-                    var relative = Path.GetRelativePath(voFolder, file).Replace('\\', '/');
-                    zip.CreateEntryFromFile(file, $"vo/{relative}", CompressionLevel.Optimal);
+                    foreach (var file in Directory.EnumerateFiles(voFolder, "*", SearchOption.AllDirectories))
+                    {
+                        ct.ThrowIfCancellationRequested();
+                        var relative = Path.GetRelativePath(voFolder, file).Replace('\\', '/');
+                        zip.CreateEntryFromFile(file, $"vo/{relative}", CompressionLevel.Optimal);
+                    }
                 }
 
                 // FORMAT.md
