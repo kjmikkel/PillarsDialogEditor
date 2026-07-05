@@ -241,6 +241,7 @@ public partial class MainWindowViewModel : ObservableObject
         Canvas.IsEditable = project is not null;
         OnPropertyChanged(nameof(IsProjectOpen));
         SaveProjectCommand.NotifyCanExecuteChanged();
+        SaveProjectAsCommand.NotifyCanExecuteChanged();
         NewConversationCommand.NotifyCanExecuteChanged();
         ImportConversationCommand.NotifyCanExecuteChanged();
         ExportConversationsCommand.NotifyCanExecuteChanged();
@@ -325,6 +326,7 @@ public partial class MainWindowViewModel : ObservableObject
                 IsModified = Canvas.IsModified;
                 SaveCommand.NotifyCanExecuteChanged();
                 SaveProjectCommand.NotifyCanExecuteChanged();
+                SaveProjectAsCommand.NotifyCanExecuteChanged();
             }
         };
 
@@ -550,6 +552,7 @@ public partial class MainWindowViewModel : ObservableObject
             _attributionPath = null;   // force attribution rebuild next time
             StatusText = Loc.Format("Status_ProjectNotOnBranch", path);
             SaveProjectCommand.NotifyCanExecuteChanged();
+            SaveProjectAsCommand.NotifyCanExecuteChanged();
             return;
         }
 
@@ -661,6 +664,7 @@ public partial class MainWindowViewModel : ObservableObject
         ClearPendingConflict();
         SaveCommand.NotifyCanExecuteChanged();
         SaveProjectCommand.NotifyCanExecuteChanged();
+        SaveProjectAsCommand.NotifyCanExecuteChanged();
         StatusText = Loc.Format("Status_ProjectGitConflictResolved", merged.Name);
     }
 
@@ -906,6 +910,7 @@ public partial class MainWindowViewModel : ObservableObject
             IsModified = false;
             SaveCommand.NotifyCanExecuteChanged();
             SaveProjectCommand.NotifyCanExecuteChanged();
+            SaveProjectAsCommand.NotifyCanExecuteChanged();
             AppLog.Info($"Project saved: {_projectPath}");
             StatusText = Loc.Format("Status_ProjectSaved", _project.Name);
             ConversationSaved?.Invoke();
@@ -919,6 +924,66 @@ public partial class MainWindowViewModel : ObservableObject
 
     private bool CanSaveProject() =>
         _project is not null && _projectPath is not null && IsModified;
+
+    // ── Save As — rebind to a new file (spec: 2026-07-05-save-project-as) ──
+    [RelayCommand(CanExecute = nameof(CanSaveProjectAs))]
+    private async Task SaveProjectAs()
+    {
+        if (_project is null || _projectPath is null) return;
+
+        var path = await _filePicker.PickSaveFileAsync(
+            Loc.Get("Dialog_SaveProjectAs"),
+            Path.GetFileNameWithoutExtension(_projectPath),
+            ".dialogproject",
+            Loc.Get("FileType_DialogProject"));
+        if (path is null) return;
+
+        if (string.Equals(Path.GetFullPath(path), Path.GetFullPath(_projectPath),
+                StringComparison.OrdinalIgnoreCase))
+        {
+            SaveProject();   // same file — a plain save; no rename, no rebind
+            return;
+        }
+
+        var oldPath = _projectPath;
+        var oldName = _project.Name;
+        try
+        {
+            FoldCanvasIntoProject();
+            // Rename before writing so the file carries the new name; rebind the
+            // path only after the write succeeds so a failed save leaves the
+            // editor bound to the original file.
+            SetProject(_project! with { Name = Path.GetFileNameWithoutExtension(path) });
+            DialogProjectSerializer.SaveToFile(path, _project!);
+        }
+        catch (Exception ex)
+        {
+            SetProject(_project! with { Name = oldName });
+            AppLog.Error($"Failed to save project as '{path}'", ex);
+            StatusText = Loc.Format("Status_SaveError", oldName, ex.Message);
+            return;
+        }
+
+        _projectPath        = path;
+        Detail.ProjectPath  = path;
+        Canvas.ProjectPath  = path;
+
+        Canvas.IsModified = false;
+        IsModified = false;
+        SaveCommand.NotifyCanExecuteChanged();
+        SaveProjectCommand.NotifyCanExecuteChanged();
+        SaveProjectAsCommand.NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(HasLocalVoFolder));
+        BatchImportVoAllCommand.NotifyCanExecuteChanged();
+        AppSettings.LastProjectPath = path;
+        CurrentProjectName = _project!.Name;
+        AppLog.Info($"Project saved as: {path}");
+        StatusText = Loc.Format("Status_ProjectSavedAs", _project!.Name);
+        ConversationSaved?.Invoke();
+    }
+
+    private bool CanSaveProjectAs() =>
+        _project is not null && _projectPath is not null;
 
     /// With a conversation open, folds the canvas edits into its patch on _project.
     /// With no conversation open (e.g. a freshly conflict-merged project), the
