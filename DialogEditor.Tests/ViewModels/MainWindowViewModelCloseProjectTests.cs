@@ -151,4 +151,18 @@ public class MainWindowViewModelCloseProjectTests : IDisposable
         Assert.Equal(path, AppSettings.LastProjectPath);   // may reappear on switch back
         Assert.NotEmpty(vm.Canvas.Nodes);                  // canvas deliberately untouched
     }
+
+    [Fact]
+    public async Task CanExportModBundle_TracksSavedProjectState()
+    {
+        var vm = MakeVm();
+        Assert.False(vm.CanExportModBundle);
+
+        var path = WriteProject("p.dialogproject");
+        await InvokeLoadProjectAsync(vm, path);
+        Assert.True(vm.CanExportModBundle);
+
+        vm.CloseProjectCommand.Execute(null);
+        Assert.False(vm.CanExportModBundle);
+    }
 }
