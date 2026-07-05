@@ -20,6 +20,23 @@ Every interactive control — buttons, icon-only actions, toolbar items, canvas 
 
 The only exception is controls whose purpose is 100% self-explanatory from their label alone in context — for example, **OK** and **Cancel** buttons on a confirmation dialog. When in doubt, add the tooltip.
 
+## UI Automation Support
+
+The app must stay drivable from the outside via Windows UI Automation — the
+`running-the-app` skill and `tools/ui-automation/DriveApp.ps1` rely on it for
+end-to-end GUI verification. In practice:
+
+- Interactive controls must be discoverable by their UIA Name (menu items get
+  this from their localised `Header`; other controls may need
+  `AutomationProperties.Name`). Don't suppress or strip automation peers.
+- If a verification run can't find a control by name, treat that as a defect to
+  fix in the app, not something to script around.
+- The boundary: support is **passive and OS-level only** (accessibility APIs,
+  synthetic input on the local desktop). Never add remote-control endpoints,
+  network test hooks, or in-app automation backdoors on this rule's account —
+  if supporting automation would ever require weakening the app's security
+  posture, security wins and this rule yields.
+
 ## Error Handling
 
 Every caught exception must be logged via `AppLog.Error(...)` or `AppLog.Warn(...)` before or after any user-facing status update. The sole exception is `OperationCanceledException`, which represents deliberate cancellation and must be swallowed silently. Bare `catch { }` blocks are not permitted.
