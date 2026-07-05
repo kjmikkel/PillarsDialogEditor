@@ -310,6 +310,13 @@ public partial class MainWindow : Window
                 e.Handled = true;
                 break;
 
+            case Key.S when e.KeyModifiers == (KeyModifiers.Control | KeyModifiers.Shift):
+                if (TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() is TextBox)
+                    CanvasView.FocusEditor();   // commit a focused TextBox edit first, like Ctrl+S
+                vm.SaveProjectAsCommand.Execute(null);
+                e.Handled = true;
+                break;
+
             case Key.S when e.KeyModifiers == KeyModifiers.Control:
                 if (TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() is TextBox)
                     CanvasView.FocusEditor();
