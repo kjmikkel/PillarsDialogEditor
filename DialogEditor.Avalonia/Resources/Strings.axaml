@@ -732,6 +732,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Menu_NewProject">New Project…</sys:String>
     <sys:String x:Key="Menu_OpenProject">Open Project…</sys:String>
     <sys:String x:Key="Menu_SaveProject">Save Project</sys:String>
+    <sys:String x:Key="Menu_SaveProjectAs">Save Project As…</sys:String>
+    <sys:String x:Key="ToolTip_SaveProjectAs">Save the open project under a new name or location. The editor switches to the new file — later saves go there — and any voice-over files (the _vo folder) are copied alongside it. The original file is left unchanged.</sys:String>
     <sys:String x:Key="Menu_Settings">Settings…</sys:String>
 
     <!-- ─── Patch — toolbar buttons ──────────────────────────────────────── -->
@@ -784,6 +786,10 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Status_ProjectOpened_Other">Opened project '{1}' ({0} patches)</sys:String>
     <!-- {0} = project name -->
     <sys:String x:Key="Status_ProjectSaved">Project saved: {0}</sys:String>
+    <!-- {0} = new project name -->
+    <sys:String x:Key="Status_ProjectSavedAs">Project saved as: {0}</sys:String>
+    <!-- {0} = new project name, {1} = error message -->
+    <sys:String x:Key="Status_SaveAsVoCopyFailed">Project saved as: {0} — but copying the voice-over (_vo) folder failed: {1}</sys:String>
     <!-- Shown when Ctrl+S is pressed with no project open -->
     <sys:String x:Key="Status_NoProjectOpen">No project is open — use File &gt; New Project or Open Project.</sys:String>
     <!-- Shown when Test Patch is pressed but project has no patches -->
@@ -871,6 +877,7 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Dialog_NewProject">Create new project</sys:String>
     <sys:String x:Key="Dialog_NewProjectDefault">MyMod</sys:String>
     <sys:String x:Key="Dialog_OpenProject">Open project</sys:String>
+    <sys:String x:Key="Dialog_SaveProjectAs">Save project as</sys:String>
     <sys:String x:Key="FileType_DialogProject">Dialog Project (*.dialogproject)</sys:String>
     <sys:String x:Key="FileType_DialogProjectOrPack">Dialog Project / Pack (*.dialogproject, *.dialogpack)</sys:String>
     <sys:String x:Key="Menu_MergeProjects">Merge Projects…</sys:String>
