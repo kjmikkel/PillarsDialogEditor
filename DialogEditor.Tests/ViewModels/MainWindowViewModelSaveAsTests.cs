@@ -151,4 +151,61 @@ public class MainWindowViewModelSaveAsTests : IDisposable
         var vm = MakeVm();
         Assert.False(vm.SaveProjectAsCommand.CanExecute(null));
     }
+
+    // ── _vo/ sidecar copy ─────────────────────────────────────────────────
+
+    [Fact]
+    public async Task SaveAs_DifferentDirectory_CopiesVoFolderRecursively()
+    {
+        var orig = WriteProject("orig.dialogproject");
+        var voFile = Path.Combine(_tempDir, "_vo", "speaker", "conv_12.wem");
+        Directory.CreateDirectory(Path.GetDirectoryName(voFile)!);
+        File.WriteAllBytes(voFile, [1, 2, 3]);
+
+        var target = Path.Combine(_tempDir, "fork", "forked.dialogproject");
+        Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+        var vm = await OpenVm(orig, target);
+
+        await vm.SaveProjectAsCommand.ExecuteAsync(null);
+
+        var copied = Path.Combine(_tempDir, "fork", "_vo", "speaker", "conv_12.wem");
+        Assert.True(File.Exists(copied), "_vo/ must be copied next to the new project file.");
+        Assert.True(File.Exists(voFile), "the original _vo/ must be left in place.");
+    }
+
+    [Fact]
+    public async Task SaveAs_NoVoFolder_CopiesNothing()
+    {
+        var orig   = WriteProject("orig.dialogproject");
+        var target = Path.Combine(_tempDir, "fork", "forked.dialogproject");
+        Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+        var vm = await OpenVm(orig, target);
+
+        await vm.SaveProjectAsCommand.ExecuteAsync(null);
+
+        Assert.False(Directory.Exists(Path.Combine(_tempDir, "fork", "_vo")));
+    }
+
+    [Fact]
+    public async Task SaveAs_VoCopyFailure_ProjectIsStillSavedAndRebound()
+    {
+        var orig = WriteProject("orig.dialogproject");
+        var voFile = Path.Combine(_tempDir, "_vo", "a.wem");
+        Directory.CreateDirectory(Path.GetDirectoryName(voFile)!);
+        File.WriteAllBytes(voFile, [1]);
+
+        var forkDir = Path.Combine(_tempDir, "fork");
+        Directory.CreateDirectory(forkDir);
+        // A FILE named "_vo" blocks Directory.CreateDirectory → deterministic copy failure.
+        File.WriteAllText(Path.Combine(forkDir, "_vo"), "blocker");
+
+        var target = Path.Combine(forkDir, "forked.dialogproject");
+        var vm = await OpenVm(orig, target);
+
+        await vm.SaveProjectAsCommand.ExecuteAsync(null);
+
+        Assert.True(File.Exists(target), "the save itself must not be rolled back.");
+        Assert.Equal(target, AppSettings.LastProjectPath);
+        Assert.False(vm.IsModified);
+    }
 }

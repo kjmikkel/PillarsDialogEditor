@@ -968,6 +968,8 @@ public partial class MainWindowViewModel : ObservableObject
         Detail.ProjectPath  = path;
         Canvas.ProjectPath  = path;
 
+        var voCopyError = CopyVoFolder(oldPath, path);
+
         Canvas.IsModified = false;
         IsModified = false;
         SaveCommand.NotifyCanExecuteChanged();
@@ -978,12 +980,48 @@ public partial class MainWindowViewModel : ObservableObject
         AppSettings.LastProjectPath = path;
         CurrentProjectName = _project!.Name;
         AppLog.Info($"Project saved as: {path}");
-        StatusText = Loc.Format("Status_ProjectSavedAs", _project!.Name);
+        StatusText = voCopyError is null
+            ? Loc.Format("Status_ProjectSavedAs", _project!.Name)
+            : Loc.Format("Status_SaveAsVoCopyFailed", _project!.Name, voCopyError);
         ConversationSaved?.Invoke();
     }
 
     private bool CanSaveProjectAs() =>
         _project is not null && _projectPath is not null;
+
+    /// Copies the _vo/ sidecar folder next to the new project file when the
+    /// directory changed (same directory → the folder is already adjacent).
+    /// Returns null on success or nothing-to-copy, else the failure message —
+    /// a failed copy must not roll back the already-written project file.
+    private static string? CopyVoFolder(string oldPath, string newPath)
+    {
+        try
+        {
+            var oldDir = Path.GetDirectoryName(oldPath)!;
+            var newDir = Path.GetDirectoryName(newPath)!;
+            if (string.Equals(Path.GetFullPath(oldDir), Path.GetFullPath(newDir),
+                    StringComparison.OrdinalIgnoreCase))
+                return null;
+            var source = Path.Combine(oldDir, "_vo");
+            if (!Directory.Exists(source)) return null;
+            CopyDirectoryRecursive(source, Path.Combine(newDir, "_vo"));
+            return null;
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error("Save As: copying the _vo/ sidecar folder failed", ex);
+            return ex.Message;
+        }
+    }
+
+    private static void CopyDirectoryRecursive(string source, string destination)
+    {
+        Directory.CreateDirectory(destination);
+        foreach (var file in Directory.GetFiles(source))
+            File.Copy(file, Path.Combine(destination, Path.GetFileName(file)), overwrite: true);
+        foreach (var dir in Directory.GetDirectories(source))
+            CopyDirectoryRecursive(dir, Path.Combine(destination, Path.GetFileName(dir)));
+    }
 
     /// With a conversation open, folds the canvas edits into its patch on _project.
     /// With no conversation open (e.g. a freshly conflict-merged project), the
