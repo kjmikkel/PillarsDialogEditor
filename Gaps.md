@@ -68,9 +68,11 @@ assists, both game-aware and driven by the same vocabulary as the reference wind
   (`[Vailian]`) — sentence-like bracket content is a writing convention, ~1,300 distinct
   values in shipped data. Shipped data also contains malformed `<link>` attributes
   (missing closing quote), so validation of vanilla text must stay lenient/informational.
-Open question feeding both: decompile the PoE2 token-replacement class in
-`Assembly-CSharp` to confirm the exact token list and case-insensitivity
-(`[player class]` occurs lowercase in shipped data) instead of inferring from text.
+Open question feeding both: confirm the exact token list and case-insensitivity
+(`[player class]` occurs lowercase in shipped data) from the token-replacement code
+instead of inferring from text. Decompiled sources are available locally:
+PoE1 at `C:\Users\kjmik\Documents\Programming\Deadfire\PoE1 Code`, PoE2 at
+`C:\Users\kjmik\Documents\Programming\Deadfire\PoE2 Code`.
 
 ### ~~Export Mod Bundle without VO~~ ✓ Resolved by descoping (2026-07-05)
 Use-case analysis rejected the proposed with-VO/without-VO export choice: the only
