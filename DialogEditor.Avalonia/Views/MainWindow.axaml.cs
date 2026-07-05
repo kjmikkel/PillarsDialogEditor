@@ -9,6 +9,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Threading;
 using DialogEditor.Avalonia.Audio;
 using DialogEditor.Avalonia.Controls;
 using DialogEditor.Avalonia.Services;
@@ -87,8 +88,10 @@ public partial class MainWindow : Window
             var dialog = new ImportWarningsDialog(warnings);
             await dialog.ShowDialog(this);
         };
-        vm.ReportSaveError = ex =>
-            (Application.Current as App)?.ShowExceptionReport(ex);
+        // Post: some ReportError call sites run off the UI thread (e.g. the VO
+        // alias index rebuild in Task.Run), and window creation must not.
+        vm.ReportError = ex =>
+            Dispatcher.UIThread.Post(() => (Application.Current as App)?.ShowExceptionReport(ex));
         vm.ShowGitConflictResolution = async resolutionVm =>
         {
             var dialog = new GitConflictResolutionWindow(resolutionVm);
