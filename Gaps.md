@@ -26,6 +26,18 @@ update, and the `_vo/` sidecar folder is copied alongside when the directory cha
 whenever a project is open — no dirty-state requirement, so forking a clean project
 works. Spec: docs/superpowers/specs/2026-07-05-save-project-as-design.md.
 
+### Non-save errors are status-bar-only
+Caught failures outside the save path — project open, conversation import, git
+operations (compare/history/branches), translation CSV import — report only via a
+one-line status-bar message, the same visibility problem that hid B-009 for save.
+The save path now routes its caught exceptions into the existing
+`ExceptionReportWindow` via a `MainWindowViewModel.ReportSaveError` delegate (see
+docs/superpowers/specs/2026-07-05-save-error-visibility-design.md); the same delegate
+pattern can be extended to these other error families later. Triage which failures
+warrant a window (data-loss-risk ones first) versus which are fine as status text —
+flooding the desktop with report windows for routine environmental errors would be
+worse than the status quo.
+
 ### Export Mod Bundle without VO
 **File ▸ Export Mod Bundle…** always packages the project *and* the entire `_vo/` folder
 into the `.dialogpack` ZIP. VO files are large; a text-only mod update (or a project whose
