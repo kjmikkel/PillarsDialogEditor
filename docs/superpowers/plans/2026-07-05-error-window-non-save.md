@@ -33,12 +33,12 @@
 - Consumes: existing `public Action<Exception>? ReportSaveError { get; set; }`.
 - Produces: `public Action<Exception>? ReportError { get; set; }` — same semantics; Task 2's new call sites and tests use this name.
 
-- [ ] **Step 1: Confirm green**
+- [x] **Step 1: Confirm green**
 
 Run: `dotnet test DialogEditor.Tests`
 Expected: PASS (1890).
 
-- [ ] **Step 2: Rename every occurrence**
+- [x] **Step 2: Rename every occurrence**
 
 Replace the identifier `ReportSaveError` with `ReportError` in all three files
 (`Grep "ReportSaveError"` must return zero hits afterwards). The property's doc
@@ -51,7 +51,7 @@ comment becomes:
     public Action<Exception>? ReportError { get; set; }
 ```
 
-- [ ] **Step 3: Post the wiring to the UI thread**
+- [x] **Step 3: Post the wiring to the UI thread**
 
 In `DialogEditor.Avalonia\Views\MainWindow.axaml.cs`, the wiring becomes:
 
@@ -64,12 +64,12 @@ In `DialogEditor.Avalonia\Views\MainWindow.axaml.cs`, the wiring becomes:
 
 Add `using Avalonia.Threading;` to the file's usings if not present.
 
-- [ ] **Step 4: Verify green**
+- [x] **Step 4: Verify green**
 
 Run: `dotnet test DialogEditor.Tests`
 Expected: PASS (1890) — pure rename, no behaviour change at the VM layer.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs DialogEditor.Tests/ViewModels/MainWindowViewModelSaveAsTests.cs DialogEditor.Avalonia/Views/MainWindow.axaml.cs
@@ -96,7 +96,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 - Consumes: `ReportError` (Task 1); test helpers `StubStringProvider`, `StubDispatcher`, `StubFolderPicker`, `StubFilePicker`, `StubProvider` (all in `DialogEditor.Tests\Helpers`).
 - Produces: nothing downstream — this completes the feature.
 
-- [ ] **Step 1: Write the source-scan enforcement test**
+- [x] **Step 1: Write the source-scan enforcement test**
 
 Create `DialogEditor.Tests\ViewModels\ErrorReportingCoverageTests.cs`:
 
@@ -158,7 +158,7 @@ public class ErrorReportingCoverageTests
 }
 ```
 
-- [ ] **Step 2: Write the representative behavioural tests**
+- [x] **Step 2: Write the representative behavioural tests**
 
 Create `DialogEditor.Tests\ViewModels\MainWindowViewModelReportErrorTests.cs`:
 
@@ -268,12 +268,12 @@ public class MainWindowViewModelReportErrorTests : IDisposable
 }
 ```
 
-- [ ] **Step 3: Run to verify red**
+- [x] **Step 3: Run to verify red**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~ErrorReporting|FullyQualifiedName~ReportErrorTests"`
 Expected: `EveryErrorLoggingCatchAlsoReportsToTheErrorWindow` FAILS listing ~11 offender lines; `OpenCorruptProject_InvokesReportError` and `ImportConversation_MissingFile_InvokesReportError` FAIL (`reported` null); `OpenValidProject_DoesNotInvokeReportError` passes.
 
-- [ ] **Step 4: Add `ReportError?.Invoke(ex);` to every offending catch**
+- [x] **Step 4: Add `ReportError?.Invoke(ex);` to every offending catch**
 
 In `MainWindowViewModel.cs`, for each line the scan test reported, add
 `ReportError?.Invoke(ex);` as the last statement of the catch block (after the
@@ -295,7 +295,7 @@ restore, test-apply, per-file VO sync copy. Example for the single-line catch:
 Do NOT touch any `AppLog.Warn` catch, and do NOT change `CopyVoFolder`
 (its `return ex;` already satisfies the rule).
 
-- [ ] **Step 5: Run the new tests, then the full suite**
+- [x] **Step 5: Run the new tests, then the full suite**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~ErrorReporting|FullyQualifiedName~ReportErrorTests"`
 Expected: PASS (4).
@@ -303,7 +303,7 @@ Expected: PASS (4).
 Run: `dotnet test DialogEditor.Tests`
 Expected: PASS (1894).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```powershell
 git add DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs DialogEditor.Tests/ViewModels/ErrorReportingCoverageTests.cs DialogEditor.Tests/ViewModels/MainWindowViewModelReportErrorTests.cs
@@ -329,7 +329,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 
 **Interfaces:** none — documentation only.
 
-- [ ] **Step 1: Mark the gap implemented**
+- [x] **Step 1: Mark the gap implemented**
 
 Replace the entry body with:
 
@@ -345,12 +345,12 @@ status-bar-only by design; git tool windows keep their in-window reporting.
 Spec: docs/superpowers/specs/2026-07-05-error-window-non-save-design.md.
 ```
 
-- [ ] **Step 2: Full suite**
+- [x] **Step 2: Full suite**
 
 Run: `dotnet test DialogEditor.Tests`
 Expected: PASS.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```powershell
 git add Gaps.md
