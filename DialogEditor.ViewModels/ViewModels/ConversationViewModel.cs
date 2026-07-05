@@ -300,9 +300,12 @@ public partial class ConversationViewModel : ObservableObject
     /// reproduces the full patch instead of only this session's delta. Null keeps
     /// the old behaviour: baseline = the loaded state itself.
     /// </param>
-    public void Load(Conversation conversation, ConversationEditSnapshot? baseSnapshot = null)
+    /// Resets the canvas to the empty no-conversation state: no nodes, clean
+    /// undo/dirty state, no baseline. Used by Close Project — a closed project's
+    /// patched content must not stay visible — and by Load() before populating.
+    public void Clear()
     {
-        ConversationName = conversation.Name;
+        ConversationName = "";
         _searchCts?.Cancel();
         _undoStack.Clear();
         IsModified  = false;
@@ -313,6 +316,12 @@ public partial class ConversationViewModel : ObservableObject
         SearchQuery  = string.Empty;
         BaseSnapshot = null;
         RefreshUndoRedo();
+    }
+
+    public void Load(Conversation conversation, ConversationEditSnapshot? baseSnapshot = null)
+    {
+        Clear();
+        ConversationName = conversation.Name;
 
         var nodeMap = new Dictionary<int, NodeViewModel>();
 
