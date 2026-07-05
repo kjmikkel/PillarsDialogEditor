@@ -780,6 +780,8 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- ─── Project — status messages ────────────────────────────────────── -->
     <!-- {0} = project name -->
     <sys:String x:Key="Status_ProjectNew">New project: {0}</sys:String>
+    <!-- {0} = project name -->
+    <sys:String x:Key="Status_ProjectClosed">Closed project '{0}'</sys:String>
     <!-- {0} = project name, {1} = patch count -->
     <!-- {1} = project name (count moved to {0} for FormatCount) -->
     <sys:String x:Key="Status_ProjectOpened_One">Opened project '{1}' (1 patch)</sys:String>
@@ -882,6 +884,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="FileType_DialogProjectOrPack">Dialog Project / Pack (*.dialogproject, *.dialogpack)</sys:String>
     <sys:String x:Key="Menu_MergeProjects">Merge Projects…</sys:String>
     <sys:String x:Key="ToolTip_MergeProjects">Merge one or more other .dialogproject files into the current project. Later projects win on conflict.</sys:String>
+    <sys:String x:Key="Menu_CloseProject">Close Project</sys:String>
+    <sys:String x:Key="ToolTip_CloseProject">Close the current project and return to browse mode. Game conversations stay browsable read-only. If the canvas has unsaved edits you will be asked to save or discard them first. The project will not reopen automatically on next launch; use File &gt; Open Project to return to it.</sys:String>
     <sys:String x:Key="Dialog_MergeProjects">Select projects to merge into the current project</sys:String>
     <sys:String x:Key="Status_MergeComplete_One">Merged 1 project into '{1}'</sys:String>
     <sys:String x:Key="Status_MergeComplete_Other">Merged {0} projects into '{1}'</sys:String>

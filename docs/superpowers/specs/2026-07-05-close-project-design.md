@@ -66,7 +66,7 @@ preserved).
 | `MainWindowViewModel` | New `[RelayCommand(CanExecute = nameof(IsProjectOpen))] CloseProject()` wrapping `GuardDirtyThen`; private `CloseProjectCore(string statusText)` extracted from `ReloadCurrentProjectFromDisk`; `SetProject` additionally calls `CloseProjectCommand.NotifyCanExecuteChanged()`. |
 | `ConversationViewModel` | New public `Clear()` — the reset block currently inlined at the top of `Load()` (undo stack, nodes, connections, annotations, selection, search, `IsModified`, `BaseSnapshot`), plus `ConversationName` reset; `Load()` calls it. |
 | `MainWindow.axaml` | Menu item after Merge Projects with `InputGesture="Ctrl+W"`, tooltip + `AutomationProperties.HelpText` (UI guidelines: tooltips mandatory). |
-| `MainWindow.axaml(.cs)` | Window-level `KeyBinding` for Ctrl+W → `CloseProjectCommand` (`InputGesture` on MenuItem is display-only in Avalonia). |
+| `MainWindow.axaml(.cs)` | Ctrl+W case in the `OnKeyDownTunnel` switch → `CloseProjectCommand`, gated by `CanExecute` (the codebase dispatches all shortcuts there; `InputGesture` on MenuItem is display-only in Avalonia). |
 | `Strings.axaml` | `Menu_CloseProject`, `ToolTip_CloseProject`, `Status_ProjectClosed` (localisation rule: no hard-coded user-visible text). |
 
 ## Testing (strict TDD)

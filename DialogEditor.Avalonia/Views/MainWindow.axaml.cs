@@ -275,6 +275,14 @@ public partial class MainWindow : Window
                 e.Handled = true;
                 break;
 
+            case Key.W when e.KeyModifiers == KeyModifiers.Control:
+                // RelayCommand.Execute does not gate itself: with no project open,
+                // Ctrl+W must not clear a remembered LastProjectPath.
+                if (vm.CloseProjectCommand.CanExecute(null))
+                    vm.CloseProjectCommand.Execute(null);
+                e.Handled = true;
+                break;
+
             case Key.O when e.KeyModifiers == (KeyModifiers.Control | KeyModifiers.Shift):
                 vm.OpenFolderCommand.Execute(null);
                 e.Handled = true;

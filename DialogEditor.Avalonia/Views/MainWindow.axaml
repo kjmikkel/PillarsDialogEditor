@@ -59,6 +59,11 @@
                                   Command="{Binding MergeProjectsCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_MergeProjects}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_MergeProjects}"/>
+                        <MenuItem Header="{DynamicResource Menu_CloseProject}"
+                                  Command="{Binding CloseProjectCommand}"
+                                  InputGesture="Ctrl+W"
+                                  ToolTip.Tip="{DynamicResource ToolTip_CloseProject}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_CloseProject}"/>
                         <Separator/>
                         <MenuItem Header="{DynamicResource Button_OpenFolder}"
                                   Command="{Binding OpenFolderCommand}"
