@@ -87,6 +87,8 @@ public partial class MainWindow : Window
             var dialog = new ImportWarningsDialog(warnings);
             await dialog.ShowDialog(this);
         };
+        vm.ReportSaveError = ex =>
+            (Application.Current as App)?.ShowExceptionReport(ex);
         vm.ShowGitConflictResolution = async resolutionVm =>
         {
             var dialog = new GitConflictResolutionWindow(resolutionVm);

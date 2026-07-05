@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using DialogEditor.ViewModels;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Avalonia.Views;
 
@@ -27,7 +28,7 @@ public partial class ExceptionReportWindow : Window
     {
         if (DataContext is not ExceptionReportViewModel vm) return;
         try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(vm.IssuesUrl) { UseShellExecute = true }); }
-        catch { }
+        catch (Exception ex) { AppLog.Warn($"ExceptionReportWindow: could not open issues link — {ex.Message}"); }
     }
 
     private void Close_Click(object? sender, RoutedEventArgs e) => Close();
