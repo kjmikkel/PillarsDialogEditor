@@ -381,6 +381,13 @@ public partial class ConversationViewModel : ObservableObject
 
     public void AddConnection(ConnectorViewModel source, ConnectorViewModel target)
     {
+        // A node must never carry two links to the same target: DiffEngine keys a
+        // node's links by ToNodeId, so a duplicate makes every save of the
+        // conversation throw (B-006). The drag/keyboard paths pre-check, but this
+        // funnel guards every caller (e.g. the detail panel's add-link).
+        if (Connections.Any(c => c.Source == source && c.Target == target))
+            return;
+
         var conn = new ConnectionViewModel(source, target) { UndoStack = _undoStack };
         _undoStack.Execute(new AddConnectionCommand(this, conn));
         IsModified = true;
