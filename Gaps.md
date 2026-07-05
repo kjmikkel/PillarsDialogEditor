@@ -17,6 +17,25 @@ All ViewModels with non-trivial logic now have tests. Added: `AnnotationViewMode
 
 ## Feature Gaps
 
+### No "Save As…"
+The File menu offers only **Save Project** (`Menu_SaveProject`), which writes back to the
+`.dialogproject` path the project was opened from. There is no way to save the open project
+under a new name/location — useful for forking a mod variant, making a safety copy before a
+risky batch operation, or moving a project out of a synced folder. Needs a
+**File ▸ Save Project As…** command: save-file picker defaulting to the current filename,
+rebind the project's path so subsequent saves target the new file, refresh the window
+title, and decide what happens to sidecar state (`_vo/` folder, editor-only annotations) —
+probably copy `_vo/` alongside, since the exported bundle and VO sync resolve it relative
+to the project file.
+
+### Export Mod Bundle without VO
+**File ▸ Export Mod Bundle…** always packages the project *and* the entire `_vo/` folder
+into the `.dialogpack` ZIP. VO files are large; a text-only mod update (or a project whose
+VO is distributed separately) has no lightweight option. Consider an export choice —
+with VO / without VO — at export time. Raised during the Save As design discussion
+(2026-07-05); the guiding principle is "no loose files", so the *default* should remain
+the complete bundle.
+
 ### VO import over an ExternalVO alias silently overwrites shared audio
 `ExternalVO` (PoE2 only; ~1,000 shipped nodes across 193 conversations) redirects a node's
 VO to *another* line's `.wem` (`<speaker folder>/<conversation>_<nodeid>`, resolved under
