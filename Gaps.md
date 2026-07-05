@@ -17,16 +17,14 @@ All ViewModels with non-trivial logic now have tests. Added: `AnnotationViewMode
 
 ## Feature Gaps
 
-### No "Save As…"
-The File menu offers only **Save Project** (`Menu_SaveProject`), which writes back to the
-`.dialogproject` path the project was opened from. There is no way to save the open project
-under a new name/location — useful for forking a mod variant, making a safety copy before a
-risky batch operation, or moving a project out of a synced folder. Needs a
-**File ▸ Save Project As…** command: save-file picker defaulting to the current filename,
-rebind the project's path so subsequent saves target the new file, refresh the window
-title, and decide what happens to sidecar state (`_vo/` folder, editor-only annotations) —
-probably copy `_vo/` alongside, since the exported bundle and VO sync resolve it relative
-to the project file.
+### ~~No "Save As…"~~ ✓ Implemented (2026-07-05)
+**File ▸ Save Project As…** (Ctrl+Shift+S) saves the open project under a new
+name/location with classic rebind semantics: subsequent saves target the new file, the
+internal project `Name` follows the new filename, the window title/`LastProjectPath`
+update, and the `_vo/` sidecar folder is copied alongside when the directory changes
+(copy failure is reported but never rolls back the save). The command is available
+whenever a project is open — no dirty-state requirement, so forking a clean project
+works. Spec: docs/superpowers/specs/2026-07-05-save-project-as-design.md.
 
 ### Export Mod Bundle without VO
 **File ▸ Export Mod Bundle…** always packages the project *and* the entire `_vo/` folder
