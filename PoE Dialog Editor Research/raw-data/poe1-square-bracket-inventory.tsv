@@ -1,0 +1,1048 @@
+Specified 0	409	[Specified 0] grabs the latch and applies just the right amount of pressure, nudging the metal until its rust gives way …	px1_00_cv_lafda_henchmen_spied.stringtable
+Player Name	257	"Was that really necessary, [Player Name]?"	01_cv_gordy.stringtable
+Leave	210	[Leave] "I should get back to the search."	00_cv_medreth_new.stringtable
+Leave.	189	[Leave.]	00_cv_leaden_key_agent_soul.stringtable
+Attack	140	[Attack] "That's enough from you."	00_cv_korgrak.stringtable
+Slot 0	132	[Send [Slot 0].]	00_si_cliaban_water_tunnel.stringtable
+Slot 2	118	[Slot 2] pulls himself into the tunnel, executing deft scissor kicks while the passage narrows. At the end, he finds a s…	00_si_cliaban_water_tunnel.stringtable
+Slot 1	118	[Send [Slot 1].]	00_si_cliaban_water_tunnel.stringtable
+Lie	117	[Lie] "I'm here on business for the duc."	00_cv_beodmar.stringtable
+Slot 4	115	[Send [Slot 4].]	00_si_cliaban_water_tunnel.stringtable
+Slot 3	115	[Send [Slot 3].]	00_si_cliaban_water_tunnel.stringtable
+Slot 5	115	[Send [Slot 5].]	00_si_cliaban_water_tunnel.stringtable
+SkillCheck 0	101	[SkillCheck 0] clears the gap but twists an ankle upon landing.	00_si_ruillag_bridge_02.stringtable
+Player Race	83	"Have you come to give of yourself, [Player Race]? You may seek out any of our order within the sacrificial chambers." 	te_barks_all.stringtable
+Pained grunt	47	[Pained grunt]	player_voice_set_f_feisty.stringtable
+Attack.	43	[Attack.]	01_cv_orimanth.stringtable
+Effort grunt	42	[Effort grunt]	player_voice_set_f_feisty.stringtable
+Grunt/cry	42	[Grunt/cry]	player_voice_set_f_feisty.stringtable
+Death grunt/cry	42	[Death grunt/cry]	player_voice_set_f_feisty.stringtable
+SkillCheck 1	33	The sound of labored breathing echoes across the chasm. [SkillCheck 0], [SkillCheck 1], [SkillCheck 2], and [SkillCheck …	00_si_skaen_temple_bridge_02.stringtable
+Turn around.	30	[Turn around.]	px2_00_si_spider_maze.stringtable
+Attacking Effort	30	[Attacking Effort]	player_voice_set_f01.stringtable
+Say nothing.	28	[Say nothing.]	00_cv_medreth_new.stringtable
+Unintelligible, layered whispers	25	[Unintelligible, layered whispers]	player_voice_set_f_feisty.stringtable
+Take the path to the left.	23	[Take the path to the left.]	px2_00_si_spider_maze.stringtable
+Take the path to the right.	23	[Take the path to the right.]	px2_00_si_spider_maze.stringtable
+Coughing	22	[Coughing] "Ugh."	player_voice_set_f_feisty.stringtable
+Shrug.	19	[Shrug.]	02_cv_fyrga.stringtable
+Pain grunt	18	[Pain grunt]	companion_cv_durance_voice_set.stringtable
+Death cry	18	[Death cry]	companion_cv_durance_voice_set.stringtable
+Attack grunt	17	[Attack grunt]	voice_set_iovara.stringtable
+SkillCheck 2	14	The sound of labored breathing echoes across the chasm. [SkillCheck 0], [SkillCheck 1], [SkillCheck 2], and [SkillCheck …	00_si_skaen_temple_bridge_02.stringtable
+Intimidate	13	[Intimidate] "Don't make me take that letter from you."	01_cv_langden.stringtable
+Specified 1	13	[Specified 1]'s likenesses appear along the tunnel.  The Eyeless roar and lunge fruitlessly at the images.	px2_04_si_moon_escape.stringtable
+Damaged Effort	12	[Damaged Effort]	player_voice_set_f01.stringtable
+Knocked out Effort	12	[Knocked out Effort] 	player_voice_set_f01.stringtable
+Death Effort	12	[Death Effort]	player_voice_set_f01.stringtable
+Damaged grunt	12	[Damaged grunt]	voice_set_iovara.stringtable
+Lie.	11	[Lie.] "I have a contact in the Crucible Knights who can help. He'll see you past the guard and to the harbor."	06_cv_visitor_criminal.stringtable
+Read his soul.	11	[Read his soul.] 	px1_00_cv_flagon_innkeeper.stringtable
+Nod.	11	[Nod.]	04_cv_edmar_doemenel.stringtable
+Yawn	9	[Yawn] "Time for a nap."	player_voice_set_f_feisty.stringtable
+Do nothing.	9	[Do nothing.]	14_si_burial_isle_pit.stringtable
+Go forward.	8	[Go forward.]	px2_00_si_spider_maze.stringtable
+OrlansHeadGame_PlayerLastResult	8	The knife hits [OrlansHeadGame_PlayerLastResult], scoring [OrlansHeadGame_PlayerLastScore].	px1_00_cv_andred_knife_toss.stringtable
+Motion for your guest to return.	8	[Motion for your guest to return.]	06_cv_visitor_animancer.stringtable
+Back away.	8	[Back away.]	02_cv_leaden_key_agent.stringtable
+OrlansHeadGame_OpponentLastScore	8	The knife hits [OrlansHeadGame_OpponentLastResult], scoring [OrlansHeadGame_OpponentLastScore].	px1_00_cv_andred_knife_toss.stringtable
+OrlansHeadGame_PlayerLastScore	8	The knife hits [OrlansHeadGame_PlayerLastResult], scoring [OrlansHeadGame_PlayerLastScore].	px1_00_cv_andred_knife_toss.stringtable
+OrlansHeadGame_OpponentLastResult	8	The knife hits [OrlansHeadGame_OpponentLastResult], scoring [OrlansHeadGame_OpponentLastScore].	px1_00_cv_andred_knife_toss.stringtable
+Leave it alone.	7	[Leave it alone.]	01_cv_flesh_construct.stringtable
+Remain silent.	7	[Remain silent.]	01_cv_nyrid.stringtable
+Ring the left, smaller bell.	7	[Ring the left, smaller bell.]	07_si_temple_bells.stringtable
+Walk away.	7	[Walk away.]	1015_cv_adra_dragon.stringtable
+Listen.	7	[Listen.]	06_cv_memory_commander.stringtable
+Injured grunt	7	[Injured grunt]	companion_cv_hiravias_voice_set.stringtable
+SkillCheck 3	7	The sound of labored breathing echoes across the chasm. [SkillCheck 0], [SkillCheck 1], [SkillCheck 2], and [SkillCheck …	00_si_skaen_temple_bridge_02.stringtable
+Touch your fiery hair to the brazier.	6	[Touch your fiery hair to the brazier.]	07_cv_pillar_puzzle.stringtable
+Ring the right, smaller bell.	6	[Ring the right, smaller bell.]	07_si_temple_bells.stringtable
+KO grunt	6	[KO grunt]	px1_cm_bs_zahua_voice_set.stringtable
+Ring the middle, larger bell.	6	[Ring the middle, larger bell.]	07_si_temple_bells.stringtable
+Inspect the area.	6	[Inspect the area.]	00_si_skaen_temple_bridge_02.stringtable
+Use the flint and tinder to strike up a flame	6	[Use the flint and tinder to strike up a flame]	07_cv_pillar_puzzle.stringtable
+Give 1000 cp.	6	[Give 1000 cp.] "Here you go."	05_cv_crucible_watch_male_01.stringtable
+Examine the area.	6	[Examine the area.]	08_si_sky_dragon_ridge.stringtable
+Pay 200 cp.	6	[Pay 200 cp.] "Fair enough."	03_cv_aldwyn.stringtable
+Hollering battle cry	5	[Hollering battle cry]	px1_cm_bs_zahua_voice_set.stringtable
+Do it yourself.	5	[Do it yourself.]	px1_00_cv_lafda_henchmen_spied.stringtable
+Stay silent.	5	[Stay silent.]	01_cv_danna.stringtable
+Leave it for now.	5	[Leave it for now.] 	px1_02_si_battery_entrance.stringtable
+Leave the creature be.	5	[Leave the creature be.]	01_cv_alghul_01.stringtable
+Grunting	5	[Grunting] "I'm stuck!"	player_voice_set_f_kind.stringtable
+Examine your surroundings.	4	[Examine your surroundings.]	companion_cv_sagani_clues.stringtable
+Continue fixing the winch.	4	[Continue fixing the winch.]	px2_02_si_elevator.stringtable
+Pay 500 cp.	4	[Pay 500 cp.] "If you say so."	03_cv_big_durmsey.stringtable
+Light a torch.	4	[Light a torch.]	px2_00_si_spider_maze.stringtable
+Use your torch to light the brazier	4	[Use your torch to light the brazier]	07_cv_pillar_puzzle.stringtable
+Breathing heavily, pained.	4	[Breathing heavily, pained.]	player_voice_set_f01.stringtable
+Breathing heavily through gritted teeth - wounded.	4	[Breathing heavily through gritted teeth - wounded.]	player_voice_set_f01.stringtable
+Prepare to defend against the skuldrak.	4	[Prepare to defend against the skuldrak.]	px2_02_si_elevator.stringtable
+Toss your rope and grappling hook across the chasm.	4	[Toss your rope and grappling hook across the chasm.]	00_si_skaen_temple_bridge_02.stringtable
+Big Attacking Effort	4	[Big Attacking Effort]	player_voice_set_f01.stringtable
+Consider other options.	4	[Consider other options.]	px1_00_cv_lafda_henchmen_spied.stringtable
+Return.	4	[Return.]	px2_02_si_weak_wall.stringtable
+screams	4	No! No! [screams]	07_bs_torture.stringtable
+Give 100 cp.	4	[Give 100 cp.] "Any chance you could look the other way?" 	01_cv_thug_stairs.stringtable
+Wait.	4	[Wait.]	03_cv_serel.stringtable
+Climb down.	4	[Climb down.]	px1_02_si_chasm_rescue_redux.stringtable
+Pay 300 cp.	4	[Pay 300 cp.] "Fine."	01_cv_roedric.stringtable
+Give 50 cp.	4	[Give 50 cp.] "I'm afraid this is all I've got."	03_cv_imatl.stringtable
+KO grunt 	3	[KO grunt ]	px1_cm_bs_zahua_voice_set.stringtable
+Extinguish Icantha's pride.	3	[Extinguish Icantha's pride.]	05_cv_icantha_02.stringtable
+Pain grunt/cry and chimes	3	[Pain grunt/cry and chimes]	companion_cv_gm_voice_set.stringtable
+Death	3	[Death]	voice_set_iovara.stringtable
+Insert the Sigil of the Shield into the depression.	3	[Insert the Sigil of the Shield into the depression.]	px1_02_cv_mines_trap_01.stringtable
+KO grunt / bell chimes	3	[KO grunt / bell chimes]	companion_cv_gm_voice_set.stringtable
+Explore the tunnels.	3	[Explore the tunnels.]	px2_00_si_spider_maze.stringtable
+Attack Grunt 2	3	[Attack Grunt 2]	bs_greetings.stringtable
+Go on through.	3	[Go on through.]	px2_05_si_bog_thorns_return.stringtable
+Jump to the other side.	3	[Jump to the other side.]	00_si_ruillag_bridge_02.stringtable
+Pay 100 cp.	3	[Pay 100 cp.] "If you say so."	03_cv_big_durmsey.stringtable
+Give jewel.	3	[Give jewel.] "Here it is."	04_cv_abrecan_doemenel.stringtable
+Strike the fragment with Abydon's Hammer.	3	[Strike the fragment with Abydon's Hammer.]	px2_04_cv_moon_fragment.stringtable
+Insert the Sigil of the Helm into the depression.	3	[Insert the Sigil of the Helm into the depression.]	px1_02_cv_mines_trap_01.stringtable
+Damaged Grunt 1	3	[Damaged Grunt 1]	bs_greetings.stringtable
+Cast Bulwark Against the Elements.	3	[Cast Bulwark Against the Elements.]	px1_02_si_chasm_rescue_redux.stringtable
+Groan	3	[Groan] "I don't feel so good..."	player_voice_set_f_feisty.stringtable
+Ring the right bell again.	3	[Ring the right bell again.]	07_si_temple_bells.stringtable
+Push the door.	3	[Push the door.]	px1_02_si_battery_entrance.stringtable
+Pay 50 cp.	3	[Pay 50 cp.] "Here you are."	01_cv_roedric.stringtable
+Take the key.	3	[Take the key.]	px1_02_cv_ghost_foreman.stringtable
+Damaged Grunt 2	3	[Damaged Grunt 2]	bs_greetings.stringtable
+Climb down the rope.	3	[Climb down the rope.]	04_si_two_story_job_02.stringtable
+Pay 600 cp.	3	[Pay 600 cp.] "Fair enough."	03_cv_aldwyn.stringtable
+Reach out to the essence.	3	[Reach out to the essence.]	px1_02_cv_ghost_foreman.stringtable
+Continue with the current.	3	[Continue with the current.]	00_si_cliaban_water_tunnel.stringtable
+Reach out.	3	[Reach out.]	07_cv_perly.stringtable
+Pay 400 cp.	3	[Pay 400 cp.] "Fair enough."	03_cv_aldwyn.stringtable
+Tear away, pull back.	3	[Tear away, pull back.]	companion_cv_gm_02.stringtable
+Make a stand in the center of the platform.	3	[Make a stand in the center of the platform.]	px2_02_si_elevator.stringtable
+Stay here.	3	[Stay here.]	px2_00_cv_tax_collector.stringtable
+Death Chimes/Sigh of Death	3	[Death Chimes/Sigh of Death]	companion_cv_gm_voice_set.stringtable
+Take prisoner.	3	[Take prisoner.] "I won't let the Knights take you. But I can't just let you go free." 	01_cv_eorn.stringtable
+Show steel sun.	3	[Show steel sun.] "I want to trace a man who might've touched this item."	04_cv_lady_webb.stringtable
+Inspect the stone carving.	3	[Inspect the stone carving.]	px1_02_cv_mines_trap_01.stringtable
+Use a hammer and chisel to widen the crack.	3	[Use a hammer and chisel to widen the crack.]	px2_00_si_spider_maze.stringtable
+Ring the left bell again.	3	[Ring the left bell again.]	07_si_temple_bells.stringtable
+Hand over the crate.	3	[Hand over the crate.] "I found that shipment you were waiting on." 	07_cv_tuatanu.stringtable
+Search the bookcase.	3	[Search the bookcase.]	px1_04_si_bookcase_01.stringtable
+OrlansHeadGame_OpponentTotalScore	3	"That's [OrlansHeadGame_PlayerTotalScore] for you, and [OrlansHeadGame_OpponentTotalScore] for me. Not bad, stranger. Lo…	px1_00_cv_andred_knife_toss.stringtable
+Stay put.	3	[Stay put.]	1015_si_stairs.stringtable
+Give him the amulet.	3	[Give him the amulet.] "From your old adversary, Helig. He trapped her soul inside it."	01_cv_dalton.stringtable
+Cast Fan of Flames.	3	[Cast Fan of Flames.] 	px1_02_si_frozen_dwarf_ground_level.stringtable
+Attack Grunt 1	3	[Attack Grunt 1]	bs_greetings.stringtable
+OrlansHeadGame_PlayerTotalScore	3	"That's [OrlansHeadGame_PlayerTotalScore] for you, and [OrlansHeadGame_OpponentTotalScore] for me. Not bad, stranger. Lo…	px1_00_cv_andred_knife_toss.stringtable
+Read her soul.	3	[Read her soul.] 	px1_00_cv_feara.stringtable
+Knocked Out.	3	[Knocked Out.]	companion_cv_eder_voice_set.stringtable
+Give letter.	3	[Give letter.] "I found a note that may interest you."	04_cv_abrecan_doemenel.stringtable
+Observe the cean gŵla.	3	[Observe the cean gŵla.]	03_cv_lilith.stringtable
+Release the estoc.	3	[Release the estoc.]	px1_03_si_cursed_weapon.stringtable
+Shrug	3	[Shrug] "I'll be on my way."	04_cv_kurren.stringtable
+Step forward.	3	[Step forward.]	px2_00_cv_mines_worker_3.stringtable
+Get closer.	3	[Get closer.]	03_cv_lilith.stringtable
+Insert the Sigil of the Sword into the depression.	3	[Insert the Sigil of the Sword into the depression.]	px1_02_cv_mines_trap_01.stringtable
+DozensGame_LastOpponentRollDesc	2	Teanleycg rolls his dice... [DozensGame_LastOpponentRollNums] [DozensGame_LastOpponentRollDesc]  	px1_00_cv_teanlecg_dice_game.stringtable
+Snoring	2	[Snoring]	px1_04_bs_mercenary_sleep.stringtable
+Try to reach for the man through the flames.	2	[Try to reach for the man through the flames.]	px1_00_si_burning_building.stringtable
+Cast your Grappling Hook.	2	[Cast your Grappling Hook.]	px2_03_si_skel_hand_swing_02.stringtable
+Salute Gathbin with your weapon.	2	[Salute Gathbin with your weapon.]	15_si_yenwood.stringtable
+Reach out for his soul.	2	[Reach out for his soul.]	04_cv_uscgrim.stringtable
+Whistles idly	2	[Whistles idly]	player_voice_set_f01.stringtable
+Persuade	2	[Persuade] "That's a good point. I'd like to know more."	03_cv_cosso.stringtable
+Draw the child forth.	2	[Draw the child forth.]	companion_cv_gm_02.stringtable
+Pay 800 cp.	2	[Pay 800 cp.] "Take it. Now go."	00_cv_sevis.stringtable
+Keep trying.	2	[Keep trying.]	px1_00_si_burning_building.stringtable
+Death groan.	2	[Death groan.]	companion_cv_eder_voice_set.stringtable
+Swim into the tunnel.	2	[Swim into the tunnel.]	00_si_cliaban_water_tunnel_02.stringtable
+Player Deity	2	"Careful, [Player Name]. Wouldn't want [Player Deity] to hear you spouting heresy." She wags a finger. 	px1_companion_cv_devil_interjections.stringtable
+KO GRUNT 3	2	[KO GRUNT 3]	player_voice_set_f_cocky.stringtable
+DozensGame_LastPlayerRollDesc	2	You cast the dice...  [DozensGame_LastPlayerRollNums] [DozensGame_LastPlayerRollDesc]	px1_00_cv_teanlecg_dice_game.stringtable
+Give her the gems.	2	[Give her the gems.] "Here you are."	px1_00_cv_ista.stringtable
+Punch Gathbin.	2	[Punch Gathbin.]	15_cv_chancellor.stringtable
+KO GRUNT 2	2	[KO GRUNT 2]	player_voice_set_f_cocky.stringtable
+Exasperated grunt	2	[Exasperated grunt]	player_voice_set_f_sinister.stringtable
+Stick your finger into the cavity.	2	[Stick your finger into the cavity.]	px1_02_si_battery_entrance.stringtable
+Kick the man in the face.	2	[Kick the man in the face.]	px1_00_si_burning_building.stringtable
+Clear the rubble with a prybar.	2	[Clear the rubble with a prybar.]	14_si_burial_isle_passage_upper.stringtable
+Climb back up.	2	[Climb back up.]	px1_02_si_chasm_rescue_redux.stringtable
+Point your weapon at Gathbin.	2	[Point your weapon at Gathbin.]	15_si_yenwood.stringtable
+Yawn.	2	[Yawn.]	player_voice_set_f_stoic.stringtable
+Raise your hand.	2	[Raise your hand.] "Everyone who owns their own keep, raise a hand. Go on, don't be shy."	15_cv_chancellor.stringtable
+Attack Grunt 3	2	[Attack Grunt 3]	player_voice_set_f_cocky.stringtable
+DEATH GRUNT 1	2	[DEATH GRUNT 1]	player_voice_set_f_cocky.stringtable
+Leave the body alone.	2	[Leave the body alone.]	03_si_derrin_soul.stringtable
+Examine the pile of rubble.	2	[Examine the pile of rubble.]	14_si_burial_isle_passage_upper.stringtable
+Step back.	2	[Step back.]	cv_watcher_backer_story.stringtable
+Beat him up.	2	[Beat him up.] "Be grateful I'm only roughing you up."	03_cv_kolfecg.stringtable
+Focus on the chimes.	2	[Focus on the chimes.]	companion_cv_gm_02.stringtable
+Carry the woman out.	2	[Carry the woman out.]	px1_00_si_burning_building.stringtable
+Examine the relief.	2	[Examine the relief.]	px1_02_si_battery_entrance.stringtable
+Swing across the chasm.	2	[Swing across the chasm.]	px2_03_si_skel_hand_swing_02.stringtable
+Shimmy across the chasm.	2	[Shimmy across the chasm.]	00_si_skaen_temple_bridge_02.stringtable
+Give him the bottle.	2	[Give him the bottle.] "Here you go."	px1_00_cv_reyfald.stringtable
+Give 2000cp	2	[Give 2000cp] "Hire some muscle. That ought to help."	06_cv_visitor_animancer.stringtable
+Kill the orlan.	2	[Kill the orlan.]	px1_04_cv_sleeping_merc.stringtable
+Pull him away from Scâthden.	2	[Pull him away from Scâthden.]	14_cv_scathden.stringtable
+Cross the chasm.	2	[Cross the chasm.]	12_si_maw_bridge_02.stringtable
+Stop and examine the situation to the left.	2	[Stop and examine the situation to the left.]	px1_00_si_burning_building.stringtable
+Enter the tunnel.	2	[Enter the tunnel.]	08_si_rhemen_spider_tunnel_1.stringtable
+Push the beam away.	2	[Push the beam away.]	px1_00_si_burning_building.stringtable
+unintelligible whispering	2	[unintelligible whispering]	player_voice_set_f_cocky.stringtable
+Cast the spell of Winter Wind upon the flames.	2	[Cast the spell of Winter Wind upon the flames.]	px1_00_si_burning_building.stringtable
+Proceed to the bottom.	2	[Proceed to the bottom.]	05_cv_tower_transition.stringtable
+Call for help.	2	[Call for help.]	px1_00_si_burning_building.stringtable
+Wiggle the estoc loose.	2	[Wiggle the estoc loose.]	px1_03_si_cursed_weapon.stringtable
+Ring the middle bell once more.	2	[Ring the middle bell once more.]	07_si_temple_bells.stringtable
+Wake up.	2	[Wake up.]	companion_cv_gm_dreams_02.stringtable
+Point at Gathbin, then make a throat-slicing gesture.	2	[Point at Gathbin, then make a throat-slicing gesture.]	15_si_yenwood.stringtable
+Give him Zolla's torc	2	[Give him Zolla's torc] "Zolla is dead." 	1003_cv_thulgar.stringtable
+DozensGame_LastOpponentRollNums	2	Teanleycg rolls his dice... [DozensGame_LastOpponentRollNums] [DozensGame_LastOpponentRollDesc]  	px1_00_cv_teanlecg_dice_game.stringtable
+Show her the drawing.	2	[Show her the drawing.] "Do you recognize this place?"	px2_00_cv_asca.stringtable
+Give up.	2	[Give up.] 	px1_00_si_burning_building.stringtable
+Go to the Great Hall.	2	[Go to the Great Hall.]	px2_02_cv_battery_cayron_transition.stringtable
+Forceful cry - attacking	2	[Forceful cry - attacking]	player_voice_set_f_mystic.stringtable
+Dive after him.	2	[Dive after him.]	px1_02_si_chasm_rescue_redux.stringtable
+You will cast the Grappling Hook.	2	[You will cast the Grappling Hook.]	px2_03_si_skel_hand_swing_02.stringtable
+Bash through the wall.	2	[Bash through the wall.]	px2_02_si_weak_wall.stringtable
+Attack your allies.	2	[Attack your allies.]	px2_00_cv_radiant_spore.stringtable
+Go up one level.	2	[Go up one level.]	05_cv_tower_transition.stringtable
+Inspect the blade.	2	[Inspect the blade.]	px1_03_si_cursed_weapon.stringtable
+Look on.	2	[Look on.] 	px1_02_si_chasm_rescue_redux.stringtable
+Attack Verzano	2	[Attack Verzano] "It's not the Doemenels he needs to be worried about... "	companion_cv_pallegina.stringtable
+Push on the wall.	2	[Push on the wall.]	07_si_weak_wall.stringtable
+Large attack grunt + frustration	2	[Large attack grunt + frustration]	player_voice_set_f_noble.stringtable
+Secure a grappling hook.	2	[Secure a grappling hook.]	04_si_two_story_job_02.stringtable
+Leave the rubble alone.	2	[Leave the rubble alone.]	14_si_burial_isle_passage_upper.stringtable
+Show him the drawing.	2	[Show him the drawing.] "Do you know where this is?"	px2_00_cv_engrim.stringtable
+Turn away to help the woman.	2	[Turn away to help the woman.]	px1_00_si_burning_building.stringtable
+Large attack grunt	2	[Large attack grunt]	player_voice_set_f_noble.stringtable
+Try something else.	2	[Try something else.]	07_si_weak_wall.stringtable
+Leave her and rush to the exit.	2	[Leave her and rush to the exit.]	px1_00_si_burning_building.stringtable
+Swim toward the glint.	2	[Swim toward the glint.]	00_si_cliaban_water_tunnel.stringtable
+Cast Winter Wind.	2	[Cast Winter Wind.]	px1_02_si_chasm_rescue.stringtable
+Show him the pieces of the Blade of the Endless Paths.	2	[Show him the pieces of the Blade of the Endless Paths.] "I found several fragments of an ancient sword. Do you think yo…	02_cv_dunstan.stringtable
+Pull the rubble loose.	2	[Pull the rubble loose.]	14_si_burial_isle_passage_upper.stringtable
+Press on.	2	[Press on.]	px1_02_si_chasm_rescue_redux.stringtable
+Take the ring.	2	[Take the ring.] 	px1_00_si_burning_building.stringtable
+DozensGame_PlayerFinalDesc	2	"Damn. Your [DozensGame_PlayerFinalDesc] beats my [DozensGame_OpponentFinalDesc]. The round's yours."	px1_00_cv_teanlecg_dice_game.stringtable
+DEATH GRUNT 2	2	[DEATH GRUNT 2]	player_voice_set_f_cocky.stringtable
+Take a drink.	2	[Take a drink.]	13_si_weald_water.stringtable
+Turn away to help the man.	2	[Turn away to help the man.]	px1_00_si_burning_building.stringtable
+Keep holding on.	2	[Keep holding on.]	px1_03_si_cursed_weapon.stringtable
+Surrender the child.	2	[Surrender the child.]	companion_cv_gm_02.stringtable
+Study the battlefield.	2	[Study the battlefield.]	15_si_yenwood.stringtable
+Examine the statue.	2	[Examine the statue.]	companion_cv_durance_v2.stringtable
+Give her the svef shipment.	2	[Give her the svef shipment.] "I have proof that Feara, a woman at the Gréf's Rest, is a svef smuggler."	px1_00_renengild.stringtable
+Sound of chimes.	2	[Sound of chimes.]	companion_cv_gm_voice_set.stringtable
+DozensGame_LastPlayerRollNums	2	You cast the dice...  [DozensGame_LastPlayerRollNums] [DozensGame_LastPlayerRollDesc]	px1_00_cv_teanlecg_dice_game.stringtable
+Retreat to the exit.	2	[Retreat to the exit.]	px1_00_si_burning_building.stringtable
+Leave it be.	2	[Leave it be.]	px4_cv_fulvano_blunderbuss.stringtable
+Tear his soul apart.	2	[Tear his soul apart.] "I do not envy you, Thaos. I of all people realize the sway memories can hold. It is time you wer…	14_cv_thaos_2.stringtable
+Place an adra sphere into the right eye socket.	2	[Place an adra sphere into the right eye socket.]	px1_02_si_forge_awakening.stringtable
+Stomp out the symbols.	2	[Stomp out the symbols.]	px2_05_cv_benno.stringtable
+Push the crenelated wall relief.	2	[Push the crenelated wall relief.]	px1_02_si_battery_entrance.stringtable
+Use a prybar to clear the rubble.	2	[Use a prybar to clear the rubble.] 	px1_00_si_burning_building.stringtable
+Travel directly to Cayron's Scar.	2	[Travel directly to Cayron's Scar.]	px2_02_cv_battery_cayron_transition.stringtable
+Go down one level.	2	[Go down one level.]	05_cv_tower_transition.stringtable
+DEATH GRUNT 3	2	[DEATH GRUNT 3]	player_voice_set_f_cocky.stringtable
+Focus on the child, the movement of your hands.	2	[Focus on the child, the movement of your hands.]	companion_cv_gm_02.stringtable
+Give him the glowing ice crystal.	2	[Give him the glowing ice crystal.] "I have something that may get you through the Breach. It's yours if you release Alw…	12_cv_glaswal.stringtable
+You will.	2	[You will.]	px1_04_cv_sleeping_merc.stringtable
+Do nothing right now.	2	[Do nothing right now.]	15_si_yenwood.stringtable
+Brace against the pedestal to pull the estoc out.	2	[Brace against the pedestal to pull the estoc out.]	px1_03_si_cursed_weapon.stringtable
+Open the chest.	2	[Open the chest.]	03_cv_sea_chest.stringtable
+Give 2500 cp.	2	[Give 2500 cp.] "A simple bribe. Walk away and pretend this conversation never happened."	15_cv_emery.stringtable
+Use the torch to light the brazier	2	[Use the torch to light the brazier]	07_cv_pillar_puzzle.stringtable
+Run past.	2	[Run past.]	px1_00_si_burning_building.stringtable
+Pay 1000 cp.	2	[Pay 1000 cp.] "I'd like a night with Serel."	03_cv_maea.stringtable
+Pick her back up.	2	[Pick her back up.]	px1_00_si_burning_building.stringtable
+Look around the room.	2	[Look around the room.]	15_cv_chancellor.stringtable
+Nod noncommittally.	2	[Nod noncommittally.]	companion_cv_pallegina.stringtable
+Turn and run.	2	[Turn and run.]	13_cv_berath.stringtable
+Jump into the pit.	2	[Jump into the pit.]	14_si_burial_isle_pit.stringtable
+Prop up the beam with another log.	2	[Prop up the beam with another log.]	px1_00_si_burning_building.stringtable
+Do something else.	2	[Do something else.]	px1_01_si_chute.stringtable
+Grab the lever as you pass.	2	[Grab the lever as you pass.]	px1_02_si_minecart_shenanigans_start.stringtable
+Stop and examine the situation to the right.	2	[Stop and examine the situation to the right.]	px1_00_si_burning_building.stringtable
+Draw the estoc from the stone.	2	[Draw the estoc from the stone.]	px1_03_si_cursed_weapon.stringtable
+Proceed to the top.	2	[Proceed to the top.]	05_cv_tower_transition.stringtable
+Crack your knuckles.	2	[Crack your knuckles.] "Are you certain you want to do that?"	01_cv_kadal.stringtable
+Give medallion.	2	[Give medallion.] "Yes."	04_cv_thristwn.stringtable
+Cast the spell of Chill Fog upon the flames.	2	[Cast the spell of Chill Fog upon the flames.]	px1_00_si_burning_building.stringtable
+Pull the lever.	2	[Pull the lever.]	px1_02_si_minecart_shenanigans_start.stringtable
+Keep swimming forward.	2	[Keep swimming forward.]	00_si_cliaban_water_tunnel_02.stringtable
+Slowly pull back, retreat from the memory.	2	[Slowly pull back, retreat from the memory.]	companion_cv_gm_02.stringtable
+Try to lift the rubble off the woman.	2	[Try to lift the rubble off the woman.]	px1_00_si_burning_building.stringtable
+Enter the room through the widened crack.	2	[Enter the room through the widened crack.]	px2_02_si_weak_wall.stringtable
+Grab Gathbin's arm.	2	[Grab Gathbin's arm.]	15_cv_chancellor.stringtable
+Inspect your forces.	2	[Inspect your forces.]	15_si_yenwood.stringtable
+Give 500 cp.	2	[Give 500 cp.] "Here, for all of you."	15_cv_mob.stringtable
+frustrated grunt	2	[frustrated grunt]	px1_cm_bs_zahua_voice_set.stringtable
+KO GRUNT 1	2	[KO GRUNT 1]	player_voice_set_f_cocky.stringtable
+Damaged Grunt 3	2	[Damaged Grunt 3]	player_voice_set_f_cocky.stringtable
+Pull the rocks loose yourself.	2	[Pull the rocks loose yourself.]	14_si_burial_isle_passage_upper.stringtable
+Wait for the beam to fall.	2	[Wait for the beam to fall.]	px1_00_si_burning_building.stringtable
+DozensGame_OpponentFinalDesc	2	"Damn. Your [DozensGame_PlayerFinalDesc] beats my [DozensGame_OpponentFinalDesc]. The round's yours."	px1_00_cv_teanlecg_dice_game.stringtable
+Place an adra sphere into the left eye socket.	2	[Place an adra sphere into the left eye socket.]	px1_02_si_forge_awakening.stringtable
+Climb the rope.	2	[Climb the rope.]	04_si_two_story_job.stringtable
+Give 10,000 cp.	2	[Give 10,000 cp.] "This should do."	15_cv_marshal.stringtable
+Bury the scroll of Wael.	1	[Bury the scroll of Wael.]	08_cv_drake_skull.stringtable
+Leave him.	1	[Leave him.]	08_cv_dying_monk.stringtable
+Continue climbing down.	1	[Continue climbing down.]	px1_02_si_chasm_rescue_redux.stringtable
+Treat the wound with your knowledge of field medicine.	1	[Treat the wound with your knowledge of field medicine.]	px1_03_cv_injured_wolf.stringtable
+Crouch down to avoid the smoke.	1	[Crouch down to avoid the smoke.]	px1_00_si_burning_building.stringtable
+Take her hand.	1	[Take her hand.]	13_cv_berath.stringtable
+Look through the water to the bottom of the pond.	1	[Look through the water to the bottom of the pond.]	px1_03_si_hole.stringtable
+Pretend to leave.	1	[Pretend to leave.] "I guess I'll just have to tell your parents..."	px2_05_cv_mylla.stringtable
+Ring the left bell a fourth time.	1	[Ring the left bell a fourth time.] 	07_si_temple_bells.stringtable
+Take the hat and rapier	1	[Take the hat and rapier]	03_cv_sea_chest.stringtable
+Bring up your Arcane Veil.	1	[Bring up your Arcane Veil.]	px2_05_si_frontal_assault.stringtable
+Give 6cp.	1	[Give 6cp.] "Here you are." 	07_cv_gilded_vale_innkeeper.stringtable
+Threaten the lagufaeth.	1	[Threaten the lagufaeth.]	px1_03_si_hole.stringtable
+Cast Charm Beast on the wolf.	1	[Cast Charm Beast on the wolf.]	px1_03_cv_injured_wolf.stringtable
+Keep silent.	1	[Keep silent.] 	1013_bs_spirit_mural.stringtable
+Give the items.	1	[Give the items.] "Fine. Take them." 	1012_cv_scouts.stringtable
+Continue chiseling at the wall.	1	[Continue chiseling at the wall.]	07_si_weak_wall.stringtable
+Pray to Galawain.	1	[Pray to Galawain.]	13_cv_galawain_coalition.stringtable
+Show him Penhelm's affidavit.	1	[Show him Penhelm's affidavit.] "Is this affidavit real? It's signed by you."	04_cv_kurren.stringtable
+Show him the steel sun.	1	[Show him the steel sun.] "I want to trace a man who might've touched this item."	04_cv_kurren.stringtable
+Keep running.	1	[Keep running.]	px2_04_si_moon_escape.stringtable
+Give the construct 500p	1	[Give the construct 500p] "Please, just don't hurt us."	px1_02_bs_construct_bandit.stringtable
+Look at the circular indentation.	1	[Look at the circular indentation.]	08_si_rhemen_gorge_entrance.stringtable
+Give 1800 cp.	1	[Give 1800 cp.] "Put the scepter back together."	04_cv_nans.stringtable
+Take his hand.	1	[Take his hand.]	13_cv_berath.stringtable
+Send someone over the wall.	1	[Send someone over the wall.]	px2_05_si_infiltration.stringtable
+Whisper to Hiravias	1	[Whisper to Hiravias] "His soul reads the same markings as yours. His soul and yours appear split from a common root."	14_cv_scathden.stringtable
+Snatch Kadal's weapon and point it at his throat.	1	[Snatch Kadal's weapon and point it at his throat.] "Think again."	01_cv_kadal.stringtable
+Choose "End."	1	[Choose "End."]	05_cv_tayr_nowneth_machine_01.stringtable
+Fire upon the archers.	1	[Fire upon the archers.]	px2_05_si_frontal_assault.stringtable
+Give him the Reymont signet ring.	1	[Give him the Reymont signet ring.] "They were all murdered. Linete Reymont was responsible."	04_cv_kurren.stringtable
+Grab her, shake her.	1	[Grab her, shake her.]	companion_cv_gm_hub_dreams_chat_02.stringtable
+Give 700cp.	1	[Give 700cp.] "A show of force will knock some sense into them. Here. Hire some mercenaries."	06_cv_visitor_cruel_lord.stringtable
+Pay him.	1	[Pay him.] "Here. Ready to talk now?"	03_cv_oly.stringtable
+Spit at his feet.	1	[Spit at his feet.] "One more word like that, and it'll be your last."	p2_cv_aeldin.stringtable
+Stab the creature.	1	[Stab the creature.]	px1_01_cv_chorus.stringtable
+Use the hammer and chisel to weaken the wall.	1	[Use the hammer and chisel to weaken the wall.] 	07_si_weak_wall.stringtable
+Examine the scroll case.	1	[Examine the scroll case.]	08_cv_dying_monk.stringtable
+Rotate the dial counterclockwise.	1	[Rotate the dial counterclockwise.]	px1_02_si_mines_door_key.stringtable
+Dive toward the shimmering light.	1	[Dive toward the shimmering light.]	px2_04_si_pool.stringtable
+Cast Form of the Helpless Beast on someone.	1	[Cast Form of the Helpless Beast on someone.]	px2_05_si_infiltration.stringtable
+Send the souls back into the reincarnation cycle.	1	[Send the souls back into the reincarnation cycle.]	14_cv_machine_ending.stringtable
+Pull him up.	1	[Pull him up.]	px1_02_si_chasm_rescue.stringtable
+Point to the dagger.	1	[Point to the dagger.] "What happened there?" 	07_cv_raedric.stringtable
+Push Zenove's essence down, allowing Taena to reemerge.	1	[Push Zenove's essence down, allowing Taena to reemerge.]	px1_00_cv_taena.stringtable
+Ring the middle bell a third time.	1	[Ring the middle bell a third time.]	07_si_temple_bells.stringtable
+Pickpocket adra stone.	1	[Pickpocket adra stone.] "You're right. We'll head back and tell Wenan we're done."	08_cv_cook_company.stringtable
+Turn the dial.	1	[Turn the dial.]	05_cv_tayr_nowneth_machine_01.stringtable
+Jump down onto the nearest ledge.	1	[Jump down onto the nearest ledge.]	px1_02_si_chasm_rescue_redux.stringtable
+Give 50cp.	1	[Give 50cp.] "Here you are." 	07_cv_esternwood_sellsword.stringtable
+Examine Renengild's soul.	1	[Examine Renengild's soul.]	px1_00_renengild.stringtable
+Push the statue.	1	[Push the statue.]	p2_si_shrine.stringtable
+Leave it where it is.	1	[Leave it where it is.]	px2_05_cv_batling.stringtable
+Shoo the lagufaeth away.	1	[Shoo the lagufaeth away.]	px1_03_si_hole.stringtable
+Take cover beside the door.	1	[Take cover beside the door.]	px1_01_cv_chorus.stringtable
+Aim for a clear spot and jump down.	1	[Aim for a clear spot and jump down.]	px2_05_si_bog_stone_wall.stringtable
+Use the chant of "Rime and Frost".	1	[Use the chant of "Rime and Frost".]	px1_00_si_burning_building.stringtable
+Slide the panel of the flourishing city.	1	[Slide the panel of the flourishing city.]	px2_03_si_ondra_panels.stringtable
+Reach out for the soul.	1	[Reach out for the soul.]	cv_watcher_backer_story.stringtable
+Reach out with your thoughts.	1	[Reach out with your thoughts.]	companion_cv_gm_dreams_02.stringtable
+Retreat from the blood pool.	1	[Retreat from the blood pool.]	p2_cv_pool.stringtable
+Push the disc.	1	[Push the disc.]	px1_02_si_mines_door_key.stringtable
+Investigate the glint of light.	1	[Investigate the glint of light.]	px2_05_cv_eyeless_vision_fort.stringtable
+Cast Twin Stones.	1	[Cast Twin Stones.]	px2_04_si_moon_escape.stringtable
+Let him climb on his own.	1	[Let him climb on his own.]	px1_02_si_chasm_rescue.stringtable
+Push it yourself.	1	[Push it yourself.]	p2_si_shrine.stringtable
+Put him out of his misery.	1	[Put him out of his misery.] "This will be quick."	08_cv_dying_monk.stringtable
+Attack her.	1	[Attack her.]	13_cv_berath.stringtable
+Watch in silence.	1	[Watch in silence.]	companion_cv_sagani_clues.stringtable
+Triumphant hoot	1	[Triumphant hoot]	px2_companion_cv_maneha_voice_set.stringtable
+Push Taena's essence down, allowing Zenove to fully emerge.	1	[Push Taena's essence down, allowing Zenove to fully emerge.]	px1_00_cv_taena.stringtable
+Wedge a prybar under the statue to move it.	1	[Wedge a prybar under the statue to move it.]	p2_si_shrine.stringtable
+Stab the creature from behind.	1	[Stab the creature from behind.]	px1_01_cv_chorus.stringtable
+Read Ixtli's notes.	1	[Read Ixtli's notes.]	px1_03_si_hole.stringtable
+Raise your arms and stand still.	1	[Raise your arms and stand still.]	07_cv_starved_xaurip.stringtable
+Recreate Abydon's hammer.	1	[Recreate Abydon's hammer.]	px2_02_cv_reforge_hammer.stringtable
+Pray.	1	[Pray.]	07_temple_eothas_ambients.stringtable
+Reach out for it.	1	[Reach out for it.]	04_cv_lady_webb.stringtable
+Tug it open.	1	[Tug it open.]	px1_02_si_frozen_dwarf_ground_level.stringtable
+Frenzy and smash the rubble.	1	[Frenzy and smash the rubble.]	px2_04_si_moon_escape.stringtable
+Throw a torch as a distraction.	1	[Throw a torch as a distraction.]	px1_03_cv_suldrun.stringtable
+Hold your ground.	1	[Hold your ground.]	px2_05_llengraths_arrival.stringtable
+Retrace your steps to the Stalwart Mines.	1	[Retrace your steps to the Stalwart Mines.]	px2_00_si_spider_maze.stringtable
+Damaged Grunt #1	1	[Damaged Grunt #1]	companion_cv_kana_voice_set.stringtable
+Yawning	1	[Yawning] "I'm not tired."	px2_companion_cv_maneha_voice_set.stringtable
+Look at the vines.	1	[Look at the vines.]	1011_si_fungus_wall.stringtable
+Cast Kalakoth's Freezing Rake to hold the ice together.	1	[Cast Kalakoth's Freezing Rake to hold the ice together.]	px2_04_si_moon_escape.stringtable
+Pretend to pass out.	1	[Pretend to pass out.]	px1_01_cv_chorus.stringtable
+Continue the climb.	1	[Continue the climb.]	px1_02_si_chasm_rescue_redux.stringtable
+Shrug, say nothing.	1	[Shrug, say nothing.]	px1_00_cv_owynna.stringtable
+Examine the barrier.	1	[Examine the barrier.]	px2_05_cv_benno.stringtable
+Pull out the head.	1	[Pull out the head.]	px1_cm_si_zahua_intro.stringtable
+Background: Nihilist	1	[Background: Nihilist] "I KNEW IT!"	14_cv_iovara.stringtable
+Read Harmke's soul.	1	[Read Harmke's soul.]	px1_03_cv_harmke.stringtable
+Attack before it can say more.	1	[Attack before it can say more.]	1012_cv_vithrack_leader.stringtable
+Speak Engwithan.	1	[Speak Engwithan.] "Hello?" 	1013_bs_spirit_mural.stringtable
+Try to leave.	1	[Try to leave.]	px1_00_cv_owynna.stringtable
+Use your icepick as a hook.	1	[Use your icepick as a hook.]	px1_02_si_minecart_shenanigans_start.stringtable
+Stay here a little longer.	1	[Stay here a little longer.]	px2_05_bs_bars.stringtable
+Look around quickly.	1	[Look around quickly.]	px1_02_si_minecart_shenanigans_start.stringtable
+Yawns.	1	[Yawns.] 	companion_cv_eder_voice_set.stringtable
+Fit a pickaxe into the slot.	1	[Fit a pickaxe into the slot.]	px2_02_cv_elevator_parts.stringtable
+Pour some oil on the latch.	1	[Pour some oil on the latch.]	px1_00_cv_lafda_henchmen_spied.stringtable
+Let Hiravias talk.	1	[Let Hiravias talk.]	13_cv_tamrwn.stringtable
+Wait a while.	1	[Wait a while.]	08_si_rhemen_gorge_entrance.stringtable
+Pick your nose, then shake his hand.	1	[Pick your nose, then shake his hand.]	px1_00_cv_bounty_quest_giver.stringtable
+Banish his soul to Breith Eaman.	1	[Banish his soul to Breith Eaman.] "Thaos ix Arkannon, there can be no forgiveness for your deeds, only justice. You sha…	14_cv_thaos_2.stringtable
+Pass through the vines.	1	[Pass through the vines.]	12_si_maw_thorns_02.stringtable
+Get out of the cart.	1	[Get out of the cart.]	px1_02_si_minecart_shenanigans_start.stringtable
+Kneel.	1	[Kneel.]	px1_03_cv_cursed_estoc_progression.stringtable
+Adopt combat stance.	1	[Adopt combat stance.]	07_cv_padebald.stringtable
+Look inside.	1	[Look inside.]	px1_02_si_frozen_dwarf_ground_level.stringtable
+Seek refuge in Defiance Bay.	1	[Seek refuge in Defiance Bay.]	px2_00_intro_dream.stringtable
+Quickly strike down one of the sleeping men.	1	[Quickly strike down one of the sleeping men.] 	px2_05_cv_sleeping_mercenaries.stringtable
+Shake him by the shoulders.	1	[Shake him by the shoulders.] "Aloth! You've got to wake up!"	04_cv_bellasege.stringtable
+Use your hammer and chisel to break the satchel free.	1	[Use your hammer and chisel to break the satchel free.] 	px1_02_si_frozen_dwarf_ground_level.stringtable
+Give him the antidote.	1	[Give him the antidote.] "Here. Haeferic says this ought to do it."	px1_00_cv_reyfald.stringtable
+Draw lots.	1	[Draw lots.]	px2_04_si_moon_escape.stringtable
+Give him Kaenra's ring.	1	[Give him Kaenra's ring.] "Kaenra asked me to give you this."	01_cv_nyrid.stringtable
+Help him up.	1	[Help him up.]	03_cv_battered_noble.stringtable
+Dig through the rubble with bare hands.	1	[Dig through the rubble with bare hands.]	px2_04_si_moon_escape.stringtable
+Pet the dog.	1	[Pet the dog.] 	07_cv_black_hound.stringtable
+Brandish your weapon.	1	[Brandish your weapon.]	px2_05_llengraths_arrival.stringtable
+Toss him the dagger.	1	[Toss him the dagger.] "Don't kill yourself or anything." 	01_cv_gordy.stringtable
+Toss him the bracelet.	1	[Toss him the bracelet.] "Very well. Here, take the bracelet."	px1_00_cv_grynde.stringtable
+Give skuldr meat to the creature.	1	[Give skuldr meat to the creature.]	07_cv_starved_xaurip.stringtable
+Destroy all memories contained within.	1	[Destroy all memories contained within.] "Your memory makes you a slave to your own past. Perhaps it can't be undone, bu…	14_cv_thaos_2.stringtable
+Study the terrain.	1	[Study the terrain.]	companion_cv_sagani_clues.stringtable
+Hacking cough.	1	[Hacking cough.]	px2_poi_bs_gas_chamber.stringtable
+Launch an assault on the fort with a battering ram.	1	[Launch an assault on the fort with a battering ram.]	px2_05_si_battering_ram.stringtable
+Labored breathing.	1	[Labored breathing.]	companion_cv_eder_voice_set.stringtable
+Disperse the cloud of essence.	1	[Disperse the cloud of essence.] "Then I will unmake you. Return to the Wheel."	px2_04_cv_abydon_finale.stringtable
+Climb up the rope.	1	[Climb up the rope.]	px1_01_si_chute_02.stringtable
+Relive Derrin's memory.	1	[Relive Derrin's memory.]	03_si_derrin_soul.stringtable
+Cast Bulwark Against the Elements before diving in.	1	[Cast Bulwark Against the Elements before diving in.]	px1_03_si_hole.stringtable
+Grab Oly by the collar.	1	[Grab Oly by the collar.] "I need answers, so you'd better sober up fast."	03_cv_oly.stringtable
+Carefully climb up to leave the chute.	1	[Carefully climb up to leave the chute.]	px1_01_si_chute.stringtable
+Return to the surface.	1	[Return to the surface.]	px2_04_si_pool.stringtable
+Pray to Hylea.	1	[Pray to Hylea.]	13_cv_hylea.stringtable
+Fish for it with a grappling hook.	1	[Fish for it with a grappling hook.]	08_si_ice_fishing.stringtable
+Give 400 pands.	1	[Give 400 pands.] "I'll buy that horn off you."	px1_00_yduran.stringtable
+Place the sabre Resolution in the statue's grip.	1	[Place the sabre Resolution in the statue's grip.]	1003_si_aedyran_statue.stringtable
+Do not cast Bulwark Against the Elements.	1	[Do not cast Bulwark Against the Elements.]	px1_03_si_hole.stringtable
+Explore further into the chamber.	1	[Explore further into the chamber.]	px2_05_cv_eyeless_vision_fort.stringtable
+Triumphant laugh	1	[Triumphant laugh]	px2_companion_cv_maneha_voice_set.stringtable
+Place the Sapphire Seal into the middle socket.	1	[Place the Sapphire Seal into the middle socket.]	1006_si_sealed_door.stringtable
+Damaged Grunt #3	1	[Damaged Grunt #3]	companion_cv_kana_voice_set.stringtable
+Cast Repulsing Seal.	1	[Cast Repulsing Seal.]	px2_04_si_moon_escape.stringtable
+Explore Thaos' soul.	1	[Explore Thaos' soul.]	14_cv_thaos_2.stringtable
+Say nothing, listen.	1	[Say nothing, listen.]	px1_00_cv_grynde.stringtable
+Place the Bloodstone Seal into the right socket.	1	[Place the Bloodstone Seal into the right socket.]	1006_si_sealed_door.stringtable
+Snuff a candle.	1	[Snuff a candle.]	07_temple_eothas_ambients.stringtable
+Decouple from Gram's soul.	1	[Decouple from Gram's soul.]	04_cv_gram.stringtable
+Pet the cat.	1	[Pet the cat.]	07_bs_black_cat.stringtable
+Examine the globe.	1	[Examine the globe.]	px1_02_cv_forge_globe.stringtable
+screech of metal as she turns her head	1	[screech of metal as she turns her head]	px1_companion_cv_devil_voice_set.stringtable
+Bind them to the cannons.	1	[Bind them to the cannons.] "Defend Abydon's forge and the fortress you built around it."	px1_02_cv_forge.stringtable
+Remove armor.	1	[Remove armor.] "I just wanted to try it on. It's yours, of course."	01_cv_osric.stringtable
+Try to unlock the chest.	1	[Try to unlock the chest.]	03_cv_sea_chest.stringtable
+Strike the killing blow.	1	[Strike the killing blow.] "I'm finishing you now."	03_cv_aefre.stringtable
+Attack grunt - big miss.	1	[Attack grunt - big miss.]	companion_cv_eder_voice_set.stringtable
+Examine the left socket.	1	[Examine the left socket.]	1006_si_sealed_door.stringtable
+Give her the Theorems.	1	[Give her the Theorems.] "You'll never believe what I found."	04_cv_nedyn.stringtable
+Retrace your steps to the exit.	1	[Retrace your steps to the exit.]	px2_00_si_spider_maze.stringtable
+Hold a torch to the ice.	1	[Hold a torch to the ice.]	px1_02_si_frozen_dwarf_ground_level.stringtable
+Take shelter in the gap.	1	[Take shelter in the gap.] 	px1_02_si_chasm_rescue_redux.stringtable
+Slide the panel of the city in flames.	1	[Slide the panel of the city in flames.]	px2_03_si_ondra_panels.stringtable
+Examine Scathden's corpse.	1	[Examine Scathden's corpse.]	companion_cv_hiravias_quest.stringtable
+Stay to continue exploring the area.	1	[Stay to continue exploring the area.]	px2_03_cv_abbey_topside_travel.stringtable
+Examine the symbols more closely.	1	[Examine the symbols more closely.]	px2_05_cv_benno.stringtable
+Give Simoc the essence potion.	1	[Give Simoc the essence potion.] "Here is the potion you asked for."	13_cv_simoc.stringtable
+Refuse to answer.	1	[Refuse to answer.]	07_cv_magistrate_urgeat.stringtable
+Give Ondra's Witness.	1	[Give Ondra's Witness.] "It is done."	px2_03_cv_kaoto.stringtable
+Turn and leave.	1	[Turn and leave.]	13_cv_berath.stringtable
+Give Penhelm the affidavit.	1	[Give Penhelm the affidavit.] "You're right. Take it."	02_cv_penhelm.stringtable
+Let him talk.	1	[Let him talk.]	14_cv_scathden.stringtable
+Attack them anyway.	1	[Attack them anyway.]	px1_03_cv_fampyr.stringtable
+Plug the hole with a handful of snow.	1	[Plug the hole with a handful of snow.]	13_cv_rymrgand_coalition.stringtable
+Flow back with the current.	1	[Flow back with the current.]	00_si_cliaban_water_tunnel_02.stringtable
+Read from Ixtli's Notebook, "Notoc Tlocotl."	1	[Read from Ixtli's Notebook, "Notoc Tlocotl."]	px1_03_si_hole.stringtable
+Give 300 pands.	1	[Give 300 pands.] "I'll buy that horn off you."	px1_00_yduran.stringtable
+Shrug and vaguely nod.	1	[Shrug and vaguely nod.]	px2_00_cv_royse.stringtable
+Stare through her.	1	[Stare through her.]	px2_00_cv_royse.stringtable
+Hold your ground in the center.	1	[Hold your ground in the center.]	px2_02_si_elevator.stringtable
+Pick up the wurm.	1	[Pick up the wurm.] 	1002_cv_pet_wurm.stringtable
+Ignore Rinatto's feeble attack.	1	[Ignore Rinatto's feeble attack.]	11_cv_rinatto.stringtable
+Is Aumaua - easier con check	1	[Is Aumaua - easier con check]	08_si_ice_fishing.stringtable
+Grab the edge of the tunnel.	1	[Grab the edge of the tunnel.]	00_si_cliaban_water_tunnel.stringtable
+Pick up the scarf.	1	[Pick up the scarf.]	01_cv_kora_soul.stringtable
+Brace for impact.	1	[Brace for impact.]	px1_01_si_chute.stringtable
+Raise your hands.	1	[Raise your hands.]	px1_02_bs_construct_bandit.stringtable
+Cast Arkemyr's Dazzling Lights.	1	[Cast Arkemyr's Dazzling Lights.] 	px2_05_si_frontal_assault.stringtable
+Is not aumaua - con check success	1	[Is not aumaua - con check success]	08_si_ice_fishing.stringtable
+Give it the locket.	1	[Give it the locket.] "Is this yours?" 	01_cv_alghul_02.stringtable
+Hide in Twin Elms.	1	[Hide in Twin Elms.]	px2_00_intro_dream.stringtable
+Attack the Radiant Spore.	1	[Attack the Radiant Spore.]	px2_00_cv_radiant_spore.stringtable
+Slowly hold out the dagger, pommel-first.	1	[Slowly hold out the dagger, pommel-first.] "Listen first. When you're not using it, keep it sheathed or it will rust. D…	01_cv_gordy.stringtable
+Hold up the refined adra crystal.	1	[Hold up the refined adra crystal.] "Then maybe I should smash this, and you can find your own." 	1012_cv_scouts.stringtable
+Place the Peridot Seal into the middle socket.	1	[Place the Peridot Seal into the middle socket.]	1006_si_sealed_door.stringtable
+Reach out for the beast's soul.	1	[Reach out for the beast's soul.] 	px1_03_cv_suldrun.stringtable
+Give him the tarnished Engwithan weapons.	1	[Give him the tarnished Engwithan weapons.] "I've brought the weaponry you were looking for."	01_cv_roedric.stringtable
+Strike the warriors.	1	[Strike the warriors.] 	px1_02_si_battery_entrance.stringtable
+Take control of the souls to guide yourself to safety.	1	[Take control of the souls to guide yourself to safety.]	14_si_burial_isle_pit.stringtable
+Go to the White Forge.	1	[Go to the White Forge.]	px2_02_cv_battery_new_transitions.stringtable
+Stay here for now.	1	[Stay here for now.] 	px1_02_si_minecart_shenanigans_return.stringtable
+Pay 6,000 cp.	1	[Pay 6,000 cp.] "Deal."	03_cv_serel.stringtable
+Examine the staff.	1	[Examine the staff.]	companion_cv_durance_scripted_sequences.stringtable
+Stick your weapon into the mouth.	1	[Stick your weapon into the mouth.]	px1_02_si_battery_entrance.stringtable
+Toss a grappling hook to the window.	1	[Toss a grappling hook to the window.]	04_si_two_story_job.stringtable
+Sing a song to calm the wolf.	1	[Sing a song to calm the wolf.]	px1_03_cv_injured_wolf.stringtable
+Clear your throat.	1	[Clear your throat.]	px1_02_galvino_critpath.stringtable
+Study the man.	1	[Study the man.]	companion_cv_durance_v2.stringtable
+Give 5,000cp	1	[Give 5,000cp] "My name has worth in these parts. I'll personally insure the delivery, and cover all losses that occur. …	06_cv_visitor_rare_item_merchant.stringtable
+Howl back.	1	[Howl back.]	13_cv_galawain_coalition.stringtable
+Examine the forge.	1	[Examine the forge.] 	px1_02_si_forge_awakening.stringtable
+Pay 700 cp.	1	[Pay 700 cp.] "Deal."	px1_02_galvino.stringtable
+Perform the gesture you saw Kaoto use on the hidden carving.	1	[Perform the gesture you saw Kaoto use on the hidden carving.]	px2_03_si_ondra_panels.stringtable
+Waiting on some lore from Rob	1	[Waiting on some lore from Rob]	07_cv_esternwood_sellsword.stringtable
+Look down.	1	[Look down.]	px2_02_si_weak_wall.stringtable
+Cast the spell Blast of Frost on the ice floes.	1	[Cast the spell Blast of Frost on the ice floes.]	px2_04_si_ice_floes.stringtable
+Leave it.	1	[Leave it.]	px1_03_cv_lagufaeth_nests.stringtable
+Try to see the tasks.	1	[Try to see the tasks.]	02_cv_leaden_key_agent.stringtable
+Go to Stalwart.	1	[Go to Stalwart.]	px2_00_intro_dream.stringtable
+Grab the miller by the neck	1	[Grab the miller by the neck] "If you ever want breathe again, you may want to reconsider." 	07_cv_trumbel.stringtable
+Lunge for Aelys and break her neck.	1	[Lunge for Aelys and break her neck.]	00_cv_wymund.stringtable
+Cast Mirrored Image.	1	[Cast Mirrored Image.]	px2_04_si_moon_escape.stringtable
+Retreat from the door.	1	[Retreat from the door.]	02_cv_ritual_door.stringtable
+Cast Burst of Summer Flame.	1	[Cast Burst of Summer Flame.]	px1_02_si_frozen_dwarf_ground_level.stringtable
+chuckles	1	[chuckles]	px1_cm_bs_zahua_voice_set.stringtable
+Take her shoulder, try and steady her.	1	[Take her shoulder, try and steady her.]	companion_cv_gm_hub_dreams_chat_02.stringtable
+Wave.	1	[Wave.]	px2_05_llengraths_arrival.stringtable
+Leave the cat alone.	1	[Leave the cat alone.] 	07_bs_black_cat.stringtable
+Large attack grunt.	1	[Large attack grunt.]	companion_cv_eder_voice_set.stringtable
+Press the dragon's tongue to light a fire in the mouth.	1	[Press the dragon's tongue to light a fire in the mouth.]	px1_02_si_battery_entrance.stringtable
+Bless Masca's forge hammer.	1	[Bless Masca's forge hammer.]	px2_00_cv_abydon_shrine.stringtable
+Reach toward the soul.	1	[Reach toward the soul.]	03_si_derrin_soul.stringtable
+Barricade yourself in Caed Nua.	1	[Barricade yourself in Caed Nua.]	px2_00_intro_dream.stringtable
+Display your coin pouch.	1	[Display your coin pouch.] "Perhaps you could make it your business."	p2_cv_osmaer.stringtable
+Stare at him.	1	[Stare at him.]	12_cv_delem.stringtable
+Slowly back away.	1	[Slowly back away.]	07_cv_starved_xaurip.stringtable
+Give 5000cp	1	[Give 5000cp] "Sell them to me. I'll take them off your hands."	06_cv_visitor_slaver.stringtable
+Resist.	1	[Resist.]	px2_00_cv_radiant_spore.stringtable
+Continue listening through the closed panes.	1	[Continue listening through the closed panes.]	px1_00_cv_lafda_henchmen_spied.stringtable
+Set him down and leave.	1	[Set him down and leave.] "See? That wasn't so hard." 	01_cv_gordy.stringtable
+Throw a rock at the sparrow.	1	[Throw a rock at the sparrow.]	13_cv_hylea.stringtable
+Remain silent but watch them both.	1	[Remain silent but watch them both.]	14_cv_scathden.stringtable
+Shove the creature.	1	[Shove the creature.]	01_cv_alghul_01.stringtable
+Hop in.	1	[Hop in.]	px1_02_si_minecart_shenanigans_return.stringtable
+Fire an arrow at the rope.	1	[Fire an arrow at the rope.] 	px1_03_cv_pale_elves.stringtable
+Call out for help from your comrades.	1	[Call out for help from your comrades.]	px1_02_si_chasm_rescue_redux.stringtable
+Climb up.	1	[Climb up.]	px2_05_si_bog_stone_wall.stringtable
+Scale the cliff.	1	[Scale the cliff.]	p2_si_cliff.stringtable
+Reach for the object.	1	[Reach for the object.] 	px1_02_cv_ghost_adra_disc.stringtable
+Stay where you are.	1	[Stay where you are.]	px1_04_cv_pelden.stringtable
+Share a memory of peace and comfort.	1	[Share a memory of peace and comfort.]	companion_cv_gm_hub_dreams_chat_02.stringtable
+Give Tcharek the items.	1	[Give Tcharek the items.] "I have all the adra samples." 	1012_cv_vithrack_leader.stringtable
+Raise your voice.	1	[Raise your voice.] "I'll say this one more time. These wichts are not your friends. Go home, Mylla."	px2_05_cv_mylla.stringtable
+Dodge past the Eyeless.	1	[Dodge past the Eyeless.]	px2_04_si_moon_escape.stringtable
+Dive for your companion.	1	[Dive for your companion.]	14_si_burial_isle_pit.stringtable
+Resist the illusion.	1	[Resist the illusion.] 	13_si_weald_water.stringtable
+The party member did not.	1	[The party member did not.]	07_cv_eothas_altar_spirit.stringtable
+Follow the Usher.	1	[Follow the Usher.]	13_cv_berath.stringtable
+Press the panel.	1	[Press the panel.]	px1_02_si_battery_entrance.stringtable
+Cut Giacco's throat.	1	[Cut Giacco's throat.]	07_cv_giacco.stringtable
+Focus on the woman.	1	[Focus on the woman.]	companion_cv_gm_02.stringtable
+Give 400 cp.	1	[Give 400 cp.] "Here, perhaps this will make up for the loss of your pigs."	p2_cv_rumbald.stringtable
+Pay the Pallid Knight.	1	[Pay the Pallid Knight.]	13_cv_berath.stringtable
+Try to get the elves' attention.	1	[Try to get the elves' attention.]	13_cv_rymrgand_coalition.stringtable
+Go to the outskirts of the abbey.	1	[Go to the outskirts of the abbey.]	px2_03_cv_abbey_topside_travel.stringtable
+Reach out for the woman.	1	[Reach out for the woman.]	07_cv_caldara.stringtable
+Take it.	1	[Take it.]	px1_03_cv_lagufaeth_nests.stringtable
+Examine the mouth more closely.	1	[Examine the mouth more closely.]	px1_02_si_battery_entrance.stringtable
+Shake head, eyes wide.	1	[Shake head, eyes wide.]	companion_cv_pallegina_act_3.stringtable
+Go to the East Tower.	1	[Go to the East Tower.]	px2_02_cv_battery_new_transitions.stringtable
+Inspect the arch.	1	[Inspect the arch.]	companion_cv_sagani_clues.stringtable
+Continue the descent.	1	[Continue the descent.]	px1_02_si_chasm_rescue_redux.stringtable
+Wipe Aelys' mind of the vengeful essence.	1	[Wipe Aelys' mind of the vengeful essence.] "I'll free Aelys from him, and I'll free her from you, too."	00_cv_wymund.stringtable
+Watch and listen.	1	[Watch and listen.]	px2_00_intro_dream.stringtable
+Consider your options.	1	[Consider your options.]	px1_03_si_hole.stringtable
+Get a closer look at the work.	1	[Get a closer look at the work.]	px2_02_cv_abydon_tower_dream.stringtable
+Keep hold of him with one hand.	1	[Keep hold of him with one hand.]	px1_02_si_chasm_rescue_redux.stringtable
+Rappel from the ledge.	1	[Rappel from the ledge.]	px1_02_si_chasm_rescue_redux.stringtable
+Ring the right bell once more.	1	[Ring the right bell once more.]	07_si_temple_bells.stringtable
+Jump across.	1	[Jump across.] 	px1_02_si_battery_tower_shortcut_jump.stringtable
+Show to Grieving Mother	1	[Show to Grieving Mother] "Do you think you can help us?"	companion_cv_eder_quest.stringtable
+Call out for help above.	1	[Call out for help above.]	px1_02_si_chasm_rescue_redux.stringtable
+Sift through the fish scraps.	1	[Sift through the fish scraps.]	px1_cm_si_zahua_intro.stringtable
+Examine her teeth.	1	[Examine her teeth.]	px1_00_cv_feara.stringtable
+Climb the chute.	1	[Climb the chute.]	px1_01_si_chute_02.stringtable
+Hand over the forge hammer.	1	[Hand over the forge hammer.] "I completed the ritual."	px2_00_cv_masca.stringtable
+Attack the creature.	1	[Attack the creature.]	px1_01_cv_chorus.stringtable
+Cast Ringleader.	1	[Cast Ringleader.]	px2_04_si_moon_escape.stringtable
+Stow the scroll case in your pack.	1	[Stow the scroll case in your pack.]	08_cv_dying_monk.stringtable
+Take the spear.	1	[Take the spear.]	08_cv_rhemen_weapons.stringtable
+Show him the message	1	[Show him the message] "He gave me this missive."	11_cv_high_monk.stringtable
+Dodge past the creature and escape.	1	[Dodge past the creature and escape.]	px1_01_cv_chorus.stringtable
+Pray to Rymrgand.	1	[Pray to Rymrgand.]	13_cv_rymrgand_coalition.stringtable
+Send someone onto the ledge.	1	[Send someone onto the ledge.]	px2_02_si_weak_wall.stringtable
+Go to the front gates.	1	[Go to the front gates.]	px2_02_cv_battery_new_transitions.stringtable
+Pay 4,000 cp.	1	[Pay 4,000 cp.] "Here you are."	03_cv_serel.stringtable
+Charge the orlan with Wild Sprint.	1	[Charge the orlan with Wild Sprint.]	px1_04_cv_sleeping_merc.stringtable
+Ring the right, smaller bell. 	1	[Ring the right, smaller bell. ]	07_si_temple_bells.stringtable
+Jump down onto the ledge.	1	[Jump down onto the ledge.]	px1_02_si_chasm_rescue_redux.stringtable
+Anchor a grappling hook to the edge and climb down.	1	[Anchor a grappling hook to the edge and climb down.]	08_si_rhemen_broken_stairs.stringtable
+Read the woman's soul.	1	[Read the woman's soul.]	px2_05_cv_stalwart_delegation.stringtable
+Inspect the stream.	1	[Inspect the stream.]	00_si_cliaban_water_tunnel.stringtable
+Continue listening.	1	[Continue listening.]	px2_00_cv_rabble_rouser.stringtable
+Try to step around the boulder.	1	[Try to step around the boulder.]	08_si_sky_dragon_ridge.stringtable
+Mutter indistinctly.	1	[Mutter indistinctly.]	02_cv_leaden_key_agent.stringtable
+Leave them inside the chest.	1	[Leave them inside the chest.]	03_cv_sea_chest.stringtable
+Shake her awake.	1	[Shake her awake.]	px2_companion_cv_maneha_quest.stringtable
+Look into the ruins.	1	[Look into the ruins.]	02_cv_leaden_key_agent.stringtable
+Retreat.	1	[Retreat.]	px2_00_intro_dream.stringtable
+Fit a torch into the slot.	1	[Fit a torch into the slot.]	px2_02_cv_elevator_parts.stringtable
+Place the Bloodstone Seal into the left socket.	1	[Place the Bloodstone Seal into the left socket.]	1006_si_sealed_door.stringtable
+Follow the arm.	1	[Follow the arm.]	px2_02_cv_abydon_tower_dream.stringtable
+Break away.	1	[Break away.]	px2_05_cv_adaryc.stringtable
+Arrange the panels.	1	[Arrange the panels.]	px2_03_si_ondra_panels.stringtable
+Examine the xaurip.	1	[Examine the xaurip.]	1002_cv_sick_xaurip.stringtable
+Give him the bottle of liquor.	1	[Give him the bottle of liquor.] Here. Haeferic gave it to me for opening the Battery."	px1_00_cv_reyfald.stringtable
+Throw your spear at the orlan.	1	[Throw your spear at the orlan.]	px1_04_cv_sleeping_merc.stringtable
+Ignore the pain	1	[Ignore the pain]	13_si_weald_water.stringtable
+No one.	1	[No one.]	08_si_ice_fishing.stringtable
+Cover her mouth.	1	[Cover her mouth.] "Stay quiet."	03_cv_serel.stringtable
+Force your way through.	1	[Force your way through.] 	12_si_maw_thorns.stringtable
+Travel directly to the Foundry in Durgan's Battery.	1	[Travel directly to the Foundry in Durgan's Battery.]	px2_03_cv_abbey_topside_travel.stringtable
+Attack Grunt #1	1	[Attack Grunt #1]	companion_cv_kana_voice_set.stringtable
+Show him the lagufaeth.	1	[Show him the lagufaeth.] "This came out of the 'thermal pearl.'"	px1_00_cv_bounty_quest_giver.stringtable
+Hurl a grappling hook to the outcropping.	1	[Hurl a grappling hook to the outcropping.]	p2_si_cliff.stringtable
+Rally your companions, and charge towards the gate	1	[Rally your companions, and charge towards the gate]	px2_05_si_frontal_assault.stringtable
+Pick up the pace.	1	[Pick up the pace.]	px1_02_si_chasm_rescue_redux.stringtable
+Attack Grunt #3	1	[Attack Grunt #3]	companion_cv_kana_voice_set.stringtable
+Attacking Effort 2	1	[Attacking Effort 2]	companion_cv_hiravias_voice_set.stringtable
+Roll your eyes.	1	[Roll your eyes.]	px1_03_cv_fampyr.stringtable
+Poke the creature in the head.	1	[Poke the creature in the head.]	01_cv_alghul_02.stringtable
+Put your hand over Hiravias before he can talk.	1	[Put your hand over Hiravias before he can talk.]	14_cv_scathden.stringtable
+Take the weapon.	1	[Take the weapon.]	px4_cv_sabre_of_the_seas.stringtable
+Calm the wolf.	1	[Calm the wolf.]	px1_03_cv_injured_wolf.stringtable
+Wait for Gamel to settle down.	1	[Wait for Gamel to settle down.]	px2_00_cv_mines_worker_1.stringtable
+Use your pickaxe to break the satchel free.	1	[Use your pickaxe to break the satchel free.]	px1_02_si_frozen_dwarf_ground_level.stringtable
+Climb it yourself.	1	[Climb it yourself.]	p2_si_cliff.stringtable
+Inspect your surroundings.	1	[Inspect your surroundings.]	px1_01_si_chute.stringtable
+Study the woman.	1	[Study the woman.]	companion_cv_gm_02.stringtable
+Read Byrhtwen's soul.	1	[Read Byrhtwen's soul.]	px1_00_cv_andred_byrhtwen.stringtable
+Examine the right socket.	1	[Examine the right socket.]	1006_si_sealed_door.stringtable
+Try to open the door.	1	[Try to open the door.]	1006_si_sealed_door.stringtable
+Take the dagger.	1	[Take the dagger.]	03_si_derrin_soul.stringtable
+Squeeze through.	1	[Squeeze through.]	px2_05_bs_bars.stringtable
+Try leaning right.	1	[Try leaning right.] 	px1_02_si_minecart_shenanigans_start.stringtable
+Show him the Heart of White March.	1	[Show him the Heart of White March.] "Is this what you're looking for?"	04_cv_abrecan_doemenel.stringtable
+Examine the skull.	1	[Examine the skull.]	p2_si_shrine.stringtable
+Put down your weapons.	1	[Put down your weapons.] "Very well. Let him go."	07_cv_glanfathan_leader.stringtable
+Climb up the rocks.	1	[Climb up the rocks.]	1015_si_stairs.stringtable
+Instruct him to tie the rope off around his waist first.	1	[Instruct him to tie the rope off around his waist first.]	px1_02_si_chasm_rescue.stringtable
+Give him the bottle from the cellar.	1	[Give him the bottle from the cellar.] "Here you go." 	px1_00_cv_reyfald.stringtable
+Move away.	1	[Move away.]	07_cv_perly.stringtable
+Fight.	1	[Fight.]	px2_00_cv_magran_shrine.stringtable
+You cast Bulwark Against the Elements.	1	[You cast Bulwark Against the Elements.]	px1_03_si_hole.stringtable
+Cast Withdraw.	1	[Cast Withdraw.]	px2_05_si_frontal_assault.stringtable
+Bow.	1	[Bow.] "As you wish, Lord Doemenel."	04_cv_edmar_doemenel.stringtable
+Rush the man before he can react.	1	[Rush the man before he can react.]	07_cv_glanfathan_leader.stringtable
+Attacking effort 1	1	[Attacking effort 1]	companion_cv_hiravias_voice_set.stringtable
+Give Mylla the cookie.	1	[Give Mylla the cookie.]	px2_05_cv_mylla.stringtable
+Focus on the woman's cries.	1	[Focus on the woman's cries.]	companion_cv_gm_dreams_02.stringtable
+Fit the replacement lever into the slot.	1	[Fit the replacement lever into the slot.]	px2_02_cv_elevator_parts.stringtable
+Inquire about the prisoner.	1	[Inquire about the prisoner.]	02_cv_leaden_key_agent.stringtable
+Use a hammer and chisel to clear the way.	1	[Use a hammer and chisel to clear the way.]	08_si_sky_dragon_ridge.stringtable
+Inspect the machine.	1	[Inspect the machine.]	05_cv_tayr_nowneth_machine_01.stringtable
+Climb up to secure the hook yourself.	1	[Climb up to secure the hook yourself.]	px1_01_si_chute.stringtable
+Examine the water.	1	[Examine the water.]	13_si_weald_water.stringtable
+Grab the weapon and pull it out.	1	[Grab the weapon and pull it out.]	px1_03_si_cursed_weapon.stringtable
+Cross the wall.	1	[Cross the wall.]	1011_si_fungus_wall.stringtable
+Beckon your party to follow you into the chamber.	1	[Beckon your party to follow you into the chamber.]	02_cv_ritual_door.stringtable
+Assemble the thought.	1	[Assemble the thought.] "Do you wish to travel with me?"	companion_cv_gm_02.stringtable
+Inspect the hammer.	1	[Inspect the hammer.]	px2_02_cv_abydon_tower_dream.stringtable
+Disintegrate Iovara's soul.	1	[Disintegrate Iovara's soul.]	14_cv_iovara_2.stringtable
+Speak the words you learned from the Leaden Key Acolyte.	1	[Speak the words you learned from the Leaden Key Acolyte.]	05_si_tower_door.stringtable
+Stare silently.	1	[Stare silently.]	companion_cv_hiravias.stringtable
+Examine the orlan.	1	[Examine the orlan.]	px1_04_cv_sleeping_merc.stringtable
+Leap aside.	1	[Leap aside.]	px2_05_si_frontal_assault.stringtable
+Attack the elves.	1	[Attack the elves.]	13_cv_rymrgand_coalition.stringtable
+Touch the altar.	1	[Touch the altar.]	px1_03_cv_galawain_shrine.stringtable
+Use the log for cover.	1	[Use the log for cover.]	px2_05_si_frontal_assault.stringtable
+Take the treasure.	1	[Take the treasure.]	px2_00_si_spider_maze.stringtable
+Cast Smoke Cloud.	1	[Cast Smoke Cloud.]	px2_04_si_moon_escape.stringtable
+Show him the totem.	1	[Show him the totem.] "Do you recognize this?" 	px1_00_cv_thyrsc.stringtable
+Allow the souls to pass through the vein to Woedica.	1	[Allow the souls to pass through the vein to Woedica.]	14_cv_machine_ending.stringtable
+Place the Sapphire Seal into the right socket.	1	[Place the Sapphire Seal into the right socket.]	1006_si_sealed_door.stringtable
+Do not attempt to clear the webbing.	1	[Do not attempt to clear the webbing.]	08_si_rhemen_spider_tunnel_1.stringtable
+Quickly grab Rinatto's hand before it strikes.	1	[Quickly grab Rinatto's hand before it strikes.]	11_cv_rinatto.stringtable
+Open the scroll case.	1	[Open the scroll case.]	08_cv_dying_monk.stringtable
+Cast Dragon Leap to save yourself.	1	[Cast Dragon Leap to save yourself.]	px1_01_si_chute.stringtable
+Rush forward to the gate.	1	[Rush forward to the gate.]	px2_05_si_frontal_assault.stringtable
+Go back downstairs.	1	[Go back downstairs.]	04_cv_servant_upstairs.stringtable
+Remove the Sapphire Seal.	1	[Remove the Sapphire Seal.]	1006_si_sealed_door.stringtable
+Turn back to Teir Evron.	1	[Turn back to Teir Evron.]	13_cv_galawain_coalition.stringtable
+Deck her.	1	[Deck her.]	px2_companion_cv_maneha_quest.stringtable
+Give 1500 cp.	1	[Give 1500 cp.] "Fifteen hundred it is."	04_cv_nans.stringtable
+Cast Puppetmaster.	1	[Cast Puppetmaster.]	px1_04_cv_sleeping_merc.stringtable
+psychedelic hysteria giggling	1	[psychedelic hysteria giggling] If only everyone could see this.	px1_cm_bs_zahua_voice_set.stringtable
+Take Vela.	1	[Take Vela.]	11_cv_sacrificial_crib.stringtable
+Examine the wound.	1	[Examine the wound.]	px1_03_cv_injured_wolf.stringtable
+Place the Sapphire Seal into the left socket.	1	[Place the Sapphire Seal into the left socket.]	1006_si_sealed_door.stringtable
+Place the Peridot Seal into the right socket.	1	[Place the Peridot Seal into the right socket.]	1006_si_sealed_door.stringtable
+Try to reach the ledge again.	1	[Try to reach the ledge again.]	px1_01_si_chute.stringtable
+Leave the lever alone.	1	[Leave the lever alone.]	px1_02_si_minecart_shenanigans_start.stringtable
+Show him the dagger you found on Derrin.	1	[Show him the dagger you found on Derrin.] "This belong to you?"	03_cv_bragan_thug.stringtable
+Kick at the cat.	1	[Kick at the cat.] "Get away from me, beast." 	07_bs_black_cat.stringtable
+Try the skull-handled key.	1	[Try the skull-handled key.]	p2_si_shrine.stringtable
+Retrace your steps to the caves.	1	[Retrace your steps to the caves.]	px2_00_si_spider_maze.stringtable
+Gather some water in the waterskin.	1	[Gather some water in the waterskin.]	13_si_weald_water.stringtable
+Pull him aside from the group.	1	[Pull him aside from the group.] "Can we discuss our party members?"	companion_cv_hiravias.stringtable
+Approach the elven woman.	1	[Approach the elven woman.]	13_cv_berath.stringtable
+Hide in the gap.	1	[Hide in the gap.]	px1_02_si_chasm_rescue_redux.stringtable
+Whistle to the bird.	1	[Whistle to the bird.]	13_cv_hylea.stringtable
+Retrace your steps to the vithrack common house.	1	[Retrace your steps to the vithrack common house.]	px2_00_si_spider_maze.stringtable
+Continue forward.	1	[Continue forward.]	px1_00_si_burning_building.stringtable
+Examine the outer circle.	1	[Examine the outer circle.]	08_si_rhemen_gorge_entrance.stringtable
+Pick up the cat.	1	[Pick up the cat.]	07_bs_black_cat.stringtable
+Call down a cannon strike from Durgan's Battery.	1	[Call down a cannon strike from Durgan's Battery.]	px2_05_si_frontal_assault.stringtable
+Inhale some of the Radiant Spores.	1	[Inhale some of the Radiant Spores.]	px2_00_cv_radiant_spore.stringtable
+Rappel down.	1	[Rappel down.]	px1_02_si_chasm_rescue_redux.stringtable
+Sever the rope, allowing Maerwald to pass from the world.	1	[Sever the rope, allowing Maerwald to pass from the world.]	06_cv_maerwald.stringtable
+Give her 5000cp.	1	[Give her 5000cp.] "You'll be less recognizable outside the Dyrwood. I'll give you some coin for the move."	06_cv_visitor_war_vet.stringtable
+Examine the buckle.	1	[Examine the buckle.]	01_cv_lendry_soul.stringtable
+Command the souls holding your companion.	1	[Command the souls holding your companion.]	14_si_burial_isle_pit.stringtable
+Yank your hand back.	1	[Yank your hand back.]	13_si_weald_water.stringtable
+Scout for a more stable place to cross.	1	[Scout for a more stable place to cross.]	px2_04_si_moon_escape.stringtable
+Climb in.	1	[Climb in.] 	px1_02_si_minecart_shenanigans_start.stringtable
+Summon Beregan's ogres.	1	[Summon Beregan's ogres.]	px2_04_si_moon_escape.stringtable
+Ring the left bell a third time.	1	[Ring the left bell a third time.]	07_si_temple_bells.stringtable
+Pray to Berath.	1	[Pray to Berath.]	13_cv_berath.stringtable
+Whimpering in panic	1	[Whimpering in panic]	companion_cv_hiravias_voice_set.stringtable
+Let Aelys go.	1	[Let Aelys go.]	00_cv_wymund.stringtable
+Tie a rope around your waist and anchor it.	1	[Tie a rope around your waist and anchor it.] 	px1_02_si_chasm_rescue_redux.stringtable
+Hold up the ogre's head.	1	[Hold up the ogre's head.] "Is this what you were looking for?"	p2_cv_rumbald.stringtable
+Climb carefully down the rocks.	1	[Climb carefully down the rocks.]	1015_si_stairs.stringtable
+Swim to the surface as fast as possible.	1	[Swim to the surface as fast as possible.]	px2_04_si_pool.stringtable
+Examine the threads.	1	[Examine the threads.]	px2_00_cv_radiant_spore.stringtable
+Reach for a companion.	1	[Reach for a companion.]	14_si_burial_isle_pit.stringtable
+Pick it up.	1	[Pick it up.]	px2_05_cv_batling.stringtable
+Spit	1	"Vo'ts asabas." [Spit]	companion_cv_pallegina_voice_set.stringtable
+Focus your gaze on the staff.	1	[Focus your gaze on the staff.]	companion_cv_durance_v2.stringtable
+Leave the dog alone.	1	[Leave the dog alone.] 	07_cv_black_hound.stringtable
+Examine the book.	1	[Examine the book.]	01_bs_helig_book.stringtable
+Cast Cleansing Wind.	1	[Cast Cleansing Wind.]	px1_02_si_chasm_rescue.stringtable
+Use your torch to light a fire in the mouth.	1	[Use your torch to light a fire in the mouth.]	px1_02_si_battery_entrance.stringtable
+Remove the Peridot Seal.	1	[Remove the Peridot Seal.]	1006_si_sealed_door.stringtable
+Dive in after it.	1	[Dive in after it.]	08_si_ice_fishing.stringtable
+Lift Wirtan off his feet.	1	[Lift Wirtan off his feet.] "I will crack your head in two if you lie to me again." 	07_cv_wirtan.stringtable
+Touch the necklace.	1	[Touch the necklace.]	01_cv_kendal_soul.stringtable
+Approach the dwarven man.	1	[Approach the dwarven man.]	13_cv_berath.stringtable
+Unfasten the latch.	1	[Unfasten the latch.]	px1_00_cv_lafda_henchmen_spied.stringtable
+Eat it.	1	[Eat it.]	companion_cv_hiravias_intro.stringtable
+Look to the sea.	1	[Look to the sea.]	px2_03_cv_abydon_moon_vision.stringtable
+Return the figurine.	1	[Return the figurine.] "I've got it. He's standing on a cliff."	companion_cv_sagani_main.stringtable
+Roll your eyes, say nothing.	1	[Roll your eyes, say nothing.]	px1_00_cv_flagon_innkeeper.stringtable
+Test the vines.	1	[Test the vines.]	04_si_two_story_job.stringtable
+Punch the nearest elf.	1	[Punch the nearest elf.]	px1_03_cv_pale_elves.stringtable
+Fire your crossbow at the orlan.	1	[Fire your crossbow at the orlan.]	px1_04_cv_sleeping_merc.stringtable
+Go back to Stalwart.	1	[Go back to Stalwart.]	px2_00_cv_tax_collector.stringtable
+Grab the item.	1	[Grab the item.]	px4_cv_fulvano_blunderbuss.stringtable
+Give her Vianna's research.	1	[Give her Vianna's research.] "Here it is."	07_cv_aranroed.stringtable
+Examine the socket.	1	[Examine the socket.]	px1_02_si_mines_door_key.stringtable
+Haul him over by the arm.	1	[Haul him over by the arm.] "Get moving, or I'll throw you out." 	07_cv_giacco.stringtable
+Death Groan	1	[Death Groan]	bs_greetings.stringtable
+Give 200 cp.	1	[Give 200 cp.] "We've got a deal."	03_cv_imatl.stringtable
+Use the hammer and chisel to weaken the wall	1	[Use the hammer and chisel to weaken the wall] 	si_selected_member_proto.stringtable
+Strike the anvil relief.	1	[Strike the anvil relief.]	px1_02_si_battery_entrance.stringtable
+Ring the middle, large bell.	1	[Ring the middle, large bell.]	07_si_temple_bells.stringtable
+Attack the cean gŵla.	1	[Attack the cean gŵla.]	03_cv_lilith.stringtable
+Release them from Durgan's Battery.	1	[Release them from Durgan's Battery.] "You're free to roam again. Return to the Wheel and seek new lives."	px1_02_cv_forge.stringtable
+Cast Ray of Fire.	1	[Cast Ray of Fire.] 	px1_02_si_frozen_dwarf_ground_level.stringtable
+Use a hammer and chisel to weaken the boulder.	1	[Use a hammer and chisel to weaken the boulder.]	px2_00_si_spider_maze.stringtable
+Jump the chasm.	1	[Jump the chasm.]	si_party_check_proto.stringtable
+Fix the winch.	1	[Fix the winch.]	px2_02_si_elevator.stringtable
+Point the object toward the open gate.	1	[Point the object toward the open gate.]	px2_03_si_rising_machine.stringtable
+Inspect the waters.	1	[Inspect the waters.]	00_si_cliaban_water_tunnel_02.stringtable
+Cast the spell Winter Wind on the ice floes.	1	[Cast the spell Winter Wind on the ice floes.]	px2_04_si_ice_floes.stringtable
+Pay 50p	1	[Pay 50p] "Let's play."	px1_00_cv_andred_knife_toss.stringtable
+Hurl Gordy to the ground.	1	[Hurl Gordy to the ground.] "Don't try anything like that again, or you'll see what grown-ups can do with a nice, sharp …	01_cv_gordy.stringtable
+Squeeze through the gap.	1	[Squeeze through the gap.] 	px2_05_si_infiltration.stringtable
+Stay silent	1	[Stay silent]	08_cv_leaden_key_ambush_01.stringtable
+Seek out the foreign presence in Cillan's mind.	1	[Seek out the foreign presence in Cillan's mind.]	px2_00_cv_mines_worker_3.stringtable
+Look below.	1	[Look below.]	08_si_rhemen_broken_stairs.stringtable
+Flip, directing yourself back to the center of the pit.	1	[Flip, directing yourself back to the center of the pit.]	14_si_burial_isle_pit.stringtable
+Use a rope for assistance.	1	[Use a rope for assistance.]	px2_05_si_bog_stone_wall.stringtable
+Grab Gordy by the shirt and hold him above your head.	1	[Grab Gordy by the shirt and hold him above your head.] "How about you tell me that secret right now, before I get angry…	01_cv_gordy.stringtable
+Place the totem on the altar.	1	[Place the totem on the altar.] 	px1_03_cv_galawain_shrine.stringtable
+Stay.	1	[Stay.]	00_cv_leaden_key_agent_soul.stringtable
+Order the party onward with Zealous Charge.	1	[Order the party onward with Zealous Charge.]	px2_04_si_moon_escape.stringtable
+Attack Grunt #2	1	[Attack Grunt #2]	companion_cv_kana_voice_set.stringtable
+Use Swift Strikes to punch through the ice.	1	[Use Swift Strikes to punch through the ice.]	px1_02_si_frozen_dwarf_ground_level.stringtable
+Return the souls to the bodies they were intended for.	1	[Return the souls to the bodies they were intended for.]	14_cv_machine_ending.stringtable
+Leave the scarf alone.	1	[Leave the scarf alone.]	01_cv_kora_soul.stringtable
+Give him 1200cp.	1	[Give him 1200cp.] "This ought to be enough to settle your debts."	06_cv_visitor_town_drunk.stringtable
+Silence the bell.	1	[Silence the bell.]	07_si_temple_bells.stringtable
+Brace yourself.	1	[Brace yourself.]	14_si_burial_isle_pit.stringtable
+Attack him.	1	[Attack him.]	13_cv_berath.stringtable
+Go to the top of the West Tower.	1	[Go to the top of the West Tower.]	px2_02_cv_battery_new_transitions.stringtable
+Shrug and walk away.	1	[Shrug and walk away.]	px2_05_cv_stalwart_delegation.stringtable
+Wade to the tunnel.	1	[Wade to the tunnel.]	00_si_cliaban_water_tunnel.stringtable
+Extract Iovara's soul from the adra.	1	[Extract Iovara's soul from the adra.]	14_cv_iovara_2.stringtable
+Silently slit their throats.	1	[Silently slit their throats.]	px2_05_cv_sleeping_mercenaries.stringtable
+Strike out at the form.	1	[Strike out at the form.]	07_cv_eothas_altar_spirit.stringtable
+Throw a grappling hook up onto the roof.	1	[Throw a grappling hook up onto the roof.]	px2_05_si_infiltration.stringtable
+Leave it alone for now.	1	[Leave it alone for now.]	px1_02_cv_ghost_adra_disc.stringtable
+Pay 50 pands	1	[Pay 50 pands] "Go have a few drinks on me. Just tell me who your ringleader is."	03_cv_cosso.stringtable
+Climb back up to the chute's opening.	1	[Climb back up to the chute's opening.]	px1_01_si_chute.stringtable
+Read from Ixtli's Notebook, "Xitlac Cualla."	1	[Read from Ixtli's Notebook, "Xitlac Cualla."]	px1_03_si_hole.stringtable
+Look inside the cart.	1	[Look inside the cart.]	px1_02_si_minecart_shenanigans_start.stringtable
+Grab Weyd by the collar.	1	[Grab Weyd by the collar.]	03_cv_weyd.stringtable
+Focus your senses, and seek out the edges of the illusion.	1	[Focus your senses, and seek out the edges of the illusion.] 	13_si_weald_water.stringtable
+Peer into Gram's soul.	1	[Peer into Gram's soul.]	04_cv_gram.stringtable
+Throw your dagger at the orlan.	1	[Throw your dagger at the orlan.]	px1_04_cv_sleeping_merc.stringtable
+Present the dagger.	1	[Present the dagger.] "A dagger made of March steel? Like this one?"	01_cv_gordy.stringtable
+Put the wolf out of its misery.	1	[Put the wolf out of its misery.]	px1_03_cv_injured_wolf.stringtable
+Send no one.	1	[Send no one.]	p2_si_cliff.stringtable
+Gesture toward Mylla.	1	[Gesture toward Mylla.] "Sagani, would you mind... ?" 	px2_05_cv_mylla.stringtable
+Ring the middle bell a fourth time.	1	[Ring the middle bell a fourth time.]	07_si_temple_bells.stringtable
+Give 1000cp	1	[Give 1000cp] "Here. This ought to be enough to pay for passage."	06_cv_visitor_criminal.stringtable
+Leave her alone.	1	[Leave her alone.]	companion_cv_gm_hub_dreams_chat_02.stringtable
+Leave them be.	1	[Leave them be.]	px2_05_cv_sleeping_mercenaries.stringtable
+Enter the skull's mouth.	1	[Enter the skull's mouth.]	13_cv_berath.stringtable
+Secure the grappling hook to the broken stalagmite.	1	[Secure the grappling hook to the broken stalagmite.]	px1_01_si_chute.stringtable
+Dispassionately stare off into the distance.	1	[Dispassionately stare off into the distance.]	companion_cv_pallegina.stringtable
+Strike the ice with a Barbaric Blow.	1	[Strike the ice with a Barbaric Blow.]	px1_02_si_frozen_dwarf_ground_level.stringtable
+Background	1	[Background] "I was practically raised at sea."	px2_03_cv_kaoto.stringtable
+Continue into the chamber alone.	1	[Continue into the chamber alone.]	02_cv_ritual_door.stringtable
+Sniff the breeze.	1	[Sniff the breeze.]	companion_cv_sagani_main.stringtable
+Try to remove the arrow.	1	[Try to remove the arrow.] 	px1_03_cv_injured_wolf.stringtable
+Place Masca's forge hammer on the shrine.	1	[Place Masca's forge hammer on the shrine.]	px2_00_cv_magran_shrine.stringtable
+Read Andred's soul.	1	[Read Andred's soul.]	px1_00_cv_andred_byrhtwen.stringtable
+Carefully climb up the rope to secure it once more.	1	[Carefully climb up the rope to secure it once more.]	px1_01_si_chute.stringtable
+Rush forward to help the hunters.	1	[Rush forward to help the hunters.] 	px1_03_cv_suldrun.stringtable
+Move in to pull the weapon from the stone.	1	[Move in to pull the weapon from the stone.]	px1_03_si_cursed_weapon.stringtable
+Give him the Heart of White March.	1	[Give him the Heart of White March.] "I have a gem you've been looking for..."	02_cv_clyver_rimgund.stringtable
+Speak the command to activate the machine.	1	[Speak the command to activate the machine.]	14_cv_machine_ending.stringtable
+Give 350 cp.	1	[Give 350 cp.] "Perhaps you should look the other way."	02_cv_woedica_mercenary.stringtable
+Take the sea chest.	1	[Take the sea chest.]	03_cv_sea_chest.stringtable
+Attack the serpent.	1	[Attack the serpent.]	px1_01_cv_chorus.stringtable
+Push the latch open.	1	[Push the latch open.]	px1_00_cv_lafda_henchmen_spied.stringtable
+Use flint and tinder to light a fire in the mouth.	1	[Use flint and tinder to light a fire in the mouth.]	px1_02_si_battery_entrance.stringtable
+Give 600 pands.	1	[Give 600 pands.] "I'll buy that horn off you."	px1_00_yduran.stringtable
+Not yet.	1	[Not yet.]	14_cv_machine_ending.stringtable
+Examine the spear.	1	[Examine the spear.]	08_cv_rhemen_weapons.stringtable
+Examine the trunk more closely.	1	[Examine the trunk more closely.]	04_si_sanitarium_wicht_chest.stringtable
+Inspect the gate.	1	[Inspect the gate.]	px2_05_si_frontal_assault.stringtable
+Examine the shrine more closely.	1	[Examine the shrine more closely.] 	px1_03_cv_galawain_shrine.stringtable
+Inspect the mural.	1	[Inspect the mural.]	px2_03_si_ondra_mural.stringtable
+Watch.	1	[Watch.]	px2_00_cv_masca.stringtable
+Pay the 50p.	1	[Pay the 50p.] 	px1_00_cv_teanlecg_dice_game.stringtable
+Sadistic laugh.	1	[Sadistic laugh.]	companion_cv_durance_voice_set.stringtable
+Give 300 cp.	1	[Give 300 cp.] "Here. This should be enough to buy your passage out of Defiance Bay."	01_cv_eorn.stringtable
+Try to sneak through the living wall.	1	[Try to sneak through the living wall.] 	12_si_maw_thorns.stringtable
+Twist Wirtan's injured arm.	1	[Twist Wirtan's injured arm.] "Not sorry enough." 	07_cv_wirtan.stringtable
+Press the sapphire in the Living Lands.	1	[Press the sapphire in the Living Lands.]	px1_02_cv_forge_globe.stringtable
+Set a blade to his neck	1	[Set a blade to his neck] "You want to try that one again?" 	07_cv_sweynur.stringtable
+Search her pockets.	1	[Search her pockets.]	px2_05_bs_llen_assassin_soul.stringtable
+Extend your soul to the blood pool.	1	[Extend your soul to the blood pool.]	p2_cv_pool.stringtable
+Give Simoc the poison.	1	[Give Simoc the poison.] "Here is the potion you asked for."	13_cv_simoc.stringtable
+Show him the amulet.	1	[Show him the amulet.] "Yes, but not as you expected." 	01_cv_dalton.stringtable
+Tap Weyd on the shoulder.	1	[Tap Weyd on the shoulder.]	03_cv_weyd.stringtable
+Remove the sabre.	1	[Remove the sabre.]	1003_si_aedyran_statue.stringtable
+Cast Call to Slumber.	1	[Cast Call to Slumber.]	px1_04_cv_sleeping_merc.stringtable
+Give 2000 cp.	1	[Give 2000 cp.] "Coin, to purchase guides and bribes where necessary."	06_cv_visitor_dignitary.stringtable
+Wink obnoxiously at Pallegina.	1	[Lie] [Wink obnoxiously at Pallegina.] "I understand completely and will make sure she completes this important mission …	companion_cv_pallegina.stringtable
+Death grunt	1	[Death grunt]	companion_cv_sagani_voice_set.stringtable
+Hand her the child.	1	[Hand her the child.]	companion_cv_gm_dreams_02.stringtable
+Point the object toward the rising wave.	1	[Point the object toward the rising wave.]	px2_03_si_rising_machine.stringtable
+Push the boulder out of the way.	1	[Push the boulder out of the way.]	08_si_sky_dragon_ridge.stringtable
+Grab him.	1	[Grab him.] "Here's my counteroffer: I tell her whatever I please and you still give me that discount."	01_cv_doran.stringtable
+Present the burning stone.	1	[Present the burning stone.] "I journeyed to Searing Falls myself. This is what I found there."	02_cv_fyrga.stringtable
+Poke the head.	1	[Poke the head.]	px1_cm_si_zahua_intro.stringtable
+Aim for the Ears.	1	[Aim for the Ears.]	px1_00_cv_andred_knife_toss.stringtable
+Give him the key.	1	[Give him the key.] "He said you kept it in that trunk over there." 	04_cv_moedred.stringtable
+Press the recessed stone button.	1	[Press the recessed stone button.]	px2_03_si_ondra_panels.stringtable
+Snatch the opal from Imatl.	1	[Snatch the opal from Imatl.]	03_cv_imatl.stringtable
+Open the trunk.	1	[Open the trunk.]	04_si_sanitarium_wicht_chest.stringtable
+Graze Nyfre's Neck with your Weapon	1	[Graze Nyfre's Neck with your Weapon] "Next one will cut deeper... just enough for you to confess before bleeding to dea…	00_cv_nyfre.stringtable
+Give 6,000 cp.	1	[Give 6,000 cp.] "Yes."	03_cv_serel.stringtable
+Hand over the bundle of remains.	1	[Hand over the bundle of remains.] 	07_cv_wirtan.stringtable
+Go back to sleep.	1	[Go back to sleep.]	px2_companion_cv_maneha_quest.stringtable
+Roll the dice.	1	[Roll the dice.]	px1_00_cv_teanlecg_dice_game.stringtable
+Fire your bow at the orlan.	1	[Fire your bow at the orlan.]	px1_04_cv_sleeping_merc.stringtable
+Strike the crenelated wall relief.	1	[Strike the crenelated wall relief.]	px1_02_si_battery_entrance.stringtable
+Sound the birthing chimes in your mind.	1	[Sound the birthing chimes in your mind.]	companion_cv_gm_hub_dreams_chat_02.stringtable
+Examine the trees.	1	[Examine the trees.]	companion_cv_sagani_clues.stringtable
+The party member reacts	1	[The party member reacts]	07_cv_eothas_altar_spirit.stringtable
+Slide the panel of the tidal wave.	1	[Slide the panel of the tidal wave.]	px2_03_si_ondra_panels.stringtable
+Leave him be.	1	[Leave him be.]	04_cv_gram.stringtable
+Gasp	1	[Gasp]	01_bs_audience_boo.stringtable
+Ride along.	1	[Ride along.]	px1_02_si_minecart_shenanigans_start.stringtable
+Cut away at the vegetation with a weapon.	1	[Cut away at the vegetation with a weapon.]	1011_si_fungus_wall.stringtable
+Watch them go.	1	[Watch them go.]	00_cv_lord_harond.stringtable
+Don the hood and mask.	1	[Don the hood and mask.]	02_cv_ritual_door.stringtable
+Command Rinatto to stop.	1	[Command Rinatto to stop.]	11_cv_rinatto.stringtable
+Rotate the dial clockwise.	1	[Rotate the dial clockwise.]	px1_02_si_mines_door_key.stringtable
+Take the egg and climb down the cliff.	1	[Take the egg and climb down the cliff.]	p2_si_cliff.stringtable
+Swing on the rope to make a grab for the ledge.	1	[Swing on the rope to make a grab for the ledge.]	px1_01_si_chute.stringtable
+Touch the broken staff.	1	[Touch the broken staff.] 	px1_02_cv_grimoire_vision.stringtable
+Hack away some of the vines.	1	[Hack away some of the vines.] 	px2_05_si_bog_stone_wall.stringtable
+Remove the Bloodstone Seal.	1	[Remove the Bloodstone Seal.]	1006_si_sealed_door.stringtable
+Stare back silently.	1	[Stare back silently.]	01_cv_orimanth.stringtable
+Show him the message.	1	[Show him the message.] "I almost forgot - he gave me this."	11_cv_high_monk.stringtable
+Press the sapphire in Old Vailia.	1	[Press the sapphire in Old Vailia.]	px1_02_cv_forge_globe.stringtable
+Press the sapphire in Rauatai.	1	[Press the sapphire in Rauatai.]	px1_02_cv_forge_globe.stringtable
+Brandish your weapons.	1	[Brandish your weapons.] "Are you certain?" 	1012_cv_scouts.stringtable
+Send someone to fix the winch.	1	[Send someone to fix the winch.]	px2_02_si_elevator.stringtable
+Climb the vines.	1	[Climb the vines.]	04_si_two_story_job.stringtable
+Throw the remains at his feet.	1	[Throw the remains at his feet.] "You left them down there." 	07_cv_wirtan.stringtable
+Inspect the statue.	1	[Inspect the statue.]	1003_si_aedyran_statue.stringtable
+Cut the xaurip's throat.	1	[Cut the xaurip's throat.]	1002_cv_sick_xaurip.stringtable
+cheerful humming	1	[cheerful humming]	companion_cv_kana_voice_set.stringtable
+Raise your weapon.	1	[Raise your weapon.]	07_cv_padebald.stringtable
+Attack the wichts.	1	[Attack the wichts.]	px2_05_cv_mylla.stringtable
+Wicked/gleeful laugh	1	[Wicked/gleeful laugh]	px1_companion_cv_devil_voice_set.stringtable
+Give gem.	1	[Give gem.] "Yes, I have it here."	px2_cv_cv_zahua_pedestal_spirit.stringtable
+Keep climbing.	1	[Keep climbing.] 	px1_02_si_chasm_rescue_redux.stringtable
+Examine the writing.	1	[Examine the writing.]	08_si_rhemen_gorge_entrance.stringtable
+Growl	1	[Growl]	13_bs_simoc_stelgaer.stringtable
+Examine the vines.	1	[Examine the vines.]	12_si_maw_thorns.stringtable
+Secure the egg with a rope and lower it.	1	[Secure the egg with a rope and lower it.]	p2_si_cliff.stringtable
+Examine what lies in your hands.	1	[Examine what lies in your hands.]	companion_cv_gm_dreams_02.stringtable
+Put on Iverra's Diving Helmet and swim into the tunnel.	1	[Put on Iverra's Diving Helmet and swim into the tunnel.]	00_si_cliaban_water_tunnel.stringtable
+Attempt a free hand descent down the chute.	1	[Attempt a free hand descent down the chute.]	px1_01_si_chute.stringtable
+Attempt to hide.	1	[Attempt to hide.]	px2_04_si_pool.stringtable
+Show her the cargo.	1	[Show her the cargo.] "Would these happen to be your wares?"	07_cv_peregund.stringtable
+Climb back down.	1	[Climb back down.]	p2_si_cliff.stringtable
+Place the amulet on the statue.	1	[Place the amulet on the statue.]	1015_cv_adra_dragon.stringtable
+Gather the remains.	1	[Gather the remains.]	07_cv_eothas_vault_spirit.stringtable
+Take a deep breath.	1	[Take a deep breath.]	px2_00_cv_radiant_spore.stringtable
+Grab her arm.	1	[Grab her arm.] "Yes, I changed my mind. I suggest you do as I say."	px2_00_cv_masca.stringtable
+Use your head to light a fire in the mouth.	1	[Use your head to light a fire in the mouth.]	px1_02_si_battery_entrance.stringtable
+Grab Maneha.	1	[Grab Maneha.]	px2_companion_cv_maneha_quest_2.stringtable
+Climb down the vines.	1	[Climb down the vines.]	04_si_two_story_job_02.stringtable
+Push on it yourself.	1	[Push on it yourself.]	07_si_weak_wall.stringtable
+Kill Harond.	1	[Kill Harond.] "My thoughts exactly."	00_cv_lord_harond.stringtable
+Give her the forge hammer.	1	[Give her the forge hammer.]	px2_00_cv_masca.stringtable
+Dive in yourself.	1	[Dive in yourself.]	px2_04_si_pool.stringtable
+Who will cast Bulwark Against the Elements?	1	[Who will cast Bulwark Against the Elements?]	px1_03_si_hole.stringtable
+Place the stone disc in the hollow space behind the basin.	1	[Place the stone disc in the hollow space behind the basin.]	px1_02_si_forge_awakening.stringtable
+Say nothing and hide beneath the waves.	1	[Say nothing and hide beneath the waves.]	px1_01_cv_chorus.stringtable
+Place the anvil tile in the relief.	1	[Place the anvil tile in the relief.] 	px1_02_si_battery_entrance.stringtable
+Pick the lock.	1	[Pick the lock.]	p2_si_shrine.stringtable
+Place the adra disc in the indentation.	1	[Place the adra disc in the indentation.]	08_si_rhemen_gorge_entrance.stringtable
+Charge the orlan.	1	[Charge the orlan.]	px1_04_cv_sleeping_merc.stringtable
+Follow her gaze.	1	[Follow her gaze.]	px2_00_cv_mines_worker_3.stringtable
+Apply the Pargrun Rust-Dissolver.	1	[Apply the Pargrun Rust-Dissolver.]	px2_02_cv_elevator_parts.stringtable
+Follow the pole.	1	[Follow the pole.]	px2_02_cv_abydon_tower_dream.stringtable
+Attack Beregan.	1	[Attack Beregan.]	px1_01_beregan.stringtable
+Examine the thought about the tower.	1	[Examine the thought about the tower.]	02_cv_leaden_key_agent.stringtable
+Read Taena's soul.	1	[Read Taena's soul.]	px1_00_cv_taena_spirit.stringtable
+Leave the trunk alone.	1	[Leave the trunk alone.]	04_si_sanitarium_wicht_chest.stringtable
+Unbar the door and fling it open wide.	1	[Unbar the door and fling it open wide.]	px1_01_cv_chorus.stringtable
+Wait, say nothing.	1	[Wait, say nothing.]	px1_02_galvino_critpath.stringtable
+DEBUG	1	[DEBUG] test cutscene	03_cv_niah.stringtable
+NPCBacker	1	[NPCBacker]	cv_watcher_backer_story.stringtable
+Cross your arms, wait.	1	[Cross your arms, wait.]	companion_cv_aloth_caed_nua.stringtable
+Shake his hand.	1	[Shake his hand.]	px1_00_cv_bounty_quest_giver.stringtable
+Nod	1	[Nod]	px1_00_cv_reyfald.stringtable
+Damaged Grunt #2	1	[Damaged Grunt #2]	companion_cv_kana_voice_set.stringtable
+Search the body.	1	[Search the body.]	px1_02_cv_ghost_foreman.stringtable
+Quietly approach the orlan.	1	[Quietly approach the orlan.]	px1_04_cv_sleeping_merc.stringtable
+Step away.	1	[Step away.]	px1_00_cv_burning_building_intro_convo.stringtable
+Place the stone disc in the socket.	1	[Place the stone disc in the socket.]	px1_02_si_mines_door_key.stringtable
+Place the Bloodstone Seal into the middle socket.	1	[Place the Bloodstone Seal into the middle socket.]	1006_si_sealed_door.stringtable
+Jump across the floes.	1	[Jump across the floes.]	px2_04_si_ice_floes.stringtable
+Don't attempt to push the pedestal.	1	[Don't attempt to push the pedestal.]	p2_si_shrine.stringtable
+Examine the middle socket.	1	[Examine the middle socket.]	1006_si_sealed_door.stringtable
+Release the weapon.	1	[Release the weapon.]	px1_03_si_cursed_weapon.stringtable
+Return to the shallows.	1	[Return to the shallows.]	00_si_cliaban_water_tunnel.stringtable
+Try to pull the satchel away.	1	[Try to pull the satchel away.]	px1_02_si_frozen_dwarf_ground_level.stringtable
+Take him down with you.	1	[Take him down with you.]	px1_01_cv_chorus.stringtable
+Aim for the Nose.	1	[Aim for the Nose.] 	px1_00_cv_andred_knife_toss.stringtable
+Knock Cillan out.	1	[Knock Cillan out.]	px2_00_cv_mines_worker_3.stringtable
+Destroy the amulet.	1	[Destroy the amulet.] "This isn't your choice. Rowyna wants to be released, and I'll honor her wishes."	01_cv_dalton.stringtable
+Ring the middle bell again.	1	[Ring the middle bell again.]	07_si_temple_bells.stringtable
+Read from Ixtli's Notebook, "Cualla Micha."	1	[Read from Ixtli's Notebook, "Cualla Micha."]	px1_03_si_hole.stringtable
+Read the soul.	1	[Read the soul.] 	px1_00_cv_owynna_spirit.stringtable
+Step back and consider this further.	1	[Step back and consider this further.]	px2_04_si_moon_escape.stringtable
+Insert the new cog.	1	[Insert the new cog.]	px2_02_cv_elevator_parts.stringtable
+You dive.	1	[You dive.]	px1_03_si_hole.stringtable
+Chant Blessed Was Wengridh, Quickest of His Tribe.	1	[Chant Blessed Was Wengridh, Quickest of His Tribe.]	px2_04_si_moon_escape.stringtable
+Lever the rubble with the prybar.	1	[Lever the rubble with the prybar.]	px2_04_si_moon_escape.stringtable
+Slap Aloth.	1	[Slap Aloth.]	04_cv_bellasege.stringtable
+Leave the remains where they are.	1	[Leave the remains where they are.]	07_cv_eothas_vault_spirit.stringtable
+Dive in and search the bottom of the pond.	1	[Dive in and search the bottom of the pond.]	px1_03_si_hole.stringtable
+Go to Durgan's Battery.	1	[Go to Durgan's Battery.]	px2_00_intro_dream.stringtable
+Plug the hole with your finger.	1	[Plug the hole with your finger.]	13_cv_rymrgand_coalition.stringtable
+Give water.	1	[Give water.] "We were able to capture some water, yes."	px2_cm_cv_zahua_waterfall_spirit.stringtable
+Throw him a rope.	1	[Throw him a rope.]	px1_02_si_chasm_rescue.stringtable
+Perform the Sign of the Tide on the hidden carving.	1	[Perform the Sign of the Tide on the hidden carving.]	px2_03_si_ondra_panels.stringtable
+Give Gordy the dagger.	1	[Give Gordy the dagger.] "A deal's a deal. Here you go."	01_cv_gordy.stringtable
+Disperse the souls to an unknown location.	1	[Disperse the souls to an unknown location.]	14_cv_machine_ending.stringtable
+Use a hammer and chisel to gouge a hole near the statue.	1	[Use a hammer and chisel to gouge a hole near the statue.]	p2_si_shrine.stringtable
+Give him Vianna's research.	1	[Give him Vianna's research.] "I think this is what you've been looking for."	02_cv_dunstan.stringtable
+Unlock the trunk.	1	[Unlock the trunk.]	04_si_sanitarium_wicht_chest.stringtable
+Shove a companion out of harm's way.	1	[Shove a companion out of harm's way.]	px2_05_si_frontal_assault.stringtable
+Examine the bells.	1	[Examine the bells.]	07_si_temple_bells.stringtable
+Grab the chimes on her wrists.	1	[Grab the chimes on her wrists.]	companion_cv_gm_hub_dreams_chat_02.stringtable
+Bind them to the White Forge.	1	[Bind them to the White Forge.] "Tend to your legacy. Remain here and lend your skills to others."	px1_02_cv_forge.stringtable
+Return it to the cycle.	1	[Return it to the cycle.] "You will remember this, Thaos. Remember that no man can hide the truth forever, and all you'v…	14_cv_thaos_2.stringtable
+Place the Peridot Seal into the left socket.	1	[Place the Peridot Seal into the left socket.]	1006_si_sealed_door.stringtable
+Kill Wirtan.	1	[Kill Wirtan.] "You had your second chance." 	08_cv_gramrfel.stringtable
+Throw the amulet around her neck.	1	[Throw the amulet around her neck.]	08_cv_falanroed.stringtable
+Jump to the freestanding segment.	1	[Jump to the freestanding segment.]	14_si_broken_bridge_02.stringtable
+Nod head, smiling warmly.	1	[Nod head, smiling warmly.]	companion_cv_pallegina_act_3.stringtable
+Crawl under the webbing.	1	[Crawl under the webbing.]	08_si_rhemen_spider_tunnel_1.stringtable
+Bird tweets	1	[Bird tweets]	companion_cv_pallegina_voice_set.stringtable
+Leap forward to help him.	1	[Leap forward to help him.] 	px1_02_si_chasm_rescue.stringtable
+Examine the door.	1	[Examine the door.]	1006_si_sealed_door.stringtable
+Clear the webbing yourself.	1	[Clear the webbing yourself.]	08_si_rhemen_spider_tunnel_1.stringtable
+Reach into Taena's soul and suppress Zenove's personality.	1	[Reach into Taena's soul and suppress Zenove's personality.]	px1_00_cv_taena.stringtable
+Go to the West Tower.	1	[Go to the West Tower.]	px2_02_cv_battery_new_transitions.stringtable
+Climb faster.	1	[Climb faster.]	px1_02_si_chasm_rescue_redux.stringtable
+Listen with your ear against the shutters.	1	[Listen with your ear against the shutters.]	px1_00_cv_lafda_henchmen_spied.stringtable
+Leave him alone.	1	[Leave him alone.]	01_cv_doran.stringtable
+Fit a prybar into the slot.	1	[Fit a prybar into the slot.]	px2_02_cv_elevator_parts.stringtable
+Whistles a tune.	1	[Whistles a tune.]	companion_cv_eder_voice_set.stringtable
+Inspect the panels.	1	[Inspect the panels.]	px2_03_si_ondra_panels.stringtable
+Attempt to deal with the lagufaeth.	1	[Attempt to deal with the lagufaeth.]	px1_03_si_hole.stringtable
+Widen the tunnel with a hammer and chisel.	1	[Widen the tunnel with a hammer and chisel.]	08_si_rhemen_spider_tunnel_1.stringtable
+Stay armed.	1	[Stay armed.] "If I put down my weapons we're all dead."	07_cv_glanfathan_leader.stringtable
+Feed some fish to the lagufaeth.	1	[Feed some fish to the lagufaeth.]	px1_03_si_hole.stringtable
+Tell everyone to lean right.	1	[Tell everyone to lean right.]	px1_02_si_minecart_shenanigans_start.stringtable
+Take the medallion.	1	[Take the medallion.] "Thanks."	03_cv_serel.stringtable
+Squeeze Aloth's hand.	1	[Squeeze Aloth's hand.] "You're safe. Everything's fine."	04_cv_bellasege.stringtable
+Backhand her.	1	[Backhand her.]	04_cv_servant_upstairs.stringtable
+Finish Oly's drink.	1	[Finish Oly's drink.] "I'm your new drinking buddy. And I've got questions for you."	03_cv_oly.stringtable
+Inspect the chest.	1	[Inspect the chest.]	px1_00_cv_lafda_loot_chest.stringtable
+Beckon the creature to attack you.	1	[Beckon the creature to attack you.]	px1_01_cv_chorus.stringtable
+Touch the corpse.	1	[Touch the corpse.]	px2_04_cv_dead_explorer.stringtable
+Put on Iverra's diving helmet and swim through.	1	[Put on Iverra's diving helmet and swim through.]	07_si_raedric_moat.stringtable
+Look to the land.	1	[Look to the land.]	px2_03_cv_abydon_moon_vision.stringtable
+Hold up your hands.	1	[Hold up your hands.]	px2_05_llengraths_arrival.stringtable
+Haul Sweynur up out of his chair	1	[Haul Sweynur up out of his chair] "If you want a fight with Trumbel, let's make it a fair one." 	07_cv_sweynur.stringtable
+Break through the rubble with the pickaxe.	1	[Break through the rubble with the pickaxe.]	px2_04_si_moon_escape.stringtable
+Charge the orlan with Long Stride.	1	[Charge the orlan with Long Stride.]	px1_04_cv_sleeping_merc.stringtable
+Break through the webbing.	1	[Break through the webbing.]	08_si_rhemen_spider_tunnel_1.stringtable
+Try to open the chest.	1	[Try to open the chest.]	px1_00_cv_lafda_loot_chest.stringtable
+Slide the panel of the barren shore.	1	[Slide the panel of the barren shore.]	px2_03_si_ondra_panels.stringtable
+Examine the gate.	1	[Examine the gate.] 	px2_05_si_infiltration.stringtable
+Push the spore's voice out of your thoughts.	1	[Push the spore's voice out of your thoughts.]	px2_00_cv_radiant_spore.stringtable
+Speak to the voice.	1	[Speak to the voice.]	1013_si_crystal_door.stringtable
+Do not interrupt.	1	[Do not interrupt.]	companion_cv_pallegina.stringtable
+Plug the hole with Rymrgand's shard.	1	[Plug the hole with Rymrgand's shard.]	12_cv_noonfrost_breach_altar.stringtable
+Touch the creature.	1	[Touch the creature.]	01_cv_flesh_construct.stringtable
+Defend yourself.	1	[Defend yourself.]	11_cv_high_monk.stringtable
+Continue searching.	1	[Continue searching.]	04_cv_gram.stringtable
+Use the chant of "Rime and Frost."	1	[Use the chant of "Rime and Frost."]	px1_00_si_burning_building.stringtable
+Help the man get to his feet.	1	[Help the man get to his feet.]	08_cv_dying_monk.stringtable
+Pull out the metal fragment.	1	[Pull out the metal fragment.]	px2_03_cv_abydon_moon_vision.stringtable
+Cast Armor of Faith.	1	[Cast Armor of Faith.]	px1_01_si_chute.stringtable
+Examine the roads nearby.	1	[Examine the roads nearby.]	companion_cv_sagani_main.stringtable
+Inspect the next panel.	1	[Inspect the next panel.]	px2_03_si_ondra_mural.stringtable
+Use one hand to keep hold of him.	1	[Use one hand to keep hold of him.]	px1_02_si_chasm_rescue_redux.stringtable
+Entropically disintegrate the souls, ending their existence.	1	[Entropically disintegrate the souls, ending their existence.]	14_cv_machine_ending.stringtable
+Grasp his hand.	1	[Grasp his hand.] "I accept your terms."	04_cv_edmar_doemenel.stringtable

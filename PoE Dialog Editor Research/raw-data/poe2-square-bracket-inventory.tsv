@@ -1,0 +1,1372 @@
+Specified 0	752	[Specified 0] takes a firm grip on the rope and descends.	00_cv_poko_kohara_well.stringtable
+Specified 1	394	"Take us into the storm, [Specified 1]. There's nothing we can do here."	12_si_fleet_battle.stringtable
+Say nothing.	306	[Say nothing.]	00_cv_mukumu.stringtable
+Attack	260	[Attack] "You'll have to take it the hard way."	00_cv_nairi.stringtable
+Leave	213	[Leave] "Farewell."	cv_test_pet_sac.stringtable
+Player Name	199	"I'm [Player Name], captain of [Player Ship]."	00_cv_drummer.stringtable
+Player Ship	188	Xoti's journey through the Deadfire on [Player Ship] is an eye-opening experience for the sheltered farm girl. After man…	endgameslides.stringtable
+Specified 2	179	[Specified 2] stands at the rail. "Much as I hate agreeing with [Specified 0]... damn. There ain't no charts for what li…	12_si_fleet_battle.stringtable
+Leave.	174	[Leave.]	00_cv_poko_kohara_well.stringtable
+Specified 4	162	A hand falls on your shoulder, and you turn to see [Specified 4]. "We go now where gods would not have us tread. Yet the…	12_si_fleet_battle.stringtable
+Lie	156	[Lie] "He kept the koīki for himself and paid for my silence."	00_cv_mukumu.stringtable
+Specified 3	131	Perched on the rail, one hand clinging to the rigging, [Specified 3] laughs, lip curling over uneven teeth. "You kidding…	12_si_fleet_battle.stringtable
+SkillCheck 0	79	Partway through, [SkillCheck 0] starts to lag behind. Panic sets in as the remaining distance becomes clear.  [SkillChec…	09_si_sea_cave_swim.stringtable
+Specified 5	51	"I'm not sure what to tell you..." [Specified 5] says. "It looks like a normal rope. Should be safe to cross."	re_si_2609_victims.stringtable
+Shrug.	49	[Shrug.]	00_cv_himuihi.stringtable
+Player Animal Companion	33	"[Player Animal Companion] and I don't mind trudging through the hatchery."	00_cv_himuihi.stringtable
+Turn around.	27	[Turn around.]	06_si_bm_alleys.stringtable
+ShipDuel_OpponentShip	26	The crew of [ShipDuel_OpponentShip] spring into action, scrambling across the deck. Some scurry up the masts to furl and…	re_si_ship_combat.stringtable
+Listen.	25	[Listen.]	04_cv_post_magrans_teeth.stringtable
+Attack.	23	[Attack.] "Your mistake."	09_cv_galian.stringtable
+Nod.	23	[Nod.]	03_cv_martino.stringtable
+Do nothing.	22	[Do nothing.]	03_si_the_duel.stringtable
+ShipDuel_PlayerShip	22	"You've got a point there. Even [ShipDuel_PlayerShip] can't outrun the Rauataian fleet."	15_cv_fleet_master_okaya.stringtable
+Leave it be.	20	[Leave it be.]	03_si_vtc_hq_infiltration.stringtable
+Draw your weapons and attack.	18	[Draw your weapons and attack.]	26_si_lich_ext_wraiths.stringtable
+Whisper	17	[Whisper] "Not every guard is as steadfast as her. Try later... with some spare change."	08_cv_merchant_guard_argument.stringtable
+Return the way you came.	16	[Return the way you came.]	26_si__collapsed_mine_guardians.stringtable
+Ambush and attack.	14	[Ambush and attack.]	26_si__collapsed_mine_guardians.stringtable
+Walk away.	13	[Walk away.]	06_cv_roparu_beggar.stringtable
+Go forward.	12	[Go forward.]	06_si_bm_alleys.stringtable
+Press down on the metalwork.	12	[Press down on the metalwork.]	22_si_map.stringtable
+Go left.	12	[Go left.]	06_si_bm_alleys.stringtable
+Go right.	11	[Go right.]	06_si_bm_alleys.stringtable
+Wait.	10	[Wait.]	00_cv_ruanu.stringtable
+Approach openly.	10	[Approach openly.]	re_si_campsite_xaurips.stringtable
+Sneak closer to observe.	10	[Sneak closer to observe.]	26_si_lich_ext_wraiths.stringtable
+Player Race	8	<ispeech>What is this, [Player Race]-creature?</ispeech> The vithrack cocks its head and focuses its many eyes on you.  …	06_cv_zahak.stringtable
+Wait and observe.	8	[Wait and observe.]	03_si_the_duel.stringtable
+Surrender to the sensation.	7	[Surrender to the sensation.]	companion_tekehu_arc.stringtable
+Go back.	7	[Go back.]	11_si_swim.stringtable
+Repress the sensation.	7	[Repress the sensation.]	companion_tekehu_arc.stringtable
+Use spyglass.	7	[Use spyglass.]	re_si_campsite_xaurips.stringtable
+Back away with your hands up.	7	[Back away with your hands up.] "You're right, I do know."	13_cv_guard_horn_01.stringtable
+Player Culture	7	He grins. "Ekera! Then you will also share my name when you take this back to [Player Culture]?"	04_cv_takano.stringtable
+Reconsider your options...	6	[Reconsider your options...]	re_si_city_collapsed_tunnel.stringtable
+Turn back.	6	[Turn back.]	05_si_dragon_door.stringtable
+Take the pendant.	6	[Take the pendant.]	re_cv_location_abandoned_ship.stringtable
+Sail into the storm.	6	[Sail into the storm.] "Catch me if you can, you bastard."	12_si_fleet_battle.stringtable
+Deactivate the machine.	6	[Deactivate the machine.]	12_cv_machine.stringtable
+Sneak past the area.	6	[Sneak past the area.]	26_si__collapsed_mine_guardians.stringtable
+Remain silent.	6	[Remain silent.]	03_cv_vtc_exile_trial.stringtable
+Fight against it.	6	[Fight against it.]	13_cv_syri.stringtable
+Continue cautiously forward.	6	[Continue cautiously forward.]	26_si__collapsed_mine_guardians.stringtable
+Flee.	6	[Flee.] "Nothing!"	07_cv_magran_high_priest.stringtable
+Let the visions come.	6	[Let the visions come.]	13_cv_syri.stringtable
+Show the suolenet.	5	[Show the suolenet.]	06_cv_bm_lift_guard.stringtable
+Continue watching.	5	[Continue watching.]	re_si_2607_pirates_booty.stringtable
+Show the medallion.	5	[Show the medallion.] "Any chance this will get me past you?"	06_cv_bm_lift_guard.stringtable
+Search the location.	5	[Search the location.]	re_cv_location_abandoned_ship.stringtable
+Keep searching this location.	5	[Keep searching this location.]	re_cv_location_abandoned_ship.stringtable
+Read her soul.	5	[Read her soul.]	02_cv_beza.stringtable
+Reach for the soul.	5	[Reach for the soul.]	10_cv_rathun_soul_lair.stringtable
+Strengthen the spell of imprisonment.	5	[Strengthen the spell of imprisonment.]	05_cv_dragon_dais.stringtable
+Shrug	5	[Shrug] "Couldn't be helped."	03_cv_avetta.stringtable
+Stay here.	5	[Stay here.] 	03_cv_heist_window_escape.stringtable
+Attack without warning.	5	[Attack without warning.]	13_cv_guard_horn_03.stringtable
+Shout	5	[Shout] "Kill him, Larro!" 	03_si_the_duel.stringtable
+Wink	5	[Wink] "I'll bet you say that to all of your clients."	03_cv_abocco.stringtable
+Search the area.	5	[Search the area.]	26_si_lagufaeth_ambush.stringtable
+Leave the shrine and continue your travels.	5	[Leave the shrine and continue your travels.]	re_si_shrine_rest.stringtable
+Shake your head.	5	[Shake your head.]	04_cv_backer_npc_granis.stringtable
+Identify it.	4	[Identify it.]	re_si_sea_creature_gaint_jellyfish.stringtable
+Attempt to flee.	4	[Attempt to flee.]	26_si_lagufaeth_ambush.stringtable
+Draw your weapon.	4	[Draw your weapon.] "If that's how you want it, kid." 	03_cv_tiela.stringtable
+Examine the machine.	4	[Examine the machine.]	02_cv_poko_kohara_machinery.stringtable
+Lie.	4	[Lie.] "I left some important papers behind." 	03_bs_vtc_hq_night_watch.stringtable
+Depress the kraken mural.	4	[Depress the kraken mural.]	15_si_mural.stringtable
+Hold the staff firmly.	4	[Hold the staff firmly.] "What in Eora..."	22_si_menpwgra_tree_01.stringtable
+Wrestle the staff down.	4	[Wrestle the staff down.] "You're not going anywhere."	22_si_menpwgra_tree_01.stringtable
+Nod along.	4	[Nod along.]	17_cv_principi_boss_betrayal.stringtable
+Bid 2000 cp.	4	[Bid 2000 cp.]	14_cv_slave_auction.stringtable
+Roll your eyes.	4	[Roll your eyes.]	17_cv_aeldys_betrayal.stringtable
+The bird, Amira.	4	[The bird, Amira.]	26_si_desert_ruin_burial.stringtable
+Climb up.	4	[Climb up.]	07_si_sepulchers_tunnels.stringtable
+Enter the cave.	4	[Enter the cave.]	26_si_flame_naga_cave.stringtable
+Take the mace.	4	[Take the mace.]	26_cv_soulbound_mace.stringtable
+Stay.	4	[Stay.]	02_cv_shortcut_descent.stringtable
+Search the surrounding area.	4	[Search the surrounding area.]	re_si_2609_victims.stringtable
+Destroy the tree.	4	[Destroy the tree.]	22_si_menpwgra_tree_01.stringtable
+Kiss him.	4	[Kiss him.]	companion_aloth_hub.stringtable
+Throw a grappling hook across the gap.	4	[Throw a grappling hook across the gap.]	11_si_grapple_dining_hall_side.stringtable
+Examine the altar.	4	[Examine the altar.]	10_si_magran_elevator.stringtable
+Rotate the dial counterclockwise.	4	[Rotate the dial counterclockwise.]	05_si_dragon_door.stringtable
+Crack your knuckles.	4	[Crack your knuckles.] "About that contract..." 	03_cv_vtc_clerk.stringtable
+Pick up the staff.	4	[Pick up the staff.] "What..."	22_si_menpwgra_tree_01.stringtable
+Clear your throat.	4	[Clear your throat.]	05_si_circle_of_archmagi.stringtable
+Continue traveling.	4	[Continue traveling.]	re_si_stampede.stringtable
+Attack the cultists.	4	[Attack the cultists.]	26_si_sanguine_harvest_ritual.stringtable
+Press the dial.	4	[Press the dial.]	05_si_dragon_door.stringtable
+The angler fish, Ngati.	4	[The angler fish, Ngati.]	26_si_desert_ruin_burial.stringtable
+SkillCheck 1	4	Partway through, [SkillCheck 0] starts to lag behind. Panic sets in as the remaining distance becomes clear.  [SkillChec…	09_si_sea_cave_swim.stringtable
+Give gloves.	4	[Give gloves.] "I have them right here for you."	05_cv_fessina.stringtable
+Eat and rest.	4	[Eat and rest.]	re_si_campsite_explorers.stringtable
+The eels, Rikuhu.	4	[The eels, Rikuhu.]	26_si_desert_ruin_burial.stringtable
+Observe the ritual.	4	[Observe the ritual.]	26_si_sanguine_harvest_ritual.stringtable
+Investigate your surroundings.	4	[Investigate your surroundings.]	re_si_shrine_thieves.stringtable
+Brandish your weapon.	4	[Brandish your weapon.] "Take a gander and find out."	10_cv_dragon_magma.stringtable
+ShipDuel_Opponent	4	For your surrender, [ShipDuel_Opponent] demands: [ShipDuel_SurrenderCost]	re_si_ship_combat.stringtable
+Cross your arms over your chest.	4	[Cross your arms over your chest.] "Do I look like prey to you?"	10_cv_dragon_magma.stringtable
+Read the soul.	4	[Read the soul.]	05_cv_thief_soul.stringtable
+Rotate the dial clockwise.	4	[Rotate the dial clockwise.]	05_si_dragon_door.stringtable
+Hide in the undergrowth.	3	[Hide in the undergrowth.]	26_si_lagufaeth_ambush.stringtable
+Burn the bodies.	3	[Burn the bodies.]	re_si_2609_victims.stringtable
+Leave them be.	3	[Leave them be.]	re_si_campsite_explorers.stringtable
+Let them fight.	3	[Let them fight.]	companion_tekehu_relationship_maia.stringtable
+Place the conch in the statue's open hand.	3	[Place the conch in the statue's open hand.]	06_si_statue_sealed_door.stringtable
+ERROR	3	[ERROR] AI used unrecognized ship combat action.	re_si_ship_combat.stringtable
+Stand your ground.	3	[Stand your ground.] "I am a serious client." 	03_cv_vtc_bounty_giver.stringtable
+Pretend to drink from an empty tankard.	3	[Pretend to drink from an empty tankard.]	13_cv_pirate_drunkard.stringtable
+Cross the rope.	3	[Cross the rope.]	11_si_grapple_dining_hall_side.stringtable
+Let go of the memory.	3	[Let go of the memory.]	22_cv_soul_vision_01.stringtable
+Search for the presence of other minds.	3	[Search for the presence of other minds.]	26_si__collapsed_mine_guardians.stringtable
+Try to break the machine.	3	[Try to break the machine.]	15_si_engwithan_pylon_c.stringtable
+Bow	3	[Bow] "Honored to meet you."	04_cv_prince_aruihi.stringtable
+Attempt to steal from them.	3	[Attempt to steal from them.]	re_si_campsite_explorers.stringtable
+Do something else.	3	[Do something else.]	13_si_crane_cargo.stringtable
+Slot 0	3	You make to continue your journey, only to watch helplessly as [Slot 0] stumbles over a vine ahead of you. You hear a ne…	re_si_wilder_trap.stringtable
+Pray at the shrine and rest.	3	[Pray at the shrine and rest.]	re_si_shrine_rest.stringtable
+Return to your ship.	3	[Return to your ship.]	re_si_plague_ship_dead_tiny.stringtable
+OrlansHeadGame_PlayerTotalScore	3	[Specified 1] rubs their palms together. "The final score is [OrlansHeadGame_OpponentTotalScore] for [Specified 0], and …	re_si_crew_event_orlans_head.stringtable
+Show her the suolenet.	3	[Show her the suolenet.]	06_cv_undercroft_captain.stringtable
+Throw the mushroom on the ground.	3	[Throw the mushroom on the ground.]	re_si_spore_lures.stringtable
+Ignore the sensation.	3	[Ignore the sensation.]	22_si_menpwgra_tree_01.stringtable
+Take it.	3	[Take it.]	06_cv_botaro_soul.stringtable
+Toast	3	[Toast] "To the fleet."	companion_maia_relationship_player.stringtable
+Study the tree, see if it is beyond healing.	3	[Study the tree, see if it is beyond healing.]	22_si_menpwgra_tree_01.stringtable
+Give book.	3	[Give book.] "The Brawler's grimoire, wrested from the hands of an ancient lich." 	28_cv_nemnok_base.stringtable
+Depress the whale mural.	3	[Depress the whale mural.]	15_si_mural.stringtable
+Bury the bodies.	3	[Bury the bodies.]	re_si_2609_victims.stringtable
+Meditate on your travails and rest.	3	[Meditate on your travails and rest.] 	re_si_shrine_rest.stringtable
+Take the sword.	3	[Take the sword.]	companion_cv_talkingweapon01.stringtable
+Go back, reconsider.	3	[Go back, reconsider.]	22_si_map.stringtable
+Desecrate the shrine.	3	[Desecrate the shrine.]	re_si_shrine_rest.stringtable
+Let him go.	3	[Let him go.]	06_cv_bm_lift_guard.stringtable
+Inspect the statue.	3	[Inspect the statue.]	06_si_statue_sealed_door.stringtable
+Slap him.	3	[Slap him.]	00_cv_tamau.stringtable
+Feel the bark, listen.	3	[Feel the bark, listen.]	22_si_menpwgra_tree_01.stringtable
+Eat the mushroom.	3	[Eat the mushroom.]	re_si_spore_lures.stringtable
+Search for the presence of spirits.	3	[Search for the presence of spirits.]	re_si_2609_victims.stringtable
+Approach and identify it.	3	[Approach and identify it.]	re_si_shrine_rest.stringtable
+Examine the spore.	3	[Examine the spore.]	re_si_spore_lures.stringtable
+Glare silently.	3	[Glare silently.]	09_cv_erol.stringtable
+Bluff/Lie	3	[Bluff/Lie] "I know you're after the adra! Your partner squealed. The jig is up." 	03_cv_baer.stringtable
+Search the area around the altar.	2	[Search the area around the altar.]	26_si_sanguine_harvest_empty.stringtable
+Cast a spell to break the cargo's rope.	2	[Cast a spell to break the cargo's rope.]	13_si_crane_cargo.stringtable
+Clear your throat back at him.	2	[Clear your throat back at him.]	13_cv_lurtharn.stringtable
+Pick his pocket while he's distracted.	2	[Pick his pocket while he's distracted.] 	03_cv_vtc_clerk.stringtable
+Plant a grenade.	2	[Plant a grenade.]	09_cv_jail_window.stringtable
+Approach the camp.	2	[Approach the camp.]	re_si_campsite_explorers.stringtable
+Pay 50 cp.	2	[Pay 50 cp.] "Will this satisfy you?"	06_cv_amb_thugs_01.stringtable
+Double back and attempt an ambush.	2	[Double back and attempt an ambush.]	26_si__collapsed_mine_guardians.stringtable
+Cast Necrotic Lance.	2	[Cast Necrotic Lance.]	13_si_crane_cargo.stringtable
+Push the bombard into position.	2	[Push the bombard into position.]	11_si_cannon.stringtable
+Cast Burst of Summer Flame.	2	[Cast Burst of Summer Flame.]	13_si_crane_cargo.stringtable
+Call up a strong wind in an attempt to disperse the fog.	2	[Call up a strong wind in an attempt to disperse the fog.]	re_si_fog_deep_sea.stringtable
+Identify the symbol.	2	[Identify the symbol.]	re_si_huana_druid.stringtable
+Shake head.	2	[Shake head.] "Yes."	10_si_eothas_saves_you.stringtable
+Place a bomb in the ash.	2	[Place a bomb in the ash.]	16_cv_brazier.stringtable
+Orient yourself in the passage.	2	[Orient yourself in the passage.]	11_si_swim.stringtable
+Make a rude hand gesture.	2	[Make a rude hand gesture.]	13_cv_benweth.stringtable
+Continue whipping.	2	[Continue whipping.]	re_si_crew_event_murder.stringtable
+Use your fiery hair to kindle a flame.	2	[Use your fiery hair to kindle a flame.]	09_cv_braziers.stringtable
+Dive toward the light.	2	[Dive toward the light.]	06_si_statue_sunken.stringtable
+Examine the gemstones.	2	[Examine the gemstones.]	05_cv_vault_lock.stringtable
+Enter Combat.	2	[Enter Combat.] "Easy prey!"	re_si_ship_combat.stringtable
+Rotate the gems to experiment with various positions.	2	[Rotate the gems to experiment with various positions.]	05_cv_vault_lock.stringtable
+Plant a frost bomb.	2	[Plant a frost bomb.]	09_cv_jail_window.stringtable
+ShipDuel_SurrenderCost	2	For your surrender, [ShipDuel_Opponent] demands: [ShipDuel_SurrenderCost]	re_si_ship_combat.stringtable
+Take the conch and swim back up.	2	[Take the conch and swim back up.]	06_si_statue_sunken.stringtable
+Take the lift down to the ground.	2	[Take the lift down to the ground.]	16_si_lift.stringtable
+Keep watching.	2	[Keep watching.]	17_cv_aeldys_betrayal.stringtable
+Consign his soul to Berath.	2	[Consign his soul to Berath.]	re_si_port_maje_swimming.stringtable
+Punch him in the gut.	2	[Punch him in the gut.]	13_cv_benweth.stringtable
+Kiss her.	2	[Kiss her.]	companion_cv_xoti_arc.stringtable
+Cut the ropes.	2	[Cut the ropes.] "Benweth won't be troubling you any time soon."	13_cv_pirate_lass.stringtable
+Depress the shark mural.	2	[Depress the shark mural.]	15_si_mural.stringtable
+Search the camp.	2	[Search the camp.]	re_si_campsite_explorers.stringtable
+Draw the beast's attention.	2	[Draw the beast's attention.]	re_si_city_skuldr.stringtable
+Give her an ale.	2	[Give her an ale.] "Nonsense. To loyal birds." 	companion_maia_relationship_player.stringtable
+Swim back to the surface.	2	[Swim back to the surface.]	06_si_statue_sunken.stringtable
+Destroy the disc.	2	[Destroy the disc.]	22_si_map.stringtable
+Conjure a magical decoy as a distraction.	2	[Conjure a magical decoy as a distraction.]	re_si_campsite_explorers.stringtable
+Investigate the scene.	2	[Investigate the scene.]	re_si_stampede.stringtable
+Search for salvage.	2	[Search for salvage.]	re_si_hunter_camp_lurker.stringtable
+Plant a lightning bomb.	2	[Plant a lightning bomb.]	09_cv_jail_window.stringtable
+Continue toward the light.	2	[Continue toward the light.]	06_si_statue_sunken.stringtable
+Offer Ishiza some more shark meat.	2	[Offer Ishiza some more shark meat.]	companion_maia_relationship_player.stringtable
+Abandon the plot.	2	[Abandon the plot.]	re_si_campsite_explorers.stringtable
+Terrify them with an ability.	2	[Terrify them with an ability.]	re_si_mutiny.stringtable
+Use the Rod of the Deep Hunter to disable the enchantments.	2	[Use the Rod of the Deep Hunter to disable the enchantments.]	05_cv_dragon_dais.stringtable
+Look to Maia and Tekēhu	2	[Look to Maia and Tekēhu] "Both of you look like you have something to say."	companion_maia_main.stringtable
+Pull the door open.	2	[Pull the door open.]	11_si_swim.stringtable
+Step away.	2	[Step away.]	23_si_xaurip_tunnel.stringtable
+Swim onward.	2	[Swim onward.]	11_si_swim.stringtable
+Give her the explosive.	2	[Give her the explosive.] "Queen Onekaza asked me to destroy the powderhouse."	08_cv_hazanui_karu.stringtable
+Give her the broodmother's head.	2	[Give her the broodmother's head.] "I killed the lagufaeth broodmother. The others are too weak to attack you now."	00_cv_himuihi.stringtable
+Bow your head.	2	[Bow your head.]	07_cv_berath_high_priest.stringtable
+Ask a companion to speak to them.	2	[Ask a companion to speak to them.]	26_si__collapsed_mine_guardians.stringtable
+Stay your course.	2	[Stay your course.]	13_si_deadight_approach.stringtable
+Fill the sails with a summoned wind.	2	[Fill the sails with a summoned wind.]	re_si_sea_creature_gaint_jellyfish.stringtable
+Keep going.	2	[Keep going.]	re_si_2609_victims.stringtable
+Find the ship's surgeon.	2	[Find the ship's surgeon.] "Care to tell me why everyone on my boat is sick, [Specified 1]?"	re_si_crew_event_sick.stringtable
+Cut their bonds.	2	[Cut their bonds.] "The way is clear. You can go."	20_cv_principi_captive.stringtable
+Join their camp.	2	[Join their camp.]	re_si_campsite_explorers.stringtable
+Try to move the pointer.	2	[Try to move the pointer.]	26_si_desert_ruin_burial.stringtable
+Kick her.	2	[Kick her.]	06_cv_roparu_beggar.stringtable
+Cross the hallway and continue.	2	[Cross the hallway and continue.]	07_si_sepulchers_tunnels.stringtable
+Shield your mind.	2	[Shield your mind.]	06_cv_zahak.stringtable
+Plant a blister bomb.	2	[Plant a blister bomb.]	09_cv_jail_window.stringtable
+Take them.	2	[Take them.]	re_si_campsite_explorers.stringtable
+Free her.	2	[Free her.] "Let's do this."	17_cv_aeldys_betrayal.stringtable
+Throw a dagger to cut the cargo's rope.	2	[Throw a dagger to cut the cargo's rope.]	13_si_crane_cargo.stringtable
+Retrieve the glittering object from the tomb.	2	[Retrieve the glittering object from the tomb.]	07_si_sepulchers_tunnels.stringtable
+Enter the ruin.	2	[Enter the ruin.]	26_si_cannibal_ruin.stringtable
+Draw your weapons.	2	[Draw your weapons.]	26_si_flame_naga_cave.stringtable
+Sacrifice a crew member as bait and flee.	2	[Sacrifice a crew member as bait and flee.]	re_si_sea_creature_gaint_jellyfish.stringtable
+Let it leave.	2	[Let it leave.]	re_si_shrine_thieves.stringtable
+Shoot an arrow to sever the cargo's rope.	2	[Shoot an arrow to sever the cargo's rope.]	13_si_crane_cargo.stringtable
+Give Rinco the coin purse	2	[Give Rinco the coin purse] "I have what you asked for."	09_cv_rinco.stringtable
+Climb into the tunnel.	2	[Climb into the tunnel.]	23_si_xaurip_tunnel.stringtable
+Cut her ropes.	2	[Cut her ropes.]	17_cv_aeldys_betrayal.stringtable
+Climb back down.	2	[Climb back down.]	28_si_drowned_barrows_transition.stringtable
+Scatter them with magic.	2	[Scatter them with magic.]	re_si_spore_lures.stringtable
+Bribe	2	[Bribe] "Maybe two hundred and fifty coppers will jog your memory."	03_cv_aenalys.stringtable
+Shake her hand.	2	[Shake her hand.] "Been a pleasure working with you, Aenia."	03_cv_vtc_bounty_giver.stringtable
+Nod	2	[Nod] "Farewell to you."	06_cv_survivor_solo.stringtable
+Sneak up on the eotens.	2	[Sneak up on the eotens.]	re_si_eoten.stringtable
+Give him Beza's pages.	2	[Give him Beza's pages.] "The Vailians would have harvested your souls to use the machines in Poko Kohara."	00_cv_ruanu.stringtable
+Sneak away.	2	[Sneak away.]	re_si_2607_pirates_booty.stringtable
+Set camp and rest.	2	[Set camp and rest.]	re_si_shrine_rest.stringtable
+Swim through.	2	[Swim through.]	09_si_sea_cave_swim_return.stringtable
+Swing toward the sack.	2	[Swing toward the sack.]	00_cv_poko_kohara_well.stringtable
+Inspect the hallway.	2	[Inspect the hallway.]	07_si_sepulchers_tunnels.stringtable
+Descend.	2	[Descend.]	26_si_flame_naga_cave.stringtable
+Head for the path.	2	[Head for the path.]	26_si_undead_crypt_swamp.stringtable
+Collect the baby boar.	2	[Collect the baby boar.]	re_si_stampede.stringtable
+Continue along the path.	2	[Continue along the path.]	re_si_spore_lures.stringtable
+Return towards the bridge.	2	[Return towards the bridge.]	re_si_port_maje_swimming.stringtable
+Sneak forward and take his coin purse.	2	[Sneak forward and take his coin purse.]	re_si_city_wealthy_noble.stringtable
+OrlansHeadGame_OpponentTotalScore	2	[Specified 1] rubs their palms together. "The final score is [OrlansHeadGame_OpponentTotalScore] for [Specified 0], and …	re_si_crew_event_orlans_head.stringtable
+Reject.	2	[Reject.]	re_si_ship_combat.stringtable
+Leave the road and avoid the wagon entirely.	2	[Leave the road and avoid the wagon entirely.]	re_si_supply_wagon_trap.stringtable
+Cast your grappling hook.	2	[Cast your grappling hook.]	07_si_sepulchers_tunnels.stringtable
+Finish him.	2	[Finish him.] "This is going to hurt you more than it hurts me."	10_cv_rathun_wounded.stringtable
+Pry the torc from the priestess' hand.	2	[Pry the torc from the priestess' hand.]	10_cv_rathun_soul_priestess.stringtable
+Lie and point to your companion.	2	[Lie and point to your companion.] "I'm Arkemyr's guest and helping him test a new illusion."	05_cv_imp_butler.stringtable
+Give rubbing.	2	[Give rubbing.] "I found this ancient Huana navigational chart."	04_cv_prince_aruihi_huana_ruins.stringtable
+Inspect the skeleton.	2	[Inspect the skeleton.]	07_si_sepulchers_champion_gate.stringtable
+Insight	2	[Insight] "Seems like there was more in that letter."	companion_serafen_quest_1.stringtable
+Think at her.	2	[Think at her.] <i>I understand, highness.</i>	04_cv_queen_onezaka_ii.stringtable
+Retreat.	2	[Retreat.] "Let them be."	re_si_ship_combat.stringtable
+Plant an immolator.	2	[Plant an immolator.]	09_cv_jail_window.stringtable
+Throw a grenade at it.	2	[Throw a grenade at it.]	re_si_sea_creature_gaint_jellyfish.stringtable
+Swim back to the kitchen.	2	[Swim back to the kitchen.]	11_si_swim.stringtable
+Reach into the hole.	2	[Reach into the hole.]	26_si_desert_ruin_burial.stringtable
+Fire a burst of magic from your weapon.	2	[Fire a burst of magic from your weapon.]	13_si_crane_cargo.stringtable
+Cast Mind Blades.	2	[Cast Mind Blades.]	13_si_crane_cargo.stringtable
+Grin menacingly.	2	[Grin menacingly.]	13_cv_aeldys.stringtable
+Board and loot the ship.	2	[Board and loot the ship.] "In this shape, they're defenseless! Take them for all they're worth!"	re_si_plague_ship_alive.stringtable
+Toss Remaro's head at her feet.	2	[Toss Remaro's head at her feet.]	17_cv_principi_bounty_giver.stringtable
+Examine the markings.	2	[Examine the markings.]	re_si_huana_druid.stringtable
+Give her an egg.	2	[Give her an egg.] "You probably need this more than I do."	03_cv_scav_urchins.stringtable
+Enhance Insight and Intimidate	2	[Enhance Insight and Intimidate] "Here you are."	15_cv_backer_npc_marofeto_liano.stringtable
+Show dried koīki.	2	[Show dried koīki.] "Rongi was hiding this on the shore."	00_cv_mukumu.stringtable
+Throw a grappling hook through the window.	2	[Throw a grappling hook through the window.]	13_si_wall_climb.stringtable
+Plant an implosion charge.	2	[Plant an implosion charge.]	09_cv_jail_window.stringtable
+Pay 800 cp.	2	[Pay 800 cp.] "I'll buy the drowner's lung medicine."	06_cv_fabrozzo.stringtable
+Continue sailing onward.	2	[Continue sailing onward.]	12_si_ukaizo_storm.stringtable
+Refuse the mushroom.	2	[Refuse the mushroom.]	re_si_spore_lures.stringtable
+Use flint and tinder.	2	[Use flint and tinder.]	09_cv_braziers.stringtable
+Let go of the mace.	2	[Let go of the mace.]	26_cv_soulbound_mace.stringtable
+Untie him.	2	[Untie him.]	23_cv_huana_prisoners.stringtable
+Wink.	2	[Wink.] "Surely I needn't spend it <i>all</i>, aimica."	03_cv_cortina.stringtable
+ShipDuel_CloseToBoardCost	2	The crew mutters nervously as you give the order to charge. [ShipDuel_PlayerShip] will be exposed to raking fire and the…	re_si_ship_combat.stringtable
+Wait silently.	2	[Wait silently.]	03_cv_vtc_exile_trial.stringtable
+Refuse it.	2	[Refuse it.]	re_si_spore_lures.stringtable
+Inspect the path.	2	[Inspect the path.]	06_si_os1_cliff_steps.stringtable
+Plant a cinder bomb.	2	[Plant a cinder bomb.]	09_cv_jail_window.stringtable
+Light the brazier with a torch.	2	[Light the brazier with a torch.]	09_cv_braziers.stringtable
+Try to save the falling gems.	2	[Try to save the falling gems.]	00_cv_poko_kohara_well.stringtable
+Accept.	2	[Accept.]	re_si_ship_combat.stringtable
+Ignore it and let the issue sort itself out.	2	[Ignore it and let the issue sort itself out.]	re_si_crew_event_infighting.stringtable
+Bribe him.	2	[Bribe him.] "Might five thousand copper change your mind?"	05_cv_bathhouse_owner.stringtable
+Take the helm.	2	[Take the helm.] "Thanks."	20_cv_copperhead.stringtable
+Reach out to the beast's mind.	2	[Reach out to the beast's mind.] 	re_si_sea_creature_whale.stringtable
+Climb to the open window.	2	[Climb to the open window.]	13_si_wall_climb.stringtable
+Climb down.	2	[Climb down.]	09_si_ship_prow_climb.stringtable
+Let the vithrack explore your thoughts.	2	[Let the vithrack explore your thoughts.]	06_cv_zahak.stringtable
+Back away slowly.	2	[Back away slowly.]	16_cv_wahaki_chanter.stringtable
+Swim into the passage.	2	[Swim into the passage.]	11_si_swim.stringtable
+Aim the bombard using the artillery manual as a guide.	1	[Aim the bombard using the artillery manual as a guide.]	11_si_cannon.stringtable
+Use a grappling hook to tug on the gear.	1	[Use a grappling hook to tug on the gear.]	02_cv_door_puzzle.stringtable
+Attempt to deactivate the machine.	1	[Attempt to deactivate the machine.]	15_si_engwithan_machine.stringtable
+Salute	1	[Salute] "It's been a pleasure, Wakoyo."	08_cv_rdc_bounty_giver.stringtable
+Give the tablet.	1	[Give the tablet.] "I retrieved the tablet from Arkemyr's manor."	05_cv_tumara.stringtable
+Have the grubs attack the xaurips.	1	[Have the grubs attack the xaurips.]	re_si_campsite_xaurips.stringtable
+Take it off his head by force.	1	[Take it off his head by force.]	20_cv_copperhead.stringtable
+Set off a magical spark next to his ear.	1	[Set off a magical spark next to his ear.]	00_cv_vektor.stringtable
+Remove the blighted koīki fruit.	1	[Remove the blighted koīki fruit.]	16_cv_bowl.stringtable
+Strengthen the gangly teen with a spell.	1	[Strengthen the gangly teen with a spell.]	re_si_port_maje_swimming.stringtable
+Walk away without further explanation.	1	[Walk away without further explanation.]	companion_cv_xoti_arc.stringtable
+Descend the rope.	1	[Descend the rope.]	00_cv_poko_kohara_well.stringtable
+Kiss the poor fool already.	1	[Kiss the poor fool already.]	re_si_crew_event_immodest_proposal.stringtable
+Remove the bomb.	1	[Remove the bomb.]	16_cv_brazier.stringtable
+Hide from the cultists.	1	[Hide from the cultists.]	26_si_sanguine_harvest_ritual.stringtable
+Brandish your fists.	1	[Brandish your fists.] "Take a gander and find out."	10_cv_dragon_magma.stringtable
+Take the opportunity to study each of the opponents.	1	[Take the opportunity to study each of the opponents.]	03_si_the_duel.stringtable
+Hold up the dried koīki.	1	[Hold up the dried koīki.] "Looking for this?"	00_cv_rongi.stringtable
+Climb the rope.	1	[Climb the rope.]	11_si_gate_tower_climb.stringtable
+Descend to the bottom floor of the ruins.	1	[Descend to the bottom floor of the ruins.]	02_cv_shortcut_descent.stringtable
+Swim some shark meat in his direction.	1	[Swim some shark meat in his direction.]	companion_maia_relationship_player.stringtable
+Roll the rigged dice around in your hand.	1	[Roll the rigged dice around in your hand.] "Looking for these?"	13_cv_pirate_cheater.stringtable
+Dump the body in the fire.	1	[Dump the body in the fire.]	07_cv_magran_high_priest.stringtable
+Pay	1	[Pay] "I'd like to stay a bit longer."	05_cv_bathhouse_guard.stringtable
+Tap the imp's shoulder.	1	[Tap the imp's shoulder.]	05_cv_imp_butler.stringtable
+Disarm the trap.	1	[Disarm the trap.]	re_si_wilder_trap.stringtable
+Whistle 'innocently' at Maia to indicate your intent.	1	[Whistle 'innocently' at Maia to indicate your intent.]	10_cv_dragon_magma.stringtable
+Leave him alone.	1	[Leave him alone.]	20_cv_copperhead.stringtable
+Approach the aumaua near the water.	1	[Approach the aumaua near the water.]	re_si_port_maje_swimming.stringtable
+Lunge for his throat.	1	[Lunge for his throat.]	13_cv_benweth.stringtable
+Examine it closely.	1	[Examine it closely.]	20_cv_crypt_fampyr_door.stringtable
+Explore the Narrows.	1	[Explore the Narrows.]	06_si_bm_alleys.stringtable
+Raise the door.	1	[Raise the door.]	02_cv_door_puzzle.stringtable
+Search for the buried chest.	1	[Search for the buried chest.]	re_si_2607_pirates_booty.stringtable
+Watch from a distance.	1	[Watch from a distance.]	06_si_undercroft_introduction.stringtable
+Aim the bombard at the cluster of nāga.	1	[Aim the bombard at the cluster of nāga.]	11_si_cannon.stringtable
+Squeeze through the opening and go down.	1	[Squeeze through the opening and go down.]	03_si_vtc_hq_infiltration.stringtable
+Point	1	[Point] "Your desk... the eye..."	03_cv_ezzali.stringtable
+Examine the cards to choose your legacy.	1	[Examine the cards to choose your legacy.]	21_si_pallid_knight.stringtable
+Blast the creature with magic.	1	[Blast the creature with magic.]	re_si_sea_creature_whale.stringtable
+Wait politely.	1	[Wait politely.]	03_cv_vtc_exile_trial.stringtable
+Press on.	1	[Press on.]	26_si_witch_guardians.stringtable
+Travel through the passage.	1	[Travel through the passage.]	05_si_dragon_door.stringtable
+Show her the ledger.	1	[Show her the ledger.] "I don't think your family can afford the distraction right now." 	03_cv_ezzali.stringtable
+Ease her pain with a spell.	1	[Ease her pain with a spell.]	09_cv_irrena_port_maje.stringtable
+Leave the noble be.	1	[Leave the noble be.]	re_si_city_wealthy_noble.stringtable
+Reach out your hand.	1	[Reach out your hand.]	04_cv_muhai.stringtable
+Tap your foot impatiently.	1	[Tap your foot impatiently.]	07_cv_berath_high_priest.stringtable
+Go to the Gullet.	1	[Go to the Gullet.]	06_si_bm_alleys.stringtable
+Investigate the bodies.	1	[Investigate the bodies.]	re_si_supply_wagon_trap.stringtable
+Allow him to sail away with the Huana Chart.	1	[Allow him to sail away with the Huana Chart.]	22_si_rdc_encounter.stringtable
+Keep holding your hand over the flame.	1	[Keep holding your hand over the flame.]	09_cv_dawnstars_priestess.stringtable
+Take the burial goods.	1	[Take the burial goods.]	26_si_desert_ruin_burial.stringtable
+Raise your hands, back away slowly.	1	[Raise your hands, back away slowly.]	22_cv_wahaki_leader.stringtable
+Go north.	1	[Go north.]	28_si_drowned_barrows_transition.stringtable
+Attempt to trip him.	1	[Attempt to trip him.]	05_cv_bertenno.stringtable
+Jump down into the eye.	1	[Jump down into the eye.]	28_si_drowned_barrows_transition.stringtable
+Sit back and let Xoti rant.	1	[Sit back and let Xoti rant.]	companion_cv_xoti_relationship_pallegina.stringtable
+Hoist up a Príncipi flag and dock at Deadlight's port.	1	[Hoist up a Príncipi flag and dock at Deadlight's port.]	13_si_deadight_approach.stringtable
+Intimidate the child.	1	[Intimidate the child.]	06_si_bm_alleys.stringtable
+Grab him by his collar.	1	[Grab him by his collar.]	05_cv_iolfr.stringtable
+Try to calm its rage.	1	[Try to calm its rage.]	re_si_sea_creature_whale.stringtable
+ShipDuel_PlayerFullSailDist	1	<link="glossary://GlossaryEntry_Action_Full_Sail"><sprite="Inline" name="action_full_sail" tint=1></link> "Full speed ah…	re_si_ship_combat.stringtable
+Blink innocently.	1	[Blink innocently.] "Wow, really? How thrilling!"	15_cv_fleet_master_okaya.stringtable
+Dig deeper into her final memory.	1	[Dig deeper into her final memory.]	10_cv_rathun_soul_priestess.stringtable
+Push the slab out of the path.	1	[Push the slab out of the path.]	re_si_city_collapsed_tunnel.stringtable
+Remove weapons and armor	1	[Remove weapons and armor] "Of course."	05_cv_bathhouse_guard.stringtable
+Surrender.	1	<link="glossary://GlossaryEntry_Action_Surrender"><sprite="Inline" name="ic_ship_surrender" tint=1> [Surrender.]	re_si_ship_combat.stringtable
+Look for the constellation of the Leviathan.	1	[Look for the constellation of the Leviathan.]	19_cv_telescope.stringtable
+Let Rust escape.	1	[Let Rust escape.]	06_si_bm_alleys.stringtable
+Leave the memory.	1	[Leave the memory.]	02_cv_anaharu.stringtable
+Approach the cave.	1	[Approach the cave.]	26_si_transition_to_fampyr_cave.stringtable
+Eld Aedyran	1	[Eld Aedyran] <link="neutralvalue://Eld Aedyran: Do you speak Eld Aedyran?">"Scaketh fe Eld Aedyran?"</link>	companion_rekke_intro.stringtable
+Complete legacy.	1	[Complete legacy.]	si_legacy_history.stringtable
+Draw your weapons and prepare for battle.	1	[Draw your weapons and prepare for battle.]	re_si_stampede.stringtable
+Turn back and retreat the way you came.	1	[Turn back and retreat the way you came.]	26_si_undead_crypt_swamp.stringtable
+Disperse them with a summoned storm.	1	[Disperse them with a summoned storm.]	re_si_stampede.stringtable
+Cough.	1	[Cough.]	06_cv_pitli_roparu_f_01.stringtable
+Flash her a lewd gesture as you continue walking.	1	[Flash her a lewd gesture as you continue walking.]	14_cv_aeldys_spy.stringtable
+Follow the footprints.	1	[Follow the footprints.]	re_si_2607_pirates_booty.stringtable
+Heave the door open.	1	[Heave the door open.]	26_si_desert_ruin_sand_trap_escape.stringtable
+Examine the fruit.	1	[Examine the fruit.]	16_cv_bowl.stringtable
+Step closer to the bars.	1	[Step closer to the bars.]	14_cv_wahaki_slave_leader.stringtable
+Approach the beach.	1	[Approach the beach.]	bounty_si_imp.stringtable
+Cross your arms over your chest and glare menacingly.	1	[Cross your arms over your chest and glare menacingly.]	06_cv_survivor_solo.stringtable
+Bid 1100 cp.	1	[Bid 1100 cp.]	14_cv_slave_auction.stringtable
+Perform a blessing.	1	[Perform a blessing.] "Brethren, you have witnessed the coming of our lord. Let us pray together to give thanks for this…	re_si_supply_wagon_trap.stringtable
+Enhance Bluff and Streetwise	1	[Enhance Bluff and Streetwise] "Here you are."	17_cv_backer_npc_coel.stringtable
+Exit to the deck.	1	[Exit to the deck.]	re_si_crew_event_wilders.stringtable
+Freeze the encroaching water.	1	[Freeze the encroaching water.]	re_si_storms.stringtable
+Signal the slavers to intercept the oncoming vessel.	1	[Signal the slavers to intercept the oncoming vessel.]	12_si_fleet_battle.stringtable
+Your bear cub.	1	[Your bear cub.]	re_si_crew_event_cannibalism.stringtable
+Twist the handle.	1	[Twist the handle.]	26_si_desert_ruin_burial.stringtable
+Show her the weight of your coin purse.	1	[Show her the weight of your coin purse.] "I'm both able and willing to pay the price."	14_cv_slave_auction.stringtable
+Leave the tree and continue your journey.	1	[Leave the tree and continue your journey.]	re_si_2609_victims.stringtable
+Leap over the counter.	1	[Leap over the counter.]	06_si_bm_alleys.stringtable
+Squeeze her hand.	1	[Squeeze her hand.] "Thank you."	re_si_spore_lures.stringtable
+Continue past the nāga.	1	[Continue past the nāga.]	re_si_flame_naga_camp.stringtable
+Reconsider your options.	1	[Reconsider your options.]	14_si_iron_bars.stringtable
+Keep pulling.	1	[Keep pulling.]	27_si_pyramid_weakened_wall.stringtable
+Insert the copper muzūma shell key.	1	[Insert the copper muzūma shell key.]	02_cv_door_puzzle.stringtable
+Ceremoniously toss 1000 cp overboard.	1	[Ceremoniously toss 1000 cp overboard.] "I think we can spare something for the Lady of Lament."	re_si_crew_event_omen_cloud.stringtable
+Lower a rope.	1	[Lower a rope.]	13_si_wall_climb.stringtable
+Wade into the cave.	1	[Wade into the cave.]	14_si_underwater_cavern.stringtable
+Return to the top.	1	[Return to the top.]	06_si_os1_cliff_steps.stringtable
+Watch her sleep.	1	[Watch her sleep.]	companion_cv_xoti_arc.stringtable
+Examine the stone wall.	1	[Examine the stone wall.]	05_si_weak_wall.stringtable
+Give her some food.	1	[Give her some food.]	06_cv_roparu_beggar.stringtable
+Study the engravings, look for a pattern.	1	[Study the engravings, look for a pattern.]	22_si_map.stringtable
+Transform someone into a small creature.	1	[Transform someone into a small creature.]	14_si_iron_bars.stringtable
+Punch the door.	1	[Punch the door.]	05_si_dragon_door.stringtable
+Request the Ruquapa engage the oncoming vessel.	1	[Request the Ruquapa engage the oncoming vessel.]	12_si_fleet_battle.stringtable
+Pray	1	[Pray] "Berath, I call to you for aid in this hour of need."	09_cv_beach_landing.stringtable
+Take stock of your audience.	1	[Take stock of your audience.]	04_cv_critpath_faction_argument.stringtable
+Peer at the treeline.	1	[Peer at the treeline.]	22_si_wahaki_encounter.stringtable
+Stoke their anger.	1	[Stoke their anger.]	re_si_wilder_trap.stringtable
+Use a spell to melt the bars.	1	[Use a spell to melt the bars.]	03_si_vtc_hq_infiltration.stringtable
+Cross your arms and scowl.	1	[Cross your arms and scowl.]	27_cv_court_of_woedica_player_interrupts.stringtable
+Wipe the construct's memory.	1	[Wipe the construct's memory.]	16_cv_construct.stringtable
+Charge towards the lagufaeth.	1	[Charge towards the lagufaeth.]	26_si_lagufaeth_warchief.stringtable
+Have someone pull the vines away from the chest.	1	[Have someone pull the vines away from the chest.]	01_si_chest.stringtable
+Use your grappling hook.	1	[Use your grappling hook.]	09_si_ship_prow_climb.stringtable
+Give her the medicine.	1	[Give her the medicine.]	06_cv_pitli.stringtable
+Continue forward.	1	[Continue forward.]	12_cv_point_of_no_return.stringtable
+Yell	1	[Yell] "Look out!"	03_si_the_duel.stringtable
+Look for structural weaknesses.	1	[Look for structural weaknesses.]	03_si_vtc_hq_infiltration.stringtable
+Start a beat you can share, humming under your breath.	1	[Start a beat you can share, humming under your breath.]	00_cv_drummer.stringtable
+Take the crates and sail away.	1	[Take the crates and sail away.]	08_si_rdc_faction_quest_02_post_smugglers.stringtable
+Break them up with a blast of magic.	1	[Break them up with a blast of magic.] 	re_si_crew_event_infighting.stringtable
+Present the forged Writ.	1	[Present the forged Writ.] "I think you'll find my papers are in order."	00_cv_ruanu.stringtable
+Whip them.	1	[Whip them.]	re_si_crew_event_infighting.stringtable
+Look for the constellation of the Kingfisher.	1	[Look for the constellation of the Kingfisher.]	19_cv_telescope.stringtable
+Attempt to defuse the situation with words...	1	[Attempt to defuse the situation with words...]	re_si_mutiny.stringtable
+Study him carefully.	1	[Study him carefully.]	09_cv_stranger.stringtable
+Give her a gesture of blessing.	1	[Give her a gesture of blessing.]	companion_cv_xoti_intro_pm.stringtable
+Give her both explosives.	1	[Give her both explosives.] "The Huana <i>and</i> the Vailians plan to destroy the powderhouse."	08_cv_hazanui_karu.stringtable
+Send someone in to bend the bars.	1	[Send someone in to bend the bars.]	03_si_vtc_hq_infiltration.stringtable
+End him.	1	[End him.]	07_cv_mercenary_attack.stringtable
+Grab an extra portion.	1	[Grab an extra portion.]	07_cv_dawnstar_food_line.stringtable
+Rig a quick fix for the helmet.	1	[Rig a quick fix for the helmet.]	15_si_transition_exit_pylons_destroyed.stringtable
+Give Pūrākau's head.	1	[Give Pūrākau's head.] "Here's your thirsty drake."	03_cv_abocco.stringtable
+Psychically reduce their nausea.	1	[Psychically reduce their nausea.]	re_si_storms.stringtable
+Retrace your steps.	1	[Retrace your steps.]	07_si_sepulchers_tunnels.stringtable
+Mercy kill by administration of poison.	1	[Mercy kill by administration of poison.] "Drink this and rest easy."	10_cv_rathun_wounded.stringtable
+Approach the group.	1	[Approach the group.]	re_si_city_wealthy_noble.stringtable
+Cross your arms across your chest.	1	[Cross your arms across your chest.] "Calm seas, trencher."	08_cv_greeter_guard.stringtable
+Look around.	1	[Look around.] "Where?"	09_cv_governor_clario.stringtable
+Wait quietly.	1	[Wait quietly.]	08_cv_hazanui_karu.stringtable
+Steal back five times what you lost.	1	[Steal back five times what you lost.]	03_bs_urchins.stringtable
+i'm going to tell him to end all life on eora	1	[i'm going to tell him to end all life on eora]	re_si_mid_ukaizo_gods.stringtable
+Force his windpipe open.	1	[Force his windpipe open.]	companion_eder_quest_ship.stringtable
+Pull the Lever.	1	[Pull the Lever.]	14_si_iron_bars.stringtable
+Show him the cursed idol.	1	[Show him the cursed idol.] "I think Nairi had something to do with their deaths."	00_cv_vektor.stringtable
+Pretend to return the coins.	1	[Pretend to return the coins.] "Sorry."	09_cv_ikawha.stringtable
+Examine the skull.	1	[Examine the skull.]	26_si_desert_ruin_sand_trap.stringtable
+Background: Nihilist	1	[Background: Nihilist] "Kith and wilder have always fought. There's no meaning in any of it."	11_cv_sugaan.stringtable
+Cross your arms over your chest and watch.	1	[Cross your arms over your chest and watch.]	07_cv_berath_high_priest.stringtable
+Place the blighted koīki fruit at the top of the pile.	1	[Place the blighted koīki fruit at the top of the pile.]	16_cv_bowl.stringtable
+Give Rokowa's Fingers.	1	[Give Rokowa's Fingers.] "I took these from Bertenno. I take it they're yours?"	05_cv_fessina.stringtable
+Look for the constellation of the Huntress.	1	[Look for the constellation of the Huntress.]	19_cv_telescope.stringtable
+Sneak towards the malignant presence.	1	[Sneak towards the malignant presence.]	re_si_wilder_trap.stringtable
+Bend their hearts or minds with an ability.	1	[Bend their hearts or minds with an ability.]	re_si_mutiny.stringtable
+Present the Cornett of Waves.	1	[Present the Cornett of Waves.] "I have what you're looking for."	06_cv_gwenfin.stringtable
+Touch his shoulder while he's distracted.	1	[Touch his shoulder while he's distracted.]	03_cv_rtc_soldiers.stringtable
+Stare pointedly.	1	[Stare pointedly.]	companion_cv_xoti_main.stringtable
+Send someone up to scout for a safe route.	1	[Send someone up to scout for a safe route.]	16_si_cliff.stringtable
+Laugh loudly.	1	[Laugh loudly.]	companion_cv_xoti_main.stringtable
+Walk onto the bridge.	1	[Walk onto the bridge.]	re_si_port_maje_swimming.stringtable
+Sneak up on the camp.	1	[Sneak up on the camp.]	re_si_campsite_explorers.stringtable
+Offer Aged Shark Meat.	1	[Offer Aged Shark Meat.] "Do you like shark? I've got some finely aged shark meat."	re_si_eoten.stringtable
+Gesture in the direction of the skuldr.	1	[Gesture in the direction of the skuldr.] "Just back that way. If you hurry, you should catch her."	re_si_city_skuldr.stringtable
+Lift the hammer from the altar.	1	[Lift the hammer from the altar.]	26_si_desert_ruin_sand_trap.stringtable
+Examine the controls more closely.	1	[Examine the controls more closely.]	19_cv_orrery_controls.stringtable
+Row to Queen's Berth.	1	[Row to Queen's Berth.]	06_si_undercroft_skiff.stringtable
+Cast Withdraw on Giacolo.	1	[Attack] [Cast Withdraw on Giacolo.]	17_cv_captain_tatzatl.stringtable
+Search the wagon.	1	[Search the wagon.]	re_si_supply_wagon_trap.stringtable
+Make additional preparations.	1	[Make additional preparations.]	12_cv_ship_wheel.stringtable
+Take the lift up.	1	[Take the lift up.]	16_si_lift.stringtable
+Yawn obnoxiously.	1	[Yawn obnoxiously.]	17_cv_pallegina_taztatl_aftermath.stringtable
+Examine the door.	1	[Examine the door.]	09_cv_benessa.stringtable
+Give Beina's head.	1	[Give Beina's head.] "Looks like her luck ran out." 	04_cv_nungata.stringtable
+Consider something else.	1	[Consider something else.]	re_si_mutiny.stringtable
+Shake his hand.	1	[Shake his hand.] "I hope you find what you're looking for."	companion_aloth_intro.stringtable
+Investigate the ruckus.	1	[Investigate the ruckus.]	re_si_crew_event_infighting.stringtable
+Inspect the wardstone.	1	[Inspect the wardstone.]	05_cv_dragon_dais.stringtable
+Knock on the surface of the water.	1	[Knock on the surface of the water.]	05_si_circle_of_archmagi.stringtable
+Pull yourself up.	1	[Pull yourself up.]	re_si_eoten.stringtable
+Give Tāhae's head.	1	[Give Tāhae's head.] "I hope he enjoyed his last meal."	03_cv_abocco.stringtable
+Cast a spell to slow the monsters.	1	[Cast a spell to slow the monsters.]	re_si_city_skuldr.stringtable
+Inform the guards.	1	[Inform the guards.]	re_si_city_bad_deal.stringtable
+Drink your ale in silence.	1	[Drink your ale in silence.]	companion_maia_relationship_player.stringtable
+Touch the vines, reach down to the life at their core.	1	[Touch the vines, reach down to the life at their core.]	22_cv_vtc_survivor.stringtable
+Force your way to the front of the line.	1	[Force your way to the front of the line.]	re_si_city_ooze.stringtable
+Inspect the merchant stall.	1	[Inspect the merchant stall.]	06_si_bm_alleys.stringtable
+Manipulate the controls.	1	[Manipulate the controls.]	19_cv_orrery_controls.stringtable
+Hold up the Rod of the Deep Hunter.	1	[Hold up the Rod of the Deep Hunter.] "This what you're looking for?"	05_cv_umaris.stringtable
+Secure a rope and grappling hook to the tree.	1	[Secure a rope and grappling hook to the tree.]	07_si_sepulchers_tunnels.stringtable
+Continue to say nothing.	1	[Continue to say nothing.]	companion_cv_xoti_relationship_pallegina.stringtable
+Slide the golden wheels onto the control panel.	1	[Slide the golden wheels onto the control panel.]	22_si_map.stringtable
+Squint and nod confidently.	1	[Squint and nod confidently.]	17_cv_captain_tatzatl.stringtable
+Show her the shards of the Whispers of Yenwood.	1	[Show her the shards of the Whispers of Yenwood.] "Can you do anything with these?"	05_cv_marihi.stringtable
+Watch them.	1	[Watch them.]	companion_serafen_relationship_xoti.stringtable
+Blast the hatch open and enter.	1	[Blast the hatch open and enter.]	re_si_plague_ship_dead_tiny.stringtable
+Pay 800cp	1	[Pay 800cp] "How about some copper for your troubles, I only wanted a look around?"	03_cv_mill_guard_frontdoor.stringtable
+Give Steel Preacher's head.	1	[Give Steel Preacher's head.] "I'll be glad when this isn't weighing down my pack."	04_cv_nungata.stringtable
+Flee the house.	1	[Flee the house.]	re_si_city_burning_building.stringtable
+Assault Fort Deadlight.	1	[Assault Fort Deadlight.]	13_si_deadight_approach.stringtable
+Create "Potion of Creative Necessity."	1	[Create "Potion of Creative Necessity."]	26_si_witch_cauldron.stringtable
+Inspect the grate.	1	[Inspect the grate.]	03_si_vtc_hq_infiltration.stringtable
+Glance in her direction.	1	[Glance in her direction.]	14_cv_aeldys_spy.stringtable
+Leave the oasis.	1	[Leave the oasis.]	27_si_pyramid_ascent.stringtable
+Pat the dog.	1	[Pat the dog.]	09_bs_readceran_hound.stringtable
+Leave the girl to her fate.	1	[Leave the girl to her fate.]	re_si_city_skuldr.stringtable
+Distract the dragon with some backflips and juggling.	1	[Distract the dragon with some backflips and juggling.]	10_cv_dragon_magma.stringtable
+Attempt to break down the wall.	1	[Attempt to break down the wall.]	27_si_pyramid_weakened_wall.stringtable
+Pretend to drop the tablet.	1	[Pretend to drop the tablet.] "I got you the Harapo - whoops!" 	05_cv_netehe.stringtable
+Enter Combat	1	[Enter Combat] "Advance!"	re_si_ship_combat.stringtable
+Call on the Rathun to board the oncoming vessel.	1	[Call on the Rathun to board the oncoming vessel.]	12_si_fleet_battle.stringtable
+Approach the circle.	1	[Approach the circle.]	re_si_crew_event_infighting.stringtable
+Turn the bombard toward the rubble obstruction to the west.	1	[Turn the bombard toward the rubble obstruction to the west.]	11_si_cannon.stringtable
+Disperse the fog with a spell.	1	[Disperse the fog with a spell.]	26_si_elewys_spirits.stringtable
+Put back 10cp	1	[Put back 10cp] "Sorry."	09_cv_ikawha.stringtable
+Swim for the surface.	1	[Swim for the surface.]	14_si_underwater_cavern.stringtable
+Step through the mouth.	1	[Step through the mouth.]	28_si_drowned_barrows_transition.stringtable
+Hold her hand.	1	[Hold her hand.]	05_cv_rod_font.stringtable
+Try to save yourself.	1	[Try to save yourself.]	17_cv_aeldys_betrayal.stringtable
+Hand them cannon sponges.	1	[Hand them cannon sponges.] "Go ahead. Fight it out."	re_si_crew_event_infighting.stringtable
+Toss a grappling hook to the top of the wall.	1	[Toss a grappling hook to the top of the wall.]	11_si_gate_tower_climb.stringtable
+Give Ikorno's head.	1	[Give Ikorno's head.] "I brought justice to the wizard."	07_cv_okauro.stringtable
+Grab the mace.	1	[Grab the mace.]	26_cv_soulbound_mace.stringtable
+Stay within the wave's trough.	1	[Stay within the wave's trough.]	re_si_storms.stringtable
+Watch quietly for now.	1	[Watch quietly for now.]	03_si_the_duel.stringtable
+Search the skeletons.	1	[Search the skeletons.]	re_si_sand_graveyard.stringtable
+Execute a perfect flourish as you bow.	1	[Execute a perfect flourish as you bow.]	03_cv_vtc_exile_trial.stringtable
+Nod to them.	1	[Nod to them.]	re_si_campsite_xaurips.stringtable
+Let them finish.	1	[Let them finish.]	companion_cv_xoti_intro.stringtable
+Continue through the bog.	1	[Continue through the bog.]	26_si_witch_guardians.stringtable
+Return items.	1	[Return items.] "It's not my place to interfere in your plans."	05_cv_degnos.stringtable
+Smile menacingly.	1	[Smile menacingly.] "I have questions, and you have answers. Are we clear?"	05_cv_bathhouse_quarno.stringtable
+Cast a blessing on one of the duelists.	1	[Cast a blessing on one of the duelists.] 	03_si_the_duel.stringtable
+Place the clear crystal into the hole.	1	[Place the clear crystal into the hole.]	05_cv_vault_lock.stringtable
+Surprise the fampyrs with holy light.	1	[Surprise the fampyrs with holy light.]	26_si_sanguine_harvest_ritual.stringtable
+Sic the slavers on the nearest galleon.	1	[Sic the slavers on the nearest galleon.]	12_si_fleet_battle.stringtable
+Turn the bombard toward the cluster of nāga.	1	[Turn the bombard toward the cluster of nāga.]	11_si_cannon.stringtable
+Inspire the grubs to do a wiggly dance.	1	[Inspire the grubs to do a wiggly dance.]	re_si_campsite_xaurips.stringtable
+Punch Talfor.	1	[Punch Talfor.]	re_si_talfor_pirates.stringtable
+Reject her offer.	1	[Reject her offer.] "We have enough mouths to feed as it is."	22_cv_vtc_survivor.stringtable
+Attempt to steal the dwarf's dagger.	1	[Attempt to steal the dwarf's dagger.]	re_si_campsite_explorers.stringtable
+Shake your head for her to refrain.	1	[Shake your head for her to refrain.] "Never mind."	10_cv_dragon_magma.stringtable
+Scribble out the section that impacts ownership.	1	[Scribble out the section that impacts ownership.] 	03_si_vtc_hq_infiltration.stringtable
+Give Vessali's head.	1	[Give Vessali's head.] "She won't be slithering out of this one."	04_cv_nungata.stringtable
+Pursue the arsonists out the back.	1	[Pursue the arsonists out the back.]	re_si_city_burning_building.stringtable
+Speak to the wilder.	1	[Speak to the wilder.]	re_si_eoten.stringtable
+Manipulate the xaurip's mind.	1	[Manipulate the xaurip's mind.]	re_si_shrine_thieves.stringtable
+Fire your cannons on the fort.	1	[Fire your cannons on the fort.]	13_si_deadight_approach.stringtable
+Refuse the sword.	1	[Refuse the sword.] "So be it."	07_cv_berath_deathguard_boss.stringtable
+Don your diving suit and swim down.	1	[Don your diving suit and swim down.]	15_si_transition_enter.stringtable
+Read the inscription.	1	[Read the inscription.]	05_si_dragon_door.stringtable
+Bend the bars.	1	[Bend the bars.]	03_si_vtc_hq_infiltration.stringtable
+Stare at Edér.	1	[Stare at Edér.]	companion_eder_quest_1.stringtable
+Slip him up with magic.	1	[Slip him up with magic.]	re_si_plague_ship_alive.stringtable
+Ascend the pyramid.	1	[Ascend the pyramid.]	27_si_pyramid_ascent.stringtable
+Send Ishiza to scout.	1	[Send Ishiza to scout.]	re_si_campsite_xaurips.stringtable
+Offer seal.	1	[Offer seal.] "Does this belong to you?"	03_cv_avetta.stringtable
+The sky wurm.	1	[The sky wurm.]	re_si_crew_event_cannibalism.stringtable
+Rauataian	1	[Rauataian] <link="neutralvalue://Rauataian: Do you speak Rauataian?">"A kana Rauataian ō ikoru ne?"</link>	companion_rekke_intro.stringtable
+Read the note.	1	[Read the note.]	06_si_bm_alleys.stringtable
+Examine the mace.	1	[Examine the mace.]	26_cv_soulbound_mace.stringtable
+Sing to her.	1	[Sing to her.]	01_cv_lagufaeth_broodmother.stringtable
+Slot 2	1	As you struggle through the narrowing tunnel, the dirt takes on a more mud-like consistency, helpfully greasing the pass…	03_si_xaurip_tunnel.stringtable
+Ask a companion's aid.	1	[Ask a companion's aid.]	re_si_storms.stringtable
+Pry the chest apart.	1	[Pry the chest apart.]	re_si_2607_pirates_booty.stringtable
+Administer taru taru combined with ripple sponge.	1	[Administer taru taru combined with ripple sponge.]	companion_eder_quest_ship.stringtable
+The baby boar.	1	[The baby boar.]	re_si_crew_event_cannibalism.stringtable
+Signal the Wahaki to intercept the oncoming vessel.	1	[Signal the Wahaki to intercept the oncoming vessel.]	12_si_fleet_battle.stringtable
+Threaten	1	[Threaten] "Hand over whatever valuables you've got or you'll be meeting Eothas sooner than you'd thought."	re_si_supply_wagon_trap.stringtable
+Sneak up behind the lagufaeth.	1	[Sneak up behind the lagufaeth.]	26_si_lagufaeth_warchief.stringtable
+Submerge and approach Fort Deadlight underwater.	1	[Submerge and approach Fort Deadlight underwater.]	13_si_deadight_approach.stringtable
+Send someone down the rope.	1	[Send someone down the rope.]	00_cv_poko_kohara_well.stringtable
+Flirt	1	[Flirt] "So Serafen..."	companion_serafen_main.stringtable
+Unleash the Wahaki on the galleons.	1	[Unleash the Wahaki on the galleons.]	12_si_fleet_battle.stringtable
+Player Subrace	1	At first, you worried this [Player Subrace] before you had been sent by the Vailian debt collectors.   It would be a low…	04_cv_takano.stringtable
+OrlansHeadGame_PlayerLastScore	1	You let the dagger fly and, with a heavy thump, lodge it into the orlan's [OrlansHeadGame_PlayerLastResult].  "A hit, ca…	re_si_crew_event_orlans_head.stringtable
+Destroy the orb.	1	[Destroy the orb.]	20_cv_wizard_orb.stringtable
+Read his soul.	1	[Read his soul.]	06_cv_botaro_soul.stringtable
+Gesture for him to hurry.	1	[Gesture for him to hurry.]	05_cv_thief_soul.stringtable
+Grunt noncommittally.	1	[Grunt noncommittally.]	10_cv_rathun_warlord.stringtable
+Succumb to the temptation.	1	[Succumb to the temptation.]	22_si_menpwgra_tree_boss.stringtable
+Show her the Spine of Thicket Green.	1	[Show her the Spine of Thicket Green.] "This staff may help with the corruption of your grove." 	22_cv_menpwgra_boss.stringtable
+Destroy the totem.	1	[Destroy the totem.]	re_si_wilder_trap.stringtable
+Attempt to cheat.	1	[Attempt to cheat.]	re_si_crew_event_orlans_head.stringtable
+Push against the door.	1	[Push against the door.]	05_si_dragon_door.stringtable
+Nod and return to your seat.	1	[Nod and return to your seat.]	re_si_campsite_explorers.stringtable
+Continue looking into his eyes.	1	[Continue looking into his eyes.]	companion_tekehu_relationship_player.stringtable
+Click your tongue like Maia.	1	[Click your tongue like Maia.]	companion_maia_intro.stringtable
+Project yourself into the pillar.	1	[Project yourself into the pillar.]	02_cv_poko_kohara_machinery.stringtable
+Use a prybar to open the door.	1	[Use a prybar to open the door.]	11_si_swim.stringtable
+Return satchel	1	[Return satchel] "Indeed."	05_cv_degnos.stringtable
+Continue up the cavern.	1	[Continue up the cavern.]	07_si_sepulchers_tunnels.stringtable
+Chase after the lagufaeth.	1	[Chase after the lagufaeth.]	26_si_lagufaeth_traps.stringtable
+Show her the Engoliero.	1	[Show her the Engoliero.] "Like my sword?"	13_cv_aeldys.stringtable
+Grab her by the arm.	1	[Grab her by the arm.]	03_bs_urchins.stringtable
+Enter the eye.	1	[Enter the eye.]	28_si_drowned_barrows_transition.stringtable
+Give Nomu's head.	1	[Give Nomu's head.] "Here, catch!"	03_cv_abocco.stringtable
+Cast a healing balm on Radora's head.	1	[Cast a healing balm on Radora's head.]	03_cv_radoro.stringtable
+Examine the body.	1	[Examine the body.]	02_cv_beza.stringtable
+Attempt to open the door.	1	[Attempt to open the door.]	26_si_desert_ruin_sand_trap_escape.stringtable
+Chuckle.	1	[Chuckle.]	09_cv_governor_clario.stringtable
+Read Takano's soul.	1	[Read Takano's soul.]	04_cv_takano.stringtable
+Identify the creatures.	1	[Identify the creatures.]	re_si_spore_lures.stringtable
+Prepare an ambush and attack.	1	[Prepare an ambush and attack.]	re_si_city_wealthy_noble.stringtable
+Raise an eyebrow.	1	[Raise an eyebrow.]	03_cv_dessiral.stringtable
+Continue down the twisting cavern.	1	[Continue down the twisting cavern.]	07_si_sepulchers_tunnels.stringtable
+Hold the Eel's Coil up to the door.	1	[Hold the Eel's Coil up to the door.]	07_si_sepulchers_ext_door.stringtable
+Inspect the instrument.	1	[Inspect the instrument.]	13_si_piano.stringtable
+Recall what you need to tell her.	1	[Recall what you need to tell her.]	06_cv_botaro_soul.stringtable
+Take their goods and leave.	1	[Take their goods and leave.] "Fine."	re_si_supply_wagon_trap.stringtable
+Wink and tap the side of your nose.	1	[Wink and tap the side of your nose.]	17_cv_aeldys_betrayal.stringtable
+Reach out to the lost souls.	1	[Reach out to the lost souls.]	09_cv_pm_eothas.stringtable
+Brandish a knife.	1	[Brandish a knife.] "Want to do this easy or painful?"	17_cv_aeldys_betrayal.stringtable
+Interact with the shrine.	1	[Interact with the shrine.]	10_cv_magran_shrine.stringtable
+Recruit Konstanten.	1	[Recruit Konstanten.] "Grab your things, then, and let's go."	03_cv_scilba.stringtable
+Listen closely to the sounds.	1	[Listen closely to the sounds.]	26_si_desert_ruin_ext.stringtable
+Shrug off the suit and make a mad dash for the surface.	1	[Shrug off the suit and make a mad dash for the surface.]	15_si_transition_exit_pylons_destroyed.stringtable
+Call out to the archers.	1	[Call out to the archers.]	26_si__collapsed_mine_guardians.stringtable
+Toss a blister bomb at the door.	1	[Toss a blister bomb at the door.]	26_si_desert_ruin_sand_trap_escape.stringtable
+Shout at the top of your lungs.	1	[Shout at the top of your lungs.] "Stop!"	03_si_the_duel.stringtable
+Stare into space with your mouth hanging open.	1	[Stare into space with your mouth hanging open.]	03_cv_rtc_soldiers.stringtable
+Do your best to ignore her.	1	[Do your best to ignore her.]	14_cv_aeldys_spy.stringtable
+Give her another bottle of rice wine.	1	[Give her another bottle of rice wine.]	05_cv_bathhouse_tola.stringtable
+Stop feeding Ishiza.	1	[Stop feeding Ishiza.]	companion_maia_relationship_player.stringtable
+Move one of the cups.	1	[Move one of the cups.]	06_cv_orron.stringtable
+Go back to the passage's exit to the cliff.	1	[Go back to the passage's exit to the cliff.]	07_si_sepulchers_tunnels.stringtable
+Blast the wall with a concussion bomb.	1	[Blast the wall with a concussion bomb.]	27_si_pyramid_weakened_wall.stringtable
+Wave.	1	[Wave.]	03_cv_vtc_exile_trial.stringtable
+Hide within the shadow of a wrecked ship.	1	[Hide within the shadow of a wrecked ship.]	20_si_town_exploration.stringtable
+Leave the area undisturbed.	1	[Leave the area undisturbed.]	re_si_sand_graveyard.stringtable
+Reconsider.	1	[Reconsider.]	02_cv_door_puzzle.stringtable
+Cast Lay on Hands	1	[Cast Lay on Hands] "This is all I can do for now. We'll set it later."	09_cv_irrena_port_maje.stringtable
+Cast a spell to freeze the oozes.	1	[Cast a spell to freeze the oozes.]	re_si_city_ooze.stringtable
+Create "Potion of the Steadfast Hound."	1	[Create "Potion of the Steadfast Hound."]	26_si_witch_cauldron.stringtable
+Return the salute.	1	[Return the salute.]	companion_pallegina_hub.stringtable
+Study the cliff.	1	[Study the cliff.]	16_si_cliff.stringtable
+Grab his wrist.	1	[Grab his wrist.] "Care to find out if broken fingers improve your music?"	03_cv_zili.stringtable
+Keep silent as you approach.	1	[Keep silent as you approach.]	20_si_town_exploration.stringtable
+Assign crew duties.	1	[Assign crew duties.]	re_si_storms.stringtable
+Turn to see what she's looking at.	1	[Turn to see what she's looking at.]	03_cv_akema.stringtable
+Enter the combination you found.	1	[Enter the combination you found.]	05_cv_vault_lock.stringtable
+Explain the science.	1	[Explain the science.] "This wind is a natural phenomenon, nothing to worry about."	re_si_crew_event_omen_cloud.stringtable
+Show them Castol's letter.	1	[Show them Castol's letter.] "Here's your proof."	17_cv_principi_boss_betrayal.stringtable
+Provide a bonus...	1	[Provide a bonus...]	re_si_crew_event_high_money.stringtable
+Dig it up.	1	[Dig it up.]	re_si_2607_pirates_booty.stringtable
+Enhance Explosives and Mechanics	1	[Enhance Explosives and Mechanics] "Here you are."	17_cv_backer_npc_elias_zelen.stringtable
+Jerk your hand away.	1	[Jerk your hand away.]	09_cv_dawnstars_priestess.stringtable
+Give him the empty coin purse.	1	[Give him the empty coin purse.] "Sure did."	09_cv_rinco.stringtable
+Chirrup at her.	1	[Chirrup at her.]	01_cv_lagufaeth_broodmother.stringtable
+Press onwards.	1	[Press onwards.]	12_si_ukaizo_storm.stringtable
+Climb down the tower.	1	[Climb down the tower.]	11_si_gate_tower_climb.stringtable
+Direct the Lifeless to engage the oncoming vessel.	1	[Direct the Lifeless to engage the oncoming vessel.]	12_si_fleet_battle.stringtable
+Place a conch in one hand.	1	[Place a conch in one hand.]	06_si_mural_temple.stringtable
+Use the girl as a distraction and ambush the creatures.	1	[Use the girl as a distraction and ambush the creatures.]	re_si_city_skuldr.stringtable
+Step back from the bars.	1	[Step back from the bars.]	14_cv_wahaki_slave_leader.stringtable
+Try to land one in the "orlan's" nose.	1	[Try to land one in the "orlan's" nose.]	re_si_crew_event_orlans_head.stringtable
+Approach the Eoten.	1	[Approach the Eoten.]	re_si_junvik_eoten_guard.stringtable
+Examine the cauldron.	1	[Examine the cauldron.]	26_si_witch_cauldron.stringtable
+Raise your voice.	1	[Raise your voice.] "It sure would be a shame if the owner of this operation found out about your - !"	14_cv_aeldys_spy.stringtable
+Fire the bombard.	1	[Fire the bombard.]	11_si_cannon.stringtable
+Present the Cornett of Depths.	1	[Present the Cornett of Depths.] "Is this what you're looking for?"	06_cv_gwenfin.stringtable
+Douse the fire with water magic.	1	[Douse the fire with water magic.]	re_si_storms.stringtable
+Truth	1	[Truth] "I'm pretty sure you were given a forgery."	03_cv_tawenu.stringtable
+Leap from hiding, weapons drawn.	1	[Leap from hiding, weapons drawn.]	26_si_lagufaeth_ambush.stringtable
+Give him Quarno's ledger.	1	[Give him Quarno's ledger.] "Here - a list of Quarno's recent transactions."	03_cv_director_castol.stringtable
+Take the cloth.	1	[Take the cloth.]	26_si_desert_ruin_burial.stringtable
+Throw a party.	1	[Throw a party.] "Absolutely! You deserve a reward. Break out the casks and the good meats!"	re_si_crew_event_high_money.stringtable
+Jostle her out of it.	1	[Jostle her out of it.]	companion_cv_xoti_arc.stringtable
+Throw a grappling hook up the lift.	1	[Throw a grappling hook up the lift.]	16_si_lift.stringtable
+Flee the beast.	1	[Flee the beast.]	re_si_wilder_trap.stringtable
+Touch the corner of her mouth.	1	[Touch the corner of her mouth.] "I'd do anything for you, Xoti."	companion_cv_xoti_arc.stringtable
+Pry the gate off its hinges.	1	[Pry the gate off its hinges.]	14_si_iron_bars.stringtable
+Point at Xoti then jerk your thumb toward the torc.	1	[Point at Xoti then jerk your thumb toward the torc.]	10_cv_dragon_magma.stringtable
+Ignore them and walk away.	1	[Ignore them and walk away.]	re_si_city_wealthy_noble.stringtable
+Attempt the crossing.	1	[Attempt the crossing.]	re_si_eoten.stringtable
+Chase Rust into the darkness.	1	[Chase Rust into the darkness.]	06_si_bm_alleys.stringtable
+Continue up the path.	1	[Continue up the path.]	26_si_lich_ext_wraiths.stringtable
+Face your pursuer, head on.	1	[Face your pursuer, head on.]	09_si_principi_boss_encounter.stringtable
+Examine the hammer.	1	[Examine the hammer.]	26_si_desert_ruin_sand_trap.stringtable
+Use a hammer and chisel to break the slab in two.	1	[Use a hammer and chisel to break the slab in two.]	re_si_city_collapsed_tunnel.stringtable
+Pull the vines away from the chest.	1	[Pull the vines away from the chest.]	01_si_chest.stringtable
+Go back down to the narrow cavern.	1	[Go back down to the narrow cavern.]	07_si_sepulchers_tunnels.stringtable
+Shimmy across the ledge.	1	[Shimmy across the ledge.]	06_si_os1_cliff_steps.stringtable
+Bow and leave.	1	[Bow and leave.]	05_cv_bathhouse_tola.stringtable
+Hold your nose.	1	[Hold your nose.] "Lady, you are setting all kinds of records right now."	08_cv_iverra_on_player_ship.stringtable
+Set the notes aside.	1	[Set the notes aside.]	26_cv_witch_notes.stringtable
+Forge ahead through the sand storm.	1	[Forge ahead through the sand storm.]	26_si_transition_to_desert_ruin.stringtable
+Use a grappling hook to climb down.	1	[Use a grappling hook to climb down.]	11_si_gate_tower_climb.stringtable
+player class	1	"Don't believe it, boss. This one's the softest [player class] in Deadfire."	06_cv_ateira.stringtable
+Toss it into the flames.	1	[Toss it into the flames.]	05_cv_bathhouse_boiler.stringtable
+Show him Benweth's suolenet.	1	[Show him Benweth's suolenet.] "I want fourth seat on the Consuaglo mes Casitàs."	17_cv_pim.stringtable
+Show him Beza's pages.	1	[Show him Beza's pages.] "You sure? They'll do anything to protect an investment."	02_cv_anaharu.stringtable
+God_Boon	1	The gods offered you boons in exchange for resolving the Hollowborn crisis. You vowed to aid:  [God_Boon]  What did you …	21_si_pallid_knight.stringtable
+Direct the Rathun against the ogres.	1	[Direct the Rathun against the ogres.]	12_si_fleet_battle.stringtable
+Trip Orso.	1	[Trip Orso.]	03_si_the_duel.stringtable
+Huana	1	[Huana] <link="neutralvalue://Huana: Do you speak Huana?">"Kautō e kui ne Huana?"</link>	companion_rekke_intro.stringtable
+Enter the tunnel.	1	[Enter the tunnel.]	re_si_city_bad_deal.stringtable
+Sneak past the nāga camp.	1	[Sneak past the nāga camp.]	26_si_desert_ruin_ext.stringtable
+Sneak attack the nāga.	1	[Sneak attack the nāga.]	re_si_flame_naga_camp.stringtable
+Gather and address the crew.	1	[Gather and address the crew.]	re_si_crew_event_captain_personality.stringtable
+Give the empty sword to Yngfrith.	1	[Give the empty sword to Yngfrith.]	17_cv_talkingweapon_owner.stringtable
+Smile politely.	1	[Smile politely.]	09_cv_governor_clario.stringtable
+Search for a locking mechanism.	1	[Search for a locking mechanism.]	05_si_dragon_door.stringtable
+Unlock the chest.	1	[Unlock the chest.]	re_si_2607_pirates_booty.stringtable
+Raise Lord Darryn's Voulge towards the sky.	1	[Raise Lord Darryn's Voulge towards the sky.] "Take us into the storm."	re_si_storms.stringtable
+Show her the torc.	1	[Show her the torc.] "Look here! I recovered this from your fallen brenthís."	10_cv_rathun_keep_guard.stringtable
+Enhance History and Arcana	1	[Enhance History and Arcana] "Here you are."	17_cv_backer_npc_geirvard.stringtable
+Pay 1000 cp.	1	[Pay 1000 cp.] "Consider this me making a contract with you."	06_cv_orron.stringtable
+Study the symbols around the dial.	1	[Study the symbols around the dial.]	05_si_dragon_door.stringtable
+Drink the grog.	1	[Drink the grog.]	13_cv_pirate_drunkard.stringtable
+Watch from within the crowd.	1	[Watch from within the crowd.]	companion_cv_xoti_intro_pm.stringtable
+Steal a glance at her desk.	1	[Steal a glance at her desk.]	08_cv_hazanui_karu.stringtable
+Keep the empty sword.	1	[Keep the empty sword.]	17_cv_talkingweapon_owner.stringtable
+Speak the words of the command scroll.	1	[Speak the words of the command scroll.]	16_cv_construct.stringtable
+Smirk.	1	[Smirk.] "Funny how miracles happen everywhere I go."	17_cv_pallegina_taztatl_aftermath.stringtable
+Search for the contract with the Duape tribe.	1	[Search for the contract with the Duape tribe.]	03_si_vtc_hq_infiltration.stringtable
+Examine the absence in the center.	1	[Examine the absence in the center.]	05_cv_vault_lock.stringtable
+Inspect the ropes.	1	[Inspect the ropes.]	06_si_undercroft_rope_bridge.stringtable
+Bow and give her a bottle of rice wine.	1	[Bow and give her a bottle of rice wine.]	05_cv_bathhouse_tola.stringtable
+Tap your chest.	1	[Tap your chest.] "Sounds familiar."	companion_pallegina_quest.stringtable
+Raise your hands.	1	[Raise your hands.] "Begone! I'll have no mischief from you, crooked thing!"	03_cv_rtc_soldiers.stringtable
+Slap him in the face.	1	[Slap him in the face.]	13_cv_benweth.stringtable
+Ignore him and walk past.	1	[Ignore him and walk past.]	re_si_talfor_pirates.stringtable
+Try to read Ishiza's soul.	1	[Try to read Ishiza's soul.]	companion_maia_relationship_player.stringtable
+Break the connection.	1	[Break the connection.]	companion_cv_xoti_arc.stringtable
+Warn Chitupec.	1	[Warn Chitupec.]	21_si_shipwreck.stringtable
+Look up.	1	[Look up.] "Berath, this would be a great time for one of your demonstrations..."	11_cv_sugaan.stringtable
+Tap on the surface of the drum.	1	[Tap on the surface of the drum.]	00_cv_drummer.stringtable
+Slap the rod away.	1	[Slap the rod away.]	07_cv_flaune.stringtable
+Relinquish the sword.	1	[Relinquish the sword.] "It is yours to guard once more."	07_cv_berath_deathguard_boss.stringtable
+Stare him down.	1	[Stare him down.]	07_cv_berath_high_priest.stringtable
+Cast a corrosive spell at the door.	1	[Cast a corrosive spell at the door.]	26_si_desert_ruin_sand_trap_escape.stringtable
+Give him the cursed idol.	1	[Give him the cursed idol.] "Nairi is responsible for the Vailian expedition's misfortune. I found this among their corp…	00_cv_ruanu.stringtable
+Stay put for the time being.	1	[Stay put for the time being.]	09_si_sea_cave_swim_return.stringtable
+Muster your willpower against the vithrack.	1	[Muster your willpower against the vithrack.]	06_cv_zahak.stringtable
+Reach through the bars to flip the lever.	1	[Reach through the bars to flip the lever.]	14_si_iron_bars.stringtable
+Use Touch of Rot on the vines.	1	[Use Touch of Rot on the vines.]	22_cv_vtc_survivor.stringtable
+Close to Board.	1	[Close to Board.] "Give no quarter! Charge!"	re_si_ship_combat.stringtable
+Study her hands.	1	[Study her hands.]	03_cv_nera.stringtable
+Player Deity	1	Shouting from the deck interrupts your prayers to [Player Deity].	re_si_crew_event_infighting.stringtable
+Show mercy.	1	[Show mercy.] "I hope I've made myself clear."	re_si_crew_event_infighting.stringtable
+Examine the statue.	1	[Examine the statue.]	26_cv_soulbound_mace.stringtable
+Give to Tumara	1	[Give to Tumara] "I hope it fetches a good price." 	05_cv_tumara.stringtable
+Blind the fampyrs with dazzling light.	1	[Blind the fampyrs with dazzling light.]	26_si_sanguine_harvest_ritual.stringtable
+Wait	1	[Wait]	companion_maia_main.stringtable
+Climb down to the base of the skull.	1	[Climb down to the base of the skull.]	28_si_drowned_barrows_transition.stringtable
+Let the lagufaeth retreat.	1	[Let the lagufaeth retreat.]	26_si_lagufaeth_traps.stringtable
+Wait in line to fill a few water skins.	1	[Wait in line to fill a few water skins.]	re_si_city_ooze.stringtable
+Free the slaves.	1	[Free the slaves.]	14_cv_auction_slaves.stringtable
+Inspect the pool.	1	[Inspect the pool.]	06_si_statue_sunken.stringtable
+Continue listening.	1	[Continue listening.]	16_cv_wahaki_trader.stringtable
+Hit him again.	1	[Hit him again.]	13_cv_benweth.stringtable
+Call out his name, the Lord of Heldengate.	1	[Call out his name, the Lord of Heldengate.]	07_si_sepulchers_champion_gate.stringtable
+i'm going to tell him to merge with berath	1	[i'm going to tell him to merge with berath]	re_si_mid_ukaizo_gods.stringtable
+Summon a storm to quench the flames.	1	[Summon a storm to quench the flames.]	re_si_city_burning_building.stringtable
+Retrace your steps to the exit.	1	[Retrace your steps to the exit.]	06_si_bm_alleys.stringtable
+Row to the shores on a skiff under the cover of night.	1	[Row to the shores on a skiff under the cover of night.]	13_si_deadight_approach.stringtable
+Pull back from the memory.	1	[Pull back from the memory.]	10_cv_rathun_soul_priestess.stringtable
+Choose a companion to accompany you.	1	[Choose a companion to accompany you.]	re_si_2604_campsite_skaen.stringtable
+Vailian	1	[Vailian] <link="neutralvalue://Vailian: Do you speak Vailian, sir?">"Perla Vailian, fentre?"</link>	companion_rekke_intro.stringtable
+Push past the lost souls to find your own soul.	1	[Push past the lost souls to find your own soul.]	09_cv_pm_eothas.stringtable
+Check for ammunition.	1	[Check for ammunition.]	11_si_cannon.stringtable
+Back away a step.	1	[Back away a step.]	04_cv_queen_onezaka_ii.stringtable
+Move closer.	1	[Move closer.] "I'm listening."	re_si_2604_campsite_skaen.stringtable
+Stuff the note in your pocket.	1	[Stuff the note in your pocket.]	06_si_bm_alleys.stringtable
+Give her the sword.	1	[Give her the sword.]	re_cv_ghost_ship_captain_encounter.stringtable
+Level a weapon at her.	1	[Level a weapon at her.]	17_cv_aeldys_betrayal.stringtable
+Keep walking.	1	[Keep walking.]	06_si_bm_alleys.stringtable
+Examine the competitors.	1	[Examine the competitors.] 	re_si_port_maje_swimming.stringtable
+Cast a spell to burn the vines.	1	[Cast a spell to burn the vines.]	01_si_chest.stringtable
+Present Beza's pages.	1	[Present Beza's pages.] "The Vailian Trading Company wanted to conduct a dangerous experiment on the souls of the tribe.…	00_cv_tikawara_resolution.stringtable
+Hold up your hands.	1	[Hold up your hands.] "All right. Never mind, then."	10_cv_dragon_magma.stringtable
+Summon a drake.	1	[Summon a drake.]	re_si_wilder_trap.stringtable
+Sneak behind the xaurip and attack it.	1	[Sneak behind the xaurip and attack it.]	re_si_shrine_thieves.stringtable
+Retrace back to the exit into the catacombs.	1	[Retrace back to the exit into the catacombs.]	07_si_sepulchers_tunnels.stringtable
+Sail out of the storm.	1	[Sail out of the storm.]	12_si_ukaizo_storm.stringtable
+Pull her up.	1	[Pull her up.]	re_si_2609_victims.stringtable
+Point to a companion.	1	[Point to a companion.] "Bring me a second barrel so Pai here knows I'm serious."	22_si_rdc_encounter.stringtable
+Return to your cabin.	1	[Return to your cabin.] "I don't have time for this."	re_si_crew_event_infighting.stringtable
+Exit to the Gullet.	1	[Exit to the Gullet.]	06_si_bm_alleys.stringtable
+Slowly back away.	1	[Slowly back away.] "Actually, no. I don't think that's the priestess I'm looking for."	10_cv_dragon_magma.stringtable
+OrlansHeadGame_PlayerLastResult	1	You let the dagger fly and, with a heavy thump, lodge it into the orlan's [OrlansHeadGame_PlayerLastResult].  "A hit, ca…	re_si_crew_event_orlans_head.stringtable
+Attempt to steal the strongbox.	1	[Attempt to steal the strongbox.]	re_si_supply_wagon_trap.stringtable
+Follow their directions.	1	[Follow their directions.]	re_si_2604_campsite_skaen.stringtable
+Forge ahead into the swamp.	1	[Forge ahead into the swamp.]	26_si_undead_crypt_swamp.stringtable
+Pretend to cut your hand.	1	[Pretend to cut your hand.] [Lie.] "I'll return it your charge, I swear."	07_cv_berath_deathguard_boss.stringtable
+Examine the rope.	1	[Examine the rope.]	re_si_2609_victims.stringtable
+Charm the grubs.	1	[Charm the grubs.]	re_si_campsite_xaurips.stringtable
+Check the fish for signs of disease.	1	[Check the fish for signs of disease.] "Let's judge the fitness of the catch."	re_si_crew_event_dead_fish.stringtable
+Swim back to the dining hall.	1	[Swim back to the dining hall.]	11_si_swim.stringtable
+i can't wait to be disintegrated!	1	glaswahl: [i can't wait to be disintegrated!]	23_cv_rymrgand.stringtable
+Explore the oasis.	1	[Explore the oasis.]	27_si_pyramid_ascent.stringtable
+Climb across to the manor.	1	[Climb across to the manor.]	05_si_rooftop.stringtable
+Furtively wave for Pallegina to creep toward the torc.	1	[Furtively wave for Pallegina to creep toward the torc.]	10_cv_dragon_magma.stringtable
+Laugh wildly in his face.	1	[Laugh wildly in his face.]	13_cv_benweth.stringtable
+Approach the nāga.	1	[Approach the nāga.]	re_si_flame_naga_camp.stringtable
+Bury the chest and leave.	1	[Bury the chest and leave.]	re_si_2607_pirates_booty.stringtable
+Crack the code.	1	[Crack the code.]	26_cv_witch_notes.stringtable
+Take him by the hand.	1	[Take him by the hand.] "It'll be okay. I'm here." 	companion_tekehu_black_market.stringtable
+Grab her by her shirt.	1	[Grab her by her shirt.] "If you don't tell me, the Mataru will be the least of your worries."	06_cv_tender_toko.stringtable
+Go through anyway.	1	[Go through anyway.]	05_si_dragon_door.stringtable
+The desert wurm hatchling.	1	[The desert wurm hatchling.]	re_si_crew_event_cannibalism.stringtable
+Accept his offer.	1	[Accept his offer.] "Welcome to the crew of [Player Ship]."	26_cv_giordu.stringtable
+Rub the dirt from her cheek.	1	[Rub the dirt from her cheek.]	companion_cv_xoti_arc.stringtable
+Go down the dark hallway to the left.	1	[Go down the dark hallway to the left.]	11_si_swim.stringtable
+Mirror the gesture.	1	[Mirror the gesture.] "Greetings, ranga."	00_cv_ruanu.stringtable
+Enter the hideout.	1	[Enter the hideout.]	06_si_bm_alleys.stringtable
+Chuck a concussion bomb at the door.	1	[Chuck a concussion bomb at the door.]	26_si_desert_ruin_sand_trap_escape.stringtable
+Accept 500 cp.	1	[Accept 500 cp.] "Deal." 	05_cv_fessina.stringtable
+Call out	1	[Call out] "Hello? Someone there?"	re_si_huana_druid.stringtable
+Pull away gently.	1	[Pull away gently.]	companion_tekehu_relationship_player.stringtable
+Search for evidence of smugglers.	1	[Search for evidence of smugglers.]	re_si_reef_wrecked_merchant_ship.stringtable
+Swim into the mouth of the cave.	1	[Swim into the mouth of the cave.]	14_si_underwater_cavern.stringtable
+Throw an explosive at it.	1	[Throw an explosive at it.]	re_si_sea_creature_whale.stringtable
+Enter Delver's Row.	1	[Enter Delver's Row.]	06_si_bm_alleys.stringtable
+To Berath.	1	[To Berath.] "Shut up!"	03_cv_kaoha.stringtable
+Rescue Chitupec.	1	[Rescue Chitupec.]	21_si_shipwreck.stringtable
+Roll eyes.	1	[Roll eyes.] "Oh, praise Eothas! What an <i>amazing</i> gesture."	10_cv_eothas.stringtable
+Cast defensive wards on the ship.	1	[Cast defensive wards on the ship.]	re_si_sea_creature_gaint_jellyfish.stringtable
+Read the dragon's soul.	1	[Read the dragon's soul.] "Your soul is stuck here? Let me take a look." 	05_cv_sea_dragon.stringtable
+Sneak around the Eoten.	1	[Sneak around the Eoten.]	re_si_junvik_eoten_guard.stringtable
+Send someone to push the slab out of the path.	1	[Send someone to push the slab out of the path.]	re_si_city_collapsed_tunnel.stringtable
+Lob a grenade at the door.	1	[Lob a grenade at the door.]	26_si_desert_ruin_sand_trap_escape.stringtable
+Have the drake attack the xaurips.	1	[Have the drake attack the xaurips.]	re_si_campsite_xaurips.stringtable
+Continue searching the ship.	1	[Continue searching the ship.]	re_cv_location_shipwreck.stringtable
+i don't care/i'm not going to tell him anything	1	[i don't care/i'm not going to tell him anything]	re_si_mid_ukaizo_gods.stringtable
+Show her the shards of the Blade of the Endless Paths.	1	[Show her the shards of the Blade of the Endless Paths.] "Do you think you can reforge this?"	05_cv_marihi.stringtable
+Take the letter.	1	[Take the letter.]	companion_serafen_quest_1.stringtable
+Turn to your companions.	1	[Turn to your companions.] "So. Here we are."	12_cv_companions_ukaizo.stringtable
+Climb down the steps.	1	[Climb down the steps.]	06_si_os1_cliff_steps.stringtable
+Inspect the plaques and pointer.	1	[Inspect the plaques and pointer.]	26_si_desert_ruin_burial.stringtable
+Destroy the skull and eliminate Concelhaut for good.	1	[Destroy the skull and eliminate Concelhaut for good.]	26_cv_lich_lair_throne.stringtable
+Refuse their demands...	1	[Refuse their demands...]	re_si_crew_event_high_money.stringtable
+Chant	1	[Chant] "Nemnok! Nemnok!" 	28_cv_nemnok_kaali_player_interrupts.stringtable
+Attack the skuldr.	1	[Attack the skuldr.] "Fiiine!"	re_si_city_skuldr.stringtable
+Offer Captain's Banquet.	1	[Offer Captain's Banquet.] "I've got a full banquet of delicious seafood I could give you."	re_si_eoten.stringtable
+Spit in her face.	1	[Spit in her face.]	13_cv_pirate_lass.stringtable
+Rotate the wheel into the first configuration.	1	[Rotate the wheel into the first configuration.]	22_si_map.stringtable
+Present the idol.	1	[Present the idol.] "Nairi cursed the last expedition. She's responsible for their deaths."	00_cv_tikawara_resolution.stringtable
+Feed the tree enough soul essence to heal itself.	1	[Feed the tree enough soul essence to heal itself.]	22_si_menpwgra_tree_boss.stringtable
+Chant to it.	1	[Chant to it.]	re_si_shrine_thieves.stringtable
+Pass through the barrier	1	[Pass through the barrier]	15_si_transition_enter.stringtable
+Pocket the coins.	1	[Pocket the coins.]	09_cv_ikawha.stringtable
+Cut your hand.	1	[Cut your hand.] "I'll return your charge, I swear."	07_cv_berath_deathguard_boss.stringtable
+Drive the vithrack out of your mind.	1	[Drive the vithrack out of your mind.]	06_cv_zahak.stringtable
+Inspect the lingering soul.	1	[Inspect the lingering soul.]	05_cv_rod_font.stringtable
+Look for an alternative route.	1	[Look for an alternative route.]	re_si_eoten.stringtable
+Throw a lightning bomb.	1	[Throw a lightning bomb.]	re_si_sea_creature_whale.stringtable
+Inspect the mural.	1	[Inspect the mural.]	15_si_mural.stringtable
+Hold a torch close to a gunpowder barrel.	1	[Hold a torch close to a gunpowder barrel.] "Do you want to live forever, Pai?"	22_si_rdc_encounter.stringtable
+Release the drake.	1	[Release the drake.]	re_si_campsite_xaurips.stringtable
+Take the pages.	1	[Take the pages.]	02_cv_beza.stringtable
+Pick up the skull.	1	[Pick up the skull.]	26_si_desert_ruin_sand_trap.stringtable
+Look over your companions.	1	[Look over your companions.]	12_si_fleet_battle.stringtable
+Craft a splint from some debris.	1	[Craft a splint from some debris.] "I'll patch you up best as I can, but you'll want to stay off the leg as much as poss…	09_cv_irrena_port_maje.stringtable
+Hurl electricity at it.	1	[Hurl electricity at it.]	re_si_wilder_trap.stringtable
+Kill him.	1	[Kill him.]	re_si_plague_ship_alive.stringtable
+Grab the baby boar and flee.	1	[Grab the baby boar and flee.]	re_si_stampede.stringtable
+Place the explosive.	1	[Place the explosive.]	08_cv_powderhouse_bomb_placement.stringtable
+Depress the serpent mural.	1	[Depress the serpent mural.]	15_si_mural.stringtable
+Hike up to the mine.	1	[Hike up to the mine.]	26_si_transition_to_mine.stringtable
+Climb the mountain.	1	[Climb the mountain.]	26_si_flame_naga_cave.stringtable
+Send someone to scout ahead for air pockets.	1	[Send someone to scout ahead for air pockets.]	09_si_sea_cave_swim.stringtable
+Nod to Onekaza.	1	[Nod to Onekaza.]	04_cv_critpath_faction_argument.stringtable
+Descend to the tomb's opening.	1	[Descend to the tomb's opening.]	07_si_sepulchers_tunnels.stringtable
+Growl at her.	1	[Growl at her.]	17_cv_aeldys_betrayal.stringtable
+Examine the bowl more closely.	1	[Examine the bowl more closely.]	09_cv_bowl.stringtable
+ShipDuel_PlayerHalfSailDist	1	<link="glossary://GlossaryEntry_Action_Half_Sail"><sprite="Inline" name="action_half_sail" tint=1></link> "Half sail!" (…	re_si_ship_combat.stringtable
+Call out her name, the Lady of Vigils.	1	[Call out her name, the Lady of Vigils.]	07_si_sepulchers_champion_vigil.stringtable
+Investigate the corruption closer.	1	[Investigate the corruption closer.]	22_si_menpwgra_tree_boss.stringtable
+Examine the rotating platform.	1	[Examine the rotating platform.]	11_si_cannon.stringtable
+Break the vithrack's domination with your cipher abilities.	1	[Break the vithrack's domination with your cipher abilities.]	re_si_crew_event_wilders.stringtable
+Accept the fish.	1	[Accept the fish.] "Thank you."	re_si_wilder_trap.stringtable
+Read the plaque.	1	[Read the plaque.]	19_cv_orrery_controls.stringtable
+Try to help.	1	[Try to help.]	companion_eder_quest_ship.stringtable
+Feel the spot.	1	[Feel the spot.]	companion_tekehu_relationship_player.stringtable
+Induce vomiting with your fingers.	1	[Induce vomiting with your fingers.]	companion_eder_quest_ship.stringtable
+Wait out the illness.	1	[Wait out the illness.]	re_si_crew_event_sick.stringtable
+Tackle Chitupec.	1	[Tackle Chitupec.]	21_si_shipwreck.stringtable
+Engage the enemy.	1	[Engage the enemy.]	12_si_fleet_battle.stringtable
+Wrest her fingers from your neck.	1	[Wrest her fingers from your neck.]	14_cv_wahaki_slave_leader.stringtable
+Go left toward the barricaded room.	1	[Go left toward the barricaded room.]	11_si_swim.stringtable
+Bless Larro.	1	[Bless Larro.]	03_si_the_duel.stringtable
+Glower at him.	1	[Glower at him.]	17_cv_principi_boss_slavers.stringtable
+Swim into the brighter tunnel.	1	[Swim into the brighter tunnel.]	14_si_underwater_cavern.stringtable
+Hold your hand over the flame.	1	[Hold your hand over the flame.]	09_cv_dawnstars_priestess.stringtable
+Commune with the spirits.	1	[Commune with the spirits.]	re_si_wilder_trap.stringtable
+Knock him to the ground.	1	[Knock him to the ground.]	re_si_plague_ship_alive.stringtable
+Attempt to understand its motivation.	1	[Attempt to understand its motivation.]	re_si_wilder_trap.stringtable
+Say nothing, slap him again.	1	[Say nothing, slap him again.]	08_cv_hamuto.stringtable
+Turn and glare at her.	1	[Turn and glare at her.]	14_cv_aeldys_spy.stringtable
+Pay 300 cp.	1	[Pay 300 cp.] "That's a fair price for three."	06_cv_rauatai_ship_captain.stringtable
+Study the enemy.	1	[Study the enemy.]	12_si_fleet_battle.stringtable
+Ignore them.	1	[Ignore them.]	re_si_campsite_explorers.stringtable
+Attempt to heal the boars.	1	[Attempt to heal the boars.]	re_si_stampede.stringtable
+Use the distraction to sneak closer.	1	[Use the distraction to sneak closer.]	re_si_campsite_xaurips.stringtable
+Let go of the door.	1	[Let go of the door.]	26_si_desert_ruin_sand_trap_escape.stringtable
+Send up a distracting cheer.	1	[Send up a distracting cheer.]	03_si_the_duel.stringtable
+Knock everything off the table.	1	[Knock everything off the table.]	06_cv_orron.stringtable
+Project your party into the pillar.	1	[Project your party into the pillar.]	02_cv_poko_kohara_machinery.stringtable
+Dive in and help him to shore.	1	[Dive in and help him to shore.]	re_si_port_maje_swimming.stringtable
+Charm the drake.	1	[Charm the drake.]	re_si_campsite_xaurips.stringtable
+Lie, and give him poison.	1	[Lie, and give him poison.] "Here. A potion of liquid adra."	20_cv_menzzago.stringtable
+Examine the door closely.	1	[Examine the door closely.]	02_cv_door_puzzle.stringtable
+Hold the door open while your party escapes.	1	[Hold the door open while your party escapes.]	26_si_desert_ruin_sand_trap_escape.stringtable
+Inspect the tomb's entrance.	1	[Inspect the tomb's entrance.]	07_si_sepulchers_tunnels.stringtable
+Order the construct to kill Tangara.	1	[Order the construct to kill Tangara.]	16_cv_construct.stringtable
+Drape your arm over her shoulders and nestle her close.	1	[Drape your arm over her shoulders and nestle her close.]	companion_cv_xoti_arc.stringtable
+Take the figurine.	1	[Take the figurine.]	02_cv_beza.stringtable
+Leave the bombard alone.	1	[Leave the bombard alone.]	11_si_cannon.stringtable
+Swap the contract with the forgery.	1	[Swap the contract with the forgery.]	03_si_vtc_hq_infiltration.stringtable
+Unleash the Lifeless on the ogres.	1	[Unleash the Lifeless on the ogres.]	12_si_fleet_battle.stringtable
+Create "Potion of Mataru's Strength."	1	[Create "Potion of Mataru's Strength."]	26_si_witch_cauldron.stringtable
+Cast a spell to freeze the vines.	1	[Cast a spell to freeze the vines.]	01_si_chest.stringtable
+Let the current pull you back to the shore.	1	[Let the current pull you back to the shore.]	14_si_underwater_cavern.stringtable
+Play along	1	[Play along] "Kea mai."	09_cv_governor_clario.stringtable
+Peer through the crack in the stone.	1	[Peer through the crack in the stone.]	02_cv_door_puzzle.stringtable
+Trip Larro.	1	[Trip Larro.]	03_si_the_duel.stringtable
+Create "Potion of Antelope's Grace."	1	[Create "Potion of Antelope's Grace."]	26_si_witch_cauldron.stringtable
+Go back the way you came.	1	[Go back the way you came.]	22_si_wahaki_encounter.stringtable
+Scout ahead for a safe route.	1	[Scout ahead for a safe route.]	16_si_cliff.stringtable
+Pay 1200 cp.	1	[Pay 1200 cp.] "This should cover it."	06_cv_orron.stringtable
+Ask Xoti to draw the spirits into her lantern.	1	[Ask Xoti to draw the spirits into her lantern.]	26_si_elewys_spirits.stringtable
+Enter the house.	1	[Enter the house.]	re_si_city_burning_building.stringtable
+Throw a grenade.	1	[Throw a grenade.]	re_si_sea_creature_whale.stringtable
+Mimic speech.	1	[Mimic speech.] "EH. GIMME CRYSTAL." 	05_cv_imp_butler.stringtable
+Make the grubs slither away.	1	[Make the grubs slither away.]	re_si_campsite_xaurips.stringtable
+Blind the Príncipi with an ability.	1	[Blind the Príncipi with an ability.]	re_si_city_bad_deal.stringtable
+ShipDuel_BraceChance	1	<link="glossary://GlossaryEntry_Action_BraceForImpact"><sprite="Inline" name="action_brace" tint=1></link> "Brace for im…	re_si_ship_combat.stringtable
+Descend into the depths of Ashen Maw.	1	[Descend into the depths of Ashen Maw.]	10_si_magran_elevator.stringtable
+Help him to shore.	1	[Help him to shore.]	re_si_port_maje_swimming.stringtable
+Attempt to outrun the dhow.	1	[Attempt to outrun the dhow.]	09_si_principi_boss_encounter.stringtable
+Walk down the cavern.	1	[Walk down the cavern.]	06_si_os1_cavern.stringtable
+Let the mace continue.	1	[Let the mace continue.]	26_cv_soulbound_mace.stringtable
+Inspect the fortress wall.	1	[Inspect the fortress wall.]	13_si_wall_climb.stringtable
+Dip your face in the water.	1	[Dip your face in the water.]	05_si_circle_of_archmagi.stringtable
+Concentrate on folding the edge of the In-Between.	1	[Concentrate on folding the edge of the In-Between.]	03_cv_kaoha.stringtable
+Loot the bodies.	1	[Loot the bodies.]	re_si_city_burning_building.stringtable
+Stay for now.	1	[Stay for now.]	02_cv_poko_kohara_machinery.stringtable
+Hold up tablet.	1	[Hold up tablet.] "You don't mean THIS Harapo Epic, do you?" 	05_cv_tumara.stringtable
+Sail to Ukaizo.	1	[Sail to Ukaizo.]	12_cv_ship_wheel.stringtable
+Give him the body.	1	[Give him the body.]	07_cv_magran_high_priest.stringtable
+Kaz the dog.	1	[Kaz the dog.]	re_si_crew_event_cannibalism.stringtable
+Inspect the wagon.	1	[Inspect the wagon.] "Let me take a look."	re_si_supply_wagon_trap.stringtable
+Give letter.	1	[Give letter.] "I found a curious letter in Degnos' satchel. Its content may interest you."	03_cv_avetta.stringtable
+Climb up to the plateau.	1	[Climb up to the plateau.]	16_si_lift.stringtable
+Follow him.	1	[Follow him.]	21_si_pallid_knight.stringtable
+ Your Ship 	1	"Fire the port guns! Reload, and keep firing until we're out!"  Your cannons pepper the fort's white stone walls, cracki…	13_si_deadight_approach.stringtable
+Find a route around the collapse.	1	[Find a route around the collapse.]	re_si_city_collapsed_tunnel.stringtable
+Brandish weapons and yell.	1	[Brandish weapons and yell.]	re_si_campsite_xaurips.stringtable
+Leave the disc intact and step away.	1	[Leave the disc intact and step away.]	22_si_map.stringtable
+Wipe a glob of wax from your shoulder.	1	[Wipe a glob of wax from your shoulder.]	companion_cv_xoti_intro_pm.stringtable
+Glance toward where he's looking.	1	[Glance toward where he's looking.]	12_cv_machine.stringtable
+Sneak closer and observe.	1	[Sneak closer and observe.]	re_si_stampede.stringtable
+Calm their minds.	1	[Calm their minds.]	re_si_crew_event_infighting.stringtable
+Enter the hold.	1	[Enter the hold.]	re_si_plague_ship_dead_tiny.stringtable
+Pocket the eye.	1	[Pocket the eye.]	09_cv_port_maje_tavernkeeper.stringtable
+i don't know yet/i'm still thinking about it	1	[i don't know yet/i'm still thinking about it]	re_si_mid_ukaizo_gods.stringtable
+Listen in.	1	[Listen in.]	06_si_bm_alleys.stringtable
+Hold your ground.	1	[Hold your ground.]	26_si_lagufaeth_traps.stringtable
+Return the eye.	1	[Return the eye.] "Sorry! I was just looking at it."	09_cv_port_maje_tavernkeeper.stringtable
+Kiss her senseless.	1	[Kiss her senseless.]	companion_cv_xoti_main.stringtable
+Toss the grappling hook.	1	[Toss the grappling hook.]	11_si_gate_tower_climb.stringtable
+Offer Hardtack.	1	[Offer Hardtack.] "I've got some tasty... bread... here."	re_si_eoten.stringtable
+Ascend into the Jagged Keep.	1	[Ascend into the Jagged Keep.]	10_si_magran_elevator.stringtable
+Offer her a handkerchief.	1	[Offer her a handkerchief.] "You have a little spot... on your chin..."	17_cv_aeldys_betrayal.stringtable
+Not now, thanks.	1	[Not now, thanks.]	07_cv_vendor_tiabo.stringtable
+Groan.	1	[Groan.]	06_cv_pitli_roparu_f_01.stringtable
+Put all your strength into lifting the door.	1	[Put all your strength into lifting the door.]	02_cv_door_puzzle.stringtable
+Sneak up to the nāga.	1	[Sneak up to the nāga.]	re_si_flame_naga_camp.stringtable
+Listen to the argument.	1	[Listen to the argument.]	companion_cv_xoti_intro.stringtable
+Attempt to lift the corner of the wagon.	1	[Attempt to lift the corner of the wagon.]	re_si_supply_wagon_trap.stringtable
+Take another rubbing of the navigational chart.	1	[Take another rubbing of the navigational chart.]	22_si_map.stringtable
+Address the ship's surgeon.	1	[Address the ship's surgeon.] "Your thoughts, [Specified 3]?"	re_si_plague_ship_dead_tiny.stringtable
+Keep your head bowed.	1	[Keep your head bowed.]	07_cv_berath_high_priest.stringtable
+Pay 100 cp.	1	[Pay 100 cp.] "Just this once."	06_si_bm_alleys.stringtable
+Pray for divine intercession.	1	[Pray for divine intercession.]	re_si_crew_event_sick.stringtable
+Leave her alone for the moment.	1	[Leave her alone for the moment.]	20_cv_principi_captive.stringtable
+Attack the guards.	1	[Attack the guards.]	06_si_bm_alleys.stringtable
+Touch the door with the Rod of the Deep Hunter.	1	[Touch the door with the Rod of the Deep Hunter.]	05_si_dragon_door.stringtable
+Attempt to cross the crumbling ridge.	1	[Attempt to cross the crumbling ridge.]	06_si_os1_cliff_steps.stringtable
+Roll your eyes and shrug.	1	[Roll your eyes and shrug.]	03_cv_kahn.stringtable
+Enter the passage.	1	[Enter the passage.]	07_si_sepulchers_tunnels.stringtable
+Dive into the tunnel.	1	[Dive into the tunnel.]	14_si_underwater_cavern.stringtable
+Give Meryel's head.	1	[Give Meryel's head.] "She joins the goddess of death in the Beyond."	03_cv_abocco.stringtable
+Show him the Captain's Report.	1	[Show him the Captain's Report.] "You can't afford to do business here, much less carry on a feud." 	03_cv_atello.stringtable
+Keep swimming for the goal.	1	[Keep swimming for the goal.]	re_si_port_maje_swimming.stringtable
+Command it to leave.	1	[Command it to leave.]	re_si_campsite_xaurips.stringtable
+Continue exploring the neighborhood.	1	[Continue exploring the neighborhood.]	06_si_bm_alleys.stringtable
+Bow your head to it.	1	[Bow your head to it.]	re_si_wilder_trap.stringtable
+Charge him and attack.	1	[Charge him and attack.]	22_cv_wahaki_leader.stringtable
+Examine the pool.	1	[Examine the pool.]	26_cv_potion_pool.stringtable
+Return into the tomb's passage.	1	[Return into the tomb's passage.]	07_si_sepulchers_tunnels.stringtable
+Clear your throat and give Aloth a pointed look.	1	[Clear your throat and give Aloth a pointed look.]	10_cv_dragon_magma.stringtable
+Grab the crew's attention	1	[Grab the crew's attention] "All of you listen here!"	re_si_crew_event_wilders.stringtable
+Attempt Retreat.	1	[Attempt Retreat.] "Fall back!"	re_si_ship_combat.stringtable
+Grab the crate.	1	[Grab the crate.]	21_si_shipwreck.stringtable
+Climb across to the Dark Cupboard.	1	[Climb across to the Dark Cupboard.]	05_si_rooftop.stringtable
+Retreat from the memory.	1	[Retreat from the memory.]	17_cv_aeldys_betrayal.stringtable
+Put on your diving helm.	1	[Put on your diving helm.]	09_si_sea_cave_swim.stringtable
+Place a second conch in the other hand.	1	[Place a second conch in the other hand.]	06_si_mural_temple.stringtable
+Approach the commotion.	1	[Approach the commotion.]	re_si_crew_event_shore_leave.stringtable
+Punish them.	1	[Punish them.] "[Specified 2], tie these two to the masts and fetch the whip."	re_si_crew_event_infighting.stringtable
+Go down.	1	[Go down.]	06_si_old_slums_lift.stringtable
+Row to The Undercroft.	1	[Row to The Undercroft.]	06_si_undercroft_skiff.stringtable
+Create no legacy.	1	[Create no legacy.]	si_legacy_history.stringtable
+Wipe away the tear.	1	[Wipe away the tear.]	05_cv_rod_font.stringtable
+Glare at crew	1	[Glare at crew] "Anyone <i>else</i> want to question how I run my ship?"	re_si_crew_event_omen_cloud.stringtable
+Lean in for a better look at the engraving.	1	[Lean in for a better look at the engraving.]	28_cv_aduk.stringtable
+Slip the Huana Chart in your boot.	1	[Slip the Huana Chart in your boot.] "I found nothing, but feel free to search [Player Ship]."	22_si_rdc_encounter.stringtable
+Go up.	1	[Go up.]	06_si_old_slums_lift.stringtable
+Seize the advantage and attack.	1	[Seize the advantage and attack.]	20_si_town_exploration.stringtable
+Crouch down on your knees.	1	[Crouch down on your knees.]	06_cv_roparu_beggar.stringtable
+Creep closer.	1	[Creep closer.]	06_si_undercroft_introduction.stringtable
+Give him the ingredients for Ondra's Bile.	1	[Give him the ingredients for Ondra's Bile.] "Rosanella says this should work."	17_cv_iron_gut_sailor.stringtable
+Give her a look.	1	[Give her a look.]	00_cv_mukumu.stringtable
+Speak with the locals.	1	[Speak with the locals.]	re_si_city_ooze.stringtable
+Put the boars out of their misery.	1	[Put the boars out of their misery.]	re_si_stampede.stringtable
+Go back to sleep.	1	[Go back to sleep.]	re_si_shrine_thieves.stringtable
+Use a ranged weapon to test the sand mound's reaction.	1	[Use a ranged weapon to test the sand mound's reaction.]	re_si_sand_graveyard.stringtable
+Remove her gag.	1	[Remove her gag.]	20_cv_principi_captive.stringtable
+Pull at the vines with your hands.	1	[Pull at the vines with your hands.]	22_cv_vtc_survivor.stringtable
+Coo at Ishiza.	1	[Coo at Ishiza.]	companion_maia_intro.stringtable
+Break open the cage.	1	[Break open the cage.]	26_cv_sharp_rock.stringtable
+Tap into the soul energy at the construct's core.	1	[Tap into the soul energy at the construct's core.]	16_cv_construct.stringtable
+Examine the clerk.	1	[Examine the clerk.]	03_cv_vtc_clerk.stringtable
+Give her a chaste peck on the cheek.	1	[Give her a chaste peck on the cheek.]	companion_cv_xoti_main.stringtable
+Ordhjóma	1	[Ordhjóma] <link="neutralvalue://Ordhjóma: Do you speak Ordhjóma?">"Telé dha Ordhjóma?"</link>	companion_rekke_intro.stringtable
+Wake her.	1	[Wake her.]	companion_cv_xoti_arc.stringtable
+Give the noble directions.	1	[Give the noble directions.]	re_si_city_wealthy_noble.stringtable
+Leave, backing away slowly.	1	[Leave, backing away slowly.]	01_cv_lagufaeth_broodmother.stringtable
+Enhance Survival and Athletics	1	[Enhance Survival and Athletics] "Here you are."	04_cv_backer_npc_granis.stringtable
+Give her the artifact.	1	[Give her the artifact.] "I retrieved the tablet from Arkemyr's vault."	05_cv_netehe.stringtable
+Scale the hull by hand.	1	[Scale the hull by hand.]	09_si_ship_prow_climb.stringtable
+Attack Yngfrith.	1	[Attack Yngfrith.] "You have to pay for this abominable act."	17_cv_talkingweapon_owner.stringtable
+OrlansHeadGame_OpponentLastScore	1	The dagger sinks into the orlan's [OrlansHeadGame_OpponentLastResult], and [Specified 1] chuckles. "That’s [OrlansHeadGa…	re_si_crew_event_orlans_head.stringtable
+Take some food.	1	[Take some food.] "Thank you."	07_cv_dawnstar_food_line.stringtable
+Climb down the rope.	1	[Climb down the rope.]	11_si_gate_tower_climb.stringtable
+Hold up Sigil of Mortality.	1	[Hold up Sigil of Mortality.] "Will this wardstone do me any good?"	28_cv_kinnuq.stringtable
+Drink the mead.	1	[Drink the mead.]	13_cv_pirate_drunkard.stringtable
+Give him the notes.	1	[Give him the notes.] "I found these."	09_cv_governor_clario.stringtable
+Repel her attack.	1	[Repel her attack.]	17_cv_talkingweapon_owner.stringtable
+Scan the fortress.	1	[Scan the fortress.]	11_si_cannon.stringtable
+Take the conch back.	1	[Take the conch back.]	06_si_mural_temple.stringtable
+Detonate the adra, destroying the pillar.	1	[Detonate the adra, destroying the pillar.]	02_cv_poko_kohara_soul_decision.stringtable
+Reach for the orb.	1	[Reach for the orb.]	20_cv_wizard_orb.stringtable
+Examine the iron collar more closely.	1	[Examine the iron collar more closely.]	20_cv_principi_captive.stringtable
+Have someone study the cliff.	1	[Have someone study the cliff.]	16_si_cliff.stringtable
+Burn the vines with a torch.	1	[Burn the vines with a torch.]	01_si_chest.stringtable
+Destroy the altar.	1	[Destroy the altar.]	re_si_2604_campsite_skaen.stringtable
+Pull him up.	1	[Pull him up.]	re_si_2609_victims.stringtable
+Look inside the passage.	1	[Look inside the passage.]	07_si_sepulchers_tunnels.stringtable
+Steal the child's money.	1	[Steal the child's money.]	06_si_bm_alleys.stringtable
+Attempt to read the plaque.	1	[Attempt to read the plaque.]	05_cv_rod_font.stringtable
+Go to the water and strip down.	1	[Go to the water and strip down.]	re_si_port_maje_swimming.stringtable
+Begin to manipulate the dial.	1	[Begin to manipulate the dial.]	05_si_dragon_door.stringtable
+Press your lips into a hard line.	1	[Press your lips into a hard line.]	13_cv_mirke.stringtable
+Climb to the left eye.	1	[Climb to the left eye.]	28_si_drowned_barrows_transition.stringtable
+Go right toward the dining hall.	1	[Go right toward the dining hall.]	11_si_swim.stringtable
+Roll the dice around in your hand.	1	[Roll the dice around in your hand.] "Your dice are weighted."	13_cv_pirate_cheater.stringtable
+Sneak closer.	1	[Sneak closer.]	re_si_hunter_camp_lurker.stringtable
+Barrel through the stall.	1	[Barrel through the stall.]	06_si_bm_alleys.stringtable
+Exit Bathhouse	1	[Exit Bathhouse] "Fine, I'll leave."	05_cv_bathhouse_guard.stringtable
+Give Uamoru's head	1	[Give Uamoru's head] "One rebellion cut off at the root."	04_cv_nungata.stringtable
+Retreat, hands up.	1	[Retreat, hands up.] "Took a wrong turn. That's all." 	06_cv_undercroft_captain.stringtable
+Punch her in the mouth.	1	[Punch her in the mouth.]	06_cv_undercroft_captain.stringtable
+You notice something unusual.	1	[You notice something unusual.]	03_cv_ezzali.stringtable
+Jerk your chin for Edér to sneak for it.	1	[Jerk your chin for Edér to sneak for it.]	10_cv_dragon_magma.stringtable
+Climb up to the eyes.	1	[Climb up to the eyes.]	28_si_drowned_barrows_transition.stringtable
+Point to yourself and slowly say your name.	1	[Point to yourself and slowly say your name.]	companion_rekke_intro.stringtable
+Grab the sack.	1	[Grab the sack.]	00_cv_poko_kohara_well.stringtable
+Step back from the puzzle.	1	[Step back from the puzzle.]	26_si_desert_ruin_burial.stringtable
+To the guards.	1	[To the guards.] "Shut up!"	03_cv_kaoha.stringtable
+Bend the bars apart.	1	[Bend the bars apart.]	14_si_iron_bars.stringtable
+Speak to the workers.	1	[Speak to the workers.]	re_si_city_collapsed_tunnel.stringtable
+Investigate for clues.	1	[Investigate for clues.]	re_si_city_burning_building.stringtable
+Whistle for the dog.	1	[Whistle for the dog.]	20_si_town_exploration.stringtable
+Place the torc on the altar.	1	[Place the torc on the altar.]	10_si_magran_elevator.stringtable
+Find a better vantage point to observe the fight.	1	[Find a better vantage point to observe the fight.] 	03_si_the_duel.stringtable
+Hang the body as a warning.	1	[Hang the body as a warning.]	re_si_crew_event_cannibalism.stringtable
+Inspect the door.	1	[Inspect the door.]	07_si_sepulchers_ext_door.stringtable
+Use a prybar to raise the door.	1	[Use a prybar to raise the door.]	02_cv_door_puzzle.stringtable
+Study her face tattoos.	1	[Study her face tattoos.]	28_cv_anniq.stringtable
+Pull up the rope.	1	[Pull up the rope.]	00_cv_poko_kohara_well.stringtable
+Make a "get on with it" hand gesture.	1	[Make a "get on with it" hand gesture.]	11_si_luminous_adra_vein.stringtable
+Climb down to the bottom of the cliff.	1	[Climb down to the bottom of the cliff.]	16_si_cliff.stringtable
+Bomb the wall with a grenade.	1	[Bomb the wall with a grenade.]	27_si_pyramid_weakened_wall.stringtable
+Swim back to the fork.	1	[Swim back to the fork.]	14_si_underwater_cavern.stringtable
+Steal luminous adra.	1	[Steal luminous adra.]	05_cv_bathhouse_boiler_workers.stringtable
+Pretend you didn't see it.	1	[Pretend you didn't see it.]	companion_tekehu_black_market.stringtable
+Sneak closer to the spirits.	1	[Sneak closer to the spirits.]	26_si_lich_ext_wraiths.stringtable
+Give him a potion of luminous adra.	1	[Give him a potion of luminous adra.] "Try it for yourself."	20_cv_menzzago.stringtable
+Close off your mind.	1	[Close off your mind.]	26_cv_soulbound_mace.stringtable
+Purge the fish of toxins.	1	[Purge the fish of toxins.] "We'll fix this."	re_si_crew_event_dead_fish.stringtable
+Scratch behind his ears.	1	[Scratch behind his ears.]	11_bs_kaz_the_shiba_inu.stringtable
+Finish investigating.	1	[Finish investigating.]	re_si_hunter_camp_lurker.stringtable
+Create "Tama Watua's Potion of Cast-Iron Stomach."	1	[Create "Tama Watua's Potion of Cast-Iron Stomach."]	26_si_witch_cauldron.stringtable
+Put Concelhaut's skull in your pack.	1	[Put Concelhaut's skull in your pack.]	26_cv_lich_lair_throne.stringtable
+The volcano rumbles and the ground shakes.	1	[The volcano rumbles and the ground shakes.]	10_cv_eothas.stringtable
+Place the Champion's Medallion into the depression.	1	[Place the Champion's Medallion into the depression.]	09_cv_bowl.stringtable
+Give to Netehe	1	[Give to Netehe] "Here, a bedtime story for the tribes." 	05_cv_tumara.stringtable
+Sigh obnoxiously.	1	[Sigh obnoxiously.] "I knew this wasn't going to be a 'few minutes.'"	companion_pallegina_quest.stringtable
+Charge the skuldr.	1	[Charge the skuldr.] "Let's save her!"	re_si_city_skuldr.stringtable
+Engage one of the galleons.	1	[Engage one of the galleons.]	12_si_fleet_battle.stringtable
+Dig up the chest.	1	[Dig up the chest.]	re_si_2607_pirates_booty.stringtable
+Escape out the window.	1	[Escape out the window.] 	03_cv_heist_window_escape.stringtable
+Observe the imp some more.	1	[Observe the imp some more.]	05_cv_imp_butler.stringtable
+Shake your head for him to refrain.	1	[Shake your head for him to refrain.] "Never mind."	10_cv_dragon_magma.stringtable
+Step back from the rotating platform.	1	[Step back from the rotating platform.]	11_si_cannon.stringtable
+Give Urnox's head.	1	[Give Urnox's head.] "His flames have been extinguished."	07_cv_okauro.stringtable
+Pour Fampyr blood into the basin.	1	[Pour Fampyr blood into the basin.]	20_cv_crypt_fampyr_door.stringtable
+Move in for a better look.	1	[Move in for a better look.]	26_si_desert_ruin_ext.stringtable
+Prepare for battle.	1	[Prepare for battle.]	12_si_fleet_battle.stringtable
+Scale the mountainside.	1	[Scale the mountainside.]	26_si_flame_naga_cave.stringtable
+Drift toward it.	1	[Drift toward it.]	11_cv_naga_spirit.stringtable
+Inspect the carving.	1	[Inspect the carving.]	06_si_mural_temple.stringtable
+Climb the tower.	1	[Climb the tower.]	11_si_gate_tower_climb.stringtable
+Stop using the prybar.	1	[Stop using the prybar.]	27_si_pyramid_weakened_wall.stringtable
+Try to feed Ishiza.	1	[Try to feed Ishiza.]	companion_maia_relationship_player.stringtable
+Reach out and touch him.	1	[Reach out and touch him.]	companion_tekehu_relationship_player.stringtable
+Give Dhwrgas' head.	1	[Give Dhwrgas' head.] "One dead ascetic for you."	07_cv_okauro.stringtable
+Applaud.	1	[Applaud.] "Bravo!"	companion_cv_xoti_intro.stringtable
+Leave him be.	1	[Leave him be.]	10_cv_rathun_wounded.stringtable
+Use a prybar.	1	[Use a prybar.]	27_si_pyramid_weakened_wall.stringtable
+Raise an eyebrow in question.	1	[Raise an eyebrow in question.]	companion_rekke_minihub.stringtable
+Charm the boars.	1	[Charm the boars.]	re_si_huana_druid.stringtable
+Leave it alone.	1	[Leave it alone.]	09_cv_braziers.stringtable
+Puzzle begins	1	[Puzzle begins]	26_si_desert_ruin_burial.stringtable
+Give her your hand.	1	[Give her your hand.]	09_cv_dawnstars_priestess.stringtable
+Cry and sob.	1	[Cry and sob.] "Please, good sir! I meant no offense. Don't kill me!"	05_cv_bathhouse_quarno.stringtable
+Go to Delver's Row.	1	[Go to Delver's Row.]	06_si_bm_alleys.stringtable
+i'm going to tell him to inspire animancers	1	[i'm going to tell him to inspire animancers]	re_si_mid_ukaizo_gods.stringtable
+Watch a little longer.	1	[Watch a little longer.]	03_si_the_duel.stringtable
+Take advantage of the view.	1	[Take advantage of the view.]	re_si_2609_victims.stringtable
+Cast a shield around Larro.	1	[Cast a shield around Larro.]	03_si_the_duel.stringtable
+Return to examining the sarcophagus.	1	[Return to examining the sarcophagus.]	26_si_desert_ruin_burial.stringtable
+Give him an ale.	1	[Give him an ale.] "Here, you need this more than I do."	03_cv_abocco.stringtable
+Wait for the captain to speak.	1	[Wait for the captain to speak.]	17_cv_principi_boss_main.stringtable
+Follow his gaze, see what he's looking at.	1	[Follow his gaze, see what he's looking at.]	00_cv_vektor.stringtable
+Sail away.	1	[Sail away.]	13_si_deadight_approach.stringtable
+Motion for her to continue.	1	[Motion for her to continue.]	companion_pallegina_quest.stringtable
+Take Xoti's sickle.	1	[Take Xoti's sickle.]	companion_cv_xoti_main.stringtable
+Let her go.	1	[Let her go.]	re_si_2609_victims.stringtable
+Let them handle it.	1	[Let them handle it.]	00_cv_tikawara_resolution.stringtable
+Scan the crowd, see if anything stands out.	1	[Scan the crowd, see if anything stands out.]	09_cv_tuaha.stringtable
+Distract Larro with an insult.	1	[Distract Larro with an insult.]	03_si_the_duel.stringtable
+Enhance Alchemy and Religion	1	[Enhance Alchemy and Religion] "Here you are."	07_cv_backer_npc_markvanderbij.stringtable
+Climb up the steps.	1	[Climb up the steps.]	06_si_os3_cliff_steps.stringtable
+Use the grappling hook to climb.	1	[Use the grappling hook to climb.]	09_si_ship_prow_climb.stringtable
+Look deeply into his eyes.	1	[Look deeply into his eyes.]	companion_tekehu_relationship_player.stringtable
+Give her the idol.	1	[Give her the idol.] "Here it is."	00_cv_nairi.stringtable
+Step away from the statue.	1	[Step away from the statue.]	26_cv_soulbound_mace.stringtable
+Assign deckhand duties.	1	[Assign deckhand duties.]	re_si_storms.stringtable
+Lean in close and... make a fart noise into her ear.	1	[Lean in close and... make a fart noise into her ear.]	companion_cv_xoti_arc.stringtable
+Follow the tracks.	1	[Follow the tracks.]	re_si_hunter_camp_lurker.stringtable
+Swim deeper into the cave.	1	[Swim deeper into the cave.]	14_si_underwater_cavern.stringtable
+Give strange tablet to Rekke.	1	[Give strange tablet to Rekke.] "I found something written in a language I don't know. Do you recognize it?"	companion_rekke_minihub.stringtable
+Signal someone to sneak for the torc.	1	[Signal someone to sneak for the torc.] 	10_cv_dragon_magma.stringtable
+Read the soul fragment.	1	[Read the soul fragment.]	companion_aloth_lk_sailor.stringtable
+Rekke bursts into delighted laughter	1	"[Rekke bursts into delighted laughter]"  ACTOR LAUGHS. DO NOT LOCALIZE.  apply wav file to node 190	companion_rekke_minihub.stringtable
+Feed it.	1	[Feed it.]	re_si_shrine_thieves.stringtable
+Slap Yellow-Eye Three's claw while he's distracted.	1	[Slap Yellow-Eye Three's claw while he's distracted.]	05_cv_imp_butler.stringtable
+Study the machine.	1	[Study the machine.]	15_si_engwithan_machine.stringtable
+Secure a grappling hook and climb down into the eye.	1	[Secure a grappling hook and climb down into the eye.]	28_si_drowned_barrows_transition.stringtable
+Look for the constellation of the Panther.	1	[Look for the constellation of the Panther.]	19_cv_telescope.stringtable
+Ixamitl	1	[Ixamitl] <link="neutralvalue://Ixamitl: Do you speak Ixamitl?">"¿Ixamitl ye llank'ayku?"</link>	companion_rekke_intro.stringtable
+Examine the sarcophagus further.	1	[Examine the sarcophagus further.]	26_si_desert_ruin_burial.stringtable
+Distract Orso with an insult.	1	[Distract Orso with an insult.]	03_si_the_duel.stringtable
+Throw a blister bomb.	1	[Throw a blister bomb.]	re_si_sea_creature_whale.stringtable
+Signal the bartender.	1	[Signal the bartender.] "You could use another." 	03_cv_abocco.stringtable
+Peer over the precipice.	1	[Peer over the precipice.]	07_si_sepulchers_tunnels.stringtable
+Blast the chest open with a grenade.	1	[Blast the chest open with a grenade.]	re_si_2607_pirates_booty.stringtable
+Furtively glance about.	1	[Furtively glance about.]	13_cv_lurtharn.stringtable
+Accept 600 cp.	1	[Accept 600 cp.] "Deal." 	05_cv_fessina.stringtable
+Go inland.	1	[Go inland.]	22_si_wahaki_encounter.stringtable
+Study the distance.	1	[Study the distance.]	05_si_rooftop.stringtable
+Stick your hand in the gears.	1	[Stick your hand in the gears.]	02_cv_door_puzzle.stringtable
+Address soldiers.	1	[Address soldiers.] "My business is with Hamuto. Does anyone think I'd hesitate to go after you next?" 	08_cv_hamuto.stringtable
+Give him 100cp	1	[Give him 100cp] "Here. Find another tavern."	09_cv_galian.stringtable
+Pull away.	1	[Pull away.]	companion_serafen_relationship_xoti.stringtable
+Twinkle eyes and raise eyebrows mischievously.	1	[Twinkle eyes and raise eyebrows mischievously.]	10_si_eothas_saves_you.stringtable
+Leave with the sack.	1	[Leave with the sack.]	00_cv_poko_kohara_well.stringtable
+Aim the bombard at the rubble obstruction.	1	[Aim the bombard at the rubble obstruction.]	11_si_cannon.stringtable
+Tuck a loose strand of hair behind her ear.	1	[Tuck a loose strand of hair behind her ear.]	companion_cv_xoti_main.stringtable
+Drink it.	1	[Drink it.]	20_cv_undead_barkeep.stringtable
+Consider an unorthodox solution...	1	[Consider an unorthodox solution...]	re_si_crew_event_injuried_drunk.stringtable
+Climb up through the passage.	1	[Climb up through the passage.]	06_si_os2_cavern.stringtable
+Manifest your aura.	1	[Manifest your aura.] "Cease this squabbling."	re_si_crew_event_infighting.stringtable
+Break through the wave with magic.	1	[Break through the wave with magic.]	re_si_storms.stringtable
+Return to the Narrows.	1	[Return to the Narrows.]	06_si_bm_alleys.stringtable
+Shake off the gesture.	1	[Shake off the gesture.]	05_cv_rod_font.stringtable
+Watch her hallucinate.	1	[Watch her hallucinate.]	companion_cv_xoti_arc.stringtable
+Leave them be and continue on.	1	[Leave them be and continue on.]	re_si_supply_wagon_trap.stringtable
+Disable the alarm system.	1	[Disable the alarm system.]	05_si_weak_wall.stringtable
+Offer Vegetables.	1	[Offer Vegetables.] "You look like you could use some vegetables. Fresh from Neketaka."	re_si_eoten.stringtable
+Enhance Sleight of Hand and Diplomacy	1	[Enhance Sleight of Hand and Diplomacy] "Here you are."	17_cv_backer_npc_carlo.stringtable
+Mirror his gesture.	1	[Mirror his gesture.] "Consider it done."	03_cv_martino.stringtable
+Load the bombard.	1	[Load the bombard.]	11_si_cannon.stringtable
+Squeeze through the crack.	1	[Squeeze through the crack.]	05_si_bathhouse_tunnel.stringtable
+Muddle their thoughts.	1	[Muddle their thoughts.]	re_si_crew_event_wilders.stringtable
+Back off.	1	[Back off.] "Serafen just saved your life, Remaro."	companion_serafen_quest_3.stringtable
+Draw back.	1	[Draw back.]	11_cv_naga_spirit.stringtable
+Reject the false promises.	1	[Reject the false promises.]	22_si_menpwgra_tree_boss.stringtable
+Stay put for now.	1	[Stay put for now.]	09_si_ship_prow_climb.stringtable
+Pull spirits from the In-Between.	1	[Pull spirits from the In-Between.] "Smoke and mirrors? I think not." 	03_cv_cotta.stringtable
+Throw a grappling hook across to the manor's railing.	1	[Throw a grappling hook across to the manor's railing.]	05_si_rooftop.stringtable
+Punch him in the nose.	1	[Punch him in the nose.]	09_cv_galian.stringtable
+Have someone tinker with the panel to see if anything works.	1	[Have someone tinker with the panel to see if anything works.]	05_cv_vault_lock.stringtable
+Climb through.	1	[Climb through.] 	03_si_vtc_hq_infiltration.stringtable
+Step aside.	1	[Step aside.]	09_cv_galian.stringtable
+Close your eyes and take the wheel.	1	[Close your eyes and take the wheel.]	re_si_reef_unknown.stringtable
+Throw the corpse overboard.	1	[Throw the corpse overboard.]	re_si_crew_event_cannibalism.stringtable
+Nod silently.	1	[Nod silently.]	04_cv_huana_bounty_giver.stringtable
+Drink the liquor.	1	[Drink the liquor.]	13_cv_pirate_drunkard.stringtable
+Rub cooking fat into the gears.	1	[Rub cooking fat into the gears.]	11_si_cannon.stringtable
+Have someone push through the wall.	1	[Have someone push through the wall.]	05_si_weak_wall.stringtable
+Cast Blessing.	1	[Cast Blessing.] "I call on the gods, and they listen. Do not test me - or the gods - further."	11_cv_sugaan.stringtable
+Observe Luca.	1	[Observe Luca.]	03_cv_vtc_clerk.stringtable
+Sift through the wreckage.	1	[Sift through the wreckage.]	re_cv_location_shipwreck.stringtable
+Wait and watch.	1	[Wait and watch.]	re_si_stampede.stringtable
+Swim into the darker tunnel.	1	[Swim into the darker tunnel.]	14_si_underwater_cavern.stringtable
+Put out the torches with frost magic.	1	[Put out the torches with frost magic.]	re_si_city_burning_building.stringtable
+Approach and look under the hood.	1	[Approach and look under the hood.]	re_si_campsite_explorers.stringtable
+Set up an ambush while they are confused.	1	[Set up an ambush while they are confused.]	re_si_city_burning_building.stringtable
+Enhance Stealth and Metaphysics	1	[Enhance Stealth and Metaphysics] "Here you are."	17_cv_backer_npc_kae.stringtable
+Rig a bomb to the harpsichord.	1	[Rig a bomb to the harpsichord.]	13_si_piano.stringtable
+Explore the neighborhood.	1	[Explore the neighborhood.]	06_si_bm_alleys.stringtable
+OrlansHeadGame_OpponentLastResult	1	The dagger sinks into the orlan's [OrlansHeadGame_OpponentLastResult], and [Specified 1] chuckles. "That’s [OrlansHeadGa…	re_si_crew_event_orlans_head.stringtable
+Smell the air.	1	[Smell the air.] "Four lagufaeth. Their odor suggests they're young - still hatchlings - and in distress."	00_cv_himuihi.stringtable
+Set off the traps prematurely with a few heavy stones.	1	[Set off the traps prematurely with a few heavy stones.]	09_cv_beodul_port_maje.stringtable
+Kick Orso's sword back toward him.	1	[Kick Orso's sword back toward him.]	03_si_the_duel.stringtable
+Take the punch.	1	[Take the punch.]	09_cv_galian.stringtable
+Continue alone.	1	[Continue alone.]	12_cv_companions_ukaizo.stringtable
+Chisel away at the mortar.	1	[Chisel away at the mortar.]	05_si_weak_wall.stringtable
+Approach them.	1	[Approach them.] "Ahoy there!"	re_si_2607_pirates_booty.stringtable
+Beckon the dog to come with you.	1	[Beckon the dog to come with you.]	11_bs_kaz_the_shiba_inu.stringtable
+Stab him in the arm.	1	[Stab him in the arm.]	09_cv_galian.stringtable
+Circumvent the stall.	1	[Circumvent the stall.]	06_si_bm_alleys.stringtable
+Save the crate.	1	[Save the crate.]	21_si_shipwreck.stringtable
+Engwithan	1	[Engwithan] <link="neutralvalue://Engwithan: Do you speak Engwithan?">"E dhnéi tói Engwith?"</link>	companion_rekke_intro.stringtable
+Stay put.	1	[Stay put.]	09_si_ship_prow_climb.stringtable
+Fiddle with the panel, see if you can get something to work.	1	[Fiddle with the panel, see if you can get something to work.]	05_cv_vault_lock.stringtable
+Kill her.	1	[Kill her.]	05_cv_bathhouse_sick_noble.stringtable
+Bless Orso.	1	[Bless Orso.]	03_si_the_duel.stringtable
+Scout for whatever left the totem.	1	[Scout for whatever left the totem.]	re_si_wilder_trap.stringtable
+Place the helmet back on his head.	1	[Place the helmet back on his head.]	20_cv_copperhead.stringtable
+Throw an explosive at the totem.	1	[Throw an explosive at the totem.]	26_si_flame_naga_cave.stringtable
+Activate the machine.	1	[Activate the machine.]	02_cv_poko_kohara_machinery.stringtable
+Read the main inscription.	1	[Read the main inscription.]	22_si_map.stringtable
+Examine the suit for damage.	1	[Examine the suit for damage.]	15_si_transition_exit_pylons_destroyed.stringtable
+Strike him.	1	[Strike him.]	05_cv_imp.stringtable
+Examine the tracks.	1	[Examine the tracks.]	re_si_hunter_camp_lurker.stringtable
+Play something together.	1	[Play something together.]	00_cv_drummer.stringtable
+Squint dramatically while looking out at the ocean.	1	[Squint dramatically while looking out at the ocean.] "I've returned as the Herald of Berath. I'm on a special mission t…	09_cv_beach_landing.stringtable
+Haul him up by his collar.	1	[Haul him up by his collar.]	03_cv_vtc_clerk.stringtable
+Follow the passage into the tomb.	1	[Follow the passage into the tomb.]	07_si_sepulchers_tunnels.stringtable
+Use Wardstone of Darkness on the totem.	1	[Use Wardstone of Darkness on the totem.]	re_si_wilder_trap.stringtable
+Give her Beza's pages.	1	[Give her Beza's pages.] "You were right to be wary of the Vailians."	00_cv_nairi.stringtable
+Let the child go.	1	[Let the child go.]	06_si_bm_alleys.stringtable
+Show your empty hands.	1	[Show your empty hands.] "I know you're out there. Let's talk about this."	22_si_wahaki_encounter.stringtable
+Move in to pet them.	1	[Move in to pet them.]	04_cv_queen_onezaka_ii.stringtable
+Point your finger to a spot in the air and scream.	1	[Point your finger to a spot in the air and scream.]	03_cv_rtc_soldiers.stringtable
+Sneak inside.	1	[Sneak inside.]	26_si_flame_naga_cave.stringtable
+Search for the xaurips.	1	[Search for the xaurips.]	re_si_wilder_trap.stringtable
+Fill your waterskins.	1	[Fill your waterskins.]	27_si_pyramid_ascent.stringtable
+Circumvent the trap.	1	[Circumvent the trap.]	re_si_wilder_trap.stringtable
+Cut their bonds	1	[Cut their bonds] "Stay here. I'll clear a path."	20_cv_principi_captive.stringtable
+Cross the bridge.	1	[Cross the bridge.] "I don’t care about your games."	re_si_port_maje_swimming.stringtable
+Pay 200 cp.	1	[Pay 200 cp.] "Perhaps this will change your mind."	06_cv_guard_sergeant.stringtable
+Bid 900 cp.	1	[Bid 900 cp.]	14_cv_slave_auction.stringtable
+Cast a corrosive spell on the metal.	1	[Cast a corrosive spell on the metal.]	14_si_iron_bars.stringtable
+Smile seductively.	1	[Smile seductively.] "You're beautiful just the way you are."	companion_pallegina_quest.stringtable
+Signal the hazanui's distress to the Ruquapa.	1	[Signal the hazanui's distress to the Ruquapa.]	12_si_fleet_battle.stringtable
+Weigh your options.	1	[Weigh your options.]	13_si_deadight_approach.stringtable
+Sing an Ondrite dirge.	1	[Sing an Ondrite dirge.]	re_si_shrine_worshipers.stringtable
+Give Onadere's head.	1	[Give Onadere's head.] "Sailors can rest easy. For now."	07_cv_okauro.stringtable
+Attempt the climb again.	1	[Attempt the climb again.]	re_si_reef_wrecked_merchant_ship.stringtable
+Observe the eoten.	1	[Observe the eoten.]	re_si_eoten.stringtable
+Climb back up.	1	[Climb back up.]	00_cv_poko_kohara_well.stringtable
+Pick the lock and open the chest.	1	[Pick the lock and open the chest.]	re_si_2607_pirates_booty.stringtable
+Fire an arrow at one of the unfamiliar toughs with your bow.	1	[Fire an arrow at one of the unfamiliar toughs with your bow.]	re_si_crew_event_shore_leave.stringtable
+Laugh maniacally.	1	[Laugh maniacally.] "Well, what are you waiting for? Sing praise to Ondra!"	re_si_crew_event_omen_cloud.stringtable
+Push harder.	1	[Push harder.]	26_si_desert_ruin_sand_trap_escape.stringtable
+Use Purge of Toxins on the vines.	1	[Use Purge of Toxins on the vines.]	22_cv_vtc_survivor.stringtable
+Bid 1200 cp.	1	[Bid 1200 cp.]	14_cv_slave_auction.stringtable
+Place Muhai's remains in the flames.	1	[Place Muhai's remains in the flames.]	07_cv_magran_flame.stringtable
+Try and steal her coin.	1	[Try and steal her coin.] "Maybe." 	07_cv_okauro.stringtable
+Consider another approach.	1	[Consider another approach.]	22_si_menpwgra_tree_boss.stringtable
+Attack the broodmother.	1	[Attack the broodmother.]	01_cv_lagufaeth_broodmother.stringtable
+Use a prybar to open the grate.	1	[Use a prybar to open the grate.]	03_si_vtc_hq_infiltration.stringtable
+Place a hand on her shoulder.	1	[Place a hand on her shoulder.] "I'm sorry, but it's true."	companion_cv_xoti_arc.stringtable
+Give her Oderisi's notes	1	[Give her Oderisi's notes] "I thought you might be interested in these."	07_cv_flaune.stringtable
+Continue.	1	[Continue.]	02_cv_anaharu.stringtable
+Release the handle.	1	[Release the handle.]	26_si_desert_ruin_burial.stringtable
+Go back, start from the beginning.	1	[Go back, start from the beginning.]	22_si_map.stringtable
+Teach the child better technique.	1	[Teach the child better technique.]	06_si_bm_alleys.stringtable
+Sigh and draw your weapon.	1	[Sigh and draw your weapon.]	12_cv_machine.stringtable
+Consider an alternative.	1	[Consider an alternative.]	22_si_menpwgra_tree_boss.stringtable
+Offer Candied Nuts.	1	[Offer Candied Nuts.] "These are both delicious and healthy."	re_si_eoten.stringtable
+Scowl at him.	1	[Scowl at him.]	06_cv_legendary_assassin.stringtable
+Show him Quarno's Ledger.	1	[Show him Quarno's Ledger.]	03_cv_director_castol.stringtable
+Let Tekēhu answer.	1	[Let Tekēhu answer.]	06_cv_dereo.stringtable
+Return to your quarters.	1	[Return to your quarters.]	re_si_crew_event_captain_personality.stringtable
+See if you can tamper with the contract.	1	[See if you can tamper with the contract.]	03_si_vtc_hq_infiltration.stringtable
+Throw it onto the pyre.	1	[Throw it onto the pyre.]	16_cv_wahaki_chief.stringtable
+Climb down to the beach.	1	[Climb down to the beach.]	13_si_wall_climb.stringtable
+Show him the Cornett of Depths.	1	[Show him the Cornett of Depths.] "Look, I have a special shell, too!"	04_cv_takano.stringtable
+Listen carefully.	1	[Listen carefully.]	re_si_campsite_xaurips.stringtable
+Bow.	1	[Bow.]	re_si_post_hasongo_gods.stringtable
+Bid 1000 cp.	1	[Bid 1000 cp.]	14_cv_slave_auction.stringtable
+Wink at him.	1	[Wink at him.]	06_cv_legendary_assassin.stringtable
+Search for the source of the voices.	1	[Search for the source of the voices.]	26_si_lich_ext_wraiths.stringtable
+Throw an immolator.	1	[Throw an immolator.]	re_si_sea_creature_whale.stringtable
+Toss down a pebble.	1	[Toss down a pebble.]	00_cv_poko_kohara_well.stringtable
+Step away from the edge.	1	[Step away from the edge.]	16_si_cliff.stringtable
+Attempt to open the sarcophagus with force.	1	[Attempt to open the sarcophagus with force.]	26_si_desert_ruin_burial.stringtable
+Inspect the pillar of adra.	1	[Inspect the pillar of adra.]	22_si_menpwgra_tree_boss.stringtable
+Hide from the noble and guards.	1	[Hide from the noble and guards.]	re_si_city_wealthy_noble.stringtable
+Look to Pallegina.	1	[Look to Pallegina.]	17_cv_captain_tatzatl.stringtable
+Look around, knowingly	1	[Look around, knowingly] "Well, you can't blame the parents, can you? Nothing good can come from a Skaen godlike."	17_cv_captain_tatzatl.stringtable
+Say nothing about the smugglers.	1	[Say nothing about the smugglers.]	15_cv_fleet_master_okaya.stringtable
+Kill it.	1	[Kill it.]	re_si_campsite_xaurips.stringtable
+Lembur	1	[Lembur] <link="neutralvalue://Lembur: Do you speak Lembur?">"Vii dornesti za Lembur?"</link>	companion_rekke_intro.stringtable
+Drink from the pool.	1	[Drink from the pool.]	26_cv_potion_pool.stringtable
+Toss him the Huana Chart.	1	[Toss him the Huana Chart.] "Be my guest." 	22_si_rdc_encounter.stringtable
+Examine the brazier.	1	[Examine the brazier.]	16_cv_brazier.stringtable
+Fight your way out of this.	1	[Fight your way out of this.]	22_si_rdc_encounter.stringtable
+Take aim at the "orlan's" ears.	1	[Take aim at the "orlan's" ears.]	re_si_crew_event_orlans_head.stringtable
+Ram full speed into the fort's docks.	1	[Ram full speed into the fort's docks.]	13_si_deadight_approach.stringtable
+Throw an implosion charge at the door.	1	[Throw an implosion charge at the door.]	26_si_desert_ruin_sand_trap_escape.stringtable
+Look through the telescope.	1	[Look through the telescope.]	19_cv_telescope.stringtable
+Go through the curtain behind the merchant stall.	1	[Go through the curtain behind the merchant stall.]	06_si_bm_alleys.stringtable
+Climb to the right eye.	1	[Climb to the right eye.]	28_si_drowned_barrows_transition.stringtable
+Throw him a line.	1	[Throw him a line.]	re_si_port_maje_swimming.stringtable
+Lower your voice.	1	[Lower your voice.] "I only meant, it would be in your best interest to gain an ally for your endeavors."	14_cv_aeldys_spy.stringtable
+Climb through the passage.	1	[Climb through the passage.]	06_si_os1_cavern.stringtable
+Impress them with some sleight of hand.	1	[Impress them with some sleight of hand.]	re_si_campsite_xaurips.stringtable
+Ignore Serafen.	1	[Ignore Serafen.]	companion_serafen_relationship_player.stringtable
+Search the body.	1	[Search the body.]	06_si_bm_alleys.stringtable
+Shoot the bastard traitor.	1	[Shoot the bastard traitor.]	17_cv_aeldys_betrayal.stringtable
+Take her weapon.	1	[Take her weapon.]	02_cv_beza.stringtable
+Shift into your spirit form.	1	[Shift into your spirit form.]	re_si_crew_event_shore_leave.stringtable
+Blind an eoten with an ability.	1	[Blind an eoten with an ability.]	re_si_eoten.stringtable
+Scout for air pockets.	1	[Scout for air pockets.]	09_si_sea_cave_swim.stringtable
+Shove him back.	1	[Shove him back.]	09_cv_galian.stringtable
+Ball your fist.	1	[Ball your fist.] "I'm not thirsty." 	03_cv_vtc_clerk.stringtable
+Inspect the fleet.	1	[Inspect the fleet.]	12_si_fleet_battle.stringtable
+Try to locate the attackers.	1	[Try to locate the attackers.]	26_si__collapsed_mine_guardians.stringtable
+Go to Dereo's hideout.	1	[Go to Dereo's hideout.]	06_si_bm_alleys.stringtable
+Pull Yanass' soul into the Here.	1	[Pull Yanass' soul into the Here.] "Hear this, Sugaan."	11_cv_sugaan.stringtable
+Inspect the bones.	1	[Inspect the bones.]	06_si_statue_sunken.stringtable
+Examine the house.	1	[Examine the house.]	re_si_city_burning_building.stringtable
+Keep hiding.	1	[Keep hiding.]	20_si_town_exploration.stringtable
+Choose a recipient for the spell.	1	[Choose a recipient for the spell.]	14_si_iron_bars.stringtable
+Leave the dog alone.	1	[Leave the dog alone.]	11_bs_kaz_the_shiba_inu.stringtable
+Call out to them.	1	[Call out to them.] "Ahoy there. Looking for me?"	re_si_supply_wagon_trap.stringtable
+Step into the fog.	1	[Step into the fog.]	26_si_elewys_spirits.stringtable
+Attack the nāga.	1	[Attack the nāga.]	26_si_desert_ruin_ext.stringtable
+Create "Potion of Panther's Sight."	1	[Create "Potion of Panther's Sight."]	26_si_witch_cauldron.stringtable
+Accept her offer.	1	[Accept her offer.] "Welcome to the crew. I'll see you on the ship."	22_cv_vtc_survivor.stringtable
+Watch the duel to its end.	1	[Watch the duel to its end.]	03_si_the_duel.stringtable
+Go left to the kitchen.	1	[Go left to the kitchen.]	11_si_swim.stringtable
+Grab him.	1	[Grab him.]	05_cv_bertenno.stringtable
+Present the Writ of Commission.	1	[Present the Writ of Commission.] "My associates thought you might say that."	00_cv_ruanu.stringtable
+Cast a spell to clear the smoke.	1	[Cast a spell to clear the smoke.]	06_si_bm_alleys.stringtable

@@ -1,0 +1,3 @@
+temp	5	<temp>You see a broken bridge. It looks like you can jump across the gap. What do you do?	test_interaction.stringtable
+Fail	1	<temp> <Fail> The gap looks larger than you thought. You reconsider the jump attempt.	test_interaction.stringtable
+Success	1	<temp> <Success> The party makes the jump without incident.	test_interaction.stringtable
