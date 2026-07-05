@@ -1,7 +1,8 @@
 ---
 tags: [research, text, tags, markup, stringtables, poe1, poe2]
-status: first-pass
+status: second-pass
 date: 2026-07-05
+updated: 2026-07-05
 ---
 
 # Dialog Text Tags Research
@@ -56,7 +57,9 @@ Three unrelated mechanisms share the square-bracket syntax:
 | `[Player Animal Companion]` | 33 | Ranger companion's name |
 | `[Player Culture]` | 7 | Watcher's culture |
 | `[Player Subrace]` | 1 | Watcher's subrace |
-| `[player class]` | 1 | Watcher's class — sic, lowercase (`06_cv_ateira.stringtable`); token matching appears case-insensitive |
+| `[Player Class]` | 1* | Watcher's class (*shipped use is lowercase, `06_cv_ateira.stringtable` — see [[#Engine verification]] for the lowercase-pair mechanism) |
+| `[Player Background]` | 0 | Watcher's background — engine-only, never in shipped text |
+| `[Player Paladin Order]` | 0 | Paladin's order, gendered — engine-only in dialog text |
 | `[ShipDuel_OpponentShip]` | 26 | Enemy ship name |
 | `[ShipDuel_PlayerShip]` | 22 | Player ship name |
 | `[ShipDuel_Opponent]` | 4 | Enemy captain name |
@@ -110,8 +113,29 @@ Complete inventories (token ⟶ count ⟶ example line ⟶ example file, TSV, so
 - [poe1-angle-bracket-inventory.tsv](raw-data/poe1-angle-bracket-inventory.tsv) — the 3 test-file values
 - [scan-tags.ps1](raw-data/scan-tags.ps1) — the PowerShell scanner (re-runnable against any game copy)
 
+## Engine verification
+
+Second pass (2026-07-05): token lists confirmed against the decompiled sources (`C:\Users\kjmik\Documents\Programming\Deadfire\PoE1 Code` / `PoE2 Code`), answering the first pass's open questions.
+
+**Replacement sites:**
+
+| Game | File | Lines |
+|---|---|---|
+| PoE1 | `Assembly-CSharp\Conversation.cs` | ~551–600 |
+| PoE2 | `Assembly-CSharp\Game\Conversation.cs` | ~789–901 |
+| PoE2 ship duels | `Assembly-CSharp\Game\ShipDuelManager.cs` | ~959–996 |
+
+**Findings beyond the text scan:**
+
+- **Case sensitivity answered:** matching is exact-case, *not* case-insensitive. PoE2 does explicit paired replaces — `[Player Race]` then `[player race]` (lower-cased value via `ToLowerLocal()`) — for race, subrace, class, culture, and background only. PoE1 has **no** lowercase pairs at all; the shipped `[player class]` would render literally in PoE1.
+- **Engine-only tokens (count 0 in shipped dialog, still valid for mods):** PoE2 `[Player Background]`, `[Interaction Ability]`, `[God_Boon]`, `[ShipDuel_Player]`, `[ShipDuel_FleeChance]`; both games `[NPCBacker]`, PoE1 also `[Player Subrace]`, `[Player Class]`, `[Player Culture]`, `[Player Paladin Order]` (PoE2 uses them in text; PoE1 engine supports them unused).
+- **`[Slot n]` is not vestigial in PoE2:** the loop over active party members (`Conversation.cs:842`) handles `[Slot i]` and `[SkillCheck i]` exactly as PoE1 does; shipped PoE2 text just rarely uses it.
+- **`[Temp]`:** both engines append it to nodes with missing text — dev marker.
+- **UI-injected labels confirmed:** PoE1 `Conversation.cs:441–452` builds `[Stat: Value]`/`[Stat N]` option prefixes from node check data; they never exist in stringtables.
+- **Curiosity:** PoE2's `[Player Animal Companion]` fallback path wraps the animal's name in `<xg>` markup (`Conversation.cs:808`) — the engine itself emits markup during substitution.
+
 ## Open questions
 
-- Which class implements the `[Token]` replacement in PoE2 (`Assembly-CSharp`)? Decompiling it would confirm the exact token list + case-insensitivity instead of inferring from shipped text.
-- Does `[Slot n]` in PoE2 still work, or is it vestigial (only 4 occurrences vs. 713 in PoE1)?
-- Possible editor features: token autocomplete in node text, unknown-token warning (identifier-shaped only), `<i>`/`<ispeech>` rendering in the detail pane.
+- ~~Which class implements the `[Token]` replacement in PoE2?~~ Answered above.
+- ~~Does `[Slot n]` in PoE2 still work, or is it vestigial?~~ Works; see above.
+- Possible editor features: token autocomplete in node text, unknown-token warning (identifier-shaped only), `<i>`/`<ispeech>` rendering in the detail pane. Reference-window design: `docs/superpowers/specs/2026-07-05-tag-reference-window-design.md` (repo).
