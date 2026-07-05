@@ -38,15 +38,13 @@ status-bar-only by design; git tool windows keep their in-window reporting, and 
 recovery dialog.
 Spec: docs/superpowers/specs/2026-07-05-error-window-non-save-design.md.
 
-### No "Close Project" command
-There is no way to close the current project without opening another one (or quitting):
-once `IsProjectOpen` is true it stays true for the session, and on next launch the app
-auto-reopens `AppSettings.LastProjectPath`. A **File ▸ Close Project** command would
-prompt on unsaved changes, then clear the project/provider/path state and return to the
-no-project state, re-evaluating every project-gated command (`IsProjectOpen` and the
-`_project is null` guards). Decide whether closing also clears `LastProjectPath` —
-probably yes, otherwise the next launch reopens the project the user just deliberately
-closed. Raised 2026-07-05.
+### ~~No "Close Project" command~~ ✓ Implemented (2026-07-05)
+**File ▸ Close Project** (Ctrl+W, enabled only with a project open) runs the existing
+unsaved-changes guard, then tears down project state via `CloseProjectCore` (shared
+with the branch-switch vanished-file path, which keeps its distinct semantics: no
+`LastProjectPath` clear, no canvas clear), clears the canvas (`ConversationViewModel.Clear()`),
+and clears `AppSettings.LastProjectPath` so the next launch starts projectless.
+Spec: docs/superpowers/specs/2026-07-05-close-project-design.md.
 
 ### Export Mod Bundle without VO
 **File ▸ Export Mod Bundle…** always packages the project *and* the entire `_vo/` folder
