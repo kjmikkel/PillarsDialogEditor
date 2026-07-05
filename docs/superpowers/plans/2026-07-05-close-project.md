@@ -31,7 +31,7 @@
 - Consumes: existing `Load(Conversation, ConversationEditSnapshot?)`, `AddNode(NodeViewModel, LayoutPoint)`, test helpers `StubDispatcher`, `StubStringProvider`.
 - Produces: `public void Clear()` on `ConversationViewModel` — resets the canvas to the empty no-conversation state. Task 2's `DoCloseProject` calls `Canvas.Clear()`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `DialogEditor.Tests\ViewModels\ConversationViewModelClearTests.cs`:
 
@@ -94,12 +94,12 @@ public class ConversationViewModelClearTests
 }
 ```
 
-- [ ] **Step 2: Run to verify red**
+- [x] **Step 2: Run to verify red**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~ConversationViewModelClearTests"`
 Expected: FAIL to compile — `'ConversationViewModel' does not contain a definition for 'Clear'`.
 
-- [ ] **Step 3: Implement `Clear()` by extraction**
+- [x] **Step 3: Implement `Clear()` by extraction**
 
 In `DialogEditor.ViewModels\ViewModels\ConversationViewModel.cs`, the top of `Load()` currently reads:
 
@@ -149,7 +149,7 @@ assigned after the reset instead of before, which nothing in the block reads):
 
 (The doc comment for `baseSnapshot` stays on `Load` unchanged.)
 
-- [ ] **Step 4: Run the new tests, then the full suite**
+- [x] **Step 4: Run the new tests, then the full suite**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~ConversationViewModelClearTests"`
 Expected: PASS (2).
@@ -157,7 +157,7 @@ Expected: PASS (2).
 Run: `dotnet test DialogEditor.Tests`
 Expected: PASS (1896).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add DialogEditor.ViewModels/ViewModels/ConversationViewModel.cs DialogEditor.Tests/ViewModels/ConversationViewModelClearTests.cs
@@ -183,7 +183,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 - Consumes: `Canvas.Clear()` (Task 1); existing `GuardDirtyThen(Action)`, `SetProject(DialogProject?)`, `Detail.Clear()`, `AppSettings.LastProjectPath` (nullable setter); test helpers `StubDispatcher`, `StubFolderPicker`, `StubFilePicker`, `StubStringProvider`.
 - Produces: `CloseProjectCommand` (`IRelayCommand`, `CanExecute` = project open) — Task 3 binds the menu item and key handler to it. Private `CloseProjectCore(string statusText)` shared with `ReloadCurrentProjectFromDisk`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `DialogEditor.Tests\ViewModels\MainWindowViewModelCloseProjectTests.cs`:
 
@@ -345,12 +345,12 @@ public class MainWindowViewModelCloseProjectTests : IDisposable
 }
 ```
 
-- [ ] **Step 2: Run to verify red**
+- [x] **Step 2: Run to verify red**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~MainWindowViewModelCloseProjectTests"`
 Expected: FAIL to compile — `'MainWindowViewModel' does not contain a definition for 'CloseProjectCommand'`.
 
-- [ ] **Step 3: Extract `CloseProjectCore` and add the command**
+- [x] **Step 3: Extract `CloseProjectCore` and add the command**
 
 In `DialogEditor.ViewModels\ViewModels\MainWindowViewModel.cs`:
 
@@ -424,7 +424,7 @@ its `return;`) with:
         CloseProjectCommand.NotifyCanExecuteChanged();
 ```
 
-- [ ] **Step 4: Run the new tests, then the full suite**
+- [x] **Step 4: Run the new tests, then the full suite**
 
 Run: `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~MainWindowViewModelCloseProjectTests"`
 Expected: PASS (5).
@@ -432,7 +432,7 @@ Expected: PASS (5).
 Run: `dotnet test DialogEditor.Tests`
 Expected: PASS (1901).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```powershell
 git add DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs DialogEditor.Tests/ViewModels/MainWindowViewModelCloseProjectTests.cs
@@ -466,7 +466,7 @@ No new unit tests: this task is pure XAML/wiring with no testable logic (the
 command's behaviour is covered by Task 2; shortcut dispatch lives in the
 untestable `OnKeyDownTunnel` switch alongside every other app shortcut).
 
-- [ ] **Step 1: Add the three strings**
+- [x] **Step 1: Add the three strings**
 
 In `DialogEditor.Avalonia\Resources\Strings.axaml`, after `ToolTip_MergeProjects`
 (~line 884):
@@ -482,7 +482,7 @@ After `Status_ProjectNew` (~line 782):
     <sys:String x:Key="Status_ProjectClosed">Closed project '{0}'</sys:String>
 ```
 
-- [ ] **Step 2: Add the menu item**
+- [x] **Step 2: Add the menu item**
 
 In `DialogEditor.Avalonia\Views\MainWindow.axaml`, directly after the Merge Projects
 `MenuItem` (before the first `<Separator/>`):
@@ -495,7 +495,7 @@ In `DialogEditor.Avalonia\Views\MainWindow.axaml`, directly after the Merge Proj
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_CloseProject}"/>
 ```
 
-- [ ] **Step 3: Add the Ctrl+W case to `OnKeyDownTunnel`**
+- [x] **Step 3: Add the Ctrl+W case to `OnKeyDownTunnel`**
 
 In `DialogEditor.Avalonia\Views\MainWindow.axaml.cs`, add a case to the switch in
 `OnKeyDownTunnel` (next to the other Ctrl single-letter cases). The explicit
@@ -510,7 +510,7 @@ project open Ctrl+W must not clear a remembered `LastProjectPath`:
                 break;
 ```
 
-- [ ] **Step 4: Amend the spec's shortcut mechanism line**
+- [x] **Step 4: Amend the spec's shortcut mechanism line**
 
 In `docs\superpowers\specs\2026-07-05-close-project-design.md`, in the Components
 table, replace the `MainWindow.axaml(.cs)` row's description:
@@ -519,7 +519,7 @@ Old: `Window-level KeyBinding for Ctrl+W → CloseProjectCommand (InputGesture o
 
 New: `Ctrl+W case in the OnKeyDownTunnel switch → CloseProjectCommand, gated by CanExecute (the codebase dispatches all shortcuts there; InputGesture on MenuItem is display-only in Avalonia).`
 
-- [ ] **Step 5: Build and run the full suite**
+- [x] **Step 5: Build and run the full suite**
 
 Run: `dotnet build "DialogEditor.slnx"`
 Expected: Build succeeded (same pre-existing warnings only).
@@ -527,7 +527,7 @@ Expected: Build succeeded (same pre-existing warnings only).
 Run: `dotnet test DialogEditor.Tests`
 Expected: PASS (1901).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```powershell
 git add DialogEditor.Avalonia/Resources/Strings.axaml DialogEditor.Avalonia/Views/MainWindow.axaml DialogEditor.Avalonia/Views/MainWindow.axaml.cs docs/superpowers/specs/2026-07-05-close-project-design.md
@@ -552,7 +552,7 @@ Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>
 
 **Interfaces:** none — documentation only.
 
-- [ ] **Step 1: Mark the gap implemented**
+- [x] **Step 1: Mark the gap implemented**
 
 Replace the entry body with:
 
@@ -566,12 +566,12 @@ and clears `AppSettings.LastProjectPath` so the next launch starts projectless.
 Spec: docs/superpowers/specs/2026-07-05-close-project-design.md.
 ```
 
-- [ ] **Step 2: Full suite**
+- [x] **Step 2: Full suite**
 
 Run: `dotnet test DialogEditor.Tests`
 Expected: PASS (1901).
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```powershell
 git add Gaps.md
