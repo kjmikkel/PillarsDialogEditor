@@ -1,0 +1,65 @@
+/i	824	In reaching Ukaizo and facing Eothas, you have accomplished the impossible, and you have done it without the assistance …	endgameslides.stringtable
+i	822	In reaching Ukaizo and facing Eothas, you have accomplished the impossible, and you have done it without the assistance …	endgameslides.stringtable
+ispeech	490	<ispeech>Show. Them.</ispeech>	03_cv_kaoha.stringtable
+/ispeech	490	<ispeech>Show. Them.</ispeech>	03_cv_kaoha.stringtable
+/link	70	<link="neutralvalue://Huana: Don't worry, sister. Surely you can let me through...">"Maue a katuzatuka, uahene. Ne tozo …	03_cv_kaoha.stringtable
+xg	18	"Course, it's surely pirate territory. They've a number of boltholes out this way. I'd <xg>nae</xg> be surprised if that…	09_cv_engrim_port_maje.stringtable
+/xg	16	"Course, it's surely pirate territory. They've a number of boltholes out this way. I'd <xg>nae</xg> be surprised if that…	09_cv_engrim_port_maje.stringtable
+/color	7	"The Hollowborn Crisis." <color="red">(Required - Incomplete)</color>	si_legacy_history.stringtable
+color="red"	7	"The Hollowborn Crisis." <color="red">(Required - Incomplete)</color>	si_legacy_history.stringtable
+link="glossary://GlossaryEntry_Action_LieAhull"	5	"Get everyone belowdecks and batten the hatches! We're <link="glossary://GlossaryEntry_Action_LieAhull">lying ahull</lin…	re_si_storms.stringtable
+link="stringtooltip://tooltips/2"	5	<link="stringtooltip://tooltips/2">'Io guri di prodeggere mat Paladina med Darcozzi i ouer iusti regli, mea Orelia Darco…	17_cv_aeldys_betrayal.stringtable
+sprite="Inline" name="action_full_sail" tint=1	4	<link="glossary://GlossaryEntry_Action_Ram"><sprite="Inline" name="action_full_sail" tint=1></link> "Ramming speed!"	re_si_ship_combat.stringtable
+sprite="Inline" name="action_fire" tint=1	4	<link="glossary://GlossaryEntry_Action_FireCannons"><sprite="Inline" name="action_fire" tint=1></link> "Fire the forward…	re_si_ship_combat.stringtable
+link="glossary://GlossaryEntry_Action_FireCannons"	4	<link="glossary://GlossaryEntry_Action_FireCannons"><sprite="Inline" name="action_fire" tint=1></link> "Fire the forward…	re_si_ship_combat.stringtable
+link="glossary://GlossaryEntry_Action_BarePoles"	4	"We're <link="glossary://GlossaryEntry_Action_BarePoles">flying bare poles</link>, [Specified 1]! Everyone else get belo…	re_si_storms.stringtable
+link="glossary://GlossaryEntry_Action_HoldCourse"	4	"All hands to their posts! We're <link="glossary://GlossaryEntry_Action_HoldCourse">holding course</link>!"	re_si_storms.stringtable
+link="glossary://GlossaryEntry_Action_Heave_To"	4	"We're <link="glossary://GlossaryEntry_Action_Heave_To">heaving-to!</link> Lash the rudder against the sails and get bel…	re_si_storms.stringtable
+link="stringtooltip://cyclopedia/49"	3	You recognize the large, uneven, roundish tracks as those of a <link="stringtooltip://cyclopedia/49">lurker</link>, a ma…	re_si_hunter_camp_lurker.stringtable
+link="glossary://GlossaryEntry_Action_Ram"	2	<link="glossary://GlossaryEntry_Action_Ram"><sprite="Inline" name="action_full_sail" tint=1></link> "Ramming speed!"	re_si_ship_combat.stringtable
+sprite="Inline" name="action_board" tint=1	2	<link="glossary://GlossaryEntry_Action_Board"><sprite="Inline" name="action_board" tint=1></link> "Prepare to board!"	re_si_ship_combat.stringtable
+link="glossary://GlossaryEntry_Action_Board"	2	<link="glossary://GlossaryEntry_Action_Board"><sprite="Inline" name="action_board" tint=1></link> "Prepare to board!"	re_si_ship_combat.stringtable
+link="glossary://GlossaryEntry_Skaen"	2	The man draws a small doll from his robes. An effigy, with blackstone eyes.   "<link="glossary://GlossaryEntry_Skaen">Th…	re_si_2604_campsite_skaen.stringtable
+link="neutralvalue://Rauataian: Do you speak Rauataian?"	1	[Rauataian] <link="neutralvalue://Rauataian: Do you speak Rauataian?">"A kana Rauataian ō ikoru ne?"</link>	companion_rekke_intro.stringtable
+link="neutralvalue://Vailian: Give me the Devourer of Souls!	1	<link="neutralvalue://Vailian: Give me the Devourer of Souls!>"Derme o Engoliero do Espirs!"</link>  She reaches a skele…	re_cv_ghost_ship_captain_encounter.stringtable
+link="glossary://GlossaryEntry_Action_Reefing_Sails"	1	"Everyone into the rigging! We need to <link="glossary://GlossaryEntry_Action_Reefing_Sails">reef the sails</link>!"	re_si_storms.stringtable
+link="glossary://GlossaryEntry_Action_Flee"	1	<link="glossary://GlossaryEntry_Action_Flee"><sprite="Inline" name="action_flee" tint=1></link> "Retreat!"	re_si_ship_combat.stringtable
+sprite="Inline" name="action_half_sail" tint=1	1	<link="glossary://GlossaryEntry_Action_Half_Sail"><sprite="Inline" name="action_half_sail" tint=1></link> "Half sail!" (…	re_si_ship_combat.stringtable
+sprite="Inline" name="ic_ship_surrender" tint=1	1	<link="glossary://GlossaryEntry_Action_Surrender"><sprite="Inline" name="ic_ship_surrender" tint=1> [Surrender.]	re_si_ship_combat.stringtable
+link="neutralvalue://Huana: Sorry, 'brother.'"	1	<link="neutralvalue://Huana: Sorry, 'brother.'">"Okora mae, 'reika.'</link> No one gets through without a good reason. N…	03_cv_kaoha.stringtable
+link="glossary://GlossaryEntry_Action_Dive"	1	<link="glossary://GlossaryEntry_Action_Dive"><sprite="Inline" name="action_dive" tint=1></link> "Prepare to dive!"	re_si_ship_combat.stringtable
+link="glossary://GlossaryEntry_Action_Turn_Port"	1	<link="glossary://GlossaryEntry_Action_Turn_Port"><sprite="Inline" name="action_left" tint=1></link> "Turn to port!"	re_si_ship_combat.stringtable
+link="neutralvalue://Vailian: You little fox shit!	1	<link="neutralvalue://Vailian: You little fox shit!>"Voc se no vulpinet merla!</link> Careful, shiphunter. Mind that you…	17_cv_principi_boss_portmaje_shallows.stringtable
+link="glossary://GlossaryEntry_Action_Hold"	1	<link="glossary://GlossaryEntry_Action_Hold"><sprite="Inline" name="action_hold" tint=1></link> "Hold position!"	re_si_ship_combat.stringtable
+link="glossary://GlossaryEntry_Action_RainBarrels"	1	"<link="glossary://GlossaryEntry_Action_RainBarrels">Bring the rain barrels</link> up from the hold. Let's see if we can…	re_si_storms.stringtable
+link="stringtooltip://cyclopedia/56"	1	The essence of the spirits <link="stringtooltip://cyclopedia/56">roils dangerously</link>, fed by the physical flames an…	re_si_city_burning_building.stringtable
+link="neutralvalue://Ordhjóma: fermented whale blubber"	1	"It has its charms - I miss the <link="neutralvalue://Ordhjóma: fermented whale blubber">skír hrél</link> and <link="neu…	20_cv_ydwin.stringtable
+link="glossary://GlossaryEntry_Action_Full_Sail"	1	<link="glossary://GlossaryEntry_Action_Full_Sail"><sprite="Inline" name="action_full_sail" tint=1></link> "Full speed ah…	re_si_ship_combat.stringtable
+link="neutralvalue://Engwithan: Do you speak Engwithan?"	1	[Engwithan] <link="neutralvalue://Engwithan: Do you speak Engwithan?">"E dhnéi tói Engwith?"</link>	companion_rekke_intro.stringtable
+sprite="Inline" name="action_brace" tint=1	1	<link="glossary://GlossaryEntry_Action_BraceForImpact"><sprite="Inline" name="action_brace" tint=1></link> "Brace for im…	re_si_ship_combat.stringtable
+link="glossary://GlossaryEntry_Action_Turn_Starboard"	1	<link="glossary://GlossaryEntry_Action_Turn_Starboard"><sprite="Inline" name="action_right" tint=1></link> "Turn to star…	re_si_ship_combat.stringtable
+link="neutralvalue://Ixamitl: Do you speak Ixamitl?"	1	[Ixamitl] <link="neutralvalue://Ixamitl: Do you speak Ixamitl?">"¿Ixamitl ye llank'ayku?"</link>	companion_rekke_intro.stringtable
+link="neutralvalue://Eld Aedyran: Do you speak Eld Aedyran?"	1	[Eld Aedyran] <link="neutralvalue://Eld Aedyran: Do you speak Eld Aedyran?">"Scaketh fe Eld Aedyran?"</link>	companion_rekke_intro.stringtable
+link="glossary://GlossaryEntry_Action_Report"	1	<link="glossary://GlossaryEntry_Action_Report"><sprite="Inline" name="action_report" tint=1></link> "Report to..."	re_si_ship_combat.stringtable
+link="glossary://GlossaryEntry_Action_Surrender"	1	<link="glossary://GlossaryEntry_Action_Surrender"><sprite="Inline" name="ic_ship_surrender" tint=1> [Surrender.]	re_si_ship_combat.stringtable
+link="stringtooltip://tooltips/9"	1	<link="stringtooltip://tooltips/9">"Vu maddicche postenago! Buffan vi! Cues es malgro me fulpa med tuor! Peri chue na cr…	03_cv_pallegina_outcast.stringtable
+link="neutralvalue://Vailian: Fuck this!	1	<link="neutralvalue://Vailian: Fuck this!>"Se futtito!</link> Madiccho, I did not sign up to be burned."	companion_cv_xoti_intro_pm.stringtable
+link="neutralvalue://Ordhjóma: herbal aperitif"	1	"It has its charms - I miss the <link="neutralvalue://Ordhjóma: fermented whale blubber">skír hrél</link> and <link="neu…	20_cv_ydwin.stringtable
+link="neutralvalue://Vailian: Do you speak Vailian, sir?"	1	[Vailian] <link="neutralvalue://Vailian: Do you speak Vailian, sir?">"Perla Vailian, fentre?"</link>	companion_rekke_intro.stringtable
+link="neutralvalue://Huana: Do you speak Huana?"	1	[Huana] <link="neutralvalue://Huana: Do you speak Huana?">"Kautō e kui ne Huana?"</link>	companion_rekke_intro.stringtable
+link="neutralvalue://Vailian: Get me the Devourer of Souls!	1	"Crew! <link="neutralvalue://Vailian: Get me the Devourer of Souls!> Derme o Engoliero do Espirs!</link> Take the sword …	re_si_ghost_ship_resolution.stringtable
+sprite="Inline" name="action_report" tint=1	1	<link="glossary://GlossaryEntry_Action_Report"><sprite="Inline" name="action_report" tint=1></link> "Report to..."	re_si_ship_combat.stringtable
+link="neutralvalue://Lembur: Do you speak Lembur?"	1	[Lembur] <link="neutralvalue://Lembur: Do you speak Lembur?">"Vii dornesti za Lembur?"</link>	companion_rekke_intro.stringtable
+sprite="Inline" name="action_hold" tint=1	1	<link="glossary://GlossaryEntry_Action_Hold"><sprite="Inline" name="action_hold" tint=1></link> "Hold position!"	re_si_ship_combat.stringtable
+link="glossary://GlossaryEntry_Action_Jibe"	1	<link="glossary://GlossaryEntry_Action_Jibe"><sprite="Inline" name="action_reverse" tint=1></link> "Prepare to jibe!"	re_si_ship_combat.stringtable
+sprite="Inline" name="action_flee" tint=1	1	<link="glossary://GlossaryEntry_Action_Flee"><sprite="Inline" name="action_flee" tint=1></link> "Retreat!"	re_si_ship_combat.stringtable
+link="glossary://GlossaryEntry_Action_BraceForImpact"	1	<link="glossary://GlossaryEntry_Action_BraceForImpact"><sprite="Inline" name="action_brace" tint=1></link> "Brace for im…	re_si_ship_combat.stringtable
+sprite="Inline" name="action_right" tint=1	1	<link="glossary://GlossaryEntry_Action_Turn_Starboard"><sprite="Inline" name="action_right" tint=1></link> "Turn to star…	re_si_ship_combat.stringtable
+link="neutralvalue://Ordhjóma: We always do."	1	<link="neutralvalue://Ordhjóma: We always do.">"Vith jerüm dháth eldtaf."</link>	20_cv_ydwin.stringtable
+link="glossary://GlossaryEntry_Action_SecureCargo"	1	"All hands, get belowdecks and <link="glossary://GlossaryEntry_Action_SecureCargo">secure the cargo</link>!"	re_si_storms.stringtable
+link="glossary://GlossaryEntry_Action_Half_Sail"	1	<link="glossary://GlossaryEntry_Action_Half_Sail"><sprite="Inline" name="action_half_sail" tint=1></link> "Half sail!" (…	re_si_ship_combat.stringtable
+sprite="Inline" name="action_dive" tint=1	1	<link="glossary://GlossaryEntry_Action_Dive"><sprite="Inline" name="action_dive" tint=1></link> "Prepare to dive!"	re_si_ship_combat.stringtable
+sprite="Inline" name="action_left" tint=1	1	<link="glossary://GlossaryEntry_Action_Turn_Port"><sprite="Inline" name="action_left" tint=1></link> "Turn to port!"	re_si_ship_combat.stringtable
+sprite="Inline" name="action_reverse" tint=1	1	<link="glossary://GlossaryEntry_Action_Jibe"><sprite="Inline" name="action_reverse" tint=1></link> "Prepare to jibe!"	re_si_ship_combat.stringtable
+link="neutralvalue://Ordhjóma: Do you speak Ordhjóma?"	1	[Ordhjóma] <link="neutralvalue://Ordhjóma: Do you speak Ordhjóma?">"Telé dha Ordhjóma?"</link>	companion_rekke_intro.stringtable
+link="neutralvalue://Huana: Sorry, 'sister.'"	1	<link="neutralvalue://Huana: Sorry, 'sister.'">"Okora mae, 'uahene.'</link> No one gets through without a good reason. N…	03_cv_kaoha.stringtable
