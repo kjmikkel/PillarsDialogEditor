@@ -50,6 +50,11 @@
                         <MenuItem Header="{DynamicResource Menu_SaveProject}"
                                   Command="{Binding SaveProjectCommand}"
                                   InputGesture="Ctrl+S"/>
+                        <MenuItem Header="{DynamicResource Menu_SaveProjectAs}"
+                                  Command="{Binding SaveProjectAsCommand}"
+                                  InputGesture="Ctrl+Shift+S"
+                                  ToolTip.Tip="{DynamicResource ToolTip_SaveProjectAs}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_SaveProjectAs}"/>
                         <MenuItem Header="{DynamicResource Menu_MergeProjects}"
                                   Command="{Binding MergeProjectsCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_MergeProjects}"
