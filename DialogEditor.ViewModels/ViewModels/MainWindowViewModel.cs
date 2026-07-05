@@ -900,34 +900,7 @@ public partial class MainWindowViewModel : ObservableObject
         if (_project is null || _projectPath is null) return;
         try
         {
-            // With a conversation open, fold the canvas edits into its patch first.
-            // With no conversation open (e.g. a freshly conflict-merged project), the
-            // in-memory _project is already complete — just serialize it.
-            if (_currentFile is not null && Canvas.BaseSnapshot is not null)
-            {
-                var patch  = DiffEngine.Diff(_currentFile.Name, Canvas.BaseSnapshot, Canvas.BuildSnapshot(), _provider!.Language);
-                patch = patch with { NodeComments = Canvas.NodeComments };
-
-                // WithPatch replaces the stored patch wholesale, but the diff only knows
-                // the canvas language — carry over imported translations for every other
-                // language, or they would be silently erased on each save. The current
-                // language always takes the freshly diffed value (including "no entry"
-                // when the text was reverted to vanilla).
-                if (_project.Patches.TryGetValue(_currentFile.Name, out var prior)
-                    && prior.Translations.Count > 0)
-                {
-                    var mergedTranslations =
-                        new Dictionary<string, IReadOnlyList<NodeTranslation>>(prior.Translations);
-                    mergedTranslations.Remove(_provider.Language);
-                    foreach (var (lang, entries) in patch.Translations)
-                        mergedTranslations[lang] = entries;
-                    patch = patch with { Translations = mergedTranslations };
-                }
-                var layout      = Canvas.GetCurrentLayout();
-                var annotations = Canvas.GetCurrentAnnotations();
-                SetProject(_project!.WithPatch(patch).WithLayout(_currentFile.Name, layout)
-                    .WithAnnotations(_currentFile.Name, annotations));
-            }
+            FoldCanvasIntoProject();
             DialogProjectSerializer.SaveToFile(_projectPath, _project!);
             Canvas.IsModified = false;
             IsModified = false;
@@ -946,6 +919,37 @@ public partial class MainWindowViewModel : ObservableObject
 
     private bool CanSaveProject() =>
         _project is not null && _projectPath is not null && IsModified;
+
+    /// With a conversation open, folds the canvas edits into its patch on _project.
+    /// With no conversation open (e.g. a freshly conflict-merged project), the
+    /// in-memory _project is already complete — no-op.
+    private void FoldCanvasIntoProject()
+    {
+        if (_currentFile is null || Canvas.BaseSnapshot is null) return;
+
+        var patch  = DiffEngine.Diff(_currentFile.Name, Canvas.BaseSnapshot, Canvas.BuildSnapshot(), _provider!.Language);
+        patch = patch with { NodeComments = Canvas.NodeComments };
+
+        // WithPatch replaces the stored patch wholesale, but the diff only knows
+        // the canvas language — carry over imported translations for every other
+        // language, or they would be silently erased on each save. The current
+        // language always takes the freshly diffed value (including "no entry"
+        // when the text was reverted to vanilla).
+        if (_project!.Patches.TryGetValue(_currentFile.Name, out var prior)
+            && prior.Translations.Count > 0)
+        {
+            var mergedTranslations =
+                new Dictionary<string, IReadOnlyList<NodeTranslation>>(prior.Translations);
+            mergedTranslations.Remove(_provider.Language);
+            foreach (var (lang, entries) in patch.Translations)
+                mergedTranslations[lang] = entries;
+            patch = patch with { Translations = mergedTranslations };
+        }
+        var layout      = Canvas.GetCurrentLayout();
+        var annotations = Canvas.GetCurrentAnnotations();
+        SetProject(_project!.WithPatch(patch).WithLayout(_currentFile.Name, layout)
+            .WithAnnotations(_currentFile.Name, annotations));
+    }
 
     // ── Apply from diff ───────────────────────────────────────────────────
 
