@@ -4,6 +4,12 @@ namespace DialogEditor.ViewModels.Services;
 /// that delimiter is, and the text typed so far (delimiter included).
 public sealed record CompletionContext(char Delimiter, int FragmentStart, string Fragment);
 
+/// The edit to apply when a completion is accepted: which span of the text to
+/// replace, the text to insert, and where to leave the caret/selection.
+public sealed record CompletionEdit(
+    int ReplaceStart, int ReplaceLength, string InsertedText,
+    int SelectionStart, int SelectionLength);
+
 /// Pure logic for token/markup autocomplete in dialog text. Owns context
 /// detection, candidate ranking, and the exact edit applied on accept — no UI.
 /// Spec: docs/superpowers/specs/2026-07-06-token-autocomplete-design.md
@@ -50,6 +56,19 @@ public sealed class TokenCompletionService
             .OrderByDescending(e => e.Count)
             .ThenBy(e => InsertionOf(e).Literal, System.StringComparer.Ordinal)
             .ToList();
+    }
+
+    /// Computes the text replacement and resulting caret/selection when `entry`
+    /// is accepted in `context`. The View applies the result verbatim.
+    public CompletionEdit ApplyCompletion(CompletionContext context, TagEntry entry)
+    {
+        var (literal, selStart, selLen) = InsertionOf(entry);
+        return new CompletionEdit(
+            ReplaceStart:    context.FragmentStart,
+            ReplaceLength:   context.Fragment.Length,
+            InsertedText:    literal,
+            SelectionStart:  context.FragmentStart + selStart,
+            SelectionLength: selLen);
     }
 
     /// Expands an entry's `insert` marker into literal text plus the selection to
