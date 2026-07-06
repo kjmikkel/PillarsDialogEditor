@@ -1512,6 +1512,13 @@ public partial class MainWindowViewModel : ObservableObject
     private void About()
         => ShowAbout?.Invoke(new AboutViewModel(AppVersion.Current, RepositoryUrl, DocsUrl));
 
+    /// Set by the UI layer to open the dialog-text tag reference window.
+    public Action<TagReferenceViewModel>? ShowTagReference { get; set; }
+
+    [RelayCommand]
+    private void TagReference()
+        => ShowTagReference?.Invoke(new TagReferenceViewModel(_activeGameId));
+
     // ── Backup offer (first time per game folder) ─────────────────────────
     private async Task OfferBackupAsync(string gameDirectory)
     {
