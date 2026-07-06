@@ -32,4 +32,39 @@ public sealed class TokenCompletionService
         }
         return null;
     }
+
+    /// The offerable entries for a context, game-filtered and ranked. `[` offers
+    /// Tokens, `<` offers Markup; Conventions are never offered. An empty/unknown
+    /// gameId offers the union of both games.
+    public IReadOnlyList<TagEntry> GetCandidates(CompletionContext context, string gameId)
+    {
+        var kind = context.Delimiter == '[' ? "Token" : "Markup";
+        var offerUnion = string.IsNullOrEmpty(gameId);
+
+        return _catalogue.All
+            .Where(e => e.Kind == kind)
+            .Where(e => offerUnion || e.Games.Any(g =>
+                string.Equals(g, gameId, System.StringComparison.OrdinalIgnoreCase)))
+            .Where(e => InsertionOf(e).Literal.StartsWith(
+                context.Fragment, System.StringComparison.OrdinalIgnoreCase))
+            .OrderByDescending(e => e.Count)
+            .ThenBy(e => InsertionOf(e).Literal, System.StringComparer.Ordinal)
+            .ToList();
+    }
+
+    /// Expands an entry's `insert` marker into literal text plus the selection to
+    /// place on accept. No `insert` → the Name inserted verbatim, caret at the end.
+    internal static (string Literal, int SelStart, int SelLen) InsertionOf(TagEntry entry)
+    {
+        if (string.IsNullOrEmpty(entry.Insert))
+            return (entry.Name, entry.Name.Length, 0);
+
+        var s = entry.Insert!;
+        var open = s.IndexOf("${", System.StringComparison.Ordinal);
+        var close = s.IndexOf('}', open);
+        var before = s[..open];
+        var token = s[(open + 2)..close];
+        var after = s[(close + 1)..];
+        return (before + token + after, before.Length, token.Length);
+    }
 }
