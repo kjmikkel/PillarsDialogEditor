@@ -17,7 +17,8 @@ public record TagEntry(
     string Description,
     string? Example = null,
     int Count = 0,
-    string? Notes = null);
+    string? Notes = null,
+    string? Insert = null);
 
 /// The dialog-text tag vocabulary, engine-verified against both games'
 /// decompiled Conversation.cs (+ PoE2 ShipDuelManager.cs) — see
