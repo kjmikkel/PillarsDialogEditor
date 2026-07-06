@@ -60,8 +60,17 @@ Spec: docs/superpowers/specs/2026-07-05-tag-reference-window-design.md.
 ### Token autocomplete and validation in node text editing
 The node text editor treats `[Player Name]`, `<i>…</i>`, etc. as plain text. Two
 assists, both game-aware and driven by the same vocabulary as the reference window:
-- **Autocomplete** — typing `[` (or `<`) in a text field offers the known substitution
-  tokens (respecting the open game: no `[ShipDuel_*]` for PoE1) and markup tags.
+- **Autocomplete ✅ IMPLEMENTED (2026-07-06).** Typing `[` (or `<`) in the node's
+  Default/Female text fields opens an IDE-style popup of the known substitution
+  tokens / markup tags for the open game (no `[ShipDuel_*]` for PoE1; union when no
+  game folder is open), ranked by shipped frequency, name-primary with a description
+  line. `Convention` entries (free-text stage directions like `[Say nothing.]`) are
+  never offered. Accepting inserts a ready-to-fill template with the caret on the
+  first placeholder (`[Specified 0]` selects the `0`; `<i></i>` drops the caret
+  between the tags; `<color=""></color>` inside the quotes), driven by a data-authored
+  `insert` field in `tags.json`. Pure `TokenCompletionService` (context detection,
+  candidate ranking, apply-edit) + a thin `TokenCompletion` attached behaviour on the
+  TextBoxes. Spec: docs/superpowers/specs/2026-07-06-token-autocomplete-design.md.
 - **Validation** — warn on *identifier-shaped* unknown tokens (e.g. `[Player Nmae]`)
   and unbalanced markup pairs (`<i>` without `</i>`). Must NOT flag free-text stage
   directions (`[Say nothing.]`, `[Draw your weapons and attack.]`) or language markers
