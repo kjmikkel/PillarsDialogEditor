@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
              xmlns:types="clr-namespace:DialogEditor.ViewModels.Services;assembly=DialogEditor.ViewModels"
+             xmlns:beh="clr-namespace:DialogEditor.Avalonia.Behaviors;assembly=DialogEditor.Avalonia"
              x:Class="DialogEditor.Avalonia.Views.NodeDetailView"
              x:CompileBindings="False">
 
@@ -77,6 +78,8 @@
                 <TextBox x:Name="DefaultTextBox" Classes="detail-field"
                          Text="{Binding DefaultText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="52"
+                         beh:TokenCompletion.IsEnabled="True"
+                         beh:TokenCompletion.GameId="{Binding ActiveGameId}"
                          ToolTip.Tip="{DynamicResource ToolTip_DefaultText}"
                          AutomationProperties.HelpText="{DynamicResource ToolTip_DefaultText}"
                          AutomationProperties.Name="{DynamicResource Label_DefaultMaleText}"/>
@@ -86,6 +89,8 @@
                 <TextBox Classes="detail-field"
                          Text="{Binding FemaleText, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                          AcceptsReturn="True" TextWrapping="Wrap" MinHeight="36"
+                         beh:TokenCompletion.IsEnabled="True"
+                         beh:TokenCompletion.GameId="{Binding ActiveGameId}"
                          Watermark="{DynamicResource Placeholder_FemaleText}"
                          ToolTip.Tip="{DynamicResource ToolTip_FemaleText}"
                          AutomationProperties.HelpText="{DynamicResource ToolTip_FemaleText}"
