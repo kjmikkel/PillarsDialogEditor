@@ -117,4 +117,49 @@ public class TokenCompletionServiceTests
         var ctx = _svc.TryGetContext("[Zzz", 4)!;
         Assert.Empty(_svc.GetCandidates(ctx, "poe2"));
     }
+
+    private static TagEntry Entry(string name)
+        => TagCatalogue.Instance.All.Single(e => e.Name == name);
+
+    [Fact]
+    public void ApplyCompletion_PlainToken_CaretAtEnd()
+    {
+        var ctx = _svc.TryGetContext("[Pla", 4)!;
+        var edit = _svc.ApplyCompletion(ctx, Entry("[Player Name]"));
+        Assert.Equal(0, edit.ReplaceStart);
+        Assert.Equal(4, edit.ReplaceLength);
+        Assert.Equal("[Player Name]", edit.InsertedText);
+        Assert.Equal("[Player Name]".Length, edit.SelectionStart);
+        Assert.Equal(0, edit.SelectionLength);
+    }
+
+    [Fact]
+    public void ApplyCompletion_ParameterisedToken_SelectsNumber()
+    {
+        var ctx = _svc.TryGetContext("[Spe", 4)!;
+        var edit = _svc.ApplyCompletion(ctx, Entry("[Specified n]"));
+        Assert.Equal("[Specified 0]", edit.InsertedText);
+        Assert.Equal("[Specified ".Length, edit.SelectionStart); // caret on the '0'
+        Assert.Equal(1, edit.SelectionLength);
+    }
+
+    [Fact]
+    public void ApplyCompletion_PairedMarkup_CaretBetweenTags()
+    {
+        var ctx = _svc.TryGetContext("<i", 2)!;
+        var edit = _svc.ApplyCompletion(ctx, Entry("<i>…</i>"));
+        Assert.Equal("<i></i>", edit.InsertedText);
+        Assert.Equal("<i>".Length, edit.SelectionStart);
+        Assert.Equal(0, edit.SelectionLength);
+    }
+
+    [Fact]
+    public void ApplyCompletion_AttributeMarkup_CaretInsideQuotes()
+    {
+        var ctx = _svc.TryGetContext("<col", 4)!;
+        var edit = _svc.ApplyCompletion(ctx, Entry("<color=\"…\">…</color>"));
+        Assert.Equal("<color=\"\"></color>", edit.InsertedText);
+        Assert.Equal("<color=\"".Length, edit.SelectionStart);
+        Assert.Equal(0, edit.SelectionLength);
+    }
 }
