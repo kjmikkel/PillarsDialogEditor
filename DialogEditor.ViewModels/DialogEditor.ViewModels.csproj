@@ -13,6 +13,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\conditions.json" />
     <EmbeddedResource Include="Resources\scripts.json" />
+    <EmbeddedResource Include="Resources\tags.json" />
   </ItemGroup>
 
   <ItemGroup>

@@ -12,6 +12,9 @@ in the engine but never occur in shipped dialog — still valid for mod text.
 The same three mechanisms as PoE2 (see `tags-poe2.md`), with a smaller
 vocabulary — no ship tokens, and essentially no rich-text markup.
 
+Machine-readable copy: `data/tags.json` (embedded in the app for the in-app
+tag reference window; keep the two in sync when either changes).
+
 ---
 
 ## 1. Substitution tokens
