@@ -1,0 +1,92 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DialogEditor.Avalonia.Views.TagReferenceWindow"
+        Title="{DynamicResource TagRef_Title}"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="600" Height="680" MinWidth="440" MinHeight="360" CanResize="True"
+        ShowInTaskbar="False">
+    <Window.Resources>
+        <!-- One shared row template for all three sections. -->
+        <DataTemplate x:Key="TagRowTemplate">
+            <StackPanel Margin="0,0,0,10">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="{Binding Name}" FontWeight="Bold"
+                               FontFamily="Consolas,Courier New,monospace"
+                               Foreground="{DynamicResource Brush.Text.Emphasis}"
+                               FontSize="{DynamicResource FontSize.Body}"/>
+                    <TextBlock Text="{Binding GamesBadge}" IsVisible="{Binding ShowBadge}"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource Brush.Text.Tertiary}"
+                               FontSize="{DynamicResource FontSize.Label}"/>
+                    <TextBlock Text="{Binding EngineOnlyLabel}" IsVisible="{Binding IsEngineOnly}"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource Brush.Text.Link.Subtle}"
+                               FontSize="{DynamicResource FontSize.Label}"/>
+                </StackPanel>
+                <TextBlock Text="{Binding Description}" TextWrapping="Wrap"
+                           Foreground="{DynamicResource Brush.Text.Tertiary}"
+                           FontSize="{DynamicResource FontSize.Body}"/>
+                <TextBlock Text="{Binding Example}" IsVisible="{Binding HasExample}"
+                           FontStyle="Italic" TextWrapping="Wrap" Margin="8,2,0,0"
+                           Foreground="{DynamicResource Brush.Text.Tertiary}"
+                           FontSize="{DynamicResource FontSize.Body}"/>
+                <TextBlock Text="{Binding Notes}" IsVisible="{Binding HasNotes}"
+                           TextWrapping="Wrap" Margin="8,2,0,0"
+                           Foreground="{DynamicResource Brush.Text.Tertiary}"
+                           FontSize="{DynamicResource FontSize.Label}"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+
+    <DockPanel Margin="14,12">
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
+            <TextBox Width="280"
+                     Text="{Binding SearchText}"
+                     Watermark="{DynamicResource TagRef_SearchWatermark}"
+                     ToolTip.Tip="{DynamicResource ToolTip_TagRef_Search}"
+                     AutomationProperties.Name="{DynamicResource TagRef_SearchWatermark}"/>
+            <ComboBox ItemsSource="{Binding GameOptions}"
+                      SelectedItem="{Binding SelectedGame}"
+                      ToolTip.Tip="{DynamicResource ToolTip_TagRef_GameSelector}"
+                      AutomationProperties.Name="{DynamicResource ToolTip_TagRef_GameSelector}"/>
+        </StackPanel>
+
+        <TextBlock DockPanel.Dock="Top" IsVisible="{Binding HasNoResults}"
+                   Text="{DynamicResource TagRef_NoResults}" TextWrapping="Wrap"
+                   Foreground="{DynamicResource Brush.Text.Tertiary}"
+                   FontSize="{DynamicResource FontSize.Medium}"/>
+
+        <ScrollViewer>
+            <StackPanel>
+                <TextBlock Text="{DynamicResource TagRef_SectionTokens}" IsVisible="{Binding HasTokens}"
+                           FontWeight="Bold" FontSize="{DynamicResource FontSize.Subtitle}"
+                           Foreground="{DynamicResource Brush.Text.Emphasis}" Margin="0,0,0,6"/>
+                <ItemsControl ItemsSource="{Binding TokenGroups}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Margin="0,0,0,8">
+                                <TextBlock Text="{Binding Header}" FontWeight="Bold"
+                                           Foreground="{DynamicResource Brush.Text.Link.Subtle}"
+                                           FontSize="{DynamicResource FontSize.Label}" Margin="0,0,0,4"/>
+                                <ItemsControl ItemsSource="{Binding Rows}"
+                                              ItemTemplate="{StaticResource TagRowTemplate}" Margin="6,0,0,0"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Text="{DynamicResource TagRef_SectionMarkup}" IsVisible="{Binding HasMarkup}"
+                           FontWeight="Bold" FontSize="{DynamicResource FontSize.Subtitle}"
+                           Foreground="{DynamicResource Brush.Text.Emphasis}" Margin="0,8,0,6"/>
+                <ItemsControl ItemsSource="{Binding MarkupRows}"
+                              ItemTemplate="{StaticResource TagRowTemplate}" Margin="6,0,0,0"/>
+
+                <TextBlock Text="{DynamicResource TagRef_SectionConventions}" IsVisible="{Binding HasConventions}"
+                           FontWeight="Bold" FontSize="{DynamicResource FontSize.Subtitle}"
+                           Foreground="{DynamicResource Brush.Text.Emphasis}" Margin="0,8,0,6"/>
+                <ItemsControl ItemsSource="{Binding ConventionRows}"
+                              ItemTemplate="{StaticResource TagRowTemplate}" Margin="6,0,0,0"/>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
+</Window>

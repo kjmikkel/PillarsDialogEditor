@@ -199,6 +199,10 @@
                                   Command="{Binding StartGuidedTourCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Menu_StartGuidedTour}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_StartGuidedTour}"/>
+                        <MenuItem Header="{DynamicResource Menu_TagReference}"
+                                  Command="{Binding TagReferenceCommand}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_Menu_TagReference}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_TagReference}"/>
                         <Separator/>
                         <MenuItem Header="{DynamicResource Menu_ExportUiStrings}"
                                   ToolTip.Tip="{DynamicResource Menu_ExportUiStringsTip}"

@@ -27,6 +27,7 @@ public partial class MainWindow : Window
     private double _browserExpandedWidth = 220;
     private double _detailExpandedWidth  = 240;
     private LegendWindow?          _legendWindow;
+    private TagReferenceWindow?    _tagReferenceWindow;
     private PatchManagerWindow?    _patchManagerWindow;
     private FindReplaceWindow?     _findReplaceWindow;
     private BatchReplaceWindow?    _batchReplaceWindow;
@@ -76,6 +77,19 @@ public partial class MainWindow : Window
             var window = new ChangelogWindow(changelogVm);
             window.Show();
             window.Activate();
+        };
+        vm.ShowTagReference = tagVm =>
+        {
+            // Cached instance: reopening the menu item focuses the open window.
+            if (_tagReferenceWindow is { IsVisible: true })
+            {
+                _tagReferenceWindow.Activate();
+                return;
+            }
+            _tagReferenceWindow = new TagReferenceWindow(tagVm);
+            _tagReferenceWindow.Closed += (_, _) => _tagReferenceWindow = null;
+            _tagReferenceWindow.Show();
+            _tagReferenceWindow.Activate();
         };
         vm.ShowAbout = aboutVm =>
         {
