@@ -1034,6 +1034,28 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Menu_OpenWalkthroughTip">Open the step-by-step beginner guide that walks you through editing, testing, translating, and version control using the sample project.</sys:String>
     <sys:String x:Key="Menu_Changelog">Changelog…</sys:String>
     <sys:String x:Key="Menu_ChangelogTip">See what has changed in each released version of the editor, newest first.</sys:String>
+
+    <!-- Dialog text tag reference (Help menu) — entries themselves are data from tags.json -->
+    <sys:String x:Key="Menu_TagReference">Text Tag Reference…</sys:String>
+    <sys:String x:Key="ToolTip_Menu_TagReference">Open a searchable reference of the tags used in dialog text: substitution tokens like [Player Name], text markup like &lt;i&gt;, and the bracket writing conventions.</sys:String>
+    <sys:String x:Key="TagRef_Title">Dialog Text Tag Reference</sys:String>
+    <sys:String x:Key="TagRef_SearchWatermark">Search tags…</sys:String>
+    <sys:String x:Key="ToolTip_TagRef_Search">Filter the reference by tag name or description text.</sys:String>
+    <sys:String x:Key="ToolTip_TagRef_GameSelector">Choose which game's tag vocabulary to show. The two games differ: ship-duel tokens and text markup are Deadfire-only.</sys:String>
+    <sys:String x:Key="TagRef_GamePoE1">Pillars of Eternity</sys:String>
+    <sys:String x:Key="TagRef_GamePoE2">Deadfire</sys:String>
+    <sys:String x:Key="TagRef_GameBoth">Both games</sys:String>
+    <sys:String x:Key="TagRef_BadgePoE1">PoE1</sys:String>
+    <sys:String x:Key="TagRef_BadgePoE2">PoE2</sys:String>
+    <sys:String x:Key="TagRef_SectionTokens">Substitution tokens</sys:String>
+    <sys:String x:Key="TagRef_SectionMarkup">Rich-text markup</sys:String>
+    <sys:String x:Key="TagRef_SectionConventions">Writing conventions</sys:String>
+    <sys:String x:Key="TagCategory_Player">Player</sys:String>
+    <sys:String x:Key="TagCategory_CharacterReference">Character references</sys:String>
+    <sys:String x:Key="TagCategory_ShipDuel">Ship duels</sys:String>
+    <sys:String x:Key="TagCategory_Other">Other</sys:String>
+    <sys:String x:Key="TagRef_EngineOnly">engine-supported, unused in shipped dialog</sys:String>
+    <sys:String x:Key="TagRef_NoResults">No tags match your search.</sys:String>
     <sys:String x:Key="Menu_About">About…</sys:String>
     <sys:String x:Key="Menu_AboutTip">Show the application version, licence, credits, and links to the project's repository and online documentation.</sys:String>
 
