@@ -16,6 +16,9 @@ Three different mechanisms share the bracket syntax:
 3. **Writing conventions** — brackets with free text inside carry meaning for
    the player, but the engine renders them literally.
 
+Machine-readable copy: `data/tags.json` (embedded in the app for the in-app
+tag reference window; keep the two in sync when either changes).
+
 ---
 
 ## 1. Substitution tokens
