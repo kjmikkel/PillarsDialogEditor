@@ -73,6 +73,14 @@ Rules:
 
 `ShouldShow` is simply `ReleasesToShow.Count > 0` (computed by the caller).
 
+**Build-metadata normalization.** `AppVersion.Current` is the assembly
+`InformationalVersion`, which carries a `+<git-hash>` semver build-metadata suffix
+(e.g. `1.0.0+9c2d3a55…`) that changelog headings never have. `Decide` strips
+everything from the first `+` on `lastSeen`, `current`, and each release `Version`
+before comparing, so versions match on their released identity and a per-commit
+hash change on rebuilds doesn't spuriously re-trigger the greeting. (Discovered
+during app verification; unit tests originally used clean version strings.)
+
 ### 3. `ChangelogViewModel` — "what's new" mode
 
 Add an optional constructor path:

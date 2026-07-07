@@ -602,8 +602,15 @@ never drift. (See `docs/superpowers/specs/2026-06-07-changelog-and-about-design.
 `CHANGELOG.md` (grouped `### Added`/`### Changed`/`### Fixed` subsections per version,
 newest first) and shows an empty-state message when there are no entries. Per the CLAUDE.md
 **Changelog** rule, `CHANGELOG.md` stays **frozen until the initial public release**;
-thereafter each release appends its notes. A version-aware "what's new since your last run"
-layer remains a future enhancement — see the design spec.
+thereafter each release appends its notes.
+
+A version-aware **"what's new since your last run"** layer is now implemented
+(2026-07-07): on launch, if `AppVersion.Current` advanced past the persisted
+`AppSettings.LastSeenVersion`, the changelog auto-opens filtered to the new releases
+(pure `WhatsNewDecider` walks the newest-first log, ignoring semver `+build` metadata;
+`ChangelogWindow` reused in a "what's new" mode). Dormant until `CHANGELOG.md` is
+populated at release. Fresh installs and the first feature-adding upgrade record the
+baseline silently. Spec: docs/superpowers/specs/2026-07-07-whats-new-on-launch-design.md.
 
 ### Onboarding
 A **Create Sample Project** command (Help menu) plus a shipped **beginner walkthrough**
