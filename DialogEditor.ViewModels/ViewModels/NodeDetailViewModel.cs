@@ -17,6 +17,8 @@ public partial class NodeDetailViewModel : ObservableObject
     private NodeViewModel? _node;
     public  NodeViewModel? Node => _node;
 
+    private readonly TokenValidationService _tokenValidator = new();
+
     /// Set by MainWindowViewModel when a game folder is opened.
     public string ActiveGameId { get; set; } = string.Empty;
 
@@ -67,13 +69,13 @@ public partial class NodeDetailViewModel : ObservableObject
     public string DefaultText
     {
         get => _node?.DefaultText ?? string.Empty;
-        set { if (_node != null) _node.DefaultText = value; }
+        set { if (_node != null) { _node.DefaultText = value; OnPropertyChanged(nameof(TokenWarnings)); } }
     }
 
     public string FemaleText
     {
         get => _node?.FemaleText ?? string.Empty;
-        set { if (_node != null) _node.FemaleText = value; }
+        set { if (_node != null) { _node.FemaleText = value; OnPropertyChanged(nameof(TokenWarnings)); } }
     }
 
     public bool IsPlayerChoice
@@ -376,6 +378,40 @@ public partial class NodeDetailViewModel : ObservableObject
                 warnings.Add(Loc.Get("Bark_Warning_PlayerChoiceChild"));
             }
             return warnings;
+        }
+    }
+
+    /// Token/markup validation warnings for the selected node's Default (and, when
+    /// present, Female) text — likely token typos and unbalanced markup. Free-text
+    /// stage directions are never flagged. Recomputed on selection change and on
+    /// Default/Female edits.
+    public IReadOnlyList<string> TokenWarnings
+    {
+        get
+        {
+            if (_node is null) return [];
+            var messages = new List<string>();
+            AppendTokenWarnings(_node.DefaultText, messages);
+            if (_node.HasFemaleText)
+                AppendTokenWarnings(_node.FemaleText, messages);
+            return messages;
+        }
+    }
+
+    private void AppendTokenWarnings(string? text, List<string> into)
+    {
+        if (string.IsNullOrEmpty(text)) return;
+        foreach (var issue in _tokenValidator.Validate(text, ActiveGameId))
+        {
+            var msg = issue.Kind switch
+            {
+                TokenIssueKind.UnbalancedMarkup =>
+                    Loc.Format("Validation_UnbalancedMarkup", issue.Fragment),
+                _ when issue.Suggestion is not null =>
+                    Loc.Format("Validation_UnknownToken_Suggest", issue.Fragment, issue.Suggestion),
+                _ => Loc.Format("Validation_UnknownToken", issue.Fragment),
+            };
+            into.Add(msg);
         }
     }
 
@@ -745,6 +781,7 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(SelectedSpeakerEntry));
         OnPropertyChanged(nameof(SelectedListenerEntry));
         OnPropertyChanged(nameof(BarkWarnings));
+        OnPropertyChanged(nameof(TokenWarnings));
 
         _voCheck = _node is null ? null
             : VoPathResolver.Check(
