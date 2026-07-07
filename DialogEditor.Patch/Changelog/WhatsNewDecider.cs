@@ -12,15 +12,27 @@ public static class WhatsNewDecider
     public static WhatsNewResult Decide(
         string lastSeen, string current, IReadOnlyList<ChangelogRelease> all)
     {
+        // AppVersion.Current carries a "+<git-hash>" build-metadata suffix that changelog
+        // headings never have; strip it so versions compare on their released identity.
+        lastSeen = StripBuildMetadata(lastSeen);
+        current  = StripBuildMetadata(current);
+
         if (string.IsNullOrEmpty(lastSeen) || lastSeen == current)
             return new WhatsNewResult([]);
 
         var newer = new List<ChangelogRelease>();
         foreach (var release in all)
         {
-            if (release.Version == lastSeen) break;   // reached last-seen (exclusive)
+            if (StripBuildMetadata(release.Version) == lastSeen)
+                break;   // reached last-seen (exclusive)
             newer.Add(release);
         }
         return new WhatsNewResult(newer);
+    }
+
+    private static string StripBuildMetadata(string version)
+    {
+        var plus = version.IndexOf('+');
+        return plus < 0 ? version : version[..plus];
     }
 }
