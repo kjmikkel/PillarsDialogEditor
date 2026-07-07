@@ -18,7 +18,8 @@ public record TagEntry(
     string? Example = null,
     int Count = 0,
     string? Notes = null,
-    string? Insert = null);
+    string? Insert = null,
+    bool Lowercase = false);
 
 /// The dialog-text tag vocabulary, engine-verified against both games'
 /// decompiled Conversation.cs (+ PoE2 ShipDuelManager.cs) — see
