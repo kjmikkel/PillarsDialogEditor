@@ -664,6 +664,17 @@ the "Parameter Readability — Beyond Characters" gap tracks that follow-up surv
 
 ### ~~Parameter Readability — Beyond Characters~~ ✓ Implemented
 
+> **Catalogue coverage completed (2026-07-07).** The lookup work below originally applied
+> only to a small hand-authored catalogue (37 scripts / 164 conditions), which covered just
+> ~77 of the 353 signatures used in shipped PoE2 conversations — so most GUID params still
+> showed raw (B-011). The catalogue is now **generated from the decompiled PoE1/PoE2 sources**
+> by a committed tool (`tools/catalogue-gen`): 526 scripts / 461 conditions, with lookup kinds
+> resolved from each param's `BrowserType`/`DataTypeID`. `CatalogueCoverageTests` enforces that
+> every shipped signature is covered (bar 5 documented version-skew signatures). Many
+> `$type`-derived kinds have no runtime `GameDataNameService` loader yet and stay **dormant**
+> (raw display, safe) until one is added — a bounded follow-up. Spec:
+> `docs/superpowers/specs/2026-07-07-catalogue-regeneration-design.md`.
+
 Implemented across commits `ccc27af..0e3ef19` (Tasks 1–9 of the implementation plan at
 `docs/superpowers/plans/2026-06-19-parameter-readability-beyond-characters.md`).
 
