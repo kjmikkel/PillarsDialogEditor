@@ -67,6 +67,10 @@ public static class AppSettings
         // TODO: add "Auto" (OS locale detection) once a non-English translation ships —
         //       would resolve via CultureInfo.CurrentUICulture and fall back to "en".
         public string UiLanguage                     { get; set; } = "en";
+        // The app version last run, for the launch "what's new" greeting. Default ""
+        // means "no baseline yet" — covers both a fresh install and the first upgrade
+        // that adds this key; both set the baseline silently (see design 2026-07-07).
+        public string LastSeenVersion                { get; set; } = "";
     }
 
     public static string? LastLanguage
@@ -218,6 +222,12 @@ public static class AppSettings
     {
         get => Load().UiLanguage;
         set { var s = Load(); s.UiLanguage = value; Save(s); }
+    }
+
+    public static string LastSeenVersion
+    {
+        get => Load().LastSeenVersion;
+        set { var s = Load(); s.LastSeenVersion = value; Save(s); }
     }
 
     public static string PickLanguage(IReadOnlyList<string> available, string? preferred)
