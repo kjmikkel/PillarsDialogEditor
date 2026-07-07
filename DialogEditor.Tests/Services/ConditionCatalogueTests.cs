@@ -136,23 +136,13 @@ public class ConditionCatalogueTests
     }
 
     [Fact]
-    public void IsReputation_Poe2_FactionParam_HasLabeledOptions()
+    public void IsReputation_Poe2_FactionParam_UsesFactionLookup()
     {
+        // Regenerated catalogue is registry-driven: the faction param carries the
+        // "Faction" lookup kind (suggestions come from GameDataNameService at
+        // runtime) rather than a hand-authored inline options/values list.
         var entry = Catalogue.ForGame("poe2").Single(e => e.MethodName == "IsReputation");
         var param = entry.Parameters[0];
-        Assert.NotNull(param.Options);
-        Assert.NotNull(param.Values);
-        Assert.Equal(param.Options!.Count, param.Values!.Count);
-        Assert.Contains("Huana", param.Options);
-        Assert.Contains("Vailian Trading Company", param.Options);
-    }
-
-    [Fact]
-    public void IsReputation_Poe2_FactionParam_LabelsMappedToGuids()
-    {
-        var entry = Catalogue.ForGame("poe2").Single(e => e.MethodName == "IsReputation");
-        var param = entry.Parameters[0];
-        var idx = param.Options!.ToList().IndexOf("Huana");
-        Assert.Equal("5325a7f1-0292-41bb-a223-2c84c005779a", param.Values![idx]);
+        Assert.Equal("Faction", param.LookupKind);
     }
 }

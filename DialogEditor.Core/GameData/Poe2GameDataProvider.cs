@@ -122,8 +122,10 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
         FactionBundle("Disposition",         "DispositionGameData",
                       n => n.EndsWith("Disposition", StringComparison.Ordinal)
                            ? n[..^"Disposition".Length].TrimEnd() : n);
-        // DispositionStrength is stored as ChangeStrengthGameData (DebugName: "Average" etc.)
-        FactionBundle("DispositionStrength", "ChangeStrengthGameData");
+        // ChangeStrengthGameData (DebugName: "Major"/"Minor"/"Average" etc.) is the shared
+        // strength object used by reputation, disposition, and relationship change scripts.
+        // The regenerated catalogue emits the canonical kind "ChangeStrength" for all of them.
+        FactionBundle("ChangeStrength", "ChangeStrengthGameData");
         // PaladinOrder DebugName format: "Bleak_Walkers" — replace underscores.
         FactionBundle("PaladinOrder",        "PaladinOrderGameData",
                       n => n.Replace('_', ' '));

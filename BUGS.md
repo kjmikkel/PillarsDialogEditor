@@ -41,6 +41,16 @@ _None yet._
 
 ## Fixed
 
+### B-011 — Most PoE2 script/condition GUID parameters shown as raw GUIDs (catalogue incompleteness)
+- **Area:** Script/condition parameter editors — `scripts.json` / `conditions.json` catalogue
+- **Severity:** major
+- **Repro:**
+  1. Open a PoE2 project; inspect node 177 of `08_cv_atsura` (an `Add Reputation` / `ReputationAddPoints` On-Enter script).
+  2. Look at the first (Faction) and third (Strength) parameters.
+- **Expected:** Faction and Strength shown as names with lookups.
+- **Actual:** Raw GUIDs. Root cause (found via B-010 follow-up): the hand-authored catalogue held only 37 scripts / 164 conditions and covered just ~77 of the 353 signatures used across shipped PoE2 conversations — 276 missing. Any missing method with GUID params rendered raw (the editor's catalogue entry is nullable → raw fallback). `ReputationAddPoints(Guid, Axis, Guid)` (the PoE2 overload) was entirely absent.
+- **Fixed:** `cd4132e`..`53c6f52` — catalogue regenerated from the decompiled PoE1/PoE2 `Scripts.cs`/`Conditionals.cs` via a committed generator (`tools/catalogue-gen`), resolving lookup kinds (incl. GameData `$type` via each param's DataTypeID). Now 526 scripts / 461 conditions; ReputationAddPoints resolves Faction + ChangeStrength (new runtime loader). Guarded by `CatalogueCoverageTests` (every shipped signature covered, bar 5 documented version-skew ones). Spec: docs/superpowers/specs/2026-07-07-catalogue-regeneration-design.md.
+
 ### B-010 — PoE2 faction reputation GUID shown without useful lookup assistance
 - **Area:** Condition editor / parameter lookups — `conditions.json` (`ReputationRankEquals`, `ReputationRankGreater`)
 - **Severity:** minor
