@@ -41,6 +41,18 @@ _None yet._
 
 ## Fixed
 
+### B-010 — PoE2 faction reputation GUID shown without useful lookup assistance
+- **Area:** Condition editor / parameter lookups — `conditions.json` (`ReputationRankEquals`, `ReputationRankGreater`)
+- **Severity:** minor
+- **Repro:**
+  1. Open a PoE2 project with a game folder loaded.
+  2. Add/edit a condition `Reputation Rank Equals` or `Reputation Rank Greater or Equal`.
+  3. Look at the faction ("Object") GUID field.
+- **Expected:** An autocomplete offering faction names (like `Is Reputation` does), with the stored GUID shown as its faction name.
+- **Actual:** The faction GUID had `lookupKind: "Speaker"` (embedded copy) / no lookupKind at all (`data/` copy), so the field offered the companion/speaker list — which never contains factions — or nothing, and displayed the raw GUID. Effectively no assistance for a faction GUID.
+- **Notes:** The two `conditions.json` copies had drifted on this param (embedded had `Speaker`, `data/` had none). `IsReputation` was already correct (`Faction`).
+- **Fixed:** `c9b34a9` — both copies' faction param now `lookupKind: "Faction"`. Guarded by `ReputationFactionLookupTests` (asserts the faction param of all three reputation conditions uses the Faction lookup).
+
 ### B-009 — Duplicate link via detail panel makes every save silently write nothing
 - **Area:** Canvas connections / save — `ConversationViewModel.AddConnection`, `DiffEngine.DiffNode`
 - **Severity:** major
