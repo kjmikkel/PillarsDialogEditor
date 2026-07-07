@@ -4559,7 +4559,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Faction object to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Faction"
       },
       {
         "name": "Axis",
@@ -4594,7 +4595,8 @@
         "name": "Object",
         "type": "ObjectGuid",
         "description": "Faction object to check.",
-        "default": ""
+        "default": "",
+        "lookupKind": "Faction"
       },
       {
         "name": "Axis",
