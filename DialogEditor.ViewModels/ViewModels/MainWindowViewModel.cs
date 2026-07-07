@@ -214,6 +214,19 @@ public partial class MainWindowViewModel : ObservableObject
     // ── Project open state ────────────────────────────────────────────────
     public bool IsProjectOpen => _project is not null;
 
+    /// The active game id ("poe1"/"poe2"/""), for consumers that validate against
+    /// the tag vocabulary (Flow Analytics token validation).
+    public string ActiveGameId => _activeGameId;
+
+    /// The open conversation's saved translations (language → per-node text), or
+    /// empty when no conversation/patch is loaded. Used by Flow Analytics to
+    /// validate translation text for the open conversation.
+    public IReadOnlyDictionary<string, IReadOnlyList<NodeTranslation>> CurrentConversationTranslations
+        => _project is not null && _currentFile is not null &&
+           _project.Patches.TryGetValue(_currentFile.Name, out var patch)
+            ? patch.Translations
+            : new Dictionary<string, IReadOnlyList<NodeTranslation>>();
+
     /// True when a PoE2 game folder is loaded and a conversation with nodes is open.
     /// Guards the Validate VO menu item and CreateVoValidationViewModel().
     public bool CanValidateVO =>
