@@ -107,8 +107,10 @@
                    HorizontalAlignment="Center" VerticalAlignment="Center"
                    IsVisible="{Binding !HasData}"/>
 
-        <!-- ── Issues list ────────────────────────────────────────────────── -->
-        <ScrollViewer Grid.Row="1" Margin="0,6,0,6">
+        <!-- ── Issues area: flow issues (top) + text-tag issues (bottom) ──── -->
+        <Grid Grid.Row="1" RowDefinitions="*,Auto,*" Margin="0,6,0,6">
+
+        <ScrollViewer Grid.Row="0">
             <ItemsControl ItemsSource="{Binding Issues}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="vm:FlowIssueViewModel">
@@ -154,6 +156,49 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
         </ScrollViewer>
+
+            <!-- Section divider + header for text-tag issues -->
+            <StackPanel Grid.Row="1" Spacing="4" IsVisible="{Binding HasData}">
+                <Separator Background="{DynamicResource Brush.Border.Default}" Height="1" Margin="0,4"/>
+                <TextBlock Classes="section-header"
+                           Text="{DynamicResource FlowAnalytics_TagIssues}"
+                           ToolTip.Tip="{DynamicResource ToolTip_TokenWarnings}"
+                           AutomationProperties.HelpText="{DynamicResource ToolTip_TokenWarnings}"/>
+                <TextBlock Text="{DynamicResource FlowAnalytics_TagIssues_None}"
+                           Foreground="{DynamicResource Brush.Text.Disabled}"
+                           FontSize="{DynamicResource FontSize.Small}" FontStyle="Italic"
+                           IsVisible="{Binding TokenIssues.Count, Converter={StaticResource CountToVis}, ConverterParameter=invert}"/>
+            </StackPanel>
+
+            <!-- Text-tag issues list -->
+            <ScrollViewer Grid.Row="2">
+                <ItemsControl ItemsSource="{Binding TokenIssues}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="vm:TokenIssueRowViewModel">
+                            <Grid ColumnDefinitions="*,Auto" Margin="0,2" Height="28">
+                                <TextBlock Grid.Column="0"
+                                           Text="{Binding DisplayText}"
+                                           Foreground="{DynamicResource Brush.Text.Secondary}"
+                                           FontSize="{DynamicResource FontSize.Label}"
+                                           VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <Button Grid.Column="1"
+                                        Content="→"
+                                        Command="{Binding NavigateCommand}"
+                                        Background="Transparent" BorderThickness="0"
+                                        Foreground="{DynamicResource Brush.Text.Muted}"
+                                        FontSize="{DynamicResource FontSize.Subtitle}"
+                                        Padding="8,0" Margin="4,0,0,0"
+                                        VerticalAlignment="Center"
+                                        ToolTip.Tip="{DynamicResource ToolTip_FlowAnalytics_Navigate}"
+                                        AutomationProperties.HelpText="{DynamicResource ToolTip_FlowAnalytics_Navigate}"
+                                        AutomationProperties.Name="{DynamicResource AutomationName_GoToNode}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
 
         <!-- ── Bottom bar ─────────────────────────────────────────────────── -->
         <Grid Grid.Row="2" ColumnDefinitions="*,Auto">

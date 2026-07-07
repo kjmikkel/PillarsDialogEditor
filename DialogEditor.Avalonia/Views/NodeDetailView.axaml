@@ -351,6 +351,21 @@
                     </ItemsControl>
                 </Border>
 
+                <Border Background="{DynamicResource Brush.Validation.Background}" BorderBrush="{DynamicResource Brush.Validation.Border}" BorderThickness="1"
+                        CornerRadius="2" Padding="6,4" Margin="0,0,0,4"
+                        IsVisible="{Binding TokenWarnings.Count, Converter={StaticResource CountToVis}}"
+                        ToolTip.Tip="{DynamicResource ToolTip_TokenWarnings}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_TokenWarnings}">
+                    <ItemsControl ItemsSource="{Binding TokenWarnings}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Foreground="{DynamicResource Brush.Validation.Text}"
+                                           FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+
                 <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_Persistence}"/>
                 <ComboBox Classes="detail-combo"
                           ItemsSource="{x:Static vm:NodeDetailViewModel.PersistenceOptions}"

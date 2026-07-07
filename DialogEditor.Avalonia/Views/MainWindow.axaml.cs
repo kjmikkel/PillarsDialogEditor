@@ -420,7 +420,9 @@ public partial class MainWindow : Window
                 {
                     var node = vm.Canvas.Nodes.FirstOrDefault(n => n.NodeId == nodeId);
                     if (node is not null) CanvasView.ScrollToNode(node);
-                });
+                },
+                () => vm.CurrentConversationTranslations,
+                vm.ActiveGameId);
 
             _flowAnalyticsWindow = new FlowAnalyticsWindow(analyticsVm);
 
