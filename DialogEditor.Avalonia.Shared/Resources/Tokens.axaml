@@ -161,6 +161,11 @@
     <SolidColorBrush x:Key="Brush.Bark.Detail.Border"    Color="{StaticResource Palette.Amber.900}"/>
     <SolidColorBrush x:Key="Brush.Bark.Detail.Text"      Color="{StaticResource Palette.Amber.560}"/>
     <SolidColorBrush x:Key="Brush.Node.Bark.Outline"     Color="{StaticResource Palette.Amber.520}"/>
+
+    <!-- Token/markup validation warning box (node detail panel + flow analytics) -->
+    <SolidColorBrush x:Key="Brush.Validation.Background" Color="{StaticResource Palette.Amber.950}"/>
+    <SolidColorBrush x:Key="Brush.Validation.Border"     Color="{StaticResource Palette.Amber.900}"/>
+    <SolidColorBrush x:Key="Brush.Validation.Text"       Color="{StaticResource Palette.Amber.560}"/>
     <SolidColorBrush x:Key="Brush.Node.Quotidian.Note"   Color="{StaticResource Palette.Olive.500}"/>
 
     <!-- Annotation boxes — seven curated colours, each with Fill/Header/Stroke.
