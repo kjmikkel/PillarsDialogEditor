@@ -4671,7 +4671,7 @@
         "type": "ObjectGuid",
         "description": "Faction object to check.",
         "default": "",
-        "lookupKind": "Speaker"
+        "lookupKind": "Faction"
       },
       {
         "name": "Axis",
@@ -4707,7 +4707,7 @@
         "type": "ObjectGuid",
         "description": "Faction object to check.",
         "default": "",
-        "lookupKind": "Speaker"
+        "lookupKind": "Faction"
       },
       {
         "name": "Axis",
