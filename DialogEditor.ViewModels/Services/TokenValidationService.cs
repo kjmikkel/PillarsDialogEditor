@@ -30,7 +30,7 @@ public sealed class TokenValidationService
 
         var issues = new List<TokenIssue>();
         ValidateTokens(text, gameId, issues);
-        // Task 3 adds: ValidateMarkup(text, gameId, issues);
+        ValidateMarkup(text, gameId, issues);
         return issues;
     }
 
@@ -48,6 +48,53 @@ public sealed class TokenValidationService
                 issues.Add(new TokenIssue(
                     TokenIssueKind.UnknownToken, span, suggestion, m.Index));
             // else: assumed a free-text convention → silent
+        }
+    }
+
+    // ── Unbalanced-markup detection ──────────────────────────────────────
+    // Matches an opening tag "<name" or "<name ...", a closing tag "</name>",
+    // capturing the tag name. Attribute content is deliberately not parsed.
+    private static readonly Regex TagToken =
+        new(@"<(?<close>/?)(?<name>[a-zA-Z]+)[^>]*?>", RegexOptions.Compiled);
+
+    // The paired markup tag names we balance-check. Self-closing "sprite" is
+    // intentionally excluded. Only known markup names are checked, so unknown
+    // tags (e.g. "<b>") are ignored (leniency).
+    private static readonly HashSet<string> PairedMarkup =
+        new(System.StringComparer.OrdinalIgnoreCase)
+        { "i", "ispeech", "xg", "color", "link" };
+
+    private void ValidateMarkup(string text, string gameId, List<TokenIssue> issues)
+    {
+        var stack = new Stack<(string Name, int Pos, string Frag)>();
+
+        foreach (Match m in TagToken.Matches(text))
+        {
+            var name = m.Groups["name"].Value;
+            if (!PairedMarkup.Contains(name)) continue;   // unknown/self-closing → ignore
+            var isClose = m.Groups["close"].Value == "/";
+
+            if (!isClose)
+            {
+                stack.Push((name, m.Index, $"<{name}>"));
+            }
+            else if (stack.Count > 0 &&
+                     string.Equals(stack.Peek().Name, name, System.StringComparison.OrdinalIgnoreCase))
+            {
+                stack.Pop();
+            }
+            else
+            {
+                issues.Add(new TokenIssue(
+                    TokenIssueKind.UnbalancedMarkup, $"</{name}>", null, m.Index));
+            }
+        }
+
+        while (stack.Count > 0)
+        {
+            var open = stack.Pop();
+            issues.Add(new TokenIssue(
+                TokenIssueKind.UnbalancedMarkup, open.Frag, null, open.Pos));
         }
     }
 
