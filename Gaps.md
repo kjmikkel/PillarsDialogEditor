@@ -57,9 +57,10 @@ tokens (count 0 in shipped dialog) are badged as such. The catalogue lives in
 consume it. Human-readable docs: `data/tags-poe1.md` / `data/tags-poe2.md`.
 Spec: docs/superpowers/specs/2026-07-05-tag-reference-window-design.md.
 
-### Token autocomplete and validation in node text editing
+### Token autocomplete and validation in node text editing ✅ IMPLEMENTED (both assists)
 The node text editor treats `[Player Name]`, `<i>…</i>`, etc. as plain text. Two
-assists, both game-aware and driven by the same vocabulary as the reference window:
+assists, both game-aware and driven by the same vocabulary as the reference window
+(both now shipped):
 - **Autocomplete ✅ IMPLEMENTED (2026-07-06).** Typing `[` (or `<`) in the node's
   Default/Female text fields opens an IDE-style popup of the known substitution
   tokens / markup tags for the open game (no `[ShipDuel_*]` for PoE1; union when no
@@ -71,17 +72,20 @@ assists, both game-aware and driven by the same vocabulary as the reference wind
   `insert` field in `tags.json`. Pure `TokenCompletionService` (context detection,
   candidate ranking, apply-edit) + a thin `TokenCompletion` attached behaviour on the
   TextBoxes. Spec: docs/superpowers/specs/2026-07-06-token-autocomplete-design.md.
-- **Validation** — warn on *identifier-shaped* unknown tokens (e.g. `[Player Nmae]`)
-  and unbalanced markup pairs (`<i>` without `</i>`). Must NOT flag free-text stage
-  directions (`[Say nothing.]`, `[Draw your weapons and attack.]`) or language markers
-  (`[Vailian]`) — sentence-like bracket content is a writing convention, ~1,300 distinct
-  values in shipped data. Shipped data also contains malformed `<link>` attributes
-  (missing closing quote), so validation of vanilla text must stay lenient/informational.
-Open question feeding both: confirm the exact token list and case-insensitivity
-(`[player class]` occurs lowercase in shipped data) from the token-replacement code
-instead of inferring from text. Decompiled sources are available locally:
-PoE1 at `C:\Users\kjmik\Documents\Programming\Deadfire\PoE1 Code`, PoE2 at
-`C:\Users\kjmik\Documents\Programming\Deadfire\PoE2 Code`.
+- **Validation ✅ IMPLEMENTED (2026-07-07).** Hybrid unknown-token detection
+  (fuzzy "did you mean" over digit-normalised forms, so both `[Player Nmae]` and
+  `[Specfied 0]` are caught with a suggestion) plus tag-name-only markup balance
+  (lenient on vanilla malformed attributes — the shipped `<link>` missing-quote case
+  passes because attribute syntax is never parsed). Free-text stage directions /
+  language markers are never flagged, guarded by a shipped-convention false-positive
+  regression test. Case-insensitivity is data-driven: a `lowercase` flag in
+  `tags.json` marks the five Player tokens whose all-lowercase form PoE2 substitutes
+  (`[player race]` etc.); PoE1 stays exact-case. Surfaced as a live amber warning box
+  in the node detail panel (Default/Female) and a "Text tag issues" section in Flow
+  Analytics (the open conversation's Default/Female + every translation language).
+  Pure `TokenValidationService` (`DialogEditor.ViewModels`). Per-conversation scope;
+  a project-wide translation sweep is deferred. Spec:
+  docs/superpowers/specs/2026-07-07-token-validation-design.md.
 
 ### ~~Export Mod Bundle without VO~~ ✓ Resolved by descoping (2026-07-05)
 Use-case analysis rejected the proposed with-VO/without-VO export choice: the only
