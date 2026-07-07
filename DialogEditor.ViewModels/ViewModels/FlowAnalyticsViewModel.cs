@@ -3,7 +3,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Analytics;
 using DialogEditor.Core.Editing;
+using DialogEditor.Core.Models;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.ViewModels;
 
@@ -48,10 +50,37 @@ public partial class FlowIssueViewModel : ObservableObject
     private void Navigate() => _navigate(NodeId);
 }
 
+public partial class TokenIssueRowViewModel : ObservableObject
+{
+    private readonly Action<int> _navigate;
+
+    public int    NodeId   { get; }
+    public string Language { get; }   // "" for Default/Female text
+    public string Message  { get; }
+
+    public string DisplayText => string.IsNullOrEmpty(Language)
+        ? Loc.Format("FlowAnalytics_TagIssue_Row_Default", NodeId, Message)
+        : Loc.Format("FlowAnalytics_TagIssue_Row", NodeId, Language, Message);
+
+    public TokenIssueRowViewModel(int nodeId, string language, string message, Action<int> navigate)
+    {
+        NodeId    = nodeId;
+        Language  = language;
+        Message   = message;
+        _navigate = navigate;
+    }
+
+    [RelayCommand]
+    private void Navigate() => _navigate(NodeId);
+}
+
 public partial class FlowAnalyticsViewModel : ObservableObject
 {
     private readonly Func<ConversationEditSnapshot?> _getSnapshot;
     private readonly Action<int>                     _navigateToNode;
+    private readonly Func<IReadOnlyDictionary<string, IReadOnlyList<NodeTranslation>>> _getTranslations;
+    private readonly string                          _gameId;
+    private readonly TokenValidationService          _tokenValidator = new();
 
     [ObservableProperty] private FlowStatistics? _statistics;
     [ObservableProperty] private string          _statusText             = string.Empty;
@@ -59,14 +88,20 @@ public partial class FlowAnalyticsViewModel : ObservableObject
     [ObservableProperty] private string          _conditionalLinksDisplay = string.Empty;
     [ObservableProperty] private bool            _hasData;
 
-    public ObservableCollection<FlowIssueViewModel> Issues { get; } = [];
+    public ObservableCollection<FlowIssueViewModel>   Issues      { get; } = [];
+    public ObservableCollection<TokenIssueRowViewModel> TokenIssues { get; } = [];
 
     public FlowAnalyticsViewModel(
         Func<ConversationEditSnapshot?> getSnapshot,
-        Action<int>                     navigateToNode)
+        Action<int>                     navigateToNode,
+        Func<IReadOnlyDictionary<string, IReadOnlyList<NodeTranslation>>>? getTranslations = null,
+        string                          gameId = "")
     {
-        _getSnapshot    = getSnapshot;
-        _navigateToNode = navigateToNode;
+        _getSnapshot     = getSnapshot;
+        _navigateToNode  = navigateToNode;
+        _getTranslations = getTranslations
+            ?? (() => new Dictionary<string, IReadOnlyList<NodeTranslation>>());
+        _gameId          = gameId;
     }
 
     [RelayCommand]
@@ -106,6 +141,37 @@ public partial class FlowAnalyticsViewModel : ObservableObject
             : Loc.Get("FlowAnalytics_NoIssues");
         LastAnalysed = Loc.Format("FlowAnalytics_LastAnalysed",
             DateTime.Now.ToString("HH:mm:ss"));
+
+        // ── Token/markup validation (Default/Female + translations) ──────────
+        TokenIssues.Clear();
+        foreach (var node in snapshot.Nodes)
+        {
+            AddTokenIssues(node.NodeId, "", node.DefaultText);
+            AddTokenIssues(node.NodeId, "", node.FemaleText);
+        }
+        foreach (var (lang, entries) in _getTranslations())
+            foreach (var t in entries)
+            {
+                AddTokenIssues(t.NodeId, lang, t.DefaultText);
+                AddTokenIssues(t.NodeId, lang, t.FemaleText);
+            }
+    }
+
+    private void AddTokenIssues(int nodeId, string language, string? text)
+    {
+        if (string.IsNullOrEmpty(text)) return;
+        foreach (var issue in _tokenValidator.Validate(text, _gameId))
+        {
+            var msg = issue.Kind switch
+            {
+                TokenIssueKind.UnbalancedMarkup =>
+                    Loc.Format("Validation_UnbalancedMarkup", issue.Fragment),
+                _ when issue.Suggestion is not null =>
+                    Loc.Format("Validation_UnknownToken_Suggest", issue.Fragment, issue.Suggestion),
+                _ => Loc.Format("Validation_UnknownToken", issue.Fragment),
+            };
+            TokenIssues.Add(new TokenIssueRowViewModel(nodeId, language, msg, _navigateToNode));
+        }
     }
 
     private static string Truncate(string text, int maxLength)
