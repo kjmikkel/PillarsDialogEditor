@@ -78,6 +78,8 @@ public partial class MainWindow : Window
             window.Show();
             window.Activate();
         };
+        // Launch greeting: show "what's new" once if the app version advanced.
+        vm.ShowWhatsNewIfUpdated();
         vm.ShowTagReference = tagVm =>
         {
             // Cached instance: reopening the menu item focuses the open window.

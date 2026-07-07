@@ -1,11 +1,17 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="DialogEditor.Avalonia.Views.ChangelogWindow"
-        Title="{DynamicResource Changelog_Title}"
+        Title="{Binding WindowTitle}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="460" Height="560" MinHeight="320" CanResize="True"
         ShowInTaskbar="False" Background="{DynamicResource Brush.Surface.Info}">
     <DockPanel Margin="14,12,14,12">
+        <TextBlock DockPanel.Dock="Top"
+                   IsVisible="{Binding ShowHeader}"
+                   Text="{Binding HeaderText}"
+                   FontWeight="Bold" FontSize="{DynamicResource FontSize.Subtitle}"
+                   Foreground="{DynamicResource Brush.Text.Emphasis}"
+                   Margin="0,0,0,10" TextWrapping="Wrap"/>
         <Button DockPanel.Dock="Bottom" HorizontalAlignment="Right" Margin="0,10,0,0"
                 Content="{DynamicResource Changelog_Close}"
                 ToolTip.Tip="{DynamicResource Changelog_Close}"
