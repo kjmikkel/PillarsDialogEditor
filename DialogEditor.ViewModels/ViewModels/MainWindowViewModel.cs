@@ -1487,6 +1487,37 @@ public partial class MainWindowViewModel : ObservableObject
     /// Set by the UI layer to open the changelog reader window.
     public Action<ChangelogViewModel>? ShowChangelog { get; set; }
 
+    // Test seams for the launch "what's new" greeting (default to AppSettings/AppVersion).
+    public Func<string>?   LastSeenVersionGetter  { get; set; }
+    public Action<string>? LastSeenVersionSetter  { get; set; }
+    public Func<string>?   CurrentVersionProvider { get; set; }
+
+    /// Called once at startup: if the app version advanced since last run, open the
+    /// changelog filtered to the new releases. Always records the current version so it
+    /// never re-shows. See docs/superpowers/specs/2026-07-07-whats-new-on-launch-design.md.
+    public void ShowWhatsNewIfUpdated()
+    {
+        var current = (CurrentVersionProvider ?? (() => AppVersion.Current))();
+        if (string.IsNullOrEmpty(current) || current == "unknown")
+            return; // no usable version — never show, never poison the baseline
+
+        var lastSeen = (LastSeenVersionGetter ?? (() => AppSettings.LastSeenVersion))();
+
+        var read     = ChangelogReader ?? DefaultChangelogReader;
+        var text     = read();
+        if (text is null) AppLog.Warn("What's new: CHANGELOG.md unavailable.");
+        var releases = text is null
+            ? Array.Empty<ChangelogRelease>()
+            : ChangelogParser.Parse(text);
+
+        var result = WhatsNewDecider.Decide(lastSeen, current, releases);
+        if (result.ReleasesToShow.Count > 0)
+            ShowChangelog?.Invoke(new ChangelogViewModel(
+                result.ReleasesToShow, isWhatsNew: true, version: current));
+
+        (LastSeenVersionSetter ?? (v => AppSettings.LastSeenVersion = v))(current);
+    }
+
     [RelayCommand]
     private void Changelog()
     {
