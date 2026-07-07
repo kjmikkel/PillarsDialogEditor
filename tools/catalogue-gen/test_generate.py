@@ -145,6 +145,19 @@ def test_merge_unions_games_for_same_signature():
     assert byfn["Void G()"]["games"] == ["poe2"]
 
 
+def test_param_kind_override_applies():
+    src = r'''
+    [ConditionalScript("Reputation Rank Equals", "Conditionals\\Faction")]
+    [ScriptParam0("Object", "Object to check.", "", Scripts.BrowserType.ObjectGuid)]
+    [ScriptParam1("Axis", "a", "Positive")]
+    [ScriptParam2("Ranks", "r", "0")]
+    public static bool ReputationRankEquals(Guid objectGuid, Axis axis, int rank) { }
+    '''
+    e = generate.parse_source(src, "condition", enums={})[0]
+    assert e["parameters"][0]["lookupKind"] == "Faction"
+    assert e["parameters"][0]["type"] == "GameData"
+
+
 if __name__ == "__main__":
     fns = [v for k, v in sorted(globals().items()) if k.startswith("test_") and callable(v)]
     for fn in fns:

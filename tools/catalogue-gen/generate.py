@@ -54,6 +54,15 @@ _KIND_ALIAS = {
     "GenericAbility": "Ability",   # abilities.gamedatabundle is loaded as "Ability"
 }
 
+# Deliberate corrections where the decompiled source's BrowserType is unhelpful.
+# (method name, param index) -> lookupKind. These faction-reputation conditions
+# mark their faction reference as ObjectGuid (Speaker), but store faction GUIDs,
+# so the Speaker list never matches — use Faction instead (see BUGS.md B-010).
+_PARAM_KIND_OVERRIDE = {
+    ("ReputationRankEquals", 0): "Faction",
+    ("ReputationRankGreater", 0): "Faction",
+}
+
 
 def type_to_kind(typename):
     if typename in _TYPE_KIND_OVERRIDE:
@@ -219,7 +228,12 @@ def _build_entry(mm, attrs, enums, guid_index, game, datatype_index):
     params = []
     for i, clr in enumerate(clr_types):
         pa = param_attrs.get(i)
-        params.append(_build_param(i, clr, pa, enums, guid_index, datatype_index))
+        p = _build_param(i, clr, pa, enums, guid_index, datatype_index)
+        override = _PARAM_KIND_OVERRIDE.get((name, i))
+        if override:
+            p["type"] = "GameData"
+            p["lookupKind"] = override
+        params.append(p)
 
     return {
         "methodName": name,
