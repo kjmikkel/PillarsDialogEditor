@@ -410,6 +410,9 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Option_DisplayBark">Bark</sys:String>
     <sys:String x:Key="Bark_Warning_TextTooLong">Bark text is {1} characters — exceeds the {0}-character yardstick (longest bark in either shipped game) and may overflow the in-game bubble.</sys:String>
     <sys:String x:Key="Bark_Warning_PlayerChoiceChild">Bark nodes should not lead to player choice responses.</sys:String>
+    <sys:String x:Key="Validation_UnknownToken_Suggest">Unknown tag "{0}" — did you mean "{1}"?</sys:String>
+    <sys:String x:Key="Validation_UnknownToken">Unknown tag "{0}".</sys:String>
+    <sys:String x:Key="Validation_UnbalancedMarkup">Unbalanced markup "{0}" — check the opening/closing tags match.</sys:String>
     <sys:String x:Key="Option_PersistenceNone">None</sys:String>
     <sys:String x:Key="Option_PersistenceOnceEver">OnceEver</sys:String>
 
@@ -478,6 +481,7 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_ListenerGuid">GUID of the listening character — edit directly or use the name picker above</sys:String>
     <sys:String x:Key="ToolTip_DisplayType">How this node is presented to the player (Conversation = full portrait, Bark = floating text)</sys:String>
     <sys:String x:Key="ToolTip_BarkWarnings">Bark-specific validation warnings. These do not block saving — they help writers avoid common mistakes.</sys:String>
+    <sys:String x:Key="ToolTip_TokenWarnings">Possible problems with substitution tokens or markup in this line's text. These are warnings, not errors — free-text stage directions are never flagged.</sys:String>
     <sys:String x:Key="ToolTip_Persistence">OnceEver hides this node after it has been shown once, even across saves</sys:String>
     <sys:String x:Key="ToolTip_ActorDirection">Optional director's note for the voice actor — not shown to players</sys:String>
     <sys:String x:Key="ToolTip_HasVO">Check if a voice-over recording exists for this line</sys:String>
