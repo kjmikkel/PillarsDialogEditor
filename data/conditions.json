@@ -2354,10 +2354,10 @@
     "parameters": [
       {
         "name": "Object",
-        "type": "ObjectGuid",
+        "type": "GameData",
         "description": "Object to check.",
         "default": "",
-        "lookupKind": "Speaker"
+        "lookupKind": "Faction"
       },
       {
         "name": "Axis",
@@ -2389,10 +2389,10 @@
     "parameters": [
       {
         "name": "Object",
-        "type": "ObjectGuid",
+        "type": "GameData",
         "description": "Object to check",
         "default": "",
-        "lookupKind": "Speaker"
+        "lookupKind": "Faction"
       },
       {
         "name": "Axis",

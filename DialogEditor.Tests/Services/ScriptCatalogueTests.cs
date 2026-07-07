@@ -42,7 +42,7 @@ public class ScriptCatalogueTests
     {
         var entry = Catalogue.Find("SetGlobalValue")!;
         Assert.NotEmpty(entry.Parameters);
-        Assert.Equal("Tag", entry.Parameters[0].Name);
+        Assert.Equal("Name", entry.Parameters[0].Name);
     }
 
     [Fact]
