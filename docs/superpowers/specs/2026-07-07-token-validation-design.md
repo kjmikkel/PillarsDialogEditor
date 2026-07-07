@@ -103,15 +103,17 @@ surfaces).
    uses the union of both games' tokens, matching the autocomplete side's
    over-offer-rather-than-hide stance; lowercase variants require an explicit PoE2
    context.)
-2. **Fuzzy near-miss** — Damerau-Levenshtein distance (transposition-aware; typos
-   like `Nmae` are a single transposition) from `X` to the nearest known token name,
-   within a conservative length-relative threshold → flag `UnknownToken` with the
-   nearest name as `Suggestion` ("did you mean '[Player Name]'?").
-3. **Parameterised shape** — `X` is identifier word(s) + whitespace + digits (e.g.
-   `Specfied 0`) whose identifier part is not a known parameterised token
-   (`Specified`/`SkillCheck`/`Slot`) → flag `UnknownToken` with no suggestion
-   ("looks like a token but isn't recognised").
-4. **Otherwise** → assumed free-text convention, **silent**.
+2. **Fuzzy near-miss (Hybrid, unified)** — Damerau-Levenshtein distance
+   (transposition-aware; typos like `Nmae` are a single transposition) from `X` to
+   the nearest known token name, within a conservative length-relative threshold →
+   flag `UnknownToken` with the nearest name as `Suggestion` ("did you mean
+   '[Player Name]'?"). **Before the distance check, a trailing run of digits in both
+   `X` and each parameterised candidate is normalized to `n`** (`Specfied 0` →
+   `Specfied n`), so a parameterised-token typo (`[Specfied 0]`) fuzzy-matches its
+   family (`[Specified n]`) and gets a suggestion. This subsumes the "parameterised
+   shape" catch into the fuzzy rule — a strict improvement over a suggestion-less
+   flag, and still conservative because it only fires on genuine near-misses.
+3. **Otherwise** → assumed free-text convention, **silent**.
 
 Threshold tuning is conservative and pinned by the false-positive regression test
 (below): short tokens use a tighter absolute threshold so `[Loot]`/`[Lie]`-style
@@ -190,7 +192,8 @@ There is no single project-wide translation sweep today; see "Deferred".
   form of a token *without* `"lowercase"` (e.g. `[player name]`) is flagged with a
   "did you mean" suggestion.
 - Fuzzy: `[Player Nmae]` → `UnknownToken`, suggestion `[Player Name]`.
-- Parameterised shape: `[Specfied 0]` → `UnknownToken`, no suggestion.
+- Parameterised typo: `[Specfied 0]` → `UnknownToken`, suggestion `[Specified n]`
+  (via digit-normalization); valid `[Specified 0]`/`[Slot 3]` → zero issues.
 - **Silent on conventions:** `[Say nothing.]`, `[Draw your weapons and attack.]`,
   `[Attack]`, `[Lie]`, `[Vailian]`, `[Pained grunt]`, `[Diplomacy]` → **zero** issues.
 - Markup: `<i>` without `</i>` flagged; unmatched `</i>` flagged; nested
