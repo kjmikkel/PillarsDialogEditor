@@ -171,6 +171,24 @@ public class Poe2GameDataProviderTests : IDisposable
     }
 
     [Fact]
+    public void LoadGameDataNames_RegistersChangeStrength_FromFactionsBundle()
+    {
+        var gameDataDir = Path.Combine(_root, "PillarsOfEternityII_Data", "exported", "design", "gamedata");
+        Directory.CreateDirectory(gameDataDir);
+        File.WriteAllText(Path.Combine(gameDataDir, "factions.gamedatabundle"), """
+            {"GameDataObjects":[
+              {"$type":"Game.GameData.ChangeStrengthGameData, Assembly-CSharp",
+               "DebugName":"Major","ID":"e19a6f92-2165-4e34-be10-c65e8de970eb"}
+            ]}
+            """);
+
+        var names = _provider.LoadGameDataNames();
+
+        Assert.True(names.ContainsKey("ChangeStrength"));
+        Assert.Contains(names["ChangeStrength"], e => e.Name == "Major");
+    }
+
+    [Fact]
     public void LoadSpeakerNames_WithoutSpeakersFile_ReturnsEmpty()
     {
         var names = _provider.LoadSpeakerNames();
