@@ -87,61 +87,80 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
         var result = new Dictionary<string, IReadOnlyList<GameDataEntry>>();
         var gdRoot = GameDataRoot;
 
-        void Bundle(string kind, string filename, Func<string, string>? clean = null, string? typeFilter = null)
+        // ── Phase 1 — generic sweep ──────────────────────────────────────────
+        // Parse every bundle once, bucket objects by short $type, and register each
+        // bucket under GameDataKindMapper.TypeToKind. This lights up every
+        // bundle-backed lookup kind the generated catalogue references (Ship, Team,
+        // Affliction, Schedule, CreatureType, …) and any future kind, with zero
+        // per-kind code. Spec: docs/superpowers/specs/2026-07-09-lookup-kind-sweep-design.md.
+        if (Directory.Exists(gdRoot))
         {
-            var entries = Poe2GameDataBundleParser.ParseFile(Path.Combine(gdRoot, filename), clean, typeFilter);
-            if (entries.Count > 0) result[kind] = entries;
+            var byKind = new Dictionary<string, List<GameDataEntry>>(StringComparer.Ordinal);
+            foreach (var file in Directory.EnumerateFiles(gdRoot, "*.gamedatabundle"))
+            {
+                foreach (var (shortType, entries) in Poe2GameDataBundleParser.ParseAllByTypeFile(file))
+                {
+                    var kind = GameDataKindMapper.TypeToKind(shortType);
+                    if (!byKind.TryGetValue(kind, out var list))
+                        byKind[kind] = list = [];
+                    list.AddRange(entries);
+                }
+            }
+            foreach (var (kind, entries) in byKind)
+                result[kind] = entries;
+
+            // ── Phase 1.5 — inheritance composition ─────────────────────────
+            // The sweep buckets by EXACT $type, but a param whose DataTypeID names a
+            // base class accepts every subclass instance. Compose buckets to match,
+            // for the base kinds the catalogue references. Hierarchy verified against
+            // the decompiled Game.GameData sources (2026-07-09):
+            //   WeaponGameData ⊂ EquippableGameData ⊂ ItemGameData; ConsumableGameData ⊂ ItemGameData
+            //   AfflictionGameData ⊂ StatusEffectGameData
+            //   GenericAbilityGameData / PhraseGameData ⊂ ProgressionUnlockableGameData
+            //   Attack*GameData ⊂ AttackBaseGameData
+            void ComposeInto(string parent, params string[] children)
+            {
+                var union = result.TryGetValue(parent, out var own)
+                    ? new List<GameDataEntry>(own) : [];
+                foreach (var child in children)
+                    if (result.TryGetValue(child, out var entries))
+                        union.AddRange(entries);
+                if (union.Count > 0) result[parent] = union;
+            }
+
+            ComposeInto("Equippable", "Weapon");
+            ComposeInto("Item", "Equippable", "Consumable"); // Equippable already holds weapons
+            ComposeInto("StatusEffect", "Affliction");
+            ComposeInto("ProgressionUnlockable", "Ability", "Phrase");
+            ComposeInto("AttackBase",
+                result.Keys.Where(k => k.StartsWith("Attack", StringComparison.Ordinal)
+                                    && k != "AttackBase").ToArray());
         }
 
+        // ── Phase 2 — explicit overrides (overwrite the sweep) ──────────────
+        // Only kinds needing cleaning/filtering the sweep can't express.
         void FactionBundle(string kind, string typeFilter, Func<string, string>? clean = null)
-            => Bundle(kind, "factions.gamedatabundle", clean, typeFilter);
-
-        void CharBundle(string kind, string typeFilter,
-                        Func<string, string>? clean = null,
-                        Func<IReadOnlyList<JsonElement>, bool>? componentFilter = null)
         {
             var entries = Poe2GameDataBundleParser.ParseFile(
-                Path.Combine(gdRoot, "characters.gamedatabundle"), clean, typeFilter, componentFilter);
+                Path.Combine(gdRoot, "factions.gamedatabundle"), clean, typeFilter);
             if (entries.Count > 0) result[kind] = entries;
         }
 
-        // ── Single-kind bundles ──────────────────────────────────────────────
-        Bundle("Item",         "items.gamedatabundle");
-        Bundle("Ability",      "abilities.gamedatabundle");
-        Bundle("StatusEffect", "statuseffects.gamedatabundle");
-        // abilities.gamedatabundle also contains phrases — register separately with $type filter.
-        Bundle("Phrase",  "abilities.gamedatabundle", typeFilter: "PhraseGameData");
-        Bundle("Keyword", "gui.gamedatabundle",       typeFilter: "KeywordGameData");
-        Bundle("Map",     "worldmap.gamedatabundle",  typeFilter: "MapGameData");
-
-        // ── factions.gamedatabundle — multi-kind ─────────────────────────────
-        // All share the file; a $type filter extracts each kind independently.
-        FactionBundle("Faction",             "FactionGameData");
-        FactionBundle("Deity",               "DeityGameData");
         // Disposition DebugName format: "<Name>Disposition" — strip the suffix.
-        FactionBundle("Disposition",         "DispositionGameData",
+        FactionBundle("Disposition", "DispositionGameData",
                       n => n.EndsWith("Disposition", StringComparison.Ordinal)
                            ? n[..^"Disposition".Length].TrimEnd() : n);
-        // ChangeStrengthGameData (DebugName: "Major"/"Minor"/"Average" etc.) is the shared
-        // strength object used by reputation, disposition, and relationship change scripts.
-        // The regenerated catalogue emits the canonical kind "ChangeStrength" for all of them.
-        FactionBundle("ChangeStrength", "ChangeStrengthGameData");
         // PaladinOrder DebugName format: "Bleak_Walkers" — replace underscores.
-        FactionBundle("PaladinOrder",        "PaladinOrderGameData",
+        FactionBundle("PaladinOrder", "PaladinOrderGameData",
                       n => n.Replace('_', ' '));
 
-        // ── characters.gamedatabundle — multi-kind ───────────────────────────
-        // Confirmed: Class=BaseStatsGameData, Race=RaceGameData.
-        // Subrace/Background/Culture $type names inferred; return empty if wrong (plain text fallback).
-        // BaseStatsGameData also includes NPC creature archetypes — filter to IsPlayerClass:"true".
-        CharBundle("Class", "BaseStatsGameData", componentFilter: IsPlayerClassComponent);
-        CharBundle("Race",       "RaceGameData");
-        CharBundle("Subrace",    "SubraceGameData");
-        CharBundle("Background", "BackgroundGameData");
-        CharBundle("Culture",    "CultureGameData");
+        // Class: BaseStatsGameData includes NPC creature archetypes — keep only
+        // playable classes (IsPlayerClass:"true"); the sweep's bucket is unfiltered.
+        var classEntries = Poe2GameDataBundleParser.ParseFile(
+            Path.Combine(gdRoot, "characters.gamedatabundle"),
+            typeFilter: "BaseStatsGameData", componentFilter: IsPlayerClassComponent);
+        if (classEntries.Count > 0) result["Class"] = classEntries;
 
-        // ── global.gamedatabundle ────────────────────────────────────────────
-        Bundle("Skill", "global.gamedatabundle", typeFilter: "SkillGameData");
         // WeaponType conditions store DebugName (e.g. "Unarmed"), not the GUID → strip Id.
         var weaponEntries = Poe2GameDataBundleParser
             .ParseFile(Path.Combine(gdRoot, "global.gamedatabundle"), typeFilter: "WeaponTypeGameData")
@@ -177,10 +196,10 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
             if (conversations.Count > 0) result["Conversation"] = conversations;
         }
 
-        // Deferred — no data source located:
-        // ArmorType:    GUID-keyed but ArmorTypeGameData absent from all bundles; condition unused in game.
-        // CreatureType: GUID-keyed but CreatureTypeGameData absent from all bundles.
-        // Parameters for these kinds fall back to plain-text input.
+        // Kinds with no bundle-backed $type stay dormant (empty suggestions, raw GUID
+        // display — safe): ProgressionUnlockable, AttackBase, and the generic "GameData"
+        // fallback kind. ArmorTypeGameData is also absent from shipped bundles; if a
+        // patch ever adds it, the sweep registers it automatically.
 
         return result;
     }

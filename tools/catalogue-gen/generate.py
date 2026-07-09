@@ -42,6 +42,8 @@ _BROWSER_KIND = {
 # GameData $type -> lookupKind. Any *ItemGameData -> Item; otherwise strip the
 # trailing "GameData". A few explicit overrides keep names aligned with the
 # runtime loaders (GameDataNameService kinds).
+# MUST mirror DialogEditor.Core/GameData/GameDataKindMapper.cs (the runtime
+# sweep resolves the kind names this generator stamps into the catalogue).
 _TYPE_KIND_OVERRIDE = {
     "BaseStatsGameData": "Class",
 }

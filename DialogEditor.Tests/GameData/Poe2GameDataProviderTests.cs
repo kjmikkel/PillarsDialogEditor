@@ -170,6 +170,143 @@ public class Poe2GameDataProviderTests : IDisposable
         Assert.Equal("TestSpeaker", names["bbbbbbbb-0000-0000-0000-000000000001"]);
     }
 
+    private string GameDataDir()
+    {
+        var dir = Path.Combine(_root, "PillarsOfEternityII_Data", "exported", "design", "gamedata");
+        Directory.CreateDirectory(dir);
+        return dir;
+    }
+
+    [Fact]
+    public void LoadGameDataNames_Sweep_RegistersShipFromShipsBundle()
+    {
+        File.WriteAllText(Path.Combine(GameDataDir(), "ships.gamedatabundle"), """
+            {"GameDataObjects":[
+              {"$type":"Game.GameData.ShipGameData, Assembly-CSharp",
+               "DebugName":"SHP_Defiant","ID":"11111111-1111-1111-1111-111111111111"}
+            ]}
+            """);
+        var names = _provider.LoadGameDataNames();
+        Assert.Contains(names["Ship"], e => e.Name == "SHP_Defiant");
+    }
+
+    [Fact]
+    public void LoadGameDataNames_Sweep_RegistersScheduleFromAiBundle()
+    {
+        File.WriteAllText(Path.Combine(GameDataDir(), "ai.gamedatabundle"), """
+            {"GameDataObjects":[
+              {"$type":"Game.GameData.ScheduleGameData, Assembly-CSharp",
+               "DebugName":"Schedule Townie","ID":"22222222-2222-2222-2222-222222222222"}
+            ]}
+            """);
+        var names = _provider.LoadGameDataNames();
+        Assert.Contains(names["Schedule"], e => e.Name == "Schedule Townie");
+    }
+
+    [Fact]
+    public void LoadGameDataNames_ExplicitDispositionCleaning_WinsOverSweep()
+    {
+        File.WriteAllText(Path.Combine(GameDataDir(), "factions.gamedatabundle"), """
+            {"GameDataObjects":[
+              {"$type":"Game.GameData.DispositionGameData, Assembly-CSharp",
+               "DebugName":"HonestDisposition","ID":"33333333-3333-3333-3333-333333333333"}
+            ]}
+            """);
+        var names = _provider.LoadGameDataNames();
+        // Explicit registration strips the "Disposition" suffix; the raw sweep would not.
+        Assert.Contains(names["Disposition"], e => e.Name == "Honest");
+        Assert.DoesNotContain(names["Disposition"], e => e.Name == "HonestDisposition");
+    }
+
+    [Fact]
+    public void LoadGameDataNames_ItemKind_ExcludesLootLists()
+    {
+        File.WriteAllText(Path.Combine(GameDataDir(), "items.gamedatabundle"), """
+            {"GameDataObjects":[
+              {"$type":"Game.GameData.ConsumableItemGameData, Assembly-CSharp",
+               "DebugName":"Potion","ID":"44444444-4444-4444-4444-444444444444"},
+              {"$type":"Game.GameData.LootListGameData, Assembly-CSharp",
+               "DebugName":"LL_Quest","ID":"55555555-5555-5555-5555-555555555555"}
+            ]}
+            """);
+        var names = _provider.LoadGameDataNames();
+        Assert.Contains(names["Item"], e => e.Name == "Potion");
+        Assert.DoesNotContain(names["Item"], e => e.Name == "LL_Quest");
+        Assert.Contains(names["LootList"], e => e.Name == "LL_Quest");
+    }
+
+    // ── Inheritance composition ─────────────────────────────────────────────
+    // A param whose DataTypeID names a base class accepts every subclass instance
+    // (Weapon ⊂ Equippable ⊂ Item; Affliction ⊂ StatusEffect; GenericAbility/Phrase
+    // ⊂ ProgressionUnlockable; Attack* ⊂ AttackBase). The sweep's exact-$type
+    // buckets must be composed to match.
+
+    [Fact]
+    public void LoadGameDataNames_ItemKind_IncludesWeaponsAndConsumables()
+    {
+        File.WriteAllText(Path.Combine(GameDataDir(), "items.gamedatabundle"), """
+            {"GameDataObjects":[
+              {"$type":"Game.GameData.WeaponGameData, Assembly-CSharp",
+               "DebugName":"Sabre","ID":"66666666-6666-6666-6666-666666666666"},
+              {"$type":"Game.GameData.ConsumableGameData, Assembly-CSharp",
+               "DebugName":"Potion","ID":"77777777-7777-7777-7777-777777777777"},
+              {"$type":"Game.GameData.EquippableGameData, Assembly-CSharp",
+               "DebugName":"Cloak","ID":"88888888-8888-8888-8888-888888888888"}
+            ]}
+            """);
+        var names = _provider.LoadGameDataNames();
+        Assert.Contains(names["Item"], e => e.Name == "Sabre");
+        Assert.Contains(names["Item"], e => e.Name == "Potion");
+        Assert.Contains(names["Item"], e => e.Name == "Cloak");
+        Assert.Contains(names["Equippable"], e => e.Name == "Sabre"); // Weapon ⊂ Equippable
+    }
+
+    [Fact]
+    public void LoadGameDataNames_StatusEffectKind_IncludesAfflictions()
+    {
+        File.WriteAllText(Path.Combine(GameDataDir(), "statuseffects.gamedatabundle"), """
+            {"GameDataObjects":[
+              {"$type":"Game.GameData.AfflictionGameData, Assembly-CSharp",
+               "DebugName":"AFF_Sickened","ID":"99999999-9999-9999-9999-999999999999"}
+            ]}
+            """);
+        var names = _provider.LoadGameDataNames();
+        Assert.Contains(names["StatusEffect"], e => e.Name == "AFF_Sickened");
+        Assert.Contains(names["Affliction"],   e => e.Name == "AFF_Sickened");
+    }
+
+    [Fact]
+    public void LoadGameDataNames_ProgressionUnlockable_IsAbilityPlusPhrase()
+    {
+        File.WriteAllText(Path.Combine(GameDataDir(), "abilities.gamedatabundle"), """
+            {"GameDataObjects":[
+              {"$type":"Game.GameData.GenericAbilityGameData, Assembly-CSharp",
+               "DebugName":"Fireball","ID":"aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"},
+              {"$type":"Game.GameData.PhraseGameData, Assembly-CSharp",
+               "DebugName":"Chant","ID":"bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"}
+            ]}
+            """);
+        var names = _provider.LoadGameDataNames();
+        Assert.Contains(names["ProgressionUnlockable"], e => e.Name == "Fireball");
+        Assert.Contains(names["ProgressionUnlockable"], e => e.Name == "Chant");
+    }
+
+    [Fact]
+    public void LoadGameDataNames_AttackBase_UnionsAttackSubtypes()
+    {
+        File.WriteAllText(Path.Combine(GameDataDir(), "attacks.gamedatabundle"), """
+            {"GameDataObjects":[
+              {"$type":"Game.GameData.AttackMeleeGameData, Assembly-CSharp",
+               "DebugName":"Claw","ID":"cccccccc-cccc-cccc-cccc-cccccccccccc"},
+              {"$type":"Game.GameData.AttackAOEGameData, Assembly-CSharp",
+               "DebugName":"Blast","ID":"dddddddd-dddd-dddd-dddd-dddddddddddd"}
+            ]}
+            """);
+        var names = _provider.LoadGameDataNames();
+        Assert.Contains(names["AttackBase"], e => e.Name == "Claw");
+        Assert.Contains(names["AttackBase"], e => e.Name == "Blast");
+    }
+
     [Fact]
     public void LoadGameDataNames_RegistersChangeStrength_FromFactionsBundle()
     {
