@@ -670,10 +670,20 @@ the "Parameter Readability — Beyond Characters" gap tracks that follow-up surv
 > showed raw (B-011). The catalogue is now **generated from the decompiled PoE1/PoE2 sources**
 > by a committed tool (`tools/catalogue-gen`): 526 scripts / 461 conditions, with lookup kinds
 > resolved from each param's `BrowserType`/`DataTypeID`. `CatalogueCoverageTests` enforces that
-> every shipped signature is covered (bar 5 documented version-skew signatures). Many
-> `$type`-derived kinds have no runtime `GameDataNameService` loader yet and stay **dormant**
-> (raw display, safe) until one is added — a bounded follow-up. Spec:
+> every shipped signature is covered (bar 5 documented version-skew signatures). Spec:
 > `docs/superpowers/specs/2026-07-07-catalogue-regeneration-design.md`.
+>
+> **Runtime coverage completed (2026-07-09).** A **generic bundle sweep** in
+> `Poe2GameDataProvider` parses every `*.gamedatabundle` once and registers every `$type`
+> bucket under `GameDataKindMapper.TypeToKind` (the C# mirror of the generator's mapping),
+> then composes base-class kinds from their subclass buckets per the game's GameData
+> inheritance (`Weapon ⊂ Equippable ⊂ Item`, `Affliction ⊂ StatusEffect`,
+> `Ability`/`Phrase` ⊂ `ProgressionUnlockable`, `Attack*` ⊂ `AttackBase`). All formerly
+> dormant kinds now resolve (Ship, Team, Affliction, Schedule, CreatureType, …; 215 kinds
+> against the shipped install, ~1.5 s one-time at game-folder open); explicit cleaned
+> registrations (Disposition, PaladinOrder, Class, WeaponType) overwrite the sweep. Only
+> the generic `GameData` fallback kind remains dormant (unresolvable by definition). Spec:
+> `docs/superpowers/specs/2026-07-09-lookup-kind-sweep-design.md`.
 
 Implemented across commits `ccc27af..0e3ef19` (Tasks 1–9 of the implementation plan at
 `docs/superpowers/plans/2026-06-19-parameter-readability-beyond-characters.md`).
@@ -719,12 +729,17 @@ Implemented across commits `ccc27af..0e3ef19` (Tasks 1–9 of the implementation
 - `ArmorType` — the PoE2 condition `IsArmorTypeEquipped(Guid, Guid)` references armor-type
   GUIDs, but no `ArmorTypeGameData` bundle was found in any PoE2 `.gamedatabundle`, and the
   condition is unused in all shipped `.conversationbundle` files. Falls back to plain-text
-  GUID input.
-- `CreatureType` — likewise; `CreatureTypeGameData` absent from all bundles.
-- Three parameters intentionally left without a `lookupKind` because no suitable game-data
-  source was identified: `"Unlockable"` (PartyHasAbility — spans Ability/Phrase/Talent),
-  and generic scene-object GUID params (`"Object GUID"`, `"Collider Object"` in ObjectGuid
-  scripts) where the Speaker kind is applied but a scene-object lookup table doesn't exist.
+  GUID input. (If a patch ever ships the `$type`, the 2026-07-09 sweep registers it
+  automatically.)
+- ~~`CreatureType` — likewise; `CreatureTypeGameData` absent from all bundles.~~
+  **Corrected 2026-07-09:** that survey was wrong — `CreatureTypeGameData` exists (110
+  objects in `characters.gamedatabundle`) and is now registered by the generic sweep.
+- ~~`"Unlockable"` (PartyHasAbility — spans Ability/Phrase/Talent) had no source~~ —
+  **resolved 2026-07-09:** `ProgressionUnlockableGameData` is the base class of
+  `GenericAbility`/`Phrase`; the sweep's inheritance composition registers
+  `ProgressionUnlockable` as their union. Generic scene-object GUID params
+  (`"Object GUID"`, `"Collider Object"`) remain on the Speaker kind — a true
+  scene-object lookup table still doesn't exist.
 
 ### ~~Font Scale Live Switching~~ ✓ Implemented
 
