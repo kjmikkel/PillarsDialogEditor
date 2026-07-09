@@ -108,6 +108,33 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
             }
             foreach (var (kind, entries) in byKind)
                 result[kind] = entries;
+
+            // ── Phase 1.5 — inheritance composition ─────────────────────────
+            // The sweep buckets by EXACT $type, but a param whose DataTypeID names a
+            // base class accepts every subclass instance. Compose buckets to match,
+            // for the base kinds the catalogue references. Hierarchy verified against
+            // the decompiled Game.GameData sources (2026-07-09):
+            //   WeaponGameData ⊂ EquippableGameData ⊂ ItemGameData; ConsumableGameData ⊂ ItemGameData
+            //   AfflictionGameData ⊂ StatusEffectGameData
+            //   GenericAbilityGameData / PhraseGameData ⊂ ProgressionUnlockableGameData
+            //   Attack*GameData ⊂ AttackBaseGameData
+            void ComposeInto(string parent, params string[] children)
+            {
+                var union = result.TryGetValue(parent, out var own)
+                    ? new List<GameDataEntry>(own) : [];
+                foreach (var child in children)
+                    if (result.TryGetValue(child, out var entries))
+                        union.AddRange(entries);
+                if (union.Count > 0) result[parent] = union;
+            }
+
+            ComposeInto("Equippable", "Weapon");
+            ComposeInto("Item", "Equippable", "Consumable"); // Equippable already holds weapons
+            ComposeInto("StatusEffect", "Affliction");
+            ComposeInto("ProgressionUnlockable", "Ability", "Phrase");
+            ComposeInto("AttackBase",
+                result.Keys.Where(k => k.StartsWith("Attack", StringComparison.Ordinal)
+                                    && k != "AttackBase").ToArray());
         }
 
         // ── Phase 2 — explicit overrides (overwrite the sweep) ──────────────
