@@ -67,6 +67,46 @@ public static class Poe2GameDataBundleParser
         return Parse(text, cleanName, typeFilter, componentFilter);
     }
 
+    /// One-pass sweep: every valid object in the bundle grouped by its SHORT $type
+    /// name ("Game.GameData.ShipGameData, Assembly-CSharp" -> "ShipGameData").
+    /// Used by Poe2GameDataProvider's generic lookup-kind sweep — see
+    /// docs/superpowers/specs/2026-07-09-lookup-kind-sweep-design.md.
+    public static IReadOnlyDictionary<string, IReadOnlyList<GameDataEntry>> ParseAllByType(string json)
+    {
+        var root = JsonSerializer.Deserialize<BundleRoot>(json, Options);
+        if (root is null) return new Dictionary<string, IReadOnlyList<GameDataEntry>>();
+
+        var byType = new Dictionary<string, List<GameDataEntry>>(StringComparer.Ordinal);
+        foreach (var o in root.GameDataObjects)
+        {
+            if (string.IsNullOrWhiteSpace(o.Id) || string.IsNullOrWhiteSpace(o.DebugName))
+                continue;
+            var shortType = ShortTypeName(o.DataType);
+            if (shortType.Length == 0) continue;
+            if (!byType.TryGetValue(shortType, out var list))
+                byType[shortType] = list = [];
+            list.Add(new GameDataEntry(Id: o.Id, Name: o.DebugName));
+        }
+        return byType.ToDictionary(kv => kv.Key, kv => (IReadOnlyList<GameDataEntry>)kv.Value);
+    }
+
+    public static IReadOnlyDictionary<string, IReadOnlyList<GameDataEntry>> ParseAllByTypeFile(string path)
+    {
+        if (!File.Exists(path))
+            return new Dictionary<string, IReadOnlyList<GameDataEntry>>();
+        var text = File.ReadAllText(path, new System.Text.UTF8Encoding(true));
+        return ParseAllByType(text);
+    }
+
+    /// "Game.GameData.ShipGameData, Assembly-CSharp" -> "ShipGameData".
+    private static string ShortTypeName(string? dataType)
+    {
+        if (string.IsNullOrWhiteSpace(dataType)) return string.Empty;
+        var beforeComma = dataType.Split(',')[0].Trim();
+        var lastDot = beforeComma.LastIndexOf('.');
+        return lastDot >= 0 ? beforeComma[(lastDot + 1)..] : beforeComma;
+    }
+
     private static bool MatchesTypeFilter(string? dataType, string? typeFilter)
     {
         if (typeFilter is null) return true;
