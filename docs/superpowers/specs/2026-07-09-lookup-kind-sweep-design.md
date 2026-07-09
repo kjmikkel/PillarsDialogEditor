@@ -102,9 +102,27 @@ Background, Culture, Skill.
 (`LoadSpeakerNames`). PoE1's provider is unchanged (its catalogue entries use only
 Speaker/GlobalVariable).
 
-**Net effect:** all 30 sourceable dormant kinds register; `ProgressionUnlockable`,
-`AttackBase`, and generic `GameData` stay dormant (no data source — safe, documented).
-If a future game patch or overlooked bundle ever supplies a missing `$type`
+**Phase 1.5 — inheritance composition (added during implementation).** The sweep
+buckets by *exact* `$type`, but a parameter whose `DataTypeID` names a base class
+accepts every subclass instance — inheritance the flat string mapping can't see, and
+which the old unfiltered registrations accidentally provided (the whole
+`items.gamedatabundle` under `Item` included weapons because `WeaponGameData ⊂ Item`).
+A composition step after the sweep unions subclass buckets into their base kind, per
+the hierarchy verified in the decompiled `Game.GameData` sources:
+
+- `Equippable` += `Weapon`; then `Item` += `Equippable`, `Consumable`
+  (`Weapon ⊂ Equippable ⊂ Item`; `Consumable ⊂ Item` — LootList/ItemMod are *not* items)
+- `StatusEffect` += `Affliction`
+- `ProgressionUnlockable` += `Ability`, `Phrase` (both subclass it)
+- `AttackBase` += every `Attack*` bucket (~2,050 objects across 15 subclasses)
+
+This also **revises the spec's dormancy claim**: `ProgressionUnlockable` and
+`AttackBase` are not sourceless — they are base classes whose registries are the
+union of their subclass buckets, and both now resolve.
+
+**Net effect:** all sourceable dormant kinds register — including the two the survey
+originally wrote off; only the generic `GameData` fallback kind stays dormant. If a
+future game patch or overlooked bundle ever supplies a missing `$type`
 (e.g. `ArmorTypeGameData`), it lights up automatically.
 
 ## Cross-cutting rules (CLAUDE.md)
