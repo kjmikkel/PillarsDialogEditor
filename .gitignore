@@ -27,6 +27,9 @@ Desktop.ini
 # Brainstorming mockups (visual companion session files)
 .superpowers/
 
+# Obsidian vaults
+PoE Dialog Editor Research/.obsidian/workspace.json
+
 # Git worktrees
 .worktrees/
 
