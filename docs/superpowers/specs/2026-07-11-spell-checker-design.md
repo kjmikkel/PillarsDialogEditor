@@ -88,6 +88,10 @@ reviews the diff); other languages ship uncurated initially — safe in the cons
 direction (a shipped word is never flagged), curable later. The lexicons are embedded
 resources (like `tags.json`) with the `data/` mirror kept byte-identical.
 
+**The generator is a permanent, committed tool** — not a one-off script. It is kept
+(with its tests and README) so lexicons can be regenerated for future languages,
+after game patches, or for curation refreshes without reinventing the wheel.
+
 ### 2. Dictionary store — `SpellDictionaryStore` (`DialogEditor.ViewModels/Services`)
 
 Owns the three layers:
