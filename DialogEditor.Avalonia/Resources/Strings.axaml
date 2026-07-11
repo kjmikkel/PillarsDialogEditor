@@ -1178,6 +1178,27 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="VoValidation_CleanUpConfirm_Other">Delete {0} orphaned files from the _vo folder? The editor cannot undo this — re-import the source audio to restore a file.</sys:String>
     <sys:String x:Key="Button_ConfirmCleanUp">Delete files</sys:String>
     <sys:String x:Key="ToolTip_ConfirmCleanUp">Permanently delete the listed orphaned files from the _vo folder.</sys:String>
+
+    <!-- ── Validate Text Tags (project-wide sweep) ───────────────────────── -->
+    <sys:String x:Key="TextTagValidation_Title">Validate Text Tags</sys:String>
+    <sys:String x:Key="TextTagValidation_SavedNote">Scans the saved project — text in every patched conversation and every language.</sys:String>
+    <!-- Summary composes two pre-pluralised fragments (see pluralisation design). -->
+    <sys:String x:Key="TextTagValidation_Summary">{0} across {1}</sys:String>
+    <sys:String x:Key="TextTagValidation_Issues_One">{0} issue</sys:String>
+    <sys:String x:Key="TextTagValidation_Issues_Other">{0} issues</sys:String>
+    <sys:String x:Key="TextTagValidation_Convs_One">{0} conversation</sys:String>
+    <sys:String x:Key="TextTagValidation_Convs_Other">{0} conversations</sys:String>
+    <sys:String x:Key="TextTagValidation_NoIssues">No text tag issues found.</sys:String>
+    <sys:String x:Key="TextTagValidation_Default">Default</sys:String>
+    <sys:String x:Key="Menu_ValidateTextTags">Validate Text Tags…</sys:String>
+    <sys:String x:Key="ToolTip_ValidateTextTags">Scan every patched conversation in the saved project (all languages) for unknown substitution tokens and unbalanced markup. Requires an open project.</sys:String>
+    <sys:String x:Key="ToolTip_TextTagValidation_Refresh">Re-scan the saved project for text tag issues</sys:String>
+    <sys:String x:Key="SaveBeforeScan_Title">Unsaved changes</sys:String>
+    <sys:String x:Key="SaveBeforeScan_Message">The scan reads the saved project. Unsaved changes will not be included.</sys:String>
+    <sys:String x:Key="SaveBeforeScan_SaveAndScan">Save and scan</sys:String>
+    <sys:String x:Key="SaveBeforeScan_ScanSavedOnly">Scan saved state only</sys:String>
+    <sys:String x:Key="ToolTip_SaveBeforeScan_SaveAndScan">Save the project first, then scan everything including your latest edits</sys:String>
+    <sys:String x:Key="ToolTip_SaveBeforeScan_ScanSavedOnly">Scan the project as last saved; unsaved edits are not included</sys:String>
     <sys:String x:Key="Button_CancelCleanUp">Keep files</sys:String>
     <sys:String x:Key="ToolTip_CancelCleanUp">Close the confirmation without deleting anything.</sys:String>
     <!-- {0} = files deleted -->
