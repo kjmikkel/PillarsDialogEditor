@@ -462,6 +462,35 @@ public partial class MainWindowViewModel : ObservableObject
         return vm;
     }
 
+    /// Seam for the Validate Text Tags dirty guard (three-way consent). Null in unit
+    /// tests that don't exercise the dialog — a dirty project with no seam wired
+    /// treats the request as cancelled rather than silently scanning stale state.
+    /// The View wires SaveBeforeScanDialog.
+    public Func<Task<ScanDirtyChoice>>? ConfirmScanWithUnsavedChanges { get; set; }
+
+    /// Test ▸ Validate Text Tags…: returns a ready view-model over the SAVED project,
+    /// or null when no project is open / the user cancels the dirty guard.
+    public async Task<TextTagValidationViewModel?> RequestTextTagValidationAsync()
+    {
+        if (_project is null) return null;
+
+        if (IsModified)
+        {
+            var choice = ConfirmScanWithUnsavedChanges is null
+                ? ScanDirtyChoice.Cancel
+                : await ConfirmScanWithUnsavedChanges();
+            if (choice == ScanDirtyChoice.Cancel) return null;
+            if (choice == ScanDirtyChoice.SaveAndScan) SaveProject();
+        }
+
+        // The closure reads the current fields, so Refresh in the open window picks
+        // up saves made later in the session.
+        return new TextTagValidationViewModel(() =>
+            _project is null
+                ? []
+                : ProjectTextTagScanner.Scan(_project, _activeGameId, _provider?.Language ?? ""));
+    }
+
     /// Opens the batch VO import dialog in multi-conversation mode.
     /// Wired by MainWindow.axaml.cs; null in unit tests that don't need the dialog.
     public Func<IReadOnlyList<BatchVoRowViewModel>, Task>? ShowBatchVoImportAll { get; set; }
