@@ -64,17 +64,25 @@ public static class ProjectTextTagScanner
 }
 ```
 
-Per patch (skipping `IsEmpty` ones):
-- **Added nodes:** validate `DefaultText` and `FemaleText`.
-- **Modified nodes:** for each `FieldChanges` entry whose key is a dialog-text field
-  (`DefaultText` / `FemaleText` — exact key strings and their encoding pinned from
-  `DiffEngine.DiffNode` during implementation; the `FieldChange` comment says both
-  sides are JSON-encoded strings, so the `To` value is decoded before validation, and
-  an undecodable value is skipped, never thrown on), validate the `To` text.
-- **Translations:** for every language, validate each `NodeTranslation`'s
-  `DefaultText` and `FemaleText`.
+**Correction (implementation-time verification, 2026-07-09):** `DiffEngine` stores
+**all** dialog text — including the primary language's Default/Female edits — in
+`patch.Translations[primaryLanguage]`; `AddedNodes` are saved with their text zeroed
+and `FieldChanges` never contains `DefaultText`/`FemaleText` (`DiffEngine.cs:21,69`).
+The walk is therefore simpler than first drafted:
 
-`Language` is `""` for Default/Female rows and the language code for translation rows.
+Per patch (skipping `IsEmpty` ones):
+- **Translations (the whole story):** for every language, validate each
+  `NodeTranslation`'s `DefaultText` and `FemaleText`. The primary language's entries
+  *are* the writer's Default/Female text.
+- **Added nodes (defensive only):** validate `DefaultText`/`FemaleText` when non-empty
+  — always empty under the current schema, but a legacy or hand-edited patch might
+  carry text here; three lines of insurance, no JSON decoding anywhere.
+- `FieldChanges` is **not** walked (never contains dialog text).
+
+The scanner takes a `primaryLanguage` parameter (from `_provider?.Language`, may be
+empty when no game folder is loaded); rows in that language get `Language == ""` so
+they display as "Default", matching Flow Analytics' convention. Other rows carry
+their language code.
 Messages are produced with the existing `Validation_UnknownToken_Suggest` /
 `Validation_UnknownToken` / `Validation_UnbalancedMarkup` keys via `Loc.Format`
 (identical formatting to the detail panel and Flow Analytics). An empty/unknown
