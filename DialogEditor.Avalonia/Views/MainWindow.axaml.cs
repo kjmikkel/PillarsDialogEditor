@@ -33,6 +33,7 @@ public partial class MainWindow : Window
     private BatchReplaceWindow?    _batchReplaceWindow;
     private FlowAnalyticsWindow?   _flowAnalyticsWindow;
     private VoValidationWindow?    _voValidationWindow;
+    private TextTagValidationWindow? _textTagValidationWindow;
 
     // Tour adorner state — one adorner on one target at a time.
     private TourHighlightAdorner? _tourAdorner;
@@ -78,6 +79,10 @@ public partial class MainWindow : Window
             window.Show();
             window.Activate();
         };
+        // Validate Text Tags dirty guard: three-way consent when the project has
+        // unsaved changes (the scan reads saved state only).
+        vm.ConfirmScanWithUnsavedChanges = () =>
+            new SaveBeforeScanDialog().ShowDialogAsync(this);
         // Launch greeting: show "what's new" once if the app version advanced.
         vm.ShowWhatsNewIfUpdated();
         vm.ShowTagReference = tagVm =>
@@ -460,6 +465,29 @@ public partial class MainWindow : Window
         _voValidationWindow.Closed += (_, _) => _voValidationWindow = null;
         _voValidationWindow.Show(this);
         _ = vm.RunAsync();
+    }
+
+    private async void ValidateTextTags_Click(object? sender, RoutedEventArgs e)
+    {
+        // async void event handler: exceptions would crash the process, so keep the
+        // whole body guarded (per the error-handling rule).
+        try
+        {
+            if (_textTagValidationWindow is not null && _textTagValidationWindow.IsVisible)
+            {
+                _textTagValidationWindow.Activate();
+                return;
+            }
+            var vm = await ((MainWindowViewModel)DataContext!).RequestTextTagValidationAsync();
+            if (vm is null) return; // no project, or the dirty guard was cancelled
+            _textTagValidationWindow = new TextTagValidationWindow(vm);
+            _textTagValidationWindow.Closed += (_, _) => _textTagValidationWindow = null;
+            _textTagValidationWindow.Show(this);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error("Validate Text Tags failed", ex);
+        }
     }
 
     private void CompareVersions_Click(object? sender, RoutedEventArgs e)
