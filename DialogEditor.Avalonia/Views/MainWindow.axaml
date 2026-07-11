@@ -184,6 +184,15 @@
                                   Command="{Binding BatchImportVoAllCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Menu_BatchImportVoAll}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_BatchImportVoAll}"/>
+                        <Separator/>
+                        <!-- Project-wide text-tag sweep (2026-07-09): scans every patched
+                             conversation's saved text in every language. Visible-but-disabled
+                             without an open project, for discoverability. -->
+                        <MenuItem Header="{DynamicResource Menu_ValidateTextTags}"
+                                  Click="ValidateTextTags_Click"
+                                  IsEnabled="{Binding IsProjectOpen}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_ValidateTextTags}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_ValidateTextTags}"/>
                     </MenuItem>
 
                     <MenuItem Header="{DynamicResource Menu_Help}">

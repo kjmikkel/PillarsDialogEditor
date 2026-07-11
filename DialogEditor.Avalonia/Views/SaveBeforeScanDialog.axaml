@@ -1,0 +1,37 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DialogEditor.Avalonia.Views.SaveBeforeScanDialog"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Title="{DynamicResource SaveBeforeScan_Title}"
+        Width="460" MinWidth="420" SizeToContent="Height"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource Brush.Surface.Panel}">
+  <StackPanel Margin="20" Spacing="12">
+    <TextBlock Text="{DynamicResource SaveBeforeScan_Message}"
+               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"
+               TextWrapping="Wrap"/>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
+      <Button x:Name="SaveAndScanButton"
+              Content="{DynamicResource SaveBeforeScan_SaveAndScan}"
+              Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
+              Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
+              IsDefault="True"
+              ToolTip.Tip="{DynamicResource ToolTip_SaveBeforeScan_SaveAndScan}"
+              AutomationProperties.HelpText="{DynamicResource ToolTip_SaveBeforeScan_SaveAndScan}"/>
+      <Button x:Name="ScanSavedOnlyButton"
+              Content="{DynamicResource SaveBeforeScan_ScanSavedOnly}"
+              Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
+              Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
+              ToolTip.Tip="{DynamicResource ToolTip_SaveBeforeScan_ScanSavedOnly}"
+              AutomationProperties.HelpText="{DynamicResource ToolTip_SaveBeforeScan_ScanSavedOnly}"/>
+      <Button x:Name="CancelButton"
+              Content="{DynamicResource Button_Cancel}"
+              Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
+              Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
+              IsCancel="True"
+              ToolTip.Tip="{DynamicResource Button_Cancel}"
+              AutomationProperties.HelpText="{DynamicResource Button_Cancel}"/>
+    </StackPanel>
+  </StackPanel>
+</Window>

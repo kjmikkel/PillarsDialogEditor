@@ -83,9 +83,15 @@ assists, both game-aware and driven by the same vocabulary as the reference wind
   (`[player race]` etc.); PoE1 stays exact-case. Surfaced as a live amber warning box
   in the node detail panel (Default/Female) and a "Text tag issues" section in Flow
   Analytics (the open conversation's Default/Female + every translation language).
-  Pure `TokenValidationService` (`DialogEditor.ViewModels`). Per-conversation scope;
-  a project-wide translation sweep is deferred. Spec:
+  Pure `TokenValidationService` (`DialogEditor.ViewModels`). Spec:
   docs/superpowers/specs/2026-07-07-token-validation-design.md.
+  **Project-wide sweep ✅ implemented (2026-07-09):** **Test ▸ Validate Text Tags…**
+  scans every patched conversation's saved text in every language (pure
+  `ProjectTextTagScanner` over `DialogProject.Patches[*].Translations` — zero IO,
+  synchronous; DiffEngine keeps all dialog text there), with a three-way dirty guard
+  (save and scan / scan saved state only / cancel) shown only when the project has
+  unsaved changes. Spec:
+  docs/superpowers/specs/2026-07-09-text-tag-project-sweep-design.md.
 
 ### ~~Export Mod Bundle without VO~~ ✓ Resolved by descoping (2026-07-05)
 Use-case analysis rejected the proposed with-VO/without-VO export choice: the only
