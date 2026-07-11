@@ -755,3 +755,79 @@ Converted 371 `{StaticResource FontSize.*}` → `{DynamicResource FontSize.*}` a
 service on every call. `SettingsViewModel` injects `IFontScaleApplier`, calls it on
 scale change, and the restart notice is removed. `NoStaticFontSizeResourceTests` enforcer
 added to prevent regressions.
+
+### Spell Checker for Dialog Text
+
+Check Default/Female text **and translations** for spelling errors — the same
+writer-typo argument as token validation, and the same natural surfaces once built
+(detail panel, Flow Analytics, the project-wide Validate Text Tags sweep).
+
+**Settled design sketch — a three-layer dictionary (2026-07-11):**
+
+1. **Real-world language dictionary.** A normal open-source dictionary (Hunspell-style)
+   per language; the user picks which language(s) to download and use.
+2. **Generated game lexicon.** Scan every shipped conversation's text (per game, for
+   each game language installed on the machine), **omitting all tags/tokens**, and
+   record per-word frequencies. Subtract every word that appears in that language's
+   layer-1 dictionary — what remains is a close approximation of the in-world
+   vocabulary (*Rauatai, adra, kith, Ondra, …*). A one-time curation pass (human or
+   assistant) then removes residual real-world words (typos in shipped text, archaic
+   forms the dictionary lacks). Same data-driven pattern as `tags.json` / the
+   generated catalogue: a committed, regenerable artifact.
+3. **Custom user dictionary.** Starts blank; the user adds their own words (mod-specific
+   names) via an "add to dictionary" action.
+
+A word is correctly spelled if it appears in **any** of the three layers. Open
+questions for brainstorming: dictionary download source/licence, per-language layer-2
+files vs one file with language tags, and whether checking runs live (detail panel)
+or sweep-only at first.
+
+### In-Editor Playtest Mode
+
+Writers cannot *play* a conversation without launching the game: start at the root,
+read the NPC line (reusing the existing VO playback), pick a player response, walk the
+branch. The hard design problem is **conditions** — either a simulated game-state
+panel (set global values / quest states as they're encountered) or a simpler
+"choose which branch wins" prompt at each conditional fork. Likely the largest
+remaining writer-facing quality-of-life feature.
+
+### Project Autosave / Crash Recovery
+
+The exception-report window reports crashes but does not protect unsaved work. A
+periodic sidecar autosave (e.g. `.dialogproject.autosave` next to the project file)
+plus an offer-to-restore on next launch. Cheap insurance; pre-launch is the right time
+— data loss is a first-impression a public release doesn't recover from.
+
+### Stale Patch Data Hygiene
+
+The VO lifecycle work (2026-07-02) cleans orphaned `.wem` files, but the equivalent
+*data* rot is untracked: `Translations`, `NodeComments`, and layout entries referencing
+**deleted node IDs** accumulate silently in the saved patch. A hygiene report/cleanup
+(a section in an existing validation window, or its own) that lists and prunes them —
+mirroring the orphaned-VO pattern.
+
+### Smaller Writer/UX Backlog
+
+Recorded 2026-07-11; each is small and independent:
+
+- **Speaker line browser** — "show every line spoken by this character across the
+  project (and vanilla)" for voice-consistency checking; builds on the existing
+  stringtable parsing.
+- **Project-wide find** (read-only) — Batch Replace covers destructive changes, but
+  "where did I mention X?" has no navigable answer today.
+- **Path-based writing stats** — Flow Analytics counts words globally; writers think
+  in playthroughs: longest path, words per speaker, estimated reading time per branch.
+- **Duplicate/near-duplicate line detection** — catches copy-paste artifacts; could
+  ride on Flow Analytics.
+- **Recent projects menu** — only `LastProjectPath` auto-reopen exists; a File ▸
+  Recent list is trivial QoL.
+- **PatchManager cross-mod conflict warning** — if two `.dialogpack`s touch the same
+  nodes, the second likely silently wins (verify current behaviour first); end users
+  applying multiple mods deserve a warning at apply time.
+
+### Deliberate Non-Goals
+
+Recorded so they aren't re-litigated: **quest/journal text editing** (this is a
+*dialog* editor; quests only ever appear as lookup targets), **lip-sync / audio
+timing tooling**, and **live in-game preview** beyond the bark-preview investigation
+already tracked above.
