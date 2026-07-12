@@ -83,6 +83,10 @@ public partial class MainWindow : Window
         // unsaved changes (the scan reads saved state only).
         vm.ConfirmScanWithUnsavedChanges = () =>
             new SaveBeforeScanDialog().ShowDialogAsync(this);
+        // Spell checking: three-layer store (user dictionaries + embedded game
+        // lexicons + personal word list). Null checker would just disable spelling.
+        EmbeddedLexicons.LoadInto(SpellDictionaryStore.Default);
+        vm.Detail.SpellChecker = new SpellCheckService(SpellDictionaryStore.Default);
         // Launch greeting: show "what's new" once if the app version advanced.
         vm.ShowWhatsNewIfUpdated();
         vm.ShowTagReference = tagVm =>

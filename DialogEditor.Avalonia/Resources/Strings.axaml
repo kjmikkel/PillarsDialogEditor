@@ -413,6 +413,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Validation_UnknownToken_Suggest">Unknown tag "{0}" — did you mean "{1}"?</sys:String>
     <sys:String x:Key="Validation_UnknownToken">Unknown tag "{0}".</sys:String>
     <sys:String x:Key="Validation_UnbalancedMarkup">Unbalanced markup "{0}" — check the opening/closing tags match.</sys:String>
+    <sys:String x:Key="Spelling_Misspelled_Suggest">Possible misspelling "{0}" — did you mean "{1}"?</sys:String>
+    <sys:String x:Key="Spelling_Misspelled">Possible misspelling "{0}".</sys:String>
     <sys:String x:Key="Option_PersistenceNone">None</sys:String>
     <sys:String x:Key="Option_PersistenceOnceEver">OnceEver</sys:String>
 
