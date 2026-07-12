@@ -1364,6 +1364,7 @@ public partial class MainWindowViewModel : ObservableObject
 
             _activeGameId = provider.GameId;
             Detail.ActiveGameId = provider.GameId;
+            Detail.ActiveLanguage = provider.Language;
             Detail.GameRoot = path;
             ChatterPrefixService.Register(provider.LoadChatterPrefixes());
 
