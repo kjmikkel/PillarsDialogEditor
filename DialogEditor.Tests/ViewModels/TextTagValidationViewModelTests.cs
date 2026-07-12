@@ -42,4 +42,41 @@ public class TextTagValidationViewModelTests
         Assert.Single(vm.Rows);
         Assert.True(vm.HasIssues);
     }
+
+    // ── Spelling rows (spell checker feature) ───────────────────────────────
+
+    private static TextTagIssueRow SpellRow(string word) =>
+        new("conv_a", 5, "", "msg", TextIssueType.Spelling, word);
+
+    [Fact]
+    public void TypeLabels_AreLocalized()
+    {
+        var vm = new TextTagValidationViewModel(() => [Row("conv_a", 1, ""), SpellRow("captian")]);
+        Assert.Equal("TextIssueType_Tag",      vm.Rows[0].TypeLabel); // stub echoes keys
+        Assert.Equal("TextIssueType_Spelling", vm.Rows[1].TypeLabel);
+    }
+
+    [Fact]
+    public void AddToDictionary_OnlyOnSpellingRows_InvokesAndRescans()
+    {
+        var added = new List<string>();
+        var results = new List<TextTagIssueRow> { Row("conv_a", 1, ""), SpellRow("captian") };
+        var vm = new TextTagValidationViewModel(() => results, addWord: added.Add);
+
+        Assert.False(vm.Rows[0].CanAddToDictionary);
+        Assert.True(vm.Rows[1].CanAddToDictionary);
+
+        results.RemoveAt(1); // simulate the word becoming correct after add
+        vm.Rows[1].AddToDictionaryCommand.Execute(null);
+
+        Assert.Equal(["captian"], added);
+        Assert.Single(vm.Rows); // rescanned
+    }
+
+    [Fact]
+    public void NoAddWordCallback_DisablesAddButton()
+    {
+        var vm = new TextTagValidationViewModel(() => [SpellRow("captian")]);
+        Assert.False(vm.Rows[0].CanAddToDictionary);
+    }
 }

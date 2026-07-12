@@ -22,6 +22,16 @@ public partial class NodeDetailViewModel : ObservableObject
     /// Set by MainWindowViewModel when a game folder is opened.
     public string ActiveGameId { get; set; } = string.Empty;
 
+    /// The provider's text language ("en" etc.) — the language Default/Female text
+    /// is written in. Set by MainWindowViewModel alongside ActiveGameId; drives
+    /// which spelling dictionary checks this node's text.
+    public string ActiveLanguage { get; set; } = string.Empty;
+
+    /// Spell checker over the three-layer dictionary store. Wired at app startup
+    /// (MainWindow) from SpellDictionaryStore.Default; null in unit tests, which
+    /// silently disables spelling warnings.
+    public SpellCheckService? SpellChecker { get; set; }
+
     /// Set by MainWindowViewModel when a game folder is opened.
     public string GameRoot { get; set; } = string.Empty;
 
@@ -381,10 +391,11 @@ public partial class NodeDetailViewModel : ObservableObject
         }
     }
 
-    /// Token/markup validation warnings for the selected node's Default (and, when
-    /// present, Female) text — likely token typos and unbalanced markup. Free-text
-    /// stage directions are never flagged. Recomputed on selection change and on
-    /// Default/Female edits.
+    /// Text validation warnings for the selected node's Default (and, when present,
+    /// Female) text — likely token typos, unbalanced markup, and (when a spell
+    /// checker is wired and a dictionary is installed for the active language)
+    /// possible misspellings. Free-text stage directions are never flagged.
+    /// Recomputed on selection change and on Default/Female edits.
     public IReadOnlyList<string> TokenWarnings
     {
         get
@@ -394,7 +405,21 @@ public partial class NodeDetailViewModel : ObservableObject
             AppendTokenWarnings(_node.DefaultText, messages);
             if (_node.HasFemaleText)
                 AppendTokenWarnings(_node.FemaleText, messages);
+            AppendSpellingWarnings(_node.DefaultText, messages);
+            if (_node.HasFemaleText)
+                AppendSpellingWarnings(_node.FemaleText, messages);
             return messages;
+        }
+    }
+
+    private void AppendSpellingWarnings(string? text, List<string> into)
+    {
+        if (SpellChecker is null || string.IsNullOrEmpty(text)) return;
+        foreach (var issue in SpellChecker.Check(text, ActiveLanguage))
+        {
+            into.Add(issue.Suggestion is not null
+                ? Loc.Format("Spelling_Misspelled_Suggest", issue.Word, issue.Suggestion)
+                : Loc.Format("Spelling_Misspelled", issue.Word));
         }
     }
 

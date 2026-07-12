@@ -8,12 +8,14 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="WeCantSpell.Hunspell" Version="7.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Resources\conditions.json" />
     <EmbeddedResource Include="Resources\scripts.json" />
     <EmbeddedResource Include="Resources\tags.json" />
+    <EmbeddedResource Include="Resources\Lexicons\*.txt" />
   </ItemGroup>
 
   <ItemGroup>
