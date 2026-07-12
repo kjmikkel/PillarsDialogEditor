@@ -88,6 +88,8 @@ public partial class MainWindow : Window
         EmbeddedLexicons.LoadInto(SpellDictionaryStore.Default);
         vm.Detail.SpellChecker = new SpellCheckService(SpellDictionaryStore.Default);
         vm.SpellStoreFactory   = () => SpellDictionaryStore.Default;
+        // Crash recovery: offer to restore a newer autosave sidecar at project open.
+        vm.ConfirmRestoreAutosave = t => new AutosaveRestoreDialog(t).ShowDialogAsync(this);
         // Launch greeting: show "what's new" once if the app version advanced.
         vm.ShowWhatsNewIfUpdated();
         vm.ShowTagReference = tagVm =>

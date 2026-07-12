@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DialogEditor.Avalonia.Views.AutosaveRestoreDialog"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Title="{DynamicResource AutosaveRestore_Title}"
+        Width="460" MinWidth="420" SizeToContent="Height"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource Brush.Surface.Panel}">
+  <StackPanel Margin="20" Spacing="12">
+    <TextBlock x:Name="MessageText"
+               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"
+               TextWrapping="Wrap"/>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
+      <Button x:Name="RestoreButton"
+              Content="{DynamicResource AutosaveRestore_Restore}"
+              Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
+              Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
+              IsDefault="True"
+              ToolTip.Tip="{DynamicResource ToolTip_AutosaveRestore_Restore}"
+              AutomationProperties.HelpText="{DynamicResource ToolTip_AutosaveRestore_Restore}"/>
+      <Button x:Name="DiscardButton"
+              Content="{DynamicResource AutosaveRestore_Discard}"
+              Background="{DynamicResource Brush.Button.Destructive.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
+              Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
+              IsCancel="True"
+              ToolTip.Tip="{DynamicResource ToolTip_AutosaveRestore_Discard}"
+              AutomationProperties.HelpText="{DynamicResource ToolTip_AutosaveRestore_Discard}"/>
+    </StackPanel>
+  </StackPanel>
+</Window>
