@@ -1039,6 +1039,21 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ForceDelete_Confirm">Delete permanently</sys:String>
     <sys:String x:Key="ForceDelete_Cancel">Cancel</sys:String>
 
+    <!-- ─── Recent projects: missing-file dialog ──────────────────────── -->
+    <sys:String x:Key="RecentMissing_Title">Project Not Found</sys:String>
+    <!-- {0} = full path -->
+    <sys:String x:Key="RecentMissing_Message" xml:space="preserve">This project could not be found:
+
+{0}
+
+Remove it from the recent list?</sys:String>
+    <sys:String x:Key="RecentMissing_Remove">Remove</sys:String>
+    <sys:String x:Key="RecentMissing_Keep">Keep</sys:String>
+    <sys:String x:Key="ToolTip_RecentMissing_Remove">Remove this entry from the recent projects list. The project file itself is not deleted.</sys:String>
+    <sys:String x:Key="ToolTip_RecentMissing_Keep">Leave the entry in the list — the file may become available again (a reconnected drive, or a different git branch).</sys:String>
+    <!-- {0} = full path -->
+    <sys:String x:Key="Status_RecentProjectMissing">Project not found: {0}</sys:String>
+
     <!-- Branches menu entry -->
     <sys:String x:Key="Menu_Branches">Branches…</sys:String>
     <sys:String x:Key="Menu_BranchesTip">View and manage the local Git branches of the open project.</sys:String>

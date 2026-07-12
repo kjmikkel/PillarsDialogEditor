@@ -1,0 +1,31 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DialogEditor.Avalonia.Views.RecentProjectMissingDialog"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Title="{DynamicResource RecentMissing_Title}"
+        Width="460" MinWidth="420" SizeToContent="Height"
+        CanResize="True"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource Brush.Surface.Panel}">
+  <StackPanel Margin="20" Spacing="12">
+    <TextBlock x:Name="MessageText"
+               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"
+               TextWrapping="Wrap"/>
+    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
+      <Button x:Name="KeepButton"
+              Content="{DynamicResource RecentMissing_Keep}"
+              Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
+              Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
+              IsCancel="True"
+              IsDefault="True"
+              ToolTip.Tip="{DynamicResource ToolTip_RecentMissing_Keep}"
+              AutomationProperties.HelpText="{DynamicResource ToolTip_RecentMissing_Keep}"/>
+      <Button x:Name="RemoveButton"
+              Content="{DynamicResource RecentMissing_Remove}"
+              Background="{DynamicResource Brush.Button.Destructive.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
+              Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
+              ToolTip.Tip="{DynamicResource ToolTip_RecentMissing_Remove}"
+              AutomationProperties.HelpText="{DynamicResource ToolTip_RecentMissing_Remove}"/>
+    </StackPanel>
+  </StackPanel>
+</Window>
