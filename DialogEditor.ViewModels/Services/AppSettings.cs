@@ -171,8 +171,12 @@ public static class AppSettings
 
     public static void RemoveRecentProject(string path)
     {
+        // Normalize like AddRecentProject stores, so a caller passing a relative or
+        // non-canonical form still matches the canonical entries (the menu passes
+        // already-canonical paths today; this keeps remove robust for any caller).
+        var full = Path.GetFullPath(path);
         var s = Load();
-        if (s.RecentProjects.RemoveAll(p => string.Equals(p, path, StringComparison.OrdinalIgnoreCase)) > 0)
+        if (s.RecentProjects.RemoveAll(p => string.Equals(p, full, StringComparison.OrdinalIgnoreCase)) > 0)
             Save(s);
     }
 
