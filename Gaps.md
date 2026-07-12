@@ -815,12 +815,19 @@ panel (set global values / quest states as they're encountered) or a simpler
 "choose which branch wins" prompt at each conditional fork. Likely the largest
 remaining writer-facing quality-of-life feature.
 
-### Project Autosave / Crash Recovery
+### Project Autosave / Crash Recovery ✅ IMPLEMENTED (2026-07-12)
 
-The exception-report window reports crashes but does not protect unsaved work. A
-periodic sidecar autosave (e.g. `.dialogproject.autosave` next to the project file)
-plus an offer-to-restore on next launch. Cheap insurance; pre-launch is the right time
-— data loss is a first-impression a public release doesn't recover from.
+A `.dialogproject.autosave` sidecar is written every 60 s while the project has
+unsaved changes (silent; never touches the real file, never clears the dirty flag,
+never interrupts on failure). Deleted on save, Save As, and every deliberate discard
+(the `DiscardAndProceed` choke point) — it survives only crashes/kills. On the next
+open, a sidecar newer than the project file triggers a restore offer (timestamped
+dialog); restoring loads it as *unsaved* changes and keeps the sidecar until the
+explicit save (double-crash protection), declining deletes it, stale sidecars are
+silently removed, and a corrupt sidecar falls back to the saved file. Verified live
+via crash simulation (both restore and discard paths). Deferred: configurable
+interval; rotating generations. Spec:
+docs/superpowers/specs/2026-07-12-autosave-design.md.
 
 ### Stale Patch Data Hygiene
 
