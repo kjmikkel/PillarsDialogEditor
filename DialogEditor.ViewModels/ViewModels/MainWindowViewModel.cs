@@ -556,9 +556,10 @@ public partial class MainWindowViewModel : ObservableObject
 
     // ── Project — New / Open / Save ───────────────────────────────────────
 
-    /// MRU list of recently opened/created/saved-as projects (newest first) for the
-    /// File ▸ Recent Projects submenu. Reads through to AppSettings; the submenu is
-    /// rebuilt on open, and this raises change notification after each mutation.
+    /// MRU list of recently opened/created/saved-as projects (newest first), read
+    /// through to AppSettings. The File ▸ Recent Projects submenu binds to the derived
+    /// RecentProjectsMenuItems collection (below); both are refreshed together by
+    /// RefreshRecentProjects() after every mutation.
     public IReadOnlyList<string> RecentProjects => AppSettings.RecentProjects;
 
     /// Data-bound source for the File ▸ Recent Projects submenu. NEVER empty — an
