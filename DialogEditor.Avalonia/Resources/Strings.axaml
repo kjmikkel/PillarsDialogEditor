@@ -1213,6 +1213,15 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_DictionarySource">Opens the LibreOffice dictionaries repository in your browser — free, open-source Hunspell dictionaries for many languages. Download a language's .aff and .dic files and drop them in the dictionaries folder.</sys:String>
     <sys:String x:Key="Settings_DetectedDictionaries">Detected dictionaries: {0}</sys:String>
     <sys:String x:Key="Settings_DetectedDictionaries_None">No dictionaries detected yet.</sys:String>
+
+    <!-- ── Autosave / crash recovery ─────────────────────────────────────── -->
+    <sys:String x:Key="AutosaveRestore_Title">Unsaved changes found</sys:String>
+    <sys:String x:Key="AutosaveRestore_Message">The editor closed without saving. Automatically saved changes from {0} were found for this project. Restore them?</sys:String>
+    <sys:String x:Key="AutosaveRestore_Restore">Restore unsaved changes</sys:String>
+    <sys:String x:Key="AutosaveRestore_Discard">Discard</sys:String>
+    <sys:String x:Key="ToolTip_AutosaveRestore_Restore">Load the automatically saved changes. They stay unsaved until you save the project yourself.</sys:String>
+    <sys:String x:Key="ToolTip_AutosaveRestore_Discard">Delete the automatic save and open the project as last saved.</sys:String>
+    <sys:String x:Key="Status_AutosaveRestored">Restored automatically saved changes — save the project to keep them.</sys:String>
     <sys:String x:Key="Button_CancelCleanUp">Keep files</sys:String>
     <sys:String x:Key="ToolTip_CancelCleanUp">Close the confirmation without deleting anything.</sys:String>
     <!-- {0} = files deleted -->

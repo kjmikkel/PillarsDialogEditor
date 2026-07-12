@@ -682,8 +682,46 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
+    /// Seam for the autosave restore offer (argument: the sidecar's local timestamp;
+    /// true = restore). Null in unit tests that don't exercise it — a newer sidecar
+    /// is then left untouched (never destroy recovery data because no dialog was
+    /// wired) and the saved file loads normally. The View wires AutosaveRestoreDialog.
+    public Func<DateTime, Task<bool>>? ConfirmRestoreAutosave { get; set; }
+
     private async Task LoadProjectAsync(string path, bool offerDeferred)
     {
+        // Crash recovery (spec 2026-07-12 §4): a sidecar newer than the project file
+        // holds work lost to a crash/kill — offer to restore it before loading.
+        var recovery = AutosaveRecovery.Check(path);
+        if (recovery.State == AutosaveState.Stale)
+        {
+            AutosaveRecovery.TryDelete(path); // save happened through another route
+        }
+        else if (recovery.State == AutosaveState.Newer && ConfirmRestoreAutosave is not null)
+        {
+            var restore = await ConfirmRestoreAutosave(recovery.SidecarTimeUtc!.Value.ToLocalTime());
+            if (restore)
+            {
+                try
+                {
+                    var recovered = DialogProjectSerializer.LoadFromFile(recovery.SidecarPath);
+                    FinishLoad(recovered, path);
+                    IsModified = true;   // recovered state is unsaved until an explicit save
+                    StatusText = Loc.Get("Status_AutosaveRestored");
+                    return;              // sidecar is KEPT until that save (double-crash protection)
+                }
+                catch (Exception ex)
+                {
+                    AppLog.Warn($"Autosave restore failed for '{path}': {ex.Message} — loading saved file");
+                    AutosaveRecovery.TryDelete(path); // corrupt sidecar: don't re-offer forever
+                }
+            }
+            else
+            {
+                AutosaveRecovery.TryDelete(path);    // user declined — respect it
+            }
+        }
+
         try
         {
             var text = File.ReadAllText(path);

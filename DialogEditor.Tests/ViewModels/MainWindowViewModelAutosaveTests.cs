@@ -107,4 +107,81 @@ public class MainWindowViewModelAutosaveTests : IDisposable
 
         Assert.False(File.Exists(AutosaveRecovery.SidecarPath(_projectPath)));
     }
+
+    // ── Restore offer on open (spec §4) ─────────────────────────────────────
+
+    private static Task InvokeLoadProjectAsync(MainWindowViewModel vm, string path)
+    {
+        var mi = typeof(MainWindowViewModel)
+            .GetMethod("LoadProjectAsync", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+        return (Task)mi.Invoke(vm, [path, false])!;
+    }
+
+    /// Real file named "Saved"; newer sidecar named "Recovered".
+    private void WriteProjectAndNewerSidecar()
+    {
+        DialogProjectSerializer.SaveToFile(_projectPath, DialogProject.Empty("Saved"));
+        var sidecar = AutosaveRecovery.SidecarPath(_projectPath);
+        DialogProjectSerializer.SaveToFile(sidecar, DialogProject.Empty("Recovered"));
+        File.SetLastWriteTimeUtc(_projectPath, DateTime.UtcNow.AddMinutes(-10));
+        File.SetLastWriteTimeUtc(sidecar,      DateTime.UtcNow.AddMinutes(-1));
+    }
+
+    [Fact]
+    public async Task Open_NewerSidecar_Restore_LoadsSidecarDirty_AndKeepsIt()
+    {
+        WriteProjectAndNewerSidecar();
+        var vm = MakeVm();
+        vm.ConfirmRestoreAutosave = _ => Task.FromResult(true);
+
+        await InvokeLoadProjectAsync(vm, _projectPath);
+
+        Assert.Equal("Recovered", vm.CurrentProjectName);
+        Assert.True(vm.IsModified); // unsaved until an explicit save
+        Assert.True(File.Exists(AutosaveRecovery.SidecarPath(_projectPath))); // double-crash protection
+    }
+
+    [Fact]
+    public async Task Open_NewerSidecar_Decline_DeletesSidecar_LoadsSaved()
+    {
+        WriteProjectAndNewerSidecar();
+        var vm = MakeVm();
+        vm.ConfirmRestoreAutosave = _ => Task.FromResult(false);
+
+        await InvokeLoadProjectAsync(vm, _projectPath);
+
+        Assert.Equal("Saved", vm.CurrentProjectName);
+        Assert.False(File.Exists(AutosaveRecovery.SidecarPath(_projectPath)));
+    }
+
+    [Fact]
+    public async Task Open_StaleSidecar_SilentlyDeleted_NoSeamCall()
+    {
+        DialogProjectSerializer.SaveToFile(_projectPath, DialogProject.Empty("Saved"));
+        var sidecar = AutosaveRecovery.SidecarPath(_projectPath);
+        DialogProjectSerializer.SaveToFile(sidecar, DialogProject.Empty("Old"));
+        File.SetLastWriteTimeUtc(sidecar,      DateTime.UtcNow.AddMinutes(-10));
+        File.SetLastWriteTimeUtc(_projectPath, DateTime.UtcNow.AddMinutes(-1));
+        var vm = MakeVm();
+        var consulted = false;
+        vm.ConfirmRestoreAutosave = _ => { consulted = true; return Task.FromResult(false); };
+
+        await InvokeLoadProjectAsync(vm, _projectPath);
+
+        Assert.Equal("Saved", vm.CurrentProjectName);
+        Assert.False(consulted);
+        Assert.False(File.Exists(sidecar));
+    }
+
+    [Fact]
+    public async Task Open_NewerSidecar_NullSeam_LoadsSaved_KeepsSidecar()
+    {
+        WriteProjectAndNewerSidecar();
+        var vm = MakeVm(); // no seam wired — never destroy recovery data
+
+        await InvokeLoadProjectAsync(vm, _projectPath);
+
+        Assert.Equal("Saved", vm.CurrentProjectName);
+        Assert.True(File.Exists(AutosaveRecovery.SidecarPath(_projectPath)));
+    }
 }
