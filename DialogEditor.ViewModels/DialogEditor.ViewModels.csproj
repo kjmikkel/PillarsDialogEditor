@@ -15,6 +15,7 @@
     <EmbeddedResource Include="Resources\conditions.json" />
     <EmbeddedResource Include="Resources\scripts.json" />
     <EmbeddedResource Include="Resources\tags.json" />
+    <EmbeddedResource Include="Resources\Lexicons\*.txt" />
   </ItemGroup>
 
   <ItemGroup>
