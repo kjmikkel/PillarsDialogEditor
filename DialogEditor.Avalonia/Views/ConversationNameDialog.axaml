@@ -23,7 +23,7 @@
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
             <Button x:Name="CancelButton"
-                    Content="Cancel"
+                    Content="{DynamicResource ConversationName_Cancel}"
                     Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="{DynamicResource FontSize.Body}"/>
             <Button x:Name="OkButton"

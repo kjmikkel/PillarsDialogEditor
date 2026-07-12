@@ -272,12 +272,12 @@
         <Border Grid.Row="1" Background="{DynamicResource Brush.Surface.Panel}" Padding="14,10">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
                 <Button Classes="footer-btn"
-                        Content="Cancel"
+                        Content="{DynamicResource ConditionEditor_Cancel}"
                         Command="{Binding CancelCommand}"
                         ToolTip.Tip="{DynamicResource ToolTip_ConditionEditorCancel}"
                         AutomationProperties.HelpText="{DynamicResource ToolTip_ConditionEditorCancel}"/>
                 <Button Classes="footer-btn primary"
-                        Content="OK"
+                        Content="{DynamicResource ConditionEditor_OK}"
                         Command="{Binding ConfirmCommand}"
                         ToolTip.Tip="{DynamicResource ToolTip_ConditionEditorOK}"
                         AutomationProperties.HelpText="{DynamicResource ToolTip_ConditionEditorOK}"/>

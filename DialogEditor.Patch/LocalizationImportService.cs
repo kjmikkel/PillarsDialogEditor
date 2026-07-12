@@ -39,7 +39,11 @@ public static class LocalizationImportService
         return result;
     }
 
-    public static string? DetectLanguage(string path, LocalizationExportFormat format)
+    // onError: detection is best-effort (a failure just means "no suggestion"), but the
+    // failure must not be silent. This project has no logger of its own, so the caller —
+    // typically the UI layer — passes a callback that routes the exception to AppLog.
+    public static string? DetectLanguage(string path, LocalizationExportFormat format,
+        Action<Exception>? onError = null)
     {
         try
         {
@@ -51,8 +55,9 @@ public static class LocalizationImportService
                 _                              => null,
             };
         }
-        catch
+        catch (Exception ex)
         {
+            onError?.Invoke(ex);
             return null;
         }
     }

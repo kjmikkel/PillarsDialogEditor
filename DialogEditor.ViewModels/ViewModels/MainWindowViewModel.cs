@@ -1360,7 +1360,8 @@ public partial class MainWindowViewModel : ObservableObject
             new[] { (".csv", "CSV"), (".json", "JSON"), (".xlf", "XLIFF") });
         if (path is null) return;
         var fmt          = DetectFormat(path);
-        var suggestedLang = LocalizationImportService.DetectLanguage(path, fmt);
+        var suggestedLang = LocalizationImportService.DetectLanguage(path, fmt,
+            ex => AppLog.Warn($"Language auto-detect failed for '{path}': {ex.Message}"));
         var lang = await (RequestLanguageCode?.Invoke("Target language", suggestedLang)
                           ?? Task.FromResult<string?>(suggestedLang));
         if (lang is null) return;

@@ -87,7 +87,7 @@
             <TextBlock Text="{DynamicResource ExportConversations_Format}"
                        Foreground="{DynamicResource Brush.Text.Muted.Light}"
                        Margin="0,0,0,6"/>
-            <RadioButton Content="CSV"
+            <RadioButton Content="{DynamicResource ExportConversations_FormatCsv}"
                          GroupName="Format"
                          IsChecked="{Binding SelectedFormat,
                              Converter={StaticResource StringEqualsBool},
@@ -96,7 +96,7 @@
                          Tag="csv"
                          ToolTip.Tip="{DynamicResource ToolTip_ExportConversations_Csv}"
                          AutomationProperties.HelpText="{DynamicResource ToolTip_ExportConversations_Csv}"/>
-            <RadioButton Content="JSON"
+            <RadioButton Content="{DynamicResource ExportConversations_FormatJson}"
                          GroupName="Format"
                          IsChecked="{Binding SelectedFormat,
                              Converter={StaticResource StringEqualsBool},
@@ -105,7 +105,7 @@
                          Tag="json"
                          ToolTip.Tip="{DynamicResource ToolTip_ExportConversations_Json}"
                          AutomationProperties.HelpText="{DynamicResource ToolTip_ExportConversations_Json}"/>
-            <RadioButton Content="Yarn Spinner"
+            <RadioButton Content="{DynamicResource ExportConversations_FormatYarnSpinner}"
                          GroupName="Format"
                          IsChecked="{Binding SelectedFormat,
                              Converter={StaticResource StringEqualsBool},
@@ -115,7 +115,7 @@
                          ToolTip.Tip="{DynamicResource ToolTip_ExportConversations_Yarn}"
                          AutomationProperties.HelpText="{DynamicResource ToolTip_ExportConversations_Yarn}"/>
             <RadioButton x:Name="ArticyRadioButton"
-                         Content="Articy Draft XML"
+                         Content="{DynamicResource ExportConversations_FormatArticy}"
                          GroupName="Format"
                          IsEnabled="False"
                          ToolTip.Tip="{DynamicResource ExportConversations_ArticyNote}"
