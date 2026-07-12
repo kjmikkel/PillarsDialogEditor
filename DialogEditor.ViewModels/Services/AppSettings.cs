@@ -71,6 +71,9 @@ public static class AppSettings
         // means "no baseline yet" — covers both a fresh install and the first upgrade
         // that adds this key; both set the baseline silently (see design 2026-07-07).
         public string LastSeenVersion                { get; set; } = "";
+        // MRU list of recently opened/created/saved-as project file paths, newest
+        // first, capped at MaxRecentProjects. Powers File ▸ Recent Projects.
+        public List<string> RecentProjects { get; set; } = [];
     }
 
     public static string? LastLanguage
@@ -149,6 +152,36 @@ public static class AppSettings
     {
         get => Load().LastProjectPath;
         set { var s = Load(); s.LastProjectPath = value; Save(s); }
+    }
+
+    private const int MaxRecentProjects = 10;
+
+    public static IReadOnlyList<string> RecentProjects => Load().RecentProjects;
+
+    public static void AddRecentProject(string path)
+    {
+        var full = Path.GetFullPath(path);
+        var s = Load();
+        s.RecentProjects.RemoveAll(p => string.Equals(p, full, StringComparison.OrdinalIgnoreCase));
+        s.RecentProjects.Insert(0, full);
+        if (s.RecentProjects.Count > MaxRecentProjects)
+            s.RecentProjects.RemoveRange(MaxRecentProjects, s.RecentProjects.Count - MaxRecentProjects);
+        Save(s);
+    }
+
+    public static void RemoveRecentProject(string path)
+    {
+        var s = Load();
+        if (s.RecentProjects.RemoveAll(p => string.Equals(p, path, StringComparison.OrdinalIgnoreCase)) > 0)
+            Save(s);
+    }
+
+    public static void ClearRecentProjects()
+    {
+        var s = Load();
+        if (s.RecentProjects.Count == 0) return;
+        s.RecentProjects.Clear();
+        Save(s);
     }
 
     public static IReadOnlyList<PendingRestoreEntry>? GetPendingRestores()
