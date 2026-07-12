@@ -48,7 +48,7 @@
                 <ItemsControl ItemsSource="{Binding Rows}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="vm:TextTagRowViewModel">
-                            <Grid ColumnDefinitions="Auto,Auto,Auto,*" Margin="0,3">
+                            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*,Auto" Margin="0,3">
                                 <TextBlock Grid.Column="0"
                                            Text="{Binding ConversationName}"
                                            Foreground="{DynamicResource Brush.Text.Emphasis}"
@@ -67,10 +67,25 @@
                                            FontSize="{DynamicResource FontSize.Small}"
                                            Width="60" VerticalAlignment="Center"/>
                                 <TextBlock Grid.Column="3"
+                                           Text="{Binding TypeLabel}"
+                                           Foreground="{DynamicResource Brush.Text.Tertiary}"
+                                           FontSize="{DynamicResource FontSize.Small}"
+                                           FontWeight="Bold"
+                                           Width="60" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="4"
                                            Text="{Binding Message}"
                                            Foreground="{DynamicResource Brush.Text.Secondary}"
                                            FontSize="{DynamicResource FontSize.Label}"
                                            TextWrapping="Wrap" VerticalAlignment="Center"/>
+                                <Button Grid.Column="5"
+                                        Content="{DynamicResource Button_AddToDictionary}"
+                                        Command="{Binding AddToDictionaryCommand}"
+                                        IsVisible="{Binding CanAddToDictionary}"
+                                        FontSize="{DynamicResource FontSize.Small}"
+                                        Padding="8,2" Margin="6,0,0,0"
+                                        VerticalAlignment="Center"
+                                        ToolTip.Tip="{DynamicResource ToolTip_AddToDictionary}"
+                                        AutomationProperties.HelpText="{DynamicResource ToolTip_AddToDictionary}"/>
                             </Grid>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
