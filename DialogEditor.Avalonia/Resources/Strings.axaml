@@ -413,6 +413,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Validation_UnknownToken_Suggest">Unknown tag "{0}" — did you mean "{1}"?</sys:String>
     <sys:String x:Key="Validation_UnknownToken">Unknown tag "{0}".</sys:String>
     <sys:String x:Key="Validation_UnbalancedMarkup">Unbalanced markup "{0}" — check the opening/closing tags match.</sys:String>
+    <sys:String x:Key="Spelling_Misspelled_Suggest">Possible misspelling "{0}" — did you mean "{1}"?</sys:String>
+    <sys:String x:Key="Spelling_Misspelled">Possible misspelling "{0}".</sys:String>
     <sys:String x:Key="Option_PersistenceNone">None</sys:String>
     <sys:String x:Key="Option_PersistenceOnceEver">OnceEver</sys:String>
 
@@ -1179,26 +1181,38 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Button_ConfirmCleanUp">Delete files</sys:String>
     <sys:String x:Key="ToolTip_ConfirmCleanUp">Permanently delete the listed orphaned files from the _vo folder.</sys:String>
 
-    <!-- ── Validate Text Tags (project-wide sweep) ───────────────────────── -->
-    <sys:String x:Key="TextTagValidation_Title">Validate Text Tags</sys:String>
-    <sys:String x:Key="TextTagValidation_SavedNote">Scans the saved project — text in every patched conversation and every language.</sys:String>
+    <!-- ── Validate Text (project-wide sweep: tags + spelling) ──────────── -->
+    <sys:String x:Key="TextTagValidation_Title">Validate Text</sys:String>
+    <sys:String x:Key="TextTagValidation_SavedNote">Scans the saved project — tags and spelling in every patched conversation and every language.</sys:String>
+    <sys:String x:Key="TextIssueType_Tag">Tag</sys:String>
+    <sys:String x:Key="TextIssueType_Spelling">Spelling</sys:String>
+    <sys:String x:Key="Button_AddToDictionary">Add to dictionary</sys:String>
+    <sys:String x:Key="ToolTip_AddToDictionary">Treat this word as correctly spelled from now on — adds it to your personal dictionary.</sys:String>
     <!-- Summary composes two pre-pluralised fragments (see pluralisation design). -->
     <sys:String x:Key="TextTagValidation_Summary">{0} across {1}</sys:String>
     <sys:String x:Key="TextTagValidation_Issues_One">{0} issue</sys:String>
     <sys:String x:Key="TextTagValidation_Issues_Other">{0} issues</sys:String>
     <sys:String x:Key="TextTagValidation_Convs_One">{0} conversation</sys:String>
     <sys:String x:Key="TextTagValidation_Convs_Other">{0} conversations</sys:String>
-    <sys:String x:Key="TextTagValidation_NoIssues">No text tag issues found.</sys:String>
+    <sys:String x:Key="TextTagValidation_NoIssues">No text issues found.</sys:String>
     <sys:String x:Key="TextTagValidation_Default">Default</sys:String>
-    <sys:String x:Key="Menu_ValidateTextTags">Validate Text Tags…</sys:String>
-    <sys:String x:Key="ToolTip_ValidateTextTags">Scan every patched conversation in the saved project (all languages) for unknown substitution tokens and unbalanced markup. Requires an open project.</sys:String>
-    <sys:String x:Key="ToolTip_TextTagValidation_Refresh">Re-scan the saved project for text tag issues</sys:String>
+    <sys:String x:Key="Menu_ValidateTextTags">Validate Text…</sys:String>
+    <sys:String x:Key="ToolTip_ValidateTextTags">Scan every patched conversation in the saved project (all languages) for unknown substitution tokens, unbalanced markup, and misspellings. Requires an open project.</sys:String>
+    <sys:String x:Key="ToolTip_TextTagValidation_Refresh">Re-scan the saved project for text issues</sys:String>
     <sys:String x:Key="SaveBeforeScan_Title">Unsaved changes</sys:String>
     <sys:String x:Key="SaveBeforeScan_Message">The scan reads the saved project. Unsaved changes will not be included.</sys:String>
     <sys:String x:Key="SaveBeforeScan_SaveAndScan">Save and scan</sys:String>
     <sys:String x:Key="SaveBeforeScan_ScanSavedOnly">Scan saved state only</sys:String>
     <sys:String x:Key="ToolTip_SaveBeforeScan_SaveAndScan">Save the project first, then scan everything including your latest edits</sys:String>
     <sys:String x:Key="ToolTip_SaveBeforeScan_ScanSavedOnly">Scan the project as last saved; unsaved edits are not included</sys:String>
+    <sys:String x:Key="Settings_SpellingHeader">Spelling</sys:String>
+    <sys:String x:Key="Settings_SpellingInstructions">To enable spell checking for a language, download its Hunspell dictionary (a matching .aff and .dic pair) and place both files in the dictionaries folder. The editor detects them automatically the next time it starts.</sys:String>
+    <sys:String x:Key="Settings_OpenDictionariesFolder">Open dictionaries folder</sys:String>
+    <sys:String x:Key="ToolTip_OpenDictionariesFolder">Open the folder where Hunspell dictionary files (.aff/.dic pairs) go. The folder is created if it does not exist yet.</sys:String>
+    <sys:String x:Key="Settings_DictionarySource">Get dictionaries (LibreOffice repository)</sys:String>
+    <sys:String x:Key="ToolTip_DictionarySource">Opens the LibreOffice dictionaries repository in your browser — free, open-source Hunspell dictionaries for many languages. Download a language's .aff and .dic files and drop them in the dictionaries folder.</sys:String>
+    <sys:String x:Key="Settings_DetectedDictionaries">Detected dictionaries: {0}</sys:String>
+    <sys:String x:Key="Settings_DetectedDictionaries_None">No dictionaries detected yet.</sys:String>
     <sys:String x:Key="Button_CancelCleanUp">Keep files</sys:String>
     <sys:String x:Key="ToolTip_CancelCleanUp">Close the confirmation without deleting anything.</sys:String>
     <!-- {0} = files deleted -->

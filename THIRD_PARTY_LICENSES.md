@@ -40,6 +40,50 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 ---
 
+## WeCantSpell.Hunspell
+
+**Used for:** evaluating user-supplied Hunspell `.aff`/`.dic` dictionaries for the
+dialog-text spell checker (layer 1 of the three-layer dictionary).  
+**Version:** 7.0.1 (NuGet package, `DialogEditor.ViewModels`)  
+**Source:** https://github.com/aarondandy/WeCantSpell.Hunspell  
+**License:** MPL 1.1 / GPL 2.0 / LGPL 2.1 tri-license, inherited from the original
+Hunspell project (this project uses it under the **MPL 1.1** option). Full MPL 1.1
+text: https://www.mozilla.org/MPL/1.1/
+
+```
+Note that this license is inherited from the original Hunspell project
+as this is derived from that work. Original license:
+
+Version: MPL 1.1/GPL 2.0/LGPL 2.1
+
+The contents of this file are subject to the Mozilla Public License Version
+1.1 (the "License"); you may not use this file except in compliance with
+the License. You may obtain a copy of the License at
+http://www.mozilla.org/MPL/
+
+Software distributed under the License is distributed on an "AS IS" basis,
+WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+for the specific language governing rights and limitations under the
+License.
+
+The Original Code is Hunspell, based on MySpell.
+
+The Initial Developers of the Original Code are
+Kevin Hendricks (MySpell) and Németh László (Hunspell).
+Portions created by the Initial Developers are Copyright (C) 2002-2005
+the Initial Developers. All Rights Reserved.
+
+Alternatively, the contents of this file may be used under the terms of
+either the GNU General Public License Version 2 or later (the "GPL"), or
+the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+in which case the provisions of the GPL or the LGPL are applicable instead
+of those above.
+```
+
+The full contributor list is included in the package's `license.txt`.
+
+---
+
 ## FFmpeg (vgmstream build)
 
 **Used for:** audio codec support bundled with vgmstream-cli.  

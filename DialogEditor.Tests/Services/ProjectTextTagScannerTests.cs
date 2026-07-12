@@ -87,6 +87,69 @@ public class ProjectTextTagScannerTests
             rows.Select(r => (r.ConversationName, r.NodeId, r.Language)).ToList());
     }
 
+    // ── Spelling integration (spell checker feature) ────────────────────────
+
+    private static SpellCheckService FixtureChecker(string dir)
+    {
+        var root = new DirectoryInfo(AppContext.BaseDirectory);
+        while (root is not null && !File.Exists(Path.Combine(root.FullName, "DialogEditor.slnx")))
+            root = root.Parent;
+        var fixtures = Path.Combine(root!.FullName, "DialogEditor.Tests", "Fixtures", "spell");
+        Directory.CreateDirectory(dir);
+        File.Copy(Path.Combine(fixtures, "test_en.aff"), Path.Combine(dir, "en_US.aff"), overwrite: true);
+        File.Copy(Path.Combine(fixtures, "test_en.dic"), Path.Combine(dir, "en_US.dic"), overwrite: true);
+        return new SpellCheckService(new SpellDictionaryStore(dir, Path.Combine(dir, "user.txt")));
+    }
+
+    [Fact]
+    public void SpellingRow_ForPrimaryLanguageTypo_WithWordAndType()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), $"scanspell_{Guid.NewGuid():N}");
+        try
+        {
+            var project = Project(Patch("conv_a", new Dictionary<string, IReadOnlyList<NodeTranslation>>
+            {
+                ["en"] = [new NodeTranslation(5, "the captian glows", "")],
+            }));
+            var rows = ProjectTextTagScanner.Scan(project, "poe2", "en", spell: FixtureChecker(dir));
+            // "the" and "captian" are both unknown to the tiny fixture dic; assert captian present.
+            var spelling = rows.Where(r => r.Type == TextIssueType.Spelling).ToList();
+            Assert.Contains(spelling, r => r.Word == "captian" && r.NodeId == 5 && r.Language == "");
+        }
+        finally { try { Directory.Delete(dir, true); } catch (Exception) { /* best-effort */ } }
+    }
+
+    [Fact]
+    public void SpellingSkipsLanguagesWithoutDictionary_ChecksTranslationLanguage()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), $"scanspell_{Guid.NewGuid():N}");
+        try
+        {
+            var project = Project(Patch("conv_a", new Dictionary<string, IReadOnlyList<NodeTranslation>>
+            {
+                ["fr"] = [new NodeTranslation(7, "zzqq pff", "")],   // no fr dictionary → skipped
+                ["en"] = [new NodeTranslation(7, "captian", "")],    // en dictionary → checked
+            }));
+            var rows = ProjectTextTagScanner.Scan(project, "poe2", "en", spell: FixtureChecker(dir));
+            var spelling = rows.Where(r => r.Type == TextIssueType.Spelling).ToList();
+            Assert.All(spelling, r => Assert.Equal("", r.Language)); // only en (primary) rows
+            Assert.Contains(spelling, r => r.Word == "captian");
+        }
+        finally { try { Directory.Delete(dir, true); } catch (Exception) { /* best-effort */ } }
+    }
+
+    [Fact]
+    public void NullSpellChecker_TagBehaviourUnchanged()
+    {
+        var project = Project(Patch("conv_a", new Dictionary<string, IReadOnlyList<NodeTranslation>>
+        {
+            ["en"] = [new NodeTranslation(5, "Hi [Player Nmae] captian", "")],
+        }));
+        var rows = ProjectTextTagScanner.Scan(project, "poe2", "en");
+        var row = Assert.Single(rows);
+        Assert.Equal(TextIssueType.Tag, row.Type);
+    }
+
     [Fact]
     public void DefensiveAddedNodesText_ValidatedWhenPresent()
     {

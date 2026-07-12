@@ -83,6 +83,11 @@ public partial class MainWindow : Window
         // unsaved changes (the scan reads saved state only).
         vm.ConfirmScanWithUnsavedChanges = () =>
             new SaveBeforeScanDialog().ShowDialogAsync(this);
+        // Spell checking: three-layer store (user dictionaries + embedded game
+        // lexicons + personal word list). Null checker would just disable spelling.
+        EmbeddedLexicons.LoadInto(SpellDictionaryStore.Default);
+        vm.Detail.SpellChecker = new SpellCheckService(SpellDictionaryStore.Default);
+        vm.SpellStoreFactory   = () => SpellDictionaryStore.Default;
         // Launch greeting: show "what's new" once if the app version advanced.
         vm.ShowWhatsNewIfUpdated();
         vm.ShowTagReference = tagVm =>
@@ -581,10 +586,13 @@ public partial class MainWindow : Window
     private async Task OpenSettingsAsync()
     {
         var vm = (MainWindowViewModel)DataContext!;
-        var settings = new SettingsWindow
-        {
-            DataContext = vm.CreateSettingsViewModel(new FontScaleApplier())
-        };
+        var settingsVm = vm.CreateSettingsViewModel(new FontScaleApplier());
+        // Spelling section shell-outs (folder in Explorer, source link in browser).
+        settingsVm.FolderOpener = p => System.Diagnostics.Process.Start(
+            new System.Diagnostics.ProcessStartInfo(p) { UseShellExecute = true });
+        settingsVm.UrlOpener = u => System.Diagnostics.Process.Start(
+            new System.Diagnostics.ProcessStartInfo(u) { UseShellExecute = true });
+        var settings = new SettingsWindow { DataContext = settingsVm };
         await settings.ShowDialog(this);
     }
 
