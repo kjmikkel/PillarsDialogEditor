@@ -550,6 +550,12 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     // ── Project — New / Open / Save ───────────────────────────────────────
+
+    /// MRU list of recently opened/created/saved-as projects (newest first) for the
+    /// File ▸ Recent Projects submenu. Reads through to AppSettings; the submenu is
+    /// rebuilt on open, and this raises change notification after each mutation.
+    public IReadOnlyList<string> RecentProjects => AppSettings.RecentProjects;
+
     [RelayCommand]
     private void NewProject()
         => GuardDirtyThen(() => _ = DoNewProject());
@@ -571,6 +577,8 @@ public partial class MainWindowViewModel : ObservableObject
         BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
         DialogProjectSerializer.SaveToFile(path, _project!);
         AppSettings.LastProjectPath = path;
+        AppSettings.AddRecentProject(path);
+        OnPropertyChanged(nameof(RecentProjects));
         CurrentProjectName = name;
         AppLog.Info($"New project: {path}");
         StatusText = Loc.Format("Status_ProjectNew", name);
@@ -811,6 +819,8 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
         AppSettings.LastProjectPath = path;
+        AppSettings.AddRecentProject(path);
+        OnPropertyChanged(nameof(RecentProjects));
         CurrentProjectName = loaded.Name;
         AppLog.Info($"Opened project: {path}");
         StatusText = Loc.FormatCount("Status_ProjectOpened", loaded.Patches.Count, loaded.Name);
@@ -1143,6 +1153,8 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();
         AppSettings.LastProjectPath = path;
+        AppSettings.AddRecentProject(path);
+        OnPropertyChanged(nameof(RecentProjects));
         CurrentProjectName = _project!.Name;
         AppLog.Info($"Project saved as: {path}");
         StatusText = voCopyError is null
