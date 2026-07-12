@@ -28,9 +28,11 @@ except ImportError:  # pragma: no cover - environment-dependent
 _BRACKET = re.compile(r"\[[^\[\]\n\r]*\]")
 _MARKUP = re.compile(r"<[^>]*>")
 
-# Words: letters (any script) with internal apostrophes/hyphens. Pure numbers
-# and single letters are not words for spelling purposes.
-_WORD = re.compile(r"[^\W\d_]+(?:['’-][^\W\d_]+)*", re.UNICODE)
+# Tokens: word chars + apostrophes/hyphens. Tokens containing digits ("3rd")
+# are skipped entirely rather than yielding letter fragments ("rd"); single
+# letters and pure numbers are not words. Mirrors SpellCheckService.
+_TOKEN = re.compile(r"[\w'’-]+", re.UNICODE)
+_HAS_DIGIT = re.compile(r"[\d_]")
 
 
 def strip_tags(text):
@@ -42,8 +44,16 @@ def strip_tags(text):
 
 
 def tokenize(text):
-    """Words of letters + internal apostrophes/hyphens; singles/numbers dropped."""
-    return [w for w in _WORD.findall(text) if len(w) > 1]
+    """Words of letters + internal apostrophes/hyphens; tokens containing
+    digits, single letters, and pure numbers dropped."""
+    out = []
+    for tok in _TOKEN.findall(text):
+        if _HAS_DIGIT.search(tok):
+            continue
+        tok = tok.strip("'’-")
+        if len(tok) > 1:
+            out.append(tok)
+    return out
 
 
 def _entry_texts(stringtable_path):
