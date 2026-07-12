@@ -87,6 +87,7 @@ public partial class MainWindow : Window
         // lexicons + personal word list). Null checker would just disable spelling.
         EmbeddedLexicons.LoadInto(SpellDictionaryStore.Default);
         vm.Detail.SpellChecker = new SpellCheckService(SpellDictionaryStore.Default);
+        vm.SpellStoreFactory   = () => SpellDictionaryStore.Default;
         // Launch greeting: show "what's new" once if the app version advanced.
         vm.ShowWhatsNewIfUpdated();
         vm.ShowTagReference = tagVm =>

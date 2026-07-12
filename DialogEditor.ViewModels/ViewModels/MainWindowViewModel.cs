@@ -468,7 +468,12 @@ public partial class MainWindowViewModel : ObservableObject
     /// The View wires SaveBeforeScanDialog.
     public Func<Task<ScanDirtyChoice>>? ConfirmScanWithUnsavedChanges { get; set; }
 
-    /// Test ▸ Validate Text Tags…: returns a ready view-model over the SAVED project,
+    /// Supplies the spelling store for the Validate Text sweep. Null (the unit-test
+    /// default) disables spelling in the sweep; the View wires it to
+    /// SpellDictionaryStore.Default at startup.
+    public Func<SpellDictionaryStore?>? SpellStoreFactory { get; set; }
+
+    /// Test ▸ Validate Text…: returns a ready view-model over the SAVED project,
     /// or null when no project is open / the user cancels the dirty guard.
     public async Task<TextTagValidationViewModel?> RequestTextTagValidationAsync()
     {
@@ -483,12 +488,17 @@ public partial class MainWindowViewModel : ObservableObject
             if (choice == ScanDirtyChoice.SaveAndScan) SaveProject();
         }
 
+        var store = SpellStoreFactory?.Invoke();
+        var spell = store is null ? null : new SpellCheckService(store);
+
         // The closure reads the current fields, so Refresh in the open window picks
         // up saves made later in the session.
-        return new TextTagValidationViewModel(() =>
-            _project is null
+        return new TextTagValidationViewModel(
+            () => _project is null
                 ? []
-                : ProjectTextTagScanner.Scan(_project, _activeGameId, _provider?.Language ?? ""));
+                : ProjectTextTagScanner.Scan(
+                    _project, _activeGameId, _provider?.Language ?? "", spell: spell),
+            addWord: store is null ? null : store.AddWord);
     }
 
     /// Opens the batch VO import dialog in multi-conversation mode.

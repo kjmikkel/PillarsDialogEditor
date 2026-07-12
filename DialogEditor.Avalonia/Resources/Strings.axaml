@@ -1181,9 +1181,13 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Button_ConfirmCleanUp">Delete files</sys:String>
     <sys:String x:Key="ToolTip_ConfirmCleanUp">Permanently delete the listed orphaned files from the _vo folder.</sys:String>
 
-    <!-- ── Validate Text Tags (project-wide sweep) ───────────────────────── -->
-    <sys:String x:Key="TextTagValidation_Title">Validate Text Tags</sys:String>
-    <sys:String x:Key="TextTagValidation_SavedNote">Scans the saved project — text in every patched conversation and every language.</sys:String>
+    <!-- ── Validate Text (project-wide sweep: tags + spelling) ──────────── -->
+    <sys:String x:Key="TextTagValidation_Title">Validate Text</sys:String>
+    <sys:String x:Key="TextTagValidation_SavedNote">Scans the saved project — tags and spelling in every patched conversation and every language.</sys:String>
+    <sys:String x:Key="TextIssueType_Tag">Tag</sys:String>
+    <sys:String x:Key="TextIssueType_Spelling">Spelling</sys:String>
+    <sys:String x:Key="Button_AddToDictionary">Add to dictionary</sys:String>
+    <sys:String x:Key="ToolTip_AddToDictionary">Treat this word as correctly spelled from now on — adds it to your personal dictionary.</sys:String>
     <!-- Summary composes two pre-pluralised fragments (see pluralisation design). -->
     <sys:String x:Key="TextTagValidation_Summary">{0} across {1}</sys:String>
     <sys:String x:Key="TextTagValidation_Issues_One">{0} issue</sys:String>
@@ -1192,9 +1196,9 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="TextTagValidation_Convs_Other">{0} conversations</sys:String>
     <sys:String x:Key="TextTagValidation_NoIssues">No text tag issues found.</sys:String>
     <sys:String x:Key="TextTagValidation_Default">Default</sys:String>
-    <sys:String x:Key="Menu_ValidateTextTags">Validate Text Tags…</sys:String>
-    <sys:String x:Key="ToolTip_ValidateTextTags">Scan every patched conversation in the saved project (all languages) for unknown substitution tokens and unbalanced markup. Requires an open project.</sys:String>
-    <sys:String x:Key="ToolTip_TextTagValidation_Refresh">Re-scan the saved project for text tag issues</sys:String>
+    <sys:String x:Key="Menu_ValidateTextTags">Validate Text…</sys:String>
+    <sys:String x:Key="ToolTip_ValidateTextTags">Scan every patched conversation in the saved project (all languages) for unknown substitution tokens, unbalanced markup, and misspellings. Requires an open project.</sys:String>
+    <sys:String x:Key="ToolTip_TextTagValidation_Refresh">Re-scan the saved project for text issues</sys:String>
     <sys:String x:Key="SaveBeforeScan_Title">Unsaved changes</sys:String>
     <sys:String x:Key="SaveBeforeScan_Message">The scan reads the saved project. Unsaved changes will not be included.</sys:String>
     <sys:String x:Key="SaveBeforeScan_SaveAndScan">Save and scan</sys:String>
