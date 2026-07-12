@@ -88,6 +88,17 @@ public partial class MainWindow : Window
         EmbeddedLexicons.LoadInto(SpellDictionaryStore.Default);
         vm.Detail.SpellChecker = new SpellCheckService(SpellDictionaryStore.Default);
         vm.SpellStoreFactory   = () => SpellDictionaryStore.Default;
+        // Crash recovery: offer to restore a newer autosave sidecar at project open.
+        vm.ConfirmRestoreAutosave = t => new AutosaveRestoreDialog(t).ShowDialogAsync(this);
+        // Autosave: sidecar written every 60 s while the project has unsaved changes
+        // (spec 2026-07-12). The tick is a no-op on a clean session; runs on the UI
+        // thread so folding the canvas into the project is safe.
+        var autosaveTimer = new global::Avalonia.Threading.DispatcherTimer
+        {
+            Interval = TimeSpan.FromSeconds(60),
+        };
+        autosaveTimer.Tick += (_, _) => vm.AutosaveTick();
+        autosaveTimer.Start();
         // Launch greeting: show "what's new" once if the app version advanced.
         vm.ShowWhatsNewIfUpdated();
         vm.ShowTagReference = tagVm =>
