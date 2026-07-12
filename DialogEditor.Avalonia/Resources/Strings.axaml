@@ -1205,6 +1205,14 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="SaveBeforeScan_ScanSavedOnly">Scan saved state only</sys:String>
     <sys:String x:Key="ToolTip_SaveBeforeScan_SaveAndScan">Save the project first, then scan everything including your latest edits</sys:String>
     <sys:String x:Key="ToolTip_SaveBeforeScan_ScanSavedOnly">Scan the project as last saved; unsaved edits are not included</sys:String>
+    <sys:String x:Key="Settings_SpellingHeader">Spelling</sys:String>
+    <sys:String x:Key="Settings_SpellingInstructions">To enable spell checking for a language, download its Hunspell dictionary (a matching .aff and .dic pair) and place both files in the dictionaries folder. The editor detects them automatically the next time it starts.</sys:String>
+    <sys:String x:Key="Settings_OpenDictionariesFolder">Open dictionaries folder</sys:String>
+    <sys:String x:Key="ToolTip_OpenDictionariesFolder">Open the folder where Hunspell dictionary files (.aff/.dic pairs) go. The folder is created if it does not exist yet.</sys:String>
+    <sys:String x:Key="Settings_DictionarySource">Get dictionaries (LibreOffice repository)</sys:String>
+    <sys:String x:Key="ToolTip_DictionarySource">Opens the LibreOffice dictionaries repository in your browser — free, open-source Hunspell dictionaries for many languages. Download a language's .aff and .dic files and drop them in the dictionaries folder.</sys:String>
+    <sys:String x:Key="Settings_DetectedDictionaries">Detected dictionaries: {0}</sys:String>
+    <sys:String x:Key="Settings_DetectedDictionaries_None">No dictionaries detected yet.</sys:String>
     <sys:String x:Key="Button_CancelCleanUp">Keep files</sys:String>
     <sys:String x:Key="ToolTip_CancelCleanUp">Close the confirmation without deleting anything.</sys:String>
     <!-- {0} = files deleted -->

@@ -103,6 +103,31 @@
                 </StackPanel>
             </Border>
 
+            <!-- Spelling: user-supplied Hunspell dictionaries (layer 1 of the
+                 three-layer spell checker; spec 2026-07-11) -->
+            <StackPanel Spacing="6">
+                <TextBlock Text="{DynamicResource Settings_SpellingHeader}"
+                           Foreground="{DynamicResource Brush.Text.Primary}"
+                           FontWeight="Bold"/>
+                <TextBlock Text="{DynamicResource Settings_SpellingInstructions}"
+                           Foreground="{DynamicResource Brush.Text.Muted}"
+                           FontSize="{DynamicResource FontSize.Small}"
+                           TextWrapping="Wrap"/>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Content="{DynamicResource Settings_OpenDictionariesFolder}"
+                            Command="{Binding OpenDictionariesFolderCommand}"
+                            ToolTip.Tip="{DynamicResource ToolTip_OpenDictionariesFolder}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_OpenDictionariesFolder}"/>
+                    <Button Content="{DynamicResource Settings_DictionarySource}"
+                            Command="{Binding OpenDictionarySourceCommand}"
+                            ToolTip.Tip="{DynamicResource ToolTip_DictionarySource}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_DictionarySource}"/>
+                </StackPanel>
+                <TextBlock Text="{Binding DetectedDictionariesText}"
+                           Foreground="{DynamicResource Brush.Text.Tertiary}"
+                           FontSize="{DynamicResource FontSize.Small}"/>
+            </StackPanel>
+
             <!-- Language picker (own DataContext set in code-behind; shared with PatchManager) -->
             <shared:LanguagePickerView x:Name="LanguagePicker"/>
 
