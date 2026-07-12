@@ -118,7 +118,8 @@ public sealed class VoImporter : IVoImporter
         }
         finally
         {
-            try { Directory.Delete(tempDir, recursive: true); } catch { }
+            try { Directory.Delete(tempDir, recursive: true); }
+            catch (Exception ex) { AppLog.Warn($"VoImporter: temp dir cleanup failed: {ex.Message}"); }
         }
     }
 

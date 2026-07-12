@@ -26,12 +26,12 @@
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
             <Button x:Name="CancelButton"
-                    Content="Cancel"
+                    Content="{DynamicResource LanguageCode_Cancel}"
                     IsCancel="True"
                     Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
                     Padding="16,5"/>
             <Button x:Name="OkButton"
-                    Content="OK"
+                    Content="{DynamicResource LanguageCode_OK}"
                     IsDefault="True"
                     Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,5"

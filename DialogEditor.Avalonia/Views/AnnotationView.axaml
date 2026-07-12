@@ -140,7 +140,7 @@
                     <!-- Edit button — hidden while editing -->
                     <Button Grid.Column="2"
                             x:Name="EditButton"
-                            Content="Edit"
+                            Content="{DynamicResource Annotation_Edit}"
                             IsVisible="{Binding !IsEditing}"
                             Background="Transparent" BorderThickness="0"
                             Foreground="{DynamicResource Brush.Text.OnAccent}"

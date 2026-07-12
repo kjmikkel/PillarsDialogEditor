@@ -162,7 +162,7 @@
                                                                Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Label}"/>
                                                     <Grid ColumnDefinitions="Auto,*">
                                                         <TextBlock Grid.Column="0"
-                                                                   Text="Before: "
+                                                                   Text="{DynamicResource BatchReplace_Before}"
                                                                    Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}"
                                                                    VerticalAlignment="Top"/>
                                                         <TextBlock Grid.Column="1"
@@ -172,7 +172,7 @@
                                                     </Grid>
                                                     <Grid ColumnDefinitions="Auto,*">
                                                         <TextBlock Grid.Column="0"
-                                                                   Text="After:  "
+                                                                   Text="{DynamicResource BatchReplace_After}"
                                                                    Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}"
                                                                    VerticalAlignment="Top"/>
                                                         <TextBlock Grid.Column="1"

@@ -39,7 +39,9 @@ end-to-end GUI verification. In practice:
 
 ## Error Handling
 
-Every caught exception must be logged via `AppLog.Error(...)` or `AppLog.Warn(...)` before or after any user-facing status update. The sole exception is `OperationCanceledException`, which represents deliberate cancellation and must be swallowed silently. Bare `catch { }` blocks are not permitted.
+In **production code**, every caught exception must be logged via `AppLog.Error(...)` or `AppLog.Warn(...)` before or after any user-facing status update. The sole exception is `OperationCanceledException`, which represents deliberate cancellation and must be swallowed silently. Bare `catch { }` blocks are not permitted in production code.
+
+This rule does not apply to `DialogEditor.Tests`: best-effort cleanup in test teardown (e.g. `try { File.Delete(...) } catch { /* best-effort */ }`) may swallow silently — a cleanup failure there is noise, not a defect worth logging infrastructure.
 
 ## Changelog
 

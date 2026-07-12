@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Avalonia.Services;
 
@@ -92,7 +93,10 @@ public static class VoPackExporter
             catch
             {
                 // Delete the partial output so the caller doesn't see a corrupt archive.
-                try { if (File.Exists(outputPath)) File.Delete(outputPath); } catch { /* best-effort */ }
+                // The delete is best-effort: the original exception (rethrown below) is
+                // what the caller must see, so a cleanup failure is only worth a warning.
+                try { if (File.Exists(outputPath)) File.Delete(outputPath); }
+                catch (Exception cleanupEx) { AppLog.Warn($"VoPackExporter: could not delete partial output '{outputPath}': {cleanupEx.Message}"); }
                 throw;
             }
         }, ct);

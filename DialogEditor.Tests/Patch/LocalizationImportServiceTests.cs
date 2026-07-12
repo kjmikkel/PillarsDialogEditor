@@ -183,4 +183,26 @@ public class LocalizationImportServiceTests : IDisposable
         var result = LocalizationImportService.DetectLanguage(exportPath, LocalizationExportFormat.Json);
         Assert.Null(result);
     }
+
+    [Fact]
+    public void DetectLanguage_MalformedFile_ReturnsNullAndReportsError()
+    {
+        // Detection failure must not be silent: DialogEditor.Patch has no logger of
+        // its own, so DetectLanguage surfaces the exception through an optional
+        // callback the UI layer wires to AppLog (per the error-logging rule).
+        var path = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".json");
+        File.WriteAllText(path, "{ not valid json");
+        try
+        {
+            Exception? reported = null;
+            var result = LocalizationImportService.DetectLanguage(
+                path, LocalizationExportFormat.Json, ex => reported = ex);
+            Assert.Null(result);
+            Assert.NotNull(reported);
+        }
+        finally
+        {
+            try { File.Delete(path); } catch { /* best-effort */ }
+        }
+    }
 }

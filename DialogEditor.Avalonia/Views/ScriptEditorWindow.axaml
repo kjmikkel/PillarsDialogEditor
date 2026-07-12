@@ -226,11 +226,11 @@
         <!-- Footer -->
         <Border Grid.Row="1" Background="{DynamicResource Brush.Surface.Panel}" Padding="14,10">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-                <Button Classes="footer-btn" Content="Cancel"
+                <Button Classes="footer-btn" Content="{DynamicResource ScriptEditor_Cancel}"
                         Command="{Binding CancelCommand}"
                         ToolTip.Tip="{DynamicResource ToolTip_ScriptEditorCancel}"
                         AutomationProperties.HelpText="{DynamicResource ToolTip_ScriptEditorCancel}"/>
-                <Button Classes="footer-btn primary" Content="OK"
+                <Button Classes="footer-btn primary" Content="{DynamicResource ScriptEditor_OK}"
                         Command="{Binding ConfirmCommand}"
                         ToolTip.Tip="{DynamicResource ToolTip_ScriptEditorOK}"
                         AutomationProperties.HelpText="{DynamicResource ToolTip_ScriptEditorOK}"/>
