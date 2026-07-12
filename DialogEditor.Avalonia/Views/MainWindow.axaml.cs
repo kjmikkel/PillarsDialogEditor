@@ -141,6 +141,12 @@ public partial class MainWindow : Window
             await dialog.ShowDialog(this);
             return dialog.Result;
         };
+        // Recent Projects: missing-file remove-offer dialog (Task 4/5).
+        vm.ConfirmRemoveMissingProject = path =>
+            new RecentProjectMissingDialog(Loc.Format("RecentMissing_Message", path)).ShowDialogAsync(this);
+        // Rebuild the File ▸ Recent Projects submenu each time it opens — keeps the
+        // list current without a live-binding ItemsSource on a MenuItem's Items.
+        RecentProjectsMenu.SubmenuOpened += (_, _) => RebuildRecentProjectsMenu(vm);
 
         var audioPlayer = new VoAudioPlayer();
         vm.Detail.Player = audioPlayer;
@@ -635,6 +641,50 @@ public partial class MainWindow : Window
                 AppSettings.SetLegendPosition(_legendWindow.Position.X, _legendWindow.Position.Y);
         };
         return _legendWindow;
+    }
+
+    // ── Recent Projects submenu ───────────────────────────────────────────
+    // Rebuilt on every SubmenuOpened rather than bound live: MenuItem.Items has
+    // no natural ItemsSource binding path here, and the list only needs to be
+    // current at the moment the user looks at it.
+    private void RebuildRecentProjectsMenu(MainWindowViewModel vm)
+    {
+        RecentProjectsMenu.Items.Clear();
+        var recents = vm.RecentProjects;
+
+        if (recents.Count == 0)
+        {
+            RecentProjectsMenu.Items.Add(new MenuItem
+            {
+                Header = Loc.Get("Menu_RecentProjectsEmpty"),
+                IsEnabled = false,
+            });
+            return;
+        }
+
+        foreach (var path in recents)
+        {
+            var item = new MenuItem
+            {
+                // Filename as the label (also the UIA Name); full path in the tooltip.
+                Header  = Path.GetFileNameWithoutExtension(path),
+                Command = vm.OpenRecentProjectCommand,
+                CommandParameter = path,
+            };
+            ToolTip.SetTip(item, path);
+            global::Avalonia.Automation.AutomationProperties.SetHelpText(item, path);
+            RecentProjectsMenu.Items.Add(item);
+        }
+
+        RecentProjectsMenu.Items.Add(new Separator());
+        var clear = new MenuItem
+        {
+            Header  = Loc.Get("Menu_ClearRecentProjects"),
+            Command = vm.ClearRecentProjectsCommand,
+        };
+        ToolTip.SetTip(clear, Loc.Get("ToolTip_ClearRecentProjects"));
+        global::Avalonia.Automation.AutomationProperties.SetHelpText(clear, Loc.Get("ToolTip_ClearRecentProjects"));
+        RecentProjectsMenu.Items.Add(clear);
     }
 
     // ── Startup project re-open ───────────────────────────────────────────

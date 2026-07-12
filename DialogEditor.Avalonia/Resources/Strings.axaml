@@ -750,6 +750,11 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Menu_Test">Test</sys:String>
     <sys:String x:Key="Menu_NewProject">New Project…</sys:String>
     <sys:String x:Key="Menu_OpenProject">Open Project…</sys:String>
+    <sys:String x:Key="Menu_RecentProjects">Recent Projects</sys:String>
+    <sys:String x:Key="ToolTip_RecentProjects">Reopen a project you've recently opened, created, or saved. Newest first; the list fills as you use the editor.</sys:String>
+    <sys:String x:Key="Menu_RecentProjectsEmpty">(no recent projects)</sys:String>
+    <sys:String x:Key="Menu_ClearRecentProjects">Clear Recently Opened</sys:String>
+    <sys:String x:Key="ToolTip_ClearRecentProjects">Remove every entry from the Recent Projects list. Your project files are not deleted.</sys:String>
     <sys:String x:Key="Menu_SaveProject">Save Project</sys:String>
     <sys:String x:Key="Menu_SaveProjectAs">Save Project As…</sys:String>
     <sys:String x:Key="ToolTip_SaveProjectAs">Save the open project under a new name or location. The editor switches to the new file — later saves go there — and any voice-over files (the _vo folder) are copied alongside it. The original file is left unchanged.</sys:String>

@@ -47,6 +47,10 @@
                         <MenuItem Header="{DynamicResource Menu_OpenProject}"
                                   Command="{Binding OpenProjectCommand}"
                                   InputGesture="Ctrl+O"/>
+                        <MenuItem x:Name="RecentProjectsMenu"
+                                  Header="{DynamicResource Menu_RecentProjects}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_RecentProjects}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_RecentProjects}"/>
                         <MenuItem Header="{DynamicResource Menu_SaveProject}"
                                   Command="{Binding SaveProjectCommand}"
                                   InputGesture="Ctrl+S"/>
