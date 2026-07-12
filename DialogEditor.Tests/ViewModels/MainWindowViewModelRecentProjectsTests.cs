@@ -100,4 +100,51 @@ public class MainWindowViewModelRecentProjectsTests : IDisposable
 
         Assert.Empty(vm.RecentProjects);
     }
+
+    // ── Bound Recent Projects submenu (Task 5b) ────────────────────────────
+    // The submenu is data-bound via ItemsSource + ItemContainerTheme rather
+    // than rebuilt from SubmenuOpened code-behind. The collection must NEVER
+    // be empty (see RecentProjectsMenuItems doc comment) — an empty ItemsSource
+    // is exactly the bug this task fixes (a childless MenuItem never opens).
+
+    [Fact]
+    public void MenuItems_WhenEmpty_ShowSingleDisabledPlaceholder()
+    {
+        var vm = NewProject(_projectPath);            // no recents recorded yet
+        AppSettings.ClearRecentProjects();
+        vm.ClearRecentProjectsCommand.Execute(null);   // clear goes through the rebuild path
+
+        var item = Assert.Single(vm.RecentProjectsMenuItems);
+        Assert.False(item.IsEnabled);
+        Assert.Null(item.Command);
+    }
+
+    [Fact]
+    public void MenuItems_WhenPopulated_EntriesNewestFirstThenClear()
+    {
+        var vm = NewProject(_projectPath);
+        vm.NewProjectCommand.Execute(null);   // records _projectPath, rebuilds collection
+
+        var items = vm.RecentProjectsMenuItems;
+        Assert.True(items.Count >= 2);                        // at least one entry + Clear
+        Assert.Equal(Path.GetFullPath(_projectPath), items[0].CommandParameter); // newest entry first
+        Assert.NotNull(items[0].Command);                     // entry is clickable
+        Assert.Null(items[^1].CommandParameter);              // last row is Clear (no param)
+        Assert.NotNull(items[^1].Command);                    // Clear is clickable
+    }
+
+    [Fact]
+    public void MenuItems_EscapeUnderscoreInHeader()
+    {
+        var vm = NewProject(_projectPath);
+        var p = Path.Combine(Path.GetTempPath(), $"a_b_{Guid.NewGuid():N}.dialogproject");
+        try
+        {
+            AppSettings.AddRecentProject(p);
+            vm.NewProjectCommand.Execute(null);  // rebuild
+            var entry = vm.RecentProjectsMenuItems.First(i => i.CommandParameter is string s && s == Path.GetFullPath(p));
+            Assert.DoesNotContain("_", entry.Header.Replace("__", ""));  // every '_' was doubled
+        }
+        finally { try { File.Delete(p); } catch { /* best-effort */ } }
+    }
 }

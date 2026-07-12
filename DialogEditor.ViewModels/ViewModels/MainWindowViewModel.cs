@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -386,6 +387,10 @@ public partial class MainWindowViewModel : ObservableObject
         // Re-opening the last project is deferred to ReopenLastProjectOnStartup(),
         // invoked by the View once the window is shown and callbacks are wired — so a
         // conflicted project can offer resolution rather than only showing guidance.
+
+        // Must run last: OpenRecentProjectCommand/ClearRecentProjectsCommand (source-
+        // generated RelayCommands) are only available once the constructor body runs.
+        RefreshRecentProjects();
     }
 
     /// Re-opens the last project, if any. Must be called by the View after the main
@@ -556,6 +561,49 @@ public partial class MainWindowViewModel : ObservableObject
     /// rebuilt on open, and this raises change notification after each mutation.
     public IReadOnlyList<string> RecentProjects => AppSettings.RecentProjects;
 
+    /// Data-bound source for the File ▸ Recent Projects submenu. NEVER empty — an
+    /// empty-state placeholder stands in when there are no recents, which is what
+    /// keeps the parent MenuItem a real (openable) submenu rather than a leaf.
+    /// (An empty ItemsSource would make the submenu never open — the bug that
+    /// replaced the earlier SubmenuOpened code-behind approach.)
+    public ObservableCollection<RecentProjectMenuItem> RecentProjectsMenuItems { get; } = new();
+
+    // Avalonia treats '_' in a Header as an access-key mnemonic and eats it, so a
+    // file like "my_project" would display as "myproject". Double the underscores.
+    private static string EscapeMenuMnemonic(string s) => s.Replace("_", "__");
+
+    private void RefreshRecentProjects()
+    {
+        OnPropertyChanged(nameof(RecentProjects));
+        RecentProjectsMenuItems.Clear();
+        var recents = AppSettings.RecentProjects;
+        if (recents.Count == 0)
+        {
+            RecentProjectsMenuItems.Add(new RecentProjectMenuItem
+            {
+                Header = Loc.Get("Menu_RecentProjectsEmpty"),
+                IsEnabled = false,
+            });
+            return;
+        }
+        foreach (var path in recents)
+        {
+            RecentProjectsMenuItems.Add(new RecentProjectMenuItem
+            {
+                Header = EscapeMenuMnemonic(Path.GetFileNameWithoutExtension(path)),
+                ToolTip = path,
+                Command = OpenRecentProjectCommand,
+                CommandParameter = path,
+            });
+        }
+        RecentProjectsMenuItems.Add(new RecentProjectMenuItem
+        {
+            Header = Loc.Get("Menu_ClearRecentProjects"),
+            ToolTip = Loc.Get("ToolTip_ClearRecentProjects"),
+            Command = ClearRecentProjectsCommand,
+        });
+    }
+
     [RelayCommand]
     private void NewProject()
         => GuardDirtyThen(() => _ = DoNewProject());
@@ -578,7 +626,7 @@ public partial class MainWindowViewModel : ObservableObject
         DialogProjectSerializer.SaveToFile(path, _project!);
         AppSettings.LastProjectPath = path;
         AppSettings.AddRecentProject(path);
-        OnPropertyChanged(nameof(RecentProjects));
+        RefreshRecentProjects();
         CurrentProjectName = name;
         AppLog.Info($"New project: {path}");
         StatusText = Loc.Format("Status_ProjectNew", name);
@@ -622,7 +670,7 @@ public partial class MainWindowViewModel : ObservableObject
         if (await ConfirmRemoveMissingProject(path))
         {
             AppSettings.RemoveRecentProject(path);
-            OnPropertyChanged(nameof(RecentProjects));
+            RefreshRecentProjects();
         }
     }
 
@@ -630,7 +678,7 @@ public partial class MainWindowViewModel : ObservableObject
     private void ClearRecentProjects()
     {
         AppSettings.ClearRecentProjects();
-        OnPropertyChanged(nameof(RecentProjects));
+        RefreshRecentProjects();
     }
 
     [RelayCommand(CanExecute = nameof(IsProjectOpen))]
@@ -855,7 +903,7 @@ public partial class MainWindowViewModel : ObservableObject
         BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
         AppSettings.LastProjectPath = path;
         AppSettings.AddRecentProject(path);
-        OnPropertyChanged(nameof(RecentProjects));
+        RefreshRecentProjects();
         CurrentProjectName = loaded.Name;
         AppLog.Info($"Opened project: {path}");
         StatusText = Loc.FormatCount("Status_ProjectOpened", loaded.Patches.Count, loaded.Name);
@@ -1189,7 +1237,7 @@ public partial class MainWindowViewModel : ObservableObject
         BatchImportVoAllCommand.NotifyCanExecuteChanged();
         AppSettings.LastProjectPath = path;
         AppSettings.AddRecentProject(path);
-        OnPropertyChanged(nameof(RecentProjects));
+        RefreshRecentProjects();
         CurrentProjectName = _project!.Name;
         AppLog.Info($"Project saved as: {path}");
         StatusText = voCopyError is null
