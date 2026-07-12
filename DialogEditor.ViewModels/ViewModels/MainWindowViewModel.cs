@@ -435,7 +435,8 @@ public partial class MainWindowViewModel : ObservableObject
 
     // ── Settings ──────────────────────────────────────────────────────────
     public SettingsViewModel CreateSettingsViewModel(IFontScaleApplier? fontScaleApplier = null)
-        => new(_currentGameDirectory, _folderPicker, fontScaleApplier);
+        => new(_currentGameDirectory, _folderPicker, fontScaleApplier,
+               SpellStoreFactory?.Invoke());
 
     /// Returns a ready-to-run VoValidationViewModel for the current conversation,
     /// or null if CanValidateVO is false (e.g. wrong game, no nodes loaded).
