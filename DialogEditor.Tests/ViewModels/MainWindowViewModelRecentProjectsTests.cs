@@ -49,4 +49,55 @@ public class MainWindowViewModelRecentProjectsTests : IDisposable
         Assert.Null(AppSettings.LastProjectPath);                            // close cleared auto-reopen
         Assert.Contains(Path.GetFullPath(_projectPath), vm.RecentProjects);  // history kept
     }
+
+    [Fact]
+    public void OpenRecent_MissingFile_ConfirmYes_RemovesEntryAndAsks()
+    {
+        var vm = NewProject(_projectPath);
+        var ghost = @"Z:\nope\ghost.dialogproject";
+        AppSettings.AddRecentProject(ghost);
+        var asked = new List<string>();
+        vm.ConfirmRemoveMissingProject = p => { asked.Add(p); return Task.FromResult(true); };
+
+        vm.OpenRecentProjectCommand.Execute(ghost);
+
+        Assert.Equal(new[] { Path.GetFullPath(ghost) }, asked);
+        Assert.DoesNotContain(Path.GetFullPath(ghost), vm.RecentProjects);
+    }
+
+    [Fact]
+    public void OpenRecent_MissingFile_ConfirmNo_KeepsEntry()
+    {
+        var vm = NewProject(_projectPath);
+        var ghost = @"Z:\nope\ghost.dialogproject";
+        AppSettings.AddRecentProject(ghost);
+        vm.ConfirmRemoveMissingProject = _ => Task.FromResult(false);
+
+        vm.OpenRecentProjectCommand.Execute(ghost);
+
+        Assert.Contains(Path.GetFullPath(ghost), vm.RecentProjects);
+    }
+
+    [Fact]
+    public void OpenRecent_ExistingFile_OpensProject()
+    {
+        var vm = NewProject(_projectPath);
+        vm.NewProjectCommand.Execute(null);   // writes a real .dialogproject at _projectPath
+        vm.CloseProjectCommand.Execute(null); // no project open now
+
+        vm.OpenRecentProjectCommand.Execute(Path.GetFullPath(_projectPath));
+
+        Assert.NotNull(vm.CurrentProjectName); // funnel loaded the project
+    }
+
+    [Fact]
+    public void ClearRecent_EmptiesList()
+    {
+        var vm = NewProject(_projectPath);
+        AppSettings.AddRecentProject(@"C:\a\one.dialogproject");
+
+        vm.ClearRecentProjectsCommand.Execute(null);
+
+        Assert.Empty(vm.RecentProjects);
+    }
 }

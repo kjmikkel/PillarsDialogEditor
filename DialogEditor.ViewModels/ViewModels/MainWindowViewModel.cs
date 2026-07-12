@@ -598,6 +598,41 @@ public partial class MainWindowViewModel : ObservableObject
         LoadProject(path);
     }
 
+    /// View-supplied confirm for a recent entry whose file is missing: returns true to
+    /// remove it from the list, false to keep it. Null in headless/tests.
+    public Func<string, Task<bool>>? ConfirmRemoveMissingProject { get; set; }
+
+    [RelayCommand]
+    private void OpenRecentProject(string? path)
+    {
+        if (string.IsNullOrEmpty(path)) return;
+        if (!File.Exists(path))
+        {
+            _ = HandleMissingRecentProjectAsync(path);
+            return;
+        }
+        GuardDirtyThen(() => LoadProject(path));
+    }
+
+    private async Task HandleMissingRecentProjectAsync(string path)
+    {
+        AppLog.Warn($"Recent project not found: {path}");
+        StatusText = Loc.Format("Status_RecentProjectMissing", path);
+        if (ConfirmRemoveMissingProject is null) return;
+        if (await ConfirmRemoveMissingProject(path))
+        {
+            AppSettings.RemoveRecentProject(path);
+            OnPropertyChanged(nameof(RecentProjects));
+        }
+    }
+
+    [RelayCommand]
+    private void ClearRecentProjects()
+    {
+        AppSettings.ClearRecentProjects();
+        OnPropertyChanged(nameof(RecentProjects));
+    }
+
     [RelayCommand(CanExecute = nameof(IsProjectOpen))]
     private void CloseProject()
         => GuardDirtyThen(DoCloseProject);
