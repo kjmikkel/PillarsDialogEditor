@@ -191,7 +191,13 @@ public partial class MainWindowViewModel : ObservableObject
         Proceed();
     }
 
-    public void DiscardAndProceed() => Proceed();
+    public void DiscardAndProceed()
+    {
+        // The user consciously discarded these edits — the next launch must not
+        // resurrect them from the autosave sidecar (spec 2026-07-12 §3).
+        if (_projectPath is not null) AutosaveRecovery.TryDelete(_projectPath);
+        Proceed();
+    }
 
     public void CancelPendingNavigation()
     {
@@ -989,6 +995,27 @@ public partial class MainWindowViewModel : ObservableObject
         if (!IsBrowserPinned) IsBrowserExpanded = false;
     }
 
+    /// Periodic autosave (wired to a 60 s DispatcherTimer in MainWindow). Writes a
+    /// sidecar next to the project file while there are unsaved changes; never
+    /// touches the real file, never clears IsModified, never throws.
+    /// Spec: docs/superpowers/specs/2026-07-12-autosave-design.md.
+    public void AutosaveTick()
+    {
+        if (_project is null || _projectPath is null || !IsModified) return;
+        try
+        {
+            FoldCanvasIntoProject();
+            var sidecar = AutosaveRecovery.SidecarPath(_projectPath);
+            DialogProjectSerializer.SaveToFile(sidecar, _project!);
+            AppLog.Info($"Autosaved to {sidecar}");
+        }
+        catch (Exception ex)
+        {
+            // Autosave must never interrupt writing — log and carry on.
+            AppLog.Warn($"Autosave failed: {ex.Message}");
+        }
+    }
+
     [RelayCommand(CanExecute = nameof(CanSaveProject))]
     private void SaveProject()
     {
@@ -997,6 +1024,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             FoldCanvasIntoProject();
             DialogProjectSerializer.SaveToFile(_projectPath, _project!);
+            AutosaveRecovery.TryDelete(_projectPath); // changes are now in the real file
             Canvas.IsModified = false;
             IsModified = false;
             SaveCommand.NotifyCanExecuteChanged();
@@ -1060,6 +1088,10 @@ public partial class MainWindowViewModel : ObservableObject
         _projectPath        = path;
         Detail.ProjectPath  = path;
         Canvas.ProjectPath  = path;
+
+        // The just-saved state needs no recovery sidecar — under either path.
+        AutosaveRecovery.TryDelete(oldPath);
+        AutosaveRecovery.TryDelete(path);
 
         var voCopyError = CopyVoFolder(oldPath, path);
         if (voCopyError is not null)
