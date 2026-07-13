@@ -1316,7 +1316,8 @@ public partial class MainWindowViewModel : ObservableObject
     {
         if (_currentFile is null || Canvas.BaseSnapshot is null) return;
 
-        var patch  = DiffEngine.Diff(_currentFile.Name, Canvas.BaseSnapshot, Canvas.BuildSnapshot(), _provider!.Language);
+        var current = Canvas.BuildSnapshot();
+        var patch   = DiffEngine.Diff(_currentFile.Name, Canvas.BaseSnapshot, current, _provider!.Language);
         patch = patch with { NodeComments = Canvas.NodeComments };
 
         // WithPatch replaces the stored patch wholesale, but the diff only knows
@@ -1334,6 +1335,23 @@ public partial class MainWindowViewModel : ObservableObject
                 mergedTranslations[lang] = entries;
             patch = patch with { Translations = mergedTranslations };
         }
+
+        // Prevention: the canvas holds the full effective conversation, so its live
+        // node-ID set is authoritative (game-folder-free). Drop comment/translation
+        // entries for nodes that no longer exist, so deleting a node cannot leave
+        // stale patch data behind (see the Stale Patch Data Hygiene spec).
+        var liveIds = current.Nodes.Select(n => n.NodeId).ToHashSet();
+        patch = patch with
+        {
+            NodeComments = patch.NodeComments
+                .Where(kv => liveIds.Contains(kv.Key))
+                .ToDictionary(kv => kv.Key, kv => kv.Value),
+            Translations = patch.Translations.ToDictionary(
+                kv => kv.Key,
+                kv => (IReadOnlyList<NodeTranslation>)
+                      kv.Value.Where(t => liveIds.Contains(t.NodeId)).ToList()),
+        };
+
         var layout      = Canvas.GetCurrentLayout();
         var annotations = Canvas.GetCurrentAnnotations();
         SetProject(_project!.WithPatch(patch).WithLayout(_currentFile.Name, layout)
