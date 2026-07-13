@@ -31,6 +31,11 @@ conversation. The request: **"show every line spoken by this character across th
    colour-only). A **"Only my lines"** toggle hides Vanilla rows (shows Edited + New).
 5. **Primary/game language only for v1** (matches the detail panel and the other analysis
    tools). Non-primary-language browsing is deferred.
+6. **Dirty-project save prompt on open.** If the project has unsaved changes when the
+   browser is opened, the user is prompted — crystal-clearly — to save first for a more
+   accurate scan. Declining still runs the scan; the choice is explicit, never silent.
+7. **Visible loading animation + Cancel.** The (off-thread) scan shows an animated loading
+   indicator, and the user can cancel a scan in progress if they change their mind.
 
 ## Why this needs a new scan (not a reuse of the existing walk)
 
@@ -48,8 +53,31 @@ This is not the declined persistent cache: the map is discarded when the window 
 **Refresh** re-scans to pick up edits made after opening.
 
 Because a full-game load is heavier than the patched-only walks (PoE2 ≈ 1,000+ conversation
-files; PoE1 ≈ 40,991 nodes), the scan runs **off the UI thread** with a busy indicator —
-unlike the synchronous Find-in-Project.
+files; PoE1 ≈ 40,991 nodes), the scan runs **off the UI thread** with a visible loading
+animation and a **Cancel** control — unlike the synchronous Find-in-Project.
+
+## Dirty-project guard (on open)
+
+Opening the browser while the project has unsaved changes prompts the user, reusing the
+existing three-way guard the Validate Text Tags sweep uses — `ScanDirtyChoice { SaveAndScan,
+ScanSavedOnly, Cancel }`, the `SaveBeforeScanDialog` view, and the
+`ConfirmScanWithUnsavedChanges` seam on `MainWindowViewModel` (null in unit tests → treated
+as Cancel, never a silent stale scan). Behaviour:
+
+- **Save & browse** — `SaveProject()` first, then scan. This also makes the **open
+  conversation's origin badges accurate** (see below) and folds its edits into
+  `project.Patches`.
+- **Browse without saving** — the scan runs anyway. Line *content* for the open conversation
+  is still accurate (the scan reads its live snapshot); the caveat is only that the open
+  conversation's origin badges reflect the last *saved* patch (a just-added, unsaved node may
+  read `Vanilla`/`Edited` rather than `New`).
+- **Cancel** — the window does not open.
+
+The dialog copy is **browser-specific and crystal-clear** about what "browse without saving"
+means here (unlike the tag sweep's "saved state only", this scan still includes the open
+conversation's unsaved text) — so the user is never misled into thinking their current edits
+are excluded. Shown **only** when `IsModified` is true; a clean project opens the browser
+directly.
 
 ## Components
 
@@ -127,11 +155,14 @@ used to populate the picker with counts.
   `IGameDataProvider`, primary language, the open-conversation accessor
   `Func<(string? Name, ConversationEditSnapshot? Snapshot)>`), plus an optional
   `initialSpeakerGuid` for the "from selected node" entry point.
-- Runs the scan via `Task.Run` (cancellable), exposes `IsBusy`, `StatusText`, the
-  `Speakers` list (picker source), `SelectedSpeaker`, `OnlyMyLines` toggle, and the filtered
-  `Rows`.
+- Runs the scan via `Task.Run` with a `CancellationTokenSource`, exposes `IsBusy`,
+  `StatusText`, the `Speakers` list (picker source), `SelectedSpeaker`, `OnlyMyLines` toggle,
+  and the filtered `Rows`.
+- `CancelScanCommand` cancels the in-flight scan (enabled only while `IsBusy`); the token is
+  also cancelled on window close. A cancelled scan clears busy state and shows a
+  "scan cancelled" status rather than partial rows.
 - Changing `SelectedSpeaker` or `OnlyMyLines` re-filters the in-memory result — no re-scan.
-- `RefreshCommand` re-runs the scan.
+- `RefreshCommand` re-runs the scan (respects the same cancellation).
 - Navigation: `public event Action<string,int>? RequestNavigate;` and
   `NavigateTo(SpeakerLineRow row) => RequestNavigate?.Invoke(row.ConversationName, row.NodeId);`
   — identical to `ProjectFindViewModel`. The host wires it to
@@ -143,7 +174,9 @@ used to populate the picker with counts.
 
 - Non-modal, owned (`Show(this)`), carries the app icon.
 - Speaker `ComboBox` (name + count), the "Only my lines" `ToggleButton`/`CheckBox`, a
-  `Refresh` button, a busy indicator, a status line, and a scrolling results list.
+  `Refresh` button, an **animated loading overlay** shown while `IsBusy` with a visible
+  **Cancel** button (bound to `CancelScanCommand`), a status line, and a scrolling results
+  list.
 - Result row template: conversation, node id, textual origin badge, variant label, and the
   **full wrapping** line text. `DoubleTapped` and Enter call `_vm.NavigateTo`, mirroring
   `FindInProjectWindow` code-behind.
@@ -159,6 +192,11 @@ used to populate the picker with counts.
   (initial speaker = selected node's `SpeakerGuid`). Gate: open project + game provider
   (same shape as `CanFindInProject`); `NotifyCanExecuteChanged` added at the same sites as
   `FindInProjectCommand`.
+- **Dirty guard runs before the window opens:** if `IsModified`, await
+  `ConfirmScanWithUnsavedChanges()` (the same seam the tag sweep uses); `Cancel` aborts the
+  open, `SaveAndScan` calls `SaveProject()` first, `ScanSavedOnly` opens without saving. The
+  browser-specific dialog copy is wired via the View (`SaveBeforeScanDialog`, or a browser
+  variant of it) — the seam is reused, the strings are browser-specific.
 - The VM's `RequestNavigate` is wired to `NavigateToFoundNode` at construction.
 
 ## Localisation, tooltips, accessibility
@@ -190,6 +228,17 @@ used to populate the picker with counts.
 - `OnlyMyLines` filter hides Vanilla rows; re-filtering does not re-scan.
 - `NavigateTo` raises `RequestNavigate` with the row's conversation + node id.
 - `initialSpeakerGuid` pre-selects that speaker.
+- `CancelScanCommand` cancels an in-flight scan: busy clears, status shows "cancelled",
+  no partial rows are surfaced.
+
+`MainWindowViewModel` dirty-guard tests (mirroring `MainWindowViewModelTextTagTests`):
+
+- `IsModified` true + seam returns `Cancel` → window not opened (`ShowSpeakerLineBrowser`
+  not invoked).
+- Returns `SaveAndScan` → `SaveProject()` called, then window opened.
+- Returns `ScanSavedOnly` → window opened without saving.
+- Clean project → no prompt, window opened directly.
+- Null seam (unit-test default) with a dirty project → treated as Cancel (no silent open).
 
 `SpeakerLineBrowserWindowTests`: smoke/headless construction mirroring
 `FindInProjectWindowTests`.
