@@ -515,6 +515,20 @@ public partial class MainWindowViewModel : ObservableObject
         var store = SpellStoreFactory?.Invoke();
         var spell = store is null ? null : new SpellCheckService(store);
 
+        Func<bool, IReadOnlyList<StaleDataRow>> staleScan = includeLikely =>
+        {
+            if (_project is null) return [];
+            var eff = includeLikely && _provider is not null ? BuildEffectiveNodeIds() : null;
+            return ProjectStaleDataScanner.Scan(_project, eff);
+        };
+
+        Action<IReadOnlyList<StaleDataRow>> prune = staleRows =>
+        {
+            if (_project is null) return;
+            SetProject(StaleDataPruner.Prune(_project, staleRows));
+            SaveProject();
+        };
+
         // The closure reads the current fields, so Refresh in the open window picks
         // up saves made later in the session.
         return new TextTagValidationViewModel(
@@ -522,7 +536,45 @@ public partial class MainWindowViewModel : ObservableObject
                 ? []
                 : ProjectTextTagScanner.Scan(
                     _project, _activeGameId, _provider?.Language ?? "", spell: spell),
-            addWord: store is null ? null : store.AddWord);
+            addWord: store is null ? null : store.AddWord,
+            staleScan: staleScan,
+            prune: prune,
+            canCheckGameFiles: _provider is not null,
+            primaryLanguage: _provider?.Language ?? "");
+    }
+
+    /// Builds a conversation-name → live-node-ID-set resolver for the likely-stale
+    /// pass. The open conversation uses the live canvas snapshot; others are
+    /// reconstructed vanilla + patch (conflicts ignored — display semantics),
+    /// returning null (skip) when a conversation can't be loaded. Mirrors
+    /// VoOrphanScanner's per-conversation resolution.
+    private Func<string, IReadOnlySet<int>?> BuildEffectiveNodeIds()
+    {
+        var provider = _provider!;
+        var openConv = Canvas.ConversationName;
+        var openIds  = Canvas.BuildSnapshot().Nodes.Select(n => n.NodeId).ToHashSet();
+
+        return convName =>
+        {
+            if (!string.IsNullOrEmpty(openConv) && convName == openConv)
+                return openIds;
+            if (_project is null || !_project.Patches.TryGetValue(convName, out var patch))
+                return null;
+            try
+            {
+                var file     = provider.FindConversation(convName);
+                var baseSnap = file is not null
+                    ? ConversationSnapshotBuilder.Build(provider.LoadConversation(file))
+                    : new ConversationEditSnapshot([]);
+                var applied  = PatchApplier.Apply(baseSnap, patch, ignoreConflicts: true);
+                return applied.Nodes.Select(n => n.NodeId).ToHashSet();
+            }
+            catch (Exception ex)
+            {
+                AppLog.Warn($"Stale-data scan: could not load '{convName}': {ex.Message}");
+                return null;
+            }
+        };
     }
 
     /// Opens the batch VO import dialog in multi-conversation mode.

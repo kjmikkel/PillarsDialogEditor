@@ -45,6 +45,22 @@ public class MainWindowViewModelTextTagTests : IDisposable
         fi.SetValue(vm, _projectPath);
     }
 
+    /// A saved project whose open conversation's patch carries a comment on a
+    /// deleted node — a confirmed-stale row (no live-node reconstruction needed,
+    /// since Confirmed rows come straight from DeletedNodeIds ∩ NodeComments).
+    private MainWindowViewModel OpenSavedProjectWithStaleComment(int deletedNodeId)
+    {
+        var vm = MakeVm();
+        var patch = new ConversationPatch("Conv", ConversationPatch.CurrentSchemaVersion, [], [deletedNodeId], [])
+        {
+            NodeComments = new Dictionary<int, string> { [deletedNodeId] = "x" }
+        };
+        var project = DialogProject.Empty("T").WithPatch(patch);
+        InjectProject(vm, project);
+        InjectProjectPath(vm);
+        return vm;
+    }
+
     [Fact]
     public async Task NoProject_ReturnsNull()
     {
@@ -114,5 +130,26 @@ public class MainWindowViewModelTextTagTests : IDisposable
         InjectProject(vm, DialogProject.Empty("T"));
         vm.IsModified = true;
         Assert.Null(await vm.RequestTextTagValidationAsync());
+    }
+
+    [Fact]
+    public async Task StaleComment_ForDeletedNode_ShownAndPrunable()
+    {
+        // Arrange: a saved project whose open conversation's patch has a comment on a
+        // deleted node id.
+        var vm = OpenSavedProjectWithStaleComment(deletedNodeId: 7);
+
+        // Act
+        var window = await vm.RequestTextTagValidationAsync();
+
+        // Assert: the stale row is present and confirmed.
+        Assert.NotNull(window);
+        var stale = Assert.Single(window!.StaleRows);
+        Assert.False(stale.IsLikely);
+
+        // Prune it and confirm the saved project no longer carries the comment.
+        window.CleanUpStaleCommand.Execute(null);
+        window.ConfirmCleanUpStaleCommand.Execute(null);
+        Assert.Empty(window.StaleRows);
     }
 }
