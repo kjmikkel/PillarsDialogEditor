@@ -1393,15 +1393,24 @@ public partial class MainWindowViewModel : ObservableObject
         // entries for nodes that no longer exist, so deleting a node cannot leave
         // stale patch data behind (see the Stale Patch Data Hygiene spec).
         var liveIds = current.Nodes.Select(n => n.NodeId).ToHashSet();
+        // A language whose only surviving entries were on the deleted node must
+        // lose the key entirely, not persist as an empty list — mirrors
+        // StaleDataPruner's (the reactive half's) "kept.Count > 0" behaviour, so
+        // both halves of the feature agree and empty keys don't get carried
+        // forward forever by the translation-merge block above.
+        var filteredTranslations = new Dictionary<string, IReadOnlyList<NodeTranslation>>();
+        foreach (var (lang, entries) in patch.Translations)
+        {
+            var kept = entries.Where(t => liveIds.Contains(t.NodeId)).ToList();
+            if (kept.Count > 0)
+                filteredTranslations[lang] = kept;
+        }
         patch = patch with
         {
             NodeComments = patch.NodeComments
                 .Where(kv => liveIds.Contains(kv.Key))
                 .ToDictionary(kv => kv.Key, kv => kv.Value),
-            Translations = patch.Translations.ToDictionary(
-                kv => kv.Key,
-                kv => (IReadOnlyList<NodeTranslation>)
-                      kv.Value.Where(t => liveIds.Contains(t.NodeId)).ToList()),
+            Translations = filteredTranslations,
         };
 
         var layout      = Canvas.GetCurrentLayout();
