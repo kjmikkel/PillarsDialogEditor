@@ -850,8 +850,13 @@ Recorded 2026-07-11; each is small and independent:
   in playthroughs: longest path, words per speaker, estimated reading time per branch.
 - **Duplicate/near-duplicate line detection** — catches copy-paste artifacts; could
   ride on Flow Analytics.
-- **Recent projects menu** — only `LastProjectPath` auto-reopen exists; a File ▸
-  Recent list is trivial QoL.
+- ~~**Recent projects menu**~~ ✓ Implemented (2026-07-12). File ▸ Recent Projects
+  submenu (MRU, cap 10, newest-first, case-insensitive dedupe); records at the three
+  `LastProjectPath` sites (open/new/save-as, never on close); data-bound via
+  `ItemsSource` + `ItemContainerTheme` over a never-empty `RecentProjectsMenuItems`
+  collection (an empty Avalonia MenuItem is a non-opening leaf — see the
+  `SubmenuOpened` gotcha); keep-until-clicked missing-file handling via
+  `RecentProjectMissingDialog`. Spec: docs/superpowers/specs/2026-07-12-recent-projects-menu-design.md.
 - **PatchManager cross-mod conflict warning** — if two `.dialogpack`s touch the same
   nodes, the second likely silently wins (verify current behaviour first); end users
   applying multiple mods deserve a warning at apply time.
