@@ -844,8 +844,14 @@ Recorded 2026-07-11; each is small and independent:
 - **Speaker line browser** — "show every line spoken by this character across the
   project (and vanilla)" for voice-consistency checking; builds on the existing
   stringtable parsing.
-- **Project-wide find** (read-only) — Batch Replace covers destructive changes, but
-  "where did I mention X?" has no navigable answer today.
+- ~~**Project-wide find** (read-only)~~ ✓ Implemented (2026-07-12). **Edit ▸ Find in
+  Project…** (Ctrl+Shift+F): read-only search over the *effective* text (vanilla base +
+  edits) of every patched conversation — the read-only mirror of Batch Replace. Default +
+  Female node text always; link/choice, all-language translations, and node comments are
+  opt-in toggles. `ProjectFindService` reuses the `ProjectVoRowScanner` walk (live snapshot
+  for the open conversation, base+patch for the rest, skip-unreadable). Double-click / Enter
+  navigates to the node (cross-conversation, honouring the dirty guard). Spec:
+  docs/superpowers/specs/2026-07-12-find-in-project-design.md.
 - **Path-based writing stats** — Flow Analytics counts words globally; writers think
   in playthroughs: longest path, words per speaker, estimated reading time per branch.
 - **Duplicate/near-duplicate line detection** — catches copy-paste artifacts; could
