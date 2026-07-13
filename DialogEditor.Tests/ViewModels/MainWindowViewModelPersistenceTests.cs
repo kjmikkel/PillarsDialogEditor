@@ -197,4 +197,60 @@ public class MainWindowViewModelPersistenceTests : IDisposable
         Assert.Equal("created line",
             savedPatch.Translations["en"].Single(t => t.NodeId == 1).DefaultText);
     }
+
+    // ── Save-time prevention: deleting a node must not leave orphaned patch data ──
+
+    /// Two-node "greeting" conversation: node 4 and node 5, both vanilla text.
+    private static Conversation TwoNodeGreeting() =>
+        new("greeting", [MakeNode(4), MakeNode(5)],
+            new StringTable([
+                new StringEntry(4, "orig line", ""),
+                new StringEntry(5, "second line", ""),
+            ]));
+
+    /// An (otherwise empty) patch over <see cref="TwoNodeGreeting"/> that already
+    /// carries an imported "de" translation for node 5 — mirrors how a prior
+    /// editing session's imported translations are carried over on save.
+    private static ConversationPatch TwoNodeGreetingPatchWithGermanTranslation()
+    {
+        var vanilla = ConversationSnapshotBuilder.Build(TwoNodeGreeting());
+        var patch   = DiffEngine.Diff("greeting", vanilla, vanilla, "en");
+        return patch with
+        {
+            Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>(patch.Translations)
+            {
+                ["de"] = [new NodeTranslation(5, "weg", "")],
+            },
+        };
+    }
+
+    private async Task<(MainWindowViewModel Vm, FakeGameDataProvider Provider, string ProjectPath)>
+        OpenProjectWithConversationAndPatch(Conversation vanilla, ConversationPatch patch)
+    {
+        var provider = new FakeGameDataProvider("poe2", "en", vanilla);
+        var project  = DialogProject.Empty("Persist").WithPatch(patch);
+        var path     = TempProjectPath();
+        DialogProjectSerializer.SaveToFile(path, project);
+
+        var vm = MakeVm();
+        InjectProvider(vm, provider);
+        await InvokeLoadProjectAsync(vm, path);
+        return (vm, provider, path);
+    }
+
+    [Fact]
+    public async Task SaveAfterDeleteNode_DropsCommentAndTranslation_ForDeletedNode()
+    {
+        var (vm, provider, path) = await OpenProjectWithConversationAndPatch(
+            TwoNodeGreeting(), TwoNodeGreetingPatchWithGermanTranslation());
+        SelectConversation(vm, provider.BuildNewConversationFile("greeting"));
+
+        vm.Canvas.SetNodeComment(5, "note that should die with the node");
+        vm.Canvas.DeleteNode(vm.Canvas.Nodes.Single(n => n.NodeId == 5));
+        vm.SaveProjectCommand.Execute(null);
+
+        var saved = DialogProjectSerializer.LoadFromFile(path).Patches["greeting"];
+        Assert.False(saved.NodeComments.ContainsKey(5));
+        Assert.DoesNotContain(saved.Translations.SelectMany(kv => kv.Value), t => t.NodeId == 5);
+    }
 }
