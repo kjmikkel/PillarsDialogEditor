@@ -12,7 +12,7 @@
         WindowStartupLocation="CenterOwner"
         x:CompileBindings="False">
 
-    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto" Margin="14,12,14,12">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto,Auto" Margin="14,12,14,12">
 
         <!-- Saved-state note -->
         <TextBlock Grid.Row="0"
@@ -170,7 +170,9 @@
                     AutomationProperties.HelpText="{DynamicResource ToolTip_StaleData_CleanUp}"/>
             <Button Content="{DynamicResource Button_Cancel}"
                     Command="{Binding CancelCleanUpStaleCommand}"
-                    IsVisible="{Binding IsStaleCleanUpArmed}"/>
+                    IsVisible="{Binding IsStaleCleanUpArmed}"
+                    ToolTip.Tip="{DynamicResource ToolTip_StaleData_CancelCleanUp}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_StaleData_CancelCleanUp}"/>
         </StackPanel>
 
         <!-- Focus hint bar (accessibility item 13 pattern) -->
