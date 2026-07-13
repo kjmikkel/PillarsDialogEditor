@@ -594,6 +594,40 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="FindField_LinkChoice">Link / choice</sys:String>
     <sys:String x:Key="FindField_NodeComment">Node comment</sys:String>
     <sys:String x:Key="Status_FindInProject_NodeGone">That node no longer exists — it may have been edited since the search.</sys:String>
+    <!-- ─── Speaker Line Browser ─────────────────────────────────────────── -->
+    <sys:String x:Key="Menu_BrowseSpeakerLines">Browse Speaker Lines…</sys:String>
+    <sys:String x:Key="ToolTip_BrowseSpeakerLines">Open a read-only window listing every line the chosen character speaks across the whole game, with your project's edits applied — for checking that new lines match the character's established voice. Requires an open project and a game folder.</sys:String>
+    <sys:String x:Key="Menu_Canvas_BrowseSpeakerLinesForNode">Show all lines by this speaker</sys:String>
+    <sys:String x:Key="ToolTip_Canvas_BrowseSpeakerLinesForNode">Open the Speaker Line Browser pre-filtered to this node's speaker.</sys:String>
+    <sys:String x:Key="SpeakerLines_Title">Speaker Lines</sys:String>
+    <sys:String x:Key="SpeakerLines_CharacterLabel">Character:</sys:String>
+    <sys:String x:Key="AutomationName_SpeakerLines_Character">Character</sys:String>
+    <sys:String x:Key="ToolTip_SpeakerLines_Character">Choose whose lines to list. The count in parentheses is how many lines that character speaks across the whole game plus your edits.</sys:String>
+    <sys:String x:Key="SpeakerLines_OnlyMyLines">Only my lines</sys:String>
+    <sys:String x:Key="AutomationName_SpeakerLines_OnlyMyLines">Only my lines</sys:String>
+    <sys:String x:Key="ToolTip_SpeakerLines_OnlyMyLines">Hide unchanged game lines, showing only lines your project edits or adds.</sys:String>
+    <sys:String x:Key="SpeakerLines_Refresh">Refresh</sys:String>
+    <sys:String x:Key="AutomationName_SpeakerLines_Refresh">Refresh scan</sys:String>
+    <sys:String x:Key="ToolTip_SpeakerLines_Refresh">Re-scan the game and your project to pick up edits made since this window opened.</sys:String>
+    <sys:String x:Key="SpeakerLines_Cancel">Cancel</sys:String>
+    <sys:String x:Key="AutomationName_SpeakerLines_Cancel">Cancel scan</sys:String>
+    <sys:String x:Key="ToolTip_SpeakerLines_Cancel">Stop the scan in progress.</sys:String>
+    <sys:String x:Key="SpeakerLines_Scanning">Scanning every conversation…</sys:String>
+    <sys:String x:Key="SpeakerLines_Cancelled">Scan cancelled.</sys:String>
+    <sys:String x:Key="SpeakerLines_NoLines">No lines found for this character.</sys:String>
+    <sys:String x:Key="SpeakerLines_LineCount_One">{0} line</sys:String>
+    <sys:String x:Key="SpeakerLines_LineCount_Other">{0} lines</sys:String>
+    <sys:String x:Key="SpeakerLines_Node">Node</sys:String>
+    <sys:String x:Key="SpeakerLines_Origin_Vanilla">Vanilla</sys:String>
+    <sys:String x:Key="SpeakerLines_Origin_Edited">Edited</sys:String>
+    <sys:String x:Key="SpeakerLines_Origin_New">New</sys:String>
+    <sys:String x:Key="SpeakerLines_Variant_Female">Female</sys:String>
+    <!-- Browser-specific save-before-browse copy (reuses SaveBeforeScanDialog) -->
+    <sys:String x:Key="SaveBeforeBrowse_Message">This project has unsaved changes. Save first so line origins and other conversations reflect your latest work? Your currently-open conversation's unsaved text is included either way — saving only affects how lines are tagged and the other conversations you've edited.</sys:String>
+    <sys:String x:Key="SaveBeforeBrowse_SaveAndBrowse">Save and browse</sys:String>
+    <sys:String x:Key="ToolTip_SaveBeforeBrowse_SaveAndBrowse">Save the project, then open the browser with accurate line origins.</sys:String>
+    <sys:String x:Key="SaveBeforeBrowse_BrowseAnyway">Browse without saving</sys:String>
+    <sys:String x:Key="ToolTip_SaveBeforeBrowse_BrowseAnyway">Open the browser now. Your open conversation's edits still show, but their origin tags and other unsaved conversations reflect the last save.</sys:String>
     <!-- ─── Batch Find / Replace ─────────────────────────────────────────── -->
     <sys:String x:Key="Menu_BatchReplace">Batch Find / Replace…</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace">Find and replace text, GUIDs, and parameter values across all conversations on disk</sys:String>

@@ -179,6 +179,11 @@
                                               CommandParameter="{Binding}"
                                               ToolTip.Tip="{DynamicResource ToolTip_ConnectToNode}"
                                               AutomationProperties.HelpText="{DynamicResource ToolTip_ConnectToNode}"/>
+                                    <MenuItem Header="{DynamicResource Menu_Canvas_BrowseSpeakerLinesForNode}"
+                                              Command="{Binding $parent[UserControl].DataContext.BrowseSpeakerLinesForNodeCommand}"
+                                              CommandParameter="{Binding}"
+                                              ToolTip.Tip="{DynamicResource ToolTip_Canvas_BrowseSpeakerLinesForNode}"
+                                              AutomationProperties.HelpText="{DynamicResource ToolTip_Canvas_BrowseSpeakerLinesForNode}"/>
                                     <Separator IsVisible="{Binding $parent[UserControl].DataContext.Detail.HasVoStatus}"/>
                                     <MenuItem Header="{DynamicResource Menu_ImportVo}"
                                               Command="{Binding $parent[UserControl].DataContext.Detail.ImportVoCommand}"

@@ -1,0 +1,114 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
+        x:Class="DialogEditor.Avalonia.Views.SpeakerLineBrowserWindow"
+        Title="{DynamicResource SpeakerLines_Title}"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="820" Height="620" MinWidth="560" MinHeight="360"
+        CanResize="True"
+        ShowInTaskbar="False"
+        Background="{DynamicResource Brush.Surface.Window}"
+        WindowStartupLocation="CenterOwner"
+        x:CompileBindings="False">
+
+    <Window.Styles>
+        <Style Selector="TextBlock.col-header">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}"/>
+            <Setter Property="FontSize"   Value="{DynamicResource FontSize.Small}"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="14,12,14,12">
+
+        <!-- ── Controls row: character picker, filter, refresh ─────────────── -->
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,*,Auto,Auto" Margin="0,0,0,8">
+            <TextBlock Grid.Column="0" Text="{DynamicResource SpeakerLines_CharacterLabel}"
+                       VerticalAlignment="Center" Margin="0,0,6,0"
+                       Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"/>
+            <ComboBox Grid.Column="1" x:Name="SpeakerPicker" MinWidth="240"
+                      ItemsSource="{Binding Speakers}"
+                      SelectedItem="{Binding SelectedSpeaker}"
+                      AutomationProperties.Name="{DynamicResource AutomationName_SpeakerLines_Character}"
+                      ToolTip.Tip="{DynamicResource ToolTip_SpeakerLines_Character}"
+                      AutomationProperties.HelpText="{DynamicResource ToolTip_SpeakerLines_Character}"/>
+
+            <CheckBox Grid.Column="3" Content="{DynamicResource SpeakerLines_OnlyMyLines}"
+                      IsChecked="{Binding OnlyMyLines}" VerticalAlignment="Center" Margin="8,0"
+                      AutomationProperties.Name="{DynamicResource AutomationName_SpeakerLines_OnlyMyLines}"
+                      ToolTip.Tip="{DynamicResource ToolTip_SpeakerLines_OnlyMyLines}"
+                      AutomationProperties.HelpText="{DynamicResource ToolTip_SpeakerLines_OnlyMyLines}"/>
+
+            <Button Grid.Column="4" Content="{DynamicResource SpeakerLines_Refresh}"
+                    Command="{Binding RefreshCommand}"
+                    Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
+                    Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
+                    AutomationProperties.Name="{DynamicResource AutomationName_SpeakerLines_Refresh}"
+                    ToolTip.Tip="{DynamicResource ToolTip_SpeakerLines_Refresh}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_SpeakerLines_Refresh}"/>
+        </Grid>
+
+        <!-- ── Status line ────────────────────────────────────────────────── -->
+        <TextBlock Grid.Row="1" Text="{Binding StatusText}"
+                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
+                   Margin="0,0,0,4"/>
+
+        <!-- ── Results list + loading overlay (same cell) ─────────────────── -->
+        <Grid Grid.Row="2">
+            <DockPanel>
+                <!-- Column headers; widths must match the row template below -->
+                <Grid DockPanel.Dock="Top" ColumnDefinitions="70,180,90,*" Margin="4,0,4,2">
+                    <TextBlock Grid.Column="0" Classes="col-header" Text="{DynamicResource SpeakerLines_Origin_Vanilla}"/>
+                    <TextBlock Grid.Column="1" Classes="col-header" Text="{DynamicResource FindInProject_ColConversation}"/>
+                    <TextBlock Grid.Column="2" Classes="col-header" Text="{DynamicResource SpeakerLines_Node}"/>
+                    <TextBlock Grid.Column="3" Classes="col-header" Text="{DynamicResource FindInProject_ColSnippet}"/>
+                </Grid>
+                <ListBox x:Name="ResultsList"
+                         Background="{DynamicResource Brush.Surface.Card}" BorderThickness="0"
+                         KeyDown="ResultsList_KeyDown">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="70,180,90,*" Margin="0,2"
+                                  DoubleTapped="OnRowActivated">
+                                <TextBlock Grid.Column="0" Text="{Binding OriginLabel}"
+                                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
+                                           VerticalAlignment="Top"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Row.ConversationName}"
+                                           Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"
+                                           TextTrimming="CharacterEllipsis" VerticalAlignment="Top"/>
+                                <TextBlock Grid.Column="2" Text="{Binding NodeLabel}"
+                                           Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Small}"
+                                           TextTrimming="CharacterEllipsis" VerticalAlignment="Top"/>
+                                <TextBlock Grid.Column="3" Text="{Binding Row.LineText}"
+                                           Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"
+                                           TextWrapping="Wrap"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+
+            <!-- Loading overlay: covers the list while a scan runs -->
+            <Border IsVisible="{Binding IsBusy}"
+                    Background="{DynamicResource Brush.Surface.Window}">
+                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12">
+                    <ProgressBar IsIndeterminate="True" Width="220" Height="6"/>
+                    <TextBlock Text="{Binding StatusText}" HorizontalAlignment="Center"
+                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"/>
+                    <Button Content="{DynamicResource SpeakerLines_Cancel}" HorizontalAlignment="Center"
+                            Command="{Binding CancelScanCommand}"
+                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
+                            Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
+                            AutomationProperties.Name="{DynamicResource AutomationName_SpeakerLines_Cancel}"
+                            ToolTip.Tip="{DynamicResource ToolTip_SpeakerLines_Cancel}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_SpeakerLines_Cancel}"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Focus hint bar -->
+        <shared:FocusHintBar Grid.Row="3" x:Name="HintBar"/>
+
+    </Grid>
+
+</Window>

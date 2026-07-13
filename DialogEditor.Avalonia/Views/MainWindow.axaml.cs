@@ -83,6 +83,13 @@ public partial class MainWindow : Window
         // unsaved changes (the scan reads saved state only).
         vm.ConfirmScanWithUnsavedChanges = () =>
             new SaveBeforeScanDialog().ShowDialogAsync(this);
+        // Speaker Line Browser dirty guard: same three-way mechanism, browser-specific
+        // copy (the scan still includes the open conversation's unsaved text).
+        vm.ConfirmBrowseWithUnsavedChanges = () =>
+            new SaveBeforeScanDialog(
+                messageKey:       "SaveBeforeBrowse_Message",
+                saveButtonKey:    "SaveBeforeBrowse_SaveAndBrowse",
+                proceedButtonKey: "SaveBeforeBrowse_BrowseAnyway").ShowDialogAsync(this);
         // Spell checking: three-layer store (user dictionaries + embedded game
         // lexicons + personal word list). Null checker would just disable spelling.
         EmbeddedLexicons.LoadInto(SpellDictionaryStore.Default);
@@ -205,6 +212,13 @@ public partial class MainWindow : Window
         {
             var win = new FindInProjectWindow(findVm);
             win.Show(this);          // non-modal, owned — results stay visible while browsing
+            await Task.CompletedTask;
+        };
+
+        vm.ShowSpeakerLineBrowser = async browserVm =>
+        {
+            var win = new SpeakerLineBrowserWindow(browserVm);
+            win.Show(this);          // non-modal, owned — stays open while the writer browses
             await Task.CompletedTask;
         };
 
