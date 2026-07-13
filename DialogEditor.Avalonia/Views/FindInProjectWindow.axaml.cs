@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -37,6 +38,12 @@ public partial class FindInProjectWindow : Window
         DataContext = vm;
         vm.PropertyChanged += Vm_PropertyChanged;
         RefreshResults();
+    }
+
+    protected override void OnClosed(EventArgs e)
+    {
+        base.OnClosed(e);
+        if (_vm is not null) _vm.PropertyChanged -= Vm_PropertyChanged;
     }
 
     private void Vm_PropertyChanged(object? sender, PropertyChangedEventArgs e)
