@@ -64,6 +64,9 @@ public class ProjectFindServiceTests
     public void Translation_LabeledByLanguage_WhenToggled()
     {
         var (project, provider) = ProjectWithTranslation("c1", 1, lang: "de", text: "Der Wächter");
+        // Off by default: proves the InTranslations flag actually gates the search.
+        Assert.Empty(ProjectFindService.Search(project, provider, "en",
+            new ProjectFindQuery("Wächter")));
         var rows = ProjectFindService.Search(project, provider, "en",
             new ProjectFindQuery("Wächter", InTranslations: true));
         var row = Assert.Single(rows);
@@ -86,6 +89,9 @@ public class ProjectFindServiceTests
         var (project, provider) = TwoConvsOneThrows(good: "c1", bad: "c2", text: "findme");
         var rows = ProjectFindService.Search(project, provider, "en",
             new ProjectFindQuery("findme"));
+        // NotEmpty guards against a vacuous pass: if the whole walk broke and skipped
+        // c1 too, an empty result would still satisfy Assert.All.
+        Assert.NotEmpty(rows);
         Assert.All(rows, r => Assert.Equal("c1", r.ConversationName));
     }
 
