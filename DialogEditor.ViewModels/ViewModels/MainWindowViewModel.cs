@@ -1140,6 +1140,15 @@ public partial class MainWindowViewModel : ObservableObject
         IsModified = false;
         CurrentConversationName = file.Name;
         if (!IsBrowserPinned) IsBrowserExpanded = false;
+
+        // Drain a Find-in-Project navigation target, same as LoadConversationFile:
+        // a match in a new conversation routes here, and its node lives in the
+        // reconstructed-from-patch canvas above.
+        if (_pendingSelectNodeId is int pending)
+        {
+            _pendingSelectNodeId = null;
+            SelectNodeById(pending);
+        }
     }
 
     /// Periodic autosave (wired to a 60 s DispatcherTimer in MainWindow). Writes a
@@ -2304,7 +2313,20 @@ public partial class MainWindowViewModel : ObservableObject
             SelectNodeById(nodeId);
             return;
         }
-        if (_provider?.FindConversation(conversationName) is not { } file) return;
+        // Resolve the target file. A new (not-yet-on-disk) conversation the project
+        // added lives only in Patches, so FindConversation returns null for it — fall
+        // back to a synthetic new-conversation file, the same pattern every other call
+        // site uses (e.g. the F5 apply loop). Without this, double-clicking a match in
+        // a new conversation while a different one is open would silently do nothing.
+        var file = _provider?.FindConversation(conversationName)
+                ?? (_project?.IsNewConversation(conversationName) == true
+                       ? _provider?.BuildNewConversationFile(conversationName)
+                       : null);
+        if (file is null)
+        {
+            StatusText = Loc.Get("Status_FindInProject_NodeGone");
+            return;
+        }
         _pendingSelectNodeId = nodeId;
         OnConversationSelected(file);   // honours the dirty guard; loads the conversation
     }
