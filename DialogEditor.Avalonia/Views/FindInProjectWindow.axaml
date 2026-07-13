@@ -1,0 +1,110 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
+        x:Class="DialogEditor.Avalonia.Views.FindInProjectWindow"
+        Title="{DynamicResource FindInProject_Title}"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="720" Height="520" MinWidth="560" MinHeight="360"
+        CanResize="True"
+        ShowInTaskbar="False"
+        Background="{DynamicResource Brush.Surface.Window}"
+        WindowStartupLocation="CenterOwner"
+        x:CompileBindings="False">
+
+    <Window.Styles>
+        <Style Selector="TextBlock.col-header">
+            <Setter Property="Foreground"  Value="{DynamicResource Brush.Text.Secondary}"/>
+            <Setter Property="FontSize"    Value="{DynamicResource FontSize.Small}"/>
+            <Setter Property="FontWeight"  Value="Bold"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Margin="14,12,14,12">
+
+        <!-- ── Query row: search box + Search button ─────────────────────── -->
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
+            <TextBox Grid.Column="0" x:Name="SearchBox"
+                     Text="{Binding SearchText}"
+                     Watermark="{DynamicResource FindInProject_SearchPlaceholder}"
+                     ToolTip.Tip="{DynamicResource ToolTip_FindInProject}"
+                     AutomationProperties.Name="{DynamicResource FindInProject_SearchPlaceholder}"
+                     AutomationProperties.HelpText="{DynamicResource ToolTip_FindInProject}"
+                     Margin="0,0,8,0"/>
+            <Button Grid.Column="1" x:Name="SearchButton"
+                    Content="{DynamicResource FindInProject_SearchButton}"
+                    Command="{Binding SearchCommand}"
+                    ToolTip.Tip="{DynamicResource ToolTip_FindInProject_Search}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_FindInProject_Search}"
+                    Background="{DynamicResource Brush.Button.Confirm.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
+                    Padding="16,6" FontSize="{DynamicResource FontSize.Body}"/>
+        </Grid>
+
+        <!-- ── Option checkboxes ──────────────────────────────────────────── -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="16" Margin="0,0,0,8">
+            <CheckBox Content="{DynamicResource FindInProject_CaseSensitive}"
+                      IsChecked="{Binding CaseSensitive}"
+                      ToolTip.Tip="{DynamicResource ToolTip_FindInProject_CaseSensitive}"
+                      AutomationProperties.HelpText="{DynamicResource ToolTip_FindInProject_CaseSensitive}"/>
+            <CheckBox Content="{DynamicResource FindInProject_InLinkChoice}"
+                      IsChecked="{Binding InLinkChoice}"
+                      ToolTip.Tip="{DynamicResource ToolTip_FindInProject_InLinkChoice}"
+                      AutomationProperties.HelpText="{DynamicResource ToolTip_FindInProject_InLinkChoice}"/>
+            <CheckBox Content="{DynamicResource FindInProject_InTranslations}"
+                      IsChecked="{Binding InTranslations}"
+                      ToolTip.Tip="{DynamicResource ToolTip_FindInProject_InTranslations}"
+                      AutomationProperties.HelpText="{DynamicResource ToolTip_FindInProject_InTranslations}"/>
+            <CheckBox Content="{DynamicResource FindInProject_InNodeComments}"
+                      IsChecked="{Binding InNodeComments}"
+                      ToolTip.Tip="{DynamicResource ToolTip_FindInProject_InNodeComments}"
+                      AutomationProperties.HelpText="{DynamicResource ToolTip_FindInProject_InNodeComments}"/>
+        </StackPanel>
+
+        <!-- ── Status line ────────────────────────────────────────────────── -->
+        <TextBlock Grid.Row="2"
+                   Text="{Binding StatusText}"
+                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
+                   Margin="0,0,0,4"/>
+
+        <!-- ── Results list ───────────────────────────────────────────────── -->
+        <DockPanel Grid.Row="3">
+            <!-- Column headers; widths must match the row template below -->
+            <Grid DockPanel.Dock="Top" ColumnDefinitions="160,50,110,90,*" Margin="4,0,4,2">
+                <TextBlock Grid.Column="0" Classes="col-header" Text="{DynamicResource FindInProject_ColConversation}"/>
+                <TextBlock Grid.Column="1" Classes="col-header" Text="{DynamicResource FindInProject_ColNode}"/>
+                <TextBlock Grid.Column="2" Classes="col-header" Text="{DynamicResource FindInProject_ColField}"/>
+                <TextBlock Grid.Column="3" Classes="col-header" Text="{DynamicResource FindInProject_ColLanguage}"/>
+                <TextBlock Grid.Column="4" Classes="col-header" Text="{DynamicResource FindInProject_ColSnippet}"/>
+            </Grid>
+            <ListBox x:Name="ResultsList"
+                     Background="{DynamicResource Brush.Surface.Card}" BorderThickness="0"
+                     KeyDown="ResultsList_KeyDown">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid ColumnDefinitions="160,50,110,90,*" Margin="0,2"
+                              DoubleTapped="OnResultActivated">
+                            <TextBlock Grid.Column="0" Text="{Binding Row.ConversationName}"
+                                       Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Column="1" Text="{Binding Row.NodeId}"
+                                       Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"/>
+                            <TextBlock Grid.Column="2" Text="{Binding Row.FieldLabel}"
+                                       Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Column="3" Text="{Binding LanguageDisplay}"
+                                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Body}"
+                                       TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Grid.Column="4" Text="{Binding Row.Snippet}"
+                                       Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+
+        <!-- Focus hint bar -->
+        <shared:FocusHintBar Grid.Row="4" x:Name="HintBar"/>
+
+    </Grid>
+
+</Window>

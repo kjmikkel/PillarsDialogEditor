@@ -565,6 +565,35 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="FindReplace_Replaced_One">Replaced 1 match</sys:String>
     <sys:String x:Key="FindReplace_Replaced_Other">Replaced {0} matches</sys:String>
     <sys:String x:Key="FindReplace_NothingReplaced">Nothing replaced</sys:String>
+    <!-- ─── Find in Project (read-only project-wide search) ───────────── -->
+    <sys:String x:Key="FindInProject_Title">Find in Project</sys:String>
+    <sys:String x:Key="Menu_FindInProject">Find in Project…</sys:String>
+    <sys:String x:Key="ToolTip_FindInProject">Search the text of every conversation your project touches (all its edits, plus the vanilla lines in those conversations). Read-only — nothing is changed. Requires an open project and a game folder.</sys:String>
+    <sys:String x:Key="FindInProject_SearchPlaceholder">Search text…</sys:String>
+    <sys:String x:Key="FindInProject_SearchButton">Search</sys:String>
+    <sys:String x:Key="ToolTip_FindInProject_Search">Search all patched conversations for this text.</sys:String>
+    <sys:String x:Key="FindInProject_CaseSensitive">Case sensitive</sys:String>
+    <sys:String x:Key="ToolTip_FindInProject_CaseSensitive">Match upper- and lower-case exactly.</sys:String>
+    <sys:String x:Key="FindInProject_InLinkChoice">Link / choice text</sys:String>
+    <sys:String x:Key="ToolTip_FindInProject_InLinkChoice">Also search player-choice and link display text.</sys:String>
+    <sys:String x:Key="FindInProject_InTranslations">Translations (all languages)</sys:String>
+    <sys:String x:Key="ToolTip_FindInProject_InTranslations">Also search your translated text in every language. Each match shows its language.</sys:String>
+    <sys:String x:Key="FindInProject_InNodeComments">Node comments</sys:String>
+    <sys:String x:Key="ToolTip_FindInProject_InNodeComments">Also search your per-node writer comments (editor notes, never game text).</sys:String>
+    <sys:String x:Key="FindInProject_ColConversation">Conversation</sys:String>
+    <sys:String x:Key="FindInProject_ColNode">Node</sys:String>
+    <sys:String x:Key="FindInProject_ColField">Field</sys:String>
+    <sys:String x:Key="FindInProject_ColLanguage">Language</sys:String>
+    <sys:String x:Key="FindInProject_ColSnippet">Match</sys:String>
+    <sys:String x:Key="FindInProject_PrimaryLanguage">Default</sys:String>
+    <sys:String x:Key="FindInProject_NoMatches">No matches.</sys:String>
+    <sys:String x:Key="FindInProject_Matches_One">{0} match</sys:String>
+    <sys:String x:Key="FindInProject_Matches_Other">{0} matches</sys:String>
+    <sys:String x:Key="FindField_DefaultText">Default text</sys:String>
+    <sys:String x:Key="FindField_FemaleText">Female text</sys:String>
+    <sys:String x:Key="FindField_LinkChoice">Link / choice</sys:String>
+    <sys:String x:Key="FindField_NodeComment">Node comment</sys:String>
+    <sys:String x:Key="Status_FindInProject_NodeGone">That node no longer exists — it may have been edited since the search.</sys:String>
     <!-- ─── Batch Find / Replace ─────────────────────────────────────────── -->
     <sys:String x:Key="Menu_BatchReplace">Batch Find / Replace…</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace">Find and replace text, GUIDs, and parameter values across all conversations on disk</sys:String>
