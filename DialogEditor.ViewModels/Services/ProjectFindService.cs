@@ -45,6 +45,11 @@ public static class ProjectFindService
                 }
             }
 
+            // Translation text (primary fallback below + the InTranslations block) is
+            // read from the saved patch, even for the open conversation whose node text
+            // comes from the live snapshot — the accessor passes only the snapshot, not
+            // live translations. Unsaved translation edits therefore aren't reflected in
+            // translation-scoped matches (same contract as ProjectVoRowScanner).
             var primaryTranslations = (patch.Translations.GetValueOrDefault(primaryLanguage) ?? [])
                 .ToDictionary(t => t.NodeId);
 
