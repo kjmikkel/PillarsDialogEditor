@@ -286,6 +286,7 @@ public partial class MainWindowViewModel : ObservableObject
         ImportTranslationCommand.NotifyCanExecuteChanged();
         BatchImportVoAllCommand.NotifyCanExecuteChanged();
         FindInProjectCommand.NotifyCanExecuteChanged();
+        BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
         // Only re-scan the game folder when NewConversations actually changes —
         // not on every patch save, which would re-enumerate all conversations.
         if (_provider is not null && !ReferenceEquals(prevNew, nextNew))
@@ -387,6 +388,10 @@ public partial class MainWindowViewModel : ObservableObject
                 _ => StatusText,
             };
         };
+
+        // Canvas context action: "Show all lines by this speaker" forwards the node's
+        // speaker GUID up here (we own the project/provider and the dirty guard).
+        Canvas.RequestBrowseSpeakerLines += guid => _ = OpenSpeakerLineBrowserAsync(guid);
 
         var last = AppSettings.LastGameDirectory;
         if (!string.IsNullOrEmpty(last) && Directory.Exists(last))
@@ -689,6 +694,7 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
         FindInProjectCommand.NotifyCanExecuteChanged();
+        BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
         DialogProjectSerializer.SaveToFile(path, _project!);
         AppSettings.LastProjectPath = path;
         AppSettings.AddRecentProject(path);
@@ -805,6 +811,7 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
         FindInProjectCommand.NotifyCanExecuteChanged();
+        BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
         CurrentProjectName = null;
         IsModified = false;        // nothing open → not dirty
         _attributionPath = null;   // force attribution rebuild next time
@@ -969,6 +976,7 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
         FindInProjectCommand.NotifyCanExecuteChanged();
+        BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
         AppSettings.LastProjectPath = path;
         AppSettings.AddRecentProject(path);
         RefreshRecentProjects();
@@ -1313,6 +1321,7 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();
         FindInProjectCommand.NotifyCanExecuteChanged();
+        BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
         AppSettings.LastProjectPath = path;
         AppSettings.AddRecentProject(path);
         RefreshRecentProjects();
@@ -1669,6 +1678,7 @@ public partial class MainWindowViewModel : ObservableObject
             OnPropertyChanged(nameof(CanValidateVO));
             BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on game folder + id
             FindInProjectCommand.NotifyCanExecuteChanged();
+            BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
             AvailableLanguages = provider.AvailableLanguages;
             SelectedLanguage   = AppSettings.PickLanguage(AvailableLanguages, AppSettings.LastLanguage);
             Browser.Load(provider, _project?.NewConversations);
@@ -2381,6 +2391,52 @@ public partial class MainWindowViewModel : ObservableObject
         vm.RequestNavigate += NavigateToFoundNode;
         if (ShowFindInProject is not null)
             await ShowFindInProject(vm);
+    }
+
+    /// Same requirements as Find in Project: an open project, a loaded provider, and a
+    /// game folder (the browser scans every vanilla conversation on disk).
+    public bool CanBrowseSpeakerLines =>
+        _project is not null
+        && _provider is not null
+        && !string.IsNullOrEmpty(_currentGameDirectory);
+
+    /// The View constructs and shows the browser window (and kicks off ScanAsync).
+    public Func<SpeakerLineBrowserViewModel, Task>? ShowSpeakerLineBrowser { get; set; }
+
+    /// Browser-specific three-way dirty guard (sibling of ConfirmScanWithUnsavedChanges;
+    /// browser copy differs — the scan still includes the open conversation's live text).
+    /// Null in unit tests → a dirty project is treated as Cancel, never a silent open.
+    public Func<Task<ScanDirtyChoice>>? ConfirmBrowseWithUnsavedChanges { get; set; }
+
+    [RelayCommand(CanExecute = nameof(CanBrowseSpeakerLines))]
+    private Task BrowseSpeakerLines() => OpenSpeakerLineBrowserAsync(null);
+
+    /// Opens the Speaker Line Browser, pre-selecting <paramref name="initialSpeakerGuid"/>
+    /// when supplied (the canvas context action). Runs the dirty guard first; declining to
+    /// save still opens, cancelling does not. Reuses NavigateToFoundNode for jump-to-node.
+    public async Task OpenSpeakerLineBrowserAsync(string? initialSpeakerGuid = null)
+    {
+        if (_project is null || _provider is null) return;
+
+        if (IsModified)
+        {
+            var choice = ConfirmBrowseWithUnsavedChanges is null
+                ? ScanDirtyChoice.Cancel
+                : await ConfirmBrowseWithUnsavedChanges();
+            if (choice == ScanDirtyChoice.Cancel) return;
+            if (choice == ScanDirtyChoice.SaveAndScan) SaveProject();
+        }
+
+        var vm = new SpeakerLineBrowserViewModel(
+            _project, _provider, _provider.Language,
+            () => Canvas.Nodes.Count > 0
+                ? (Canvas.ConversationName, Canvas.BuildSnapshot())
+                : (null, (ConversationEditSnapshot?)null),
+            initialSpeakerGuid);
+        vm.RequestNavigate += NavigateToFoundNode;
+
+        if (ShowSpeakerLineBrowser is not null)
+            await ShowSpeakerLineBrowser(vm);
     }
 
     /// Navigate from a find result to its node: switch conversation if needed

@@ -481,6 +481,19 @@ public partial class ConversationViewModel : ObservableObject
         if (connection is not null) DeleteConnection(connection);
     }
 
+    /// Raised with a node's speaker GUID when the user asks to browse that
+    /// character's lines. MainWindowViewModel subscribes and opens the browser
+    /// (it owns the project/provider and the dirty guard). Read-only, so unlike
+    /// the editing commands above it isn't gated on IsEditable.
+    public event Action<string>? RequestBrowseSpeakerLines;
+
+    [RelayCommand]
+    private void BrowseSpeakerLinesForNode(NodeViewModel? node)
+    {
+        if (node is not null && !string.IsNullOrWhiteSpace(node.SpeakerGuid))
+            RequestBrowseSpeakerLines?.Invoke(node.SpeakerGuid);
+    }
+
     // ── Keyboard selection & navigation (spec: 2026-06-12 canvas keyboard) ──
     private NodeViewModel? _lastSelection;
 
