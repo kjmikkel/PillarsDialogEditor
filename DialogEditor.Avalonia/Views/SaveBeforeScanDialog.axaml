@@ -8,7 +8,7 @@
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource Brush.Surface.Panel}">
   <StackPanel Margin="20" Spacing="12">
-    <TextBlock Text="{DynamicResource SaveBeforeScan_Message}"
+    <TextBlock x:Name="MessageText" Text="{DynamicResource SaveBeforeScan_Message}"
                Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"
                TextWrapping="Wrap"/>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
