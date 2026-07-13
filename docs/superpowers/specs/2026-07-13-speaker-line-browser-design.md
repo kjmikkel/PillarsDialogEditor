@@ -20,7 +20,10 @@ conversation. The request: **"show every line spoken by this character across th
    persistent cross-session index (that option was explicitly declined); the scan runs on
    demand and its result is held only while the window is open.
 2. **Two entry points, one window:**
-   - **Menu** — `Test ▸ Browse Speaker Lines…`, opens with no speaker pre-selected.
+   - **Menu** — `Edit ▸ Browse Speaker Lines…`, placed directly after **Find in Project**
+     (the Edit menu is the home of the read-only analysis tools — Find in Project, Flow
+     Analytics, Compare, History, Attribution — so the voice-consistency browser belongs
+     beside its closest sibling). Opens with no speaker pre-selected.
    - **From selected node** — a canvas context-menu item and node-detail-panel action,
      **"Show all lines by this speaker"**, which pre-selects the selected node's speaker.
 3. **Row content: full line + location.** Each row shows conversation name, node id, the
@@ -137,17 +140,17 @@ public record SpeakerLineRow(
     LineVariant Variant,
     string LineText,
     LineOrigin  Origin);
-
-public record SpeakerLineScanResult(
-    IReadOnlyList<SpeakerLineRow> Rows,
-    IReadOnlyList<SpeakerLineCount> Speakers);   // guid + resolved name + count, name-sorted
-
-public record SpeakerLineCount(string Guid, string Name, int Count);
 ```
 
-Rows sorted by `ConversationName` (Ordinal) → `NodeId` → `Variant`, matching Find-in-Project.
-`Speakers` lists only speakers with ≥ 1 line, name-sorted (via `SpeakerNameService.Resolve`),
-used to populate the picker with counts.
+The scanner returns `IReadOnlyList<SpeakerLineRow>` **only** — it stays pure and has no
+dependency on the static `SpeakerNameService`. Rows are sorted by `ConversationName`
+(Ordinal) → `NodeId` → `Variant`, matching Find-in-Project. Nodes with a blank
+`SpeakerGuid` (no speaker to attribute) are skipped.
+
+The **speaker picker list** is derived in the ViewModel (the UI layer that legitimately
+depends on `SpeakerNameService`): it groups the rows by `SpeakerGuid`, resolves each to a
+display name, counts them, and sorts by name — yielding a small `SpeakerPickerItem(Guid,
+DisplayName, Count)` per speaker with ≥ 1 line.
 
 ### `SpeakerLineBrowserViewModel` (`DialogEditor.ViewModels`)
 
@@ -192,11 +195,14 @@ used to populate the picker with counts.
   (initial speaker = selected node's `SpeakerGuid`). Gate: open project + game provider
   (same shape as `CanFindInProject`); `NotifyCanExecuteChanged` added at the same sites as
   `FindInProjectCommand`.
-- **Dirty guard runs before the window opens:** if `IsModified`, await
-  `ConfirmScanWithUnsavedChanges()` (the same seam the tag sweep uses); `Cancel` aborts the
-  open, `SaveAndScan` calls `SaveProject()` first, `ScanSavedOnly` opens without saving. The
-  browser-specific dialog copy is wired via the View (`SaveBeforeScanDialog`, or a browser
-  variant of it) — the seam is reused, the strings are browser-specific.
+- **Dirty guard runs before the window opens:** if `IsModified`, await a **browser-specific
+  seam** `ConfirmBrowseWithUnsavedChanges` (a sibling of the tag sweep's
+  `ConfirmScanWithUnsavedChanges`, reusing the `ScanDirtyChoice` enum and the
+  `SaveBeforeScanDialog` view but with browser-specific message/button copy); `Cancel` aborts
+  the open, `SaveAndScan` calls `SaveProject()` first, `ScanSavedOnly` opens without saving. A
+  separate seam (not the shared one) keeps the tag-sweep dialog's wording untouched while the
+  browser shows its own crystal-clear copy. `SaveBeforeScanDialog` gains optional
+  message/label override parameters so a second dialog class isn't needed (DRY).
 - The VM's `RequestNavigate` is wired to `NavigateToFoundNode` at construction.
 
 ## Localisation, tooltips, accessibility
