@@ -1,3 +1,6 @@
+using DialogEditor.Core.Editing;
+using DialogEditor.Core.GameData;
+using DialogEditor.Core.Models;
 using DialogEditor.Patch;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
@@ -130,6 +133,104 @@ public class MainWindowViewModelTextTagTests : IDisposable
         InjectProject(vm, DialogProject.Empty("T"));
         vm.IsModified = true;
         Assert.Null(await vm.RequestTextTagValidationAsync());
+    }
+
+    private static void InjectProvider(MainWindowViewModel vm, IGameDataProvider provider)
+    {
+        var fi = typeof(MainWindowViewModel)
+            .GetField("_provider", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+        fi.SetValue(vm, provider);
+    }
+
+    /// Enumerates (resolves) each named conversation, but LOADS only those mapped to
+    /// true — a name mapped to false throws on load, modelling a vanilla file that
+    /// exists on disk yet can't be parsed. Loadable conversations return an empty
+    /// vanilla base (the effective set then comes purely from the applied patch).
+    private sealed class ResolvingProvider(IReadOnlyDictionary<string, bool> loadable) : IGameDataProvider
+    {
+        public string GameName                          => "Stub";
+        public string GameId                            => "stub";
+        public IReadOnlyList<string> AvailableLanguages => [];
+        public string Language { get; set; }            = "en";
+
+        public IReadOnlyList<ConversationFile> EnumerateConversations()
+            => loadable.Keys.Select(n => new ConversationFile(n, "", "", "")).ToList();
+
+        public Conversation LoadConversation(ConversationFile f)
+            => loadable[f.Name]
+                ? new Conversation(f.Name, [], new StringTable([]))
+                : throw new InvalidDataException($"corrupt conversation: {f.Name}");
+
+        public void SaveConversation(ConversationFile f, ConversationEditSnapshot s) { }
+        public IReadOnlyDictionary<string, string> LoadSpeakerNames() => new Dictionary<string, string>();
+        public string GetStringTablePath(ConversationFile f) => string.Empty;
+        public string GetStringTablePath(ConversationFile f, string language) => string.Empty;
+        public (string, string) GetBackupRoots() => (string.Empty, string.Empty);
+        public ConversationFile BuildNewConversationFile(string name) => new(name, "", "", "");
+        public void InitializeConversationFile(ConversationFile f) { }
+    }
+
+    private static readonly NodeEditSnapshot AddedNode5 =
+        new(5, false, SpeakerCategory.Npc, "", "", "", "", "Conversation", "None", "", "", "", false, false, [], [], []);
+
+    /// A saved project with two conversations, neither the open one, exercised with the
+    /// game-file (likely) pass armed:
+    ///  • "ResolvableConv" — the provider loads it (empty vanilla base). Its patch adds
+    ///    node 5 (which survives, so its comment is NOT stale) and carries an orphaned
+    ///    comment on node 42 — an added node that was created then deleted, so 42 is in
+    ///    neither AddedNodes nor DeletedNodeIds and is absent from the reconstructed set.
+    ///  • "BrokenConv" — the provider throws on load; its patch carries a comment on 99.
+    ///    The delegate hits the catch → returns null → the scanner skips it (never flags).
+    private async Task<TextTagValidationViewModel> OpenValidationWithGameFiles()
+    {
+        var vm = MakeVm();
+        InjectProvider(vm, new ResolvingProvider(new Dictionary<string, bool>
+        {
+            ["ResolvableConv"] = true,
+            ["BrokenConv"]     = false,
+        }));
+
+        var resolvable = new ConversationPatch(
+            "ResolvableConv", ConversationPatch.CurrentSchemaVersion, [AddedNode5], [], [])
+        {
+            NodeComments = new Dictionary<int, string> { [5] = "kept", [42] = "orphan" }
+        };
+        var broken = new ConversationPatch(
+            "BrokenConv", ConversationPatch.CurrentSchemaVersion, [], [], [])
+        {
+            NodeComments = new Dictionary<int, string> { [99] = "orphan" }
+        };
+
+        InjectProject(vm, DialogProject.Empty("T").WithPatch(resolvable).WithPatch(broken));
+        InjectProjectPath(vm);
+
+        var window = await vm.RequestTextTagValidationAsync();
+        Assert.NotNull(window);
+        window!.CheckGameFiles = true;   // arms the reconstruction-based likely pass
+        return window;
+    }
+
+    [Fact]
+    public async Task LikelyStale_AddedNodeOrphan_InResolvableConversation_SurfacesAsLikelyRow()
+    {
+        var window = await OpenValidationWithGameFiles();
+
+        // Exactly one row: node 42's orphaned comment. (Node 5 survives reconstruction, so
+        // its comment is not flagged; BrokenConv is skipped, so it contributes nothing.)
+        var stale = Assert.Single(window.StaleRows);
+        Assert.True(stale.IsLikely);
+        Assert.Equal("ResolvableConv", stale.ConversationName);
+        Assert.Equal(42, stale.Row.NodeId);
+    }
+
+    [Fact]
+    public async Task LikelyStale_UnloadableConversation_IsSkipped_NotFlagged()
+    {
+        var window = await OpenValidationWithGameFiles();
+
+        // The conversation the provider can't load surfaces no rows at all — a load
+        // failure means "skip", never "flag".
+        Assert.DoesNotContain(window.StaleRows, r => r.ConversationName == "BrokenConv");
     }
 
     [Fact]
