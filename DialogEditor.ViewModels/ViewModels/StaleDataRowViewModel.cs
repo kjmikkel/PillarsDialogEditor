@@ -27,7 +27,7 @@ public sealed partial class StaleDataRowViewModel
         _removeOne = removeOne;
 
         ConversationName = row.ConversationName;
-        NodeLabel        = Loc.Format("VoValidation_NodeRow", row.NodeId);
+        NodeLabel        = Loc.Format("StaleData_NodeRow", row.NodeId);
         CategoryLabel    = row.Kind switch
         {
             StaleDataKind.Comment  => Loc.Get("StaleData_Category_Comment"),
@@ -45,6 +45,14 @@ public sealed partial class StaleDataRowViewModel
         string.IsNullOrEmpty(lang) ||
         string.Equals(lang, primary, StringComparison.OrdinalIgnoreCase);
 
-    [RelayCommand]
-    private void Remove() => _removeOne?.Invoke(_row);
+    [RelayCommand(CanExecute = nameof(CanRemove))]
+    private void Remove()
+    {
+        // Defense-in-depth: ICommand.Execute does not itself enforce CanExecute, so a
+        // confirmed row's command being invoked directly (e.g. via UI automation bypassing
+        // the disabled-button gate) must still be a no-op — confirmed rows are removed only
+        // through the armed bulk clean-up.
+        if (!CanRemove) return;
+        _removeOne?.Invoke(_row);
+    }
 }
