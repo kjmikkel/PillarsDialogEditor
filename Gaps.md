@@ -829,13 +829,30 @@ via crash simulation (both restore and discard paths). Deferred: configurable
 interval; rotating generations. Spec:
 docs/superpowers/specs/2026-07-12-autosave-design.md.
 
-### Stale Patch Data Hygiene
+### Stale Patch Data Hygiene ✅ IMPLEMENTED (2026-07-13)
 
-The VO lifecycle work (2026-07-02) cleans orphaned `.wem` files, but the equivalent
-*data* rot is untracked: `Translations`, `NodeComments`, and layout entries referencing
-**deleted node IDs** accumulate silently in the saved patch. A hygiene report/cleanup
-(a section in an existing validation window, or its own) that lists and prunes them —
-mirroring the orphaned-VO pattern.
+The VO lifecycle work (2026-07-02) cleaned orphaned `.wem` files; this closes the
+equivalent *data* rot — `Translations`, `NodeComments`, and canvas `Layouts` entries
+referencing nodes that no longer exist, which previously accumulated silently (deleting a
+node left its comment and its non-canvas-language translations behind). Two halves:
+
+- **Prevention (save-time):** `FoldCanvasIntoProject` filters `NodeComments` and
+  all-language `Translations` down to the canvas's live node-ID set — game-folder-free,
+  since the canvas holds the full effective conversation — so an edited-and-saved
+  conversation can no longer leave stale data behind.
+- **Reactive report + prune:** a **"Stale data"** section in the existing
+  **Test ▸ Validate Text…** window. Pure `ProjectStaleDataScanner` (over
+  `DialogProject.Patches`) reports two confidence tiers: **Confirmed** (node ID ∈ the
+  patch's own `DeletedNodeIds`; always detected, zero false positives) and **Likely**
+  (ID absent from the reconstructed effective node set `base ∪ Added − Deleted`; behind an
+  opt-in "Also check against the game files" toggle, gated on an open game folder, flagged
+  as possible version-skew). Pruning mirrors the orphaned-VO armed two-click cleanup: a
+  bulk **"Remove stale data"** acts on Confirmed rows only; each Likely row has its own
+  per-row Remove. Pure `StaleDataPruner` rebuilds the cleaned project; the confidence-tier
+  gating is enforced at the VM (`CanRemove` / a `CanExecute` guard), not just in XAML.
+  GUI-verified end-to-end (all three categories detected, armed prune writes through to
+  disk, re-scan clean). Spec:
+  docs/superpowers/specs/2026-07-13-stale-patch-data-hygiene-design.md.
 
 ### Smaller Writer/UX Backlog
 
