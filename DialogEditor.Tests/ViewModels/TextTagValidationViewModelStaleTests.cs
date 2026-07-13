@@ -73,6 +73,19 @@ public class TextTagValidationViewModelStaleTests
     }
 
     [Fact]
+    public void RemoveCommand_GuardsConfirmedRows()
+    {
+        var confirmedCalled = false;
+        var confirmedVm = new StaleDataRowViewModel(Confirmed(7), "en", _ => confirmedCalled = true);
+        Assert.False(confirmedVm.RemoveCommand.CanExecute(null));
+        confirmedVm.RemoveCommand.Execute(null);
+        Assert.False(confirmedCalled);
+
+        var likelyVm = new StaleDataRowViewModel(Likely(8), "en", _ => { });
+        Assert.True(likelyVm.RemoveCommand.CanExecute(null));
+    }
+
+    [Fact]
     public void CheckGameFiles_Toggle_PassesFlagToStaleScan()
     {
         bool? lastFlag = null;
