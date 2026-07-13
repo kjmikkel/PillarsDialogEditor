@@ -252,5 +252,10 @@ public class MainWindowViewModelPersistenceTests : IDisposable
         var saved = DialogProjectSerializer.LoadFromFile(path).Patches["greeting"];
         Assert.False(saved.NodeComments.ContainsKey(5));
         Assert.DoesNotContain(saved.Translations.SelectMany(kv => kv.Value), t => t.NodeId == 5);
+        // The deleted node's "de" translation was the only "de" entry — once it's
+        // filtered out, the emptied language key must be dropped entirely (not
+        // persisted as Translations["de"] = []), matching StaleDataPruner's
+        // (the reactive half's) behaviour of omitting keys with zero survivors.
+        Assert.False(saved.Translations.ContainsKey("de"));
     }
 }
