@@ -136,6 +136,11 @@
                                   InputGesture="Ctrl+Shift+H"
                                   ToolTip.Tip="{DynamicResource ToolTip_BatchReplace}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace}"/>
+                        <MenuItem Header="{DynamicResource Menu_FindInProject}"
+                                  Command="{Binding FindInProjectCommand}"
+                                  InputGesture="Ctrl+Shift+F"
+                                  ToolTip.Tip="{DynamicResource ToolTip_FindInProject}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_FindInProject}"/>
                         <MenuItem Header="{DynamicResource Menu_FlowAnalytics}"
                                   Click="FlowAnalytics_Click"
                                   InputGesture="F7"

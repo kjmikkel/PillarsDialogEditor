@@ -910,4 +910,49 @@ public class MainWindowViewModelTests : IDisposable
             ChatterPrefixService.Clear();
         }
     }
+
+    // ── FindInProjectCommand ──────────────────────────────────────────────
+
+    [Fact]
+    public void CanFindInProject_RequiresProjectProviderAndGameFolder()
+    {
+        var vm = MakeVm();
+        Assert.False(vm.CanFindInProject);
+    }
+
+    [Fact]
+    public void CanFindInProject_TrueWithProjectProviderAndGameFolder()
+    {
+        var vm = MakeVoAllReadyVm(new FakeGameDataProvider("poe1", "en"));
+        // Unlike batch VO, Find in Project needs no saved project path.
+        SetPrivateField(vm, "_projectPath", null);
+        Assert.True(vm.CanFindInProject);
+    }
+
+    private static void SelectConversation(MainWindowViewModel vm, ConversationFile file)
+    {
+        var mi = typeof(MainWindowViewModel)
+            .GetMethod("OnConversationSelected", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!;
+        mi.Invoke(vm, [file]);
+    }
+
+    private static ConversationNode MakeGameNode(int id) =>
+        new(id, false, SpeakerCategory.Npc, "", "", [], [], [], "Conversation", "None");
+
+    [Fact]
+    public void NavigateToFoundNode_SameConversation_SelectsNode()
+    {
+        var nodes = new[] { MakeGameNode(1), MakeGameNode(2), MakeGameNode(3) };
+        var strings = new StringTable(nodes.Select(n => new StringEntry(n.NodeId, "text", "")));
+        var conv = new Conversation("c1", nodes, strings);
+        var provider = new FakeGameDataProvider("poe1", "en", conv);
+
+        var vm = MakeVm();
+        InjectProvider(vm, provider);
+        SelectConversation(vm, provider.BuildNewConversationFile("c1"));
+
+        vm.NavigateToFoundNode("c1", 2);
+
+        Assert.Equal(2, vm.Canvas.SelectedNode?.NodeId);
+    }
 }

@@ -204,6 +204,9 @@ public partial class MainWindowViewModel : ObservableObject
     {
         _pendingFile   = null;
         _pendingAction = null;
+        // A cancelled Find-in-Project navigation must not leave a stale node id
+        // that a later, unrelated conversation load would inherit.
+        _pendingSelectNodeId = null;
         _unsavedDecision?.TrySetResult(false);
         _unsavedDecision = null;
     }
@@ -257,6 +260,14 @@ public partial class MainWindowViewModel : ObservableObject
     /// so export is meaningful for any saved project, voiced or text-only.
     public bool CanExportModBundle => ProjectPath is not null;
 
+    /// Find in Project needs a project open, a game-data provider, and a game folder
+    /// (it loads each patched conversation's effective text). Unlike batch VO it is
+    /// game-agnostic and needs no saved project path.
+    public bool CanFindInProject =>
+        _project is not null
+        && _provider is not null
+        && !string.IsNullOrEmpty(_currentGameDirectory);
+
     private void SetProject(DialogProject? project)
     {
         var prevNew  = _project?.NewConversations;
@@ -274,6 +285,7 @@ public partial class MainWindowViewModel : ObservableObject
         ExportForTranslationCommand.NotifyCanExecuteChanged();
         ImportTranslationCommand.NotifyCanExecuteChanged();
         BatchImportVoAllCommand.NotifyCanExecuteChanged();
+        FindInProjectCommand.NotifyCanExecuteChanged();
         // Only re-scan the game folder when NewConversations actually changes —
         // not on every patch save, which would re-enumerate all conversations.
         if (_provider is not null && !ReferenceEquals(prevNew, nextNew))
@@ -624,6 +636,7 @@ public partial class MainWindowViewModel : ObservableObject
         Canvas.ProjectPath  = _projectPath;
         OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
+        FindInProjectCommand.NotifyCanExecuteChanged();
         DialogProjectSerializer.SaveToFile(path, _project!);
         AppSettings.LastProjectPath = path;
         AppSettings.AddRecentProject(path);
@@ -739,6 +752,7 @@ public partial class MainWindowViewModel : ObservableObject
         Canvas.ProjectPath  = null;
         OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
+        FindInProjectCommand.NotifyCanExecuteChanged();
         CurrentProjectName = null;
         IsModified = false;        // nothing open → not dirty
         _attributionPath = null;   // force attribution rebuild next time
@@ -902,6 +916,7 @@ public partial class MainWindowViewModel : ObservableObject
         Canvas.ProjectPath  = _projectPath;
         OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
+        FindInProjectCommand.NotifyCanExecuteChanged();
         AppSettings.LastProjectPath = path;
         AppSettings.AddRecentProject(path);
         RefreshRecentProjects();
@@ -1236,6 +1251,7 @@ public partial class MainWindowViewModel : ObservableObject
         SaveProjectAsCommand.NotifyCanExecuteChanged();
         OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();
+        FindInProjectCommand.NotifyCanExecuteChanged();
         AppSettings.LastProjectPath = path;
         AppSettings.AddRecentProject(path);
         RefreshRecentProjects();
@@ -1564,6 +1580,7 @@ public partial class MainWindowViewModel : ObservableObject
             }
             OnPropertyChanged(nameof(CanValidateVO));
             BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on game folder + id
+            FindInProjectCommand.NotifyCanExecuteChanged();
             AvailableLanguages = provider.AvailableLanguages;
             SelectedLanguage   = AppSettings.PickLanguage(AvailableLanguages, AppSettings.LastLanguage);
             Browser.Load(provider, _project?.NewConversations);
@@ -2243,6 +2260,14 @@ public partial class MainWindowViewModel : ObservableObject
                 StatusText = Loc.Get("Status_NoProjectReadOnly");
             else
                 StatusText = Loc.Format("Status_ConversationLoaded", file.Name, conversation.Nodes.Count);
+
+            // A Find-in-Project navigation may have requested a node in this conversation
+            // before it was loaded; select it now that Canvas.Nodes is populated.
+            if (_pendingSelectNodeId is int pending)
+            {
+                _pendingSelectNodeId = null;
+                SelectNodeById(pending);
+            }
         }
         catch (Exception ex)
         {
@@ -2250,5 +2275,46 @@ public partial class MainWindowViewModel : ObservableObject
             StatusText = Loc.Format("Status_LoadError", file.Name, ex.Message);
             ReportError?.Invoke(ex);
         }
+    }
+
+    /// Opens the project-wide Find window. Game-agnostic; unlike batch VO it doesn't
+    /// require a saved project path since it never writes anything.
+    public Func<ProjectFindViewModel, Task>? ShowFindInProject { get; set; }
+
+    [RelayCommand(CanExecute = nameof(CanFindInProject))]
+    private async Task FindInProject()
+    {
+        if (_project is null || _provider is null) return;
+        var vm = new ProjectFindViewModel(
+            _project, _provider, _provider.Language,
+            () => Canvas.Nodes.Count > 0
+                ? (Canvas.ConversationName, Canvas.BuildSnapshot())
+                : (null, (ConversationEditSnapshot?)null));
+        vm.RequestNavigate += NavigateToFoundNode;
+        if (ShowFindInProject is not null)
+            await ShowFindInProject(vm);
+    }
+
+    /// Navigate from a find result to its node: switch conversation if needed
+    /// (reusing the unsaved-changes guard), then select the node by id.
+    public void NavigateToFoundNode(string conversationName, int nodeId)
+    {
+        if (Canvas.ConversationName == conversationName)
+        {
+            SelectNodeById(nodeId);
+            return;
+        }
+        if (_provider?.FindConversation(conversationName) is not { } file) return;
+        _pendingSelectNodeId = nodeId;
+        OnConversationSelected(file);   // honours the dirty guard; loads the conversation
+    }
+
+    private int? _pendingSelectNodeId;
+
+    private void SelectNodeById(int nodeId)
+    {
+        var node = Canvas.Nodes.FirstOrDefault(n => n.NodeId == nodeId);
+        if (node is not null) Canvas.SelectedNode = node;
+        else StatusText = Loc.Get("Status_FindInProject_NodeGone");
     }
 }

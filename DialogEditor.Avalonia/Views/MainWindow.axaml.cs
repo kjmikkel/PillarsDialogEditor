@@ -201,6 +201,13 @@ public partial class MainWindow : Window
             await dlg.ShowDialog(this);
         };
 
+        vm.ShowFindInProject = async findVm =>
+        {
+            var win = new FindInProjectWindow(findVm);
+            win.Show(this);          // non-modal, owned — results stay visible while browsing
+            await Task.CompletedTask;
+        };
+
         if (!vm.IsBrowserExpanded)
         {
             BrowserColumn.MinWidth = 34;
@@ -302,6 +309,15 @@ public partial class MainWindow : Window
 
             case Key.H when e.KeyModifiers == (KeyModifiers.Control | KeyModifiers.Shift):
                 BatchReplace_Click(null, null!);
+                e.Handled = true;
+                break;
+
+            case Key.F when e.KeyModifiers == (KeyModifiers.Control | KeyModifiers.Shift):
+                // Not gated via RelayCommand.Execute — that doesn't self-check CanExecute —
+                // so an unmet gate (no project/provider/game folder) silently no-ops instead
+                // of throwing.
+                if (vm.FindInProjectCommand.CanExecute(null))
+                    vm.FindInProjectCommand.Execute(null);
                 e.Handled = true;
                 break;
 
