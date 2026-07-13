@@ -54,17 +54,53 @@ public partial class TextTagValidationViewModel : ObservableObject
     private readonly Func<IReadOnlyList<TextTagIssueRow>> _scan;
     private readonly Action<string>? _addWord;
 
+    private readonly Func<bool, IReadOnlyList<StaleDataRow>>? _staleScan;
+    private readonly Action<IReadOnlyList<StaleDataRow>>? _prune;
+    private readonly string _primaryLanguage;
+
     public ObservableCollection<TextTagRowViewModel> Rows { get; } = [];
+    public ObservableCollection<StaleDataRowViewModel> StaleRows { get; } = [];
 
     [ObservableProperty] private string _summaryText = string.Empty;
     [ObservableProperty] private bool   _hasIssues;
 
+    [ObservableProperty] private string _staleSummaryText = string.Empty;
+    [ObservableProperty] private bool   _hasStaleData;
+    [ObservableProperty] private bool   _isStaleCleanUpArmed;
+
+    public bool CanCheckGameFiles { get; }
+    [ObservableProperty] private bool _checkGameFiles;
+
+    public RelayCommand CleanUpStaleCommand        { get; }
+    public RelayCommand ConfirmCleanUpStaleCommand { get; }
+    public RelayCommand CancelCleanUpStaleCommand  { get; }
+
+    public string StaleCleanUpConfirmText =>
+        Loc.FormatCount("StaleData_CleanUpConfirm", ConfirmedCount);
+
+    private int ConfirmedCount =>
+        StaleRows.Count(r => !r.IsLikely);
+
     public TextTagValidationViewModel(
         Func<IReadOnlyList<TextTagIssueRow>> scan,
-        Action<string>? addWord = null)
+        Action<string>? addWord = null,
+        Func<bool, IReadOnlyList<StaleDataRow>>? staleScan = null,
+        Action<IReadOnlyList<StaleDataRow>>? prune = null,
+        bool canCheckGameFiles = false,
+        string primaryLanguage = "")
     {
-        _scan    = scan;
-        _addWord = addWord;
+        _scan             = scan;
+        _addWord          = addWord;
+        _staleScan        = staleScan;
+        _prune            = prune;
+        CanCheckGameFiles = canCheckGameFiles;
+        _primaryLanguage  = primaryLanguage;
+
+        CleanUpStaleCommand        = new RelayCommand(() => IsStaleCleanUpArmed = true,
+                                                      () => HasStaleData && ConfirmedCount > 0 && !IsStaleCleanUpArmed);
+        ConfirmCleanUpStaleCommand = new RelayCommand(ExecuteStaleCleanUp, () => IsStaleCleanUpArmed);
+        CancelCleanUpStaleCommand  = new RelayCommand(() => IsStaleCleanUpArmed = false, () => IsStaleCleanUpArmed);
+
         Refresh();
     }
 
@@ -81,5 +117,50 @@ public partial class TextTagValidationViewModel : ObservableObject
             : Loc.Format("TextTagValidation_Summary",
                 Loc.FormatCount("TextTagValidation_Issues", rows.Count),
                 Loc.FormatCount("TextTagValidation_Convs", convCount));
+
+        RefreshStale();
+    }
+
+    private void RefreshStale()
+    {
+        IsStaleCleanUpArmed = false;
+        StaleRows.Clear();
+        if (_staleScan is not null)
+        {
+            foreach (var r in _staleScan(CheckGameFiles && CanCheckGameFiles))
+                StaleRows.Add(new StaleDataRowViewModel(r, _primaryLanguage, RemoveOne));
+        }
+        HasStaleData = StaleRows.Count > 0;
+        StaleSummaryText = StaleRows.Count == 0
+            ? Loc.Get("StaleData_NoIssues")
+            : Loc.FormatCount("StaleData_Summary", StaleRows.Count);
+        OnPropertyChanged(nameof(StaleCleanUpConfirmText));
+        RaiseStaleCommandStates();
+    }
+
+    partial void OnCheckGameFilesChanged(bool value) => RefreshStale();
+    partial void OnHasStaleDataChanged(bool value) => RaiseStaleCommandStates();
+    partial void OnIsStaleCleanUpArmedChanged(bool value) => RaiseStaleCommandStates();
+
+    private void RaiseStaleCommandStates()
+    {
+        CleanUpStaleCommand.NotifyCanExecuteChanged();
+        ConfirmCleanUpStaleCommand.NotifyCanExecuteChanged();
+        CancelCleanUpStaleCommand.NotifyCanExecuteChanged();
+    }
+
+    private void ExecuteStaleCleanUp()
+    {
+        var confirmed = StaleRows.Where(r => !r.IsLikely).Select(r => r.Row).ToList();
+        IsStaleCleanUpArmed = false;
+        if (confirmed.Count == 0) return;
+        _prune?.Invoke(confirmed);
+        Refresh();
+    }
+
+    private void RemoveOne(StaleDataRow row)
+    {
+        _prune?.Invoke([row]);
+        Refresh();
     }
 }
