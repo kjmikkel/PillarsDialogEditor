@@ -30,4 +30,20 @@ public class TextTagValidationWindowTests
         Assert.True(window.IsVisible);
         window.Close();
     }
+
+    [AvaloniaFact]
+    public void Window_BuildsAndBindsStaleRow()
+    {
+        var vm = new TextTagValidationViewModel(
+            scan: () => [],
+            staleScan: _ => [new StaleDataRow("conv_a", 7, StaleDataKind.Comment, null, StaleConfidence.Confirmed)],
+            canCheckGameFiles: true);
+
+        var window = new TextTagValidationWindow(vm);
+        window.Show();
+
+        Assert.True(vm.HasStaleData);
+        Assert.Single(vm.StaleRows);
+        window.Close();
+    }
 }

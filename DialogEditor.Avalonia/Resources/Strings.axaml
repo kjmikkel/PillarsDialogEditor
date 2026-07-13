@@ -1278,6 +1278,28 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="Settings_DetectedDictionaries">Detected dictionaries: {0}</sys:String>
     <sys:String x:Key="Settings_DetectedDictionaries_None">No dictionaries detected yet.</sys:String>
 
+    <!-- ── Validate Text — stale patch data ("Stale data" section) ──────── -->
+    <sys:String x:Key="StaleData_SectionHeader">Stale data</sys:String>
+    <sys:String x:Key="StaleData_NoIssues">No stale data found.</sys:String>
+    <sys:String x:Key="StaleData_Summary_One">{0} stale entry</sys:String>
+    <sys:String x:Key="StaleData_Summary_Other">{0} stale entries</sys:String>
+    <sys:String x:Key="StaleData_Category_Comment">Comment</sys:String>
+    <sys:String x:Key="StaleData_Category_Layout">Layout</sys:String>
+    <sys:String x:Key="StaleData_Category_Translation">Translation</sys:String>
+    <sys:String x:Key="StaleData_Category_TranslationLang">Translation ({0})</sys:String>
+    <sys:String x:Key="StaleData_Confidence_Confirmed">Confirmed</sys:String>
+    <sys:String x:Key="StaleData_Confidence_Likely">Likely</sys:String>
+    <sys:String x:Key="StaleData_CheckGameFiles">Also check against the game files</sys:String>
+    <sys:String x:Key="StaleData_CleanUp">Remove stale data</sys:String>
+    <sys:String x:Key="StaleData_CleanUpConfirm_One">Remove {0} confirmed entry?</sys:String>
+    <sys:String x:Key="StaleData_CleanUpConfirm_Other">Remove {0} confirmed entries?</sys:String>
+    <sys:String x:Key="StaleData_NodeRow">Node {0}</sys:String>
+    <sys:String x:Key="Button_Confirm">Confirm</sys:String>
+    <sys:String x:Key="Button_Remove">Remove</sys:String>
+    <sys:String x:Key="ToolTip_StaleData_CheckGameFiles">When a game folder is open, also flag comment/translation/layout entries whose node no longer exists in the reconstructed conversation. These are marked "Likely" because a node missing from your installed game version (but present in the version the patch targeted) can look stale.</sys:String>
+    <sys:String x:Key="ToolTip_StaleData_CleanUp">Remove all Confirmed stale entries (comments, translations, and layout positions for deleted nodes) from the saved project. This does not touch Likely entries.</sys:String>
+    <sys:String x:Key="ToolTip_StaleData_Remove">Remove this single Likely entry. It may be a false positive if your installed game version differs from the one this patch targeted — check before removing.</sys:String>
+
     <!-- ── Autosave / crash recovery ─────────────────────────────────────── -->
     <sys:String x:Key="AutosaveRestore_Title">Unsaved changes found</sys:String>
     <sys:String x:Key="AutosaveRestore_Message">The editor closed without saving. Automatically saved changes from {0} were found for this project. Restore them?</sys:String>

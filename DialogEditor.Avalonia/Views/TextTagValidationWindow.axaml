@@ -12,7 +12,7 @@
         WindowStartupLocation="CenterOwner"
         x:CompileBindings="False">
 
-    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Margin="14,12,14,12">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto" Margin="14,12,14,12">
 
         <!-- Saved-state note -->
         <TextBlock Grid.Row="0"
@@ -93,8 +93,88 @@
             </Panel>
         </ScrollViewer>
 
+        <!-- Stale data section header + toggle -->
+        <Grid Grid.Row="4" ColumnDefinitions="*,Auto" Margin="0,4,0,2">
+            <TextBlock Grid.Column="0"
+                       Text="{DynamicResource StaleData_SectionHeader}"
+                       Foreground="{DynamicResource Brush.Text.Primary}"
+                       FontSize="{DynamicResource FontSize.Body}"
+                       FontWeight="Bold" VerticalAlignment="Center"/>
+            <CheckBox Grid.Column="1"
+                      Content="{DynamicResource StaleData_CheckGameFiles}"
+                      IsChecked="{Binding CheckGameFiles}"
+                      IsEnabled="{Binding CanCheckGameFiles}"
+                      FontSize="{DynamicResource FontSize.Small}"
+                      ToolTip.Tip="{DynamicResource ToolTip_StaleData_CheckGameFiles}"
+                      AutomationProperties.Name="{DynamicResource StaleData_CheckGameFiles}"
+                      AutomationProperties.HelpText="{DynamicResource ToolTip_StaleData_CheckGameFiles}"/>
+        </Grid>
+
+        <!-- Stale data rows -->
+        <ScrollViewer Grid.Row="5" MaxHeight="150" Margin="0,0,0,4">
+            <Panel>
+                <TextBlock Text="{DynamicResource StaleData_NoIssues}"
+                           Foreground="{DynamicResource Brush.Text.Disabled}"
+                           FontStyle="Italic"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           IsVisible="{Binding !HasStaleData}"/>
+                <ItemsControl ItemsSource="{Binding StaleRows}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="vm:StaleDataRowViewModel">
+                            <Grid ColumnDefinitions="150,66,Auto,Auto,*,Auto" Margin="0,3">
+                                <TextBlock Grid.Column="0" Text="{Binding ConversationName}"
+                                           Foreground="{DynamicResource Brush.Text.Emphasis}"
+                                           FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"
+                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Column="1" Text="{Binding NodeLabel}"
+                                           Foreground="{DynamicResource Brush.Text.Muted}"
+                                           FontSize="{DynamicResource FontSize.Small}" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Text="{Binding CategoryLabel}"
+                                           Foreground="{DynamicResource Brush.Text.Tertiary}"
+                                           FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"
+                                           Width="110" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="3" Text="{Binding ConfidenceLabel}"
+                                           Foreground="{DynamicResource Brush.Text.Secondary}"
+                                           FontSize="{DynamicResource FontSize.Small}"
+                                           Width="70" VerticalAlignment="Center"/>
+                                <Button Grid.Column="5" Content="{DynamicResource Button_Remove}"
+                                        Command="{Binding RemoveCommand}"
+                                        IsVisible="{Binding CanRemove}"
+                                        FontSize="{DynamicResource FontSize.Small}"
+                                        Padding="8,2" Margin="6,0,0,0" VerticalAlignment="Center"
+                                        ToolTip.Tip="{DynamicResource ToolTip_StaleData_Remove}"
+                                        AutomationProperties.HelpText="{DynamicResource ToolTip_StaleData_Remove}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Panel>
+        </ScrollViewer>
+
+        <!-- Stale data clean-up bar (armed two-click, confirmed rows only) -->
+        <StackPanel Grid.Row="6" Orientation="Horizontal" Spacing="8" Margin="0,0,0,8"
+                    IsVisible="{Binding HasStaleData}">
+            <Button Content="{DynamicResource StaleData_CleanUp}"
+                    Command="{Binding CleanUpStaleCommand}"
+                    IsVisible="{Binding !IsStaleCleanUpArmed}"
+                    ToolTip.Tip="{DynamicResource ToolTip_StaleData_CleanUp}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_StaleData_CleanUp}"/>
+            <TextBlock Text="{Binding StaleCleanUpConfirmText}"
+                       IsVisible="{Binding IsStaleCleanUpArmed}"
+                       Foreground="{DynamicResource Brush.Text.Primary}"
+                       VerticalAlignment="Center"/>
+            <Button Content="{DynamicResource Button_Confirm}"
+                    Command="{Binding ConfirmCleanUpStaleCommand}"
+                    IsVisible="{Binding IsStaleCleanUpArmed}"
+                    ToolTip.Tip="{DynamicResource ToolTip_StaleData_CleanUp}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_StaleData_CleanUp}"/>
+            <Button Content="{DynamicResource Button_Cancel}"
+                    Command="{Binding CancelCleanUpStaleCommand}"
+                    IsVisible="{Binding IsStaleCleanUpArmed}"/>
+        </StackPanel>
+
         <!-- Focus hint bar (accessibility item 13 pattern) -->
-        <shared:FocusHintBar Grid.Row="4" x:Name="HintBar"/>
+        <shared:FocusHintBar Grid.Row="7" x:Name="HintBar"/>
 
     </Grid>
 
