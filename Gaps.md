@@ -858,9 +858,21 @@ node left its comment and its non-canvas-language translations behind). Two halv
 
 Recorded 2026-07-11; each is small and independent:
 
-- **Speaker line browser** — "show every line spoken by this character across the
-  project (and vanilla)" for voice-consistency checking; builds on the existing
-  stringtable parsing.
+- ~~**Speaker line browser**~~ ✓ Implemented (2026-07-13). **Edit ▸ Browse Speaker
+  Lines…** (and a canvas node context action **"Show all lines by this speaker"**) opens a
+  read-only window listing every line a chosen character speaks across the *whole game*
+  with the project's edits applied — for voice-consistency checking. New
+  `SpeakerLineScanner` walks every conversation (enumerated ∪ patched names; live snapshot
+  for the open conversation; unreadable skipped), emitting origin-tagged rows
+  (Vanilla/Edited/New). Full-line rows with a textual origin badge + an "only my lines"
+  filter; double-click / Enter jumps to the node (cross-conversation, honouring the dirty
+  guard, via the reused `NavigateToFoundNode`). The whole-game scan runs off the UI thread
+  with a loading animation and a Cancel control; the character picker (name + line count)
+  filters the single scan in memory, so switching characters never re-reads the folder.
+  Opening with unsaved changes shows a browser-specific three-way save prompt
+  (`ConfirmBrowseWithUnsavedChanges` + the reused `SaveBeforeScanDialog`). Pure
+  `SpeakerLineScanner` + `SpeakerLineBrowserViewModel`. Spec:
+  docs/superpowers/specs/2026-07-13-speaker-line-browser-design.md.
 - ~~**Project-wide find** (read-only)~~ ✓ Implemented (2026-07-12). **Edit ▸ Find in
   Project…** (Ctrl+Shift+F): read-only search over the *effective* text (vanilla base +
   edits) of every patched conversation — the read-only mirror of Batch Replace. Default +
