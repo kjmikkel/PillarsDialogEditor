@@ -1,0 +1,53 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="DialogEditor.Avalonia.Views.ConditionSearchView"
+             x:CompileBindings="False"
+             Width="260">
+  <Border Background="{DynamicResource Brush.Surface.Panel}"
+          BorderBrush="{DynamicResource Brush.Border.Default}" BorderThickness="1,0,0,0"
+          Padding="10">
+    <StackPanel Spacing="8">
+      <TextBlock Text="{DynamicResource CondSearch_Title}" FontWeight="Bold"
+                 TextWrapping="Wrap"
+                 Foreground="{DynamicResource Brush.Text.Primary}"/>
+      <TextBlock Text="{DynamicResource CondSearch_EntryLabel}"
+                 Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Small}"/>
+      <ComboBox ItemsSource="{Binding Entries}" SelectedItem="{Binding SelectedEntry}"
+                HorizontalAlignment="Stretch"
+                ToolTip.Tip="{DynamicResource CondSearch_Tip_Entry}"
+                AutomationProperties.Name="{DynamicResource CondSearch_EntryLabel}"
+                AutomationProperties.HelpText="{DynamicResource CondSearch_Tip_Entry}"/>
+
+      <ItemsControl ItemsSource="{Binding PinRows}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Grid ColumnDefinitions="*,*" Margin="0,2">
+              <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center"
+                         Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"
+                         TextTrimming="CharacterEllipsis"/>
+              <TextBox Grid.Column="1" Text="{Binding Value}"
+                       ToolTip.Tip="{DynamicResource CondSearch_Tip_Pin}"
+                       AutomationProperties.Name="{Binding Name}"
+                       AutomationProperties.HelpText="{DynamicResource CondSearch_Tip_Pin}"/>
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <Button Content="{DynamicResource CondSearch_Search}" Command="{Binding SearchCommand}"
+                ToolTip.Tip="{DynamicResource CondSearch_Tip_Search}"
+                AutomationProperties.HelpText="{DynamicResource CondSearch_Tip_Search}"
+                Background="{DynamicResource Brush.Button.Confirm.Background}"
+                Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0" Padding="14,6"/>
+        <Button Content="{DynamicResource CondSearch_Clear}" Command="{Binding ClearCommand}"
+                ToolTip.Tip="{DynamicResource CondSearch_Tip_Clear}"
+                AutomationProperties.HelpText="{DynamicResource CondSearch_Tip_Clear}"
+                Padding="14,6"/>
+      </StackPanel>
+
+      <TextBlock Text="{Binding MatchCountText}" Foreground="{DynamicResource Brush.Text.Muted}"
+                 FontSize="{DynamicResource FontSize.Small}"/>
+    </StackPanel>
+  </Border>
+</UserControl>
