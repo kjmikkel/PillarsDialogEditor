@@ -956,8 +956,9 @@ docs/superpowers/specs/2026-07-16-rep-disposition-balance-design.md,
 docs/superpowers/specs/2026-07-16-catalogue-match-primitive-design.md.
 
 ### Condition/Script Node Search & Highlight
-**✅ Implemented (2026-07-16).** A collapsible dock in the canvas area (toggled by the ⚑ button
-in the canvas toolbar) searches the open conversation for the nodes using a chosen condition
+**✅ Implemented (2026-07-16).** A collapsible dock in the canvas area (toggled by
+**Edit ▸ Find Nodes by Condition / Script…**, enabled once a conversation is loaded) searches
+the open conversation for the nodes using a chosen condition
 **or** script, narrowed by pinned parameters (unset = wildcard; a pinned value must equal the
 node's raw stored value). A node is a hit if the query matches its own condition, any outgoing
 link's condition, or any of its scripts (node-only granularity). Matches get a `Brush.Severity.Info`
