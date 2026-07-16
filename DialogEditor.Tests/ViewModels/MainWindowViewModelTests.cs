@@ -325,35 +325,6 @@ public class MainWindowViewModelTests : IDisposable
         Assert.StartsWith("●", vm.WindowTitle);
     }
 
-    // ── IsBrowserFlyoutOpen ───────────────────────────────────────────────
-
-    [Fact]
-    public void IsBrowserFlyoutOpen_TrueWhenExpandedAndNotPinned()
-    {
-        var vm = MakeVm();
-        vm.IsBrowserPinned   = false;
-        vm.IsBrowserExpanded = true;
-        Assert.True(vm.IsBrowserFlyoutOpen);
-    }
-
-    [Fact]
-    public void IsBrowserFlyoutOpen_FalseWhenPinned()
-    {
-        var vm = MakeVm();
-        vm.IsBrowserPinned   = true;
-        vm.IsBrowserExpanded = true;
-        Assert.False(vm.IsBrowserFlyoutOpen);
-    }
-
-    [Fact]
-    public void IsBrowserFlyoutOpen_FalseWhenCollapsed()
-    {
-        var vm = MakeVm();
-        vm.IsBrowserPinned   = false;
-        vm.IsBrowserExpanded = false;
-        Assert.False(vm.IsBrowserFlyoutOpen);
-    }
-
     // ── GuardDirtyThen — clean state: runs immediately ────────────────────
 
     [Fact]

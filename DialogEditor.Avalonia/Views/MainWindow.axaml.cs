@@ -10,8 +10,10 @@ using Avalonia.Interactivity;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using DialogEditor.Avalonia.Audio;
 using DialogEditor.Avalonia.Controls;
+using DialogEditor.Avalonia.Docking;
 using DialogEditor.Avalonia.Services;
 using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.Avalonia.Shared.Theming;
@@ -24,8 +26,6 @@ namespace DialogEditor.Avalonia.Views;
 
 public partial class MainWindow : Window
 {
-    private double _browserExpandedWidth = 220;
-    private double _detailExpandedWidth  = 240;
     private LegendWindow?          _legendWindow;
     private TagReferenceWindow?    _tagReferenceWindow;
     private PatchManagerWindow?    _patchManagerWindow;
@@ -46,9 +46,6 @@ public partial class MainWindow : Window
     // Guards the one-time startup project re-open in OnOpened.
     private bool _startupDone = false;
 
-    private ColumnDefinition BrowserColumn => ContentGrid.ColumnDefinitions[0];
-    private ColumnDefinition DetailColumn  => ContentGrid.ColumnDefinitions[4];
-
     public MainWindow()
     {
         InitializeComponent();
@@ -59,7 +56,6 @@ public partial class MainWindow : Window
 
         var vm = (MainWindowViewModel)DataContext;
         vm.Tour.StepChanged += OnTourStepChanged;
-        vm.PropertyChanged += OnVmPropertyChanged;
         vm.UnsavedChangesRequested += () => _ = ShowUnsavedChangesDialogAsync(vm);
         vm.TestModeEntered += () => TestOverlay.IsVisible = true;
         vm.TestModeExited  += () => TestOverlay.IsVisible = false;
@@ -230,77 +226,62 @@ public partial class MainWindow : Window
             await Task.CompletedTask;
         };
 
-        if (!vm.IsBrowserExpanded)
+        // BuildDock wires the docking shell (Browser/Canvas/Details/ConditionSearch tools)
+        // once a game is loaded — see LoadDirectory's completion below and Tour's Ready hook.
+        // FocusDetailRequested (canvas → detail-pane focus, e.g. Enter on a selected node)
+        // is re-subscribed there too, once the live ConversationView instance exists.
+        vm.PropertyChanged += (_, e) =>
         {
-            BrowserColumn.MinWidth = 34;
-            BrowserColumn.Width = new GridLength(34);
-        }
-        if (!vm.IsDetailExpanded)
-        {
-            DetailColumn.MinWidth = 34;
-            DetailColumn.Width = new GridLength(34);
-        }
-
-        CanvasView.FocusDetailRequested += (_, _) =>
-        {
-            vm.IsDetailExpanded = true;        // panel may be collapsed — open it first
-            DetailView.FocusFirstField();
+            if (e.PropertyName == nameof(MainWindowViewModel.ConditionSearch) && vm.ConditionSearch is not null)
+                BuildDock(vm);
         };
+        // The VM's constructor may already have auto-loaded the last game folder
+        // (AppSettings.LastGameDirectory) synchronously, before the subscription above
+        // existed to catch it — cover that case explicitly.
+        if (vm.ConditionSearch is not null)
+            BuildDock(vm);
 
         AddHandler(KeyDownEvent, OnKeyDownTunnel, RoutingStrategies.Tunnel);
         this.AddHandler(GotFocusEvent, OnAnyGotFocus, RoutingStrategies.Bubble);
     }
 
-    private void OnVmPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        var vm = (MainWindowViewModel)DataContext!;
-        switch (e.PropertyName)
-        {
-            case nameof(MainWindowViewModel.IsBrowserExpanded):
-                if (vm.IsBrowserExpanded)
-                {
-                    BrowserColumn.MinWidth = 150;
-                    BrowserColumn.Width = new GridLength(_browserExpandedWidth);
-                }
-                else
-                {
-                    _browserExpandedWidth = BrowserColumn.Width.Value;
-                    BrowserColumn.MinWidth = 34;
-                    BrowserColumn.Width = new GridLength(34);
-                }
-                break;
+    private EditorDockFactory? _factory;
 
-            case nameof(MainWindowViewModel.IsDetailExpanded):
-                if (vm.IsDetailExpanded)
-                {
-                    DetailColumn.MinWidth = 180;
-                    DetailColumn.Width = new GridLength(_detailExpandedWidth);
-                }
-                else
-                {
-                    _detailExpandedWidth = DetailColumn.Width.Value;
-                    DetailColumn.MinWidth = 34;
-                    DetailColumn.Width = new GridLength(34);
-                }
-                break;
-        }
+    /// Builds the default docking layout (Conversations/Canvas/Node Details/Condition
+    /// search) once the shell-level ConditionSearchViewModel exists — i.e. once a game
+    /// folder has loaded (see MainWindowViewModel.RebuildConditionSearch). Also re-wires
+    /// the canvas → detail-pane focus hop, which now targets the Dock-hosted views instead
+    /// of named XAML controls (the fixed 5-column grid is gone).
+    private void BuildDock(MainWindowViewModel vm)
+    {
+        if (vm.ConditionSearch is null) return;   // needs a loaded game
+
+        var factory = new EditorDockFactory(vm.Browser, vm.Canvas, vm.Detail, vm.ConditionSearch);
+        var layout  = factory.CreateLayout();
+        factory.InitLayout(layout);
+        vm.DockLayout = layout;
+        _factory = factory;
+
+        // The document/tool content is realised by Application.DataTemplates once Dock
+        // renders the new layout — defer the FocusDetailRequested re-wire to the next
+        // dispatcher pass so the ConversationView instance exists to hook.
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (FindCanvasView() is { } canvasView)
+                canvasView.FocusDetailRequested += (_, _) => FindDetailView()?.FocusFirstField();
+        }, DispatcherPriority.Loaded);
     }
 
-    protected override void OnPointerPressed(PointerPressedEventArgs e)
-    {
-        base.OnPointerPressed(e);
-        var vm = (MainWindowViewModel)DataContext!;
+    /// Locates the live ConversationView hosted by the Dock canvas document. Dock
+    /// instantiates it lazily from Application.DataTemplates, so this is a lookup
+    /// (not a cached field) — safe to call any time after BuildDock has run.
+    private ConversationView? FindCanvasView() =>
+        this.GetVisualDescendants().OfType<ConversationView>().FirstOrDefault();
 
-        if (vm.IsBrowserFlyoutOpen)
-        {
-            var pos = e.GetPosition(BrowserPanel);
-            bool outsidePanel = pos.X < 0 || pos.Y < 0
-                             || pos.X > BrowserPanel.Bounds.Width
-                             || pos.Y > BrowserPanel.Bounds.Height;
-            if (outsidePanel)
-                vm.IsBrowserExpanded = false;
-        }
-    }
+    /// Locates the live NodeDetailView hosted by the Dock details tool (same caveat as
+    /// <see cref="FindCanvasView"/> — it may be null if the tool is closed/floated away).
+    private NodeDetailView? FindDetailView() =>
+        this.GetVisualDescendants().OfType<NodeDetailView>().FirstOrDefault();
 
     // Mirrors the focused control's AutomationProperties.HelpText (set by item 5's
     // Part A sweep) into the view model so the status bar can show it — giving
@@ -320,7 +301,7 @@ public partial class MainWindow : Window
         switch (e.Key)
         {
             case Key.F when e.KeyModifiers == KeyModifiers.Control:
-                CanvasView.FocusSearch();
+                FindCanvasView()?.FocusSearch();
                 e.Handled = true;
                 break;
 
@@ -403,14 +384,14 @@ public partial class MainWindow : Window
 
             case Key.S when e.KeyModifiers == (KeyModifiers.Control | KeyModifiers.Shift):
                 if (TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() is TextBox)
-                    CanvasView.FocusEditor();   // commit a focused TextBox edit first, like Ctrl+S
+                    FindCanvasView()?.FocusEditor();   // commit a focused TextBox edit first, like Ctrl+S
                 vm.SaveProjectAsCommand.Execute(null);
                 e.Handled = true;
                 break;
 
             case Key.S when e.KeyModifiers == KeyModifiers.Control:
                 if (TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement() is TextBox)
-                    CanvasView.FocusEditor();
+                    FindCanvasView()?.FocusEditor();
                 vm.SaveCommand.Execute(null);
                 e.Handled = true;
                 break;
@@ -419,11 +400,6 @@ public partial class MainWindow : Window
                              && e.Source is not TextBox
                              && vm.Canvas.IsEditable:
                 vm.Canvas.DeleteNodeCmdCommand.Execute(vm.Canvas.SelectedNode);
-                e.Handled = true;
-                break;
-
-            case Key.Escape when vm.IsBrowserFlyoutOpen:
-                vm.IsBrowserExpanded = false;
                 e.Handled = true;
                 break;
         }
@@ -483,7 +459,7 @@ public partial class MainWindow : Window
                 nodeId =>
                 {
                     var node = vm.Canvas.Nodes.FirstOrDefault(n => n.NodeId == nodeId);
-                    if (node is not null) CanvasView.ScrollToNode(node);
+                    if (node is not null) FindCanvasView()?.ScrollToNode(node);
                 },
                 () => vm.CurrentConversationTranslations,
                 vm.ActiveGameId);
@@ -646,15 +622,6 @@ public partial class MainWindow : Window
             new System.Diagnostics.ProcessStartInfo(u) { UseShellExecute = true });
         var settings = new SettingsWindow { DataContext = settingsVm };
         await settings.ShowDialog(this);
-    }
-
-    private void CollapsedBrowserTitle_Click(object? sender, RoutedEventArgs e)
-        => ((MainWindowViewModel)DataContext!).IsBrowserExpanded = true;
-
-    private void ToggleDetail_Click(object? sender, RoutedEventArgs e)
-    {
-        var vm = (MainWindowViewModel)DataContext!;
-        vm.IsDetailExpanded = !vm.IsDetailExpanded;
     }
 
     private void HelpToggle_IsCheckedChanged(object? sender, RoutedEventArgs e)
@@ -858,8 +825,6 @@ public partial class MainWindow : Window
         var target = this.FindControl<Control>(step.TargetName);
         if (target is null) return;
 
-        EnsureTourPanelVisible(step.TargetName);
-
         var layer = AdornerLayer.GetAdornerLayer(target);
         if (layer is null) return;
 
@@ -877,14 +842,10 @@ public partial class MainWindow : Window
         _tourAdorner = null;
     }
 
-    private void EnsureTourPanelVisible(string targetName)
-    {
-        var vm = (MainWindowViewModel)DataContext!;
-        // Expand collapsed panels before the adorner tries to highlight them.
-        // CanvasView and HelpToggle are always visible — no action needed for them.
-        if (targetName == "BrowserPanel" && !vm.IsBrowserExpanded)
-            vm.IsBrowserExpanded = true;
-        else if (targetName == "DetailPanel" && !vm.IsDetailExpanded)
-            vm.IsDetailExpanded  = true;
-    }
+    // NOTE (Docking Shell Phase 1 orphan — see task-4-report.md): guided-tour steps that
+    // targeted the old fixed "BrowserPanel"/"DetailPanel" grid names no longer resolve —
+    // those controls were replaced by Dock-hosted tool content with no compile-time
+    // x:Name. OnTourStepChanged's FindControl(...) already no-ops gracefully (returns
+    // null, step highlight silently skipped) rather than throwing, but those tour steps
+    // need re-targeting at dockable tools in a follow-up. Tracked for Task 6+ /Gaps.md.
 }

@@ -112,18 +112,17 @@ public partial class MainWindowViewModel : ObservableObject
     [ObservableProperty] private string              _selectedLanguage    = string.Empty;
     [ObservableProperty] private bool                _isModified;
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsBrowserFlyoutOpen))]
-    private bool _isBrowserExpanded = AppSettings.BrowserPinned;
-
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsBrowserFlyoutOpen))]
-    private bool _isBrowserPinned = AppSettings.BrowserPinned;
-
-    [ObservableProperty] private bool    _isDetailExpanded       = AppSettings.DetailExpanded;
     [ObservableProperty] private string? _currentConversationName;
 
-    public bool IsBrowserFlyoutOpen => IsBrowserExpanded && !IsBrowserPinned;
+    /// The shell-level docking layout root (an IRootDock, kept as object so this
+    /// Dock-free VM project never references Dock.*). Built by MainWindow's code-behind
+    /// once a game is loaded and bound to <c>DockControl.Layout</c>.
+    [ObservableProperty] private object? _dockLayout;
+
+    /// The Condition/script-search dock tool's VM. Owned at the shell level (rather than by
+    /// Canvas) so EditorDockFactory can host it alongside Browser/Canvas/Detail as its own
+    /// dock tool. Null until a game is loaded (built in LoadDirectory/RebuildConditionSearch).
+    public ConditionSearchViewModel? ConditionSearch { get; private set; }
 
     // ── Window title reflects dirty state ─────────────────────────────────
     /// True when there are unsaved changes worth signalling and guarding. A dirty
@@ -236,6 +235,21 @@ public partial class MainWindowViewModel : ObservableObject
     /// the tag vocabulary (Flow Analytics token validation).
     public string ActiveGameId => _activeGameId;
 
+    /// (Re)builds the shell-level condition/script-search VM for the given game so it offers
+    /// that game's catalogue, and wires its snapshot/highlight callbacks to Canvas. Called from
+    /// LoadDirectory once a provider is detected; empty gameId nulls the dock (no game loaded).
+    private void RebuildConditionSearch(string gameId)
+    {
+        ConditionSearch = string.IsNullOrEmpty(gameId)
+            ? null
+            : new ConditionSearchViewModel(
+                gameId,
+                () => Canvas.Nodes.Count > 0 ? Canvas.BuildSnapshot() : null,
+                matches => Canvas.ApplyConditionHighlight(matches),
+                () => Canvas.ClearConditionHighlight());
+        OnPropertyChanged(nameof(ConditionSearch));
+    }
+
     /// The open conversation's saved translations (language → per-node text), or
     /// empty when no conversation/patch is loaded. Used by Flow Analytics to
     /// validate translation text for the open conversation.
@@ -310,14 +324,6 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     // ── Partial hooks ─────────────────────────────────────────────────────
-    partial void OnIsBrowserPinnedChanged(bool value)
-    {
-        AppSettings.BrowserPinned = value;
-        IsBrowserExpanded = value;
-    }
-
-    partial void OnIsDetailExpandedChanged(bool value) => AppSettings.DetailExpanded = value;
-
     partial void OnCurrentConversationNameChanged(string? value)
         => OnPropertyChanged(nameof(WindowTitle));
 
@@ -1246,7 +1252,6 @@ public partial class MainWindowViewModel : ObservableObject
         Detail.Clear();
         IsModified = false;
         CurrentConversationName = file.Name;
-        if (!IsBrowserPinned) IsBrowserExpanded = false;
 
         // Drain a Find-in-Project navigation target, same as LoadConversationFile:
         // a match in a new conversation routes here, and its node lives in the
@@ -1703,7 +1708,8 @@ public partial class MainWindowViewModel : ObservableObject
 
             _activeGameId = provider.GameId;
             Detail.ActiveGameId = provider.GameId;
-            Canvas.ActiveGameId = provider.GameId;   // enables the condition-search dock
+            Canvas.ActiveGameId = provider.GameId;
+            RebuildConditionSearch(provider.GameId);   // builds the shell-level condition-search dock
             Detail.ActiveLanguage = provider.Language;
             Detail.GameRoot = path;
             ChatterPrefixService.Register(provider.LoadChatterPrefixes());
@@ -2403,7 +2409,6 @@ public partial class MainWindowViewModel : ObservableObject
             IsModified = false;
             CurrentConversationName = file.Name;
             OnPropertyChanged(nameof(CanValidateVO));
-            if (!IsBrowserPinned) IsBrowserExpanded = false;
             if (_project is null)
                 StatusText = Loc.Get("Status_NoProjectReadOnly");
             else

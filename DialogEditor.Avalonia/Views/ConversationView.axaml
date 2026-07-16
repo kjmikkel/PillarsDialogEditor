@@ -102,8 +102,8 @@
             </DockPanel>
         </Border>
 
-        <!-- Canvas (column 0) + collapsible condition-search dock (column 1) -->
-        <Grid Grid.Row="1" ClipToBounds="True" ColumnDefinitions="*,Auto">
+        <!-- Canvas -->
+        <Grid Grid.Row="1" ClipToBounds="True">
             <nodify:NodifyEditor x:Name="Editor"
                                  Background="{DynamicResource Brush.Canvas.Background}"
                                  ItemsSource="{Binding Nodes}"
@@ -437,13 +437,6 @@
                     </ControlTheme>
                 </ItemsControl.ItemContainerTheme>
             </ItemsControl>
-
-            <!-- Condition/script search dock — collapsed until toggled (⚑).
-                 The ContentControl keeps the ConversationViewModel context so IsVisible binds
-                 correctly; the inner view overrides its own DataContext to the search VM. -->
-            <ContentControl Grid.Column="1" IsVisible="{Binding IsConditionSearchVisible}">
-                <local:ConditionSearchView DataContext="{Binding ConditionSearch}"/>
-            </ContentControl>
 
         </Grid>
     </Grid>
