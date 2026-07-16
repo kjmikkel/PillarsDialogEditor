@@ -215,6 +215,14 @@ public partial class MainWindow : Window
             await Task.CompletedTask;
         };
 
+        vm.ShowRepDispositionBalance = async balanceVm =>
+        {
+            var win = new RepDispositionBalanceWindow(balanceVm);
+            win.Show(this);          // non-modal, owned — report stays visible while browsing
+            balanceVm.RefreshCommand.Execute(null);   // analyse immediately on open
+            await Task.CompletedTask;
+        };
+
         vm.ShowSpeakerLineBrowser = async browserVm =>
         {
             var win = new SpeakerLineBrowserWindow(browserVm);

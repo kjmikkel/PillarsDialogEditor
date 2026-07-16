@@ -150,6 +150,10 @@
                                   InputGesture="F7"
                                   ToolTip.Tip="{DynamicResource ToolTip_FlowAnalytics}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_FlowAnalytics}"/>
+                        <MenuItem Header="{DynamicResource Menu_RepDispositionBalance}"
+                                  Command="{Binding ShowRepDispositionBalanceWindowCommand}"
+                                  ToolTip.Tip="{DynamicResource RepBalance_Tip_Refresh}"
+                                  AutomationProperties.HelpText="{DynamicResource RepBalance_Tip_Refresh}"/>
                         <MenuItem Header="{DynamicResource Menu_CompareVersions}"
                                   Click="CompareVersions_Click"
                                   IsEnabled="{Binding IsProjectOpen}"
