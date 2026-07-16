@@ -31,7 +31,7 @@ public sealed class BalanceRowViewModel
             BalanceFlag.Over    => Loc.Get("RepBalance_Flag_Over"),
             BalanceFlag.Under   => Loc.Get("RepBalance_Flag_Under"),
             BalanceFlag.Ignored => Loc.Get("RepBalance_Flag_Ignored"),
-            _                   => Loc.Get("RepBalance_Flag_Normal"),
+            _                   => string.Empty,   // Normal rows carry no flag label
         };
     }
 }
