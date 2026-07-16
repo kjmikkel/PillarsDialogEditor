@@ -1,3 +1,4 @@
+using DialogEditor.Patch;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
@@ -78,5 +79,63 @@ public class TextTagValidationViewModelTests
     {
         var vm = new TextTagValidationViewModel(() => [SpellRow("captian")]);
         Assert.False(vm.Rows[0].CanAddToDictionary);
+    }
+
+    // ── Duplicate + ignored panes ───────────────────────────────────────────
+
+    private static LineRef Ref(string conv, int id, string text) => new(conv, id, text);
+
+    private static DuplicateLineReport OneExact() =>
+        new([new ExactDuplicateGroup("the wind howls through the rigging tonight",
+                "The wind howls through the rigging tonight",
+                [Ref("c1", 1, "The wind howls through the rigging tonight"),
+                 Ref("c2", 2, "the wind howls through the rigging tonight")])],
+            []);
+
+    [Fact]
+    public void DupScan_PopulatesDuplicateRows()
+    {
+        var vm = new TextTagValidationViewModel(
+            scan: () => [],
+            dupScan: OneExact);
+
+        Assert.True(vm.HasDuplicates);
+        var row = Assert.Single(vm.DuplicateRows);
+        Assert.Contains("wind howls", row.Text);
+    }
+
+    [Fact]
+    public void IgnoreCommand_CallsDelegate_AndRefreshes()
+    {
+        IgnoredDuplicate? ignored = null;
+        var report = OneExact();
+        var vm = new TextTagValidationViewModel(
+            scan: () => [],
+            dupScan: () => ignored is null ? report : new DuplicateLineReport([], []),
+            ignore: e => ignored = e);
+
+        vm.DuplicateRows[0].IgnoreCommand.Execute(null);
+
+        Assert.NotNull(ignored);
+        Assert.Equal(DuplicateKind.Exact, ignored!.Kind);
+        Assert.False(vm.HasDuplicates);   // re-scanned; delegate now filters it out
+    }
+
+    [Fact]
+    public void IgnoredList_PopulatesPane_AndRestoreCallsDelegate()
+    {
+        IgnoredDuplicate? restored = null;
+        var entry = new IgnoredDuplicate(DuplicateKind.Exact, ["k"], "the ignored line here");
+        var vm = new TextTagValidationViewModel(
+            scan: () => [],
+            ignoredList: () => [entry],
+            unignore: e => restored = e);
+
+        Assert.True(vm.HasIgnoredDuplicates);
+        var row = Assert.Single(vm.IgnoredDuplicateRows);
+        Assert.Equal("the ignored line here", row.DisplayText);
+
+        row.RestoreCommand.Execute(null);
+        Assert.Equal(entry, restored);
     }
 }

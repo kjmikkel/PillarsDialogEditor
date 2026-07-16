@@ -628,6 +628,26 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_SaveBeforeBrowse_SaveAndBrowse">Save the project, then open the browser with accurate line origins.</sys:String>
     <sys:String x:Key="SaveBeforeBrowse_BrowseAnyway">Browse without saving</sys:String>
     <sys:String x:Key="ToolTip_SaveBeforeBrowse_BrowseAnyway">Open the browser now. Your open conversation's edits still show, but their origin tags and other unsaved conversations reflect the last save.</sys:String>
+    <!-- ─── Duplicate line detection ─────────────────────────────────────── -->
+    <sys:String x:Key="Duplicate_Tier_Exact">Exact</sys:String>
+    <sys:String x:Key="Duplicate_Tier_NearShort">Near</sys:String>
+    <sys:String x:Key="Duplicate_Tier_Near">Near ~{0}%</sys:String>
+    <sys:String x:Key="Duplicate_Location">{0} · {1}</sys:String>
+    <sys:String x:Key="Duplicate_NearDisplay">«{0}» ~ «{1}»</sys:String>
+    <sys:String x:Key="Duplicate_NoIssues">No duplicate lines.</sys:String>
+    <sys:String x:Key="Duplicate_Summary_One">{0} duplicate</sys:String>
+    <sys:String x:Key="Duplicate_Summary_Other">{0} duplicates</sys:String>
+    <sys:String x:Key="Duplicate_Ignored_NoIssues">Nothing ignored.</sys:String>
+    <sys:String x:Key="Duplicate_Ignored_Summary_One">{0} ignored</sys:String>
+    <sys:String x:Key="Duplicate_Ignored_Summary_Other">{0} ignored</sys:String>
+    <sys:String x:Key="Duplicate_SectionHeader">Duplicate lines</sys:String>
+    <sys:String x:Key="Duplicate_Ignored_SectionHeader">Ignored duplicates</sys:String>
+    <sys:String x:Key="Button_Ignore">Ignore</sys:String>
+    <sys:String x:Key="ToolTip_Duplicate_Ignore">Mark this duplicate as intentional. It moves to the Ignored list and stops being reported (until you restore it).</sys:String>
+    <sys:String x:Key="Button_Restore">Restore</sys:String>
+    <sys:String x:Key="ToolTip_Duplicate_Restore">Remove this entry from the ignore list. If the lines are still duplicates, they will be reported again.</sys:String>
+    <sys:String x:Key="Button_GoToNode">Go</sys:String>
+    <sys:String x:Key="ToolTip_Duplicate_GoToNode">Jump to the first node of this duplicate (switches conversation if needed).</sys:String>
     <!-- ─── Batch Find / Replace ─────────────────────────────────────────── -->
     <sys:String x:Key="Menu_BatchReplace">Batch Find / Replace…</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace">Find and replace text, GUIDs, and parameter values across all conversations on disk</sys:String>
