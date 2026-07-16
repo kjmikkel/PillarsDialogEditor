@@ -4,11 +4,17 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using DialogEditor.Avalonia.Views;
 using DialogEditor.Core.Import;
+using DialogEditor.Tests.Helpers;
+using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.Tests.Views;
 
 public class ImportWarningsDialogTests
 {
+    // The dialog resolves localized strings at construction; configure Loc so these tests
+    // don't depend on another test having done so first (xUnit ordering is nondeterministic).
+    public ImportWarningsDialogTests() => Loc.Configure(new StubStringProvider());
+
     private static readonly IReadOnlyList<ImportWarning> Warnings =
     [
         new("if", 2),
