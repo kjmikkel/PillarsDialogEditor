@@ -6,6 +6,13 @@
 
     <Application.Styles>
         <FluentTheme/>
+        <!-- Dock.Avalonia's own Fluent theme (Dock.Avalonia.Themes.Fluent package) — required
+             for DockControl and its child views (tool/document tabs, splitters, etc.) to render.
+             Task 1 of Docking Shell Phase 1: theme merged now, no DockControl exists yet.
+             StyleInclude (not the <DockFluentTheme .../> element form) is used because
+             Avalonia's XAML compiler in this version rejects xmlns declarations on
+             non-root elements (AXN0002), which the element form requires. -->
+        <StyleInclude Source="avares://Dock.Avalonia.Themes.Fluent/DockFluentTheme.axaml"/>
     </Application.Styles>
 
     <Application.Resources>

@@ -13,8 +13,12 @@
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.14" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.14" />
     <PackageReference Include="NodifyAvalonia" Version="6.6.0" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
     <PackageReference Include="NAudio" Version="2.2.1" />
+    <PackageReference Include="Dock.Avalonia" Version="11.3.*" />
+    <PackageReference Include="Dock.Avalonia.Themes.Fluent" Version="11.3.*" />
+    <PackageReference Include="Dock.Model.Mvvm" Version="11.3.*" />
+    <PackageReference Include="Dock.Serializer.SystemTextJson" Version="11.3.*" />
   </ItemGroup>
 
   <ItemGroup>
