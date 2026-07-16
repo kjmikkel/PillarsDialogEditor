@@ -105,6 +105,8 @@
             <converters:PropertyValueStyleToBrushConverter x:Key="PropertyValueStyleToBrush"/>
             <converters:FlowIssueKindToSeverityBrushConverter x:Key="FlowIssueSeverityBrush"/>
             <converters:BalanceFlagToBrushConverter             x:Key="BalanceFlagToBrush"/>
+            <converters:SearchMatchStateToOpacityConverter      x:Key="SearchStateOpacity"/>
+            <converters:SearchMatchStateToBorderBrushConverter  x:Key="SearchMatchBorderBrush"/>
             <converters:FlowIssueKindToSeverityGlyphConverter   x:Key="FlowIssueSeverityGlyph"/>
             <converters:DiffStatusToBrushConverter              x:Key="DiffStatusToBrushConverter"/>
             <converters:DiffStatusToGlyphConverter               x:Key="DiffStatusToGlyph"/>
