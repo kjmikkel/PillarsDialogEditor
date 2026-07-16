@@ -1703,6 +1703,7 @@ public partial class MainWindowViewModel : ObservableObject
 
             _activeGameId = provider.GameId;
             Detail.ActiveGameId = provider.GameId;
+            Canvas.ActiveGameId = provider.GameId;   // enables the condition-search dock
             Detail.ActiveLanguage = provider.Language;
             Detail.GameRoot = path;
             ChatterPrefixService.Register(provider.LoadChatterPrefixes());

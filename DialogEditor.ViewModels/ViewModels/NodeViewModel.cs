@@ -245,7 +245,7 @@ public partial class NodeViewModel : ObservableObject
     // ── Canvas state ──────────────────────────────────────────────────────
     [ObservableProperty] private LayoutPoint _location;
     [ObservableProperty] private bool        _isSelected;
-    [ObservableProperty] private bool        _isSearchMatch = true;
+    [ObservableProperty] private SearchMatchState _searchMatchState = SearchMatchState.None;
 
     /// <summary>
     /// True only for the node currently acting as the source in keyboard "connect
