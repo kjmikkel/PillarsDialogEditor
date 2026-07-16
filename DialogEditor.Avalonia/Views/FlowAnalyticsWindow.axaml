@@ -135,6 +135,10 @@
                 </ItemsControl>
 
                 <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_OpeningChoices}" Margin="0,4,0,0"/>
+                <TextBlock Text="{DynamicResource PathStats_NoOpeningChoices}"
+                           Foreground="{DynamicResource Brush.Text.Disabled}"
+                           FontSize="{DynamicResource FontSize.Small}" FontStyle="Italic"
+                           IsVisible="{Binding Branches.Count, Converter={StaticResource CountToVis}, ConverterParameter=invert}"/>
                 <ScrollViewer MaxHeight="140">
                     <ItemsControl ItemsSource="{Binding Branches}">
                         <ItemsControl.ItemTemplate>
