@@ -1660,4 +1660,14 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="Dock_Tool_ConditionSearch">Condition search</sys:String>
     <sys:String x:Key="Dock_Doc_Canvas">Canvas</sys:String>
 
+    <!-- View menu — show/focus a docking tool (re-opening it if closed) + reset the
+         default layout (Docking Shell Phase 1, Task 6) -->
+    <sys:String x:Key="Menu_View">View</sys:String>
+    <sys:String x:Key="Menu_View_Conversations">Conversations</sys:String>
+    <sys:String x:Key="Menu_View_Details">Node Details</sys:String>
+    <sys:String x:Key="Menu_View_ConditionSearch">Condition search</sys:String>
+    <sys:String x:Key="Menu_View_ResetLayout">Reset Layout</sys:String>
+    <sys:String x:Key="ToolTip_View_ShowTool">Shows and focuses this panel, reopening it first if you closed its tab.</sys:String>
+    <sys:String x:Key="ToolTip_View_ResetLayout">Restores the default panel arrangement — Conversations, Canvas, Node Details, and Condition search back in their original positions and sizes.</sys:String>
+
 </ResourceDictionary>

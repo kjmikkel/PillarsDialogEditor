@@ -313,6 +313,47 @@ public partial class MainWindow : Window
     private NodeDetailView? FindDetailView() =>
         this.GetVisualDescendants().OfType<NodeDetailView>().FirstOrDefault();
 
+    // ── View menu: show/focus a tool, re-opening it if the user closed its tab ────
+    private void ShowBrowserTool_Click(object? sender, RoutedEventArgs e)         => ShowToolById("Browser");
+    private void ShowDetailsTool_Click(object? sender, RoutedEventArgs e)         => ShowToolById("Details");
+    private void ShowConditionSearchTool_Click(object? sender, RoutedEventArgs e) => ShowToolById("ConditionSearch");
+
+    /// Shows/focuses a Dock tool by its Id. If the tool is still present in the tree
+    /// (open, even if its tab isn't active), this just activates it. If the user closed
+    /// its tab, EditorDockFactory.HideToolsOnClose=true means Dock moved it into
+    /// IRootDock.HiddenDockables instead of discarding it — FactoryBase.RestoreDockable(id)
+    /// re-inserts it into its original owner dock, and we then activate it the same way.
+    /// No-ops safely (with a log) if no game is loaded yet (_factory/DockLayout are null)
+    /// or the id isn't found in either the live tree or the hidden set.
+    private void ShowToolById(string id)
+    {
+        if (_factory is null || DataContext is not MainWindowViewModel { DockLayout: Dock.Model.Core.IDock root })
+            return;
+
+        try
+        {
+            var tool = _factory.FindDockable(root, d => d.Id == id) ?? _factory.RestoreDockable(id);
+            if (tool is not null)
+                _factory.SetActiveDockable(tool);
+            else
+                AppLog.Warn($"MainWindow: View menu could not find dock tool '{id}' to show.");
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error($"MainWindow: failed to show dock tool '{id}'.", ex);
+        }
+    }
+
+    /// Rebuilds the default docking layout (Conversations/Canvas/Node Details/Condition
+    /// search in their original panes), discarding any floating windows, closed tools or
+    /// resized panes from the current session. No-ops (silently — nothing to reset) if no
+    /// game is loaded, matching BuildDock's own guard.
+    private void ResetLayout_Click(object? sender, RoutedEventArgs e)
+    {
+        if (DataContext is not MainWindowViewModel vm) return;
+        BuildDock(vm);
+    }
+
     // Mirrors the focused control's AutomationProperties.HelpText (set by item 5's
     // Part A sweep) into the view model so the status bar can show it — giving
     // sighted keyboard users the same explanation screen readers announce on focus.
