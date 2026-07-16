@@ -4,7 +4,7 @@
 
 **Goal:** Let the writer search one conversation for the nodes that use a chosen condition or script (narrowed by pinned parameters) and highlight those nodes on the canvas while dimming the rest.
 
-**Architecture:** A pure Core `CatalogueMatch` predicate (the primitive deferred from Gap #1) drives a pure Core `NodeConditionSearchService` that walks each node's three condition/script sites and returns matching node IDs. The existing per-node search-dim (`IsSearchMatch` bool) is **unified** into a `SearchMatchState { None, Match, Dimmed }` enum that both the existing text search and the new condition search flow through. A non-modal `ConditionSearchWindow` (the codebase idiom for canvas-driving tools) picks a catalogue entry, pins parameters, and applies Match/Dimmed to the open conversation's nodes.
+**Architecture:** A pure Core `CatalogueMatch` predicate (the primitive deferred from Gap #1) drives a pure Core `NodeConditionSearchService` that walks each node's three condition/script sites and returns matching node IDs. The existing per-node search-dim (`IsSearchMatch` bool) is **unified** into a `SearchMatchState { None, Match, Dimmed }` enum that both the existing text search and the new condition search flow through. A collapsible dock in the canvas area (owned by `ConversationViewModel`) picks a catalogue entry, pins parameters, and applies Match/Dimmed to the open conversation's nodes.
 
 **Tech Stack:** C# / .NET 8, Avalonia, CommunityToolkit.Mvvm, xUnit, Nodify canvas.
 
@@ -13,7 +13,7 @@
 ## Two deviations from the approved spec (decided during planning)
 
 1. **Highlight state — UNIFY (user decision).** The spec proposed a fresh node highlight state; the codebase already had `NodeViewModel.IsSearchMatch` (bool) dimming non-matches for the canvas **text search**. The user chose to **unify** both searches through one `SearchMatchState { None, Match, Dimmed }` enum. The text search keeps its dim-only look (match → `None`, non-match → `Dimmed`, never `Match`); the condition search uses `Match` for hits and `Dimmed` for the rest. Consequence (accepted): the two searches share the state, so starting one replaces the other (last-search-wins).
-2. **Panel host — non-modal WINDOW, not an embedded dock.** The spec said "non-modal side panel." There is no docked-panel infrastructure in the app; the established idiom for a non-modal tool that drives the canvas and persists while you pan/click is an owned `Window` (`FindInProjectWindow`, `FlowAnalyticsWindow`, `SpeakerLineBrowserWindow`). This plan realizes the "non-modal panel" as `ConditionSearchWindow`. **Confirm at plan review** if you specifically want an embedded dock instead — that would replace Task 6's window with MainWindow layout surgery, leaving Tasks 1–5 unchanged.
+2. **Panel host — embedded DOCK (user decision).** The search lives as a collapsible panel docked to the right edge of the **canvas area** inside `ConversationView`, toggled from the canvas toolbar — not a floating window. Because it operates on the open conversation and highlights `Canvas.Nodes` directly, the search VM hangs off `ConversationViewModel` (which owns the canvas). A future flag could unify this dock with the left (browser) and right (detail) panels into one docking host; this plan keeps it a self-contained collapsible panel. This only shapes Task 6; Tasks 1–5 are host-agnostic.
 
 ## Global Constraints
 
@@ -749,47 +749,66 @@ git commit -m "feat(viewmodels): ConditionSearchViewModel — entry + parameter-
 
 ---
 
-### Task 6: `ConditionSearchWindow` + canvas apply/clear + wiring
+### Task 6: Embedded search dock + canvas apply/clear + wiring
 
-Add the non-modal window, the ConversationViewModel apply/clear that set node states, the MainWindowViewModel command/delegate/gate, a menu item, strings, and GUI verification.
+Add the collapsible dock in the canvas area, the `ConversationViewModel` state that owns the search VM and applies/clears node highlight, the game-id wiring, the toolbar toggle, strings, and GUI verification.
 
 **Files:**
-- Create: `DialogEditor.Avalonia/Views/ConditionSearchWindow.axaml` + `.axaml.cs`
-- Modify: `DialogEditor.ViewModels/ViewModels/ConversationViewModel.cs` (apply/clear methods)
-- Modify: `DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs` (command + delegate + gate + `NotifyCanExecuteChanged` sites)
-- Modify: `DialogEditor.Avalonia/Views/MainWindow.axaml.cs` (set delegate)
-- Modify: `DialogEditor.Avalonia/Views/MainWindow.axaml` (menu item)
+- Create: `DialogEditor.Avalonia/Views/ConditionSearchView.axaml` + `.axaml.cs` (the dock's content UserControl)
+- Modify: `DialogEditor.ViewModels/ViewModels/ConversationViewModel.cs` (ActiveGameId, ConditionSearch, visibility, apply/clear, toggle command)
+- Modify: `DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs:1705` area (set `Canvas.ActiveGameId = provider.GameId;`)
+- Modify: `DialogEditor.Avalonia/Views/ConversationView.axaml` (toolbar toggle button + docked panel hosting `ConditionSearchView`)
 - Modify: `DialogEditor.Avalonia/Resources/Strings.axaml` (strings)
 - Test: `DialogEditor.Tests/ViewModels/ConversationHighlightTests.cs`
 
 **Interfaces:**
 - `ConversationViewModel.ApplyConditionHighlight(IReadOnlySet<int> matches)` — for each node: `SearchMatchState = matches.Contains(node.NodeId) ? Match : Dimmed`.
-- `ConversationViewModel.ClearConditionHighlight()` — every node → `None`; also cancel any text-search state.
-- `MainWindowViewModel`: `public Func<ConditionSearchViewModel, Task>? ShowConditionSearch { get; set; }`, `CanShowConditionSearch => _provider is not null && Canvas.Nodes.Count > 0`, `[RelayCommand(CanExecute=...)] ShowConditionSearchWindow()`.
+- `ConversationViewModel.ClearConditionHighlight()` — every node → `None`.
+- `ConversationViewModel.ActiveGameId` (string) — setter builds `ConditionSearch` (or nulls it when empty).
+- `ConversationViewModel.ConditionSearch` (`ConditionSearchViewModel?`), `IsConditionSearchVisible` (`[ObservableProperty] bool`), `ToggleConditionSearchCommand` (gated on `ConditionSearch is not null && Nodes.Count > 0`).
 
 - [ ] **Step 1: Write the failing highlight test**
 
 ```csharp
 // DialogEditor.Tests/ViewModels/ConversationHighlightTests.cs
-// Build a ConversationViewModel with a couple of nodes (reuse the construction the existing
-// ConversationViewModel tests use — see ConversationStatisticsTests / ConditionBranchEditingTests
-// for the established setup), then:
+// Build a ConversationViewModel and load a small conversation (reuse the setup from an existing
+// ConversationViewModel test — e.g. ConditionBranchEditingTests / ConversationStatisticsTests),
+// with nodes 0 and 1, then:
 //   vm.ApplyConditionHighlight(new HashSet<int> { 0 });
-//   Assert node 0 => SearchMatchState.Match, node 1 => SearchMatchState.Dimmed;
-//   vm.ClearConditionHighlight();
-//   Assert both => SearchMatchState.None;
+//   node0.SearchMatchState == SearchMatchState.Match; node1 == SearchMatchState.Dimmed;
+//   vm.ClearConditionHighlight();  // both back to None
 ```
 
-> Do not invent a constructor — open an existing `ConversationViewModel` test and copy its setup (loading a small conversation into the VM). The assertions above are the deliverable.
+> Do not invent a constructor — open an existing `ConversationViewModel` test and copy its load setup. The assertions above are the deliverable.
 
 - [ ] **Step 2: Run test to verify it fails**
 
 Run: `dotnet test --filter "FullyQualifiedName~ConversationHighlightTests"`
 Expected: FAIL — `ApplyConditionHighlight` does not exist.
 
-- [ ] **Step 3: Add apply/clear to `ConversationViewModel`**
+- [ ] **Step 3: Add state + apply/clear to `ConversationViewModel`**
 
 ```csharp
+// Field + property (setter builds the search VM so the dock is always ready once a game loads):
+private string _activeGameId = "";
+public string ActiveGameId
+{
+    get => _activeGameId;
+    set
+    {
+        _activeGameId = value;
+        ConditionSearch = string.IsNullOrEmpty(value)
+            ? null
+            : new ConditionSearchViewModel(value, BuildSnapshot, ApplyConditionHighlight, ClearConditionHighlight);
+        OnPropertyChanged(nameof(ConditionSearch));
+        ToggleConditionSearchCommand.NotifyCanExecuteChanged();
+    }
+}
+
+public ConditionSearchViewModel? ConditionSearch { get; private set; }
+
+[ObservableProperty] private bool _isConditionSearchVisible;
+
 /// Highlights the given node IDs as condition/script-search matches and dims the rest.
 /// Shares the unified SearchMatchState with the text search (last search wins).
 public void ApplyConditionHighlight(IReadOnlySet<int> matches)
@@ -800,78 +819,145 @@ public void ApplyConditionHighlight(IReadOnlySet<int> matches)
             : SearchMatchState.Dimmed;
 }
 
-/// Clears any search emphasis/dim (condition search Clear button, or a fresh conversation).
+/// Clears search emphasis/dim (Clear button, or a fresh conversation).
 public void ClearConditionHighlight()
 {
-    _searchCts?.Cancel();
     foreach (var node in Nodes)
         node.SearchMatchState = SearchMatchState.None;
 }
+
+private bool CanToggleConditionSearch() => ConditionSearch is not null && Nodes.Count > 0;
+
+[RelayCommand(CanExecute = nameof(CanToggleConditionSearch))]
+private void ToggleConditionSearch() => IsConditionSearchVisible = !IsConditionSearchVisible;
 ```
+
+Also call `ToggleConditionSearchCommand.NotifyCanExecuteChanged();` where `Nodes` is (re)populated on conversation load (find the load path near line 324 where `ConversationName = conversation.Name;`), so the toggle enables once a conversation is on the canvas.
 
 - [ ] **Step 4: Run the highlight test**
 
 Run: `dotnet test --filter "FullyQualifiedName~ConversationHighlightTests"`
 Expected: PASS.
 
-- [ ] **Step 5: Add the command/delegate/gate to `MainWindowViewModel`**
+- [ ] **Step 5: Set the game id on the canvas VM**
 
-Place next to `ShowRepDispositionBalance`. Add `ShowConditionSearchWindowCommand.NotifyCanExecuteChanged()` wherever `Canvas.Nodes` changes materially — at minimum after a conversation loads. (Find where the canvas is populated on conversation selection; the command gate depends on `Canvas.Nodes.Count`.)
+In `MainWindowViewModel.cs`, next to the existing `Detail.ActiveGameId = provider.GameId;` (≈line 1705):
 
 ```csharp
-public Func<ConditionSearchViewModel, Task>? ShowConditionSearch { get; set; }
+Canvas.ActiveGameId = provider.GameId;
+```
 
-public bool CanShowConditionSearch => _provider is not null && Canvas.Nodes.Count > 0;
+- [ ] **Step 6: Create the dock content view**
 
-[RelayCommand(CanExecute = nameof(CanShowConditionSearch))]
-private async Task ShowConditionSearchWindow()
+```xml
+<!-- DialogEditor.Avalonia/Views/ConditionSearchView.axaml — DataContext is a ConditionSearchViewModel -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="DialogEditor.Avalonia.Views.ConditionSearchView"
+             x:CompileBindings="False"
+             Width="260">
+  <Border Background="{DynamicResource Brush.Surface.Panel}" Padding="10">
+    <StackPanel Spacing="8">
+      <TextBlock Text="{DynamicResource CondSearch_Title}" FontWeight="Bold"
+                 Foreground="{DynamicResource Brush.Text.Primary}"/>
+      <TextBlock Text="{DynamicResource CondSearch_EntryLabel}" Foreground="{DynamicResource Brush.Text.Secondary}"/>
+      <ComboBox ItemsSource="{Binding Entries}" SelectedItem="{Binding SelectedEntry}"
+                HorizontalAlignment="Stretch"
+                ToolTip.Tip="{DynamicResource CondSearch_Tip_Entry}"
+                AutomationProperties.Name="{DynamicResource CondSearch_EntryLabel}"
+                AutomationProperties.HelpText="{DynamicResource CondSearch_Tip_Entry}"/>
+      <ItemsControl ItemsSource="{Binding PinRows}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Grid ColumnDefinitions="*,*" Margin="0,2">
+              <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center"
+                         Foreground="{DynamicResource Brush.Text.Secondary}"/>
+              <TextBox Grid.Column="1" Text="{Binding Value}"
+                       ToolTip.Tip="{DynamicResource CondSearch_Tip_Pin}"
+                       AutomationProperties.Name="{Binding Name}"
+                       AutomationProperties.HelpText="{DynamicResource CondSearch_Tip_Pin}"/>
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <Button Content="{DynamicResource CondSearch_Search}" Command="{Binding SearchCommand}"
+                ToolTip.Tip="{DynamicResource CondSearch_Tip_Search}"
+                AutomationProperties.HelpText="{DynamicResource CondSearch_Tip_Search}"
+                Background="{DynamicResource Brush.Button.Confirm.Background}"
+                Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0" Padding="14,6"/>
+        <Button Content="{DynamicResource CondSearch_Clear}" Command="{Binding ClearCommand}"
+                ToolTip.Tip="{DynamicResource CondSearch_Tip_Clear}"
+                AutomationProperties.HelpText="{DynamicResource CondSearch_Tip_Clear}"
+                Padding="14,6"/>
+      </StackPanel>
+      <TextBlock Text="{Binding MatchCountText}" Foreground="{DynamicResource Brush.Text.Muted}"
+                 FontSize="{DynamicResource FontSize.Small}"/>
+    </StackPanel>
+  </Border>
+</UserControl>
+```
+
+```csharp
+// DialogEditor.Avalonia/Views/ConditionSearchView.axaml.cs
+using Avalonia.Controls;
+using Avalonia.Markup.Xaml;
+
+namespace DialogEditor.Avalonia.Views;
+
+public partial class ConditionSearchView : UserControl
 {
-    if (_provider is null) return;
-    var vm = new ConditionSearchViewModel(
-        _provider.GameId,
-        () => Canvas.Nodes.Count > 0 ? Canvas.BuildSnapshot() : null,
-        matches => Canvas.ApplyConditionHighlight(matches),
-        () => Canvas.ClearConditionHighlight());
-    if (ShowConditionSearch is not null)
-        await ShowConditionSearch(vm);
+    public ConditionSearchView() => InitializeComponent();
 }
 ```
 
-> Wire `ShowConditionSearchWindowCommand.NotifyCanExecuteChanged()` into the conversation-selected path so the menu enables once a conversation is on the canvas. Search the VM for where `Canvas` is filled on selection and add the notify there.
+> For v1 a `TextBox` per pin row is acceptable (a pinned enum/lookup value must be typed exactly, e.g. `Benevolent` or the GUID). A dropdown driven by `Options`/`LookupKind` is a deferred refinement, not required by the spec.
 
-- [ ] **Step 6: Create the window (non-modal)**
+- [ ] **Step 7: Embed the dock + toggle in `ConversationView.axaml`**
 
-Mirror `FindInProjectWindow`: parameterless ctor + `(vm)` ctor, `FocusHintBar`, icon, `x:CompileBindings="False"`. Layout: an entry `AutoCompleteBox`/`ComboBox` bound to `Entries` (`SelectedItem = SelectedEntry`), an `ItemsControl` over `PinRows` (each row: label + a `TextBox` bound to `Value`, or a `ComboBox` when `Options`/`LookupKind` present — a `TextBox` is acceptable for v1, with the row `Name` as `AutomationProperties.Name`), `Search` + `Clear` buttons, and a `MatchCountText` line. Every control gets a `ToolTip.Tip`. On window close, call `vm.ClearCommand.Execute(null)` so a lingering highlight doesn't outlive the window.
+Add a toolbar toggle next to the search box (inside the header DockPanel, ≈ after the SearchBox Grid at line 101):
 
-- [ ] **Step 7: Add strings, wire the delegate + menu item**
-
-Strings in `Strings.axaml` (`<sys:String>`): `Menu_ConditionSearch`, `CondSearch_Title`, `CondSearch_EntryLabel`, `CondSearch_EntryCondition` (`{0}`), `CondSearch_EntryScript` (`{0}`), `CondSearch_Search`, `CondSearch_Clear`, `CondSearch_MatchCount` (`{0}` — reword to avoid `(s)`, e.g. `Matches: {0}`), and tooltips `CondSearch_Tip_Entry`, `CondSearch_Tip_Pin`, `CondSearch_Tip_Search`, `CondSearch_Tip_Clear`.
-
-In `MainWindow.axaml.cs` (next to `ShowRepDispositionBalance`):
-
-```csharp
-vm.ShowConditionSearch = async searchVm =>
-{
-    var win = new ConditionSearchWindow(searchVm);
-    win.Show(this);          // non-modal, owned — highlight persists while you use the canvas
-    await Task.CompletedTask;
-};
+```xml
+<Button Content="⚑"
+        Command="{Binding ToggleConditionSearchCommand}"
+        Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}"
+        BorderThickness="0" Padding="8,2" Margin="8,0,0,0"
+        ToolTip.Tip="{DynamicResource ToolTip_ToggleConditionSearch}"
+        AutomationProperties.Name="{DynamicResource AutomationName_ToggleConditionSearch}"
+        AutomationProperties.HelpText="{DynamicResource ToolTip_ToggleConditionSearch}"/>
 ```
 
-In `MainWindow.axaml`, add a menu item under Edit (near Find in Project) bound to `ShowConditionSearchWindowCommand` with `Menu_ConditionSearch` header + a tooltip.
+Wrap the canvas cell (the `Grid Grid.Row="1"` at line 106) so the dock sits to its right:
 
-- [ ] **Step 8: Build, run, GUI-verify**
+```xml
+<Grid Grid.Row="1" ColumnDefinitions="*,Auto">
+  <Grid Grid.Column="0" ClipToBounds="True">
+    <!-- existing NodifyEditor ... (unchanged) -->
+  </Grid>
+  <views:ConditionSearchView Grid.Column="1"
+                             DataContext="{Binding ConditionSearch}"
+                             IsVisible="{Binding IsConditionSearchVisible}"/>
+</Grid>
+```
+
+> Confirm the `views:` namespace prefix is already declared in `ConversationView.axaml`; if not, add `xmlns:views="clr-namespace:DialogEditor.Avalonia.Views"`. Keep the existing NodifyEditor markup intact inside the new `Grid.Column="0"` wrapper.
+
+- [ ] **Step 8: Add strings**
+
+In `Strings.axaml` (`<sys:String>`): `CondSearch_Title` ("Find nodes by condition / script"), `CondSearch_EntryLabel` ("Condition or script:"), `CondSearch_EntryCondition` ("{0}  (condition)"), `CondSearch_EntryScript` ("{0}  (script)"), `CondSearch_Search` ("Search"), `CondSearch_Clear` ("Clear"), `CondSearch_MatchCount` ("Matches: {0}" — no `(s)`), and tooltips `CondSearch_Tip_Entry`, `CondSearch_Tip_Pin`, `CondSearch_Tip_Search`, `CondSearch_Tip_Clear`, `ToolTip_ToggleConditionSearch`, plus `AutomationName_ToggleConditionSearch` ("Condition search").
+
+- [ ] **Step 9: Build, run, GUI-verify**
 
 Run: `dotnet build`
 Expected: succeeds.
 
-Use the `running-the-app` skill (scratch project auto-loads the real PoE2 folder). Open a conversation with condition/script usage, open the search window, pick e.g. an `IsDisposition`/`SetGlobalValue` entry, Search → confirm matching nodes get the emphasis border and the rest dim; pin a parameter → confirm the set narrows; Clear → confirm all nodes return to normal; switch conversations → confirm the highlight is gone.
+Use the `running-the-app` skill (scratch project auto-loads the real PoE2 folder). Open a conversation with condition/script usage, click the ⚑ toggle → the dock appears; pick e.g. `IsDisposition` / `SetGlobalValue`, Search → matching nodes get the emphasis border and the rest dim; pin a parameter → the set narrows; Clear → all nodes normal; switch conversations → highlight gone and dock still toggglable.
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 10: Commit**
 
 ```bash
-git add DialogEditor.Avalonia/Views/ConditionSearchWindow.axaml DialogEditor.Avalonia/Views/ConditionSearchWindow.axaml.cs DialogEditor.ViewModels/ViewModels/ConversationViewModel.cs DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs DialogEditor.Avalonia/Views/MainWindow.axaml.cs DialogEditor.Avalonia/Views/MainWindow.axaml DialogEditor.Avalonia/Resources/Strings.axaml DialogEditor.Tests/ViewModels/ConversationHighlightTests.cs
-git commit -m "feat(ui): Condition/Script Node Search window + canvas highlight wiring"
+git add DialogEditor.Avalonia/Views/ConditionSearchView.axaml DialogEditor.Avalonia/Views/ConditionSearchView.axaml.cs DialogEditor.ViewModels/ViewModels/ConversationViewModel.cs DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs DialogEditor.Avalonia/Views/ConversationView.axaml DialogEditor.Avalonia/Resources/Strings.axaml DialogEditor.Tests/ViewModels/ConversationHighlightTests.cs
+git commit -m "feat(ui): embedded Condition/Script search dock + canvas highlight"
 ```
 
 ---
@@ -899,7 +985,7 @@ git commit -m "docs(gaps): mark condition/script node search implemented"
 ## Self-Review
 
 **Spec coverage:**
-- Non-modal search surface (persists during canvas use) → Task 6 (window; deviation noted). ✓
+- Non-modal search surface (persists during canvas use) → Task 6 (embedded canvas dock). ✓
 - Pick a catalogue entry, conditions AND scripts, current game → Task 5. ✓
 - Optional parameter pins; unset = wildcard; pinned = exact raw value → Tasks 1, 5. ✓
 - Hit if match in node condition / link condition / script; node-only granularity → Task 2. ✓
