@@ -41,6 +41,51 @@ public partial class ConversationViewModel : ObservableObject
             await ShowBatchVoImport();
     }
 
+    // ── Condition/script search dock ──────────────────────────────────────
+    private string _activeGameId = "";
+
+    /// The loaded game (set by MainWindowViewModel on folder load). Setting it (re)builds the
+    /// condition-search dock so it offers that game's catalogue; empty nulls the dock.
+    public string ActiveGameId
+    {
+        get => _activeGameId;
+        set
+        {
+            _activeGameId = value;
+            ConditionSearch = string.IsNullOrEmpty(value)
+                ? null
+                : new ConditionSearchViewModel(value, BuildSnapshot, ApplyConditionHighlight, ClearConditionHighlight);
+            OnPropertyChanged(nameof(ConditionSearch));
+            ToggleConditionSearchCommand.NotifyCanExecuteChanged();
+        }
+    }
+
+    public ConditionSearchViewModel? ConditionSearch { get; private set; }
+
+    [ObservableProperty] private bool _isConditionSearchVisible;
+
+    /// Highlights the given node IDs as condition/script-search matches and dims the rest.
+    /// Shares the unified SearchMatchState with the text search (last search wins).
+    public void ApplyConditionHighlight(IReadOnlySet<int> matches)
+    {
+        foreach (var node in Nodes)
+            node.SearchMatchState = matches.Contains(node.NodeId)
+                ? SearchMatchState.Match
+                : SearchMatchState.Dimmed;
+    }
+
+    /// Clears search emphasis/dim (Clear button, or a fresh conversation).
+    public void ClearConditionHighlight()
+    {
+        foreach (var node in Nodes)
+            node.SearchMatchState = SearchMatchState.None;
+    }
+
+    private bool CanToggleConditionSearch() => ConditionSearch is not null && Nodes.Count > 0;
+
+    [RelayCommand(CanExecute = nameof(CanToggleConditionSearch))]
+    private void ToggleConditionSearch() => IsConditionSearchVisible = !IsConditionSearchVisible;
+
     private readonly HashSet<NodeViewModel> _subscribedNodes = [];
 
     public ConversationViewModel(IDispatcher dispatcher)
@@ -81,6 +126,7 @@ public partial class ConversationViewModel : ObservableObject
             }
             RefreshStatistics();
             BatchImportVoCommand.NotifyCanExecuteChanged();
+            ToggleConditionSearchCommand.NotifyCanExecuteChanged();
         };
     }
 
