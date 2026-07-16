@@ -548,6 +548,14 @@ switching, the translation CSV round-trip, the layout-elasticity fixes, and CLDR
 plural-category support are all in place — what is missing is not mechanism but
 content: no translation overlay has been authored yet.
 
+**Known deferred gap — Dock.Avalonia built-in strings (recorded 2026-07-16).** When the
+VS-style docking shell lands (see **Visual Studio–style Docking Shell**), the docking
+framework's own context-menu strings (float / dock / close / auto-hide) ship inside the
+`Dock.Avalonia` package and are **not** routed through `Strings.axaml`, so they stay English
+even under a translation overlay. Accepted for the docking work; fixable later by supplying
+localised `{DynamicResource}` strings to Dock's retemplatable menu controls (no library fork
+needed). Revisit when a translation overlay is authored.
+
 **Already in place (verified):**
 - Single funnel: all UI strings live in three XAML dictionaries (`Strings.axaml`,
   `SharedStrings.axaml`, PatchManager's `Strings.axaml`); all views now use
