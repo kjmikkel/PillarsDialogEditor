@@ -1,0 +1,133 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
+        x:Class="DialogEditor.Avalonia.Views.RepDispositionBalanceWindow"
+        Title="{DynamicResource RepBalance_Title}"
+        Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
+        Width="760" Height="580" MinWidth="560" MinHeight="380"
+        CanResize="True"
+        ShowInTaskbar="False"
+        Background="{DynamicResource Brush.Surface.Window}"
+        WindowStartupLocation="CenterOwner"
+        x:CompileBindings="False">
+
+    <Window.Styles>
+        <Style Selector="TextBlock.col-header">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}"/>
+            <Setter Property="FontSize"   Value="{DynamicResource FontSize.Small}"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+        <Style Selector="TextBlock.table-title">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}"/>
+            <Setter Property="FontSize"   Value="{DynamicResource FontSize.Body}"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin"     Value="0,0,0,4"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid RowDefinitions="Auto,*,Auto" Margin="14,12,14,12">
+
+        <!-- ── Controls row: Source + Scope + Analyze/Cancel ─────────────────── -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
+            <TextBlock Text="{DynamicResource RepBalance_Source_Label}" VerticalAlignment="Center"/>
+            <ComboBox x:Name="SourceBox"
+                      ToolTip.Tip="{DynamicResource RepBalance_Tip_Source}"
+                      AutomationProperties.Name="{DynamicResource RepBalance_Source_Label}"
+                      AutomationProperties.HelpText="{DynamicResource RepBalance_Tip_Source}"/>
+            <TextBlock Text="{DynamicResource RepBalance_Scope_Label}" VerticalAlignment="Center" Margin="8,0,0,0"/>
+            <ComboBox x:Name="ScopeBox"
+                      ToolTip.Tip="{DynamicResource RepBalance_Tip_Scope}"
+                      AutomationProperties.Name="{DynamicResource RepBalance_Scope_Label}"
+                      AutomationProperties.HelpText="{DynamicResource RepBalance_Tip_Scope}"/>
+            <Button Content="{DynamicResource RepBalance_Refresh}"
+                    Command="{Binding RefreshCommand}"
+                    ToolTip.Tip="{DynamicResource RepBalance_Tip_Refresh}"
+                    AutomationProperties.HelpText="{DynamicResource RepBalance_Tip_Refresh}"
+                    Background="{DynamicResource Brush.Button.Confirm.Background}"
+                    Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
+                    Padding="16,6" Margin="8,0,0,0"/>
+            <Button Content="{DynamicResource RepBalance_Cancel}"
+                    Command="{Binding CancelCommand}"
+                    IsVisible="{Binding IsBusy}"
+                    ToolTip.Tip="{DynamicResource RepBalance_Tip_Cancel}"
+                    AutomationProperties.HelpText="{DynamicResource RepBalance_Tip_Cancel}"
+                    Padding="16,6"/>
+        </StackPanel>
+
+        <!-- ── Two tables side by side ───────────────────────────────────────── -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,12,*">
+
+            <!-- Dispositions -->
+            <DockPanel Grid.Column="0">
+                <TextBlock DockPanel.Dock="Top" Classes="table-title"
+                           Text="{DynamicResource RepBalance_DispositionsHeader}"/>
+                <Grid DockPanel.Dock="Top" ColumnDefinitions="*,50,70,110" Margin="4,0,4,2">
+                    <TextBlock Grid.Column="0" Classes="col-header" Text="{DynamicResource RepBalance_Col_Value}"/>
+                    <TextBlock Grid.Column="1" Classes="col-header" Text="{DynamicResource RepBalance_Col_Count}"/>
+                    <TextBlock Grid.Column="2" Classes="col-header" Text="{DynamicResource RepBalance_Col_Share}"/>
+                    <TextBlock Grid.Column="3" Classes="col-header" Text="{DynamicResource RepBalance_Col_Flag}"/>
+                </Grid>
+                <ListBox ItemsSource="{Binding DispositionRows}"
+                         ToolTip.Tip="{DynamicResource RepBalance_Tip_Table}"
+                         Background="{DynamicResource Brush.Surface.Card}" BorderThickness="0">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="*,50,70,110" Margin="0,2">
+                                <TextBlock Grid.Column="0" Text="{Binding DisplayValue}"
+                                           Foreground="{DynamicResource Brush.Text.Primary}" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Count}"
+                                           Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                <TextBlock Grid.Column="2" Text="{Binding ShareText}"
+                                           Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                <TextBlock Grid.Column="3" Text="{Binding FlagLabel}"
+                                           Foreground="{Binding Flag, Converter={StaticResource BalanceFlagToBrush}}"
+                                           FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+
+            <!-- Reputations -->
+            <DockPanel Grid.Column="2">
+                <TextBlock DockPanel.Dock="Top" Classes="table-title"
+                           Text="{DynamicResource RepBalance_ReputationsHeader}"/>
+                <Grid DockPanel.Dock="Top" ColumnDefinitions="*,50,70,110" Margin="4,0,4,2">
+                    <TextBlock Grid.Column="0" Classes="col-header" Text="{DynamicResource RepBalance_Col_Value}"/>
+                    <TextBlock Grid.Column="1" Classes="col-header" Text="{DynamicResource RepBalance_Col_Count}"/>
+                    <TextBlock Grid.Column="2" Classes="col-header" Text="{DynamicResource RepBalance_Col_Share}"/>
+                    <TextBlock Grid.Column="3" Classes="col-header" Text="{DynamicResource RepBalance_Col_Flag}"/>
+                </Grid>
+                <ListBox ItemsSource="{Binding ReputationRows}"
+                         ToolTip.Tip="{DynamicResource RepBalance_Tip_Table}"
+                         Background="{DynamicResource Brush.Surface.Card}" BorderThickness="0">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="*,50,70,110" Margin="0,2">
+                                <TextBlock Grid.Column="0" Text="{Binding DisplayValue}"
+                                           Foreground="{DynamicResource Brush.Text.Primary}" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Count}"
+                                           Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                <TextBlock Grid.Column="2" Text="{Binding ShareText}"
+                                           Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                <TextBlock Grid.Column="3" Text="{Binding FlagLabel}"
+                                           Foreground="{Binding Flag, Converter={StaticResource BalanceFlagToBrush}}"
+                                           FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Grid>
+
+        <!-- ── Status line + focus hint bar ──────────────────────────────────── -->
+        <StackPanel Grid.Row="2">
+            <TextBlock Text="{Binding StatusText}"
+                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
+                       Margin="0,6,0,0"/>
+            <shared:FocusHintBar x:Name="HintBar"/>
+        </StackPanel>
+
+    </Grid>
+
+</Window>

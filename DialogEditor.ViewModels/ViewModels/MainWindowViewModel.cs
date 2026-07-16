@@ -276,6 +276,13 @@ public partial class MainWindowViewModel : ObservableObject
         && _provider is not null
         && !string.IsNullOrEmpty(_currentGameDirectory);
 
+    /// Same requirements as Find in Project: an open project, a loaded provider, and a game
+    /// folder (the "on disk" scope enumerates every conversation). Read-only; never writes.
+    public bool CanShowRepDispositionBalance =>
+        _project is not null
+        && _provider is not null
+        && !string.IsNullOrEmpty(_currentGameDirectory);
+
     private void SetProject(DialogProject? project)
     {
         var prevNew  = _project?.NewConversations;
@@ -294,6 +301,7 @@ public partial class MainWindowViewModel : ObservableObject
         ImportTranslationCommand.NotifyCanExecuteChanged();
         BatchImportVoAllCommand.NotifyCanExecuteChanged();
         FindInProjectCommand.NotifyCanExecuteChanged();
+        ShowRepDispositionBalanceWindowCommand.NotifyCanExecuteChanged();
         BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
         // Only re-scan the game folder when NewConversations actually changes —
         // not on every patch save, which would re-enumerate all conversations.
@@ -730,6 +738,7 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
         FindInProjectCommand.NotifyCanExecuteChanged();
+        ShowRepDispositionBalanceWindowCommand.NotifyCanExecuteChanged();
         BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
         DialogProjectSerializer.SaveToFile(path, _project!);
         AppSettings.LastProjectPath = path;
@@ -847,6 +856,7 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
         FindInProjectCommand.NotifyCanExecuteChanged();
+        ShowRepDispositionBalanceWindowCommand.NotifyCanExecuteChanged();
         BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
         CurrentProjectName = null;
         IsModified = false;        // nothing open → not dirty
@@ -1012,6 +1022,7 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
         FindInProjectCommand.NotifyCanExecuteChanged();
+        ShowRepDispositionBalanceWindowCommand.NotifyCanExecuteChanged();
         BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
         AppSettings.LastProjectPath = path;
         AppSettings.AddRecentProject(path);
@@ -1357,6 +1368,7 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();
         FindInProjectCommand.NotifyCanExecuteChanged();
+        ShowRepDispositionBalanceWindowCommand.NotifyCanExecuteChanged();
         BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
         AppSettings.LastProjectPath = path;
         AppSettings.AddRecentProject(path);
@@ -1714,6 +1726,7 @@ public partial class MainWindowViewModel : ObservableObject
             OnPropertyChanged(nameof(CanValidateVO));
             BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on game folder + id
             FindInProjectCommand.NotifyCanExecuteChanged();
+            ShowRepDispositionBalanceWindowCommand.NotifyCanExecuteChanged();
             BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
             AvailableLanguages = provider.AvailableLanguages;
             SelectedLanguage   = AppSettings.PickLanguage(AvailableLanguages, AppSettings.LastLanguage);
@@ -2427,6 +2440,23 @@ public partial class MainWindowViewModel : ObservableObject
         vm.RequestNavigate += NavigateToFoundNode;
         if (ShowFindInProject is not null)
             await ShowFindInProject(vm);
+    }
+
+    /// Opens the read-only Reputation & Disposition Balance window. Same gate as Find in
+    /// Project; the window never writes.
+    public Func<RepDispositionBalanceViewModel, Task>? ShowRepDispositionBalance { get; set; }
+
+    [RelayCommand(CanExecute = nameof(CanShowRepDispositionBalance))]
+    private async Task ShowRepDispositionBalanceWindow()
+    {
+        if (_project is null || _provider is null) return;
+        var vm = new RepDispositionBalanceViewModel(
+            _project, _provider,
+            () => Canvas.Nodes.Count > 0
+                ? (Canvas.ConversationName, (ConversationEditSnapshot?)Canvas.BuildSnapshot())
+                : (null, (ConversationEditSnapshot?)null));
+        if (ShowRepDispositionBalance is not null)
+            await ShowRepDispositionBalance(vm);
     }
 
     /// Same requirements as Find in Project: an open project, a loaded provider, and a
