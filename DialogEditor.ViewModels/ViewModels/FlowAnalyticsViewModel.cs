@@ -74,6 +74,38 @@ public partial class TokenIssueRowViewModel : ObservableObject
     private void Navigate() => _navigate(NodeId);
 }
 
+/// One "By opening choice" row.
+public sealed partial class PathBranchRowViewModel : ObservableObject
+{
+    private readonly Action _navigate;
+
+    public string ChoiceText         { get; }
+    public string DefaultContentText { get; }
+    public string DefaultLongestText { get; }
+    public string FemaleContentText  { get; }
+    public string FemaleLongestText  { get; }
+
+    public PathBranchRowViewModel(string choiceText, string defaultContent, string defaultLongest,
+        string femaleContent, string femaleLongest, Action navigate)
+    {
+        ChoiceText         = choiceText;
+        DefaultContentText = defaultContent;
+        DefaultLongestText = defaultLongest;
+        FemaleContentText  = femaleContent;
+        FemaleLongestText  = femaleLongest;
+        _navigate          = navigate;
+    }
+
+    [RelayCommand] private void Navigate() => _navigate();
+}
+
+/// One "Words per speaker" row.
+public sealed class SpeakerWordRowViewModel
+{
+    public string Display { get; }
+    public SpeakerWordRowViewModel(string display) => Display = display;
+}
+
 public partial class FlowAnalyticsViewModel : ObservableObject
 {
     private readonly Func<ConversationEditSnapshot?> _getSnapshot;
@@ -90,6 +122,14 @@ public partial class FlowAnalyticsViewModel : ObservableObject
 
     public ObservableCollection<FlowIssueViewModel>   Issues      { get; } = [];
     public ObservableCollection<TokenIssueRowViewModel> TokenIssues { get; } = [];
+    public ObservableCollection<PathBranchRowViewModel> Branches       { get; } = [];
+    public ObservableCollection<SpeakerWordRowViewModel> WordsPerSpeaker { get; } = [];
+
+    [ObservableProperty] private bool   _hasPathStats;
+    [ObservableProperty] private bool   _hasSignificantFemaleVariant;
+    [ObservableProperty] private string _longestPlaythroughText  = string.Empty;
+    [ObservableProperty] private string _shortestPlaythroughText = string.Empty;
+    [ObservableProperty] private string _totalContentText        = string.Empty;
 
     public FlowAnalyticsViewModel(
         Func<ConversationEditSnapshot?> getSnapshot,
@@ -155,6 +195,64 @@ public partial class FlowAnalyticsViewModel : ObservableObject
                 AddTokenIssues(t.NodeId, lang, t.DefaultText);
                 AddTokenIssues(t.NodeId, lang, t.FemaleText);
             }
+
+        RefreshPathStats(snapshot);
+    }
+
+    private void RefreshPathStats(ConversationEditSnapshot snapshot)
+    {
+        var report = PathStatsService.Analyze(snapshot);
+        HasSignificantFemaleVariant = report.HasSignificantFemaleVariant;
+
+        LongestPlaythroughText  = WordsTimePair(report.DefaultLongestWords,  report.FemaleLongestWords);
+        ShortestPlaythroughText = WordsTimePair(report.DefaultShortestWords, report.FemaleShortestWords);
+        TotalContentText        = WordsTimePair(report.DefaultTotalWords,    report.FemaleTotalWords);
+
+        WordsPerSpeaker.Clear();
+        foreach (var s in report.WordsPerSpeaker)
+        {
+            var name = ResolveSpeakerName(s);
+            var display = HasSignificantFemaleVariant
+                ? Loc.Format("PathStats_SpeakerRowFemale", name, s.DefaultWords, s.FemaleWords)
+                : Loc.Format("PathStats_SpeakerRow", name, s.DefaultWords);
+            WordsPerSpeaker.Add(new SpeakerWordRowViewModel(display));
+        }
+
+        Branches.Clear();
+        foreach (var b in report.Branches)
+        {
+            var choice = Truncate(b.ChoiceText, 50);
+            Branches.Add(new PathBranchRowViewModel(
+                choice,
+                Loc.Format("PathStats_BranchContent", WordsTime(b.DefaultContentWords)),
+                Loc.Format("PathStats_BranchLongest", WordsTime(b.DefaultLongestWords)),
+                Loc.Format("PathStats_BranchContent", WordsTime(b.FemaleContentWords)),
+                Loc.Format("PathStats_BranchLongest", WordsTime(b.FemaleLongestWords)),
+                () => _navigateToNode(b.ChoiceNodeId)));
+        }
+
+        HasPathStats = report.DefaultTotalWords > 0 || report.WordsPerSpeaker.Count > 0;
+    }
+
+    private string WordsTime(int words) =>
+        Loc.Format("PathStats_WordsTime", words, PathStatsFormat.ReadingTime(words));
+
+    private string WordsTimePair(int defaultWords, int femaleWords) =>
+        HasSignificantFemaleVariant
+            ? Loc.Format("PathStats_DefaultFemale", WordsTime(defaultWords), WordsTime(femaleWords))
+            : WordsTime(defaultWords);
+
+    private static string ResolveSpeakerName(SpeakerWordCount s)
+    {
+        var resolved = SpeakerNameService.Resolve(s.SpeakerGuid);
+        if (!string.IsNullOrEmpty(resolved)) return resolved;
+        return s.Category switch
+        {
+            SpeakerCategory.Player   => Loc.Get("PathStats_Cat_Player"),
+            SpeakerCategory.Narrator => Loc.Get("PathStats_Cat_Narrator"),
+            SpeakerCategory.Script   => Loc.Get("PathStats_Cat_Script"),
+            _                        => Loc.Get("PathStats_Cat_Npc"),
+        };
     }
 
     private void AddTokenIssues(int nodeId, string language, string? text)

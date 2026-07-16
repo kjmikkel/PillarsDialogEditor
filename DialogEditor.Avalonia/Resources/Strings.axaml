@@ -806,6 +806,26 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="FlowAnalytics_TagIssues_None">No text tag issues.</sys:String>
     <sys:String x:Key="FlowAnalytics_TagIssue_Row">Node {0} ({1}): {2}</sys:String>
     <sys:String x:Key="FlowAnalytics_TagIssue_Row_Default">Node {0}: {1}</sys:String>
+    <!-- Playthrough stats -->
+    <sys:String x:Key="PathStats_Header">PLAYTHROUGH STATS</sys:String>
+    <sys:String x:Key="PathStats_Longest">Longest playthrough</sys:String>
+    <sys:String x:Key="PathStats_Shortest">Shortest playthrough</sys:String>
+    <sys:String x:Key="PathStats_Total">Total content</sys:String>
+    <sys:String x:Key="PathStats_WordsPerSpeaker">Words per speaker</sys:String>
+    <sys:String x:Key="PathStats_OpeningChoices">By opening choice</sys:String>
+    <sys:String x:Key="PathStats_NoOpeningChoices">No opening player choices.</sys:String>
+    <sys:String x:Key="PathStats_WordsTime">{0} words · {1}</sys:String>
+    <sys:String x:Key="PathStats_DefaultFemale">{0}   ♀ {1}</sys:String>
+    <sys:String x:Key="PathStats_SpeakerRow">{0}: {1}</sys:String>
+    <sys:String x:Key="PathStats_SpeakerRowFemale">{0}: {1}   ♀ {2}</sys:String>
+    <sys:String x:Key="PathStats_BranchContent">content {0}</sys:String>
+    <sys:String x:Key="PathStats_BranchLongest">longest {0}</sys:String>
+    <sys:String x:Key="PathStats_Cat_Player">Player</sys:String>
+    <sys:String x:Key="PathStats_Cat_Npc">NPC</sys:String>
+    <sys:String x:Key="PathStats_Cat_Narrator">Narrator</sys:String>
+    <sys:String x:Key="PathStats_Cat_Script">Script</sys:String>
+    <sys:String x:Key="ToolTip_PathStats_Navigate">Jump to this opening choice's node.</sys:String>
+    <sys:String x:Key="ToolTip_PathStats">Playthrough-oriented stats: the longest and shortest single read, words per speaker, and how much content sits down each opening choice. Female figures appear when the female variant differs by more than 10%.</sys:String>
     <sys:String x:Key="FlowAnalytics_NoData">Open a conversation and click Refresh</sys:String>
     <sys:String x:Key="FlowAnalytics_LastAnalysed">Last analysed: {0}</sys:String>
     <sys:String x:Key="FlowAnalytics_Refresh">Refresh</sys:String>

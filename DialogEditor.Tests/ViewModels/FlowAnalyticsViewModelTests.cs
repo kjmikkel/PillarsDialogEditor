@@ -115,4 +115,68 @@ public class FlowAnalyticsViewModelTests
         var vm = new FlowIssueViewModel(new FlowIssue(1, kind), "snippet", _ => { });
         Assert.Equal(expectedKey, vm.SeverityLabel);   // StubStringProvider echoes keys
     }
+
+    // ── Playthrough stats ────────────────────────────────────────────────
+
+    private static NodeEditSnapshot PathNode(
+        int id, string defaultText = "", string femaleText = "",
+        bool isPlayerChoice = false, string speaker = "",
+        SpeakerCategory category = SpeakerCategory.Npc,
+        IReadOnlyList<LinkEditSnapshot>? links = null) =>
+        new(id, isPlayerChoice, category, speaker, "", defaultText, femaleText,
+            "Conversation", "None", "", "", "", false, false, links ?? [], [], []);
+
+    [Fact]
+    public void Refresh_PopulatesBranchesAndSpeakers()
+    {
+        var snapshot = new ConversationEditSnapshot([
+            PathNode(0, "start", speaker: "npc1", links: [Link(0, 1)]),
+            PathNode(1, "reply", isPlayerChoice: true, speaker: "player",
+                     category: SpeakerCategory.Player, links: [Link(1, 2)]),
+            PathNode(2, "aa bb cc", speaker: "npc1")
+        ]);
+        var vm = new FlowAnalyticsViewModel(() => snapshot, _ => { });
+
+        vm.RefreshCommand.Execute(null);
+
+        Assert.True(vm.HasPathStats);
+        Assert.Single(vm.Branches);
+        Assert.NotEmpty(vm.WordsPerSpeaker);
+    }
+
+    [Fact]
+    public void Refresh_FemaleColumns_GatedBySignificance()
+    {
+        var significant = new ConversationEditSnapshot([
+            PathNode(0, "a", links: [Link(0, 1)]),
+            PathNode(1, "b", femaleText: "one two three four five", isPlayerChoice: true)
+        ]);
+        var vm = new FlowAnalyticsViewModel(() => significant, _ => { });
+        vm.RefreshCommand.Execute(null);
+        Assert.True(vm.HasSignificantFemaleVariant);
+
+        var plain = new ConversationEditSnapshot([
+            PathNode(0, "a", links: [Link(0, 1)]),
+            PathNode(1, "b", isPlayerChoice: true)
+        ]);
+        var vm2 = new FlowAnalyticsViewModel(() => plain, _ => { });
+        vm2.RefreshCommand.Execute(null);
+        Assert.False(vm2.HasSignificantFemaleVariant);
+    }
+
+    [Fact]
+    public void BranchRow_Navigate_CallsCallbackWithChoiceNode()
+    {
+        var navigatedId = -1;
+        var snapshot = new ConversationEditSnapshot([
+            PathNode(0, "start", links: [Link(0, 7)]),
+            PathNode(7, "reply", isPlayerChoice: true)
+        ]);
+        var vm = new FlowAnalyticsViewModel(() => snapshot, id => navigatedId = id);
+        vm.RefreshCommand.Execute(null);
+
+        vm.Branches[0].NavigateCommand.Execute(null);
+
+        Assert.Equal(7, navigatedId);
+    }
 }
