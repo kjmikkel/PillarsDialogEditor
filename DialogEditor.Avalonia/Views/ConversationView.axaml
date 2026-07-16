@@ -210,7 +210,17 @@
                             </nodify:Node.OutputConnectorTemplate>
 
                             <Grid Width="200" RowDefinitions="Auto,Auto,Auto,Auto"
-                                  Opacity="{Binding IsSearchMatch, Converter={StaticResource SearchMatchOpacity}}">
+                                  Opacity="{Binding SearchMatchState, Converter={StaticResource SearchStateOpacity}}">
+
+                                <!-- Search-match emphasis — highlight border on condition/script-search
+                                     hits (SearchMatchState.Match); Transparent otherwise -->
+                                <Border Grid.Row="0" Grid.RowSpan="3"
+                                        CornerRadius="2"
+                                        IsHitTestVisible="False"
+                                        ZIndex="9"
+                                        BorderThickness="3"
+                                        BorderBrush="{Binding SearchMatchState, Converter={StaticResource SearchMatchBorderBrush}}"
+                                        Background="Transparent"/>
 
                                 <!-- Diff tint overlay — transparent when Unchanged -->
                                 <Border Grid.Row="0" Grid.RowSpan="3"
