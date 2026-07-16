@@ -964,6 +964,24 @@ public class MainWindowViewModelTests : IDisposable
         Assert.True(vm.CanFindInProject);
     }
 
+    // ── ShowRepDispositionBalanceWindowCommand ────────────────────────────
+
+    [Fact]
+    public void CanShowRepDispositionBalance_RequiresProjectProviderAndGameFolder()
+    {
+        var vm = MakeVm();
+        Assert.False(vm.CanShowRepDispositionBalance);
+    }
+
+    [Fact]
+    public void CanShowRepDispositionBalance_TrueWithProjectProviderAndGameFolder()
+    {
+        var vm = MakeVoAllReadyVm(new FakeGameDataProvider("poe1", "en"));
+        // Read-only report; like Find in Project it needs no saved project path.
+        SetPrivateField(vm, "_projectPath", null);
+        Assert.True(vm.CanShowRepDispositionBalance);
+    }
+
     private static void SelectConversation(MainWindowViewModel vm, ConversationFile file)
     {
         var mi = typeof(MainWindowViewModel)
