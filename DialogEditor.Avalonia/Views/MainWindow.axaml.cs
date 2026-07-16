@@ -1,5 +1,4 @@
 using System;
-using System.ComponentModel;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls.Primitives;
@@ -7,7 +6,6 @@ using Avalonia.Platform;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
-using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -247,6 +245,18 @@ public partial class MainWindow : Window
 
     private EditorDockFactory? _factory;
 
+    // Tracks the ConversationView instance whose FocusDetailRequested we've already
+    // hooked, so re-running BuildDock (e.g. opening a second game folder in the same
+    // session) rewires the new Dock-realised instance without leaving the old one's
+    // now-orphaned subscription behind or double-subscribing the same instance twice.
+    private ConversationView? _wiredCanvasView;
+
+    // Bounds TryWireCanvasFocusHop's retry loop below — a handful of dispatcher passes
+    // is normally more than enough for Dock to realise the tool content; giving up
+    // afterwards avoids spinning forever if the Canvas tool is never shown (e.g. closed
+    // by the user before a game folder ever loads it, or a future layout omits it).
+    private const int MaxCanvasWireAttempts = 20;
+
     /// Builds the default docking layout (Conversations/Canvas/Node Details/Condition
     /// search) once the shell-level ConditionSearchViewModel exists — i.e. once a game
     /// folder has loaded (see MainWindowViewModel.RebuildConditionSearch). Also re-wires
@@ -263,13 +273,33 @@ public partial class MainWindow : Window
         _factory = factory;
 
         // The document/tool content is realised by Application.DataTemplates once Dock
-        // renders the new layout — defer the FocusDetailRequested re-wire to the next
-        // dispatcher pass so the ConversationView instance exists to hook.
-        Dispatcher.UIThread.Post(() =>
+        // renders the new layout, not synchronously here — retry across dispatcher
+        // passes (bounded) until the live ConversationView instance exists to hook.
+        TryWireCanvasFocusHop(MaxCanvasWireAttempts);
+    }
+
+    /// Finds the live ConversationView and, once found, hooks its FocusDetailRequested
+    /// event — resolving the target NodeDetailView lazily, at fire time, so a
+    /// not-yet-realised/closed/floated Detail tool degrades to a no-op instead of an
+    /// NRE. If the view isn't realised yet, reposts itself for the next dispatcher pass
+    /// (up to <paramref name="attemptsLeft"/> times) instead of giving up silently.
+    private void TryWireCanvasFocusHop(int attemptsLeft)
+    {
+        if (FindCanvasView() is not { } canvasView)
         {
-            if (FindCanvasView() is { } canvasView)
-                canvasView.FocusDetailRequested += (_, _) => FindDetailView()?.FocusFirstField();
-        }, DispatcherPriority.Loaded);
+            if (attemptsLeft <= 1)
+            {
+                AppLog.Warn("MainWindow: gave up waiting for ConversationView to realise; " +
+                            "canvas -> detail focus hop (Enter on a node) will not work this session.");
+                return;
+            }
+            Dispatcher.UIThread.Post(() => TryWireCanvasFocusHop(attemptsLeft - 1), DispatcherPriority.Loaded);
+            return;
+        }
+
+        if (ReferenceEquals(canvasView, _wiredCanvasView)) return;   // already hooked
+        _wiredCanvasView = canvasView;
+        canvasView.FocusDetailRequested += (_, _) => FindDetailView()?.FocusFirstField();
     }
 
     /// Locates the live ConversationView hosted by the Dock canvas document. Dock
