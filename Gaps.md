@@ -920,6 +920,35 @@ Recorded 2026-07-11; each is small and independent:
   nodes, the second likely silently wins (verify current behaviour first); end users
   applying multiple mods deserve a warning at apply time.
 
+### Reputation & Disposition Check Balance
+**📐 Designed (2026-07-16), not yet implemented.** A read-only, project-wide tally of how
+often each reputation and disposition *value* is **checked** (conditions, not scripts),
+surfacing whether some dispositions/factions are over-favoured or ignored. New dedicated
+window with a **Source** (Project's own changes | On disk + changes) × **Scope** (Current
+conversation | All conversations) selection, over the *effective* (base + patch) snapshots
+(live snapshot for the open conversation; heavy full-corpus sweep runs async/cancellable).
+Two tables (Dispositions, Reputations), each bucketed **by value** and enumerated across the
+full domain (so never-checked values show as `0`), flagged against an **even-share** baseline
+(≥2× = over-favoured, ≤½× = under-used, 0 = ignored). Rep/disposition checks are identified
+as the `Faction`-category catalogue entries. v1 shows one total per value (no per-rank
+breakdown). Shares the Core `CatalogueMatch` primitive with the node-search gap below. Specs:
+docs/superpowers/specs/2026-07-16-rep-disposition-balance-design.md,
+docs/superpowers/specs/2026-07-16-catalogue-match-primitive-design.md.
+
+### Condition/Script Node Search & Highlight
+**📐 Designed (2026-07-16), not yet implemented.** A per-conversation search that highlights
+the nodes using a chosen condition **or** script, narrowed by its parameters. A non-modal
+side panel: pick a catalogue entry, then optionally pin any of its parameters (unset =
+wildcard; a pinned value must match the node's raw stored value). A node is a hit if the query
+matches its own condition, any outgoing-link condition, or any of its scripts (node-only
+highlight granularity). Matching nodes are highlighted and the rest dimmed via a new
+`NodeViewModel.SearchMatchState` (today nodes carry only `IsSelected`); the highlight persists
+across pan/click/edit and clears on **Clear** or conversation switch. v1 is single-entry
+(matcher shaped so multi-condition AND/OR can layer on later). Shares the Core `CatalogueMatch`
+primitive with the balance gap above. Specs:
+docs/superpowers/specs/2026-07-16-condition-script-node-search-design.md,
+docs/superpowers/specs/2026-07-16-catalogue-match-primitive-design.md.
+
 ### Deliberate Non-Goals
 
 Recorded so they aren't re-litigated: **quest/journal text editing** (this is a
