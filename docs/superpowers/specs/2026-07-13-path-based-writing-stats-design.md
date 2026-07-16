@@ -60,8 +60,10 @@ The graph can contain cycles (loops back to a hub). Enumerating paths or computi
      cycle-safe by construction).
    - **Longest playthrough through `c`** = longest weighted path from `c` to a terminal on the
      DAG.
-4. **Words-per-speaker** = one pass summing each node's Default-reading weight grouped by
-   `SpeakerGuid` (+ `SpeakerCategory` for fallback naming). Structure-independent.
+4. **Words-per-speaker** = one pass summing each node's weight grouped by `SpeakerGuid`
+   (+ `SpeakerCategory` for fallback naming), under **both** readings — a Default and a Female
+   total per speaker. Structure-independent. The Female total is shown under the same 10%
+   significance gate as the other metrics.
 
 **Conventions (shared with `FlowAnalysisService`):** root is node 0; reachability is from the
 root; a node unreachable from root contributes to words-per-speaker but never to a playthrough
@@ -78,7 +80,8 @@ Beside `FlowAnalysisService`. `static PathStatsReport Analyze(ConversationEditSn
 Numbers only — reading-time formatting is the ViewModel's job.
 
 ```csharp
-public record SpeakerWordCount(string SpeakerGuid, SpeakerCategory Category, int Words);
+public record SpeakerWordCount(
+    string SpeakerGuid, SpeakerCategory Category, int DefaultWords, int FemaleWords);
 
 public record BranchStat(
     int    ChoiceNodeId,
@@ -101,7 +104,8 @@ public record PathStatsReport(
 ```
 
 `ChoiceText` is the choice node's full DefaultText (the VM truncates for display). `Branches`
-are ordered by the choice node's id (stable). `WordsPerSpeaker` is ordered by words descending.
+are ordered by the choice node's id (stable). `WordsPerSpeaker` is ordered by `DefaultWords`
+descending.
 
 ### `FlowAnalyticsViewModel` extensions
 
@@ -112,7 +116,8 @@ Alongside `Statistics` / `Issues` / `TokenIssues`:
   `"{words} words · {m:ss}"`, with a Female figure appended only when significant.
 - `ObservableCollection<SpeakerWordRowViewModel> WordsPerSpeaker` — resolves
   `SpeakerGuid → name` via `SpeakerNameService` (fallback to the localised category label),
-  each row `"{name}: {words}"`.
+  each row `"{name}: {defaultWords}"`, with the female total appended only when
+  `HasSignificantFemaleVariant`.
 - `ObservableCollection<PathBranchRowViewModel> Branches` — `ChoiceText` (truncated),
   `DefaultContent` / `DefaultLongest` (and `FemaleContent` / `FemaleLongest` when significant),
   each `"{words} words · {m:ss}"`, plus a `NavigateCommand` → the choice node (reuses the
@@ -144,7 +149,8 @@ existing `FocusHintBar` and navigation.
 - Back-edge cut: a hub-loop graph terminates and counts the looped node once.
 - Per opening-choice rows: content volume = reachable-set sum; longest = longest path through
   the choice.
-- Words-per-speaker grouped by `SpeakerGuid` with correct sums.
+- Words-per-speaker grouped by `SpeakerGuid` with correct Default and Female sums (a speaker
+  with a >10%-different female line shows a distinct `FemaleWords`).
 - Female gate: within-10% → `HasSignificantFemaleVariant == false`, female == default;
   >10% female difference → `true`, distinct female figures.
 - Edge cases: empty snapshot → empty report; no node 0 → empty header/branches but
