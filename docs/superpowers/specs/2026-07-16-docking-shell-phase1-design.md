@@ -139,6 +139,12 @@ App exit / Reset → serialize IRootDock → layout.json
   must (a) carry the app icon (`Icon="avares://DialogEditor.Avalonia/Assets/app.ico"`, per the
   project window-icon rule) and (b) merge the app theme dictionaries, so a floated panel matches
   the main window and retints with it.
+- **Tab placement:** the docked **tool** group (Node Details + Condition search) shows its tab
+  strip at the **bottom** of the pane (VS-style). This is Dock's native tool-tab appearance in the
+  Fluent theme; the theme-override dictionary pins the `ToolTabStrip` position to bottom explicitly
+  so it can't drift on a package upgrade. The **canvas document** tab stays at the top:
+  `DocumentTabLayout` supports only Top/Left/Right (no Bottom), and with a single document the
+  placement is cosmetic — a bottom document tab would need custom templating and is out of scope.
 
 ## Cross-cutting requirements (project rules)
 
@@ -146,8 +152,10 @@ App exit / Reset → serialize IRootDock → layout.json
   round-trip, and the persistence-load fallback.
 - **Localisation** — tool `Title`s, the View menu, and any Dock-surfaced strings come from
   `Strings.axaml` via `Loc`; `NoHardcodedUiStrings` applies. Dock's built-in context-menu strings
-  (float/dock/close) are a **known localisation gap** noted here (they come from the package);
-  revisit if the app is translated.
+  (float / dock / close) ship inside the package and are a **known localisation gap**, accepted
+  for now and **tracked in `Gaps.md`** (UI Localisation Readiness). It is fixable later — Dock
+  surfaces those menus via retemplatable controls, so a future pass can supply localised
+  `{DynamicResource}` strings without forking the library.
 - **Tooltips** — new interactive controls (View menu items) carry `ToolTip`s.
 - **UIA** — tools/tabs discoverable by `Title`; View-menu items by localised `Header`. Do not
   suppress Dock's automation peers.
