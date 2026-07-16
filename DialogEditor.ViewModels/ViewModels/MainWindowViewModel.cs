@@ -126,15 +126,23 @@ public partial class MainWindowViewModel : ObservableObject
     public bool IsBrowserFlyoutOpen => IsBrowserExpanded && !IsBrowserPinned;
 
     // ── Window title reflects dirty state ─────────────────────────────────
+    /// True when there are unsaved changes worth signalling and guarding. A dirty
+    /// project is unsaved whether the dirt came from canvas edits (a conversation is
+    /// open) OR a project-level metadata edit with no conversation open — e.g. adding
+    /// a duplicate to the ignore allowlist. The open-project half is what covers that
+    /// second case; without it, metadata-only dirt was invisible and unguarded.
+    private bool HasUnsavedChanges =>
+        IsModified && (CurrentConversationName is not null || IsProjectOpen);
+
     public string WindowTitle
     {
         get
         {
             var project = CurrentProjectName is not null ? $" [{CurrentProjectName}]" : string.Empty;
-            var dirty   = IsModified && CurrentConversationName is not null ? "● " : string.Empty;
+            var dirty   = HasUnsavedChanges ? "● " : string.Empty;
             return CurrentConversationName is not null
                 ? $"{dirty}{CurrentConversationName}{project}"
-                : Loc.Get("App_Title") + project;
+                : $"{dirty}{Loc.Get("App_Title")}{project}";
         }
     }
 
@@ -154,7 +162,7 @@ public partial class MainWindowViewModel : ObservableObject
     /// Guard that fires UnsavedChangesRequested if dirty, otherwise runs action immediately.
     public void GuardDirtyThen(Action proceed)
     {
-        if (IsModified && CurrentConversationName is not null)
+        if (HasUnsavedChanges)
         {
             _pendingAction = proceed;
             UnsavedChangesRequested?.Invoke();
@@ -171,7 +179,7 @@ public partial class MainWindowViewModel : ObservableObject
     /// UnsavedChangesRequested dialog plumbing.
     public Task<bool> EnsureNoUnsavedEditsAsync()
     {
-        if (!(IsModified && CurrentConversationName is not null))
+        if (!HasUnsavedChanges)
             return Task.FromResult(true);
 
         // Defensive: resolve any stale pending decision and drop a stale pending-file

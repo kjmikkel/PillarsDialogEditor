@@ -309,9 +309,20 @@ public class MainWindowViewModelTests : IDisposable
     public void WindowTitle_WhenDirtyButNoConversation_NoBullet()
     {
         var vm = MakeVm();
-        // IsModified=true but CurrentConversationName is null
+        // IsModified=true but CurrentConversationName is null AND no project open
         vm.Canvas.AddNode(MakeNode(1), new(0, 0));
         Assert.DoesNotContain("●", vm.WindowTitle);
+    }
+
+    [Fact]
+    public void WindowTitle_WhenDirtyWithProjectOpenButNoConversation_ShowsBullet()
+    {
+        // A metadata-only edit (e.g. ignoring a duplicate) marks the project dirty with
+        // no conversation on the canvas — the ● must still show.
+        var vm = MakeVm();
+        OpenEmptyProject(vm);
+        vm.IsModified = true;
+        Assert.StartsWith("●", vm.WindowTitle);
     }
 
     // ── IsBrowserFlyoutOpen ───────────────────────────────────────────────
@@ -357,13 +368,37 @@ public class MainWindowViewModelTests : IDisposable
     [Fact]
     public void GuardDirtyThen_WhenDirtyButNoConversation_RunsImmediately()
     {
-        // Dirty canvas but no CurrentConversationName — guard should not fire
+        // Dirty canvas but no CurrentConversationName AND no project open — guard should not fire
         var vm  = MakeVm();
         vm.Canvas.AddNode(MakeNode(1), new(0, 0));
         var ran = false;
         vm.GuardDirtyThen(() => ran = true);
         Assert.True(ran);
     }
+
+    [Fact]
+    public void GuardDirtyThen_WhenDirtyWithProjectOpenButNoConversation_FiresEvent()
+    {
+        // Metadata-only dirt (project open, no conversation) must still guard on
+        // close/switch so the edit isn't silently discarded.
+        var vm = MakeVm();
+        OpenEmptyProject(vm);
+        vm.IsModified = true;
+
+        var fired = false;
+        vm.UnsavedChangesRequested += () => fired = true;
+
+        var ran = false;
+        vm.GuardDirtyThen(() => ran = true);
+
+        Assert.True(fired);
+        Assert.False(ran);
+    }
+
+    private static void OpenEmptyProject(MainWindowViewModel vm) =>
+        typeof(MainWindowViewModel).GetMethod("SetProject",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+            .Invoke(vm, [DialogProject.Empty("T")]);
 
     // ── GuardDirtyThen — dirty state: fires event instead ────────────────
 
