@@ -229,7 +229,7 @@ public partial class ConversationViewModel : ObservableObject
         if (string.IsNullOrEmpty(q))
         {
             foreach (var node in Nodes)
-                node.IsSearchMatch = true;
+                node.SearchMatchState = SearchMatchState.None;
             return;
         }
         _searchCts = new CancellationTokenSource();
@@ -247,7 +247,8 @@ public partial class ConversationViewModel : ObservableObject
             for (int i = 0; i < results.Count; i++)
             {
                 ct.ThrowIfCancellationRequested();
-                results[i].node.IsSearchMatch = results[i].match;
+                results[i].node.SearchMatchState =
+                    results[i].match ? SearchMatchState.None : SearchMatchState.Dimmed;
                 if (i % 25 == 24)
                     await _dispatcher.YieldToBackground();
             }
