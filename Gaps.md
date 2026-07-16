@@ -881,8 +881,19 @@ Recorded 2026-07-11; each is small and independent:
   for the open conversation, base+patch for the rest, skip-unreadable). Double-click / Enter
   navigates to the node (cross-conversation, honouring the dirty guard). Spec:
   docs/superpowers/specs/2026-07-12-find-in-project-design.md.
-- **Path-based writing stats** — Flow Analytics counts words globally; writers think
-  in playthroughs: longest path, words per speaker, estimated reading time per branch.
+- ~~**Path-based writing stats**~~ ✓ Implemented (2026-07-13). A **Playthrough stats**
+  section in Flow Analytics (F7): longest / shortest playthrough and total content (each
+  `N words · m:ss` at 200 wpm), **words per speaker** (resolved names), and a **By opening
+  choice** list — one row per top-level player choice with its reachable content volume and
+  longest read, plus jump-to-node. Pure `PathStatsService` (`DialogEditor.Core.Analytics`)
+  does a back-edge-cut DAG walk (cycles counted once), computing every metric under two
+  readings — Default and Female (female text where present, else default) — with a **10%
+  total-word significance gate**: female figures (including per-speaker) show only when the
+  female variant materially differs. GUI-verified live (longest/shortest/total, per-speaker
+  totals summing to the whole, reading times). Deferred: configurable reading speed,
+  cross-conversation paths, per-ending / recursive-fork breakdowns, condition-aware paths
+  (Playtest Mode territory). Spec:
+  docs/superpowers/specs/2026-07-13-path-based-writing-stats-design.md.
 - ~~**Duplicate/near-duplicate line detection**~~ ✓ Implemented (2026-07-13). New
   **Duplicate lines** + **Ignored duplicates** panes in **Test ▸ Validate Text…** report
   copy-paste artifacts among the writer's *own* edited/added Default text (pure
