@@ -1,6 +1,8 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:DialogEditor.Avalonia.Converters"
+             xmlns:docking="clr-namespace:DialogEditor.Avalonia.Docking"
+             xmlns:views="clr-namespace:DialogEditor.Avalonia.Views"
              x:Class="DialogEditor.Avalonia.App"
              RequestedThemeVariant="Dark">
 
@@ -125,5 +127,24 @@
 
         </ResourceDictionary>
     </Application.Resources>
+
+    <!-- Dock tool/document wrapper VMs (DialogEditor.Avalonia.Docking) render by
+         unwrapping their Inner property into the pre-existing panel views. No
+         layout/factory yet (Task 3) — just the templates so the wrappers are
+         displayable once a DockControl exists. -->
+    <Application.DataTemplates>
+        <DataTemplate DataType="docking:BrowserTool">
+            <views:GameBrowserView DataContext="{Binding Inner}"/>
+        </DataTemplate>
+        <DataTemplate DataType="docking:DetailsTool">
+            <views:NodeDetailView DataContext="{Binding Inner}"/>
+        </DataTemplate>
+        <DataTemplate DataType="docking:ConditionSearchTool">
+            <views:ConditionSearchView DataContext="{Binding Inner}"/>
+        </DataTemplate>
+        <DataTemplate DataType="docking:CanvasDocument">
+            <views:ConversationView DataContext="{Binding Inner}"/>
+        </DataTemplate>
+    </Application.DataTemplates>
 
 </Application>
