@@ -1606,6 +1606,7 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="Menu_ConditionSearch">Find Nodes by Condition / Script…</sys:String>
     <sys:String x:Key="CondSearch_Title">Find nodes by condition / script</sys:String>
     <sys:String x:Key="CondSearch_EntryLabel">Condition or script:</sys:String>
+    <sys:String x:Key="CondSearch_EntryPlaceholder">Type to filter…</sys:String>
     <!-- {0} = the condition's display name -->
     <sys:String x:Key="CondSearch_EntryCondition">{0}  (condition)</sys:String>
     <!-- {0} = the script's display name -->
