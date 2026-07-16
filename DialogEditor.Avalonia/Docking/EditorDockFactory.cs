@@ -22,6 +22,14 @@ public sealed class EditorDockFactory : Factory
         NodeDetailViewModel details, ConditionSearchViewModel search)
     {
         _browser = browser; _canvas = canvas; _details = details; _search = search;
+
+        // Closing a tool tab (the little X) defaults to Dock.Model's RemoveDockable,
+        // which drops the dockable from the tree entirely with no way back short of
+        // rebuilding the whole layout. Hiding instead moves it to IRootDock.HiddenDockables
+        // and remembers its original owner dock, so the View menu's "show tool" commands
+        // (MainWindow.ShowToolById) can bring a closed tool back via RestoreDockable(id)
+        // instead of only being able to focus an already-open one.
+        HideToolsOnClose = true;
     }
 
     public override IRootDock CreateLayout()
