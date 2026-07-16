@@ -5,14 +5,14 @@
         x:Class="DialogEditor.Avalonia.Views.TextTagValidationWindow"
         Title="{DynamicResource TextTagValidation_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
-        Width="560" Height="440" MinWidth="460" MinHeight="300"
+        Width="560" Height="600" MinWidth="460" MinHeight="420"
         CanResize="True"
         ShowInTaskbar="False"
         Background="{DynamicResource Brush.Surface.Window}"
         WindowStartupLocation="CenterOwner"
         x:CompileBindings="False">
 
-    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto,Auto" Margin="14,12,14,12">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" Margin="14,12,14,12">
 
         <!-- Saved-state note -->
         <TextBlock Grid.Row="0"
@@ -175,8 +175,93 @@
                     AutomationProperties.HelpText="{DynamicResource ToolTip_StaleData_CancelCleanUp}"/>
         </StackPanel>
 
+        <!-- Duplicate lines section header -->
+        <TextBlock Grid.Row="7"
+                   Text="{DynamicResource Duplicate_SectionHeader}"
+                   Foreground="{DynamicResource Brush.Text.Primary}"
+                   FontSize="{DynamicResource FontSize.Body}"
+                   FontWeight="Bold" Margin="0,4,0,2"/>
+
+        <!-- Duplicate rows -->
+        <ScrollViewer Grid.Row="8" MaxHeight="150" Margin="0,0,0,4">
+            <Panel>
+                <TextBlock Text="{DynamicResource Duplicate_NoIssues}"
+                           Foreground="{DynamicResource Brush.Text.Disabled}" FontStyle="Italic"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           IsVisible="{Binding !HasDuplicates}"/>
+                <ItemsControl ItemsSource="{Binding DuplicateRows}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="vm:DuplicateRowViewModel">
+                            <Grid ColumnDefinitions="70,*,Auto,Auto" Margin="0,3">
+                                <TextBlock Grid.Column="0" Text="{Binding TierLabel}"
+                                           Foreground="{DynamicResource Brush.Text.Tertiary}"
+                                           FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"
+                                           VerticalAlignment="Center"/>
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding Text}"
+                                               Foreground="{DynamicResource Brush.Text.Secondary}"
+                                               FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding Locations}"
+                                               Foreground="{DynamicResource Brush.Text.Muted}"
+                                               FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <Button Grid.Column="2" Content="{DynamicResource Button_GoToNode}"
+                                        Command="{Binding NavigateCommand}"
+                                        FontSize="{DynamicResource FontSize.Small}" Padding="8,2" Margin="6,0,0,0"
+                                        VerticalAlignment="Center"
+                                        AutomationProperties.Name="{DynamicResource Button_GoToNode}"
+                                        ToolTip.Tip="{DynamicResource ToolTip_Duplicate_GoToNode}"
+                                        AutomationProperties.HelpText="{DynamicResource ToolTip_Duplicate_GoToNode}"/>
+                                <Button Grid.Column="3" Content="{DynamicResource Button_Ignore}"
+                                        Command="{Binding IgnoreCommand}"
+                                        FontSize="{DynamicResource FontSize.Small}" Padding="8,2" Margin="6,0,0,0"
+                                        VerticalAlignment="Center"
+                                        ToolTip.Tip="{DynamicResource ToolTip_Duplicate_Ignore}"
+                                        AutomationProperties.HelpText="{DynamicResource ToolTip_Duplicate_Ignore}"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Panel>
+        </ScrollViewer>
+
+        <!-- Ignored duplicates section header (hidden when empty) -->
+        <TextBlock Grid.Row="9"
+                   Text="{DynamicResource Duplicate_Ignored_SectionHeader}"
+                   Foreground="{DynamicResource Brush.Text.Primary}"
+                   FontSize="{DynamicResource FontSize.Body}"
+                   FontWeight="Bold" Margin="0,4,0,2"
+                   IsVisible="{Binding HasIgnoredDuplicates}"/>
+
+        <!-- Ignored duplicate rows -->
+        <ScrollViewer Grid.Row="10" MaxHeight="120" Margin="0,0,0,4"
+                      IsVisible="{Binding HasIgnoredDuplicates}">
+            <ItemsControl ItemsSource="{Binding IgnoredDuplicateRows}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="vm:IgnoredDuplicateRowViewModel">
+                        <Grid ColumnDefinitions="70,*,Auto" Margin="0,3">
+                            <TextBlock Grid.Column="0" Text="{Binding TierLabel}"
+                                       Foreground="{DynamicResource Brush.Text.Tertiary}"
+                                       FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Text="{Binding DisplayText}"
+                                       Foreground="{DynamicResource Brush.Text.Secondary}"
+                                       FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap"
+                                       VerticalAlignment="Center"/>
+                            <Button Grid.Column="2" Content="{DynamicResource Button_Restore}"
+                                    Command="{Binding RestoreCommand}"
+                                    FontSize="{DynamicResource FontSize.Small}" Padding="8,2" Margin="6,0,0,0"
+                                    VerticalAlignment="Center"
+                                    ToolTip.Tip="{DynamicResource ToolTip_Duplicate_Restore}"
+                                    AutomationProperties.HelpText="{DynamicResource ToolTip_Duplicate_Restore}"/>
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+
         <!-- Focus hint bar (accessibility item 13 pattern) -->
-        <shared:FocusHintBar Grid.Row="7" x:Name="HintBar"/>
+        <shared:FocusHintBar Grid.Row="11" x:Name="HintBar"/>
 
     </Grid>
 
