@@ -95,6 +95,92 @@
 
             <Separator Background="{DynamicResource Brush.Border.Default}" Height="1" Margin="0,2,0,2"/>
 
+            <!-- ── Playthrough stats ─────────────────────────────────────── -->
+            <StackPanel Spacing="4" IsVisible="{Binding HasPathStats}">
+                <TextBlock Classes="section-header"
+                           Text="{DynamicResource PathStats_Header}"
+                           ToolTip.Tip="{DynamicResource ToolTip_PathStats}"
+                           AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats}"/>
+
+                <Grid ColumnDefinitions="*,*,*">
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_Longest}"/>
+                        <TextBlock Foreground="{DynamicResource Brush.Text.Primary}"
+                                   FontSize="{DynamicResource FontSize.Body}"
+                                   Text="{Binding LongestPlaythroughText}" TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_Shortest}"/>
+                        <TextBlock Foreground="{DynamicResource Brush.Text.Primary}"
+                                   FontSize="{DynamicResource FontSize.Body}"
+                                   Text="{Binding ShortestPlaythroughText}" TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_Total}"/>
+                        <TextBlock Foreground="{DynamicResource Brush.Text.Primary}"
+                                   FontSize="{DynamicResource FontSize.Body}"
+                                   Text="{Binding TotalContentText}" TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Grid>
+
+                <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_WordsPerSpeaker}" Margin="0,4,0,0"/>
+                <ItemsControl ItemsSource="{Binding WordsPerSpeaker}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="vm:SpeakerWordRowViewModel">
+                            <TextBlock Text="{Binding Display}"
+                                       Foreground="{DynamicResource Brush.Text.Secondary}"
+                                       FontSize="{DynamicResource FontSize.Label}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_OpeningChoices}" Margin="0,4,0,0"/>
+                <ScrollViewer MaxHeight="140">
+                    <ItemsControl ItemsSource="{Binding Branches}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="vm:PathBranchRowViewModel">
+                                <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,2">
+                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding ChoiceText}"
+                                                   Foreground="{DynamicResource Brush.Text.Primary}"
+                                                   FontSize="{DynamicResource FontSize.Label}"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <StackPanel Orientation="Horizontal" Spacing="10">
+                                            <TextBlock Text="{Binding DefaultContentText}"
+                                                       Foreground="{DynamicResource Brush.Text.Muted}"
+                                                       FontSize="{DynamicResource FontSize.Small}"/>
+                                            <TextBlock Text="{Binding DefaultLongestText}"
+                                                       Foreground="{DynamicResource Brush.Text.Muted}"
+                                                       FontSize="{DynamicResource FontSize.Small}"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="10"
+                                                    IsVisible="{Binding $parent[ItemsControl].DataContext.HasSignificantFemaleVariant}">
+                                            <TextBlock Text="{Binding FemaleContentText}"
+                                                       Foreground="{DynamicResource Brush.Text.Tertiary}"
+                                                       FontSize="{DynamicResource FontSize.Small}"/>
+                                            <TextBlock Text="{Binding FemaleLongestText}"
+                                                       Foreground="{DynamicResource Brush.Text.Tertiary}"
+                                                       FontSize="{DynamicResource FontSize.Small}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <Button Grid.Column="2" Content="→"
+                                            Command="{Binding NavigateCommand}"
+                                            Background="Transparent" BorderThickness="0"
+                                            Foreground="{DynamicResource Brush.Text.Muted}"
+                                            FontSize="{DynamicResource FontSize.Subtitle}"
+                                            Padding="8,0" Margin="4,0,0,0" VerticalAlignment="Center"
+                                            ToolTip.Tip="{DynamicResource ToolTip_PathStats_Navigate}"
+                                            AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats_Navigate}"
+                                            AutomationProperties.Name="{DynamicResource AutomationName_GoToNode}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <Separator Background="{DynamicResource Brush.Border.Default}" Height="1" Margin="0,2,0,2"/>
+            </StackPanel>
+
             <!-- Issues header -->
             <TextBlock Classes="section-header" Text="{Binding StatusText}"/>
 
