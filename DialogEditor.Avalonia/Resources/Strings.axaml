@@ -1602,6 +1602,24 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="ToolTip_AliasPickerConvFilter">Type to narrow the conversation list.</sys:String>
     <sys:String x:Key="ToolTip_AliasPickerNodeFilter">Type to narrow the node list by dialogue text or node ID.</sys:String>
 
+    <!-- ─── Condition / script node search dock ────────────────────────────── -->
+    <sys:String x:Key="CondSearch_Title">Find nodes by condition / script</sys:String>
+    <sys:String x:Key="CondSearch_EntryLabel">Condition or script:</sys:String>
+    <!-- {0} = the condition's display name -->
+    <sys:String x:Key="CondSearch_EntryCondition">{0}  (condition)</sys:String>
+    <!-- {0} = the script's display name -->
+    <sys:String x:Key="CondSearch_EntryScript">{0}  (script)</sys:String>
+    <sys:String x:Key="CondSearch_Search">Search</sys:String>
+    <sys:String x:Key="CondSearch_Clear">Clear</sys:String>
+    <!-- {0} = number of matching nodes -->
+    <sys:String x:Key="CondSearch_MatchCount">Matches: {0}</sys:String>
+    <sys:String x:Key="CondSearch_Tip_Entry">Pick the condition or script to search for. Every node that uses it (in its own conditions, an outgoing link's conditions, or its scripts) will be highlighted.</sys:String>
+    <sys:String x:Key="CondSearch_Tip_Pin">Leave blank to match any value, or type an exact value (e.g. a disposition name or GUID) to match only that value in this parameter.</sys:String>
+    <sys:String x:Key="CondSearch_Tip_Search">Highlight the nodes that use the selected condition/script with the given parameter values; dim the rest.</sys:String>
+    <sys:String x:Key="CondSearch_Tip_Clear">Remove the highlight and return every node to normal.</sys:String>
+    <sys:String x:Key="ToolTip_ToggleConditionSearch">Show or hide the condition/script search dock, which highlights the nodes using a chosen condition or script.</sys:String>
+    <sys:String x:Key="AutomationName_ToggleConditionSearch">Condition search</sys:String>
+
     <!-- ─── Reputation & Disposition Balance window ────────────────────────── -->
     <sys:String x:Key="Menu_RepDispositionBalance">Reputation &amp; Disposition Balance…</sys:String>
     <sys:String x:Key="RepBalance_Title">Reputation &amp; Disposition Balance</sys:String>

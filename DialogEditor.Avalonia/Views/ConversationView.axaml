@@ -78,6 +78,13 @@
                            Text="{Binding StatisticsText}"
                            Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}" VerticalAlignment="Center" Margin="0,0,8,0"
                            ToolTip.Tip="{Binding StatisticsTooltip}"/>
+                <Button DockPanel.Dock="Right" Content="⚑"
+                        Command="{Binding ToggleConditionSearchCommand}"
+                        Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}"
+                        BorderThickness="0" Padding="8,2" Margin="8,0,0,0"
+                        ToolTip.Tip="{DynamicResource ToolTip_ToggleConditionSearch}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_ToggleConditionSearch}"
+                        AutomationProperties.Name="{DynamicResource AutomationName_ToggleConditionSearch}"/>
                 <Grid VerticalAlignment="Center" Margin="0,0,8,0">
                     <TextBox x:Name="SearchBox"
                              Text="{Binding SearchQuery}"
@@ -102,8 +109,8 @@
             </DockPanel>
         </Border>
 
-        <!-- Canvas -->
-        <Grid Grid.Row="1" ClipToBounds="True">
+        <!-- Canvas (column 0) + collapsible condition-search dock (column 1) -->
+        <Grid Grid.Row="1" ClipToBounds="True" ColumnDefinitions="*,Auto">
             <nodify:NodifyEditor x:Name="Editor"
                                  Background="{DynamicResource Brush.Canvas.Background}"
                                  ItemsSource="{Binding Nodes}"
@@ -437,6 +444,13 @@
                     </ControlTheme>
                 </ItemsControl.ItemContainerTheme>
             </ItemsControl>
+
+            <!-- Condition/script search dock — collapsed until toggled (⚑).
+                 The ContentControl keeps the ConversationViewModel context so IsVisible binds
+                 correctly; the inner view overrides its own DataContext to the search VM. -->
+            <ContentControl Grid.Column="1" IsVisible="{Binding IsConditionSearchVisible}">
+                <local:ConditionSearchView DataContext="{Binding ConditionSearch}"/>
+            </ContentControl>
 
         </Grid>
     </Grid>
