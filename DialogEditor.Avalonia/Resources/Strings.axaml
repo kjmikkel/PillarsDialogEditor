@@ -1602,4 +1602,37 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="ToolTip_AliasPickerConvFilter">Type to narrow the conversation list.</sys:String>
     <sys:String x:Key="ToolTip_AliasPickerNodeFilter">Type to narrow the node list by dialogue text or node ID.</sys:String>
 
+    <!-- ─── Reputation & Disposition Balance window ────────────────────────── -->
+    <sys:String x:Key="Menu_RepDispositionBalance">Reputation &amp; Disposition Balance…</sys:String>
+    <sys:String x:Key="RepBalance_Title">Reputation &amp; Disposition Balance</sys:String>
+    <sys:String x:Key="RepBalance_Source_Label">Source:</sys:String>
+    <sys:String x:Key="RepBalance_Source_ProjectChanges">Project's own changes</sys:String>
+    <sys:String x:Key="RepBalance_Source_OnDiskPlusChanges">On disk + changes</sys:String>
+    <sys:String x:Key="RepBalance_Scope_Label">Scope:</sys:String>
+    <sys:String x:Key="RepBalance_Scope_Current">Current conversation</sys:String>
+    <sys:String x:Key="RepBalance_Scope_All">All conversations</sys:String>
+    <sys:String x:Key="RepBalance_Refresh">Analyze</sys:String>
+    <sys:String x:Key="RepBalance_Cancel">Cancel</sys:String>
+    <sys:String x:Key="RepBalance_DispositionsHeader">Dispositions</sys:String>
+    <sys:String x:Key="RepBalance_ReputationsHeader">Reputations</sys:String>
+    <sys:String x:Key="RepBalance_Col_Value">Value</sys:String>
+    <sys:String x:Key="RepBalance_Col_Count">Count</sys:String>
+    <sys:String x:Key="RepBalance_Col_Share">Share</sys:String>
+    <sys:String x:Key="RepBalance_Col_Flag">Flag</sys:String>
+    <sys:String x:Key="RepBalance_Flag_Over">Over-favoured</sys:String>
+    <sys:String x:Key="RepBalance_Flag_Under">Under-used</sys:String>
+    <sys:String x:Key="RepBalance_Flag_Ignored">Never checked</sys:String>
+    <!-- {0} = the value's count divided by its even-split expected count -->
+    <sys:String x:Key="RepBalance_Share">{0:0.0}×</sys:String>
+    <sys:String x:Key="RepBalance_Analyzing">Analyzing…</sys:String>
+    <!-- Label-form counts (avoids count-dependent plural noun forms): {0} conversations,
+         {1} disposition checks, {2} reputation checks -->
+    <sys:String x:Key="RepBalance_Summary">Conversations: {0} · Disposition checks: {1} · Reputation checks: {2}</sys:String>
+    <sys:String x:Key="RepBalance_Error">Analysis failed — see the log for details.</sys:String>
+    <sys:String x:Key="RepBalance_Tip_Source">Choose whether to tally only the conversations your project changes, or every conversation on disk with your changes applied.</sys:String>
+    <sys:String x:Key="RepBalance_Tip_Scope">Choose whether to tally just the open conversation or every conversation in the selected source.</sys:String>
+    <sys:String x:Key="RepBalance_Tip_Refresh">Run the tally over the selected source and scope.</sys:String>
+    <sys:String x:Key="RepBalance_Tip_Cancel">Stop the in-progress all-conversations analysis.</sys:String>
+    <sys:String x:Key="RepBalance_Tip_Table">Each value's check count, its share of the even-split expected count, and whether it is over-favoured, under-used, or never checked.</sys:String>
+
 </ResourceDictionary>

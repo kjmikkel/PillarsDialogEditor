@@ -921,7 +921,27 @@ Recorded 2026-07-11; each is small and independent:
   applying multiple mods deserve a warning at apply time.
 
 ### Reputation & Disposition Check Balance
-**📐 Designed (2026-07-16), not yet implemented.** A read-only, project-wide tally of how
+**✅ Implemented (2026-07-16).** **Edit ▸ Reputation & Disposition Balance…** opens a read-only,
+non-modal window with a **Source** (Project's own changes | On disk + changes) × **Scope**
+(Current conversation | All conversations) selection and an **Analyze** action. Two tables
+(Dispositions, Reputations) bucket checks **by value** over the *effective* (base + patch)
+snapshots — live snapshot for the open conversation; the heavy on-disk sweep runs
+async/cancellable — with the full value domain enumerated from `GameDataNameService`
+(`Faction`/`Disposition` lookups; PoE1 disposition falls back to the catalogue `Axis` enum),
+so never-checked values show as `0` rows flagged **Never checked**. Each row is flagged against
+its domain's even-share baseline (≥2× over-favoured, ≤½× under-used, 0 ignored; `OverFactor`/
+`UnderFactor` constants). Rep/disposition checks are the `Faction`-category catalogue entries;
+v1 shows one total per value (no per-rank breakdown) and tallies conditions only, never scripts.
+Pieces: `NodeConditionExtensions.ConditionLeaves` (Core; shared with the node-search gap),
+`FactionCheckClassifier` + `RepDispositionTallyService` + `RepDispositionGatherService` +
+`RepDispositionBalanceViewModel` (ViewModels), `RepDispositionBalanceWindow` +
+`BalanceFlagToBrushConverter` (Avalonia). GUI-verified against the real PoE2 game data (full
+domain rendered, zero rows flagged). Specs:
+docs/superpowers/specs/2026-07-16-rep-disposition-balance-design.md,
+docs/superpowers/specs/2026-07-16-catalogue-match-primitive-design.md; plan:
+docs/superpowers/plans/2026-07-16-rep-disposition-balance.md.
+
+**Original design note (kept for context):** A read-only, project-wide tally of how
 often each reputation and disposition *value* is **checked** (conditions, not scripts),
 surfacing whether some dispositions/factions are over-favoured or ignored. New dedicated
 window with a **Source** (Project's own changes | On disk + changes) × **Scope** (Current
