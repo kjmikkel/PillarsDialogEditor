@@ -1,0 +1,115 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Docking Shell Phase 1, Task 7: retints Dock.Avalonia.Themes.Fluent's chrome onto the
+         app's Brush.* design tokens instead of stock Dock Fluent grey.
+
+         KEY DISCOVERY: the installed Dock.Avalonia.Themes.Fluent 11.3.12.1 package embeds its
+         axaml as compiled XamlIl (no plain-text .axaml ships in the nupkg), so the override
+         key names below were read by decompiling the theme assembly
+         (dock.avalonia.themes.fluent/11.3.12.1/lib/net8.0/Dock.Avalonia.Themes.Fluent.dll)
+         with ilspycmd (-p project mode) and grepping the generated
+         CompiledAvaloniaXaml/-AvaloniaResources.cs for every `AddDeferred((object)"...")` /
+         `ResourceKey = "..."` resource-dictionary key the theme registers. That enumerates the
+         theme's full public brush surface (tab strip, surfaces, splitters, target overlay,
+         floating host-window chrome, chrome buttons) with certainty — no guessing at names.
+         Every key below is Brush-typed in the theme (confirmed by the "...Brush" suffix and by
+         the theme's own Background/Foreground/BorderBrush setters consuming it via
+         {DynamicResource <key>}), so each override aliases the Dock key straight to the
+         already-Brush-typed app token.
+
+         ALIAS FORM: `<DynamicResource x:Key="DockX" ResourceKey="Brush.Y"/>` (not
+         `<SolidColorBrush Color="{DynamicResource Brush.Y}"/>` — Brush.* tokens are already
+         IBrush, and SolidColorBrush.Color expects a Color, so wrapping would be a type
+         mismatch). This exact alias-element idiom is what Dock's own compiled theme uses
+         internally to redirect one resource key to another (confirmed by decompiled Build_N
+         methods returning `new StaticResourceExtension{ResourceKey="..."}.ProvideValue(...)`,
+         i.e. literal `<StaticResource x:Key="A" ResourceKey="B"/>` dictionary entries) — using
+         DynamicResource instead of StaticResource here is what makes the alias re-resolve live
+         when ThemeApplier swaps the Palette+Tokens wrapper at runtime (see ThemeApplier.cs).
+         No hex literals (NoStrayHexTests scans every non-palette .axaml in the solution). -->
+
+    <!-- Base theme roles (background/control-background/border/accent/foreground) — the
+         theme's own low-level palette, mostly superseded below by more specific keys but
+         still consulted by a handful of default control templates. -->
+    <DynamicResource x:Key="DockThemeBackgroundBrush"        ResourceKey="Brush.Surface.Window"/>
+    <DynamicResource x:Key="DockThemeControlBackgroundBrush" ResourceKey="Brush.Surface.Card"/>
+    <DynamicResource x:Key="DockThemeBorderLowBrush"         ResourceKey="Brush.Border.Subtle"/>
+    <DynamicResource x:Key="DockThemeAccentBrush"             ResourceKey="Brush.Button.Primary.Background"/>
+    <DynamicResource x:Key="DockThemeForegroundBrush"        ResourceKey="Brush.Text.Primary"/>
+
+    <!-- Surfaces — the panel backgrounds behind the workbench, sidebars, document area and
+         tool/document group headers. -->
+    <DynamicResource x:Key="DockSurfaceWorkbenchBrush"    ResourceKey="Brush.Surface.Window"/>
+    <DynamicResource x:Key="DockSurfaceEditorBrush"       ResourceKey="Brush.Surface.Panel"/>
+    <DynamicResource x:Key="DockSurfacePanelBrush"        ResourceKey="Brush.Surface.Panel"/>
+    <DynamicResource x:Key="DockSurfaceSidebarBrush"      ResourceKey="Brush.Surface.Panel"/>
+    <DynamicResource x:Key="DockSurfaceHeaderBrush"       ResourceKey="Brush.Surface.Header"/>
+    <DynamicResource x:Key="DockSurfaceHeaderActiveBrush" ResourceKey="Brush.Surface.Subtle"/>
+
+    <!-- Tool/document tab strip (tab chrome, not the tool dock's Left/Right/Bottom placement,
+         which is set on ToolDock itself in EditorDockFactory / already default per Step 3). -->
+    <DynamicResource x:Key="DockTabBackgroundBrush"              ResourceKey="Brush.Surface.Subtle"/>
+    <DynamicResource x:Key="DockTabHoverBackgroundBrush"         ResourceKey="Brush.Toolbar.Button.Hover"/>
+    <DynamicResource x:Key="DockTabActiveBackgroundBrush"        ResourceKey="Brush.Surface.Card"/>
+    <DynamicResource x:Key="DockTabForegroundBrush"              ResourceKey="Brush.Text.Secondary"/>
+    <DynamicResource x:Key="DockTabActiveForegroundBrush"        ResourceKey="Brush.Text.Primary"/>
+    <DynamicResource x:Key="DockTabSelectedForegroundBrush"      ResourceKey="Brush.Text.Primary"/>
+    <!-- Active-tab underline/indicator: the app's primary accent, so the selected tab reads
+         as "on" the same way a primary action button does. -->
+    <DynamicResource x:Key="DockTabActiveIndicatorBrush"         ResourceKey="Brush.Button.Primary.Background"/>
+    <DynamicResource x:Key="DockTabCloseHoverBackgroundBrush"    ResourceKey="Brush.Toolbar.Button.Pressed"/>
+
+    <!-- Document tab strip (the centre document dock — Conversations canvas today). -->
+    <DynamicResource x:Key="DockDocumentTabStripBackgroundBrush"            ResourceKey="Brush.Surface.Header"/>
+    <DynamicResource x:Key="DockDocumentTabSelectedForegroundBrush"         ResourceKey="Brush.Text.Primary"/>
+    <DynamicResource x:Key="DockDocumentTabPointerOverForegroundBrush"      ResourceKey="Brush.Text.Emphasis"/>
+    <DynamicResource x:Key="DockDocumentTabClosePointerOverForegroundBrush" ResourceKey="Brush.Text.Status.Error"/>
+    <DynamicResource x:Key="DockDocumentTabCloseSelectedForegroundBrush"    ResourceKey="Brush.Text.Primary"/>
+    <DynamicResource x:Key="DockDocumentContentBorderBrush"                 ResourceKey="Brush.Border.Default"/>
+
+    <!-- Splitters between docks. -->
+    <DynamicResource x:Key="DockSplitterIdleBrush"  ResourceKey="Brush.Border.Subtle"/>
+    <DynamicResource x:Key="DockSplitterHoverBrush" ResourceKey="Brush.Border.Strong"/>
+    <DynamicResource x:Key="DockSplitterDragBrush"  ResourceKey="Brush.Border.Focus"/>
+
+    <!-- General borders/separators. -->
+    <DynamicResource x:Key="DockBorderSubtleBrush" ResourceKey="Brush.Border.Subtle"/>
+    <DynamicResource x:Key="DockBorderStrongBrush" ResourceKey="Brush.Border.Strong"/>
+    <DynamicResource x:Key="DockSeparatorBrush"    ResourceKey="Brush.Border.Default"/>
+
+    <!-- Drag/drop target overlay (the docking-guide highlight shown while dragging a tab) and
+         the tab-picker overlay backdrop. -->
+    <DynamicResource x:Key="DockTargetIndicatorBrush"         ResourceKey="Brush.Border.Focus"/>
+    <DynamicResource x:Key="DockSelectorOverlayBackdropBrush" ResourceKey="Brush.Surface.Overlay.Scrim"/>
+
+    <!-- Application accent family — hover/pressed/full-strength intensities for
+         accent-tinted interactive elements, and the accent foreground (text/icon colour that
+         sits on top of a full-strength accent fill). -->
+    <DynamicResource x:Key="DockApplicationAccentBrushLow"        ResourceKey="Brush.Toolbar.Button.Hover"/>
+    <DynamicResource x:Key="DockApplicationAccentBrushMed"        ResourceKey="Brush.Toolbar.Button.Pressed"/>
+    <DynamicResource x:Key="DockApplicationAccentBrushHigh"       ResourceKey="Brush.Button.Primary.Background"/>
+    <DynamicResource x:Key="DockApplicationAccentBrushIndicator"  ResourceKey="Brush.Button.Primary.Background"/>
+    <DynamicResource x:Key="DockApplicationAccentForegroundBrush" ResourceKey="Brush.Text.OnAccent"/>
+
+    <!-- Floating host-window chrome (title bar + window border) — EditorHostWindow inherits
+         the app theme via these merged dictionaries, so a floated tool/document matches the
+         docked chrome instead of falling back to stock Dock Fluent grey. -->
+    <DynamicResource x:Key="DockWindowChromeBackgroundBrush"         ResourceKey="Brush.Surface.Header"/>
+    <DynamicResource x:Key="DockWindowChromeBorderBrush"             ResourceKey="Brush.Border.Strong"/>
+    <DynamicResource x:Key="DockWindowChromeForegroundBrush"         ResourceKey="Brush.Text.Primary"/>
+    <DynamicResource x:Key="DockWindowChromeTitleBarBackgroundBrush" ResourceKey="Brush.Surface.Header"/>
+
+    <!-- Floating window chrome buttons (pin/minimize/maximize/close) and the drag grip. -->
+    <DynamicResource x:Key="DockChromeButtonForegroundBrush"        ResourceKey="Brush.Text.Primary"/>
+    <DynamicResource x:Key="DockChromeButtonHoverBackgroundBrush"   ResourceKey="Brush.Toolbar.Button.Hover"/>
+    <DynamicResource x:Key="DockChromeButtonPressedBackgroundBrush" ResourceKey="Brush.Toolbar.Button.Pressed"/>
+    <!-- Close-button hover reads as destructive, matching the app's other destructive/danger
+         accents (e.g. GitConflictResolutionWindow's Theirs/error tone). -->
+    <DynamicResource x:Key="DockChromeButtonDangerHoverBrush"       ResourceKey="Brush.Text.Status.Error"/>
+    <DynamicResource x:Key="DockChromeGripBrush"                    ResourceKey="Brush.Border.Muted"/>
+
+    <!-- Tool-window chrome icon (the small icon in a tool tab's chrome, if content supplies one). -->
+    <DynamicResource x:Key="DockToolChromeIconBrush" ResourceKey="Brush.Text.Secondary"/>
+
+</ResourceDictionary>

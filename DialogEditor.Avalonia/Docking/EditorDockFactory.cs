@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Dock.Model.Controls;
 using Dock.Model.Core;
 using Dock.Model.Mvvm;
@@ -83,5 +85,19 @@ public sealed class EditorDockFactory : Factory
         root.ActiveDockable  = main;
         root.VisibleDockables = CreateList<IDockable>(main);
         return root;
+    }
+
+    // Registers EditorHostWindow (a themed HostWindow carrying app.ico — Docking Shell Phase 1
+    // Task 7) as the window Dock.Avalonia creates when a dockable is floated/torn off, so
+    // floating windows match the app icon + theme instead of stock Dock chrome. Task 9 will
+    // extend this SAME override with ContextLocator/DockableLocator; do not duplicate the
+    // override elsewhere.
+    public override void InitLayout(IDockable layout)
+    {
+        HostWindowLocator = new Dictionary<string, Func<IHostWindow?>>
+        {
+            [nameof(IDockWindow)] = () => new EditorHostWindow(),
+        };
+        base.InitLayout(layout);
     }
 }
