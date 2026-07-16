@@ -1617,7 +1617,7 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="RepBalance_ReputationsHeader">Reputations</sys:String>
     <sys:String x:Key="RepBalance_Col_Value">Value</sys:String>
     <sys:String x:Key="RepBalance_Col_Count">Count</sys:String>
-    <sys:String x:Key="RepBalance_Col_Share">Share vs expected</sys:String>
+    <sys:String x:Key="RepBalance_Col_Share">Share</sys:String>
     <sys:String x:Key="RepBalance_Col_Flag">Flag</sys:String>
     <sys:String x:Key="RepBalance_Flag_Over">Over-favoured</sys:String>
     <sys:String x:Key="RepBalance_Flag_Under">Under-used</sys:String>
