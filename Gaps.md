@@ -956,7 +956,24 @@ docs/superpowers/specs/2026-07-16-rep-disposition-balance-design.md,
 docs/superpowers/specs/2026-07-16-catalogue-match-primitive-design.md.
 
 ### Condition/Script Node Search & Highlight
-**📐 Designed (2026-07-16), not yet implemented.** A per-conversation search that highlights
+**✅ Implemented (2026-07-16).** A collapsible dock in the canvas area (toggled by the ⚑ button
+in the canvas toolbar) searches the open conversation for the nodes using a chosen condition
+**or** script, narrowed by pinned parameters (unset = wildcard; a pinned value must equal the
+node's raw stored value). A node is a hit if the query matches its own condition, any outgoing
+link's condition, or any of its scripts (node-only granularity). Matches get a `Brush.Severity.Info`
+emphasis border and the rest dim, via a **unified** `SearchMatchState { None, Match, Dimmed }`
+that both this search and the pre-existing canvas text search now flow through (last search
+wins). Clearing (Clear button) or switching conversations resets to normal. v1 is single-entry;
+the shared Core `CatalogueMatch` primitive + per-node walk are shaped so multi-condition AND/OR
+can wrap them later. Pieces: `CatalogueMatch` + `NodeConditionSearchService` (Core, the deferred
+Gap #1 primitive), `ConditionSearchViewModel` + `ConversationViewModel` dock state (ViewModels),
+`ConditionSearchView` + `SearchMatchState` converters (Avalonia). GUI-verified (dock hidden by
+default, renders on toggle, entry list from the game catalogue). Specs:
+docs/superpowers/specs/2026-07-16-condition-script-node-search-design.md,
+docs/superpowers/specs/2026-07-16-catalogue-match-primitive-design.md; plan:
+docs/superpowers/plans/2026-07-16-condition-script-node-search.md.
+
+**Original design note (kept for context):** A per-conversation search that highlights
 the nodes using a chosen condition **or** script, narrowed by its parameters. A non-modal
 side panel: pick a catalogue entry, then optionally pin any of its parameters (unset =
 wildcard; a pinned value must match the node's raw stored value). A node is a hit if the query
