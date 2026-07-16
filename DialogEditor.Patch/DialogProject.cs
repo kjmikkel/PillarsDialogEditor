@@ -15,7 +15,10 @@ public record DialogProject(
     IReadOnlyList<string>? NewConversations = null,
     // Canvas annotations per conversation — editor metadata only, never in game files.
     // Nullable for back-compat with old .dialogproject files.
-    IReadOnlyDictionary<string, IReadOnlyList<AnnotationSnapshot>>? Annotations = null)
+    IReadOnlyDictionary<string, IReadOnlyList<AnnotationSnapshot>>? Annotations = null,
+    // Duplicate-line ignore allowlist — editor metadata, never in game files.
+    // Nullable for back-compat with projects saved before this field existed.
+    IReadOnlyList<IgnoredDuplicate>? IgnoredDuplicates = null)
 {
     public static readonly int CurrentSchemaVersion = 1;
 
@@ -116,6 +119,27 @@ public record DialogProject(
 
     public IReadOnlyList<AnnotationSnapshot>? GetAnnotations(string conversationName) =>
         Annotations?.GetValueOrDefault(conversationName);
+
+    /// Adds a duplicate to the ignore allowlist (editor metadata). Deduped by
+    /// Kind + Keys, so ignoring the same duplicate twice is a no-op.
+    public DialogProject WithIgnoredDuplicate(IgnoredDuplicate entry)
+    {
+        var existing = IgnoredDuplicates ?? [];
+        if (existing.Any(e => e.Kind == entry.Kind && e.Keys.SequenceEqual(entry.Keys)))
+            return this;
+        return this with { IgnoredDuplicates = [.. existing, entry] };
+    }
+
+    /// Removes a matching entry from the ignore allowlist; the list becomes null
+    /// once empty (so a clean project serializes no ignore state).
+    public DialogProject WithoutIgnoredDuplicate(IgnoredDuplicate entry)
+    {
+        if (IgnoredDuplicates is null) return this;
+        var kept = IgnoredDuplicates
+            .Where(e => !(e.Kind == entry.Kind && e.Keys.SequenceEqual(entry.Keys)))
+            .ToList();
+        return this with { IgnoredDuplicates = kept.Count > 0 ? kept : null };
+    }
 
     /// Merges <paramref name="incoming"/> annotations into the existing set for
     /// <paramref name="conversationName"/>. Incoming wins on any ID collision;
