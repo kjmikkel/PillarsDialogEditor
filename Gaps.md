@@ -883,8 +883,21 @@ Recorded 2026-07-11; each is small and independent:
   docs/superpowers/specs/2026-07-12-find-in-project-design.md.
 - **Path-based writing stats** — Flow Analytics counts words globally; writers think
   in playthroughs: longest path, words per speaker, estimated reading time per branch.
-- **Duplicate/near-duplicate line detection** — catches copy-paste artifacts; could
-  ride on Flow Analytics.
+- ~~**Duplicate/near-duplicate line detection**~~ ✓ Implemented (2026-07-13). New
+  **Duplicate lines** + **Ignored duplicates** panes in **Test ▸ Validate Text…** report
+  copy-paste artifacts among the writer's *own* edited/added Default text (pure
+  `DuplicateLineScanner` over `DialogProject.Patches[*].Translations[primary]`, game-folder-free).
+  Two tiers: **Exact** (identical after case/whitespace normalization, grouped) and **Near**
+  (length-blocked Levenshtein ratio ≥ 0.85, shown with the similarity %); lines under 4 words
+  are suppressed, and a member of an exact cluster is never also flagged as a near pair. Each
+  finding has **Go** (jump to node, cross-conversation via `NavigateToFoundNode`) and
+  **Ignore**. Ignoring moves it to the Ignored-duplicates pane and stops it being reported;
+  ignores are **content-keyed** and persisted in the `.dialogproject` as editor metadata
+  (`DialogProject.IgnoredDuplicates`, nullable/back-compat), marking the project dirty like an
+  edit. Read-only otherwise (no bulk auto-remove). GUI-verified end-to-end (exact + near
+  detection, ignore→ignored-pane→restore). Deferred: female/link/translation-language scope,
+  cross-vanilla comparison, a configurable threshold. Spec:
+  docs/superpowers/specs/2026-07-13-duplicate-line-detection-design.md.
 - ~~**Recent projects menu**~~ ✓ Implemented (2026-07-12). File ▸ Recent Projects
   submenu (MRU, cap 10, newest-first, case-insensitive dedupe); records at the three
   `LastProjectPath` sites (open/new/save-as, never on close); data-bound via
