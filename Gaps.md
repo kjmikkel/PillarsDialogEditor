@@ -987,6 +987,21 @@ primitive with the balance gap above. Specs:
 docs/superpowers/specs/2026-07-16-condition-script-node-search-design.md,
 docs/superpowers/specs/2026-07-16-catalogue-match-primitive-design.md.
 
+### Visual Studio–style Docking Shell
+**📐 Designed (2026-07-16, Phase 1), not yet implemented.** Replace the fixed 5-column panel
+layout (hand-rolled browser/canvas/details grid with ad-hoc pin/collapse) with a real VS-style
+docking system via **`Dock.Avalonia`**: tool panels that drag/drop (guide diamonds), tab, float
+into windows, auto-hide/pin, with a **persisted layout** (`%LOCALAPPDATA%\PillarsDialogEditor\
+layout.json`, fall back to default on corrupt/missing) and a **View menu** (reopen a closed tool
++ Reset Layout). **Phase 1** docks Conversations (left tool), Canvas (centre document, single),
+Node Details + Condition search (right, tabbed) via thin `Tool`/`Document` wrappers around the
+existing VMs (which stay Dock-free). Dock chrome is retinted onto the app's `Brush.*` tokens
+(no hex; retints live with the theme switch); floating `HostWindow`s carry `app.ico`. Removes the
+old collapse strips / 📌 pins and the condition-search toggle (→ a View-menu entry). **Phase 2
+(deferred, own spec):** migrate the standalone analysis windows (Flow Analytics, Rep/Disposition
+Balance, Find in Project) into dockable tools. Spec:
+docs/superpowers/specs/2026-07-16-docking-shell-phase1-design.md.
+
 ### Deliberate Non-Goals
 
 Recorded so they aren't re-litigated: **quest/journal text editing** (this is a
