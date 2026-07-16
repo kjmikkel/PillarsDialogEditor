@@ -12,11 +12,18 @@
                  Foreground="{DynamicResource Brush.Text.Primary}"/>
       <TextBlock Text="{DynamicResource CondSearch_EntryLabel}"
                  Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Small}"/>
-      <ComboBox ItemsSource="{Binding Entries}" SelectedItem="{Binding SelectedEntry}"
-                HorizontalAlignment="Stretch"
-                ToolTip.Tip="{DynamicResource CondSearch_Tip_Entry}"
-                AutomationProperties.Name="{DynamicResource CondSearch_EntryLabel}"
-                AutomationProperties.HelpText="{DynamicResource CondSearch_Tip_Entry}"/>
+      <!-- Type-to-filter picker: ValueMemberBinding=DisplayLabel drives both the display text
+           and the built-in Contains filter; MinimumPrefixLength=0 shows the full list on focus. -->
+      <AutoCompleteBox ItemsSource="{Binding Entries}"
+                       SelectedItem="{Binding SelectedEntry, Mode=TwoWay}"
+                       ValueMemberBinding="{Binding DisplayLabel}"
+                       FilterMode="Contains"
+                       MinimumPrefixLength="0"
+                       HorizontalAlignment="Stretch"
+                       Watermark="{DynamicResource CondSearch_EntryPlaceholder}"
+                       ToolTip.Tip="{DynamicResource CondSearch_Tip_Entry}"
+                       AutomationProperties.Name="{DynamicResource CondSearch_EntryLabel}"
+                       AutomationProperties.HelpText="{DynamicResource CondSearch_Tip_Entry}"/>
 
       <ItemsControl ItemsSource="{Binding PinRows}">
         <ItemsControl.ItemTemplate>

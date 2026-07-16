@@ -78,13 +78,6 @@
                            Text="{Binding StatisticsText}"
                            Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}" VerticalAlignment="Center" Margin="0,0,8,0"
                            ToolTip.Tip="{Binding StatisticsTooltip}"/>
-                <Button DockPanel.Dock="Right" Content="⚑"
-                        Command="{Binding ToggleConditionSearchCommand}"
-                        Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}"
-                        BorderThickness="0" Padding="8,2" Margin="8,0,0,0"
-                        ToolTip.Tip="{DynamicResource ToolTip_ToggleConditionSearch}"
-                        AutomationProperties.HelpText="{DynamicResource ToolTip_ToggleConditionSearch}"
-                        AutomationProperties.Name="{DynamicResource AutomationName_ToggleConditionSearch}"/>
                 <Grid VerticalAlignment="Center" Margin="0,0,8,0">
                     <TextBox x:Name="SearchBox"
                              Text="{Binding SearchQuery}"

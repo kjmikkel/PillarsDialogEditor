@@ -141,6 +141,10 @@
                                   InputGesture="Ctrl+Shift+F"
                                   ToolTip.Tip="{DynamicResource ToolTip_FindInProject}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_FindInProject}"/>
+                        <MenuItem Header="{DynamicResource Menu_ConditionSearch}"
+                                  Command="{Binding Canvas.ToggleConditionSearchCommand}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_ToggleConditionSearch}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_ToggleConditionSearch}"/>
                         <MenuItem Header="{DynamicResource Menu_BrowseSpeakerLines}"
                                   Command="{Binding BrowseSpeakerLinesCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_BrowseSpeakerLines}"
