@@ -534,6 +534,29 @@ public partial class MainWindowViewModel : ObservableObject
             SaveProject();
         };
 
+        Func<DuplicateLineReport> dupScan = () =>
+            _project is null
+                ? new DuplicateLineReport([], [])
+                : DuplicateLineScanner.Scan(_project, _provider?.Language ?? "");
+
+        Func<IReadOnlyList<IgnoredDuplicate>> ignoredList = () =>
+            _project?.IgnoredDuplicates ?? [];
+
+        // Ignore/un-ignore are metadata-only edits: mutate _project directly and mark
+        // dirty (persists on next save, like annotations) — no SetProject side effects.
+        Action<IgnoredDuplicate> ignore = e =>
+        {
+            if (_project is null) return;
+            _project = _project.WithIgnoredDuplicate(e);
+            IsModified = true;
+        };
+        Action<IgnoredDuplicate> unignore = e =>
+        {
+            if (_project is null) return;
+            _project = _project.WithoutIgnoredDuplicate(e);
+            IsModified = true;
+        };
+
         // The closure reads the current fields, so Refresh in the open window picks
         // up saves made later in the session.
         return new TextTagValidationViewModel(
@@ -545,7 +568,12 @@ public partial class MainWindowViewModel : ObservableObject
             staleScan: staleScan,
             prune: prune,
             canCheckGameFiles: _provider is not null,
-            primaryLanguage: _provider?.Language ?? "");
+            primaryLanguage: _provider?.Language ?? "",
+            dupScan: dupScan,
+            ignoredList: ignoredList,
+            ignore: ignore,
+            unignore: unignore,
+            navigate: NavigateToFoundNode);
     }
 
     /// Builds a conversation-name → live-node-ID-set resolver for the likely-stale
