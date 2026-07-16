@@ -1603,6 +1603,7 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="ToolTip_AliasPickerNodeFilter">Type to narrow the node list by dialogue text or node ID.</sys:String>
 
     <!-- ─── Condition / script node search dock ────────────────────────────── -->
+    <sys:String x:Key="Menu_ConditionSearch">Find Nodes by Condition / Script…</sys:String>
     <sys:String x:Key="CondSearch_Title">Find nodes by condition / script</sys:String>
     <sys:String x:Key="CondSearch_EntryLabel">Condition or script:</sys:String>
     <!-- {0} = the condition's display name -->
@@ -1618,7 +1619,6 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="CondSearch_Tip_Search">Highlight the nodes that use the selected condition/script with the given parameter values; dim the rest.</sys:String>
     <sys:String x:Key="CondSearch_Tip_Clear">Remove the highlight and return every node to normal.</sys:String>
     <sys:String x:Key="ToolTip_ToggleConditionSearch">Show or hide the condition/script search dock, which highlights the nodes using a chosen condition or script.</sys:String>
-    <sys:String x:Key="AutomationName_ToggleConditionSearch">Condition search</sys:String>
 
     <!-- ─── Reputation & Disposition Balance window ────────────────────────── -->
     <sys:String x:Key="Menu_RepDispositionBalance">Reputation &amp; Disposition Balance…</sys:String>
