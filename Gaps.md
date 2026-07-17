@@ -1004,7 +1004,7 @@ docs/superpowers/specs/2026-07-16-condition-script-node-search-design.md,
 docs/superpowers/specs/2026-07-16-catalogue-match-primitive-design.md.
 
 ### Visual Studio–style Docking Shell
-**📐 Designed (2026-07-16, Phase 1), not yet implemented.** Replace the fixed 5-column panel
+**✅ Phase 1 implemented (2026-07-17).** Replace the fixed 5-column panel
 layout (hand-rolled browser/canvas/details grid with ad-hoc pin/collapse) with a real VS-style
 docking system via **`Dock.Avalonia`**: tool panels that drag/drop (guide diamonds), tab, float
 into windows, auto-hide/pin, with a **persisted layout** (`%LOCALAPPDATA%\PillarsDialogEditor\
@@ -1017,6 +1017,28 @@ old collapse strips / 📌 pins and the condition-search toggle (→ a View-menu
 (deferred, own spec):** migrate the standalone analysis windows (Flow Analytics, Rep/Disposition
 Balance, Find in Project) into dockable tools. Spec:
 docs/superpowers/specs/2026-07-16-docking-shell-phase1-design.md.
+
+**Shipped (Phase 1, commits `d6f3db5`..`05dc6a7`):** `Dock.Avalonia` 11.3.12.1 (+ MVVM +
+SystemTextJson serializer + Fluent theme). Four thin `Tool`/`Document` wrappers
+(`BrowserTool`/`DetailsTool`/`ConditionSearchTool`/`CanvasDocument`, `Inner` `[JsonIgnore]`)
+over the existing VMs; `EditorDockFactory` builds the default layout (Conversations left, Canvas
+centre document, Node Details + Condition search tabbed right, tool tabs at bottom). `MainWindow`
+hosts a single `DockControl`; the old pin/flyout chrome + in-canvas condition-search toggle are
+gone. **View menu:** show/focus each tool (reopens a closed tab via `HideToolsOnClose` +
+`RestoreDockable`) + Reset Layout. Dock chrome retinted onto `Brush.*` tokens (hex-free, live
+retint); floating `EditorHostWindow` carries `app.ico`. **Persisted layout**
+(`%LOCALAPPDATA%\PillarsDialogEditor\layout.json`): saved on close, restored on first launch with
+live content re-hydrated by id; corrupt/missing/unexpected ⇒ default (never crashes); Reset
+deletes the file. Notable fixes during build: DockTheme brushes must be concrete
+`SolidColorBrush`es (not `DynamicResource` aliases) or Dock throws `IBrush`-cast on render;
+tabbed-tool content is selected by inner-VM **type** through a `ContentControl` (Dock's
+`DeferredContentControl` keeps the stale sibling view on tab-switch otherwise); the live layout
+must have `Owner` back-refs stripped before serialization (Dock's list converter bypasses
+`ReferenceHandler.Preserve`); canvas→detail focus hop wired via `LayoutUpdated` (deferred content
+realises after `BuildDock`). **Known follow-ups (Phase 2):** the guided-tour highlight mechanism
+is name-based `FindControl` and no longer resolves dock-hosted content (CanvasView step no-ops —
+see Guided Tour note); float-window drag + live theme-retint were verified structurally, not via
+drag automation.
 
 ### Deliberate Non-Goals
 
