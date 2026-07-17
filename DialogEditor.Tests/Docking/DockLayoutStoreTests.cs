@@ -124,6 +124,51 @@ public class DockLayoutStoreTests : IDisposable
         Assert.Same(leftDock.VisibleDockables![0], leftDock.ActiveDockable);
     }
 
+    // Fix pass 2 (review): DockLayoutStore.Load only guards against unparseable JSON — a file
+    // containing syntactically valid JSON that just isn't a dock layout (e.g. hand-edited,
+    // or from an unrelated schema) must still come back as null/no-throw, never bubble an
+    // exception up to the BuildDock restore-consumption site. (BuildDock's own try/catch
+    // around RestoreLayout/InitLayout is exercised at the GUI level by the coordinator, since
+    // it lives in code-behind with no unit-test seam; this covers the Load half we can reach.)
+    [Fact]
+    public void Load_ValidJsonButNotADockLayout_ReturnsNull_DoesNotThrow()
+    {
+        File.WriteAllText(_path, "{ \"foo\": \"bar\", \"nested\": { \"a\": 1 } }");
+        var ex = Record.Exception(() => new DockLayoutStore().Load(_path));
+        Assert.Null(ex);
+    }
+
+    // Fix pass 2 (review) Minor #2: ReplaceInList's fall-through for a recognised wrapper id
+    // whose DockableLocator entry can't be resolved (e.g. a future maintenance slip where
+    // WrapperIds and DockableLocator drift out of sync, or — as reproduced here — the locator
+    // simply isn't wired yet) must not throw and must leave the wrapper as-is rather than
+    // crashing; the AppLog.Warn added at that site is a diagnostic (verified by code review /
+    // GUI log inspection, not asserted here since AppLog writes to the real app.log file with
+    // no test seam).
+    [Fact]
+    public void ReplaceWrappers_UnresolvableWrapperId_DoesNotThrow()
+    {
+        DialogEditor.ViewModels.Resources.Loc.Configure(new DialogEditor.Tests.Helpers.StubStringProvider());
+        var factory = new EditorDockFactory(
+            new DialogEditor.ViewModels.GameBrowserViewModel(new DialogEditor.Tests.Helpers.StubDispatcher()),
+            new DialogEditor.ViewModels.ConversationViewModel(new DialogEditor.Tests.Helpers.StubDispatcher()),
+            new DialogEditor.ViewModels.NodeDetailViewModel(),
+            new DialogEditor.ViewModels.ConditionSearchViewModel("poe2", () => null, _ => { }, () => { }));
+
+        // A layout whose wrapper carries a recognised WrapperIds value ("Browser"), but the
+        // factory's DockableLocator is deliberately never populated (SetLocators is never
+        // called) — simulating the "locator can't resolve this known wrapper id" case via
+        // reflection into the private ReplaceWrappers/ReplaceInList pair RestoreLayout uses.
+        var layout = factory.CreateLayout();
+
+        var method = typeof(EditorDockFactory).GetMethod(
+            "ReplaceWrappers", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        Assert.NotNull(method);
+
+        var ex = Record.Exception(() => method!.Invoke(factory, new object[] { layout }));
+        Assert.Null(ex);
+    }
+
     private static IDockable? FindById(IDockable d, string id)
     {
         if (d.Id == id) return d;
