@@ -345,14 +345,6 @@
     <!-- × button in the top-right corner of the legend panel -->
     <sys:String x:Key="ToolTip_CloseLegend">Close legend</sys:String>
 
-    <!-- ─── Tooltips — collapsible side panels ────────────────────────── -->
-    <!-- − button (collapse) and + button (expand) on both side panels -->
-    <sys:String x:Key="ToolTip_TogglePanel">Expand / collapse panel</sys:String>
-    <!-- 📌 pin button on the Conversations panel only.
-         When unpinned the panel acts as a flyout: it closes when you click
-         outside it or select a conversation. -->
-    <sys:String x:Key="ToolTip_PinPanel">Pin panel open — when unpinned, acts as a flyout (closes on click-outside or conversation selection)</sys:String>
-
     <!-- ─── Editing — toolbar buttons ───────────────────────────────────── -->
     <sys:String x:Key="Button_Undo">↩</sys:String>
     <sys:String x:Key="Button_Redo">↪</sys:String>
@@ -1249,12 +1241,9 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="AutomationName_ClearFilter">Clear filter</sys:String>
     <sys:String x:Key="AutomationName_ToggleHelp">Toggle help</sys:String>
     <sys:String x:Key="AutomationName_Settings">Settings</sys:String>
-    <sys:String x:Key="AutomationName_PinBrowserPanel">Pin browser panel</sys:String>
     <sys:String x:Key="AutomationName_ExpandAllFolders">Expand all folders</sys:String>
     <sys:String x:Key="AutomationName_CollapseAllFolders">Collapse all folders</sys:String>
     <sys:String x:Key="AutomationName_NewConversation">New conversation</sys:String>
-    <sys:String x:Key="AutomationName_CollapseDetailsPanel">Collapse details panel</sys:String>
-    <sys:String x:Key="AutomationName_ExpandDetailsPanel">Expand details panel</sys:String>
     <sys:String x:Key="AutomationName_MoveScriptUp">Move script up</sys:String>
     <sys:String x:Key="AutomationName_MoveScriptDown">Move script down</sys:String>
     <sys:String x:Key="AutomationName_RemoveScript">Remove script</sys:String>
@@ -1414,9 +1403,7 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="ToolTip_Tour_Dismiss">Close the guided tour without finishing</sys:String>
     <sys:String x:Key="AutomationName_Tour_Dismiss">Dismiss tour</sys:String>
 
-    <sys:String x:Key="Tour_Step1_Text">The conversation browser lists every conversation in your game folder. Click one to open it on the canvas.</sys:String>
     <sys:String x:Key="Tour_Step2_Text">The canvas shows the node graph for the open conversation. Click a node to select it; double-click empty space to add a new one.</sys:String>
-    <sys:String x:Key="Tour_Step3_Text">The detail panel shows the selected node's text, speaker, and conditions. Edit here to change what characters say.</sys:String>
     <sys:String x:Key="Tour_Step4_Text">The ? button shows a hint for whatever you focus. Help ▸ Open Walkthrough has the full beginner guide.</sys:String>
 
     <!-- ── Diff window first-run intro banner ───────────────────────────── -->
@@ -1603,7 +1590,6 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="ToolTip_AliasPickerNodeFilter">Type to narrow the node list by dialogue text or node ID.</sys:String>
 
     <!-- ─── Condition / script node search dock ────────────────────────────── -->
-    <sys:String x:Key="Menu_ConditionSearch">Find Nodes by Condition / Script…</sys:String>
     <sys:String x:Key="CondSearch_Title">Find nodes by condition / script</sys:String>
     <sys:String x:Key="CondSearch_EntryLabel">Condition or script:</sys:String>
     <sys:String x:Key="CondSearch_EntryPlaceholder">Type to filter…</sys:String>
@@ -1619,7 +1605,6 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="CondSearch_Tip_Pin">Leave blank to match any value, or type an exact value (e.g. a disposition name or GUID) to match only that value in this parameter.</sys:String>
     <sys:String x:Key="CondSearch_Tip_Search">Highlight the nodes that use the selected condition/script with the given parameter values; dim the rest.</sys:String>
     <sys:String x:Key="CondSearch_Tip_Clear">Remove the highlight and return every node to normal.</sys:String>
-    <sys:String x:Key="ToolTip_ToggleConditionSearch">Show or hide the condition/script search dock, which highlights the nodes using a chosen condition or script.</sys:String>
 
     <!-- ─── Reputation & Disposition Balance window ────────────────────────── -->
     <sys:String x:Key="Menu_RepDispositionBalance">Reputation &amp; Disposition Balance…</sys:String>

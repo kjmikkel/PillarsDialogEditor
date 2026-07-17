@@ -631,9 +631,17 @@ A **Create Sample Project** command (Help menu) plus a shipped **beginner walkth
 (`docs/walkthrough.md`) now give newcomers a safe, install-matched sandbox for learning the
 editor and the version-control tools.
 
-**In-app guided tour ✓ implemented (2026-06-23):** four-step tour bar + adorner ring
+**In-app guided tour ✓ implemented (2026-06-23):** tour bar + adorner ring, originally
 highlighting BrowserPanel → CanvasView → DetailPanel → HelpToggle. Auto-triggers on
 fresh install; re-accessible via Help ▸ Start Guided Tour.
+
+**Docking Shell Phase 1 (2026-07-17):** the BrowserPanel/DetailPanel steps were dropped
+(Task 8 cleanup) — those targets became Dock-hosted tool content with no compile-time
+name once the panel chrome was removed, so the steps could no longer resolve a target
+(silent no-op). The tour is now CanvasView → HelpToggle only. Re-adding coverage for the
+browser/details tools would need a name-independent targeting mechanism (e.g. locate the
+live tool content by type, as `MainWindow.axaml.cs`'s `FindCanvasView()`/`FindDetailView()`
+already do for event wiring).
 
 ### Voice-Over Integration
 
