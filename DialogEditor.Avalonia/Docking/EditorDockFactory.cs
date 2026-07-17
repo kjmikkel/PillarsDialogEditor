@@ -4,6 +4,7 @@ using Dock.Model.Core;
 using Dock.Model.Mvvm;
 using Dock.Model.Mvvm.Controls;
 using DialogEditor.ViewModels;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Avalonia.Docking;
 
@@ -200,11 +201,21 @@ public sealed class EditorDockFactory : Factory
         for (var i = 0; i < list.Count; i++)
         {
             var child = list[i];
-            if (child.Id is { Length: > 0 } id && WrapperIds.Contains(id)
-                && DockableLocator is not null && DockableLocator.TryGetValue(id, out var makeFresh)
-                && makeFresh() is { } fresh)
+            if (child.Id is { Length: > 0 } id && WrapperIds.Contains(id))
             {
-                list[i] = fresh;   // leaf wrapper — no need to recurse into the fresh instance
+                if (DockableLocator is not null && DockableLocator.TryGetValue(id, out var makeFresh)
+                    && makeFresh() is { } fresh)
+                {
+                    list[i] = fresh;   // leaf wrapper — no need to recurse into the fresh instance
+                    continue;
+                }
+
+                // A known wrapper id that DockableLocator couldn't re-hydrate (e.g. an id that
+                // existed in a previously-saved layout.json but has since been renamed/removed
+                // from WrapperIds/DockableLocator). The deserialized wrapper's Inner stays null
+                // ([JsonIgnore]), so this panel would otherwise render blank with no diagnostic —
+                // log it so a future id-rename regression is visible instead of silent.
+                AppLog.Warn($"Dock layout restore: no live wrapper found for wrapper id '{id}'; panel will render blank.");
                 continue;
             }
             ReplaceWrappers(child);

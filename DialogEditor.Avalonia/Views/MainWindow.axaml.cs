@@ -292,8 +292,23 @@ public partial class MainWindow : Window
             var restored = _store.Load(_store.DefaultPath);
             if (restored is not null)
             {
-                factory.RestoreLayout(restored);
-                layout = restored;
+                // DockLayoutStore.Load only guards against unparseable JSON; a file that
+                // deserializes to a non-null IRootDock with an unexpected shape (schema skew
+                // after an upgrade, a torn-but-valid prior write, a hand-edited file) can still
+                // throw inside RestoreLayout/InitLayout. Catch broadly here, log, delete the
+                // offending file (so the next launch doesn't retry and crash-loop on it), and
+                // fall through to the default CreateLayout path below.
+                try
+                {
+                    factory.RestoreLayout(restored);
+                    layout = restored;
+                }
+                catch (Exception ex)
+                {
+                    AppLog.Warn($"Dock layout restore failed, using default: {ex.Message}");
+                    _store.Delete(_store.DefaultPath);
+                    layout = null;
+                }
             }
         }
         if (layout is null)
