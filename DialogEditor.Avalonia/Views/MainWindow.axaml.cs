@@ -244,6 +244,20 @@ public partial class MainWindow : Window
 
     private EditorDockFactory? _factory;
 
+    // Persists/restores the dock layout structure across sessions (Docking Shell Phase 1,
+    // Task 9). Content (live VMs) is never serialized — EditorDockFactory.RestoreLayout
+    // re-attaches it by Id. Never throws; a missing/corrupt file falls back to the default.
+    private readonly DockLayoutStore _store = new();
+
+    // BuildDock runs on EVERY game-folder load, not just the first (see the PropertyChanged
+    // hook above and ReopenLastProjectOnStartup). Loading the on-disk layout again on a later
+    // folder-open would silently discard the user's in-session rearrangement, so the saved
+    // layout is only consulted for the FIRST build of the process; subsequent folder-opens
+    // rebuild the current in-memory default via CreateLayout, same as before Task 9.
+    // ResetLayout_Click intentionally does NOT re-arm this guard — Reset must bypass the disk
+    // file entirely (it just deleted it) and always produce the true default layout.
+    private bool _dockRestored = false;
+
     // Tracks the ConversationView instance whose FocusDetailRequested we've already
     // hooked, so re-running BuildDock (e.g. opening a second game folder in the same
     // session) rewires the new Dock-realised instance without leaving the old one's
@@ -256,18 +270,37 @@ public partial class MainWindow : Window
     // by the user before a game folder ever loads it, or a future layout omits it).
     private const int MaxCanvasWireAttempts = 20;
 
-    /// Builds the default docking layout (Conversations/Canvas/Node Details/Condition
-    /// search) once the shell-level ConditionSearchViewModel exists — i.e. once a game
-    /// folder has loaded (see MainWindowViewModel.RebuildConditionSearch). Also re-wires
-    /// the canvas → detail-pane focus hop, which now targets the Dock-hosted views instead
-    /// of named XAML controls (the fixed 5-column grid is gone).
+    /// Builds the docking layout (Conversations/Canvas/Node Details/Condition search) once
+    /// the shell-level ConditionSearchViewModel exists — i.e. once a game folder has loaded
+    /// (see MainWindowViewModel.RebuildConditionSearch). On the FIRST build of the process,
+    /// tries the saved layout from disk (_store.Load) and re-hydrates it via
+    /// EditorDockFactory.RestoreLayout; falls back to (and every later build uses) the
+    /// in-memory default from CreateLayout — see _dockRestored's comment for why later
+    /// folder-opens don't re-consult the disk file. Also re-wires the canvas → detail-pane
+    /// focus hop, which now targets the Dock-hosted views instead of named XAML controls
+    /// (the fixed 5-column grid is gone).
     private void BuildDock(MainWindowViewModel vm)
     {
         if (vm.ConditionSearch is null) return;   // needs a loaded game
 
         var factory = new EditorDockFactory(vm.Browser, vm.Canvas, vm.Detail, vm.ConditionSearch);
-        var layout  = factory.CreateLayout();
-        factory.InitLayout(layout);
+
+        Dock.Model.Controls.IRootDock? layout = null;
+        if (!_dockRestored)
+        {
+            _dockRestored = true;   // only the first build of the session may consult the disk file
+            var restored = _store.Load(_store.DefaultPath);
+            if (restored is not null)
+            {
+                factory.RestoreLayout(restored);
+                layout = restored;
+            }
+        }
+        if (layout is null)
+        {
+            layout = factory.CreateLayout();
+            factory.InitLayout(layout);
+        }
         vm.DockLayout = layout;
         _factory = factory;
 
@@ -313,9 +346,9 @@ public partial class MainWindow : Window
         this.GetVisualDescendants().OfType<NodeDetailView>().FirstOrDefault();
 
     // ── View menu: show/focus a tool, re-opening it if the user closed its tab ────
-    private void ShowBrowserTool_Click(object? sender, RoutedEventArgs e)         => ShowToolById("Browser");
-    private void ShowDetailsTool_Click(object? sender, RoutedEventArgs e)         => ShowToolById("Details");
-    private void ShowConditionSearchTool_Click(object? sender, RoutedEventArgs e) => ShowToolById("ConditionSearch");
+    private void ShowBrowserTool_Click(object? sender, RoutedEventArgs e)         => ShowToolById(EditorDockFactory.BrowserId);
+    private void ShowDetailsTool_Click(object? sender, RoutedEventArgs e)         => ShowToolById(EditorDockFactory.DetailsId);
+    private void ShowConditionSearchTool_Click(object? sender, RoutedEventArgs e) => ShowToolById(EditorDockFactory.ConditionSearchId);
 
     /// Shows/focuses a Dock tool by its Id. If the tool is still present in the tree
     /// (open, even if its tab isn't active), this just activates it. If the user closed
@@ -345,11 +378,15 @@ public partial class MainWindow : Window
 
     /// Rebuilds the default docking layout (Conversations/Canvas/Node Details/Condition
     /// search in their original panes), discarding any floating windows, closed tools or
-    /// resized panes from the current session. No-ops (silently — nothing to reset) if no
-    /// game is loaded, matching BuildDock's own guard.
+    /// resized panes from the current session — AND deletes the saved layout file, so the
+    /// next launch also starts from the true default rather than the just-discarded
+    /// arrangement. No-ops (silently — nothing to reset) if no game is loaded, matching
+    /// BuildDock's own guard.
     private void ResetLayout_Click(object? sender, RoutedEventArgs e)
     {
         if (DataContext is not MainWindowViewModel vm) return;
+        _store.Delete(_store.DefaultPath);
+        _dockRestored = true;   // bypass the disk file even if this is somehow the first build
         BuildDock(vm);
     }
 
@@ -744,6 +781,11 @@ public partial class MainWindow : Window
         }
         else
         {
+            // Real close path (either the conversation was never dirty, or the dirty-close
+            // dialog already ran and this is the re-entrant confirmed Close()) — save exactly
+            // once, here, so a corrupt/interrupted write can never cancel the actual close.
+            if (vm.DockLayout is Dock.Model.Controls.IRootDock root)
+                _store.Save(root, _store.DefaultPath);
             base.OnClosing(e);
         }
     }
