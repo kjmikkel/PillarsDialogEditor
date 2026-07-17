@@ -1,4 +1,3 @@
-using System;
 using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls.Primitives;
@@ -913,10 +912,10 @@ public partial class MainWindow : Window
         _tourAdorner = null;
     }
 
-    // NOTE (Docking Shell Phase 1 orphan — see task-4-report.md): guided-tour steps that
-    // targeted the old fixed "BrowserPanel"/"DetailPanel" grid names no longer resolve —
-    // those controls were replaced by Dock-hosted tool content with no compile-time
-    // x:Name. OnTourStepChanged's FindControl(...) already no-ops gracefully (returns
-    // null, step highlight silently skipped) rather than throwing, but those tour steps
-    // need re-targeting at dockable tools in a follow-up. Tracked for Task 6+ /Gaps.md.
+    // NOTE (Docking Shell Phase 1, Task 8 cleanup): the guided tour's "BrowserPanel" and
+    // "DetailPanel" steps were dropped from GuidedTourViewModel.DefaultSteps — those
+    // targets were replaced by Dock-hosted tool content with no compile-time x:Name, so
+    // FindControl(...) below could never resolve them (silently skipped, not a crash).
+    // OnTourStepChanged's null-guard is still kept for defence — a caller could construct
+    // a GuidedTourViewModel with an arbitrary/stale target name.
 }
