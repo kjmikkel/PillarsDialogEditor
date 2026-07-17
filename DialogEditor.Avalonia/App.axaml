@@ -3,6 +3,7 @@
              xmlns:converters="clr-namespace:DialogEditor.Avalonia.Converters"
              xmlns:docking="clr-namespace:DialogEditor.Avalonia.Docking"
              xmlns:views="clr-namespace:DialogEditor.Avalonia.Views"
+             xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
              x:Class="DialogEditor.Avalonia.App"
              RequestedThemeVariant="Dark">
 
@@ -140,18 +141,47 @@
          unwrapping their Inner property into the pre-existing panel views. No
          layout/factory yet (Task 3) — just the templates so the wrappers are
          displayable once a DockControl exists. -->
+    <!-- Dock tool/document content is selected in TWO hops on purpose:
+         1. Each wrapper dockable (docking:*Tool / docking:CanvasDocument) is presented as a
+            plain ContentControl bound to its inner VM.
+         2. The inner VM is then matched to its view by the VM's TYPE (vm:* templates below).
+
+         Why the indirection: Dock's ToolControl hosts the active tool through a
+         DeferredContentControl + ControlRecyclingDataTemplate. When two tools share one ToolDock
+         (Node Details + Condition search), switching the active tab does NOT rebuild that host's
+         child — it keeps the first-built view and merely lets DataContext="{Binding ActiveDockable}"
+         re-flow down, which would rebind e.g. NodeDetailView onto a ConditionSearchViewModel (wrong
+         view, wrong data). By presenting Inner through a ContentControl, the *inner* ContentControl
+         re-selects its child by the new VM's runtime type on every DataContext change, so the correct
+         view always renders regardless of Dock reusing the outer host. (GUI-verified: Details<->Condition
+         search tab switching now shows the right panel both directions.) -->
     <Application.DataTemplates>
         <DataTemplate DataType="docking:BrowserTool">
-            <views:GameBrowserView DataContext="{Binding Inner}"/>
+            <ContentControl Content="{Binding Inner}"/>
         </DataTemplate>
         <DataTemplate DataType="docking:DetailsTool">
-            <views:NodeDetailView DataContext="{Binding Inner}"/>
+            <ContentControl Content="{Binding Inner}"/>
         </DataTemplate>
         <DataTemplate DataType="docking:ConditionSearchTool">
-            <views:ConditionSearchView DataContext="{Binding Inner}"/>
+            <ContentControl Content="{Binding Inner}"/>
         </DataTemplate>
         <DataTemplate DataType="docking:CanvasDocument">
-            <views:ConversationView DataContext="{Binding Inner}"/>
+            <ContentControl Content="{Binding Inner}"/>
+        </DataTemplate>
+
+        <!-- VM-type -> view. These drive the ContentControls above; keeping them global also makes
+             each panel VM render consistently anywhere it is presented by type. -->
+        <DataTemplate DataType="vm:GameBrowserViewModel">
+            <views:GameBrowserView/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:NodeDetailViewModel">
+            <views:NodeDetailView/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:ConditionSearchViewModel">
+            <views:ConditionSearchView/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:ConversationViewModel">
+            <views:ConversationView/>
         </DataTemplate>
     </Application.DataTemplates>
 
