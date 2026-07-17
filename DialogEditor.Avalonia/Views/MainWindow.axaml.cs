@@ -264,11 +264,9 @@ public partial class MainWindow : Window
     // now-orphaned subscription behind or double-subscribing the same instance twice.
     private ConversationView? _wiredCanvasView;
 
-    // Bounds TryWireCanvasFocusHop's retry loop below — a handful of dispatcher passes
-    // is normally more than enough for Dock to realise the tool content; giving up
-    // afterwards avoids spinning forever if the Canvas tool is never shown (e.g. closed
-    // by the user before a game folder ever loads it, or a future layout omits it).
-    private const int MaxCanvasWireAttempts = 20;
+    // The LayoutUpdated handler we attach while waiting for the canvas ConversationView to
+    // realise (null when we're not currently waiting). Held so we can detach it once wired.
+    private EventHandler? _canvasWireHandler;
 
     /// Builds the docking layout (Conversations/Canvas/Node Details/Condition search) once
     /// the shell-level ConditionSearchViewModel exists — i.e. once a game folder has loaded
@@ -320,33 +318,39 @@ public partial class MainWindow : Window
         _factory = factory;
 
         // The document/tool content is realised by Application.DataTemplates once Dock
-        // renders the new layout, not synchronously here — retry across dispatcher
-        // passes (bounded) until the live ConversationView instance exists to hook.
-        TryWireCanvasFocusHop(MaxCanvasWireAttempts);
+        // renders the new layout — and, because Dock presents document/tool bodies through a
+        // DeferredContentControl, the ConversationView can appear several layout passes AFTER
+        // BuildDock returns. A bounded burst of Dispatcher.Post(Loaded) retries raced that
+        // deferral timeline and lost (all attempts ran before the view existed). Instead,
+        // listen on LayoutUpdated and wire the hop the first pass the view is present.
+        WireCanvasFocusHopWhenRealised();
     }
 
-    /// Finds the live ConversationView and, once found, hooks its FocusDetailRequested
-    /// event — resolving the target NodeDetailView lazily, at fire time, so a
-    /// not-yet-realised/closed/floated Detail tool degrades to a no-op instead of an
-    /// NRE. If the view isn't realised yet, reposts itself for the next dispatcher pass
-    /// (up to <paramref name="attemptsLeft"/> times) instead of giving up silently.
-    private void TryWireCanvasFocusHop(int attemptsLeft)
+    /// Hooks the canvas ConversationView's FocusDetailRequested (Enter on a node → focus the
+    /// Node Details pane) as soon as Dock realises the view. Because that realisation is
+    /// deferred and its exact timing is not observable up front, we watch LayoutUpdated —
+    /// which fires on every layout pass, including the one that first materialises the
+    /// deferred document content — and detach ourselves once the hop is wired. The
+    /// NodeDetailView target is resolved lazily at fire time, so a closed/floated Detail tool
+    /// degrades to a no-op instead of an NRE.
+    private void WireCanvasFocusHopWhenRealised()
     {
-        if (FindCanvasView() is not { } canvasView)
-        {
-            if (attemptsLeft <= 1)
-            {
-                AppLog.Warn("MainWindow: gave up waiting for ConversationView to realise; " +
-                            "canvas -> detail focus hop (Enter on a node) will not work this session.");
-                return;
-            }
-            Dispatcher.UIThread.Post(() => TryWireCanvasFocusHop(attemptsLeft - 1), DispatcherPriority.Loaded);
-            return;
-        }
+        if (_canvasWireHandler is not null) return;   // already waiting (a prior build's watcher is live)
 
-        if (ReferenceEquals(canvasView, _wiredCanvasView)) return;   // already hooked
-        _wiredCanvasView = canvasView;
-        canvasView.FocusDetailRequested += (_, _) => FindDetailView()?.FocusFirstField();
+        _canvasWireHandler = (_, _) =>
+        {
+            if (FindCanvasView() is not { } canvasView) return;   // not realised yet — keep listening
+
+            if (!ReferenceEquals(canvasView, _wiredCanvasView))
+            {
+                _wiredCanvasView = canvasView;
+                canvasView.FocusDetailRequested += (_, _) => FindDetailView()?.FocusFirstField();
+            }
+
+            LayoutUpdated -= _canvasWireHandler;   // wired (or already wired to this instance) — stop watching
+            _canvasWireHandler = null;
+        };
+        LayoutUpdated += _canvasWireHandler;
     }
 
     /// Locates the live ConversationView hosted by the Dock canvas document. Dock
