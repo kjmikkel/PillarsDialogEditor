@@ -48,6 +48,36 @@ public class DockLayoutStoreTests : IDisposable
     // deserialization. EditorDockFactory.RestoreLayout must fix both: swap in fresh, live-wired
     // wrapper instances by Id, and reconcile ActiveDockable/DefaultDockable back to the
     // (now-fresh) VisibleDockables entries.
+    // Regression for the app-close defect: the real app calls factory.InitLayout(layout) before
+    // ever saving (MainWindow.BuildDock does this on every layout, freshly-created or restored).
+    // InitLayout wires Owner/Factory/Context back-references (and MdiBounds tracking state) onto
+    // the model — a graph the PREVIOUS version of this test never exercised, because it saved
+    // straight from CreateLayout() with no InitLayout call. That gap is exactly why the 0-byte-
+    // file/"object cycle" defect (AppLog.Warn: "Dock layout save failed: A possible object cycle
+    // was detected... Path: $.MdiBounds.X") shipped past this test suite.
+    [Fact]
+    public void SaveThenLoad_RoundTripsStructure_AfterInitLayout()
+    {
+        DialogEditor.ViewModels.Resources.Loc.Configure(new DialogEditor.Tests.Helpers.StubStringProvider());
+        var factory = new EditorDockFactory(
+            new DialogEditor.ViewModels.GameBrowserViewModel(new DialogEditor.Tests.Helpers.StubDispatcher()),
+            new DialogEditor.ViewModels.ConversationViewModel(new DialogEditor.Tests.Helpers.StubDispatcher()),
+            new DialogEditor.ViewModels.NodeDetailViewModel(),
+            new DialogEditor.ViewModels.ConditionSearchViewModel("poe2", () => null, _ => { }, () => { }));
+        var layout = factory.CreateLayout();
+        factory.InitLayout(layout);
+
+        var store = new DockLayoutStore();
+        store.Save(layout, _path);
+
+        Assert.True(File.Exists(_path));
+        Assert.True(new FileInfo(_path).Length > 0, "layout.json must not be 0 bytes after Save");
+
+        var restored = store.Load(_path);
+        Assert.NotNull(restored);
+        Assert.Contains("Browser", Flatten(restored!));
+    }
+
     [Fact]
     public void RestoreLayout_ReattachesLiveInnerOnBrowserTool()
     {
