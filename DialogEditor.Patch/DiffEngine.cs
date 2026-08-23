@@ -75,6 +75,11 @@ public static class DiffEngine
         TryAddChange(changes, "HasVO",          @base.HasVO,             current.HasVO);
         TryAddChange(changes, "HideSpeaker",    @base.HideSpeaker,       current.HideSpeaker);
 
+        // Invariant: a node's links are keyed by target, so it must never carry two
+        // links to the same ToNodeId — a duplicate makes this ToDictionary throw and
+        // every save of the conversation fail (B-009). Creation is funnelled through
+        // ConversationViewModel.AddConnection, which rejects duplicate source→target
+        // pairs; keep that guard if the link model ever gains another creation path.
         var baseLinks    = @base.Links.ToDictionary(l => l.ToNodeId);
         var currentLinks = current.Links.ToDictionary(l => l.ToNodeId);
 
