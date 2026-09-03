@@ -33,8 +33,14 @@ public static class BuildOutputParser
 
         foreach (Match m in DiagnosticPattern.Matches(output))
         {
-            var key = m.Value;
-            // MSBuild repeats the same diagnostic once per target framework.
+            // Deduplicate on severity+code+location rather than the whole line. MSBuild
+            // repeats a diagnostic once per target framework (identical lines), but it also
+            // restates ONE problem many times with a varying counter — a locked output file
+            // emits ten MSB3026 "Beginning retry N" warnings from the same targets line.
+            // Keying on the message text would let those flood the list.
+            var key = string.Join('|',
+                m.Groups["sev"].Value, m.Groups["code"].Value,
+                m.Groups["file"].Value.Trim(), m.Groups["line"].Value, m.Groups["col"].Value);
             if (!seen.Add(key)) continue;
 
             all.Add(new Diagnostic(

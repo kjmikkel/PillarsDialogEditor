@@ -70,6 +70,24 @@ public class BuildOutputParserTests
     }
 
     [Fact]
+    public void CollapsesMsBuildRetryWarningsThatRestateOneProblem()
+    {
+        // Observed live: a locked-output-file build emits ten MSB3026 "Beginning retry N"
+        // warnings from the same targets file line. Deduplicating on the whole line cannot
+        // see they are one problem, so they flooded the diagnostic list and crowded out
+        // the two real errors.
+        var retries = Enumerable.Range(1, 10).Select(i =>
+            @"C:\Program Files\dotnet\sdk\10.0.400\Microsoft.Common.CurrentVersion.targets(5455,5): " +
+            $"warning MSB3026: Could not copy \"apphost.exe\". Beginning retry {i} in 1000ms. " +
+            @"[C:\repo\tools\DialogEditor.UiaMcp\DialogEditor.UiaMcp.csproj]");
+        var output = string.Join("\n", retries) + "\nBuild FAILED.\n";
+
+        var result = BuildOutputParser.Parse(output);
+
+        Assert.Single(result.Diagnostics);
+    }
+
+    [Fact]
     public void TruncatesToMaxDiagnosticsAndFlagsIt()
     {
         var lines = Enumerable.Range(1, 30)

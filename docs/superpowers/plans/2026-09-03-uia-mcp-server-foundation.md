@@ -2206,7 +2206,7 @@ git commit -m "feat(uiamcp): add read_tree, find and menu inspection tools"
 - Consumes: `BuildOutputParser`, `TestOutputParser` (Tasks 2–3).
 - Produces: MCP tools `build`, `run_tests`.
 
-- [ ] **Step 1: Write the process runner**
+- [x] **Step 1: Write the process runner**
 
 `tools/DialogEditor.UiaMcp/ProcessRunner.cs`:
 
@@ -2249,7 +2249,7 @@ internal static class ProcessRunner
 }
 ```
 
-- [ ] **Step 2: Write the build/test tools**
+- [x] **Step 2: Write the build/test tools**
 
 `tools/DialogEditor.UiaMcp/Tools/BuildTools.cs`:
 
@@ -2312,12 +2312,12 @@ internal sealed class BuildTools
 }
 ```
 
-- [ ] **Step 3: Build**
+- [x] **Step 3: Build**
 
 Run: `dotnet build "DialogEditor.slnx" -c Debug`
 Expected: Build succeeded, 0 errors.
 
-- [ ] **Step 4: Verify manually**
+- [x] **Step 4: Verify manually**
 
 Run:
 
@@ -2335,7 +2335,7 @@ pwsh tools/DialogEditor.UiaMcp/drive.ps1 -Tool run_tests -Arguments @{ repoRoot 
 
 Expected: `Tests passed. 11 passed, 0 skipped, 11 total.` The filter must be fully qualified: `FullyQualifiedName~ResolverTests` is a substring match that also catches the pre-existing `VoPathResolverTests` and `LanguageNameResolverTests`, giving 41.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp/ProcessRunner.cs tools/DialogEditor.UiaMcp/Tools/BuildTools.cs
