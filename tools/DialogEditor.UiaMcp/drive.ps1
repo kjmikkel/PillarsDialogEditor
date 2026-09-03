@@ -16,12 +16,18 @@
 #   ... -Tool launch_app -Arguments '{"repoRoot":"C:/repo"}' -Then session_status,kill_app
 
 param(
-    [Parameter(Mandatory)][string]$Tool,
+    [string]$Tool,
     # Hashtable (in-session) or JSON string (across a process boundary) — see header.
     [object]$Arguments = @{},
     # Comma-separated is accepted, because a string[] passed across a new pwsh
-    # process boundary arrives as one comma-joined string.
+    # process boundary arrives as one comma-joined string. -Then carries no arguments;
+    # use -Script when later calls in the same session need their own.
     [string[]]$Then = @(),
+    # A JSON array of {name, arguments} run in order against ONE server process, for
+    # sequences where later tools need arguments of their own:
+    #   -Script '[{"name":"launch_app","arguments":{"repoRoot":"C:/repo"}},
+    #             {"name":"find","arguments":{"query":"Viewbox"}}]'
+    [string]$Script,
     [switch]$KeepAlive,
     [string]$Exe = "tools/DialogEditor.UiaMcp/bin/Debug/net8.0-windows/DialogEditor.UiaMcp.exe",
     [int]$TimeoutSec = 120
@@ -89,15 +95,28 @@ try {
         clientInfo = @{ name = "drive.ps1"; version = "1" } } | Out-Null
     Send-Rpc -Id $null -Method "notifications/initialized" -Params @{} | Out-Null
 
-    Invoke-Tool -Name $Tool -ToolArgs $Arguments
-    foreach ($t in $Then) { Invoke-Tool -Name $t -ToolArgs @{} }
+    $ranKill = $false
+    if ($Script) {
+        foreach ($step in ($Script | ConvertFrom-Json)) {
+            $stepArgs = @{}
+            if ($step.arguments) {
+                $step.arguments.PSObject.Properties | ForEach-Object { $stepArgs[$_.Name] = $_.Value }
+            }
+            Invoke-Tool -Name $step.name -ToolArgs $stepArgs
+            if ($step.name -eq 'kill_app') { $ranKill = $true }
+        }
+    }
+    else {
+        if (-not $Tool) { throw "Pass -Tool or -Script." }
+        Invoke-Tool -Name $Tool -ToolArgs $Arguments
+        foreach ($t in $Then) { Invoke-Tool -Name $t -ToolArgs @{} }
+        $ranKill = ($Tool -eq 'kill_app') -or ($Then -contains 'kill_app')
+    }
 
     # Never leave the editor running with the user's settings mutated. A hard Kill()
     # of this server does NOT run its ProcessExit handler, so nothing else would
     # tear the app down or restore settings until the next server start.
-    if (-not $KeepAlive -and $Tool -ne 'kill_app' -and $Then -notcontains 'kill_app') {
-        Invoke-Tool -Name 'kill_app'
-    }
+    if (-not $KeepAlive -and -not $ranKill) { Invoke-Tool -Name 'kill_app' }
 }
 finally {
     # Close stdin so the server ends its stdio loop and exits normally, giving its

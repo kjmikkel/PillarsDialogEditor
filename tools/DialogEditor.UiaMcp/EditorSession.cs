@@ -42,6 +42,9 @@ internal sealed class EditorSession
     public string? StartupRecovery { get; }
     public bool IsLive => _process is { HasExited: false };
 
+    /// <summary>Shared across tool calls so refs minted by read_tree resolve in later calls.</summary>
+    public RefTable Refs { get; } = new();
+
     public string Launch(string repoRoot, string project)
     {
         var exe = Path.Combine(repoRoot, "DialogEditor.Avalonia", "bin", "Debug", "net8.0",
