@@ -30,6 +30,7 @@
     <ProjectReference Include="..\DialogEditor.Core\DialogEditor.Core.csproj" />
     <ProjectReference Include="..\DialogEditor.Patch\DialogEditor.Patch.csproj" />
     <ProjectReference Include="..\DialogEditor.ViewModels\DialogEditor.ViewModels.csproj" />
+    <ProjectReference Include="..\tools\DialogEditor.UiaMcp.Core\DialogEditor.UiaMcp.Core.csproj" />
   </ItemGroup>
 
 </Project>
