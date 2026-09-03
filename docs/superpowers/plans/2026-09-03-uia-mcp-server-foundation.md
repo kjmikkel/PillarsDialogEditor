@@ -57,7 +57,7 @@ The settings state machine is first because it is the safety property everything
 - Consumes: nothing.
 - Produces: `SettingsGuard(string settingsPath, string backupPath)` with `string? RecoverStaleBackup()`, `void Backup()`, `string Restore()`, `void SetLastProjectPath(string path)`.
 
-- [ ] **Step 1: Create the Core project**
+- [x] **Step 1: Create the Core project**
 
 `tools/DialogEditor.UiaMcp.Core/DialogEditor.UiaMcp.Core.csproj`:
 
@@ -85,7 +85,7 @@ Add to `DialogEditor.Tests/DialogEditor.Tests.csproj`, inside the existing `Item
     <ProjectReference Include="..\tools\DialogEditor.UiaMcp.Core\DialogEditor.UiaMcp.Core.csproj" />
 ```
 
-- [ ] **Step 2: Write the failing tests**
+- [x] **Step 2: Write the failing tests**
 
 `DialogEditor.Tests/UiaMcp/SettingsGuardTests.cs`:
 
@@ -204,12 +204,12 @@ public class SettingsGuardTests : IDisposable
 }
 ```
 
-- [ ] **Step 3: Run the tests to verify they fail**
+- [x] **Step 3: Run the tests to verify they fail**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~SettingsGuardTests"`
 Expected: FAIL — `SettingsGuard` does not exist (CS0246).
 
-- [ ] **Step 4: Write the minimal implementation**
+- [x] **Step 4: Write the minimal implementation**
 
 `tools/DialogEditor.UiaMcp.Core/SettingsGuard.cs`:
 
@@ -273,12 +273,12 @@ public sealed class SettingsGuard(string settingsPath, string backupPath)
 }
 ```
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~SettingsGuardTests"`
 Expected: PASS, 7 tests.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp.Core DialogEditor.slnx DialogEditor.Tests/DialogEditor.Tests.csproj DialogEditor.Tests/UiaMcp/SettingsGuardTests.cs
@@ -2309,7 +2309,7 @@ Run:
 pwsh tools/DialogEditor.UiaMcp/drive.ps1 -Tool build -Arguments @{ repoRoot = (Get-Location).Path }
 ```
 
-Expected: `Build succeeded. 0 error(s), 8 warning(s).` followed by up to 20 diagnostics.
+Expected: `Build succeeded.` with 0 errors. Warning count depends on what recompiled — a clean build reports 8 pre-existing warnings, an incremental one reports 0. Only the error count is a pass/fail signal here.
 
 Run:
 
