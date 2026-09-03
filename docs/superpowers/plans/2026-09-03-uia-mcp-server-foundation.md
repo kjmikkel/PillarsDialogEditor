@@ -297,7 +297,7 @@ git commit -m "feat(uiamcp): add SettingsGuard with stale-backup recovery"
 - Consumes: nothing.
 - Produces: `record Diagnostic(string Severity, string File, int Line, int Column, string Code, string Message)`; `record BuildResult(bool Succeeded, int ErrorCount, int WarningCount, IReadOnlyList<Diagnostic> Diagnostics, bool Truncated)`; `static BuildResult BuildOutputParser.Parse(string output, int maxDiagnostics = 20)`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `DialogEditor.Tests/UiaMcp/BuildOutputParserTests.cs`:
 
@@ -388,12 +388,12 @@ public class BuildOutputParserTests
 }
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~BuildOutputParserTests"`
 Expected: FAIL — `BuildOutputParser` does not exist.
 
-- [ ] **Step 3: Write the minimal implementation**
+- [x] **Step 3: Write the minimal implementation**
 
 `tools/DialogEditor.UiaMcp.Core/BuildOutputParser.cs`:
 
@@ -473,12 +473,12 @@ public static class BuildOutputParser
 }
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~BuildOutputParserTests"`
 Expected: PASS, 6 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp.Core/BuildOutputParser.cs DialogEditor.Tests/UiaMcp/BuildOutputParserTests.cs
