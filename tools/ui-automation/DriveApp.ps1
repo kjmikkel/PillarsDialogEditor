@@ -32,6 +32,7 @@
 
 $script:SettingsPath = Join-Path $env:LOCALAPPDATA "PillarsDialogEditor\settings.json"
 $script:SettingsBackup = $null
+$script:SettingsBackupPath = Join-Path $env:TEMP "PillarsDialogEditor.settings.backup.json"
 
 function Initialize-DriveApp {
     # Loads the UIA client, WinForms (SendKeys), Drawing (screenshots), and the
@@ -66,15 +67,38 @@ public class DriveAppWin32 {
 
 function Backup-EditorSettings {
     # Snapshot the user's real settings before a verification run touches them.
-    if (Test-Path $script:SettingsPath) {
-        $script:SettingsBackup = Get-Content $script:SettingsPath -Raw
+    #
+    # The snapshot goes to a FILE, not just a variable: a verification run is often
+    # split across several pwsh invocations (launch in one, drive in the next, tear
+    # down in a third), and $script: state dies with the session that set it. An
+    # in-memory-only backup makes Restore-EditorSettings a silent no-op in any later
+    # session — the user's real LastProjectPath then keeps whatever the run left behind.
+    #
+    # An existing backup is never overwritten: if a previous run died before restoring,
+    # the older file is the one holding the user's genuine settings.
+    if (-not (Test-Path $script:SettingsPath)) { return }
+    if (-not (Test-Path $script:SettingsBackupPath)) {
+        Copy-Item $script:SettingsPath $script:SettingsBackupPath -Force
     }
+    $script:SettingsBackup = Get-Content $script:SettingsPath -Raw
 }
 
 function Restore-EditorSettings {
     # Put the user's settings back exactly as they were. Call from a finally.
-    if ($null -ne $script:SettingsBackup) {
+    # Kill the app FIRST — it rewrites settings on exit and would win the race.
+    # Reads the on-disk snapshot, so this works from a different pwsh session than
+    # the one that called Backup-EditorSettings. Removes the snapshot on success so
+    # the next run starts clean; warns loudly if there is nothing to restore, since
+    # a silent no-op here is how a run leaks its state into the user's session.
+    if (Test-Path $script:SettingsBackupPath) {
+        Copy-Item $script:SettingsBackupPath $script:SettingsPath -Force
+        Remove-Item $script:SettingsBackupPath -Force
+    }
+    elseif ($null -ne $script:SettingsBackup) {
         Set-Content -Path $script:SettingsPath -Value $script:SettingsBackup -Encoding UTF8
+    }
+    else {
+        Write-Warning "Restore-EditorSettings: no backup found — settings.json still holds whatever this run wrote. Call Backup-EditorSettings before mutating it."
     }
 }
 
