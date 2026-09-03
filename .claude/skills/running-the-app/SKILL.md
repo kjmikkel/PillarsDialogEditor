@@ -13,6 +13,18 @@ read its header comment — it documents the gotchas so you don't rediscover the
 **Prerequisites:** a Debug build (`dotnet build "DialogEditor.slnx"`), pwsh 7+,
 and a real interactive desktop (screenshots/SendKeys fail on a headless session).
 
+**Prefer the MCP server for inspection when it is registered.**
+`tools/DialogEditor.UiaMcp` exposes `launch_app`, `read_tree`, `find`, `menu`,
+`window_title`, `read_status_bar`, `build` and `run_tests` as tools, with the
+gotchas below already encoded — including erroring on ambiguous names instead of
+silently clicking the first match, and scoping menu queries to the app's own menu
+so the OS "System" item cannot wedge a run. It also restores a stale settings
+snapshot at startup, so a crashed run cannot strand `LastProjectPath`.
+
+It does **not** yet implement actions — clicking, typing, screenshots — so use the
+PowerShell path below for those, and whenever the server is not registered. See
+`tools/DialogEditor.UiaMcp/README.md`.
+
 ## The golden path
 
 Run from pwsh with the repo root in `$repo`:
