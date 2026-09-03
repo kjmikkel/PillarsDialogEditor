@@ -1101,7 +1101,7 @@ This is the core of the design: the departure from `Invoke-ElementClick`'s silen
 - Consumes: `IUiaTree`, `ElementInfo`, `Selector` (Tasks 4–5).
 - Produces: `record ResolveResult(ElementInfo? Element, string? ErrorKind, string? ErrorMessage)`; `class Resolver(IUiaTree tree, string? uiLanguage = null)` with `ResolveResult Resolve(Selector selector)` and `IReadOnlyList<ElementInfo> Flatten(string? withinPane = null)`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `DialogEditor.Tests/UiaMcp/ResolverTests.cs`:
 
@@ -1224,12 +1224,12 @@ public class ResolverTests
 }
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~ResolverTests"`
 Expected: FAIL — `Resolver` does not exist.
 
-- [ ] **Step 3: Write the minimal implementation**
+- [x] **Step 3: Write the minimal implementation**
 
 `tools/DialogEditor.UiaMcp.Core/Resolver.cs`:
 
@@ -1399,12 +1399,12 @@ public sealed class Resolver(IUiaTree tree, string? uiLanguage = null)
 }
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~ResolverTests"`
 Expected: PASS, 11 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp.Core/Resolver.cs DialogEditor.Tests/UiaMcp/ResolverTests.cs
@@ -2314,10 +2314,10 @@ Expected: `Build succeeded.` with 0 errors. Warning count depends on what recomp
 Run:
 
 ```powershell
-pwsh tools/DialogEditor.UiaMcp/drive.ps1 -Tool run_tests -Arguments @{ repoRoot = (Get-Location).Path; filter = "FullyQualifiedName~ResolverTests" }
+pwsh tools/DialogEditor.UiaMcp/drive.ps1 -Tool run_tests -Arguments @{ repoRoot = (Get-Location).Path; filter = "FullyQualifiedName~DialogEditor.Tests.UiaMcp.ResolverTests" }
 ```
 
-Expected: `Tests passed. 11 passed, 0 skipped, 11 total.`
+Expected: `Tests passed. 11 passed, 0 skipped, 11 total.` The filter must be fully qualified: `FullyQualifiedName~ResolverTests` is a substring match that also catches the pre-existing `VoPathResolverTests` and `LanguageNameResolverTests`, giving 41.
 
 - [ ] **Step 5: Commit**
 
