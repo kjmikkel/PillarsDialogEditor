@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Automation;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Primitives;
 using Avalonia.Platform;
 using Avalonia.Controls;
@@ -35,6 +36,12 @@ public partial class MainWindow : Window
     // Tour adorner state — one adorner on one target at a time.
     private TourHighlightAdorner? _tourAdorner;
     private Control?              _tourTarget;
+
+    // One-shot LayoutUpdated watcher used when a tour step's target is a Dock tool whose
+    // content has not been realised yet (see AttachTourAdornerWhenRealised). Held so the
+    // next step change can cancel a watcher that is still hunting for the previous step's
+    // target — otherwise a late realisation would ring a control the user has moved past.
+    private EventHandler? _tourRealiseHandler;
 
     // Set to true immediately before a programmatic Close() call so that
     // the re-entrant OnClosing doesn't show the dirty-close dialog again.
@@ -356,13 +363,40 @@ public partial class MainWindow : Window
     /// Locates the live ConversationView hosted by the Dock canvas document. Dock
     /// instantiates it lazily from Application.DataTemplates, so this is a lookup
     /// (not a cached field) — safe to call any time after BuildDock has run.
-    private ConversationView? FindCanvasView() =>
-        this.GetVisualDescendants().OfType<ConversationView>().FirstOrDefault();
+    private ConversationView? FindCanvasView() => FindDockedView<ConversationView>();
 
     /// Locates the live NodeDetailView hosted by the Dock details tool (same caveat as
-    /// <see cref="FindCanvasView"/> — it may be null if the tool is closed/floated away).
-    private NodeDetailView? FindDetailView() =>
-        this.GetVisualDescendants().OfType<NodeDetailView>().FirstOrDefault();
+    /// <see cref="FindCanvasView"/> — it may be null if the tool is closed).
+    private NodeDetailView? FindDetailView() => FindDockedView<NodeDetailView>();
+
+    /// Locates the live GameBrowserView hosted by the Dock conversations tool.
+    private GameBrowserView? FindBrowserView() => FindDockedView<GameBrowserView>();
+
+    /// Finds a Dock-hosted view by TYPE rather than by name. Tool content is instantiated
+    /// lazily from Application.DataTemplates and therefore carries no compile-time x:Name
+    /// in MainWindow's scope, so type is the only stable handle we have on it.
+    ///
+    /// Searches this window first, then any floating EditorHostWindow: dragging a tool out
+    /// reparents its content into a separate TopLevel, where this window's visual tree can
+    /// no longer see it. Returns null when the tool is closed entirely, or when Dock has
+    /// not realised the content yet — callers must treat null as "not now", not "never".
+    private T? FindDockedView<T>() where T : Control
+    {
+        if (this.GetVisualDescendants().OfType<T>().FirstOrDefault() is { } here)
+            return here;
+
+        // Application.Current already tracks every open top-level, so floating hosts need
+        // no registry of their own — Dock opens and closes them behind our back.
+        if (global::Avalonia.Application.Current?.ApplicationLifetime
+            is IClassicDesktopStyleApplicationLifetime desktop)
+        {
+            foreach (var host in desktop.Windows.OfType<EditorHostWindow>())
+                if (host.GetVisualDescendants().OfType<T>().FirstOrDefault() is { } floated)
+                    return floated;
+        }
+
+        return null;
+    }
 
     // ── View menu: show/focus a tool, re-opening it if the user closed its tab ────
     private void ShowBrowserTool_Click(object? sender, RoutedEventArgs e)         => ShowToolById(EditorDockFactory.BrowserId);
@@ -945,17 +979,77 @@ public partial class MainWindow : Window
     }
 
     // ── Guided tour adorner ───────────────────────────────────────────────
+
+    /// Maps a step's opaque TargetName to (a) the Dock tool that must be on screen before
+    /// the target can exist, and (b) how to find the live Control once it does.
+    ///
+    /// The first three targets are Dock-hosted tool content. They have no x:Name in this
+    /// window's scope, so FindControl can never see them — they are found by view type
+    /// instead. Anything else falls through to the classic named-control lookup, which is
+    /// still correct for chrome that lives directly in MainWindow.axaml (HelpToggle).
+    private (string? DockId, Func<Control?> Resolve) ResolveTourTarget(string targetName) =>
+        targetName switch
+        {
+            "BrowserPanel" => (EditorDockFactory.BrowserId, () => FindBrowserView()),
+            "CanvasView"   => (EditorDockFactory.CanvasId,  () => FindCanvasView()),
+            "DetailPanel"  => (EditorDockFactory.DetailsId, () => FindDetailView()),
+            _              => (null, () => this.FindControl<Control>(targetName)),
+        };
+
     private void OnTourStepChanged()
     {
         RemoveTourAdorner();
+        CancelTourRealiseWatch();   // a watcher still hunting the previous step is now stale
 
         var vm = (MainWindowViewModel)DataContext!;
         if (!vm.Tour.IsVisible) return;
 
-        var step   = vm.Tour.CurrentStep;
-        var target = this.FindControl<Control>(step.TargetName);
-        if (target is null) return;
+        var (dockId, resolve) = ResolveTourTarget(vm.Tour.CurrentStep.TargetName);
 
+        // Reveal before highlighting. The tour is onboarding: a step describing the Node
+        // Details pane is worthless if the user closed that tab, and ShowToolById already
+        // handles both cases (RestoreDockable for a closed tab, SetActiveDockable for one
+        // that is merely the inactive sibling in a tab group).
+        if (dockId is not null) ShowToolById(dockId);
+
+        if (resolve() is { } target)
+        {
+            AttachTourAdorner(target);
+            return;
+        }
+
+        // Not realised yet. Dock materialises tool content lazily, so a tool revealed a
+        // moment ago has no Control to adorn until the next layout pass — the same timing
+        // problem WireCanvasFocusHopWhenRealised solves for the canvas→detail focus hop.
+        if (dockId is not null) AttachTourAdornerWhenRealised(resolve);
+    }
+
+    /// Waits for Dock to realise a just-revealed tool's content, then rings it. Self-detaches
+    /// on success; a step change detaches it via CancelTourRealiseWatch. If the content never
+    /// appears (the tool was floated into a window that has since closed, say) the watcher is
+    /// simply dropped at the next step — a missing ring, never a crash.
+    private void AttachTourAdornerWhenRealised(Func<Control?> resolve)
+    {
+        _tourRealiseHandler = (_, _) =>
+        {
+            if (resolve() is not { } target) return;   // still deferred — keep listening
+            CancelTourRealiseWatch();
+            AttachTourAdorner(target);
+        };
+        LayoutUpdated += _tourRealiseHandler;
+    }
+
+    private void CancelTourRealiseWatch()
+    {
+        if (_tourRealiseHandler is null) return;
+        LayoutUpdated -= _tourRealiseHandler;
+        _tourRealiseHandler = null;
+    }
+
+    private void AttachTourAdorner(Control target)
+    {
+        // A floated tool lives in its own TopLevel, so the adorner layer must come from the
+        // target's own tree rather than this window's.
         var layer = AdornerLayer.GetAdornerLayer(target);
         if (layer is null) return;
 
@@ -972,11 +1066,4 @@ public partial class MainWindow : Window
         _tourTarget  = null;
         _tourAdorner = null;
     }
-
-    // NOTE (Docking Shell Phase 1, Task 8 cleanup): the guided tour's "BrowserPanel" and
-    // "DetailPanel" steps were dropped from GuidedTourViewModel.DefaultSteps — those
-    // targets were replaced by Dock-hosted tool content with no compile-time x:Name, so
-    // FindControl(...) below could never resolve them (silently skipped, not a crash).
-    // OnTourStepChanged's null-guard is still kept for defence — a caller could construct
-    // a GuidedTourViewModel with an arbitrary/stale target name.
 }

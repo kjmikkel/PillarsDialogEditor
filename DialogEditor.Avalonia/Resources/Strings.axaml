@@ -1403,7 +1403,9 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="ToolTip_Tour_Dismiss">Close the guided tour without finishing</sys:String>
     <sys:String x:Key="AutomationName_Tour_Dismiss">Dismiss tour</sys:String>
 
+    <sys:String x:Key="Tour_Step1_Text">The conversation browser lists every conversation in your game folder. Click one to open it on the canvas.</sys:String>
     <sys:String x:Key="Tour_Step2_Text">The canvas shows the node graph for the open conversation. Click a node to select it; double-click empty space to add a new one.</sys:String>
+    <sys:String x:Key="Tour_Step3_Text">The detail panel shows the selected node's text, speaker, and conditions. Edit here to change what characters say.</sys:String>
     <sys:String x:Key="Tour_Step4_Text">The ? button shows a hint for whatever you focus. Help ▸ Open Walkthrough has the full beginner guide.</sys:String>
 
     <!-- ── Diff window first-run intro banner ───────────────────────────── -->

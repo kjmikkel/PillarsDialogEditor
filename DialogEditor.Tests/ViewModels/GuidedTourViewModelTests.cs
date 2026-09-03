@@ -148,4 +148,21 @@ public sealed class GuidedTourViewModelTests
         vm.NextCommand.Execute(null);
         Assert.Equal("CanvasView", vm.CurrentStep.TargetName);
     }
+
+    // The four onboarding targets, in the order a newcomer meets them: pick a
+    // conversation, see it on the canvas, edit the selected node, find further help.
+    // Pinned because the Browser/Details steps were once silently dropped when the
+    // docking shell removed their named controls — the steps are the contract, and
+    // MainWindow is responsible for resolving each target, not for defining the set.
+    [Fact]
+    public void DefaultSteps_CoverTheFourOnboardingTargets()
+    {
+        Assert.Equal(
+            new[] { "BrowserPanel", "CanvasView", "DetailPanel", "HelpToggle" },
+            GuidedTourViewModel.DefaultSteps.Select(s => s.TargetName));
+
+        Assert.Equal(
+            new[] { "Tour_Step1_Text", "Tour_Step2_Text", "Tour_Step3_Text", "Tour_Step4_Text" },
+            GuidedTourViewModel.DefaultSteps.Select(s => s.DescriptionKey));
+    }
 }
