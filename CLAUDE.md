@@ -50,17 +50,19 @@ back-fill entries before then — pre-release churn is not changelog-worthy and 
 ships effectively empty (or with a single "unreleased" placeholder). **Remove this rule
 when the initial version is published**, after which every release appends its entries.
 
-## Internal Tracking (pre-launch)
+## Issue Tracking
 
-`BUGS.md` and `Gaps.md` are **temporary pre-launch** working files for solo development.
-**Delete both before the initial public release** — at launch, anything still worth doing is
-transferred to GitHub Issues for public scrutiny, and tracking lives there afterwards.
+All issues — defects, feature requests, design gaps, deferred work — are registered as
+**GitHub Issues** on `kjmikkel/PillarsDialogEditor`. There is no local issue file.
 
-- `BUGS.md` — defect log; newest first; move a fixed entry to the *Fixed* section with the
-  fixing commit hash rather than deleting it.
-- `Gaps.md` — known design gaps / deferred features.
-
-**Remove this rule when both files are removed.**
+- File with `gh issue create` (the `gh` CLI is authenticated; the GitHub MCP server is not
+  reliably available). Reference issues in commits as `#NNN`.
+- The repository is **public**, so issue text is world-readable. Do not paste absolute local
+  paths, machine names, or anything from the user's game installs into an issue body.
+- `BUGS.md` and `Gaps.md` are **retired and read-only**. They remain in the tree as the
+  historical record of pre-launch work and are still linked from test docstrings and specs,
+  so do not delete or restructure them — but never add, edit, or re-open an entry in either.
+  Anything still open there is migrated to a GitHub Issue when it is next worked on.
 
 ## Worktree Cleanup
 

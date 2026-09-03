@@ -1,5 +1,13 @@
 # Dialog Editor — Bug Tracker (pre-launch, internal)
 
+>
+> ## ⛔ RETIRED — read-only historical record (2026-09-03)
+>
+> **Do not add or edit entries here.** All issue tracking moved to GitHub Issues on
+> <https://github.com/kjmikkel/PillarsDialogEditor/issues> (see the **Issue Tracking**
+> rule in `CLAUDE.md`). This file is kept because test docstrings and design specs link
+> to its entries; anything still open is migrated to a GitHub Issue when next worked on.
+
 > **Temporary file — delete before the initial public release.** This is a lightweight,
 > local bug list for solo development. When the project goes public, bug tracking moves to
 > GitHub Issues and this file is removed (see the **Bug Tracker** rule in `CLAUDE.md`).
