@@ -497,7 +497,7 @@ git commit -m "feat(uiamcp): parse dotnet build output into a compact result"
 - Consumes: nothing.
 - Produces: `record TestFailure(string TestName, string Message)`; `record TestRunResult(bool Succeeded, int Passed, int Failed, int Skipped, int Total, IReadOnlyList<TestFailure> Failures, bool Truncated)`; `static TestRunResult TestOutputParser.Parse(string output, int maxFailures = 20)`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `DialogEditor.Tests/UiaMcp/TestOutputParserTests.cs`:
 
@@ -584,12 +584,12 @@ public class TestOutputParserTests
 }
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~TestOutputParserTests"`
 Expected: FAIL — `TestOutputParser` does not exist.
 
-- [ ] **Step 3: Write the minimal implementation**
+- [x] **Step 3: Write the minimal implementation**
 
 `tools/DialogEditor.UiaMcp.Core/TestOutputParser.cs`:
 
@@ -653,12 +653,12 @@ public static class TestOutputParser
 }
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~TestOutputParserTests"`
 Expected: PASS, 5 tests.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp.Core/TestOutputParser.cs DialogEditor.Tests/UiaMcp/TestOutputParserTests.cs
