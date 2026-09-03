@@ -679,7 +679,7 @@ git commit -m "feat(uiamcp): parse dotnet test output into counts and named fail
 - Consumes: nothing.
 - Produces: `record ElementInfo(string Id, string Name, string ControlType, string AutomationId, string ClassName, bool IsEnabled, bool IsOffscreen, bool IsFocusable, IReadOnlyList<string> Patterns)`; `interface IUiaTree { ElementInfo Root { get; } IReadOnlyList<ElementInfo> ChildrenOf(string id); }`; `FakeUiaTree.AuditSnapshot()` returning an `IUiaTree`.
 
-- [ ] **Step 1: Write `ElementInfo` and `IUiaTree`**
+- [x] **Step 1: Write `ElementInfo` and `IUiaTree`**
 
 `tools/DialogEditor.UiaMcp.Core/ElementInfo.cs`:
 
@@ -716,7 +716,7 @@ public interface IUiaTree
 }
 ```
 
-- [ ] **Step 2: Write the failing test for the fake**
+- [x] **Step 2: Write the failing test for the fake**
 
 `DialogEditor.Tests/UiaMcp/FakeUiaTreeTests.cs`:
 
@@ -788,12 +788,12 @@ public class FakeUiaTreeTests
 }
 ```
 
-- [ ] **Step 3: Run the tests to verify they fail**
+- [x] **Step 3: Run the tests to verify they fail**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~FakeUiaTreeTests"`
 Expected: FAIL — `FakeUiaTree` does not exist.
 
-- [ ] **Step 4: Write the fake**
+- [x] **Step 4: Write the fake**
 
 `DialogEditor.Tests/UiaMcp/FakeUiaTree.cs`:
 
@@ -892,12 +892,12 @@ public sealed class FakeUiaTree : IUiaTree
 }
 ```
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~FakeUiaTreeTests"`
-Expected: PASS, 5 tests.
+Expected: PASS, 6 tests. (The planned assertion that ALL MenuItems lack an AutomationId was wrong: the OS system menu item carries 'Item 1'. Split into an app-menu test and a test pinning the OS peer — audit findings 4 and 5.)
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp.Core/ElementInfo.cs tools/DialogEditor.UiaMcp.Core/IUiaTree.cs DialogEditor.Tests/UiaMcp/FakeUiaTree.cs DialogEditor.Tests/UiaMcp/FakeUiaTreeTests.cs
