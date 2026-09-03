@@ -34,7 +34,10 @@ public sealed class FakeUiaTree : IUiaTree
 
         // Title bar: the OS system menu is a MenuItem peer of the app's own menus.
         var titleBar = t.Add(win.Id, "Pillars Dialog Editor [AuditScratch]", "TitleBar", "TitleBar");
-        var sysBar = t.Add(titleBar.Id, "System Menu Bar", "MenuBar", "SystemMenuBar");
+        // Focusable with NO patterns at all, as measured live — the one element the
+        // NoPatterns warning genuinely fires on.
+        var sysBar = t.Add(titleBar.Id, "System Menu Bar", "MenuBar", "SystemMenuBar",
+            focusable: true);
         t.Add(sysBar.Id, "System", "MenuItem", "Item 1");
 
         // The app's own menu is ANONYMOUS — selectable only by ClassName.
@@ -59,11 +62,16 @@ public sealed class FakeUiaTree : IUiaTree
         var left = t.Add(rootDock.Id, "Conversations", "Pane", "LeftPane", "ToolControl");
         AddPaneChrome(t, rootDock.Id);
 
-        // 37 nameless, patternless conversation rows.
-        var tree = t.Add(left.Id, "", "Tree", className: "TreeView");
+        // 37 nameless conversation rows. They DO expose Scroll/ScrollItem — measured on
+        // the live app — but no SelectionItem, ExpandCollapse or Invoke, so they cannot be
+        // selected or expanded programmatically. The original audit reported "no patterns
+        // at all"; that was a false negative from a regex bug in its PowerShell probe.
+        var tree = t.Add(left.Id, "", "Tree", className: "TreeView",
+            patterns: new[] { "Scroll", "ScrollItem" });
         for (var i = 0; i < 37; i++)
         {
-            var item = t.Add(tree.Id, "", "TreeItem", focusable: true);
+            var item = t.Add(tree.Id, "", "TreeItem", focusable: true,
+                patterns: new[] { "Scroll", "ScrollItem" });
             t.Add(item.Id, "", "Button", "PART_ExpandCollapseChevron");
             t.Add(item.Id, i == 0 ? "(root)" : $"{i:00}_conversation", "Text");
         }

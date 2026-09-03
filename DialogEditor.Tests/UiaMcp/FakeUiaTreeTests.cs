@@ -37,13 +37,20 @@ public class FakeUiaTreeTests
     }
 
     [Fact]
-    public void ReproducesThirtySevenNamelessPatternlessTreeItems()
+    public void ReproducesThirtySevenNamelessInoperableTreeItems()
     {
+        // Audit finding 1, corrected: these rows are unreachable by name AND cannot be
+        // selected or expanded programmatically — but they are not pattern-free. They
+        // expose Scroll/ScrollItem, which is what makes scroll-into-view possible.
         var all = Flatten(FakeUiaTree.AuditSnapshot());
         var items = all.Where(e => e.ControlType == "TreeItem").ToList();
+
         Assert.Equal(37, items.Count);
         Assert.All(items, i => Assert.Equal("", i.Name));
-        Assert.All(items, i => Assert.Empty(i.Patterns));
+        Assert.All(items, i => Assert.DoesNotContain("SelectionItem", i.Patterns));
+        Assert.All(items, i => Assert.DoesNotContain("ExpandCollapse", i.Patterns));
+        Assert.All(items, i => Assert.DoesNotContain("Invoke", i.Patterns));
+        Assert.All(items, i => Assert.Contains("ScrollItem", i.Patterns));
     }
 
     [Fact]

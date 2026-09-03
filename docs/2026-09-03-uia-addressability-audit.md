@@ -9,6 +9,12 @@ Two probes were run against a Debug build via `tools/ui-automation/DriveApp.ps1`
 1. the shell projectless (189 elements) and with a project open (190 elements);
 2. each of the five app menus expanded in turn (194–205 elements per surface).
 
+> **Caveat on this report's method:** the probe's pattern-name normalisation was buggy
+> and under-reported supported patterns (see the correction in Finding 1). Pattern claims
+> in this report should be re-checked against `read_tree` in the MCP server, whose
+> extraction is correct. Name, control-type, automation-id and collision findings are
+> unaffected.
+
 Method: recursive `TreeWalker.ControlViewWalker` descent from the main window, recording
 `Name`, `ControlType`, `AutomationId`, `ClassName`, `IsEnabled`, `IsKeyboardFocusable`,
 `BoundingRectangle`, and supported patterns for every element, plus the ancestor path so a
@@ -42,14 +48,26 @@ Phase 2 would have churned names that were never broken.
 
 ---
 
-## Finding 1 — The conversation tree is not programmatically operable (blocker)
+## Finding 1 — The conversation tree cannot be selected or expanded programmatically (blocker)
+
+> **Corrected 2026-09-03, after the MCP server re-measured this surface independently.**
+> This finding originally claimed the rows expose *no supported patterns at all*. That was
+> a false negative caused by a bug in this audit's own PowerShell probe: it normalised
+> pattern names with `-replace '^\w+Identifiers\.', '' -replace 'Pattern$', ''`, which
+> turns `ScrollPatternIdentifiers.Pattern` into an empty string. Two real patterns became
+> two empty strings, and `-join ','` printed a bare comma that read as "none".
+>
+> The rows **do** expose `Scroll` and `ScrollItem`. What they lack is `SelectionItem`,
+> `ExpandCollapse` and `Invoke`. The operational conclusion is unchanged — they cannot be
+> selected or expanded programmatically — and `ScrollItem` is good news for tooling,
+> because scroll-into-view is available for the rows that are offscreen.
 
 The Conversations pane holds **37 `TreeItem` elements, every one of them with an empty
-`Name` and no supported patterns at all** — no `SelectionItem`, no `ExpandCollapse`, no
-`Invoke`. The visible label lives on a child `Text` element instead:
+`Name`**, exposing only `Scroll`/`ScrollItem` — no `SelectionItem`, no `ExpandCollapse`,
+no `Invoke`. The visible label lives on a child `Text` element instead:
 
 ```
-TreeItem  name=''  focusable=True  patterns=<none>
+TreeItem  name=''  focusable=True  patterns=[Scroll,ScrollItem]
   Button  name=''            id='PART_ExpandCollapseChevron'
   Text    name='00_prototype' id=''
 ```
@@ -58,8 +76,9 @@ Consequences:
 
 - `FindFirst(Name == '07_neketaka_temple_district')` returns the inner **`Text`**, which
   cannot be selected or expanded.
-- Even once found, the `TreeItem` exposes no pattern, so there is no programmatic way to
-  select or expand it. Synthetic clicking at its bounding rectangle is the only option.
+- Even once found, the `TreeItem` exposes no `SelectionItem` or `ExpandCollapse` pattern,
+  so there is no programmatic way to select or expand it. Synthetic clicking at its
+  bounding rectangle is the only option.
 - All 37 expand chevrons are anonymous and share `AutomationId='PART_ExpandCollapseChevron'`.
 
 This is the app's primary navigation surface — choosing which conversation to open — and it
