@@ -37,8 +37,12 @@ public class AddressabilityWarningsTests
     [Fact]
     public void FlagsFocusableElementsExposingNoPatterns()
     {
+        // Fires on the OS System Menu Bar, which is what it fires on live. Notably NOT
+        // on the conversation TreeItems: they expose Scroll/ScrollItem, so the gap there
+        // is a missing SelectionItem/ExpandCollapse rather than a total absence.
         var warnings = AddressabilityWarnings.Inspect(AuditElements());
-        Assert.Contains(warnings, w => w.Kind == "NoPatterns" && w.Detail.Contains("TreeItem"));
+        Assert.Contains(warnings, w => w.Kind == "NoPatterns" && w.Detail.Contains("MenuBar"));
+        Assert.DoesNotContain(warnings, w => w.Kind == "NoPatterns" && w.Detail.Contains("TreeItem"));
     }
 
     [Fact]
