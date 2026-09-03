@@ -2019,7 +2019,7 @@ git commit -m "feat(uiamcp): add MCP server host, session tools and live UIA tre
 - Consumes: `Resolver`, `RefTable`, `AddressabilityWarnings`, `Selector` (Tasks 5–7), `EditorSession`, `UiaTree` (Task 8).
 - Produces: MCP tools `read_tree`, `find`, `menu`, `window_title`, `read_status_bar`.
 
-- [ ] **Step 1: Expose a RefTable on the session**
+- [x] **Step 1: Expose a RefTable on the session**
 
 In `tools/DialogEditor.UiaMcp/EditorSession.cs`, add to the class body:
 
@@ -2028,7 +2028,7 @@ In `tools/DialogEditor.UiaMcp/EditorSession.cs`, add to the class body:
     public RefTable Refs { get; } = new();
 ```
 
-- [ ] **Step 2: Write the inspection tools**
+- [x] **Step 2: Write the inspection tools**
 
 `tools/DialogEditor.UiaMcp/Tools/InspectionTools.cs`:
 
@@ -2154,12 +2154,12 @@ internal sealed class InspectionTools(EditorSession session)
 }
 ```
 
-- [ ] **Step 3: Build**
+- [x] **Step 3: Build**
 
 Run: `dotnet build "DialogEditor.slnx" -c Debug`
 Expected: Build succeeded, 0 errors.
 
-- [ ] **Step 4: Verify manually against the live app**
+- [x] **Step 4: Verify manually against the live app**
 
 Run:
 
@@ -2169,19 +2169,25 @@ pwsh tools/DialogEditor.UiaMcp/drive.ps1 -Tool launch_app -Arguments @{ repoRoot
 
 Then, in a fresh invocation for each, confirm:
 
-- `-Tool read_tree -Arguments @{ withinPane = "Conversations" }` — lists refs and prints an `UnnamedFocusable` warning naming 37 `TreeItem` elements plus a `NoPatterns` warning. Those two warnings are the expected output today; they are audit finding 1 and must appear until issue #15 fixes it.
+- `read_tree` — lists refs and prints an `UnnamedFocusable` warning naming 37 `TreeItem`
+  elements. **Corrected during execution:** there is no `NoPatterns` warning for them.
+  The live `TreeItem`s expose `Scroll` and `ScrollItem`; the audit's claim of "no
+  supported patterns" was a false negative from a regex bug in the PowerShell probe
+  (it reduced every pattern name to an empty string). What they lack is `SelectionItem`
+  and `ExpandCollapse`, so the operational conclusion holds — see the corrected
+  finding 1 in the audit report.
 - `-Tool find -Arguments @{ query = "Viewbox" }` — returns the six `Avalonia.Controls.Viewbox` buttons.
 - `-Tool menu` — lists exactly `File, Edit, View, Test, Help` and **not** `System`.
 - `-Tool menu -Arguments @{ path = @("File") }` — lists File's items with `enabled=` reflecting whether a project is open.
 - `-Tool read_status_bar` — returns the current status text, e.g. `Opened project '…' (0 patches)`.
 - `-Tool window_title` — reports the held session's pid and window title.
 
-- [ ] **Step 5: Run the whole test suite**
+- [x] **Step 5: Run the whole test suite**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj`
 Expected: PASS, no regressions.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp/Tools/InspectionTools.cs tools/DialogEditor.UiaMcp/EditorSession.cs
