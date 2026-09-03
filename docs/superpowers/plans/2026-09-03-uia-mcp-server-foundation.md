@@ -1597,7 +1597,7 @@ First task with live I/O. Verified by running the server, not by unit tests.
 - Consumes: `SettingsGuard` (Task 1), `ElementInfo`/`IUiaTree` (Task 4).
 - Produces: `EditorSession` with `string Launch(string repoRoot, string project)`, `void Foreground()`, `IUiaTree Tree()`, `string Kill()`, `string Status()`; MCP tools `launch_app`, `session_status`, `kill_app`.
 
-- [ ] **Step 1: Create the server project**
+- [x] **Step 1: Create the server project**
 
 `tools/DialogEditor.UiaMcp/DialogEditor.UiaMcp.csproj`:
 
@@ -1629,7 +1629,7 @@ Add to `DialogEditor.slnx` after the Core project line:
   <Project Path="tools/DialogEditor.UiaMcp/DialogEditor.UiaMcp.csproj" />
 ```
 
-- [ ] **Step 2: Write the Win32 shim**
+- [x] **Step 2: Write the Win32 shim**
 
 `tools/DialogEditor.UiaMcp/Win32.cs`:
 
@@ -1657,7 +1657,7 @@ internal static class Win32
 }
 ```
 
-- [ ] **Step 3: Write the live `UiaTree`**
+- [x] **Step 3: Write the live `UiaTree`**
 
 `tools/DialogEditor.UiaMcp/UiaTree.cs`:
 
@@ -1732,7 +1732,7 @@ internal sealed class UiaTree : IUiaTree
 }
 ```
 
-- [ ] **Step 4: Write `EditorSession`**
+- [x] **Step 4: Write `EditorSession`**
 
 `tools/DialogEditor.UiaMcp/EditorSession.cs`:
 
@@ -1849,7 +1849,7 @@ internal sealed class EditorSession
 }
 ```
 
-- [ ] **Step 5: Write the session tools and host**
+- [x] **Step 5: Write the session tools and host**
 
 `tools/DialogEditor.UiaMcp/Tools/SessionTools.cs`:
 
@@ -1909,7 +1909,7 @@ builder.Services.AddMcpServer()
 await builder.Build().RunAsync();
 ```
 
-- [ ] **Step 6: Add the manual verification driver**
+- [x] **Step 6: Add the manual verification driver**
 
 `tools/DialogEditor.UiaMcp/drive.ps1`:
 
@@ -1970,7 +1970,7 @@ finally {
 }
 ```
 
-- [ ] **Step 7: Build and verify manually**
+- [x] **Step 7: Build and verify manually**
 
 Run: `dotnet build "DialogEditor.slnx" -c Debug`
 Expected: Build succeeded, 0 errors.
@@ -1978,8 +1978,18 @@ Expected: Build succeeded, 0 errors.
 Run: `pwsh tools/DialogEditor.UiaMcp/drive.ps1 -Tool session_status`
 Expected: `no session`
 
-Run: `pwsh tools/DialogEditor.UiaMcp/drive.ps1 -Tool launch_app -Arguments @{ repoRoot = (Get-Location).Path }`
-Expected: `launched: 'Pillars Dialog Editor'` — the app window appears.
+Run (note the JSON form — a hashtable passed as a command-line argument to a NEW pwsh
+process is stringified to "System.Collections.Hashtable" and lost; use `& script.ps1` with
+a hashtable only when calling from an existing session):
+
+```powershell
+$repo = (Get-Location).Path -replace '\','/'
+pwsh tools/DialogEditor.UiaMcp/drive.ps1 -Tool launch_app -Arguments "{`"repoRoot`":`"$repo`"}" -Then session_status
+```
+
+Expected: `launched: 'Pillars Dialog Editor'` — the app window appears — then
+`pid=… exited=False` from the *separate* session_status call, then an automatic
+`kill_app` reporting `Settings restored from backup.`
 
 Verify teardown restored state. Run:
 
@@ -1990,7 +2000,7 @@ Test-Path "$env:TEMP\PillarsDialogEditor.settings.backup.json"
 
 Expected: no process (drive.ps1 kills the server, whose ProcessExit handler restores), and `False` for the leftover backup.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp DialogEditor.slnx

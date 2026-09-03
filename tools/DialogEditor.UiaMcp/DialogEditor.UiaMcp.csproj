@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <!-- net8.0-windows + UseWPF is what supplies UIAutomationClient / UIAutomationTypes,
+         the same assemblies DriveApp.ps1 loads with Add-Type. NOTE: UseWPF swaps in the
+         WPF implicit-usings set, which does NOT include System.IO — import it explicitly. -->
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="ModelContextProtocol" Version="2.2.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.11" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\DialogEditor.UiaMcp.Core\DialogEditor.UiaMcp.Core.csproj" />
+  </ItemGroup>
+</Project>

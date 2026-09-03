@@ -8,4 +8,5 @@
   <Project Path="DialogEditor.PatchManager/DialogEditor.PatchManager.csproj" />
   <Project Path="DialogEditor.PatchCli/DialogEditor.PatchCli.csproj" />
   <Project Path="tools/DialogEditor.UiaMcp.Core/DialogEditor.UiaMcp.Core.csproj" />
+  <Project Path="tools/DialogEditor.UiaMcp/DialogEditor.UiaMcp.csproj" />
 </Solution>
