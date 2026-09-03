@@ -1425,7 +1425,7 @@ Makes the server a detector for issue #15 rather than a workaround for it.
 - Consumes: `ElementInfo` (Task 4).
 - Produces: `record AddressabilityWarning(string Kind, string Detail)`; `static IReadOnlyList<AddressabilityWarning> AddressabilityWarnings.Inspect(IReadOnlyList<ElementInfo> elements)`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `DialogEditor.Tests/UiaMcp/AddressabilityWarningsTests.cs`:
 
@@ -1487,12 +1487,12 @@ public class AddressabilityWarningsTests
 }
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~AddressabilityWarningsTests"`
 Expected: FAIL — `AddressabilityWarnings` does not exist.
 
-- [ ] **Step 3: Write the minimal implementation**
+- [x] **Step 3: Write the minimal implementation**
 
 `tools/DialogEditor.UiaMcp.Core/AddressabilityWarnings.cs`:
 
@@ -1560,17 +1560,17 @@ public static class AddressabilityWarnings
 }
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~AddressabilityWarningsTests"`
 Expected: PASS, 5 tests.
 
-- [ ] **Step 5: Run the whole suite to confirm nothing regressed**
+- [x] **Step 5: Run the whole suite to confirm nothing regressed**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj`
-Expected: PASS, all pre-existing tests plus the 44 added so far.
+Expected: PASS. Measured: 2348 total, of which 45 are the UiaMcp tests added by tasks 1-7 (44 planned + 1 extra from the task 4 correction).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp.Core/AddressabilityWarnings.cs DialogEditor.Tests/UiaMcp/AddressabilityWarningsTests.cs
