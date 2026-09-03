@@ -7,4 +7,5 @@
   <Project Path="DialogEditor.Avalonia/DialogEditor.Avalonia.csproj" />
   <Project Path="DialogEditor.PatchManager/DialogEditor.PatchManager.csproj" />
   <Project Path="DialogEditor.PatchCli/DialogEditor.PatchCli.csproj" />
+  <Project Path="tools/DialogEditor.UiaMcp.Core/DialogEditor.UiaMcp.Core.csproj" />
 </Solution>
