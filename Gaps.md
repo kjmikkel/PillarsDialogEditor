@@ -1,5 +1,13 @@
 # Dialog Editor — Known Gaps
 
+>
+> ## ⛔ RETIRED — read-only historical record (2026-09-03)
+>
+> **Do not add or edit entries here.** All issue tracking moved to GitHub Issues on
+> <https://github.com/kjmikkel/PillarsDialogEditor/issues> (see the **Issue Tracking**
+> rule in `CLAUDE.md`). This file is kept because test docstrings and design specs link
+> to its entries; anything still open is migrated to a GitHub Issue when next worked on.
+
 > **Temporary file — delete before the initial public release.** This is an internal,
 > pre-launch record of design gaps and deferred features for solo development. At launch,
 > anything still worth pursuing is transferred to GitHub Issues for public scrutiny, and
