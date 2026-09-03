@@ -7,22 +7,22 @@ namespace DialogEditor.ViewModels;
 
 public sealed partial class GuidedTourViewModel : ObservableObject
 {
-    // The steps that every running instance uses by default.
-    // MainWindow.axaml.cs maps TargetName to an actual named Control.
+    // The steps that every running instance uses by default, in the order a newcomer
+    // meets them: pick a conversation, see it on the canvas, edit the selected node,
+    // find further help.
     //
-    // NOTE (Docking Shell Phase 1, Task 8 cleanup): the former "BrowserPanel" and
-    // "DetailPanel" steps targeted fixed grid-named controls that were removed when
-    // those panels became Dock-hosted tool content with no compile-time x:Name.
-    // OnTourStepChanged's FindControl(...) already no-ops gracefully for an unresolved
-    // target, so the dead steps were silent no-ops rather than crashes — but a
-    // silently-skipped tour step is still a defect, so they're dropped here rather than
-    // left in. Re-introducing them would require a name-independent targeting mechanism
-    // (e.g. locating the live tool content by type, the way FindCanvasView()/
-    // FindDetailView() already do below) — left for a follow-up if the tour is revisited.
+    // TargetName is an opaque key, NOT a control name — this project stays Avalonia-free.
+    // MainWindow.axaml.cs owns the mapping from key to a live Control (see
+    // ResolveTourTarget there). That indirection is what lets the first three targets be
+    // Dock-hosted tool content, which has no compile-time x:Name to look up: they are
+    // resolved by view type from the live visual tree, and the tool is revealed first if
+    // the user has closed or backgrounded its tab.
     public static readonly IReadOnlyList<GuidedTourStep> DefaultSteps =
     [
-        new("CanvasView", "Tour_Step2_Text"),
-        new("HelpToggle", "Tour_Step4_Text"),
+        new("BrowserPanel", "Tour_Step1_Text"),
+        new("CanvasView",   "Tour_Step2_Text"),
+        new("DetailPanel",  "Tour_Step3_Text"),
+        new("HelpToggle",   "Tour_Step4_Text"),
     ];
 
     private readonly IReadOnlyList<GuidedTourStep> _steps;

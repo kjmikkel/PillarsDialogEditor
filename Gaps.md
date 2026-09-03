@@ -635,13 +635,22 @@ editor and the version-control tools.
 highlighting BrowserPanel → CanvasView → DetailPanel → HelpToggle. Auto-triggers on
 fresh install; re-accessible via Help ▸ Start Guided Tour.
 
-**Docking Shell Phase 1 (2026-07-17):** the BrowserPanel/DetailPanel steps were dropped
-(Task 8 cleanup) — those targets became Dock-hosted tool content with no compile-time
-name once the panel chrome was removed, so the steps could no longer resolve a target
-(silent no-op). The tour is now CanvasView → HelpToggle only. Re-adding coverage for the
-browser/details tools would need a name-independent targeting mechanism (e.g. locate the
-live tool content by type, as `MainWindow.axaml.cs`'s `FindCanvasView()`/`FindDetailView()`
-already do for event wiring).
+**Docking Shell regression ✓ fixed (2026-09-03):** Phase 1 broke the tour's name-based
+targeting — Dock-hosted tool content carries no compile-time `x:Name` in MainWindow's
+scope, so `FindControl` could not resolve BrowserPanel/DetailPanel (dropped outright in
+Task 8 cleanup) or CanvasView (left in place, silently ringing nothing). All four steps
+are restored and their copy recovered verbatim. `TargetName` stays an opaque key — the
+ViewModels project remains Avalonia-free — and `MainWindow.ResolveTourTarget` maps it to
+(dock tool id, type-based finder), falling through to the classic named lookup for chrome
+that still lives in `MainWindow.axaml` (HelpToggle). A step whose tool is closed or merely
+the inactive tab in its group **reveals it first** via the existing `ShowToolById`, then
+attaches the ring once Dock realises the content (one-shot `LayoutUpdated` watcher, the
+same deferral `WireCanvasFocusHopWhenRealised` uses; cancelled on step change so a late
+realisation can't ring a step the user has left). `FindDockedView<T>` also scans floating
+`EditorHostWindow`s, so a torn-off tool is still highlightable. Guarded by
+`GuidedTourStringCoverageTests` — the missing-copy failure mode was invisible to the build
+and to the rest of the suite, since step text is reached only via a late `Loc.Get(key)`.
+GUI-verified: all four rings, plus the auto-reveal path with Node Details closed.
 
 ### Voice-Over Integration
 
@@ -1035,10 +1044,9 @@ tabbed-tool content is selected by inner-VM **type** through a `ContentControl` 
 `DeferredContentControl` keeps the stale sibling view on tab-switch otherwise); the live layout
 must have `Owner` back-refs stripped before serialization (Dock's list converter bypasses
 `ReferenceHandler.Preserve`); canvas→detail focus hop wired via `LayoutUpdated` (deferred content
-realises after `BuildDock`). **Known follow-ups (Phase 2):** the guided-tour highlight mechanism
-is name-based `FindControl` and no longer resolves dock-hosted content (CanvasView step no-ops —
-see Guided Tour note); float-window drag + live theme-retint were verified structurally, not via
-drag automation.
+realises after `BuildDock`). **Known follow-ups (Phase 2):** float-window drag + live theme-retint were
+verified structurally, not via drag automation. (The guided-tour highlight regression this
+phase introduced is **fixed** — see the Onboarding section.)
 
 ### Deliberate Non-Goals
 
