@@ -917,7 +917,7 @@ git commit -m "test(uiamcp): add IUiaTree seam and audit-seeded fake tree"
 - Consumes: `ElementInfo` (Task 4).
 - Produces: `record Selector(string? Name, string? ControlType, string? AutomationId, string? WithinPane, int? Nth)`; `class RefTable` with `int Generation`, `IReadOnlyList<string> Mint(IEnumerable<ElementInfo>)`, `bool TryResolve(string reference, out string elementId, out string error)`.
 
-- [ ] **Step 1: Write `Selector`**
+- [x] **Step 1: Write `Selector`**
 
 `tools/DialogEditor.UiaMcp.Core/Selector.cs`:
 
@@ -939,7 +939,7 @@ public record Selector(
 }
 ```
 
-- [ ] **Step 2: Write the failing tests for `RefTable`**
+- [x] **Step 2: Write the failing tests for `RefTable`**
 
 `DialogEditor.Tests/UiaMcp/RefTableTests.cs`:
 
@@ -1004,12 +1004,12 @@ public class RefTableTests
 }
 ```
 
-- [ ] **Step 3: Run the tests to verify they fail**
+- [x] **Step 3: Run the tests to verify they fail**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~RefTableTests"`
 Expected: FAIL — `RefTable` does not exist.
 
-- [ ] **Step 4: Write the minimal implementation**
+- [x] **Step 4: Write the minimal implementation**
 
 `tools/DialogEditor.UiaMcp.Core/RefTable.cs`:
 
@@ -1075,12 +1075,12 @@ public sealed class RefTable
 }
 ```
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~RefTableTests"`
 Expected: PASS, 5 tests.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp.Core/Selector.cs tools/DialogEditor.UiaMcp.Core/RefTable.cs DialogEditor.Tests/UiaMcp/RefTableTests.cs
