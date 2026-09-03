@@ -2354,7 +2354,7 @@ git commit -m "feat(uiamcp): add build and run_tests tools with parsed output"
 - Consumes: everything above.
 - Produces: no code.
 
-- [ ] **Step 1: Write the README**
+- [x] **Step 1: Write the README**
 
 `tools/DialogEditor.UiaMcp/README.md`:
 
@@ -2407,7 +2407,7 @@ is tracked by [issue #15](https://github.com/kjmikkel/PillarsDialogEditor/issues
     pwsh tools/DialogEditor.UiaMcp/drive.ps1 -Tool menu
 ```
 
-- [ ] **Step 2: Point the skill at the server**
+- [x] **Step 2: Point the skill at the server**
 
 In `.claude/skills/running-the-app/SKILL.md`, add immediately after the opening
 paragraph:
@@ -2421,15 +2421,15 @@ server is not registered, or for anything it does not yet cover (clicks, typing,
 screenshots — not yet built).
 ```
 
-- [ ] **Step 3: Final full verification**
+- [x] **Step 3: Final full verification**
 
 Run: `dotnet build "DialogEditor.slnx" -c Debug`
 Expected: Build succeeded, 0 errors.
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj`
-Expected: PASS — all pre-existing tests plus the 44 added by this plan.
+Expected: PASS. Measured: 2349 total, of which 46 are the UiaMcp tests added by this plan (44 planned, +1 from the task 4 correction, +1 from the task 10 MSB3026 retry-collapse fix).
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp/README.md .claude/skills/running-the-app/SKILL.md
