@@ -38,17 +38,27 @@ public sealed class FakeUiaTree : IUiaTree
         // NoPatterns warning genuinely fires on.
         var sysBar = t.Add(titleBar.Id, "System Menu Bar", "MenuBar", "SystemMenuBar",
             focusable: true);
-        t.Add(sysBar.Id, "System", "MenuItem", "Item 1");
+        // Measured live: the OS system menu item DOES expose ExpandCollapse; the app's own
+        // top-level items expose ScrollItem only — no Invoke, no ExpandCollapse.
+        t.Add(sysBar.Id, "System", "MenuItem", "Item 1", focusable: true,
+            patterns: new[] { "ExpandCollapse" });
 
         // The app's own menu is ANONYMOUS — selectable only by ClassName.
-        var menu = t.Add(win.Id, "", "Menu", className: "Menu");
+        var menu = t.Add(win.Id, "", "Menu", className: "Menu",
+            patterns: new[] { "Scroll", "ScrollItem" });
         foreach (var top in new[] { "File", "Edit", "View", "Test", "Help" })
         {
-            var mi = t.Add(menu.Id, top, "MenuItem", className: "MenuItem");
+            var mi = t.Add(menu.Id, top, "MenuItem", className: "MenuItem",
+                patterns: new[] { "ScrollItem" });
             if (top == "File")
                 foreach (var item in new[] { "New Project…", "Open Project…", "Save Project", "Close Project" })
-                    t.Add(mi.Id, item, "MenuItem", className: "MenuItem");
-            if (top == "Edit") { t.Add(mi.Id, "↩", "MenuItem"); t.Add(mi.Id, "↪", "MenuItem"); }
+                    t.Add(mi.Id, item, "MenuItem", className: "MenuItem",
+                        patterns: new[] { "ScrollItem" });
+            if (top == "Edit")
+            {
+                t.Add(mi.Id, "↩", "MenuItem", patterns: new[] { "ScrollItem" });
+                t.Add(mi.Id, "↪", "MenuItem", patterns: new[] { "ScrollItem" });
+            }
         }
 
         // Label and its ComboBox share a Name.
