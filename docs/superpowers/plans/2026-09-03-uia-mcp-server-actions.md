@@ -69,7 +69,7 @@ is testable with no GUI.
 - Consumes: `ElementInfo` (phase 1–2).
 - Produces: `enum ActionKind { Activate, Expand, SetValue, Focus }`; `record ActionPlan(string Route, string? Pattern, bool NeedsScrollIntoView, string? Warning, string? Reason)`; `static ActionPlan ActionStrategy.Plan(ElementInfo element, ActionKind action)`. `Route` is one of `"Pattern"`, `"SyntheticClick"`, `"FocusAndType"`, `"Focus"`, `"NotOperable"`.
 
-- [ ] **Step 1: Give the fake the pattern sets measured on the live app**
+- [x] **Step 1: Give the fake the pattern sets measured on the live app**
 
 In `DialogEditor.Tests/UiaMcp/FakeUiaTree.cs`, inside `AuditSnapshot()`:
 
@@ -110,7 +110,7 @@ offscreen `TreeItem` under the Node Details pane would break the existing
 `ResolverTests.FlattenScopedToAPaneExcludesOtherPanesContents`, which asserts that pane
 contains no `TreeItem`. Keep this step to the menu pattern fidelity above.
 
-- [ ] **Step 2: Write the failing tests**
+- [x] **Step 2: Write the failing tests**
 
 `DialogEditor.Tests/UiaMcp/ActionStrategyTests.cs`:
 
@@ -126,14 +126,17 @@ namespace DialogEditor.Tests.UiaMcp;
 /// </summary>
 public class ActionStrategyTests
 {
-    private static ElementInfo El(string name, string controlType, bool offscreen = false,
-        bool focusable = true, params string[] patterns) =>
+    // patterns is a required positional array rather than a trailing `params`: a named
+    // `patterns:` argument followed by unnamed ones is CS8323, and the bools need names
+    // at the call sites to stay readable.
+    private static ElementInfo El(string name, string controlType, string[] patterns,
+        bool offscreen = false, bool focusable = true) =>
         new($"id-{name}", name, controlType, "", "", true, offscreen, focusable, patterns);
 
     [Fact]
     public void ActivatePrefersInvokeWhenAvailable()
     {
-        var plan = ActionStrategy.Plan(El("Save node", "Button", patterns: "Invoke", "ScrollItem"),
+        var plan = ActionStrategy.Plan(El("Save node", "Button", ["Invoke", "ScrollItem"]),
             ActionKind.Activate);
 
         Assert.Equal("Pattern", plan.Route);
@@ -144,7 +147,7 @@ public class ActionStrategyTests
     [Fact]
     public void ActivateUsesToggleForAToggleButton()
     {
-        var plan = ActionStrategy.Plan(El("Pin", "Button", patterns: "Toggle", "ScrollItem"),
+        var plan = ActionStrategy.Plan(El("Pin", "Button", ["Toggle", "ScrollItem"]),
             ActionKind.Activate);
 
         Assert.Equal("Pattern", plan.Route);
@@ -157,7 +160,7 @@ public class ActionStrategyTests
         // Measured live: TabItem exposes Invoke AND SelectionItem. Invoke is the action the
         // user means by "activate"; SelectionItem alone would only change selection state.
         var plan = ActionStrategy.Plan(
-            El("Node Details", "TabItem", patterns: "Invoke", "SelectionItem", "ScrollItem"),
+            El("Node Details", "TabItem", ["Invoke", "SelectionItem", "ScrollItem"]),
             ActionKind.Activate);
 
         Assert.Equal("Invoke", plan.Pattern);
@@ -166,7 +169,7 @@ public class ActionStrategyTests
     [Fact]
     public void ActivateFallsBackToSelectionItemWhenThereIsNoInvoke()
     {
-        var plan = ActionStrategy.Plan(El("Row", "ListItem", patterns: "SelectionItem"),
+        var plan = ActionStrategy.Plan(El("Row", "ListItem", ["SelectionItem"]),
             ActionKind.Activate);
 
         Assert.Equal("Pattern", plan.Route);
@@ -177,7 +180,7 @@ public class ActionStrategyTests
     public void ActivateFallsBackToASyntheticClickWithAWarningForTheAppsMenuItems()
     {
         // Audit finding: the app's top-level MenuItems expose ScrollItem only.
-        var plan = ActionStrategy.Plan(El("File", "MenuItem", patterns: "ScrollItem"),
+        var plan = ActionStrategy.Plan(El("File", "MenuItem", ["ScrollItem"]),
             ActionKind.Activate);
 
         Assert.Equal("SyntheticClick", plan.Route);
@@ -190,7 +193,7 @@ public class ActionStrategyTests
     public void ActivateFallsBackToASyntheticClickForConversationRows()
     {
         // Issue #15 finding 1: Scroll/ScrollItem only — no SelectionItem, no ExpandCollapse.
-        var plan = ActionStrategy.Plan(El("", "TreeItem", patterns: "Scroll", "ScrollItem"),
+        var plan = ActionStrategy.Plan(El("", "TreeItem", ["Scroll", "ScrollItem"]),
             ActionKind.Activate);
 
         Assert.Equal("SyntheticClick", plan.Route);
@@ -201,7 +204,7 @@ public class ActionStrategyTests
     public void ExpandUsesExpandCollapseWhenPresent()
     {
         var plan = ActionStrategy.Plan(
-            El("Language:", "ComboBox", patterns: "ExpandCollapse", "Value"), ActionKind.Expand);
+            El("Language:", "ComboBox", ["ExpandCollapse", "Value"]), ActionKind.Expand);
 
         Assert.Equal("Pattern", plan.Route);
         Assert.Equal("ExpandCollapse", plan.Pattern);
@@ -210,7 +213,7 @@ public class ActionStrategyTests
     [Fact]
     public void ExpandFallsBackToASyntheticClickWithAWarning()
     {
-        var plan = ActionStrategy.Plan(El("File", "MenuItem", patterns: "ScrollItem"),
+        var plan = ActionStrategy.Plan(El("File", "MenuItem", ["ScrollItem"]),
             ActionKind.Expand);
 
         Assert.Equal("SyntheticClick", plan.Route);
@@ -220,7 +223,7 @@ public class ActionStrategyTests
     [Fact]
     public void SetValueUsesTheValuePattern()
     {
-        var plan = ActionStrategy.Plan(El("Speaker", "Edit", patterns: "Value", "ScrollItem"),
+        var plan = ActionStrategy.Plan(El("Speaker", "Edit", ["Value", "ScrollItem"]),
             ActionKind.SetValue);
 
         Assert.Equal("Pattern", plan.Route);
@@ -230,7 +233,7 @@ public class ActionStrategyTests
     [Fact]
     public void SetValueFallsBackToFocusAndTypeWithAWarning()
     {
-        var plan = ActionStrategy.Plan(El("Odd field", "Custom", patterns: "ScrollItem"),
+        var plan = ActionStrategy.Plan(El("Odd field", "Custom", ["ScrollItem"]),
             ActionKind.SetValue);
 
         Assert.Equal("FocusAndType", plan.Route);
@@ -240,7 +243,7 @@ public class ActionStrategyTests
     [Fact]
     public void FocusNeedsOnlyKeyboardFocusability()
     {
-        var plan = ActionStrategy.Plan(El("Speaker", "Edit", patterns: "Value"), ActionKind.Focus);
+        var plan = ActionStrategy.Plan(El("Speaker", "Edit", ["Value"]), ActionKind.Focus);
 
         Assert.Equal("Focus", plan.Route);
         Assert.Null(plan.Warning);
@@ -249,7 +252,7 @@ public class ActionStrategyTests
     [Fact]
     public void FocusIsNotOperableOnANonFocusableElement()
     {
-        var plan = ActionStrategy.Plan(El("Label", "Text", focusable: false, patterns: "ScrollItem"),
+        var plan = ActionStrategy.Plan(El("Label", "Text", ["ScrollItem"], focusable: false),
             ActionKind.Focus);
 
         Assert.Equal("NotOperable", plan.Route);
@@ -261,7 +264,7 @@ public class ActionStrategyTests
     {
         // The common case: most conversation rows are scrolled out of view at any moment.
         var plan = ActionStrategy.Plan(
-            El("", "TreeItem", offscreen: true, patterns: "Scroll", "ScrollItem"),
+            El("", "TreeItem", ["Scroll", "ScrollItem"], offscreen: true),
             ActionKind.Activate);
 
         Assert.True(plan.NeedsScrollIntoView);
@@ -272,7 +275,7 @@ public class ActionStrategyTests
     public void AnOffscreenElementWithoutScrollItemIsNotOperable()
     {
         var plan = ActionStrategy.Plan(
-            El("Stranded", "Button", offscreen: true, patterns: "Invoke"), ActionKind.Activate);
+            El("Stranded", "Button", ["Invoke"], offscreen: true), ActionKind.Activate);
 
         Assert.Equal("NotOperable", plan.Route);
         Assert.Contains("offscreen", plan.Reason);
@@ -282,7 +285,7 @@ public class ActionStrategyTests
     [Fact]
     public void AnOnscreenPatternRouteNeedsNoScrolling()
     {
-        var plan = ActionStrategy.Plan(El("Save node", "Button", patterns: "Invoke"),
+        var plan = ActionStrategy.Plan(El("Save node", "Button", ["Invoke"]),
             ActionKind.Activate);
 
         Assert.False(plan.NeedsScrollIntoView);
@@ -291,7 +294,7 @@ public class ActionStrategyTests
     [Fact]
     public void AnElementWithNoPatternsAtAllAndNoFocusIsNotOperable()
     {
-        var plan = ActionStrategy.Plan(El("System Menu Bar", "MenuBar", focusable: false),
+        var plan = ActionStrategy.Plan(El("System Menu Bar", "MenuBar", [], focusable: false),
             ActionKind.Activate);
 
         Assert.Equal("NotOperable", plan.Route);
@@ -299,12 +302,12 @@ public class ActionStrategyTests
 }
 ```
 
-- [ ] **Step 3: Run the tests to verify they fail**
+- [x] **Step 3: Run the tests to verify they fail**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~ActionStrategyTests"`
 Expected: FAIL — `ActionStrategy` does not exist (CS0103).
 
-- [ ] **Step 4: Write the implementation**
+- [x] **Step 4: Write the implementation**
 
 `tools/DialogEditor.UiaMcp.Core/ActionStrategy.cs`:
 
@@ -417,19 +420,19 @@ public static class ActionStrategy
 }
 ```
 
-- [ ] **Step 5: Run the tests to verify they pass**
+- [x] **Step 5: Run the tests to verify they pass**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~ActionStrategyTests"`
 Expected: PASS, 16 tests.
 
-- [ ] **Step 6: Run the whole UiaMcp subset — the fixture changed, so earlier tests must still hold**
+- [x] **Step 6: Run the whole UiaMcp subset — the fixture changed, so earlier tests must still hold**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~DialogEditor.Tests.UiaMcp"`
 Expected: PASS. If `FakeUiaTreeTests` or `AddressabilityWarningsTests` now fail, the fixture
 edit changed counts they assert — reconcile against the measured facts table above rather
 than loosening the assertion.
 
-- [ ] **Step 7: Commit**
+- [x] **Step 7: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp.Core/ActionStrategy.cs DialogEditor.Tests/UiaMcp/ActionStrategyTests.cs DialogEditor.Tests/UiaMcp/FakeUiaTree.cs
