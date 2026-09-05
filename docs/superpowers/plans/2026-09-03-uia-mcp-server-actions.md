@@ -916,7 +916,7 @@ git commit -m "feat(uiamcp): add invoke and focus tools"
 - Consumes: `SendKeysEscaper` (Task 2), `ElementOperator` (Task 3), `ElementAddress` (Task 4).
 - Produces: MCP tools `send_keys`, `set_value`.
 
-- [ ] **Step 1: Add the tools**
+- [x] **Step 1: Add the tools**
 
 Append inside the `ActionTools` class in `tools/DialogEditor.UiaMcp/Tools/ActionTools.cs`:
 
@@ -967,12 +967,12 @@ Append inside the `ActionTools` class in `tools/DialogEditor.UiaMcp/Tools/Action
     }
 ```
 
-- [ ] **Step 2: Build**
+- [x] **Step 2: Build**
 
 Run: `dotnet build "DialogEditor.slnx" -c Debug`
 Expected: Build succeeded, 0 errors.
 
-- [ ] **Step 3: Verify against the live app**
+- [x] **Step 3: Verify against the live app**
 
 ```powershell
 $repo = ((Get-Location).Path -replace '\\','/')
@@ -1001,7 +1001,7 @@ Expected: `ok: sent '^n'.` Check `window_title` afterwards to see whether the sh
 effect. If nothing changed, that is a finding to record, not a test to loosen — a shortcut
 that silently does nothing is exactly what this tooling exists to catch.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp/Tools/ActionTools.cs
