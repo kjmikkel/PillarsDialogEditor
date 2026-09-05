@@ -9,6 +9,15 @@
 #     by Name — but its TOP-LEVEL MenuItems do NOT support the UIA
 #     ExpandCollapse pattern. Opening a menu requires a real mouse click at the
 #     item's clickable point (see Invoke-ElementClick).
+#     (Re-verified 2026-09-03 via the MCP server's read_tree: the app's top-level
+#     MenuItems expose ScrollItem ONLY. The ExpandCollapse that does show up on a
+#     MenuItem belongs to the title bar's OS "System" item, NOT to File/Edit/View/
+#     Test/Help — so this note is correct, do not "fix" it.)
+#   * Synthetic clicking is STATEFUL, unlike invoking a pattern: if a previous step left
+#     a menu popup open, the next click merely dismisses that popup instead of opening
+#     the menu you asked for. Send {ESC} before starting a menu interaction.
+#   * SetForegroundWindow DISMISSES an open popup, so do not call Set-EditorForeground
+#     between opening a menu and clicking an item in it.
 #   * pwsh 7 can load the WPF UIA client assemblies (UIAutomationClient /
 #     UIAutomationTypes) because the .NET Desktop runtime ships them; this is
 #     what Initialize-DriveApp does.
@@ -182,16 +191,82 @@ function Invoke-ElementClick {
 }
 
 function Get-MenuItemStates {
-    # All MenuItem elements under the window as "Name | enabled=…" strings —
-    # with a menu popup open this includes its items, so it verifies both
-    # placement (order) and CanExecute-driven enablement in one call.
+    # All MenuItem elements UNDER THE APP'S OWN MENU as "Name | enabled=…" strings.
+    #
+    # Scoping matters: a window-wide ControlType=MenuItem search also returns the title
+    # bar's system menu ("System", AutomationId 'Item 1'), which is indistinguishable from
+    # File/Edit/View/Test/Help by control type. The 2026-09-03 audit's first probe
+    # enumerated that way, clicked "System", opened the OS window menu and wedged the run —
+    # the main-window walk collapsed to 12 elements and every later lookup failed.
+    #
+    # The app's Menu has no Name, so ClassName is the only handle.
     param([Parameter(Mandatory)]$Window)
-    $cond = New-Object System.Windows.Automation.PropertyCondition(
+
+    $menuCond = New-Object System.Windows.Automation.PropertyCondition(
+        [System.Windows.Automation.AutomationElement]::ClassNameProperty, 'Menu')
+    $appMenu = $Window.FindFirst(
+        [System.Windows.Automation.TreeScope]::Descendants, $menuCond)
+    if ($null -eq $appMenu) { throw "App menu not found (ClassName='Menu')." }
+
+    $itemCond = New-Object System.Windows.Automation.PropertyCondition(
         [System.Windows.Automation.AutomationElement]::ControlTypeProperty,
         [System.Windows.Automation.ControlType]::MenuItem)
-    foreach ($it in $Window.FindAll([System.Windows.Automation.TreeScope]::Descendants, $cond)) {
+
+    # Stream the strings rather than returning `,$out`. The comma idiom exists to stop an
+    # EMPTY array collapsing to $null, but applied to a non-empty array it NESTS it, so
+    # @(Get-MenuItemStates ...) then yields one element containing all the rows. Callers
+    # should wrap in @() — which also turns the empty case into an empty array.
+    foreach ($it in $appMenu.FindAll(
+            [System.Windows.Automation.TreeScope]::Descendants, $itemCond)) {
         "{0} | enabled={1}" -f $it.Current.Name, $it.Current.IsEnabled
     }
+}
+
+function Find-EditorElement {
+    # Find ONE element, erroring when the match is ambiguous instead of taking tree order.
+    #
+    # Invoke-ElementClick uses FindFirst on Name, which silently takes the first match in
+    # tree order — and the 2026-09-03 audit confirmed eight same-surface Name collisions,
+    # so that can act on the wrong control and still look successful. Filtering on
+    # ControlType.Edit was the old workaround; it is coincidental, and does not help for
+    # e.g. the "Language:" label colliding with its ComboBox (a ComboBox, not an Edit).
+    #
+    # Pass -ControlType and/or -WithinPane to narrow. Panes are reliably named
+    # (LeftPane / Documents / RightPane), so pane scoping is the dependable disambiguator.
+    param(
+        [Parameter(Mandatory)]$Window,
+        [Parameter(Mandatory)][string]$Name,
+        [string]$ControlType,
+        [string]$WithinPane
+    )
+
+    $scope = $Window
+    if ($WithinPane) {
+        $paneCond = New-Object System.Windows.Automation.PropertyCondition(
+            [System.Windows.Automation.AutomationElement]::NameProperty, $WithinPane)
+        $scope = $Window.FindFirst(
+            [System.Windows.Automation.TreeScope]::Descendants, $paneCond)
+        if ($null -eq $scope) { throw "Pane '$WithinPane' not found." }
+    }
+
+    $cond = New-Object System.Windows.Automation.PropertyCondition(
+        [System.Windows.Automation.AutomationElement]::NameProperty, $Name)
+    $found = @($scope.FindAll(
+        [System.Windows.Automation.TreeScope]::Descendants, $cond))
+
+    if ($ControlType) {
+        $found = @($found | Where-Object {
+            $_.Current.ControlType.ProgrammaticName -eq "ControlType.$ControlType" })
+    }
+
+    if ($found.Count -eq 0) { throw "No element named '$Name' found." }
+    if ($found.Count -gt 1) {
+        $desc = ($found | ForEach-Object {
+            "[{0}] id='{1}'" -f ($_.Current.ControlType.ProgrammaticName -replace '^ControlType\.', ''),
+                                $_.Current.AutomationId }) -join '; '
+        throw "'$Name' is ambiguous ($($found.Count) matches): $desc. Narrow with -ControlType or -WithinPane."
+    }
+    return $found[0]
 }
 
 function Send-EditorKeys {

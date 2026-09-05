@@ -1615,7 +1615,7 @@ the route for anything the server does not cover, so it should not stay wrong.
 - Consumes: nothing.
 - Produces: corrected `Get-MenuItemStates`; new `Find-EditorElement`.
 
-- [ ] **Step 1: Scope `Get-MenuItemStates` to the app's own menu**
+- [x] **Step 1: Scope `Get-MenuItemStates` to the app's own menu**
 
 In `tools/ui-automation/DriveApp.ps1`, replace the `Get-MenuItemStates` function with:
 
@@ -1646,11 +1646,13 @@ function Get-MenuItemStates {
             [System.Windows.Automation.TreeScope]::Descendants, $itemCond)) {
         $out += "{0} | enabled={1}" -f $it.Current.Name, $it.Current.IsEnabled
     }
-    return ,$out   # comma keeps an empty result an array rather than $null
+    # Stream the rows. `return ,$out` is the idiom for stopping an EMPTY array collapsing
+    # to $null, but on a NON-EMPTY array it nests it, so @(Get-MenuItemStates ...) yields
+    # one element containing every row. Callers wrap in @() instead.
 }
 ```
 
-- [ ] **Step 2: Replace the `ControlType.Edit` habit with a real disambiguator**
+- [x] **Step 2: Replace the `ControlType.Edit` habit with a real disambiguator**
 
 Add after `Invoke-ElementClick`:
 
@@ -1703,7 +1705,7 @@ function Find-EditorElement {
 }
 ```
 
-- [ ] **Step 3: Correct the header's pattern note**
+- [x] **Step 3: Correct the header's pattern note**
 
 The header's claim about top-level MenuItems is **correct** and must stay. Add the measured
 detail beneath it so nobody "corrects" it later. In the header comment block, after the
@@ -1715,7 +1717,7 @@ existing bullet about `ExpandCollapse`, add:
 #     title bar's OS "System" item, not to File/Edit/View/Test/Help.)
 ```
 
-- [ ] **Step 4: Verify the corrected functions against the live app**
+- [x] **Step 4: Verify the corrected functions against the live app**
 
 ```powershell
 $repo = (Get-Location).Path
@@ -1745,7 +1747,7 @@ finally {
 Expected: the menu list has 5 top-level entries and no `System`; the ambiguous lookup throws
 listing 6 candidates; the narrowed lookup returns `ControlType.ComboBox`.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add tools/ui-automation/DriveApp.ps1
