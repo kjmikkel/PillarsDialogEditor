@@ -454,7 +454,7 @@ sending a literal `[` requires `{[}`. Encode it once, with tests, instead of rem
 - Consumes: nothing.
 - Produces: `static string SendKeysEscaper.EscapeLiteral(string text)`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 `DialogEditor.Tests/UiaMcp/SendKeysEscaperTests.cs`:
 
@@ -508,12 +508,12 @@ public class SendKeysEscaperTests
 }
 ```
 
-- [ ] **Step 2: Run the tests to verify they fail**
+- [x] **Step 2: Run the tests to verify they fail**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~SendKeysEscaperTests"`
 Expected: FAIL — `SendKeysEscaper` does not exist.
 
-- [ ] **Step 3: Write the implementation**
+- [x] **Step 3: Write the implementation**
 
 `tools/DialogEditor.UiaMcp.Core/SendKeysEscaper.cs`:
 
@@ -544,12 +544,12 @@ public static class SendKeysEscaper
 }
 ```
 
-- [ ] **Step 4: Run the tests to verify they pass**
+- [x] **Step 4: Run the tests to verify they pass**
 
 Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --filter "FullyQualifiedName~SendKeysEscaperTests"`
 Expected: PASS, 12 tests (8 theory cases + 4 facts).
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp.Core/SendKeysEscaper.cs DialogEditor.Tests/UiaMcp/SendKeysEscaperTests.cs
