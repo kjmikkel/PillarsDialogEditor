@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Text;
-using System.Windows.Automation;
 using DialogEditor.UiaMcp.Core;
 using ModelContextProtocol.Server;
 
@@ -92,72 +91,36 @@ internal sealed class InspectionTools(EditorSession session)
         // The app's Menu is anonymous (audit finding 5) — ClassName is the only handle,
         // and scoping here is what stops the OS 'System' menu being treated as a peer
         // of File/Edit/View/Test/Help.
-        var appMenu = new Resolver(tree).Flatten()
-            .FirstOrDefault(e => e.ClassName == "Menu" && e.ControlType == "Menu");
-        if (appMenu is null)
-            return "Error(NotFound): the app's menu (ClassName='Menu') was not found.";
+        ElementInfo container;
+        var prefix = "";
 
-        var sb = new StringBuilder();
-        var current = appMenu;
-
-        foreach (var segment in path ?? Array.Empty<string>())
+        if (path is null || path.Length == 0)
         {
-            var next = tree.ChildrenOf(current.Id)
-                .FirstOrDefault(c => string.Equals(c.Name, segment, StringComparison.Ordinal));
-            if (next is null)
-            {
-                var available = string.Join(", ",
-                    tree.ChildrenOf(current.Id).Where(c => c.Name.Length > 0).Select(c => $"'{c.Name}'"));
-                return $"Error(NotFound): no menu item '{segment}' under " +
-                       $"'{(current.Name.Length > 0 ? current.Name : "the menu bar")}'. " +
-                       $"Available: {available}. Note menu labels use the ellipsis character '…', not three dots.";
-            }
+            var appMenu = new Resolver(tree).Flatten()
+                .FirstOrDefault(e => e.ClassName == "Menu" && e.ControlType == "Menu");
+            if (appMenu is null) return "Error(NotFound): the app's menu (ClassName='Menu') was not found.";
+            container = appMenu;
+        }
+        else
+        {
+            // Walk to the leaf, then open IT too, so its children are listed.
+            if (!MenuNavigator.TryWalk(session, path, out var leaf, out var log, out var error))
+                return error;
+            prefix = log;
 
-            // Avalonia's top-level MenuItems implement NEITHER Invoke NOR ExpandCollapse,
-            // so a popup's children do not exist in the tree until it is really opened.
-            // A synthetic click is the only way in — reported, not hidden, because needing
-            // it at all is an addressability defect (issue #15).
-            session.Foreground();
-            if (!TryOpen(tree, next, out var why))
-                return $"Error(NotOperable): could not open menu '{segment}': {why}";
-            sb.AppendLine($"note: opened '{segment}' with a synthetic click — it exposes no " +
-                          "Invoke or ExpandCollapse pattern (issue #15).");
-
-            current = next;
+            var opened = ElementOperator.Execute(tree, leaf, ActionKind.Expand);
+            if (opened.StartsWith("Error(", StringComparison.Ordinal)) return opened;
+            prefix += opened;
+            container = leaf;
         }
 
-        var items = tree.ChildrenOf(current.Id).Where(c => c.ControlType == "MenuItem").ToList();
+        var items = tree.ChildrenOf(container.Id).Where(c => c.ControlType == "MenuItem").ToList();
         if (items.Count == 0)
-            return sb + $"'{(current.Name.Length > 0 ? current.Name : "the menu bar")}' has no child menu items.";
+            return prefix + $"'{(container.Name.Length > 0 ? container.Name : "the menu bar")}' has no child menu items.";
 
+        var sb = new StringBuilder(prefix);
         foreach (var item in items)
             sb.AppendLine($"{item.Name} | enabled={item.IsEnabled} | id='{item.AutomationId}'");
         return sb.ToString();
-    }
-
-    private static bool TryOpen(UiaTree tree, ElementInfo item, out string why)
-    {
-        why = "";
-        var element = tree.Element(item.Id);
-
-        if (item.Patterns.Contains("ExpandCollapse"))
-        {
-            ((ExpandCollapsePattern)element.GetCurrentPattern(ExpandCollapsePattern.Pattern)).Expand();
-            Thread.Sleep(600);
-            return true;
-        }
-
-        try
-        {
-            var pt = element.GetClickablePoint();
-            Win32.Click((int)pt.X, (int)pt.Y);
-            Thread.Sleep(700);
-            return true;
-        }
-        catch (NoClickablePointException)
-        {
-            why = "the element has no clickable point (it is offscreen or has zero size).";
-            return false;
-        }
     }
 }
