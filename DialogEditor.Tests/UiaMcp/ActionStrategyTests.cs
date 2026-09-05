@@ -98,9 +98,11 @@ public class ActionStrategyTests
     }
 
     [Fact]
-    public void ActivateFallsBackToASyntheticClickForConversationRows()
+    public void ActivateFallsBackToASyntheticClickForAScrollOnlyTreeItem()
     {
-        // Issue #15 finding 1: Scroll/ScrollItem only — no SelectionItem, no ExpandCollapse.
+        // The RULE, not the app's current state: the real conversation rows now expose
+        // SelectionItem (issue #15 finding 1, fixed), but any row that exposes only
+        // Scroll/ScrollItem must still fall back and warn.
         var plan = ActionStrategy.Plan(El("", "TreeItem", ["Scroll", "ScrollItem"]),
             ActionKind.Activate);
 

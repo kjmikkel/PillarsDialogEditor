@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+             xmlns:ctrl="clr-namespace:DialogEditor.Avalonia.Controls"
              x:Class="DialogEditor.Avalonia.Views.GameBrowserView" x:CompileBindings="False">
 
     <Grid RowDefinitions="Auto,*,Auto">
@@ -31,13 +32,13 @@
         </Border>
 
         <!-- Conversation tree -->
-        <TreeView Grid.Row="1" Background="{DynamicResource Brush.Surface.Subtle}"
+        <ctrl:ConversationTreeView Grid.Row="1" Background="{DynamicResource Brush.Surface.Subtle}"
                   BorderThickness="0"
                   ItemsSource="{Binding FilteredFolders}"
                   SelectedItem="{Binding SelectedTreeItem, Mode=TwoWay}"
                   SelectionChanged="TreeView_SelectionChanged">
 
-            <TreeView.Styles>
+            <ctrl:ConversationTreeView.Styles>
                 <!-- Selection highlight -->
                 <Style Selector="TreeViewItem:selected /template/ ContentPresenter#PART_HeaderPresenter">
                     <Setter Property="Background" Value="{DynamicResource Brush.Border.Focus}"/>
@@ -45,9 +46,9 @@
                 <Style Selector="TreeViewItem:selected:focus /template/ ContentPresenter#PART_HeaderPresenter">
                     <Setter Property="Background" Value="{DynamicResource Brush.Border.Focus}"/>
                 </Style>
-            </TreeView.Styles>
+            </ctrl:ConversationTreeView.Styles>
 
-            <TreeView.DataTemplates>
+            <ctrl:ConversationTreeView.DataTemplates>
                 <TreeDataTemplate DataType="{x:Type vm:ConversationFolderViewModel}" ItemsSource="{Binding Items}">
                     <TextBlock Text="{Binding DisplayName}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}" Padding="2"/>
                 </TreeDataTemplate>
@@ -58,9 +59,9 @@
                                Cursor="Hand"
                                Tapped="ConversationItem_Tapped"/>
                 </DataTemplate>
-            </TreeView.DataTemplates>
+            </ctrl:ConversationTreeView.DataTemplates>
 
-            <TreeView.ItemContainerTheme>
+            <ctrl:ConversationTreeView.ItemContainerTheme>
                 <ControlTheme TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
                     <!-- Name the CONTAINER, not just the templated TextBlock inside it
@@ -72,9 +73,9 @@
                          binding is the correct source here rather than a localised resource. -->
                     <Setter Property="AutomationProperties.Name" Value="{Binding DisplayName}"/>
                 </ControlTheme>
-            </TreeView.ItemContainerTheme>
+            </ctrl:ConversationTreeView.ItemContainerTheme>
 
-        </TreeView>
+        </ctrl:ConversationTreeView>
 
         <!-- Game name footer -->
         <Border Grid.Row="2" Background="{DynamicResource Brush.Surface.Card}" Padding="8,5">

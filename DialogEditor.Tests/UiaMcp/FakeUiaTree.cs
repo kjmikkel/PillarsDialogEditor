@@ -72,11 +72,10 @@ public sealed class FakeUiaTree : IUiaTree
         var left = t.Add(rootDock.Id, "Conversations", "Pane", "LeftPane", "ToolControl");
         AddPaneChrome(t, rootDock.Id);
 
-        // 37 conversation rows. They are NAMED as of the issue #15 finding-1 fix, but still
-        // expose only Scroll/ScrollItem — no SelectionItem, ExpandCollapse or Invoke — so
-        // they cannot be selected or expanded programmatically. (The original audit reported
-        // "no patterns at all"; that was a false negative from a regex bug in its PowerShell
-        // probe, and TryGetCurrentPattern later confirmed the corrected set.)
+        // 37 conversation rows, fully addressable as of the issue #15 finding-1 fix: named
+        // from their own data, and operable via SelectionItem/ExpandCollapse supplied by
+        // ConversationTreeViewItemAutomationPeer (Avalonia's own TreeViewItem peer implements
+        // no provider interfaces). Verified live with TryGetCurrentPattern.
         var tree = t.Add(left.Id, "", "Tree", className: "TreeView",
             patterns: new[] { "Scroll", "ScrollItem" });
         for (var i = 0; i < 37; i++)
@@ -87,7 +86,7 @@ public sealed class FakeUiaTree : IUiaTree
             // report it; see LabelledContainersAreNotReportedAsCollisions.
             var label = i == 0 ? "(root)" : $"{i:00}_conversation";
             var item = t.Add(tree.Id, label, "TreeItem", focusable: true,
-                patterns: new[] { "Scroll", "ScrollItem" });
+                patterns: new[] { "SelectionItem", "ExpandCollapse", "Scroll", "ScrollItem" });
             t.Add(item.Id, "", "Button", "PART_ExpandCollapseChevron");
             t.Add(item.Id, label, "Text");
         }

@@ -9,7 +9,7 @@ permanent furniture.
 |---|---|---|---|---|
 | 1 | Synthetic click to open a top-level menu | App `MenuItem`s expose `ScrollItem` only — no `Invoke`, no `ExpandCollapse` | [#15](https://github.com/kjmikkel/PillarsDialogEditor/issues/15) gives menu items an operable pattern | `ActionToolsGuiTests.TopLevelMenuItemsStillLackInvokeAndExpandCollapse` |
 | 2 | Synthetic click to activate a menu command | Same — the leaf item has no `Invoke` either | #15, same fix | same test |
-| 3 | Synthetic click to select a conversation row | `TreeItem`s expose `Scroll`/`ScrollItem` only — no `SelectionItem` | #15 finding 1 | `ActionToolsGuiTests.ConversationRowsStillLackSelectionItem` |
+| ~~3~~ | ~~Synthetic click to select a conversation row~~ | **RESOLVED 2026-09-05.** Rows are named from their data and a custom automation peer supplies `SelectionItem`/`ExpandCollapse` | — | `ActionToolsGuiTests.ConversationRowsAreSelectableAndExpandableByPattern` + `ActivatingAConversationRowUsesAPatternNotASyntheticClick` |
 | ~~4~~ | ~~Menu addressing by localised `Name`~~ | **RESOLVED 2026-09-05.** All 51 menu items (and 9 context-menu items) now carry stable non-localised `AutomationId`s; `MenuNavigator` matches id first, then name | — | `MenuItemAutomationIdTests` (markup) + `ActionToolsGuiTests.MenuItemsExposeStableAutomationIdsToUia` (live tree) |
 | 5 | App menu located by `ClassName='Menu'` | The app's `Menu` element is anonymous | #15 names the menu | `ActionToolsGuiTests.TheAppMenuIsFoundAndExcludesTheOsSystemItem` (would need inverting) |
 | 6 | `FocusAndType` in `set_value` | Some fields expose no `Value` pattern | per-control, as found | none — data-dependent |
@@ -29,6 +29,34 @@ Worth noting what the enforcement test had to get *right*: the rule is the exact
 `AutomationId` is never shown so it MUST NOT be, or the locale coupling comes straight back.
 Both directions are now structurally enforced, plus id uniqueness within a view — a duplicated
 id could not disambiguate anything, which is the entire point of adding them.
+
+**#3 — synthetic click to select a conversation row (2026-09-05).** Issue #15 finding 1, in
+two halves.
+
+The *name* half was markup: `AutomationProperties.Name` bound to `DisplayName` on the
+`TreeViewItem` container via `ItemContainerTheme`. Without it a row's accessible name was
+empty, the label living only on the templated `TextBlock`, so a lookup for a conversation
+resolved to that inner `Text` — and a screen reader announced nothing.
+
+The *pattern* half was an upstream framework gap. Avalonia 11.3's
+`TreeViewItemAutomationPeer` overrides only `GetAutomationControlTypeCore()` and implements no
+provider interfaces, so rows exposed neither `ISelectionItemProvider` nor
+`IExpandCollapseProvider`. `ListItemAutomationPeer` (used by `TabItem`) *does* implement
+selection, which is why tabs were operable and tree rows were not — the Win32 bridge was never
+the problem. `DialogEditor.Avalonia/Controls/ConversationTreeView.cs` supplies the missing
+providers locally; **delete all three types when Avalonia ships them upstream.**
+
+Two traps worth remembering if this is ever revisited:
+
+- `TreeViewItem.CreateContainerForItemOverride` delegates to its owning `TreeView`, so one
+  override on the `TreeView` subclass covers containers at every depth.
+- Subclassing a templated control changes its style key. Without `StyleKeyOverride` pointing
+  back at the base type, the subclass matches no `ControlTheme`, gets no template, and renders
+  nothing — the tree went from 37 rows to zero UIA elements before that was added.
+
+Verified live: `SelectionItem` and `ExpandCollapse` both present, `Select()` flips `IsSelected`
+False → True, `invoke` reports `ok: used the SelectionItem pattern.` with no warning, and a
+screenshot confirms the row highlights with no visual regression.
 
 ## How to remove one
 

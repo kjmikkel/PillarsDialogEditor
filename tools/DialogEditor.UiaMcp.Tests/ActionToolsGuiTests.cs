@@ -98,15 +98,32 @@ public class ActionToolsGuiTests(EditorSessionFixture fixture) : IClassFixture<E
     }
 
     [Fact]
-    public void ConversationRowsStillLackSelectionItem()
+    public void ConversationRowsAreSelectableAndExpandableByPattern()
     {
-        // Issue #15 finding 1. Also expected to fail once the app is fixed.
+        // Issue #15 finding 1, fixed. Inverted from asserting the defect — the previous form
+        // failing is what signalled the fix had landed, exactly as the fallback inventory
+        // prescribes. Supplied by ConversationTreeViewItemAutomationPeer, since Avalonia's
+        // own TreeViewItem peer implements no provider interfaces.
         var rows = new Resolver(fixture.Session.Tree()).Flatten()
             .Where(e => e.ControlType == "TreeItem").ToList();
 
         Assert.NotEmpty(rows);
-        Assert.All(rows, r => Assert.DoesNotContain("SelectionItem", r.Patterns));
+        Assert.All(rows, r => Assert.Contains("SelectionItem", r.Patterns));
+        Assert.All(rows, r => Assert.Contains("ExpandCollapse", r.Patterns));
         Assert.All(rows, r => Assert.Contains("ScrollItem", r.Patterns));
+    }
+
+    [Fact]
+    public void ActivatingAConversationRowUsesAPatternNotASyntheticClick()
+    {
+        var row = new Resolver(fixture.Session.Tree()).Flatten()
+            .First(e => e.ControlType == "TreeItem");
+
+        var plan = ActionStrategy.Plan(row, ActionKind.Activate);
+
+        Assert.Equal("Pattern", plan.Route);
+        Assert.Equal("SelectionItem", plan.Pattern);
+        Assert.Null(plan.Warning);
     }
 
     [Fact]
