@@ -58,12 +58,19 @@ public static class ActionStrategy
     {
         // Invoke first: it is what "activate" means. SelectionItem only changes selection,
         // so it is a fallback rather than a peer.
-        foreach (var p in new[] { "Invoke", "Toggle", "SelectionItem" })
+        //
+        // ExpandCollapse is last but genuine, not a consolation prize: for a ComboBox —
+        // which exposes Selection/Value/Scroll/ExpandCollapse and no Invoke — activating
+        // IS expanding. Omitting it made the strategy click such controls and blame issue
+        // #15 for a non-defect, and a warning that cries wolf on correct controls is how
+        // real warnings stop being believed.
+        foreach (var p in new[] { "Invoke", "Toggle", "SelectionItem", "ExpandCollapse" })
             if (e.Patterns.Contains(p))
                 return new ActionPlan("Pattern", p, scroll, null, null);
 
         return Clickable(e)
-            ? new ActionPlan("SyntheticClick", null, scroll, FallbackWarning(e, "Invoke, Toggle or SelectionItem"), null)
+            ? new ActionPlan("SyntheticClick", null, scroll,
+                FallbackWarning(e, "Invoke, Toggle, SelectionItem or ExpandCollapse"), null)
             : NotOperable($"'{Describe(e)}' exposes no actionable pattern and is not clickable.");
     }
 
