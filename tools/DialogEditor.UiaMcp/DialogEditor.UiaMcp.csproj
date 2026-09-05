@@ -19,4 +19,11 @@
   <ItemGroup>
     <ProjectReference Include="..\DialogEditor.UiaMcp.Core\DialogEditor.UiaMcp.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- EditorSession, UiaTree and the tool classes are internal; the Gui test project
+         drives them directly rather than over JSON-RPC. -->
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>DialogEditor.UiaMcp.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
 </Project>

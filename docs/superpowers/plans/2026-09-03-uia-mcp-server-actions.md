@@ -1382,7 +1382,7 @@ cannot reference the `net8.0-windows` server, so the live layer had manual verif
 - Consumes: everything in `DialogEditor.UiaMcp`.
 - Produces: a `Gui`-traited test assembly, excluded from the default run.
 
-- [ ] **Step 1: Create the project**
+- [x] **Step 1: Create the project**
 
 `tools/DialogEditor.UiaMcp.Tests/DialogEditor.UiaMcp.Tests.csproj`:
 
@@ -1429,7 +1429,7 @@ Add to `DialogEditor.slnx`, after the `DialogEditor.UiaMcp` line:
   <Project Path="tools/DialogEditor.UiaMcp.Tests/DialogEditor.UiaMcp.Tests.csproj" />
 ```
 
-- [ ] **Step 2: Add the session fixture**
+- [x] **Step 2: Add the session fixture**
 
 Gui exclusion is done with a class-level `[Trait("Category", "Gui")]` on the test class (see
 step 3) — plain xunit, no custom attribute. A custom `GuiFactAttribute` implementing
@@ -1485,7 +1485,7 @@ public sealed class EditorSessionFixture : IDisposable
 }
 ```
 
-- [ ] **Step 3: Write the Gui tests**
+- [x] **Step 3: Write the Gui tests**
 
 `tools/DialogEditor.UiaMcp.Tests/ActionToolsGuiTests.cs`:
 
@@ -1571,7 +1571,7 @@ public class ActionToolsGuiTests(EditorSessionFixture fixture) : IClassFixture<E
 }
 ```
 
-- [ ] **Step 4: Build and confirm the default run still excludes these**
+- [x] **Step 4: Build and confirm the default run still excludes these**
 
 Run: `dotnet build "DialogEditor.slnx" -c Debug`
 Expected: Build succeeded, 0 errors.
@@ -1580,10 +1580,10 @@ Run: `dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj --nologo`
 Expected: PASS, unchanged from the phase 1–2 baseline plus this plan's additions. This project
 is separate, so it does not appear here at all.
 
-- [ ] **Step 5: Run the Gui tests explicitly**
+- [x] **Step 5: Run the Gui tests explicitly**
 
 Run: `dotnet test tools/DialogEditor.UiaMcp.Tests/DialogEditor.UiaMcp.Tests.csproj --filter "Category=Gui" --nologo`
-Expected: PASS, 5 tests. The app window appears once and is torn down at the end.
+Expected: PASS. Measured: 7 tests. The app window appears once and is torn down at the end.
 
 Afterwards confirm nothing leaked:
 
@@ -1594,7 +1594,7 @@ Get-ChildItem "$env:TEMP\PillarsDialogEditor.settings.*"
 
 Expected: no process; no `settings.backup.json` and no leftover `uiamcptests` snapshot.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp.Tests tools/DialogEditor.UiaMcp/DialogEditor.UiaMcp.csproj DialogEditor.slnx
