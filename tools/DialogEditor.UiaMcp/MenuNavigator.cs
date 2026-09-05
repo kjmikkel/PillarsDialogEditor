@@ -53,17 +53,27 @@ internal static class MenuNavigator
         for (var i = 0; i < path.Length; i++)
         {
             var segment = path[i];
-            var next = tree.ChildrenOf(current.Id)
-                .FirstOrDefault(c => string.Equals(c.Name, segment, StringComparison.Ordinal));
+
+            // Match an AutomationId FIRST, then the display Name. Ids are stable and
+            // non-localised (issue #15 finding 4, fixed), so 'MenuHelp_About' keeps working
+            // when the label is reworded or the UI language changes, whereas 'About…'
+            // depends on both — including the ellipsis character.
+            var children = tree.ChildrenOf(current.Id);
+            var next = children.FirstOrDefault(c =>
+                          c.AutomationId.Length > 0 &&
+                          string.Equals(c.AutomationId, segment, StringComparison.Ordinal))
+                       ?? children.FirstOrDefault(c =>
+                          string.Equals(c.Name, segment, StringComparison.Ordinal));
 
             if (next is null)
             {
-                var available = string.Join(", ",
-                    tree.ChildrenOf(current.Id).Where(c => c.Name.Length > 0).Select(c => $"'{c.Name}'"));
+                var available = string.Join(", ", children
+                    .Where(c => c.Name.Length > 0 || c.AutomationId.Length > 0)
+                    .Select(c => c.AutomationId.Length > 0 ? $"'{c.AutomationId}' ('{c.Name}')" : $"'{c.Name}'"));
                 error = $"Error(NotFound): no menu item '{segment}' under " +
-                        $"'{Label(current)}'. Available: {available}. Menu labels use the " +
-                        "ellipsis character '…', not three dots, and are localised — no menu " +
-                        "item carries an AutomationId (issue #15 finding 4).";
+                        $"'{Label(current)}'. Available (id then label): {available}. " +
+                        "Prefer the AutomationId: labels are localised and use the ellipsis " +
+                        "character '…', not three dots.";
                 return false;
             }
 

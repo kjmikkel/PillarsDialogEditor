@@ -116,17 +116,20 @@
                 <nodify:NodifyEditor.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="{DynamicResource Menu_Canvas_AddNodeHere}"
+                                  AutomationProperties.AutomationId="CanvasMenu_AddNodeHere"
                                   Click="CanvasMenu_AddNode_Click"
                                   IsVisible="{Binding IsEditable}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Menu_Canvas_AddNodeHere}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_Canvas_AddNodeHere}"/>
                         <MenuItem Header="{DynamicResource Menu_Canvas_AddAnnotationHere}"
+                                  AutomationProperties.AutomationId="CanvasMenu_AddAnnotationHere"
                                   Click="CanvasMenu_AddAnnotation_Click"
                                   IsVisible="{Binding IsEditable}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Menu_Canvas_AddAnnotationHere}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_Canvas_AddAnnotationHere}"/>
                         <Separator IsVisible="{Binding CanBatchImportVo}"/>
                         <MenuItem Header="{DynamicResource Menu_BatchImportVo}"
+                                  AutomationProperties.AutomationId="CanvasMenu_BatchImportVo"
                                   Command="{Binding BatchImportVoCommand}"
                                   IsVisible="{Binding CanBatchImportVo}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Menu_BatchImportVo}"
@@ -165,27 +168,32 @@
                             <nodify:Node.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="{DynamicResource Menu_DeleteNode}"
+                                              AutomationProperties.AutomationId="NodeMenu_Delete"
                                               Command="{Binding $parent[UserControl].DataContext.DeleteNodeCmdCommand}"
                                               CommandParameter="{Binding}"
                                               ToolTip.Tip="{DynamicResource ToolTip_DeleteNode}"
                                               AutomationProperties.HelpText="{DynamicResource ToolTip_DeleteNode}"/>
                                     <MenuItem Header="{DynamicResource Menu_AddConnectedNode}"
+                                              AutomationProperties.AutomationId="NodeMenu_AddConnectedNode"
                                               Command="{Binding $parent[UserControl].DataContext.AddConnectedNodeCmdCommand}"
                                               CommandParameter="{Binding}"
                                               ToolTip.Tip="{DynamicResource ToolTip_AddConnectedNode}"
                                               AutomationProperties.HelpText="{DynamicResource ToolTip_AddConnectedNode}"/>
                                     <MenuItem Header="{DynamicResource Menu_ConnectToNode}"
+                                              AutomationProperties.AutomationId="NodeMenu_ConnectToNode"
                                               Command="{Binding $parent[UserControl].DataContext.BeginConnectCmdCommand}"
                                               CommandParameter="{Binding}"
                                               ToolTip.Tip="{DynamicResource ToolTip_ConnectToNode}"
                                               AutomationProperties.HelpText="{DynamicResource ToolTip_ConnectToNode}"/>
                                     <MenuItem Header="{DynamicResource Menu_Canvas_BrowseSpeakerLinesForNode}"
+                                              AutomationProperties.AutomationId="NodeMenu_BrowseSpeakerLines"
                                               Command="{Binding $parent[UserControl].DataContext.BrowseSpeakerLinesForNodeCommand}"
                                               CommandParameter="{Binding}"
                                               ToolTip.Tip="{DynamicResource ToolTip_Canvas_BrowseSpeakerLinesForNode}"
                                               AutomationProperties.HelpText="{DynamicResource ToolTip_Canvas_BrowseSpeakerLinesForNode}"/>
                                     <Separator IsVisible="{Binding $parent[UserControl].DataContext.Detail.HasVoStatus}"/>
                                     <MenuItem Header="{DynamicResource Menu_ImportVo}"
+                                              AutomationProperties.AutomationId="NodeMenu_ImportVo"
                                               Command="{Binding $parent[UserControl].DataContext.Detail.ImportVoCommand}"
                                               IsVisible="{Binding $parent[UserControl].DataContext.Detail.HasVoStatus}"
                                               ToolTip.Tip="{DynamicResource ToolTip_Menu_ImportVo}"
@@ -356,6 +364,7 @@
                             <nodify:Connection.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="{DynamicResource Menu_DeleteConnection}"
+                                              AutomationProperties.AutomationId="ConnectionMenu_Delete"
                                               Command="{Binding $parent[UserControl].DataContext.DeleteConnectionCmdCommand}"
                                               CommandParameter="{Binding}"
                                               ToolTip.Tip="{DynamicResource ToolTip_DeleteConnection}"

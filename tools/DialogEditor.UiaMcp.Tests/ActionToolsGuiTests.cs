@@ -36,6 +36,24 @@ public class ActionToolsGuiTests(EditorSessionFixture fixture) : IClassFixture<E
     }
 
     [Fact]
+    public void MenuItemsExposeStableAutomationIdsToUia()
+    {
+        // Issue #15 finding 4, fixed. MenuItemAutomationIdTests enforces the markup; this
+        // pins that the ids actually REACH the UIA tree, which markup alone cannot prove.
+        var all = new Resolver(fixture.Session.Tree()).Flatten();
+        var appMenu = all.Single(e => e.ClassName == "Menu" && e.ControlType == "Menu");
+        var tops = fixture.Session.Tree().ChildrenOf(appMenu.Id)
+            .Where(c => c.ControlType == "MenuItem").ToList();
+
+        Assert.Equal(
+            new[] { "MenuFile", "MenuEdit", "MenuView", "MenuTest", "MenuHelp" },
+            tops.Select(t => t.AutomationId));
+
+        // Ids must be independent of the display text, which is localised.
+        Assert.All(tops, t => Assert.NotEqual(t.Name, t.AutomationId));
+    }
+
+    [Fact]
     public void AmbiguousNamesAreRefusedRatherThanGuessed()
     {
         var result = new Resolver(fixture.Session.Tree())
