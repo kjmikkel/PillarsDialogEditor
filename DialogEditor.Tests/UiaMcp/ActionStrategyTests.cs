@@ -60,6 +60,31 @@ public class ActionStrategyTests
     }
 
     [Fact]
+    public void ActivateUsesExpandCollapseForAComboBoxWithoutWarning()
+    {
+        // Measured live: a ComboBox exposes Selection/Value/Scroll/ExpandCollapse/ScrollItem
+        // and no Invoke. Activating a ComboBox MEANS expanding it, so this is a legitimate
+        // pattern route — warning about it would blame the app for a non-defect, and
+        // false-positive warnings are what make real ones stop being believed.
+        var plan = ActionStrategy.Plan(
+            El("Language:", "ComboBox", ["Selection", "Value", "Scroll", "ExpandCollapse", "ScrollItem"]),
+            ActionKind.Activate);
+
+        Assert.Equal("Pattern", plan.Route);
+        Assert.Equal("ExpandCollapse", plan.Pattern);
+        Assert.Null(plan.Warning);
+    }
+
+    [Fact]
+    public void ActivateStillPrefersInvokeOverExpandCollapse()
+    {
+        var plan = ActionStrategy.Plan(
+            El("Split", "Button", ["Invoke", "ExpandCollapse"]), ActionKind.Activate);
+
+        Assert.Equal("Invoke", plan.Pattern);
+    }
+
+    [Fact]
     public void ActivateFallsBackToASyntheticClickWithAWarningForTheAppsMenuItems()
     {
         // Audit finding: the app's top-level MenuItems expose ScrollItem only.

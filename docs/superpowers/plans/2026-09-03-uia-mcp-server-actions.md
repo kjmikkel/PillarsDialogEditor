@@ -742,7 +742,7 @@ git commit -m "feat(uiamcp): execute action plans against live UI Automation"
 - Consumes: `ElementOperator` (Task 3), `Resolver`, `RefTable`, `Selector`, `EditorSession` (phase 1–2).
 - Produces: `static bool ElementAddress.TryResolve(EditorSession, string? reference, Selector, out ElementInfo, out string error)`; MCP tools `invoke`, `focus`.
 
-- [ ] **Step 1: Write the shared address resolution**
+- [x] **Step 1: Write the shared address resolution**
 
 Both tools — and every later one — accept either a `ref` or a selector. Factor it once.
 
@@ -806,7 +806,7 @@ internal static class ElementAddress
 }
 ```
 
-- [ ] **Step 2: Write the tools**
+- [x] **Step 2: Write the tools**
 
 `tools/DialogEditor.UiaMcp/Tools/ActionTools.cs`:
 
@@ -860,12 +860,12 @@ internal sealed class ActionTools(EditorSession session)
 }
 ```
 
-- [ ] **Step 3: Build**
+- [x] **Step 3: Build**
 
 Run: `dotnet build "DialogEditor.slnx" -c Debug`
 Expected: Build succeeded, 0 errors.
 
-- [ ] **Step 4: Verify against the live app**
+- [x] **Step 4: Verify against the live app**
 
 ```powershell
 $repo = ((Get-Location).Path -replace '\\','/')
@@ -876,7 +876,12 @@ pwsh tools/DialogEditor.UiaMcp/drive.ps1 -Script @"
 "@
 ```
 
-Expected: `invoke` reports `ok: used the Invoke pattern.` **or** a `SyntheticClick` line with a
+**Corrected during execution:** a ComboBox exposes ExpandCollapse and no Invoke, so the
+original Activate preference list (Invoke/Toggle/SelectionItem) clicked it and blamed
+issue #15 for a non-defect. ExpandCollapse is now the last Activate preference and this
+call reports `ok: used the ExpandCollapse pattern.` with no warning.
+
+Expected: `invoke` reports `ok: used the ExpandCollapse pattern.` **or** a `SyntheticClick` line with a
 `WARNING:` naming issue #15 — either is a pass; which one it is tells you what the ComboBox
 actually exposes. An `Error(Ambiguous)` is **also** a pass if it lists both the `Text` label
 and the `ComboBox`: that is the resolver refusing to guess, which is the contract.
@@ -893,7 +898,7 @@ pwsh tools/DialogEditor.UiaMcp/drive.ps1 -Script @"
 Expected: `Error(Ambiguous)` listing 6 candidates with `nth=0..5`. **Do not "fix" this by
 making it pick the first** — refusing is the whole point.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp/ElementAddress.cs tools/DialogEditor.UiaMcp/Tools/ActionTools.cs
