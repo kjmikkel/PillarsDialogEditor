@@ -63,6 +63,14 @@
             <TreeView.ItemContainerTheme>
                 <ControlTheme TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                    <!-- Name the CONTAINER, not just the templated TextBlock inside it
+                         (issue #15 finding 1). Without this a TreeViewItem's accessible name
+                         is empty and the label lives only on its child Text element, so a
+                         screen reader announces nothing for the row and an automation lookup
+                         for a conversation resolves to that inner Text — which cannot be
+                         selected or expanded. DisplayName is data, not UI chrome, so a
+                         binding is the correct source here rather than a localised resource. -->
+                    <Setter Property="AutomationProperties.Name" Value="{Binding DisplayName}"/>
                 </ControlTheme>
             </TreeView.ItemContainerTheme>
 

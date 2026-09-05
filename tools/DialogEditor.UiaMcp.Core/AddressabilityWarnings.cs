@@ -24,11 +24,34 @@ public static class AddressabilityWarnings
                      .GroupBy(e => e.Name, StringComparer.Ordinal)
                      .Where(g => g.Count() > 1))
         {
-            var ids = string.Join(", ", group.Select(e => $"'{e.AutomationId}'").Distinct());
-            var types = string.Join("/", group.Select(e => e.ControlType).Distinct());
+            // Strip labels before judging ambiguity. A control sharing its name with its own
+            // Text label is not something a caller can trip over: a Text element is never an
+            // interaction target, so it cannot be the thing you meant, and controlType
+            // separates them trivially.
+            //
+            // This matters for signal quality, not neatness. After the issue #15 finding-1
+            // fix named the conversation rows, the Conversations pane alone produced 37 such
+            // pairs — enough to bury the real collisions. Same lesson as the ComboBox false
+            // positive: a warning that cries wolf teaches the reader to skim past them.
+            var targets = group.Where(e => e.ControlType != "Text").ToList();
+
+            if (targets.Count == 0)
+            {
+                // All labels. Not an addressing problem, but a screen reader announces the
+                // same text more than once, which is its own defect.
+                warnings.Add(new AddressabilityWarning("DuplicateLabel",
+                    $"'{group.Key}' appears on {group.Count()} static Text elements — " +
+                    "assistive technology will announce it more than once."));
+                continue;
+            }
+
+            if (targets.Count == 1) continue;   // a labelled control: benign
+
+            var ids = string.Join(", ", targets.Select(e => $"'{e.AutomationId}'").Distinct());
+            var types = string.Join("/", targets.Select(e => e.ControlType).Distinct());
             warnings.Add(new AddressabilityWarning("CollidingName",
-                $"'{group.Key}' matches {group.Count()} elements ({types}; automationIds {ids}) — " +
-                "a bare name lookup here is ambiguous."));
+                $"'{group.Key}' matches {targets.Count} interactive elements ({types}; " +
+                $"automationIds {ids}) — a bare name lookup here is ambiguous."));
         }
 
         foreach (var group in elements

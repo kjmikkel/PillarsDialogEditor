@@ -79,6 +79,25 @@ public class ActionToolsGuiTests(EditorSessionFixture fixture) : IClassFixture<E
     }
 
     [Fact]
+    public void ConversationRowsAreReachableByName()
+    {
+        // Issue #15 finding 1, name half. The rows used to have an empty Name with the
+        // label sitting on a child Text element, so a lookup for a conversation returned
+        // something unselectable — and a screen reader announced nothing at all.
+        var all = new Resolver(fixture.Session.Tree()).Flatten();
+        var rows = all.Where(e => e.ControlType == "TreeItem").ToList();
+
+        Assert.NotEmpty(rows);
+        Assert.All(rows, r => Assert.False(string.IsNullOrWhiteSpace(r.Name),
+            "a conversation row has no accessible name"));
+
+        // The name must be the row's own label, not a shared placeholder — otherwise the
+        // rows would all collide and still not be individually addressable.
+        var distinct = rows.Select(r => r.Name).Distinct(StringComparer.Ordinal).Count();
+        Assert.Equal(rows.Count, distinct);
+    }
+
+    [Fact]
     public void ConversationRowsStillLackSelectionItem()
     {
         // Issue #15 finding 1. Also expected to fail once the app is fixed.

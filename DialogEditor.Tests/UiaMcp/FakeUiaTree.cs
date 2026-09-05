@@ -72,18 +72,24 @@ public sealed class FakeUiaTree : IUiaTree
         var left = t.Add(rootDock.Id, "Conversations", "Pane", "LeftPane", "ToolControl");
         AddPaneChrome(t, rootDock.Id);
 
-        // 37 nameless conversation rows. They DO expose Scroll/ScrollItem — measured on
-        // the live app — but no SelectionItem, ExpandCollapse or Invoke, so they cannot be
-        // selected or expanded programmatically. The original audit reported "no patterns
-        // at all"; that was a false negative from a regex bug in its PowerShell probe.
+        // 37 conversation rows. They are NAMED as of the issue #15 finding-1 fix, but still
+        // expose only Scroll/ScrollItem — no SelectionItem, ExpandCollapse or Invoke — so
+        // they cannot be selected or expanded programmatically. (The original audit reported
+        // "no patterns at all"; that was a false negative from a regex bug in its PowerShell
+        // probe, and TryGetCurrentPattern later confirmed the corrected set.)
         var tree = t.Add(left.Id, "", "Tree", className: "TreeView",
             patterns: new[] { "Scroll", "ScrollItem" });
         for (var i = 0; i < 37; i++)
         {
-            var item = t.Add(tree.Id, "", "TreeItem", focusable: true,
+            // The container carries the row's own label as of the finding-1 name fix, and
+            // the templated Text child still carries it too — so each row's name collides
+            // with its own label. That pair is benign and AddressabilityWarnings must not
+            // report it; see LabelledContainersAreNotReportedAsCollisions.
+            var label = i == 0 ? "(root)" : $"{i:00}_conversation";
+            var item = t.Add(tree.Id, label, "TreeItem", focusable: true,
                 patterns: new[] { "Scroll", "ScrollItem" });
             t.Add(item.Id, "", "Button", "PART_ExpandCollapseChevron");
-            t.Add(item.Id, i == 0 ? "(root)" : $"{i:00}_conversation", "Text");
+            t.Add(item.Id, label, "Text");
         }
 
         var docs = t.Add(rootDock.Id, "Canvas", "Pane", "Documents", "DocumentControl");
