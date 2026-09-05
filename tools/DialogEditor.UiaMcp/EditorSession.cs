@@ -45,6 +45,9 @@ internal sealed class EditorSession
     /// <summary>Shared across tool calls so refs minted by read_tree resolve in later calls.</summary>
     public RefTable Refs { get; } = new();
 
+    public IntPtr WindowHandle => _process?.MainWindowHandle
+        ?? throw new InvalidOperationException("NoSession: call launch_app first.");
+
     public string Launch(string repoRoot, string project)
     {
         var exe = Path.Combine(repoRoot, "DialogEditor.Avalonia", "bin", "Debug", "net8.0",

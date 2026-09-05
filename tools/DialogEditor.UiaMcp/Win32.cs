@@ -12,6 +12,10 @@ internal static class Win32
     [DllImport("user32.dll")] internal static extern void SetCursorPos(int x, int y);
     [DllImport("user32.dll")] internal static extern void mouse_event(uint f, uint dx, uint dy, uint d, UIntPtr e);
 
+    [DllImport("user32.dll")] internal static extern bool GetWindowRect(IntPtr hWnd, out RECT r);
+
+    internal struct RECT { public int Left, Top, Right, Bottom; }
+
     internal static void Click(int x, int y)
     {
         SetCursorPos(x, y);
