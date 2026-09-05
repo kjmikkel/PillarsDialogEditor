@@ -28,6 +28,8 @@ param(
     #   -Script '[{"name":"launch_app","arguments":{"repoRoot":"C:/repo"}},
     #             {"name":"find","arguments":{"query":"Viewbox"}}]'
     [string]$Script,
+    # Where image content blocks get written, so screenshots can be inspected.
+    [string]$ImageOutDir = ".",
     [switch]$KeepAlive,
     [string]$Exe = "tools/DialogEditor.UiaMcp/bin/Debug/net8.0-windows/DialogEditor.UiaMcp.exe",
     [int]$TimeoutSec = 120
@@ -84,8 +86,23 @@ function Invoke-Tool {
     $script:NextId++
     $resp = Send-Rpc -Id $script:NextId -Method "tools/call" -Params @{ name = $Name; arguments = $ToolArgs }
     Write-Host "=== $Name ==="
-    if ($resp.error) { Write-Host "ERROR: $($resp.error.message)" }
-    else { ($resp.result.content | Where-Object { $_.type -eq 'text' }).text | Write-Host }
+    if ($resp.error) { Write-Host "ERROR: $($resp.error.message)"; return }
+
+    foreach ($block in $resp.result.content) {
+        switch ($block.type) {
+            'text'  { Write-Host $block.text }
+            'image' {
+                # Save image blocks to disk so a screenshot can actually be LOOKED at.
+                # Dimensions in the text block are not proof the pixels are right — a
+                # blank or black frame reports the same size as a good capture.
+                $ext = if ($block.mimeType -eq 'image/png') { 'png' } else { 'bin' }
+                $path = Join-Path $ImageOutDir ("{0}-{1:yyyyMMdd-HHmmss}.{2}" -f $Name, (Get-Date), $ext)
+                [IO.File]::WriteAllBytes($path, [Convert]::FromBase64String($block.data))
+                Write-Host "[image saved: $path ($([Math]::Round((Get-Item $path).Length/1KB)) KB)]"
+            }
+            default { Write-Host "[$($block.type) block]" }
+        }
+    }
 }
 
 try {

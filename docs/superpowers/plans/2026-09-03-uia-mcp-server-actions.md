@@ -1020,7 +1020,7 @@ git commit -m "feat(uiamcp): add send_keys and set_value tools"
 - Consumes: `EditorSession`, `Win32` (phase 1–2).
 - Produces: `IntPtr EditorSession.WindowHandle`; `Win32.GetWindowRect`; MCP tool `screenshot` returning `IEnumerable<ContentBlock>`.
 
-- [ ] **Step 1: Add the window rect helper**
+- [x] **Step 1: Add the window rect helper**
 
 Append to `tools/DialogEditor.UiaMcp/Win32.cs`, inside the `Win32` class:
 
@@ -1030,7 +1030,7 @@ Append to `tools/DialogEditor.UiaMcp/Win32.cs`, inside the `Win32` class:
     internal struct RECT { public int Left, Top, Right, Bottom; }
 ```
 
-- [ ] **Step 2: Expose the window handle**
+- [x] **Step 2: Expose the window handle**
 
 Add to the `EditorSession` class body in `tools/DialogEditor.UiaMcp/EditorSession.cs`:
 
@@ -1039,7 +1039,7 @@ Add to the `EditorSession` class body in `tools/DialogEditor.UiaMcp/EditorSessio
         ?? throw new InvalidOperationException("NoSession: call launch_app first.");
 ```
 
-- [ ] **Step 3: Write the tool**
+- [x] **Step 3: Write the tool**
 
 `tools/DialogEditor.UiaMcp/Tools/ScreenshotTool.cs`:
 
@@ -1088,14 +1088,14 @@ internal sealed class ScreenshotTool(EditorSession session)
 }
 ```
 
-- [ ] **Step 4: Build**
+- [x] **Step 4: Build**
 
 Run: `dotnet build "DialogEditor.slnx" -c Debug`
 Expected: Build succeeded, 0 errors. If `ImageContentBlock` or `ContentBlock` do not resolve,
 check the namespace against the installed `ModelContextProtocol` 2.2.0 package rather than
 guessing — the SDK moved these types between versions.
 
-- [ ] **Step 5: Verify against the live app**
+- [x] **Step 5: Verify against the live app**
 
 ```powershell
 $repo = ((Get-Location).Path -replace '\\','/')
@@ -1105,15 +1105,18 @@ pwsh tools/DialogEditor.UiaMcp/drive.ps1 -Script @"
 "@ 2>&1 | Select-Object -First 6
 ```
 
-Expected: a text line giving the pixel dimensions, then a large base64 blob. `drive.ps1`
-prints only `type == 'text'` blocks, so seeing the dimensions line plus no error is the pass
-condition here; the image itself is verified when an MCP client renders it.
+**Corrected during execution:** `drive.ps1` now SAVES image blocks to `-ImageOutDir`
+(default `.`) rather than dropping them, so the capture can actually be opened and looked
+at. Pass `-ImageOutDir <dir>` to keep PNGs out of the repo.
+
+Expected: a text line giving the pixel dimensions, then an `[image saved: …]` line. Open
+the PNG. A ~67 KB 1416x889 capture of the shell is a pass.
 
 **A blank or black capture is a real failure**, usually meaning the window was not foreground
 or had not painted. Do not accept dimensions alone as proof the pixels are right — view it
 through a client before ticking this.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp/Tools/ScreenshotTool.cs tools/DialogEditor.UiaMcp/Win32.cs tools/DialogEditor.UiaMcp/EditorSession.cs
