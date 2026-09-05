@@ -10,10 +10,25 @@ permanent furniture.
 | 1 | Synthetic click to open a top-level menu | App `MenuItem`s expose `ScrollItem` only — no `Invoke`, no `ExpandCollapse` | [#15](https://github.com/kjmikkel/PillarsDialogEditor/issues/15) gives menu items an operable pattern | `ActionToolsGuiTests.TopLevelMenuItemsStillLackInvokeAndExpandCollapse` |
 | 2 | Synthetic click to activate a menu command | Same — the leaf item has no `Invoke` either | #15, same fix | same test |
 | 3 | Synthetic click to select a conversation row | `TreeItem`s expose `Scroll`/`ScrollItem` only — no `SelectionItem` | #15 finding 1 | `ActionToolsGuiTests.ConversationRowsStillLackSelectionItem` |
-| 4 | Menu addressing by localised `Name` | 0 of 51 menu items carry an `AutomationId` | #15 finding 4 | none yet — add one with the fix |
+| ~~4~~ | ~~Menu addressing by localised `Name`~~ | **RESOLVED 2026-09-05.** All 51 menu items (and 9 context-menu items) now carry stable non-localised `AutomationId`s; `MenuNavigator` matches id first, then name | — | `MenuItemAutomationIdTests` (markup) + `ActionToolsGuiTests.MenuItemsExposeStableAutomationIdsToUia` (live tree) |
 | 5 | App menu located by `ClassName='Menu'` | The app's `Menu` element is anonymous | #15 names the menu | `ActionToolsGuiTests.TheAppMenuIsFoundAndExcludesTheOsSystemItem` (would need inverting) |
 | 6 | `FocusAndType` in `set_value` | Some fields expose no `Value` pattern | per-control, as found | none — data-dependent |
 | 7 | `{ESC}` dismissal before every menu walk | Synthetic clicking is stateful; a leftover popup swallows the next click | fallbacks 1–2 gone | none — becomes unnecessary rather than wrong |
+
+## Retired fallbacks
+
+**#4 — menu addressing by localised name (2026-09-05).** The first fallback retired, and it
+followed the procedure below exactly. `AutomationProperties.AutomationId` was added to all 51
+`MainWindow.axaml` menu items and the 9 `ConversationView.axaml` context-menu items, enforced
+by `MenuItemAutomationIdTests`, and `MenuNavigator` now resolves a path segment against the
+id before the name. `invoke_menu ["MenuHelp","MenuHelp_About"]` opens the About window with no
+localised text anywhere in the call.
+
+Worth noting what the enforcement test had to get *right*: the rule is the exact inverse of
+`AutomationNameTests`. A `Name` is spoken to the user so it MUST be a localised resource; an
+`AutomationId` is never shown so it MUST NOT be, or the locale coupling comes straight back.
+Both directions are now structurally enforced, plus id uniqueness within a view — a duplicated
+id could not disambiguate anything, which is the entire point of adding them.
 
 ## How to remove one
 

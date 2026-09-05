@@ -41,14 +41,17 @@
                       Foreground="{DynamicResource Brush.Text.Secondary}"
                       Margin="4,0,8,0">
 
-                    <MenuItem Header="{DynamicResource Menu_File}">
+                    <MenuItem Header="{DynamicResource Menu_File}" AutomationProperties.AutomationId="MenuFile">
                         <MenuItem Header="{DynamicResource Menu_NewProject}"
+                                  AutomationProperties.AutomationId="MenuFile_NewProject"
                                   Command="{Binding NewProjectCommand}"
                                   InputGesture="Ctrl+N"/>
                         <MenuItem Header="{DynamicResource Menu_OpenProject}"
+                                  AutomationProperties.AutomationId="MenuFile_OpenProject"
                                   Command="{Binding OpenProjectCommand}"
                                   InputGesture="Ctrl+O"/>
                         <MenuItem Header="{DynamicResource Menu_RecentProjects}"
+                                  AutomationProperties.AutomationId="MenuFile_RecentProjects"
                                   ItemsSource="{Binding RecentProjectsMenuItems}"
                                   ToolTip.Tip="{DynamicResource ToolTip_RecentProjects}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_RecentProjects}">
@@ -64,152 +67,184 @@
                           </MenuItem.ItemContainerTheme>
                         </MenuItem>
                         <MenuItem Header="{DynamicResource Menu_SaveProject}"
+                                  AutomationProperties.AutomationId="MenuFile_SaveProject"
                                   Command="{Binding SaveProjectCommand}"
                                   InputGesture="Ctrl+S"/>
                         <MenuItem Header="{DynamicResource Menu_SaveProjectAs}"
+                                  AutomationProperties.AutomationId="MenuFile_SaveProjectAs"
                                   Command="{Binding SaveProjectAsCommand}"
                                   InputGesture="Ctrl+Shift+S"
                                   ToolTip.Tip="{DynamicResource ToolTip_SaveProjectAs}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_SaveProjectAs}"/>
                         <MenuItem Header="{DynamicResource Menu_MergeProjects}"
+                                  AutomationProperties.AutomationId="MenuFile_MergeProjects"
                                   Command="{Binding MergeProjectsCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_MergeProjects}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_MergeProjects}"/>
                         <MenuItem Header="{DynamicResource Menu_CloseProject}"
+                                  AutomationProperties.AutomationId="MenuFile_CloseProject"
                                   Command="{Binding CloseProjectCommand}"
                                   InputGesture="Ctrl+W"
                                   ToolTip.Tip="{DynamicResource ToolTip_CloseProject}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_CloseProject}"/>
                         <Separator/>
                         <MenuItem Header="{DynamicResource Button_OpenFolder}"
+                                  AutomationProperties.AutomationId="MenuFile_OpenGameFolder"
                                   Command="{Binding OpenFolderCommand}"
                                   InputGesture="Ctrl+Shift+O"/>
                         <Separator/>
                         <MenuItem Header="{DynamicResource PatchManager_Title}"
+                                  AutomationProperties.AutomationId="MenuFile_PatchManager"
                                   Click="PatchManager_Click"
                                   ToolTip.Tip="{DynamicResource ToolTip_PatchManagerOpen}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_PatchManagerOpen}"/>
                         <Separator/>
                         <MenuItem Header="{DynamicResource Menu_ImportConversation}"
+                                  AutomationProperties.AutomationId="MenuFile_ImportConversation"
                                   Command="{Binding ImportConversationCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_ImportConversation}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_ImportConversation}"/>
                         <MenuItem Header="{DynamicResource Menu_ExportConversation}"
+                                  AutomationProperties.AutomationId="MenuFile_ExportConversation"
                                   Command="{Binding ExportConversationsCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_ExportConversation}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_ExportConversation}"/>
                         <Separator/>
                         <MenuItem Header="{DynamicResource Menu_ExportForTranslation}"
+                                  AutomationProperties.AutomationId="MenuFile_ExportForTranslation"
                                   Command="{Binding ExportForTranslationCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_ExportForTranslation}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_ExportForTranslation}"/>
                         <MenuItem Header="{DynamicResource Menu_ImportTranslation}"
+                                  AutomationProperties.AutomationId="MenuFile_ImportTranslation"
                                   Command="{Binding ImportTranslationCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_ImportTranslation}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_ImportTranslation}"/>
                         <Separator/>
                         <MenuItem Header="{DynamicResource Menu_ExportModBundle}"
+                                  AutomationProperties.AutomationId="MenuFile_ExportModBundle"
                                   Click="ExportModBundle_Click"
                                   IsEnabled="{Binding CanExportModBundle}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Menu_ExportModBundle}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_ExportModBundle}"/>
                         <Separator/>
                         <MenuItem Header="{DynamicResource Menu_Settings}"
+                                  AutomationProperties.AutomationId="MenuFile_Settings"
                                   Click="SettingsButton_Click"
                                   InputGesture="Ctrl+,"/>
                     </MenuItem>
 
-                    <MenuItem Header="{DynamicResource Menu_Edit}">
+                    <MenuItem Header="{DynamicResource Menu_Edit}" AutomationProperties.AutomationId="MenuEdit">
                         <MenuItem Header="{DynamicResource Button_Undo}"
+                                  AutomationProperties.AutomationId="MenuEdit_Undo"
                                   Command="{Binding Canvas.UndoCommand}"
                                   InputGesture="Ctrl+Z"/>
                         <MenuItem Header="{DynamicResource Button_Redo}"
+                                  AutomationProperties.AutomationId="MenuEdit_Redo"
                                   Command="{Binding Canvas.RedoCommand}"
                                   InputGesture="Ctrl+Y"/>
                         <Separator/>
                         <MenuItem Header="{DynamicResource Menu_FindReplace}"
+                                  AutomationProperties.AutomationId="MenuEdit_FindReplace"
                                   Click="FindReplace_Click"
                                   InputGesture="Ctrl+H"
                                   ToolTip.Tip="{DynamicResource ToolTip_FindReplace}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_FindReplace}"/>
                         <MenuItem Header="{DynamicResource Menu_BatchReplace}"
+                                  AutomationProperties.AutomationId="MenuEdit_BatchReplace"
                                   Click="BatchReplace_Click"
                                   InputGesture="Ctrl+Shift+H"
                                   ToolTip.Tip="{DynamicResource ToolTip_BatchReplace}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace}"/>
                         <MenuItem Header="{DynamicResource Menu_FindInProject}"
+                                  AutomationProperties.AutomationId="MenuEdit_FindInProject"
                                   Command="{Binding FindInProjectCommand}"
                                   InputGesture="Ctrl+Shift+F"
                                   ToolTip.Tip="{DynamicResource ToolTip_FindInProject}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_FindInProject}"/>
                         <MenuItem Header="{DynamicResource Menu_BrowseSpeakerLines}"
+                                  AutomationProperties.AutomationId="MenuEdit_BrowseSpeakerLines"
                                   Command="{Binding BrowseSpeakerLinesCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_BrowseSpeakerLines}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_BrowseSpeakerLines}"/>
                         <MenuItem Header="{DynamicResource Menu_FlowAnalytics}"
+                                  AutomationProperties.AutomationId="MenuEdit_FlowAnalytics"
                                   Click="FlowAnalytics_Click"
                                   InputGesture="F7"
                                   ToolTip.Tip="{DynamicResource ToolTip_FlowAnalytics}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_FlowAnalytics}"/>
                         <MenuItem Header="{DynamicResource Menu_RepDispositionBalance}"
+                                  AutomationProperties.AutomationId="MenuEdit_RepDispositionBalance"
                                   Command="{Binding ShowRepDispositionBalanceWindowCommand}"
                                   ToolTip.Tip="{DynamicResource RepBalance_Tip_Refresh}"
                                   AutomationProperties.HelpText="{DynamicResource RepBalance_Tip_Refresh}"/>
                         <MenuItem Header="{DynamicResource Menu_CompareVersions}"
+                                  AutomationProperties.AutomationId="MenuEdit_CompareVersions"
                                   Click="CompareVersions_Click"
                                   IsEnabled="{Binding IsProjectOpen}"
                                   ToolTip.Tip="{DynamicResource ToolTip_CompareVersions}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_CompareVersions}"/>
                         <MenuItem Header="{DynamicResource Menu_History}"
+                                  AutomationProperties.AutomationId="MenuEdit_History"
                                   Click="History_Click"
                                   IsEnabled="{Binding IsProjectOpen}"
                                   ToolTip.Tip="{DynamicResource ToolTip_History}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_History}"/>
                         <MenuItem Header="{DynamicResource Menu_Attribution}"
+                                  AutomationProperties.AutomationId="MenuEdit_Attribution"
                                   Click="Attribution_Click"
                                   IsEnabled="{Binding IsProjectOpen}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Attribution}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Attribution}"/>
                         <MenuItem Header="{DynamicResource Menu_Branches}"
+                                  AutomationProperties.AutomationId="MenuEdit_Branches"
                                   Click="OnOpenBranches"
                                   IsEnabled="{Binding IsProjectOpen}"
                                   ToolTip.Tip="{DynamicResource Menu_BranchesTip}"
                                   AutomationProperties.HelpText="{DynamicResource Menu_BranchesTip}"/>
                     </MenuItem>
 
-                    <MenuItem Header="{DynamicResource Menu_View}">
+                    <MenuItem Header="{DynamicResource Menu_View}" AutomationProperties.AutomationId="MenuView">
                         <MenuItem Header="{DynamicResource Menu_View_Conversations}"
+                                  AutomationProperties.AutomationId="MenuView_Conversations"
                                   Click="ShowBrowserTool_Click"
                                   ToolTip.Tip="{DynamicResource ToolTip_View_ShowTool}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_View_ShowTool}"/>
                         <MenuItem Header="{DynamicResource Menu_View_Details}"
+                                  AutomationProperties.AutomationId="MenuView_Details"
                                   Click="ShowDetailsTool_Click"
                                   ToolTip.Tip="{DynamicResource ToolTip_View_ShowTool}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_View_ShowTool}"/>
                         <MenuItem Header="{DynamicResource Menu_View_ConditionSearch}"
+                                  AutomationProperties.AutomationId="MenuView_ConditionSearch"
                                   Click="ShowConditionSearchTool_Click"
                                   ToolTip.Tip="{DynamicResource ToolTip_View_ShowTool}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_View_ShowTool}"/>
                         <Separator/>
                         <MenuItem Header="{DynamicResource Menu_View_ResetLayout}"
+                                  AutomationProperties.AutomationId="MenuView_ResetLayout"
                                   Click="ResetLayout_Click"
                                   ToolTip.Tip="{DynamicResource ToolTip_View_ResetLayout}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_View_ResetLayout}"/>
                     </MenuItem>
 
-                    <MenuItem Header="{DynamicResource Menu_Test}">
+                    <MenuItem Header="{DynamicResource Menu_Test}" AutomationProperties.AutomationId="MenuTest">
                         <MenuItem Header="{DynamicResource Button_TestPatch}"
+                                  AutomationProperties.AutomationId="MenuTest_TestPatch"
                                   Command="{Binding TestPatchCommand}"
                                   InputGesture="F5"/>
                         <MenuItem Header="{DynamicResource TestMode_Restore}"
+                                  AutomationProperties.AutomationId="MenuTest_RestoreConversation"
                                   Command="{Binding RestoreConversationCommand}"
                                   InputGesture="F6"/>
                         <Separator/>
                         <MenuItem Header="{DynamicResource Button_RestoreBackup}"
+                                  AutomationProperties.AutomationId="MenuTest_RestoreBackup"
                                   Command="{Binding RestoreBackupCommand}"
                                   InputGesture="Ctrl+Shift+B"/>
                         <Separator/>
                         <MenuItem Header="{DynamicResource Menu_ValidateVO}"
+                                  AutomationProperties.AutomationId="MenuTest_ValidateVo"
                                   Click="ValidateVO_Click"
                                   IsEnabled="{Binding CanValidateVO}"
                                   ToolTip.Tip="{DynamicResource ToolTip_ValidateVO}"
@@ -222,6 +257,7 @@
                              (visible-but-disabled is the discoverability point), and the
                              command gate stays the single source of truth. -->
                         <MenuItem Header="{DynamicResource Menu_BatchImportVo}"
+                                  AutomationProperties.AutomationId="MenuTest_BatchImportVo"
                                   Command="{Binding Canvas.BatchImportVoCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Menu_BatchImportVo_Main}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_BatchImportVo_Main}"/>
@@ -230,6 +266,7 @@
                              pattern as its per-conversation sibling above — the
                              MenuItem auto-disables from CanExecuteChanged. -->
                         <MenuItem Header="{DynamicResource Menu_BatchImportVoAll}"
+                                  AutomationProperties.AutomationId="MenuTest_BatchImportVoAll"
                                   Command="{Binding BatchImportVoAllCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Menu_BatchImportVoAll}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_BatchImportVoAll}"/>
@@ -238,44 +275,53 @@
                              conversation's saved text in every language. Visible-but-disabled
                              without an open project, for discoverability. -->
                         <MenuItem Header="{DynamicResource Menu_ValidateTextTags}"
+                                  AutomationProperties.AutomationId="MenuTest_ValidateTextTags"
                                   Click="ValidateTextTags_Click"
                                   IsEnabled="{Binding IsProjectOpen}"
                                   ToolTip.Tip="{DynamicResource ToolTip_ValidateTextTags}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_ValidateTextTags}"/>
                     </MenuItem>
 
-                    <MenuItem Header="{DynamicResource Menu_Help}">
+                    <MenuItem Header="{DynamicResource Menu_Help}" AutomationProperties.AutomationId="MenuHelp">
                         <MenuItem Header="{DynamicResource Menu_CreateSample}"
+                                  AutomationProperties.AutomationId="MenuHelp_CreateSample"
                                   ToolTip.Tip="{DynamicResource Menu_CreateSampleTip}"
                                   AutomationProperties.HelpText="{DynamicResource Menu_CreateSampleTip}"
                                   Command="{Binding CreateSampleProjectCommand}"/>
                         <MenuItem Header="{DynamicResource Menu_OpenWalkthrough}"
+                                  AutomationProperties.AutomationId="MenuHelp_OpenWalkthrough"
                                   ToolTip.Tip="{DynamicResource Menu_OpenWalkthroughTip}"
                                   AutomationProperties.HelpText="{DynamicResource Menu_OpenWalkthroughTip}"
                                   Command="{Binding OpenWalkthroughCommand}"/>
                         <MenuItem Header="{DynamicResource Menu_StartGuidedTour}"
+                                  AutomationProperties.AutomationId="MenuHelp_StartGuidedTour"
                                   Command="{Binding StartGuidedTourCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Menu_StartGuidedTour}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_StartGuidedTour}"/>
                         <MenuItem Header="{DynamicResource Menu_TagReference}"
+                                  AutomationProperties.AutomationId="MenuHelp_TagReference"
                                   Command="{Binding TagReferenceCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Menu_TagReference}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_TagReference}"/>
                         <Separator/>
                         <MenuItem Header="{DynamicResource Menu_ExportUiStrings}"
+                                  AutomationProperties.AutomationId="MenuHelp_ExportUiStrings"
                                   ToolTip.Tip="{DynamicResource Menu_ExportUiStringsTip}"
                                   AutomationProperties.HelpText="{DynamicResource Menu_ExportUiStringsTip}"
                                   Click="ExportUiStrings_Click"/>
                         <MenuItem Header="{DynamicResource Menu_ImportUiStrings}"
+                                  AutomationProperties.AutomationId="MenuHelp_ImportUiStrings"
                                   ToolTip.Tip="{DynamicResource Menu_ImportUiStringsTip}"
                                   AutomationProperties.HelpText="{DynamicResource Menu_ImportUiStringsTip}"
                                   Click="ImportUiStrings_Click"/>
                         <Separator/>
                         <MenuItem Header="{DynamicResource Menu_Changelog}"
+                                  AutomationProperties.AutomationId="MenuHelp_Changelog"
                                   ToolTip.Tip="{DynamicResource Menu_ChangelogTip}"
                                   AutomationProperties.HelpText="{DynamicResource Menu_ChangelogTip}"
                                   Command="{Binding ChangelogCommand}"/>
                         <MenuItem Header="{DynamicResource Menu_About}"
+                                  AutomationProperties.AutomationId="MenuHelp_About"
                                   ToolTip.Tip="{DynamicResource Menu_AboutTip}"
                                   AutomationProperties.HelpText="{DynamicResource Menu_AboutTip}"
                                   Command="{Binding AboutCommand}"/>
