@@ -1138,7 +1138,7 @@ The highest-value action: it is how a verification run exercises a command.
 - Consumes: `ElementOperator` (Task 3), `Resolver`, `UiaTree`, `EditorSession`.
 - Produces: `static bool MenuNavigator.TryWalk(EditorSession, string[] path, out ElementInfo leaf, out string log, out string error)`; MCP tool `invoke_menu`.
 
-- [ ] **Step 1: Extract menu navigation from `menu` into `MenuNavigator`**
+- [x] **Step 1: Extract menu navigation from `menu` into `MenuNavigator`**
 
 `tools/DialogEditor.UiaMcp/MenuNavigator.cs`:
 
@@ -1229,7 +1229,7 @@ internal static class MenuNavigator
 }
 ```
 
-- [ ] **Step 2: Point `menu` at the navigator**
+- [x] **Step 2: Point `menu` at the navigator**
 
 In `tools/DialogEditor.UiaMcp/Tools/InspectionTools.cs`, replace the whole body of the `Menu`
 method with a version that delegates, so navigation exists in one place:
@@ -1279,7 +1279,7 @@ method with a version that delegates, so navigation exists in one place:
 Add `using DialogEditor.UiaMcp.Core;` to the file's usings if it is not already there, and
 delete the now-unused private `TryOpen` helper and its `System.Windows.Automation` using.
 
-- [ ] **Step 3: Add `invoke_menu`**
+- [x] **Step 3: Add `invoke_menu`**
 
 Append inside the `ActionTools` class in `tools/DialogEditor.UiaMcp/Tools/ActionTools.cs`:
 
@@ -1304,12 +1304,12 @@ Append inside the `ActionTools` class in `tools/DialogEditor.UiaMcp/Tools/Action
     }
 ```
 
-- [ ] **Step 4: Build**
+- [x] **Step 4: Build**
 
 Run: `dotnet build "DialogEditor.slnx" -c Debug`
 Expected: Build succeeded, 0 errors.
 
-- [ ] **Step 5: Verify against the live app**
+- [x] **Step 5: Verify against the live app**
 
 First that `menu` still behaves as it did before the refactor:
 
@@ -1337,11 +1337,28 @@ pwsh tools/DialogEditor.UiaMcp/drive.ps1 -Script @"
 ```
 
 Expected: `Save Project` returns `Error(NotOperable): … is disabled` (correct — no project is
-open). `About…` opens the About window; note the ellipsis is `…`, not three dots. Confirm the
-About window appeared, then check that `kill_app` still tears everything down and restores
-settings.
+open). `About…` opens the About window; note the ellipsis is `…`, not three dots.
 
-- [ ] **Step 6: Commit**
+**Verify the window actually appeared** — the tool reporting `ok:` is not sufficient, and two
+bugs found here both reported success while doing nothing. The server cannot see secondary
+windows (its tree is rooted at the main window), so check at the OS level:
+
+```powershell
+Add-Type -AssemblyName UIAutomationClient, UIAutomationTypes
+foreach ($p in @(Get-Process -Name DialogEditor.Avalonia)) {
+  $cond = New-Object System.Windows.Automation.PropertyCondition(
+    [System.Windows.Automation.AutomationElement]::ProcessIdProperty, $p.Id)
+  [System.Windows.Automation.AutomationElement]::RootElement.FindAll(
+    [System.Windows.Automation.TreeScope]::Children, $cond) |
+    ForEach-Object { $_.Current.Name }
+}
+```
+
+Expected: two windows, `About` and `Pillars Dialog Editor`. Run this synchronously and read
+the driver's output — a background job whose output is discarded will hide a failure and
+produce a confidently wrong conclusion.
+
+- [x] **Step 6: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp/MenuNavigator.cs tools/DialogEditor.UiaMcp/Tools/ActionTools.cs tools/DialogEditor.UiaMcp/Tools/InspectionTools.cs

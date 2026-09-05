@@ -89,4 +89,27 @@ internal sealed class ActionTools(EditorSession session)
         session.Foreground();
         return ElementOperator.Execute(session.Tree(), element, ActionKind.SetValue, text);
     }
+
+    [McpServerTool, Description(
+        "Invoke a menu command by path, e.g. ['File','Save Project']. Opens each ancestor menu, " +
+        "then activates the leaf. Refuses when the leaf is disabled.")]
+    public string InvokeMenu(
+        [Description("Menu path from the top-level bar to the command")] string[] path)
+    {
+        if (!MenuNavigator.TryWalk(session, path, out var leaf, out var log, out var error))
+            return error;
+
+        // A disabled command is a legitimate state, not a failure to route around — clicking
+        // it anyway would report success while nothing happened.
+        if (!leaf.IsEnabled)
+            return log + $"Error(NotOperable): menu item '{leaf.Name}' is disabled " +
+                   "(its command's CanExecute is false in the current app state).";
+
+        // Deliberately NO session.Foreground() here. MenuNavigator has already brought the
+        // window forward and opened the ancestor menus, and SetForegroundWindow on the main
+        // window DISMISSES an open popup — after which the click lands on empty space where
+        // the item used to be, while GetClickablePoint had already succeeded, so it reports
+        // success and nothing happens. Found by checking that Help > About… opened no window.
+        return log + ElementOperator.Execute(session.Tree(), leaf, ActionKind.Activate);
+    }
 }
