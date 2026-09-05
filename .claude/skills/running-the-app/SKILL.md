@@ -21,9 +21,16 @@ silently clicking the first match, and scoping menu queries to the app's own men
 so the OS "System" item cannot wedge a run. It also restores a stale settings
 snapshot at startup, so a crashed run cannot strand `LastProjectPath`.
 
-It does **not** yet implement actions — clicking, typing, screenshots — so use the
-PowerShell path below for those, and whenever the server is not registered. See
-`tools/DialogEditor.UiaMcp/README.md`.
+As of phase 3 it also acts: `invoke`, `focus`, `send_keys`, `set_value`, `invoke_menu` and
+`screenshot`. It prefers real UIA patterns and reports every synthetic-input fallback, so a
+result carrying a `WARNING:` about issue #15 is telling you about an app defect, not a
+tooling problem.
+
+Two limits to know: **secondary windows are invisible to it** (the tree is rooted at the
+main window, so dialogs and tool windows need the PowerShell path — issue #16), and it
+cannot rebuild itself while running. The PowerShell path below remains available for
+anything it does not cover. See `tools/DialogEditor.UiaMcp/README.md` and
+`docs/uia-fallback-inventory.md`.
 
 ## The golden path
 

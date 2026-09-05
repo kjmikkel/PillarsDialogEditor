@@ -1769,7 +1769,7 @@ Phase 4 deletes fallbacks as issue #15 lands. That only works if they are findab
 - Consumes: everything above.
 - Produces: no code.
 
-- [ ] **Step 1: Write the fallback inventory**
+- [x] **Step 1: Write the fallback inventory**
 
 `docs/uia-fallback-inventory.md`:
 
@@ -1804,7 +1804,7 @@ too. A harness that silently routed around it would let the app get less accessi
 verification runs got greener. Reporting keeps the signal load-bearing.
 ```
 
-- [ ] **Step 2: Update the README's tool table and caveats**
+- [x] **Step 2: Update the README's tool table and caveats**
 
 In `tools/DialogEditor.UiaMcp/README.md`, replace the line
 
@@ -1856,7 +1856,7 @@ and takes over the foreground, so it is a separate project excluded from the def
     dotnet test tools/DialogEditor.UiaMcp.Tests --filter "Category=Gui"
 ```
 
-- [ ] **Step 3: Update the skill**
+- [x] **Step 3: Update the skill**
 
 In `.claude/skills/running-the-app/SKILL.md`, replace the paragraph beginning
 "It does **not** yet implement actions" with:
@@ -1870,7 +1870,7 @@ anything the server does not cover. See `tools/DialogEditor.UiaMcp/README.md` an
 `docs/uia-fallback-inventory.md`.
 ```
 
-- [ ] **Step 4: Final verification**
+- [x] **Step 4: Final verification**
 
 Run: `dotnet build "DialogEditor.slnx" -c Debug`
 Expected: Build succeeded, 0 errors.
@@ -1888,7 +1888,7 @@ Get-ChildItem "$env:TEMP\PillarsDialogEditor.settings.*"
 
 Expected: no processes, no leftover snapshots.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add docs/uia-fallback-inventory.md tools/DialogEditor.UiaMcp/README.md .claude/skills/running-the-app/SKILL.md
