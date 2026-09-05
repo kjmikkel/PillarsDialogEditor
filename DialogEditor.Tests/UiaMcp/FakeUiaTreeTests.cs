@@ -37,20 +37,18 @@ public class FakeUiaTreeTests
     }
 
     [Fact]
-    public void ReproducesThirtySevenNamedButInoperableTreeItems()
+    public void ReproducesThirtySevenNamedAndOperableTreeItems()
     {
-        // Audit finding 1, half fixed. The rows now carry their own label as an accessible
-        // name, so they are reachable — but they still cannot be selected or expanded,
-        // because SelectionItem and ExpandCollapse are absent. They are not pattern-free
-        // either: Scroll/ScrollItem is what makes scroll-into-view possible.
+        // Issue #15 finding 1, fixed in full. Rows are named from their own data AND
+        // operable: SelectionItem and ExpandCollapse come from a custom automation peer,
+        // because Avalonia's TreeViewItemAutomationPeer implements no provider interfaces.
         var all = Flatten(FakeUiaTree.AuditSnapshot());
         var items = all.Where(e => e.ControlType == "TreeItem").ToList();
 
         Assert.Equal(37, items.Count);
         Assert.All(items, i => Assert.False(string.IsNullOrEmpty(i.Name)));
-        Assert.All(items, i => Assert.DoesNotContain("SelectionItem", i.Patterns));
-        Assert.All(items, i => Assert.DoesNotContain("ExpandCollapse", i.Patterns));
-        Assert.All(items, i => Assert.DoesNotContain("Invoke", i.Patterns));
+        Assert.All(items, i => Assert.Contains("SelectionItem", i.Patterns));
+        Assert.All(items, i => Assert.Contains("ExpandCollapse", i.Patterns));
         Assert.All(items, i => Assert.Contains("ScrollItem", i.Patterns));
     }
 
