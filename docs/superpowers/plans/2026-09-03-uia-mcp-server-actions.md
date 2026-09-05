@@ -571,7 +571,7 @@ because it touches `AutomationElement`.
 - Consumes: `ActionPlan`, `ActionKind`, `ActionStrategy`, `ElementInfo` (Task 1); `UiaTree`, `Win32` (phase 1–2).
 - Produces: `static string ElementOperator.Execute(UiaTree tree, ElementInfo element, ActionKind action, string? value = null)` returning a human-readable outcome, warning included.
 
-- [ ] **Step 1: Reference Windows Forms**
+- [x] **Step 1: Reference Windows Forms**
 
 `ElementOperator` and `send_keys` use `System.Windows.Forms.SendKeys`, which `UseWPF` alone
 does not bring in. In `tools/DialogEditor.UiaMcp/DialogEditor.UiaMcp.csproj`, add alongside
@@ -584,7 +584,7 @@ does not bring in. In `tools/DialogEditor.UiaMcp/DialogEditor.UiaMcp.csproj`, ad
 (`UseWPF` supplies the UIA client; `UseWindowsForms` supplies `SendKeys` and, with it,
 `System.Drawing` for the screenshot task.)
 
-- [ ] **Step 2: Write the operator**
+- [x] **Step 2: Write the operator**
 
 `tools/DialogEditor.UiaMcp/ElementOperator.cs`:
 
@@ -717,13 +717,13 @@ internal static class ElementOperator
 }
 ```
 
-- [ ] **Step 3: Build**
+- [x] **Step 3: Build**
 
 Run: `dotnet build "DialogEditor.slnx" -c Debug`
 Expected: Build succeeded, 0 errors. A `CS0234` on `System.Windows.Forms` means step 1 was
 skipped.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add tools/DialogEditor.UiaMcp/ElementOperator.cs tools/DialogEditor.UiaMcp/DialogEditor.UiaMcp.csproj

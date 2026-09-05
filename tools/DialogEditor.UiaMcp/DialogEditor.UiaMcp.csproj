@@ -6,6 +6,9 @@
          WPF implicit-usings set, which does NOT include System.IO — import it explicitly. -->
     <TargetFramework>net8.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
+    <!-- Supplies System.Windows.Forms.SendKeys (used by send_keys and the focus-and-type
+         fallback) and System.Drawing for the screenshot tool. UseWPF alone does not. -->
+    <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
