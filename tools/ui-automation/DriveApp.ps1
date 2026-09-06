@@ -199,14 +199,15 @@ function Get-MenuItemStates {
     # enumerated that way, clicked "System", opened the OS window menu and wedged the run —
     # the main-window walk collapsed to 12 elements and every later lookup failed.
     #
-    # The app's Menu has no Name, so ClassName is the only handle.
+    # The menu bar is addressed by AutomationId. It used to be anonymous, leaving ClassName
+    # as the only handle; issue #15 finding 5 gave it 'MainMenu'.
     param([Parameter(Mandatory)]$Window)
 
     $menuCond = New-Object System.Windows.Automation.PropertyCondition(
-        [System.Windows.Automation.AutomationElement]::ClassNameProperty, 'Menu')
+        [System.Windows.Automation.AutomationElement]::AutomationIdProperty, 'MainMenu')
     $appMenu = $Window.FindFirst(
         [System.Windows.Automation.TreeScope]::Descendants, $menuCond)
-    if ($null -eq $appMenu) { throw "App menu not found (ClassName='Menu')." }
+    if ($null -eq $appMenu) { throw "App menu bar not found (AutomationId='MainMenu')." }
 
     $itemCond = New-Object System.Windows.Automation.PropertyCondition(
         [System.Windows.Automation.AutomationElement]::ControlTypeProperty,

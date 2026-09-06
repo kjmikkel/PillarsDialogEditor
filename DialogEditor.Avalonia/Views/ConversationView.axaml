@@ -114,7 +114,7 @@
                                  GotFocus="Editor_GotFocus"
                                  PointerPressed="Editor_PointerPressed">
                 <nodify:NodifyEditor.ContextMenu>
-                    <ContextMenu>
+                    <ContextMenu AutomationProperties.AutomationId="CanvasContextMenu">
                         <MenuItem Header="{DynamicResource Menu_Canvas_AddNodeHere}"
                                   AutomationProperties.AutomationId="CanvasMenu_AddNodeHere"
                                   Click="CanvasMenu_AddNode_Click"
@@ -166,7 +166,7 @@
                         <nodify:Node Input="{Binding Inputs}" Output="{Binding Outputs}">
 
                             <nodify:Node.ContextMenu>
-                                <ContextMenu>
+                                <ContextMenu AutomationProperties.AutomationId="NodeContextMenu">
                                     <MenuItem Header="{DynamicResource Menu_DeleteNode}"
                                               AutomationProperties.AutomationId="NodeMenu_Delete"
                                               Command="{Binding $parent[UserControl].DataContext.DeleteNodeCmdCommand}"
@@ -362,7 +362,7 @@
                             Classes.never="{Binding IsNever}"
                             Classes.highlighted="{Binding IsHighlighted}">
                             <nodify:Connection.ContextMenu>
-                                <ContextMenu>
+                                <ContextMenu AutomationProperties.AutomationId="ConnectionContextMenu">
                                     <MenuItem Header="{DynamicResource Menu_DeleteConnection}"
                                               AutomationProperties.AutomationId="ConnectionMenu_Delete"
                                               Command="{Binding $parent[UserControl].DataContext.DeleteConnectionCmdCommand}"

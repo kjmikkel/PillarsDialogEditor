@@ -36,6 +36,8 @@
 
                 <!-- Menu bar -->
                 <Menu DockPanel.Dock="Left"
+                      AutomationProperties.AutomationId="MainMenu"
+                      AutomationProperties.Name="{DynamicResource AutomationName_MainMenu}"
                       Background="Transparent"
                       VerticalAlignment="Center"
                       Foreground="{DynamicResource Brush.Text.Secondary}"

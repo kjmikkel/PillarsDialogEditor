@@ -350,6 +350,7 @@
          is SHOWN; these are what assistive technology SPEAKS. Kept as separate keys rather
          than reusing the tooltip text, because a tooltip is a sentence of help while a
          name is the control's identity. -->
+    <sys:String x:Key="AutomationName_MainMenu">Main menu</sys:String>
     <sys:String x:Key="AutomationName_Undo">Undo</sys:String>
     <sys:String x:Key="AutomationName_Redo">Redo</sys:String>
     <sys:String x:Key="AutomationName_DiffHelp">Diff viewer help</sys:String>

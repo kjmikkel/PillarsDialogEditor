@@ -96,9 +96,9 @@ internal sealed class InspectionTools(EditorSession session)
 
         if (path is null || path.Length == 0)
         {
-            var appMenu = new Resolver(tree).Flatten()
-                .FirstOrDefault(e => e.ClassName == "Menu" && e.ControlType == "Menu");
-            if (appMenu is null) return "Error(NotFound): the app's menu (ClassName='Menu') was not found.";
+            var appMenu = MenuNavigator.FindAppMenu(tree);
+            if (appMenu is null)
+                return "Error(NotFound): the app's menu bar (AutomationId='MainMenu') was not found.";
             container = appMenu;
         }
         else

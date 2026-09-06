@@ -6,11 +6,14 @@ namespace DialogEditor.UiaMcp;
 /// <summary>
 /// Walks the app's menu tree, opening each ancestor along the way.
 ///
-/// Two audit findings are baked in. The app's Menu is ANONYMOUS, so ClassName is the only
-/// handle — and scoping to it is what stops the OS "System" MenuItem being treated as a peer
-/// of File/Edit/View/Test/Help (clicking that one wedged the original audit probe). And the
-/// app's top-level MenuItems expose neither Invoke nor ExpandCollapse, so opening them needs
-/// synthetic input; ActionStrategy reports that as the defect it is (issue #15).
+/// Scoping to the app's own menu bar is load-bearing: a window-wide MenuItem search also
+/// returns the title bar's OS "System" item, which is indistinguishable by control type and
+/// whose popup wedged the original audit probe. That scoping is now done by AutomationId
+/// (issue #15 finding 5); it used to need ClassName='Menu' because the element was anonymous.
+///
+/// Still outstanding: the app's top-level MenuItems expose neither Invoke nor ExpandCollapse,
+/// so opening one needs synthetic input, and ActionStrategy reports that as the defect it is
+/// (issue #15 findings 1–2 territory; see docs/uia-fallback-inventory.md rows 1–2).
 /// </summary>
 internal static class MenuNavigator
 {
@@ -35,11 +38,12 @@ internal static class MenuNavigator
 
         var tree = session.Tree();
 
-        var appMenu = new Resolver(tree).Flatten()
-            .FirstOrDefault(e => e.ClassName == "Menu" && e.ControlType == "Menu");
+        var appMenu = FindAppMenu(tree);
         if (appMenu is null)
         {
-            error = "Error(NotFound): the app's menu (ClassName='Menu') was not found.";
+            error = "Error(NotFound): the app's menu bar (AutomationId='MainMenu') was not " +
+                    "found. If the app predates issue #15 finding 5 it has no such id — " +
+                    "rebuild it.";
             return false;
         }
 
@@ -98,6 +102,19 @@ internal static class MenuNavigator
         log = sb.ToString();
         return true;
     }
+
+    /// <summary>
+    /// The app's own menu bar, by AutomationId.
+    ///
+    /// Scoping to it is load-bearing: a window-wide MenuItem search also returns the title
+    /// bar's OS "System" item, which is indistinguishable by control type and whose popup
+    /// wedged the original audit probe. This used to match ClassName='Menu' because the
+    /// element was anonymous; issue #15 finding 5 gave it an id, so the framework class name
+    /// is no longer part of the contract.
+    /// </summary>
+    internal static ElementInfo? FindAppMenu(UiaTree tree) =>
+        new Resolver(tree).Flatten()
+            .FirstOrDefault(e => e is { ControlType: "Menu", AutomationId: "MainMenu" });
 
     /// <summary>
     /// Closes any open menu popup so a walk starts from a known state. Two Escapes because

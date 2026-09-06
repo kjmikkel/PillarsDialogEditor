@@ -45,6 +45,10 @@ public class MenuItemAutomationIdTests
     private static IEnumerable<XElement> MenuItems(XDocument doc) =>
         doc.Descendants().Where(e => e.Name.LocalName == "MenuItem");
 
+    /// <summary>The menu bars and context menus themselves, not their items.</summary>
+    private static IEnumerable<XElement> MenuContainers(XDocument doc) =>
+        doc.Descendants().Where(e => e.Name.LocalName is "Menu" or "ContextMenu");
+
     private static IEnumerable<string> AxamlFiles(string root) =>
         Directory.EnumerateFiles(root, "*.axaml", SearchOption.AllDirectories)
             .Where(f => !IsExcluded(f, root));
@@ -73,6 +77,40 @@ public class MenuItemAutomationIdTests
             + "(issue #15 finding 4). Offenders:\n" + string.Join("\n", offenders));
     }
 
+    /// <summary>
+    /// Issue #15 finding 5: the app's own <c>Menu</c> element had no name and no id, so
+    /// tooling could only locate it by <c>ClassName='Menu'</c> — and that scoping is what
+    /// keeps the title bar's OS "System" item from being treated as a peer of
+    /// File/Edit/View/Test/Help. Depending on a class name for something that load-bearing
+    /// is fragile; an AutomationId is the intended handle.
+    ///
+    /// Context menus are covered too: they were equally anonymous, so a caller could not
+    /// scope a query to one of them.
+    /// </summary>
+    [Fact]
+    public void EveryMenuContainerCarriesAnAutomationId()
+    {
+        var root = SolutionRoot();
+        var offenders = new List<string>();
+
+        foreach (var file in AxamlFiles(root))
+        {
+            var doc = XDocument.Load(file, LoadOptions.SetLineInfo);
+            foreach (var el in MenuContainers(doc))
+            {
+                if (el.Attribute("AutomationProperties.AutomationId") is not null) continue;
+
+                var line = ((IXmlLineInfo)el).HasLineInfo() ? ((IXmlLineInfo)el).LineNumber : 0;
+                offenders.Add($"{Path.GetFileName(file)}:{line}: <{el.Name.LocalName}> has no AutomationProperties.AutomationId");
+            }
+        }
+
+        Assert.True(offenders.Count == 0,
+            "A menu bar or context menu must be addressable by a stable id, so tooling and "
+            + "assistive technology need not fall back to matching a framework class name "
+            + "(issue #15 finding 5). Offenders:\n" + string.Join("\n", offenders));
+    }
+
     [Fact]
     public void AutomationIdsAreLiteralsNotLocalisedResources()
     {
@@ -82,7 +120,7 @@ public class MenuItemAutomationIdTests
         foreach (var file in AxamlFiles(root))
         {
             var doc = XDocument.Load(file, LoadOptions.SetLineInfo);
-            foreach (var el in MenuItems(doc))
+            foreach (var el in MenuItems(doc).Concat(MenuContainers(doc)))
             {
                 var id = el.Attribute("AutomationProperties.AutomationId")?.Value;
                 if (id is null) continue;                       // the test above owns that case
@@ -109,7 +147,7 @@ public class MenuItemAutomationIdTests
         foreach (var file in AxamlFiles(root))
         {
             var doc = XDocument.Load(file, LoadOptions.SetLineInfo);
-            var duplicates = MenuItems(doc)
+            var duplicates = MenuItems(doc).Concat(MenuContainers(doc))
                 .Select(e => e.Attribute("AutomationProperties.AutomationId")?.Value)
                 .Where(id => !string.IsNullOrEmpty(id))
                 .GroupBy(id => id!, StringComparer.Ordinal)
