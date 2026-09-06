@@ -14,4 +14,11 @@ public record ElementInfo(
     bool IsEnabled,
     bool IsOffscreen,
     bool IsFocusable,
-    IReadOnlyList<string> Patterns);
+    IReadOnlyList<string> Patterns,
+    /// <summary>
+    /// False when the bounding rectangle is empty. A zero-size element is invisible and
+    /// unclickable — which is how a hidden LiveSetting region is told apart from the visible
+    /// label showing the same text (UIA's LiveSetting property is not exposed by the .NET
+    /// client). Defaults to true so the many existing constructions stay valid.
+    /// </summary>
+    bool HasSize = true);

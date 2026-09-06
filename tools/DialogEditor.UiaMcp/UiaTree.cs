@@ -57,7 +57,8 @@ internal sealed class UiaTree : IUiaTree
             c.IsEnabled,
             c.IsOffscreen,
             c.IsKeyboardFocusable,
-            patterns);
+            patterns,
+            HasSize: !c.BoundingRectangle.IsEmpty);
     }
 
     public IReadOnlyList<ElementInfo> ChildrenOf(string id)

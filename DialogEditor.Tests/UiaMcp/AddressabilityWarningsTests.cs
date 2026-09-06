@@ -91,13 +91,14 @@ public class AddressabilityWarningsTests
     [Fact]
     public void GenuinelyAmbiguousControlsAreStillReported()
     {
-        // Two non-Text elements sharing a name IS ambiguous — stripping labels must not
-        // suppress the case the resolver exists for.
+        // Two OPERABLE elements sharing a name IS ambiguous — the suppression rules must not
+        // swallow the case the resolver exists for. Patterns match the live app: the dock
+        // pane and its tab both expose Invoke, so "invoke name=Canvas" is genuinely unclear.
         var elements = new List<ElementInfo>
         {
-            new("a", "Canvas", "Pane", "Documents", "", true, false, false, new[] { "ScrollItem" }),
-            new("b", "Canvas", "TabItem", "Canvas", "", true, false, true, new[] { "Invoke" }),
-            new("c", "Canvas", "Text", "", "", true, false, false, Array.Empty<string>()),
+            new("a", "Canvas", "Pane", "Documents", "", true, false, false, new[] { "Invoke", "ScrollItem" }),
+            new("b", "Canvas", "TabItem", "Canvas", "", true, false, true, new[] { "Invoke", "SelectionItem", "ScrollItem" }),
+            new("c", "Canvas", "Text", "", "", true, false, false, new[] { "ScrollItem" }),
         };
 
         Assert.Contains(AddressabilityWarnings.Inspect(elements),
@@ -119,6 +120,79 @@ public class AddressabilityWarningsTests
 
         Assert.Contains(warnings, w => w.Kind == "DuplicateLabel");
         Assert.DoesNotContain(warnings, w => w.Kind == "CollidingName");
+    }
+
+    [Fact]
+    public void ChromeThatCannotBeOperatedIsNotACollisionCandidate()
+    {
+        // A window and its own TitleBar share the window title. The TitleBar exposes no
+        // patterns and is not focusable, so it can never be the target of an action —
+        // it cannot be "the one you meant". Same reasoning as stripping Text labels,
+        // generalised: judge ambiguity only among things that can actually be operated.
+        var elements = new List<ElementInfo>
+        {
+            new("a", "Pillars Dialog Editor", "Window", "", "MainWindow", true, false, false,
+                new[] { "Window", "Transform" }),
+            new("b", "Pillars Dialog Editor", "TitleBar", "TitleBar", "", true, false, false,
+                Array.Empty<string>()),
+        };
+
+        Assert.DoesNotContain(AddressabilityWarnings.Inspect(elements), w => w.Kind == "CollidingName");
+    }
+
+    [Fact]
+    public void AHiddenLiveRegionIsNotADuplicateLabel()
+    {
+        // MainWindow pairs a zero-size AutomationProperties.LiveSetting="Polite" TextBlock
+        // with the visible status text, so a change is ANNOUNCED while the visible label is
+        // what gets READ. That is a deliberate accessibility pattern, not double
+        // announcement — the live region has an empty bounding rectangle, so nobody sees or
+        // clicks it. UIA's LiveSetting property is not exposed by the .NET client, so size
+        // is the available discriminator.
+        var elements = new List<ElementInfo>
+        {
+            new("live", "Opened project 'X'", "Text", "StatusLiveRegion", "", true, false, false,
+                new[] { "ScrollItem" }, HasSize: false),
+            new("vis", "Opened project 'X'", "Text", "", "", true, false, false,
+                new[] { "ScrollItem" }),
+        };
+
+        Assert.DoesNotContain(AddressabilityWarnings.Inspect(elements), w => w.Kind == "DuplicateLabel");
+    }
+
+    [Fact]
+    public void ChromeSharingANameIsNotReportedAsADuplicateLabel()
+    {
+        // Both of these were false positives introduced while fixing the collision rule:
+        // a Window with its own TitleBar, and the two splitter Thumbs both named "Position".
+        // Neither is static text, so neither is announced as a duplicated label.
+        var windowAndTitleBar = new List<ElementInfo>
+        {
+            new("a", "Pillars Dialog Editor", "Window", "", "MainWindow", true, false, false,
+                new[] { "Window", "Transform" }),
+            new("b", "Pillars Dialog Editor", "TitleBar", "TitleBar", "", true, false, false,
+                Array.Empty<string>()),
+        };
+        var thumbs = new List<ElementInfo>
+        {
+            new("a", "Position", "Thumb", "", "", true, false, false, new[] { "ScrollItem" }),
+            new("b", "Position", "Thumb", "", "", true, false, false, new[] { "ScrollItem" }),
+        };
+
+        Assert.Empty(AddressabilityWarnings.Inspect(windowAndTitleBar));
+        Assert.Empty(AddressabilityWarnings.Inspect(thumbs));
+    }
+
+    [Fact]
+    public void TwoVisibleLabelsWithTheSameTextAreStillReported()
+    {
+        var elements = new List<ElementInfo>
+        {
+            new("a", "Ready", "Text", "", "", true, false, false, new[] { "ScrollItem" }),
+            new("b", "Ready", "Text", "", "", true, false, false, new[] { "ScrollItem" }),
+        };
+
+        Assert.Contains(AddressabilityWarnings.Inspect(elements), w => w.Kind == "DuplicateLabel");
     }
 
     [Fact]
