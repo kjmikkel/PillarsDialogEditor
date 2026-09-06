@@ -50,7 +50,6 @@ public partial class BatchReplaceViewModel : ObservableObject
     [ObservableProperty] private bool   _inSpeakerGuids;
     [ObservableProperty] private bool   _inScriptParams;
     [ObservableProperty] private bool   _inConditionParams;
-    [ObservableProperty] private bool   _inLinkChoiceText;
 
     // ── Results ───────────────────────────────────────────────────────────
 
@@ -146,7 +145,7 @@ public partial class BatchReplaceViewModel : ObservableObject
     private BatchReplaceQuery BuildQuery() => new(
         SearchText, ReplaceText, CaseSensitive,
         InNodeText, InSpeakerGuids, InScriptParams,
-        InConditionParams, InLinkChoiceText);
+        InConditionParams);
 
     private string BuildStatusText(int matchCount, int convCount, int skipped)
     {

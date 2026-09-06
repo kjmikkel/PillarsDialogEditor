@@ -1,4 +1,4 @@
-using DialogEditor.Core.Editing;
+﻿using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
@@ -174,21 +174,32 @@ public class BatchReplaceServiceTests
         Assert.Contains("Condition", results[0].Matches[0].FieldPath);
     }
 
-    // ── DryRun — link choice text ─────────────────────────────────────────
+    // ── QuestionNodeTextDisplay is an enum, not prose (#24) ──────────────
 
     [Fact]
-    public void DryRun_MatchInLinkChoiceText_ReturnsMatch()
+    public void Apply_ReplaceMatchingEnumName_DoesNotCorruptQuestionNodeTextDisplay()
     {
-        var link     = new LinkEditSnapshot(1, 2, 1f, "Ask about the quest", false);
+        // QuestionNodeTextDisplay holds one of exactly three values — ShowOnce,
+        // Always, Never — controlling whether a question node's text is shown.
+        // A writer replacing "on" with "in" across node prose must not silently
+        // rewrite "ShowOnce" to "ShowInce": PoE2's serializer maps any unknown
+        // name to 0 (ShowOnce) with no error, and PoE1 writes the garbage
+        // straight into the XML.
+        var link     = new LinkEditSnapshot(1, 2, 1f, "ShowOnce", false);
         var file     = MakeFile("conv");
-        var provider = MakeProvider(file, MakeNode(1, links: [link]));
+        var provider = MakeProvider(file, MakeNode(1, defaultText: "Come on in", links: [link]));
+        // Every field toggle the query supports is enabled, so this fails the moment
+        // anyone reintroduces link fields to the batch replace surface.
         var query    = new BatchReplaceQuery(
-            "quest", "mission", false, InLinkChoiceText: true);
+            "on", "in", false, InNodeText: true, InSpeakerGuids: true,
+            InScriptParams: true, InConditionParams: true);
 
         var results = BatchReplaceService.DryRun(query, [file], provider);
+        BatchReplaceService.Apply(results, provider);
 
-        Assert.Single(results[0].Matches);
-        Assert.Equal("Link[0] Choice Text", results[0].Matches[0].FieldPath);
+        Assert.Equal("Come in in", provider.SavedSnapshot!.Nodes[0].DefaultText);
+        Assert.Equal("ShowOnce",   provider.SavedSnapshot!.Nodes[0].Links[0].QuestionNodeTextDisplay);
+        Assert.DoesNotContain(results[0].Matches, m => m.FieldPath.Contains("Link"));
     }
 
     // ── DryRun — field toggle respected ──────────────────────────────────
@@ -242,26 +253,35 @@ public class BatchReplaceServiceTests
         Assert.Equal("Hello earth", provider.SavedSnapshot!.Nodes[0].DefaultText);
     }
 
+    /// ApplyToNode indexes matches with ToDictionary(p => p.FieldPath), which throws on a
+    /// duplicate key. Links used to emit a constant path and crash a node with two matching
+    /// links (#24); they are gone now, and scripts and conditions key positionally. Nothing
+    /// asserted that invariant, so pin it: every field path a single node emits is unique.
     [Fact]
-    public void Apply_TwoMatchingLinkChoiceTexts_OnOneNode_ReplacesBoth()
+    public void DryRun_FieldPathsAreUniquePerNode()
     {
-        // Two links on one node, both with QuestionNodeTextDisplay matching the search.
-        // Both share the constant "Link Choice Text" field path, so ApplyToNode's
-        // ToDictionary(p => p.FieldPath) must not choke on duplicate keys — this pins
-        // that invariant (and that each link gets its own replacement, not a shared one).
-        var link1    = new LinkEditSnapshot(1, 2, 1f, "Ask about the quest", false);
-        var link2    = new LinkEditSnapshot(1, 3, 1f, "Refuse the quest",    false);
-        var file     = MakeFile("conv");
-        var provider = MakeProvider(file, MakeNode(1, links: [link1, link2]));
-        var query    = new BatchReplaceQuery("quest", "mission", false, InLinkChoiceText: true);
+        var leafA = new ConditionLeaf("Boolean IsGlobalValue(String, Operator, Int32)",
+                                      ["quest", "EqualTo", "1"], false, "And");
+        var leafB = new ConditionLeaf("Boolean IsGlobalValue(String, Operator, Int32)",
+                                      ["quest", "EqualTo", "2"], false, "And");
+        var callA = new ScriptCall("Void SetGlobal(String, Int32)", ["quest", "1"], ScriptCategory.Enter);
+        var callB = new ScriptCall("Void SetGlobal(String, Int32)", ["quest", "2"], ScriptCategory.Exit);
+        var file  = MakeFile("conv");
+        var provider = MakeProvider(file, MakeNode(
+            1, defaultText: "the quest", femaleText: "her quest",
+            speakerGuid: "quest", conditions: [leafA, leafB], scripts: [callA, callB]));
+        var query = new BatchReplaceQuery(
+            "quest", "mission", false, InNodeText: true, InSpeakerGuids: true,
+            InScriptParams: true, InConditionParams: true);
 
-        var dryRun = BatchReplaceService.DryRun(query, [file], provider);
-        BatchReplaceService.Apply(dryRun, provider);
+        var matches = BatchReplaceService.DryRun(query, [file], provider)[0].Matches;
 
-        Assert.NotNull(provider.SavedSnapshot);
-        var links = provider.SavedSnapshot!.Nodes[0].Links;
-        Assert.Equal("Ask about the mission", links[0].QuestionNodeTextDisplay);
-        Assert.Equal("Refuse the mission",    links[1].QuestionNodeTextDisplay);
+        Assert.True(matches.Count > 1, "expected several matching fields on the one node");
+        Assert.Equal(matches.Select(m => m.FieldPath).Distinct().Count(), matches.Count);
+
+        // The real consequence: apply must not throw on that node.
+        BatchReplaceService.Apply(
+            BatchReplaceService.DryRun(query, [file], provider), provider);
     }
 
     [Fact]
