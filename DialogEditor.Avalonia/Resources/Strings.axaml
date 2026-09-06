@@ -350,6 +350,12 @@
          is SHOWN; these are what assistive technology SPEAKS. Kept as separate keys rather
          than reusing the tooltip text, because a tooltip is a sentence of help while a
          name is the control's identity. -->
+    <!-- Names for Dock.Avalonia's pane chrome buttons (issue #15 finding 2). Their
+         Content is a Viewbox, so Avalonia derived the accessible name from
+         Content.ToString() and every one announced "Avalonia.Controls.Viewbox". -->
+    <sys:String x:Key="AutomationName_PaneMenu">Pane options</sys:String>
+    <sys:String x:Key="AutomationName_PanePin">Pin pane</sys:String>
+    <sys:String x:Key="AutomationName_PaneClose">Close pane</sys:String>
     <sys:String x:Key="AutomationName_MainMenu">Main menu</sys:String>
     <sys:String x:Key="AutomationName_Undo">Undo</sys:String>
     <sys:String x:Key="AutomationName_Redo">Redo</sys:String>
