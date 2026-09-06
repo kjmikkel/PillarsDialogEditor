@@ -34,6 +34,13 @@ public partial class BranchesViewModel : ObservableObject
     public Func<Task<bool>>?                   EnsureNoUnsavedEdits      { get; set; }
     public Action?                             ReloadProjectFromDisk     { get; set; }
     public Func<PendingCommit, Task<string?>>? RequestCommitConfirmation { get; set; }
+
+    /// <summary>
+    /// Raised when this VM moved HEAD, so anything derived from HEAD is now stale.
+    /// Distinct from ReloadProjectFromDisk on purpose: that one re-reads the project
+    /// because the WORKING TREE changed, and a commit does not change the working tree.
+    /// </summary>
+    public Action?                             HeadMoved                 { get; set; }
     public Func<string, Task<bool>>?           ConfirmForceDelete        { get; set; }
     public Func<string?, Task<string?>>?       RequestBranchName         { get; set; }
 
@@ -122,6 +129,13 @@ public partial class BranchesViewModel : ObservableObject
                 StatusText = Loc.Get("Branches_StatusCommitFailed");
                 return;
             }
+            // Signal BEFORE retrying the checkout, and unconditionally. The commit moved
+            // HEAD, so anything derived from HEAD is stale from here on -- whether or not
+            // the switch below succeeds. Doing it only on a successful switch would leave
+            // blame stale in exactly the case the user stays on this branch and keeps
+            // working, which is when they are most likely to read it (#12).
+            HeadMoved?.Invoke();
+
             result = _service.Checkout(_projectFilePath, target);
         }
 

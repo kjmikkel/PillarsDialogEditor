@@ -145,6 +145,48 @@ public class BranchesViewModelTests
         Assert.Equal(new[] { "checkout", "commit", "checkout", "reload" }, log);
     }
 
+    // Tracked changes block the checkout, the commit succeeds, but an UNTRACKED file still
+    // blocks the retry. Realistic: commit -a takes the tracked edits and leaves the rest.
+    // The commit moved HEAD, so HEAD-based blame is now stale -- and because the switch
+    // failed there is no reload to invalidate it. Issue #12.
+    private static GitBranchService CommitsThenStillBlocked(List<string> log) => new(Git(a =>
+    {
+        if (a is ["for-each-ref", ..]) return new GitResult(0, "main\nfeature/x\n", "");
+        if (a is ["status", "--porcelain"])
+            return log.Contains("commit")
+                ? new GitResult(0, "?? notes.txt\n", "")             // only untracked remains
+                : new GitResult(0, " M conv.dialogproject\n", "");   // tracked -> offer commit
+        if (a is ["checkout", "feature/x"])
+        {
+            log.Add("checkout");
+            return new GitResult(1, "", "would be overwritten");      // never succeeds
+        }
+        if (a.Length > 0 && a[0] == "commit") { log.Add("commit"); return new GitResult(0, "", ""); }
+        return null;
+    }));
+
+    [Fact]
+    public async Task Switch_CommitSucceedsButSwitchStillBlocked_SignalsHeadMoved()
+    {
+        var log = new List<string>();
+        var headMoved = 0;
+        var vm = new BranchesViewModel(CommitsThenStillBlocked(log), ProjPath())
+        {
+            EnsureNoUnsavedEdits      = () => Task.FromResult(true),
+            ReloadProjectFromDisk     = () => log.Add("reload"),
+            HeadMoved                 = () => headMoved++,
+            RequestCommitConfirmation = _ => Task.FromResult<string?>("commit msg"),
+        };
+        vm.Selected = vm.Branches[1];
+
+        await vm.SwitchCommand.ExecuteAsync(null);
+
+        // The switch failed, so nothing reloads the project...
+        Assert.Equal(new[] { "checkout", "commit", "checkout" }, log);
+        // ...but HEAD moved anyway, and whatever derives from it must be told.
+        Assert.Equal(1, headMoved);
+    }
+
     [Fact]
     public async Task Switch_Blocked_ConsentCancelled_DoesNotCommit()
     {
