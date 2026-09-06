@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 
 namespace DialogEditor.Tests.Theming;
 
@@ -8,7 +8,7 @@ namespace DialogEditor.Tests.Theming;
 ///
 /// Identification heuristic: string keys always use underscore separators (e.g.
 /// <c>Status_OpenFolder</c>, <c>Settings_Theme</c>); converter and style keys never do
-/// (e.g. <c>FontScaleToPercent</c>, <c>ToolbarPlainButton</c>). <c>{StaticResource FontSize.*}</c>
+/// (e.g. <c>DoubleToPercent</c>, <c>ToolbarPlainButton</c>). <c>{StaticResource FontSize.*}</c>
 /// and <c>{StaticResource Palette.*}</c> use dots — excluded by the same rule.
 ///
 /// Resource dictionary files themselves (<c>Strings.axaml</c>, <c>Tokens.axaml</c>, etc.)

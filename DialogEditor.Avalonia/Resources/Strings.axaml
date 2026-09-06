@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="https://github.com/avaloniaui"
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=System.Runtime">
 
@@ -648,6 +648,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Duplicate_Ignored_Summary_One">{0} ignored</sys:String>
     <sys:String x:Key="Duplicate_Ignored_Summary_Other">{0} ignored</sys:String>
     <sys:String x:Key="Duplicate_SectionHeader">Duplicate lines</sys:String>
+    <sys:String x:Key="Duplicate_Threshold">Similarity</sys:String>
+    <sys:String x:Key="Duplicate_ThresholdTooltip">How alike two lines must be before they are reported as near-duplicates. Lower this to catch lines you edited more heavily; raise it if the report is showing pairs you consider genuinely different. Exact duplicates are always reported regardless of this setting. The report re-scans as soon as you change this, and the choice is saved.</sys:String>
     <sys:String x:Key="Duplicate_Ignored_SectionHeader">Ignored duplicates</sys:String>
     <sys:String x:Key="Button_Ignore">Ignore</sys:String>
     <sys:String x:Key="ToolTip_Duplicate_Ignore">Mark this duplicate as intentional. It moves to the Ignored list and stops being reported (until you restore it).</sys:String>
@@ -815,6 +817,11 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="FlowAnalytics_TagIssue_Row_Default">Node {0}: {1}</sys:String>
     <!-- Playthrough stats -->
     <sys:String x:Key="PathStats_Header">PLAYTHROUGH STATS</sys:String>
+    <sys:String x:Key="PathStats_ReadingSpeed">Reading speed</sys:String>
+    <sys:String x:Key="PathStats_ReadingSpeedTooltip">The reading pace used to turn word counts into the times shown below. Lower it to estimate a slower reader or spoken delivery; raise it for a skim. This changes only the displayed times, never the word counts. The choice is saved and applies immediately.</sys:String>
+    <!-- {0} is a whole number of words per minute, e.g. 200. "wpm" is the standard
+         abbreviation for words per minute; translate or expand it as your language needs. -->
+    <sys:String x:Key="PathStats_WpmOption">{0} wpm</sys:String>
     <sys:String x:Key="PathStats_Longest">Longest playthrough</sys:String>
     <sys:String x:Key="PathStats_Shortest">Shortest playthrough</sys:String>
     <sys:String x:Key="PathStats_Total">Total content</sys:String>

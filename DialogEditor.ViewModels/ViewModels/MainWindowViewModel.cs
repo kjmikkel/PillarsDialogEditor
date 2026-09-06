@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -556,10 +556,12 @@ public partial class MainWindowViewModel : ObservableObject
             SaveProject();
         };
 
-        Func<DuplicateLineReport> dupScan = () =>
+        // The threshold comes from the window (issue #14), so the writer can loosen or
+        // tighten the bar and see the report change without leaving it.
+        Func<double, DuplicateLineReport> dupScan = threshold =>
             _project is null
                 ? new DuplicateLineReport([], [])
-                : DuplicateLineScanner.Scan(_project, _provider?.Language ?? "");
+                : DuplicateLineScanner.Scan(_project, _provider?.Language ?? "", threshold);
 
         Func<IReadOnlyList<IgnoredDuplicate>> ignoredList = () =>
             _project?.IgnoredDuplicates ?? [];
@@ -595,7 +597,9 @@ public partial class MainWindowViewModel : ObservableObject
             ignoredList: ignoredList,
             ignore: ignore,
             unignore: unignore,
-            navigate: NavigateToFoundNode);
+            navigate: NavigateToFoundNode,
+            nearThreshold: AppSettings.NearDuplicateThreshold,
+            persistNearThreshold: v => AppSettings.NearDuplicateThreshold = v);
     }
 
     /// Builds a conversation-name → live-node-ID-set resolver for the likely-stale

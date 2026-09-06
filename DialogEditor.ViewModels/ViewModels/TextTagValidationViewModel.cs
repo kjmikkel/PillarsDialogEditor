@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Patch;
@@ -101,7 +101,8 @@ public partial class TextTagValidationViewModel : ObservableObject
     private readonly Action<IReadOnlyList<StaleDataRow>>? _prune;
     private readonly string _primaryLanguage;
 
-    private readonly Func<DuplicateLineReport>? _dupScan;
+    private readonly Func<double, DuplicateLineReport>? _dupScan;
+    private readonly Action<double>? _persistNearThreshold;
     private readonly Func<IReadOnlyList<IgnoredDuplicate>>? _ignoredList;
     private readonly Action<IgnoredDuplicate>? _ignore;
     private readonly Action<IgnoredDuplicate>? _unignore;
@@ -127,6 +128,19 @@ public partial class TextTagValidationViewModel : ObservableObject
     public bool CanCheckGameFiles { get; }
     [ObservableProperty] private bool _checkGameFiles;
 
+    // ── Near-duplicate threshold (issue #14) ─────────────────────────────────
+    // The bar is a dial the writer discovers the right value for by watching the
+    // report change, so it lives inline beside the Duplicate-lines header rather
+    // than in Settings. The initial value and persistence come from the caller, so
+    // this VM stays free of settings-file state.
+
+    /// The presets offered inline. A fixed list rather than free entry: the scanner's
+    /// length-blocking optimisation divides by this value, so a near-zero setting would
+    /// degrade the scan to a full O(n^2) sweep.
+    public IReadOnlyList<double> NearThresholdOptions { get; } = [0.75, 0.80, 0.85, 0.90, 0.95];
+
+    [ObservableProperty] private double _nearThreshold = DuplicateLineScanner.DefaultNearThreshold;
+
     public RelayCommand CleanUpStaleCommand        { get; }
     public RelayCommand ConfirmCleanUpStaleCommand { get; }
     public RelayCommand CancelCleanUpStaleCommand  { get; }
@@ -144,11 +158,13 @@ public partial class TextTagValidationViewModel : ObservableObject
         Action<IReadOnlyList<StaleDataRow>>? prune = null,
         bool canCheckGameFiles = false,
         string primaryLanguage = "",
-        Func<DuplicateLineReport>? dupScan = null,
+        Func<double, DuplicateLineReport>? dupScan = null,
         Func<IReadOnlyList<IgnoredDuplicate>>? ignoredList = null,
         Action<IgnoredDuplicate>? ignore = null,
         Action<IgnoredDuplicate>? unignore = null,
-        Action<string, int>? navigate = null)
+        Action<string, int>? navigate = null,
+        double nearThreshold = DuplicateLineScanner.DefaultNearThreshold,
+        Action<double>? persistNearThreshold = null)
     {
         _scan             = scan;
         _addWord          = addWord;
@@ -157,6 +173,11 @@ public partial class TextTagValidationViewModel : ObservableObject
         CanCheckGameFiles = canCheckGameFiles;
         _primaryLanguage  = primaryLanguage;
         _dupScan          = dupScan;
+        // Assign the backing field directly, and BEFORE the Refresh() below:
+        // the property setter would persist a value we were just handed, and
+        // the constructor's scan reads this field.
+        _nearThreshold         = nearThreshold;
+        _persistNearThreshold  = persistNearThreshold;
         _ignoredList      = ignoredList;
         _ignore           = ignore;
         _unignore         = unignore;
@@ -193,7 +214,7 @@ public partial class TextTagValidationViewModel : ObservableObject
         DuplicateRows.Clear();
         if (_dupScan is not null)
         {
-            var report = _dupScan();
+            var report = _dupScan(NearThreshold);
 
             foreach (var g in report.Exact)
             {
@@ -260,6 +281,12 @@ public partial class TextTagValidationViewModel : ObservableObject
     }
 
     partial void OnCheckGameFilesChanged(bool value) => RefreshStale();
+
+    partial void OnNearThresholdChanged(double value)
+    {
+        _persistNearThreshold?.Invoke(value);
+        RefreshDuplicates();
+    }
     partial void OnHasStaleDataChanged(bool value) => RaiseStaleCommandStates();
     partial void OnIsStaleCleanUpArmedChanged(bool value) => RaiseStaleCommandStates();
 

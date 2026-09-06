@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Analytics;
@@ -125,6 +125,18 @@ public partial class FlowAnalyticsViewModel : ObservableObject
     public ObservableCollection<PathBranchRowViewModel> Branches       { get; } = [];
     public ObservableCollection<SpeakerWordRowViewModel> WordsPerSpeaker { get; } = [];
 
+    // ── Reading speed (issue #14) ────────────────────────────────────────────
+    // Supplied by the View from AppSettings and reported back through the persist
+    // callback; the VM itself stays free of settings-file state so its tests never
+    // touch the user's real settings.json.
+    private readonly Action<int>? _persistWordsPerMinute;
+
+    /// The presets offered inline beside the Playthrough-stats header. A fixed list
+    /// rather than free entry, so the value can never reach the divide-by-zero guard.
+    public IReadOnlyList<int> WordsPerMinuteOptions { get; } = [120, 150, 180, 200, 250, 300];
+
+    [ObservableProperty] private int _wordsPerMinute = PathStatsFormat.DefaultWordsPerMinute;
+
     [ObservableProperty] private bool   _hasPathStats;
     [ObservableProperty] private bool   _hasSignificantFemaleVariant;
     [ObservableProperty] private string _longestPlaythroughText  = string.Empty;
@@ -135,13 +147,29 @@ public partial class FlowAnalyticsViewModel : ObservableObject
         Func<ConversationEditSnapshot?> getSnapshot,
         Action<int>                     navigateToNode,
         Func<IReadOnlyDictionary<string, IReadOnlyList<NodeTranslation>>>? getTranslations = null,
-        string                          gameId = "")
+        string                          gameId = "",
+        int                             wordsPerMinute = PathStatsFormat.DefaultWordsPerMinute,
+        Action<int>?                    persistWordsPerMinute = null)
     {
         _getSnapshot     = getSnapshot;
         _navigateToNode  = navigateToNode;
         _getTranslations = getTranslations
             ?? (() => new Dictionary<string, IReadOnlyList<NodeTranslation>>());
         _gameId          = gameId;
+
+        // Assign the backing field directly: going through the property would fire
+        // OnWordsPerMinuteChanged and persist a value we were just handed.
+        _wordsPerMinute        = wordsPerMinute;
+        _persistWordsPerMinute = persistWordsPerMinute;
+    }
+
+    // Branch and header strings are built once into plain strings (see RefreshPathStats),
+    // so a speed change only reaches the UI by re-running the analysis. Refresh re-pulls
+    // the snapshot and is cheap, so just re-run it.
+    partial void OnWordsPerMinuteChanged(int value)
+    {
+        _persistWordsPerMinute?.Invoke(value);
+        Refresh();
     }
 
     [RelayCommand]
@@ -235,7 +263,7 @@ public partial class FlowAnalyticsViewModel : ObservableObject
     }
 
     private string WordsTime(int words) =>
-        Loc.Format("PathStats_WordsTime", words, PathStatsFormat.ReadingTime(words));
+        Loc.Format("PathStats_WordsTime", words, PathStatsFormat.ReadingTime(words, WordsPerMinute));
 
     private string WordsTimePair(int defaultWords, int femaleWords) =>
         HasSignificantFemaleVariant
