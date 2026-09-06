@@ -16,6 +16,17 @@ public static class AddressabilityWarnings
 {
     private static readonly string[] TypeNamePrefixes = { "Avalonia.", "System.Windows.", "System.Controls." };
 
+    /// <summary>
+    /// Patterns that represent an ACTION on the element. Scroll and ScrollItem are excluded
+    /// deliberately: they only bring something into view, which nearly everything supports,
+    /// so counting them would make every label look operable.
+    /// </summary>
+    private static readonly string[] ActionablePatterns =
+        { "Invoke", "Toggle", "SelectionItem", "ExpandCollapse", "Value", "RangeValue", "Selection" };
+
+    private static bool IsOperable(ElementInfo e) =>
+        e.IsFocusable || e.Patterns.Any(p => ActionablePatterns.Contains(p));
+
     public static IReadOnlyList<AddressabilityWarning> Inspect(IReadOnlyList<ElementInfo> elements)
     {
         var warnings = new List<AddressabilityWarning>();
@@ -24,28 +35,37 @@ public static class AddressabilityWarnings
                      .GroupBy(e => e.Name, StringComparer.Ordinal)
                      .Where(g => g.Count() > 1))
         {
-            // Strip labels before judging ambiguity. A control sharing its name with its own
-            // Text label is not something a caller can trip over: a Text element is never an
-            // interaction target, so it cannot be the thing you meant, and controlType
-            // separates them trivially.
+            // Judge ambiguity only among elements that can actually be OPERATED. An element
+            // exposing no actionable pattern and not focusable can never be the target of an
+            // action, so it cannot be "the one you meant" — a Text label and a Window's own
+            // TitleBar both fall out of consideration for the same reason.
             //
-            // This matters for signal quality, not neatness. After the issue #15 finding-1
-            // fix named the conversation rows, the Conversations pane alone produced 37 such
-            // pairs — enough to bury the real collisions. Same lesson as the ComboBox false
-            // positive: a warning that cries wolf teaches the reader to skim past them.
-            var targets = group.Where(e => e.ControlType != "Text").ToList();
+            // This is signal quality, not neatness. After the issue #15 finding-1 fix named
+            // the conversation rows, the Conversations pane alone produced 37 label pairs —
+            // enough to bury the real collisions. Same lesson as the ComboBox false positive:
+            // a warning that cries wolf teaches the reader to skim past them.
+            var targets = group.Where(IsOperable).ToList();
 
-            if (targets.Count == 0)
+            if (targets.Count <= 1)
             {
-                // All labels. Not an addressing problem, but a screen reader announces the
-                // same text more than once, which is its own defect.
-                warnings.Add(new AddressabilityWarning("DuplicateLabel",
-                    $"'{group.Key}' appears on {group.Count()} static Text elements — " +
-                    "assistive technology will announce it more than once."));
+                // At most one operable element, so nothing to disambiguate. Duplicated
+                // static TEXT is still a defect — assistive technology announces it twice —
+                // but only Text qualifies: a Window and its own TitleBar, or two splitter
+                // Thumbs, are chrome rather than labels and reporting them was a false
+                // positive of exactly the kind this method keeps trying to avoid.
+                //
+                // A zero-size element is excluded: the app deliberately pairs a hidden
+                // LiveSetting region with the visible status label, so the change is
+                // ANNOUNCED while the visible one is what gets READ.
+                var visibleLabels = group.Where(e => e is { ControlType: "Text", HasSize: true }).ToList();
+                if (visibleLabels.Count > 1)
+                {
+                    warnings.Add(new AddressabilityWarning("DuplicateLabel",
+                        $"'{group.Key}' appears on {visibleLabels.Count} visible Text elements — " +
+                        "assistive technology will announce it more than once."));
+                }
                 continue;
             }
-
-            if (targets.Count == 1) continue;   // a labelled control: benign
 
             var ids = string.Join(", ", targets.Select(e => $"'{e.AutomationId}'").Distinct());
             var types = string.Join("/", targets.Select(e => e.ControlType).Distinct());

@@ -81,6 +81,38 @@ meaning, so a name would only be announced redundantly.
 Verified live via both paths — the server's `menu` tool and `DriveApp.ps1` — each returning
 exactly five top-level items with no `System`, and the bar announcing "Main menu".
 
+**Finding 6 — same-surface name collisions (2026-09-05): investigated, no app change.**
+Not a retired fallback but worth recording, because the honest answer was "our markup is not
+the problem".
+
+Six collisions became four, and the two that went were **false positives in our own warning
+logic**: a `Window` with its own `TitleBar`, and the two splitter `Thumb`s both named
+"Position". Neither is something a caller can act on, so neither could ever be "the one you
+meant". Ambiguity is now judged only among elements exposing an *actionable* pattern
+(`Invoke`, `Toggle`, `SelectionItem`, `ExpandCollapse`, `Value`, `RangeValue`, `Selection`) or
+keyboard focus — `Scroll`/`ScrollItem` deliberately do not count, since nearly everything has
+them and counting them would make every label look operable.
+
+`DuplicateLabel` is now restricted to genuine `Text`. It had briefly reported the window and
+its title bar as "duplicated static elements", which was wrong twice over. It also ignores
+zero-size elements, because `MainWindow` deliberately pairs a hidden
+`AutomationProperties.LiveSetting="Polite"` region with the visible status label so a change
+is ANNOUNCED while the visible one is READ. UIA's `LiveSetting` is not exposed by the .NET
+client, so `ElementInfo.HasSize` (empty bounding rectangle) is the discriminator.
+
+The four survivors are all outside our markup or benign:
+
+| Collision | Source | Verdict |
+|---|---|---|
+| `Tool tabs` ×2 | Dock.Avalonia `ToolTabStrip` — the string is not in our source at all | third-party, see finding 2 |
+| `Avalonia.Controls.Viewbox` ×6 | Dock.Avalonia template parts | third-party, IS finding 2 |
+| `Canvas` (Pane + TabItem) | our dock titles | benign: a pane and its tab share a title, and the tab text is what the user reads |
+| `Node Details` (Pane + TabItem) | our dock titles | benign, same |
+
+All four are disambiguated by `controlType` or `automationId`, which the resolver already
+demands — so the practical cost is one narrowing argument, not a broken lookup. Renaming a
+pane to differ from its own tab would make the UI worse to fix a non-problem.
+
 ## How to remove one
 
 1. Fix the app so the pattern or name exists.
