@@ -108,6 +108,43 @@ internal sealed class EditorSession
         return new WindowInventory(_windows, _process.MainWindowHandle).Windows();
     }
 
+    /// <summary>
+    /// Resolve a window selector and guard it, then hand back a tree rooted there. Every
+    /// tool taking a `window` argument goes through here, so the modal guard is applied in
+    /// one place rather than remembered at each call site.
+    /// </summary>
+    public bool TryWindow(string? selector, out WindowInfo window, out UiaTree tree, out string error)
+    {
+        window = null!;
+        tree = null!;
+        error = "";
+
+        var result = new WindowResolver(Windows()).ResolveForUse(selector);
+        if (result.ErrorKind is not null)
+        {
+            error = $"Error({result.ErrorKind}): {result.ErrorMessage}";
+            return false;
+        }
+
+        window = result.Window!;
+        tree = TreeFor(window);
+        return true;
+    }
+
+    /// <summary>A census of open windows for read_tree; empty while only the main one is.</summary>
+    public string WindowsSummary() => new WindowResolver(Windows()).Summary();
+
+    /// <summary>
+    /// Foreground a SPECIFIC window. The parameterless overload always targets the main
+    /// window, which for a dialog would bring the wrong window forward and send synthetic
+    /// input to it.
+    /// </summary>
+    public void Foreground(WindowInfo window)
+    {
+        Win32.SetForegroundWindow(window.Handle);
+        Thread.Sleep(400);
+    }
+
     /// <summary>A tree rooted at the given window, so inspection can leave the main one.</summary>
     public UiaTree TreeFor(WindowInfo window)
     {

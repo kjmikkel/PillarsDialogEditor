@@ -9,12 +9,11 @@ namespace DialogEditor.UiaMcp;
 internal static class ElementAddress
 {
     public static bool TryResolve(
-        EditorSession session, string? reference, Selector selector,
+        EditorSession session, UiaTree tree, string? reference, Selector selector,
         out ElementInfo element, out string error)
     {
         element = null!;
         error = "";
-        var tree = session.Tree();
 
         if (!string.IsNullOrWhiteSpace(reference))
         {
