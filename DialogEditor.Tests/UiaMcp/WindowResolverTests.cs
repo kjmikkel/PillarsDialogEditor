@@ -251,4 +251,58 @@ public class WindowResolverTests
         Assert.Null(result.ErrorKind);
         Assert.Equal("w8", result.Window!.Id);
     }
+
+    // --- ResolveForUse: what every tool actually calls -------------------------------
+
+    [Fact]
+    public void ResolveForUseAppliesTheModalGuardAfterResolving()
+    {
+        // Resolving About succeeds on its own; it is the open modal that makes acting on
+        // it meaningless. Tools call this rather than Resolve so the guard cannot be
+        // forgotten at one call site and silently skipped there.
+        var result = NewResolver(Main, About, ForceDelete).ResolveForUse("About");
+
+        Assert.Equal("ModalOpen", result.ErrorKind);
+    }
+
+    [Fact]
+    public void ResolveForUseReportsABadSelectorRatherThanTheModal()
+    {
+        // A selector that matches nothing cannot be guarded, and NotFound already lists
+        // the open windows -- including the modal -- so the caller still learns about it.
+        var result = NewResolver(Main, About, ForceDelete).ResolveForUse("nope");
+
+        Assert.Equal("NotFound", result.ErrorKind);
+        Assert.Contains("Force delete", result.ErrorMessage);
+    }
+
+    [Fact]
+    public void ResolveForUsePassesACleanSessionThrough()
+    {
+        var result = NewResolver().ResolveForUse(null);
+
+        Assert.Null(result.ErrorKind);
+        Assert.True(result.Window!.IsMain);
+    }
+
+    // --- Summary: how a caller DISCOVERS a dialog opened -----------------------------
+
+    [Fact]
+    public void SummaryIsEmptyWhenOnlyTheMainWindowIsOpen()
+    {
+        // Nothing to disambiguate, so nothing to say. A banner on every read_tree would
+        // be noise that trains the reader to skip it -- exactly when it starts mattering.
+        Assert.Equal("", new WindowResolver(new[] { Main }).Summary());
+    }
+
+    [Fact]
+    public void SummaryListsTheWindowsAndFlagsTheModalOnceMoreThanOneIsOpen()
+    {
+        var summary = new WindowResolver(new[] { Main, About, ForceDelete }).Summary();
+
+        Assert.Contains("About", summary);
+        Assert.Contains("AboutWindow", summary);
+        Assert.Contains("modal", summary);
+        Assert.Contains("main", summary);
+    }
 }

@@ -116,4 +116,15 @@ public class WindowInventoryTests
 
         Assert.Equal("SettingsWindow", settings.ClassName);
     }
+
+    [Fact]
+    public void CarriesTheNativeHandleThroughForForegroundingAndCapture()
+    {
+        // screenshot has to capture the RESOLVED window's rect, and SetForegroundWindow
+        // needs that window's hwnd -- neither can go through Process.MainWindowHandle,
+        // which is the main window by definition and so always the wrong one here.
+        var settings = Inventory().Single(w => w.Title == "Settings");
+
+        Assert.Equal(771231, settings.Handle);
+    }
 }

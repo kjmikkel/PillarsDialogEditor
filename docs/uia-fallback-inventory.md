@@ -196,11 +196,28 @@ guards against the regression.
 The rule that follows: before adding a warning, check that the pattern the control *does*
 expose isn't the semantically correct route.
 
-## Not a fallback, but a known blind spot
+## Resolved: the secondary-window blind spot
 
-The server's tree is rooted at the main window, so secondary windows — dialogs, Settings,
-Diff, Branches, the Patch Manager — are invisible to `read_tree`, `find`, `menu` and every
-tool built on them, and `screenshot` captures only the main window's rect. `invoke_menu` can
-therefore *open* a dialog it cannot then inspect. Tracked separately as
-[#16](https://github.com/kjmikkel/PillarsDialogEditor/issues/16); it is a limitation of the
-tooling rather than of the app's addressability.
+The server's tree used to be rooted at the main window, making dialogs, Settings, Diff and
+the Patch Manager invisible to every tool built on it. Closed by
+[#16](https://github.com/kjmikkel/PillarsDialogEditor/issues/16): windows are enumerated
+recursively, every inspecting and acting tool takes an optional `window` argument, and
+`screenshot` captures the resolved window's rect.
+
+One genuine fallback came out of it, recorded here for the same reason as the others —
+so it can be retired when the platform improves:
+
+**Modality is inferred from tree position, not read from the platform.** Avalonia's window
+peer reports `WindowPattern.IsModal` as `false` even for a live `ShowDialog` window, and
+leaves the owner's `IsEnabled` at `true`. Both signals a UIA client would use are absent,
+so `WindowInventory` infers modality from ownership instead: `ShowDialog` nests the window
+under its owner, `.Show()` leaves it at root, and every `.Show()` call in this app is the
+ownerless overload — so the two coincide exactly here, and only here.
+
+*Retire when:* Avalonia's `WindowAutomationPeer` implements `IsModal`, tracked as
+[#17](https://github.com/kjmikkel/PillarsDialogEditor/issues/17). At that point
+`WindowInventory.Walk` should read the property and the ownership inference should go.
+
+*How it fails if the assumption breaks:* an owned **modeless** window would be treated as
+modal and over-refused. That direction is deliberate — the alternative is acting into a
+blocked window and reporting success, which is the failure this server exists to prevent.

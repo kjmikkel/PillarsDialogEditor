@@ -13,11 +13,17 @@ internal sealed class ScreenshotTool(EditorSession session)
     [McpServerTool, Description(
         "Capture the app window as a PNG and return it inline, so the result can actually be " +
         "looked at rather than trusted.")]
-    public IEnumerable<ContentBlock> Screenshot()
+    public IEnumerable<ContentBlock> Screenshot(
+        [Description("Window to capture: automationId, className (e.g. 'SettingsWindow') or title. Defaults to the main window.")] string? window = null)
     {
-        session.Foreground();
+        // Capture the RESOLVED window's rect. The old code took Process.MainWindowHandle,
+        // so a dialog outside the main window's bounds simply was not in the image (#16).
+        if (!session.TryWindow(window, out var target, out _, out var windowError))
+            return [new TextContentBlock { Text = windowError }];
 
-        if (!Win32.GetWindowRect(session.WindowHandle, out var r))
+        session.Foreground(target);
+
+        if (!Win32.GetWindowRect(target.Handle, out var r))
             return [new TextContentBlock { Text = "Error(NotOperable): GetWindowRect failed." }];
 
         var width = r.Right - r.Left;
@@ -35,7 +41,9 @@ internal sealed class ScreenshotTool(EditorSession session)
 
         return
         [
-            new TextContentBlock { Text = $"{width}x{height} capture of '{session.Status()}'." },
+            new TextContentBlock
+                { Text = $"{width}x{height} capture of '{target.Title}' " +
+                         $"(className='{target.ClassName}'{(target.IsModal ? ", modal" : "")})." },
             ImageContentBlock.FromBytes(ms.ToArray(), "image/png"),
         ];
     }

@@ -16,7 +16,13 @@ public record WindowInfo(
     /// </summary>
     string ClassName = "",
     bool IsMain = false,
-    bool IsModal = false);
+    bool IsModal = false,
+    /// <summary>
+    /// The native window handle. Needed because foregrounding and screen capture must
+    /// target the RESOLVED window: Process.MainWindowHandle is the main window by
+    /// definition, so it is always the wrong one for a dialog.
+    /// </summary>
+    nint Handle = 0);
 
 public record WindowResolveResult(WindowInfo? Window, string? ErrorKind, string? ErrorMessage)
 {
@@ -66,6 +72,21 @@ public sealed class WindowResolver(IReadOnlyList<WindowInfo> windows)
     }
 
     /// <summary>
+    /// Resolve, then guard. This is the entry point every tool should use: keeping the
+    /// two steps separate at each call site is how one of them ends up missing the guard
+    /// and silently acting into a blocked window.
+    ///
+    /// A resolve failure is reported in preference to the modal, because a selector that
+    /// matches nothing cannot be guarded — and NotFound lists the open windows, the modal
+    /// among them, so the caller still learns about it.
+    /// </summary>
+    public WindowResolveResult ResolveForUse(string? selector)
+    {
+        var resolved = Resolve(selector);
+        return resolved.ErrorKind is not null ? resolved : GuardModal(resolved.Window!);
+    }
+
+    /// <summary>
     /// Refuses a resolve of <paramref name="target"/> while any modal is open.
     ///
     /// Why (#16): a modal holds input for the whole app, so an action dispatched at the
@@ -100,6 +121,16 @@ public sealed class WindowResolver(IReadOnlyList<WindowInfo> windows)
             "do nothing. Close it, or address it directly with window=" +
             $"'{modal.AutomationId}'.");
     }
+
+    /// <summary>
+    /// A one-line census for read_tree, empty while only the main window is open. #16
+    /// notes that a run can currently open a dialog and never notice; this is how the
+    /// caller DISCOVERS one rather than having to guess it appeared. Silent in the
+    /// single-window case on purpose — a banner printed every time is one the reader
+    /// learns to skip, precisely when it starts carrying information.
+    /// </summary>
+    public string Summary() =>
+        windows.Count <= 1 ? "" : $"windows({windows.Count}): {Describe()}";
 
     private static WindowResolveResult Ambiguous(string selector, List<WindowInfo> hits, string field)
     {
