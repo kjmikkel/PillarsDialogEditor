@@ -231,6 +231,7 @@
                     <Border Width="10" Height="10" Background="{DynamicResource Brush.Text.Status.Removed}" VerticalAlignment="Center"/>
                     <TextBlock Text="{DynamicResource Diff_LegendRemoved}" Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Small}" VerticalAlignment="Center"/>
                     <Button Content="{DynamicResource Diff_HelpButton}" Click="Help_Click"
+                            AutomationProperties.Name="{DynamicResource AutomationName_DiffHelp}"
                             ToolTip.Tip="{DynamicResource ToolTip_Diff_Help}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_Help}"/>
                 </StackPanel>

@@ -137,10 +137,12 @@
                     <MenuItem Header="{DynamicResource Menu_Edit}" AutomationProperties.AutomationId="MenuEdit">
                         <MenuItem Header="{DynamicResource Button_Undo}"
                                   AutomationProperties.AutomationId="MenuEdit_Undo"
+                                  AutomationProperties.Name="{DynamicResource AutomationName_Undo}"
                                   Command="{Binding Canvas.UndoCommand}"
                                   InputGesture="Ctrl+Z"/>
                         <MenuItem Header="{DynamicResource Button_Redo}"
                                   AutomationProperties.AutomationId="MenuEdit_Redo"
+                                  AutomationProperties.Name="{DynamicResource AutomationName_Redo}"
                                   Command="{Binding Canvas.RedoCommand}"
                                   InputGesture="Ctrl+Y"/>
                         <Separator/>

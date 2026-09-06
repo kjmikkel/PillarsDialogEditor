@@ -346,6 +346,14 @@
     <sys:String x:Key="ToolTip_CloseLegend">Close legend</sys:String>
 
     <!-- ─── Editing — toolbar buttons ───────────────────────────────────── -->
+    <!-- Accessible names for glyph-only controls (issue #15 finding 3). The glyph is what
+         is SHOWN; these are what assistive technology SPEAKS. Kept as separate keys rather
+         than reusing the tooltip text, because a tooltip is a sentence of help while a
+         name is the control's identity. -->
+    <sys:String x:Key="AutomationName_Undo">Undo</sys:String>
+    <sys:String x:Key="AutomationName_Redo">Redo</sys:String>
+    <sys:String x:Key="AutomationName_DiffHelp">Diff viewer help</sys:String>
+    <sys:String x:Key="AutomationName_DeleteLink">Delete link</sys:String>
     <sys:String x:Key="Button_Undo">↩</sys:String>
     <sys:String x:Key="Button_Redo">↪</sys:String>
     <sys:String x:Key="Button_Save">Save</sys:String>
