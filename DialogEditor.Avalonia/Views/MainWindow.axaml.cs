@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Primitives;
@@ -622,7 +622,11 @@ public partial class MainWindow : Window
                     if (node is not null) FindCanvasView()?.ScrollToNode(node);
                 },
                 () => vm.CurrentConversationTranslations,
-                vm.ActiveGameId);
+                vm.ActiveGameId,
+                // Reading speed (issue #14): the View owns AppSettings, so the VM stays
+                // settings-free and its tests never touch the real settings.json.
+                wordsPerMinute: AppSettings.ReadingWordsPerMinute,
+                persistWordsPerMinute: v => AppSettings.ReadingWordsPerMinute = v);
 
             _flowAnalyticsWindow = new FlowAnalyticsWindow(analyticsVm);
 

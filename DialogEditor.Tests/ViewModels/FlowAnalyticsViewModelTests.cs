@@ -1,4 +1,4 @@
-using DialogEditor.Core.Analytics;
+﻿using DialogEditor.Core.Analytics;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Tests.Helpers;
@@ -178,5 +178,74 @@ public class FlowAnalyticsViewModelTests
         vm.Branches[0].NavigateCommand.Execute(null);
 
         Assert.Equal(7, navigatedId);
+    }
+
+    // ── Configurable reading speed (issue #14) ───────────────────────────────
+
+    [Fact] // Omitting the ctor argument keeps the historical 200 wpm.
+    public void WordsPerMinute_DefaultsToPathStatsDefault()
+    {
+        var vm = new FlowAnalyticsViewModel(() => SimpleSnapshot(), _ => { });
+
+        Assert.Equal(PathStatsFormat.DefaultWordsPerMinute, vm.WordsPerMinute);
+    }
+
+    [Fact] // The View supplies the persisted value at construction.
+    public void WordsPerMinute_InitialisedFromConstructor()
+    {
+        var vm = new FlowAnalyticsViewModel(() => SimpleSnapshot(), _ => { },
+                                            wordsPerMinute: 120);
+
+        Assert.Equal(120, vm.WordsPerMinute);
+    }
+
+    [Fact] // The preset list the ComboBox binds to must offer the default.
+    public void WordsPerMinuteOptions_IncludeTheDefault()
+    {
+        var vm = new FlowAnalyticsViewModel(() => SimpleSnapshot(), _ => { });
+
+        Assert.Contains(PathStatsFormat.DefaultWordsPerMinute, vm.WordsPerMinuteOptions);
+        Assert.All(vm.WordsPerMinuteOptions, wpm => Assert.True(wpm > 0));
+    }
+
+    /// The branch/header strings are built once into plain strings, so a speed change
+    /// only reaches the UI by re-running the analysis. Assert the re-run rather than the
+    /// rendered text: the test string provider echoes keys, so the formatted m:ss value
+    /// never appears in the output here (PathStatsFormatTests covers the arithmetic).
+    [Fact]
+    public void WordsPerMinute_Change_ReRunsAnalysis()
+    {
+        var snapshotReads = 0;
+        var vm = new FlowAnalyticsViewModel(
+            () => { snapshotReads++; return SimpleSnapshot(); }, _ => { });
+        vm.RefreshCommand.Execute(null);
+        var before = snapshotReads;
+
+        vm.WordsPerMinute = 120;
+
+        Assert.True(snapshotReads > before,
+            "changing the reading speed should re-run Refresh so the m:ss figures update");
+    }
+
+    [Fact] // Persistence is the View's job; the VM just reports the change.
+    public void WordsPerMinute_Change_InvokesPersistCallback()
+    {
+        var persisted = 0;
+        var vm = new FlowAnalyticsViewModel(() => SimpleSnapshot(), _ => { },
+                                            persistWordsPerMinute: v => persisted = v);
+
+        vm.WordsPerMinute = 300;
+
+        Assert.Equal(300, persisted);
+    }
+
+    [Fact] // No callback wired (the unit-test default) must not throw.
+    public void WordsPerMinute_Change_WithoutPersistCallback_DoesNotThrow()
+    {
+        var vm = new FlowAnalyticsViewModel(() => SimpleSnapshot(), _ => { });
+
+        vm.WordsPerMinute = 150;
+
+        Assert.Equal(150, vm.WordsPerMinute);
     }
 }

@@ -1,4 +1,4 @@
-<Application xmlns="https://github.com/avaloniaui"
+﻿<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:DialogEditor.Avalonia.Converters"
              xmlns:docking="clr-namespace:DialogEditor.Avalonia.Docking"
@@ -154,7 +154,8 @@
             <converters:EnumToBoolConverter                      x:Key="EnumToBool"/>
             <converters:IsNullConverter                          x:Key="IsNull"/>
             <converters:IsNotNullConverter                       x:Key="IsNotNull"/>
-            <converters:FontScaleToPercentConverter              x:Key="FontScaleToPercent"/>
+            <converters:DoubleToPercentConverter                 x:Key="DoubleToPercent"/>
+            <converters:WordsPerMinuteConverter                   x:Key="WordsPerMinute"/>
 
         </ResourceDictionary>
     </Application.Resources>
