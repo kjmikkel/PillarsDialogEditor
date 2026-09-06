@@ -82,6 +82,10 @@ public static class AppSettings
         public int ReadingWordsPerMinute { get; set; } = 200;
         // Similarity bar for the near-duplicate tier (DuplicateLineScanner.Scan).
         public double NearDuplicateThreshold { get; set; } = 0.85;
+        // Scope of the duplicate sweep (issue #14). Both default false so an
+        // upgrading install sees exactly the report it saw before.
+        public bool DuplicateIncludeFemaleText { get; set; }
+        public bool DuplicateIncludeOtherLanguages { get; set; }
 
         // MRU list of recently opened/created/saved-as project file paths, newest
         // first, capped at MaxRecentProjects. Powers File ▸ Recent Projects.
@@ -263,6 +267,20 @@ public static class AppSettings
     {
         get => Load().NearDuplicateThreshold;
         set { var s = Load(); s.NearDuplicateThreshold = value; Save(s); }
+    }
+
+    /// Whether the duplicate sweep also considers female text.
+    public static bool DuplicateIncludeFemaleText
+    {
+        get => Load().DuplicateIncludeFemaleText;
+        set { var s = Load(); s.DuplicateIncludeFemaleText = value; Save(s); }
+    }
+
+    /// Whether the duplicate sweep also considers non-primary translation languages.
+    public static bool DuplicateIncludeOtherLanguages
+    {
+        get => Load().DuplicateIncludeOtherLanguages;
+        set { var s = Load(); s.DuplicateIncludeOtherLanguages = value; Save(s); }
     }
 
     public static bool ThemeOnboardingSeen
