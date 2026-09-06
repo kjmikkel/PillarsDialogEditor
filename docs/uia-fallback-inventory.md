@@ -7,13 +7,13 @@ permanent furniture.
 
 | # | Fallback | Why it exists | Removed when | Test that will fail first |
 |---|---|---|---|---|
-| 1 | Synthetic click to open a top-level menu | App `MenuItem`s expose `ScrollItem` only — no `Invoke`, no `ExpandCollapse` | [#15](https://github.com/kjmikkel/PillarsDialogEditor/issues/15) gives menu items an operable pattern | `ActionToolsGuiTests.TopLevelMenuItemsStillLackInvokeAndExpandCollapse` |
-| 2 | Synthetic click to activate a menu command | Same — the leaf item has no `Invoke` either | #15, same fix | same test |
+| ~~1~~ | ~~Synthetic click to open a top-level menu~~ | **RESOLVED 2026-09-06.** `AccessibleMenuItem` supplies `IExpandCollapseProvider` ([#18](https://github.com/kjmikkel/PillarsDialogEditor/issues/18)) | — | `ActionToolsGuiTests.MenuItemsAreOperableByPattern` |
+| ~~2~~ | ~~Synthetic click to activate a menu command~~ | **RESOLVED 2026-09-06.** Same type supplies `IInvokeProvider` | — | same test |
 | ~~3~~ | ~~Synthetic click to select a conversation row~~ | **RESOLVED 2026-09-05.** Rows are named from their data and a custom automation peer supplies `SelectionItem`/`ExpandCollapse` | — | `ActionToolsGuiTests.ConversationRowsAreSelectableAndExpandableByPattern` + `ActivatingAConversationRowUsesAPatternNotASyntheticClick` |
 | ~~4~~ | ~~Menu addressing by localised `Name`~~ | **RESOLVED 2026-09-05.** All 51 menu items (and 9 context-menu items) now carry stable non-localised `AutomationId`s; `MenuNavigator` matches id first, then name | — | `MenuItemAutomationIdTests` (markup) + `ActionToolsGuiTests.MenuItemsExposeStableAutomationIdsToUia` (live tree) |
 | ~~5~~ | ~~App menu located by `ClassName='Menu'`~~ | **RESOLVED 2026-09-05.** The menu bar carries `AutomationId='MainMenu'` and the name "Main menu"; all six call sites now address it by id | — | `MenuItemAutomationIdTests.EveryMenuContainerCarriesAnAutomationId` + `ActionToolsGuiTests.TheAppMenuIsFoundAndExcludesTheOsSystemItem` |
 | 6 | `FocusAndType` in `set_value` | Some fields expose no `Value` pattern | per-control, as found | none — data-dependent |
-| 7 | `{ESC}` dismissal before every menu walk | Synthetic clicking is stateful; a leftover popup swallows the next click | fallbacks 1–2 gone | none — becomes unnecessary rather than wrong |
+| ~~7~~ | ~~`{ESC}` dismissal before every menu walk~~ | **RESOLVED 2026-09-06.** Became unnecessary the moment 1–2 went: expanding by pattern needs neither a clean slate nor foreground | — | — |
 
 ## Retired fallbacks
 
@@ -142,6 +142,34 @@ is fixed, and `withinPane` scoping is the natural way to address pane chrome any
 *Possible follow-up:* pane-qualified names ("Close Node Details pane") would remove the
 residual duplication for screen-reader users too, but need a localisable format string bound
 to the pane title — real complexity for marginal gain, so not done.
+
+**#1, #2 and #7 — menu synthetic clicks and the `{ESC}` workaround (2026-09-06).** Issue #18.
+Avalonia 11.3's `MenuItemAutomationPeer` implements no provider interfaces — the same gap as
+`TreeViewItemAutomationPeer` — so menu items exposed `ScrollItem` only.
+`DialogEditor.Avalonia/Controls/AccessibleMenuItem.cs` supplies `IInvokeProvider` and
+`IExpandCollapseProvider`; **delete both types when Avalonia ships them upstream.**
+
+Invoke follows WPF's semantics: a parent item opens its submenu, a leaf raises the routed
+`ClickEvent` rather than executing `Command` directly — `MenuItem.OnClick` already runs the
+command, and going through the event also fires the `Click="…"` handlers several items use
+instead of a command. One path, both mechanisms.
+
+Unlike finding 1's tree fix this touched **60 markup elements**, because menu items are
+declared directly rather than generated as containers. `AccessibleMenuItem` also overrides
+`CreateContainerForItemOverride` so File ▸ Recent Projects' bound children are operable too,
+and `MenuItemAutomationIdTests.EveryMenuItemIsAnAccessibleMenuItem` stops a future bare
+`<MenuItem>` regressing silently.
+
+**Row 7 went for free.** It existed only because synthetic clicking is stateful — a leftover
+popup swallowed the next click, and `SetForegroundWindow` dismissed an open popup. Expanding
+by pattern opens the requested menu regardless of what else is open, so `MenuNavigator` needs
+neither `{ESC}` nor foregrounding. Verified by the sequence that used to fail: an
+`invoke_menu` erroring on a disabled `Save Project`, immediately followed by a successful
+`MenuHelp ▸ MenuHelp_About` — now `ok: used the ExpandCollapse pattern.` then
+`ok: used the Invoke pattern.`, with no warnings anywhere.
+
+**The inventory is now empty of app-caused fallbacks.** Only #6 (`FocusAndType` in
+`set_value`) remains, and it is data-dependent rather than a known defect.
 
 ## How to remove one
 

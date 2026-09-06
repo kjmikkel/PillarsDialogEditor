@@ -11,9 +11,10 @@ namespace DialogEditor.UiaMcp;
 /// whose popup wedged the original audit probe. That scoping is now done by AutomationId
 /// (issue #15 finding 5); it used to need ClassName='Menu' because the element was anonymous.
 ///
-/// Still outstanding: the app's top-level MenuItems expose neither Invoke nor ExpandCollapse,
-/// so opening one needs synthetic input, and ActionStrategy reports that as the defect it is
-/// (issue #15 findings 1–2 territory; see docs/uia-fallback-inventory.md rows 1–2).
+/// Opening a menu now uses the ExpandCollapse pattern, supplied by AccessibleMenuItem
+/// (issue #18) because Avalonia's own MenuItemAutomationPeer implements no providers. That
+/// removed the synthetic click and, with it, the statefulness workarounds this class used to
+/// need — no {ESC} dismissal, no foregrounding.
 /// </summary>
 internal static class MenuNavigator
 {
@@ -28,14 +29,13 @@ internal static class MenuNavigator
         log = "";
         var sb = new StringBuilder();
 
-        // Start from a known state. Opening a menu relies on a synthetic click, which —
-        // unlike invoking a pattern — is STATEFUL: if a previous call left a popup open,
-        // the next click merely dismisses that popup instead of opening the menu we asked
-        // for, and the walk then reports the target as missing with no children. Found the
-        // hard way: an invoke_menu that errored on a disabled item left File open, and the
-        // following Help walk failed with "Available: ".
-        DismissOpenMenus(session);
-
+        // No {ESC} dismissal and no foregrounding needed any more. Both existed because
+        // opening a menu relied on a synthetic click, which — unlike invoking a pattern — is
+        // STATEFUL: a leftover popup swallowed the next click, and SetForegroundWindow
+        // dismissed an open popup. AccessibleMenuItem's ExpandCollapse provider (issue #18)
+        // opens the requested menu directly regardless of what else is open, so neither
+        // workaround applies. DismissOpenMenus is kept for callers that still want a clean
+        // slate, but the walk no longer needs it.
         var tree = session.Tree();
 
         var appMenu = FindAppMenu(tree);
@@ -85,7 +85,6 @@ internal static class MenuNavigator
             // that decision belongs to the caller.
             if (i < path.Length - 1)
             {
-                session.Foreground();
                 var opened = ElementOperator.Execute(tree, next, ActionKind.Expand);
                 if (opened.StartsWith("Error(", StringComparison.Ordinal))
                 {
