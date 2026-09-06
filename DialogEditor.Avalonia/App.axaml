@@ -4,6 +4,7 @@
              xmlns:docking="clr-namespace:DialogEditor.Avalonia.Docking"
              xmlns:views="clr-namespace:DialogEditor.Avalonia.Views"
              xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
+             xmlns:dock="using:Dock.Avalonia.Controls"
              x:Class="DialogEditor.Avalonia.App"
              RequestedThemeVariant="Dark">
 
@@ -16,6 +17,27 @@
              Avalonia's XAML compiler in this version rejects xmlns declarations on
              non-root elements (AXN0002), which the element form requires. -->
         <StyleInclude Source="avares://Dock.Avalonia.Themes.Fluent/DockFluentTheme.axaml"/>
+
+        <!-- Accessible names for Dock.Avalonia's pane chrome buttons (issue #15 finding 2).
+             ToolChromeControl's template gives each button a <Viewbox> as its Content, and
+             Avalonia's ButtonAutomationPeer derives the accessible name from
+             Content.ToString() — so all six announced "Avalonia.Controls.Viewbox":
+             meaningless through a screen reader, untranslatable, and identical across panes.
+
+             These buttons are not in our markup, so there is nothing to annotate directly.
+             Reaching into the third-party template with /template/ is the fix, mirroring how
+             the Dock theme styles its own parts. MUST come after the StyleInclude above to
+             win, and the dock xmlns is on the root element because this Avalonia version
+             rejects xmlns on non-root elements (AXN0002). -->
+        <Style Selector="dock|ToolChromeControl /template/ Button#PART_MenuButton">
+            <Setter Property="AutomationProperties.Name" Value="{DynamicResource AutomationName_PaneMenu}"/>
+        </Style>
+        <Style Selector="dock|ToolChromeControl /template/ Button#PART_PinButton">
+            <Setter Property="AutomationProperties.Name" Value="{DynamicResource AutomationName_PanePin}"/>
+        </Style>
+        <Style Selector="dock|ToolChromeControl /template/ Button#PART_CloseButton">
+            <Setter Property="AutomationProperties.Name" Value="{DynamicResource AutomationName_PaneClose}"/>
+        </Style>
     </Application.Styles>
 
     <Application.Resources>

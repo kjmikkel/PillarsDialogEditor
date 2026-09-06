@@ -113,6 +113,36 @@ All four are disambiguated by `controlType` or `automationId`, which the resolve
 demands — so the practical cost is one narrowing argument, not a broken lookup. Renaming a
 pane to differ from its own tab would make the UI worse to fix a non-problem.
 
+**Finding 2 — `Avalonia.Controls.Viewbox` chrome buttons (2026-09-05): fixed in our styles,
+no upstream report needed.** Dock.Avalonia's `ToolChromeControl` template gives each pane
+chrome button a `<Viewbox>` as its `Content`, and Avalonia's `ButtonAutomationPeer` derives
+the accessible name from `Content.ToString()` — so all six announced
+"Avalonia.Controls.Viewbox".
+
+Unlike finding 1's pattern half, this needed no subclassing and no upstream change. A
+`Style` in `App.axaml` reaches into the third-party template the same way the Dock theme
+styles its own parts:
+
+```xml
+<Style Selector="dock|ToolChromeControl /template/ Button#PART_CloseButton">
+    <Setter Property="AutomationProperties.Name" Value="{DynamicResource AutomationName_PaneClose}"/>
+</Style>
+```
+
+Two ordering constraints: the styles must come **after** the `DockFluentTheme` `StyleInclude`
+to win, and the `dock` xmlns must be on the root element because this Avalonia version rejects
+`xmlns` on non-root elements (AXN0002).
+
+The buttons now announce "Pane options", "Pin pane" and "Close pane", and the `TypeNameLeak`
+warning is gone. Note the collision count did **not** drop: one warning about six buttons
+sharing a meaningless name became three warnings about pairs sharing meaningful names, one per
+pane. That is the real structure surfacing rather than a regression — the accessibility defect
+is fixed, and `withinPane` scoping is the natural way to address pane chrome anyway.
+
+*Possible follow-up:* pane-qualified names ("Close Node Details pane") would remove the
+residual duplication for screen-reader users too, but need a localisable format string bound
+to the pane title — real complexity for marginal gain, so not done.
+
 ## How to remove one
 
 1. Fix the app so the pattern or name exists.

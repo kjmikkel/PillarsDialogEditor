@@ -84,10 +84,36 @@ public class ActionToolsGuiTests(EditorSessionFixture fixture) : IClassFixture<E
     }
 
     [Fact]
+    public void PaneChromeButtonsHaveRealAccessibleNames()
+    {
+        // Issue #15 finding 2. Dock.Avalonia's ToolChromeControl template gives each chrome
+        // button a <Viewbox> as its Content, and Avalonia's ButtonAutomationPeer derives the
+        // name from Content.ToString() — so all six announced "Avalonia.Controls.Viewbox":
+        // meaningless to a screen reader, untranslatable, and identical across panes.
+        //
+        // No structural test can cover this: the buttons are not in our markup. A style
+        // override reaching into the third-party template is the fix, so the live tree is
+        // the only place it can be verified.
+        var all = new Resolver(fixture.Session.Tree()).Flatten();
+
+        Assert.Empty(all.Where(e => e.Name.StartsWith("Avalonia.", StringComparison.Ordinal)));
+
+        var chrome = all.Where(e => e.AutomationId is
+            "PART_MenuButton" or "PART_PinButton" or "PART_CloseButton").ToList();
+        Assert.NotEmpty(chrome);
+        Assert.All(chrome, b => Assert.False(string.IsNullOrWhiteSpace(b.Name),
+            $"chrome button {b.AutomationId} has no accessible name"));
+    }
+
+    [Fact]
     public void AmbiguousNamesAreRefusedRatherThanGuessed()
     {
-        var result = new Resolver(fixture.Session.Tree())
-            .Resolve(new Selector(Name: "Avalonia.Controls.Viewbox"));
+        // "Canvas" is a dock pane AND its own tab, both exposing Invoke — genuine ambiguity
+        // that finding 6 concluded is intentional and not worth renaming, since the tab text
+        // is what users read. That makes it a durable fixture. This test previously used
+        // "Avalonia.Controls.Viewbox", which stopped being ambiguous once finding 2 gave
+        // those buttons real names — the fix invalidating the fixture is the signal working.
+        var result = new Resolver(fixture.Session.Tree()).Resolve(new Selector(Name: "Canvas"));
 
         Assert.Equal("Ambiguous", result.ErrorKind);
         Assert.Contains("nth=0", result.ErrorMessage);
