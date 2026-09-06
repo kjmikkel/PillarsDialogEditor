@@ -12,10 +12,14 @@ internal sealed class InspectionTools(EditorSession session)
         "Dump the app's UI Automation tree with refs and addressability warnings. " +
         "Scope with withinPane to keep the output small.")]
     public string ReadTree(
+        [Description("Window to inspect: automationId, className (e.g. 'SettingsWindow') or title. Defaults to the main window.")] string? window = null,
         [Description("Pane name or automation id, e.g. 'Node Details' or 'RightPane'")] string? withinPane = null,
         [Description("'interactive' (focusable or pattern-bearing) or 'all'")] string filter = "interactive")
     {
-        var resolver = new Resolver(session.Tree());
+        if (!session.TryWindow(window, out _, out var tree, out var windowError))
+            return windowError;
+
+        var resolver = new Resolver(tree);
         var all = resolver.Flatten(withinPane);
 
         if (all.Count == 0 && withinPane is not null)
@@ -28,6 +32,12 @@ internal sealed class InspectionTools(EditorSession session)
         var refs = session.Refs.Mint(shown);
 
         var sb = new StringBuilder();
+
+        // Announce other open windows before the tree. #16: a run could open a dialog and
+        // never notice, then read the main window and report its state as the whole truth.
+        var census = session.WindowsSummary();
+        if (census.Length > 0) sb.AppendLine(census);
+
         sb.AppendLine($"generation={session.Refs.Generation}  elements={shown.Count} (of {all.Count} in scope)");
         for (var i = 0; i < shown.Count; i++)
         {
@@ -53,7 +63,12 @@ internal sealed class InspectionTools(EditorSession session)
     [McpServerTool, Description("Read the status bar's live-region text.")]
     public string ReadStatusBar()
     {
-        var all = new Resolver(session.Tree()).Flatten();
+        // Guarded like the rest: under a modal the status bar shows whatever it showed
+        // before the dialog opened, which reads as current and is not.
+        if (!session.TryWindow(null, out _, out var tree, out var windowError))
+            return windowError;
+
+        var all = new Resolver(tree).Flatten();
         var status = all.FirstOrDefault(e => e.AutomationId == "StatusLiveRegion");
         return status is null
             ? "Error(NotFound): no element with automationId 'StatusLiveRegion'."
@@ -61,9 +76,14 @@ internal sealed class InspectionTools(EditorSession session)
     }
 
     [McpServerTool, Description("Find elements whose name, automation id or control type contains the query.")]
-    public string Find([Description("Case-insensitive substring")] string query)
+    public string Find(
+        [Description("Case-insensitive substring")] string query,
+        [Description("Window to search: automationId, className or title. Defaults to the main window.")] string? window = null)
     {
-        var all = new Resolver(session.Tree()).Flatten();
+        if (!session.TryWindow(window, out _, out var tree, out var windowError))
+            return windowError;
+
+        var all = new Resolver(tree).Flatten();
         var hits = all.Where(e =>
             e.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
             e.AutomationId.Contains(query, StringComparison.OrdinalIgnoreCase) ||
@@ -86,7 +106,10 @@ internal sealed class InspectionTools(EditorSession session)
         "Always scoped to the app's own menu, never the OS window menu.")]
     public string Menu([Description("Menu path, e.g. ['File']")] string[]? path = null)
     {
-        var tree = session.Tree();
+        // Listing a submenu OPENS it (ActionKind.Expand below), so this is an acting tool
+        // in inspection's clothing and needs the same modal guard as invoke_menu.
+        if (!session.TryWindow(null, out _, out var tree, out var windowError))
+            return windowError;
 
         // The app's Menu is anonymous (audit finding 5) — ClassName is the only handle,
         // and scoping here is what stops the OS 'System' menu being treated as a peer

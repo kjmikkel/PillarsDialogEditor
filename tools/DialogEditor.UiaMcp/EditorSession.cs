@@ -20,6 +20,7 @@ internal sealed class EditorSession
     private readonly SettingsGuard _guard;
     private Process? _process;
     private UiaTree? _tree;
+    private UiaWindowSource? _windows;
 
     public EditorSession() : this(new SettingsGuard(DefaultSettings, DefaultBackup)) { }
 
@@ -63,6 +64,7 @@ internal sealed class EditorSession
 
         var window = WaitForWindow(_process, TimeSpan.FromSeconds(30));
         _tree = new UiaTree(window);
+        _windows = new UiaWindowSource(_process.Id);
         Foreground();
         return _process.MainWindowTitle;
     }
@@ -94,6 +96,66 @@ internal sealed class EditorSession
     public UiaTree Tree() => _tree
         ?? throw new InvalidOperationException("NoSession: call launch_app first.");
 
+    /// <summary>
+    /// Every window this process currently shows, main window first-class rather than
+    /// sole (#16). Re-enumerated on each call: a dialog can open or close between tool
+    /// calls, and a stale list is how a run acts into a window that is already gone.
+    /// </summary>
+    public IReadOnlyList<WindowInfo> Windows()
+    {
+        if (_process is null || _windows is null)
+            throw new InvalidOperationException("NoSession: call launch_app first.");
+        return new WindowInventory(_windows, _process.MainWindowHandle).Windows();
+    }
+
+    /// <summary>
+    /// Resolve a window selector and guard it, then hand back a tree rooted there. Every
+    /// tool taking a `window` argument goes through here, so the modal guard is applied in
+    /// one place rather than remembered at each call site.
+    /// </summary>
+    public bool TryWindow(string? selector, out WindowInfo window, out UiaTree tree, out string error)
+    {
+        window = null!;
+        tree = null!;
+        error = "";
+
+        var result = new WindowResolver(Windows()).ResolveForUse(selector);
+        if (result.ErrorKind is not null)
+        {
+            error = $"Error({result.ErrorKind}): {result.ErrorMessage}";
+            return false;
+        }
+
+        window = result.Window!;
+        tree = TreeFor(window);
+        return true;
+    }
+
+    /// <summary>A census of open windows for read_tree; empty while only the main one is.</summary>
+    public string WindowsSummary() => new WindowResolver(Windows()).Summary();
+
+    /// <summary>
+    /// Foreground a SPECIFIC window. The parameterless overload always targets the main
+    /// window, which for a dialog would bring the wrong window forward and send synthetic
+    /// input to it.
+    /// </summary>
+    public void Foreground(WindowInfo window)
+    {
+        Win32.SetForegroundWindow(window.Handle);
+        Thread.Sleep(400);
+    }
+
+    /// <summary>A tree rooted at the given window, so inspection can leave the main one.</summary>
+    public UiaTree TreeFor(WindowInfo window)
+    {
+        if (_windows is null)
+            throw new InvalidOperationException("NoSession: call launch_app first.");
+
+        // The main window keeps its long-lived tree: refs minted by an earlier read_tree
+        // must still resolve, which a freshly built tree would break.
+        return window.IsMain ? Tree() : new UiaTree(_windows.Element(window.Id));
+    }
+
     public string Status()
     {
         if (_process is null) return "no session";
@@ -112,6 +174,7 @@ internal sealed class EditorSession
         {
             _process = null;
             _tree = null;
+            _windows = null;
         }
         return _guard.Restore();
     }

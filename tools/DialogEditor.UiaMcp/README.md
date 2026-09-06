@@ -59,8 +59,36 @@ Requires a Debug build and a real interactive desktop; GUI tools cannot run head
 | `invoke_menu` | Invoke a menu command by path |
 | `screenshot` | Capture the window as an inline PNG |
 
-Actions are implemented as of phase 3. `DriveApp.ps1` remains available and is still the
-route for anything not covered here — notably secondary windows (see below).
+Every inspecting and acting tool takes an optional `window` argument, so none of them are
+limited to the main window any more (see **Addressing a window** below). `DriveApp.ps1`
+remains available for anything not covered here.
+
+## Addressing a window
+
+`read_tree`, `find`, `invoke`, `focus`, `set_value`, `send_keys` and `screenshot` take an
+optional `window`. Omit it for the main window. Resolution is three tiers, most-stable
+first, and more than one match is an error rather than a guess:
+
+| Tier | Example | Stability |
+|---|---|---|
+| `automationId` | not yet set on any window | declared contract; survives refactors |
+| `className` | `SettingsWindow`, `AboutWindow` | locale-stable, but a class rename moves it silently |
+| `title` | `Settings`, `About` | localised — moves with the UI language |
+
+Until the automationId sweep lands, `className` is the key to reach for: Avalonia sets it
+to the Window subclass name on every window already.
+
+`read_tree` prints a `windows(N):` census whenever more than one window is open, so a run
+discovers a dialog rather than reading the main window and reporting that as the whole
+truth. It stays silent in the single-window case.
+
+Two measurements behind the design, both taken against the running app rather than assumed:
+a `ShowDialog` window is a **child of its owner** in the UIA tree (not a root sibling, so
+enumerating root children alone misses every modal), and Avalonia reports
+`WindowPattern.IsModal` as **false** even for a live modal while the owner stays
+`IsEnabled=true` — so modality is inferred from ownership. See
+[#16](https://github.com/kjmikkel/PillarsDialogEditor/issues/16) and
+[#17](https://github.com/kjmikkel/PillarsDialogEditor/issues/17).
 
 ## Why warnings, not workarounds
 
@@ -104,10 +132,11 @@ Three behaviours worth knowing before relying on the acting tools:
 - **Ambiguous selectors are refused, not guessed.** `invoke` with
   `name="Avalonia.Controls.Viewbox"` returns all six candidates with their `nth` indices.
   Narrow with `controlType`, `automationId` or `withinPane` — reach for `nth` last.
-- **Secondary windows are invisible.** The session tree is rooted at the main window, so
-  dialogs and tool windows do not appear in `read_tree`/`find`, and `screenshot` captures
-  only the main window's rect. `invoke_menu` can open a dialog it cannot then inspect —
-  tracked as [#16](https://github.com/kjmikkel/PillarsDialogEditor/issues/16).
+- **An open modal refuses every other window.** A modal holds input for the whole app, so
+  an action aimed at the main window would report success and do nothing. Tools return
+  `Error(ModalOpen)` naming the dialog instead. The modal itself stays addressable — that
+  is where the work is. This covers `invoke_menu` and `menu` too: the menu bar belongs to
+  the main window, so a modal blocks it.
 
 Two traps the code guards against, both found by running it rather than reading it:
 synthetic clicking is **stateful** (a leftover open popup swallows the next click, so menu
