@@ -5,12 +5,14 @@ namespace DialogEditor.UiaMcp.Tests;
 
 /// <summary>
 /// Live-app coverage for the acting layer. These pin the behaviours that only appear against
-/// a real window: pattern routes actually working, the ambiguity refusal, and the
-/// synthetic-click fallback being reported.
+/// a real window: pattern routes actually working, names reaching the UIA tree, and the
+/// ambiguity refusal.
 ///
-/// Several tests deliberately assert that TODAY'S DEFECTS STILL EXIST. When issue #15 fixes
-/// them these tests fail, and that failure is the documented signal to delete the matching
-/// fallback — see docs/uia-fallback-inventory.md.
+/// Several of these were originally written to assert that a DEFECT still existed, so that
+/// fixing the app would make them fail — the documented signal to retire the matching
+/// fallback in docs/uia-fallback-inventory.md. Issues #15 and #18 are now resolved, so they
+/// have all been inverted to assert the fixed behaviour instead. If a future test asserts a
+/// defect again, keep that convention.
 /// </summary>
 [Trait("Category", "Gui")]
 public class ActionToolsGuiTests(EditorSessionFixture fixture) : IClassFixture<EditorSessionFixture>
@@ -77,8 +79,10 @@ public class ActionToolsGuiTests(EditorSessionFixture fixture) : IClassFixture<E
         }
         finally
         {
-            // Leave no popup open: synthetic clicking is stateful and would derail whichever
-            // test in this class runs next.
+            // Leave no popup open. Less critical than it was — the walk now expands by
+            // pattern rather than clicking, so a leftover popup no longer swallows the next
+            // interaction — but tests in a class share one app instance, so tidying up keeps
+            // them independent of ordering.
             MenuNavigator.DismissOpenMenus(fixture.Session);
         }
     }
@@ -120,18 +124,28 @@ public class ActionToolsGuiTests(EditorSessionFixture fixture) : IClassFixture<E
     }
 
     [Fact]
-    public void TopLevelMenuItemsStillLackInvokeAndExpandCollapse()
+    public void MenuItemsAreOperableByPattern()
     {
-        // Pins the claim in DriveApp.ps1's header. When issue #15 fixes this, THIS TEST
-        // SHOULD FAIL — that is the signal to delete the synthetic-click fallback.
-        var file = Resolve(new Selector(Name: "File", ControlType: "MenuItem"));
+        // Issue #18, fixed. Inverted from asserting the defect: the previous form required
+        // Invoke and ExpandCollapse to be ABSENT and the plan to fall back to a synthetic
+        // click. Avalonia's MenuItemAutomationPeer still implements no providers, so these
+        // come from AccessibleMenuItem.
+        var file = Resolve(new Selector(AutomationId: "MenuFile"));
 
-        Assert.DoesNotContain("Invoke", file.Patterns);
-        Assert.DoesNotContain("ExpandCollapse", file.Patterns);
+        Assert.Contains("Invoke", file.Patterns);
+        Assert.Contains("ExpandCollapse", file.Patterns);
 
         var plan = ActionStrategy.Plan(file, ActionKind.Activate);
-        Assert.Equal("SyntheticClick", plan.Route);
-        Assert.Contains("#15", plan.Warning);
+        Assert.Equal("Pattern", plan.Route);
+        Assert.Equal("Invoke", plan.Pattern);
+        Assert.Null(plan.Warning);
+
+        // Expand must take the pattern route too — that is what removes the need to
+        // synthesise a click, and with it the statefulness traps.
+        var expand = ActionStrategy.Plan(file, ActionKind.Expand);
+        Assert.Equal("Pattern", expand.Route);
+        Assert.Equal("ExpandCollapse", expand.Pattern);
+        Assert.Null(expand.Warning);
     }
 
     [Fact]

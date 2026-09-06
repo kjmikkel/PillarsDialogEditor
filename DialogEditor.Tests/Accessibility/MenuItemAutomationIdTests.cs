@@ -39,11 +39,15 @@ public class MenuItemAutomationIdTests
     }
 
     /// <summary>
-    /// Real menu items only. <c>&lt;MenuItem.ItemContainerTheme&gt;</c> is property-element
+    /// Real menu items only. <c>&lt;…MenuItem.ItemContainerTheme&gt;</c> is property-element
     /// syntax, not a menu item, and parses with that whole string as its local name.
+    ///
+    /// Both type names are accepted so these rules keep applying either way — but a bare
+    /// <c>MenuItem</c> is itself a defect, enforced by
+    /// <see cref="EveryMenuItemIsAnAccessibleMenuItem"/>.
     /// </summary>
     private static IEnumerable<XElement> MenuItems(XDocument doc) =>
-        doc.Descendants().Where(e => e.Name.LocalName == "MenuItem");
+        doc.Descendants().Where(e => e.Name.LocalName is "MenuItem" or "AccessibleMenuItem");
 
     /// <summary>The menu bars and context menus themselves, not their items.</summary>
     private static IEnumerable<XElement> MenuContainers(XDocument doc) =>
@@ -52,6 +56,38 @@ public class MenuItemAutomationIdTests
     private static IEnumerable<string> AxamlFiles(string root) =>
         Directory.EnumerateFiles(root, "*.axaml", SearchOption.AllDirectories)
             .Where(f => !IsExcluded(f, root));
+
+    /// <summary>
+    /// Issue #18: Avalonia's <c>MenuItemAutomationPeer</c> implements no provider interfaces,
+    /// so a plain <c>MenuItem</c> exposes <c>ScrollItem</c> only and cannot be opened or
+    /// activated through UI Automation. <c>AccessibleMenuItem</c> supplies the missing
+    /// <c>IInvokeProvider</c>/<c>IExpandCollapseProvider</c>, so every menu item must be one.
+    ///
+    /// Without this rule a newly added <c>&lt;MenuItem&gt;</c> would be silently
+    /// inoperable — and worse, the other rules in this class would keep passing, since they
+    /// accept either type name.
+    /// </summary>
+    [Fact]
+    public void EveryMenuItemIsAnAccessibleMenuItem()
+    {
+        var root = SolutionRoot();
+        var offenders = new List<string>();
+
+        foreach (var file in AxamlFiles(root))
+        {
+            var doc = XDocument.Load(file, LoadOptions.SetLineInfo);
+            foreach (var el in doc.Descendants().Where(e => e.Name.LocalName == "MenuItem"))
+            {
+                var line = ((IXmlLineInfo)el).HasLineInfo() ? ((IXmlLineInfo)el).LineNumber : 0;
+                offenders.Add($"{Path.GetFileName(file)}:{line}: <MenuItem Header=\"{el.Attribute("Header")?.Value}\"> should be <ctrl:AccessibleMenuItem>");
+            }
+        }
+
+        Assert.True(offenders.Count == 0,
+            "A plain MenuItem cannot be opened or activated through UI Automation, because "
+            + "Avalonia's MenuItemAutomationPeer implements no provider interfaces (issue #18). "
+            + "Use ctrl:AccessibleMenuItem. Offenders:\n" + string.Join("\n", offenders));
+    }
 
     [Fact]
     public void EveryMenuItemCarriesAnAutomationId()
@@ -70,6 +106,8 @@ public class MenuItemAutomationIdTests
                 offenders.Add($"{Path.GetFileName(file)}:{line}: <MenuItem Header=\"{el.Attribute("Header")?.Value}\"> has no AutomationProperties.AutomationId");
             }
         }
+
+        Assert.NotEmpty(AxamlFiles(root).SelectMany(f => MenuItems(XDocument.Load(f))));
 
         Assert.True(offenders.Count == 0,
             "Menu items must carry a stable, non-localised AutomationId so automation and "
