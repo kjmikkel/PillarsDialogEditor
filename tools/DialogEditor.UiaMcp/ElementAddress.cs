@@ -28,8 +28,14 @@ internal static class ElementAddress
             var found = new Resolver(tree).Flatten().FirstOrDefault(e => e.Id == elementId);
             if (found is null)
             {
-                error = $"Error(StaleRef): ref '{reference}' no longer resolves to a live element. " +
-                        "Re-run read_tree.";
+                // Two different causes, and the caller cannot tell them apart from the
+                // ref alone: the element really went away, or the ref belongs to another
+                // window's tree. Saying only "re-run read_tree" would send them back to
+                // the same wrong window to hit the same wall.
+                error = $"Error(StaleRef): ref '{reference}' does not resolve in this window. " +
+                        "Either the element is gone, or the ref was minted against a " +
+                        "different window — pass the same `window` argument you used for " +
+                        "read_tree, or re-run read_tree here.";
                 return false;
             }
             element = found;
