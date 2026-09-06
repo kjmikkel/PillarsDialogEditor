@@ -844,7 +844,7 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        _attributionPath = null;       // HEAD moved → stale blame
+        InvalidateAttribution();       // HEAD moved → stale blame
         _ = LoadProjectAsync(path, offerDeferred: false);
     }
 
@@ -866,11 +866,18 @@ public partial class MainWindowViewModel : ObservableObject
         BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
         CurrentProjectName = null;
         IsModified = false;        // nothing open → not dirty
-        _attributionPath = null;   // force attribution rebuild next time
+        InvalidateAttribution();   // force attribution rebuild next time
         StatusText = statusText;
         SaveProjectCommand.NotifyCanExecuteChanged();
         SaveProjectAsCommand.NotifyCanExecuteChanged();
     }
+
+    /// <summary>
+    /// Drops the cached blame so the next lookup rebuilds. Call whenever HEAD moves under
+    /// an open project — the cache assumes HEAD is stable for the life of the project,
+    /// which stops being true the moment the app commits (#12).
+    /// </summary>
+    public void InvalidateAttribution() => _attributionPath = null;
 
     // Per-node attribution for the node detail panel. Built lazily on first lookup after
     // the project path changes (blame is HEAD-based, so it's stable for the open project).
