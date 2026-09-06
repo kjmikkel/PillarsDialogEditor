@@ -127,6 +127,7 @@
                                                        TextTrimming="CharacterEllipsis"/>
                                             <Button Grid.Column="3"
                                                     Content="{DynamicResource Button_DeleteLink}"
+                                                    AutomationProperties.Name="{DynamicResource AutomationName_DeleteLink}"
                                                     Command="{Binding DataContext.DeleteLinkCommand,
                                                               RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}"

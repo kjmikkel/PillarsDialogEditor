@@ -54,6 +54,36 @@ public class ActionToolsGuiTests(EditorSessionFixture fixture) : IClassFixture<E
     }
 
     [Fact]
+    public void GlyphOnlyMenuItemsAnnounceRealNames()
+    {
+        // Issue #15 finding 3, fixed. Edit ▸ Undo/Redo show "↩"/"↪" but must SPEAK words.
+        // AutomationNameTests enforces the markup by resolving the resource; this pins that
+        // the name reaches the UIA tree, which a markup scan cannot show.
+        //
+        // The menu must be OPENED first: a popup's children do not exist in the tree until
+        // then, so resolving against a closed menu returns NotFound. Navigating by
+        // AutomationId also exercises the finding-4 fix.
+        try
+        {
+            Assert.True(MenuNavigator.TryWalk(
+                fixture.Session, ["MenuEdit", "MenuEdit_Undo"], out var undo, out _, out var error),
+                error);
+            Assert.Equal("Undo", undo.Name);
+
+            Assert.True(MenuNavigator.TryWalk(
+                fixture.Session, ["MenuEdit", "MenuEdit_Redo"], out var redo, out _, out error),
+                error);
+            Assert.Equal("Redo", redo.Name);
+        }
+        finally
+        {
+            // Leave no popup open: synthetic clicking is stateful and would derail whichever
+            // test in this class runs next.
+            MenuNavigator.DismissOpenMenus(fixture.Session);
+        }
+    }
+
+    [Fact]
     public void AmbiguousNamesAreRefusedRatherThanGuessed()
     {
         var result = new Resolver(fixture.Session.Tree())

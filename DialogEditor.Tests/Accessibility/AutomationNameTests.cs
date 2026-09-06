@@ -96,6 +96,100 @@ public class AutomationNameTests
     }
 
     /// <summary>
+    /// The same rule as <see cref="IconOnlyButtonsCarryLocalizedAutomationName"/>, but for
+    /// glyphs that arrive through a RESOURCE rather than as an inline literal — and for
+    /// <c>MenuItem</c> headers, which that test does not look at.
+    ///
+    /// The gap this closes: the icon-only-Button test skips any Content beginning with '{',
+    /// on the assumption that a markup extension means real localised text. That assumption
+    /// is wrong when the resource's own VALUE is a glyph. Edit ▸ Undo/Redo are
+    /// <c>Header="{DynamicResource Button_Undo}"</c> where <c>Button_Undo</c> is "↩", so a
+    /// screen reader announces a piece of punctuation (issue #15 finding 3) — and the same
+    /// held for the Diff viewer's "?" button and the delete-link "✕".
+    ///
+    /// So this test resolves keys against Strings.axaml and judges the resolved text. An
+    /// AutomationProperties.Name is still required to come from a resource, since it is
+    /// spoken to the user.
+    /// </summary>
+    [Fact]
+    public void GlyphOnlyHeadersAndContentCarryLocalizedAutomationName()
+    {
+        var root = SolutionRoot();
+        var strings = LoadStringResources(root);
+        var offenders = new List<string>();
+
+        foreach (var file in Directory.EnumerateFiles(root, "*.axaml", SearchOption.AllDirectories))
+        {
+            if (IsExcluded(file, root)) continue;
+            var doc = XDocument.Load(file, LoadOptions.SetLineInfo);
+
+            foreach (var el in doc.Descendants()
+                         .Where(e => e.Name.LocalName is "Button" or "ToggleButton" or "MenuItem"))
+            {
+                var raw = el.Attribute("Content")?.Value ?? el.Attribute("Header")?.Value;
+                if (raw is null) continue;
+
+                var text = ResolveResourceText(raw, strings);
+                if (text is null) continue;                     // a binding, or an unknown key
+                if (text.Length == 0) continue;
+                if (text.Any(char.IsLetterOrDigit)) continue;   // real text, not a glyph
+
+                if (IsLocalizedResourceReference(el.Attribute("AutomationProperties.Name")?.Value))
+                    continue;
+
+                var line = ((IXmlLineInfo)el).HasLineInfo() ? ((IXmlLineInfo)el).LineNumber : 0;
+                offenders.Add($"{Path.GetFileName(file)}:{line}: <{el.Name.LocalName}> shows only the glyph \"{text}\" (from {raw}) and has no localized AutomationProperties.Name");
+            }
+        }
+
+        Assert.True(offenders.Count == 0,
+            "A control whose visible text is only a glyph is announced as punctuation, no "
+            + "matter how good its tooltip is — a ToolTip/HelpText is supplementary, not the "
+            + "accessible name. Add AutomationProperties.Name bound to a localized resource. "
+            + "Offenders:\n" + string.Join("\n", offenders));
+    }
+
+    /// <summary>Key to value for every &lt;sys:String&gt; in the app's resource dictionaries.</summary>
+    private static Dictionary<string, string> LoadStringResources(string root)
+    {
+        var map = new Dictionary<string, string>(StringComparer.Ordinal);
+
+        foreach (var file in Directory.EnumerateFiles(root, "Strings.axaml", SearchOption.AllDirectories))
+        {
+            if (IsExcluded(file, root)) continue;
+            foreach (var el in XDocument.Load(file).Descendants()
+                         .Where(e => e.Name.LocalName == "String"))
+            {
+                var key = el.Attributes().FirstOrDefault(a => a.Name.LocalName == "Key")?.Value;
+                if (key is not null) map[key] = el.Value;
+            }
+        }
+
+        Assert.NotEmpty(map);   // a silently empty map would make this test vacuous
+        return map;
+    }
+
+    /// <summary>
+    /// The text a control actually displays: an inline literal as-is, a resource key resolved
+    /// through <paramref name="strings"/>, or null when it cannot be known statically (a
+    /// binding, or a key defined outside the scanned dictionaries).
+    /// </summary>
+    private static string? ResolveResourceText(string raw, Dictionary<string, string> strings)
+    {
+        var value = raw.Trim();
+        if (!value.StartsWith('{')) return value;
+
+        foreach (var prefix in new[] { "{DynamicResource ", "{StaticResource " })
+        {
+            if (!value.StartsWith(prefix, StringComparison.Ordinal)) continue;
+            var key = value[prefix.Length..].TrimEnd('}').Trim();
+            return strings.TryGetValue(key, out var resolved) ? resolved : null;
+        }
+
+        return null;   // {Binding ...} and friends
+    }
+
+    /// <summary>
     /// Gaps.md accessibility item 2: form fields are labelled by *adjacent* TextBlocks
     /// with no programmatic association, so every TextBox/ComboBox/AutoCompleteBox/
     /// NumericUpDown reads as an unlabeled "edit" to a screen reader. Each must carry
