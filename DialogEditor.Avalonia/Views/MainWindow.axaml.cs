@@ -738,6 +738,9 @@ public partial class MainWindow : Window
         {
             EnsureNoUnsavedEdits  = () => vm.EnsureNoUnsavedEditsAsync(),
             ReloadProjectFromDisk = () => vm.ReloadCurrentProjectFromDisk(),
+            // A commit moves HEAD without touching the working tree, so there is nothing
+            // to reload — only the HEAD-derived blame cache to drop (#12).
+            HeadMoved             = () => vm.InvalidateAttribution(),
         };
 
         var window = new BranchesWindow(branchesVm);
