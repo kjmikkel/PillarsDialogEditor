@@ -8,6 +8,13 @@ public record WindowInfo(
     string Id,
     string Title,
     string AutomationId,
+    /// <summary>
+    /// Avalonia sets this to the Window subclass name ('SettingsWindow', 'AboutWindow'),
+    /// so it is a locale-stable key available on every window today — unlike AutomationId,
+    /// which no Window carries yet. Defaults to empty so the many existing constructions
+    /// stay valid.
+    /// </summary>
+    string ClassName = "",
     bool IsMain = false,
     bool IsModal = false);
 
@@ -19,6 +26,13 @@ public record WindowResolveResult(WindowInfo? Window, string? ErrorKind, string?
 
 public sealed class WindowResolver(IReadOnlyList<WindowInfo> windows)
 {
+    private static readonly (string Field, Func<WindowInfo, string> Key)[] Tiers =
+    [
+        ("automationId", w => w.AutomationId),
+        ("className", w => w.ClassName),
+        ("title", w => w.Title),
+    ];
+
     public WindowResolveResult Resolve(string? selector)
     {
         if (selector is null)
@@ -29,18 +43,26 @@ public sealed class WindowResolver(IReadOnlyList<WindowInfo> windows)
                 : WindowResolveResult.Ok(main);
         }
 
-        var byId = windows.Where(w =>
-            string.Equals(w.AutomationId, selector, StringComparison.Ordinal)).ToList();
-        if (byId.Count == 1) return WindowResolveResult.Ok(byId[0]);
-        if (byId.Count > 1) return Ambiguous(selector, byId, "automationId");
+        // Three tiers, most-stable first. AutomationId is a declared contract; ClassName
+        // is locale-stable but incidental (a C# class rename moves it silently); the title
+        // is localised and moves with the UI language. A window is matched on the first
+        // tier that hits, so a window merely TITLED like another's class cannot outrank it.
+        foreach (var (field, key) in Tiers)
+        {
+            // An empty key never matches. Every Window in the app currently has an empty
+            // AutomationId, so without this an empty selector would "match" all of them
+            // and report ambiguity instead of asking for a real selector.
+            var hits = windows
+                .Where(w => key(w).Length > 0 && string.Equals(key(w), selector, StringComparison.Ordinal))
+                .ToList();
 
-        var byTitle = windows.Where(w =>
-            string.Equals(w.Title, selector, StringComparison.Ordinal)).ToList();
-        if (byTitle.Count == 1) return WindowResolveResult.Ok(byTitle[0]);
-        if (byTitle.Count > 1) return Ambiguous(selector, byTitle, "title");
+            if (hits.Count == 1) return WindowResolveResult.Ok(hits[0]);
+            if (hits.Count > 1) return Ambiguous(selector, hits, field);
+        }
 
         return WindowResolveResult.Error("NotFound",
-            $"No window matched '{selector}' by automationId or title. Open windows: {Describe()}.");
+            $"No window matched '{selector}' by automationId, className or title. " +
+            $"Open windows: {Describe()}.");
     }
 
     /// <summary>
@@ -81,7 +103,8 @@ public sealed class WindowResolver(IReadOnlyList<WindowInfo> windows)
 
     private static WindowResolveResult Ambiguous(string selector, List<WindowInfo> hits, string field)
     {
-        var listed = string.Join(", ", hits.Select(w => $"title='{w.Title}' automationId='{w.AutomationId}'"));
+        var listed = string.Join(", ", hits.Select(w =>
+            $"title='{w.Title}' automationId='{w.AutomationId}' className='{w.ClassName}'"));
         return WindowResolveResult.Error("Ambiguous",
             $"{hits.Count} windows share the {field} '{selector}'; refusing to guess which one you " +
             $"meant. Candidates: {listed}.");
@@ -89,5 +112,6 @@ public sealed class WindowResolver(IReadOnlyList<WindowInfo> windows)
 
     private string Describe() =>
         string.Join(", ", windows.Select(w =>
-            $"'{w.Title}' (automationId='{w.AutomationId}'{(w.IsMain ? ", main" : "")})"));
+            $"'{w.Title}' (automationId='{w.AutomationId}' className='{w.ClassName}'" +
+            $"{(w.IsMain ? ", main" : "")}{(w.IsModal ? ", modal" : "")})"));
 }
