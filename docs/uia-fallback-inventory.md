@@ -11,7 +11,7 @@ permanent furniture.
 | 2 | Synthetic click to activate a menu command | Same — the leaf item has no `Invoke` either | #15, same fix | same test |
 | ~~3~~ | ~~Synthetic click to select a conversation row~~ | **RESOLVED 2026-09-05.** Rows are named from their data and a custom automation peer supplies `SelectionItem`/`ExpandCollapse` | — | `ActionToolsGuiTests.ConversationRowsAreSelectableAndExpandableByPattern` + `ActivatingAConversationRowUsesAPatternNotASyntheticClick` |
 | ~~4~~ | ~~Menu addressing by localised `Name`~~ | **RESOLVED 2026-09-05.** All 51 menu items (and 9 context-menu items) now carry stable non-localised `AutomationId`s; `MenuNavigator` matches id first, then name | — | `MenuItemAutomationIdTests` (markup) + `ActionToolsGuiTests.MenuItemsExposeStableAutomationIdsToUia` (live tree) |
-| 5 | App menu located by `ClassName='Menu'` | The app's `Menu` element is anonymous | #15 names the menu | `ActionToolsGuiTests.TheAppMenuIsFoundAndExcludesTheOsSystemItem` (would need inverting) |
+| ~~5~~ | ~~App menu located by `ClassName='Menu'`~~ | **RESOLVED 2026-09-05.** The menu bar carries `AutomationId='MainMenu'` and the name "Main menu"; all six call sites now address it by id | — | `MenuItemAutomationIdTests.EveryMenuContainerCarriesAnAutomationId` + `ActionToolsGuiTests.TheAppMenuIsFoundAndExcludesTheOsSystemItem` |
 | 6 | `FocusAndType` in `set_value` | Some fields expose no `Value` pattern | per-control, as found | none — data-dependent |
 | 7 | `{ESC}` dismissal before every menu walk | Synthetic clicking is stateful; a leftover popup swallows the next click | fallbacks 1–2 gone | none — becomes unnecessary rather than wrong |
 
@@ -59,6 +59,27 @@ Two traps worth remembering if this is ever revisited:
 Verified live: `SelectionItem` and `ExpandCollapse` both present, `Select()` flips `IsSelected`
 False → True, `invoke` reports `ok: used the SelectionItem pattern.` with no warning, and a
 screenshot confirms the row highlights with no visual regression.
+
+**#5 — app menu located by `ClassName='Menu'` (2026-09-05).** Issue #15 finding 5. The menu
+bar was anonymous, so the only handle was its framework class name — and that scoping is what
+keeps the title bar's OS "System" item from being treated as a peer of
+File/Edit/View/Test/Help. Depending on an Avalonia class name for something that load-bearing
+was fragile.
+
+It now carries `AutomationProperties.AutomationId="MainMenu"` plus a localised
+`AutomationProperties.Name` ("Main menu") for assistive tech. The `ClassName` lookup is
+**deleted**, not softened, from all six call sites: `MenuNavigator`, `InspectionTools`, two Gui
+tests and `DriveApp.ps1`'s `Get-MenuItemStates`. `MenuNavigator.FindAppMenu` is now the single
+shared lookup rather than the same predicate written twice.
+
+The three `ContextMenu` containers in `ConversationView.axaml` were equally anonymous and got
+ids too (`CanvasContextMenu`, `NodeContextMenu`, `ConnectionContextMenu`), matching their
+items' prefixes — a caller can now scope a query to one context menu. They get **no** spoken
+name on purpose: assistive tech announces a context menu by role, and their items carry the
+meaning, so a name would only be announced redundantly.
+
+Verified live via both paths — the server's `menu` tool and `DriveApp.ps1` — each returning
+exactly five top-level items with no `System`, and the bar announcing "Main menu".
 
 ## How to remove one
 

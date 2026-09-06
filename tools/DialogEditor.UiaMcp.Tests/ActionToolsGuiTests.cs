@@ -26,7 +26,7 @@ public class ActionToolsGuiTests(EditorSessionFixture fixture) : IClassFixture<E
     public void TheAppMenuIsFoundAndExcludesTheOsSystemItem()
     {
         var all = new Resolver(fixture.Session.Tree()).Flatten();
-        var appMenu = all.Single(e => e.ClassName == "Menu" && e.ControlType == "Menu");
+        var appMenu = all.Single(e => e is { ControlType: "Menu", AutomationId: "MainMenu" });
 
         var tops = fixture.Session.Tree().ChildrenOf(appMenu.Id)
             .Where(c => c.ControlType == "MenuItem").Select(c => c.Name).ToList();
@@ -41,7 +41,7 @@ public class ActionToolsGuiTests(EditorSessionFixture fixture) : IClassFixture<E
         // Issue #15 finding 4, fixed. MenuItemAutomationIdTests enforces the markup; this
         // pins that the ids actually REACH the UIA tree, which markup alone cannot prove.
         var all = new Resolver(fixture.Session.Tree()).Flatten();
-        var appMenu = all.Single(e => e.ClassName == "Menu" && e.ControlType == "Menu");
+        var appMenu = all.Single(e => e is { ControlType: "Menu", AutomationId: "MainMenu" });
         var tops = fixture.Session.Tree().ChildrenOf(appMenu.Id)
             .Where(c => c.ControlType == "MenuItem").ToList();
 
