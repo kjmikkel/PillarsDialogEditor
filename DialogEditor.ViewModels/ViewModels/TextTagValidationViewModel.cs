@@ -101,8 +101,8 @@ public partial class TextTagValidationViewModel : ObservableObject
     private readonly Action<IReadOnlyList<StaleDataRow>>? _prune;
     private readonly string _primaryLanguage;
 
-    private readonly Func<double, DuplicateLineReport>? _dupScan;
-    private readonly Action<double>? _persistNearThreshold;
+    private readonly Func<DuplicateScanOptions, DuplicateLineReport>? _dupScan;
+    private readonly Action<DuplicateScanOptions>? _persistDuplicateOptions;
     private readonly Func<IReadOnlyList<IgnoredDuplicate>>? _ignoredList;
     private readonly Action<IgnoredDuplicate>? _ignore;
     private readonly Action<IgnoredDuplicate>? _unignore;
@@ -141,6 +141,19 @@ public partial class TextTagValidationViewModel : ObservableObject
 
     [ObservableProperty] private double _nearThreshold = DuplicateLineScanner.DefaultNearThreshold;
 
+    // Scope toggles (issue #14). Both default OFF so the historical report — primary
+    // language, Default text only — is what the writer gets unasked. Female text and
+    // other languages were always present in patch.Translations; the scan simply
+    // discarded them.
+    [ObservableProperty] private bool _includeFemaleText;
+    [ObservableProperty] private bool _includeOtherLanguages;
+
+    /// The three scan options as one value. They travel together into the scan delegate
+    /// and back out through the persist callback, so the constructor takes one record
+    /// rather than three initial values and three callbacks.
+    public DuplicateScanOptions DuplicateOptions =>
+        new(NearThreshold, IncludeFemaleText, IncludeOtherLanguages);
+
     public RelayCommand CleanUpStaleCommand        { get; }
     public RelayCommand ConfirmCleanUpStaleCommand { get; }
     public RelayCommand CancelCleanUpStaleCommand  { get; }
@@ -158,13 +171,13 @@ public partial class TextTagValidationViewModel : ObservableObject
         Action<IReadOnlyList<StaleDataRow>>? prune = null,
         bool canCheckGameFiles = false,
         string primaryLanguage = "",
-        Func<double, DuplicateLineReport>? dupScan = null,
+        Func<DuplicateScanOptions, DuplicateLineReport>? dupScan = null,
         Func<IReadOnlyList<IgnoredDuplicate>>? ignoredList = null,
         Action<IgnoredDuplicate>? ignore = null,
         Action<IgnoredDuplicate>? unignore = null,
         Action<string, int>? navigate = null,
-        double nearThreshold = DuplicateLineScanner.DefaultNearThreshold,
-        Action<double>? persistNearThreshold = null)
+        DuplicateScanOptions? duplicateOptions = null,
+        Action<DuplicateScanOptions>? persistDuplicateOptions = null)
     {
         _scan             = scan;
         _addWord          = addWord;
@@ -173,11 +186,14 @@ public partial class TextTagValidationViewModel : ObservableObject
         CanCheckGameFiles = canCheckGameFiles;
         _primaryLanguage  = primaryLanguage;
         _dupScan          = dupScan;
-        // Assign the backing field directly, and BEFORE the Refresh() below:
-        // the property setter would persist a value we were just handed, and
-        // the constructor's scan reads this field.
-        _nearThreshold         = nearThreshold;
-        _persistNearThreshold  = persistNearThreshold;
+        // Assign the backing fields directly, and BEFORE the Refresh() below: the
+        // property setters would persist values we were just handed, and the
+        // constructor's scan reads all three.
+        var initial              = duplicateOptions ?? new DuplicateScanOptions();
+        _nearThreshold           = initial.NearThreshold;
+        _includeFemaleText       = initial.IncludeFemaleText;
+        _includeOtherLanguages   = initial.IncludeOtherLanguages;
+        _persistDuplicateOptions = persistDuplicateOptions;
         _ignoredList      = ignoredList;
         _ignore           = ignore;
         _unignore         = unignore;
@@ -214,14 +230,13 @@ public partial class TextTagValidationViewModel : ObservableObject
         DuplicateRows.Clear();
         if (_dupScan is not null)
         {
-            var report = _dupScan(NearThreshold);
+            var report = _dupScan(DuplicateOptions);
 
             foreach (var g in report.Exact)
             {
                 var entry     = new IgnoredDuplicate(DuplicateKind.Exact, [g.Key], g.SampleText);
                 var primary   = g.Members[0];
-                var locations = string.Join(", ", g.Members.Select(
-                    m => Loc.Format("Duplicate_Location", m.ConversationName, m.NodeId)));
+                var locations = string.Join(", ", g.Members.Select(Describe));
                 DuplicateRows.Add(new DuplicateRowViewModel(
                     Loc.Get("Duplicate_Tier_Exact"), g.SampleText, locations,
                     () => _navigate?.Invoke(primary.ConversationName, primary.NodeId),
@@ -232,8 +247,7 @@ public partial class TextTagValidationViewModel : ObservableObject
             {
                 var display   = Loc.Format("Duplicate_NearDisplay", p.A.Text, p.B.Text);
                 var entry     = new IgnoredDuplicate(DuplicateKind.Near, p.Key, display);
-                var locations = Loc.Format("Duplicate_Location", p.A.ConversationName, p.A.NodeId)
-                              + ", " + Loc.Format("Duplicate_Location", p.B.ConversationName, p.B.NodeId);
+                var locations = Describe(p.A) + ", " + Describe(p.B);
                 DuplicateRows.Add(new DuplicateRowViewModel(
                     Loc.Format("Duplicate_Tier_Near", p.SimilarityPercent), display, locations,
                     () => _navigate?.Invoke(p.A.ConversationName, p.A.NodeId),
@@ -280,11 +294,35 @@ public partial class TextTagValidationViewModel : ObservableObject
         RaiseStaleCommandStates();
     }
 
+    /// Where a duplicate was found. A primary-language Default line renders exactly as
+    /// it always did, so widening the scope leaves existing rows untouched; anything else
+    /// gains a source marker, because "these two lines match" is unactionable when the
+    /// reader cannot tell which field or language matched. Language follows the
+    /// convention used by the tag rows above: "" means primary.
+    private static string Describe(LineRef r)
+    {
+        var where = Loc.Format("Duplicate_Location", r.ConversationName, r.NodeId);
+        var source = (r.Language.Length > 0, r.IsFemale) switch
+        {
+            (false, false) => "",
+            (false, true)  => Loc.Get("Duplicate_Source_Female"),
+            (true,  false) => r.Language,
+            (true,  true)  => Loc.Format("Duplicate_Source_LanguageFemale", r.Language),
+        };
+        return source.Length == 0 ? where : Loc.Format("Duplicate_Source", where, source);
+    }
+
     partial void OnCheckGameFilesChanged(bool value) => RefreshStale();
 
-    partial void OnNearThresholdChanged(double value)
+    // Each of the three re-scans immediately and persists the whole option set —
+    // the report is the only way to judge whether a scope change was the right call.
+    partial void OnNearThresholdChanged(double value)         => OnDuplicateOptionChanged();
+    partial void OnIncludeFemaleTextChanged(bool value)       => OnDuplicateOptionChanged();
+    partial void OnIncludeOtherLanguagesChanged(bool value)   => OnDuplicateOptionChanged();
+
+    private void OnDuplicateOptionChanged()
     {
-        _persistNearThreshold?.Invoke(value);
+        _persistDuplicateOptions?.Invoke(DuplicateOptions);
         RefreshDuplicates();
     }
     partial void OnHasStaleDataChanged(bool value) => RaiseStaleCommandStates();

@@ -288,6 +288,23 @@ public class AppSettingsAnalysisTests : IDisposable
         Assert.Equal(0.75, AppSettings.NearDuplicateThreshold);
     }
 
+    [Fact] // Widened duplicate scope is opt-in: an upgrading install sees no change.
+    public void DuplicateScopeFlags_DefaultToFalse()
+    {
+        Assert.False(AppSettings.DuplicateIncludeFemaleText);
+        Assert.False(AppSettings.DuplicateIncludeOtherLanguages);
+    }
+
+    [Fact]
+    public void DuplicateScopeFlags_RoundTrip()
+    {
+        AppSettings.DuplicateIncludeFemaleText     = true;
+        AppSettings.DuplicateIncludeOtherLanguages = true;
+
+        Assert.True(AppSettings.DuplicateIncludeFemaleText);
+        Assert.True(AppSettings.DuplicateIncludeOtherLanguages);
+    }
+
     [Fact] // The two are independent keys, not one shared blob.
     public void BothKnobs_PersistIndependently()
     {

@@ -57,7 +57,7 @@ public class TextTagValidationWindowTests
         var seen = new List<double>();
         var vm = new TextTagValidationViewModel(
             scan: () => [],
-            dupScan: t => { seen.Add(t); return new DuplicateLineReport([], []); });
+            dupScan: o => { seen.Add(o.NearThreshold); return new DuplicateLineReport([], []); });
 
         var window = new TextTagValidationWindow(vm);
         window.Show();
@@ -71,6 +71,39 @@ public class TextTagValidationWindowTests
 
         Assert.Equal(0.75, vm.NearThreshold);
         Assert.Equal(0.75, Assert.Single(seen));
+        window.Close();
+    }
+
+    /// The scope toggles are the only way to widen the sweep from the UI, so pin that
+    /// they are bound both ways and that ticking one re-scans with the new scope.
+    [AvaloniaFact]
+    public void Window_BindsScopeToggles_AndTickingReScans()
+    {
+        var seen = new List<DuplicateScanOptions>();
+        var vm = new TextTagValidationViewModel(
+            scan: () => [],
+            dupScan: o => { seen.Add(o); return new DuplicateLineReport([], []); });
+
+        var window = new TextTagValidationWindow(vm);
+        window.Show();
+
+        var female = window.FindControl<CheckBox>("IncludeFemaleCheckBox");
+        var langs  = window.FindControl<CheckBox>("IncludeOtherLanguagesCheckBox");
+        Assert.NotNull(female);
+        Assert.NotNull(langs);
+        Assert.False(female!.IsChecked);
+        Assert.False(langs!.IsChecked);
+
+        seen.Clear();
+        female.IsChecked = true;
+        Assert.True(vm.IncludeFemaleText);
+        Assert.True(Assert.Single(seen).IncludeFemaleText);
+
+        seen.Clear();
+        langs.IsChecked = true;
+        Assert.True(vm.IncludeOtherLanguages);
+        Assert.True(Assert.Single(seen).IncludeOtherLanguages);
+
         window.Close();
     }
 }
