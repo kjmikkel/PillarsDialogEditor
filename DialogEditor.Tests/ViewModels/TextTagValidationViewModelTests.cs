@@ -1,4 +1,4 @@
-using DialogEditor.Patch;
+﻿using DialogEditor.Patch;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
@@ -97,7 +97,7 @@ public class TextTagValidationViewModelTests
     {
         var vm = new TextTagValidationViewModel(
             scan: () => [],
-            dupScan: OneExact);
+            dupScan: _ => OneExact());
 
         Assert.True(vm.HasDuplicates);
         var row = Assert.Single(vm.DuplicateRows);
@@ -111,7 +111,7 @@ public class TextTagValidationViewModelTests
         var report = OneExact();
         var vm = new TextTagValidationViewModel(
             scan: () => [],
-            dupScan: () => ignored is null ? report : new DuplicateLineReport([], []),
+            dupScan: _ => ignored is null ? report : new DuplicateLineReport([], []),
             ignore: e => ignored = e);
 
         vm.DuplicateRows[0].IgnoreCommand.Execute(null);
@@ -137,5 +137,75 @@ public class TextTagValidationViewModelTests
 
         row.RestoreCommand.Execute(null);
         Assert.Equal(entry, restored);
+    }
+
+    // ── Configurable near-duplicate threshold (issue #14) ────────────────────
+
+    [Fact] // Omitting the ctor argument keeps the historical 0.85 bar.
+    public void NearThreshold_DefaultsToScannerDefault()
+    {
+        var vm = new TextTagValidationViewModel(scan: () => []);
+
+        Assert.Equal(DuplicateLineScanner.DefaultNearThreshold, vm.NearThreshold);
+    }
+
+    /// The constructor calls Refresh(), so the threshold field has to be assigned before
+    /// that — otherwise the very first duplicate scan runs with 0 and reports nonsense.
+    [Fact]
+    public void NearThreshold_InitialValue_ReachesTheConstructorScan()
+    {
+        var seen = new List<double>();
+        _ = new TextTagValidationViewModel(
+            scan: () => [],
+            dupScan: t => { seen.Add(t); return new DuplicateLineReport([], []); },
+            nearThreshold: 0.75);
+
+        Assert.Equal(0.75, Assert.Single(seen));
+    }
+
+    [Fact] // The preset list the ComboBox binds to must offer the default.
+    public void NearThresholdOptions_IncludeTheDefault()
+    {
+        var vm = new TextTagValidationViewModel(scan: () => []);
+
+        Assert.Contains(DuplicateLineScanner.DefaultNearThreshold, vm.NearThresholdOptions);
+        Assert.All(vm.NearThresholdOptions, t => Assert.InRange(t, 0.0, 1.0));
+    }
+
+    [Fact] // Modelled on CheckGameFiles_Toggle_PassesFlagToStaleScan.
+    public void NearThreshold_Change_PassesNewValueToDupScan()
+    {
+        var seen = new List<double>();
+        var vm = new TextTagValidationViewModel(
+            scan: () => [],
+            dupScan: t => { seen.Add(t); return new DuplicateLineReport([], []); });
+        seen.Clear();
+
+        vm.NearThreshold = 0.70;
+
+        Assert.Equal(0.70, Assert.Single(seen));
+    }
+
+    [Fact] // Persistence is the caller's job; the VM just reports the change.
+    public void NearThreshold_Change_InvokesPersistCallback()
+    {
+        var persisted = 0.0;
+        var vm = new TextTagValidationViewModel(
+            scan: () => [],
+            persistNearThreshold: v => persisted = v);
+
+        vm.NearThreshold = 0.95;
+
+        Assert.Equal(0.95, persisted);
+    }
+
+    [Fact] // No callback wired (the unit-test default) must not throw.
+    public void NearThreshold_Change_WithoutPersistCallback_DoesNotThrow()
+    {
+        var vm = new TextTagValidationViewModel(scan: () => []);
+
+        vm.NearThreshold = 0.80;
+
+        Assert.Equal(0.80, vm.NearThreshold);
     }
 }

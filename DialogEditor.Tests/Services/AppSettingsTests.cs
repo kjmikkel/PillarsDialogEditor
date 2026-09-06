@@ -1,4 +1,4 @@
-using DialogEditor.Core.GameData;
+﻿using DialogEditor.Core.GameData;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.Services;
@@ -245,5 +245,56 @@ public class AppSettingsGuidedTourTests : IDisposable
         AppSettings.SettingsPathOverride = path;
 
         Assert.True(AppSettings.DiffWindowSeen);
+    }
+}
+
+/// The two analysis knobs from issue #14. Unlike FontScale these take effect immediately
+/// in the window that shows the result, so there is no "next launch" caveat to encode.
+public class AppSettingsAnalysisTests : IDisposable
+{
+    public AppSettingsAnalysisTests()
+        => AppSettings.SettingsPathOverride = Path.GetTempFileName();
+
+    public void Dispose()
+    {
+        var path = AppSettings.SettingsPathOverride;
+        AppSettings.SettingsPathOverride = null;
+        if (path is not null) File.Delete(path);
+    }
+
+    [Fact]
+    public void ReadingWordsPerMinute_DefaultsTo200()
+    {
+        Assert.Equal(200, AppSettings.ReadingWordsPerMinute);
+    }
+
+    [Fact]
+    public void ReadingWordsPerMinute_RoundTrips()
+    {
+        AppSettings.ReadingWordsPerMinute = 120;
+        Assert.Equal(120, AppSettings.ReadingWordsPerMinute);
+    }
+
+    [Fact]
+    public void NearDuplicateThreshold_DefaultsTo085()
+    {
+        Assert.Equal(0.85, AppSettings.NearDuplicateThreshold);
+    }
+
+    [Fact]
+    public void NearDuplicateThreshold_RoundTrips()
+    {
+        AppSettings.NearDuplicateThreshold = 0.75;
+        Assert.Equal(0.75, AppSettings.NearDuplicateThreshold);
+    }
+
+    [Fact] // The two are independent keys, not one shared blob.
+    public void BothKnobs_PersistIndependently()
+    {
+        AppSettings.ReadingWordsPerMinute  = 300;
+        AppSettings.NearDuplicateThreshold = 0.95;
+
+        Assert.Equal(300, AppSettings.ReadingWordsPerMinute);
+        Assert.Equal(0.95, AppSettings.NearDuplicateThreshold);
     }
 }

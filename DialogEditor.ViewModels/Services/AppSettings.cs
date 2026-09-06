@@ -1,4 +1,4 @@
-using System.IO;
+﻿using System.IO;
 using System.Text.Json;
 using DialogEditor.Core.GameData;
 
@@ -71,6 +71,18 @@ public static class AppSettings
         // means "no baseline yet" — covers both a fresh install and the first upgrade
         // that adds this key; both set the baseline silently (see design 2026-07-07).
         public string LastSeenVersion                { get; set; } = "";
+        // ── Analysis knobs (issue #14) ───────────────────────────────────────
+        // Both were hard-coded constants until they were exposed inline in the window
+        // that shows the result. Unlike FontScale these apply immediately (the owning
+        // window re-scans on change), so there is no "next launch" caveat. Values are
+        // written verbatim — settings.json is hand-editable, so each consumer clamps
+        // defensively rather than trusting what it reads back.
+        //
+        // Reading speed for path-stats reading times (PathStatsFormat.ReadingTime).
+        public int ReadingWordsPerMinute { get; set; } = 200;
+        // Similarity bar for the near-duplicate tier (DuplicateLineScanner.Scan).
+        public double NearDuplicateThreshold { get; set; } = 0.85;
+
         // MRU list of recently opened/created/saved-as project file paths, newest
         // first, capped at MaxRecentProjects. Powers File ▸ Recent Projects.
         public List<string> RecentProjects { get; set; } = [];
@@ -235,6 +247,22 @@ public static class AppSettings
     {
         get => Load().FontScale;
         set { var s = Load(); s.FontScale = value; Save(s); }
+    }
+
+    /// Reading speed (words per minute) used to turn path-stats word counts into m:ss.
+    /// See PathStatsFormat.DefaultWordsPerMinute for the baseline.
+    public static int ReadingWordsPerMinute
+    {
+        get => Load().ReadingWordsPerMinute;
+        set { var s = Load(); s.ReadingWordsPerMinute = value; Save(s); }
+    }
+
+    /// Similarity bar (0..1) above which two lines are reported as near-duplicates.
+    /// See DuplicateLineScanner.DefaultNearThreshold for the baseline.
+    public static double NearDuplicateThreshold
+    {
+        get => Load().NearDuplicateThreshold;
+        set { var s = Load(); s.NearDuplicateThreshold = value; Save(s); }
     }
 
     public static bool ThemeOnboardingSeen

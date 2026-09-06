@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
         xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
@@ -97,10 +97,32 @@
 
             <!-- ── Playthrough stats ─────────────────────────────────────── -->
             <StackPanel Spacing="4" IsVisible="{Binding HasPathStats}">
-                <TextBlock Classes="section-header"
-                           Text="{DynamicResource PathStats_Header}"
-                           ToolTip.Tip="{DynamicResource ToolTip_PathStats}"
-                           AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats}"/>
+                <!-- The reading speed sits here rather than in Settings because it is only
+                     meaningful next to the times it changes: the writer adjusts it and reads
+                     the result in the same glance. Changing it re-runs the analysis. -->
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Grid.Column="0"
+                               Classes="section-header"
+                               VerticalAlignment="Center"
+                               Text="{DynamicResource PathStats_Header}"
+                               ToolTip.Tip="{DynamicResource ToolTip_PathStats}"
+                               AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats}"/>
+                    <ComboBox Grid.Column="1"
+                              x:Name="ReadingSpeedComboBox"
+                              ItemsSource="{Binding WordsPerMinuteOptions}"
+                              SelectedItem="{Binding WordsPerMinute, Mode=TwoWay}"
+                              MinWidth="110"
+                              FontSize="{DynamicResource FontSize.Small}"
+                              ToolTip.Tip="{DynamicResource PathStats_ReadingSpeedTooltip}"
+                              AutomationProperties.Name="{DynamicResource PathStats_ReadingSpeed}"
+                              AutomationProperties.HelpText="{DynamicResource PathStats_ReadingSpeedTooltip}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource WordsPerMinute}}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </Grid>
 
                 <Grid ColumnDefinitions="*,*,*">
                     <StackPanel Grid.Column="0">

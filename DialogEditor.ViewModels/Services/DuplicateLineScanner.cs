@@ -1,4 +1,4 @@
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
 using DialogEditor.Patch;
 
 namespace DialogEditor.ViewModels.Services;
@@ -26,13 +26,32 @@ public record DuplicateLineReport(
 /// </summary>
 public static class DuplicateLineScanner
 {
-    private const double NearThreshold = 0.85;
-    private const int    MinWords      = 4;
+    /// The historical bar, and the default when no configured value is supplied.
+    public const double DefaultNearThreshold = 0.85;
+
+    // The configured threshold is clamped to this range. The lower bound is not taste:
+    // the length-blocking break below divides by the threshold, so a value at or near
+    // zero makes the divisor huge (or infinite) and degrades this scan to a full O(n^2)
+    // Levenshtein sweep. The upper bound keeps a "100%" setting from silently meaning
+    // "exact only", which the Exact tier already covers.
+    private const double MinNearThreshold = 0.50;
+    private const double MaxNearThreshold = 0.99;
+
+    private const int MinWords = 4;
 
     private static readonly Regex Whitespace = new(@"\s+", RegexOptions.Compiled);
 
-    public static DuplicateLineReport Scan(DialogProject project, string primaryLanguage)
+    public static DuplicateLineReport Scan(
+        DialogProject project, string primaryLanguage,
+        double nearThreshold = DefaultNearThreshold)
     {
+        // settings.json is hand-editable, so an out-of-range (or NaN) threshold is reachable
+        // without going through the UI's fixed preset list. NaN fails every comparison, so
+        // test for it explicitly rather than relying on Math.Clamp.
+        var threshold = double.IsNaN(nearThreshold)
+            ? DefaultNearThreshold
+            : Math.Clamp(nearThreshold, MinNearThreshold, MaxNearThreshold);
+
         // 1. Collect one candidate per node: Default text from the primary-language
         //    translations, with a defensive AddedNodes fallback (legacy patches).
         var byNode = new Dictionary<(string Conv, int Node), (LineRef Ref, string Norm)>();
@@ -88,10 +107,10 @@ public static class DuplicateLineScanner
                 var b = nearCandidates[j];
                 // Sorted ascending by length: once b is too long to possibly reach
                 // the threshold, no later j can either — stop.
-                if (b.Norm.Length > a.Norm.Length / NearThreshold) break;
+                if (b.Norm.Length > a.Norm.Length / threshold) break;
 
                 var ratio = Ratio(a.Norm, b.Norm);
-                if (ratio < NearThreshold) continue;
+                if (ratio < threshold) continue;
 
                 var key = new[] { a.Norm, b.Norm }.OrderBy(s => s, StringComparer.Ordinal).ToList();
                 if (ignoredNear.Contains(NearKey(key[0], key[1]))) continue;
