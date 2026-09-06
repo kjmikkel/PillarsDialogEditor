@@ -15,7 +15,15 @@ namespace DialogEditor.UiaMcp;
 internal sealed class UiaTree : IUiaTree
 {
     private readonly Dictionary<string, AutomationElement> _elements = new(StringComparer.Ordinal);
-    private int _next;
+
+    // Process-wide, NOT per-tree. Since #16 there can be several live trees at once (one
+    // per window), and a per-tree counter made every tree mint e1, e2, e3... So a ref
+    // minted against a dialog RESOLVED against the main window -- to whatever element
+    // happened to hold that number -- and the tool acted on the wrong control and reported
+    // success. Caught by ARefMintedInOneWindowSaysSoRatherThanClaimingItWentStale, which
+    // saw an About ref land on the main window itself. A shared counter means ids are
+    // unique across trees, so a cross-window ref misses cleanly instead.
+    private static int _next;
 
     public ElementInfo Root { get; }
 
