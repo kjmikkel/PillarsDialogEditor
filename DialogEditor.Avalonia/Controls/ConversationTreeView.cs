@@ -17,10 +17,11 @@ namespace DialogEditor.Avalonia.Controls;
 /// does implement <c>ISelectionItemProvider</c>, which is why tabs are operable and tree rows
 /// are not. Measured with <c>TryGetCurrentPattern</c>, not inferred.
 ///
-/// This is an upstream framework gap that affects every Avalonia application, reported at
-/// <see href="https://github.com/AvaloniaUI/Avalonia/issues">AvaloniaUI/Avalonia</see>. These
-/// three types are a local workaround and should be DELETED once Avalonia ships selection and
-/// expand/collapse providers for <c>TreeViewItem</c>. See
+/// This is an upstream framework gap that affects every Avalonia application. A report is
+/// drafted and parked in
+/// <see href="https://github.com/kjmikkel/PillarsDialogEditor/issues/17">issue #17</see> — not
+/// yet filed with Avalonia. These three types are a local workaround and should be DELETED
+/// once Avalonia ships selection and expand/collapse providers for <c>TreeViewItem</c>. See
 /// <c>docs/uia-fallback-inventory.md</c> and issue #15 finding 1.
 ///
 /// Only <see cref="CreateContainerForItemOverride"/> needs overriding here: Avalonia's

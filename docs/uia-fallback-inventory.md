@@ -44,7 +44,9 @@ provider interfaces, so rows exposed neither `ISelectionItemProvider` nor
 `IExpandCollapseProvider`. `ListItemAutomationPeer` (used by `TabItem`) *does* implement
 selection, which is why tabs were operable and tree rows were not — the Win32 bridge was never
 the problem. `DialogEditor.Avalonia/Controls/ConversationTreeView.cs` supplies the missing
-providers locally; **delete all three types when Avalonia ships them upstream.**
+providers locally; **delete all three types when Avalonia ships them upstream.** The upstream
+report is drafted and parked in
+[#17](https://github.com/kjmikkel/PillarsDialogEditor/issues/17), not yet filed.
 
 Two traps worth remembering if this is ever revisited:
 
