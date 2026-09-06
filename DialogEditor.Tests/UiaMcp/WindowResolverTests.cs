@@ -103,6 +103,84 @@ public class WindowResolverTests
         Assert.Contains("About", result.ErrorMessage);
     }
 
+    // --- ClassName, the middle tier -------------------------------------------------
+    //
+    // Avalonia already sets ClassName to the Window subclass name on all ~40 windows
+    // (measured 2026-09-06: 'MainWindow', 'AboutWindow', 'SettingsWindow'). That is
+    // locale-stable TODAY, which is the whole reason AutomationId was preferred over the
+    // title -- so it slots between them rather than replacing either. It stays SECOND
+    // because it is incidental: renaming the C# class silently moves the key, with no
+    // signal at the rename site, whereas an AutomationId is a declared contract.
+
+    private static readonly WindowInfo Diff =
+        new("w9", "Diff - greeting", AutomationId: "", ClassName: "DiffWindow");
+
+    [Fact]
+    public void FallsBackToClassNameWhenNoAutomationIdMatches()
+    {
+        var result = NewResolver(Main, Diff).Resolve("DiffWindow");
+
+        Assert.Null(result.ErrorKind);
+        Assert.Equal("w9", result.Window!.Id);
+    }
+
+    [Fact]
+    public void PrefersAnAutomationIdMatchOverAClassNameMatch()
+    {
+        var byId = new WindowInfo("w10", "Report", AutomationId: "DiffWindow");
+
+        var result = NewResolver(Main, Diff, byId).Resolve("DiffWindow");
+
+        Assert.Null(result.ErrorKind);
+        Assert.Equal("w10", result.Window!.Id);
+    }
+
+    [Fact]
+    public void PrefersAClassNameMatchOverALocalisedTitleMatch()
+    {
+        // The point of the tier: a window whose TITLE happens to read 'DiffWindow' must
+        // not outrank the window whose class actually is DiffWindow, because the title
+        // moves with the UI language and the class does not.
+        var byTitle = new WindowInfo("w11", "DiffWindow", AutomationId: "", ClassName: "HistoryWindow");
+
+        var result = NewResolver(Main, Diff, byTitle).Resolve("DiffWindow");
+
+        Assert.Null(result.ErrorKind);
+        Assert.Equal("w9", result.Window!.Id);
+    }
+
+    [Fact]
+    public void ErrorsAsAmbiguousWhenTwoWindowsShareAClassName()
+    {
+        var a = new WindowInfo("w12", "Diff - greeting", AutomationId: "", ClassName: "DiffWindow");
+        var b = new WindowInfo("w13", "Diff - farewell", AutomationId: "", ClassName: "DiffWindow");
+
+        var result = NewResolver(Main, a, b).Resolve("DiffWindow");
+
+        Assert.Equal("Ambiguous", result.ErrorKind);
+        Assert.Contains("className", result.ErrorMessage);
+    }
+
+    [Fact]
+    public void NotFoundListsTheClassNameSinceItIsOftenTheOnlyStableKey()
+    {
+        var result = NewResolver(Main, Diff).Resolve("nope");
+
+        Assert.Equal("NotFound", result.ErrorKind);
+        Assert.Contains("DiffWindow", result.ErrorMessage);
+    }
+
+    [Fact]
+    public void AnEmptySelectorMatchesNothingRatherThanEveryIdlessWindow()
+    {
+        // Every Window in the app currently has an empty AutomationId. Without the
+        // empty-key guard, Resolve("") would "match" all of them and report ambiguity,
+        // which blames the wrong thing -- the caller passed no selector at all.
+        var result = NewResolver(Main, Diff).Resolve("");
+
+        Assert.Equal("NotFound", result.ErrorKind);
+    }
+
     // --- GuardModal (#16) ------------------------------------------------------------
     //
     // A modal grabs input app-wide, so an invoke aimed at the main window dispatches,

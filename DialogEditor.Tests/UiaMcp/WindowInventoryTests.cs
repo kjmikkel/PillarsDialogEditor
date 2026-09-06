@@ -105,4 +105,15 @@ public class WindowInventoryTests
 
         Assert.True(inner.IsModal);
     }
+
+    [Fact]
+    public void CarriesClassNameThroughAsTheStableKeyThatExistsToday()
+    {
+        // No Window in the app has an AutomationId yet, so ClassName is the only stable
+        // key the resolver can actually match on right now. Dropping it here would quietly
+        // demote every lookup to the localised title.
+        var settings = Inventory().Single(w => w.Title == "Settings");
+
+        Assert.Equal("SettingsWindow", settings.ClassName);
+    }
 }

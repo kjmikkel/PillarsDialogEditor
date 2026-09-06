@@ -52,19 +52,23 @@ public class WindowEnumerationGuiTests(EditorSessionFixture fixture) : IClassFix
     }
 
     [Fact]
-    public void TitlesStillResolveWhileWindowsCarryNoAutomationId()
+    public void ClassNameResolvesWindowsWhileNoneCarryAnAutomationId()
     {
         // Honest about today's state: no Window element in the app has an AutomationId
-        // yet, so the resolver's PRIMARY key matches nothing and every lookup lands on the
-        // localised-title fallback. When the AutomationId sweep lands this test should be
-        // joined by one resolving 'AboutWindow' by id -- and this one keeps the fallback
-        // covered rather than being deleted.
-        Assert.All(fixture.Session.Windows(), w => Assert.Equal("", w.AutomationId));
+        // yet, so the resolver's PRIMARY tier matches nothing. This asserts that
+        // explicitly, so the sweep landing shows up as a test change rather than passing
+        // unnoticed.
+        var windows = fixture.Session.Windows();
+        Assert.All(windows, w => Assert.Equal("", w.AutomationId));
 
-        var resolver = new WindowResolver(fixture.Session.Windows());
-        var result = resolver.Resolve("Pillars Dialog Editor");
+        // ...and that the middle tier carries the load meanwhile. This is the payoff of
+        // adding ClassName: locale-stable addressing with no app change at all.
+        var byClass = new WindowResolver(windows).Resolve("MainWindow");
+        Assert.Null(byClass.ErrorKind);
+        Assert.True(byClass.Window!.IsMain);
 
-        Assert.Null(result.ErrorKind);
-        Assert.True(result.Window!.IsMain);
+        var byTitle = new WindowResolver(windows).Resolve("Pillars Dialog Editor");
+        Assert.Null(byTitle.ErrorKind);
+        Assert.True(byTitle.Window!.IsMain);
     }
 }

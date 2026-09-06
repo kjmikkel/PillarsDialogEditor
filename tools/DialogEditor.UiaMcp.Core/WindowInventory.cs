@@ -37,7 +37,7 @@ public sealed class WindowInventory(IWindowSource source, nint mainHandle)
     /// </summary>
     private void Walk(RawWindow w, bool isModal, List<WindowInfo> into)
     {
-        into.Add(new WindowInfo(w.Id, w.Title, w.AutomationId,
+        into.Add(new WindowInfo(w.Id, w.Title, w.AutomationId, w.ClassName,
             IsMain: w.Handle == mainHandle, IsModal: isModal));
         foreach (var owned in source.OwnedBy(w.Id)) Walk(owned, isModal: true, into);
     }
