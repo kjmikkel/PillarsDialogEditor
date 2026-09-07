@@ -1,4 +1,4 @@
-using DialogEditor.Core.Editing;
+﻿using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
 using DialogEditor.Patch;
 using DialogEditor.ViewModels.Resources;
@@ -65,9 +65,9 @@ public static class ProjectFindService
                 Check(convName, node.NodeId, "FindField_DefaultText", "", def, query.Text, cmp, rows);
                 Check(convName, node.NodeId, "FindField_FemaleText",  "", fem, query.Text, cmp, rows);
 
-                if (query.InLinkChoice)
+                if (query.InLinkDisplaySetting)
                     foreach (var link in node.Links)
-                        Check(convName, node.NodeId, "FindField_LinkChoice", "",
+                        Check(convName, node.NodeId, "FindField_LinkDisplaySetting", "",
                               link.QuestionNodeTextDisplay, query.Text, cmp, rows);
 
                 if (query.InNodeComments &&

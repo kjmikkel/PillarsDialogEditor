@@ -1,4 +1,4 @@
-using DialogEditor.Core.Editing;
+﻿using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
@@ -47,7 +47,7 @@ public class ProjectFindViewModelTests
         { SearchText = "Ask about X" };
         vm.SearchCommand.Execute(null);
         Assert.Empty(vm.Results);                 // link off
-        vm.InLinkChoice = true;
+        vm.InLinkDisplaySetting = true;
         vm.SearchCommand.Execute(null);
         Assert.Single(vm.Results);
     }
