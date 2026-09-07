@@ -649,6 +649,17 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Duplicate_Ignored_Summary_Other">{0} ignored</sys:String>
     <sys:String x:Key="Duplicate_SectionHeader">Duplicate lines</sys:String>
     <sys:String x:Key="Duplicate_Threshold">Similarity</sys:String>
+    <sys:String x:Key="Duplicate_IncludeFemale">Female text</sys:String>
+    <sys:String x:Key="Duplicate_IncludeFemaleTooltip">Also compare the female variant of each line, not just the default. Off by default because most female variants differ from their own default by only a pronoun; a line is never reported against its own female variant, so only genuine copies between different nodes appear.</sys:String>
+    <sys:String x:Key="Duplicate_IncludeAllLanguages">Other languages</sys:String>
+    <sys:String x:Key="Duplicate_IncludeAllLanguagesTooltip">Also compare translations in every other language, not just your primary one. Lines are only ever compared against lines in the same language. Off by default because it multiplies how much text is scanned.</sys:String>
+    <!-- {0} is a "conversation · node" location, {1} the source it came from
+         (a language code, the female marker, or both). -->
+    <sys:String x:Key="Duplicate_Source">{0} [{1}]</sys:String>
+    <sys:String x:Key="Duplicate_Source_Female">female</sys:String>
+    <!-- {0} is a language code, e.g. "de". Shown when a hit comes from the female
+         variant of a non-primary translation. -->
+    <sys:String x:Key="Duplicate_Source_LanguageFemale">{0} female</sys:String>
     <sys:String x:Key="Duplicate_ThresholdTooltip">How alike two lines must be before they are reported as near-duplicates. Lower this to catch lines you edited more heavily; raise it if the report is showing pairs you consider genuinely different. Exact duplicates are always reported regardless of this setting. The report re-scans as soon as you change this, and the choice is saved.</sys:String>
     <sys:String x:Key="Duplicate_Ignored_SectionHeader">Ignored duplicates</sys:String>
     <sys:String x:Key="Button_Ignore">Ignore</sys:String>
