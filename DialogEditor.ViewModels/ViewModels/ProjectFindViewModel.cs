@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
@@ -37,7 +37,7 @@ public partial class ProjectFindViewModel : ObservableObject
     private string _searchText = string.Empty;
 
     [ObservableProperty] private bool _caseSensitive;
-    [ObservableProperty] private bool _inLinkChoice;
+    [ObservableProperty] private bool _inLinkDisplaySetting;
     [ObservableProperty] private bool _inTranslations;
     [ObservableProperty] private bool _inNodeComments;
     [ObservableProperty] private string _statusText = string.Empty;
@@ -53,7 +53,7 @@ public partial class ProjectFindViewModel : ObservableObject
     private void Search()
     {
         var (name, snap) = _openAccessor();
-        var query = new ProjectFindQuery(SearchText, CaseSensitive, InLinkChoice, InTranslations, InNodeComments);
+        var query = new ProjectFindQuery(SearchText, CaseSensitive, InLinkDisplaySetting, InTranslations, InNodeComments);
         Results = ProjectFindService.Search(_project, _provider, _primaryLanguage, query, name, snap);
         StatusText = Results.Count > 0
             ? Loc.FormatCount("FindInProject_Matches", Results.Count)

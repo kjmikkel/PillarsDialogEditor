@@ -584,8 +584,8 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- This searches a link's QuestionNodeTextDisplay, which is not prose: it is
          an enum whose only legal values are ShowOnce, Always and Never. The label
          must say so, so nobody mistakes it for choice text again (see issue #24). -->
-    <sys:String x:Key="FindInProject_InLinkChoice">Link display setting</sys:String>
-    <sys:String x:Key="ToolTip_FindInProject_InLinkChoice">Also search each link's display setting — one of ShowOnce, Always or Never. This is a policy flag, not writer-authored text.</sys:String>
+    <sys:String x:Key="FindInProject_InLinkDisplaySetting">Link display setting</sys:String>
+    <sys:String x:Key="ToolTip_FindInProject_InLinkDisplaySetting">Also search each link's display setting — one of ShowOnce, Always or Never. This is a policy flag, not writer-authored text.</sys:String>
     <sys:String x:Key="FindInProject_InTranslations">Translations (all languages)</sys:String>
     <sys:String x:Key="ToolTip_FindInProject_InTranslations">Also search your translated text in every language. Each match shows its language.</sys:String>
     <sys:String x:Key="FindInProject_InNodeComments">Node comments</sys:String>
@@ -601,7 +601,7 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="FindInProject_Matches_Other">{0} matches</sys:String>
     <sys:String x:Key="FindField_DefaultText">Default text</sys:String>
     <sys:String x:Key="FindField_FemaleText">Female text</sys:String>
-    <sys:String x:Key="FindField_LinkChoice">Link / choice</sys:String>
+    <sys:String x:Key="FindField_LinkDisplaySetting">Link display setting</sys:String>
     <sys:String x:Key="FindField_NodeComment">Node comment</sys:String>
     <sys:String x:Key="Status_FindInProject_NodeGone">That node no longer exists — it may have been edited since the search.</sys:String>
     <!-- ─── Speaker Line Browser ─────────────────────────────────────────── -->
