@@ -581,8 +581,11 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_FindInProject_Search">Search all patched conversations for this text.</sys:String>
     <sys:String x:Key="FindInProject_CaseSensitive">Case sensitive</sys:String>
     <sys:String x:Key="ToolTip_FindInProject_CaseSensitive">Match upper- and lower-case exactly.</sys:String>
-    <sys:String x:Key="FindInProject_InLinkChoice">Link / choice text</sys:String>
-    <sys:String x:Key="ToolTip_FindInProject_InLinkChoice">Also search player-choice and link display text.</sys:String>
+    <!-- This searches a link's QuestionNodeTextDisplay, which is not prose: it is
+         an enum whose only legal values are ShowOnce, Always and Never. The label
+         must say so, so nobody mistakes it for choice text again (see issue #24). -->
+    <sys:String x:Key="FindInProject_InLinkChoice">Link display setting</sys:String>
+    <sys:String x:Key="ToolTip_FindInProject_InLinkChoice">Also search each link's display setting — one of ShowOnce, Always or Never. This is a policy flag, not writer-authored text.</sys:String>
     <sys:String x:Key="FindInProject_InTranslations">Translations (all languages)</sys:String>
     <sys:String x:Key="ToolTip_FindInProject_InTranslations">Also search your translated text in every language. Each match shows its language.</sys:String>
     <sys:String x:Key="FindInProject_InNodeComments">Node comments</sys:String>
@@ -680,7 +683,6 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="BatchReplace_InSpeakerGuids">Speaker GUIDs</sys:String>
     <sys:String x:Key="BatchReplace_InScriptParams">Script params</sys:String>
     <sys:String x:Key="BatchReplace_InConditionParams">Condition params</sys:String>
-    <sys:String x:Key="BatchReplace_InLinkChoiceText">Link choice text</sys:String>
     <sys:String x:Key="BatchReplace_Preview">Preview</sys:String>
     <sys:String x:Key="BatchReplace_Apply">Apply</sys:String>
     <!-- Match preview rows: trailing spaces align the "Before:"/"After: " labels — preserve them -->
@@ -707,7 +709,6 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_BatchReplace_InSpeakerGuids">Search in Speaker GUID and Listener GUID fields</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace_InScriptParams">Search in script call parameter values</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace_InConditionParams">Search in condition parameter values</sys:String>
-    <sys:String x:Key="ToolTip_BatchReplace_InLinkChoiceText">Search in link choice text (QuestionNodeTextDisplay)</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace_Preview">Scan all conversations and show a preview of changes without writing to disk</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace_Apply">Write the previewed replacements to disk for all selected conversations</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace_ConvCheckbox">Uncheck to exclude this conversation from the apply step</sys:String>

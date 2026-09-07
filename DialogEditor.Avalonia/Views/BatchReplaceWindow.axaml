@@ -96,16 +96,15 @@
                           Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Label}" Margin="0,0,10,0"
                           ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_InScriptParams}"
                           AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_InScriptParams}"/>
+                <!-- There is deliberately no "link choice text" checkbox. The only link
+                     field it ever searched was QuestionNodeTextDisplay, an enum
+                     (ShowOnce/Always/Never) that a substring replace corrupts; it is
+                     edited through the node detail dropdown instead. See issue #24. -->
                 <CheckBox IsChecked="{Binding InConditionParams, Mode=TwoWay}"
                           Content="{DynamicResource BatchReplace_InConditionParams}"
-                          Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Label}" Margin="0,0,10,0"
+                          Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Label}"
                           ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_InConditionParams}"
                           AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_InConditionParams}"/>
-                <CheckBox IsChecked="{Binding InLinkChoiceText, Mode=TwoWay}"
-                          Content="{DynamicResource BatchReplace_InLinkChoiceText}"
-                          Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Label}"
-                          ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_InLinkChoiceText}"
-                          AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_InLinkChoiceText}"/>
             </WrapPanel>
 
             <!-- Action buttons -->
