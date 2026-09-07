@@ -248,4 +248,102 @@ public class FlowAnalyticsViewModelTests
 
         Assert.Equal(150, vm.WordsPerMinute);
     }
+
+    // ── Recursive fork tree + endings (issue #14) ────────────────────────────
+
+    /// root -> A (choice) -> npc -> A1 (choice). A1 is a fork UNDER A, never a sibling.
+    private static ConversationEditSnapshot NestedForkSnapshot() => new([
+        PathNode(0, "start", links: [Link(0, 1)]),
+        PathNode(1, "A", isPlayerChoice: true, links: [Link(1, 2)]),
+        PathNode(2, "npc", links: [Link(2, 3)]),
+        PathNode(3, "A1", isPlayerChoice: true)
+    ]);
+
+    [Fact]
+    public void Refresh_NestsSubForksUnderTheirOpeningChoice()
+    {
+        var vm = new FlowAnalyticsViewModel(() => NestedForkSnapshot(), _ => { });
+
+        vm.RefreshCommand.Execute(null);
+
+        var a = Assert.Single(vm.Branches);
+        Assert.Equal("A", a.ChoiceText);
+        var a1 = Assert.Single(a.SubBranches);
+        Assert.Equal("A1", a1.ChoiceText);
+        Assert.Empty(a1.SubBranches);
+    }
+
+    [Fact] // Top level opens; deeper levels stay folded so the panel is readable.
+    public void Refresh_TopLevelForksExpanded_DeeperOnesCollapsed()
+    {
+        var vm = new FlowAnalyticsViewModel(() => NestedForkSnapshot(), _ => { });
+
+        vm.RefreshCommand.Execute(null);
+
+        var a = vm.Branches[0];
+        Assert.True(a.HasSubBranches);
+        Assert.True(a.IsExpanded);
+        Assert.False(a.SubBranches[0].IsExpanded);
+        Assert.False(a.SubBranches[0].HasSubBranches);
+    }
+
+    [Fact]
+    public void SubForkRow_Navigate_CallsCallbackWithItsOwnNode()
+    {
+        var navigatedId = -1;
+        var vm = new FlowAnalyticsViewModel(() => NestedForkSnapshot(), id => navigatedId = id);
+        vm.RefreshCommand.Execute(null);
+
+        vm.Branches[0].SubBranches[0].NavigateCommand.Execute(null);
+
+        Assert.Equal(3, navigatedId);
+    }
+
+    [Fact]
+    public void Refresh_PopulatesEndings_LongestFirst()
+    {
+        var snapshot = new ConversationEditSnapshot([
+            PathNode(0, "start", links: [Link(0, 1), Link(0, 2)]),
+            PathNode(1, "A", isPlayerChoice: true, links: [Link(1, 3)]),
+            PathNode(3, "the long ending"),
+            PathNode(2, "B", isPlayerChoice: true)
+        ]);
+        var vm = new FlowAnalyticsViewModel(() => snapshot, _ => { });
+
+        vm.RefreshCommand.Execute(null);
+
+        Assert.True(vm.HasEndings);
+        Assert.Equal([3, 2], vm.Endings.Select(e => e.NodeId));
+    }
+
+    [Fact]
+    public void EndingRow_Navigate_CallsCallbackWithEndingNode()
+    {
+        var navigatedId = -1;
+        var snapshot = new ConversationEditSnapshot([
+            PathNode(0, "start", links: [Link(0, 4)]),
+            PathNode(4, "the end")
+        ]);
+        var vm = new FlowAnalyticsViewModel(() => snapshot, id => navigatedId = id);
+        vm.RefreshCommand.Execute(null);
+
+        vm.Endings[0].NavigateCommand.Execute(null);
+
+        Assert.Equal(4, navigatedId);
+    }
+
+    [Fact] // Every exit loops backwards: a DAG terminal, but not a way the talk ends.
+    public void Refresh_LoopOnlyConversation_HasNoEndings()
+    {
+        var snapshot = new ConversationEditSnapshot([
+            PathNode(0, "a", links: [Link(0, 1)]),
+            PathNode(1, "b", links: [Link(1, 0)])
+        ]);
+        var vm = new FlowAnalyticsViewModel(() => snapshot, _ => { });
+
+        vm.RefreshCommand.Execute(null);
+
+        Assert.False(vm.HasEndings);
+        Assert.Empty(vm.Endings);
+    }
 }
