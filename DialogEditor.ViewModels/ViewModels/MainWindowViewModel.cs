@@ -556,12 +556,12 @@ public partial class MainWindowViewModel : ObservableObject
             SaveProject();
         };
 
-        // The threshold comes from the window (issue #14), so the writer can loosen or
-        // tighten the bar and see the report change without leaving it.
-        Func<double, DuplicateLineReport> dupScan = threshold =>
+        // Scan scope and threshold come from the window (issue #14), so the writer can
+        // widen or tighten the sweep and see the report change without leaving it.
+        Func<DuplicateScanOptions, DuplicateLineReport> dupScan = options =>
             _project is null
                 ? new DuplicateLineReport([], [])
-                : DuplicateLineScanner.Scan(_project, _provider?.Language ?? "", threshold);
+                : DuplicateLineScanner.Scan(_project, _provider?.Language ?? "", options);
 
         Func<IReadOnlyList<IgnoredDuplicate>> ignoredList = () =>
             _project?.IgnoredDuplicates ?? [];
@@ -598,8 +598,16 @@ public partial class MainWindowViewModel : ObservableObject
             ignore: ignore,
             unignore: unignore,
             navigate: NavigateToFoundNode,
-            nearThreshold: AppSettings.NearDuplicateThreshold,
-            persistNearThreshold: v => AppSettings.NearDuplicateThreshold = v);
+            duplicateOptions: new DuplicateScanOptions(
+                AppSettings.NearDuplicateThreshold,
+                AppSettings.DuplicateIncludeFemaleText,
+                AppSettings.DuplicateIncludeOtherLanguages),
+            persistDuplicateOptions: o =>
+            {
+                AppSettings.NearDuplicateThreshold         = o.NearThreshold;
+                AppSettings.DuplicateIncludeFemaleText     = o.IncludeFemaleText;
+                AppSettings.DuplicateIncludeOtherLanguages = o.IncludeOtherLanguages;
+            });
     }
 
     /// Builds a conversation-name → live-node-ID-set resolver for the likely-stale

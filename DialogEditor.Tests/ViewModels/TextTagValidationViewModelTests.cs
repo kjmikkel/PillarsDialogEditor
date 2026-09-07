@@ -157,8 +157,8 @@ public class TextTagValidationViewModelTests
         var seen = new List<double>();
         _ = new TextTagValidationViewModel(
             scan: () => [],
-            dupScan: t => { seen.Add(t); return new DuplicateLineReport([], []); },
-            nearThreshold: 0.75);
+            dupScan: o => { seen.Add(o.NearThreshold); return new DuplicateLineReport([], []); },
+            duplicateOptions: new DuplicateScanOptions(0.75));
 
         Assert.Equal(0.75, Assert.Single(seen));
     }
@@ -178,7 +178,7 @@ public class TextTagValidationViewModelTests
         var seen = new List<double>();
         var vm = new TextTagValidationViewModel(
             scan: () => [],
-            dupScan: t => { seen.Add(t); return new DuplicateLineReport([], []); });
+            dupScan: o => { seen.Add(o.NearThreshold); return new DuplicateLineReport([], []); });
         seen.Clear();
 
         vm.NearThreshold = 0.70;
@@ -192,7 +192,7 @@ public class TextTagValidationViewModelTests
         var persisted = 0.0;
         var vm = new TextTagValidationViewModel(
             scan: () => [],
-            persistNearThreshold: v => persisted = v);
+            persistDuplicateOptions: o => persisted = o.NearThreshold);
 
         vm.NearThreshold = 0.95;
 
@@ -207,5 +207,116 @@ public class TextTagValidationViewModelTests
         vm.NearThreshold = 0.80;
 
         Assert.Equal(0.80, vm.NearThreshold);
+    }
+
+    // ── Widened field scope (issue #14) ──────────────────────────────────────
+
+    [Fact] // Default scope is the historical one: primary language, Default text.
+    public void ScopeToggles_DefaultToOff()
+    {
+        var vm = new TextTagValidationViewModel(scan: () => []);
+
+        Assert.False(vm.IncludeFemaleText);
+        Assert.False(vm.IncludeOtherLanguages);
+    }
+
+    /// The constructor calls Refresh(), so every scope field must be assigned before it —
+    /// otherwise the first scan runs with the wrong scope and the window opens showing a
+    /// report the toggles do not describe.
+    [Fact]
+    public void ScopeToggles_InitialValues_ReachTheConstructorScan()
+    {
+        var seen = new List<DuplicateScanOptions>();
+        _ = new TextTagValidationViewModel(
+            scan: () => [],
+            dupScan: o => { seen.Add(o); return new DuplicateLineReport([], []); },
+            duplicateOptions: new DuplicateScanOptions(0.75, true, true));
+
+        var o = Assert.Single(seen);
+        Assert.Equal(0.75, o.NearThreshold);
+        Assert.True(o.IncludeFemaleText);
+        Assert.True(o.IncludeOtherLanguages);
+    }
+
+    [Fact] // Modelled on CheckGameFiles_Toggle_PassesFlagToStaleScan.
+    public void IncludeFemaleText_Toggle_PassesFlagToDupScan()
+    {
+        var seen = new List<DuplicateScanOptions>();
+        var vm = new TextTagValidationViewModel(
+            scan: () => [],
+            dupScan: o => { seen.Add(o); return new DuplicateLineReport([], []); });
+        seen.Clear();
+
+        vm.IncludeFemaleText = true;
+
+        Assert.True(Assert.Single(seen).IncludeFemaleText);
+    }
+
+    [Fact]
+    public void IncludeOtherLanguages_Toggle_PassesFlagToDupScan()
+    {
+        var seen = new List<DuplicateScanOptions>();
+        var vm = new TextTagValidationViewModel(
+            scan: () => [],
+            dupScan: o => { seen.Add(o); return new DuplicateLineReport([], []); });
+        seen.Clear();
+
+        vm.IncludeOtherLanguages = true;
+
+        Assert.True(Assert.Single(seen).IncludeOtherLanguages);
+    }
+
+    [Fact] // All three options travel together, so one persist callback carries the lot.
+    public void ScopeToggles_Change_InvokesPersistCallbackWithEveryOption()
+    {
+        DuplicateScanOptions? persisted = null;
+        var vm = new TextTagValidationViewModel(
+            scan: () => [],
+            persistDuplicateOptions: o => persisted = o);
+
+        vm.NearThreshold       = 0.75;
+        vm.IncludeFemaleText   = true;
+        vm.IncludeOtherLanguages = true;
+
+        Assert.NotNull(persisted);
+        Assert.Equal(0.75, persisted!.NearThreshold);
+        Assert.True(persisted.IncludeFemaleText);
+        Assert.True(persisted.IncludeOtherLanguages);
+    }
+
+    [Fact] // No callback wired (the unit-test default) must not throw.
+    public void ScopeToggles_Change_WithoutPersistCallback_DoesNotThrow()
+    {
+        var vm = new TextTagValidationViewModel(scan: () => []);
+
+        vm.IncludeFemaleText     = true;
+        vm.IncludeOtherLanguages = true;
+
+        Assert.True(vm.IncludeFemaleText);
+        Assert.True(vm.IncludeOtherLanguages);
+    }
+
+    /// A row must say WHERE a hit came from once it can come from somewhere other than
+    /// primary Default text — otherwise "these two lines match" is unactionable. The test
+    /// string provider echoes keys rather than formatting them, so assert on which key the
+    /// annotation branch selected; the rendered wording is a localisation concern.
+    [Theory]
+    [InlineData("",   false, false)]  // primary language, default text -> no annotation
+    [InlineData("",   true,  true)]   // female variant
+    [InlineData("de", false, true)]   // other language
+    [InlineData("de", true,  true)]   // both
+    public void DuplicateRow_AnnotatesOnlyNonDefaultSources(
+        string language, bool isFemale, bool expectAnnotation)
+    {
+        var report = new DuplicateLineReport(
+            [new ExactDuplicateGroup("k", "some duplicated line here",
+                [new LineRef("c1", 1, "some duplicated line here", language, isFemale),
+                 new LineRef("c1", 2, "some duplicated line here", language, isFemale)])],
+            []);
+
+        var vm = new TextTagValidationViewModel(scan: () => [], dupScan: _ => report);
+
+        var row = Assert.Single(vm.DuplicateRows);
+        Assert.Equal(expectAnnotation, row.Locations.Contains("Duplicate_Source"));
     }
 }
