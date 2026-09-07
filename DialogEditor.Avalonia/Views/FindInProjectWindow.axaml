@@ -1,4 +1,4 @@
-<Window xmlns="https://github.com/avaloniaui"
+﻿<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.FindInProjectWindow"
@@ -45,10 +45,10 @@
                       IsChecked="{Binding CaseSensitive}"
                       ToolTip.Tip="{DynamicResource ToolTip_FindInProject_CaseSensitive}"
                       AutomationProperties.HelpText="{DynamicResource ToolTip_FindInProject_CaseSensitive}"/>
-            <CheckBox Content="{DynamicResource FindInProject_InLinkChoice}"
-                      IsChecked="{Binding InLinkChoice}"
-                      ToolTip.Tip="{DynamicResource ToolTip_FindInProject_InLinkChoice}"
-                      AutomationProperties.HelpText="{DynamicResource ToolTip_FindInProject_InLinkChoice}"/>
+            <CheckBox Content="{DynamicResource FindInProject_InLinkDisplaySetting}"
+                      IsChecked="{Binding InLinkDisplaySetting}"
+                      ToolTip.Tip="{DynamicResource ToolTip_FindInProject_InLinkDisplaySetting}"
+                      AutomationProperties.HelpText="{DynamicResource ToolTip_FindInProject_InLinkDisplaySetting}"/>
             <CheckBox Content="{DynamicResource FindInProject_InTranslations}"
                       IsChecked="{Binding InTranslations}"
                       ToolTip.Tip="{DynamicResource ToolTip_FindInProject_InTranslations}"
