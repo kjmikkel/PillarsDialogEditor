@@ -74,7 +74,9 @@ public partial class TokenIssueRowViewModel : ObservableObject
     private void Navigate() => _navigate(NodeId);
 }
 
-/// One "By opening choice" row.
+/// One fork row: an opening choice, or — nested in SubBranches — a choice the player
+/// meets after taking this one. The same type at every depth, because a sub-fork's
+/// figures mean exactly what a top-level fork's do (issue #14).
 public sealed partial class PathBranchRowViewModel : ObservableObject
 {
     private readonly Action _navigate;
@@ -85,8 +87,17 @@ public sealed partial class PathBranchRowViewModel : ObservableObject
     public string FemaleContentText  { get; }
     public string FemaleLongestText  { get; }
 
+    public IReadOnlyList<PathBranchRowViewModel> SubBranches { get; }
+    public bool HasSubBranches => SubBranches.Count > 0;
+
+    /// Top-level forks open, deeper ones folded. A conversation with forks all the way
+    /// down would otherwise bury the issues list under a wall of indented rows, and the
+    /// question the panel answers first is "is my opening menu balanced?".
+    [ObservableProperty] private bool _isExpanded;
+
     public PathBranchRowViewModel(string choiceText, string defaultContent, string defaultLongest,
-        string femaleContent, string femaleLongest, Action navigate)
+        string femaleContent, string femaleLongest, Action navigate,
+        IReadOnlyList<PathBranchRowViewModel>? subBranches = null, bool isExpanded = false)
     {
         ChoiceText         = choiceText;
         DefaultContentText = defaultContent;
@@ -94,6 +105,34 @@ public sealed partial class PathBranchRowViewModel : ObservableObject
         FemaleContentText  = femaleContent;
         FemaleLongestText  = femaleLongest;
         _navigate          = navigate;
+        SubBranches        = subBranches ?? [];
+        _isExpanded        = isExpanded;
+    }
+
+    [RelayCommand] private void Navigate() => _navigate();
+}
+
+/// One "Endings" row: a node the conversation can finish on, with the range of reads
+/// that arrive there (issue #14).
+public sealed partial class PathEndingRowViewModel : ObservableObject
+{
+    private readonly Action _navigate;
+
+    /// Kept alongside the label because many endings are structural nodes with no
+    /// stringtable text, so the id is the only thing that tells two of them apart.
+    public int    NodeId           { get; }
+    public string EndingText       { get; }
+    public string DefaultRangeText { get; }
+    public string FemaleRangeText  { get; }
+
+    public PathEndingRowViewModel(int nodeId, string endingText, string defaultRange,
+        string femaleRange, Action navigate)
+    {
+        NodeId           = nodeId;
+        EndingText       = endingText;
+        DefaultRangeText = defaultRange;
+        FemaleRangeText  = femaleRange;
+        _navigate        = navigate;
     }
 
     [RelayCommand] private void Navigate() => _navigate();
@@ -124,6 +163,7 @@ public partial class FlowAnalyticsViewModel : ObservableObject
     public ObservableCollection<TokenIssueRowViewModel> TokenIssues { get; } = [];
     public ObservableCollection<PathBranchRowViewModel> Branches       { get; } = [];
     public ObservableCollection<SpeakerWordRowViewModel> WordsPerSpeaker { get; } = [];
+    public ObservableCollection<PathEndingRowViewModel> Endings         { get; } = [];
 
     // ── Reading speed (issue #14) ────────────────────────────────────────────
     // Supplied by the View from AppSettings and reported back through the persist
@@ -138,6 +178,7 @@ public partial class FlowAnalyticsViewModel : ObservableObject
     [ObservableProperty] private int _wordsPerMinute = PathStatsFormat.DefaultWordsPerMinute;
 
     [ObservableProperty] private bool   _hasPathStats;
+    [ObservableProperty] private bool   _hasEndings;
     [ObservableProperty] private bool   _hasSignificantFemaleVariant;
     [ObservableProperty] private string _longestPlaythroughText  = string.Empty;
     [ObservableProperty] private string _shortestPlaythroughText = string.Empty;
@@ -247,20 +288,38 @@ public partial class FlowAnalyticsViewModel : ObservableObject
         }
 
         Branches.Clear();
-        foreach (var b in report.Branches)
+        foreach (var row in report.Branches.Select(b => BuildBranchRow(b, depth: 1)))
+            Branches.Add(row);
+
+        Endings.Clear();
+        foreach (var e in report.Endings)
         {
-            var choice = Truncate(b.ChoiceText, 50);
-            Branches.Add(new PathBranchRowViewModel(
-                choice,
-                Loc.Format("PathStats_BranchContent", WordsTime(b.DefaultContentWords)),
-                Loc.Format("PathStats_BranchLongest", WordsTime(b.DefaultLongestWords)),
-                Loc.Format("PathStats_BranchContent", WordsTime(b.FemaleContentWords)),
-                Loc.Format("PathStats_BranchLongest", WordsTime(b.FemaleLongestWords)),
-                () => _navigateToNode(b.ChoiceNodeId)));
+            var nodeId = e.NodeId;
+            Endings.Add(new PathEndingRowViewModel(
+                nodeId,
+                Loc.Format("PathStats_EndingRow", nodeId, Truncate(e.Text, 50)),
+                Loc.Format("PathStats_EndingRange",
+                    WordsTime(e.DefaultShortestWords), WordsTime(e.DefaultLongestWords)),
+                Loc.Format("PathStats_EndingRange",
+                    WordsTime(e.FemaleShortestWords), WordsTime(e.FemaleLongestWords)),
+                () => _navigateToNode(nodeId)));
         }
+        HasEndings = Endings.Count > 0;
 
         HasPathStats = report.DefaultTotalWords > 0 || report.WordsPerSpeaker.Count > 0;
     }
+
+    /// The fork tree is the same row shape at every depth; only the initial expansion
+    /// differs, so the panel opens on the opening menu rather than on everything.
+    private PathBranchRowViewModel BuildBranchRow(BranchStat b, int depth) =>
+        new(Truncate(b.ChoiceText, 50),
+            Loc.Format("PathStats_BranchContent", WordsTime(b.DefaultContentWords)),
+            Loc.Format("PathStats_BranchLongest", WordsTime(b.DefaultLongestWords)),
+            Loc.Format("PathStats_BranchContent", WordsTime(b.FemaleContentWords)),
+            Loc.Format("PathStats_BranchLongest", WordsTime(b.FemaleLongestWords)),
+            () => _navigateToNode(b.ChoiceNodeId),
+            b.SubBranches.Select(s => BuildBranchRow(s, depth + 1)).ToList(),
+            isExpanded: depth == 1);
 
     private string WordsTime(int words) =>
         Loc.Format("PathStats_WordsTime", words, PathStatsFormat.ReadingTime(words, WordsPerMinute));

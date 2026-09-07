@@ -166,9 +166,22 @@ existing `FocusHintBar` and navigation.
 
 ## Deferred (YAGNI)
 
-- A configurable reading speed / a UI knob.
+- ~~A configurable reading speed / a UI knob.~~ **Shipped** (#14 / #23): a preset picker
+  beside the Playthrough-stats header, persisted in settings.
 - Path stats across conversations (playthroughs that jump conversation files).
-- Per-ending enumeration and per-fork (recursive) branch breakdowns — the "per first player
-  choice" model is v1.
-- Condition-aware paths (simulating game state to prune unreachable-by-condition links) — this
-  is the Playtest Mode gap's territory; path stats are over the *possible* graph.
+- ~~Per-ending enumeration and per-fork (recursive) branch breakdowns — the "per first player
+  choice" model is v1.~~ **Shipped** (#14). Two decisions were settled when it landed, and
+  they revise the v1 text above:
+  - A fork is located by the **nearest choice frontier** — walk forward from a node until
+    player-choice nodes are met — not by a node's direct link targets. The v1 rule reported
+    no branches at all for a conversation opening with an NPC greeting before the choice
+    menu, because the choices were not children of root. Applied recursively, it gives each
+    choice its own sub-forks; a fork already on the way to the current node is a leaf, and
+    the tree is capped at ten levels.
+  - An **ending is a node with no outgoing links**, not a DAG terminal. A node whose every
+    exit loops back to a hub stops the longest/shortest walk but is not a way the
+    conversation finishes. Consequence: per-ending figures need not reconcile with the
+    overall longest, which does stop at DAG terminals — the UI tooltip says so.
+- Condition-aware paths (simulating game state to prune unreachable-by-condition links) —
+  tracked as #32, blocked on #1 (Playtest Mode) settling how assumed game state is
+  represented. Path stats remain over the *possible* graph until then.

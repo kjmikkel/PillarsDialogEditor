@@ -161,42 +161,105 @@
                            Foreground="{DynamicResource Brush.Text.Disabled}"
                            FontSize="{DynamicResource FontSize.Small}" FontStyle="Italic"
                            IsVisible="{Binding Branches.Count, Converter={StaticResource CountToVis}, ConverterParameter=invert}"/>
-                <ScrollViewer MaxHeight="140">
-                    <ItemsControl ItemsSource="{Binding Branches}">
+                <!-- A TreeView rather than a flat list because forks nest: expanding a
+                     choice shows the choices it leads to. Follows the GameBrowserView
+                     pattern - IsExpanded bound two-way to the row (top level opens, deeper
+                     levels stay folded) and AutomationProperties.Name set on the CONTAINER,
+                     without which a UIA lookup resolves to the inner Text element, which
+                     cannot be expanded or selected (issue #15 finding 1). -->
+                <TreeView x:Name="ForkTreeView" ItemsSource="{Binding Branches}"
+                          MaxHeight="180"
+                          Background="Transparent" BorderThickness="0"
+                          ToolTip.Tip="{DynamicResource ToolTip_PathStats_Forks}"
+                          AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats_Forks}">
+                    <TreeView.ItemContainerTheme>
+                        <ControlTheme TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                            <Setter Property="AutomationProperties.Name" Value="{Binding ChoiceText}"/>
+                        </ControlTheme>
+                    </TreeView.ItemContainerTheme>
+                    <TreeView.DataTemplates>
+                        <TreeDataTemplate DataType="{x:Type vm:PathBranchRowViewModel}"
+                                          ItemsSource="{Binding SubBranches}">
+                            <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,2">
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding ChoiceText}"
+                                               Foreground="{DynamicResource Brush.Text.Primary}"
+                                               FontSize="{DynamicResource FontSize.Label}"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="10">
+                                        <TextBlock Text="{Binding DefaultContentText}"
+                                                   Foreground="{DynamicResource Brush.Text.Muted}"
+                                                   FontSize="{DynamicResource FontSize.Small}"/>
+                                        <TextBlock Text="{Binding DefaultLongestText}"
+                                                   Foreground="{DynamicResource Brush.Text.Muted}"
+                                                   FontSize="{DynamicResource FontSize.Small}"/>
+                                    </StackPanel>
+                                    <!-- $parent[TreeView], not $parent[ItemsControl]: for a
+                                         nested row the nearest ItemsControl ancestor is its
+                                         parent TreeViewItem, whose DataContext is a row and
+                                         not the window view model. -->
+                                    <StackPanel Orientation="Horizontal" Spacing="10"
+                                                IsVisible="{Binding $parent[TreeView].DataContext.HasSignificantFemaleVariant}">
+                                        <TextBlock Text="{Binding FemaleContentText}"
+                                                   Foreground="{DynamicResource Brush.Text.Tertiary}"
+                                                   FontSize="{DynamicResource FontSize.Small}"/>
+                                        <TextBlock Text="{Binding FemaleLongestText}"
+                                                   Foreground="{DynamicResource Brush.Text.Tertiary}"
+                                                   FontSize="{DynamicResource FontSize.Small}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                                <Button Grid.Column="2" Content="&#x2192;"
+                                        Command="{Binding NavigateCommand}"
+                                        Background="Transparent" BorderThickness="0"
+                                        Foreground="{DynamicResource Brush.Text.Muted}"
+                                        FontSize="{DynamicResource FontSize.Subtitle}"
+                                        Padding="8,0" Margin="4,0,0,0" VerticalAlignment="Center"
+                                        ToolTip.Tip="{DynamicResource ToolTip_PathStats_Navigate}"
+                                        AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats_Navigate}"
+                                        AutomationProperties.Name="{DynamicResource AutomationName_GoToNode}"/>
+                            </Grid>
+                        </TreeDataTemplate>
+                    </TreeView.DataTemplates>
+                </TreeView>
+
+                <!-- Endings: where the conversation can actually stop. Collapsed to a plain
+                     list because an ending has no structure under it, unlike a fork. -->
+                <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_Endings}"
+                           Margin="0,4,0,0"
+                           ToolTip.Tip="{DynamicResource ToolTip_PathStats_EndingsSection}"
+                           AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats_EndingsSection}"/>
+                <TextBlock Text="{DynamicResource PathStats_NoEndings}"
+                           Foreground="{DynamicResource Brush.Text.Disabled}"
+                           FontSize="{DynamicResource FontSize.Small}" FontStyle="Italic"
+                           TextWrapping="Wrap"
+                           IsVisible="{Binding !HasEndings}"/>
+                <ScrollViewer MaxHeight="140" IsVisible="{Binding HasEndings}">
+                    <ItemsControl x:Name="EndingsList" ItemsSource="{Binding Endings}">
                         <ItemsControl.ItemTemplate>
-                            <DataTemplate DataType="vm:PathBranchRowViewModel">
-                                <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,2">
+                            <DataTemplate DataType="vm:PathEndingRowViewModel">
+                                <Grid ColumnDefinitions="*,Auto" Margin="0,2">
                                     <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding ChoiceText}"
+                                        <TextBlock Text="{Binding EndingText}"
                                                    Foreground="{DynamicResource Brush.Text.Primary}"
                                                    FontSize="{DynamicResource FontSize.Label}"
                                                    TextTrimming="CharacterEllipsis"/>
-                                        <StackPanel Orientation="Horizontal" Spacing="10">
-                                            <TextBlock Text="{Binding DefaultContentText}"
-                                                       Foreground="{DynamicResource Brush.Text.Muted}"
-                                                       FontSize="{DynamicResource FontSize.Small}"/>
-                                            <TextBlock Text="{Binding DefaultLongestText}"
-                                                       Foreground="{DynamicResource Brush.Text.Muted}"
-                                                       FontSize="{DynamicResource FontSize.Small}"/>
-                                        </StackPanel>
-                                        <StackPanel Orientation="Horizontal" Spacing="10"
-                                                    IsVisible="{Binding $parent[ItemsControl].DataContext.HasSignificantFemaleVariant}">
-                                            <TextBlock Text="{Binding FemaleContentText}"
-                                                       Foreground="{DynamicResource Brush.Text.Tertiary}"
-                                                       FontSize="{DynamicResource FontSize.Small}"/>
-                                            <TextBlock Text="{Binding FemaleLongestText}"
-                                                       Foreground="{DynamicResource Brush.Text.Tertiary}"
-                                                       FontSize="{DynamicResource FontSize.Small}"/>
-                                        </StackPanel>
+                                        <TextBlock Text="{Binding DefaultRangeText}"
+                                                   Foreground="{DynamicResource Brush.Text.Muted}"
+                                                   FontSize="{DynamicResource FontSize.Small}"/>
+                                        <TextBlock Text="{Binding FemaleRangeText}"
+                                                   Foreground="{DynamicResource Brush.Text.Tertiary}"
+                                                   FontSize="{DynamicResource FontSize.Small}"
+                                                   IsVisible="{Binding $parent[ItemsControl].DataContext.HasSignificantFemaleVariant}"/>
                                     </StackPanel>
-                                    <Button Grid.Column="2" Content="→"
+                                    <Button Grid.Column="1" Content="&#x2192;"
                                             Command="{Binding NavigateCommand}"
                                             Background="Transparent" BorderThickness="0"
                                             Foreground="{DynamicResource Brush.Text.Muted}"
                                             FontSize="{DynamicResource FontSize.Subtitle}"
                                             Padding="8,0" Margin="4,0,0,0" VerticalAlignment="Center"
-                                            ToolTip.Tip="{DynamicResource ToolTip_PathStats_Navigate}"
-                                            AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats_Navigate}"
+                                            ToolTip.Tip="{DynamicResource ToolTip_PathStats_NavigateEnding}"
+                                            AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats_NavigateEnding}"
                                             AutomationProperties.Name="{DynamicResource AutomationName_GoToNode}"/>
                                 </Grid>
                             </DataTemplate>

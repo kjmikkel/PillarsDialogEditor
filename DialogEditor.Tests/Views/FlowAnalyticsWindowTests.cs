@@ -1,4 +1,5 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
+using Avalonia.Threading;
 using Avalonia.Headless.XUnit;
 using DialogEditor.Avalonia.Views;
 using DialogEditor.Core.Editing;
@@ -54,6 +55,46 @@ public class FlowAnalyticsWindowTests
 
         Assert.Equal(120, vm.WordsPerMinute);
         Assert.True(reads > before, "selecting a reading speed should re-run the analysis");
+        window.Close();
+    }
+
+    /// root -> A (choice) -> npc -> A1 (choice), plus a dead end. Exercises the recursive
+    /// TreeDataTemplate and the endings list, which a VM test cannot reach: a self-nesting
+    /// template that fails to resolve throws only when the tree is actually realised.
+    private static ConversationEditSnapshot NestedSnapshot() => new([
+        new NodeEditSnapshot(0, false, SpeakerCategory.Npc, "", "", "start", "",
+                             "Conversation", "None", "", "", "", false, false,
+                             [new LinkEditSnapshot(0, 1, 1f, "", false)], [], []),
+        new NodeEditSnapshot(1, true, SpeakerCategory.Player, "", "", "A", "",
+                             "Conversation", "None", "", "", "", false, false,
+                             [new LinkEditSnapshot(1, 2, 1f, "", false)], [], []),
+        new NodeEditSnapshot(2, false, SpeakerCategory.Npc, "", "", "npc line", "",
+                             "Conversation", "None", "", "", "", false, false,
+                             [new LinkEditSnapshot(2, 3, 1f, "", false)], [], []),
+        new NodeEditSnapshot(3, true, SpeakerCategory.Player, "", "", "A1", "",
+                             "Conversation", "None", "", "", "", false, false, [], [], [])
+    ]);
+
+    [AvaloniaFact]
+    public void Constructs_WithNestedForkTreeAndEndings()
+    {
+        var vm = new FlowAnalyticsViewModel(NestedSnapshot, _ => { });
+        var window = new FlowAnalyticsWindow(vm);
+        window.Show();
+        vm.RefreshCommand.Execute(null);
+        Dispatcher.UIThread.RunJobs();
+
+        var tree = window.FindControl<TreeView>("ForkTreeView");
+        var endings = window.FindControl<ItemsControl>("EndingsList");
+        Assert.NotNull(tree);
+        Assert.NotNull(endings);
+        Assert.True(vm.HasEndings);
+
+        // The container theme binds IsExpanded two-way, so the top-level fork opens itself.
+        var container = tree!.ContainerFromIndex(0) as TreeViewItem;
+        Assert.NotNull(container);
+        Assert.True(container!.IsExpanded);
+
         window.Close();
     }
 }

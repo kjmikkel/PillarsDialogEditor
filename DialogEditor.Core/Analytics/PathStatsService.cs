@@ -1,5 +1,4 @@
 using DialogEditor.Core.Editing;
-using DialogEditor.Core.Models;
 
 namespace DialogEditor.Core.Analytics;
 
@@ -19,11 +18,18 @@ public static class PathStatsService
 {
     private const double FemaleSignificanceThreshold = 0.10;
 
+    /// How many levels of player choice the fork breakdown descends (issue #14).
+    ///
+    /// The fork tree is already bounded by the loop guard, but a long enough chain of
+    /// choices still nests as deep as the conversation is written, and nobody reads a
+    /// forty-deep indent. This caps what the report carries, not what the graph contains.
+    public const int MaxForkDepth = 10;
+
     public static PathStatsReport Analyze(ConversationEditSnapshot snapshot)
     {
         var nodes = snapshot.Nodes;
         if (nodes.Count == 0)
-            return new PathStatsReport(false, 0, 0, 0, 0, 0, 0, [], []);
+            return new PathStatsReport(false, 0, 0, 0, 0, 0, 0, [], [], []);
 
         var nodeById = nodes.ToDictionary(n => n.NodeId);
 
@@ -32,6 +38,7 @@ public static class PathStatsService
         int Def(NodeEditSnapshot n) => Words(n.DefaultText);
         int Fem(NodeEditSnapshot n) =>
             string.IsNullOrWhiteSpace(n.FemaleText) ? Words(n.DefaultText) : Words(n.FemaleText);
+        int Weight(int id, bool female) => female ? Fem(nodeById[id]) : Def(nodeById[id]);
 
         // Totals + significance over ALL nodes (structure-independent).
         var defaultTotal = nodes.Sum(Def);
@@ -47,7 +54,7 @@ public static class PathStatsService
 
         if (!nodeById.ContainsKey(0))
             return new PathStatsReport(significant, defaultTotal, femaleTotal, 0, 0, 0, 0,
-                wordsPerSpeaker, []);
+                wordsPerSpeaker, [], []);
 
         // ── Break to a DAG (drop back-edges to a DFS ancestor) ────────────
         var dag     = new Dictionary<int, List<int>>();
@@ -77,20 +84,18 @@ public static class PathStatsService
         int Longest(int u, bool female)
         {
             if (longMemo.TryGetValue((u, female), out var cached)) return cached;
-            var w = female ? Fem(nodeById[u]) : Def(nodeById[u]);
-            var best = w;
+            var best = Weight(u, female);
             if (dag.TryGetValue(u, out var outs) && outs.Count > 0)
-                best = w + outs.Max(v => Longest(v, female));
+                best += outs.Max(v => Longest(v, female));
             longMemo[(u, female)] = best;
             return best;
         }
         int Shortest(int u, bool female)
         {
             if (shortMemo.TryGetValue((u, female), out var cached)) return cached;
-            var w = female ? Fem(nodeById[u]) : Def(nodeById[u]);
-            var best = w;
+            var best = Weight(u, female);
             if (dag.TryGetValue(u, out var outs) && outs.Count > 0)
-                best = w + outs.Min(v => Shortest(v, female));
+                best += outs.Min(v => Shortest(v, female));
             shortMemo[(u, female)] = best;
             return best;
         }
@@ -105,7 +110,7 @@ public static class PathStatsService
             while (queue.Count > 0)
             {
                 var u = queue.Dequeue();
-                sum += female ? Fem(nodeById[u]) : Def(nodeById[u]);
+                sum += Weight(u, female);
                 foreach (var link in nodeById[u].Links)
                     if (nodeById.ContainsKey(link.ToNodeId) && seen.Add(link.ToNodeId))
                         queue.Enqueue(link.ToNodeId);
@@ -113,22 +118,107 @@ public static class PathStatsService
             return sum;
         }
 
-        // Opening choices: root's direct link targets that are player choices.
-        var branches = new List<BranchStat>();
-        foreach (var link in nodeById[0].Links)
+        // ── Fork tree (issue #14) ─────────────────────────────────────────
+        // A fork is where the player decides. From a starting node, walk forward until
+        // player-choice nodes are met and stop there — those are the fork. v1 took the
+        // root's DIRECT links instead, so a conversation opening with an NPC greeting
+        // before the choice menu reported no branches at all.
+        //
+        // The walk uses the FULL graph, not the DAG: a choice reachable only by looping
+        // back to a hub is still a choice the player is offered.
+        List<int> ChoiceFrontier(int start)
         {
-            if (!nodeById.TryGetValue(link.ToNodeId, out var c) || !c.IsPlayerChoice) continue;
-            branches.Add(new BranchStat(
-                c.NodeId, c.DefaultText ?? "",
-                ReachableSum(c.NodeId, female: false), Longest(c.NodeId, female: false),
-                ReachableSum(c.NodeId, female: true),  Longest(c.NodeId, female: true)));
+            var seen  = new HashSet<int> { start };
+            var queue = new Queue<int>();
+            var found = new List<int>();
+            void Enqueue(int u)
+            {
+                foreach (var link in nodeById[u].Links)
+                    if (nodeById.ContainsKey(link.ToNodeId) && seen.Add(link.ToNodeId))
+                        queue.Enqueue(link.ToNodeId);
+            }
+            Enqueue(start);
+            while (queue.Count > 0)
+            {
+                var u = queue.Dequeue();
+                if (nodeById[u].IsPlayerChoice) found.Add(u);   // fork boundary: stop here
+                else Enqueue(u);
+            }
+            return found;
         }
-        branches = branches.OrderBy(b => b.ChoiceNodeId).ToList();
+
+        // The choices on the way to here. A frontier choice already on this stack is
+        // dropped rather than recursed into — the same "a loop counts once" rule as the
+        // DAG cut, and what stops a hub-and-spoke menu from unrolling forever.
+        var forkStack = new HashSet<int>();
+        List<BranchStat> Forks(int start, int depth)
+        {
+            if (depth > MaxForkDepth) return [];
+            var result = new List<BranchStat>();
+            foreach (var c in ChoiceFrontier(start).Where(c => !forkStack.Contains(c)).OrderBy(c => c))
+            {
+                forkStack.Add(c);
+                var subs = Forks(c, depth + 1);
+                forkStack.Remove(c);
+
+                result.Add(new BranchStat(
+                    c, nodeById[c].DefaultText ?? "",
+                    ReachableSum(c, female: false), Longest(c, female: false),
+                    ReachableSum(c, female: true),  Longest(c, female: true),
+                    subs));
+            }
+            return result;
+        }
+        var branches = Forks(0, 1);
+
+        // ── Endings (issue #14) ───────────────────────────────────────────
+        // Root-to-ending figures are the mirror of Longest/Shortest: walk the DAG's edges
+        // backwards. Node 0 has no DAG predecessors by construction — it is on the DFS
+        // stack for the whole traversal, so every edge into it is a dropped back-edge —
+        // which makes the recursion well-founded without a separate base case.
+        var preds = new Dictionary<int, List<int>>();
+        foreach (var (u, outs) in dag)
+            foreach (var v in outs)
+            {
+                if (!preds.TryGetValue(v, out var list)) preds[v] = list = [];
+                list.Add(u);
+            }
+
+        var longToMemo  = new Dictionary<(int, bool), int>();
+        var shortToMemo = new Dictionary<(int, bool), int>();
+        int LongestTo(int u, bool female)
+        {
+            if (longToMemo.TryGetValue((u, female), out var cached)) return cached;
+            var best = Weight(u, female);
+            if (preds.TryGetValue(u, out var ins) && ins.Count > 0)
+                best += ins.Max(p => LongestTo(p, female));
+            longToMemo[(u, female)] = best;
+            return best;
+        }
+        int ShortestTo(int u, bool female)
+        {
+            if (shortToMemo.TryGetValue((u, female), out var cached)) return cached;
+            var best = Weight(u, female);
+            if (preds.TryGetValue(u, out var ins) && ins.Count > 0)
+                best += ins.Min(p => ShortestTo(p, female));
+            shortToMemo[(u, female)] = best;
+            return best;
+        }
+
+        var endings = dag.Keys
+            .Where(id => nodeById[id].Links.Count == 0)     // a real dead end, not a loop-back
+            .Select(id => new EndingStat(
+                id, nodeById[id].DefaultText ?? "",
+                LongestTo(id, female: false), ShortestTo(id, female: false),
+                LongestTo(id, female: true),  ShortestTo(id, female: true)))
+            .OrderByDescending(e => e.DefaultLongestWords)
+            .ThenBy(e => e.NodeId)
+            .ToList();
 
         return new PathStatsReport(
             significant, defaultTotal, femaleTotal,
             Longest(0, false),  Shortest(0, false),
             Longest(0, true),   Shortest(0, true),
-            wordsPerSpeaker, branches);
+            wordsPerSpeaker, branches, endings);
     }
 }
