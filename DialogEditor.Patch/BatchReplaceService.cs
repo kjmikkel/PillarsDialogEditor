@@ -1,4 +1,4 @@
-using DialogEditor.Core.Editing;
+﻿using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
 
@@ -110,17 +110,6 @@ public static class BatchReplaceService
                 ci++;
             }
         }
-
-        if (query.InLinkChoiceText)
-        {
-            // Key each link by its position: a node can have several links whose choice
-            // text matches, and a constant path would collide in ApplyToNode's
-            // ToDictionary (and share one replacement across links). Matches the
-            // positional scheme used for scripts/conditions above.
-            for (var li = 0; li < node.Links.Count; li++)
-                Check(node, $"Link[{li}] Choice Text",
-                      node.Links[li].QuestionNodeTextDisplay, s, r, comparison, matches);
-        }
     }
 
     private static void Check(
@@ -159,14 +148,6 @@ public static class BatchReplaceService
 
         var newConditions = ReplaceConditionParams(node.Conditions, byField);
 
-        var newLinks = node.Links.Select((link, li) =>
-        {
-            var qtd = Get($"Link[{li}] Choice Text", link.QuestionNodeTextDisplay);
-            return qtd == link.QuestionNodeTextDisplay
-                ? link
-                : link with { QuestionNodeTextDisplay = qtd };
-        }).ToList();
-
         return node with
         {
             DefaultText  = Get("Default Text",  node.DefaultText),
@@ -175,7 +156,9 @@ public static class BatchReplaceService
             ListenerGuid = Get("Listener GUID", node.ListenerGuid),
             Scripts      = newScripts,
             Conditions   = newConditions,
-            Links        = newLinks,
+            // Links are intentionally left untouched: the only link field batch
+            // replace ever reached was QuestionNodeTextDisplay, an enum that
+            // must never be rewritten by substring replacement (#24).
         };
     }
 
