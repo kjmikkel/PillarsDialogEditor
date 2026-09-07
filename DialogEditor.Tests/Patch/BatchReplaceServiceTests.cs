@@ -188,7 +188,7 @@ public class BatchReplaceServiceTests
         var results = BatchReplaceService.DryRun(query, [file], provider);
 
         Assert.Single(results[0].Matches);
-        Assert.Equal("Link Choice Text", results[0].Matches[0].FieldPath);
+        Assert.Equal("Link[0] Choice Text", results[0].Matches[0].FieldPath);
     }
 
     // ── DryRun — field toggle respected ──────────────────────────────────
@@ -240,6 +240,28 @@ public class BatchReplaceServiceTests
 
         Assert.True(provider.SavedSnapshot is not null);
         Assert.Equal("Hello earth", provider.SavedSnapshot!.Nodes[0].DefaultText);
+    }
+
+    [Fact]
+    public void Apply_TwoMatchingLinkChoiceTexts_OnOneNode_ReplacesBoth()
+    {
+        // Two links on one node, both with QuestionNodeTextDisplay matching the search.
+        // Both share the constant "Link Choice Text" field path, so ApplyToNode's
+        // ToDictionary(p => p.FieldPath) must not choke on duplicate keys — this pins
+        // that invariant (and that each link gets its own replacement, not a shared one).
+        var link1    = new LinkEditSnapshot(1, 2, 1f, "Ask about the quest", false);
+        var link2    = new LinkEditSnapshot(1, 3, 1f, "Refuse the quest",    false);
+        var file     = MakeFile("conv");
+        var provider = MakeProvider(file, MakeNode(1, links: [link1, link2]));
+        var query    = new BatchReplaceQuery("quest", "mission", false, InLinkChoiceText: true);
+
+        var dryRun = BatchReplaceService.DryRun(query, [file], provider);
+        BatchReplaceService.Apply(dryRun, provider);
+
+        Assert.NotNull(provider.SavedSnapshot);
+        var links = provider.SavedSnapshot!.Nodes[0].Links;
+        Assert.Equal("Ask about the mission", links[0].QuestionNodeTextDisplay);
+        Assert.Equal("Refuse the mission",    links[1].QuestionNodeTextDisplay);
     }
 
     [Fact]
