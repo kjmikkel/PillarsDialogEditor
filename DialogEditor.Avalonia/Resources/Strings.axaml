@@ -851,6 +851,13 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="PathStats_Cat_Narrator">Narrator</sys:String>
     <sys:String x:Key="PathStats_Cat_Script">Script</sys:String>
     <sys:String x:Key="ToolTip_PathStats_Navigate">Jump to this opening choice's node.</sys:String>
+    <sys:String x:Key="PathStats_Endings">Endings</sys:String>
+    <sys:String x:Key="PathStats_NoEndings">No endings — every path loops back to an earlier line.</sys:String>
+    <sys:String x:Key="PathStats_EndingRow">Node {0} — {1}</sys:String>
+    <sys:String x:Key="PathStats_EndingRange">shortest {0}   |   longest {1}</sys:String>
+    <sys:String x:Key="ToolTip_PathStats_Forks">The player choices in this conversation, nested: expand a choice to see the choices it leads to. Each row shows the total content down that choice and the longest single read through it, measured from the choice onward. A choice that loops back to an earlier one is shown once and not expanded again, and the tree stops after ten levels.</sys:String>
+    <sys:String x:Key="ToolTip_PathStats_EndingsSection">Every node the conversation can finish on — a line with no links out — and the range of reads that arrive there. A line whose only links loop backwards is not an ending, so these figures need not add up to the longest playthrough above, which does stop at a loop.</sys:String>
+    <sys:String x:Key="ToolTip_PathStats_NavigateEnding">Jump to this ending's node.</sys:String>
     <sys:String x:Key="ToolTip_PathStats">Playthrough-oriented stats: the longest and shortest single read, words per speaker, and how much content sits down each opening choice. Female figures appear when the female variant differs by more than 10%.</sys:String>
     <sys:String x:Key="FlowAnalytics_NoData">Open a conversation and click Refresh</sys:String>
     <sys:String x:Key="FlowAnalytics_LastAnalysed">Last analysed: {0}</sys:String>
