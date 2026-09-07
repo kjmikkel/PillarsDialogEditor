@@ -182,5 +182,6 @@ existing `FocusHintBar` and navigation.
     exit loops back to a hub stops the longest/shortest walk but is not a way the
     conversation finishes. Consequence: per-ending figures need not reconcile with the
     overall longest, which does stop at DAG terminals — the UI tooltip says so.
-- Condition-aware paths (simulating game state to prune unreachable-by-condition links) — this
-  is the Playtest Mode gap's territory; path stats are over the *possible* graph.
+- Condition-aware paths (simulating game state to prune unreachable-by-condition links) —
+  tracked as #32, blocked on #1 (Playtest Mode) settling how assumed game state is
+  represented. Path stats remain over the *possible* graph until then.
