@@ -1,4 +1,4 @@
-using DialogEditor.Core.Editing;
+﻿using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
@@ -47,7 +47,7 @@ public class ProjectFindServiceTests
         Assert.Empty(ProjectFindService.Search(project, provider, "en",
             new ProjectFindQuery("Caed Nua")));                         // off by default
         Assert.Single(ProjectFindService.Search(project, provider, "en",
-            new ProjectFindQuery("Caed Nua", InLinkChoice: true)));
+            new ProjectFindQuery("Caed Nua", InLinkDisplaySetting: true)));
     }
 
     [Fact] // Node comment only when toggled; comes from patch.NodeComments
