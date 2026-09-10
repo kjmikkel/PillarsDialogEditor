@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Editing;
@@ -79,7 +79,7 @@ public partial class ExportConversationsViewModel : ObservableObject
             {
                 var item = selected[0];
                 var path = await _filePicker.PickSaveFileAsync(
-                    "Export Conversation",
+                    Loc.Get("Export_PickFileTitle"),
                     item.Name,
                     exporter.FileExtension,
                     exporter.FileExtension.TrimStart('.').ToUpperInvariant());
@@ -89,7 +89,7 @@ public partial class ExportConversationsViewModel : ObservableObject
             }
             else
             {
-                var folder = await _folderPicker.PickFolderAsync("Export Conversations");
+                var folder = await _folderPicker.PickFolderAsync(Loc.Get("Export_PickFolderTitle"));
                 if (folder is null) return;
                 foreach (var item in selected)
                 {

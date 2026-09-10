@@ -234,7 +234,10 @@ public partial class FlowAnalyticsViewModel : ObservableObject
             var node    = snapshot.Nodes.FirstOrDefault(n => n.NodeId == issue.NodeId);
             var snippet = node is not null && !string.IsNullOrWhiteSpace(node.DefaultText)
                 ? Truncate(node.DefaultText, 60)
-                : $"({node?.SpeakerCategory.ToString().ToLower() ?? "unknown"}, no text)";
+                // The speaker category is a game-data enum name and stays verbatim.
+                : Loc.Format("FlowAnalytics_NoTextSnippet",
+                      node?.SpeakerCategory.ToString().ToLower()
+                      ?? Loc.Get("FlowAnalytics_UnknownSpeaker"));
             Issues.Add(new FlowIssueViewModel(issue, snippet, _navigateToNode));
         }
 

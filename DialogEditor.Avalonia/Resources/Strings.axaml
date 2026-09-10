@@ -685,6 +685,39 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="BatchReplace_InConditionParams">Condition params</sys:String>
     <sys:String x:Key="BatchReplace_Preview">Preview</sys:String>
     <sys:String x:Key="BatchReplace_Apply">Apply</sys:String>
+    <!-- ─── Editor window / dialog titles and prompts ─────────────────── -->
+    <!-- Heads the condition and script editors for one node. {0} = node id.
+         WindowTitle_ConditionEditor / _ScriptEditor wrap this. -->
+    <sys:String x:Key="Editor_NodeTitle">Node {0}</sys:String>
+    <!-- Titles of the OS save/open dialogs. Exporting ONE conversation saves a single
+         file; exporting several asks for a folder — two different dialogs, hence two
+         strings rather than one count-driven plural. -->
+    <sys:String x:Key="Export_PickFileTitle">Export Conversation</sys:String>
+    <sys:String x:Key="Export_PickFolderTitle">Export Conversations</sys:String>
+    <sys:String x:Key="Localization_ExportPickerTitle">Export for Translation</sys:String>
+    <sys:String x:Key="Localization_ImportPickerTitle">Import Translation</sys:String>
+    <!-- Prompts on the small dialog that asks which language code to use. "Source" is
+         the language being translated FROM, "target" the language translated INTO. -->
+    <sys:String x:Key="Localization_SourceLanguagePrompt">Source language</sys:String>
+    <sys:String x:Key="Localization_TargetLanguagePrompt">Target language</sys:String>
+
+    <!-- ─── Flow analytics: node with no text ──────────────────────────── -->
+    <!-- Stands in for a node's dialogue line when it has none, so the issue row can
+         still identify it. {0} = the speaker category in lower case, one of the game's
+         own enum names (npc, player, narrator …) and NOT translated. -->
+    <sys:String x:Key="FlowAnalytics_NoTextSnippet">({0}, no text)</sys:String>
+    <!-- Substituted for {0} above when the node itself cannot be found -->
+    <sys:String x:Key="FlowAnalytics_UnknownSpeaker">unknown</sys:String>
+
+    <!-- ─── Voice-over import failures ─────────────────────────────────── -->
+    <!-- Shown when the build has no voice-over importer wired up at all. A user should
+         never see this; it means the feature is unavailable, not that their file was
+         rejected. -->
+    <sys:String x:Key="Status_VoNoImporter">No importer configured.</sys:String>
+    <!-- Substituted into Status_VoImportFailed when the failure carried no reason.
+         Lower case: it is dropped mid-sentence, not used on its own. -->
+    <sys:String x:Key="Status_UnknownError">unknown error</sys:String>
+
     <!-- ─── Condition / script parameter type hints ────────────────────── -->
     <!--
         Shown as the tooltip on a condition or script parameter field, and read aloud

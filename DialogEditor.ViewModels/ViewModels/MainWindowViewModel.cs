@@ -1618,11 +1618,11 @@ public partial class MainWindowViewModel : ObservableObject
         var allTypes = new (string, string)[] { (".csv", "CSV"), (".json", "JSON"), (".xlf", "XLIFF") };
         var ordered = allTypes.OrderByDescending(t => t.Item1 == ext).ToArray();
         var path = await _filePicker.PickSaveFileAsync(
-            "Export for Translation",
+            Loc.Get("Localization_ExportPickerTitle"),
             "export" + ext,
             ordered);
         if (path is null) return;
-        var lang = await (RequestLanguageCode?.Invoke("Source language", _provider?.Language)
+        var lang = await (RequestLanguageCode?.Invoke(Loc.Get("Localization_SourceLanguagePrompt"), _provider?.Language)
                           ?? Task.FromResult<string?>(_provider?.Language));
         if (lang is null) return;
         var count = _project.Patches.Values
@@ -1637,13 +1637,13 @@ public partial class MainWindowViewModel : ObservableObject
     {
         if (_project is null) return;
         var path = await _filePicker.PickOpenFileAsync(
-            "Import Translation",
+            Loc.Get("Localization_ImportPickerTitle"),
             new[] { (".csv", "CSV"), (".json", "JSON"), (".xlf", "XLIFF") });
         if (path is null) return;
         var fmt          = DetectFormat(path);
         var suggestedLang = LocalizationImportService.DetectLanguage(path, fmt,
             ex => AppLog.Warn($"Language auto-detect failed for '{path}': {ex.Message}"));
-        var lang = await (RequestLanguageCode?.Invoke("Target language", suggestedLang)
+        var lang = await (RequestLanguageCode?.Invoke(Loc.Get("Localization_TargetLanguagePrompt"), suggestedLang)
                           ?? Task.FromResult<string?>(suggestedLang));
         if (lang is null) return;
         _project  = LocalizationImportService.Import(_project, path, fmt, lang);
@@ -2393,8 +2393,7 @@ public partial class MainWindowViewModel : ObservableObject
                     // Game file changed underneath the patch (e.g. a game update).
                     // Still show the user's edits — force-apply for display and surface
                     // the mismatch; F5 keeps its strict conflict flow for real writes.
-                    AppLog.Warn($"Patch for '{file.Name}' no longer matches game data " +
-                        $"(node {conflict.NodeId}, field '{conflict.FieldName}'); forcing apply for display");
+                    AppLog.Warn($"Patch for '{file.Name}' no longer matches game data (node {conflict.NodeId}, field '{conflict.FieldName}'); forcing apply for display");
                     patchedSnap = PatchApplier.Apply(vanillaSnap, storedPatch, ignoreConflicts: true);
                     StatusText = Loc.Format("Status_PatchBaselineMismatch", file.Name);
                 }

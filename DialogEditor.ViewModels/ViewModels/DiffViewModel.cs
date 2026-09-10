@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -9,6 +9,7 @@ using DialogEditor.Patch;
 using DialogEditor.Patch.Diff;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
+using DialogEditor.Core.Localisation;
 
 namespace DialogEditor.ViewModels;
 
@@ -217,7 +218,7 @@ public partial class DiffViewModel : ObservableObject
         try
         {
             // Recent commits
-            var logResult = _git.Run(dir, "log", "-n", "20", "--format=%h %s");
+            var logResult = RunGitLog(dir);
             if (logResult.Ok)
             {
                 foreach (var raw in logResult.StdOut.Split('\n'))
@@ -612,4 +613,11 @@ public partial class DiffViewModel : ObservableObject
             return new Conversation(name, [], new StringTable([]));
         }
     }
+
+    // git's own pretty-format syntax, not prose: %h is the abbreviated hash and %s the
+    // subject line, and the caller splits the result on the first space. A translated
+    // format string would make git emit something unparseable — or nothing at all.
+    [NotLocalised("git pretty-format arguments")]
+    private GitResult RunGitLog(string dir) =>
+        _git.Run(dir, "log", "-n", "20", "--format=%h %s");
 }
