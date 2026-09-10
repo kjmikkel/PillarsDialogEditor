@@ -1,5 +1,6 @@
-using System.Globalization;
+﻿using System.Globalization;
 using System.Text;
+using DialogEditor.Core.Localisation;
 
 namespace DialogEditor.Patch.Diff;
 
@@ -52,6 +53,11 @@ public class ProjectBlameService(IGitRunner git)
             .ToList();
     }
 
+    // These are substrings of git's OWN error output. git reports in English
+    // regardless of the editor's UI language (and regardless of the user's
+    // locale unless they install git's translations), so translating them
+    // would stop "this file has no history yet" from ever being recognised.
+    [NotLocalised("Substrings matched against git's English stderr")]
     private static bool LooksLikeNoHistory(string stderr) =>
         stderr.Contains("no such path", StringComparison.OrdinalIgnoreCase)
         || stderr.Contains("no such ref", StringComparison.OrdinalIgnoreCase)

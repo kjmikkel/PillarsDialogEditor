@@ -1,10 +1,14 @@
-using DialogEditor.Core.Editing;
+﻿using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
+using DialogEditor.Core.Localisation;
 using DialogEditor.Patch.Diff;
 
 namespace DialogEditor.Patch;
 
+// Diagnostic only: MainWindowViewModel logs this via AppLog.Warn and shows the user
+// Loc.Get("Sample_ConversationMissing") instead.
+[NotLocalised("Diagnostic message; the user sees Sample_ConversationMissing")]
 public sealed class SampleConversationNotFoundException(string conversationName)
     : Exception($"Sample conversation '{conversationName}' was not found in the loaded game.");
 

@@ -1,5 +1,11 @@
+﻿using DialogEditor.Core.Localisation;
+
 namespace DialogEditor.Patch;
 
+// The message is a developer diagnostic: ConflictResolutionDialog renders the four
+// structured properties below into its own localised layout, and only the CLI ever
+// prints Message. Localising it would produce a translation nobody reads.
+[NotLocalised("Diagnostic message; the UI renders the structured properties instead")]
 public sealed class PatchConflictException(
     int nodeId,
     string fieldName,
