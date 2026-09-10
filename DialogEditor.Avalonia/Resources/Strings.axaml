@@ -685,6 +685,30 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="BatchReplace_InConditionParams">Condition params</sys:String>
     <sys:String x:Key="BatchReplace_Preview">Preview</sys:String>
     <sys:String x:Key="BatchReplace_Apply">Apply</sys:String>
+    <!-- ─── Batch replace: match preview field labels ──────────────────── -->
+    <!--
+        These name the node field a match was found in. They are display labels only:
+        the editor pairs a preview row to the field it rewrites by a typed identity
+        (DialogEditor.Core.Editing.BatchField), so translating these cannot break
+        Apply. Keep them short — they head each preview row.
+    -->
+    <sys:String x:Key="BatchReplace_Field_DefaultText">Default Text</sys:String>
+    <!-- The female-variant line, used when the player character is female -->
+    <sys:String x:Key="BatchReplace_Field_FemaleText">Female Text</sys:String>
+    <!-- "GUID" is a technical identifier and is conventionally left untranslated -->
+    <sys:String x:Key="BatchReplace_Field_SpeakerGuid">Speaker GUID</sys:String>
+    <sys:String x:Key="BatchReplace_Field_ListenerGuid">Listener GUID</sys:String>
+    <!-- {0} = script phase, one of the game's own enum names (Enter/Exit/Update) and
+         NOT translated; {1} = which script on the node; {2} = which argument.
+         The brackets are array-index notation — keep them. -->
+    <sys:String x:Key="BatchReplace_Field_ScriptParam">Script {0}[{1}] Param {2}</sys:String>
+    <!-- {0} = which condition on the node, {1} = which argument -->
+    <sys:String x:Key="BatchReplace_Field_ConditionParam">Condition[{0}] Param {1}</sys:String>
+    <!-- Defensive fallback: shown only if a new field kind ships without a label -->
+    <sys:String x:Key="BatchReplace_Field_Unknown">Field</sys:String>
+    <!-- Heads one preview row. {0} = node id, {1} = one of the field labels above -->
+    <sys:String x:Key="BatchReplace_MatchLabel">Node {0} — {1}</sys:String>
+
     <!-- Match preview rows: trailing spaces align the "Before:"/"After: " labels — preserve them -->
     <sys:String x:Key="BatchReplace_Before" xml:space="preserve">Before: </sys:String>
     <sys:String x:Key="BatchReplace_After" xml:space="preserve">After:  </sys:String>

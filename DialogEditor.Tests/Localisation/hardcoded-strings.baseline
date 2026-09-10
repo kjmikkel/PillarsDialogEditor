@@ -11,12 +11,6 @@ DialogEditor.Avalonia/Views/MainWindow.axaml.cs|This conversation
 DialogEditor.Avalonia/Views/MainWindow.axaml.cs|This project
 DialogEditor.Avalonia/Views/NodeDetailView.axaml.cs|Link → {0}
 DialogEditor.Avalonia/Views/UnsavedChangesDialog.axaml.cs|'{0}' has unsaved changes.
-DialogEditor.Patch/BatchReplaceService.cs|Condition[{0}] Param {1}
-DialogEditor.Patch/BatchReplaceService.cs|Default Text
-DialogEditor.Patch/BatchReplaceService.cs|Female Text
-DialogEditor.Patch/BatchReplaceService.cs|Listener GUID
-DialogEditor.Patch/BatchReplaceService.cs|Script {0}[{1}] Param {2}
-DialogEditor.Patch/BatchReplaceService.cs|Speaker GUID
 DialogEditor.Patch/GitConflict/GitMergeAnalyzer.cs|+{0} ~{1} -{2} ({3} text)
 DialogEditor.Patch/SampleProjectService.cs|  (an alternate greeting on the experiment branch)
 DialogEditor.Patch/SampleProjectService.cs|  (try changing this line!)
