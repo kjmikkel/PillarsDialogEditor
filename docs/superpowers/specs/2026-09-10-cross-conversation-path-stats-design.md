@@ -91,7 +91,12 @@ is fetched with `ScriptCatalogue.FindByFullName` (exact reflection signature, so
 per-game variant); the conversation argument is the parameter whose `LookupKind` is
 `"Conversation"`, and the entry node is the `Int32` parameter named `"Conversation Node ID"`.
 
-**Resolution branches on that parameter's declared `Type`:**
+**Resolution branches on the argument's CLR type, read from the reflection signature** —
+deliberately *not* the catalogue parameter's own `Type` field, which reads `"GameData"` for
+**both** games and so cannot tell them apart. The signature can: PoE2 declares
+`Void StartConversation(Guid, Guid, Int32)` and PoE1 `Void StartConversation(Guid, String, Int32)`,
+so the parenthesised type list indexed at the conversation parameter's position gives `Guid`
+or `String`:
 
 - `Guid` (PoE2) — look the GUID up in a **cached `Id → Name` map** supplied to the resolver.
 
@@ -153,8 +158,11 @@ at the start of `Analyze` to obtain `jumps(u)`. Keeping the transport type flat 
 resolver never has to think about lookup shape, and the grouping is one line at the consumer.
 
 `TargetLabel` is what the UI shows for an unfollowed handoff: the resolved conversation name
-when one was found (`NotPatched`, `LoadFailed`), and a localised "unknown target" placeholder
-when resolution itself failed (`Unresolved`). It is display text, never an identifier.
+when one was found (`NotPatched`, `LoadFailed`), and **empty** when resolution itself failed
+(`Unresolved`) — the ViewModel substitutes the localised `PathStats_UnknownTarget` placeholder
+when it renders that row. The resolver does not call `Loc`: it is configured at startup, and
+coupling a service to that global state is what this suite already runs serially to survive.
+`TargetLabel` is display text, never an identifier.
 
 `ConversationsSpanned` is `graph.Conversations.Count` — the conversations actually materialised,
 so it counts the root plus every conversation genuinely reached, and never counts a handoff that
