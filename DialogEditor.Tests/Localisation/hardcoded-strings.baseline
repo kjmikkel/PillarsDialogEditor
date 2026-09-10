@@ -17,19 +17,13 @@ DialogEditor.Patch/BatchReplaceService.cs|Female Text
 DialogEditor.Patch/BatchReplaceService.cs|Listener GUID
 DialogEditor.Patch/BatchReplaceService.cs|Script {0}[{1}] Param {2}
 DialogEditor.Patch/BatchReplaceService.cs|Speaker GUID
-DialogEditor.Patch/Diff/ProjectBlameService.cs|bad revision
-DialogEditor.Patch/Diff/ProjectBlameService.cs|does not have any commits
-DialogEditor.Patch/Diff/ProjectBlameService.cs|no such path
-DialogEditor.Patch/Diff/ProjectBlameService.cs|no such ref
 DialogEditor.Patch/GitConflict/GitMergeAnalyzer.cs|+{0} ~{1} -{2} ({3} text)
-DialogEditor.Patch/PatchConflictException.cs|Patch conflict on node {0} field '{1}': expected '{2}' but found '{3}'.
 DialogEditor.Patch/SampleProjectService.cs|  (an alternate greeting on the experiment branch)
 DialogEditor.Patch/SampleProjectService.cs|  (try changing this line!)
 DialogEditor.Patch/SampleProjectService.cs|And this whole line was added as a sample.
 DialogEditor.Patch/SampleProjectService.cs|Dialog Editor Sample
 DialogEditor.Patch/SampleProjectService.cs|Initial sample — edit Eder's opening line
 DialogEditor.Patch/SampleProjectService.cs|Reshape the scene — add a line, a note, and trim a dead end
-DialogEditor.Patch/SampleProjectService.cs|Sample conversation '{0}' was not found in the loaded game.
 DialogEditor.Patch/SampleProjectService.cs|Sample translator note: keep Eder's tone warm and informal.
 DialogEditor.Patch/SampleProjectService.cs|experiment: try an alternate greeting
 DialogEditor.ViewModels/Editing/AddAnnotationCommand.cs|Add annotation
