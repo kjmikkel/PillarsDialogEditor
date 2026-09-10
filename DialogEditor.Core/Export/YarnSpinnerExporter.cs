@@ -1,7 +1,13 @@
-using System.Text;
+﻿using System.Text;
+
+using DialogEditor.Core.Localisation;
 
 namespace DialogEditor.Core.Export;
 
+// Every literal here is Yarn syntax: "title:", "---", "-> ", "===". YarnSpinnerImporter
+// reads these files back, and Yarn Spinner itself parses them, so a translated keyword
+// would produce a file neither can load.
+[NotLocalised("Yarn Spinner file syntax — round-tripped through YarnSpinnerImporter")]
 public class YarnSpinnerExporter : IDialogExporter
 {
     public string FileExtension => ".yarn";

@@ -1,13 +1,16 @@
-using DialogEditor.Core.Editing;
+﻿using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Core.Parsing;
+using DialogEditor.Core.Resources;
 using DialogEditor.Core.Serialization;
 
 namespace DialogEditor.Core.GameData;
 
 public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
 {
-    public string GameName => "Pillars of Eternity";
+    // The shipped games are themselves localised, so their titles are UI copy
+    // rather than identifiers — GameId below is the stable technical handle.
+    public string GameName => CoreStrings.Game_Poe1_Name;
     public string GameId   => "poe1";
     public string Language { get; set; } = "en";
 

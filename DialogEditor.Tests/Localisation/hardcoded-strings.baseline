@@ -11,13 +11,6 @@ DialogEditor.Avalonia/Views/MainWindow.axaml.cs|This conversation
 DialogEditor.Avalonia/Views/MainWindow.axaml.cs|This project
 DialogEditor.Avalonia/Views/NodeDetailView.axaml.cs|Link → {0}
 DialogEditor.Avalonia/Views/UnsavedChangesDialog.axaml.cs|'{0}' has unsaved changes.
-DialogEditor.Core/Export/DialogExporterFactory.cs|Yarn Spinner
-DialogEditor.Core/Export/YarnSpinnerExporter.cs|title: {0}
-DialogEditor.Core/GameData/Poe1GameDataProvider.cs|Pillars of Eternity
-DialogEditor.Core/GameData/Poe2GameDataProvider.cs|Pillars of Eternity II: Deadfire
-DialogEditor.Core/Models/ConditionNode.cs|NOT 
-DialogEditor.Core/Models/ConditionNode.cs|NOT {0}
-DialogEditor.Core/Parsing/Poe1SpeakerNameParser.cs|Grieving Mother
 DialogEditor.Patch/BatchReplaceService.cs|Condition[{0}] Param {1}
 DialogEditor.Patch/BatchReplaceService.cs|Default Text
 DialogEditor.Patch/BatchReplaceService.cs|Female Text
