@@ -92,6 +92,12 @@ public sealed partial class PathBranchRowViewModel : ObservableObject
     public IReadOnlyList<PathBranchRowViewModel> SubBranches { get; }
     public bool HasSubBranches => SubBranches.Count > 0;
 
+    /// The conversation this fork lives in, shown ONLY when it is not the one on the
+    /// canvas — otherwise every row in the common single-file report would grow a
+    /// redundant prefix (issue #14).
+    public string ConversationName       { get; }
+    public bool   IsInAnotherConversation { get; }
+
     /// Top-level forks open, deeper ones folded. A conversation with forks all the way
     /// down would otherwise bury the issues list under a wall of indented rows, and the
     /// question the panel answers first is "is my opening menu balanced?".
@@ -99,8 +105,11 @@ public sealed partial class PathBranchRowViewModel : ObservableObject
 
     public PathBranchRowViewModel(string choiceText, string defaultContent, string defaultLongest,
         string femaleContent, string femaleLongest, Action navigate,
-        IReadOnlyList<PathBranchRowViewModel>? subBranches = null, bool isExpanded = false)
+        IReadOnlyList<PathBranchRowViewModel>? subBranches = null, bool isExpanded = false,
+        string conversationName = "", bool isInAnotherConversation = false)
     {
+        ConversationName        = conversationName;
+        IsInAnotherConversation = isInAnotherConversation;
         ChoiceText         = choiceText;
         DefaultContentText = defaultContent;
         DefaultLongestText = defaultLongest;
@@ -127,9 +136,16 @@ public sealed partial class PathEndingRowViewModel : ObservableObject
     public string DefaultRangeText { get; }
     public string FemaleRangeText  { get; }
 
+    /// See PathBranchRowViewModel.ConversationName (issue #14).
+    public string ConversationName       { get; }
+    public bool   IsInAnotherConversation { get; }
+
     public PathEndingRowViewModel(int nodeId, string endingText, string defaultRange,
-        string femaleRange, Action navigate)
+        string femaleRange, Action navigate,
+        string conversationName = "", bool isInAnotherConversation = false)
     {
+        ConversationName        = conversationName;
+        IsInAnotherConversation = isInAnotherConversation;
         NodeId           = nodeId;
         EndingText       = endingText;
         DefaultRangeText = defaultRange;
@@ -138,6 +154,23 @@ public sealed partial class PathEndingRowViewModel : ObservableObject
     }
 
     [RelayCommand] private void Navigate() => _navigate();
+}
+
+/// One "Handoffs not followed" row: a StartConversation the report found but did not walk.
+/// Listed so a project-patched-only boundary never silently drops content from the end of a
+/// report — the writer sees that a figure stops here, and why (issue #14).
+public sealed class UnfollowedJumpRowViewModel
+{
+    public int    NodeId      { get; }
+    public string TargetLabel { get; }
+    public string ReasonText  { get; }
+
+    public UnfollowedJumpRowViewModel(int nodeId, string targetLabel, string reasonText)
+    {
+        NodeId      = nodeId;
+        TargetLabel = targetLabel;
+        ReasonText  = reasonText;
+    }
 }
 
 /// One "Words per speaker" row.
@@ -179,6 +212,22 @@ public partial class FlowAnalyticsViewModel : ObservableObject
 
     [ObservableProperty] private int _wordsPerMinute = PathStatsFormat.DefaultWordsPerMinute;
 
+    // ── Conversation handoffs (issue #14) ────────────────────────────────────
+    // The resolver is injected as a delegate so the VM stays testable without a
+    // DialogProject, a game folder, or disk. Null (or the toggle off) means the
+    // single-conversation overload, which is also the safe fallback.
+    private readonly Func<MultiConversationGraph>? _resolveGraph;
+    private readonly Action<bool>?                 _persistFollowJumps;
+    private readonly Action<string, int>?          _navigateToNodeInConv;
+
+    [ObservableProperty] private bool _followConversationJumps;
+
+    public ObservableCollection<UnfollowedJumpRowViewModel> UnfollowedJumpRows { get; } = [];
+
+    [ObservableProperty] private bool   _hasUnfollowedJumps;
+    [ObservableProperty] private bool   _hasSpannedConversations;
+    [ObservableProperty] private string _conversationsSpannedText = string.Empty;
+
     [ObservableProperty] private bool   _hasPathStats;
     [ObservableProperty] private bool   _hasEndings;
     [ObservableProperty] private bool   _hasSignificantFemaleVariant;
@@ -192,7 +241,11 @@ public partial class FlowAnalyticsViewModel : ObservableObject
         Func<IReadOnlyDictionary<string, IReadOnlyList<NodeTranslation>>>? getTranslations = null,
         string                          gameId = "",
         int                             wordsPerMinute = PathStatsFormat.DefaultWordsPerMinute,
-        Action<int>?                    persistWordsPerMinute = null)
+        Action<int>?                    persistWordsPerMinute = null,
+        Func<MultiConversationGraph>?   resolveGraph = null,
+        bool                            followConversationJumps = false,
+        Action<bool>?                   persistFollowJumps = null,
+        Action<string, int>?            navigateToNodeInConversation = null)
     {
         _getSnapshot     = getSnapshot;
         _navigateToNode  = navigateToNode;
@@ -204,6 +257,21 @@ public partial class FlowAnalyticsViewModel : ObservableObject
         // OnWordsPerMinuteChanged and persist a value we were just handed.
         _wordsPerMinute        = wordsPerMinute;
         _persistWordsPerMinute = persistWordsPerMinute;
+
+        // Same reason as _wordsPerMinute above: assigning the backing field skips the
+        // changed-handler, which would persist a value we were just handed.
+        _followConversationJumps = followConversationJumps;
+        _persistFollowJumps      = persistFollowJumps;
+        _resolveGraph            = resolveGraph;
+        _navigateToNodeInConv    = navigateToNodeInConversation;
+    }
+
+    /// Mirrors OnWordsPerMinuteChanged: the report's strings are baked at analysis time, so
+    /// a scope change only reaches the UI by re-running the analysis.
+    partial void OnFollowConversationJumpsChanged(bool value)
+    {
+        _persistFollowJumps?.Invoke(value);
+        Refresh();
     }
 
     // Branch and header strings are built once into plain strings (see RefreshPathStats),
@@ -272,7 +340,36 @@ public partial class FlowAnalyticsViewModel : ObservableObject
 
     private void RefreshPathStats(ConversationEditSnapshot snapshot)
     {
-        var report = PathStatsService.Analyze(snapshot);
+        // Following handoffs is opt-in (issue #14). A null resolver is the safe fallback,
+        // so the toggle can never leave the panel broken.
+        var graph  = FollowConversationJumps && _resolveGraph is not null ? _resolveGraph() : null;
+        var report = graph is not null
+            ? PathStatsService.Analyze(graph)
+            : PathStatsService.Analyze(snapshot);
+        var rootConversation = graph?.RootConversation ?? "";
+
+        HasSpannedConversations = report.ConversationsSpanned > 1;
+        ConversationsSpannedText = HasSpannedConversations
+            ? Loc.Format("FlowAnalytics_SpanningConversations", report.ConversationsSpanned)
+            : string.Empty;
+
+        UnfollowedJumpRows.Clear();
+        foreach (var u in report.Unfollowed)
+            UnfollowedJumpRows.Add(new UnfollowedJumpRowViewModel(
+                u.From.NodeId,
+                // The resolver leaves the label empty when it could not identify the target
+                // at all; localising that placeholder is this layer's job, not its.
+                string.IsNullOrEmpty(u.TargetLabel)
+                    ? Loc.Get("PathStats_UnknownTarget")
+                    : u.TargetLabel,
+                Loc.Get(u.Reason switch
+                {
+                    UnfollowedReason.NotPatched => "FlowAnalytics_Unfollowed_NotPatched",
+                    UnfollowedReason.Unresolved => "FlowAnalytics_Unfollowed_Unresolved",
+                    _                           => "FlowAnalytics_Unfollowed_LoadFailed",
+                })));
+        HasUnfollowedJumps = UnfollowedJumpRows.Count > 0;
+
         HasSignificantFemaleVariant = report.HasSignificantFemaleVariant;
 
         LongestPlaythroughText  = WordsTimePair(report.DefaultLongestWords,  report.FemaleLongestWords);
@@ -290,13 +387,15 @@ public partial class FlowAnalyticsViewModel : ObservableObject
         }
 
         Branches.Clear();
-        foreach (var row in report.Branches.Select(b => BuildBranchRow(b, depth: 1)))
+        foreach (var row in report.Branches.Select(b => BuildBranchRow(b, depth: 1, rootConversation)))
             Branches.Add(row);
 
         Endings.Clear();
         foreach (var e in report.Endings)
         {
-            var nodeId = e.Node.NodeId;
+            var nodeId  = e.Node.NodeId;
+            var conv    = e.Node.Conversation;
+            var elsewhere = conv != rootConversation;
             Endings.Add(new PathEndingRowViewModel(
                 nodeId,
                 Loc.Format("PathStats_EndingRow", nodeId, Truncate(e.Text, 50)),
@@ -304,7 +403,8 @@ public partial class FlowAnalyticsViewModel : ObservableObject
                     WordsTime(e.DefaultShortestWords), WordsTime(e.DefaultLongestWords)),
                 Loc.Format("PathStats_EndingRange",
                     WordsTime(e.FemaleShortestWords), WordsTime(e.FemaleLongestWords)),
-                () => _navigateToNode(nodeId)));
+                () => NavigateTo(conv, nodeId, elsewhere),
+                conv, elsewhere));
         }
         HasEndings = Endings.Count > 0;
 
@@ -313,15 +413,33 @@ public partial class FlowAnalyticsViewModel : ObservableObject
 
     /// The fork tree is the same row shape at every depth; only the initial expansion
     /// differs, so the panel opens on the opening menu rather than on everything.
-    private PathBranchRowViewModel BuildBranchRow(BranchStat b, int depth) =>
-        new(Truncate(b.ChoiceText, 50),
+    private PathBranchRowViewModel BuildBranchRow(BranchStat b, int depth, string rootConversation)
+    {
+        var conv      = b.Choice.Conversation;
+        var elsewhere = conv != rootConversation;
+        return new PathBranchRowViewModel(
+            Truncate(b.ChoiceText, 50),
             Loc.Format("PathStats_BranchContent", WordsTime(b.DefaultContentWords)),
             Loc.Format("PathStats_BranchLongest", WordsTime(b.DefaultLongestWords)),
             Loc.Format("PathStats_BranchContent", WordsTime(b.FemaleContentWords)),
             Loc.Format("PathStats_BranchLongest", WordsTime(b.FemaleLongestWords)),
-            () => _navigateToNode(b.Choice.NodeId),
-            b.SubBranches.Select(s => BuildBranchRow(s, depth + 1)).ToList(),
-            isExpanded: depth == 1);
+            () => NavigateTo(conv, b.Choice.NodeId, elsewhere),
+            b.SubBranches.Select(s => BuildBranchRow(s, depth + 1, rootConversation)).ToList(),
+            isExpanded: depth == 1,
+            conversationName: conv,
+            isInAnotherConversation: elsewhere);
+    }
+
+    /// A row in another conversation needs the two-argument delegate — the original
+    /// Action&lt;int&gt; can only reach the conversation on the canvas. Falls back to it when the
+    /// cross-conversation one was not supplied, so navigation degrades rather than breaking.
+    private void NavigateTo(string conversation, int nodeId, bool isElsewhere)
+    {
+        if (isElsewhere && _navigateToNodeInConv is not null)
+            _navigateToNodeInConv(conversation, nodeId);
+        else
+            _navigateToNode(nodeId);
+    }
 
     private string WordsTime(int words) =>
         Loc.Format("PathStats_WordsTime", words, PathStatsFormat.ReadingTime(words, WordsPerMinute));

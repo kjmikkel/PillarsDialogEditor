@@ -870,6 +870,17 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="FlowAnalytics_Issue_BarkHasPlayerChoiceChild">Bark has player choice</sys:String>
     <sys:String x:Key="FlowAnalytics_Issue_ConversationJumpWhileContinuing">Starts another conversation while continuing</sys:String>
     <sys:String x:Key="PathStats_UnknownTarget">(unknown target)</sys:String>
+    <!-- Cross-conversation path stats (issue #14) -->
+    <sys:String x:Key="FlowAnalytics_FollowJumps">Follow conversation jumps</sys:String>
+    <sys:String x:Key="FlowAnalytics_FollowJumps_Tip">Counts content reached through Start Conversation handoffs into conversations this project patches. Figures will be larger than the single-conversation reading. Handoffs into conversations the project does not patch are listed but not counted.</sys:String>
+    <sys:String x:Key="FlowAnalytics_SpanningConversations">Spanning {0} conversations</sys:String>
+    <sys:String x:Key="FlowAnalytics_InConversation">in {0}</sys:String>
+    <sys:String x:Key="FlowAnalytics_UnfollowedHeader">Handoffs not followed</sys:String>
+    <sys:String x:Key="FlowAnalytics_UnfollowedRow">Node {0} → {1}</sys:String>
+    <sys:String x:Key="FlowAnalytics_Unfollowed_NotPatched">not patched by this project</sys:String>
+    <sys:String x:Key="FlowAnalytics_Unfollowed_Unresolved">target not found</sys:String>
+    <sys:String x:Key="FlowAnalytics_Unfollowed_LoadFailed">could not be loaded</sys:String>
+    <sys:String x:Key="FlowAnalytics_EndingsHint_WithJumps">An ending is a node with no outgoing links and no handoff. These figures need not reconcile with the longest playthrough above.</sys:String>
     <!-- Severity tier of an issue row's icon (tooltip + screen-reader name) -->
     <sys:String x:Key="FlowAnalytics_Severity_Error">Error</sys:String>
     <sys:String x:Key="FlowAnalytics_Severity_Warning">Warning</sys:String>

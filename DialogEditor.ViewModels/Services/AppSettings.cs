@@ -86,6 +86,10 @@ public static class AppSettings
         // upgrading install sees exactly the report it saw before.
         public bool DuplicateIncludeFemaleText { get; set; }
         public bool DuplicateIncludeOtherLanguages { get; set; }
+        // Whether path stats follow StartConversation handoffs (issue #14). Default false
+        // for the same reason as the two above: an upgrading install sees the report it saw
+        // before, and only opts in to the larger figures deliberately.
+        public bool FollowConversationJumps { get; set; }
 
         // MRU list of recently opened/created/saved-as project file paths, newest
         // first, capped at MaxRecentProjects. Powers File ▸ Recent Projects.
@@ -259,6 +263,15 @@ public static class AppSettings
     {
         get => Load().ReadingWordsPerMinute;
         set { var s = Load(); s.ReadingWordsPerMinute = value; Save(s); }
+    }
+
+    /// Whether Playthrough stats follow StartConversation handoffs into conversations this
+    /// project patches. Off by default: turning it on changes existing figures, so the writer
+    /// opts in rather than discovering a doubled number.
+    public static bool FollowConversationJumps
+    {
+        get => Load().FollowConversationJumps;
+        set { var s = Load(); s.FollowConversationJumps = value; Save(s); }
     }
 
     /// Similarity bar (0..1) above which two lines are reported as near-duplicates.
