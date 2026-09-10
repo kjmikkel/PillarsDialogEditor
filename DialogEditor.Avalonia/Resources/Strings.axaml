@@ -685,6 +685,56 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="BatchReplace_InConditionParams">Condition params</sys:String>
     <sys:String x:Key="BatchReplace_Preview">Preview</sys:String>
     <sys:String x:Key="BatchReplace_Apply">Apply</sys:String>
+    <!-- ─── Undo / redo history entries ────────────────────────────────── -->
+    <!--
+        ConversationViewModel.UndoDescription / RedoDescription name the edit that
+        Undo would reverse or Redo would repeat. They are read fresh each time the
+        history is inspected, so a translation takes effect immediately — including
+        for edits made before the language was switched.
+
+        Write them as the NAME OF AN ACTION, not as a sentence or a past-tense report:
+        the reader sees them next to the words Undo and Redo, so English uses the bare
+        infinitive ("Edit dialog text", not "Edited the dialog text"). Use whatever
+        form your language pairs with "undo".
+
+        Field names here match the labels on the node detail panel — translate the two
+        consistently, so undoing an edit names the field the user just changed.
+        "VO" is voice-over. "GUID" stays untranslated (see the note above).
+    -->
+    <sys:String x:Key="Undo_EditNodeType">Edit node type</sys:String>
+    <sys:String x:Key="Undo_EditSpeakerCategory">Edit speaker category</sys:String>
+    <sys:String x:Key="Undo_EditSpeakerGuid">Edit speaker GUID</sys:String>
+    <sys:String x:Key="Undo_EditListenerGuid">Edit listener GUID</sys:String>
+    <sys:String x:Key="Undo_EditDialogText">Edit dialog text</sys:String>
+    <sys:String x:Key="Undo_EditFemaleText">Edit female text</sys:String>
+    <sys:String x:Key="Undo_EditDisplayType">Edit display type</sys:String>
+    <sys:String x:Key="Undo_EditPersistence">Edit persistence</sys:String>
+    <sys:String x:Key="Undo_EditActorDirection">Edit actor direction</sys:String>
+    <sys:String x:Key="Undo_EditComments">Edit comments</sys:String>
+    <sys:String x:Key="Undo_EditExternalVo">Edit external VO</sys:String>
+    <!-- HasVO and HideSpeaker are the game-data field names, shown as-is in the node
+         detail panel; keep them recognisable to someone reading the game's files. -->
+    <sys:String x:Key="Undo_EditHasVo">Edit HasVO</sys:String>
+    <sys:String x:Key="Undo_EditHideSpeaker">Edit HideSpeaker</sys:String>
+    <sys:String x:Key="Undo_EditConditions">Edit conditions</sys:String>
+    <sys:String x:Key="Undo_EditScripts">Edit scripts</sys:String>
+    <!-- Annotations are the user's own sticky notes on the canvas -->
+    <sys:String x:Key="Undo_EditAnnotationTitle">Edit annotation title</sys:String>
+    <sys:String x:Key="Undo_EditAnnotationBody">Edit annotation body</sys:String>
+    <sys:String x:Key="Undo_ChangeAnnotationColor">Change annotation color</sys:String>
+    <!-- A "link" is one connection between two dialogue nodes -->
+    <sys:String x:Key="Undo_EditLinkDisplay">Edit link display</sys:String>
+    <sys:String x:Key="Undo_EditLinkWeight">Edit link weight</sys:String>
+    <sys:String x:Key="Undo_EditLinkConditions">Edit link conditions</sys:String>
+    <!-- Structural edits. {0}/{1} are node numbers, and the arrow shows direction:
+         "Add connection 1 → 2" means from node 1 to node 2, so keep the order. -->
+    <sys:String x:Key="Undo_AddNode">Add node {0}</sys:String>
+    <sys:String x:Key="Undo_DeleteNode">Delete node {0}</sys:String>
+    <sys:String x:Key="Undo_AddAnnotation">Add annotation</sys:String>
+    <sys:String x:Key="Undo_DeleteAnnotation">Delete annotation</sys:String>
+    <sys:String x:Key="Undo_AddConnection">Add connection {0} → {1}</sys:String>
+    <sys:String x:Key="Undo_DeleteConnection">Delete connection → {0}</sys:String>
+
     <!-- ─── Batch replace: match preview field labels ──────────────────── -->
     <!--
         These name the node field a match was found in. They are display labels only:

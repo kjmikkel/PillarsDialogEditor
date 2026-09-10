@@ -1,5 +1,6 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using DialogEditor.Core.Editing;
+using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.ViewModels;
 
@@ -24,21 +25,21 @@ public partial class AnnotationViewModel : ObservableObject
     public string Title
     {
         get => _title;
-        set => Push(_title, value, "Edit annotation title",
+        set => Push(_title, value, "Undo_EditAnnotationTitle",
             v => { _title = v; OnPropertyChanged(nameof(Title)); });
     }
 
     public string Body
     {
         get => _body;
-        set => Push(_body, value, "Edit annotation body",
+        set => Push(_body, value, "Undo_EditAnnotationBody",
             v => { _body = v; OnPropertyChanged(nameof(Body)); });
     }
 
     public string ColorKey
     {
         get => _colorKey;
-        set => Push(_colorKey, value, "Change annotation color",
+        set => Push(_colorKey, value, "Undo_ChangeAnnotationColor",
             v => { _colorKey = v; OnPropertyChanged(nameof(ColorKey)); });
     }
 
@@ -102,10 +103,13 @@ public partial class AnnotationViewModel : ObservableObject
         ScreenHeight = Height * zoom;
     }
 
-    private void Push<T>(T current, T value, string description, Action<T> apply)
+    // descriptionKey, not description: the undo history is re-read on every peek, so
+    // the lookup is deferred to keep it correct across a live language change.
+    private void Push<T>(T current, T value, string descriptionKey, Action<T> apply)
     {
         if (EqualityComparer<T>.Default.Equals(current, value)) return;
         if (UndoStack is null) { apply(value); return; }
-        UndoStack.Execute(new SetPropertyCommand<T>(description, apply, current, value));
+        UndoStack.Execute(new SetPropertyCommand<T>(
+            () => Loc.Get(descriptionKey), apply, current, value));
     }
 }
