@@ -1,4 +1,5 @@
-using DialogEditor.Core.GameData;
+﻿using DialogEditor.Core.GameData;
+using DialogEditor.Core.Models;
 
 namespace DialogEditor.Core.Editing;
 
@@ -17,11 +18,41 @@ public record BatchReplaceQuery(
     bool   InScriptParams    = false,
     bool   InConditionParams = false);
 
+/// Which of a node's replaceable fields a batch-replace match landed in.
+public enum BatchFieldKind
+{
+    DefaultText,
+    FemaleText,
+    SpeakerGuid,
+    ListenerGuid,
+    ScriptParam,      // Index = script position on the node, ParamIndex = argument
+    ConditionParam,   // Index = leaf position in flattened order, ParamIndex = argument
+}
+
+/// The identity of one replaceable field within a node.
+///
+/// This is deliberately typed data and not the string the preview shows. Apply
+/// re-loads each conversation and pairs its fresh snapshot back to the DryRun matches
+/// by value equality on this record, so the identity must not depend on the UI
+/// language: it used to BE the display label ("Default Text"), which meant localising
+/// that label — as the editor now does — would have made a language change between
+/// preview and apply turn Apply into a silent no-op. The label is built from this by
+/// BatchReplaceMatchViewModel.FieldLabel.
+///
+/// ScriptCategory is meaningful only for ScriptParam; Index/ParamIndex only for the
+/// two indexed kinds. They default so the four plain kinds construct as
+/// new BatchField(BatchFieldKind.DefaultText).
+public record BatchField(
+    BatchFieldKind Kind,
+    ScriptCategory ScriptCategory = default,
+    int            Index          = 0,
+    int            ParamIndex     = 0);
+
 public record BatchFieldMatch(
-    int    NodeId,
-    string FieldPath,
-    string Before,
-    string After);
+    int        NodeId,
+    BatchField Field,
+    string     Before,
+    string     After);
 
 public record BatchConversationResult(
     ConversationFile               File,

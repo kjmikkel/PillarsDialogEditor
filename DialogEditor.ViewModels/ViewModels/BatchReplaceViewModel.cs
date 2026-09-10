@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Editing;
@@ -9,10 +9,34 @@ using DialogEditor.ViewModels.Resources;
 namespace DialogEditor.ViewModels;
 
 public record BatchReplaceMatchViewModel(
-    int    NodeId,
-    string FieldPath,
-    string Before,
-    string After);
+    int        NodeId,
+    BatchField Field,
+    string     Before,
+    string     After)
+{
+    /// The field's name as the preview shows it. Built here rather than in
+    /// BatchReplaceService because Patch cannot reach Loc — and because the label must
+    /// stay separable from Field, which Apply uses as a lookup key (see BatchField).
+    public string FieldLabel => Field.Kind switch
+    {
+        BatchFieldKind.DefaultText    => Loc.Get("BatchReplace_Field_DefaultText"),
+        BatchFieldKind.FemaleText     => Loc.Get("BatchReplace_Field_FemaleText"),
+        BatchFieldKind.SpeakerGuid    => Loc.Get("BatchReplace_Field_SpeakerGuid"),
+        BatchFieldKind.ListenerGuid   => Loc.Get("BatchReplace_Field_ListenerGuid"),
+        // ScriptCategory is a game-data enum name (Enter/Exit/Update) and stays verbatim,
+        // per the Strings.axaml note on technical identifiers.
+        BatchFieldKind.ScriptParam    => Loc.Format("BatchReplace_Field_ScriptParam",
+                                             Field.ScriptCategory, Field.Index, Field.ParamIndex),
+        BatchFieldKind.ConditionParam => Loc.Format("BatchReplace_Field_ConditionParam",
+                                             Field.Index, Field.ParamIndex),
+        _                             => Loc.Get("BatchReplace_Field_Unknown"),
+    };
+
+    /// The whole preview row: node plus field. Replaces a
+    /// StringFormat='Node {NodeId} — {FieldPath}' in BatchReplaceWindow.axaml that
+    /// Avalonia's positional-only StringFormat could not have rendered.
+    public string RowLabel => Loc.Format("BatchReplace_MatchLabel", NodeId, FieldLabel);
+}
 
 public partial class BatchReplaceConversationViewModel : ObservableObject
 {
@@ -93,7 +117,7 @@ public partial class BatchReplaceViewModel : ObservableObject
         foreach (var r in rawResults)
         {
             var matches = r.Matches
-                .Select(m => new BatchReplaceMatchViewModel(m.NodeId, m.FieldPath, m.Before, m.After))
+                .Select(m => new BatchReplaceMatchViewModel(m.NodeId, m.Field, m.Before, m.After))
                 .ToList();
             var conv = new BatchReplaceConversationViewModel(r.File, matches);
             conv.PropertyChanged += (_, _) => ApplyCommand.NotifyCanExecuteChanged();
@@ -119,7 +143,7 @@ public partial class BatchReplaceViewModel : ObservableObject
             .Where(r => r.IsSelected)
             .Select(r => new BatchConversationResult(
                 r.File,
-                r.Matches.Select(m => new BatchFieldMatch(m.NodeId, m.FieldPath, m.Before, m.After))
+                r.Matches.Select(m => new BatchFieldMatch(m.NodeId, m.Field, m.Before, m.After))
                          .ToList()))
             .ToList();
 
