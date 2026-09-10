@@ -1,4 +1,4 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using DialogEditor.Core.Models;
 
 namespace DialogEditor.Patch.GitConflict;
@@ -115,8 +115,11 @@ public static class GitMergeAnalyzer
 
         if (HasUncoveredTheirsContent(mine, theirs, mineFields, theirFields, mineTr, theirTr, wholeCovered))
             conflicts.Add(new MergeConflict(
-                MergeConflictKind.ConversationLevel, conv, -1, null,
-                SummarizePatch(mine), SummarizePatch(theirs)));
+                MergeConflictKind.ConversationLevel, conv, -1, null, "", "")
+            {
+                MineCounts   = CountPatch(mine),
+                TheirsCounts = CountPatch(theirs),
+            });
         else
             conflicts.AddRange(granular);
     }
@@ -154,12 +157,13 @@ public static class GitMergeAnalyzer
         return false;
     }
 
-    // Compact per-side summary shown for a whole-conversation conflict, e.g. "+1 ~2 -0 (3 text)".
-    private static string SummarizePatch(ConversationPatch p)
-    {
-        var text = p.Translations.Sum(kv => kv.Value.Count);
-        return $"+{p.AddedNodes.Count} ~{p.ModifiedNodes.Count} -{p.DeletedNodeIds.Count} ({text} text)";
-    }
+    // Per-side change counts for a whole-conversation conflict. ConflictRowViewModel
+    // turns these into the compact summary the dialog shows, e.g. "+1 ~2 -0 (3 text)".
+    private static PatchCounts CountPatch(ConversationPatch p) => new(
+        p.AddedNodes.Count,
+        p.ModifiedNodes.Count,
+        p.DeletedNodeIds.Count,
+        p.Translations.Sum(kv => kv.Value.Count));
 
     private static Dictionary<(int NodeId, string Lang), NodeTranslation> BuildTranslationMap(ConversationPatch patch)
     {

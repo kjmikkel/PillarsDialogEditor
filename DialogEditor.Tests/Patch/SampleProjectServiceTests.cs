@@ -1,4 +1,4 @@
-using DialogEditor.Core.Models;
+﻿using DialogEditor.Core.Models;
 using DialogEditor.Patch;
 using DialogEditor.Patch.Diff;
 using DialogEditor.Tests.Helpers;
@@ -12,6 +12,19 @@ public class SampleProjectServiceTests
     {
         public GitResult Run(string workingDirectory, params string[] args) => new(0, "", "");
     }
+
+    // The English copy, as SampleTextFactory would resolve it. These tests are about
+    // the shape of the built patch, not the prose; SampleTextInjectionTests covers the
+    // wiring with markers that no fallback literal could satisfy.
+    private static readonly SampleTexts Texts = new(
+        AuthorName:       "Dialog Editor Sample",
+        EditedLineSuffix: "  (try changing this line!)",
+        AltLineSuffix:    "  (an alternate greeting on the experiment branch)",
+        NewLineText:      "And this whole line was added as a sample.",
+        TranslatorNote:   "Sample translator note: keep Eder's tone warm and informal.",
+        CommitInitial:    "Initial sample",
+        CommitReshape:    "Reshape the scene",
+        CommitExperiment: "experiment: try an alternate greeting");
 
     // A 3-node line: 1 (root → 2), 2 (→ 3), 3 (leaf). Node 1 = anchor, node 3 = deletable leaf.
     private static Conversation ThreeNodeEder()
@@ -39,7 +52,7 @@ public class SampleProjectServiceTests
     public void BuildSample_ProducesAllFourDemoEdits()
     {
         var provider = new FakeGameDataProvider("poe1", "en", ThreeNodeEder());
-        var build = new SampleProjectService(new OkGit()).BuildSample(provider);
+        var build = new SampleProjectService(new OkGit()).BuildSample(provider, Texts);
 
         Assert.Equal("sample-poe1.dialogproject", build.ProjectFileName);
 
@@ -64,7 +77,7 @@ public class SampleProjectServiceTests
     {
         var provider = new FakeGameDataProvider("poe1", "en"); // no conversations
         Assert.Throws<SampleConversationNotFoundException>(
-            () => new SampleProjectService(new OkGit()).BuildSample(provider));
+            () => new SampleProjectService(new OkGit()).BuildSample(provider, Texts));
     }
 
     private sealed class RecordingGit : IGitRunner
@@ -86,7 +99,8 @@ public class SampleProjectServiceTests
                 new("c1", DialogProject.Empty("Sample"), false),
                 new("c2", DialogProject.Empty("Sample"), false),
                 new("c3", DialogProject.Empty("Sample"), true),
-            });
+            },
+            AuthorName: "Dialog Editor Sample");
 
     [Fact]
     public void SeedHistory_IssuesExpectedGitSequence()

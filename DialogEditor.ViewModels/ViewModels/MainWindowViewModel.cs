@@ -1796,7 +1796,7 @@ public partial class MainWindowViewModel : ObservableObject
         SampleBuild build;
         try
         {
-            build = service.BuildSample(_provider);
+            build = service.BuildSample(_provider, SampleTextFactory.FromResources());
         }
         catch (SampleConversationNotFoundException ex)
         {

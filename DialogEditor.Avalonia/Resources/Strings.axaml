@@ -1013,6 +1013,13 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="GitConflict_KindAddAdd">added on both sides</sys:String>
     <sys:String x:Key="GitConflict_KindConversation">conversation-level change</sys:String>
     <!-- Per-side choice labels -->
+    <!-- Compact per-side summary of a whole-conversation conflict, shown where the
+         other conflict kinds show the actual differing value.
+         {0} = nodes added, {1} = nodes modified, {2} = nodes deleted,
+         {3} = number of changed translated lines.
+         "+", "~" and "-" are the diff conventions for added/changed/removed and are
+         understood across languages — keep them. Translate the word "text". -->
+    <sys:String x:Key="GitConflict_PatchSummary">+{0} ~{1} -{2} ({3} text)</sys:String>
     <sys:String x:Key="GitConflict_KeepMine">Keep mine</sys:String>
     <sys:String x:Key="GitConflict_KeepTheirs">Keep theirs</sys:String>
     <sys:String x:Key="GitConflict_AcceptDeletion">Accept deletion</sys:String>
@@ -1287,6 +1294,38 @@ Remove it from the recent list?</sys:String>
 
     <sys:String x:Key="Sample_SelectFolder">Choose an empty folder for the sample project</sys:String>
     <sys:String x:Key="Sample_FolderNotEmpty">Please choose an empty folder — the sample needs its own folder so it doesn't disturb existing files.</sys:String>
+    <!-- ─── Sample project contents ────────────────────────────────────── -->
+    <!--
+        "Create Sample Project" seeds a small git repository from the user's own game
+        install so they can try the editor's diff and merge views on real data. These
+        strings are the demo's own content: the lines it edits into the conversation,
+        the translator note it attaches, and the three commit subjects shown in the
+        Diff view. They are the first thing a new user reads, so translate them.
+
+        Eder is a companion character in both games; keep his name as the player's
+        install spells it. The tone throughout is deliberately light and encouraging.
+    -->
+    <!-- git user.name for the seeded repository; appears as the commit author in the
+         Diff and blame views. Not an e-mail address and not matched by anything. -->
+    <sys:String x:Key="Sample_AuthorName">Dialog Editor Sample</sys:String>
+    <!-- Appended to one of Eder's existing lines, so it must start with separating
+         whitespace — the two leading spaces are deliberate, and xml:space="preserve"
+         is what keeps them. It invites the user to edit the line themselves. -->
+    <sys:String x:Key="Sample_EditedLineSuffix" xml:space="preserve">  (try changing this line!)</sys:String>
+    <!-- The competing suffix on the "experiment" branch: this is the text the merge
+         view shows conflicting with the one above. Same leading-space rule. -->
+    <sys:String x:Key="Sample_AltLineSuffix" xml:space="preserve">  (an alternate greeting on the experiment branch)</sys:String>
+    <!-- A whole new dialogue node added by the sample; stands alone as a sentence -->
+    <sys:String x:Key="Sample_NewLineText">And this whole line was added as a sample.</sys:String>
+    <!-- Demonstrates the translator-note feature by being one. Keep it self-describing -->
+    <sys:String x:Key="Sample_TranslatorNote">Sample translator note: keep Eder's tone warm and informal.</sys:String>
+    <!-- The three commit subjects, in order, as shown in the Diff view's history.
+         Written in git's conventional style: short, imperative, lower-case after the
+         first word. The third is prefixed "experiment:" to name its branch. -->
+    <sys:String x:Key="Sample_CommitInitial">Initial sample — edit Eder's opening line</sys:String>
+    <sys:String x:Key="Sample_CommitReshape">Reshape the scene — add a line, a note, and trim a dead end</sys:String>
+    <sys:String x:Key="Sample_CommitExperiment">experiment: try an alternate greeting</sys:String>
+
     <sys:String x:Key="Sample_ConversationMissing">Couldn't find the conversation the sample uses in this game installation.</sys:String>
     <sys:String x:Key="Sample_BuildFailed">Couldn't build the sample project.</sys:String>
     <!-- {0} = file name -->
