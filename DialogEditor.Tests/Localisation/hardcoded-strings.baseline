@@ -11,15 +11,6 @@ DialogEditor.Avalonia/Views/MainWindow.axaml.cs|This conversation
 DialogEditor.Avalonia/Views/MainWindow.axaml.cs|This project
 DialogEditor.Avalonia/Views/NodeDetailView.axaml.cs|Link → {0}
 DialogEditor.Avalonia/Views/UnsavedChangesDialog.axaml.cs|'{0}' has unsaved changes.
-DialogEditor.Patch/GitConflict/GitMergeAnalyzer.cs|+{0} ~{1} -{2} ({3} text)
-DialogEditor.Patch/SampleProjectService.cs|  (an alternate greeting on the experiment branch)
-DialogEditor.Patch/SampleProjectService.cs|  (try changing this line!)
-DialogEditor.Patch/SampleProjectService.cs|And this whole line was added as a sample.
-DialogEditor.Patch/SampleProjectService.cs|Dialog Editor Sample
-DialogEditor.Patch/SampleProjectService.cs|Initial sample — edit Eder's opening line
-DialogEditor.Patch/SampleProjectService.cs|Reshape the scene — add a line, a note, and trim a dead end
-DialogEditor.Patch/SampleProjectService.cs|Sample translator note: keep Eder's tone warm and informal.
-DialogEditor.Patch/SampleProjectService.cs|experiment: try an alternate greeting
 DialogEditor.ViewModels/Editing/AddAnnotationCommand.cs|Add annotation
 DialogEditor.ViewModels/Editing/AddConnectionCommand.cs|Add connection {0} → {1}
 DialogEditor.ViewModels/Editing/AddNodeCommand.cs|Add node {0}

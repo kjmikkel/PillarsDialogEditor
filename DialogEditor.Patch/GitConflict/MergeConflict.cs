@@ -1,4 +1,4 @@
-namespace DialogEditor.Patch.GitConflict;
+﻿namespace DialogEditor.Patch.GitConflict;
 
 public enum MergeConflictKind
 {
@@ -10,6 +10,11 @@ public enum MergeConflictKind
 }
 
 public enum MergeSide { Mine, Theirs }
+
+/// How much one side of a whole-conversation conflict changed. Reported as counts
+/// rather than as a rendered summary because DialogEditor.Patch references only Core
+/// and so cannot reach Loc — ConflictRowViewModel formats these for display.
+public record PatchCounts(int AddedNodes, int ModifiedNodes, int DeletedNodes, int TextChanges);
 
 /// One resolvable conflict between the mine and theirs projects.
 /// Value fields are display strings (for FieldEdit, the JSON-encoded `To` values;
@@ -29,6 +34,12 @@ public record MergeConflict(
     /// Female-variant text for a TranslationEdit conflict (mine side).
     /// Empty for every other conflict kind. Display-only: the merge replaces
     /// the whole NodeTranslation regardless of which sub-field differs.
+    /// Set only on a ConversationLevel conflict, where the two sides are too broad to
+    /// show as values and are summarised instead. Null on every other kind, which is
+    /// what tells ConflictRowViewModel to pass MineValue/TheirsValue through as-is.
+    public PatchCounts? MineCounts   { get; init; }
+    public PatchCounts? TheirsCounts { get; init; }
+
     public string MineFemaleValue { get; init; } = "";
 
     /// Female-variant text for a TranslationEdit conflict (theirs side). See MineFemaleValue.

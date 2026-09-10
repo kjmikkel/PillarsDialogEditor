@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Patch;
 using DialogEditor.Patch.GitConflict;
@@ -17,8 +17,18 @@ public partial class ConflictRowViewModel : ObservableObject
     public string TheirsLabel { get; }
 
     public MergeConflictKind Kind        => Conflict.Kind;
-    public string            MineValue   => Conflict.MineValue;
-    public string            TheirsValue => Conflict.TheirsValue;
+    public string            MineValue   => Describe(Conflict.MineCounts,   Conflict.MineValue);
+    public string            TheirsValue => Describe(Conflict.TheirsCounts, Conflict.TheirsValue);
+
+    /// A whole-conversation conflict is too broad to show as a value, so the analyzer
+    /// reports counts and we render them here. Every other kind carries real content
+    /// (a JSON field value, the differing translation) and passes straight through.
+    private static string Describe(PatchCounts? counts, string raw) =>
+        counts is null
+            ? raw
+            : Loc.Format("GitConflict_PatchSummary",
+                  counts.AddedNodes, counts.ModifiedNodes,
+                  counts.DeletedNodes, counts.TextChanges);
 
     public string MineFemaleValue   => Conflict.MineFemaleValue;
     public string TheirsFemaleValue => Conflict.TheirsFemaleValue;
