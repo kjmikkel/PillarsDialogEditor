@@ -853,7 +853,8 @@ public partial class MainWindow : Window
     // ── Unsaved-changes dialog ────────────────────────────────────────────
     private async Task ShowUnsavedChangesDialogAsync(MainWindowViewModel vm)
     {
-        var dialog = new UnsavedChangesDialog(vm.CurrentConversationName ?? "This conversation");
+        var dialog = new UnsavedChangesDialog(
+            vm.CurrentConversationName ?? Loc.Get("UnsavedChanges_ThisConversation"));
         await dialog.ShowDialog(this);
         switch (dialog.Result)
         {
@@ -870,7 +871,8 @@ public partial class MainWindow : Window
     // Returns true only if the user chooses Save; Discard/Cancel both abort the bring-in.
     private async Task<bool> ShowSaveBeforeApplyDialogAsync(MainWindowViewModel vm)
     {
-        var dialog = new UnsavedChangesDialog(vm.CurrentConversationName ?? "This project");
+        var dialog = new UnsavedChangesDialog(
+            vm.CurrentConversationName ?? Loc.Get("UnsavedChanges_ThisProject"));
         await dialog.ShowDialog(this);
         return dialog.Result == UnsavedChangesResult.Save;
     }
@@ -889,7 +891,7 @@ public partial class MainWindow : Window
         var vm = (MainWindowViewModel)DataContext!;
         var picker = new AvaloniaFilePicker(this);
         var path = await picker.PickSaveFileAsync(
-            Loc.Get("Menu_ExportUiStrings"), "ui-strings.csv", ".csv", "CSV files");
+            Loc.Get("Menu_ExportUiStrings"), "ui-strings.csv", ".csv", Loc.Get("FileType_CsvFiles"));
         if (path is null) { vm.StatusText = Loc.Get("UiExport_Cancelled"); return; }
 
         var assetUris = new[]
@@ -921,7 +923,7 @@ public partial class MainWindow : Window
         var vm = (MainWindowViewModel)DataContext!;
         var filePicker = new AvaloniaFilePicker(this);
         var csvPath = await filePicker.PickOpenFileAsync(
-            Loc.Get("Menu_ImportUiStrings"), ".csv", "CSV files");
+            Loc.Get("Menu_ImportUiStrings"), ".csv", Loc.Get("FileType_CsvFiles"));
         if (csvPath is null) { vm.StatusText = Loc.Get("UiImport_Cancelled"); return; }
 
         var lang = UiStringImportService.DetectLanguage(csvPath);
@@ -958,7 +960,7 @@ public partial class MainWindow : Window
         var picker        = new AvaloniaFilePicker(this);
         var suggestedName = Path.GetFileNameWithoutExtension(vm.ProjectPath) + ".dialogpack";
         var outputPath    = await picker.PickSaveFileAsync(
-            Loc.Get("Menu_ExportModBundle"), suggestedName, ".dialogpack", "Dialog Pack");
+            Loc.Get("Menu_ExportModBundle"), suggestedName, ".dialogpack", Loc.Get("FileType_DialogPack"));
         if (outputPath is null) return;
 
         try

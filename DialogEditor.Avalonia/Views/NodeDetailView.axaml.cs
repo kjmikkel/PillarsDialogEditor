@@ -1,6 +1,7 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Interactivity;
 using DialogEditor.ViewModels;
+using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.Avalonia.Views;
 
@@ -53,7 +54,7 @@ public partial class NodeDetailView : UserControl
         if (btn.Tag is not ConnectionViewModel conn) return;
         if (DataContext is not NodeDetailViewModel detailVm) return;
 
-        var title    = $"Link → {conn.Target.GetNodeId()}";
+        var title    = Loc.Format("Editor_LinkTitle", conn.Target.GetNodeId());
         var editorVm = new ConditionEditorViewModel(
             title,
             conn.Conditions,
