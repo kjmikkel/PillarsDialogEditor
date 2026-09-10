@@ -36,7 +36,7 @@ public partial class FlowIssueViewModel : ObservableObject
         ? Loc.Get("FlowAnalytics_Severity_Error")
         : Loc.Get("FlowAnalytics_Severity_Warning");
 
-    public string DisplayText => $"Node {NodeId} — {NodeSnippet}";
+    public string DisplayText => Loc.Format("FlowAnalytics_NodeLabel", NodeId, NodeSnippet);
 
     public FlowIssueViewModel(FlowIssue issue, string nodeSnippet, Action<int> navigate)
     {
