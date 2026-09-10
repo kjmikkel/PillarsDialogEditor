@@ -15,8 +15,9 @@ public class FlowAnalyticsViewModelTests
         int id,
         SpeakerCategory category = SpeakerCategory.Npc,
         string defaultText = "",
-        IReadOnlyList<LinkEditSnapshot>? links = null) =>
-        new(id, false, category, "", "", defaultText, "",
+        IReadOnlyList<LinkEditSnapshot>? links = null,
+        bool isPlayerChoice = false) =>
+        new(id, isPlayerChoice, category, "", "", defaultText, "",
             "Conversation", "None", "", "", "", false, false,
             links ?? [], [], []);
 
@@ -345,5 +346,141 @@ public class FlowAnalyticsViewModelTests
 
         Assert.False(vm.HasEndings);
         Assert.Empty(vm.Endings);
+    }
+
+    // ── Cross-conversation handoffs (#14) ────────────────────────────────────
+
+    private static MultiConversationGraph EmptyGraph() =>
+        new("", new Dictionary<string, ConversationEditSnapshot> { [""] = SimpleSnapshot() },
+            [], []);
+
+    /// Root conversation A hands off to B, whose entry node leads to a player choice —
+    /// so the fork tree contains a row in another conversation.
+    private static MultiConversationGraph GraphWithForkInB()
+    {
+        var a = new ConversationEditSnapshot([MakeNode(0, defaultText: "greeting")]);
+        var b = new ConversationEditSnapshot([
+            MakeNode(0, defaultText: "hub", links: [Link(0, 1)]),
+            MakeNode(1, defaultText: "pick me", isPlayerChoice: true)]);
+        return new MultiConversationGraph("A",
+            new Dictionary<string, ConversationEditSnapshot> { ["A"] = a, ["B"] = b },
+            [new JumpEdge(new NodeRef("A", 0), new NodeRef("B", 0))],
+            []);
+    }
+
+    [Fact]
+    public void ToggleOff_UsesTheSnapshotOverload()
+    {
+        var called = false;
+        var vm = new FlowAnalyticsViewModel(
+            () => SimpleSnapshot(), _ => { },
+            resolveGraph: () => { called = true; return EmptyGraph(); },
+            followConversationJumps: false);
+
+        vm.RefreshCommand.Execute(null);
+
+        Assert.False(called);
+    }
+
+    [Fact]
+    public void ToggleOn_UsesTheResolver()
+    {
+        var called = false;
+        var vm = new FlowAnalyticsViewModel(
+            () => SimpleSnapshot(), _ => { },
+            resolveGraph: () => { called = true; return EmptyGraph(); },
+            followConversationJumps: true);
+
+        vm.RefreshCommand.Execute(null);
+
+        Assert.True(called);
+    }
+
+    [Fact]
+    public void TogglingPersistsAndRefreshes()
+    {
+        bool? persisted = null;
+        var vm = new FlowAnalyticsViewModel(
+            () => SimpleSnapshot(), _ => { },
+            resolveGraph: EmptyGraph,
+            persistFollowJumps: v => persisted = v);
+
+        vm.FollowConversationJumps = true;
+
+        Assert.True(persisted);
+        Assert.True(vm.HasPathStats);   // the refresh actually ran
+    }
+
+    [Fact]
+    public void ToggleOn_WithNoResolver_FallsBackSafely()
+    {
+        var vm = new FlowAnalyticsViewModel(
+            () => SimpleSnapshot(), _ => { },
+            followConversationJumps: true);       // resolveGraph is null
+
+        vm.RefreshCommand.Execute(null);          // must not throw
+
+        Assert.True(vm.HasPathStats);
+    }
+
+    [Fact]
+    public void CrossConversationRow_NavigatesThroughTheTwoArgumentDelegate()
+    {
+        (string Conv, int Node)? went = null;
+        var vm = new FlowAnalyticsViewModel(
+            () => SimpleSnapshot(),
+            _ => Assert.Fail("should use the cross-conversation delegate"),
+            resolveGraph: GraphWithForkInB,
+            followConversationJumps: true,
+            navigateToNodeInConversation: (c, n) => went = (c, n));
+
+        vm.RefreshCommand.Execute(null);
+        var row = vm.Branches.Single(b => b.IsInAnotherConversation);
+        row.NavigateCommand.Execute(null);
+
+        Assert.Equal(("B", 1), went);
+    }
+
+    [Fact]
+    public void SameConversationRow_HasNoConversationTag()
+    {
+        var vm = new FlowAnalyticsViewModel(() => SimpleSnapshot(), _ => { });
+
+        vm.RefreshCommand.Execute(null);
+
+        Assert.All(vm.Endings, e => Assert.False(e.IsInAnotherConversation));
+    }
+
+    [Fact]
+    public void ConversationsSpanned_ShownOnlyWhenMoreThanOne()
+    {
+        var single = new FlowAnalyticsViewModel(() => SimpleSnapshot(), _ => { });
+        single.RefreshCommand.Execute(null);
+        Assert.False(single.HasSpannedConversations);
+
+        var multi = new FlowAnalyticsViewModel(
+            () => SimpleSnapshot(), _ => { },
+            resolveGraph: GraphWithForkInB, followConversationJumps: true);
+        multi.RefreshCommand.Execute(null);
+        Assert.True(multi.HasSpannedConversations);
+    }
+
+    [Fact]
+    public void UnresolvedHandoff_GetsTheLocalisedPlaceholderLabel()
+    {
+        var graph = new MultiConversationGraph("A",
+            new Dictionary<string, ConversationEditSnapshot> { ["A"] = SimpleSnapshot() },
+            [],
+            [new UnfollowedJump(new NodeRef("A", 0), "", UnfollowedReason.Unresolved)]);
+
+        var vm = new FlowAnalyticsViewModel(
+            () => SimpleSnapshot(), _ => { },
+            resolveGraph: () => graph, followConversationJumps: true);
+
+        vm.RefreshCommand.Execute(null);
+
+        var row = Assert.Single(vm.UnfollowedJumpRows);
+        Assert.False(string.IsNullOrEmpty(row.TargetLabel));   // resolver left it empty
+        Assert.False(string.IsNullOrEmpty(row.ReasonText));
     }
 }
