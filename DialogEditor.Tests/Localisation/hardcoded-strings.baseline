@@ -14,20 +14,6 @@ DialogEditor.Avalonia/Views/UnsavedChangesDialog.axaml.cs|'{0}' has unsaved chan
 DialogEditor.ViewModels/Services/IVoImporter.cs|No importer configured.
 DialogEditor.ViewModels/Services/ScriptCatalogue.cs|Void {0}()
 DialogEditor.ViewModels/ViewModels/ConditionEditorViewModel.cs|Node {0}
-DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Asset GUID — check the game data files for the correct value
-DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Check GlobalVariables.csv for valid names.
-DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Comparison operator: EqualTo, NotEqualTo, GreaterThan, LessThan, 
-DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Conversation filename without extension (e.g. edér)
-DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Decimal number (e.g. 1.5)
-DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Enum value — type: {0}
-DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|GUID of an in-scene game object. Type a name or GUID prefix to search, or paste any GUID directly.
-DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|GUID value. Type a name or GUID prefix to search, or paste any GUID directly.
-DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Integer number (whole number, no decimals)
-DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Name of a global integer flag (e.g. npc_met_edér). 
-DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Quest filename without extension
-DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Text string (e.g. a flag name, conversation name, or item name)
-DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Type: {0}
-DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|true or false
 DialogEditor.ViewModels/ViewModels/DiffViewModel.cs|--format=%h %s
 DialogEditor.ViewModels/ViewModels/ExceptionReportViewModel.cs|Issues: {0}{1}Log file: {2}
 DialogEditor.ViewModels/ViewModels/ExportConversationsViewModel.cs|Export Conversation

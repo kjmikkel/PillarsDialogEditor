@@ -685,6 +685,41 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="BatchReplace_InConditionParams">Condition params</sys:String>
     <sys:String x:Key="BatchReplace_Preview">Preview</sys:String>
     <sys:String x:Key="BatchReplace_Apply">Apply</sys:String>
+    <!-- ─── Condition / script parameter type hints ────────────────────── -->
+    <!--
+        Shown as the tooltip on a condition or script parameter field, and read aloud
+        by screen readers (AutomationProperties.HelpText). Each says what the field
+        expects. Aim for one short sentence.
+
+        Identifiers inside these hints are values the game itself parses and must NOT
+        be translated: the operator names (EqualTo …), the file name
+        GlobalVariables.csv, and the example flag name npc_met_edér. Translate the
+        prose around them. Examples introduced by "e.g." may be swapped for ones that
+        read naturally in your language, as long as they stay valid values.
+    -->
+    <sys:String x:Key="ConditionHint_String">Text string (e.g. a flag name, conversation name, or item name)</sys:String>
+    <sys:String x:Key="ConditionHint_Int32">Integer number (whole number, no decimals)</sys:String>
+    <!-- The decimal separator in the example: use whichever your locale writes -->
+    <sys:String x:Key="ConditionHint_Single">Decimal number (e.g. 1.5)</sys:String>
+    <!-- The two literal values the field accepts; leave "true"/"false" as they are -->
+    <sys:String x:Key="ConditionHint_Boolean">true or false</sys:String>
+    <!-- The six operator names are written verbatim into game data — keep them exactly -->
+    <sys:String x:Key="ConditionHint_Operator">Comparison operator: EqualTo, NotEqualTo, GreaterThan, LessThan, GreaterThanOrEqualTo, LessThanOrEqualTo</sys:String>
+    <!-- GlobalVariables.csv is a real file in the game install; npc_met_edér is a
+         sample flag name. Keep both spellings intact. -->
+    <sys:String x:Key="ConditionHint_GlobalVariable">Name of a global integer flag (e.g. npc_met_edér). Check GlobalVariables.csv for valid names.</sys:String>
+    <sys:String x:Key="ConditionHint_ObjectGuid">GUID of an in-scene game object. Type a name or GUID prefix to search, or paste any GUID directly.</sys:String>
+    <sys:String x:Key="ConditionHint_Guid">GUID value. Type a name or GUID prefix to search, or paste any GUID directly.</sys:String>
+    <!-- "edér" is the companion Edér's conversation file; keep the spelling -->
+    <sys:String x:Key="ConditionHint_Conversation">Conversation filename without extension (e.g. edér)</sys:String>
+    <sys:String x:Key="ConditionHint_Quest">Quest filename without extension</sys:String>
+    <sys:String x:Key="ConditionHint_GameData">Asset GUID — check the game data files for the correct value</sys:String>
+    <!-- {0} = the enum's dotted type name, e.g. "Game.Difficulty". Not translated. -->
+    <sys:String x:Key="ConditionHint_Enum">Enum value — type: {0}</sys:String>
+    <!-- Last resort for a parameter type the editor has no hint for.
+         {0} = the raw type name from the game data. -->
+    <sys:String x:Key="ConditionHint_Fallback">Type: {0}</sys:String>
+
     <!-- ─── Undo / redo history entries ────────────────────────────────── -->
     <!--
         ConversationViewModel.UndoDescription / RedoDescription name the edit that
