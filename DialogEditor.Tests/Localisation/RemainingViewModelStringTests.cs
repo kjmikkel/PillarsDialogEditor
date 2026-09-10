@@ -41,10 +41,10 @@ public class RemainingViewModelStringTests
     }
 
     [Fact]
-    public void NullVoImporter_FailureMessage_ComesFromResources()
+    public async Task NullVoImporter_FailureMessage_ComesFromResources()
     {
-        var result = NullVoImporter.Instance.ImportAsync(
-            new VoImportRequest("a.wem", "a.wav", null, null), CancellationToken.None).Result;
+        var result = await NullVoImporter.Instance.ImportAsync(
+            new VoImportRequest("a.wem", "a.wav", null, null), CancellationToken.None);
 
         Assert.False(result.Success);
         Assert.Equal("Status_VoNoImporter", result.ErrorMessage);
@@ -71,10 +71,10 @@ public class RemainingViewModelStringResourceTests
     }
 
     [AvaloniaFact]
-    public void NullVoImporter_FailureMessage_UsesRealResources()
+    public async Task NullVoImporter_FailureMessage_UsesRealResources()
     {
-        var result = NullVoImporter.Instance.ImportAsync(
-            new VoImportRequest("a.wem", "a.wav", null, null), CancellationToken.None).Result;
+        var result = await NullVoImporter.Instance.ImportAsync(
+            new VoImportRequest("a.wem", "a.wav", null, null), CancellationToken.None);
 
         Assert.Equal("No importer configured.", result.ErrorMessage);
     }
