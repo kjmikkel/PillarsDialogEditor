@@ -1,6 +1,6 @@
-using Avalonia;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Input;
+using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.Avalonia.Views;
 
@@ -17,9 +17,12 @@ public partial class ConversationNameDialog : Window
     {
         InitializeComponent();
 
+        // Loc, not FindResource with an English fallback: AvaloniaStringProvider already
+        // returns "[Key]" for a key it cannot find, so a renamed or missing key shows up
+        // immediately instead of silently rendering correct English forever.
         Title = defaultValue is null
-            ? Application.Current!.FindResource("Dialog_NewConversation_Title") as string ?? "New Conversation"
-            : Application.Current!.FindResource("Dialog_ImportConversation")    as string ?? "Import Conversation";
+            ? Loc.Get("Dialog_NewConversation_Title")
+            : Loc.Get("Dialog_ImportConversation");
 
         NameBox.Text = defaultValue;
 

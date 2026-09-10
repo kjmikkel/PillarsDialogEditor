@@ -2,12 +2,4 @@
 # guard was added. This list may only SHRINK. Clean a site up (route it
 # through Loc, or mark it [NotLocalised(...)]) and delete its line.
 # Regenerate: DIALOGEDITOR_UPDATE_BASELINE=1 dotnet test
-DialogEditor.Avalonia/Audio/VoImporter.cs|(not set)
-DialogEditor.Avalonia/Views/ConversationNameDialog.axaml.cs|Import Conversation
-DialogEditor.Avalonia/Views/ConversationNameDialog.axaml.cs|New Conversation
-DialogEditor.Avalonia/Views/MainWindow.axaml.cs|CSV files
-DialogEditor.Avalonia/Views/MainWindow.axaml.cs|Dialog Pack
-DialogEditor.Avalonia/Views/MainWindow.axaml.cs|This conversation
-DialogEditor.Avalonia/Views/MainWindow.axaml.cs|This project
-DialogEditor.Avalonia/Views/NodeDetailView.axaml.cs|Link → {0}
-DialogEditor.Avalonia/Views/UnsavedChangesDialog.axaml.cs|'{0}' has unsaved changes.
+

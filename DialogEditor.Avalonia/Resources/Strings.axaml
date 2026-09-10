@@ -685,6 +685,26 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="BatchReplace_InConditionParams">Condition params</sys:String>
     <sys:String x:Key="BatchReplace_Preview">Preview</sys:String>
     <sys:String x:Key="BatchReplace_Apply">Apply</sys:String>
+    <!-- ─── File-type descriptions ─────────────────────────────────────── -->
+    <!-- Shown in the OS save/open dialog's file-type dropdown, next to the extension.
+         "CSV" is an initialism and stays as it is; translate only the word "files". -->
+    <sys:String x:Key="FileType_CsvFiles">CSV files</sys:String>
+    <!-- Names this editor's own bundle format (.dialogpack) — a mod pack holding the
+         project's dialogue changes. Translate it as a descriptive name. -->
+    <sys:String x:Key="FileType_DialogPack">Dialog Pack</sys:String>
+
+    <!-- ─── Unsaved-changes prompt subjects ───────────────────────────────── -->
+    <!-- Substituted for {0} in UnsavedChanges_Message when there is no conversation
+         name to use: the first when a conversation is open but unnamed, the second when
+         the prompt is about the whole project. They read as the sentence's subject, so
+         "This conversation has unsaved changes." -->
+    <sys:String x:Key="UnsavedChanges_ThisConversation">This conversation</sys:String>
+    <sys:String x:Key="UnsavedChanges_ThisProject">This project</sys:String>
+
+    <!-- Heads the condition editor when it is opened on a LINK rather than a node.
+         {0} = the target node's id; the arrow shows the link's direction. -->
+    <sys:String x:Key="Editor_LinkTitle">Link → {0}</sys:String>
+
     <!-- ─── Editor window / dialog titles and prompts ─────────────────── -->
     <!-- Heads the condition and script editors for one node. {0} = node id.
          WindowTitle_ConditionEditor / _ScriptEditor wrap this. -->
