@@ -93,9 +93,21 @@ per-game variant); the conversation argument is the parameter whose `LookupKind`
 
 **Resolution branches on that parameter's declared `Type`:**
 
-- `Guid` (PoE2) — look up `GameDataNameService.Get("Conversation")` by `Id` to get the name.
-  That registry is populated at `Poe2GameDataProvider.cs:182-197`, which parses each bundle's
-  root `ID` and pairs it with the filename.
+- `Guid` (PoE2) — look the GUID up in a **cached `Id → Name` map** supplied to the resolver.
+
+  Deliberately *not* `GameDataNameService`: `NamedEntry` is `(DisplayName, StoredValue)`, and
+  `MainWindowViewModel.cs:1719-1721` registers entries as
+  `new NamedEntry($"{e.Name} — {e.Id}", e.Id)`. The GUID is recoverable but the name is only
+  half of a composed display string, and splitting on `" — "` would break on any conversation
+  filename containing an em-dash.
+
+  The map's source is `provider.LoadGameDataNames()["Conversation"]`, which yields clean
+  `GameDataEntry(Id, Name)` pairs — populated by `Poe2GameDataProvider.cs:182-197`, which parses
+  each bundle's root `ID` and pairs it with the filename. That call parses every bundle on disk
+  and is documented as "called once when a game folder is opened", so it must **not** run per
+  analysis. `MainWindowViewModel` already iterates that dictionary at line 1716 on folder open,
+  so it caches the Conversation kind's pairs there at no extra cost and hands the map to the
+  resolver. Taking the map as a parameter also keeps the resolver testable with no game folder.
 - `String` (PoE1) — the parameter value *is* the name. `Poe1GameDataProvider` registers no
   `"Conversation"` entries and needs none.
 
