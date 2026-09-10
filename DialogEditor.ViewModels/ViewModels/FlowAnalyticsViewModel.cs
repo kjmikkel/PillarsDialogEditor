@@ -216,7 +216,7 @@ public partial class FlowAnalyticsViewModel : ObservableObject
     // The resolver is injected as a delegate so the VM stays testable without a
     // DialogProject, a game folder, or disk. Null (or the toggle off) means the
     // single-conversation overload, which is also the safe fallback.
-    private readonly Func<MultiConversationGraph>? _resolveGraph;
+    private readonly Func<MultiConversationGraph?>? _resolveGraph;
     private readonly Action<bool>?                 _persistFollowJumps;
     private readonly Action<string, int>?          _navigateToNodeInConv;
 
@@ -242,7 +242,7 @@ public partial class FlowAnalyticsViewModel : ObservableObject
         string                          gameId = "",
         int                             wordsPerMinute = PathStatsFormat.DefaultWordsPerMinute,
         Action<int>?                    persistWordsPerMinute = null,
-        Func<MultiConversationGraph>?   resolveGraph = null,
+        Func<MultiConversationGraph?>?  resolveGraph = null,
         bool                            followConversationJumps = false,
         Action<bool>?                   persistFollowJumps = null,
         Action<string, int>?            navigateToNodeInConversation = null)
