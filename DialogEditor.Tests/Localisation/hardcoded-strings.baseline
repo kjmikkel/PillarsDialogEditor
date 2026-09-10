@@ -11,19 +11,3 @@ DialogEditor.Avalonia/Views/MainWindow.axaml.cs|This conversation
 DialogEditor.Avalonia/Views/MainWindow.axaml.cs|This project
 DialogEditor.Avalonia/Views/NodeDetailView.axaml.cs|Link → {0}
 DialogEditor.Avalonia/Views/UnsavedChangesDialog.axaml.cs|'{0}' has unsaved changes.
-DialogEditor.ViewModels/Services/IVoImporter.cs|No importer configured.
-DialogEditor.ViewModels/Services/ScriptCatalogue.cs|Void {0}()
-DialogEditor.ViewModels/ViewModels/ConditionEditorViewModel.cs|Node {0}
-DialogEditor.ViewModels/ViewModels/DiffViewModel.cs|--format=%h %s
-DialogEditor.ViewModels/ViewModels/ExceptionReportViewModel.cs|Issues: {0}{1}Log file: {2}
-DialogEditor.ViewModels/ViewModels/ExportConversationsViewModel.cs|Export Conversation
-DialogEditor.ViewModels/ViewModels/ExportConversationsViewModel.cs|Export Conversations
-DialogEditor.ViewModels/ViewModels/FlowAnalyticsViewModel.cs|({0}, no text)
-DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs|(node {0}, field '{1}'); forcing apply for display
-DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs|Export for Translation
-DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs|Import Translation
-DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs|Patch for '{0}' no longer matches game data 
-DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs|Source language
-DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs|Target language
-DialogEditor.ViewModels/ViewModels/NodeDetailViewModel.cs|unknown error
-DialogEditor.ViewModels/ViewModels/ScriptEditorViewModel.cs|Node {0}

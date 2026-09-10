@@ -1,3 +1,5 @@
+﻿using DialogEditor.ViewModels.Resources;
+
 namespace DialogEditor.ViewModels.Services;
 
 /// <summary>
@@ -19,8 +21,10 @@ public sealed class NullVoImporter : IVoImporter
 
     public bool IsWwiseAvailable => false;
 
+    // ErrorMessage reaches the user: NodeDetailViewModel folds it into
+    // Status_VoImportFailed and BatchVoImportViewModel shows it on the failing row.
     public Task<VoImportResult> ImportAsync(VoImportRequest request, CancellationToken ct)
-        => Task.FromResult(new VoImportResult(false, "No importer configured."));
+        => Task.FromResult(new VoImportResult(false, Loc.Get("Status_VoNoImporter")));
 }
 
 /// <param name="PrimaryDestinationPath">Expected .wem path inside _vo/ for the primary slot.</param>

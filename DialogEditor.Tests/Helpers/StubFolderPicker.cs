@@ -1,8 +1,15 @@
-using DialogEditor.ViewModels.Services;
+﻿using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.Helpers;
 
 public sealed class StubFolderPicker(string? result = null) : IFolderPicker
 {
-    public Task<string?> PickFolderAsync(string title) => Task.FromResult(result);
+    /// Dialog titles this picker was asked for, in call order (see StubFilePicker).
+    public List<string> Titles { get; } = [];
+
+    public Task<string?> PickFolderAsync(string title)
+    {
+        Titles.Add(title);
+        return Task.FromResult(result);
+    }
 }

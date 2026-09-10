@@ -1,6 +1,7 @@
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using DialogEditor.Core.Localisation;
 
 namespace DialogEditor.ViewModels.Services;
 
@@ -14,6 +15,10 @@ public record ScriptCatalogueEntry(
     string? FullName = null)
 {
     /// C# reflection-format FullName, e.g. "Void SetGlobalValue(String, Int32)".
+    // This is a method signature, matched against the FullName stored in the game's own
+    // conversation files (see ScriptCatalogue.FindByFullName). A translated "Void" would
+    // stop every script from resolving.
+    [NotLocalised("C# reflection signature matched against game data")]
     public string ReflectionFullName
         => !string.IsNullOrEmpty(FullName) ? FullName : $"Void {MethodName}()";
 
