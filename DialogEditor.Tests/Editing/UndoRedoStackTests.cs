@@ -1,4 +1,4 @@
-using DialogEditor.Core.Editing;
+﻿using DialogEditor.Core.Editing;
 
 namespace DialogEditor.Tests.Editing;
 
@@ -90,7 +90,7 @@ public class UndoRedoStackTests
         string current = "original";
 
         var cmd = new SetPropertyCommand<string>(
-            description: "Edit text",
+            describe: () => "Edit text",
             apply: v => current = v,
             oldValue: "original",
             newValue: "updated");
