@@ -2,6 +2,7 @@
 using Avalonia.Threading;
 using Avalonia.Headless.XUnit;
 using DialogEditor.Avalonia.Views;
+using DialogEditor.Core.Analytics;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Tests.Helpers;
@@ -96,5 +97,42 @@ public class FlowAnalyticsWindowTests
         Assert.True(container!.IsExpanded);
 
         window.Close();
+    }
+
+    // ── Cross-conversation handoffs (#14) ────────────────────────────────────
+
+    [AvaloniaFact]
+    public void Constructs_WithJumpRowsAndUnfollowedLeaves()
+    {
+        var a = new ConversationEditSnapshot([
+            new NodeEditSnapshot(0, false, SpeakerCategory.Npc, "", "", "greeting", "",
+                                 "Conversation", "None", "", "", "", false, false, [], [], [])]);
+        var b = new ConversationEditSnapshot([
+            new NodeEditSnapshot(0, false, SpeakerCategory.Npc, "", "", "hub", "",
+                                 "Conversation", "None", "", "", "", false, false,
+                                 [new LinkEditSnapshot(0, 1, 1f, "", false)], [], []),
+            new NodeEditSnapshot(1, true, SpeakerCategory.Player, "", "", "pick me", "",
+                                 "Conversation", "None", "", "", "", false, false, [], [], [])]);
+
+        var graph = new MultiConversationGraph("A",
+            new Dictionary<string, ConversationEditSnapshot> { ["A"] = a, ["B"] = b },
+            [new JumpEdge(new NodeRef("A", 0), new NodeRef("B", 0))],
+            [new UnfollowedJump(new NodeRef("A", 0), "SI_Elsewhere", UnfollowedReason.NotPatched)]);
+
+        var vm = new FlowAnalyticsViewModel(
+            () => a, _ => { },
+            resolveGraph: () => graph, followConversationJumps: true);
+        vm.RefreshCommand.Execute(null);
+
+        var window = new FlowAnalyticsWindow(vm);
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.True(vm.FollowConversationJumps);
+        Assert.True(vm.HasSpannedConversations);
+        Assert.Single(vm.UnfollowedJumpRows);
+        Assert.Contains(vm.Branches, b2 => b2.IsInAnotherConversation);
+        Assert.NotNull(window.FindControl<CheckBox>("FollowJumpsCheckBox"));
+        Assert.NotNull(window.FindControl<ItemsControl>("UnfollowedJumpsList"));
     }
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using DialogEditor.Core.Analytics;
+using System.Collections.ObjectModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -55,6 +56,14 @@ public partial class MainWindowViewModel : ObservableObject
     private ConversationFile?  _currentFile;
 
     public IGameDataProvider? Provider    => _provider;
+
+    // Conversation GUID → name, cached on folder open (issue #14). Its source,
+    // LoadGameDataNames(), parses every bundle on disk and is documented as called once per
+    // folder open, so it must not run per analysis. GameDataNameService is unsuitable: it
+    // stores NamedEntry(DisplayName, StoredValue) with DisplayName composed as
+    // "{name} — {id}", so recovering the name would mean splitting on " — ".
+    private IReadOnlyDictionary<string, string> _conversationNamesById =
+        new Dictionary<string, string>();
     public string?            ProjectPath => _projectPath;
     private string             _currentGameDirectory = string.Empty;
     private string             _activeGameId         = string.Empty;
@@ -1713,8 +1722,15 @@ public partial class MainWindowViewModel : ObservableObject
                 .ToList();
             GameDataNameService.Register("Speaker", speakerEntries);
 
+            _conversationNamesById = new Dictionary<string, string>();
             foreach (var (kind, entries) in provider.LoadGameDataNames())
             {
+                if (kind == "Conversation")
+                    _conversationNamesById = entries
+                        .Where(e => !string.IsNullOrEmpty(e.Id))
+                        .GroupBy(e => e.Id)
+                        .ToDictionary(g => g.Key, g => g.First().Name);
+
                 var namedEntries = entries
                     .Select(e => string.IsNullOrEmpty(e.Id)
                         ? new NamedEntry(e.Name, e.Name)
@@ -2532,6 +2548,21 @@ public partial class MainWindowViewModel : ObservableObject
 
     /// Navigate from a find result to its node: switch conversation if needed
     /// (reusing the unsaved-changes guard), then select the node by id.
+    /// Builds the cross-conversation graph for Flow Analytics' Playthrough stats (#14).
+    ///
+    /// Lives here rather than in the View because the project, the provider and the cached
+    /// conversation-GUID map are all private state — the View just asks for a graph. Returns
+    /// null when there is nothing to resolve against, which the panel treats as "analyse the
+    /// open conversation only".
+    public MultiConversationGraph? ResolveConversationJumpGraph()
+    {
+        if (_project is null || _provider is null) return null;
+        return ConversationJumpResolver.Resolve(
+            _project, _provider, _provider.Language,
+            Canvas.ConversationName ?? "", Canvas.BuildSnapshot(),
+            _conversationNamesById);
+    }
+
     public void NavigateToFoundNode(string conversationName, int nodeId)
     {
         if (Canvas.ConversationName == conversationName)
