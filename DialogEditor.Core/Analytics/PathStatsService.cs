@@ -90,10 +90,19 @@ public static class PathStatsService
         // because ConversationManager.StartConversation adds a FlowChartPlayer without
         // stopping the current one). Merging them into one edge list would destroy exactly
         // the distinction the additive arithmetic below depends on.
+        var jumpsByFrom = graph.Jumps
+            .GroupBy(j => j.From)
+            .ToDictionary(g => g.Key, g => g.Select(j => j.To).ToList());
+
         List<NodeRef> LinksOf(NodeRef u) => nodeById[u].Links
             .Select(l => new NodeRef(u.Conversation, l.ToNodeId))
             .Where(nodeById.ContainsKey)          // drop dangling
             .ToList();
+
+        List<NodeRef> JumpsOf(NodeRef u) =>
+            jumpsByFrom.TryGetValue(u, out var js)
+                ? js.Where(nodeById.ContainsKey).ToList()
+                : [];
 
         // ── Break to a DAG (drop back-edges to a DFS ancestor) ────────────
         var dagLinks = new Dictionary<NodeRef, List<NodeRef>>();
@@ -112,6 +121,14 @@ public static class PathStatsService
                 dagLinks[u].Add(v);
                 if (!visited.Contains(v)) Dfs(v);
             }
+            foreach (var v in JumpsOf(u))
+            {
+                // A handoff that loops back to a conversation already on the stack is cut
+                // by the same rule as a hub loop: counted once, not unrolled.
+                if (onStack.Contains(v)) continue;
+                dagJumps[u].Add(v);
+                if (!visited.Contains(v)) Dfs(v);
+            }
             onStack.Remove(u);
         }
         Dfs(root);
@@ -124,8 +141,15 @@ public static class PathStatsService
         {
             if (longMemo.TryGetValue((u, female), out var cached)) return cached;
             var best = Weight(u, female);
+            // Links are ALTERNATIVES: the player takes one, so take the max.
             if (dagLinks.TryGetValue(u, out var outs) && outs.Count > 0)
                 best += outs.Max(v => Longest(v, female));
+            // Jumps are SPAWNS: ConversationManager.StartConversation adds a new
+            // FlowChartPlayer and never stops the current one, so a handoff's words are
+            // read IN ADDITION to whatever this node's own links contribute. Summed, not
+            // maxed. NodeThatContinuesAndHandsOff_CountsBoth_NotMax pins this.
+            if (dagJumps.TryGetValue(u, out var js) && js.Count > 0)
+                best += js.Sum(v => Longest(v, female));
             longMemo[(u, female)] = best;
             return best;
         }
@@ -135,6 +159,10 @@ public static class PathStatsService
             var best = Weight(u, female);
             if (dagLinks.TryGetValue(u, out var outs) && outs.Count > 0)
                 best += outs.Min(v => Shortest(v, female));
+            // Summed here too: a spawn is not optional, so there is no shorter read that
+            // skips it.
+            if (dagJumps.TryGetValue(u, out var js) && js.Count > 0)
+                best += js.Sum(v => Shortest(v, female));
             shortMemo[(u, female)] = best;
             return best;
         }
@@ -150,7 +178,7 @@ public static class PathStatsService
             {
                 var u = queue.Dequeue();
                 sum += Weight(u, female);
-                foreach (var v in LinksOf(u))
+                foreach (var v in LinksOf(u).Concat(JumpsOf(u)))
                     if (seen.Add(v)) queue.Enqueue(v);
             }
             return sum;
@@ -171,7 +199,9 @@ public static class PathStatsService
             var found = new List<NodeRef>();
             void Enqueue(NodeRef u)
             {
-                foreach (var v in LinksOf(u))
+                // Crosses handoffs: a jump whose entry node is a player choice puts a fork
+                // in another conversation into the tree, which is the point.
+                foreach (var v in LinksOf(u).Concat(JumpsOf(u)))
                     if (seen.Add(v)) queue.Enqueue(v);
             }
             Enqueue(start);
@@ -220,7 +250,7 @@ public static class PathStatsService
         // stack for the whole traversal, so every edge into it is a dropped back-edge —
         // which makes the recursion well-founded without a separate base case.
         var preds = new Dictionary<NodeRef, List<NodeRef>>();
-        foreach (var (u, outs) in dagLinks)
+        foreach (var (u, outs) in dagLinks.Concat(dagJumps))
             foreach (var v in outs)
             {
                 if (!preds.TryGetValue(v, out var list)) preds[v] = list = [];
@@ -249,7 +279,9 @@ public static class PathStatsService
         }
 
         var endings = dagLinks.Keys
-            .Where(id => nodeById[id].Links.Count == 0)     // a real dead end, not a loop-back
+            // No links AND no handoff: a node that hands off is a way the conversation
+            // CONTINUES, not a way it finishes (#14).
+            .Where(id => nodeById[id].Links.Count == 0 && JumpsOf(id).Count == 0)
             .Select(id => new EndingStat(
                 id, nodeById[id].DefaultText ?? "",
                 LongestTo(id, female: false), ShortestTo(id, female: false),
