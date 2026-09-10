@@ -116,6 +116,32 @@ public class FlowAnalyticsViewModelTests
         Assert.Equal(expectedKey, vm.SeverityLabel);   // StubStringProvider echoes keys
     }
 
+    // ── Row text is localised (CLAUDE.md localisation rule) ─────────
+
+    // The row label used to be built inline as $"Node {NodeId} — {NodeSnippet}",
+    // which hard-codes the English word "Node" in C#. NoHardcodedUiStringsTests
+    // only scans .axaml, so nothing caught it. StubStringProvider echoes keys, so
+    // asserting the bare key proves the VM asks the resource layer for the text
+    // instead of composing it — the end-to-end test below pins the actual wording.
+    [Fact]
+    public void FlowIssue_DisplayText_ComesFromResourceKey()
+    {
+        var vm = new FlowIssueViewModel(
+            new FlowIssue(7, FlowIssueKind.EmptyText), "snippet", _ => { });
+
+        Assert.Equal("FlowAnalytics_NodeLabel", vm.DisplayText);
+    }
+
+    [Fact]
+    public void TokenIssueRow_DisplayText_ComesFromResourceKey()
+    {
+        var withLanguage = new TokenIssueRowViewModel(7, "de", "bad tag", _ => { });
+        var defaultText  = new TokenIssueRowViewModel(7, "",   "bad tag", _ => { });
+
+        Assert.Equal("FlowAnalytics_TagIssue_Row",         withLanguage.DisplayText);
+        Assert.Equal("FlowAnalytics_TagIssue_Row_Default", defaultText.DisplayText);
+    }
+
     // ── Playthrough stats ────────────────────────────────────────────────
 
     private static NodeEditSnapshot PathNode(

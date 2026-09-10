@@ -1,0 +1,98 @@
+# Pre-existing hard-coded UI strings, recorded when the C# localisation
+# guard was added. This list may only SHRINK. Clean a site up (route it
+# through Loc, or mark it [NotLocalised(...)]) and delete its line.
+# Regenerate: DIALOGEDITOR_UPDATE_BASELINE=1 dotnet test
+DialogEditor.Avalonia/Audio/VoImporter.cs|(not set)
+DialogEditor.Avalonia/Views/ConversationNameDialog.axaml.cs|Import Conversation
+DialogEditor.Avalonia/Views/ConversationNameDialog.axaml.cs|New Conversation
+DialogEditor.Avalonia/Views/MainWindow.axaml.cs|CSV files
+DialogEditor.Avalonia/Views/MainWindow.axaml.cs|Dialog Pack
+DialogEditor.Avalonia/Views/MainWindow.axaml.cs|This conversation
+DialogEditor.Avalonia/Views/MainWindow.axaml.cs|This project
+DialogEditor.Avalonia/Views/NodeDetailView.axaml.cs|Link → {0}
+DialogEditor.Avalonia/Views/UnsavedChangesDialog.axaml.cs|'{0}' has unsaved changes.
+DialogEditor.Core/Export/DialogExporterFactory.cs|Yarn Spinner
+DialogEditor.Core/Export/YarnSpinnerExporter.cs|title: {0}
+DialogEditor.Core/GameData/Poe1GameDataProvider.cs|Pillars of Eternity
+DialogEditor.Core/GameData/Poe2GameDataProvider.cs|Pillars of Eternity II: Deadfire
+DialogEditor.Core/Models/ConditionNode.cs|NOT 
+DialogEditor.Core/Models/ConditionNode.cs|NOT {0}
+DialogEditor.Core/Parsing/Poe1SpeakerNameParser.cs|Grieving Mother
+DialogEditor.Patch/BatchReplaceService.cs|Condition[{0}] Param {1}
+DialogEditor.Patch/BatchReplaceService.cs|Default Text
+DialogEditor.Patch/BatchReplaceService.cs|Female Text
+DialogEditor.Patch/BatchReplaceService.cs|Listener GUID
+DialogEditor.Patch/BatchReplaceService.cs|Script {0}[{1}] Param {2}
+DialogEditor.Patch/BatchReplaceService.cs|Speaker GUID
+DialogEditor.Patch/Diff/ProjectBlameService.cs|bad revision
+DialogEditor.Patch/Diff/ProjectBlameService.cs|does not have any commits
+DialogEditor.Patch/Diff/ProjectBlameService.cs|no such path
+DialogEditor.Patch/Diff/ProjectBlameService.cs|no such ref
+DialogEditor.Patch/GitConflict/GitMergeAnalyzer.cs|+{0} ~{1} -{2} ({3} text)
+DialogEditor.Patch/PatchConflictException.cs|Patch conflict on node {0} field '{1}': expected '{2}' but found '{3}'.
+DialogEditor.Patch/SampleProjectService.cs|  (an alternate greeting on the experiment branch)
+DialogEditor.Patch/SampleProjectService.cs|  (try changing this line!)
+DialogEditor.Patch/SampleProjectService.cs|And this whole line was added as a sample.
+DialogEditor.Patch/SampleProjectService.cs|Dialog Editor Sample
+DialogEditor.Patch/SampleProjectService.cs|Initial sample — edit Eder's opening line
+DialogEditor.Patch/SampleProjectService.cs|Reshape the scene — add a line, a note, and trim a dead end
+DialogEditor.Patch/SampleProjectService.cs|Sample conversation '{0}' was not found in the loaded game.
+DialogEditor.Patch/SampleProjectService.cs|Sample translator note: keep Eder's tone warm and informal.
+DialogEditor.Patch/SampleProjectService.cs|experiment: try an alternate greeting
+DialogEditor.ViewModels/Editing/AddAnnotationCommand.cs|Add annotation
+DialogEditor.ViewModels/Editing/AddConnectionCommand.cs|Add connection {0} → {1}
+DialogEditor.ViewModels/Editing/AddNodeCommand.cs|Add node {0}
+DialogEditor.ViewModels/Editing/DeleteAnnotationCommand.cs|Delete annotation
+DialogEditor.ViewModels/Editing/DeleteConnectionCommand.cs|Delete connection → {0}
+DialogEditor.ViewModels/Editing/DeleteNodeCommand.cs|Delete node {0}
+DialogEditor.ViewModels/Services/IVoImporter.cs|No importer configured.
+DialogEditor.ViewModels/Services/ScriptCatalogue.cs|Void {0}()
+DialogEditor.ViewModels/ViewModels/AnnotationViewModel.cs|Change annotation color
+DialogEditor.ViewModels/ViewModels/AnnotationViewModel.cs|Edit annotation body
+DialogEditor.ViewModels/ViewModels/AnnotationViewModel.cs|Edit annotation title
+DialogEditor.ViewModels/ViewModels/ConditionEditorViewModel.cs|Node {0}
+DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Asset GUID — check the game data files for the correct value
+DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Check GlobalVariables.csv for valid names.
+DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Comparison operator: EqualTo, NotEqualTo, GreaterThan, LessThan, 
+DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Conversation filename without extension (e.g. edér)
+DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Decimal number (e.g. 1.5)
+DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Enum value — type: {0}
+DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|GUID of an in-scene game object. Type a name or GUID prefix to search, or paste any GUID directly.
+DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|GUID value. Type a name or GUID prefix to search, or paste any GUID directly.
+DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Integer number (whole number, no decimals)
+DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Name of a global integer flag (e.g. npc_met_edér). 
+DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Quest filename without extension
+DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Text string (e.g. a flag name, conversation name, or item name)
+DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|Type: {0}
+DialogEditor.ViewModels/ViewModels/ConditionRowViewModel.cs|true or false
+DialogEditor.ViewModels/ViewModels/ConnectionViewModel.cs|Edit link conditions
+DialogEditor.ViewModels/ViewModels/ConnectionViewModel.cs|Edit link display
+DialogEditor.ViewModels/ViewModels/ConnectionViewModel.cs|Edit link weight
+DialogEditor.ViewModels/ViewModels/DiffViewModel.cs|--format=%h %s
+DialogEditor.ViewModels/ViewModels/ExceptionReportViewModel.cs|Issues: {0}{1}Log file: {2}
+DialogEditor.ViewModels/ViewModels/ExportConversationsViewModel.cs|Export Conversation
+DialogEditor.ViewModels/ViewModels/ExportConversationsViewModel.cs|Export Conversations
+DialogEditor.ViewModels/ViewModels/FlowAnalyticsViewModel.cs|({0}, no text)
+DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs|(node {0}, field '{1}'); forcing apply for display
+DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs|Export for Translation
+DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs|Import Translation
+DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs|Patch for '{0}' no longer matches game data 
+DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs|Source language
+DialogEditor.ViewModels/ViewModels/MainWindowViewModel.cs|Target language
+DialogEditor.ViewModels/ViewModels/NodeDetailViewModel.cs|unknown error
+DialogEditor.ViewModels/ViewModels/NodeViewModel.cs|Edit HasVO
+DialogEditor.ViewModels/ViewModels/NodeViewModel.cs|Edit HideSpeaker
+DialogEditor.ViewModels/ViewModels/NodeViewModel.cs|Edit actor direction
+DialogEditor.ViewModels/ViewModels/NodeViewModel.cs|Edit comments
+DialogEditor.ViewModels/ViewModels/NodeViewModel.cs|Edit conditions
+DialogEditor.ViewModels/ViewModels/NodeViewModel.cs|Edit dialog text
+DialogEditor.ViewModels/ViewModels/NodeViewModel.cs|Edit display type
+DialogEditor.ViewModels/ViewModels/NodeViewModel.cs|Edit external VO
+DialogEditor.ViewModels/ViewModels/NodeViewModel.cs|Edit female text
+DialogEditor.ViewModels/ViewModels/NodeViewModel.cs|Edit listener GUID
+DialogEditor.ViewModels/ViewModels/NodeViewModel.cs|Edit node type
+DialogEditor.ViewModels/ViewModels/NodeViewModel.cs|Edit persistence
+DialogEditor.ViewModels/ViewModels/NodeViewModel.cs|Edit scripts
+DialogEditor.ViewModels/ViewModels/NodeViewModel.cs|Edit speaker GUID
+DialogEditor.ViewModels/ViewModels/NodeViewModel.cs|Edit speaker category
+DialogEditor.ViewModels/ViewModels/ScriptEditorViewModel.cs|Node {0}
