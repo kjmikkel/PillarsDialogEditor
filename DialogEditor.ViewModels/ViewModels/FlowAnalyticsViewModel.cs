@@ -294,7 +294,7 @@ public partial class FlowAnalyticsViewModel : ObservableObject
         Endings.Clear();
         foreach (var e in report.Endings)
         {
-            var nodeId = e.NodeId;
+            var nodeId = e.Node.NodeId;
             Endings.Add(new PathEndingRowViewModel(
                 nodeId,
                 Loc.Format("PathStats_EndingRow", nodeId, Truncate(e.Text, 50)),
@@ -317,7 +317,7 @@ public partial class FlowAnalyticsViewModel : ObservableObject
             Loc.Format("PathStats_BranchLongest", WordsTime(b.DefaultLongestWords)),
             Loc.Format("PathStats_BranchContent", WordsTime(b.FemaleContentWords)),
             Loc.Format("PathStats_BranchLongest", WordsTime(b.FemaleLongestWords)),
-            () => _navigateToNode(b.ChoiceNodeId),
+            () => _navigateToNode(b.Choice.NodeId),
             b.SubBranches.Select(s => BuildBranchRow(s, depth + 1)).ToList(),
             isExpanded: depth == 1);
 
