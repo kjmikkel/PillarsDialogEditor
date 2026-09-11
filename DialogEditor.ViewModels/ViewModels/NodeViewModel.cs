@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using DialogEditor.Core.Analytics;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
@@ -34,35 +34,35 @@ public partial class NodeViewModel : ObservableObject
     public bool IsPlayerChoice
     {
         get => _isPlayerChoice;
-        set => Push(_isPlayerChoice, value, "Edit node type",
+        set => Push(_isPlayerChoice, value, "Undo_EditNodeType",
             v => { _isPlayerChoice = v; OnPropertyChanged(nameof(IsPlayerChoice)); OnPropertyChanged(nameof(Title)); });
     }
 
     public SpeakerCategory SpeakerCategory
     {
         get => _speakerCategory;
-        set => Push(_speakerCategory, value, "Edit speaker category",
+        set => Push(_speakerCategory, value, "Undo_EditSpeakerCategory",
             v => { _speakerCategory = v; OnPropertyChanged(nameof(SpeakerCategory)); });
     }
 
     public string SpeakerGuid
     {
         get => _speakerGuid;
-        set => Push(_speakerGuid, value, "Edit speaker GUID",
+        set => Push(_speakerGuid, value, "Undo_EditSpeakerGuid",
             v => { _speakerGuid = v; OnPropertyChanged(nameof(SpeakerGuid)); OnPropertyChanged(nameof(SpeakerName)); OnPropertyChanged(nameof(Title)); });
     }
 
     public string ListenerGuid
     {
         get => _listenerGuid;
-        set => Push(_listenerGuid, value, "Edit listener GUID",
+        set => Push(_listenerGuid, value, "Undo_EditListenerGuid",
             v => { _listenerGuid = v; OnPropertyChanged(nameof(ListenerGuid)); OnPropertyChanged(nameof(ListenerName)); });
     }
 
     public string DefaultText
     {
         get => _defaultText;
-        set => Push(_defaultText, value, "Edit dialog text",
+        set => Push(_defaultText, value, "Undo_EditDialogText",
             v => { _defaultText = v;
                    OnPropertyChanged(nameof(DefaultText));
                    OnPropertyChanged(nameof(TextPreview));
@@ -72,14 +72,14 @@ public partial class NodeViewModel : ObservableObject
     public string FemaleText
     {
         get => _femaleText;
-        set => Push(_femaleText, value, "Edit female text",
+        set => Push(_femaleText, value, "Undo_EditFemaleText",
             v => { _femaleText = v; OnPropertyChanged(nameof(FemaleText)); OnPropertyChanged(nameof(HasFemaleText)); OnPropertyChanged(nameof(FooterText)); });
     }
 
     public string DisplayType
     {
         get => _displayType;
-        set => Push(_displayType, value, "Edit display type",
+        set => Push(_displayType, value, "Undo_EditDisplayType",
             v => { _displayType = v;
                    OnPropertyChanged(nameof(DisplayType));
                    OnPropertyChanged(nameof(IsBark));
@@ -89,42 +89,42 @@ public partial class NodeViewModel : ObservableObject
     public string Persistence
     {
         get => _persistence;
-        set => Push(_persistence, value, "Edit persistence",
+        set => Push(_persistence, value, "Undo_EditPersistence",
             v => { _persistence = v; OnPropertyChanged(nameof(Persistence)); });
     }
 
     public string ActorDirection
     {
         get => _actorDirection;
-        set => Push(_actorDirection, value, "Edit actor direction",
+        set => Push(_actorDirection, value, "Undo_EditActorDirection",
             v => { _actorDirection = v; OnPropertyChanged(nameof(ActorDirection)); });
     }
 
     public string Comments
     {
         get => _comments;
-        set => Push(_comments, value, "Edit comments",
+        set => Push(_comments, value, "Undo_EditComments",
             v => { _comments = v; OnPropertyChanged(nameof(Comments)); });
     }
 
     public string ExternalVO
     {
         get => _externalVO;
-        set => Push(_externalVO, value, "Edit external VO",
+        set => Push(_externalVO, value, "Undo_EditExternalVo",
             v => { _externalVO = v; OnPropertyChanged(nameof(ExternalVO)); });
     }
 
     public bool HasVO
     {
         get => _hasVO;
-        set => Push(_hasVO, value, "Edit HasVO",
+        set => Push(_hasVO, value, "Undo_EditHasVo",
             v => { _hasVO = v; OnPropertyChanged(nameof(HasVO)); });
     }
 
     public bool HideSpeaker
     {
         get => _hideSpeaker;
-        set => Push(_hideSpeaker, value, "Edit HideSpeaker",
+        set => Push(_hideSpeaker, value, "Undo_EditHideSpeaker",
             v => { _hideSpeaker = v; OnPropertyChanged(nameof(HideSpeaker)); });
     }
 
@@ -182,7 +182,7 @@ public partial class NodeViewModel : ObservableObject
     public IReadOnlyList<ConditionNode> Conditions
     {
         get => _conditions;
-        set => Push(_conditions, value, "Edit conditions",
+        set => Push(_conditions, value, "Undo_EditConditions",
             v =>
             {
                 _conditions = v;
@@ -201,7 +201,7 @@ public partial class NodeViewModel : ObservableObject
     public IReadOnlyList<ScriptCall> Scripts
     {
         get => _scripts;
-        set => Push(_scripts, value, "Edit scripts",
+        set => Push(_scripts, value, "Undo_EditScripts",
             v => { _scripts = v; OnPropertyChanged(nameof(Scripts));
                    OnPropertyChanged(nameof(HasScripts));
                    OnPropertyChanged(nameof(ScriptDisplayStrings)); });
@@ -288,11 +288,14 @@ public partial class NodeViewModel : ObservableObject
     }
 
     // ── Command-generating setter helper ──────────────────────────────────
-    private void Push<T>(T current, T value, string description, Action<T> apply)
+    // descriptionKey, not description: the undo history is re-read on every peek, so
+    // the lookup is deferred to keep it correct across a live language change.
+    private void Push<T>(T current, T value, string descriptionKey, Action<T> apply)
     {
         if (EqualityComparer<T>.Default.Equals(current, value)) return;
         if (UndoStack is null) { apply(value); return; }
-        UndoStack.Execute(new SetPropertyCommand<T>(description, apply, current, value));
+        UndoStack.Execute(new SetPropertyCommand<T>(
+            () => Loc.Get(descriptionKey), apply, current, value));
     }
 
     // ── Snapshot helper (links provided by ConversationViewModel) ─────────

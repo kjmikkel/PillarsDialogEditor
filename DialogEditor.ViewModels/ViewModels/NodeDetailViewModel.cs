@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -293,7 +293,7 @@ public partial class NodeDetailViewModel : ObservableObject
         else
         {
             AppLog.Error($"VO import failed: {result.ErrorMessage}");
-            ReportStatus?.Invoke(Loc.Format("Status_VoImportFailed", result.ErrorMessage ?? "unknown error"));
+            ReportStatus?.Invoke(Loc.Format("Status_VoImportFailed", result.ErrorMessage ?? Loc.Get("Status_UnknownError")));
         }
 
         NotifyAllProxies(); // always refresh so UI reflects current reality

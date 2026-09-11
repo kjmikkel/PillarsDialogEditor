@@ -1,0 +1,5 @@
+# Pre-existing hard-coded UI strings, recorded when the C# localisation
+# guard was added. This list may only SHRINK. Clean a site up (route it
+# through Loc, or mark it [NotLocalised(...)]) and delete its line.
+# Regenerate: DIALOGEDITOR_UPDATE_BASELINE=1 dotnet test
+

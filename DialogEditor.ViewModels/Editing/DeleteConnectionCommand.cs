@@ -1,4 +1,5 @@
-using DialogEditor.Core.Editing;
+﻿using DialogEditor.Core.Editing;
+using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.ViewModels.Editing;
 
@@ -7,7 +8,7 @@ internal sealed class DeleteConnectionCommand(
     ConnectionViewModel connection) : IEditCommand
 {
     public string Description =>
-        $"Delete connection → {connection.Target.GetNodeId()}";
+        Loc.Format("Undo_DeleteConnection", connection.Target.GetNodeId());
 
     public void Execute() => conversation.Connections.Remove(connection);
     public void Undo()    => conversation.Connections.Add(connection);

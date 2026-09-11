@@ -1,6 +1,7 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
+using DialogEditor.Core.Localisation;
 
 namespace DialogEditor.Core.Parsing;
 
@@ -15,7 +16,11 @@ public static partial class Poe1SpeakerNameParser
     [GeneratedRegex(@"\s+\d+$")]
     private static partial Regex TrailingNumber();
 
-    // Companions whose InstanceTag codenames bear no relation to their display names
+    // Companions whose InstanceTag codenames bear no relation to their display names.
+    // These are the names PoE1's own stringtable uses; the editor shows them so a
+    // modder can match what the game shows. Translating them here would desync the
+    // editor from the install, which already carries the player's language.
+    [NotLocalised("Character names sourced from the game's own localised data")]
     private static readonly Dictionary<string, string> CodeNameOverrides =
         new(StringComparer.OrdinalIgnoreCase)
         {

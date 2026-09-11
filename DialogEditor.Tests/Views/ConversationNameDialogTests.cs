@@ -1,13 +1,20 @@
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.Avalonia.Views;
+using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.Tests.Views;
 
 public class ConversationNameDialogTests
 {
+
+    // Both dialogs resolve their text through Loc (rather than FindResource with a
+    // hard-coded English fallback), so the provider must be configured — as App does
+    // before showing any window.
+    public ConversationNameDialogTests() => Loc.Configure(new AvaloniaStringProvider());
     [AvaloniaFact]
     public void OkButton_ReturnsTypedText()
     {

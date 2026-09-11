@@ -1,4 +1,5 @@
-using DialogEditor.Core.Editing;
+﻿using DialogEditor.Core.Editing;
+using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.ViewModels.Editing;
 
@@ -7,7 +8,7 @@ internal sealed class DeleteNodeCommand(
     NodeViewModel node,
     IReadOnlyList<ConnectionViewModel> removedConnections) : IEditCommand
 {
-    public string Description => $"Delete node {node.NodeId}";
+    public string Description => Loc.Format("Undo_DeleteNode", node.NodeId);
 
     public void Execute()
     {

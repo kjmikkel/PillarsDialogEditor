@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using DialogEditor.Core.Analytics;
+using System.Collections.ObjectModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -55,6 +56,14 @@ public partial class MainWindowViewModel : ObservableObject
     private ConversationFile?  _currentFile;
 
     public IGameDataProvider? Provider    => _provider;
+
+    // Conversation GUID → name, cached on folder open (issue #14). Its source,
+    // LoadGameDataNames(), parses every bundle on disk and is documented as called once per
+    // folder open, so it must not run per analysis. GameDataNameService is unsuitable: it
+    // stores NamedEntry(DisplayName, StoredValue) with DisplayName composed as
+    // "{name} — {id}", so recovering the name would mean splitting on " — ".
+    private IReadOnlyDictionary<string, string> _conversationNamesById =
+        new Dictionary<string, string>();
     public string?            ProjectPath => _projectPath;
     private string             _currentGameDirectory = string.Empty;
     private string             _activeGameId         = string.Empty;
@@ -1618,11 +1627,11 @@ public partial class MainWindowViewModel : ObservableObject
         var allTypes = new (string, string)[] { (".csv", "CSV"), (".json", "JSON"), (".xlf", "XLIFF") };
         var ordered = allTypes.OrderByDescending(t => t.Item1 == ext).ToArray();
         var path = await _filePicker.PickSaveFileAsync(
-            "Export for Translation",
+            Loc.Get("Localization_ExportPickerTitle"),
             "export" + ext,
             ordered);
         if (path is null) return;
-        var lang = await (RequestLanguageCode?.Invoke("Source language", _provider?.Language)
+        var lang = await (RequestLanguageCode?.Invoke(Loc.Get("Localization_SourceLanguagePrompt"), _provider?.Language)
                           ?? Task.FromResult<string?>(_provider?.Language));
         if (lang is null) return;
         var count = _project.Patches.Values
@@ -1637,13 +1646,13 @@ public partial class MainWindowViewModel : ObservableObject
     {
         if (_project is null) return;
         var path = await _filePicker.PickOpenFileAsync(
-            "Import Translation",
+            Loc.Get("Localization_ImportPickerTitle"),
             new[] { (".csv", "CSV"), (".json", "JSON"), (".xlf", "XLIFF") });
         if (path is null) return;
         var fmt          = DetectFormat(path);
         var suggestedLang = LocalizationImportService.DetectLanguage(path, fmt,
             ex => AppLog.Warn($"Language auto-detect failed for '{path}': {ex.Message}"));
-        var lang = await (RequestLanguageCode?.Invoke("Target language", suggestedLang)
+        var lang = await (RequestLanguageCode?.Invoke(Loc.Get("Localization_TargetLanguagePrompt"), suggestedLang)
                           ?? Task.FromResult<string?>(suggestedLang));
         if (lang is null) return;
         _project  = LocalizationImportService.Import(_project, path, fmt, lang);
@@ -1713,8 +1722,15 @@ public partial class MainWindowViewModel : ObservableObject
                 .ToList();
             GameDataNameService.Register("Speaker", speakerEntries);
 
+            _conversationNamesById = new Dictionary<string, string>();
             foreach (var (kind, entries) in provider.LoadGameDataNames())
             {
+                if (kind == "Conversation")
+                    _conversationNamesById = entries
+                        .Where(e => !string.IsNullOrEmpty(e.Id))
+                        .GroupBy(e => e.Id)
+                        .ToDictionary(g => g.Key, g => g.First().Name);
+
                 var namedEntries = entries
                     .Select(e => string.IsNullOrEmpty(e.Id)
                         ? new NamedEntry(e.Name, e.Name)
@@ -1796,7 +1812,7 @@ public partial class MainWindowViewModel : ObservableObject
         SampleBuild build;
         try
         {
-            build = service.BuildSample(_provider);
+            build = service.BuildSample(_provider, SampleTextFactory.FromResources());
         }
         catch (SampleConversationNotFoundException ex)
         {
@@ -2393,8 +2409,7 @@ public partial class MainWindowViewModel : ObservableObject
                     // Game file changed underneath the patch (e.g. a game update).
                     // Still show the user's edits — force-apply for display and surface
                     // the mismatch; F5 keeps its strict conflict flow for real writes.
-                    AppLog.Warn($"Patch for '{file.Name}' no longer matches game data " +
-                        $"(node {conflict.NodeId}, field '{conflict.FieldName}'); forcing apply for display");
+                    AppLog.Warn($"Patch for '{file.Name}' no longer matches game data (node {conflict.NodeId}, field '{conflict.FieldName}'); forcing apply for display");
                     patchedSnap = PatchApplier.Apply(vanillaSnap, storedPatch, ignoreConflicts: true);
                     StatusText = Loc.Format("Status_PatchBaselineMismatch", file.Name);
                 }
@@ -2532,6 +2547,21 @@ public partial class MainWindowViewModel : ObservableObject
 
     /// Navigate from a find result to its node: switch conversation if needed
     /// (reusing the unsaved-changes guard), then select the node by id.
+    /// Builds the cross-conversation graph for Flow Analytics' Playthrough stats (#14).
+    ///
+    /// Lives here rather than in the View because the project, the provider and the cached
+    /// conversation-GUID map are all private state — the View just asks for a graph. Returns
+    /// null when there is nothing to resolve against, which the panel treats as "analyse the
+    /// open conversation only".
+    public MultiConversationGraph? ResolveConversationJumpGraph()
+    {
+        if (_project is null || _provider is null) return null;
+        return ConversationJumpResolver.Resolve(
+            _project, _provider, _provider.Language,
+            Canvas.ConversationName ?? "", Canvas.BuildSnapshot(),
+            _conversationNamesById);
+    }
+
     public void NavigateToFoundNode(string conversationName, int nodeId)
     {
         if (Canvas.ConversationName == conversationName)

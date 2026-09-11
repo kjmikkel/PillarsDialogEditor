@@ -1,6 +1,7 @@
-using System.IO.Compression;
+﻿using System.IO.Compression;
 using Avalonia.Platform;
 using Microsoft.Win32;
+using DialogEditor.Core.Localisation;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Avalonia.Audio;
@@ -179,6 +180,10 @@ public sealed class VoImporter : IVoImporter
         return Path.Combine(destDir, "template", "template.wproj");
     }
 
+    // Every literal in here is an install path, a registry key, an executable name, or
+    // an AppLog trace of the probe — the log is what a user attaches to a bug report
+    // about Wwise not being found, and it has to be readable by a maintainer.
+    [NotLocalised("Wwise discovery: install paths, registry keys, and probe diagnostics")]
     private static string? DetectWwiseCli()
     {
         const string ExeName = "WwiseConsole.exe"; // renamed from WwiseCLI.exe in Wwise 2019.1

@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DialogEditor.Core.Models;
 using DialogEditor.ViewModels.Resources;
@@ -79,24 +79,27 @@ public partial class ParameterValueViewModel : ObservableObject
         }
     }
 
+    /// What this parameter expects, shown as the field's tooltip and exposed as its
+    /// AutomationProperties.HelpText — so a screen reader reads it too. An unrecognised
+    /// type falls back to naming the type; an EMPTY type yields no hint at all, because
+    /// HasTypeHint drives the hint row's visibility and a resolved-but-blank string
+    /// would show an empty tooltip.
     public string TypeHint => Type switch
     {
-        "String"         => "Text string (e.g. a flag name, conversation name, or item name)",
-        "Int32"          => "Integer number (whole number, no decimals)",
-        "Single"         => "Decimal number (e.g. 1.5)",
-        "Boolean"        => "true or false",
-        "Operator"       => "Comparison operator: EqualTo, NotEqualTo, GreaterThan, LessThan, "
-                          + "GreaterThanOrEqualTo, LessThanOrEqualTo",
-        "GlobalVariable" => "Name of a global integer flag (e.g. npc_met_edér). "
-                          + "Check GlobalVariables.csv for valid names.",
-        "ObjectGuid"     => "GUID of an in-scene game object. Type a name or GUID prefix to search, or paste any GUID directly.",
-        "Guid"           => "GUID value. Type a name or GUID prefix to search, or paste any GUID directly.",
-        "Conversation"   => "Conversation filename without extension (e.g. edér)",
-        "Quest"          => "Quest filename without extension",
-        "GameData"       => "Asset GUID — check the game data files for the correct value",
+        "String"         => Loc.Get("ConditionHint_String"),
+        "Int32"          => Loc.Get("ConditionHint_Int32"),
+        "Single"         => Loc.Get("ConditionHint_Single"),
+        "Boolean"        => Loc.Get("ConditionHint_Boolean"),
+        "Operator"       => Loc.Get("ConditionHint_Operator"),
+        "GlobalVariable" => Loc.Get("ConditionHint_GlobalVariable"),
+        "ObjectGuid"     => Loc.Get("ConditionHint_ObjectGuid"),
+        "Guid"           => Loc.Get("ConditionHint_Guid"),
+        "Conversation"   => Loc.Get("ConditionHint_Conversation"),
+        "Quest"          => Loc.Get("ConditionHint_Quest"),
+        "GameData"       => Loc.Get("ConditionHint_GameData"),
         _ when Type.StartsWith("Enum:") =>
-            $"Enum value — type: {Type["Enum:".Length..].Replace('+', '.')}",
-        _ => string.IsNullOrEmpty(Type) ? string.Empty : $"Type: {Type}"
+            Loc.Format("ConditionHint_Enum", Type["Enum:".Length..].Replace('+', '.')),
+        _ => string.IsNullOrEmpty(Type) ? string.Empty : Loc.Format("ConditionHint_Fallback", Type)
     };
 
 }

@@ -1,4 +1,5 @@
-using System.Globalization;
+﻿using System.Globalization;
+using DialogEditor.Core.Localisation;
 
 namespace DialogEditor.Core.Resources;
 
@@ -9,6 +10,9 @@ namespace DialogEditor.Core.Resources;
 /// </summary>
 public static class CoreLocale
 {
+    // Cannot be localised even in principle: this is the code that installs the
+    // culture, so it runs when culture selection has already failed.
+    [NotLocalised("Debug diagnostic emitted while the locale system itself is failing")]
     public static void SetCulture(string? langCode)
     {
         if (langCode is null or "en")

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <!--
     TRANSLATOR NOTES
@@ -6,6 +6,8 @@
     These strings appear in the Node Details panel of the dialog viewer.
     Script prefixes label the trigger phase of each script call.
     Condition_Not is prefixed to every negated condition expression.
+    Game_Poe*_Name are the two supported games' titles, shown in the status bar
+    and the window title once a game folder is opened.
   -->
   <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
   <resheader name="version"><value>2.0</value></resheader>
@@ -35,6 +37,19 @@
        Trailing space is intentional — it separates NOT from the function name. -->
   <data name="Condition_Not" xml:space="preserve">
     <value>NOT </value>
+  </data>
+
+  <!-- Display name of Pillars of Eternity (2015). Both games shipped in several
+       languages; use the title as it appears on the localised store page /
+       in-game title screen rather than transliterating the English. -->
+  <data name="Game_Poe1_Name" xml:space="preserve">
+    <value>Pillars of Eternity</value>
+  </data>
+
+  <!-- Display name of Pillars of Eternity II: Deadfire (2018). "Deadfire" is the
+       subtitle and is treated as a proper noun in most localisations. -->
+  <data name="Game_Poe2_Name" xml:space="preserve">
+    <value>Pillars of Eternity II: Deadfire</value>
   </data>
 
 </root>

@@ -42,7 +42,7 @@ public static class BatchReplaceService
             var conversation = provider.LoadConversation(result.File);
             var snapshot     = ConversationSnapshotBuilder.Build(conversation);
 
-            // Rebuild the match set for this fresh load using the matches' FieldPaths as a guide —
+            // Rebuild the match set for this fresh load using the matches' field identities as a guide —
             // simpler: re-derive the query from the result's own Before/After pairs per node.
             // Since Apply is always called immediately after DryRun in practice, we re-run the
             // replacement directly on the fresh snapshot using the same before→after pairs.
@@ -75,14 +75,14 @@ public static class BatchReplaceService
 
         if (query.InNodeText)
         {
-            Check(node, "Default Text",  node.DefaultText,  s, r, comparison, matches);
-            Check(node, "Female Text",   node.FemaleText,   s, r, comparison, matches);
+            Check(node, new BatchField(BatchFieldKind.DefaultText), node.DefaultText, s, r, comparison, matches);
+            Check(node, new BatchField(BatchFieldKind.FemaleText),  node.FemaleText,  s, r, comparison, matches);
         }
 
         if (query.InSpeakerGuids)
         {
-            Check(node, "Speaker GUID",  node.SpeakerGuid,  s, r, comparison, matches);
-            Check(node, "Listener GUID", node.ListenerGuid, s, r, comparison, matches);
+            Check(node, new BatchField(BatchFieldKind.SpeakerGuid),  node.SpeakerGuid,  s, r, comparison, matches);
+            Check(node, new BatchField(BatchFieldKind.ListenerGuid), node.ListenerGuid, s, r, comparison, matches);
         }
 
         if (query.InScriptParams)
@@ -91,11 +91,8 @@ public static class BatchReplaceService
             {
                 var script = node.Scripts[si];
                 for (var pi = 0; pi < script.Parameters.Count; pi++)
-                {
-                    var cat = script.Category.ToString();
-                    Check(node, $"Script {cat}[{si}] Param {pi}",
+                    Check(node, new BatchField(BatchFieldKind.ScriptParam, script.Category, si, pi),
                           script.Parameters[pi], s, r, comparison, matches);
-                }
             }
         }
 
@@ -105,7 +102,7 @@ public static class BatchReplaceService
             foreach (var leaf in node.Conditions.SelectMany(c => c.Leaves()).OfType<ConditionLeaf>())
             {
                 for (var pi = 0; pi < leaf.Parameters.Count; pi++)
-                    Check(node, $"Condition[{ci}] Param {pi}",
+                    Check(node, new BatchField(BatchFieldKind.ConditionParam, Index: ci, ParamIndex: pi),
                           leaf.Parameters[pi], s, r, comparison, matches);
                 ci++;
             }
@@ -114,7 +111,7 @@ public static class BatchReplaceService
 
     private static void Check(
         NodeEditSnapshot      node,
-        string                fieldPath,
+        BatchField            field,
         string                value,
         string                search,
         string                replace,
@@ -123,24 +120,25 @@ public static class BatchReplaceService
     {
         if (!value.Contains(search, comparison)) return;
         var after = StringReplace.ReplaceAll(value, search, replace, comparison);
-        matches.Add(new BatchFieldMatch(node.NodeId, fieldPath, value, after));
+        matches.Add(new BatchFieldMatch(node.NodeId, field, value, after));
     }
 
     private static NodeEditSnapshot ApplyToNode(
         NodeEditSnapshot         node,
         List<BatchFieldMatch>    patches)
     {
-        // Index patches by FieldPath for O(1) lookup
-        var byField = patches.ToDictionary(p => p.FieldPath);
+        // Index patches by field identity for O(1) lookup. BatchField is a record, so
+        // value equality pairs a fresh snapshot's fields to the DryRun matches without
+        // any string round-trip — see the note on BatchField.
+        var byField = patches.ToDictionary(p => p.Field);
 
-        string Get(string fieldPath, string current)
-            => byField.TryGetValue(fieldPath, out var m) ? m.After : current;
+        string Get(BatchField field, string current)
+            => byField.TryGetValue(field, out var m) ? m.After : current;
 
         var newScripts = node.Scripts.Select((script, si) =>
         {
-            var cat = script.Category.ToString();
             var newParams = script.Parameters.Select((p, pi) =>
-                Get($"Script {cat}[{si}] Param {pi}", p)).ToList();
+                Get(new BatchField(BatchFieldKind.ScriptParam, script.Category, si, pi), p)).ToList();
             return newParams.SequenceEqual(script.Parameters)
                 ? script
                 : new ScriptCall(script.FullName, newParams, script.Category);
@@ -150,10 +148,10 @@ public static class BatchReplaceService
 
         return node with
         {
-            DefaultText  = Get("Default Text",  node.DefaultText),
-            FemaleText   = Get("Female Text",   node.FemaleText),
-            SpeakerGuid  = Get("Speaker GUID",  node.SpeakerGuid),
-            ListenerGuid = Get("Listener GUID", node.ListenerGuid),
+            DefaultText  = Get(new BatchField(BatchFieldKind.DefaultText),  node.DefaultText),
+            FemaleText   = Get(new BatchField(BatchFieldKind.FemaleText),   node.FemaleText),
+            SpeakerGuid  = Get(new BatchField(BatchFieldKind.SpeakerGuid),  node.SpeakerGuid),
+            ListenerGuid = Get(new BatchField(BatchFieldKind.ListenerGuid), node.ListenerGuid),
             Scripts      = newScripts,
             Conditions   = newConditions,
             // Links are intentionally left untouched: the only link field batch
@@ -164,9 +162,9 @@ public static class BatchReplaceService
 
     private static IReadOnlyList<ConditionNode> ReplaceConditionParams(
         IReadOnlyList<ConditionNode>  conditions,
-        Dictionary<string, BatchFieldMatch> byField)
+        Dictionary<BatchField, BatchFieldMatch> byField)
     {
-        // Re-index conditions by their leaf order to match FieldPaths used in DryRun
+        // Re-index conditions by their leaf order to match the identities used in DryRun
         var ci      = 0;
         var changed = false;
         var result  = new List<ConditionNode>();
@@ -178,8 +176,8 @@ public static class BatchReplaceService
     }
 
     private static ConditionNode ReplaceInConditionNode(
-        ConditionNode                       node,
-        Dictionary<string, BatchFieldMatch> byField,
+        ConditionNode                           node,
+        Dictionary<BatchField, BatchFieldMatch> byField,
         ref int                             ci,
         ref bool                            changed)
     {
@@ -189,7 +187,7 @@ public static class BatchReplaceService
             var modified  = false;
             for (var pi = 0; pi < leaf.Parameters.Count; pi++)
             {
-                var key = $"Condition[{ci}] Param {pi}";
+                var key = new BatchField(BatchFieldKind.ConditionParam, Index: ci, ParamIndex: pi);
                 if (byField.TryGetValue(key, out var m))
                 { newParams.Add(m.After); modified = true; }
                 else

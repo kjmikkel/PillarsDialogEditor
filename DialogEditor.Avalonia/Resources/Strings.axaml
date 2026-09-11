@@ -685,6 +685,168 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="BatchReplace_InConditionParams">Condition params</sys:String>
     <sys:String x:Key="BatchReplace_Preview">Preview</sys:String>
     <sys:String x:Key="BatchReplace_Apply">Apply</sys:String>
+    <!-- ─── File-type descriptions ─────────────────────────────────────── -->
+    <!-- Shown in the OS save/open dialog's file-type dropdown, next to the extension.
+         "CSV" is an initialism and stays as it is; translate only the word "files". -->
+    <sys:String x:Key="FileType_CsvFiles">CSV files</sys:String>
+    <!-- Names this editor's own bundle format (.dialogpack) — a mod pack holding the
+         project's dialogue changes. Translate it as a descriptive name. -->
+    <sys:String x:Key="FileType_DialogPack">Dialog Pack</sys:String>
+
+    <!-- ─── Unsaved-changes prompt subjects ───────────────────────────────── -->
+    <!-- Substituted for {0} in UnsavedChanges_Message when there is no conversation
+         name to use: the first when a conversation is open but unnamed, the second when
+         the prompt is about the whole project. They read as the sentence's subject, so
+         "This conversation has unsaved changes." -->
+    <sys:String x:Key="UnsavedChanges_ThisConversation">This conversation</sys:String>
+    <sys:String x:Key="UnsavedChanges_ThisProject">This project</sys:String>
+
+    <!-- Heads the condition editor when it is opened on a LINK rather than a node.
+         {0} = the target node's id; the arrow shows the link's direction. -->
+    <sys:String x:Key="Editor_LinkTitle">Link → {0}</sys:String>
+
+    <!-- ─── Editor window / dialog titles and prompts ─────────────────── -->
+    <!-- Heads the condition and script editors for one node. {0} = node id.
+         WindowTitle_ConditionEditor / _ScriptEditor wrap this. -->
+    <sys:String x:Key="Editor_NodeTitle">Node {0}</sys:String>
+    <!-- Titles of the OS save/open dialogs. Exporting ONE conversation saves a single
+         file; exporting several asks for a folder — two different dialogs, hence two
+         strings rather than one count-driven plural. -->
+    <sys:String x:Key="Export_PickFileTitle">Export Conversation</sys:String>
+    <sys:String x:Key="Export_PickFolderTitle">Export Conversations</sys:String>
+    <sys:String x:Key="Localization_ExportPickerTitle">Export for Translation</sys:String>
+    <sys:String x:Key="Localization_ImportPickerTitle">Import Translation</sys:String>
+    <!-- Prompts on the small dialog that asks which language code to use. "Source" is
+         the language being translated FROM, "target" the language translated INTO. -->
+    <sys:String x:Key="Localization_SourceLanguagePrompt">Source language</sys:String>
+    <sys:String x:Key="Localization_TargetLanguagePrompt">Target language</sys:String>
+
+    <!-- ─── Flow analytics: node with no text ──────────────────────────── -->
+    <!-- Stands in for a node's dialogue line when it has none, so the issue row can
+         still identify it. {0} = the speaker category in lower case, one of the game's
+         own enum names (npc, player, narrator …) and NOT translated. -->
+    <sys:String x:Key="FlowAnalytics_NoTextSnippet">({0}, no text)</sys:String>
+    <!-- Substituted for {0} above when the node itself cannot be found -->
+    <sys:String x:Key="FlowAnalytics_UnknownSpeaker">unknown</sys:String>
+
+    <!-- ─── Voice-over import failures ─────────────────────────────────── -->
+    <!-- Shown when the build has no voice-over importer wired up at all. A user should
+         never see this; it means the feature is unavailable, not that their file was
+         rejected. -->
+    <sys:String x:Key="Status_VoNoImporter">No importer configured.</sys:String>
+    <!-- Substituted into Status_VoImportFailed when the failure carried no reason.
+         Lower case: it is dropped mid-sentence, not used on its own. -->
+    <sys:String x:Key="Status_UnknownError">unknown error</sys:String>
+
+    <!-- ─── Condition / script parameter type hints ────────────────────── -->
+    <!--
+        Shown as the tooltip on a condition or script parameter field, and read aloud
+        by screen readers (AutomationProperties.HelpText). Each says what the field
+        expects. Aim for one short sentence.
+
+        Identifiers inside these hints are values the game itself parses and must NOT
+        be translated: the operator names (EqualTo …), the file name
+        GlobalVariables.csv, and the example flag name npc_met_edér. Translate the
+        prose around them. Examples introduced by "e.g." may be swapped for ones that
+        read naturally in your language, as long as they stay valid values.
+    -->
+    <sys:String x:Key="ConditionHint_String">Text string (e.g. a flag name, conversation name, or item name)</sys:String>
+    <sys:String x:Key="ConditionHint_Int32">Integer number (whole number, no decimals)</sys:String>
+    <!-- The decimal separator in the example: use whichever your locale writes -->
+    <sys:String x:Key="ConditionHint_Single">Decimal number (e.g. 1.5)</sys:String>
+    <!-- The two literal values the field accepts; leave "true"/"false" as they are -->
+    <sys:String x:Key="ConditionHint_Boolean">true or false</sys:String>
+    <!-- The six operator names are written verbatim into game data — keep them exactly -->
+    <sys:String x:Key="ConditionHint_Operator">Comparison operator: EqualTo, NotEqualTo, GreaterThan, LessThan, GreaterThanOrEqualTo, LessThanOrEqualTo</sys:String>
+    <!-- GlobalVariables.csv is a real file in the game install; npc_met_edér is a
+         sample flag name. Keep both spellings intact. -->
+    <sys:String x:Key="ConditionHint_GlobalVariable">Name of a global integer flag (e.g. npc_met_edér). Check GlobalVariables.csv for valid names.</sys:String>
+    <sys:String x:Key="ConditionHint_ObjectGuid">GUID of an in-scene game object. Type a name or GUID prefix to search, or paste any GUID directly.</sys:String>
+    <sys:String x:Key="ConditionHint_Guid">GUID value. Type a name or GUID prefix to search, or paste any GUID directly.</sys:String>
+    <!-- "edér" is the companion Edér's conversation file; keep the spelling -->
+    <sys:String x:Key="ConditionHint_Conversation">Conversation filename without extension (e.g. edér)</sys:String>
+    <sys:String x:Key="ConditionHint_Quest">Quest filename without extension</sys:String>
+    <sys:String x:Key="ConditionHint_GameData">Asset GUID — check the game data files for the correct value</sys:String>
+    <!-- {0} = the enum's dotted type name, e.g. "Game.Difficulty". Not translated. -->
+    <sys:String x:Key="ConditionHint_Enum">Enum value — type: {0}</sys:String>
+    <!-- Last resort for a parameter type the editor has no hint for.
+         {0} = the raw type name from the game data. -->
+    <sys:String x:Key="ConditionHint_Fallback">Type: {0}</sys:String>
+
+    <!-- ─── Undo / redo history entries ────────────────────────────────── -->
+    <!--
+        ConversationViewModel.UndoDescription / RedoDescription name the edit that
+        Undo would reverse or Redo would repeat. They are read fresh each time the
+        history is inspected, so a translation takes effect immediately — including
+        for edits made before the language was switched.
+
+        Write them as the NAME OF AN ACTION, not as a sentence or a past-tense report:
+        the reader sees them next to the words Undo and Redo, so English uses the bare
+        infinitive ("Edit dialog text", not "Edited the dialog text"). Use whatever
+        form your language pairs with "undo".
+
+        Field names here match the labels on the node detail panel — translate the two
+        consistently, so undoing an edit names the field the user just changed.
+        "VO" is voice-over. "GUID" stays untranslated (see the note above).
+    -->
+    <sys:String x:Key="Undo_EditNodeType">Edit node type</sys:String>
+    <sys:String x:Key="Undo_EditSpeakerCategory">Edit speaker category</sys:String>
+    <sys:String x:Key="Undo_EditSpeakerGuid">Edit speaker GUID</sys:String>
+    <sys:String x:Key="Undo_EditListenerGuid">Edit listener GUID</sys:String>
+    <sys:String x:Key="Undo_EditDialogText">Edit dialog text</sys:String>
+    <sys:String x:Key="Undo_EditFemaleText">Edit female text</sys:String>
+    <sys:String x:Key="Undo_EditDisplayType">Edit display type</sys:String>
+    <sys:String x:Key="Undo_EditPersistence">Edit persistence</sys:String>
+    <sys:String x:Key="Undo_EditActorDirection">Edit actor direction</sys:String>
+    <sys:String x:Key="Undo_EditComments">Edit comments</sys:String>
+    <sys:String x:Key="Undo_EditExternalVo">Edit external VO</sys:String>
+    <!-- HasVO and HideSpeaker are the game-data field names, shown as-is in the node
+         detail panel; keep them recognisable to someone reading the game's files. -->
+    <sys:String x:Key="Undo_EditHasVo">Edit HasVO</sys:String>
+    <sys:String x:Key="Undo_EditHideSpeaker">Edit HideSpeaker</sys:String>
+    <sys:String x:Key="Undo_EditConditions">Edit conditions</sys:String>
+    <sys:String x:Key="Undo_EditScripts">Edit scripts</sys:String>
+    <!-- Annotations are the user's own sticky notes on the canvas -->
+    <sys:String x:Key="Undo_EditAnnotationTitle">Edit annotation title</sys:String>
+    <sys:String x:Key="Undo_EditAnnotationBody">Edit annotation body</sys:String>
+    <sys:String x:Key="Undo_ChangeAnnotationColor">Change annotation color</sys:String>
+    <!-- A "link" is one connection between two dialogue nodes -->
+    <sys:String x:Key="Undo_EditLinkDisplay">Edit link display</sys:String>
+    <sys:String x:Key="Undo_EditLinkWeight">Edit link weight</sys:String>
+    <sys:String x:Key="Undo_EditLinkConditions">Edit link conditions</sys:String>
+    <!-- Structural edits. {0}/{1} are node numbers, and the arrow shows direction:
+         "Add connection 1 → 2" means from node 1 to node 2, so keep the order. -->
+    <sys:String x:Key="Undo_AddNode">Add node {0}</sys:String>
+    <sys:String x:Key="Undo_DeleteNode">Delete node {0}</sys:String>
+    <sys:String x:Key="Undo_AddAnnotation">Add annotation</sys:String>
+    <sys:String x:Key="Undo_DeleteAnnotation">Delete annotation</sys:String>
+    <sys:String x:Key="Undo_AddConnection">Add connection {0} → {1}</sys:String>
+    <sys:String x:Key="Undo_DeleteConnection">Delete connection → {0}</sys:String>
+
+    <!-- ─── Batch replace: match preview field labels ──────────────────── -->
+    <!--
+        These name the node field a match was found in. They are display labels only:
+        the editor pairs a preview row to the field it rewrites by a typed identity
+        (DialogEditor.Core.Editing.BatchField), so translating these cannot break
+        Apply. Keep them short — they head each preview row.
+    -->
+    <sys:String x:Key="BatchReplace_Field_DefaultText">Default Text</sys:String>
+    <!-- The female-variant line, used when the player character is female -->
+    <sys:String x:Key="BatchReplace_Field_FemaleText">Female Text</sys:String>
+    <!-- "GUID" is a technical identifier and is conventionally left untranslated -->
+    <sys:String x:Key="BatchReplace_Field_SpeakerGuid">Speaker GUID</sys:String>
+    <sys:String x:Key="BatchReplace_Field_ListenerGuid">Listener GUID</sys:String>
+    <!-- {0} = script phase, one of the game's own enum names (Enter/Exit/Update) and
+         NOT translated; {1} = which script on the node; {2} = which argument.
+         The brackets are array-index notation — keep them. -->
+    <sys:String x:Key="BatchReplace_Field_ScriptParam">Script {0}[{1}] Param {2}</sys:String>
+    <!-- {0} = which condition on the node, {1} = which argument -->
+    <sys:String x:Key="BatchReplace_Field_ConditionParam">Condition[{0}] Param {1}</sys:String>
+    <!-- Defensive fallback: shown only if a new field kind ships without a label -->
+    <sys:String x:Key="BatchReplace_Field_Unknown">Field</sys:String>
+    <!-- Heads one preview row. {0} = node id, {1} = one of the field labels above -->
+    <sys:String x:Key="BatchReplace_MatchLabel">Node {0} — {1}</sys:String>
+
     <!-- Match preview rows: trailing spaces align the "Before:"/"After: " labels — preserve them -->
     <sys:String x:Key="BatchReplace_Before" xml:space="preserve">Before: </sys:String>
     <sys:String x:Key="BatchReplace_After" xml:space="preserve">After:  </sys:String>
@@ -823,6 +985,10 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="FlowAnalytics_Statistics">STATISTICS</sys:String>
     <sys:String x:Key="FlowAnalytics_Issues">ISSUES — {0} found</sys:String>
     <sys:String x:Key="FlowAnalytics_NoIssues">No issues found</sys:String>
+    <!-- One structural-issue row. {0} is the node id, {1} a snippet of that
+         node's text. The em dash separates the identifier from the quoted
+         content; use whatever separator your language conventionally uses. -->
+    <sys:String x:Key="FlowAnalytics_NodeLabel">Node {0} — {1}</sys:String>
     <sys:String x:Key="FlowAnalytics_TagIssues">TEXT TAG ISSUES</sys:String>
     <sys:String x:Key="FlowAnalytics_TagIssues_None">No text tag issues.</sys:String>
     <sys:String x:Key="FlowAnalytics_TagIssue_Row">Node {0} ({1}): {2}</sys:String>
@@ -868,6 +1034,19 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="FlowAnalytics_Issue_NoIncomingLinks">No incoming links</sys:String>
     <sys:String x:Key="FlowAnalytics_Issue_BarkTextTooLong">Bark text over {0}-char yardstick (longest in shipped games)</sys:String>
     <sys:String x:Key="FlowAnalytics_Issue_BarkHasPlayerChoiceChild">Bark has player choice</sys:String>
+    <sys:String x:Key="FlowAnalytics_Issue_ConversationJumpWhileContinuing">Starts another conversation while continuing</sys:String>
+    <sys:String x:Key="PathStats_UnknownTarget">(unknown target)</sys:String>
+    <!-- Cross-conversation path stats (issue #14) -->
+    <sys:String x:Key="FlowAnalytics_FollowJumps">Follow conversation jumps</sys:String>
+    <sys:String x:Key="FlowAnalytics_FollowJumps_Tip">Counts content reached through Start Conversation handoffs into conversations this project patches. Figures will be larger than the single-conversation reading. Handoffs into conversations the project does not patch are listed but not counted.</sys:String>
+    <sys:String x:Key="FlowAnalytics_SpanningConversations">Spanning {0} conversations</sys:String>
+    <sys:String x:Key="FlowAnalytics_InConversation">in {0}</sys:String>
+    <sys:String x:Key="FlowAnalytics_UnfollowedHeader">Handoffs not followed</sys:String>
+    <sys:String x:Key="FlowAnalytics_UnfollowedRow">Node {0} → {1}</sys:String>
+    <sys:String x:Key="FlowAnalytics_Unfollowed_NotPatched">not patched by this project</sys:String>
+    <sys:String x:Key="FlowAnalytics_Unfollowed_Unresolved">target not found</sys:String>
+    <sys:String x:Key="FlowAnalytics_Unfollowed_LoadFailed">could not be loaded</sys:String>
+    <sys:String x:Key="FlowAnalytics_EndingsHint_WithJumps">An ending is a node with no outgoing links and no handoff. These figures need not reconcile with the longest playthrough above.</sys:String>
     <!-- Severity tier of an issue row's icon (tooltip + screen-reader name) -->
     <sys:String x:Key="FlowAnalytics_Severity_Error">Error</sys:String>
     <sys:String x:Key="FlowAnalytics_Severity_Warning">Warning</sys:String>
@@ -985,6 +1164,13 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="GitConflict_KindAddAdd">added on both sides</sys:String>
     <sys:String x:Key="GitConflict_KindConversation">conversation-level change</sys:String>
     <!-- Per-side choice labels -->
+    <!-- Compact per-side summary of a whole-conversation conflict, shown where the
+         other conflict kinds show the actual differing value.
+         {0} = nodes added, {1} = nodes modified, {2} = nodes deleted,
+         {3} = number of changed translated lines.
+         "+", "~" and "-" are the diff conventions for added/changed/removed and are
+         understood across languages — keep them. Translate the word "text". -->
+    <sys:String x:Key="GitConflict_PatchSummary">+{0} ~{1} -{2} ({3} text)</sys:String>
     <sys:String x:Key="GitConflict_KeepMine">Keep mine</sys:String>
     <sys:String x:Key="GitConflict_KeepTheirs">Keep theirs</sys:String>
     <sys:String x:Key="GitConflict_AcceptDeletion">Accept deletion</sys:String>
@@ -1259,6 +1445,38 @@ Remove it from the recent list?</sys:String>
 
     <sys:String x:Key="Sample_SelectFolder">Choose an empty folder for the sample project</sys:String>
     <sys:String x:Key="Sample_FolderNotEmpty">Please choose an empty folder — the sample needs its own folder so it doesn't disturb existing files.</sys:String>
+    <!-- ─── Sample project contents ────────────────────────────────────── -->
+    <!--
+        "Create Sample Project" seeds a small git repository from the user's own game
+        install so they can try the editor's diff and merge views on real data. These
+        strings are the demo's own content: the lines it edits into the conversation,
+        the translator note it attaches, and the three commit subjects shown in the
+        Diff view. They are the first thing a new user reads, so translate them.
+
+        Eder is a companion character in both games; keep his name as the player's
+        install spells it. The tone throughout is deliberately light and encouraging.
+    -->
+    <!-- git user.name for the seeded repository; appears as the commit author in the
+         Diff and blame views. Not an e-mail address and not matched by anything. -->
+    <sys:String x:Key="Sample_AuthorName">Dialog Editor Sample</sys:String>
+    <!-- Appended to one of Eder's existing lines, so it must start with separating
+         whitespace — the two leading spaces are deliberate, and xml:space="preserve"
+         is what keeps them. It invites the user to edit the line themselves. -->
+    <sys:String x:Key="Sample_EditedLineSuffix" xml:space="preserve">  (try changing this line!)</sys:String>
+    <!-- The competing suffix on the "experiment" branch: this is the text the merge
+         view shows conflicting with the one above. Same leading-space rule. -->
+    <sys:String x:Key="Sample_AltLineSuffix" xml:space="preserve">  (an alternate greeting on the experiment branch)</sys:String>
+    <!-- A whole new dialogue node added by the sample; stands alone as a sentence -->
+    <sys:String x:Key="Sample_NewLineText">And this whole line was added as a sample.</sys:String>
+    <!-- Demonstrates the translator-note feature by being one. Keep it self-describing -->
+    <sys:String x:Key="Sample_TranslatorNote">Sample translator note: keep Eder's tone warm and informal.</sys:String>
+    <!-- The three commit subjects, in order, as shown in the Diff view's history.
+         Written in git's conventional style: short, imperative, lower-case after the
+         first word. The third is prefixed "experiment:" to name its branch. -->
+    <sys:String x:Key="Sample_CommitInitial">Initial sample — edit Eder's opening line</sys:String>
+    <sys:String x:Key="Sample_CommitReshape">Reshape the scene — add a line, a note, and trim a dead end</sys:String>
+    <sys:String x:Key="Sample_CommitExperiment">experiment: try an alternate greeting</sys:String>
+
     <sys:String x:Key="Sample_ConversationMissing">Couldn't find the conversation the sample uses in this game installation.</sys:String>
     <sys:String x:Key="Sample_BuildFailed">Couldn't build the sample project.</sys:String>
     <!-- {0} = file name -->

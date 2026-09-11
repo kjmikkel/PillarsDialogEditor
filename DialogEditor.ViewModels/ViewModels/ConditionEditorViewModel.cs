@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Models;
@@ -50,7 +50,7 @@ public partial class ConditionEditorViewModel : ObservableObject
 
     // ── Convenience wrapper for node conditions (existing callers unchanged) ─
     public ConditionEditorViewModel(NodeViewModel node, string gameId = "")
-        : this($"Node {node.NodeId}",
+        : this(Loc.Format("Editor_NodeTitle", node.NodeId),
                node.Conditions,
                conditions => node.Conditions = conditions,
                gameId) { }
