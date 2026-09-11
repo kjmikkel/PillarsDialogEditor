@@ -1,5 +1,6 @@
 ﻿using DialogEditor.Core.Analytics;
 using DialogEditor.Core.Editing;
+using DialogEditor.Core.Localisation;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
@@ -22,6 +23,13 @@ namespace DialogEditor.ViewModels.Services;
 /// </summary>
 public static class ConversationJumpResolver
 {
+    // The catalogue's name for a handoff verb's entry-node parameter. ResolveTarget
+    // matches it ordinally against the parameter names loaded from scripts.json and
+    // conditions.json, which spell it exactly this way — so it is a lookup key, not text
+    // anyone reads, and a translated value would stop every handoff from resolving.
+    [NotLocalised("Parameter name matched against scripts.json / conditions.json")]
+    private const string EntryNodeParameterName = "Conversation Node ID";
+
     /// <param name="conversationNamesById">
     /// Conversation GUID → name. Supplied by the caller and cached at game-folder-open time:
     /// its source, IGameDataProvider.LoadGameDataNames(), parses every bundle on disk and is
@@ -121,7 +129,7 @@ public static class ConversationJumpResolver
             var p = entry.Parameters[i];
             if (string.Equals(p.LookupKind, "Conversation", StringComparison.Ordinal))
                 convIndex = i;
-            else if (string.Equals(p.Name, "Conversation Node ID", StringComparison.Ordinal))
+            else if (string.Equals(p.Name, EntryNodeParameterName, StringComparison.Ordinal))
                 nodeIndex = i;
         }
         if (convIndex < 0 || convIndex >= script.Parameters.Count) return null;
