@@ -10,8 +10,6 @@ namespace DialogEditor.Patch.GitConflict;
 /// side are carried through unchanged.
 public static class MergeBuilder
 {
-    private const string DeletedMarker = MergeConflict.DeletedMarker;
-
     // Takes a list of (conflict, chosen side) pairs rather than a dictionary so we
     // don't depend on MergeConflict's value-equality as a hash key (two structurally
     // identical conflicts must not collapse into one entry).
@@ -92,7 +90,7 @@ public static class MergeBuilder
                     break;
 
                 case MergeConflictKind.DeleteVsEdit:
-                    if (c.TheirsValue == DeletedMarker)
+                    if (c.DeletedSide == MergeSide.Theirs)
                     {
                         // theirs deletes — drop the node, record the deletion
                         modifiedById.Remove(c.NodeId);

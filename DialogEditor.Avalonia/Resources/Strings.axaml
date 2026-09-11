@@ -1158,6 +1158,10 @@ Saving records your edits to the open project — game files are not touched unt
          "+", "~" and "-" are the diff conventions for added/changed/removed and are
          understood across languages — keep them. Translate the word "text". -->
     <sys:String x:Key="GitConflict_PatchSummary">+{0} ~{1} -{2} ({3} text)</sys:String>
+    <!-- Shown in place of a value on the side of a delete-vs-edit conflict that
+         deleted the node (the other side shows the fields it edited). Display only —
+         the merge decides from the conflict's data, so any wording is safe. -->
+    <sys:String x:Key="GitConflict_DeletedValue">(deleted)</sys:String>
     <sys:String x:Key="GitConflict_KeepMine">Keep mine</sys:String>
     <sys:String x:Key="GitConflict_KeepTheirs">Keep theirs</sys:String>
     <sys:String x:Key="GitConflict_AcceptDeletion">Accept deletion</sys:String>

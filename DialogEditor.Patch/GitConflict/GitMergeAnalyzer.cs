@@ -12,8 +12,6 @@ namespace DialogEditor.Patch.GitConflict;
 /// rather than merely flagging fields touched by both sides.
 public static class GitMergeAnalyzer
 {
-    private const string DeletedMarker = MergeConflict.DeletedMarker;
-
     public static List<MergeConflict> Analyze(DialogProject mine, DialogProject theirs)
     {
         var conflicts = new List<MergeConflict>();
@@ -54,17 +52,21 @@ public static class GitMergeAnalyzer
         var mineTouched  = TouchedNodeIds(mine);
         var theirTouched = TouchedNodeIds(theirs);
 
+        // The deleting side has no value to show; ConflictRowViewModel labels it from
+        // DeletedSide, which is also what MergeBuilder branches on.
         foreach (var nodeId in mine.DeletedNodeIds)
             if (theirTouched.Contains(nodeId))
                 granular.Add(new MergeConflict(
                     MergeConflictKind.DeleteVsEdit, conv, nodeId, null,
-                    DeletedMarker, DescribeTouched(theirs, nodeId)));
+                    "", DescribeTouched(theirs, nodeId))
+                { DeletedSide = MergeSide.Mine });
 
         foreach (var nodeId in theirs.DeletedNodeIds)
             if (mineTouched.Contains(nodeId))
                 granular.Add(new MergeConflict(
                     MergeConflictKind.DeleteVsEdit, conv, nodeId, null,
-                    DescribeTouched(mine, nodeId), DeletedMarker));
+                    DescribeTouched(mine, nodeId), "")
+                { DeletedSide = MergeSide.Theirs });
 
         // ── Add/add ──────────────────────────────────────────────────────
         // Last-wins index — tolerant of a malformed reconstruction with

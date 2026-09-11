@@ -18,7 +18,8 @@ public record PatchCounts(int AddedNodes, int ModifiedNodes, int DeletedNodes, i
 
 /// One resolvable conflict between the mine and theirs projects.
 /// Value fields are display strings (for FieldEdit, the JSON-encoded `To` values;
-/// for TranslationEdit, the differing localized text).
+/// for TranslationEdit, the differing localized text; for DeleteVsEdit, the editing
+/// side's touched fields — the deleting side is empty and flagged by DeletedSide).
 public record MergeConflict(
     MergeConflictKind Kind,
     string            ConversationName,
@@ -27,19 +28,23 @@ public record MergeConflict(
     string            MineValue,
     string            TheirsValue)
 {
-    /// Sentinel placed in MineValue/TheirsValue for the side that deletes a node
-    /// in a DeleteVsEdit conflict.
-    public const string DeletedMarker = "(deleted)";
+    /// Which side deleted the node in a DeleteVsEdit conflict; null on every other kind.
+    /// This used to be a "(deleted)" string placed in that side's value, which made one
+    /// literal both the text the dialog showed and the sentinel MergeBuilder compared
+    /// against — so it could not be translated without making the merge
+    /// language-dependent. The side is now reported as data and ConflictRowViewModel
+    /// renders the label, as with PatchCounts below.
+    public MergeSide? DeletedSide { get; init; }
 
-    /// Female-variant text for a TranslationEdit conflict (mine side).
-    /// Empty for every other conflict kind. Display-only: the merge replaces
-    /// the whole NodeTranslation regardless of which sub-field differs.
     /// Set only on a ConversationLevel conflict, where the two sides are too broad to
     /// show as values and are summarised instead. Null on every other kind, which is
     /// what tells ConflictRowViewModel to pass MineValue/TheirsValue through as-is.
     public PatchCounts? MineCounts   { get; init; }
     public PatchCounts? TheirsCounts { get; init; }
 
+    /// Female-variant text for a TranslationEdit conflict (mine side).
+    /// Empty for every other conflict kind. Display-only: the merge replaces
+    /// the whole NodeTranslation regardless of which sub-field differs.
     public string MineFemaleValue { get; init; } = "";
 
     /// Female-variant text for a TranslationEdit conflict (theirs side). See MineFemaleValue.
