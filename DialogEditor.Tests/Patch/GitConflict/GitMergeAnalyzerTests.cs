@@ -79,6 +79,7 @@ public class GitMergeAnalyzerTests
         var c = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
         Assert.Equal(MergeConflictKind.DeleteVsEdit, c.Kind);
         Assert.Equal(4, c.NodeId);
+        Assert.Equal(MergeSide.Mine, c.DeletedSide);
     }
 
     [Fact]
@@ -90,6 +91,28 @@ public class GitMergeAnalyzerTests
         var c = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
         Assert.Equal(MergeConflictKind.DeleteVsEdit, c.Kind);
         Assert.Equal(4, c.NodeId);
+        Assert.Equal(MergeSide.Theirs, c.DeletedSide);
+    }
+
+    [Fact]
+    public void DeleteVsEdit_DeletingSideCarriesNoDisplayText()
+    {
+        // The deleting side has no value of its own; ConflictRowViewModel renders the
+        // "(deleted)" label from resources. Patch must not bake English into the value.
+        var c = Assert.Single(GitMergeAnalyzer.Analyze(
+            ProjectWithDeletion(4), ProjectWithFieldChange(4, "DefaultText", "edited")));
+
+        Assert.Equal("", c.MineValue);
+    }
+
+    [Fact]
+    public void NonDeleteConflicts_HaveNoDeletedSide()
+    {
+        var c = Assert.Single(GitMergeAnalyzer.Analyze(
+            ProjectWithFieldChange(4, "DefaultText", "mine"),
+            ProjectWithFieldChange(4, "DefaultText", "theirs")));
+
+        Assert.Null(c.DeletedSide);
     }
 
     [Fact]

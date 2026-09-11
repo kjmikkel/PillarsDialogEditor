@@ -202,4 +202,35 @@ public class MergeBuilderTests
         Assert.Contains(merged.Patches["greeting"].ModifiedNodes, m => m.NodeId == 4);
         Assert.DoesNotContain(4, merged.Patches["greeting"].DeletedNodeIds);
     }
+
+    [Fact]
+    public void DeleteVsEditMineDeletesResolvedToTheirsEdit_RestoresNode()
+    {
+        var mine   = ProjectWithDeletion(4);                             // mine deletes
+        var theirs = ProjectWithFieldChange(4, "DefaultText", "edited"); // theirs edits
+        var conflict = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
+
+        var merged = MergeBuilder.Build(mine, theirs, [(conflict, MergeSide.Theirs)]);
+
+        Assert.Contains(merged.Patches["greeting"].ModifiedNodes, m => m.NodeId == 4);
+        Assert.DoesNotContain(4, merged.Patches["greeting"].DeletedNodeIds);
+    }
+
+    [Fact]
+    public void DeleteVsEdit_DecidesByDeletedSide_NotByValueText()
+    {
+        // The sentinel used to be the display string "(deleted)" in TheirsValue. The
+        // merge must key off the typed side instead, so the label the dialog shows can
+        // be translated without changing which branch the merge takes.
+        var mine   = ProjectWithFieldChange(4, "DefaultText", "edited");
+        var theirs = ProjectWithDeletion(4);
+        var conflict = new MergeConflict(
+            MergeConflictKind.DeleteVsEdit, "greeting", 4, null, "DefaultText", "")
+            { DeletedSide = MergeSide.Theirs };
+
+        var merged = MergeBuilder.Build(mine, theirs, [(conflict, MergeSide.Theirs)]);
+
+        Assert.DoesNotContain(merged.Patches["greeting"].ModifiedNodes, m => m.NodeId == 4);
+        Assert.Contains(4, merged.Patches["greeting"].DeletedNodeIds);
+    }
 }
