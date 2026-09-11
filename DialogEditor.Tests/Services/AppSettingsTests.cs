@@ -314,4 +314,24 @@ public class AppSettingsAnalysisTests : IDisposable
         Assert.Equal(300, AppSettings.ReadingWordsPerMinute);
         Assert.Equal(0.95, AppSettings.NearDuplicateThreshold);
     }
+
+    // Issue #14: this suite runs serially precisely because AppSettings is global state,
+    // so restore whatever the machine had.
+    [Fact]
+    public void FollowConversationJumps_RoundTrips()
+    {
+        var original = AppSettings.FollowConversationJumps;
+        try
+        {
+            AppSettings.FollowConversationJumps = true;
+            Assert.True(AppSettings.FollowConversationJumps);
+
+            AppSettings.FollowConversationJumps = false;
+            Assert.False(AppSettings.FollowConversationJumps);
+        }
+        finally
+        {
+            AppSettings.FollowConversationJumps = original;
+        }
+    }
 }

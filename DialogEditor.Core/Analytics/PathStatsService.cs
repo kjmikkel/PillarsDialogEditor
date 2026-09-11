@@ -1,18 +1,28 @@
-using DialogEditor.Core.Editing;
+﻿using DialogEditor.Core.Editing;
 
 namespace DialogEditor.Core.Analytics;
 
 /// <summary>
-/// Playthrough-oriented stats over one conversation's graph. Pure and IO-free.
+/// Playthrough-oriented stats over a conversation graph. Pure and IO-free.
+///
+/// The graph may span several conversations: nodes are keyed by <see cref="NodeRef"/>
+/// (conversation + node id) and StartConversation handoffs are walked as a second kind of
+/// edge (#14). A single conversation is the degenerate case — the snapshot overload wraps
+/// into a one-conversation, no-jump graph, so both modes run this one implementation and
+/// cannot drift. PathStatsServiceTests.SnapshotOverload_EqualsOneConversationGraph pins that.
+///
 /// Cycles are broken to a DAG (back-edges to a DFS ancestor are dropped), so longest/
 /// shortest playthroughs are well-defined and O(V+E). Every metric is computed under two
 /// per-node weight functions — Default text words, and Female text words (falling back to
 /// Default where a node has no female text) — with a 10% total-difference significance gate.
 ///
-/// Conventions shared with FlowAnalysisService: root is node 0; reachability is from root.
-/// The overall longest/shortest include the root line; each branch's content/longest are
-/// measured from the choice onward (the root is shared, so it's excluded for comparison).
-/// Spec: docs/superpowers/specs/2026-07-13-path-based-writing-stats-design.md
+/// Conventions shared with FlowAnalysisService: root is node 0 of the root conversation;
+/// reachability is from root. The overall longest/shortest include the root line; each
+/// branch's content/longest are measured from the choice onward (the root is shared, so it's
+/// excluded for comparison).
+///
+/// Specs: docs/superpowers/specs/2026-07-13-path-based-writing-stats-design.md
+///        docs/superpowers/specs/2026-09-10-cross-conversation-path-stats-design.md
 /// </summary>
 public static class PathStatsService
 {
@@ -25,95 +35,151 @@ public static class PathStatsService
     /// forty-deep indent. This caps what the report carries, not what the graph contains.
     public const int MaxForkDepth = 10;
 
-    public static PathStatsReport Analyze(ConversationEditSnapshot snapshot)
-    {
-        var nodes = snapshot.Nodes;
-        if (nodes.Count == 0)
-            return new PathStatsReport(false, 0, 0, 0, 0, 0, 0, [], [], []);
+    /// Single-conversation analysis. Wraps into a one-conversation, no-jump graph so there is
+    /// exactly one implementation. The conversation name is the empty string: a snapshot
+    /// carries no name, and inventing one would be a lie.
+    public static PathStatsReport Analyze(ConversationEditSnapshot snapshot) =>
+        Analyze(new MultiConversationGraph(
+            RootConversation: "",
+            Conversations: new Dictionary<string, ConversationEditSnapshot> { [""] = snapshot },
+            Jumps: [],
+            Unfollowed: []));
 
-        var nodeById = nodes.ToDictionary(n => n.NodeId);
+    public static PathStatsReport Analyze(MultiConversationGraph graph)
+    {
+        // Flatten every conversation's nodes into one NodeRef-keyed map.
+        var nodeById = new Dictionary<NodeRef, NodeEditSnapshot>();
+        foreach (var (conv, snap) in graph.Conversations)
+            foreach (var n in snap.Nodes)
+                nodeById[new NodeRef(conv, n.NodeId)] = n;
+
+        var spanned = graph.Conversations.Count;
+
+        if (nodeById.Count == 0)
+            return new PathStatsReport(false, 0, 0, 0, 0, 0, 0, [], [], [],
+                                       graph.Unfollowed, spanned);
+
+        var allNodes = nodeById.Values.ToList();
+        var root     = new NodeRef(graph.RootConversation, 0);
 
         static int Words(string? t) =>
             string.IsNullOrEmpty(t) ? 0 : t.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
         int Def(NodeEditSnapshot n) => Words(n.DefaultText);
         int Fem(NodeEditSnapshot n) =>
             string.IsNullOrWhiteSpace(n.FemaleText) ? Words(n.DefaultText) : Words(n.FemaleText);
-        int Weight(int id, bool female) => female ? Fem(nodeById[id]) : Def(nodeById[id]);
+        int Weight(NodeRef id, bool female) => female ? Fem(nodeById[id]) : Def(nodeById[id]);
 
         // Totals + significance over ALL nodes (structure-independent).
-        var defaultTotal = nodes.Sum(Def);
-        var femaleTotal  = nodes.Sum(Fem);
+        var defaultTotal = allNodes.Sum(Def);
+        var femaleTotal  = allNodes.Sum(Fem);
         var significant  = defaultTotal > 0 &&
             Math.Abs(femaleTotal - defaultTotal) / (double)defaultTotal > FemaleSignificanceThreshold;
 
-        var wordsPerSpeaker = nodes
+        var wordsPerSpeaker = allNodes
             .GroupBy(n => n.SpeakerGuid)
             .Select(g => new SpeakerWordCount(g.Key, g.First().SpeakerCategory, g.Sum(Def), g.Sum(Fem)))
             .OrderByDescending(s => s.DefaultWords)
             .ToList();
 
-        if (!nodeById.ContainsKey(0))
+        if (!nodeById.ContainsKey(root))
             return new PathStatsReport(significant, defaultTotal, femaleTotal, 0, 0, 0, 0,
-                wordsPerSpeaker, [], []);
+                wordsPerSpeaker, [], [], graph.Unfollowed, spanned);
+
+        // ── Out-edges: two SEPARATE sets ──────────────────────────────────
+        // Links are ALTERNATIVES (the player takes one); jumps are SPAWNS (they all happen,
+        // because ConversationManager.StartConversation adds a FlowChartPlayer without
+        // stopping the current one). Merging them into one edge list would destroy exactly
+        // the distinction the additive arithmetic below depends on.
+        var jumpsByFrom = graph.Jumps
+            .GroupBy(j => j.From)
+            .ToDictionary(g => g.Key, g => g.Select(j => j.To).ToList());
+
+        List<NodeRef> LinksOf(NodeRef u) => nodeById[u].Links
+            .Select(l => new NodeRef(u.Conversation, l.ToNodeId))
+            .Where(nodeById.ContainsKey)          // drop dangling
+            .ToList();
+
+        List<NodeRef> JumpsOf(NodeRef u) =>
+            jumpsByFrom.TryGetValue(u, out var js)
+                ? js.Where(nodeById.ContainsKey).ToList()
+                : [];
 
         // ── Break to a DAG (drop back-edges to a DFS ancestor) ────────────
-        var dag     = new Dictionary<int, List<int>>();
-        var onStack = new HashSet<int>();
-        var visited = new HashSet<int>();
-        void Dfs(int u)
+        var dagLinks = new Dictionary<NodeRef, List<NodeRef>>();
+        var dagJumps = new Dictionary<NodeRef, List<NodeRef>>();
+        var onStack  = new HashSet<NodeRef>();
+        var visited  = new HashSet<NodeRef>();
+        void Dfs(NodeRef u)
         {
             visited.Add(u);
             onStack.Add(u);
-            dag[u] = [];
-            foreach (var link in nodeById[u].Links)
+            dagLinks[u] = [];
+            dagJumps[u] = [];
+            foreach (var v in LinksOf(u))
             {
-                var v = link.ToNodeId;
-                if (!nodeById.ContainsKey(v)) continue;   // dangling
-                if (onStack.Contains(v)) continue;         // back-edge → drop
-                dag[u].Add(v);
+                if (onStack.Contains(v)) continue;   // back-edge → drop
+                dagLinks[u].Add(v);
+                if (!visited.Contains(v)) Dfs(v);
+            }
+            foreach (var v in JumpsOf(u))
+            {
+                // A handoff that loops back to a conversation already on the stack is cut
+                // by the same rule as a hub loop: counted once, not unrolled.
+                if (onStack.Contains(v)) continue;
+                dagJumps[u].Add(v);
                 if (!visited.Contains(v)) Dfs(v);
             }
             onStack.Remove(u);
         }
-        Dfs(0);
+        Dfs(root);
 
         // Memoised longest/shortest weighted path on the DAG (one memo per weight fn).
-        var longMemo  = new Dictionary<(int, bool), int>();
-        var shortMemo = new Dictionary<(int, bool), int>();
+        var longMemo  = new Dictionary<(NodeRef, bool), int>();
+        var shortMemo = new Dictionary<(NodeRef, bool), int>();
 
-        int Longest(int u, bool female)
+        int Longest(NodeRef u, bool female)
         {
             if (longMemo.TryGetValue((u, female), out var cached)) return cached;
             var best = Weight(u, female);
-            if (dag.TryGetValue(u, out var outs) && outs.Count > 0)
+            // Links are ALTERNATIVES: the player takes one, so take the max.
+            if (dagLinks.TryGetValue(u, out var outs) && outs.Count > 0)
                 best += outs.Max(v => Longest(v, female));
+            // Jumps are SPAWNS: ConversationManager.StartConversation adds a new
+            // FlowChartPlayer and never stops the current one, so a handoff's words are
+            // read IN ADDITION to whatever this node's own links contribute. Summed, not
+            // maxed. NodeThatContinuesAndHandsOff_CountsBoth_NotMax pins this.
+            if (dagJumps.TryGetValue(u, out var js) && js.Count > 0)
+                best += js.Sum(v => Longest(v, female));
             longMemo[(u, female)] = best;
             return best;
         }
-        int Shortest(int u, bool female)
+        int Shortest(NodeRef u, bool female)
         {
             if (shortMemo.TryGetValue((u, female), out var cached)) return cached;
             var best = Weight(u, female);
-            if (dag.TryGetValue(u, out var outs) && outs.Count > 0)
+            if (dagLinks.TryGetValue(u, out var outs) && outs.Count > 0)
                 best += outs.Min(v => Shortest(v, female));
+            // Summed here too: a spawn is not optional, so there is no shorter read that
+            // skips it.
+            if (dagJumps.TryGetValue(u, out var js) && js.Count > 0)
+                best += js.Sum(v => Shortest(v, female));
             shortMemo[(u, female)] = best;
             return best;
         }
 
         // Reachable-set content sum on the FULL graph (cycle-safe via visited set).
-        int ReachableSum(int start, bool female)
+        int ReachableSum(NodeRef start, bool female)
         {
-            var seen  = new HashSet<int> { start };
-            var queue = new Queue<int>();
+            var seen  = new HashSet<NodeRef> { start };
+            var queue = new Queue<NodeRef>();
             queue.Enqueue(start);
             var sum = 0;
             while (queue.Count > 0)
             {
                 var u = queue.Dequeue();
                 sum += Weight(u, female);
-                foreach (var link in nodeById[u].Links)
-                    if (nodeById.ContainsKey(link.ToNodeId) && seen.Add(link.ToNodeId))
-                        queue.Enqueue(link.ToNodeId);
+                foreach (var v in LinksOf(u).Concat(JumpsOf(u)))
+                    if (seen.Add(v)) queue.Enqueue(v);
             }
             return sum;
         }
@@ -126,16 +192,17 @@ public static class PathStatsService
         //
         // The walk uses the FULL graph, not the DAG: a choice reachable only by looping
         // back to a hub is still a choice the player is offered.
-        List<int> ChoiceFrontier(int start)
+        List<NodeRef> ChoiceFrontier(NodeRef start)
         {
-            var seen  = new HashSet<int> { start };
-            var queue = new Queue<int>();
-            var found = new List<int>();
-            void Enqueue(int u)
+            var seen  = new HashSet<NodeRef> { start };
+            var queue = new Queue<NodeRef>();
+            var found = new List<NodeRef>();
+            void Enqueue(NodeRef u)
             {
-                foreach (var link in nodeById[u].Links)
-                    if (nodeById.ContainsKey(link.ToNodeId) && seen.Add(link.ToNodeId))
-                        queue.Enqueue(link.ToNodeId);
+                // Crosses handoffs: a jump whose entry node is a player choice puts a fork
+                // in another conversation into the tree, which is the point.
+                foreach (var v in LinksOf(u).Concat(JumpsOf(u)))
+                    if (seen.Add(v)) queue.Enqueue(v);
             }
             Enqueue(start);
             while (queue.Count > 0)
@@ -150,12 +217,18 @@ public static class PathStatsService
         // The choices on the way to here. A frontier choice already on this stack is
         // dropped rather than recursed into — the same "a loop counts once" rule as the
         // DAG cut, and what stops a hub-and-spoke menu from unrolling forever.
-        var forkStack = new HashSet<int>();
-        List<BranchStat> Forks(int start, int depth)
+        var forkStack = new HashSet<NodeRef>();
+        List<BranchStat> Forks(NodeRef start, int depth)
         {
             if (depth > MaxForkDepth) return [];
             var result = new List<BranchStat>();
-            foreach (var c in ChoiceFrontier(start).Where(c => !forkStack.Contains(c)).OrderBy(c => c))
+            var frontier = ChoiceFrontier(start)
+                .Where(c => !forkStack.Contains(c))
+                // Deterministic, and the open conversation's own forks stay on top.
+                .OrderBy(c => c.Conversation == graph.RootConversation ? 0 : 1)
+                .ThenBy(c => c.Conversation, StringComparer.Ordinal)
+                .ThenBy(c => c.NodeId);
+            foreach (var c in frontier)
             {
                 forkStack.Add(c);
                 var subs = Forks(c, depth + 1);
@@ -169,24 +242,24 @@ public static class PathStatsService
             }
             return result;
         }
-        var branches = Forks(0, 1);
+        var branches = Forks(root, 1);
 
         // ── Endings (issue #14) ───────────────────────────────────────────
         // Root-to-ending figures are the mirror of Longest/Shortest: walk the DAG's edges
-        // backwards. Node 0 has no DAG predecessors by construction — it is on the DFS
+        // backwards. The root has no DAG predecessors by construction — it is on the DFS
         // stack for the whole traversal, so every edge into it is a dropped back-edge —
         // which makes the recursion well-founded without a separate base case.
-        var preds = new Dictionary<int, List<int>>();
-        foreach (var (u, outs) in dag)
+        var preds = new Dictionary<NodeRef, List<NodeRef>>();
+        foreach (var (u, outs) in dagLinks.Concat(dagJumps))
             foreach (var v in outs)
             {
                 if (!preds.TryGetValue(v, out var list)) preds[v] = list = [];
                 list.Add(u);
             }
 
-        var longToMemo  = new Dictionary<(int, bool), int>();
-        var shortToMemo = new Dictionary<(int, bool), int>();
-        int LongestTo(int u, bool female)
+        var longToMemo  = new Dictionary<(NodeRef, bool), int>();
+        var shortToMemo = new Dictionary<(NodeRef, bool), int>();
+        int LongestTo(NodeRef u, bool female)
         {
             if (longToMemo.TryGetValue((u, female), out var cached)) return cached;
             var best = Weight(u, female);
@@ -195,7 +268,7 @@ public static class PathStatsService
             longToMemo[(u, female)] = best;
             return best;
         }
-        int ShortestTo(int u, bool female)
+        int ShortestTo(NodeRef u, bool female)
         {
             if (shortToMemo.TryGetValue((u, female), out var cached)) return cached;
             var best = Weight(u, female);
@@ -205,20 +278,23 @@ public static class PathStatsService
             return best;
         }
 
-        var endings = dag.Keys
-            .Where(id => nodeById[id].Links.Count == 0)     // a real dead end, not a loop-back
+        var endings = dagLinks.Keys
+            // No links AND no handoff: a node that hands off is a way the conversation
+            // CONTINUES, not a way it finishes (#14).
+            .Where(id => nodeById[id].Links.Count == 0 && JumpsOf(id).Count == 0)
             .Select(id => new EndingStat(
                 id, nodeById[id].DefaultText ?? "",
                 LongestTo(id, female: false), ShortestTo(id, female: false),
                 LongestTo(id, female: true),  ShortestTo(id, female: true)))
             .OrderByDescending(e => e.DefaultLongestWords)
-            .ThenBy(e => e.NodeId)
+            .ThenBy(e => e.Node.NodeId)
             .ToList();
 
         return new PathStatsReport(
             significant, defaultTotal, femaleTotal,
-            Longest(0, false),  Shortest(0, false),
-            Longest(0, true),   Shortest(0, true),
-            wordsPerSpeaker, branches, endings);
+            Longest(root, false),  Shortest(root, false),
+            Longest(root, true),   Shortest(root, true),
+            wordsPerSpeaker, branches, endings,
+            graph.Unfollowed, spanned);
     }
 }
