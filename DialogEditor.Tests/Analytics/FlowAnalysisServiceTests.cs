@@ -1,4 +1,4 @@
-using DialogEditor.Core.Analytics;
+﻿using DialogEditor.Core.Analytics;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 
@@ -15,11 +15,12 @@ public class FlowAnalysisServiceTests
         string defaultText         = "",
         string femaleText          = "",
         string displayType         = "Conversation",
-        IReadOnlyList<LinkEditSnapshot>? links = null) =>
+        IReadOnlyList<LinkEditSnapshot>? links = null,
+        IReadOnlyList<ScriptCall>? scripts = null) =>
         new(id, isPlayerChoice, category,
             "", "", defaultText, femaleText,
             displayType, "None", "", "", "", false, false,
-            links ?? [], [], []);
+            links ?? [], [], scripts ?? []);
 
     private static LinkEditSnapshot Link(int from, int to, bool hasConditions = false) =>
         new(from, to, 1f, "", hasConditions);
@@ -387,5 +388,49 @@ public class FlowAnalysisServiceTests
         var report = FlowAnalysisService.Analyze(snapshot);
 
         Assert.Empty(report.Issues.Where(i => i.Kind == FlowIssueKind.BarkHasPlayerChoiceChild));
+    }
+
+    // ── Conversation handoffs (#14) ───────────────────────────────────────
+
+    private static ScriptCall StartConversation() =>
+        new("Void StartConversation(Guid, Guid, Int32)",
+            ["speaker", "conv", "0"], ScriptCategory.Exit);
+
+    [Fact]
+    public void JumpWhileContinuing_IsReported()
+    {
+        var report = FlowAnalysisService.Analyze(Snapshot(
+            MakeNode(0, defaultText: "hands off and continues",
+                     links: [Link(0, 1)], scripts: [StartConversation()]),
+            MakeNode(1, defaultText: "more")));
+
+        Assert.Contains(report.Issues,
+            i => i.NodeId == 0 && i.Kind == FlowIssueKind.ConversationJumpWhileContinuing);
+    }
+
+    [Fact]
+    public void CleanHandoff_TerminalNode_IsNotReported()
+    {
+        var report = FlowAnalysisService.Analyze(Snapshot(
+            MakeNode(0, defaultText: "hands off", scripts: [StartConversation()])));
+
+        Assert.DoesNotContain(report.Issues,
+            i => i.Kind == FlowIssueKind.ConversationJumpWhileContinuing);
+    }
+
+    // MarkConversationNodeAsRead has the SAME parameter shape as StartConversation — a
+    // Conversation lookup kind plus a "Conversation Node ID" — but starts nothing. Guards
+    // against anyone replacing the verb whitelist with parameter-shape matching.
+    [Fact]
+    public void MarkConversationNodeAsRead_IsNotAJump()
+    {
+        var mark = new ScriptCall("Void MarkConversationNodeAsRead(Guid, Int32)",
+                                  ["conv", "3"], ScriptCategory.Enter);
+        var report = FlowAnalysisService.Analyze(Snapshot(
+            MakeNode(0, defaultText: "reads a flag", links: [Link(0, 1)], scripts: [mark]),
+            MakeNode(1, defaultText: "more")));
+
+        Assert.DoesNotContain(report.Issues,
+            i => i.Kind == FlowIssueKind.ConversationJumpWhileContinuing);
     }
 }

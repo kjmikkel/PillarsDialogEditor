@@ -626,7 +626,14 @@ public partial class MainWindow : Window
                 // Reading speed (issue #14): the View owns AppSettings, so the VM stays
                 // settings-free and its tests never touch the real settings.json.
                 wordsPerMinute: AppSettings.ReadingWordsPerMinute,
-                persistWordsPerMinute: v => AppSettings.ReadingWordsPerMinute = v);
+                persistWordsPerMinute: v => AppSettings.ReadingWordsPerMinute = v,
+                // Conversation handoffs (issue #14): same split as the reading speed — the
+                // View owns AppSettings so the VM stays settings-free, and the graph comes
+                // from the main VM, which holds the project, provider and GUID cache.
+                resolveGraph: () => vm.ResolveConversationJumpGraph(),
+                followConversationJumps: AppSettings.FollowConversationJumps,
+                persistFollowJumps: v => AppSettings.FollowConversationJumps = v,
+                navigateToNodeInConversation: vm.NavigateToFoundNode);
 
             _flowAnalyticsWindow = new FlowAnalyticsWindow(analyticsVm);
 
