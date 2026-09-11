@@ -1,11 +1,12 @@
-using DialogEditor.Core.Editing;
+﻿using DialogEditor.Core.Editing;
+using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.ViewModels.Editing;
 
 internal sealed class AddNodeCommand(ConversationViewModel conversation, NodeViewModel node)
     : IEditCommand
 {
-    public string Description => $"Add node {node.NodeId}";
+    public string Description => Loc.Format("Undo_AddNode", node.NodeId);
     public void Execute() => conversation.Nodes.Add(node);
     public void Undo()    => conversation.Nodes.Remove(node);
 }

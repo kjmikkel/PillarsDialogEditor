@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Models;
@@ -102,7 +102,7 @@ public partial class ScriptEditorViewModel : ObservableObject
 
     // ── Convenience wrapper for nodes ─────────────────────────────────────
     public ScriptEditorViewModel(NodeViewModel node, string gameId = "")
-        : this($"Node {node.NodeId}", node.Scripts,
+        : this(Loc.Format("Editor_NodeTitle", node.NodeId), node.Scripts,
                scripts => node.Scripts = scripts, gameId) { }
 
     private ObservableCollection<ScriptRowViewModel> RowsFor(ScriptCategory cat) => cat switch

@@ -1,14 +1,16 @@
-using System.Text.Json;
+﻿using System.Text.Json;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Core.Parsing;
+using DialogEditor.Core.Resources;
 using DialogEditor.Core.Serialization;
 
 namespace DialogEditor.Core.GameData;
 
 public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
 {
-    public string GameName => "Pillars of Eternity II: Deadfire";
+    // See Poe1GameDataProvider: the title is translatable copy, GameId is not.
+    public string GameName => CoreStrings.Game_Poe2_Name;
     public string GameId   => "poe2";
     public string Language { get; set; } = "en";
 

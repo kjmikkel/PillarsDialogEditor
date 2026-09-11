@@ -1,5 +1,5 @@
-using Avalonia;
-using Avalonia.Controls;
+﻿using Avalonia.Controls;
+using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.Avalonia.Views;
 
@@ -15,9 +15,9 @@ public partial class UnsavedChangesDialog : Window
     public UnsavedChangesDialog(string conversationName)
     {
         InitializeComponent();
-        var template = Application.Current!.FindResource("UnsavedChanges_Message") as string
-                       ?? "'{0}' has unsaved changes.";
-        MessageBlock.Text = string.Format(template, conversationName);
+        // See ConversationNameDialog: no English fallback. The one that used to sit here
+        // had also fallen behind the resource, which had gained a second paragraph.
+        MessageBlock.Text = Loc.Format("UnsavedChanges_Message", conversationName);
 
         SaveButton.Click    += (_, _) => { Result = UnsavedChangesResult.Save;    Close(); };
         DiscardButton.Click += (_, _) => { Result = UnsavedChangesResult.Discard; Close(); };

@@ -1,4 +1,5 @@
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using DialogEditor.Core.Resources;
 
 namespace DialogEditor.Core.Models;
 
@@ -40,7 +41,9 @@ public sealed record ConditionLeaf(
             ? afterSpace[..afterSpace.IndexOf('(')]
             : afterSpace;
         var body = $"{name}({paramStr})";
-        return Not ? $"NOT {body}" : body;
+        // Condition_Not carries its own trailing space (see Strings.resx) so a
+        // translation can put the negation after the call, or drop the space.
+        return Not ? CoreStrings.Condition_Not + body : body;
     }
 
     public override IEnumerable<ConditionNode> Leaves() { yield return this; }
@@ -57,7 +60,7 @@ public sealed record ConditionBranch(
         var inner = string.Join($" {Operator.ToUpperInvariant()} ",
             Components.Select(c => c.Format()));
         var wrapped = $"({inner})";
-        return Not ? $"NOT {wrapped}" : wrapped;
+        return Not ? CoreStrings.Condition_Not + wrapped : wrapped;
     }
 
     public override IEnumerable<ConditionNode> Leaves()
@@ -87,7 +90,7 @@ public static class ConditionNodeExtensions
             if (node is ConditionBranch branch)
             {
                 var inner = branch.Components.FormatTree(depth + 1);
-                var notPrefix = branch.Not ? "NOT " : "";
+                var notPrefix = branch.Not ? CoreStrings.Condition_Not : "";
                 sb.Append($"{notPrefix}({Environment.NewLine}{indent}  {inner}{Environment.NewLine}{indent})");
             }
             else

@@ -47,7 +47,7 @@ public class BatchReplaceServiceTests
 
         Assert.Single(results);
         Assert.Single(results[0].Matches);
-        Assert.Equal("Default Text", results[0].Matches[0].FieldPath);
+        Assert.Equal(new BatchField(BatchFieldKind.DefaultText), results[0].Matches[0].Field);
         Assert.Equal("Hello world", results[0].Matches[0].Before);
         Assert.Equal("Hello earth", results[0].Matches[0].After);
     }
@@ -62,7 +62,7 @@ public class BatchReplaceServiceTests
         var results = BatchReplaceService.DryRun(query, [file], provider);
 
         Assert.Single(results[0].Matches);
-        Assert.Equal("Female Text", results[0].Matches[0].FieldPath);
+        Assert.Equal(new BatchField(BatchFieldKind.FemaleText), results[0].Matches[0].Field);
     }
 
     [Fact]
@@ -119,7 +119,7 @@ public class BatchReplaceServiceTests
         var results = BatchReplaceService.DryRun(query, [file], provider);
 
         Assert.Single(results[0].Matches);
-        Assert.Equal("Speaker GUID", results[0].Matches[0].FieldPath);
+        Assert.Equal(new BatchField(BatchFieldKind.SpeakerGuid), results[0].Matches[0].Field);
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public class BatchReplaceServiceTests
         var results = BatchReplaceService.DryRun(query, [file], provider);
 
         Assert.Single(results[0].Matches);
-        Assert.Equal("Listener GUID", results[0].Matches[0].FieldPath);
+        Assert.Equal(new BatchField(BatchFieldKind.ListenerGuid), results[0].Matches[0].Field);
     }
 
     // ── DryRun — script params ────────────────────────────────────────────
@@ -151,7 +151,7 @@ public class BatchReplaceServiceTests
         var results = BatchReplaceService.DryRun(query, [file], provider);
 
         Assert.Single(results[0].Matches);
-        Assert.Contains("Script", results[0].Matches[0].FieldPath);
+        Assert.Equal(BatchFieldKind.ScriptParam, results[0].Matches[0].Field.Kind);
         Assert.Equal("myFlag", results[0].Matches[0].Before);
         Assert.Equal("renamedFlag", results[0].Matches[0].After);
     }
@@ -171,7 +171,7 @@ public class BatchReplaceServiceTests
         var results = BatchReplaceService.DryRun(query, [file], provider);
 
         Assert.Single(results[0].Matches);
-        Assert.Contains("Condition", results[0].Matches[0].FieldPath);
+        Assert.Equal(BatchFieldKind.ConditionParam, results[0].Matches[0].Field.Kind);
     }
 
     // ── QuestionNodeTextDisplay is an enum, not prose (#24) ──────────────
@@ -199,7 +199,11 @@ public class BatchReplaceServiceTests
 
         Assert.Equal("Come in in", provider.SavedSnapshot!.Nodes[0].DefaultText);
         Assert.Equal("ShowOnce",   provider.SavedSnapshot!.Nodes[0].Links[0].QuestionNodeTextDisplay);
-        Assert.DoesNotContain(results[0].Matches, m => m.FieldPath.Contains("Link"));
+        // No BatchFieldKind covers a link field at all — see the note in BatchReplaceModels.
+        Assert.DoesNotContain(results[0].Matches, m =>
+            m.Field.Kind is not (BatchFieldKind.DefaultText or BatchFieldKind.FemaleText
+                              or BatchFieldKind.SpeakerGuid or BatchFieldKind.ListenerGuid
+                              or BatchFieldKind.ScriptParam or BatchFieldKind.ConditionParam));
     }
 
     // ── DryRun — field toggle respected ──────────────────────────────────
@@ -253,12 +257,12 @@ public class BatchReplaceServiceTests
         Assert.Equal("Hello earth", provider.SavedSnapshot!.Nodes[0].DefaultText);
     }
 
-    /// ApplyToNode indexes matches with ToDictionary(p => p.FieldPath), which throws on a
+    /// ApplyToNode indexes matches with ToDictionary(p => p.Field), which throws on a
     /// duplicate key. Links used to emit a constant path and crash a node with two matching
     /// links (#24); they are gone now, and scripts and conditions key positionally. Nothing
     /// asserted that invariant, so pin it: every field path a single node emits is unique.
     [Fact]
-    public void DryRun_FieldPathsAreUniquePerNode()
+    public void DryRun_FieldIdentitiesAreUniquePerNode()
     {
         var leafA = new ConditionLeaf("Boolean IsGlobalValue(String, Operator, Int32)",
                                       ["quest", "EqualTo", "1"], false, "And");
@@ -277,7 +281,7 @@ public class BatchReplaceServiceTests
         var matches = BatchReplaceService.DryRun(query, [file], provider)[0].Matches;
 
         Assert.True(matches.Count > 1, "expected several matching fields on the one node");
-        Assert.Equal(matches.Select(m => m.FieldPath).Distinct().Count(), matches.Count);
+        Assert.Equal(matches.Select(m => m.Field).Distinct().Count(), matches.Count);
 
         // The real consequence: apply must not throw on that node.
         BatchReplaceService.Apply(

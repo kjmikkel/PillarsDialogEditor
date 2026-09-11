@@ -1,4 +1,4 @@
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.ViewModels.Resources;
@@ -23,7 +23,7 @@ public partial class ConnectionViewModel : ObservableObject
     public string QuestionNodeTextDisplay
     {
         get => _questionNodeTextDisplay;
-        set => Push(_questionNodeTextDisplay, value, "Edit link display",
+        set => Push(_questionNodeTextDisplay, value, "Undo_EditLinkDisplay",
             v => { _questionNodeTextDisplay = v; OnPropertyChanged(nameof(QuestionNodeTextDisplay));
                    OnPropertyChanged(nameof(IsAlways)); OnPropertyChanged(nameof(IsNever)); });
     }
@@ -31,14 +31,14 @@ public partial class ConnectionViewModel : ObservableObject
     public float RandomWeight
     {
         get => _randomWeight;
-        set => Push(_randomWeight, value, "Edit link weight",
+        set => Push(_randomWeight, value, "Undo_EditLinkWeight",
             v => { _randomWeight = v; OnPropertyChanged(nameof(RandomWeight)); });
     }
 
     public IReadOnlyList<ConditionNode> Conditions
     {
         get => _conditions;
-        set => Push(_conditions, value, "Edit link conditions",
+        set => Push(_conditions, value, "Undo_EditLinkConditions",
             v => { _conditions = v; OnPropertyChanged(nameof(Conditions));
                    OnPropertyChanged(nameof(HasConditions));
                    OnPropertyChanged(nameof(ConditionCount));
@@ -69,10 +69,13 @@ public partial class ConnectionViewModel : ObservableObject
         _conditions               = conditions ?? [];
     }
 
-    private void Push<T>(T current, T value, string description, Action<T> apply)
+    // descriptionKey, not description: the undo history is re-read on every peek, so
+    // the lookup is deferred to keep it correct across a live language change.
+    private void Push<T>(T current, T value, string descriptionKey, Action<T> apply)
     {
         if (EqualityComparer<T>.Default.Equals(current, value)) return;
         if (UndoStack is null) { apply(value); return; }
-        UndoStack.Execute(new SetPropertyCommand<T>(description, apply, current, value));
+        UndoStack.Execute(new SetPropertyCommand<T>(
+            () => Loc.Get(descriptionKey), apply, current, value));
     }
 }

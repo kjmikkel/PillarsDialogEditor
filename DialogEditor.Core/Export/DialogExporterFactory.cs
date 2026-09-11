@@ -1,3 +1,5 @@
+﻿using DialogEditor.Core.Localisation;
+
 namespace DialogEditor.Core.Export;
 
 public static class DialogExporterFactory
@@ -11,6 +13,10 @@ public static class DialogExporterFactory
         };
 
     /// All supported (format key, file extension, human-readable description) tuples.
+    // The descriptions are the formats' own names — "CSV" and "JSON" are initialisms
+    // and "Yarn Spinner" is the name of the tool whose files we emit. Translating any
+    // of them would name a format that does not exist.
+    [NotLocalised("Format names: CSV, JSON, and the Yarn Spinner product name")]
     public static IReadOnlyList<(string Format, string Extension, string Description)> AllFormats =>
     [
         ("csv",  ".csv",  "CSV"),
