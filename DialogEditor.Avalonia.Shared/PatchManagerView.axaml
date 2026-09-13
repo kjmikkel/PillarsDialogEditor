@@ -166,7 +166,7 @@
             <StackPanel Spacing="4">
                 <TextBlock Text="{Binding StatusText}"
                            Foreground="{DynamicResource Brush.Severity.Warning}" FontSize="{DynamicResource FontSize.Label}" FontWeight="SemiBold"/>
-                <ItemsControl ItemsSource="{Binding Conflicts}">
+                <ItemsControl x:Name="ConflictList" ItemsSource="{Binding Conflicts}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <!-- One resource, not a MultiBinding StringFormat: the whole
