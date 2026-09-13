@@ -116,5 +116,7 @@ ones are a manual fallback on disk if the newest turns out to be damaged.
 ## Out of scope / deferred
 
 - Choosing *which* generation to restore from in the recovery dialog (the offer is
-  always the newest; older generations are recovered by hand).
-- Autosaving to a central location for projects on read-only media.
+  always the newest; older generations are recovered by hand) — issue #36.
+- Autosaving to a central location for projects on read-only media — issue #37.
+  Note that today an unwritable project folder means no autosave *and* no
+  indication of it: every tick throws, is caught, and goes only to `AppLog.Warn`.
