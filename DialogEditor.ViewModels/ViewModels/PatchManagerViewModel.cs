@@ -26,7 +26,9 @@ public partial class PatchManagerViewModel : ObservableObject
 
     public bool HasEntries => Entries.Count > 0;
 
-    public IReadOnlyList<PatchConflict> Conflicts { get; private set; } = [];
+    /// Conflict rows for the summary list. Rows rather than raw PatchConflicts because
+    /// the list shows text, and only this layer can reach Loc.
+    public IReadOnlyList<PatchConflictRowViewModel> Conflicts { get; private set; } = [];
 
     public PatchManagerViewModel(IFolderPicker folderPicker, IFilePicker filePicker)
     {
@@ -130,11 +132,13 @@ public partial class PatchManagerViewModel : ObservableObject
             .Select(e => (e.ProjectName, e.Project!.Patches as IReadOnlyDictionary<string, ConversationPatch>))
             .ToList();
 
-        Conflicts    = ConflictDetector.Detect(projects);
+        Conflicts    = ConflictDetector.Detect(projects)
+                                       .Select(c => new PatchConflictRowViewModel(c))
+                                       .ToList();
         HasConflicts = Conflicts.Count > 0;
 
         var conflictedEntries = Conflicts
-            .SelectMany(c => new[] { c.FirstPatchIndex, c.SecondPatchIndex })
+            .SelectMany(c => new[] { c.Conflict.FirstPatchIndex, c.Conflict.SecondPatchIndex })
             .ToHashSet();
 
         for (int i = 0; i < Entries.Count; i++)
