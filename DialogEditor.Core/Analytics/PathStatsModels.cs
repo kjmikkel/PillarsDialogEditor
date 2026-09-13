@@ -1,4 +1,4 @@
-using DialogEditor.Core.Models;
+﻿using DialogEditor.Core.Models;
 
 namespace DialogEditor.Core.Analytics;
 
@@ -13,7 +13,7 @@ public record SpeakerWordCount(string SpeakerGuid, SpeakerCategory Category, int
 /// that loops back to a choice already on the way here is a leaf: like the DAG's dropped
 /// back-edges, a loop to an earlier decision is counted once rather than unrolled.
 public record BranchStat(
-    int    ChoiceNodeId,
+    NodeRef Choice,
     string ChoiceText,
     int    DefaultContentWords,
     int    DefaultLongestWords,
@@ -30,8 +30,16 @@ public record BranchStat(
 /// which does stop at DAG terminals; the UI says so.
 ///
 /// Figures are root-to-ending: the longest and shortest read that arrives *here*.
+///
+/// Second reason these need not reconcile, once conversation handoffs are followed (#14):
+/// LongestTo/ShortestTo walk predecessors taking max/min, which under additive spawn
+/// semantics under-counts the concurrent case — arriving at an ending in one conversation
+/// also entails reading whatever the spawning conversation continued on to, and a
+/// max-over-predecessors walk misses those sibling words. Accepted deliberately: making it
+/// exact needs per-path spawn sets, for a case FlowIssueKind.ConversationJumpWhileContinuing
+/// already reports as an authoring defect.
 public record EndingStat(
-    int    NodeId,
+    NodeRef Node,
     string Text,
     int    DefaultLongestWords,
     int    DefaultShortestWords,
@@ -50,4 +58,6 @@ public record PathStatsReport(
     int  FemaleShortestWords,
     IReadOnlyList<SpeakerWordCount> WordsPerSpeaker,
     IReadOnlyList<BranchStat>       Branches,
-    IReadOnlyList<EndingStat>       Endings);
+    IReadOnlyList<EndingStat>       Endings,
+    IReadOnlyList<UnfollowedJump>   Unfollowed,
+    int                             ConversationsSpanned);

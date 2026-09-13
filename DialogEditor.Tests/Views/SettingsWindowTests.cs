@@ -61,3 +61,63 @@ public class SettingsWindowTests : IDisposable
         Assert.Equal("Xliff", AppSettings.DefaultLocalizationFormat);
     }
 }
+
+/// The autosave pickers (issue #11): both bind int options to an int VM property, the
+/// same type-match trap B-003 was about.
+public class SettingsWindowAutosaveTests : IDisposable
+{
+    public SettingsWindowAutosaveTests()
+    {
+        AppSettings.SettingsPathOverride = Path.GetTempFileName();
+        Loc.Configure(new StubStringProvider());
+    }
+
+    public void Dispose()
+    {
+        var path = AppSettings.SettingsPathOverride;
+        AppSettings.SettingsPathOverride = null;
+        if (path is not null) File.Delete(path);
+    }
+
+    private static SettingsWindow ShowWindow()
+    {
+        var window = new SettingsWindow
+        {
+            DataContext = new SettingsViewModel("/game", new StubFolderPicker())
+        };
+        window.Show();
+        return window;
+    }
+
+    [AvaloniaFact]
+    public void AutosaveIntervalComboBox_SelectedItem_ReflectsSavedValue()
+    {
+        AppSettings.AutosaveIntervalSeconds = 300;
+        var combo = ShowWindow().FindControl<ComboBox>("AutosaveIntervalComboBox")!;
+        Assert.Equal(300, combo.SelectedItem);
+    }
+
+    [AvaloniaFact]
+    public void AutosaveIntervalComboBox_OffIsSelectable()
+    {
+        AppSettings.AutosaveIntervalSeconds = 0;
+        var combo = ShowWindow().FindControl<ComboBox>("AutosaveIntervalComboBox")!;
+        Assert.Equal(0, combo.SelectedItem);
+    }
+
+    [AvaloniaFact]
+    public void AutosaveGenerationsComboBox_SelectedItem_ReflectsSavedValue()
+    {
+        AppSettings.AutosaveGenerations = 5;
+        var combo = ShowWindow().FindControl<ComboBox>("AutosaveGenerationsComboBox")!;
+        Assert.Equal(5, combo.SelectedItem);
+    }
+
+    [AvaloniaFact]
+    public void AutosaveIntervalComboBox_SelectingAnOption_PersistsIt()
+    {
+        var combo = ShowWindow().FindControl<ComboBox>("AutosaveIntervalComboBox")!;
+        combo.SelectedItem = 120;
+        Assert.Equal(120, AppSettings.AutosaveIntervalSeconds);
+    }
+}

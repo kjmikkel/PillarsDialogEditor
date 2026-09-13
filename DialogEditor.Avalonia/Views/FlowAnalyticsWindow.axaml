@@ -100,14 +100,28 @@
                 <!-- The reading speed sits here rather than in Settings because it is only
                      meaningful next to the times it changes: the writer adjusts it and reads
                      the result in the same glance. Changing it re-runs the analysis. -->
-                <Grid ColumnDefinitions="*,Auto">
+                <Grid ColumnDefinitions="*,Auto,Auto">
                     <TextBlock Grid.Column="0"
                                Classes="section-header"
                                VerticalAlignment="Center"
                                Text="{DynamicResource PathStats_Header}"
                                ToolTip.Tip="{DynamicResource ToolTip_PathStats}"
                                AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats}"/>
-                    <ComboBox Grid.Column="1"
+                    <!-- Following handoffs is opt-in (issue #14): turning it on changes
+                         existing figures, so the writer asks for it rather than finding a
+                         doubled number one day. Sits beside the reading speed for the same
+                         reason that does — it is only meaningful next to what it changes. -->
+                    <CheckBox Grid.Column="1"
+                              x:Name="FollowJumpsCheckBox"
+                              Margin="0,0,8,0"
+                              VerticalAlignment="Center"
+                              FontSize="{DynamicResource FontSize.Small}"
+                              IsChecked="{Binding FollowConversationJumps, Mode=TwoWay}"
+                              Content="{DynamicResource FlowAnalytics_FollowJumps}"
+                              ToolTip.Tip="{DynamicResource FlowAnalytics_FollowJumps_Tip}"
+                              AutomationProperties.Name="{DynamicResource FlowAnalytics_FollowJumps}"
+                              AutomationProperties.HelpText="{DynamicResource FlowAnalytics_FollowJumps_Tip}"/>
+                    <ComboBox Grid.Column="2"
                               x:Name="ReadingSpeedComboBox"
                               ItemsSource="{Binding WordsPerMinuteOptions}"
                               SelectedItem="{Binding WordsPerMinute, Mode=TwoWay}"
@@ -123,6 +137,14 @@
                         </ComboBox.ItemTemplate>
                     </ComboBox>
                 </Grid>
+
+                <!-- Only when it actually spans: this is what makes a suddenly larger
+                     longest playthrough self-explaining rather than alarming. -->
+                <TextBlock Text="{Binding ConversationsSpannedText}"
+                           IsVisible="{Binding HasSpannedConversations}"
+                           FontSize="{DynamicResource FontSize.Small}"
+                           Foreground="{DynamicResource Brush.Text.Secondary}"
+                           TextWrapping="Wrap"/>
 
                 <Grid ColumnDefinitions="*,*,*">
                     <StackPanel Grid.Column="0">
@@ -183,6 +205,13 @@
                                           ItemsSource="{Binding SubBranches}">
                             <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,2">
                                 <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <!-- Shown only for a row in another conversation, so the
+                                         common single-file report gains no redundant prefix. -->
+                                    <TextBlock Text="{Binding ConversationName}"
+                                               IsVisible="{Binding IsInAnotherConversation}"
+                                               Foreground="{DynamicResource Brush.Text.Secondary}"
+                                               FontSize="{DynamicResource FontSize.Small}"
+                                               TextTrimming="CharacterEllipsis"/>
                                     <TextBlock Text="{Binding ChoiceText}"
                                                Foreground="{DynamicResource Brush.Text.Primary}"
                                                FontSize="{DynamicResource FontSize.Label}"
@@ -240,6 +269,11 @@
                             <DataTemplate DataType="vm:PathEndingRowViewModel">
                                 <Grid ColumnDefinitions="*,Auto" Margin="0,2">
                                     <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding ConversationName}"
+                                                   IsVisible="{Binding IsInAnotherConversation}"
+                                                   Foreground="{DynamicResource Brush.Text.Secondary}"
+                                                   FontSize="{DynamicResource FontSize.Small}"
+                                                   TextTrimming="CharacterEllipsis"/>
                                         <TextBlock Text="{Binding EndingText}"
                                                    Foreground="{DynamicResource Brush.Text.Primary}"
                                                    FontSize="{DynamicResource FontSize.Label}"
@@ -266,6 +300,31 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
+
+                <!-- Handoffs the report found but did not walk. Listed so the
+                     project-patched-only boundary never silently drops content off the end
+                     of a report — the writer sees the figure stops here, and why. Reasons
+                     are words, not colour (Layer 2.5). -->
+                <TextBlock Classes="stat-label"
+                           Text="{DynamicResource FlowAnalytics_UnfollowedHeader}"
+                           Margin="0,4,0,0"
+                           IsVisible="{Binding HasUnfollowedJumps}"/>
+                <ItemsControl x:Name="UnfollowedJumpsList"
+                              ItemsSource="{Binding UnfollowedJumpRows}"
+                              IsVisible="{Binding HasUnfollowedJumps}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,1,0,1">
+                                <TextBlock Text="{Binding TargetLabel}"
+                                           FontSize="{DynamicResource FontSize.Small}"/>
+                                <TextBlock Text="{Binding ReasonText}"
+                                           FontSize="{DynamicResource FontSize.Small}"
+                                           FontStyle="Italic"
+                                           Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
                 <Separator Background="{DynamicResource Brush.Border.Default}" Height="1" Margin="0,2,0,2"/>
             </StackPanel>

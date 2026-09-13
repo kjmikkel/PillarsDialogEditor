@@ -1,4 +1,4 @@
-using DialogEditor.Core.Editing;
+﻿using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 
 namespace DialogEditor.Core.Analytics;
@@ -92,6 +92,13 @@ public static class FlowAnalysisService
 
             if (node.NodeId != 0 && !nodesWithIncoming.Contains(node.NodeId))
                 issues.Add(new FlowIssue(node.NodeId, FlowIssueKind.NoIncomingLinks));
+
+            // A handoff is a SPAWN, not a replace — ConversationManager.StartConversation
+            // adds a new FlowChartPlayer without stopping the current one. A node that both
+            // links onward and hands off therefore really does run both.
+            if (node.Links.Count > 0 &&
+                node.Scripts.Any(sc => ConversationJumpVerbs.IsJump(sc.DisplayName)))
+                issues.Add(new FlowIssue(node.NodeId, FlowIssueKind.ConversationJumpWhileContinuing));
 
             if (node.DisplayType == "Bark")
             {

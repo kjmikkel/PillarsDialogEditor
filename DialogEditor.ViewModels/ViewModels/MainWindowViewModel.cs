@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+using DialogEditor.Core.Analytics;
+using System.Collections.ObjectModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -55,6 +56,14 @@ public partial class MainWindowViewModel : ObservableObject
     private ConversationFile?  _currentFile;
 
     public IGameDataProvider? Provider    => _provider;
+
+    // Conversation GUID → name, cached on folder open (issue #14). Its source,
+    // LoadGameDataNames(), parses every bundle on disk and is documented as called once per
+    // folder open, so it must not run per analysis. GameDataNameService is unsuitable: it
+    // stores NamedEntry(DisplayName, StoredValue) with DisplayName composed as
+    // "{name} — {id}", so recovering the name would mean splitting on " — ".
+    private IReadOnlyDictionary<string, string> _conversationNamesById =
+        new Dictionary<string, string>();
     public string?            ProjectPath => _projectPath;
     private string             _currentGameDirectory = string.Empty;
     private string             _activeGameId         = string.Empty;
@@ -484,9 +493,10 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     // ── Settings ──────────────────────────────────────────────────────────
-    public SettingsViewModel CreateSettingsViewModel(IFontScaleApplier? fontScaleApplier = null)
+    public SettingsViewModel CreateSettingsViewModel(IFontScaleApplier? fontScaleApplier = null,
+                                                     IAutosaveScheduler? autosaveScheduler = null)
         => new(_currentGameDirectory, _folderPicker, fontScaleApplier,
-               SpellStoreFactory?.Invoke());
+               SpellStoreFactory?.Invoke(), autosaveScheduler);
 
     /// Returns a ready-to-run VoValidationViewModel for the current conversation,
     /// or null if CanValidateVO is false (e.g. wrong game, no nodes loaded).
@@ -1282,9 +1292,12 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    /// Periodic autosave (wired to a 60 s DispatcherTimer in MainWindow). Writes a
-    /// sidecar next to the project file while there are unsaved changes; never
-    /// touches the real file, never clears IsModified, never throws.
+    /// Periodic autosave (wired to a DispatcherTimer in MainWindow, cadence from
+    /// AppSettings.AutosaveIntervalSeconds). Writes a sidecar next to the project file
+    /// while there are unsaved changes; never touches the real file, never clears
+    /// IsModified, never throws. Older sidecars rotate down to
+    /// AppSettings.AutosaveGenerations, so a corrupt newest autosave is not the only
+    /// copy of the work (issue #11).
     /// Spec: docs/superpowers/specs/2026-07-12-autosave-design.md.
     public void AutosaveTick()
     {
@@ -1292,6 +1305,8 @@ public partial class MainWindowViewModel : ObservableObject
         try
         {
             FoldCanvasIntoProject();
+            // Rotate first: this frees generation 1 for the write below.
+            AutosaveRecovery.Rotate(_projectPath, AppSettings.AutosaveGenerations);
             var sidecar = AutosaveRecovery.SidecarPath(_projectPath);
             DialogProjectSerializer.SaveToFile(sidecar, _project!);
             AppLog.Info($"Autosaved to {sidecar}");
@@ -1713,8 +1728,15 @@ public partial class MainWindowViewModel : ObservableObject
                 .ToList();
             GameDataNameService.Register("Speaker", speakerEntries);
 
+            _conversationNamesById = new Dictionary<string, string>();
             foreach (var (kind, entries) in provider.LoadGameDataNames())
             {
+                if (kind == "Conversation")
+                    _conversationNamesById = entries
+                        .Where(e => !string.IsNullOrEmpty(e.Id))
+                        .GroupBy(e => e.Id)
+                        .ToDictionary(g => g.Key, g => g.First().Name);
+
                 var namedEntries = entries
                     .Select(e => string.IsNullOrEmpty(e.Id)
                         ? new NamedEntry(e.Name, e.Name)
@@ -2531,6 +2553,21 @@ public partial class MainWindowViewModel : ObservableObject
 
     /// Navigate from a find result to its node: switch conversation if needed
     /// (reusing the unsaved-changes guard), then select the node by id.
+    /// Builds the cross-conversation graph for Flow Analytics' Playthrough stats (#14).
+    ///
+    /// Lives here rather than in the View because the project, the provider and the cached
+    /// conversation-GUID map are all private state — the View just asks for a graph. Returns
+    /// null when there is nothing to resolve against, which the panel treats as "analyse the
+    /// open conversation only".
+    public MultiConversationGraph? ResolveConversationJumpGraph()
+    {
+        if (_project is null || _provider is null) return null;
+        return ConversationJumpResolver.Resolve(
+            _project, _provider, _provider.Language,
+            Canvas.ConversationName ?? "", Canvas.BuildSnapshot(),
+            _conversationNamesById);
+    }
+
     public void NavigateToFoundNode(string conversationName, int nodeId)
     {
         if (Canvas.ConversationName == conversationName)

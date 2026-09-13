@@ -1,4 +1,4 @@
-namespace DialogEditor.Core.Analytics;
+﻿namespace DialogEditor.Core.Analytics;
 
 public record FlowStatistics(
     int    TotalNodes,
@@ -19,7 +19,13 @@ public enum FlowIssueKind
     EmptyText,
     NoIncomingLinks,
     BarkTextTooLong,
-    BarkHasPlayerChoiceChild
+    BarkHasPlayerChoiceChild,
+
+    /// A node that both links onward AND starts another conversation. The engine spawns a
+    /// second FlowChartPlayer without stopping the current one, so both really do run —
+    /// almost always an authoring mistake. Reported whether or not path stats are set to
+    /// follow handoffs: this is a graph-shape defect, not a stats setting (#14).
+    ConversationJumpWhileContinuing
 }
 
 public record FlowIssue(int NodeId, FlowIssueKind Kind);

@@ -168,7 +168,17 @@ existing `FocusHintBar` and navigation.
 
 - ~~A configurable reading speed / a UI knob.~~ **Shipped** (#14 / #23): a preset picker
   beside the Playthrough-stats header, persisted in settings.
-- Path stats across conversations (playthroughs that jump conversation files).
+- ~~Path stats across conversations (playthroughs that jump conversation files).~~ **Shipped**
+  (#14). Design: `docs/superpowers/specs/2026-09-10-cross-conversation-path-stats-design.md`.
+  An opt-in "Follow conversation jumps" toggle walks `StartConversation` handoffs into
+  conversations the project patches. Three decisions revise the text above when it is on:
+  - A handoff is a **spawn**, not a replace — the engine adds a second `FlowChartPlayer`
+    without stopping the current one — so a jump's words are **added** to whatever the source
+    node's own links contribute, in `Shortest` as well as `Longest`.
+  - An **ending** is a node with no links *and* no handoff: a node that hands off is a way the
+    conversation continues, not a way it finishes.
+  - Handoffs into conversations the project does not patch are **listed but not counted**, so
+    the boundary is visible rather than silent.
 - ~~Per-ending enumeration and per-fork (recursive) branch breakdowns — the "per first player
   choice" model is v1.~~ **Shipped** (#14). Two decisions were settled when it landed, and
   they revise the v1 text above:

@@ -1,4 +1,4 @@
-using DialogEditor.Core.Analytics;
+﻿using DialogEditor.Core.Analytics;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 
@@ -10,9 +10,11 @@ public class PathStatsServiceTests
         int id, string defaultText = "", string femaleText = "",
         bool isPlayerChoice = false, string speaker = "",
         SpeakerCategory category = SpeakerCategory.Npc,
-        IReadOnlyList<LinkEditSnapshot>? links = null) =>
+        IReadOnlyList<LinkEditSnapshot>? links = null,
+        IReadOnlyList<ScriptCall>? scripts = null) =>
         new(id, isPlayerChoice, category, speaker, "", defaultText, femaleText,
-            "Conversation", "None", "", "", "", false, false, links ?? [], [], []);
+            "Conversation", "None", "", "", "", false, false,
+            links ?? [], [], scripts ?? []);
 
     private static LinkEditSnapshot Link(int from, int to) => new(from, to, 1f, "", false);
     private static ConversationEditSnapshot Snap(params NodeEditSnapshot[] n) => new(n);
@@ -52,10 +54,10 @@ public class PathStatsServiceTests
             Node(5, "p")));                            // 1 word
 
         Assert.Equal(2, report.Branches.Count);
-        var a = report.Branches.Single(b => b.ChoiceNodeId == 1);
+        var a = report.Branches.Single(b => b.Choice.NodeId == 1);
         Assert.Equal(4, a.DefaultContentWords);        // A(1)+x y z(3)
         Assert.Equal(4, a.DefaultLongestWords);
-        var b = report.Branches.Single(x => x.ChoiceNodeId == 4);
+        var b = report.Branches.Single(x => x.Choice.NodeId == 4);
         Assert.Equal(2, b.DefaultContentWords);        // B(1)+p(1)
         Assert.Equal(2, b.DefaultLongestWords);
     }
@@ -128,7 +130,7 @@ public class PathStatsServiceTests
             Node(2, "A", isPlayerChoice: true),
             Node(3, "B", isPlayerChoice: true)));
 
-        Assert.Equal([2, 3], report.Branches.Select(b => b.ChoiceNodeId));
+        Assert.Equal([2, 3], report.Branches.Select(b => b.Choice.NodeId));
     }
 
     [Fact]
@@ -141,7 +143,7 @@ public class PathStatsServiceTests
             Node(3, "A1", isPlayerChoice: true)));
 
         // 3 is a fork under 1, never a sibling of it.
-        Assert.Equal([1], report.Branches.Select(b => b.ChoiceNodeId));
+        Assert.Equal([1], report.Branches.Select(b => b.Choice.NodeId));
     }
 
     // ── Recursive fork breakdown (issue #14) ─────────────────────────────────
@@ -158,9 +160,9 @@ public class PathStatsServiceTests
             Node(4, "A2", isPlayerChoice: true)));
 
         var a = Assert.Single(report.Branches);
-        Assert.Equal([3, 4], a.SubBranches.Select(b => b.ChoiceNodeId));
+        Assert.Equal([3, 4], a.SubBranches.Select(b => b.Choice.NodeId));
 
-        var a1 = a.SubBranches.Single(b => b.ChoiceNodeId == 3);
+        var a1 = a.SubBranches.Single(b => b.Choice.NodeId == 3);
         Assert.Equal(4, a1.DefaultContentWords);               // A1(1) + x y z(3)
         Assert.Equal(4, a1.DefaultLongestWords);
         Assert.Empty(a1.SubBranches);
@@ -177,7 +179,7 @@ public class PathStatsServiceTests
 
         var a = Assert.Single(report.Branches);
         var b = Assert.Single(a.SubBranches);
-        Assert.Equal(3, b.ChoiceNodeId);
+        Assert.Equal(3, b.Choice.NodeId);
         Assert.Empty(b.SubBranches);      // 1 is on the fork stack — counted once
     }
 
@@ -213,13 +215,13 @@ public class PathStatsServiceTests
             Node(3, "end one here"),                           // 3 words, dead end
             Node(2, "B", isPlayerChoice: true)));              // dead end
 
-        Assert.Equal([3, 2], report.Endings.Select(e => e.NodeId));
+        Assert.Equal([3, 2], report.Endings.Select(e => e.Node.NodeId));
 
-        var deep = report.Endings.Single(e => e.NodeId == 3);
+        var deep = report.Endings.Single(e => e.Node.NodeId == 3);
         Assert.Equal("end one here", deep.Text);
         Assert.Equal(5, deep.DefaultLongestWords);             // start+A+3
         Assert.Equal(5, deep.DefaultShortestWords);
-        Assert.Equal(2, report.Endings.Single(e => e.NodeId == 2).DefaultLongestWords);
+        Assert.Equal(2, report.Endings.Single(e => e.Node.NodeId == 2).DefaultLongestWords);
     }
 
     [Fact]
@@ -255,7 +257,7 @@ public class PathStatsServiceTests
             Node(1, "the end"),
             Node(9, "orphan line")));                          // dead end, unreachable
 
-        Assert.Equal([1], report.Endings.Select(e => e.NodeId));
+        Assert.Equal([1], report.Endings.Select(e => e.Node.NodeId));
     }
 
     [Fact]
@@ -275,5 +277,160 @@ public class PathStatsServiceTests
     {
         var report = PathStatsService.Analyze(Snap(Node(5, "hello world")));
         Assert.Empty(report.Endings);
+    }
+
+    // The load-bearing test of the cross-conversation design (#14): the single-conversation
+    // overload must BE the multi-conversation one with a one-conversation graph, not a
+    // parallel implementation. If this fails, the two modes have drifted.
+    [Fact]
+    public void SnapshotOverload_EqualsOneConversationGraph()
+    {
+        var snap = Snap(
+            Node(0, "start", links: [Link(0, 1), Link(0, 2)]),
+            Node(1, "long", isPlayerChoice: true, links: [Link(1, 3)]),
+            Node(3, "aaa bbb ccc ddd"),
+            Node(2, "short", isPlayerChoice: true));
+
+        var graph = new MultiConversationGraph(
+            RootConversation: "",
+            Conversations: new Dictionary<string, ConversationEditSnapshot> { [""] = snap },
+            Jumps: [],
+            Unfollowed: []);
+
+        // Record equality is no use here: PathStatsReport's collection members are
+        // IReadOnlyList, which compares by reference, so two separately-computed reports
+        // never compare equal however identical their contents. Flatten to values instead.
+        Assert.Equal(Flatten(PathStatsService.Analyze(snap)),
+                     Flatten(PathStatsService.Analyze(graph)));
+    }
+
+    /// Every number and node key in a report, as value-comparable tuples.
+    private static object Flatten(PathStatsReport r) => new
+    {
+        r.HasSignificantFemaleVariant,
+        r.DefaultTotalWords, r.FemaleTotalWords,
+        r.DefaultLongestWords, r.DefaultShortestWords,
+        r.FemaleLongestWords, r.FemaleShortestWords,
+        r.ConversationsSpanned,
+        Speakers = string.Join("|", r.WordsPerSpeaker.Select(
+            s => $"{s.SpeakerGuid}:{s.Category}:{s.DefaultWords}:{s.FemaleWords}")),
+        Branches = string.Join("|", FlattenBranches(r.Branches, 0)),
+        Endings  = string.Join("|", r.Endings.Select(
+            e => $"{e.Node.Conversation}#{e.Node.NodeId}:{e.DefaultLongestWords}:" +
+                 $"{e.DefaultShortestWords}:{e.FemaleLongestWords}:{e.FemaleShortestWords}")),
+        Unfollowed = string.Join("|", r.Unfollowed.Select(
+            u => $"{u.From.Conversation}#{u.From.NodeId}:{u.TargetLabel}:{u.Reason}")),
+    }.ToString()!;
+
+    private static IEnumerable<string> FlattenBranches(IReadOnlyList<BranchStat> bs, int depth) =>
+        bs.SelectMany(b => new[]
+        {
+            $"{depth}:{b.Choice.Conversation}#{b.Choice.NodeId}:{b.DefaultContentWords}:" +
+            $"{b.DefaultLongestWords}:{b.FemaleContentWords}:{b.FemaleLongestWords}"
+        }.Concat(FlattenBranches(b.SubBranches, depth + 1)));
+
+    // ── Cross-conversation handoffs (#14) ────────────────────────────────────
+
+    private static MultiConversationGraph Graph(
+        string root,
+        IReadOnlyDictionary<string, ConversationEditSnapshot> convs,
+        params JumpEdge[] jumps) => new(root, convs, jumps, []);
+
+    private static Dictionary<string, ConversationEditSnapshot> Convs(
+        params (string Name, ConversationEditSnapshot Snap)[] cs) =>
+        cs.ToDictionary(c => c.Name, c => c.Snap);
+
+    [Fact]
+    public void Handoff_TerminalNodeJumps_LongestSpansBothConversations()
+    {
+        var a = Snap(Node(0, "one two", links: [Link(0, 1)]), Node(1, "three"));
+        var b = Snap(Node(0, "four five six"));
+
+        var report = PathStatsService.Analyze(Graph("A", Convs(("A", a), ("B", b)),
+            new JumpEdge(new NodeRef("A", 1), new NodeRef("B", 0))));
+
+        Assert.Equal(6, report.DefaultLongestWords);   // 2 + 1 + 3
+        Assert.Equal(2, report.ConversationsSpanned);
+    }
+
+    // Pins the ADDITIVE rule against the rejected "treat a jump as one more link" design.
+    // The engine spawns a second FlowChartPlayer without stopping the current one, so a
+    // node that continues AND hands off really does run both. If someone folds jumps into
+    // the ordinary edge list, Longest becomes 2 + max(1, 3) = 5 and this fails.
+    // Do not "simplify" it away.
+    [Fact]
+    public void NodeThatContinuesAndHandsOff_CountsBoth_NotMax()
+    {
+        var a = Snap(Node(0, "one two", links: [Link(0, 1)]), Node(1, "three"));
+        var b = Snap(Node(0, "four five six"));
+
+        var report = PathStatsService.Analyze(Graph("A", Convs(("A", a), ("B", b)),
+            new JumpEdge(new NodeRef("A", 0), new NodeRef("B", 0))));
+
+        Assert.Equal(6, report.DefaultLongestWords);   // 2 + max(1) + 3, not 2 + max(1, 3)
+    }
+
+    [Fact]
+    public void Shortest_SumsJumps_BecauseASpawnIsNotOptional()
+    {
+        var a = Snap(Node(0, "one", links: [Link(0, 1), Link(0, 2)]),
+                     Node(1, "two three four"), Node(2, "five"));
+        var b = Snap(Node(0, "six seven"));
+
+        var report = PathStatsService.Analyze(Graph("A", Convs(("A", a), ("B", b)),
+            new JumpEdge(new NodeRef("A", 0), new NodeRef("B", 0))));
+
+        Assert.Equal(4, report.DefaultShortestWords);  // 1 + min(3, 1) + 2
+    }
+
+    [Fact]
+    public void JumpCycle_Terminates_AndCountsOnce()
+    {
+        var a = Snap(Node(0, "a"));
+        var b = Snap(Node(0, "b"));
+
+        var report = PathStatsService.Analyze(Graph("A", Convs(("A", a), ("B", b)),
+            new JumpEdge(new NodeRef("A", 0), new NodeRef("B", 0)),
+            new JumpEdge(new NodeRef("B", 0), new NodeRef("A", 0))));
+
+        Assert.Equal(2, report.DefaultLongestWords);
+    }
+
+    [Fact]
+    public void NodeWithAHandoff_IsNotAnEnding()
+    {
+        var a = Snap(Node(0, "a"));
+        var b = Snap(Node(0, "b"));
+
+        var report = PathStatsService.Analyze(Graph("A", Convs(("A", a), ("B", b)),
+            new JumpEdge(new NodeRef("A", 0), new NodeRef("B", 0))));
+
+        Assert.DoesNotContain(report.Endings, e => e.Node == new NodeRef("A", 0));
+        Assert.Contains(report.Endings,       e => e.Node == new NodeRef("B", 0));
+    }
+
+    [Fact]
+    public void ForkInsideAJumpedToConversation_AppearsInTheTree()
+    {
+        var a = Snap(Node(0, "greeting"));
+        var b = Snap(Node(0, "hub", links: [Link(0, 1)]),
+                     Node(1, "pick me", isPlayerChoice: true));
+
+        var report = PathStatsService.Analyze(Graph("A", Convs(("A", a), ("B", b)),
+            new JumpEdge(new NodeRef("A", 0), new NodeRef("B", 0))));
+
+        Assert.Contains(report.Branches, x => x.Choice == new NodeRef("B", 1));
+    }
+
+    [Fact]
+    public void WordsPerSpeaker_SumsOneSpeakerAcrossConversations()
+    {
+        var a = Snap(Node(0, "one two", speaker: "serafen"));
+        var b = Snap(Node(0, "three", speaker: "serafen"));
+
+        var report = PathStatsService.Analyze(Graph("A", Convs(("A", a), ("B", b)),
+            new JumpEdge(new NodeRef("A", 0), new NodeRef("B", 0))));
+
+        Assert.Equal(3, report.WordsPerSpeaker.Single(s => s.SpeakerGuid == "serafen").DefaultWords);
     }
 }

@@ -1,4 +1,4 @@
-﻿using Avalonia;
+using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Primitives;
@@ -26,6 +26,8 @@ public partial class MainWindow : Window
 {
     private LegendWindow?          _legendWindow;
     private TagReferenceWindow?    _tagReferenceWindow;
+    // Held so Settings can reschedule autosave without a restart (issue #11).
+    private global::Avalonia.Threading.DispatcherTimer? _autosaveTimer;
     private PatchManagerWindow?    _patchManagerWindow;
     private FindReplaceWindow?     _findReplaceWindow;
     private BatchReplaceWindow?    _batchReplaceWindow;
@@ -97,15 +99,14 @@ public partial class MainWindow : Window
         vm.SpellStoreFactory   = () => SpellDictionaryStore.Default;
         // Crash recovery: offer to restore a newer autosave sidecar at project open.
         vm.ConfirmRestoreAutosave = t => new AutosaveRestoreDialog(t).ShowDialogAsync(this);
-        // Autosave: sidecar written every 60 s while the project has unsaved changes
-        // (spec 2026-07-12). The tick is a no-op on a clean session; runs on the UI
-        // thread so folding the canvas into the project is safe.
-        var autosaveTimer = new global::Avalonia.Threading.DispatcherTimer
-        {
-            Interval = TimeSpan.FromSeconds(60),
-        };
-        autosaveTimer.Tick += (_, _) => vm.AutosaveTick();
-        autosaveTimer.Start();
+        // Autosave: sidecar written while the project has unsaved changes (spec
+        // 2026-07-12), at the cadence chosen in Settings (issue #11). The tick is a
+        // no-op on a clean session; it runs on the UI thread so folding the canvas
+        // into the project is safe. The timer is held in a field so the Settings
+        // picker can reschedule it live through DispatcherAutosaveScheduler.
+        _autosaveTimer = new global::Avalonia.Threading.DispatcherTimer();
+        _autosaveTimer.Tick += (_, _) => vm.AutosaveTick();
+        ApplyAutosaveInterval(AppSettings.AutosaveIntervalSeconds);
         // Launch greeting: show "what's new" once if the app version advanced.
         vm.ShowWhatsNewIfUpdated();
         vm.ShowTagReference = tagVm =>
@@ -626,7 +627,14 @@ public partial class MainWindow : Window
                 // Reading speed (issue #14): the View owns AppSettings, so the VM stays
                 // settings-free and its tests never touch the real settings.json.
                 wordsPerMinute: AppSettings.ReadingWordsPerMinute,
-                persistWordsPerMinute: v => AppSettings.ReadingWordsPerMinute = v);
+                persistWordsPerMinute: v => AppSettings.ReadingWordsPerMinute = v,
+                // Conversation handoffs (issue #14): same split as the reading speed — the
+                // View owns AppSettings so the VM stays settings-free, and the graph comes
+                // from the main VM, which holds the project, provider and GUID cache.
+                resolveGraph: () => vm.ResolveConversationJumpGraph(),
+                followConversationJumps: AppSettings.FollowConversationJumps,
+                persistFollowJumps: v => AppSettings.FollowConversationJumps = v,
+                navigateToNodeInConversation: vm.NavigateToFoundNode);
 
             _flowAnalyticsWindow = new FlowAnalyticsWindow(analyticsVm);
 
@@ -775,13 +783,33 @@ public partial class MainWindow : Window
         _patchManagerWindow.Activate();
     }
 
+    /// Applies an autosave cadence to the live timer: 0 stops it, anything else
+    /// clamps into AppSettings' accepted range and (re)starts it.
+    private void ApplyAutosaveInterval(int intervalSeconds)
+    {
+        if (_autosaveTimer is null) return;
+        _autosaveTimer.Stop();
+        if (intervalSeconds <= 0) return;
+        _autosaveTimer.Interval = TimeSpan.FromSeconds(Math.Clamp(
+            intervalSeconds, AppSettings.MinAutosaveIntervalSeconds, AppSettings.MaxAutosaveIntervalSeconds));
+        _autosaveTimer.Start();
+    }
+
+    /// Production IAutosaveScheduler: forwards the Settings choice to the window's
+    /// own DispatcherTimer. A tiny adapter rather than a lambda so the ViewModel
+    /// layer depends only on the interface, never on Avalonia.
+    private sealed class DispatcherAutosaveScheduler(MainWindow owner) : IAutosaveScheduler
+    {
+        public void Apply(int intervalSeconds) => owner.ApplyAutosaveInterval(intervalSeconds);
+    }
+
     private async void SettingsButton_Click(object? sender, RoutedEventArgs e)
         => await OpenSettingsAsync();
 
     private async Task OpenSettingsAsync()
     {
         var vm = (MainWindowViewModel)DataContext!;
-        var settingsVm = vm.CreateSettingsViewModel(new FontScaleApplier());
+        var settingsVm = vm.CreateSettingsViewModel(new FontScaleApplier(), new DispatcherAutosaveScheduler(this));
         // Spelling section shell-outs (folder in Explorer, source link in browser).
         settingsVm.FolderOpener = p => System.Diagnostics.Process.Start(
             new System.Diagnostics.ProcessStartInfo(p) { UseShellExecute = true });
