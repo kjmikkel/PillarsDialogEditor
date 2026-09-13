@@ -152,6 +152,52 @@ public class HardcodedStringScannerTests
     }
 
     [Fact]
+    public void Scan_FlagsAParenthesisedPlaceholderWord()
+    {
+        // "(deleted)" was the PatchConflict / MergeConflict marker: a label shown in
+        // place of a missing value. It has no space, so the sentence heuristic alone
+        // let it through twice. Parentheses are the tell — identifiers, resource keys
+        // and glyphs are never written in them.
+        var offenders = HardcodedStringScanner.Scan("""
+            class C { public string T => "(deleted)"; }
+            """);
+
+        Assert.Equal("(deleted)", Assert.Single(offenders).Text);
+    }
+
+    [Fact]
+    public void Scan_StillIgnoresSingleWordIdentifiersAndFormats()
+    {
+        // The counterweight to the widening: it must admit ONLY the parenthesised
+        // shape, or every field name and encoding token in the codebase floods in.
+        var offenders = HardcodedStringScanner.Scan("""
+            class C {
+                const string A = "DefaultText";
+                const string B = "Speaker_Guid";
+                const string C2 = "utf-8";
+                const string D = "(utf-8)";
+            }
+            """);
+
+        Assert.Empty(offenders);
+    }
+
+    [Fact]
+    public void Scan_IgnoresParenthesesWithoutARealWordInThem()
+    {
+        // A regex group or a bracketed hole wears the same punctuation as a
+        // placeholder label; the 3+ letter word requirement is what separates them.
+        var offenders = HardcodedStringScanner.Scan("""
+            class C {
+                string A(int i) => $"({i})";
+                const string B = "(ab)";
+            }
+            """);
+
+        Assert.Empty(offenders);
+    }
+
+    [Fact]
     public void Scan_ReportsTheLineOfTheOffendingLiteral()
     {
         var offenders = HardcodedStringScanner.Scan("class C {\n\n  string T => \"Edit speaker category\";\n}", "Foo.cs");

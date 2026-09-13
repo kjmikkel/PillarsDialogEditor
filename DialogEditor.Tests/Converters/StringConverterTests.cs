@@ -1,5 +1,7 @@
 using System.Globalization;
 using DialogEditor.Avalonia.Converters;
+using DialogEditor.Tests.Helpers;
+using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.Tests.Converters;
 
@@ -32,6 +34,27 @@ public class StringConverterTests
     {
         var result = new QTDDisplayConverter().Convert("", typeof(string), "(default)", Inv);
         Assert.Equal("(default)", result);
+    }
+
+    [Fact]
+    public void QTDDisplay_Convert_EmptyStringWithNoParameter_FallsBackToTheResource()
+    {
+        // The fallback used to be a hard-coded "(default)". The view passes the localised
+        // string as ConverterParameter; when it is missing the converter must still reach
+        // for the same resource rather than showing English.
+        Loc.Configure(new StubStringProvider());
+
+        Assert.Equal("Option_QTD_Default",
+            new QTDDisplayConverter().Convert("", typeof(string), null, Inv));
+    }
+
+    [Fact]
+    public void QTDDisplay_ConvertBack_ResourceFallbackValue_ReturnsEmpty()
+    {
+        Loc.Configure(new StubStringProvider());
+
+        Assert.Equal("",
+            new QTDDisplayConverter().ConvertBack("Option_QTD_Default", typeof(string), null, Inv));
     }
 
     [Fact]

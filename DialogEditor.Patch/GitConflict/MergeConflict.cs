@@ -11,6 +11,12 @@ public enum MergeConflictKind
 
 public enum MergeSide { Mine, Theirs }
 
+/// What the EDITING side of a DeleteVsEdit conflict did, for the case where its patch
+/// names no fields to list. Reported as data for the same reason as MergeSide above:
+/// DialogEditor.Patch references only Core, so it cannot reach Loc, and the value used
+/// to be the English literals "(added)" / "(modified)".
+public enum MergeEditSummary { Added, Modified }
+
 /// How much one side of a whole-conversation conflict changed. Reported as counts
 /// rather than as a rendered summary because DialogEditor.Patch references only Core
 /// and so cannot reach Loc — ConflictRowViewModel formats these for display.
@@ -35,6 +41,12 @@ public record MergeConflict(
     /// language-dependent. The side is now reported as data and ConflictRowViewModel
     /// renders the label, as with PatchCounts below.
     public MergeSide? DeletedSide { get; init; }
+
+    /// Set on a DeleteVsEdit conflict when the editing side's patch names no fields --
+    /// it added the node, or modified it in ways the patch does not spell out. Null when
+    /// that side's value carries a real field list, and on every other kind.
+    /// ConflictRowViewModel renders it; nothing branches on it.
+    public MergeEditSummary? EditSummary { get; init; }
 
     /// Set only on a ConversationLevel conflict, where the two sides are too broad to
     /// show as values and are summarised instead. Null on every other kind, which is

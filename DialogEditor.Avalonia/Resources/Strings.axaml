@@ -1162,6 +1162,11 @@ Saving records your edits to the open project — game files are not touched unt
          deleted the node (the other side shows the fields it edited). Display only —
          the merge decides from the conflict's data, so any wording is safe. -->
     <sys:String x:Key="GitConflict_DeletedValue">(deleted)</sys:String>
+    <!-- Shown in place of a value on the side of a delete-vs-edit conflict that KEPT the
+         node, when its patch names no fields to list: it added the node, or changed it in
+         ways the patch does not spell out. Display only. -->
+    <sys:String x:Key="GitConflict_AddedValue">(added)</sys:String>
+    <sys:String x:Key="GitConflict_ModifiedValue">(modified)</sys:String>
     <sys:String x:Key="GitConflict_KeepMine">Keep mine</sys:String>
     <sys:String x:Key="GitConflict_KeepTheirs">Keep theirs</sys:String>
     <sys:String x:Key="GitConflict_AcceptDeletion">Accept deletion</sys:String>

@@ -56,17 +56,21 @@ public static class GitMergeAnalyzer
         // DeletedSide, which is also what MergeBuilder branches on.
         foreach (var nodeId in mine.DeletedNodeIds)
             if (theirTouched.Contains(nodeId))
+            {
+                var edit = DescribeTouched(theirs, nodeId);
                 granular.Add(new MergeConflict(
-                    MergeConflictKind.DeleteVsEdit, conv, nodeId, null,
-                    "", DescribeTouched(theirs, nodeId))
-                { DeletedSide = MergeSide.Mine });
+                    MergeConflictKind.DeleteVsEdit, conv, nodeId, null, "", edit.Fields)
+                { DeletedSide = MergeSide.Mine, EditSummary = edit.Summary });
+            }
 
         foreach (var nodeId in theirs.DeletedNodeIds)
             if (mineTouched.Contains(nodeId))
+            {
+                var edit = DescribeTouched(mine, nodeId);
                 granular.Add(new MergeConflict(
-                    MergeConflictKind.DeleteVsEdit, conv, nodeId, null,
-                    DescribeTouched(mine, nodeId), "")
-                { DeletedSide = MergeSide.Theirs });
+                    MergeConflictKind.DeleteVsEdit, conv, nodeId, null, edit.Fields, "")
+                { DeletedSide = MergeSide.Theirs, EditSummary = edit.Summary });
+            }
 
         // ── Add/add ──────────────────────────────────────────────────────
         // Last-wins index — tolerant of a malformed reconstruction with
@@ -203,12 +207,15 @@ public static class GitMergeAnalyzer
         return set;
     }
 
-    // A short display string for the side that kept the node (vs the deleting side).
-    // Field names rather than raw JSON — readable in the resolution dialog.
-    private static string DescribeTouched(ConversationPatch patch, int nodeId)
+    // What the side that KEPT the node did (vs the deleting side), for the resolution
+    // dialog. Field names rather than raw JSON — readable, and language-neutral. When
+    // there are no field names to list the answer is a word, which this assembly cannot
+    // localise, so it travels as Summary and ConflictRowViewModel renders it.
+    private static (string Fields, MergeEditSummary? Summary) DescribeTouched(
+        ConversationPatch patch, int nodeId)
     {
         if (patch.AddedNodes.Any(n => n.NodeId == nodeId))
-            return "(added)";
+            return ("", MergeEditSummary.Added);
 
         var mod = patch.ModifiedNodes.FirstOrDefault(m => m.NodeId == nodeId);
         if (mod is not null)
@@ -216,9 +223,9 @@ public static class GitMergeAnalyzer
             var fields = mod.FieldChanges.Keys.ToList();
             if (mod.UpdatedConditions is not null) fields.Add("Conditions");
             if (mod.UpdatedScripts is not null)    fields.Add("Scripts");
-            return fields.Count > 0 ? string.Join(", ", fields) : "(modified)";
+            if (fields.Count > 0) return (string.Join(", ", fields), null);
         }
 
-        return "(modified)";
+        return ("", MergeEditSummary.Modified);
     }
 }
