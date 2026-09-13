@@ -99,7 +99,8 @@ manual open):
 
 ### 6. Rotating generations (issue #11)
 
-`AppSettings.AutosaveGenerations` (default 3, clamped `[1, 10]`) decides how many
+`AppSettings.AutosaveGenerations` (default 1 — the historical single sidecar —
+clamped `[1, 10]`) decides how many
 sidecars are kept. Generation 1 deliberately keeps the historical `.autosave` name —
 older ones are `.autosave.2`, `.autosave.3`, … — so a sidecar written by a build that
 predated rotation is still found, and §4's `Check` needed no change at all: the newest
