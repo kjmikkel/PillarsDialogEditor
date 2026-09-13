@@ -1,11 +1,25 @@
 namespace DialogEditor.Patch;
 
+/// One conflict between two patches in the load order.
+///
+/// FieldName is null for a delete-vs-modify conflict (see IsDeletion), where there is
+/// no single field to name. It used to hold the literal "(deleted)" instead — but this
+/// record is also the identity of a conflict (ConflictDetector de-duplicates on
+/// FieldName among other things) as well as the text the Patch Manager shows, so that
+/// one string could not be translated without making de-duplication depend on the UI
+/// language. DialogEditor.Patch references only Core and cannot reach Loc in any case.
+/// The kind is reported as data and PatchConflictRowViewModel renders the label, the
+/// same split as MergeConflict.DeletedSide for git merges.
 public record PatchConflict(
-    string ConversationName,
-    int    NodeId,
-    string FieldName,       // field name, or "(deleted)" for delete-vs-modify conflicts
-    int    FirstPatchIndex,
-    int    SecondPatchIndex);
+    string  ConversationName,
+    int     NodeId,
+    string? FieldName,
+    int     FirstPatchIndex,
+    int     SecondPatchIndex)
+{
+    /// True when one patch deletes the node that another patch modifies.
+    public bool IsDeletion => FieldName is null;
+}
 
 public static class ConflictDetector
 {
@@ -105,7 +119,7 @@ public static class ConflictDetector
                     {
                         if (modIdx != delIdx)
                             conflicts.Add(new PatchConflict(
-                                convName, nodeId, "(deleted)", delIdx, modIdx));
+                                convName, nodeId, null, delIdx, modIdx));
                     }
                 }
             }
