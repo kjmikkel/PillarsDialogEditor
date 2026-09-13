@@ -91,6 +91,91 @@ public class HardcodedStringScannerTests
     }
 
     [Fact]
+    public void Scan_IgnoresDeveloperDiagnosticsBuiltByConcatenation()
+    {
+        // Each operand's parent is the + BinaryExpression, not the ArgumentSyntax — the
+        // shape that forced MainWindowViewModel's patch-baseline-mismatch warning to be
+        // collapsed into a single interpolated string.
+        var offenders = HardcodedStringScanner.Scan("""
+            class C {
+                void M() {
+                    AppLog.Warn($"Patch for '{Name}' no longer matches " + $"game data at node {Id}");
+                    AppLog.Error("Could not open " + "the project file");
+                }
+            }
+            """);
+
+        Assert.Empty(offenders);
+    }
+
+    [Fact]
+    public void Scan_IgnoresFallbackLiteralsInsideADiagnosticsInterpolationHole()
+    {
+        // "(not set)" sits in a ?? inside a parenthesised hole: its parent chain runs
+        // Coalesce → Parenthesized → Interpolation → InterpolatedString → Argument.
+        // VoImporter.DetectWwiseCli needed a [NotLocalised] marker to get past this.
+        var offenders = HardcodedStringScanner.Scan("""
+            class C {
+                void M() {
+                    AppLog.Info($"[DetectWwise] WWISEROOT={(wwiseRoot ?? "(not set)")}");
+                    AppLog.Info($"[Probe] state={(ok ? "all good here" : "not good at all")}");
+                }
+            }
+            """);
+
+        Assert.Empty(offenders);
+    }
+
+    [Fact]
+    public void Scan_StillFlagsProseInAHoleOfANonDiagnosticString()
+    {
+        // The widened exemption must be anchored to the AppLog call. Out here nothing
+        // exempts either the sentence or the fallback text it splices in.
+        var offenders = HardcodedStringScanner.Scan("""
+            class C { public string T => $"Loaded {(Name ?? "an untitled file")}"; }
+            """);
+
+        Assert.Equal(["Loaded {0}", "an untitled file"], offenders.Select(o => o.Text));
+    }
+
+    [Fact]
+    public void Scan_StillFlagsConcatenatedProseOutsideADiagnostic()
+    {
+        var offenders = HardcodedStringScanner.Scan("""
+            class C { public string T => "Open the " + "project file"; }
+            """);
+
+        Assert.Equal(["Open the ", "project file"], offenders.Select(o => o.Text));
+    }
+
+    [Fact]
+    public void Scan_StillFlagsProsePassedToANestedCallInsideADiagnostic()
+    {
+        // The walk up to the argument must stop at the FIRST ArgumentSyntax it meets.
+        // Here that belongs to Describe(...), whose result may well reach the UI by
+        // another route, so the AppLog call around it must not launder it.
+        var offenders = HardcodedStringScanner.Scan("""
+            class C {
+                void M() { AppLog.Warn($"Failed: {Describe("a user facing sentence")}"); }
+            }
+            """);
+
+        Assert.Equal("a user facing sentence", Assert.Single(offenders).Text);
+    }
+
+    [Fact]
+    public void Scan_StillFlagsProseReachingLocThroughALaterArgument()
+    {
+        // Only Loc's FIRST argument is a key. Walking out of the ?? must land on the
+        // second argument and keep its index, not be mistaken for the key slot.
+        var offenders = HardcodedStringScanner.Scan("""
+            class C { public string T => Loc.Format("Some_Key", Name ?? "an untitled file"); }
+            """);
+
+        Assert.Equal("an untitled file", Assert.Single(offenders).Text);
+    }
+
+    [Fact]
     public void Scan_IgnoresAttributeArgumentsIncludingTheMarkerItself()
     {
         var offenders = HardcodedStringScanner.Scan(Marked + """

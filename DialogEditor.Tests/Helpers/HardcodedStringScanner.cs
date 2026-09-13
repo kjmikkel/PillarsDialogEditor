@@ -75,7 +75,7 @@ public static class HardcodedStringScanner
             if (decl.AttributeLists.SelectMany(a => a.Attributes).Any(IsNotLocalised))
                 return true;
 
-        if (node.Parent is ArgumentSyntax arg && arg.Parent is ArgumentListSyntax args)
+        if (EnclosingArgument(node) is { Parent: ArgumentListSyntax args } arg)
         {
             // Developer diagnostics: never shown to a player, never translated.
             if (args.Parent is InvocationExpressionSyntax inv
@@ -91,6 +91,38 @@ public static class HardcodedStringScanner
                 && args.Arguments.IndexOf(arg) == 0) return true;
         }
         return false;
+    }
+
+    /// <summary>
+    /// The argument a literal's value is passed as, climbing out of the expression shapes
+    /// that merely assemble one string value: (…), either arm of ?:, + and ??, and an
+    /// interpolation hole. So the "(not set)" in AppLog.Info($"x={(v ?? "(not set)")}")
+    /// and both halves of AppLog.Warn($"a " + $"b") land on the AppLog argument, exactly
+    /// as a direct literal does.
+    ///
+    /// Stops at the FIRST ArgumentSyntax and never crosses an invocation: a literal
+    /// handed to Describe("…") inside a log call belongs to Describe, whose result may
+    /// reach the UI by some other route.
+    /// </summary>
+    private static ArgumentSyntax? EnclosingArgument(SyntaxNode node)
+    {
+        for (var n = node; ; n = n.Parent!)
+        {
+            switch (n.Parent)
+            {
+                case ArgumentSyntax arg:
+                    return arg;
+                case ParenthesizedExpressionSyntax:
+                case InterpolationSyntax:
+                case InterpolatedStringExpressionSyntax:
+                case ConditionalExpressionSyntax c when n != c.Condition:
+                case BinaryExpressionSyntax b when b.IsKind(SyntaxKind.AddExpression)
+                                                || b.IsKind(SyntaxKind.CoalesceExpression):
+                    continue;
+                default:
+                    return null;
+            }
+        }
     }
 
     private static bool IsNotLocalised(AttributeSyntax a)
