@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Text.Json;
 using DialogEditor.Core.GameData;
 
@@ -86,6 +86,20 @@ public static class AppSettings
         // upgrading install sees exactly the report it saw before.
         public bool DuplicateIncludeFemaleText { get; set; }
         public bool DuplicateIncludeOtherLanguages { get; set; }
+        // Whether path stats follow StartConversation handoffs (issue #14). Default false
+        // for the same reason as the two above: an upgrading install sees the report it saw
+        // before, and only opts in to the larger figures deliberately.
+        public bool FollowConversationJumps { get; set; }
+
+        // ── Autosave knobs (issue #11) ───────────────────────────────────────
+        // Seconds between autosave ticks; 0 disables autosave entirely. Defaults to
+        // the historical fixed 60 s, so an upgrading install keeps the cadence it had.
+        public int AutosaveIntervalSeconds { get; set; } = 60;
+        // How many autosave sidecars to keep. Defaults to 1 — the historical single
+        // sidecar — for the same reason as the knobs above: an upgrading install sees
+        // exactly the files beside its project that it saw before, and only opts in to
+        // extra sidecars deliberately. Rotation is the capability; using it is a choice.
+        public int AutosaveGenerations { get; set; } = 1;
 
         // MRU list of recently opened/created/saved-as project file paths, newest
         // first, capped at MaxRecentProjects. Powers File ▸ Recent Projects.
@@ -261,6 +275,15 @@ public static class AppSettings
         set { var s = Load(); s.ReadingWordsPerMinute = value; Save(s); }
     }
 
+    /// Whether Playthrough stats follow StartConversation handoffs into conversations this
+    /// project patches. Off by default: turning it on changes existing figures, so the writer
+    /// opts in rather than discovering a doubled number.
+    public static bool FollowConversationJumps
+    {
+        get => Load().FollowConversationJumps;
+        set { var s = Load(); s.FollowConversationJumps = value; Save(s); }
+    }
+
     /// Similarity bar (0..1) above which two lines are reported as near-duplicates.
     /// See DuplicateLineScanner.DefaultNearThreshold for the baseline.
     public static double NearDuplicateThreshold
@@ -311,6 +334,30 @@ public static class AppSettings
     {
         get => Load().LastSeenVersion;
         set { var s = Load(); s.LastSeenVersion = value; Save(s); }
+    }
+
+    /// Seconds between autosave ticks, 0 = off. Clamped on read: settings.json is
+    /// hand-editable and a 1-second cadence would thrash the disk on a large project.
+    public static int AutosaveIntervalSeconds
+    {
+        get
+        {
+            var v = Load().AutosaveIntervalSeconds;
+            if (v <= 0) return 0;                       // 0 and nonsense both mean "off"
+            return Math.Clamp(v, MinAutosaveIntervalSeconds, MaxAutosaveIntervalSeconds);
+        }
+        set { var s = Load(); s.AutosaveIntervalSeconds = value; Save(s); }
+    }
+
+    public const int MinAutosaveIntervalSeconds = 5;
+    public const int MaxAutosaveIntervalSeconds = 3600;
+
+    /// How many autosave sidecars to keep, newest first. Clamped to [1, 10] for the
+    /// same hand-editability reason; the ceiling matches AutosaveRecovery's sweep.
+    public static int AutosaveGenerations
+    {
+        get => Math.Clamp(Load().AutosaveGenerations, 1, 10);
+        set { var s = Load(); s.AutosaveGenerations = value; Save(s); }
     }
 
     public static string PickLanguage(IReadOnlyList<string> available, string? preferred)

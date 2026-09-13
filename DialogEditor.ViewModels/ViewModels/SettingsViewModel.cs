@@ -10,13 +10,24 @@ public partial class SettingsViewModel : ObservableObject
     private readonly string           _gameDirectory;
     private readonly IFolderPicker    _picker;
     private readonly IFontScaleApplier _fontScaleApplier;
+    private readonly IAutosaveScheduler _autosaveScheduler;
 
     [ObservableProperty] private string _backupDirectory;
     [ObservableProperty] private string _localizationFormat;
     [ObservableProperty] private double _selectedFontScale;
+    [ObservableProperty] private int    _selectedAutosaveInterval;
+    [ObservableProperty] private int    _selectedAutosaveGenerations;
 
     /// Preset font-scale multipliers offered in Settings.
     public IReadOnlyList<double> FontScaleOptions { get; } = [1.0, 1.25, 1.5, 1.75, 2.0];
+
+    /// Autosave cadences offered in Settings, in seconds. 0 is "Off" — a real need on
+    /// very large projects or slow network shares, where a tick is not free.
+    public IReadOnlyList<int> AutosaveIntervalOptions { get; } = [0, 30, 60, 120, 300, 600];
+
+    /// How many autosave sidecars to keep. Capped well below AppSettings' clamp: more
+    /// than five generations is clutter next to the project for no practical gain.
+    public IReadOnlyList<int> AutosaveGenerationOptions { get; } = [1, 2, 3, 4, 5];
 
     /// Localization formats offered for the "Default localization format" picker.
     public IReadOnlyList<string> LocalizationFormatOptions { get; } = ["Csv", "Json", "Xliff"];
@@ -28,7 +39,8 @@ public partial class SettingsViewModel : ObservableObject
 
     public SettingsViewModel(string gameDirectory, IFolderPicker picker,
                              IFontScaleApplier? fontScaleApplier = null,
-                             SpellDictionaryStore? spellStore = null)
+                             SpellDictionaryStore? spellStore = null,
+                             IAutosaveScheduler? autosaveScheduler = null)
     {
         _gameDirectory      = gameDirectory;
         _picker             = picker;
@@ -37,6 +49,9 @@ public partial class SettingsViewModel : ObservableObject
         _backupDirectory    = AppSettings.GetBackupPath(gameDirectory) ?? string.Empty;
         _localizationFormat = AppSettings.DefaultLocalizationFormat;
         _selectedFontScale  = AppSettings.FontScale;
+        _autosaveScheduler  = autosaveScheduler ?? new NullAutosaveScheduler();
+        _selectedAutosaveInterval    = AppSettings.AutosaveIntervalSeconds;
+        _selectedAutosaveGenerations = AppSettings.AutosaveGenerations;
     }
 
     // ── Spelling (three-layer dictionary; spec 2026-07-11) ──────────────────
@@ -104,10 +119,26 @@ public partial class SettingsViewModel : ObservableObject
         OnPropertyChanged(nameof(PreviewTitleFontSize));
     }
 
-    // No-op applier so the ViewModel is testable without injecting one explicitly.
+    // Autosave cadence applies live: persist, then reschedule the running timer.
+    partial void OnSelectedAutosaveIntervalChanged(int value)
+    {
+        AppSettings.AutosaveIntervalSeconds = value;
+        _autosaveScheduler.Apply(value);
+    }
+
+    // Generations change what a tick WRITES, not when it fires — no reschedule.
+    partial void OnSelectedAutosaveGenerationsChanged(int value)
+        => AppSettings.AutosaveGenerations = value;
+
+    // No-op appliers so the ViewModel is testable without injecting one explicitly.
     private sealed class NullFontScaleApplier : IFontScaleApplier
     {
         public void Apply(double scale) { }
+    }
+
+    private sealed class NullAutosaveScheduler : IAutosaveScheduler
+    {
+        public void Apply(int intervalSeconds) { }
     }
 
     [RelayCommand]

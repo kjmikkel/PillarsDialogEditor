@@ -156,6 +156,8 @@
             <converters:IsNotNullConverter                       x:Key="IsNotNull"/>
             <converters:DoubleToPercentConverter                 x:Key="DoubleToPercent"/>
             <converters:WordsPerMinuteConverter                   x:Key="WordsPerMinute"/>
+            <converters:AutosaveIntervalConverter                 x:Key="AutosaveInterval"/>
+            <converters:AutosaveGenerationsConverter              x:Key="AutosaveGenerations"/>
 
         </ResourceDictionary>
     </Application.Resources>

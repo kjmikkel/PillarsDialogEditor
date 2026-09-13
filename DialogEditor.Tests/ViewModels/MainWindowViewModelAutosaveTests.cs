@@ -184,4 +184,52 @@ public class MainWindowViewModelAutosaveTests : IDisposable
         Assert.Equal("Saved", vm.CurrentProjectName);
         Assert.True(File.Exists(AutosaveRecovery.SidecarPath(_projectPath)));
     }
+
+    // ── Rotating generations (issue #11) ────────────────────────────────────
+
+    [Fact]
+    public void AutosaveTick_RotatesPreviousGenerationsBeforeWriting()
+    {
+        AppSettings.AutosaveGenerations = 3;
+        var vm = DirtyVm();
+
+        vm.AutosaveTick();                                    // generation 1 = "T"
+        InjectProject(vm, DialogProject.Empty("T2"));
+        vm.IsModified = true;
+        vm.AutosaveTick();                                    // "T" pushed down to 2
+
+        Assert.Equal("T2", DialogProjectSerializer.LoadFromFile(
+            AutosaveRecovery.GenerationPath(_projectPath, 1)).Name);
+        Assert.Equal("T", DialogProjectSerializer.LoadFromFile(
+            AutosaveRecovery.GenerationPath(_projectPath, 2)).Name);
+    }
+
+    [Fact]
+    public void AutosaveTick_GenerationsOne_KeepsASingleSidecar()
+    {
+        AppSettings.AutosaveGenerations = 1;
+        var vm = DirtyVm();
+
+        vm.AutosaveTick();
+        vm.AutosaveTick();
+
+        Assert.True(File.Exists(AutosaveRecovery.GenerationPath(_projectPath, 1)));
+        Assert.False(File.Exists(AutosaveRecovery.GenerationPath(_projectPath, 2)));
+    }
+
+    [Fact]
+    public void SaveProject_DeletesEveryGeneration()
+    {
+        AppSettings.AutosaveGenerations = 3;
+        var vm = DirtyVm();
+        vm.AutosaveTick();
+        vm.IsModified = true;
+        vm.AutosaveTick();
+        Assert.True(File.Exists(AutosaveRecovery.GenerationPath(_projectPath, 2)));
+
+        vm.SaveProjectCommand.Execute(null);
+
+        Assert.False(File.Exists(AutosaveRecovery.GenerationPath(_projectPath, 1)));
+        Assert.False(File.Exists(AutosaveRecovery.GenerationPath(_projectPath, 2)));
+    }
 }
