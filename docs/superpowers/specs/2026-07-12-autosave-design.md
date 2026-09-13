@@ -24,10 +24,13 @@ format. The real project file is never touched by autosave.
 
 ### 2. Writing — `MainWindowViewModel.AutosaveTick()`
 
-Driven by an Avalonia `DispatcherTimer` wired in `MainWindow.axaml.cs`
-(**60-second interval**, fixed; a configurable interval is deferred). The timer runs on
+Driven by an Avalonia `DispatcherTimer` wired in `MainWindow.axaml.cs`. The timer runs on
 the UI thread, so the tick can reuse `FoldCanvasIntoProject()` directly — the fold is
 idempotent and is exactly what `SaveProject` does first.
+
+The interval came from `AppSettings.AutosaveIntervalSeconds` as of issue #11 (default 60,
+`0` = off) and is rescheduled live from Settings through `IAutosaveScheduler` — the View
+owns the timer, so that interface is the seam that avoids a restart.
 
 Tick behaviour:
 - No project open, no project path, or `IsModified == false` → no-op. A clean session
@@ -42,6 +45,8 @@ Tick behaviour:
 The sidecar is deleted when its contents stop representing "work the user could lose":
 
 - **Successful `SaveProject` / `SaveProjectAs`** — the changes are now in the real file.
+  (`TryDelete` removes *every* generation, sweeping to a fixed ceiling of 10 so a
+  previously higher `AutosaveGenerations` cannot strand orphans.)
   (Save As also deletes the *old* path's sidecar; the new path gets one on the next tick.)
 - **Deliberate discard** — the app-close guard's Discard choice and the Close Project
   command's discard path. If the user consciously threw edits away, the next launch must
@@ -92,8 +97,23 @@ manual open):
 - **App verification:** edit a scratch project, kill the process, relaunch — the offer
   appears; restore shows the edits as unsaved.
 
+### 6. Rotating generations (issue #11)
+
+`AppSettings.AutosaveGenerations` (default 3, clamped `[1, 10]`) decides how many
+sidecars are kept. Generation 1 deliberately keeps the historical `.autosave` name —
+older ones are `.autosave.2`, `.autosave.3`, … — so a sidecar written by a build that
+predated rotation is still found, and §4's `Check` needed no change at all: the newest
+generation is always the path it already looked at.
+
+`AutosaveRecovery.Rotate(projectPath, keep)` runs at the *start* of a tick: it deletes
+generation `keep`, then moves each remaining generation down one, freeing generation 1
+for the write that follows. Like `TryDelete` it is best-effort — a rotation failure is
+logged and the autosave still happens, because losing the tick would be the worse
+outcome. Restore is unchanged: the offer is always for the newest generation; older
+ones are a manual fallback on disk if the newest turns out to be damaged.
+
 ## Out of scope / deferred
 
-- Configurable autosave interval (fixed 60 s for now).
-- Multiple rotating autosave generations (single sidecar).
+- Choosing *which* generation to restore from in the recovery dialog (the offer is
+  always the newest; older generations are recovered by hand).
 - Autosaving to a central location for projects on read-only media.
