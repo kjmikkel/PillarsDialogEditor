@@ -26,6 +26,15 @@
     <sys:String x:Key="PatchManager_ApplySuccess_Other">Applied {0} patches to {1}.</sys:String>
     <sys:String x:Key="PatchManager_ApplyError">Apply failed: {0}</sys:String>
     <sys:String x:Key="PatchManager_LoadError">Could not load '{0}': {1}</sys:String>
+    <!-- One line of the conflict summary list. {0} is the conversation name, {1} the node
+         id, {2} the field the patches disagree about (or the PatchManager_DeletedField
+         marker below). The middle dots are separators, not words; reorder the holes as
+         the language needs. -->
+    <sys:String x:Key="PatchManager_ConflictRow">conversation '{0}' · node {1} · {2}</sys:String>
+    <!-- Shown in place of a field name when one patch deletes the node another patch
+         modifies, so there is no single field to name. Display only - the conflict is
+         identified by its data, so any wording is safe. -->
+    <sys:String x:Key="PatchManager_DeletedField">(deleted)</sys:String>
     <sys:String x:Key="PatchManager_EntryConflict">⚠ conflicts with another project</sys:String>
     <sys:String x:Key="PatchManager_EntryConflictDetail">Conflicts with another project — move lower to override the other, or higher to be overridden</sys:String>
     <sys:String x:Key="PatchManager_EntryLoadError">⚠ could not load</sys:String>

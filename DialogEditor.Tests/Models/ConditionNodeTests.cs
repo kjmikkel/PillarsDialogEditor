@@ -30,6 +30,15 @@ public class ConditionNodeTests
         Assert.Equal("IsInCombat()", leaf.Format());
     }
 
+    [Fact]
+    public void Leaf_Format_NameWithoutReturnType_KeepsWholeName()
+    {
+        // Carried over from the deleted ConditionFormatterTests — the one case it
+        // covered that this suite did not.
+        var leaf = new ConditionLeaf("IsReady", [], Not: false, Operator: "And");
+        Assert.Equal("IsReady()", leaf.Format());
+    }
+
     // ── ConditionBranch.Format ────────────────────────────────────────────
 
     [Fact]

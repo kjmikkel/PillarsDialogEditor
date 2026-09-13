@@ -45,6 +45,12 @@ public partial class BatchReplaceConversationViewModel : ObservableObject
     public IReadOnlyList<BatchReplaceMatchViewModel> Matches  { get; }
     public int                                 MatchCount => Matches.Count;
 
+    /// The conversation header's count. Replaces a StringFormat='{}{0} match(es)' in
+    /// BatchReplaceWindow.axaml: hard-coded English, and the naive "(es)" idiom that has
+    /// no answer for languages with more than two plural forms. Loc.FormatCount resolves
+    /// the _One/_Other pair the status line already uses.
+    public string MatchCountLabel => Loc.FormatCount("BatchReplace_MatchCount", MatchCount);
+
     [ObservableProperty] private bool _isSelected = true;
 
     public BatchReplaceConversationViewModel(

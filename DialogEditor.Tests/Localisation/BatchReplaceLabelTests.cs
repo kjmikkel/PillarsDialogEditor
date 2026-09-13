@@ -1,5 +1,7 @@
+using System.Globalization;
 using Avalonia.Headless.XUnit;
 using DialogEditor.Avalonia.Shared.Services;
+using DialogEditor.Core.GameData;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Tests.Helpers;
@@ -44,6 +46,58 @@ public class BatchReplaceLabelTests
     {
         Assert.Equal("BatchReplace_Field_ConditionParam",
             Label(new BatchField(BatchFieldKind.ConditionParam, Index: 2, ParamIndex: 3)));
+    }
+
+    [Fact]
+    public void ConversationMatchCountLabel_ComesFromAPluralResource()
+    {
+        // The conversation header rendered StringFormat='{}{0} match(es)' in
+        // BatchReplaceWindow.axaml -- hard-coded English, and the naive "(es)" idiom
+        // that cannot express Polish's four or Arabic's six plural forms. Neither guard
+        // saw it: NoHardcodedUiStringsTests does not scan StringFormat (#35) and
+        // NoNaivePluralTests scans only the two resource dictionaries.
+        Assert.Equal("BatchReplace_MatchCount_One",
+            Conversation(1).MatchCountLabel);
+    }
+
+    private static BatchReplaceConversationViewModel Conversation(int matches) =>
+        new(new ConversationFile("conv", "", "conv.conversation", ""),
+            Enumerable.Range(0, matches)
+                      .Select(i => new BatchReplaceMatchViewModel(
+                          i, new BatchField(BatchFieldKind.DefaultText), "before", "after"))
+                      .ToList());
+}
+
+/// <summary>
+/// Tier two for the conversation header's match count, pinned to en-US: the plural
+/// category is culture-dependent, so the class fixes the culture the way
+/// PluralResourceEndToEndTests does rather than inheriting the machine's.
+/// </summary>
+public class BatchReplaceMatchCountResourceEndToEndTests : IDisposable
+{
+    private readonly CultureInfo _originalCulture = CultureInfo.CurrentUICulture;
+
+    public BatchReplaceMatchCountResourceEndToEndTests()
+    {
+        CultureInfo.CurrentUICulture = new CultureInfo("en-US");
+        Loc.Configure(new AvaloniaStringProvider());
+    }
+
+    public void Dispose() => CultureInfo.CurrentUICulture = _originalCulture;
+
+    [AvaloniaTheory]
+    [InlineData(1, "1 match")]
+    [InlineData(3, "3 matches")]
+    public void MatchCountLabel_UsesRealResources(int matches, string expected)
+    {
+        var conv = new BatchReplaceConversationViewModel(
+            new ConversationFile("conv", "", "conv.conversation", ""),
+            Enumerable.Range(0, matches)
+                      .Select(i => new BatchReplaceMatchViewModel(
+                          i, new BatchField(BatchFieldKind.DefaultText), "before", "after"))
+                      .ToList());
+
+        Assert.Equal(expected, conv.MatchCountLabel);
     }
 }
 
