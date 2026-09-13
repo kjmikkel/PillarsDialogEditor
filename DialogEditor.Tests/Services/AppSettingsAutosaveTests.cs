@@ -45,8 +45,8 @@ public class AppSettingsAutosaveTests : IDisposable
     }
 
     [Fact]
-    public void AutosaveGenerations_DefaultsToThree()
-        => Assert.Equal(3, AppSettings.AutosaveGenerations);
+    public void AutosaveGenerations_DefaultsToOne_TheHistoricalSingleSidecar()
+        => Assert.Equal(1, AppSettings.AutosaveGenerations);
 
     [Fact]
     public void AutosaveGenerations_RoundTrips()

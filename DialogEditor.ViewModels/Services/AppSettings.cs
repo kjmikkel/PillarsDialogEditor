@@ -95,12 +95,11 @@ public static class AppSettings
         // Seconds between autosave ticks; 0 disables autosave entirely. Defaults to
         // the historical fixed 60 s, so an upgrading install keeps the cadence it had.
         public int AutosaveIntervalSeconds { get; set; } = 60;
-        // How many autosave sidecars to keep (1 = the historical single sidecar).
-        // Unlike most knobs here the default CHANGES upgrade behaviour — 3 generations
-        // rather than 1 — because the only observable difference is two extra sidecars
-        // during a dirty session, and shipping rotation off by default would leave the
-        // protection unclaimed by everyone who never opens Settings.
-        public int AutosaveGenerations { get; set; } = 3;
+        // How many autosave sidecars to keep. Defaults to 1 — the historical single
+        // sidecar — for the same reason as the knobs above: an upgrading install sees
+        // exactly the files beside its project that it saw before, and only opts in to
+        // extra sidecars deliberately. Rotation is the capability; using it is a choice.
+        public int AutosaveGenerations { get; set; } = 1;
 
         // MRU list of recently opened/created/saved-as project file paths, newest
         // first, capped at MaxRecentProjects. Powers File ▸ Recent Projects.
