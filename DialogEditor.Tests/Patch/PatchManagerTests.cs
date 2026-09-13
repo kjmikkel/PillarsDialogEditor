@@ -121,6 +121,37 @@ public class ConflictDetectorTests
         var conflicts = ConflictDetector.Detect(projects);
         Assert.NotEmpty(conflicts);
     }
+
+    [Fact]
+    public void Detect_DeleteVsModify_CarriesNoFieldNameAndIsFlaggedAsADeletion()
+    {
+        // The row used to carry the literal "(deleted)" in FieldName, which was both the
+        // text the Patch Manager showed and part of the DistinctBy identity key — so it
+        // could not be localised without making identity language-dependent. The kind is
+        // now data and PatchConflictRowViewModel renders the label.
+        var projects = new[]
+        {
+            ("ModA", new Dictionary<string, ConversationPatch> { ["conv1"] = MakePatch("conv1", 7, "DefaultText", "Old", "New") } as IReadOnlyDictionary<string, ConversationPatch>),
+            ("ModB", new Dictionary<string, ConversationPatch> { ["conv1"] = new ConversationPatch("conv1", 1, [], [7], []) } as IReadOnlyDictionary<string, ConversationPatch>),
+        };
+
+        var c = Assert.Single(ConflictDetector.Detect(projects));
+
+        Assert.Null(c.FieldName);
+        Assert.True(c.IsDeletion);
+    }
+
+    [Fact]
+    public void Detect_FieldConflict_IsNotFlaggedAsADeletion()
+    {
+        var projects = new[]
+        {
+            ("ModA", new Dictionary<string, ConversationPatch> { ["conv1"] = MakePatch("conv1", 5, "DefaultText", "Hello", "Hi") } as IReadOnlyDictionary<string, ConversationPatch>),
+            ("ModB", new Dictionary<string, ConversationPatch> { ["conv1"] = MakePatch("conv1", 5, "DefaultText", "Hello", "Hey") } as IReadOnlyDictionary<string, ConversationPatch>),
+        };
+
+        Assert.False(Assert.Single(ConflictDetector.Detect(projects)).IsDeletion);
+    }
 }
 
 public class PatchMergerTests

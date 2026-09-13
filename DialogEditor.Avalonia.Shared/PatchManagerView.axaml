@@ -166,18 +166,15 @@
             <StackPanel Spacing="4">
                 <TextBlock Text="{Binding StatusText}"
                            Foreground="{DynamicResource Brush.Severity.Warning}" FontSize="{DynamicResource FontSize.Label}" FontWeight="SemiBold"/>
-                <ItemsControl ItemsSource="{Binding Conflicts}">
+                <ItemsControl x:Name="ConflictList" ItemsSource="{Binding Conflicts}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <TextBlock FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.Muted.Light}">
-                                <TextBlock.Text>
-                                    <MultiBinding StringFormat="  conversation '{0}' · node {1} · {2}">
-                                        <Binding Path="ConversationName"/>
-                                        <Binding Path="NodeId"/>
-                                        <Binding Path="FieldName"/>
-                                    </MultiBinding>
-                                </TextBlock.Text>
-                            </TextBlock>
+                            <!-- One resource, not a MultiBinding StringFormat: the whole
+                                 line is prose a translator must be able to reorder, and
+                                 the field slot is a localised marker for a delete-vs-
+                                 modify conflict. See PatchConflictRowViewModel. -->
+                            <TextBlock Text="{Binding Description}" Margin="10,0,0,0"
+                                       FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.Muted.Light}"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>

@@ -17,18 +17,36 @@ public partial class ConflictRowViewModel : ObservableObject
     public string TheirsLabel { get; }
 
     public MergeConflictKind Kind        => Conflict.Kind;
-    public string            MineValue   => Describe(Conflict.MineCounts,   Conflict.MineValue);
-    public string            TheirsValue => Describe(Conflict.TheirsCounts, Conflict.TheirsValue);
+    public string            MineValue   => Describe(MergeSide.Mine,   Conflict.MineCounts,   Conflict.MineValue);
+    public string            TheirsValue => Describe(MergeSide.Theirs, Conflict.TheirsCounts, Conflict.TheirsValue);
 
-    /// A whole-conversation conflict is too broad to show as a value, so the analyzer
-    /// reports counts and we render them here. Every other kind carries real content
-    /// (a JSON field value, the differing translation) and passes straight through.
-    private static string Describe(PatchCounts? counts, string raw) =>
-        counts is null
+    /// Three cases have no displayable value on a side, so the analyzer reports data and
+    /// we render it here (DialogEditor.Patch references only Core and cannot reach Loc):
+    /// the side that deleted the node in a delete-vs-edit conflict; the side that kept it
+    /// when its patch names no fields to list; and a whole-conversation conflict, which
+    /// is too broad to show and is summarised from counts. Every other kind carries real
+    /// content (a JSON field value, the differing translation) and passes straight
+    /// through.
+    private string Describe(MergeSide side, PatchCounts? counts, string raw)
+    {
+        if (Conflict.DeletedSide == side)
+            return Loc.Get("GitConflict_DeletedValue");
+
+        // EditSummary describes the OTHER side of a delete-vs-edit conflict, i.e. this
+        // one whenever a side deleted and it was not this one.
+        if (Conflict.DeletedSide is not null)
+            switch (Conflict.EditSummary)
+            {
+                case MergeEditSummary.Added:    return Loc.Get("GitConflict_AddedValue");
+                case MergeEditSummary.Modified: return Loc.Get("GitConflict_ModifiedValue");
+            }
+
+        return counts is null
             ? raw
             : Loc.Format("GitConflict_PatchSummary",
                   counts.AddedNodes, counts.ModifiedNodes,
                   counts.DeletedNodes, counts.TextChanges);
+    }
 
     public string MineFemaleValue   => Conflict.MineFemaleValue;
     public string TheirsFemaleValue => Conflict.TheirsFemaleValue;
@@ -97,7 +115,7 @@ public partial class ConflictRowViewModel : ObservableObject
 
     private static (string Mine, string Theirs) Labels(MergeConflict c) => c.Kind switch
     {
-        MergeConflictKind.DeleteVsEdit when c.MineValue == MergeConflict.DeletedMarker
+        MergeConflictKind.DeleteVsEdit when c.DeletedSide == MergeSide.Mine
             => (Loc.Get("GitConflict_AcceptDeletion"), Loc.Get("GitConflict_KeepEdit")),
         MergeConflictKind.DeleteVsEdit
             => (Loc.Get("GitConflict_KeepEdit"), Loc.Get("GitConflict_AcceptDeletion")),
