@@ -20,20 +20,33 @@ public partial class ConflictRowViewModel : ObservableObject
     public string            MineValue   => Describe(MergeSide.Mine,   Conflict.MineCounts,   Conflict.MineValue);
     public string            TheirsValue => Describe(MergeSide.Theirs, Conflict.TheirsCounts, Conflict.TheirsValue);
 
-    /// Two cases have no displayable value on a side, so the analyzer reports data and
+    /// Three cases have no displayable value on a side, so the analyzer reports data and
     /// we render it here (DialogEditor.Patch references only Core and cannot reach Loc):
-    /// the side that deleted the node in a delete-vs-edit conflict, and a
-    /// whole-conversation conflict, which is too broad to show and is summarised from
-    /// counts. Every other kind carries real content (a JSON field value, the differing
-    /// translation) and passes straight through.
-    private string Describe(MergeSide side, PatchCounts? counts, string raw) =>
-        Conflict.DeletedSide == side
-            ? Loc.Get("GitConflict_DeletedValue")
-            : counts is null
-                ? raw
-                : Loc.Format("GitConflict_PatchSummary",
-                      counts.AddedNodes, counts.ModifiedNodes,
-                      counts.DeletedNodes, counts.TextChanges);
+    /// the side that deleted the node in a delete-vs-edit conflict; the side that kept it
+    /// when its patch names no fields to list; and a whole-conversation conflict, which
+    /// is too broad to show and is summarised from counts. Every other kind carries real
+    /// content (a JSON field value, the differing translation) and passes straight
+    /// through.
+    private string Describe(MergeSide side, PatchCounts? counts, string raw)
+    {
+        if (Conflict.DeletedSide == side)
+            return Loc.Get("GitConflict_DeletedValue");
+
+        // EditSummary describes the OTHER side of a delete-vs-edit conflict, i.e. this
+        // one whenever a side deleted and it was not this one.
+        if (Conflict.DeletedSide is not null)
+            switch (Conflict.EditSummary)
+            {
+                case MergeEditSummary.Added:    return Loc.Get("GitConflict_AddedValue");
+                case MergeEditSummary.Modified: return Loc.Get("GitConflict_ModifiedValue");
+            }
+
+        return counts is null
+            ? raw
+            : Loc.Format("GitConflict_PatchSummary",
+                  counts.AddedNodes, counts.ModifiedNodes,
+                  counts.DeletedNodes, counts.TextChanges);
+    }
 
     public string MineFemaleValue   => Conflict.MineFemaleValue;
     public string TheirsFemaleValue => Conflict.TheirsFemaleValue;

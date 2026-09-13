@@ -115,6 +115,13 @@ public static class HardcodedStringScanner
 
     private static readonly Regex Word = new(@"[A-Za-z]{3,}", RegexOptions.Compiled);
 
+    // "(deleted)", "(none)", "(no speaker)" — a label shown in place of a missing value.
+    // The one single-word shape that is reliably UI text: identifiers, resource keys and
+    // glyphs are never written in parentheses. Letters and spaces only inside, or regex
+    // capture groups, bracketed holes ("({0})") and version fragments flood in.
+    private static readonly Regex ParentheticalPlaceholder = new(
+        @"^\([A-Za-z][A-Za-z ]*\)$", RegexOptions.Compiled);
+
     /// <summary>
     /// THE PREDICATE — the judgement call about what counts as user-visible prose.
     /// Anything it returns true for must flow through Loc, or sit under a declaration
@@ -125,6 +132,12 @@ public static class HardcodedStringScanner
     /// sentence from an identifier — it keeps "Node {0} — {1}" and "Default Text" while
     /// dropping "node_{0}", "Speaker_Guid" and "utf-8".
     ///
+    /// One shape gets in without a space: a parenthesised word. A space is only a proxy
+    /// for "this is a sentence", and it missed the "(deleted)" marker in both
+    /// PatchConflict and MergeConflict — a placeholder standing in for a missing value is
+    /// prose, however short. Parentheses are the signal; nothing else single-word is
+    /// admitted, because a bare word is as likely to be a field name as a label.
+    ///
     /// TUNING POINT: widen or narrow here. Every change is covered by the table of
     /// HardcodedStringScannerTests cases, including one that pins the FlowIssueViewModel
     /// bug shape so tightening can never silently re-open it.
@@ -132,7 +145,8 @@ public static class HardcodedStringScanner
     public static bool LooksLikeUserVisibleText(string literal)
     {
         if (literal.Length < 4) return false;
-        if (!literal.Contains(' ')) return false;          // identifier, key, or glyph
+        if (!literal.Contains(' ')
+            && !ParentheticalPlaceholder.IsMatch(literal)) return false;  // identifier, key, or glyph
         if (!Word.IsMatch(literal)) return false;          // no real word in it
         if (literal.Any(c => c is '\"' or '\n')) return false;   // data template
         if (AssemblyQualifiedName.IsMatch(literal)) return false;

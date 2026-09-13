@@ -106,6 +106,42 @@ public class GitMergeAnalyzerTests
     }
 
     [Fact]
+    public void DeleteVsEdit_EditingSideAddedTheNode_ReportsTheSummaryAsData()
+    {
+        // The editing side's value used to be the literal "(added)" when the patch names
+        // no fields. Same defect as the deleting side's "(deleted)": DialogEditor.Patch
+        // cannot reach Loc, so the word has to travel as data.
+        var c = Assert.Single(GitMergeAnalyzer.Analyze(
+            ProjectWithDeletion(4), ProjectWithAddedNode(Node(4))));
+
+        Assert.Equal(MergeEditSummary.Added, c.EditSummary);
+        Assert.Equal("", c.TheirsValue);
+    }
+
+    [Fact]
+    public void DeleteVsEdit_EditingSideModifiedNothingNameable_ReportsModifiedSummary()
+    {
+        var theirs = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion,
+                [], [], [new NodeModification(4, new Dictionary<string, FieldChange>(), [], [])]));
+
+        var c = Assert.Single(GitMergeAnalyzer.Analyze(ProjectWithDeletion(4), theirs));
+
+        Assert.Equal(MergeEditSummary.Modified, c.EditSummary);
+        Assert.Equal("", c.TheirsValue);
+    }
+
+    [Fact]
+    public void DeleteVsEdit_EditingSideNamesItsFields_HasNoSummary()
+    {
+        var c = Assert.Single(GitMergeAnalyzer.Analyze(
+            ProjectWithDeletion(4), ProjectWithFieldChange(4, "DefaultText", "edited")));
+
+        Assert.Null(c.EditSummary);
+        Assert.Equal("DefaultText", c.TheirsValue);
+    }
+
+    [Fact]
     public void NonDeleteConflicts_HaveNoDeletedSide()
     {
         var c = Assert.Single(GitMergeAnalyzer.Analyze(

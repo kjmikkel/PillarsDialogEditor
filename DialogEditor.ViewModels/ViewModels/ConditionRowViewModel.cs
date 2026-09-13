@@ -1,5 +1,6 @@
 ﻿using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using DialogEditor.Core.Localisation;
 using DialogEditor.Core.Models;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
@@ -140,6 +141,8 @@ public partial class ConditionRowViewModel : ObservableObject
     public ObservableCollection<ParameterValueViewModel> Parameters { get; }
 
     /// Constructor for ConditionBranch pass-through rows.
+    [NotLocalised("FullName is a C# reflection signature, not a label; a branch row has "
+                + "none, and the UI shows DisplayName (the formatted branch) instead")]
     public ConditionRowViewModel(ConditionBranch branch)
     {
         IsLeaf    = false;

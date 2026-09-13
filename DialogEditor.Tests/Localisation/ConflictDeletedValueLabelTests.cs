@@ -41,6 +41,39 @@ public class ConflictDeletedValueLabelTests
     }
 
     [Fact]
+    public void EditingSideAdded_ItsValueComesFromResources()
+    {
+        Loc.Configure(new StubStringProvider());
+        var row = new ConflictRowViewModel(
+            new MergeConflict(MergeConflictKind.DeleteVsEdit, "conv", 4, null, "", "")
+            { DeletedSide = MergeSide.Mine, EditSummary = MergeEditSummary.Added });
+
+        Assert.Equal("GitConflict_DeletedValue", row.MineValue);
+        Assert.Equal("GitConflict_AddedValue",   row.TheirsValue);
+    }
+
+    [Fact]
+    public void EditingSideModified_ItsValueComesFromResources()
+    {
+        Loc.Configure(new StubStringProvider());
+        var row = new ConflictRowViewModel(
+            new MergeConflict(MergeConflictKind.DeleteVsEdit, "conv", 4, null, "", "")
+            { DeletedSide = MergeSide.Theirs, EditSummary = MergeEditSummary.Modified });
+
+        Assert.Equal("GitConflict_ModifiedValue", row.MineValue);
+        Assert.Equal("GitConflict_DeletedValue",  row.TheirsValue);
+    }
+
+    [Fact]
+    public void EditingSideNamedItsFields_ValuePassesThrough()
+    {
+        Loc.Configure(new StubStringProvider());
+        var row = new ConflictRowViewModel(DeleteVsEdit(MergeSide.Mine, "", "DefaultText"));
+
+        Assert.Equal("DefaultText", row.TheirsValue);
+    }
+
+    [Fact]
     public void MineDeletes_MineIsTheAcceptDeletionChoice()
     {
         Loc.Configure(new StubStringProvider());
@@ -73,5 +106,19 @@ public class ConflictDeletedValueResourceEndToEndTests
             { DeletedSide = MergeSide.Mine });
 
         Assert.Equal("(deleted)", row.MineValue);
+    }
+
+    [AvaloniaFact]
+    public void AddedAndModifiedSummaries_RenderFromStringsAxaml()
+    {
+        var added = new ConflictRowViewModel(
+            new MergeConflict(MergeConflictKind.DeleteVsEdit, "conv", 4, null, "", "")
+            { DeletedSide = MergeSide.Mine, EditSummary = MergeEditSummary.Added });
+        var modified = new ConflictRowViewModel(
+            new MergeConflict(MergeConflictKind.DeleteVsEdit, "conv", 4, null, "", "")
+            { DeletedSide = MergeSide.Mine, EditSummary = MergeEditSummary.Modified });
+
+        Assert.Equal("(added)",    added.TheirsValue);
+        Assert.Equal("(modified)", modified.TheirsValue);
     }
 }
