@@ -70,3 +70,106 @@ public class AutosaveRecoveryTests : IDisposable
         AutosaveRecovery.TryDelete(ProjectPath); // absent → no throw
     }
 }
+
+/// Rotating autosave generations (issue #11). Generation 1 deliberately keeps the
+/// historical `.autosave` name so a sidecar written before the upgrade is still found.
+public class AutosaveRecoveryGenerationTests : IDisposable
+{
+    private readonly string _dir;
+    private string ProjectPath => Path.Combine(_dir, "p.dialogproject");
+
+    public AutosaveRecoveryGenerationTests()
+    {
+        _dir = Path.Combine(Path.GetTempPath(), $"autogen_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(_dir);
+    }
+
+    public void Dispose()
+    {
+        try { Directory.Delete(_dir, recursive: true); } catch (Exception) { /* best-effort */ }
+    }
+
+    private string Gen(int n) => AutosaveRecovery.GenerationPath(ProjectPath, n);
+    private void Write(int n, string content) => File.WriteAllText(Gen(n), content);
+    private string? ReadOrNull(int n) => File.Exists(Gen(n)) ? File.ReadAllText(Gen(n)) : null;
+
+    [Fact]
+    public void GenerationPath_One_IsTheLegacySidecarPath()
+        => Assert.Equal(AutosaveRecovery.SidecarPath(ProjectPath), Gen(1));
+
+    [Fact]
+    public void GenerationPath_BeyondOne_AppendsTheNumber()
+    {
+        Assert.Equal(ProjectPath + ".autosave.2", Gen(2));
+        Assert.Equal(ProjectPath + ".autosave.3", Gen(3));
+    }
+
+    [Fact]
+    public void Rotate_ShiftsEachGenerationDownAndFreesGenerationOne()
+    {
+        Write(1, "newest");
+        Write(2, "older");
+        AutosaveRecovery.Rotate(ProjectPath, keep: 3);
+        Assert.Null(ReadOrNull(1));          // freed for the incoming write
+        Assert.Equal("newest", ReadOrNull(2));
+        Assert.Equal("older",  ReadOrNull(3));
+    }
+
+    [Fact]
+    public void Rotate_DropsTheOldestBeyondKeep()
+    {
+        Write(1, "a");
+        Write(2, "b");
+        Write(3, "c");
+        AutosaveRecovery.Rotate(ProjectPath, keep: 3);
+        Assert.Equal("a", ReadOrNull(2));
+        Assert.Equal("b", ReadOrNull(3));
+        Assert.Null(ReadOrNull(4));          // "c" dropped, nothing spilled past keep
+    }
+
+    [Fact]
+    public void Rotate_KeepOne_JustClearsGenerationOne()
+    {
+        Write(1, "a");
+        AutosaveRecovery.Rotate(ProjectPath, keep: 1);
+        Assert.Null(ReadOrNull(1));
+        Assert.Null(ReadOrNull(2));          // no rotation happens at keep: 1
+    }
+
+    [Fact]
+    public void Rotate_ToleratesGapsAndAbsentGenerations()
+    {
+        Write(3, "only-an-old-one");
+        AutosaveRecovery.Rotate(ProjectPath, keep: 5);   // no throw
+        Assert.Equal("only-an-old-one", ReadOrNull(4));
+    }
+
+    [Fact]
+    public void Rotate_NoGenerationsAtAll_DoesNothing()
+    {
+        AutosaveRecovery.Rotate(ProjectPath, keep: 3);   // no throw, no files created
+        Assert.Empty(Directory.GetFiles(_dir));
+    }
+
+    [Fact]
+    public void TryDelete_RemovesEveryGeneration_NotJustTheNewest()
+    {
+        // Written beyond any plausible `keep` so lowering the setting can't strand files.
+        for (var n = 1; n <= 10; n++) Write(n, "x");
+        AutosaveRecovery.TryDelete(ProjectPath);
+        Assert.Empty(Directory.GetFiles(_dir));
+    }
+
+    [Fact]
+    public void Check_StillReadsGenerationOne_WhenOlderGenerationsExist()
+    {
+        File.WriteAllText(ProjectPath, "{}");
+        Write(1, "{}");
+        Write(2, "{}");
+        File.SetLastWriteTimeUtc(ProjectPath, DateTime.UtcNow.AddMinutes(-10));
+        File.SetLastWriteTimeUtc(Gen(1),      DateTime.UtcNow.AddMinutes(-1));
+        var r = AutosaveRecovery.Check(ProjectPath);
+        Assert.Equal(AutosaveState.Newer, r.State);
+        Assert.Equal(Gen(1), r.SidecarPath);
+    }
+}

@@ -86,6 +86,43 @@
                 </ComboBox>
             </DockPanel>
 
+            <!-- Autosave (issue #11). Both apply immediately: the interval reschedules
+                 the running timer via IAutosaveScheduler, and the generation count only
+                 affects what the next tick writes. -->
+            <DockPanel ToolTip.Tip="{DynamicResource Settings_AutosaveIntervalTooltip}">
+                <TextBlock Classes="label" Text="{DynamicResource Settings_AutosaveInterval}"/>
+                <ComboBox x:Name="AutosaveIntervalComboBox"
+                          ItemsSource="{Binding AutosaveIntervalOptions}"
+                          SelectedItem="{Binding SelectedAutosaveInterval, Mode=TwoWay}"
+                          MinWidth="120"
+                          ToolTip.Tip="{DynamicResource Settings_AutosaveIntervalTooltip}"
+                          AutomationProperties.HelpText="{DynamicResource Settings_AutosaveIntervalTooltip}"
+                          AutomationProperties.Name="{DynamicResource Settings_AutosaveInterval}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource AutosaveInterval}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </DockPanel>
+
+            <DockPanel ToolTip.Tip="{DynamicResource Settings_AutosaveGenerationsTooltip}">
+                <TextBlock Classes="label" Text="{DynamicResource Settings_AutosaveGenerations}"/>
+                <ComboBox x:Name="AutosaveGenerationsComboBox"
+                          ItemsSource="{Binding AutosaveGenerationOptions}"
+                          SelectedItem="{Binding SelectedAutosaveGenerations, Mode=TwoWay}"
+                          MinWidth="120"
+                          ToolTip.Tip="{DynamicResource Settings_AutosaveGenerationsTooltip}"
+                          AutomationProperties.HelpText="{DynamicResource Settings_AutosaveGenerationsTooltip}"
+                          AutomationProperties.Name="{DynamicResource Settings_AutosaveGenerations}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource AutosaveGenerations}}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </DockPanel>
+
             <!-- Font scale live preview: independent of the static FontSize.* tokens,
                  so it reflects the *selected* (not-yet-applied) scale immediately. -->
             <Border BorderBrush="{DynamicResource Brush.Border.Default}" BorderThickness="1" CornerRadius="3"
