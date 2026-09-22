@@ -60,7 +60,7 @@ public static class DuplicateLineScanner
     private const double MinNearThreshold = 0.50;
     private const double MaxNearThreshold = 0.99;
 
-    private const int MinWords = 4;
+    internal const int MinWords = 4;
 
     private static readonly Regex Whitespace = new(@"\s+", RegexOptions.Compiled);
 
@@ -191,9 +191,9 @@ public static class DuplicateLineScanner
         }
     }
 
-    private static string Normalize(string s) => Whitespace.Replace(s.Trim(), " ").ToLowerInvariant();
+    internal static string Normalize(string s) => Whitespace.Replace(s.Trim(), " ").ToLowerInvariant();
 
-    private static int WordCount(string normalized) =>
+    internal static int WordCount(string normalized) =>
         normalized.Length == 0 ? 0 : normalized.Split(' ').Length;
 
     private static string NearKey(string a, string b) => a + " " + b;   // a,b already sorted

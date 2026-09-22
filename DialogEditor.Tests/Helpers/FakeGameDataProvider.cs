@@ -22,10 +22,17 @@ public sealed class FakeGameDataProvider : IGameDataProvider
     public IReadOnlyList<string> AvailableLanguages => [Language];
     public string Language { get; set; }
 
+    /// Conversations whose load throws — lets whole-game scanners prove they skip a
+    /// broken file instead of aborting.
+    public HashSet<string> Unreadable { get; } = [];
+
     public IReadOnlyList<ConversationFile> EnumerateConversations()
         => _conversations.Keys.Select(BuildNewConversationFile).ToList();
 
-    public Conversation LoadConversation(ConversationFile file) => _conversations[file.Name];
+    public Conversation LoadConversation(ConversationFile file) =>
+        Unreadable.Contains(file.Name)
+            ? throw new InvalidDataException($"unreadable: {file.Name}")
+            : _conversations[file.Name];
 
     public ConversationFile BuildNewConversationFile(string name)
         => new(name, "conversations",
