@@ -198,7 +198,7 @@ public static class DuplicateLineScanner
 
     private static string NearKey(string a, string b) => a + " " + b;   // a,b already sorted
 
-    private static double Ratio(string a, string b)
+    internal static double Ratio(string a, string b)
     {
         var max = Math.Max(a.Length, b.Length);
         if (max == 0) return 1.0;
