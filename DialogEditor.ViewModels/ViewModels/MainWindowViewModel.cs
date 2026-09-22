@@ -568,10 +568,10 @@ public partial class MainWindowViewModel : ObservableObject
 
         // Scan scope and threshold come from the window (issue #14), so the writer can
         // widen or tighten the sweep and see the report change without leaving it.
-        Func<DuplicateScanOptions, DuplicateLineReport> dupScan = options =>
+        Func<DuplicateScanOptions, IReadOnlyList<VanillaLine>?, DuplicateLineReport> dupScan = (options, vanilla) =>
             _project is null
                 ? new DuplicateLineReport([], [])
-                : DuplicateLineScanner.Scan(_project, _provider?.Language ?? "", options);
+                : DuplicateLineScanner.Scan(_project, _provider?.Language ?? "", options, vanilla);
 
         Func<IReadOnlyList<IgnoredDuplicate>> ignoredList = () =>
             _project?.IgnoredDuplicates ?? [];

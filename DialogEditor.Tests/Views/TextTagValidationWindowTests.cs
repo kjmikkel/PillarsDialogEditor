@@ -57,7 +57,7 @@ public class TextTagValidationWindowTests
         var seen = new List<double>();
         var vm = new TextTagValidationViewModel(
             scan: () => [],
-            dupScan: o => { seen.Add(o.NearThreshold); return new DuplicateLineReport([], []); });
+            dupScan: (o, _) => { seen.Add(o.NearThreshold); return new DuplicateLineReport([], []); });
 
         var window = new TextTagValidationWindow(vm);
         window.Show();
@@ -82,7 +82,7 @@ public class TextTagValidationWindowTests
         var seen = new List<DuplicateScanOptions>();
         var vm = new TextTagValidationViewModel(
             scan: () => [],
-            dupScan: o => { seen.Add(o); return new DuplicateLineReport([], []); });
+            dupScan: (o, _) => { seen.Add(o); return new DuplicateLineReport([], []); });
 
         var window = new TextTagValidationWindow(vm);
         window.Show();

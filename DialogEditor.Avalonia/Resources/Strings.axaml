@@ -663,6 +663,10 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- {0} is a language code, e.g. "de". Shown when a hit comes from the female
          variant of a non-primary translation. -->
     <sys:String x:Key="Duplicate_Source_LanguageFemale">{0} female</sys:String>
+    <!-- Shown in place of the language marker when a duplicate member is a line from the
+         installed game rather than the project (issue #14). -->
+    <sys:String x:Key="Duplicate_Source_BaseGame">base game</sys:String>
+    <sys:String x:Key="Duplicate_Source_BaseGameFemale">base game, female</sys:String>
     <sys:String x:Key="Duplicate_ThresholdTooltip">How alike two lines must be before they are reported as near-duplicates. Lower this to catch lines you edited more heavily; raise it if the report is showing pairs you consider genuinely different. Exact duplicates are always reported regardless of this setting. The report re-scans as soon as you change this, and the choice is saved.</sys:String>
     <sys:String x:Key="Duplicate_Ignored_SectionHeader">Ignored duplicates</sys:String>
     <sys:String x:Key="Button_Ignore">Ignore</sys:String>
