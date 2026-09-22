@@ -52,13 +52,15 @@ public record VanillaLine(string ConversationName, int NodeId, string Text, bool
 public static class VanillaLineCorpus
 {
     public static IReadOnlyList<VanillaLine> Load(
-        IGameDataProvider provider, string primaryLanguage, CancellationToken ct = default);
+        IGameDataProvider provider, CancellationToken ct = default);
 }
 ```
 
-- Walks `provider.EnumerateConversations()`, loads each conversation, and builds its snapshot
-  (`ConversationSnapshotBuilder.Build`) — the `SpeakerLineScanner` walk, minus patch
-  application: the corpus is the game as it is on disk.
+- Walks `provider.EnumerateConversations()`, loads each conversation, and reads each node's
+  entry from `conversation.Strings` — the `SpeakerLineScanner` walk, minus patch application:
+  the corpus is the game as it is on disk. The provider loads in its current `Language`, which
+  is the project's primary language (`MainWindowViewModel` passes `_provider.Language` as
+  primary everywhere), so no language parameter is needed.
 - Emits Default text and, when non-blank, Female text (both always; the scan decides whether
   to use Female — so toggling female text never forces a reload).
 - Filters at load time with the scanner's own rules: blank lines and lines under **4 words**
@@ -70,9 +72,12 @@ public static class VanillaLineCorpus
 
 ## Exclusions (recomputed on every scan)
 
-A vanilla line at `(conversation, nodeId)` is dropped when the project **adds or modifies**
-that node — i.e. the node is in `patch.AddedNodes`, `patch.ModifiedNodes`, or has an entry in
-any `patch.Translations` list. This covers two cases with one rule:
+A vanilla line at `(conversation, nodeId)` is dropped when the project **owns that node's
+text** — i.e. the node is in `patch.AddedNodes` or has an entry in any `patch.Translations`
+list (the DiffEngine records every added or edited node's text there). A node in
+`patch.ModifiedNodes` with *no* translation entry had only structural edits (links, scripts);
+its text is still genuinely vanilla, so it stays in the corpus — a writer line copying it is a
+real finding. This covers two cases with one rule:
 
 - **The writer's own original.** An edited node's vanilla text is not a finding against the
   writer's version of it (scope decision 4).
@@ -108,8 +113,11 @@ ignore entries behave identically. Vanilla members are sorted after writer membe
 ### Near tier
 
 1. **Writer vs writer** — the existing length-blocked pairwise pass, unchanged.
-2. **Writer vs vanilla** — for each writer primary-language candidate not in an exact group,
-   query the `QGramIndex` built over vanilla candidates not in an exact group, then run
+2. **Writer vs vanilla** — vanilla candidates not in a reported exact group are first
+   collapsed to one representative per normalized text (lowest conversation/node), so two
+   identical vanilla lines never yield two rows for the same writer line — and the index
+   shrinks. For each writer primary-language candidate not in an exact group, query the
+   `QGramIndex` built over those representatives, then run
    `Ratio` only on the returned candidates. Same threshold, same ignore-key check, same
    `NearDuplicatePair` shape with `A` = the writer line and `B` = the vanilla line.
 3. **No vanilla vs vanilla pass.**
@@ -184,9 +192,11 @@ needs to be seconds-scale, not instant.
   `TextTagValidationWindow` gains an `OnClosed` override that calls it (the window has no
   close handling today). `OperationCanceledException` is swallowed silently.
 - **Load failure:** any other exception is logged with `AppLog.Error`; the cached corpus stays
-  empty-and-unloaded (so the next toggle / Refresh retries), the scan runs writer-only, and
-  `DuplicateSummaryText` shows `Duplicate_BaseGameLoadFailed` ("Couldn't read the base game's
-  lines — showing your own lines only.") alongside the normal count.
+  unloaded (so the next toggle / Refresh retries), the scan runs writer-only, and a new
+  observable `BaseGameLoadFailed` becomes true. The window shows
+  `Duplicate_BaseGameLoadFailed` ("Couldn't read the base game's lines — only your own lines
+  were compared.") under the toggles while it is set. (`DuplicateSummaryText` is not bound in
+  the window, so it cannot carry this.)
 
 ## Wiring — `MainWindowViewModel`
 
@@ -229,6 +239,9 @@ In the `TextTagValidationViewModel` construction (the existing
 - Two identical vanilla lines and no writer line → nothing reported.
 - An edited node's own vanilla original → excluded.
 - An added node present on disk (pack already applied) → excluded.
+- A node in `ModifiedNodes` with no translation entry (structural edit only) → *not*
+  excluded; a writer line copying its text is reported.
+- Two identical vanilla lines near one writer line → exactly one near pair.
 - Ignore entries suppress vanilla findings (exact key and near key pair).
 - Vanilla Female lines are used only when `IncludeFemaleText` is on.
 - `IncludeBaseGame` off, or `vanilla` null → report identical to today's.
@@ -245,7 +258,8 @@ In the `TextTagValidationViewModel` construction (the existing
   the cached corpus.
 - `IsLoadingBaseGame` is true during the load and false after.
 - A superseded generation's result is discarded (controlled `TaskCompletionSource` loader).
-- A throwing loader → failure summary text, writer-only rows still shown, next toggle retries.
+- A throwing loader → `BaseGameLoadFailed` true, writer-only rows still shown, next toggle
+  retries (and clears the flag on success).
 - `IncludeBaseGame` round-trips through `persistDuplicateOptions`.
 - Existing constructor calls remain valid apart from the mechanical `dupScan` lambda update.
 
