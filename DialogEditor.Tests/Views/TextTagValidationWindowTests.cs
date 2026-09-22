@@ -106,4 +106,34 @@ public class TextTagValidationWindowTests
 
         window.Close();
     }
+
+    [AvaloniaFact]
+    public void Window_BaseGameCheckBox_HasTooltip_AndIsDisabledWithoutLoader()
+    {
+        var vm = new TextTagValidationViewModel(scan: () => [], dupScan: (_, _) => new([], []));
+        var window = new TextTagValidationWindow(vm);
+        window.Show();
+
+        var box = window.FindControl<CheckBox>("IncludeBaseGameCheckBox");
+        Assert.NotNull(box);
+        Assert.False(box!.IsEnabled);
+        Assert.NotNull(ToolTip.GetTip(box));
+        Assert.NotNull(window.FindControl<ProgressBar>("BaseGameProgressBar"));
+
+        window.Close();
+    }
+
+    [AvaloniaFact]
+    public void Window_BaseGameCheckBox_EnabledWithLoader()
+    {
+        var vm = new TextTagValidationViewModel(
+            scan: () => [], dupScan: (_, _) => new([], []),
+            loadVanilla: _ => Task.FromResult<IReadOnlyList<VanillaLine>>([]));
+        var window = new TextTagValidationWindow(vm);
+        window.Show();
+
+        Assert.True(window.FindControl<CheckBox>("IncludeBaseGameCheckBox")!.IsEnabled);
+
+        window.Close();
+    }
 }

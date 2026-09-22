@@ -86,6 +86,9 @@ public static class AppSettings
         // upgrading install sees exactly the report it saw before.
         public bool DuplicateIncludeFemaleText { get; set; }
         public bool DuplicateIncludeOtherLanguages { get; set; }
+        // Base-game comparison (issue #14). Default false: it reads the whole game, so an
+        // upgrading install should not start paying for it unasked.
+        public bool DuplicateIncludeBaseGame { get; set; }
         // Whether path stats follow StartConversation handoffs (issue #14). Default false
         // for the same reason as the two above: an upgrading install sees the report it saw
         // before, and only opts in to the larger figures deliberately.
@@ -304,6 +307,13 @@ public static class AppSettings
     {
         get => Load().DuplicateIncludeOtherLanguages;
         set { var s = Load(); s.DuplicateIncludeOtherLanguages = value; Save(s); }
+    }
+
+    /// Whether the duplicate sweep also compares against the installed game's lines.
+    public static bool DuplicateIncludeBaseGame
+    {
+        get => Load().DuplicateIncludeBaseGame;
+        set { var s = Load(); s.DuplicateIncludeBaseGame = value; Save(s); }
     }
 
     public static bool ThemeOnboardingSeen
