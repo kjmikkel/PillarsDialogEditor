@@ -9,7 +9,11 @@ namespace DialogEditor.ViewModels.Services;
 /// </summary>
 public static class AppLog
 {
-    public static readonly string LogPath = Path.Combine(
+    // Process-wide, deliberately a plain static rather than AsyncLocal (same reasoning as
+    // AppSettings.DefaultSettingsPath): the test assembly's module initializer redirects it
+    // to a per-run temp file, and an AsyncLocal set there would not flow into the execution
+    // contexts xUnit runs tests on. Settable only so tests never append to the user's real log.
+    public static string LogPath { get; internal set; } = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "PillarsDialogEditor", "app.log");
 
