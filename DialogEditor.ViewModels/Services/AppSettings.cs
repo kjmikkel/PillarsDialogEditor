@@ -12,7 +12,12 @@ public record PendingRestoreEntry(
 
 public static class AppSettings
 {
-    private static readonly string _defaultSettingsPath = Path.Combine(
+    // Process-wide fallback used whenever no per-flow override is set. Deliberately a
+    // plain static rather than AsyncLocal: the test assembly's module initializer
+    // redirects it to a per-run temp file, and an AsyncLocal set there would not flow
+    // into the execution contexts xUnit runs tests on. Tests that reset
+    // SettingsPathOverride to null therefore land here — never on the user's real file.
+    internal static string DefaultSettingsPath { get; set; } = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "PillarsDialogEditor", "settings.json");
 
@@ -24,7 +29,7 @@ public static class AppSettings
         set => _settingsPathOverride.Value = value;
     }
 
-    private static string SettingsPath => SettingsPathOverride ?? _defaultSettingsPath;
+    private static string SettingsPath => SettingsPathOverride ?? DefaultSettingsPath;
 
     private sealed class SettingsData
     {
