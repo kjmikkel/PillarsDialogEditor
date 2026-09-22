@@ -2,6 +2,7 @@ using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
 using DialogEditor.Patch.Diff;
+using DialogEditor.Tests.Helpers;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -27,55 +28,31 @@ public class ProjectBlameServiceRealGitTests(ITestOutputHelper output)
             new Dictionary<string, ConversationPatch> { ["greeting"] = patch });
     }
 
-    private static bool GitAvailable(IGitRunner git, string dir)
-    {
-        try { return git.Run(dir, "--version").Ok; }
-        catch (DiffException) { return false; }
-    }
-
     [Fact]
     public void RealGitBlame_AttributesNodeToLatestCommit()
     {
-        var git = new ProcessGitRunner();
-        var dir = Path.Combine(Path.GetTempPath(), "blamesmoke_" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(dir);
-        var path = Path.Combine(dir, "m.dialogproject");
+        using var repo = TempGitRepo.TryCreate();
+        if (repo is null) return;   // no git on this machine — skip
+        var path = repo.PathOf("m.dialogproject");
 
-        try
-        {
-            if (!GitAvailable(git, dir)) return;   // no git on this machine — skip
+        repo.SetAuthor("Ann", "ann@example.com");
+        // The file is saved with a UTF-8 BOM (Encoding.UTF8); blame must survive it.
+        DialogProjectSerializer.SaveToFile(path, Project("Hi"));
+        repo.CommitAll("Add greeting", new DateTimeOffset(2026, 1, 1, 10, 0, 0, TimeSpan.Zero));
 
-            Assert.True(git.Run(dir, "init").Ok);
-            git.Run(dir, "config", "user.email", "ann@example.com");
-            git.Run(dir, "config", "user.name", "Ann");
+        // Second commit by a different author changes the node's text.
+        repo.SetAuthor("Bob", "bob@example.com");
+        DialogProjectSerializer.SaveToFile(path, Project("Hello there"));
+        repo.CommitAll("Reword greeting", new DateTimeOffset(2026, 2, 1, 10, 0, 0, TimeSpan.Zero));
 
-            // The file is saved with a UTF-8 BOM (Encoding.UTF8); blame must survive it.
-            DialogProjectSerializer.SaveToFile(path, Project("Hi"));
-            Assert.True(git.Run(dir, "add", "-A").Ok);
-            // Explicit, distinct author dates — git author-time is second-granular, so
-            // two commits in the same wall-clock second would tie ambiguously.
-            Assert.True(git.Run(dir, "commit", "-m", "Add greeting", "--date=2026-01-01T10:00:00").Ok);
+        var result = new ProjectBlameService(repo.Git).Load(path);
 
-            // Second commit by a different author changes the node's text.
-            git.Run(dir, "config", "user.email", "bob@example.com");
-            git.Run(dir, "config", "user.name", "Bob");
-            DialogProjectSerializer.SaveToFile(path, Project("Hello there"));
-            Assert.True(git.Run(dir, "add", "-A").Ok);
-            Assert.True(git.Run(dir, "commit", "-m", "Reword greeting", "--date=2026-02-01T10:00:00").Ok);
+        foreach (var b in result)
+            output.WriteLine($"{b.ConversationName}/{b.NodeId} -> {b.LastCommit.Author} " +
+                             $"{b.LastCommit.ShortSha} {b.LastCommit.Date:O} \"{b.LastCommit.Subject}\"");
 
-            var result = new ProjectBlameService(git).Load(path);
-
-            foreach (var b in result)
-                output.WriteLine($"{b.ConversationName}/{b.NodeId} -> {b.LastCommit.Author} " +
-                                 $"{b.LastCommit.ShortSha} {b.LastCommit.Date:O} \"{b.LastCommit.Subject}\"");
-
-            var node = Assert.Single(result, b => b.ConversationName == "greeting" && b.NodeId == 1);
-            Assert.Equal("Bob", node.LastCommit.Author);
-            Assert.Equal("Reword greeting", node.LastCommit.Subject);
-        }
-        finally
-        {
-            try { Directory.Delete(dir, recursive: true); } catch { /* best effort */ }
-        }
+        var node = Assert.Single(result, b => b.ConversationName == "greeting" && b.NodeId == 1);
+        Assert.Equal("Bob", node.LastCommit.Author);
+        Assert.Equal("Reword greeting", node.LastCommit.Subject);
     }
 }
