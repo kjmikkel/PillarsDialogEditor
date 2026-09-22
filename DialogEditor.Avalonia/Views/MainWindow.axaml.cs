@@ -743,17 +743,10 @@ public partial class MainWindow : Window
     private void OnOpenBranches(object? sender, RoutedEventArgs e)
     {
         var vm = (MainWindowViewModel)DataContext!;
-        var path = vm.ProjectPath;
-        if (path is null) return;
-
-        var branchesVm = new BranchesViewModel(new GitBranchService(new ProcessGitRunner()), path)
-        {
-            EnsureNoUnsavedEdits  = () => vm.EnsureNoUnsavedEditsAsync(),
-            ReloadProjectFromDisk = () => vm.ReloadCurrentProjectFromDisk(),
-            // A commit moves HEAD without touching the working tree, so there is nothing
-            // to reload — only the HEAD-derived blame cache to drop (#12).
-            HeadMoved             = () => vm.InvalidateAttribution(),
-        };
+        // Null when no project is open. The project-side callbacks are attached by the
+        // VM; this window only adds the dialogs below.
+        var branchesVm = vm.CreateBranchesViewModel(new GitBranchService(new ProcessGitRunner()));
+        if (branchesVm is null) return;
 
         var window = new BranchesWindow(branchesVm);
 

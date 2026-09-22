@@ -901,6 +901,23 @@ public partial class MainWindowViewModel : ObservableObject
     /// </summary>
     public void InvalidateAttribution() => _attributionPath = null;
 
+    /// <summary>
+    /// A Branches window VM for the open project, with the host callbacks that tie it to
+    /// this project already attached; null when no project is open. The View only adds
+    /// its dialogs. The wiring lives here rather than in MainWindow's code-behind so it is
+    /// testable: the HeadMoved line was once a view-only one-liner that no test reached,
+    /// and dropping it would have silently brought back #12 (see #21).
+    /// </summary>
+    public BranchesViewModel? CreateBranchesViewModel(GitBranchService service) =>
+        _projectPath is null ? null : new BranchesViewModel(service, _projectPath)
+        {
+            EnsureNoUnsavedEdits  = EnsureNoUnsavedEditsAsync,
+            ReloadProjectFromDisk = ReloadCurrentProjectFromDisk,
+            // A commit moves HEAD without touching the working tree, so there is nothing
+            // to reload — only the HEAD-derived blame cache to drop (#12).
+            HeadMoved             = InvalidateAttribution,
+        };
+
     // Per-node attribution for the node detail panel. Built lazily on first lookup after
     // the project path changes (blame is HEAD-based, so it's stable for the open project).
     private NodeBlame? LookupAttribution(string conversationName, int nodeId)
