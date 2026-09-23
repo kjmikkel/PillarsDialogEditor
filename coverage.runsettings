@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Code-coverage settings for `dotnet test -settings coverage.runsettings`
+  (used by CI; works the same locally). Collector: coverlet.collector, already
+  referenced by DialogEditor.Tests.
+
+  Scope is the product: the editor, PatchManager, the CLI and their libraries.
+  Excluded:
+    - the test assemblies themselves
+    - DialogEditor.UiaMcp* — dev tooling for driving the app, never shipped
+    - generated code (Avalonia compiled XAML, CommunityToolkit.Mvvm source
+      generators), which would dilute the number without anything to act on
+-->
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <Include>[DialogEditor.*]*</Include>
+          <Exclude>[DialogEditor.Tests]*,[DialogEditor.UiaMcp*]*</Exclude>
+          <ExcludeByAttribute>GeneratedCodeAttribute,CompilerGeneratedAttribute,ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
+          <SkipAutoProps>true</SkipAutoProps>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>
