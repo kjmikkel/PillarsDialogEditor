@@ -35,7 +35,7 @@ public class LookupKindWhitelistTests
             .Distinct();
 
         foreach (var kind in kinds)
-            Assert.Contains(kind, KnownKinds);
+            Assert.Contains(kind!, KnownKinds); // non-null: filtered by IsNullOrEmpty above
     }
 
     [Fact]
@@ -48,6 +48,6 @@ public class LookupKindWhitelistTests
             .Distinct();
 
         foreach (var kind in kinds)
-            Assert.Contains(kind, KnownKinds);
+            Assert.Contains(kind!, KnownKinds); // non-null: filtered by IsNullOrEmpty above
     }
 }

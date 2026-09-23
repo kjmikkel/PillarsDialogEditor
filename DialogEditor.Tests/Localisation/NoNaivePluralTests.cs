@@ -57,7 +57,9 @@ public class NoNaivePluralTests
     [Fact]
     public void Discovery_FindsEveryKnownStringDictionary()
     {
-        var found = StringDictionaries().Select(row => (string)row[0]).ToList();
+        // Typed lambda parameter: since xunit 2.7, TheoryData<T> enumerates both as
+        // object[] rows and as typed rows, so an untyped `row` can't be inferred.
+        var found = StringDictionaries().Select((object[] row) => (string)row[0]).ToList();
         Assert.Contains("DialogEditor.Avalonia/Resources/Strings.axaml", found);
         Assert.Contains("DialogEditor.Avalonia.Shared/Resources/SharedStrings.axaml", found);
         Assert.Contains("DialogEditor.PatchManager/Resources/Strings.axaml", found);
