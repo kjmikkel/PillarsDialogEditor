@@ -410,8 +410,16 @@ and editor artefacts), writes a trimmed `.slnx` solution file, and zips:
 | `PatchManager-<ver>-src.zip` | Patch Manager source |
 | `dialog-patcher-<ver>-src.zip` | CLI source |
 
-Each source archive includes `README.md`, `VERSION`, and `DialogEditor.Tests`
-so recipients can build and verify with `dotnet test` without any extra setup.
+Each source archive also includes `README.md`, `VERSION`, `LICENSE`,
+`THIRD_PARTY_LICENSES.md`, `Directory.Packages.props`, and any repo file its
+projects pull in from outside their own folders (the editor's `CHANGELOG.md`
+and `docs/walkthrough.md`), so `dotnet build` on the extracted `.slnx` works
+with no extra setup. CI checks this with `tools/ci/Test-SourceArchives.ps1`.
+
+The archives do not include `DialogEditor.Tests`: it tests the whole repository
+(it references the editor and the UI-automation tooling, and scans every
+project's source), so no single-app subset can build or run it. Clone the
+repository to run the test suite.
 
 ```powershell
 .\build-source.ps1
