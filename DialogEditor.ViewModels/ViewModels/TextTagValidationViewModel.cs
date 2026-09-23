@@ -101,8 +101,18 @@ public partial class TextTagValidationViewModel : ObservableObject
     private readonly Action<IReadOnlyList<StaleDataRow>>? _prune;
     private readonly string _primaryLanguage;
 
-    private readonly Func<DuplicateScanOptions, DuplicateLineReport>? _dupScan;
+    private readonly Func<DuplicateScanOptions, IReadOnlyList<VanillaLine>?, DuplicateLineReport>? _dupScan;
     private readonly Action<DuplicateScanOptions>? _persistDuplicateOptions;
+
+    // Base-game comparison (issue #14). The corpus is read once per window and reused for
+    // every later option change / Refresh — the game's files do not change under us, and
+    // the scanner drops the nodes the project owns at scan time, so edits stay correct.
+    private readonly Func<CancellationToken, Task<IReadOnlyList<VanillaLine>>>? _loadVanilla;
+    private IReadOnlyList<VanillaLine>? _vanilla;
+    private readonly CancellationTokenSource _cts = new();
+    // Bumped by every duplicate refresh; an async scan whose generation is stale when it
+    // finishes has been superseded (e.g. the threshold changed twice) and is discarded.
+    private int _duplicateGeneration;
     private readonly Func<IReadOnlyList<IgnoredDuplicate>>? _ignoredList;
     private readonly Action<IgnoredDuplicate>? _ignore;
     private readonly Action<IgnoredDuplicate>? _unignore;
@@ -148,11 +158,24 @@ public partial class TextTagValidationViewModel : ObservableObject
     [ObservableProperty] private bool _includeFemaleText;
     [ObservableProperty] private bool _includeOtherLanguages;
 
-    /// The three scan options as one value. They travel together into the scan delegate
-    /// and back out through the persist callback, so the constructor takes one record
-    /// rather than three initial values and three callbacks.
+    // Base-game comparison (issue #14): off by default, and only offered with a game
+    // loaded. The load and the scan over it take seconds, so they run off the UI thread;
+    // IsLoadingBaseGame drives the busy indicator.
+    [ObservableProperty] private bool _includeBaseGame;
+    [ObservableProperty] private bool _isLoadingBaseGame;
+    [ObservableProperty] private bool _baseGameLoadFailed;
+
+    /// False when no game folder is loaded — there is nothing to compare against.
+    public bool CanCompareBaseGame => _loadVanilla is not null;
+
+    /// The in-flight base-game scan, or a completed task. Exposed for tests to await.
+    internal Task BaseGameScanTask { get; private set; } = Task.CompletedTask;
+
+    /// The scan options as one value. They travel together into the scan delegate and
+    /// back out through the persist callback, so the constructor takes one record rather
+    /// than several initial values and callbacks.
     public DuplicateScanOptions DuplicateOptions =>
-        new(NearThreshold, IncludeFemaleText, IncludeOtherLanguages);
+        new(NearThreshold, IncludeFemaleText, IncludeOtherLanguages, IncludeBaseGame);
 
     public RelayCommand CleanUpStaleCommand        { get; }
     public RelayCommand ConfirmCleanUpStaleCommand { get; }
@@ -171,13 +194,14 @@ public partial class TextTagValidationViewModel : ObservableObject
         Action<IReadOnlyList<StaleDataRow>>? prune = null,
         bool canCheckGameFiles = false,
         string primaryLanguage = "",
-        Func<DuplicateScanOptions, DuplicateLineReport>? dupScan = null,
+        Func<DuplicateScanOptions, IReadOnlyList<VanillaLine>?, DuplicateLineReport>? dupScan = null,
         Func<IReadOnlyList<IgnoredDuplicate>>? ignoredList = null,
         Action<IgnoredDuplicate>? ignore = null,
         Action<IgnoredDuplicate>? unignore = null,
         Action<string, int>? navigate = null,
         DuplicateScanOptions? duplicateOptions = null,
-        Action<DuplicateScanOptions>? persistDuplicateOptions = null)
+        Action<DuplicateScanOptions>? persistDuplicateOptions = null,
+        Func<CancellationToken, Task<IReadOnlyList<VanillaLine>>>? loadVanilla = null)
     {
         _scan             = scan;
         _addWord          = addWord;
@@ -193,6 +217,8 @@ public partial class TextTagValidationViewModel : ObservableObject
         _nearThreshold           = initial.NearThreshold;
         _includeFemaleText       = initial.IncludeFemaleText;
         _includeOtherLanguages   = initial.IncludeOtherLanguages;
+        _includeBaseGame         = initial.IncludeBaseGame;
+        _loadVanilla             = loadVanilla;
         _persistDuplicateOptions = persistDuplicateOptions;
         _ignoredList      = ignoredList;
         _ignore           = ignore;
@@ -227,11 +253,80 @@ public partial class TextTagValidationViewModel : ObservableObject
 
     private void RefreshDuplicates()
     {
-        DuplicateRows.Clear();
-        if (_dupScan is not null)
-        {
-            var report = _dupScan(DuplicateOptions);
+        var generation = ++_duplicateGeneration;
 
+        // Toggle on and a game loaded: the corpus load and the scan over it take seconds,
+        // so they run off the UI thread. Every other case stays synchronous — exactly the
+        // pre-#14 behaviour, which is what the existing tests pin.
+        if (IncludeBaseGame && _loadVanilla is not null)
+        {
+            BaseGameScanTask = RefreshDuplicatesWithBaseGameAsync(generation, DuplicateOptions);
+        }
+        else
+        {
+            IsLoadingBaseGame  = false;   // a superseded async scan may have left it set
+            BaseGameLoadFailed = false;
+            FillDuplicateRows(_dupScan?.Invoke(DuplicateOptions, null));
+        }
+        RefreshIgnoredDuplicates();
+    }
+
+    private async Task RefreshDuplicatesWithBaseGameAsync(int generation, DuplicateScanOptions options)
+    {
+        IsLoadingBaseGame = true;
+        try
+        {
+            var loadFailed = false;
+            if (_vanilla is null)
+            {
+                try
+                {
+                    _vanilla = await _loadVanilla!(_cts.Token);
+                }
+                catch (OperationCanceledException)
+                {
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    // Left unloaded on purpose, so the next toggle or Refresh retries.
+                    AppLog.Error("Base-game duplicate scan: could not read the game's lines", ex);
+                    loadFailed = true;
+                }
+            }
+
+            var corpus = _vanilla;
+            var report = _dupScan is null
+                ? null
+                : await Task.Run(() => _dupScan(options, corpus), _cts.Token);
+
+            if (generation != _duplicateGeneration) return;   // superseded
+            BaseGameLoadFailed = loadFailed;
+            FillDuplicateRows(report);
+        }
+        catch (OperationCanceledException)
+        {
+            // Window closed mid-scan.
+        }
+        catch (Exception ex)
+        {
+            // A fire-and-forget task would otherwise swallow this without a trace.
+            AppLog.Error("Base-game duplicate scan failed", ex);
+        }
+        finally
+        {
+            if (generation == _duplicateGeneration) IsLoadingBaseGame = false;
+        }
+    }
+
+    /// Cancels an in-flight base-game load or scan. The window calls this on close.
+    public void Cancel() => _cts.Cancel();
+
+    private void FillDuplicateRows(DuplicateLineReport? report)
+    {
+        DuplicateRows.Clear();
+        if (report is not null)
+        {
             foreach (var g in report.Exact)
             {
                 var entry     = new IgnoredDuplicate(DuplicateKind.Exact, [g.Key], g.SampleText);
@@ -258,7 +353,10 @@ public partial class TextTagValidationViewModel : ObservableObject
         DuplicateSummaryText = DuplicateRows.Count == 0
             ? Loc.Get("Duplicate_NoIssues")
             : Loc.FormatCount("Duplicate_Summary", DuplicateRows.Count);
+    }
 
+    private void RefreshIgnoredDuplicates()
+    {
         IgnoredDuplicateRows.Clear();
         if (_ignoredList is not null)
         {
@@ -302,12 +400,16 @@ public partial class TextTagValidationViewModel : ObservableObject
     private static string Describe(LineRef r)
     {
         var where = Loc.Format("Duplicate_Location", r.ConversationName, r.NodeId);
-        var source = (r.Language.Length > 0, r.IsFemale) switch
+        // Base-game lines are always primary-language, so the language flag is irrelevant
+        // for them; the marker tells the writer which member of a match is not theirs.
+        var source = (r.FromBaseGame, r.Language.Length > 0, r.IsFemale) switch
         {
-            (false, false) => "",
-            (false, true)  => Loc.Get("Duplicate_Source_Female"),
-            (true,  false) => r.Language,
-            (true,  true)  => Loc.Format("Duplicate_Source_LanguageFemale", r.Language),
+            (true,  _,     false) => Loc.Get("Duplicate_Source_BaseGame"),
+            (true,  _,     true)  => Loc.Get("Duplicate_Source_BaseGameFemale"),
+            (false, false, false) => "",
+            (false, false, true)  => Loc.Get("Duplicate_Source_Female"),
+            (false, true,  false) => r.Language,
+            (false, true,  true)  => Loc.Format("Duplicate_Source_LanguageFemale", r.Language),
         };
         return source.Length == 0 ? where : Loc.Format("Duplicate_Source", where, source);
     }
@@ -319,6 +421,7 @@ public partial class TextTagValidationViewModel : ObservableObject
     partial void OnNearThresholdChanged(double value)         => OnDuplicateOptionChanged();
     partial void OnIncludeFemaleTextChanged(bool value)       => OnDuplicateOptionChanged();
     partial void OnIncludeOtherLanguagesChanged(bool value)   => OnDuplicateOptionChanged();
+    partial void OnIncludeBaseGameChanged(bool value)         => OnDuplicateOptionChanged();
 
     private void OnDuplicateOptionChanged()
     {

@@ -6,18 +6,20 @@ namespace DialogEditor.ViewModels.Services;
 /// One located line. Text is the original (trimmed) writer text, for display.
 /// Language follows the TextTagIssueRow convention: "" means the primary language,
 /// anything else is the real language code. IsFemale marks the female variant.
-/// Both default so existing construction sites stay valid.
+/// FromBaseGame marks a line read from the installed game rather than the project
+/// (issue #14). All three default so existing construction sites stay valid.
 public record LineRef(
     string ConversationName, int NodeId, string Text,
-    string Language = "", bool IsFemale = false);
+    string Language = "", bool IsFemale = false, bool FromBaseGame = false);
 
 /// What the duplicate sweep should look at. Bundled into a record rather than threaded
-/// as three loose values because the consuming ViewModel constructor is already long.
-/// Both scope flags default OFF, so the historical report is what you get unasked.
+/// as loose values because the consuming ViewModel constructor is already long.
+/// Every scope flag defaults OFF, so the historical report is what you get unasked.
 public record DuplicateScanOptions(
     double NearThreshold         = DuplicateLineScanner.DefaultNearThreshold,
     bool   IncludeFemaleText     = false,
-    bool   IncludeOtherLanguages = false);
+    bool   IncludeOtherLanguages = false,
+    bool   IncludeBaseGame       = false);
 
 /// A set of nodes whose normalized text is identical. Key is that normalized
 /// text (the ignore key); SampleText is a representative original line.
@@ -45,7 +47,13 @@ public record DuplicateLineReport(
 ///   3. Ignore keys carry no language or gender (see IgnoredDuplicate), so an ignore
 ///      silences a byte-identical line in EVERY language. Deliberate: it keeps stored
 ///      ignore lists valid, and two languages sharing a 4+-word line is itself suspect.
+///   4. Base-game lines (issue #14) are reported only when they involve a writer line —
+///      vanilla-vs-vanilla is the game's business, and skipping it is what makes the pass
+///      affordable. A vanilla node whose text the project owns (added, or has a translation
+///      entry) is dropped: it is either the writer's own original or, on an install the
+///      pack was applied to, the writer's own line.
 /// Spec: docs/superpowers/specs/2026-07-13-duplicate-line-detection-design.md
+///       docs/superpowers/specs/2026-09-22-cross-vanilla-duplicate-detection-design.md
 /// </summary>
 public static class DuplicateLineScanner
 {
@@ -60,12 +68,13 @@ public static class DuplicateLineScanner
     private const double MinNearThreshold = 0.50;
     private const double MaxNearThreshold = 0.99;
 
-    private const int MinWords = 4;
+    internal const int MinWords = 4;
 
     private static readonly Regex Whitespace = new(@"\s+", RegexOptions.Compiled);
 
     public static DuplicateLineReport Scan(
-        DialogProject project, string primaryLanguage, DuplicateScanOptions? options = null)
+        DialogProject project, string primaryLanguage, DuplicateScanOptions? options = null,
+        IReadOnlyList<VanillaLine>? vanilla = null)
     {
         var opts = options ?? new DuplicateScanOptions();
 
@@ -115,6 +124,23 @@ public static class DuplicateLineScanner
 
         var candidates = byKey.Values.ToList();
 
+        // 1b. Base-game candidates (rule 4). Primary-language label "" always, so they only
+        //     ever meet primary-language writer lines (rule 2).
+        var vanillaCands = new List<(LineRef Ref, string Norm)>();
+        if (opts.IncludeBaseGame && vanilla is not null)
+        {
+            var owned = OwnedNodes(project);
+            foreach (var v in vanilla)
+            {
+                if (v.IsFemale && !opts.IncludeFemaleText) continue;
+                if (owned.Contains((v.ConversationName, v.NodeId))) continue;
+                var norm = Normalize(v.Text);
+                if (WordCount(norm) < MinWords) continue;   // corpus filters too; direct callers may not
+                vanillaCands.Add((new LineRef(v.ConversationName, v.NodeId, v.Text.Trim(),
+                                              "", v.IsFemale, FromBaseGame: true), norm));
+            }
+        }
+
         // 2. Ignore sets.
         var ignored     = project.IgnoredDuplicates ?? [];
         var ignoredExact = new HashSet<string>(
@@ -123,20 +149,24 @@ public static class DuplicateLineScanner
             ignored.Where(e => e.Kind == DuplicateKind.Near).Select(e => NearKey(e.Keys[0], e.Keys[1])));
 
         // 3. Exact: group by (language, normalized text) — rule 2. A group counts only if
-        //    it spans two DISTINCT nodes (rule 1); a node matching its own female text is
-        //    the ordinary shape of gendered writing, not a finding. The group's ignore Key
-        //    stays the bare normalized text, hence the cross-language reach noted above.
+        //    it spans two DISTINCT nodes (rule 1; a node matching its own female text is
+        //    the ordinary shape of gendered writing, not a finding) and contains a writer
+        //    line (rule 4). The group's ignore Key stays the bare normalized text, hence the
+        //    cross-language reach noted above. Writer members sort first so Members[0] —
+        //    the navigation target — is always the writer's own node.
         var exact      = new List<ExactDuplicateGroup>();
         var exactNorms = new HashSet<(string Lang, string Norm)>();
-        foreach (var g in candidates
+        foreach (var g in candidates.Concat(vanillaCands)
                      .GroupBy(c => (Lang: c.Ref.Language, c.Norm))
-                     .Where(g => g.Select(c => (c.Ref.ConversationName, c.Ref.NodeId))
+                     .Where(g => g.Any(c => !c.Ref.FromBaseGame) &&
+                                 g.Select(c => (c.Ref.ConversationName, c.Ref.NodeId))
                                   .Distinct().Count() >= 2))
         {
             exactNorms.Add(g.Key);
             if (ignoredExact.Contains(g.Key.Norm)) continue;
             var members = g.Select(c => c.Ref)
-                .OrderBy(r => r.ConversationName, StringComparer.Ordinal)
+                .OrderBy(r => r.FromBaseGame)
+                .ThenBy(r => r.ConversationName, StringComparer.Ordinal)
                 .ThenBy(r => r.NodeId)
                 .ThenBy(r => r.IsFemale)
                 .ToList();
@@ -178,6 +208,40 @@ public static class DuplicateLineScanner
             }
         }
 
+        // 5. Near, writer vs base game (rule 4) — no vanilla-vs-vanilla pass. Vanilla lines
+        //    are collapsed to one representative per normalized text first: two identical
+        //    vanilla lines must not yield two rows for one writer line, and the index shrinks.
+        //    QGramIndex is a lossless prefilter, so this reports exactly what a brute-force
+        //    Levenshtein sweep would.
+        if (vanillaCands.Count > 0)
+        {
+            var reps = vanillaCands
+                .Where(c => !exactNorms.Contains((c.Ref.Language, c.Norm)))
+                .GroupBy(c => c.Norm)
+                .Select(g => g.OrderBy(c => c.Ref.ConversationName, StringComparer.Ordinal)
+                              .ThenBy(c => c.Ref.NodeId)
+                              .ThenBy(c => c.Ref.IsFemale)
+                              .First())
+                .ToList();
+            var index = new QGramIndex(reps.Select(r => r.Norm).ToList());
+
+            foreach (var a in candidates.Where(c => c.Ref.Language.Length == 0 &&
+                                                    !exactNorms.Contains(("", c.Norm))))
+            {
+                foreach (var id in index.Query(a.Norm, threshold))
+                {
+                    var b     = reps[id];
+                    var ratio = Ratio(a.Norm, b.Norm);
+                    if (ratio < threshold) continue;
+
+                    var key = new[] { a.Norm, b.Norm }.OrderBy(s => s, StringComparer.Ordinal).ToList();
+                    if (ignoredNear.Contains(NearKey(key[0], key[1]))) continue;
+
+                    near.Add(new NearDuplicatePair(key, a.Ref, b.Ref, (int)Math.Round(ratio * 100)));
+                }
+            }
+        }
+
         return new DuplicateLineReport(exact, near);
 
         void AddCandidate(string conv, int nodeId, string lang, bool female, string? text)
@@ -191,14 +255,29 @@ public static class DuplicateLineScanner
         }
     }
 
-    private static string Normalize(string s) => Whitespace.Replace(s.Trim(), " ").ToLowerInvariant();
+    /// Nodes whose text the project owns: added nodes, and any node with a translation
+    /// entry (the DiffEngine records every added or edited node's text there). A node in
+    /// ModifiedNodes alone had structural edits only; its text is still vanilla.
+    private static HashSet<(string Conv, int Node)> OwnedNodes(DialogProject project)
+    {
+        var owned = new HashSet<(string, int)>();
+        foreach (var (conv, patch) in project.Patches)
+        {
+            foreach (var n in patch.AddedNodes) owned.Add((conv, n.NodeId));
+            foreach (var entries in patch.Translations.Values)
+                foreach (var t in entries) owned.Add((conv, t.NodeId));
+        }
+        return owned;
+    }
 
-    private static int WordCount(string normalized) =>
+    internal static string Normalize(string s) => Whitespace.Replace(s.Trim(), " ").ToLowerInvariant();
+
+    internal static int WordCount(string normalized) =>
         normalized.Length == 0 ? 0 : normalized.Split(' ').Length;
 
     private static string NearKey(string a, string b) => a + " " + b;   // a,b already sorted
 
-    private static double Ratio(string a, string b)
+    internal static double Ratio(string a, string b)
     {
         var max = Math.Max(a.Length, b.Length);
         if (max == 0) return 1.0;

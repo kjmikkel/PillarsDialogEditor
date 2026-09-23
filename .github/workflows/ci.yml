@@ -1,0 +1,132 @@
+# Continuous integration: every push to main and every pull request.
+#
+# Three independent jobs, so a red Python test doesn't hide a red .NET test:
+#   dotnet            — build the whole solution and run both xUnit projects
+#   python-tools      — unit tests for the catalogue/lexicon generators
+#   catalogue-mirror  — the embedded catalogue and its data/ mirror must match
+#
+# Nothing here needs game data. The generators themselves run only locally
+# (they read the decompiled sources and GOG installs); CI tests their logic
+# against the in-repo fixtures and checks the committed outputs for drift.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer push to the same branch/PR supersedes the in-flight run.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dotnet:
+    name: Build & test (.NET)
+    # Windows-only: DialogEditor.UiaMcp(.Tests) target net8.0-windows, and the
+    # shipped binaries are win-x64.
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+    steps:
+      - uses: actions/checkout@v5
+
+      # SDK 10 is needed to read DialogEditor.slnx (requires SDK >= 9.0.200);
+      # the 8.0 runtime is what the net8.0 test hosts actually run on.
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      # No packages.lock.json in the repo, so setup-dotnet's built-in cache
+      # can't be used — key the package cache on the project files instead.
+      - uses: actions/cache@v4
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Restore
+        run: dotnet restore DialogEditor.slnx
+
+      # Debug, matching a local `dotnet test` (and the dev path the UiaMcp GUI
+      # tests launch from, should they ever run here). Release packaging is
+      # build.ps1's job.
+      - name: Build
+        run: dotnet build DialogEditor.slnx -c Debug --no-restore
+
+      # Runs DialogEditor.Tests and tools/DialogEditor.UiaMcp.Tests. Test
+      # parallelisation is disabled in DialogEditor.Tests (AppSettings/Loc
+      # global-state race) — that's deliberate, don't "speed this up" here.
+      # Excluded here, still run by a local `dotnet test`:
+      #   Requires!=AudioDevice — hosted runners have no sound output device, so
+      #     the NAudio playback tests (VoAudioPlayerTests) can't run meaningfully.
+      #   Category!=Gui — the UiaMcp live-app tests launch the real editor against
+      #     the developer's own settings.json and game install (conversation rows
+      #     come from LastGameDirectory). A runner has neither, and game data must
+      #     never be put on a public runner, so GUI verification stays local.
+      - name: Test
+        run: >-
+          dotnet test DialogEditor.slnx -c Debug --no-build
+          --filter "Requires!=AudioDevice&Category!=Gui"
+          --logger "trx"
+          --logger "console;verbosity=minimal"
+          --results-directory TestResults
+
+      - name: Upload test results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults/**/*.trx
+          if-no-files-found: warn
+
+  python-tools:
+    name: Generator tests (Python)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        tool: [catalogue-gen, lexicon-gen]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+      # pytest is the only dependency the tests need: lexicon-gen imports
+      # spylls lazily, inside the code path that loads real dictionaries.
+      - run: pip install pytest
+      - name: pytest
+        working-directory: tools/${{ matrix.tool }}
+        run: python -m pytest -q
+
+  catalogue-mirror:
+    name: Catalogue mirror in sync
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+      # catalogue-gen writes the embedded catalogue and a human-readable copy
+      # under data/. A hand edit to only one of them drifts silently; this
+      # fails the build and shows the diff instead.
+      - name: Compare embedded catalogue with data/ mirror
+        run: |
+          status=0
+          for f in scripts conditions; do
+            if ! git diff --no-index --stat --exit-code \
+                "DialogEditor.ViewModels/Resources/$f.json" "data/$f.json"; then
+              echo "::error file=data/$f.json::data/$f.json differs from DialogEditor.ViewModels/Resources/$f.json — regenerate with tools/catalogue-gen rather than editing one copy."
+              status=1
+            fi
+          done
+          exit $status
