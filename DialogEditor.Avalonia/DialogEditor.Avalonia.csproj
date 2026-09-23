@@ -13,7 +13,7 @@
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.22" />
     <PackageReference Include="Avalonia.Fonts.Inter" Version="11.3.22" />
     <PackageReference Include="NodifyAvalonia" Version="6.6.0" />
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="NAudio" Version="2.2.1" />
     <PackageReference Include="Dock.Avalonia" Version="11.3.12.1" />
     <PackageReference Include="Dock.Avalonia.Themes.Fluent" Version="11.3.12.1" />
