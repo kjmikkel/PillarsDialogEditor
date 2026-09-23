@@ -104,8 +104,10 @@ function New-SourcePackage {
         Copy-ProjectSource -ProjectDir $project -DestRoot $stageDir
     }
 
-    # Root files recipients need to build and orient themselves
-    foreach ($file in @("README.md", "VERSION")) {
+    # Root files recipients need to build and orient themselves.
+    # Directory.Packages.props is required: projects carry no package versions of
+    # their own (Central Package Management), so without it nothing restores.
+    foreach ($file in @("README.md", "VERSION", "Directory.Packages.props")) {
         $src = Join-Path $Root $file
         if (Test-Path $src) { Copy-Item $src -Destination $stageDir -Force }
     }
