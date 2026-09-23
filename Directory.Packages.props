@@ -45,7 +45,7 @@
 
   <ItemGroup Label="Application">
     <PackageVersion Include="CommunityToolkit.Mvvm"          Version="8.4.2" />
-    <PackageVersion Include="NAudio"                         Version="2.2.1" />
+    <PackageVersion Include="NAudio"                         Version="2.4.0" />
     <PackageVersion Include="NodifyAvalonia"                 Version="6.6.0" />
     <PackageVersion Include="WeCantSpell.Hunspell"           Version="7.0.1" />
   </ItemGroup>
