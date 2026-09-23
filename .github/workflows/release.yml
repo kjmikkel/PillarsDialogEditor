@@ -1,0 +1,75 @@
+# Release build, triggered by pushing a version tag:
+#
+#   git tag v1.0.0 && git push origin v1.0.0
+#
+# Runs the test gate, then build.ps1 (three win-x64 binary zips + three source
+# zips), and attaches all six to a DRAFT GitHub Release. Nothing is public until
+# you review the draft and press Publish on GitHub.
+#
+# VERSION stays the single source of truth: the tag must equal "v" + VERSION,
+# so a tag can't silently ship binaries stamped with a different version.
+
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write   # create the draft release and upload its assets
+
+# Never run two releases for the same tag at once; never cancel one mid-upload.
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Check tag matches VERSION
+        id: version
+        run: |
+          $version = (Get-Content VERSION -Raw).Trim()
+          $tag     = '${{ github.ref_name }}'
+          if ($tag -ne "v$version") {
+            Write-Host "::error::Tag '$tag' does not match VERSION file ('$version'). Expected tag 'v$version'."
+            exit 1
+          }
+          "version=$version" >> $env:GITHUB_OUTPUT
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      # build.ps1's own test gate runs DialogEditor.Tests unfiltered, which
+      # includes the audio-device tests a hosted runner can't run. Gate here
+      # with the same exclusions as ci.yml, in Release to match what ships,
+      # then call build.ps1 with -SkipTests.
+      - name: Test gate
+        run: >-
+          dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj -c Release
+          --filter "Requires!=AudioDevice&Category!=Gui"
+          --logger "console;verbosity=minimal"
+
+      - name: Build release archives
+        run: ./build.ps1 -Version '${{ steps.version.outputs.version }}' -SkipTests
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $tag = '${{ github.ref_name }}'
+          gh release create $tag (Get-ChildItem dist -Filter *.zip).FullName `
+            --draft --verify-tag --generate-notes --title "Pillars Dialog Editor $tag"
