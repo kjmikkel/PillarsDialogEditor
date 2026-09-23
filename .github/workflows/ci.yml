@@ -58,21 +58,26 @@ jobs:
       - name: Restore
         run: dotnet restore DialogEditor.slnx
 
-      # Debug, not Release: the UiaMcp GUI tests launch the real app from the
-      # hard-wired dev path DialogEditor.Avalonia/bin/Debug/net8.0 (see
-      # EditorSession.Launch). Release packaging is build.ps1's job.
+      # Debug, matching a local `dotnet test` (and the dev path the UiaMcp GUI
+      # tests launch from, should they ever run here). Release packaging is
+      # build.ps1's job.
       - name: Build
         run: dotnet build DialogEditor.slnx -c Debug --no-restore
 
       # Runs DialogEditor.Tests and tools/DialogEditor.UiaMcp.Tests. Test
       # parallelisation is disabled in DialogEditor.Tests (AppSettings/Loc
       # global-state race) — that's deliberate, don't "speed this up" here.
-      # Requires!=AudioDevice: hosted runners have no sound output device, so
-      # the NAudio playback tests (VoAudioPlayerTests) can't run meaningfully.
+      # Excluded here, still run by a local `dotnet test`:
+      #   Requires!=AudioDevice — hosted runners have no sound output device, so
+      #     the NAudio playback tests (VoAudioPlayerTests) can't run meaningfully.
+      #   Category!=Gui — the UiaMcp live-app tests launch the real editor against
+      #     the developer's own settings.json and game install (conversation rows
+      #     come from LastGameDirectory). A runner has neither, and game data must
+      #     never be put on a public runner, so GUI verification stays local.
       - name: Test
         run: >-
           dotnet test DialogEditor.slnx -c Debug --no-build
-          --filter "Requires!=AudioDevice"
+          --filter "Requires!=AudioDevice&Category!=Gui"
           --logger "trx"
           --logger "console;verbosity=minimal"
           --results-directory TestResults
