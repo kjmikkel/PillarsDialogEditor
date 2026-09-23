@@ -8,9 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia"               Version="11.3.22"/>
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="11.3.22"/>
-    <PackageReference Include="CommunityToolkit.Mvvm"  Version="8.2.2"/>
+    <PackageReference Include="Avalonia"/>
+    <PackageReference Include="Avalonia.Themes.Fluent"/>
+    <PackageReference Include="CommunityToolkit.Mvvm"/>
   </ItemGroup>
 
   <ItemGroup>
