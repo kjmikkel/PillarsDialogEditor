@@ -568,10 +568,10 @@ public partial class MainWindowViewModel : ObservableObject
 
         // Scan scope and threshold come from the window (issue #14), so the writer can
         // widen or tighten the sweep and see the report change without leaving it.
-        Func<DuplicateScanOptions, DuplicateLineReport> dupScan = options =>
+        Func<DuplicateScanOptions, IReadOnlyList<VanillaLine>?, DuplicateLineReport> dupScan = (options, vanilla) =>
             _project is null
                 ? new DuplicateLineReport([], [])
-                : DuplicateLineScanner.Scan(_project, _provider?.Language ?? "", options);
+                : DuplicateLineScanner.Scan(_project, _provider?.Language ?? "", options, vanilla);
 
         Func<IReadOnlyList<IgnoredDuplicate>> ignoredList = () =>
             _project?.IgnoredDuplicates ?? [];
@@ -590,6 +590,13 @@ public partial class MainWindowViewModel : ObservableObject
             _project = _project.WithoutIgnoredDuplicate(e);
             IsModified = true;
         };
+
+        // Base-game comparison (issue #14): only offered with a game loaded. The provider
+        // is captured now, so a game switch while the window is open cannot change what an
+        // in-flight load reads.
+        Func<CancellationToken, Task<IReadOnlyList<VanillaLine>>>? loadVanilla = null;
+        if (_provider is { } provider)
+            loadVanilla = ct => Task.Run(() => VanillaLineCorpus.Load(provider, ct), ct);
 
         // The closure reads the current fields, so Refresh in the open window picks
         // up saves made later in the session.
@@ -611,13 +618,16 @@ public partial class MainWindowViewModel : ObservableObject
             duplicateOptions: new DuplicateScanOptions(
                 AppSettings.NearDuplicateThreshold,
                 AppSettings.DuplicateIncludeFemaleText,
-                AppSettings.DuplicateIncludeOtherLanguages),
+                AppSettings.DuplicateIncludeOtherLanguages,
+                AppSettings.DuplicateIncludeBaseGame),
             persistDuplicateOptions: o =>
             {
                 AppSettings.NearDuplicateThreshold         = o.NearThreshold;
                 AppSettings.DuplicateIncludeFemaleText     = o.IncludeFemaleText;
                 AppSettings.DuplicateIncludeOtherLanguages = o.IncludeOtherLanguages;
-            });
+                AppSettings.DuplicateIncludeBaseGame       = o.IncludeBaseGame;
+            },
+            loadVanilla: loadVanilla);
     }
 
     /// Builds a conversation-name → live-node-ID-set resolver for the likely-stale

@@ -1,4 +1,5 @@
-﻿using DialogEditor.Core.Models;
+﻿using DialogEditor.Core.Editing;
+using DialogEditor.Core.Models;
 using DialogEditor.Patch;
 using DialogEditor.ViewModels.Services;
 
@@ -37,8 +38,12 @@ public class DuplicateLineScannerTests
 
     private static DuplicateScanOptions Opts(
         bool female = false, bool otherLangs = false,
-        double threshold = DuplicateLineScanner.DefaultNearThreshold) =>
-        new(threshold, female, otherLangs);
+        double threshold = DuplicateLineScanner.DefaultNearThreshold,
+        bool baseGame = false) =>
+        new(threshold, female, otherLangs, baseGame);
+
+    private static IReadOnlyList<VanillaLine> Vanilla(params (string Conv, int Id, string Text, bool Fem)[] v) =>
+        v.Select(x => new VanillaLine(x.Conv, x.Id, x.Text, x.Fem)).ToList();
 
     private static DialogProject Project(params ConversationPatch[] patches)
     {
@@ -388,5 +393,154 @@ public class DuplicateLineScannerTests
         var report = DuplicateLineScanner.Scan(project, "en", Opts(otherLangs: true));
 
         Assert.Empty(report.Exact);
+    }
+
+    // ── Base game (issue #14, cross-vanilla) ────────────────────────────────
+
+    [Fact]
+    public void BaseGame_ExactMatch_ReportedWithWriterFirst()
+    {
+        var project = Project(PatchWith("mine", (1, L)));
+        var vanilla = Vanilla(("aaa_vanilla", 7, "The wind howls through the rigging tonight", false));
+
+        var report = DuplicateLineScanner.Scan(project, "en", Opts(baseGame: true), vanilla);
+
+        var group = Assert.Single(report.Exact);
+        Assert.Equal(2, group.Members.Count);
+        Assert.False(group.Members[0].FromBaseGame);             // navigation target is the writer's node,
+        Assert.Equal("mine", group.Members[0].ConversationName); // even though "aaa" sorts first
+        Assert.True(group.Members[1].FromBaseGame);
+        Assert.Equal(7, group.Members[1].NodeId);
+    }
+
+    [Fact]
+    public void BaseGame_NearMatch_ReportedWriterAsA()
+    {
+        var project = Project(PatchWith("mine", (1, L)));
+        var vanilla = Vanilla(("v", 7, "the wind howls through the riggings tonight", false));
+
+        var report = DuplicateLineScanner.Scan(project, "en", Opts(baseGame: true), vanilla);
+
+        var pair = Assert.Single(report.Near);
+        Assert.False(pair.A.FromBaseGame);
+        Assert.True(pair.B.FromBaseGame);
+        Assert.Equal(("v", 7), (pair.B.ConversationName, pair.B.NodeId));
+    }
+
+    [Fact] // Vanilla-vs-vanilla is the game's business, not the writer's.
+    public void BaseGame_VanillaOnlyDuplicates_NotReported()
+    {
+        var project = Project(PatchWith("mine", (1, "a completely different line of my own")));
+        var vanilla = Vanilla(("v1", 1, L, false), ("v2", 2, L, false),
+                              ("v3", 3, "the wind howls through the riggings tonight", false));
+
+        var report = DuplicateLineScanner.Scan(project, "en", Opts(baseGame: true), vanilla);
+
+        Assert.Empty(report.Exact);
+        Assert.Empty(report.Near);
+    }
+
+    [Fact] // An edit is close to its own original by definition — not a finding.
+    public void BaseGame_EditedNodesOwnOriginal_Excluded()
+    {
+        var project = Project(PatchWith("c", (5, "the wind howls through the rigging tonight, lads")));
+        var vanilla = Vanilla(("c", 5, L, false));
+
+        var report = DuplicateLineScanner.Scan(project, "en", Opts(baseGame: true), vanilla);
+
+        Assert.Empty(report.Exact);
+        Assert.Empty(report.Near);
+    }
+
+    [Fact] // Pack already applied to the install: the on-disk "vanilla" copy IS the writer's line.
+    public void BaseGame_AddedNodeAlreadyOnDisk_Excluded()
+    {
+        var added = new NodeEditSnapshot(
+            10, false, SpeakerCategory.Npc, "spk", "", "", "",
+            "Conversation", "None", "", "", "", false, false, [], [], []);
+        var patch = new ConversationPatch("c", ConversationPatch.CurrentSchemaVersion, [added], [], []);
+        var project = Project(patch, PatchWith("other", (1, L)));
+        var vanilla = Vanilla(("c", 10, L, false));
+
+        var report = DuplicateLineScanner.Scan(project, "en", Opts(baseGame: true), vanilla);
+
+        Assert.Empty(report.Exact);
+    }
+
+    [Fact] // A structural-only edit leaves the node's text genuinely vanilla — still compared.
+    public void BaseGame_StructurallyModifiedNode_NotExcluded()
+    {
+        var mod = new NodeModification(7, new Dictionary<string, FieldChange>(), [], []);
+        var structural = new ConversationPatch("v", ConversationPatch.CurrentSchemaVersion, [], [], [mod]);
+        var project = Project(structural, PatchWith("mine", (1, L)));
+        var vanilla = Vanilla(("v", 7, L, false));
+
+        var report = DuplicateLineScanner.Scan(project, "en", Opts(baseGame: true), vanilla);
+
+        Assert.Single(report.Exact);
+    }
+
+    [Fact] // Two identical vanilla lines must not produce two rows for one writer line.
+    public void BaseGame_IdenticalVanillaLines_OneNearPair()
+    {
+        var project = Project(PatchWith("mine", (1, L)));
+        const string near = "the wind howls through the riggings tonight";
+        var vanilla = Vanilla(("v2", 2, near, false), ("v1", 1, near, false));
+
+        var report = DuplicateLineScanner.Scan(project, "en", Opts(baseGame: true), vanilla);
+
+        var pair = Assert.Single(report.Near);
+        Assert.Equal("v1", pair.B.ConversationName);   // lowest conversation is the representative
+    }
+
+    [Fact]
+    public void BaseGame_IgnoredKeys_SuppressFindings()
+    {
+        const string nearV = "the wind howls through the riggings tonight";
+        const string gold  = "gold is never enough for a hungry friend";
+        var project = Project(PatchWith("mine", (1, L), (2, gold)))
+            .WithIgnoredDuplicate(new IgnoredDuplicate(DuplicateKind.Exact, [gold], "x"))
+            .WithIgnoredDuplicate(new IgnoredDuplicate(DuplicateKind.Near,
+                new[] { L, nearV }.OrderBy(s => s, StringComparer.Ordinal).ToList(), "y"));
+        var vanilla = Vanilla(("v", 1, nearV, false), ("v", 2, "Gold is never enough for a hungry friend", false));
+
+        var report = DuplicateLineScanner.Scan(project, "en", Opts(baseGame: true), vanilla);
+
+        Assert.Empty(report.Exact);
+        Assert.Empty(report.Near);
+    }
+
+    [Fact]
+    public void BaseGame_FemaleVanillaLines_OnlyWithFemaleToggle()
+    {
+        var project = Project(PatchWith("mine", (1, L)));
+        var vanilla = Vanilla(("v", 1, L, true));
+
+        Assert.Empty(DuplicateLineScanner.Scan(project, "en", Opts(baseGame: true), vanilla).Exact);
+        var group = Assert.Single(
+            DuplicateLineScanner.Scan(project, "en", Opts(baseGame: true, female: true), vanilla).Exact);
+        Assert.True(group.Members[1].IsFemale && group.Members[1].FromBaseGame);
+    }
+
+    [Fact] // The historical report is untouched unless the toggle is on AND a corpus is given.
+    public void BaseGame_ToggleOffOrNoCorpus_ReportUnchanged()
+    {
+        var project = Project(PatchWith("mine", (1, L)));
+        var vanilla = Vanilla(("v", 1, L, false));
+
+        Assert.Empty(DuplicateLineScanner.Scan(project, "en", Opts(), vanilla).Exact);
+        Assert.Empty(DuplicateLineScanner.Scan(project, "en", Opts(baseGame: true), null).Exact);
+    }
+
+    [Fact] // The vanilla side is primary-language only; other-language lines never meet it.
+    public void BaseGame_OtherLanguageWriterLine_NotComparedToVanilla()
+    {
+        var project = Project(PatchTr("mine", ("de", 1, L, "")));
+        var vanilla = Vanilla(("v", 1, L, false));
+
+        var report = DuplicateLineScanner.Scan(project, "en", Opts(otherLangs: true, baseGame: true), vanilla);
+
+        Assert.Empty(report.Exact);
+        Assert.Empty(report.Near);
     }
 }

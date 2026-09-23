@@ -4,6 +4,12 @@ using DialogEditor.Avalonia.Audio;
 
 namespace DialogEditor.Tests.Audio;
 
+// Every test here drives a real NAudio WaveOutEvent, so it needs a sound output
+// device. Machines without one (GitHub-hosted CI runners) can't open the device,
+// PlaybackStopped never fires, and the assertions become meaningless (or vacuously
+// pass). CI excludes this trait with `--filter "Requires!=AudioDevice"`; a normal
+// local `dotnet test` still runs them.
+[Trait("Requires", "AudioDevice")]
 public class VoAudioPlayerTests : IDisposable
 {
     private readonly string _wavPath;

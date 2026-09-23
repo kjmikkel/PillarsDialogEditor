@@ -97,7 +97,7 @@ public class TextTagValidationViewModelTests
     {
         var vm = new TextTagValidationViewModel(
             scan: () => [],
-            dupScan: _ => OneExact());
+            dupScan: (_, _) => OneExact());
 
         Assert.True(vm.HasDuplicates);
         var row = Assert.Single(vm.DuplicateRows);
@@ -111,7 +111,7 @@ public class TextTagValidationViewModelTests
         var report = OneExact();
         var vm = new TextTagValidationViewModel(
             scan: () => [],
-            dupScan: _ => ignored is null ? report : new DuplicateLineReport([], []),
+            dupScan: (_, _) => ignored is null ? report : new DuplicateLineReport([], []),
             ignore: e => ignored = e);
 
         vm.DuplicateRows[0].IgnoreCommand.Execute(null);
@@ -157,7 +157,7 @@ public class TextTagValidationViewModelTests
         var seen = new List<double>();
         _ = new TextTagValidationViewModel(
             scan: () => [],
-            dupScan: o => { seen.Add(o.NearThreshold); return new DuplicateLineReport([], []); },
+            dupScan: (o, _) => { seen.Add(o.NearThreshold); return new DuplicateLineReport([], []); },
             duplicateOptions: new DuplicateScanOptions(0.75));
 
         Assert.Equal(0.75, Assert.Single(seen));
@@ -178,7 +178,7 @@ public class TextTagValidationViewModelTests
         var seen = new List<double>();
         var vm = new TextTagValidationViewModel(
             scan: () => [],
-            dupScan: o => { seen.Add(o.NearThreshold); return new DuplicateLineReport([], []); });
+            dupScan: (o, _) => { seen.Add(o.NearThreshold); return new DuplicateLineReport([], []); });
         seen.Clear();
 
         vm.NearThreshold = 0.70;
@@ -229,7 +229,7 @@ public class TextTagValidationViewModelTests
         var seen = new List<DuplicateScanOptions>();
         _ = new TextTagValidationViewModel(
             scan: () => [],
-            dupScan: o => { seen.Add(o); return new DuplicateLineReport([], []); },
+            dupScan: (o, _) => { seen.Add(o); return new DuplicateLineReport([], []); },
             duplicateOptions: new DuplicateScanOptions(0.75, true, true));
 
         var o = Assert.Single(seen);
@@ -244,7 +244,7 @@ public class TextTagValidationViewModelTests
         var seen = new List<DuplicateScanOptions>();
         var vm = new TextTagValidationViewModel(
             scan: () => [],
-            dupScan: o => { seen.Add(o); return new DuplicateLineReport([], []); });
+            dupScan: (o, _) => { seen.Add(o); return new DuplicateLineReport([], []); });
         seen.Clear();
 
         vm.IncludeFemaleText = true;
@@ -258,7 +258,7 @@ public class TextTagValidationViewModelTests
         var seen = new List<DuplicateScanOptions>();
         var vm = new TextTagValidationViewModel(
             scan: () => [],
-            dupScan: o => { seen.Add(o); return new DuplicateLineReport([], []); });
+            dupScan: (o, _) => { seen.Add(o); return new DuplicateLineReport([], []); });
         seen.Clear();
 
         vm.IncludeOtherLanguages = true;
@@ -314,9 +314,176 @@ public class TextTagValidationViewModelTests
                  new LineRef("c1", 2, "some duplicated line here", language, isFemale)])],
             []);
 
-        var vm = new TextTagValidationViewModel(scan: () => [], dupScan: _ => report);
+        var vm = new TextTagValidationViewModel(scan: () => [], dupScan: (_, _) => report);
 
         var row = Assert.Single(vm.DuplicateRows);
         Assert.Equal(expectAnnotation, row.Locations.Contains("Duplicate_Source"));
+    }
+
+    // ── Base game (issue #14, cross-vanilla) ────────────────────────────────
+
+    private static readonly IReadOnlyList<VanillaLine> OneVanilla =
+        [new VanillaLine("v", 1, "the wind howls through the rigging tonight", false)];
+
+    private static DuplicateLineReport OneBaseGameExact() => new(
+        [new ExactDuplicateGroup("k", "text",
+            [new LineRef("mine", 1, "text"), new LineRef("v", 7, "text", FromBaseGame: true)])],
+        []);
+
+    [Fact]
+    public void CanCompareBaseGame_FalseWithoutLoader()
+    {
+        var vm = new TextTagValidationViewModel(scan: () => [], dupScan: (_, _) => new([], []));
+        Assert.False(vm.CanCompareBaseGame);
+    }
+
+    [Fact]
+    public async Task IncludeBaseGame_LoadsOnce_ThenReusesCorpus()
+    {
+        var loads = 0;
+        var seen  = new List<IReadOnlyList<VanillaLine>?>();
+        var vm = new TextTagValidationViewModel(
+            scan: () => [],
+            dupScan: (_, v) => { seen.Add(v); return new([], []); },
+            loadVanilla: _ => { loads++; return Task.FromResult(OneVanilla); });
+        Assert.True(vm.CanCompareBaseGame);
+
+        vm.IncludeBaseGame = true;
+        await vm.BaseGameScanTask;
+        vm.NearThreshold = 0.90;
+        await vm.BaseGameScanTask;
+        vm.RefreshCommand.Execute(null);
+        await vm.BaseGameScanTask;
+
+        Assert.Equal(1, loads);
+        Assert.Same(OneVanilla, seen[^1]);
+    }
+
+    [Fact]
+    public async Task IncludeBaseGame_Off_PassesNoCorpus_AndNeverLoads()
+    {
+        var loads = 0;
+        var seen  = new List<IReadOnlyList<VanillaLine>?>();
+        var vm = new TextTagValidationViewModel(
+            scan: () => [],
+            dupScan: (_, v) => { seen.Add(v); return new([], []); },
+            loadVanilla: _ => { loads++; return Task.FromResult(OneVanilla); });
+
+        await vm.BaseGameScanTask;
+
+        Assert.Equal(0, loads);
+        Assert.NotEmpty(seen);
+        Assert.All(seen, v => Assert.Null(v));
+    }
+
+    [Fact]
+    public async Task IsLoadingBaseGame_TrueDuringLoad_FalseAfter()
+    {
+        var gate = new TaskCompletionSource<IReadOnlyList<VanillaLine>>();
+        var vm = new TextTagValidationViewModel(
+            scan: () => [],
+            dupScan: (_, _) => OneBaseGameExact(),
+            loadVanilla: _ => gate.Task);
+
+        vm.IncludeBaseGame = true;
+        Assert.True(vm.IsLoadingBaseGame);
+
+        gate.SetResult(OneVanilla);
+        await vm.BaseGameScanTask;
+
+        Assert.False(vm.IsLoadingBaseGame);
+        Assert.True(vm.HasDuplicates);
+    }
+
+    [Fact] // A scan superseded by a newer option change must not overwrite its rows.
+    public async Task SupersededScan_ResultDiscarded()
+    {
+        var gate = new TaskCompletionSource<IReadOnlyList<VanillaLine>>();
+        var vm = new TextTagValidationViewModel(
+            scan: () => [],
+            dupScan: (_, v) => v is null ? new([], []) : OneBaseGameExact(),
+            loadVanilla: _ => gate.Task);
+
+        vm.IncludeBaseGame = true;      // generation 1: waiting on the load
+        var first = vm.BaseGameScanTask;
+        vm.IncludeBaseGame = false;     // generation 2: synchronous, writer-only, empty
+
+        gate.SetResult(OneVanilla);
+        await first;
+
+        Assert.False(vm.HasDuplicates);
+        Assert.False(vm.IsLoadingBaseGame);
+    }
+
+    [Fact]
+    public async Task LoadFailure_FlagsIt_ShowsWriterRows_AndRetries()
+    {
+        var attempt = 0;
+        var writerOnly = OneExact();
+        var vm = new TextTagValidationViewModel(
+            scan: () => [],
+            dupScan: (_, v) => v is null ? writerOnly : OneBaseGameExact(),
+            loadVanilla: _ => ++attempt == 1
+                ? Task.FromException<IReadOnlyList<VanillaLine>>(new IOException("disk"))
+                : Task.FromResult(OneVanilla));
+
+        vm.IncludeBaseGame = true;
+        await vm.BaseGameScanTask;
+
+        Assert.True(vm.BaseGameLoadFailed);
+        Assert.True(vm.HasDuplicates);            // writer-only rows still shown
+        Assert.False(vm.IsLoadingBaseGame);
+
+        vm.RefreshCommand.Execute(null);          // retry
+        await vm.BaseGameScanTask;
+
+        Assert.Equal(2, attempt);
+        Assert.False(vm.BaseGameLoadFailed);
+    }
+
+    [Fact] // Closing the window cancels the load; cancellation is silent.
+    public async Task Cancel_DuringLoad_IsSilent()
+    {
+        var vm = new TextTagValidationViewModel(
+            scan: () => [],
+            dupScan: (_, _) => new([], []),
+            loadVanilla: ct => Task.Delay(Timeout.Infinite, ct)
+                .ContinueWith<IReadOnlyList<VanillaLine>>(_ => OneVanilla, ct));
+
+        vm.IncludeBaseGame = true;
+        vm.Cancel();
+        await vm.BaseGameScanTask;               // must not throw
+
+        Assert.False(vm.BaseGameLoadFailed);
+        Assert.False(vm.IsLoadingBaseGame);
+    }
+
+    [Fact]
+    public void IncludeBaseGame_RoundTripsThroughOptions()
+    {
+        DuplicateScanOptions? persisted = null;
+        var vm = new TextTagValidationViewModel(
+            scan: () => [],
+            dupScan: (_, _) => new([], []),
+            duplicateOptions: new DuplicateScanOptions(IncludeBaseGame: false),
+            persistDuplicateOptions: o => persisted = o);
+
+        vm.IncludeBaseGame = true;               // no loader: stays on the sync path
+
+        Assert.True(persisted!.IncludeBaseGame);
+        Assert.True(vm.DuplicateOptions.IncludeBaseGame);
+    }
+
+    [Fact] // Base-game members are labelled so the writer can tell which line is theirs.
+    public void BaseGameMember_LabelledInLocations()
+    {
+        // The plain stub echoes "Duplicate_Source" with no placeholders, which would hide
+        // the inner marker; give that one key its real shape.
+        Loc.Configure(new EchoStringProvider(new() { ["Duplicate_Source"] = "{0} [{1}]" }));
+        var vm = new TextTagValidationViewModel(
+            scan: () => [],
+            dupScan: (_, _) => OneBaseGameExact());
+
+        Assert.Contains("[Duplicate_Source_BaseGame]", vm.DuplicateRows[0].Locations);
     }
 }
