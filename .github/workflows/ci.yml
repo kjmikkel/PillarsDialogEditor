@@ -58,6 +58,12 @@ jobs:
       - name: Restore
         run: dotnet restore DialogEditor.slnx
 
+      # Every finding is annotated; which ones fail the build is the policy in
+      # Test-FindingBlocksBuild inside the script.
+      - name: Vulnerable package check
+        shell: pwsh
+        run: ./tools/ci/Assert-NoVulnerablePackages.ps1
+
       # Debug, matching a local `dotnet test` (and the dev path the UiaMcp GUI
       # tests launch from, should they ever run here). Release packaging is
       # build.ps1's job.
