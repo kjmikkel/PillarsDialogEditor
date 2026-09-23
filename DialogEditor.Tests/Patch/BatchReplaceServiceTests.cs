@@ -299,4 +299,3 @@ public class BatchReplaceServiceTests
         Assert.Null(provider.SavedSnapshot);
     }
 }
-

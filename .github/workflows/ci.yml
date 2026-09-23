@@ -1,9 +1,11 @@
 # Continuous integration: every push to main and every pull request.
 #
-# Three independent jobs, so a red Python test doesn't hide a red .NET test:
-#   dotnet            — build the whole solution and run both xUnit projects
+# Independent jobs, so a red Python test doesn't hide a red .NET test:
+#   dotnet            — build the whole solution, run both xUnit projects,
+#                       report coverage
 #   python-tools      — unit tests for the catalogue/lexicon generators
 #   catalogue-mirror  — the embedded catalogue and its data/ mirror must match
+#   hygiene           — no trailing whitespace etc. in the changes
 #
 # Nothing here needs game data. The generators themselves run only locally
 # (they read the decompiled sources and GOG installs); CI tests their logic
@@ -80,10 +82,12 @@ jobs:
       #     the developer's own settings.json and game install (conversation rows
       #     come from LastGameDirectory). A runner has neither, and game data must
       #     never be put on a public runner, so GUI verification stays local.
+      # coverage.runsettings adds coverlet coverage (product assemblies only).
       - name: Test
         run: >-
           dotnet test DialogEditor.slnx -c Debug --no-build
           --filter "Requires!=AudioDevice&Category!=Gui"
+          --settings coverage.runsettings
           --logger "trx"
           --logger "console;verbosity=minimal"
           --results-directory TestResults
@@ -95,6 +99,28 @@ jobs:
           name: test-results
           path: TestResults/**/*.trx
           if-no-files-found: warn
+
+      # Informational, not a gate: the summary lands on the run's page (and the
+      # PR's Checks tab); the full per-line HTML report is an artifact.
+      # ReportGenerator is pinned in .config/dotnet-tools.json.
+      - name: Coverage report
+        if: ${{ !cancelled() && hashFiles('TestResults/**/coverage.cobertura.xml') != '' }}
+        shell: pwsh
+        run: |
+          dotnet tool restore
+          dotnet reportgenerator `
+            "-reports:TestResults/**/coverage.cobertura.xml" `
+            "-targetdir:CoverageReport" `
+            "-reporttypes:MarkdownSummaryGithub;HtmlInline" `
+            "-verbosity:Warning"
+          Get-Content CoverageReport/SummaryGithub.md | Add-Content $env:GITHUB_STEP_SUMMARY
+
+      - name: Upload coverage report
+        if: ${{ !cancelled() && hashFiles('CoverageReport/**') != '' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: CoverageReport/
 
   python-tools:
     name: Generator tests (Python)
@@ -136,3 +162,38 @@ jobs:
             fi
           done
           exit $status
+
+  hygiene:
+    name: Whitespace hygiene
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      # Deliberately NOT dotnet format: the codebase column-aligns
+      # declarations, initialisers, switch arms and record parameters, and
+      # Roslyn's formatter has no setting to preserve that — it would flag
+      # thousands of intentional lines. `git diff --check` catches only real
+      # noise (trailing whitespace, space-before-tab, blank lines at EOF), and
+      # only in what this PR/push changes, so it never blocks on old code.
+      # Refs go through env, never ${{ }} inside the script (injection-safe).
+      - name: git diff --check
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_REF: ${{ github.base_ref }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then
+            base="origin/$BASE_REF"
+          elif [ -n "$BEFORE" ] && ! [[ "$BEFORE" =~ ^0+$ ]]; then
+            base="$BEFORE"
+          else
+            echo "No base to compare against (new branch or manual run) — skipping."
+            exit 0
+          fi
+          if ! git diff --check "$base" HEAD; then
+            echo "::error::Whitespace problems in the changes above (trailing whitespace, space before tab, or blank line at end of file)."
+            exit 1
+          fi
+          echo "Clean."

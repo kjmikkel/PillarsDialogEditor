@@ -36,5 +36,9 @@ PoE Dialog Editor Research/.obsidian/workspace.json
 # Distribution output
 dist/
 
+# Test results and coverage (CI writes these; so does running its commands locally)
+TestResults/
+CoverageReport/
+
 # Palette golden test — transient artifact; only the .approved.txt is committed
 palette-golden.received.txt
