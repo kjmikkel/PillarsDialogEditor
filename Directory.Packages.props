@@ -1,0 +1,66 @@
+<!--
+  Central Package Management: the ONE place a NuGet package's version is set for
+  the whole solution. Projects list <PackageReference Include="X" /> with no
+  Version. Why: per-project versions let Dependabot bump a package in some
+  projects and not others (#54/#55/#56 with CommunityToolkit.Mvvm), which fails
+  restore with NU1605 whenever a project's direct reference is lower than what it
+  inherits. With one version per package, a bump is one line and can't be partial.
+
+  To add a package: add a <PackageVersion> here, then a Version-less
+  <PackageReference> in the project.
+-->
+<Project>
+  <PropertyGroup>
+    <!--
+      Worktree guard. MSBuild finds this file by searching UPWARD from each project.
+      Session worktrees live INSIDE this checkout (.claude/worktrees/<name>, and
+      .worktrees/<name> for the superpowers skill), so a worktree on a branch that
+      predates this file would climb up to it, switch CPM on, and fail on its own
+      Version= attributes (NU1008). Only enable CPM for projects of the checkout this
+      file belongs to: the path from here to the project must not pass through a
+      nested worktree. A worktree whose branch HAS this file stops at its own copy,
+      where that path is plain "DialogEditor.Core" etc., so the guard stays out of
+      its way.
+    -->
+    <_PathFromPackagesRoot>$([MSBuild]::MakeRelative($(MSBuildThisFileDirectory), $(MSBuildProjectDirectory)).Replace('\', '/'))</_PathFromPackagesRoot>
+    <ManagePackageVersionsCentrally Condition="!$(_PathFromPackagesRoot.Contains('.claude/worktrees/')) and !$(_PathFromPackagesRoot.Contains('.worktrees/'))">true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <!--
+    Avalonia, its headless test host and Dock move in lockstep (Dock 11.3.x tracks
+    Avalonia 11.3.x; Avalonia.Headless.XUnit must match Avalonia exactly) — see the
+    "avalonia" group in .github/dependabot.yml.
+  -->
+  <ItemGroup Label="Avalonia and Dock">
+    <PackageVersion Include="Avalonia"                       Version="11.3.22" />
+    <PackageVersion Include="Avalonia.Desktop"               Version="11.3.22" />
+    <PackageVersion Include="Avalonia.Fonts.Inter"           Version="11.3.22" />
+    <PackageVersion Include="Avalonia.Themes.Fluent"         Version="11.3.22" />
+    <PackageVersion Include="Avalonia.Headless.XUnit"        Version="11.3.22" />
+    <PackageVersion Include="Dock.Avalonia"                  Version="11.3.12.1" />
+    <PackageVersion Include="Dock.Avalonia.Themes.Fluent"    Version="11.3.12.1" />
+    <PackageVersion Include="Dock.Model.Mvvm"                Version="11.3.12.1" />
+    <PackageVersion Include="Dock.Serializer.SystemTextJson" Version="11.3.12.1" />
+  </ItemGroup>
+
+  <ItemGroup Label="Application">
+    <PackageVersion Include="CommunityToolkit.Mvvm"          Version="8.4.2" />
+    <PackageVersion Include="NAudio"                         Version="2.2.1" />
+    <PackageVersion Include="NodifyAvalonia"                 Version="6.6.0" />
+    <PackageVersion Include="WeCantSpell.Hunspell"           Version="7.0.1" />
+  </ItemGroup>
+
+  <ItemGroup Label="UI automation tooling (tools/DialogEditor.UiaMcp*)">
+    <PackageVersion Include="Microsoft.Extensions.Hosting"   Version="10.0.12" />
+    <PackageVersion Include="ModelContextProtocol"           Version="2.2.0" />
+  </ItemGroup>
+
+  <!-- xunit stays on v2: Avalonia.Headless.XUnit targets it. -->
+  <ItemGroup Label="Tests">
+    <PackageVersion Include="coverlet.collector"             Version="10.0.1" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp"  Version="5.9.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk"         Version="18.10.1" />
+    <PackageVersion Include="xunit"                          Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio"      Version="2.8.2" />
+  </ItemGroup>
+</Project>
