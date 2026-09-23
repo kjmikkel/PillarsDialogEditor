@@ -3,6 +3,7 @@
 # Independent jobs, so a red Python test doesn't hide a red .NET test:
 #   dotnet            — build the whole solution, run both xUnit projects,
 #                       report coverage
+#   source-archives   — each build-source.ps1 zip builds on its own
 #   python-tools      — unit tests for the catalogue/lexicon generators
 #   catalogue-mirror  — the embedded catalogue and its data/ mirror must match
 #   hygiene           — no trailing whitespace etc. in the changes
@@ -122,6 +123,41 @@ jobs:
         with:
           name: coverage-report
           path: CoverageReport/
+
+  source-archives:
+    name: Source archives build standalone
+    # build-source.ps1 packs a trimmed source tree per app. Nothing else builds
+    # those trees, so a project reference or out-of-folder file that isn't in
+    # the package list goes unnoticed until a recipient tries to build it.
+    # Windows, matching build-source.ps1's own environment (build.ps1 is run
+    # locally on Windows for releases).
+    runs-on: windows-latest
+    timeout-minutes: 20
+    env:
+      DOTNET_NOLOGO: true
+      DOTNET_CLI_TELEMETRY_OPTOUT: true
+      NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
+    steps:
+      - uses: actions/checkout@v7
+
+      # The archives' trimmed solutions are .slnx, so SDK 10 is needed.
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: |
+            8.0.x
+            10.0.x
+
+      - uses: actions/cache@v6
+        with:
+          path: ${{ github.workspace }}/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'Directory.Packages.props') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      # Extracts each archive under RUNNER_TEMP (outside the checkout, so the
+      # repo's root files can't mask a missing one) and builds it.
+      - name: Build each source archive standalone
+        shell: pwsh
+        run: ./tools/ci/Test-SourceArchives.ps1
 
   python-tools:
     name: Generator tests (Python)

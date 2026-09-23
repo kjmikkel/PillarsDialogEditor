@@ -4,8 +4,10 @@
 
 .DESCRIPTION
     Copies the project folders required to build each app (excluding bin/, obj/,
-    and other non-source artefacts), writes a trimmed solution file, and zips
-    everything into ./dist/. Does NOT wipe existing dist/ contents, so it can be
+    and other non-source artefacts), plus any repo files those projects pull in
+    from outside their own folders, writes a trimmed solution file, and zips
+    everything into ./dist/. Each archive must build standalone once extracted;
+    tools/ci/Test-SourceArchives.ps1 checks that (and CI runs it). Does NOT wipe existing dist/ contents, so it can be
     run alongside build-dist.ps1. Use build.ps1 to run both together with a clean
     slate and a test gate.
 
@@ -90,7 +92,11 @@ function New-SourcePackage {
         [string]   $ZipBaseName,
         [string]   $StagingSubDir,
         [string]   $SolutionName,
-        [string[]] $Projects
+        [string[]] $Projects,
+        # Repo-relative files the projects reference from outside their own
+        # folders (e.g. <Content Include="..\CHANGELOG.md">). Copied at the same
+        # relative path so those references resolve in the extracted archive.
+        [string[]] $ExtraFiles = @()
     )
 
     $stageDir = Join-Path $Staging $StagingSubDir
@@ -107,9 +113,19 @@ function New-SourcePackage {
     # Root files recipients need to build and orient themselves.
     # Directory.Packages.props is required: projects carry no package versions of
     # their own (Central Package Management), so without it nothing restores.
-    foreach ($file in @("README.md", "VERSION", "Directory.Packages.props")) {
+    foreach ($file in @("README.md", "VERSION", "LICENSE", "THIRD_PARTY_LICENSES.md", "Directory.Packages.props")) {
         $src = Join-Path $Root $file
         if (Test-Path $src) { Copy-Item $src -Destination $stageDir -Force }
+    }
+
+    # Unlike the root files above, a missing extra file is a hard error: the
+    # build needs it, so skipping it would just ship a broken archive.
+    foreach ($file in $ExtraFiles) {
+        $src = Join-Path $Root $file
+        if (-not (Test-Path $src -PathType Leaf)) { throw "Extra file not found: $file" }
+        $target = Join-Path $stageDir $file
+        New-Item (Split-Path $target -Parent) -ItemType Directory -Force | Out-Null
+        Copy-Item $src -Destination $target -Force
     }
 
     Write-SolutionFile -DestRoot $stageDir -SolutionName $SolutionName -Projects $Projects
@@ -127,8 +143,14 @@ New-Item $Staging -ItemType Directory        | Out-Null
 
 # ── Package each app ──────────────────────────────────────────────────────────
 
-# DialogEditor.Tests references Core, Patch, and ViewModels.
-# ViewModels must therefore appear in every package that includes Tests.
+# Each archive holds exactly what its app needs to build, and nothing more.
+#
+# DialogEditor.Tests is deliberately in none of them. It tests the whole
+# repository, not one app: it references DialogEditor.Avalonia and
+# tools/DialogEditor.UiaMcp.Core, and its source-scanning tests locate the repo
+# root by DialogEditor.slnx and walk every project (PatchManager's XAML
+# included). No per-app subset can satisfy that, so the tests live in the full
+# repository checkout only.
 
 New-SourcePackage `
     -ZipBaseName   "PillarsDialogEditor" `
@@ -139,8 +161,13 @@ New-SourcePackage `
         "DialogEditor.Patch",
         "DialogEditor.ViewModels",
         "DialogEditor.Avalonia.Shared",
-        "DialogEditor.Avalonia",
-        "DialogEditor.Tests"
+        "DialogEditor.Avalonia"
+    ) `
+    -ExtraFiles    @(
+        # Both copied to the editor's output by DialogEditor.Avalonia.csproj
+        # (Help > Changelog and Help > Open Walkthrough).
+        "CHANGELOG.md",
+        "docs/walkthrough.md"
     )
 
 New-SourcePackage `
@@ -152,8 +179,7 @@ New-SourcePackage `
         "DialogEditor.Patch",
         "DialogEditor.ViewModels",
         "DialogEditor.Avalonia.Shared",
-        "DialogEditor.PatchManager",
-        "DialogEditor.Tests"
+        "DialogEditor.PatchManager"
     )
 
 New-SourcePackage `
@@ -164,8 +190,7 @@ New-SourcePackage `
         "DialogEditor.Core",
         "DialogEditor.Patch",
         "DialogEditor.ViewModels",
-        "DialogEditor.PatchCli",
-        "DialogEditor.Tests"
+        "DialogEditor.PatchCli"
     )
 
 # ── Tidy ──────────────────────────────────────────────────────────────────────
