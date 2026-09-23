@@ -1,0 +1,46 @@
+# Weekly dependency-update PRs. Each one runs through ci.yml before it can merge.
+#
+# No pip entry: the Python generators under tools/ use only the standard library
+# (plus spylls, installed by hand when regenerating lexicons locally), so there
+# is no requirements file for Dependabot to track.
+
+version: 2
+updates:
+  - package-ecosystem: nuget
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # Avalonia, its headless test host and Dock must move in lockstep: Dock's
+      # 11.3.x line tracks Avalonia 11.3.x, and Avalonia.Headless.XUnit must
+      # match Avalonia exactly. Separate PRs for these would each fail CI.
+      avalonia:
+        patterns:
+          - "Avalonia"
+          - "Avalonia.*"
+          - "Dock.*"
+      test-stack:
+        patterns:
+          - "xunit*"
+          - "Microsoft.NET.Test.Sdk"
+          - "coverlet.*"
+    ignore:
+      # A major Avalonia/Dock bump (12.x) is a migration project, not a routine
+      # update — do it deliberately rather than via a bot PR that can't pass.
+      - dependency-name: "Avalonia*"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "Dock.*"
+        update-types: ["version-update:semver-major"]
+      # Avalonia.Headless.XUnit targets xunit v2; xunit v3 ships under new
+      # package ids anyway, but keep v2's own major line put.
+      - dependency-name: "xunit*"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
