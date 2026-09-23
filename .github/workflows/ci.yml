@@ -39,11 +39,11 @@ jobs:
       DOTNET_CLI_TELEMETRY_OPTOUT: true
       NUGET_PACKAGES: ${{ github.workspace }}/.nuget/packages
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       # SDK 10 is needed to read DialogEditor.slnx (requires SDK >= 9.0.200);
       # the 8.0 runtime is what the net8.0 test hosts actually run on.
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6
         with:
           dotnet-version: |
             8.0.x
@@ -51,7 +51,7 @@ jobs:
 
       # No packages.lock.json in the repo, so setup-dotnet's built-in cache
       # can't be used — key the package cache on the project files instead.
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: ${{ github.workspace }}/.nuget/packages
           key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
@@ -94,7 +94,7 @@ jobs:
 
       - name: Upload test results
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-results
           path: TestResults/**/*.trx
@@ -131,8 +131,8 @@ jobs:
       matrix:
         tool: [catalogue-gen, lexicon-gen]
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
       # pytest is the only dependency the tests need: lexicon-gen imports
@@ -147,7 +147,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       # catalogue-gen writes the embedded catalogue and a human-readable copy
       # under data/. A hand edit to only one of them drifts silently; this
       # fails the build and shows the diff instead.
