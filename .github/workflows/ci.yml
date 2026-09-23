@@ -50,11 +50,12 @@ jobs:
             10.0.x
 
       # No packages.lock.json in the repo, so setup-dotnet's built-in cache
-      # can't be used — key the package cache on the project files instead.
+      # can't be used — key the package cache on the project files and the
+      # central version list (Directory.Packages.props) instead.
       - uses: actions/cache@v6
         with:
           path: ${{ github.workspace }}/.nuget/packages
-          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj', 'Directory.Packages.props') }}
           restore-keys: nuget-${{ runner.os }}-
 
       - name: Restore
