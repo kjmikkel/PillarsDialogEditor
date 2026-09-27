@@ -105,6 +105,85 @@ public sealed class PatcherBackupStore
     public static string? HashFile(string absPath) =>
         File.Exists(absPath) ? Convert.ToHexString(SHA256.HashData(File.ReadAllBytes(absPath))) : null;
 
+    /// A file's "original state" is its backed-up hash (Overwritten) or absence (Created);
+    /// null stands for "file absent" throughout.
+    private static string? OriginalState(BackupEntry e) =>
+        e.Kind == BackupEntryKind.Overwritten ? e.OriginalSha256 : null;
+
+    private bool IsExternallyChanged(BackupEntry e)
+    {
+        var current = HashFile(ToAbsolute(e.Path));
+        if (current == OriginalState(e)) return false;
+        if (e.LastWrittenSha256 is not null && current == e.LastWrittenSha256) return false;
+        return true;
+    }
+
+    public IReadOnlyList<string> FindExternallyChanged() =>
+        _entries.Where(IsExternallyChanged).Select(e => e.Path).ToList();
+
+    public IReadOnlyList<string> RestoreAll()
+    {
+        var skipped = new List<string>();
+        for (var i = 0; i < _entries.Count; i++)
+        {
+            var e = _entries[i];
+            if (IsExternallyChanged(e)) { skipped.Add(e.Path); continue; }
+
+            var abs = ToAbsolute(e.Path);
+            if (e.Kind == BackupEntryKind.Overwritten)
+            {
+                if (HashFile(abs) != e.OriginalSha256)
+                {
+                    Directory.CreateDirectory(Path.GetDirectoryName(abs)!);
+                    File.Copy(BackupCopyPath(e.Path), abs, overwrite: true);
+                }
+            }
+            else if (File.Exists(abs))
+            {
+                File.Delete(abs);
+            }
+            _entries[i] = e with { LastWrittenSha256 = null };
+        }
+        Save();
+        return skipped;
+    }
+
+    public void AcceptCurrentAsOriginal(IEnumerable<string> relPaths)
+    {
+        foreach (var rel in relPaths)
+        {
+            var i = IndexOf(rel);
+            if (i < 0) continue;
+            var abs  = ToAbsolute(_entries[i].Path);
+            var copy = BackupCopyPath(_entries[i].Path);
+            if (File.Exists(abs))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(copy)!);
+                File.Copy(abs, copy, overwrite: true);
+                _entries[i] = _entries[i] with
+                {
+                    Kind = BackupEntryKind.Overwritten, OriginalSha256 = HashFile(abs), LastWrittenSha256 = null,
+                };
+            }
+            else
+            {
+                if (File.Exists(copy)) File.Delete(copy);
+                _entries[i] = _entries[i] with
+                {
+                    Kind = BackupEntryKind.Created, OriginalSha256 = null, LastWrittenSha256 = null,
+                };
+            }
+        }
+        Save();
+    }
+
+    public void DeleteBackup()
+    {
+        if (Directory.Exists(BackupRoot))
+            Directory.Delete(BackupRoot, recursive: true);
+        _entries.Clear();
+    }
+
     private string BackupCopyPath(string rel) =>
         Path.Combine(FilesRoot, rel.Replace('/', Path.DirectorySeparatorChar));
 
