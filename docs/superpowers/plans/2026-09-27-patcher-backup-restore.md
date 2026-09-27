@@ -1249,7 +1249,8 @@ In `PatchInstaller`:
 
 ```csharp
     /// PoE2 only: PoE1 keeps VO inside Unity asset archives the patcher cannot write (#4).
-    /// The single home of this path; the CLI and the Patch Manager used to hard-code it separately.
+    /// The single home of this path for the patcher; the CLI and the Patch Manager used to
+    /// hard-code it separately. Only English(US) until #101 adds the other VO languages.
     public static string? VoRoot(IGameDataProvider provider, string gameDir) =>
         provider.GameId == "poe2"
             ? Path.Combine(gameDir, "PillarsOfEternityII_Data", "StreamingAssets",
