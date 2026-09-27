@@ -12,8 +12,8 @@ public sealed partial class GuidedTourViewModel : ObservableObject
     // find further help.
     //
     // TargetName is an opaque key, NOT a control name — this project stays Avalonia-free.
-    // MainWindow.axaml.cs owns the mapping from key to a live Control (see
-    // ResolveTourTarget there). That indirection is what lets the first three targets be
+    // DialogEditor.Avalonia's Docking/TourTargetResolver owns the mapping from key to a
+    // live Control, and MainWindow.axaml.cs drives it (OnTourStepChanged). That indirection is what lets the first three targets be
     // Dock-hosted tool content, which has no compile-time x:Name to look up: they are
     // resolved by view type from the live visual tree, and the tool is revealed first if
     // the user has closed or backgrounded its tab.
