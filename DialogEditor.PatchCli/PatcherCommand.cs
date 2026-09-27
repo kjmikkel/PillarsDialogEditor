@@ -18,7 +18,7 @@ namespace DialogEditor.PatchCli;
 [NotLocalised("dialog-patcher is English-only console output, like CrossModConflictReport")]
 public static class PatcherCommand
 {
-    private const string Help = """
+    private const string Help = $"""
       dialog-patcher — apply Pillars of Eternity dialog patch projects to game files
 
       Usage:
@@ -50,7 +50,7 @@ public static class PatcherCommand
         -v, --verbose           Print each conversation as it is patched.
         -q, --quiet             Suppress all output except errors.
         --dry-run               Validate and plan the apply without writing any files.
-        --version               Print version and exit.
+        --version               Print version and the file formats it reads, and exit.
         -h, --help              Show this help.
 
       Exit codes:
@@ -60,7 +60,7 @@ public static class PatcherCommand
         3   Files the patcher manages were changed outside it. Re-run with
             --accept-current-files, or with --restore.
         4   A project or pack uses a newer file format than this patcher reads.
-            Nothing was changed. Update dialog-patcher.
+            Nothing was changed. Update dialog-patcher: {SchemaFormats.PatcherReleasesUrl}
       """;
 
     public static int Run(string[] args, TextWriter stdout, TextWriter stderr)
@@ -90,7 +90,12 @@ public static class PatcherCommand
         }
 
         if (Has("-h", "--help")) { stdout.WriteLine(Help); return 0; }
-        if (Has("--version"))    { stdout.WriteLine($"dialog-patcher {version}"); return 0; }
+        if (Has("--version"))
+        {
+            stdout.WriteLine($"dialog-patcher {version}");
+            stdout.WriteLine($"reads {SchemaFormats.EnglishSummary}");
+            return 0;
+        }
 
         // ── Parse arguments ───────────────────────────────────────────────
 
@@ -189,6 +194,7 @@ public static class PatcherCommand
                 // Refused in the load phase, before PatchInstaller, so nothing is written (GitHub issue 62).
                 AppLog.Warn($"dialog-patcher: '{path}' needs a newer patcher: {ex.Message}");
                 Error($"Could not load '{path}': {ex.Message}");
+                stderr.WriteLine($"Nothing was changed. Get the latest dialog-patcher: {SchemaFormats.PatcherReleasesUrl}");
                 CleanupTempDirs(tempDirs);
                 return 4;
             }
