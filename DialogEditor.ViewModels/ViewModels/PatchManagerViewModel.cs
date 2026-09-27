@@ -59,32 +59,47 @@ public partial class PatchManagerViewModel : ObservableObject
             if (Entries.Any(e => string.Equals(e.FullPath, path, StringComparison.OrdinalIgnoreCase)))
                 continue;
 
-            PatchEntryViewModel entry;
-            try
-            {
-                string projectFilePath = path;
-                string? voFolder = null;
-
-                string? tempDir = null;
-                if (DialogPackHelper.IsDialogPack(path))
-                {
-                    // TempDir is kept alive until apply (vo/ is needed) or removal.
-                    var extracted   = DialogPackHelper.Extract(path);
-                    projectFilePath = extracted.ProjectFilePath;
-                    voFolder        = extracted.VoFolderPath;
-                    tempDir         = extracted.TempDir;
-                }
-
-                var project = DialogProjectSerializer.LoadFromFile(projectFilePath);
-                entry = new PatchEntryViewModel(path, project, voFolder, tempDir);
-            }
-            catch (OperationCanceledException) { throw; }
-            catch (Exception ex)
-            {
-                AppLog.Error($"Failed to load '{path}'", ex);
-                entry = new PatchEntryViewModel(path, ex.Message);
-            }
+            var entry = LoadEntry(path);
             Entries.Add(entry);
+        }
+    }
+
+    /// Loads a .dialogproject or a .dialogpack into an entry. Shared by AddEntries and
+    /// LoadFromFile: a saved .patchlist records the pack path itself, so a reload must
+    /// extract the pack again — JSON-parsing the zip fails and the vo/ folder is lost.
+    /// A load failure yields an error entry rather than throwing, so one bad file
+    /// doesn't abort the rest of the list.
+    private static PatchEntryViewModel LoadEntry(string path)
+    {
+        string? tempDir = null;
+        try
+        {
+            string projectFilePath = path;
+            string? voFolder = null;
+
+            if (DialogPackHelper.IsDialogPack(path))
+            {
+                // TempDir is kept alive until apply (vo/ is needed) or removal.
+                var extracted   = DialogPackHelper.Extract(path);
+                projectFilePath = extracted.ProjectFilePath;
+                voFolder        = extracted.VoFolderPath;
+                tempDir         = extracted.TempDir;
+            }
+
+            var project = DialogProjectSerializer.LoadFromFile(projectFilePath);
+            return new PatchEntryViewModel(path, project, voFolder, tempDir);
+        }
+        catch (OperationCanceledException) { throw; }
+        catch (Exception ex)
+        {
+            AppLog.Error($"Failed to load '{path}'", ex);
+            // An error entry owns no temp dir, so nothing would ever delete it.
+            if (tempDir is not null)
+            {
+                try { Directory.Delete(tempDir, recursive: true); }
+                catch (Exception cleanupEx) { AppLog.Warn($"PatchManager: failed to delete temp dir '{tempDir}': {cleanupEx.Message}"); }
+            }
+            return new PatchEntryViewModel(path, ex.Message);
         }
     }
 
@@ -200,18 +215,7 @@ public partial class PatchManagerViewModel : ObservableObject
             foreach (var entry in list.Entries)
             {
                 var resolved = PatchListSerializer.ResolvePath(path, entry);
-                PatchEntryViewModel vm;
-                try
-                {
-                    var project = DialogProjectSerializer.LoadFromFile(resolved);
-                    vm = new PatchEntryViewModel(resolved, project);
-                }
-                catch (Exception ex)
-                {
-                    AppLog.Error($"Failed to load project '{resolved}'", ex);
-                    vm = new PatchEntryViewModel(resolved, ex.Message);
-                }
-                Entries.Add(vm);
+                Entries.Add(LoadEntry(resolved));
             }
         }
         catch (Exception ex)
