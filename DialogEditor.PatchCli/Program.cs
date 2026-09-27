@@ -17,6 +17,8 @@ const string Help = """
     project.dialogproject   One or more .dialogproject or .dialogpack files to apply.
                             When multiple projects are given they are merged in
                             order (later projects win on any contested field).
+                            Every such overlap is listed as a warning before the
+                            apply; use --dry-run to check a load order first.
 
   Options:
     -f, --force     Apply patches even when a field's current value does not
@@ -118,6 +120,24 @@ foreach (var path in projectPaths)
         CleanupTempDirs(tempDirs);
         return 2;
     }
+}
+
+// ── Warn about cross-mod conflicts ───────────────────────────────────────────
+// The merge below resolves every overlap last-wins, so say which ones exist before it
+// silently does (issue #6). A warning, not an error: overriding an earlier mod is often
+// the point of load order, and the exit codes stay as documented.
+
+var crossModConflicts = ConflictDetector.Detect(projects
+    .Select(p => (p.Name, (IReadOnlyDictionary<string, ConversationPatch>)p.Patches))
+    .ToList());
+
+if (crossModConflicts.Count > 0 && !quiet)
+{
+    var names = projects.Select(p => p.Name).ToList();
+    Console.Error.WriteLine(
+        $"Warning: {crossModConflicts.Count} cross-mod conflict(s); projects later on the command line win:");
+    foreach (var c in crossModConflicts)
+        Console.Error.WriteLine($"  {CrossModConflictReport.Describe(c, names)}");
 }
 
 // ── Merge projects (if more than one) ────────────────────────────────────────

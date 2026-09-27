@@ -53,11 +53,11 @@ public class PatchManagerViewTests
 
     [AvaloniaFact]
     public void FieldConflictRow_RendersTheFieldName()
-        => Assert.Equal("conversation 'conv1' \u00b7 node 5 \u00b7 DefaultText",
+        => Assert.Equal("conversation 'conv1' \u00b7 node 5 \u00b7 DefaultText \u00b7 between 'mod' and 'mod'",
                         FirstRowText(VmWith(Modifies(5, "DefaultText"), Modifies(5, "DefaultText"))));
 
     [AvaloniaFact]
     public void DeleteVsModifyRow_RendersTheLocalisedDeletedMarker()
-        => Assert.Equal("conversation 'conv1' \u00b7 node 7 \u00b7 (deleted)",
+        => Assert.Equal("conversation 'conv1' \u00b7 node 7 \u00b7 (deleted) \u00b7 between 'mod' and 'mod'",
                         FirstRowText(VmWith(Modifies(7, "DefaultText"), Deletes(7))));
 }
