@@ -26,7 +26,8 @@ public class PaletteContrastTests
         new("Text.OnAccent / Button.Caution",     "Palette.White", "Palette.Burnt.600",  true),
         new("Text.OnAccent / Button.Primary",     "Palette.White", "Palette.Azure.600",   true),
         new("Text.OnAccent / Button.Destructive", "Palette.White", "Palette.Crimson.700", true),
-        new("Text.Status.Added / Surface.Card",   "Palette.Green.400", "Palette.Neutral.100", true),
+        new("Selection.Foreground / Selection.Background", "Palette.White", "Palette.Azure.600", true), // #83
+        new("Text.Status.Added / Surface.Card",  "Palette.Green.400", "Palette.Neutral.100", true),
         new("Text.Status.Changed / Surface.Card", "Palette.Amber.540", "Palette.Neutral.100", true),
         new("Text.Status.Removed / Surface.Card", "Palette.Red.450",   "Palette.Neutral.100", true),
         new("Text.Caption / Surface.Card",  "Palette.Neutral.600", "Palette.Neutral.100", false),
