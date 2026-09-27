@@ -764,6 +764,7 @@ public partial class MainWindow : Window
                 new AvaloniaFolderPicker(this),
                 new AvaloniaFilePicker(this));
             _patchManagerWindow = new PatchManagerWindow(vm);
+            DialogEditor.Avalonia.Shared.PatchManagerDialogs.Attach(vm, _patchManagerWindow);
             _patchManagerWindow.Closed += (_, _) => _patchManagerWindow = null;
         }
         _patchManagerWindow.Show();

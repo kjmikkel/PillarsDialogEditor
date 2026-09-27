@@ -15,6 +15,25 @@
     <sys:String x:Key="PatchManager_AddProjects">Add projects…</sys:String>
     <sys:String x:Key="PatchManager_Apply">Apply patches</sys:String>
     <sys:String x:Key="PatchManager_Applying">Applying…</sys:String>
+    <!-- Remove all mods / backup status (issue #76) -->
+    <sys:String x:Key="PatchManager_RemoveAllMods">Remove all mods</sys:String>
+    <sys:String x:Key="PatchManager_NoModsInstalled">No mods installed with the Patch Manager or dialog-patcher yet.</sys:String>
+    <sys:String x:Key="PatchManager_ModsInstalled_One">Mods are installed: 1 original game file is backed up.</sys:String>
+    <sys:String x:Key="PatchManager_ModsInstalled_Other">Mods are installed: {0} original game files are backed up.</sys:String>
+    <sys:String x:Key="PatchManager_BackupCorrupt">The patcher's backup record is unreadable ({0}). Nothing was changed. Verify the game files in your storefront, then delete the PillarsDialogPatcher folder.</sys:String>
+    <sys:String x:Key="PatchManager_ApplyCancelledExternal">Apply cancelled — nothing was changed.</sys:String>
+    <sys:String x:Key="PatchManager_RemoveAllDone_One">Removed all mods: 1 file restored.</sys:String>
+    <sys:String x:Key="PatchManager_RemoveAllDone_Other">Removed all mods: {0} files restored.</sys:String>
+    <sys:String x:Key="PatchManager_RemoveAllPartial">Removed mods: {0} files restored; {1} left as is because something else changed them (see the log).</sys:String>
+    <sys:String x:Key="PatchManager_RemoveAllError">Remove all mods failed: {0}</sys:String>
+    <sys:String x:Key="PatchManager_RemoveAllConfirm_Title">Remove all mods?</sys:String>
+    <sys:String x:Key="PatchManager_RemoveAllConfirm_Message">Every game file the Patch Manager or dialog-patcher changed is put back to its original, and the files they added are deleted. Your load order stays in the list, so you can apply it again later.</sys:String>
+    <sys:String x:Key="PatchManager_ExternalChanges_Title">Game files changed outside the Patch Manager</sys:String>
+    <sys:String x:Key="PatchManager_ExternalChanges_Message">These files were changed by something other than the Patch Manager — usually a game update or "verify files", sometimes another mod tool. Treat their current contents as the new originals and apply your load order on top of them?</sys:String>
+    <sys:String x:Key="PatchManager_ExternalChanges_Confirm">Treat as new originals</sys:String>
+    <sys:String x:Key="PatchManager_ExternalChanges_More">…and {0} more</sys:String>
+    <sys:String x:Key="Confirm_Cancel">Cancel</sys:String>
+    <sys:String x:Key="ToolTip_RemoveAllMods">Undo every mod installed into this game folder: restore each game file the patcher changed to its original version and delete the files it added. The load order list is kept.</sys:String>
     <sys:String x:Key="PatchManager_EmptyHint">Add .dialogproject files above. Lower entries win on conflict.</sys:String>
     <sys:String x:Key="PatchManager_OrderHint">↑ First applied   ↓ Last applied (wins on conflict)</sys:String>
 
@@ -55,7 +74,7 @@
     <sys:String x:Key="ToolTip_MoveEntryUp">Move up — lower index is applied first; lower position wins on conflict</sys:String>
     <sys:String x:Key="ToolTip_MoveEntryDown">Move down — lower position in the list wins on conflict</sys:String>
     <sys:String x:Key="ToolTip_RemoveEntry">Remove from load order</sys:String>
-    <sys:String x:Key="ToolTip_ApplyPatches">Apply all patches to the game folder in load order. Lower entries win on conflict.</sys:String>
+    <sys:String x:Key="ToolTip_ApplyPatches">Reset the game to its original files, then apply every patch in load order. Lower entries win on conflict. Removing a project from the list and applying again removes that mod.</sys:String>
 
     <!-- FileType descriptions (used by file pickers) -->
     <sys:String x:Key="FileType_PatchList">Patch list (*.patchlist)</sys:String>
