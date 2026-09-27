@@ -11,6 +11,7 @@ using DialogEditor.Core.Import;
 using DialogEditor.Core.Layout;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
+using DialogEditor.Patch.Install;
 using DialogEditor.Patch.Changelog;
 using DialogEditor.Patch.Diff;
 using DialogEditor.Patch.GitConflict;
@@ -83,6 +84,10 @@ public partial class MainWindowViewModel : ObservableObject
     /// Set by the UI layer to surface a patch conflict and ask whether to force-apply.
     /// Returns true if the user chooses Force Apply, false to cancel.
     public Func<PatchConflictException, Task<bool>>? RequestConflictResolution { get; set; }
+
+    /// Set by the UI layer. Asked before Test Patch writes files that mods installed with the
+    /// Patch Manager / dialog-patcher also manage (argument: how many). True = continue.
+    public Func<int, Task<bool>>? ConfirmTestOverPatcherMods { get; set; }
 
     /// Set by the UI: asks the user to save the current copy before bringing in
     /// changes. Returns true to proceed (after saving), false to abort.
@@ -2113,6 +2118,26 @@ public partial class MainWindowViewModel : ObservableObject
         {
             StatusText = Loc.Get("Status_ProjectNoPatch");
             return;
+        }
+
+        // Mods installed with the Patch Manager / dialog-patcher manage some of these files
+        // (issue #76): testing now would patch the modded versions, and the patcher would see
+        // this test's writes as outside changes. Ask once; the forced re-run doesn't ask again.
+        if (!ignoreConflicts && PatcherBackupInfo.TryOpen(_currentGameDirectory) is { } patcher)
+        {
+            var paths = _project.Patches.Keys
+                .Select(name => _provider.FindConversation(name))
+                .Where(f => f is not null)
+                .SelectMany(f => new[] { f!.ConversationPath, _provider.GetStringTablePath(f) })
+                .ToList();
+            var covered = patcher.CoveredPaths(paths).Count;
+            if (covered > 0 && ConfirmTestOverPatcherMods is not null
+                && !await ConfirmTestOverPatcherMods(covered))
+            {
+                AppLog.Warn($"Test Patch cancelled: {covered} file(s) are managed by the patcher");
+                StatusText = Loc.Get("Status_TestPatchCancelledPatcherMods");
+                return;
+            }
         }
 
         var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());

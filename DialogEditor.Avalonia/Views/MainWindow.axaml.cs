@@ -70,6 +70,12 @@ public partial class MainWindow : Window
         vm.RequestConversationNameWithSuggestion = suggested => PromptConversationNameAsync(defaultValue: suggested);
         vm.AttributionLoader = path => new ProjectBlameService(new ProcessGitRunner()).Load(path);
         vm.RequestConflictResolution    = ex => ShowConflictResolutionDialogAsync(ex);
+        // Test Patch over mods installed with the Patch Manager / dialog-patcher (issue #76).
+        vm.ConfirmTestOverPatcherMods = count => new DialogEditor.Avalonia.Shared.ConfirmDialog(
+            Loc.Get("TestOverPatcher_Title"),
+            Loc.Format("TestOverPatcher_Message", count),
+            Loc.Get("TestOverPatcher_Continue"),
+            details: null).ShowAsync(this);
         vm.ShowExportConversations = exportVm =>
         {
             var window = new ExportConversationsWindow(exportVm);
