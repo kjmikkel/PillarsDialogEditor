@@ -249,6 +249,74 @@ public class ConflictDetectorTests
         var kinds = ConflictDetector.Detect(projects).Select(c => c.Kind).Distinct().Order().ToList();
         Assert.Equal([PatchConflictKind.Field, PatchConflictKind.Deletion], kinds);
     }
+
+    // ── Issue #100: text edits live in Translations, so the detector must look there ──
+
+    private static ConversationPatch Text(string lang, int nodeId, string text,
+                                          IReadOnlyList<NodeEditSnapshot>? added = null) =>
+        new("conv1", 2, added ?? [], [], [])
+        {
+            Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
+                { [lang] = [new NodeTranslation(nodeId, text, "")] },
+        };
+
+    [Fact]
+    public void Detect_BothPacksRewriteTheSameLineInTheSameLanguage_ReportsATextConflict()
+    {
+        var projects = new[]
+        {
+            Project("ModA", Text("en", 5, "Hi")),
+            Project("ModB", Text("en", 5, "Hey")),
+        };
+
+        var c = Assert.Single(ConflictDetector.Detect(projects));
+
+        Assert.Equal(PatchConflictKind.Text, c.Kind);
+        Assert.Equal("en", c.Language);
+        Assert.Equal(("conv1", 5, 0, 1), (c.ConversationName, c.NodeId, c.FirstPatchIndex, c.SecondPatchIndex));
+        Assert.False(c.IsDeletion);
+    }
+
+    [Fact]
+    public void Detect_SameLineInDifferentLanguages_IsNotAConflict()
+    {
+        // A French translation pack over an English content mod is complementary.
+        var projects = new[]
+        {
+            Project("ModA", Text("en", 5, "Hi")),
+            Project("ModB", Text("fr", 5, "Salut")),
+        };
+
+        Assert.Empty(ConflictDetector.Detect(projects));
+    }
+
+    [Fact]
+    public void Detect_BothPacksAddTheSameNode_ReportsOnlyTheAddedNodeConflict()
+    {
+        // The added-node conflict already says the later node replaces the earlier one
+        // wholesale, text included; a second row for its text would be noise.
+        var projects = new[]
+        {
+            Project("ModA", Text("en", 500, "from A", [AddedNode(500, "")])),
+            Project("ModB", Text("en", 500, "from B", [AddedNode(500, "")])),
+        };
+
+        Assert.Equal(PatchConflictKind.AddedNode, Assert.Single(ConflictDetector.Detect(projects)).Kind);
+    }
+
+    [Fact]
+    public void Detect_OnePackDeletesALineAnotherRewrites_ReportsADeletionConflict()
+    {
+        var projects = new[]
+        {
+            Project("ModA", Text("en", 5, "Hi")),
+            Project("ModB", new ConversationPatch("conv1", 2, [], [5], [])),
+        };
+
+        var c = Assert.Single(ConflictDetector.Detect(projects));
+        Assert.True(c.IsDeletion);
+        Assert.Equal((1, 0), (c.FirstPatchIndex, c.SecondPatchIndex));
+    }
 }
 
 public class PatchMergerTests
@@ -319,5 +387,69 @@ public class PatchMergerTests
         Assert.Single(merged.ModifiedNodes);
         Assert.Equal("hi",  merged.ModifiedNodes[0].FieldChanges["DefaultText"].To);
         Assert.Equal("her", merged.ModifiedNodes[0].FieldChanges["FemaleText"].To);
+    }
+
+    // ── Issue #100: translations and translator comments survive the merge ──────
+    // Since schema 2 node text lives only in Translations (DiffEngine no longer emits
+    // DefaultText/FemaleText field changes), so a merge that drops Translations loses
+    // every line of text from every mod that shares a conversation with another.
+
+    private static ConversationPatch TextPatch(
+        params (string Lang, int NodeId, string Text)[] entries) =>
+        new("conv", ConversationPatch.CurrentSchemaVersion, [], [], [])
+        {
+            Translations = entries
+                .GroupBy(e => e.Lang)
+                .ToDictionary(
+                    g => g.Key,
+                    g => (IReadOnlyList<NodeTranslation>)g
+                        .Select(e => new NodeTranslation(e.NodeId, e.Text, ""))
+                        .ToList()),
+        };
+
+    private static string? TextOf(ConversationPatch patch, string lang, int nodeId) =>
+        patch.Translations.TryGetValue(lang, out var list)
+            ? list.SingleOrDefault(t => t.NodeId == nodeId)?.DefaultText
+            : null;
+
+    [Fact]
+    public void Merge_KeepsTranslationsFromEveryPatch_LaterWinsPerLanguageAndNode()
+    {
+        var patch1 = TextPatch(("en", 1, "A1"), ("en", 2, "A2"), ("fr", 1, "A1-fr"));
+        var patch2 = TextPatch(("en", 2, "B2"), ("en", 3, "B3"), ("de", 3, "B3-de"));
+
+        var merged = PatchMerger.Merge("conv", [patch1, patch2]);
+
+        Assert.Equal("A1",    TextOf(merged, "en", 1));   // only in the earlier patch
+        Assert.Equal("B2",    TextOf(merged, "en", 2));   // overlap: later wins
+        Assert.Equal("B3",    TextOf(merged, "en", 3));   // only in the later patch
+        Assert.Equal("A1-fr", TextOf(merged, "fr", 1));   // language only the earlier has
+        Assert.Equal("B3-de", TextOf(merged, "de", 3));   // language only the later has
+        Assert.Equal(3, merged.Translations["en"].Count);
+    }
+
+    [Fact]
+    public void Merge_DropsTranslationsOfDeletedNodes()
+    {
+        var patch1 = TextPatch(("en", 1, "A1"), ("en", 2, "A2"));
+        var patch2 = new ConversationPatch("conv", ConversationPatch.CurrentSchemaVersion, [], [2], []);
+
+        var merged = PatchMerger.Merge("conv", [patch1, patch2]);
+
+        Assert.Equal("A1", TextOf(merged, "en", 1));
+        Assert.Null(TextOf(merged, "en", 2));
+    }
+
+    [Fact]
+    public void Merge_KeepsNodeComments_LaterWinsPerNode()
+    {
+        var patch1 = new ConversationPatch("conv", 2, [], [], [])
+            { NodeComments = new Dictionary<int, string> { [1] = "A1", [2] = "A2" } };
+        var patch2 = new ConversationPatch("conv", 2, [], [], [])
+            { NodeComments = new Dictionary<int, string> { [2] = "B2" } };
+
+        var merged = PatchMerger.Merge("conv", [patch1, patch2]);
+
+        Assert.Equal(new Dictionary<int, string> { [1] = "A1", [2] = "B2" }, merged.NodeComments);
     }
 }

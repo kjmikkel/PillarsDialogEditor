@@ -42,6 +42,10 @@
     <!-- Shown in place of a field name when two projects add or change the same link.
          {0} is the id of the node the link leads to (the row's node is where it starts). -->
     <sys:String x:Key="PatchManager_LinkField">link to node {0}</sys:String>
+    <!-- Shown in place of a field name when two projects both rewrite the same line's text
+         in the same language, so the later one's text replaces the earlier one's.
+         {0} is the language code, e.g. "en" or "fr". Display only. -->
+    <sys:String x:Key="PatchManager_TextField">text ({0})</sys:String>
     <sys:String x:Key="PatchManager_EntryConflict">⚠ conflicts with another project</sys:String>
     <sys:String x:Key="PatchManager_EntryConflictDetail">Conflicts with another project — move lower to override the other, or higher to be overridden</sys:String>
     <sys:String x:Key="PatchManager_EntryLoadError">⚠ could not load</sys:String>
