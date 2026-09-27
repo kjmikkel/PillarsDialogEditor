@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using DialogEditor.Patch;
+using DialogEditor.Patch.Schema;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
@@ -104,5 +105,80 @@ public class PatchManagerViewModelSchemaTests : IDisposable
         vm.LoadFromFile(listPath);
 
         Assert.Equal(["Ok"], vm.Entries.Select(e => e.ProjectName));
+    }
+
+    // ── Host-aware wording + releases link (GitHub issue 79) ─────────────
+
+    private static PatchManagerViewModel Standalone(params string[] picked) =>
+        new(new StubFolderPicker(), new StubFilePicker(multiResult: picked)) { Host = PatchManagerHost.Standalone };
+
+    [Fact]
+    public async Task Standalone_NewerMod_AsksForANewerPatcher_AndOffersTheLink()
+    {
+        var vm = Standalone(Project("Future", version: 99));
+
+        await vm.AddEntriesCommand.ExecuteAsync(null);
+
+        Assert.StartsWith("Schema_TooNewForPatcher", vm.StatusText);
+        Assert.True(vm.ShowGetLatestPatcher);
+    }
+
+    [Fact]
+    public async Task InsideTheEditor_NewerMod_KeepsTheEditorWording_AndNoLink()
+    {
+        var vm = Vm(Project("Future", version: 99));
+
+        await vm.AddEntriesCommand.ExecuteAsync(null);
+
+        Assert.StartsWith("Schema_TooNew", vm.StatusText);
+        Assert.DoesNotContain("ForPatcher", vm.StatusText);
+        Assert.False(vm.ShowGetLatestPatcher);
+    }
+
+    [Fact]
+    public void Standalone_NewerLoadOrder_OffersTheLink()
+    {
+        var vm = Standalone();
+        var listPath = Path.Combine(_dir, "future.patchlist");
+        File.WriteAllText(listPath, """{ "SchemaVersion": 99, "GameFolder": "", "Entries": [] }""");
+
+        vm.LoadFromFile(listPath);
+
+        Assert.StartsWith("Schema_TooNewForPatcher", vm.StatusText);
+        Assert.True(vm.ShowGetLatestPatcher);
+    }
+
+    [Fact]
+    public async Task TheLink_HidesOnTheNextStatus()
+    {
+        var vm = Standalone(Project("Future", version: 99));
+        await vm.AddEntriesCommand.ExecuteAsync(null);
+
+        vm.StatusText = "something else";
+
+        Assert.False(vm.ShowGetLatestPatcher);
+    }
+
+    [Fact]
+    public void GetLatestPatcher_OpensTheReleasesPage()
+    {
+        string? opened = null;
+        var vm = Standalone();
+        vm.UrlOpener = url => { opened = url; return true; };
+
+        vm.OpenPatcherReleasesCommand.Execute(null);
+
+        Assert.Equal(SchemaFormats.PatcherReleasesUrl, opened);
+    }
+
+    [Fact]
+    public void GetLatestPatcher_WhenTheBrowserFails_SaysSo()
+    {
+        var vm = Standalone();
+        vm.UrlOpener = _ => false;
+
+        vm.OpenPatcherReleasesCommand.Execute(null);
+
+        Assert.Equal("PatchManager_OpenReleasesFailed", vm.StatusText);
     }
 }

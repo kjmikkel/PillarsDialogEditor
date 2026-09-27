@@ -26,6 +26,24 @@ public class SchemaVersionMessageTests
             new UnsupportedSchemaVersionException(SchemaFileKind.ConversationPatch, 3, 2, "greeting"), "mod.dialogproject");
         Assert.StartsWith("Schema_TooNewInConversation", text);
     }
+
+    [Fact]
+    public void ForPatcher_TopLevel_UsesThePatcherTemplate()
+    {
+        Loc.Configure(new StubStringProvider());
+        var text = SchemaVersionMessages.TooNewForPatcher(new UnsupportedSchemaVersionException(SchemaFileKind.Project, 2, 1), "mod.dialogpack");
+        Assert.StartsWith("Schema_TooNewForPatcher", text);
+        Assert.DoesNotContain("InConversation", text);
+    }
+
+    [Fact]
+    public void ForPatcher_Nested_UsesThePatcherConversationTemplate()
+    {
+        Loc.Configure(new StubStringProvider());
+        var text = SchemaVersionMessages.TooNewForPatcher(
+            new UnsupportedSchemaVersionException(SchemaFileKind.ConversationPatch, 3, 2, "greeting"), "mod.dialogpack");
+        Assert.StartsWith("Schema_TooNewForPatcherInConversation", text);
+    }
 }
 
 public class SchemaVersionMessageResourceEndToEndTests
@@ -52,6 +70,19 @@ public class SchemaVersionMessageResourceEndToEndTests
             Assert.DoesNotContain("Schema_Format_",
                 SchemaVersionMessages.TooNew(new UnsupportedSchemaVersionException(kind, 9, 1), "f"));
     }
+
+    [AvaloniaFact]
+    public void ForPatcher_RendersFromSharedStrings()
+        => Assert.Equal(
+            "'mod.dialogpack' needs a newer Pillars Dialog Patcher (project format 2). " +
+            "This version reads up to project format 1. Nothing was changed.",
+            SchemaVersionMessages.TooNewForPatcher(new UnsupportedSchemaVersionException(SchemaFileKind.Project, 2, 1), "mod.dialogpack"));
+
+    [AvaloniaFact]
+    public void ForPatcher_Nested_RendersTheConversationName()
+        => Assert.Contains("'greeting'",
+            SchemaVersionMessages.TooNewForPatcher(
+                new UnsupportedSchemaVersionException(SchemaFileKind.ConversationPatch, 3, 2, "greeting"), "mod.dialogpack"));
 
     [AvaloniaFact]
     public void Title_RendersFromSharedStrings()

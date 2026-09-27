@@ -13,7 +13,10 @@ public partial class MainWindow : Window
         InitializeComponent();
         var vm = new PatchManagerViewModel(
             new AvaloniaFolderPicker(this),
-            new AvaloniaFilePicker(this));
+            new AvaloniaFilePicker(this))
+        {
+            Host = PatchManagerHost.Standalone,
+        };
         PatchManagerDialogs.Attach(vm, this);
         DataContext = vm;
     }
