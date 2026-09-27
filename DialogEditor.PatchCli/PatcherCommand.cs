@@ -63,8 +63,28 @@ public static class PatcherCommand
             Nothing was changed. Update dialog-patcher: {SchemaFormats.PatcherReleasesUrl}
       """;
 
-    public static int Run(string[] args, TextWriter stdout, TextWriter stderr)
+    private const string DoubleClickNote = """
+      This is dialog-patcher, the command-line tool for scripts and mod installers.
+
+      To install or remove mods, open DialogEditor.PatchManager.exe in the folder above
+      this one instead.
+
+      """;
+
+    public static int Run(string[] args, TextWriter stdout, TextWriter stderr, IConsoleLaunch? launch = null)
     {
+        // Double-clicked with nothing to do: explain and pause, so the window doesn't flash
+        // help text and vanish like a crash (issue #77). Terminal and script runs fall
+        // through to the usual missing-argument error and exit code.
+        if (args.Length == 0 && launch is { OwnsConsole: true })
+        {
+            stdout.WriteLine(DoubleClickNote);
+            stdout.WriteLine(Help);
+            stdout.WriteLine("Press any key to close this window.");
+            launch.WaitForKey();
+            return 0;
+        }
+
         var version = AppVersion.FromAssembly(Assembly.GetExecutingAssembly());
 
         bool Has(params string[] flags) => flags.Any(args.Contains);

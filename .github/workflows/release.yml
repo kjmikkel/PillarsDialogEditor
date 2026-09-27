@@ -1,19 +1,25 @@
-# Release build, triggered by pushing a version tag:
+# Release build, triggered by pushing a version tag. Two products, released
+# independently (issue #77):
 #
-#   git tag v1.0.0 && git push origin v1.0.0
+#   git tag v1.0.0         && git push origin v1.0.0          # Pillars Dialog Editor
+#   git tag patcher-v1.0.0 && git push origin patcher-v1.0.0  # Pillars Dialog Patcher
 #
-# Runs the test gate, then build.ps1 (three win-x64 binary zips + three source
-# zips), and attaches all six to a DRAFT GitHub Release. Nothing is public until
-# you review the draft and press Publish on GitHub.
+# ("v*" can't match "patcher-v…" — the glob is anchored at the start — so each tag
+# builds exactly one product.)
 #
-# VERSION stays the single source of truth: the tag must equal "v" + VERSION,
-# so a tag can't silently ship binaries stamped with a different version.
+# Runs the test gate, then build.ps1 for that product (binary zip + source zip +
+# SHA256SUMS.txt), and attaches them to a DRAFT GitHub Release. Nothing is public
+# until you review the draft and press Publish on GitHub.
+#
+# The version files stay the single source of truth: the tag must equal "v" +
+# VERSION (editor) or "patcher-v" + PATCHER_VERSION (patcher), so a tag can't
+# silently ship binaries stamped with a different version.
 
 name: Release
 
 on:
   push:
-    tags: ["v*"]
+    tags: ["v*", "patcher-v*"]
 
 permissions:
   contents: write   # create the draft release and upload its assets
@@ -30,22 +36,41 @@ jobs:
     env:
       DOTNET_NOLOGO: true
       DOTNET_CLI_TELEMETRY_OPTOUT: true
+      # Through env, never ${{ }} inside a script (injection-safe, as in ci.yml).
+      TAG: ${{ github.ref_name }}
     defaults:
       run:
         shell: pwsh
     steps:
+      # Full history and tags, so release notes can start from this product's
+      # previous tag rather than whichever product was tagged last.
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
-      - name: Check tag matches VERSION
+      - name: Resolve product and check tag matches its version file
         id: version
         run: |
-          $version = (Get-Content VERSION -Raw).Trim()
-          $tag     = '${{ github.ref_name }}'
-          if ($tag -ne "v$version") {
-            Write-Host "::error::Tag '$tag' does not match VERSION file ('$version'). Expected tag 'v$version'."
+          . ./tools/build/Read-VersionFile.ps1
+          if ($env:TAG -like 'patcher-v*') {
+            $product = 'Patcher'; $prefix = 'patcher-v'; $file = 'PATCHER_VERSION'; $name = 'Pillars Dialog Patcher'
+          } else {
+            $product = 'Editor';  $prefix = 'v';         $file = 'VERSION';         $name = 'Pillars Dialog Editor'
+          }
+          $version = Read-VersionFile -Root . -Product $product
+          if ($env:TAG -ne "$prefix$version") {
+            Write-Host "::error::Tag '$env:TAG' does not match $file ('$version'). Expected tag '$prefix$version'."
             exit 1
           }
-          "version=$version" >> $env:GITHUB_OUTPUT
+          # This product's previous tag (if any), for --notes-start-tag. The list
+          # pattern is anchored like the trigger, so "v*" never picks up patcher tags.
+          $previous = git tag --list "$prefix*" --sort=-v:refname |
+            Where-Object { $_ -ne $env:TAG } | Select-Object -First 1
+          "product=$product"   >> $env:GITHUB_OUTPUT
+          "version=$version"   >> $env:GITHUB_OUTPUT
+          "title=$name $env:TAG" >> $env:GITHUB_OUTPUT
+          "previous=$previous" >> $env:GITHUB_OUTPUT
 
       - uses: actions/setup-dotnet@v6
         with:
@@ -54,7 +79,8 @@ jobs:
       # build.ps1's own test gate runs DialogEditor.Tests unfiltered, which
       # includes the audio-device tests a hosted runner can't run. Gate here
       # with the same exclusions as ci.yml, in Release to match what ships,
-      # then call build.ps1 with -SkipTests.
+      # then call build.ps1 with -SkipTests. Both products share Core/Patch, so
+      # both releases run the whole suite.
       - name: Test gate
         run: >-
           dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj -c Release
@@ -62,12 +88,23 @@ jobs:
           --logger "console;verbosity=minimal"
 
       - name: Build release archives
-        run: ./build.ps1 -Version '${{ steps.version.outputs.version }}' -SkipTests
+        env:
+          PRODUCT: ${{ steps.version.outputs.product }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if ($env:PRODUCT -eq 'Patcher') {
+            ./build.ps1 -Product Patcher -PatcherVersion $env:VERSION -SkipTests
+          } else {
+            ./build.ps1 -Product Editor -Version $env:VERSION -SkipTests
+          }
 
       - name: Create draft release
         env:
           GH_TOKEN: ${{ github.token }}
+          TITLE: ${{ steps.version.outputs.title }}
+          PREVIOUS: ${{ steps.version.outputs.previous }}
         run: |
-          $tag = '${{ github.ref_name }}'
-          gh release create $tag (Get-ChildItem dist -Filter *.zip).FullName `
-            --draft --verify-tag --generate-notes --title "Pillars Dialog Editor $tag"
+          $assets = @((Get-ChildItem dist -Filter *.zip).FullName) + (Resolve-Path dist/SHA256SUMS.txt).Path
+          $notes  = if ($env:PREVIOUS) { @('--notes-start-tag', $env:PREVIOUS) } else { @() }
+          gh release create $env:TAG @assets `
+            --draft --verify-tag --generate-notes @notes --title $env:TITLE
