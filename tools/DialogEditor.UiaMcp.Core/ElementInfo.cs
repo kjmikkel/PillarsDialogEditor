@@ -2,7 +2,7 @@ namespace DialogEditor.UiaMcp.Core;
 
 /// <summary>
 /// A UIA element flattened to plain data. Deliberately free of any UI Automation type
-/// so this assembly stays net8.0 and unit-testable from DialogEditor.Tests.
+/// so this assembly stays net10.0 and unit-testable from DialogEditor.Tests.
 /// <paramref name="Id"/> is a tree-local identity assigned by the IUiaTree implementation.
 /// </summary>
 public record ElementInfo(
