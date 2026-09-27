@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using DialogEditor.Core.Editing;
 using DialogEditor.Patch;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
@@ -146,6 +147,50 @@ public class PatchManagerViewModelTests
         vm.Entries.Add(new PatchEntryViewModel("mod1.dialogproject", p1));
         vm.Entries.Add(new PatchEntryViewModel("mod2.dialogproject", p2));
         Assert.False(vm.HasConflicts);
+    }
+
+    [Fact]
+    public void Analyse_TwoPacksAddTheSameNode_FlagsBothAndNamesThePacks()
+    {
+        // Issue #6: an added-node id clash used to go unreported, and no conflict row said
+        // which packs were involved — only the entry badges hinted at it.
+        static NodeEditSnapshot Node(string text) =>
+            new(500, false, DialogEditor.Core.Models.SpeakerCategory.Npc, "", "", text, "",
+                "Conversation", "None", "", "", "", false, false, [], [], []);
+
+        var vm = MakeVm();
+        var p1 = DialogProject.Empty("Mod1").WithPatch(
+            new ConversationPatch("conv1", ConversationPatch.CurrentSchemaVersion, [Node("a")], [], []));
+        var p2 = DialogProject.Empty("Mod2").WithPatch(
+            new ConversationPatch("conv1", ConversationPatch.CurrentSchemaVersion, [Node("b")], [], []));
+        vm.Entries.Add(new PatchEntryViewModel("mod1.dialogproject", p1));
+        vm.Entries.Add(new PatchEntryViewModel("mod2.dialogproject", p2));
+
+        Assert.True(vm.HasConflicts);
+        var row = Assert.Single(vm.Conflicts);
+        Assert.Equal(PatchConflictKind.AddedNode, row.Conflict.Kind);
+        Assert.Equal(("Mod1", "Mod2"), (row.FirstProjectName, row.SecondProjectName));
+        Assert.All(vm.Entries, e => Assert.True(e.HasConflict));
+    }
+
+    [Fact]
+    public void Analyse_SkipsUnloadedEntries_WhenNamingThePacks()
+    {
+        // Conflict indices count LOADED entries only (Analyse filters on IsLoaded), so an
+        // entry that failed to load in front of the pair must not shift the names.
+        static ConversationPatch Edit(string to) => new("conv1", ConversationPatch.CurrentSchemaVersion, [], [],
+            [new NodeModification(5, new Dictionary<string, FieldChange> { ["DefaultText"] = new("x", to) }, [], [])]);
+
+        var vm = MakeVm();
+        vm.Entries.Add(new PatchEntryViewModel("broken.dialogproject", "File not found"));
+        vm.Entries.Add(new PatchEntryViewModel("mod1.dialogproject", DialogProject.Empty("Mod1").WithPatch(Edit("a"))));
+        vm.Entries.Add(new PatchEntryViewModel("mod2.dialogproject", DialogProject.Empty("Mod2").WithPatch(Edit("b"))));
+
+        var row = Assert.Single(vm.Conflicts);
+        Assert.Equal(("Mod1", "Mod2"), (row.FirstProjectName, row.SecondProjectName));
+        Assert.False(vm.Entries[0].HasConflict);
+        Assert.True(vm.Entries[1].HasConflict);
+        Assert.True(vm.Entries[2].HasConflict);
     }
 
     // ── Save / Load load order ────────────────────────────────────────────

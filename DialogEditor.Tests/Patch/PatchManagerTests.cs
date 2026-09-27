@@ -152,6 +152,103 @@ public class ConflictDetectorTests
 
         Assert.False(Assert.Single(ConflictDetector.Detect(projects)).IsDeletion);
     }
+
+    // ── Issue #6: clashes the detector used to miss ─────────────────────────────
+    // PatchMerger resolves each of these last-wins, so before the fix the earlier pack's
+    // version vanished with no warning at all.
+
+    private static NodeEditSnapshot AddedNode(int id, string text) =>
+        new(id, false, SpeakerCategory.Npc, "", "", text, "", "Conversation", "None",
+            "", "", "", false, false, [], [], []);
+
+    private static NodeModification LinkEdit(int fromNodeId, int toNodeId,
+                                             bool added = false, float weight = 1f) =>
+        new(fromNodeId, new Dictionary<string, FieldChange>(),
+            added ? [new LinkEditSnapshot(fromNodeId, toNodeId, weight, "", false)] : [],
+            [],
+            added ? [] : [new ModifiedLink(toNodeId, weight, "")]);
+
+    private static (string, IReadOnlyDictionary<string, ConversationPatch>) Project(
+        string name, ConversationPatch patch) =>
+        (name, new Dictionary<string, ConversationPatch> { [patch.ConversationName] = patch });
+
+    [Fact]
+    public void Detect_BothPacksAddTheSameNodeId_ReportsAnAddedNodeConflict()
+    {
+        // Two mods built on the same base conversation allocate new ids from the same
+        // max+1, so this is the most likely real-world clash: the later pack's node
+        // replaces the earlier one wholesale, and the earlier pack's links then point
+        // at a node it never wrote.
+        var projects = new[]
+        {
+            Project("ModA", new ConversationPatch("conv1", 2, [AddedNode(500, "from A")], [], [])),
+            Project("ModB", new ConversationPatch("conv1", 2, [AddedNode(500, "from B")], [], [])),
+        };
+
+        var c = Assert.Single(ConflictDetector.Detect(projects));
+
+        Assert.Equal(PatchConflictKind.AddedNode, c.Kind);
+        Assert.Equal(("conv1", 500, 0, 1), (c.ConversationName, c.NodeId, c.FirstPatchIndex, c.SecondPatchIndex));
+        Assert.False(c.IsDeletion);
+    }
+
+    [Fact]
+    public void Detect_BothPacksModifyTheSameLink_ReportsALinkConflict()
+    {
+        var projects = new[]
+        {
+            Project("ModA", new ConversationPatch("conv1", 2, [], [], [LinkEdit(5, 9, weight: 2f)])),
+            Project("ModB", new ConversationPatch("conv1", 2, [], [], [LinkEdit(5, 9, weight: 3f)])),
+        };
+
+        var c = Assert.Single(ConflictDetector.Detect(projects));
+
+        Assert.Equal(PatchConflictKind.Link, c.Kind);
+        Assert.Equal(5, c.NodeId);
+        Assert.Equal(9, c.LinkToNodeId);
+        Assert.False(c.IsDeletion);
+    }
+
+    [Fact]
+    public void Detect_OnePackAddsALinkAnotherModifies_ReportsALinkConflict()
+    {
+        // PatchMerger keys added and modified links by target alike, so an add and a modify
+        // of the same from→to link contest the same slot.
+        var projects = new[]
+        {
+            Project("ModA", new ConversationPatch("conv1", 2, [], [], [LinkEdit(5, 9, added: true)])),
+            Project("ModB", new ConversationPatch("conv1", 2, [], [], [LinkEdit(5, 9)])),
+        };
+
+        var c = Assert.Single(ConflictDetector.Detect(projects));
+        Assert.Equal((PatchConflictKind.Link, 9), (c.Kind, c.LinkToNodeId));
+    }
+
+    [Fact]
+    public void Detect_DifferentLinksOnTheSameNode_AreNotAConflict()
+    {
+        var projects = new[]
+        {
+            Project("ModA", new ConversationPatch("conv1", 2, [], [], [LinkEdit(5, 9)])),
+            Project("ModB", new ConversationPatch("conv1", 2, [], [], [LinkEdit(5, 10)])),
+        };
+
+        Assert.Empty(ConflictDetector.Detect(projects));
+    }
+
+    [Fact]
+    public void Detect_ExistingKinds_AreReportedAsFieldAndDeletion()
+    {
+        var projects = new[]
+        {
+            Project("ModA", MakePatch("conv1", 5, "DefaultText", "Hello", "Hi")),
+            Project("ModB", MakePatch("conv1", 5, "DefaultText", "Hello", "Hey")),
+            Project("ModC", new ConversationPatch("conv1", 2, [], [5], [])),
+        };
+
+        var kinds = ConflictDetector.Detect(projects).Select(c => c.Kind).Distinct().Order().ToList();
+        Assert.Equal([PatchConflictKind.Field, PatchConflictKind.Deletion], kinds);
+    }
 }
 
 public class PatchMergerTests
