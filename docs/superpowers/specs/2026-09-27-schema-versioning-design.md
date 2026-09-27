@@ -104,9 +104,11 @@ reads up to project format 1. Update the editor to open it."*
 Localised strings go in `SharedStrings.axaml`: one message template plus a format-name string per
 `SchemaFileKind`.
 
-## Documentation (`FORMAT.md`)
+## Documentation (`PROJECT-FORMAT.md`)
 
-A new section before `.dialogpack`, covering:
+Changed during implementation: `FORMAT.md` is the pack readme, embedded verbatim in every `.dialogpack` by `VoPackExporter`, so the developer-facing project format lives in a sibling, `PROJECT-FORMAT.md`, as issue 62 allows. The README's git section links to it.
+
+Covering:
 
 - The 1.0 stable format: `.dialogproject` fields (required / optional, nested patches with their own
   version), `ConversationPatch`, `.patchlist`.
