@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Launch the cross-platform Avalonia build.
-# Requires: .NET 8 SDK — https://dot.net
+# Requires: .NET 10 SDK — https://dot.net
 # Linux extra: libice6 libsm6 libfontconfig1 (e.g. apt install)
 
 set -e

@@ -31,7 +31,7 @@ concurrency:
 jobs:
   dotnet:
     name: Build & test (.NET)
-    # Windows-only: DialogEditor.UiaMcp(.Tests) target net8.0-windows, and the
+    # Windows-only: DialogEditor.UiaMcp(.Tests) target net10.0-windows, and the
     # shipped binaries are win-x64.
     runs-on: windows-latest
     timeout-minutes: 30
@@ -42,13 +42,9 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      # SDK 10 is needed to read DialogEditor.slnx (requires SDK >= 9.0.200);
-      # the 8.0 runtime is what the net8.0 test hosts actually run on.
       - uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: |
-            8.0.x
-            10.0.x
+          dotnet-version: 10.0.x
 
       # No packages.lock.json in the repo, so setup-dotnet's built-in cache
       # can't be used — key the package cache on the project files and the
@@ -143,9 +139,7 @@ jobs:
       # The archives' trimmed solutions are .slnx, so SDK 10 is needed.
       - uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: |
-            8.0.x
-            10.0.x
+          dotnet-version: 10.0.x
 
       - uses: actions/cache@v6
         with:

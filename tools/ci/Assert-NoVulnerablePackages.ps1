@@ -10,7 +10,7 @@
     Why a policy function rather than "fail on anything": as of 2026-09 the test
     projects carry System.Net.Http 4.3.0 and System.Text.RegularExpressions 4.3.0
     (High), pulled in by xunit 2.x -> NETStandard.Library 1.6.1. They never ship,
-    on net8.0 the framework's own assemblies win over those package versions, and
+    on net10.0 the framework's own assemblies win over those package versions, and
     Avalonia.Headless.XUnit pins us to xunit v2 so an upgrade can't remove them.
     Shipping projects (editor, PatchManager, dialog-patcher and their libraries)
     are clean. Where the line sits between those two cases is a policy decision.
