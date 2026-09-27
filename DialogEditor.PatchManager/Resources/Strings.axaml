@@ -14,4 +14,23 @@
     <sys:String x:Key="PatchManager_SettingsTooltip">Open settings to change the colour theme and application language</sys:String>
     <sys:String x:Key="AutomationName_PatchManagerSettings">Settings</sys:String>
 
+    <!-- About window (GitHub issue 79) -->
+    <sys:String x:Key="PatchManager_AboutButton">About…</sys:String>
+    <sys:String x:Key="PatchManager_AboutTooltip">Show the patcher's version, which mod file formats it can install, and where to download a newer version</sys:String>
+    <sys:String x:Key="AutomationName_PatchManagerAbout">About</sys:String>
+    <sys:String x:Key="PatchManagerAbout_Title">About Pillars Dialog Patcher</sys:String>
+    <sys:String x:Key="PatchManagerAbout_AppName">Pillars Dialog Patcher</sys:String>
+    <sys:String x:Key="PatchManagerAbout_VersionLabel">Version</sys:String>
+    <sys:String x:Key="PatchManagerAbout_Description">Installs and removes Pillars of Eternity I &amp; II conversation mods made with Pillars Dialog Editor.</sys:String>
+    <sys:String x:Key="PatchManagerAbout_FormatsHeading">Installs mods saved in:</sys:String>
+    <!-- {0} format name (Schema_Format_*), {1} newest version of it this patcher reads -->
+    <sys:String x:Key="PatchManagerAbout_FormatLine">{0} {1} or earlier</sys:String>
+    <sys:String x:Key="PatchManagerAbout_FormatsHint">A mod saved by a newer editor may need a newer patcher. Such a mod is refused before anything is changed.</sys:String>
+    <sys:String x:Key="PatchManagerAbout_OpenReleases">Get the latest patcher</sys:String>
+    <sys:String x:Key="PatchManagerAbout_OpenReleasesTip">Open the Pillars Dialog Patcher releases page in your browser to download the newest version.</sys:String>
+    <sys:String x:Key="PatchManagerAbout_OpenRepository">Repository</sys:String>
+    <sys:String x:Key="PatchManagerAbout_OpenRepositoryTip">Open the project's source-code repository in your browser.</sys:String>
+    <sys:String x:Key="PatchManagerAbout_OpenFailed">Couldn't open the link. Please check your internet connection or browser.</sys:String>
+    <sys:String x:Key="PatchManagerAbout_Close">Close</sys:String>
+
 </ResourceDictionary>

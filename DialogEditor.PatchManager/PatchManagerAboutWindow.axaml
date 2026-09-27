@@ -1,0 +1,54 @@
+<!-- About for the standalone Patch Manager (GitHub issue 79). Besides the version it shows
+     the patcher's compatibility contract, the newest file formats it reads, so a player
+     can tell whether a mod needs a newer patcher, plus a link to get one. -->
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
+        x:Class="DialogEditor.PatchManager.PatchManagerAboutWindow"
+        Title="{DynamicResource PatchManagerAbout_Title}"
+        Icon="avares://DialogEditor.PatchManager/Assets/app.ico"
+        Width="420" MinWidth="420" SizeToContent="Height" CanResize="True"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource Brush.Surface.Info}"
+        x:CompileBindings="False">
+    <StackPanel Margin="18,16,18,16" Spacing="8">
+        <TextBlock Text="{DynamicResource PatchManagerAbout_AppName}" Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Title}" FontWeight="Bold"/>
+        <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock Text="{DynamicResource PatchManagerAbout_VersionLabel}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Body}"/>
+            <TextBlock Text="{Binding Version}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"/>
+        </StackPanel>
+        <TextBlock Text="{DynamicResource PatchManagerAbout_Description}" Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
+
+        <!-- One line per format rather than a joined sentence: no list separator to translate. -->
+        <TextBlock Text="{DynamicResource PatchManagerAbout_FormatsHeading}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Label}" FontWeight="SemiBold" Margin="0,4,0,0"/>
+        <ItemsControl x:Name="FormatList" ItemsSource="{Binding SupportedFormats}" Margin="10,0,0,0">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{DynamicResource FontSize.Label}"/>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBlock Text="{DynamicResource PatchManagerAbout_FormatsHint}" Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap"/>
+
+        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+            <Button Content="{DynamicResource PatchManagerAbout_OpenReleases}"
+                    ToolTip.Tip="{DynamicResource PatchManagerAbout_OpenReleasesTip}"
+                    AutomationProperties.HelpText="{DynamicResource PatchManagerAbout_OpenReleasesTip}"
+                    Command="{Binding OpenReleasesCommand}"/>
+            <Button Content="{DynamicResource PatchManagerAbout_OpenRepository}"
+                    ToolTip.Tip="{DynamicResource PatchManagerAbout_OpenRepositoryTip}"
+                    AutomationProperties.HelpText="{DynamicResource PatchManagerAbout_OpenRepositoryTip}"
+                    Command="{Binding OpenRepositoryCommand}"/>
+        </StackPanel>
+
+        <TextBlock Text="{Binding Status}" Foreground="{DynamicResource Brush.Text.Status.Pending}" FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap"/>
+
+        <!-- Close is self-explanatory (CLAUDE.md tooltip exception). -->
+        <Button HorizontalAlignment="Right" Margin="0,8,0,0"
+                Content="{DynamicResource PatchManagerAbout_Close}"
+                Click="Close_Click"/>
+
+        <shared:FocusHintBar x:Name="HintBar"/>
+    </StackPanel>
+</Window>

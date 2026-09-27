@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using DialogEditor.Patch;
+using DialogEditor.Patch.Schema;
 using DialogEditor.PatchCli;
 using DialogEditor.Tests.Helpers;
 
@@ -134,4 +135,22 @@ public class PatcherCommandTests : IDisposable
     [Fact]
     public void Help_DocumentsExitCode4()
         => Assert.Contains("4   ", Run("--help").Out);
+
+    // ── Compatibility contract (GitHub issue 79) ─────────────────────────
+
+    [Fact]
+    public void Version_ListsTheSupportedFormats()
+    {
+        var (code, output, _) = Run("--version");
+        Assert.Equal(0, code);
+        Assert.Contains($"reads {SchemaFormats.EnglishSummary}", output);
+    }
+
+    [Fact]
+    public void NewerProject_PointsAtTheReleasesPage()
+        => Assert.Contains(SchemaFormats.PatcherReleasesUrl, Run(_game.Root, SaveNewerProject("Future")).Err);
+
+    [Fact]
+    public void Help_PointsExitCode4AtTheReleasesPage()
+        => Assert.Contains(SchemaFormats.PatcherReleasesUrl, Run("--help").Out);
 }

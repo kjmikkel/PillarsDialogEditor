@@ -18,8 +18,18 @@ public static class SchemaVersionMessages
             : Loc.Format("Schema_TooNewInConversation", fileName, format, ex.Found, ex.Supported, ex.ConversationName);
     }
 
+    /// The standalone Patch Manager's variant (GitHub issue 79): a player there updates the
+    /// Pillars Dialog Patcher, not the editor, and nothing was written to the game.
+    public static string TooNewForPatcher(UnsupportedSchemaVersionException ex, string fileName)
+    {
+        var format = FormatName(ex.Kind);
+        return ex.ConversationName is null
+            ? Loc.Format("Schema_TooNewForPatcher", fileName, format, ex.Found, ex.Supported)
+            : Loc.Format("Schema_TooNewForPatcherInConversation", fileName, format, ex.Found, ex.Supported, ex.ConversationName);
+    }
+
     // Literal keys (not $"Schema_Format_{kind}") so the resource guards can see every one.
-    private static string FormatName(SchemaFileKind kind) => kind switch
+    public static string FormatName(SchemaFileKind kind) => kind switch
     {
         SchemaFileKind.Project           => Loc.Get("Schema_Format_Project"),
         SchemaFileKind.ConversationPatch => Loc.Get("Schema_Format_ConversationPatch"),

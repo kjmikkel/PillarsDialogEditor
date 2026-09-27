@@ -192,13 +192,24 @@
 
         <!-- ── Footer ──────────────────────────────────────────────── -->
         <Grid Grid.Row="5" ColumnDefinitions="*,Auto,Auto" Margin="0,10,0,0">
-            <TextBlock Grid.Column="0"
-                       Text="{Binding StatusText}"
-                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
-                       VerticalAlignment="Center"
-                       TextTrimming="CharacterEllipsis"
-                       IsVisible="{Binding HasConflicts,
-                                   Converter={StaticResource InverseBoolToVis}}"/>
+            <!-- Wraps rather than trims: a "newer file format" refusal (issues 62, 79) is a
+                 full sentence the player has to read to the end. -->
+            <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0">
+                <TextBlock Text="{Binding StatusText}"
+                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
+                           TextWrapping="Wrap"
+                           IsVisible="{Binding HasConflicts,
+                                       Converter={StaticResource InverseBoolToVis}}"/>
+                <!-- Standalone only: the view model raises ShowGetLatestPatcher just for a
+                     "needs a newer patcher" refusal and clears it on the next status. -->
+                <Button x:Name="GetLatestPatcherButton" Classes="action-btn" Margin="0,4,0,0"
+                        HorizontalAlignment="Left"
+                        Content="{DynamicResource PatchManager_GetLatestPatcher}"
+                        Command="{Binding OpenPatcherReleasesCommand}"
+                        IsVisible="{Binding ShowGetLatestPatcher}"
+                        ToolTip.Tip="{DynamicResource ToolTip_GetLatestPatcher}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_GetLatestPatcher}"/>
+            </StackPanel>
             <Button Grid.Column="1" Classes="action-btn" Margin="0,0,8,0"
                     Content="{DynamicResource PatchManager_RemoveAllMods}"
                     Command="{Binding RemoveAllModsCommand}"
