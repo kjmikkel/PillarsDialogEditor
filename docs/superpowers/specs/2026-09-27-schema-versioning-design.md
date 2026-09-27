@@ -41,7 +41,7 @@ shape changed is refused with the friendly message rather than a JSON type error
 ### `UnsupportedSchemaVersionException`
 
 Carries `Kind`, `Found`, `Supported` and an optional `ConversationName`, which is set when the offender
-is a patch nested inside a project. It derives from `InvalidDataException` so existing generic
+is a patch nested inside a project. It derives from `Exception` (`InvalidDataException` is sealed), so existing generic
 `catch (Exception)` handlers still treat it as a load failure. Callers that care catch it first.
 
 ### `ISchemaMigrationStep` / `SchemaMigrationStep`
