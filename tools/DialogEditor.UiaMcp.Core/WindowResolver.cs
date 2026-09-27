@@ -2,7 +2,7 @@ namespace DialogEditor.UiaMcp.Core;
 
 /// <summary>
 /// A top-level window of the app under automation, flattened to plain data so this
-/// assembly stays net8.0 and unit-testable.
+/// assembly stays net10.0 and unit-testable.
 /// </summary>
 public record WindowInfo(
     string Id,
