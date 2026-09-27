@@ -49,7 +49,9 @@
         <!-- Footer: report prompt, issues link, log path, action buttons -->
         <StackPanel Grid.Row="2" Spacing="8">
 
-            <!-- Report prompt + clickable issues link -->
+            <!-- Report prompt + clickable report link. The link opens a pre-filled,
+                 path-scrubbed /issues/new page (issue #72); the URL itself is far too
+                 long to show, so the button shows a localised label instead. -->
             <WrapPanel Orientation="Horizontal">
                 <TextBlock Text="{DynamicResource ExceptionReport_ReportPrompt}"
                            FontSize="{DynamicResource FontSize.Body}"
@@ -63,7 +65,7 @@
                         Background="Transparent"
                         Foreground="{DynamicResource Brush.Text.Link}"
                         Cursor="Hand"
-                        Content="{Binding IssuesUrl}"
+                        Content="{DynamicResource ExceptionReport_ReportButton}"
                         ToolTip.Tip="{DynamicResource ToolTip_ExceptionReport_IssuesLink}"
                         AutomationProperties.HelpText="{DynamicResource ToolTip_ExceptionReport_IssuesLink}"
                         AutomationProperties.Name="{DynamicResource AutomationName_ExceptionReport_IssuesLink}"
