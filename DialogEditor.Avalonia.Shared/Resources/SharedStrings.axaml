@@ -124,4 +124,15 @@
     <sys:String x:Key="ThemeOnboarding_Button_Destructive">Destructive</sys:String>
     <sys:String x:Key="ThemeOnboarding_Button_Plain">Plain</sys:String>
 
+    <!-- ─── File-format version checks (GitHub issues 62, 104) — editor and Patch Manager ── -->
+    <sys:String x:Key="Schema_TooNew_Title">Newer file format</sys:String>
+    <!-- {0} file name, {1} format name, {2} version in the file, {3} highest version this build reads -->
+    <sys:String x:Key="Schema_TooNew">'{0}' was saved by a newer version of Pillars Dialog Editor ({1} {2}). This version reads up to {1} {3}. Update to the latest version to open it.</sys:String>
+    <!-- as above; {4} conversation name -->
+    <sys:String x:Key="Schema_TooNewInConversation">'{0}' contains conversation '{4}' saved by a newer version of Pillars Dialog Editor ({1} {2}). This version reads up to {1} {3}. Update to the latest version to open it.</sys:String>
+    <sys:String x:Key="Schema_Format_Project">project format</sys:String>
+    <sys:String x:Key="Schema_Format_ConversationPatch">conversation patch format</sys:String>
+    <sys:String x:Key="Schema_Format_PatchList">load-order format</sys:String>
+    <sys:String x:Key="Schema_TooNew_Ok">OK</sys:String>
+
 </ResourceDictionary>

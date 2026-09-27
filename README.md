@@ -292,6 +292,8 @@ dialog — click it when you're ready.
 > they matter. If either side of the conflict is too damaged to parse as JSON, the
 > editor says so and asks you to resolve it in your Git tool first.
 
+Everyone sharing a project should use the same editor version, or a newer one. A project saved by a newer version is refused rather than opened and silently truncated. Older projects open normally and are upgraded on the next save. See [PROJECT-FORMAT.md](PROJECT-FORMAT.md) for the file formats and the versioning policy.
+
 ### Git-powered features
 
 Several optional tools read your project's Git history directly and therefore need
@@ -349,7 +351,7 @@ wins on any contested field), matching the Patch Manager's load-order semantics.
 | `--version` | Print version and exit |
 | `-h`, `--help` | Show usage |
 
-**Exit codes:** `0` success · `1` conflict (re-run with `--force`) · `2` error
+**Exit codes:** `0` success · `1` conflict (re-run with `--force`) · `2` error · `3` managed files were changed outside the patcher (re-run with `--accept-current-files` or `--restore`) · `4` a mod uses a newer file format than this patcher reads (nothing was changed; update `dialog-patcher`)
 
 **Examples:**
 

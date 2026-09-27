@@ -35,4 +35,9 @@
     <ProjectReference Include="..\tools\DialogEditor.UiaMcp.Core\DialogEditor.UiaMcp.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Schema fixtures: one file per historical format version (issue #104). -->
+    <None Update="Patch\Schema\Fixtures\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

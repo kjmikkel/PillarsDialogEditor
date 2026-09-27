@@ -1,3 +1,5 @@
+using DialogEditor.Patch.Schema;
+
 namespace DialogEditor.Patch.Diff;
 
 public class ProjectVersionLoader(IGitRunner git)
@@ -15,6 +17,11 @@ public class ProjectVersionLoader(IGitRunner git)
         };
 
         try { return DialogProjectSerializer.Deserialize(json); }
+        catch (UnsupportedSchemaVersionException ex)
+        {
+            // Saved by a newer editor (GitHub issue 62): not a damaged file, so its own kind.
+            throw new DiffException($"Project uses a newer file format: {ex.Message}", DiffExceptionKind.UnsupportedSchema);
+        }
         catch (Exception ex) { throw new DiffException($"Could not parse project: {ex.Message}", DiffExceptionKind.ParseFailed); }
     }
 

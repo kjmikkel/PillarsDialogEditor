@@ -5,6 +5,7 @@ using DialogEditor.Core.Logging;
 using DialogEditor.Patch;
 using DialogEditor.Patch.Install;
 using DialogEditor.Patch.Packaging;
+using DialogEditor.Patch.Schema;
 
 namespace DialogEditor.PatchCli;
 
@@ -58,6 +59,8 @@ public static class PatcherCommand
         2   Argument, file, game-detection or backup-record error.
         3   Files the patcher manages were changed outside it. Re-run with
             --accept-current-files, or with --restore.
+        4   A project or pack uses a newer file format than this patcher reads.
+            Nothing was changed. Update dialog-patcher.
       """;
 
     public static int Run(string[] args, TextWriter stdout, TextWriter stderr)
@@ -180,6 +183,14 @@ public static class PatcherCommand
                 var p = DialogProjectSerializer.LoadFromFile(effectivePath);
                 entries.Add(new InstallEntry(p, voFolder));
                 Info($"Project: {p.Name}  ({p.Patches.Count} patch(es))  [{path}]");
+            }
+            catch (UnsupportedSchemaVersionException ex)
+            {
+                // Refused in the load phase, before PatchInstaller, so nothing is written (GitHub issue 62).
+                AppLog.Warn($"dialog-patcher: '{path}' needs a newer patcher: {ex.Message}");
+                Error($"Could not load '{path}': {ex.Message}");
+                CleanupTempDirs(tempDirs);
+                return 4;
             }
             catch (Exception ex)
             {
