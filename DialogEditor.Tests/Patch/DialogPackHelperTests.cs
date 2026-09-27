@@ -1,7 +1,7 @@
 using System.IO.Compression;
-using DialogEditor.ViewModels.Services;
+using DialogEditor.Patch.Packaging;
 
-namespace DialogEditor.Tests.Services;
+namespace DialogEditor.Tests.Patch;
 
 /// <summary>
 /// Tests for DialogPackHelper — the .dialogpack extraction and VO copy service.

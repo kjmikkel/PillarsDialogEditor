@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace DialogEditor.ViewModels.Services;
+namespace DialogEditor.Core.Logging;
 
 /// <summary>
 /// Lightweight file logger. Thread-safe. Never throws — logging failures are silently

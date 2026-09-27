@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Export;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.Core.Logging;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.ViewModels;

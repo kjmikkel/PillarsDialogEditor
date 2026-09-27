@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml.Styling;
+using DialogEditor.Core.Logging;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Avalonia.Shared.Theming;

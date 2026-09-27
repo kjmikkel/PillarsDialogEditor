@@ -15,6 +15,7 @@ using DialogEditor.Patch.Changelog;
 using DialogEditor.Patch.Diff;
 using DialogEditor.Patch.GitConflict;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.Core.Logging;
 using DialogEditor.ViewModels.Services;
 
 // Poe1/Poe2 provider types are only referenced via IGameDataProvider interface;

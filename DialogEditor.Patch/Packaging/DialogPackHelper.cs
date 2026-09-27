@@ -1,6 +1,6 @@
 using System.IO.Compression;
 
-namespace DialogEditor.ViewModels.Services;
+namespace DialogEditor.Patch.Packaging;
 
 /// <summary>
 /// Extracts a .dialogpack (ZIP with custom extension) to a temp directory.

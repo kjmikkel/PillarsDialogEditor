@@ -1,6 +1,6 @@
-using DialogEditor.ViewModels.Services;
+using DialogEditor.Core.Logging;
 
-namespace DialogEditor.Tests.Services;
+namespace DialogEditor.Tests.Logging;
 
 // Regression guard: the test run must never append to the user's real log file.
 // CLAUDE.md requires every caught exception in production code to be logged, so every

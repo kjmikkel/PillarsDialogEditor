@@ -4,6 +4,7 @@ using DialogEditor.Core.Localisation;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
+using DialogEditor.Core.Logging;
 
 namespace DialogEditor.ViewModels.Services;
 

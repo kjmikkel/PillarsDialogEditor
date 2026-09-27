@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using DialogEditor.Core.Logging;
 
 namespace DialogEditor.ViewModels.Services;
 

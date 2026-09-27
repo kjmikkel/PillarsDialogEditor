@@ -5,6 +5,7 @@ using Avalonia.Controls.Templates;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
+using DialogEditor.Core.Logging;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Avalonia.Behaviors;

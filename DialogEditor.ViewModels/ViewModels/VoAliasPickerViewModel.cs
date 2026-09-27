@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DialogEditor.Core.Audio;
 using DialogEditor.Core.GameData;
+using DialogEditor.Core.Logging;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.ViewModels;
