@@ -40,19 +40,19 @@
                 <DataTemplate>
                     <Grid ColumnDefinitions="160,60,130,110,90,*" Margin="0,3">
                         <TextBlock Grid.Column="0" Text="{Binding ConversationName}"
-                                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}" TextTrimming="CharacterEllipsis"/>
+                                   Classes="list-secondary" FontSize="{DynamicResource FontSize.Body}" TextTrimming="CharacterEllipsis"/>
                         <TextBlock Grid.Column="1" Text="{Binding NodeId}"
-                                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"/>
+                                   Classes="list-secondary" FontSize="{DynamicResource FontSize.Body}"/>
                         <TextBlock Grid.Column="2" Text="{Binding Author}"
-                                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}" TextTrimming="CharacterEllipsis"/>
+                                   Classes="list-secondary" FontSize="{DynamicResource FontSize.Body}" TextTrimming="CharacterEllipsis"/>
                         <TextBlock Grid.Column="3"
                                    Text="{Binding Date, Converter={StaticResource CommitDate}}"
                                    ToolTip.Tip="{Binding Date}"
-                                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"/>
+                                   Classes="list-secondary" FontSize="{DynamicResource FontSize.Body}"/>
                         <TextBlock Grid.Column="4" Text="{Binding ShortSha}"
-                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Body}" FontFamily="Consolas,monospace"/>
+                                   Classes="list-muted" FontSize="{DynamicResource FontSize.Body}" FontFamily="Consolas,monospace"/>
                         <TextBlock Grid.Column="5" Text="{Binding Subject}"
-                                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
+                                   Classes="list-primary" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>

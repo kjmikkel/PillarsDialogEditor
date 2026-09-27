@@ -13,6 +13,20 @@
         WindowStartupLocation="CenterOwner"
         x:CompileBindings="False">
 
+    <Window.Styles>
+        <!-- Conversation toggle colour, as a STYLE rather than a local Foreground (issue #94): a
+             local value would outrank the selected-row rule, leaving the name in its resting
+             colour on the selection highlight (Light: dark grey on dark blue). Window styles
+             apply after the application ones (Resources/ListSelection.axaml), so this view needs
+             its own selected rule, declared after the resting one. -->
+        <Style Selector="ToggleButton.diff-conversation">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Emphasis}"/>
+        </Style>
+        <Style Selector="ListBoxItem:selected ToggleButton.diff-conversation">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Selection.Foreground}"/>
+        </Style>
+    </Window.Styles>
+
     <DockPanel Margin="12">
 
         <!-- ── Endpoint selectors ─────────────────────────────────────── -->
@@ -186,7 +200,7 @@
                                                   ToolTip.Tip="{DynamicResource ToolTip_Diff_BringIn}"
                                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_BringIn}"/>
                                         <ToggleButton Content="{Binding Name}" IsChecked="{Binding IsExpanded, Mode=TwoWay}"
-                                                      Background="Transparent" Foreground="{DynamicResource Brush.Text.Emphasis}" BorderThickness="0" Padding="4,0"
+                                                      Background="Transparent" Classes="diff-conversation" BorderThickness="0" Padding="4,0"
                                                       ToolTip.Tip="{DynamicResource ToolTip_Diff_ExpandConversation}"
                                                       AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_ExpandConversation}"/>
                                     </StackPanel>
@@ -199,7 +213,7 @@
                                                               AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_BringIn}"/>
                                                     <Border Width="9" Height="9" VerticalAlignment="Center"
                                                             Background="{Binding Kind, Converter={StaticResource DiffStatusToBrushConverter}}"/>
-                                                    <TextBlock Text="{Binding NodeId, StringFormat={StaticResource Diff_NodeLine}}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
+                                                    <TextBlock Text="{Binding NodeId, StringFormat={StaticResource Diff_NodeLine}}" Classes="list-secondary" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
                                                 </StackPanel>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>

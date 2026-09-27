@@ -71,16 +71,16 @@
                             <Grid ColumnDefinitions="70,180,90,*" Margin="0,2"
                                   DoubleTapped="OnRowActivated">
                                 <TextBlock Grid.Column="0" Text="{Binding OriginLabel}"
-                                           Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
+                                           Classes="list-muted" FontSize="{DynamicResource FontSize.Small}"
                                            VerticalAlignment="Top"/>
                                 <TextBlock Grid.Column="1" Text="{Binding Row.ConversationName}"
-                                           Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"
+                                           Classes="list-primary" FontSize="{DynamicResource FontSize.Body}"
                                            TextTrimming="CharacterEllipsis" VerticalAlignment="Top"/>
                                 <TextBlock Grid.Column="2" Text="{Binding NodeLabel}"
-                                           Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Small}"
+                                           Classes="list-secondary" FontSize="{DynamicResource FontSize.Small}"
                                            TextTrimming="CharacterEllipsis" VerticalAlignment="Top"/>
                                 <TextBlock Grid.Column="3" Text="{Binding Row.LineText}"
-                                           Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"
+                                           Classes="list-primary" FontSize="{DynamicResource FontSize.Body}"
                                            TextWrapping="Wrap"/>
                             </Grid>
                         </DataTemplate>

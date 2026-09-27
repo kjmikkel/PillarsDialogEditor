@@ -23,6 +23,17 @@
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Margin"     Value="0,0,0,4"/>
         </Style>
+        <!-- Balance flag colour, as a STYLE rather than a local Foreground (issue #94): a local
+             value would outrank the app-wide selected-row rule (Resources/ListSelection.axaml),
+             leaving e.g. the red "over-favoured" label on the blue selection highlight. These
+             Window styles apply after the application ones, so this view needs its own selected
+             rule, declared after the resting one. The flag stays readable as text on selection. -->
+        <Style Selector="TextBlock.balance-flag">
+            <Setter Property="Foreground" Value="{Binding Flag, Converter={StaticResource BalanceFlagToBrush}}"/>
+        </Style>
+        <Style Selector="ListBoxItem:selected TextBlock.balance-flag">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Selection.Foreground}"/>
+        </Style>
     </Window.Styles>
 
     <Grid RowDefinitions="Auto,*,Auto" Margin="14,12,14,12">
@@ -74,13 +85,13 @@
                         <DataTemplate>
                             <Grid ColumnDefinitions="*,50,70,110" Margin="0,2">
                                 <TextBlock Grid.Column="0" Text="{Binding DisplayValue}"
-                                           Foreground="{DynamicResource Brush.Text.Primary}" TextTrimming="CharacterEllipsis"/>
+                                           Classes="list-primary" TextTrimming="CharacterEllipsis"/>
                                 <TextBlock Grid.Column="1" Text="{Binding Count}"
-                                           Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                           Classes="list-secondary"/>
                                 <TextBlock Grid.Column="2" Text="{Binding ShareText}"
-                                           Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                           Classes="list-secondary"/>
                                 <TextBlock Grid.Column="3" Text="{Binding FlagLabel}"
-                                           Foreground="{Binding Flag, Converter={StaticResource BalanceFlagToBrush}}"
+                                           Classes="balance-flag"
                                            FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
                             </Grid>
                         </DataTemplate>
@@ -105,13 +116,13 @@
                         <DataTemplate>
                             <Grid ColumnDefinitions="*,50,70,110" Margin="0,2">
                                 <TextBlock Grid.Column="0" Text="{Binding DisplayValue}"
-                                           Foreground="{DynamicResource Brush.Text.Primary}" TextTrimming="CharacterEllipsis"/>
+                                           Classes="list-primary" TextTrimming="CharacterEllipsis"/>
                                 <TextBlock Grid.Column="1" Text="{Binding Count}"
-                                           Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                           Classes="list-secondary"/>
                                 <TextBlock Grid.Column="2" Text="{Binding ShareText}"
-                                           Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                                           Classes="list-secondary"/>
                                 <TextBlock Grid.Column="3" Text="{Binding FlagLabel}"
-                                           Foreground="{Binding Flag, Converter={StaticResource BalanceFlagToBrush}}"
+                                           Classes="balance-flag"
                                            FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
                             </Grid>
                         </DataTemplate>
