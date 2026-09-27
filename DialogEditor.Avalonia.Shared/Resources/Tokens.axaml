@@ -82,6 +82,15 @@
     <SolidColorBrush x:Key="Brush.Border.OnDark"  Color="{StaticResource Palette.Alpha.HairlineOnDark}"/>
     <SolidColorBrush x:Key="Brush.Border.Focus"   Color="{StaticResource Palette.Azure.600}"/>
 
+    <!-- Selected row in a list/tree (issue #83). A Background/Foreground PAIR, so a selected
+         row never keeps its resting foreground: resting text colours are tuned for the panel
+         surface (dark-on-light in Light, dim greys/greens elsewhere) and several of them fall
+         below WCAG AA on the dark-blue highlight — Light's were ~1.5:1, i.e. invisible.
+         Views must set BOTH tokens on a selected row. The pair is gated per palette in
+         PaletteContrastTests (>=4.5:1, >=7:1 in High Contrast); white on Azure.600 is ~8.4:1. -->
+    <SolidColorBrush x:Key="Brush.Selection.Background" Color="{StaticResource Palette.Azure.600}"/>
+    <SolidColorBrush x:Key="Brush.Selection.Foreground" Color="{StaticResource Palette.White}"/>
+
     <!-- Text -->
     <!-- Text emphasis ramp (light→dim), each a distinct used grey level -->
     <SolidColorBrush x:Key="Brush.Text.Primary"      Color="{StaticResource Palette.Neutral.910}"/>
