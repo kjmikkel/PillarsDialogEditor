@@ -18,12 +18,12 @@
     <!-- Remove all mods / backup status (issue #76) -->
     <sys:String x:Key="PatchManager_RemoveAllMods">Remove all mods</sys:String>
     <sys:String x:Key="PatchManager_NoModsInstalled">No mods installed with the Patch Manager or dialog-patcher yet.</sys:String>
-    <sys:String x:Key="PatchManager_ModsInstalled_One">Mods are installed: 1 original game file is backed up.</sys:String>
-    <sys:String x:Key="PatchManager_ModsInstalled_Other">Mods are installed: {0} original game files are backed up.</sys:String>
+    <sys:String x:Key="PatchManager_ModsInstalled_One">Mods are installed: the patcher manages 1 game file and can put it back as it was.</sys:String>
+    <sys:String x:Key="PatchManager_ModsInstalled_Other">Mods are installed: the patcher manages {0} game files and can put them back as they were.</sys:String>
     <sys:String x:Key="PatchManager_BackupCorrupt">The patcher's backup record is unreadable ({0}). Nothing was changed. Verify the game files in your storefront, then delete the PillarsDialogPatcher folder.</sys:String>
     <sys:String x:Key="PatchManager_ApplyCancelledExternal">Apply cancelled — nothing was changed.</sys:String>
-    <sys:String x:Key="PatchManager_RemoveAllDone_One">Removed all mods: 1 file restored.</sys:String>
-    <sys:String x:Key="PatchManager_RemoveAllDone_Other">Removed all mods: {0} files restored.</sys:String>
+    <sys:String x:Key="PatchManager_RemoveAllDone_One">Removed all mods: 1 game file is back as it was.</sys:String>
+    <sys:String x:Key="PatchManager_RemoveAllDone_Other">Removed all mods: {0} game files are back as they were.</sys:String>
     <sys:String x:Key="PatchManager_RemoveAllPartial">Removed mods: {0} files restored; {1} left as is because something else changed them (see the log).</sys:String>
     <sys:String x:Key="PatchManager_RemoveAllError">Remove all mods failed: {0}</sys:String>
     <sys:String x:Key="PatchManager_RemoveAllConfirm_Title">Remove all mods?</sys:String>
