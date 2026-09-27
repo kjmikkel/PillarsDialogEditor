@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Logging;
 using DialogEditor.Patch;
+using DialogEditor.Patch.Install;
 using DialogEditor.Patch.Packaging;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
@@ -24,7 +25,24 @@ public partial class PatchManagerViewModel : ObservableObject
 
     [ObservableProperty] private string _statusText   = string.Empty;
     [ObservableProperty] private bool   _hasConflicts;
-    [ObservableProperty] private bool   _isApplying;
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RemoveAllModsCommand))]
+    private bool _isApplying;
+
+    /// True when the patcher has a backup in the chosen game folder, i.e. "Remove all mods"
+    /// has something to undo.
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(RemoveAllModsCommand))]
+    private bool _hasInstalledMods;
+
+    [ObservableProperty] private string _backupStatusText = string.Empty;
+
+    /// Set by the host view: shows the files changed outside the patcher and returns true
+    /// when the user chooses to treat them as the new originals.
+    public Func<IReadOnlyList<string>, Task<bool>>? ConfirmAcceptExternalChanges { get; set; }
+
+    /// Set by the host view: returns true when the user confirms "Remove all mods".
+    public Func<Task<bool>>? ConfirmRemoveAllMods { get; set; }
 
     public bool HasEntries => Entries.Count > 0;
 
@@ -239,6 +257,8 @@ public partial class PatchManagerViewModel : ObservableObject
     }
 
     // ── Apply ─────────────────────────────────────────────────────────────
+    // Apply = restore the originals, then apply the whole list (PatchInstaller, issue #76), so
+    // applying again after reordering or removing entries replaces the previous mods.
 
     [RelayCommand(CanExecute = nameof(CanApply))]
     private async Task Apply()
@@ -254,13 +274,41 @@ public partial class PatchManagerViewModel : ObservableObject
         StatusText = Loc.Get("PatchManager_Applying");
         ApplyCommand.NotifyCanExecuteChanged();
 
+        var entries = Entries.Where(e => e.IsLoaded)
+                             .Select(e => new InstallEntry(e.Project!, e.VoFolder))
+                             .ToList();
+        var gameFolder = GameFolder;
         try
         {
-            await Task.Run(() => ApplyPatches(provider));
-            var convCount = Entries.Where(e => e.IsLoaded)
-                                   .Sum(e => e.Project!.Patches.Count);
-            AppLog.Info($"Applied {convCount} patch(es) from {Entries.Count} project(s)");
-            StatusText = Loc.FormatCount("PatchManager_ApplySuccess", convCount, GameFolder);
+            var result = await Task.Run(() =>
+                PatchInstaller.Install(provider, gameFolder, entries, new InstallOptions()));
+
+            if (result is InstallResult.ExternalChanges ext)
+            {
+                var accept = ConfirmAcceptExternalChanges is not null
+                          && await ConfirmAcceptExternalChanges(ext.Paths);
+                if (!accept)
+                {
+                    AppLog.Warn($"Apply cancelled: {ext.Paths.Count} file(s) changed outside the patcher");
+                    StatusText = Loc.Get("PatchManager_ApplyCancelledExternal");
+                    return;
+                }
+                result = await Task.Run(() => PatchInstaller.Install(provider, gameFolder, entries,
+                                                                     new InstallOptions(AcceptCurrentFiles: true)));
+            }
+
+            var applied = (InstallResult.Applied)result;
+            foreach (var m in applied.MissingConversations)
+                AppLog.Warn($"Conversation not found for patch: {m}");
+            foreach (var p in applied.RestoreSkipped)
+                AppLog.Warn($"Left as is (changed outside the patcher): {p}");
+            AppLog.Info($"Applied {applied.ConversationsPatched} conversation(s) from {entries.Count} project(s)");
+            StatusText = Loc.FormatCount("PatchManager_ApplySuccess", applied.ConversationsPatched, gameFolder);
+        }
+        catch (PatcherBackupCorruptException ex)
+        {
+            AppLog.Error("Patch application refused: backup manifest unreadable", ex);
+            StatusText = Loc.Format("PatchManager_BackupCorrupt", ex.ManifestPath);
         }
         catch (Exception ex)
         {
@@ -271,6 +319,7 @@ public partial class PatchManagerViewModel : ObservableObject
         {
             IsApplying = false;
             ApplyCommand.NotifyCanExecuteChanged();
+            RefreshBackupStatus();
         }
     }
 
@@ -278,67 +327,73 @@ public partial class PatchManagerViewModel : ObservableObject
                              && Entries.Count > 0
                              && !IsApplying;
 
-    private void ApplyPatches(IGameDataProvider provider)
+    // ── Remove all mods ───────────────────────────────────────────────────
+
+    [RelayCommand(CanExecute = nameof(CanRemoveAllMods))]
+    private async Task RemoveAllMods()
     {
-        // Collect all conversation names across all loaded projects
-        var allConversations = Entries
-            .Where(e => e.IsLoaded)
-            .SelectMany(e => e.Project!.Patches.Keys)
-            .Concat(Entries.Where(e => e.IsLoaded)
-                           .SelectMany(e => e.Project!.NewConversations ?? []))
-            .Distinct()
-            .ToList();
+        if (ConfirmRemoveAllMods is null || !await ConfirmRemoveAllMods()) return;
 
-        foreach (var convName in allConversations)
+        IsApplying = true;
+        ApplyCommand.NotifyCanExecuteChanged();
+        var gameFolder = GameFolder;
+        try
         {
-            // Gather patches in order
-            var patches = Entries
-                .Where(e => e.IsLoaded && e.Project!.Patches.ContainsKey(convName))
-                .Select(e => e.Project!.Patches[convName])
-                .ToList();
-
-            if (patches.Count == 0) continue;
-
-            var merged = PatchMerger.Merge(convName, patches);
-
-            // Resolve the conversation file (handles new conversations too)
-            var isNew = Entries.Any(e => e.IsLoaded
-                                      && (e.Project!.NewConversations?.Contains(convName) == true));
-            var file  = provider.FindConversation(convName)
-                     ?? (isNew ? provider.BuildNewConversationFile(convName) : null);
-
-            if (file is null)
-            {
-                AppLog.Warn($"Conversation not found for patch: {convName}");
-                continue;
-            }
-
-            if (!File.Exists(file.ConversationPath))
-                provider.InitializeConversationFile(file);
-
-            var conversation = provider.LoadConversation(file);
-            var baseSnap     = ConversationSnapshotBuilder.Build(conversation);
-            var applied      = PatchApplier.Apply(baseSnap, merged);
-            provider.SaveConversation(file, applied);
+            var r = await Task.Run(() => PatchInstaller.Restore(gameFolder));
+            foreach (var p in r.Skipped)
+                AppLog.Warn($"Remove all mods left a file as is (changed outside the patcher): {p}");
+            AppLog.Info($"Removed all mods: {r.Restored} file(s) restored, {r.Skipped.Count} skipped");
+            StatusText = r.Skipped.Count == 0
+                ? Loc.FormatCount("PatchManager_RemoveAllDone", r.Restored)
+                : Loc.Format("PatchManager_RemoveAllPartial", r.Restored, r.Skipped.Count);
         }
-
-        // Copy any VO files from .dialogpack entries
-        var gameVoRoot = Path.Combine(GameFolder,
-            "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
-
-        foreach (var entry in Entries.Where(e => e.IsLoaded && e.VoFolder is not null))
+        catch (PatcherBackupCorruptException ex)
         {
-            try
-            {
-                DialogPackHelper.CopyVoToGame(entry.VoFolder!, gameVoRoot);
-                AppLog.Info($"Copied VO files from: {entry.FullPath}");
-            }
-            catch (OperationCanceledException) { throw; }
-            catch (Exception ex)
-            {
-                AppLog.Error($"Failed to copy VO from '{entry.FullPath}': {ex.Message}", ex);
-                throw; // surface to caller
-            }
+            AppLog.Error("Remove all mods refused: backup manifest unreadable", ex);
+            StatusText = Loc.Format("PatchManager_BackupCorrupt", ex.ManifestPath);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error("Remove all mods failed", ex);
+            StatusText = Loc.Format("PatchManager_RemoveAllError", ex.Message);
+        }
+        finally
+        {
+            IsApplying = false;
+            ApplyCommand.NotifyCanExecuteChanged();
+            RefreshBackupStatus();
+        }
+    }
+
+    private bool CanRemoveAllMods() => HasInstalledMods && !IsApplying;
+
+    // ── Backup status ─────────────────────────────────────────────────────
+
+    partial void OnGameFolderChanged(string value) => RefreshBackupStatus();
+
+    /// Tells the player whether mods are installed in the chosen folder (and so whether
+    /// "Remove all mods" has anything to undo).
+    public void RefreshBackupStatus()
+    {
+        if (string.IsNullOrEmpty(GameFolder) || !Directory.Exists(GameFolder))
+        {
+            HasInstalledMods = false;
+            BackupStatusText = string.Empty;
+            return;
+        }
+        try
+        {
+            HasInstalledMods = PatchInstaller.HasInstalledMods(GameFolder);
+            BackupStatusText = HasInstalledMods
+                ? Loc.FormatCount("PatchManager_ModsInstalled",
+                                  PatcherBackupStore.Open(GameFolder).Entries.Count)
+                : Loc.Get("PatchManager_NoModsInstalled");
+        }
+        catch (PatcherBackupCorruptException ex)
+        {
+            AppLog.Error("Patch Manager: backup manifest unreadable", ex);
+            HasInstalledMods = false;
+            BackupStatusText = Loc.Format("PatchManager_BackupCorrupt", ex.ManifestPath);
         }
     }
 }

@@ -38,7 +38,7 @@
         </Style>
     </UserControl.Styles>
 
-    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto" Margin="14,12,14,12">
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto,Auto" Margin="14,12,14,12">
 
         <!-- ── Game folder ─────────────────────────────────────────── -->
         <TextBlock Grid.Row="0" Classes="section-label"
@@ -181,8 +181,17 @@
             </StackPanel>
         </Border>
 
+        <!-- ── Backup status (issue #76) ─────────────────────────────
+             Tells the player whether mods are installed in this game folder, i.e. whether
+             "Remove all mods" has anything to undo. -->
+        <TextBlock Grid.Row="4" Margin="0,8,0,0"
+                   Text="{Binding BackupStatusText}"
+                   TextWrapping="Wrap"
+                   Foreground="{DynamicResource Brush.Text.Muted}"
+                   FontSize="{DynamicResource FontSize.Small}"/>
+
         <!-- ── Footer ──────────────────────────────────────────────── -->
-        <Grid Grid.Row="4" ColumnDefinitions="*,Auto" Margin="0,10,0,0">
+        <Grid Grid.Row="5" ColumnDefinitions="*,Auto,Auto" Margin="0,10,0,0">
             <TextBlock Grid.Column="0"
                        Text="{Binding StatusText}"
                        Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
@@ -190,13 +199,18 @@
                        TextTrimming="CharacterEllipsis"
                        IsVisible="{Binding HasConflicts,
                                    Converter={StaticResource InverseBoolToVis}}"/>
-            <Button Grid.Column="1" Classes="primary-btn"
+            <Button Grid.Column="1" Classes="action-btn" Margin="0,0,8,0"
+                    Content="{DynamicResource PatchManager_RemoveAllMods}"
+                    Command="{Binding RemoveAllModsCommand}"
+                    ToolTip.Tip="{DynamicResource ToolTip_RemoveAllMods}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_RemoveAllMods}"/>
+            <Button Grid.Column="2" Classes="primary-btn"
                     Content="{DynamicResource PatchManager_Apply}"
                     Command="{Binding ApplyCommand}"
                     IsVisible="{Binding IsApplying, Converter={StaticResource InverseBoolToVis}}"
                     ToolTip.Tip="{DynamicResource ToolTip_ApplyPatches}"
                     AutomationProperties.HelpText="{DynamicResource ToolTip_ApplyPatches}"/>
-            <Button Grid.Column="1" Classes="primary-btn"
+            <Button Grid.Column="2" Classes="primary-btn"
                     Content="{DynamicResource PatchManager_Applying}"
                     IsEnabled="False"
                     IsVisible="{Binding IsApplying}"/>
