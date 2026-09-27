@@ -11,18 +11,29 @@
         x:CompileBindings="False">
     <DockPanel>
         <!-- Standalone-only settings bar. Lives here (not in the shared PatchManagerView)
-             so it appears only in the standalone PatchManager. -->
+             so it appears only in the standalone PatchManager; inside the editor, the
+             editor's own Help > About covers it. -->
         <Border DockPanel.Dock="Top"
                 Background="{DynamicResource Brush.Surface.Header}"
                 Padding="8,6">
-            <Button Content="{DynamicResource PatchManager_SettingsButton}"
-                    Click="Settings_Click"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Padding="6,2"
-                    ToolTip.Tip="{DynamicResource PatchManager_SettingsTooltip}"
-                    AutomationProperties.Name="{DynamicResource AutomationName_PatchManagerSettings}"
-                    AutomationProperties.HelpText="{DynamicResource PatchManager_SettingsTooltip}"/>
+            <StackPanel Orientation="Horizontal" Spacing="4">
+                <Button Content="{DynamicResource PatchManager_SettingsButton}"
+                        Click="Settings_Click"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="6,2"
+                        ToolTip.Tip="{DynamicResource PatchManager_SettingsTooltip}"
+                        AutomationProperties.Name="{DynamicResource AutomationName_PatchManagerSettings}"
+                        AutomationProperties.HelpText="{DynamicResource PatchManager_SettingsTooltip}"/>
+                <Button Content="{DynamicResource PatchManager_AboutButton}"
+                        Click="About_Click"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="6,2"
+                        ToolTip.Tip="{DynamicResource PatchManager_AboutTooltip}"
+                        AutomationProperties.Name="{DynamicResource AutomationName_PatchManagerAbout}"
+                        AutomationProperties.HelpText="{DynamicResource PatchManager_AboutTooltip}"/>
+            </StackPanel>
         </Border>
         <shared:PatchManagerView/>
     </DockPanel>
