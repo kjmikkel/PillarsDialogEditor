@@ -1,0 +1,13 @@
+{
+  "Name": "LegacyV1",
+  "SchemaVersion": 1,
+  "Patches": {
+    "greeting": {
+      "ConversationName": "greeting",
+      "SchemaVersion": 1,
+      "AddedNodes": [],
+      "DeletedNodeIds": [ 7 ],
+      "ModifiedNodes": []
+    }
+  }
+}

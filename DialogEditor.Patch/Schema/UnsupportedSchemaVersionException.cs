@@ -1,3 +1,5 @@
+using DialogEditor.Core.Localisation;
+
 namespace DialogEditor.Patch.Schema;
 
 /// A file was written by a newer editor than this build (issue #62). Loading is refused
@@ -7,6 +9,7 @@ namespace DialogEditor.Patch.Schema;
 /// editor" catch it first.
 /// Message is English (logs and the English-only dialog-patcher); the GUI builds its own
 /// localised text from Kind / Found / Supported via SchemaVersionMessages.
+[NotLocalised("Diagnostic and dialog-patcher text; the GUI renders Kind / Found / Supported via SchemaVersionMessages")]
 public sealed class UnsupportedSchemaVersionException(
     SchemaFileKind kind, int found, int supported, string? conversationName = null)
     : Exception(BuildMessage(kind, found, supported, conversationName))
