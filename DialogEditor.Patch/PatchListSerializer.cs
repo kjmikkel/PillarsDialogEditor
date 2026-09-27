@@ -1,6 +1,8 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Nodes;
+using DialogEditor.Patch.Schema;
 
 namespace DialogEditor.Patch;
 
@@ -19,10 +21,15 @@ public static class PatchListSerializer
         File.WriteAllText(path, JsonSerializer.Serialize(list, Options), Encoding.UTF8);
     }
 
-    public static PatchList LoadFromFile(string path)
+    public static PatchList LoadFromFile(string path) => Deserialize(File.ReadAllText(path));
+
+    /// Parses, refuses newer / migrates older (SchemaMigrator, GitHub issues 62 + 104), then binds.
+    public static PatchList Deserialize(string json)
     {
-        var json = File.ReadAllText(path);
-        return JsonSerializer.Deserialize<PatchList>(json, Options)
+        var root = JsonNode.Parse(json) as JsonObject
+                   ?? throw new InvalidDataException("Load-order file is not a JSON object.");
+        SchemaMigrator.Default.Migrate(root, SchemaFileKind.PatchList);
+        return root.Deserialize<PatchList>(Options)
                ?? throw new InvalidOperationException("Deserialised PatchList was null.");
     }
 

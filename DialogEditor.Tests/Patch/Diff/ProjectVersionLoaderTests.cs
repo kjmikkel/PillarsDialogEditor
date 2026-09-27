@@ -163,4 +163,19 @@ public class ProjectVersionLoaderTests
             loader.Load(new DiffEndpoint.GitRef("badref"), "C:/repo/mods/my.dialogproject")));
         Assert.Equal(DiffExceptionKind.BadRef, ex.Kind);
     }
+
+    // GitHub issue 62: a newer project format is its own kind, not "damaged file".
+    [Fact]
+    public void NewerFormat_ThrowsUnsupportedSchema()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"wc_{Guid.NewGuid():N}.dialogproject");
+        File.WriteAllText(path, """{ "Name": "P", "SchemaVersion": 99, "Patches": {} }""");
+        try
+        {
+            var ex = Assert.Throws<DiffException>(() =>
+                new ProjectVersionLoader(new FakeGit()).Load(new DiffEndpoint.WorkingCopy(), path));
+            Assert.Equal(DiffExceptionKind.UnsupportedSchema, ex.Kind);
+        }
+        finally { File.Delete(path); }
+    }
 }

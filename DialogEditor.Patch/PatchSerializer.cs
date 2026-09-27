@@ -1,6 +1,8 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Nodes;
+using DialogEditor.Patch.Schema;
 
 namespace DialogEditor.Patch;
 
@@ -16,9 +18,15 @@ public static class PatchSerializer
     public static string Serialize(ConversationPatch patch)
         => JsonSerializer.Serialize(patch, Options);
 
+    /// Parses, refuses newer / migrates older (SchemaMigrator, GitHub issues 62 + 104), then binds.
     public static ConversationPatch Deserialize(string json)
-        => JsonSerializer.Deserialize<ConversationPatch>(json, Options)
-           ?? throw new InvalidOperationException("Deserialised patch was null.");
+    {
+        var root = JsonNode.Parse(json) as JsonObject
+                   ?? throw new InvalidDataException("Patch file is not a JSON object.");
+        SchemaMigrator.Default.Migrate(root, SchemaFileKind.ConversationPatch);
+        return root.Deserialize<ConversationPatch>(Options)
+               ?? throw new InvalidOperationException("Deserialised patch was null.");
+    }
 
     public static void SaveToFile(string path, ConversationPatch patch)
     {
