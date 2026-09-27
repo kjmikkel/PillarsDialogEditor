@@ -290,10 +290,23 @@ function Save-WindowScreenshot {
         [Parameter(Mandatory)][System.Diagnostics.Process]$Process,
         [Parameter(Mandatory)][string]$Path
     )
-    Set-EditorForeground -Process $Process
+    #
+    # MainWindowHandle is cached on the Process object and can be stale or zero
+    # right after launch (or after a startup dialog closes). A zero/stale handle
+    # yields an empty rect, and Bitmap(0, 0) throws an unhelpful "Parameter is
+    # not valid" — so refresh and retry until the window has a real size.
     $r = New-Object DriveAppWin32+RECT
-    [DriveAppWin32]::GetWindowRect($Process.MainWindowHandle, [ref]$r) | Out-Null
+    for ($attempt = 0; $attempt -lt 5; $attempt++) {
+        $Process.Refresh()
+        [DriveAppWin32]::GetWindowRect($Process.MainWindowHandle, [ref]$r) | Out-Null
+        if (($r.Right - $r.Left) -gt 0 -and ($r.Bottom - $r.Top) -gt 0) { break }
+        Start-Sleep -Seconds 2
+    }
     $w = $r.Right - $r.Left; $h = $r.Bottom - $r.Top
+    if ($w -le 0 -or $h -le 0) {
+        throw "Save-WindowScreenshot: no usable window rect (handle=$($Process.MainWindowHandle)). Is the main window open?"
+    }
+    Set-EditorForeground -Process $Process
     $bmp = New-Object System.Drawing.Bitmap($w, $h)
     $g = [System.Drawing.Graphics]::FromImage($bmp)
     $g.CopyFromScreen($r.Left, $r.Top, 0, 0, $bmp.Size)
