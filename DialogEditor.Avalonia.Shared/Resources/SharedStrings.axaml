@@ -133,5 +133,6 @@
     <sys:String x:Key="Schema_Format_Project">project format</sys:String>
     <sys:String x:Key="Schema_Format_ConversationPatch">conversation patch format</sys:String>
     <sys:String x:Key="Schema_Format_PatchList">load-order format</sys:String>
+    <sys:String x:Key="Schema_TooNew_Ok">OK</sys:String>
 
 </ResourceDictionary>

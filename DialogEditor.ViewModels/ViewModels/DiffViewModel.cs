@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -329,6 +329,7 @@ public partial class DiffViewModel : ObservableObject
             DiffExceptionKind.ReadFailed   => Loc.Format("Status_DiffReadError", endpointLabel),
             DiffExceptionKind.ParseFailed  => Loc.Format("Status_DiffParseError", endpointLabel),
             DiffExceptionKind.GitMissing   => Loc.Get("Status_DiffGitMissing"),
+            DiffExceptionKind.UnsupportedSchema => Loc.Format("Status_DiffUnsupportedSchema", endpointLabel),
             _                              => Loc.Format("Status_DiffLoadError", endpointLabel),
         };
 
