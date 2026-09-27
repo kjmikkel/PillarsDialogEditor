@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using DialogEditor.Patch;
 using DialogEditor.PatchCli;
 using DialogEditor.Tests.Helpers;
@@ -94,4 +95,43 @@ public class PatcherCommandTests : IDisposable
         Assert.Equal(0, code);
         Assert.Contains("restore", output, StringComparison.OrdinalIgnoreCase);
     }
+
+    // ── Newer file format (GitHub issue 62) ──────────────────────────────
+
+    private string SaveNewerProject(string name)
+    {
+        var path = SaveProject(FakePoe2Game.ExternalVoMod(name, "x"));
+        File.WriteAllText(path, File.ReadAllText(path).Replace("\"SchemaVersion\": 1", "\"SchemaVersion\": 99"));
+        return path;
+    }
+
+    [Fact]
+    public void NewerProject_ExitsWith4_NamesTheFile_AndWritesNothing()
+    {
+        var before = _game.SnapshotGameData();
+        var newer  = SaveNewerProject("Future");
+
+        var (code, _, err) = Run(_game.Root, SaveProject(FakePoe2Game.ExternalVoMod("A", "a")), newer);
+
+        Assert.Equal(4, code);
+        Assert.Contains("Future.dialogproject", err);
+        Assert.Contains("newer", err);
+        Assert.Equal(before, _game.SnapshotGameData());
+        Assert.False(Directory.Exists(Path.Combine(_game.Root, "PillarsDialogPatcher")));
+    }
+
+    [Fact]
+    public void NewerPack_ExitsWith4()
+    {
+        var project = SaveNewerProject("FuturePack");
+        var pack    = Path.Combine(_projDir, "FuturePack.dialogpack");
+        using (var zip = ZipFile.Open(pack, ZipArchiveMode.Create))
+            zip.CreateEntryFromFile(project, "project.dialogproject");
+
+        Assert.Equal(4, Run(_game.Root, pack).Code);
+    }
+
+    [Fact]
+    public void Help_DocumentsExitCode4()
+        => Assert.Contains("4   ", Run("--help").Out);
 }
