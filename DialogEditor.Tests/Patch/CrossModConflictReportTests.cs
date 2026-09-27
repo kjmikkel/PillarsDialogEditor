@@ -37,4 +37,11 @@ public class CrossModConflictReportTests
             "conv1, link 5 -> 9: changed by 'ModA' and 'ModB'; 'ModB' wins (later in the load order)",
             CrossModConflictReport.Describe(
                 new PatchConflict("conv1", 5, null, 0, 1) { Kind = PatchConflictKind.Link, LinkToNodeId = 9 }, Names));
+
+    [Fact]
+    public void TextConflict_NamesTheLanguageBothPacksAndTheWinner()
+        => Assert.Equal(
+            "conv1, node 5, text (fr): changed by 'ModA' and 'ModB'; 'ModB' wins (later in the load order)",
+            CrossModConflictReport.Describe(
+                new PatchConflict("conv1", 5, null, 0, 1) { Kind = PatchConflictKind.Text, Language = "fr" }, Names));
 }

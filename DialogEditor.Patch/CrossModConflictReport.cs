@@ -31,6 +31,9 @@ public static class CrossModConflictReport
             PatchConflictKind.Link =>
                 $"{c.ConversationName}, link {c.NodeId} -> {c.LinkToNodeId}: changed by '{first}' and '{second}'; " +
                 $"'{second}' wins {LaterWins}",
+            PatchConflictKind.Text =>
+                $"{c.ConversationName}, node {c.NodeId}, text ({c.Language}): changed by '{first}' and '{second}'; " +
+                $"'{second}' wins {LaterWins}",
             _ =>
                 $"{c.ConversationName}, node {c.NodeId}, {c.FieldName}: changed by '{first}' and '{second}'; " +
                 $"'{second}' wins {LaterWins}",

@@ -28,6 +28,9 @@ public record PatchConflict(
     /// For a Link conflict, the target of the contested NodeId → LinkToNodeId link.
     public int? LinkToNodeId { get; init; }
 
+    /// For a Text conflict, the language code both packs wrote the node's text in.
+    public string? Language { get; init; }
+
     /// True when one patch deletes the node that another patch modifies.
     public bool IsDeletion => Kind == PatchConflictKind.Deletion;
 }
@@ -46,6 +49,12 @@ public enum PatchConflictKind
     /// Two patches add or modify the same NodeId → LinkToNodeId link (PatchMerger keys
     /// added and modified links by target alike, later wins).
     Link,
+    /// Two patches write the same node's text in the same language (GitHub issue 100). Text
+    /// lives only in ConversationPatch.Translations since schema 2, so it never shows up
+    /// as a field change; PatchMerger resolves it last-wins per language and node.
+    /// Different languages do not clash: a translation pack over a content mod is the
+    /// point of having languages.
+    Text,
 }
 
 public static class ConflictDetector
@@ -69,6 +78,8 @@ public static class ConflictDetector
         // Added node ids and added/modified links, same shape (issue #6).
         var additions = new Dictionary<string, Dictionary<int, List<int>>>();
         var linkTouches = new Dictionary<string, Dictionary<(int from, int to), List<int>>>();
+        // Node text per language (GitHub issue 100) — it lives in Translations, not FieldChanges.
+        var textTouches = new Dictionary<string, Dictionary<(int nodeId, string lang), List<int>>>();
 
         for (int pi = 0; pi < projects.Count; pi++)
         {
@@ -82,6 +93,14 @@ public static class ConflictDetector
 
                 foreach (var node in patch.AddedNodes)
                     Touch(additions, convName, node.NodeId, pi);
+
+                // A pack's text for a node it adds itself is part of that node: if two
+                // packs add the same id, the AddedNode conflict already covers it.
+                var ownNodes = patch.AddedNodes.Select(n => n.NodeId).ToHashSet();
+                foreach (var (lang, entries) in patch.Translations)
+                    foreach (var nodeId in entries.Select(t => t.NodeId).Distinct())
+                        if (!ownNodes.Contains(nodeId))
+                            Touch(textTouches, convName, (nodeId, lang), pi);
 
                 foreach (var mod in patch.ModifiedNodes)
                 {
@@ -151,6 +170,9 @@ public static class ConflictDetector
                 var modifyingProjects = convFields.Keys
                     .Where(k => k.nodeId == nodeId)
                     .SelectMany(k => convFields[k])
+                    .Concat(textTouches.GetValueOrDefault(convName)?
+                                .Where(t => t.Key.nodeId == nodeId)
+                                .SelectMany(t => t.Value) ?? [])
                     .Distinct()
                     .ToList();
 
@@ -179,9 +201,15 @@ public static class ConflictDetector
                     conflicts.Add(new PatchConflict(convName, from, null, indices[0], indices[1])
                         { Kind = PatchConflictKind.Link, LinkToNodeId = to });
 
+        foreach (var (convName, texts) in textTouches)
+            foreach (var ((nodeId, lang), indices) in texts)
+                if (indices.Count >= 2)
+                    conflicts.Add(new PatchConflict(convName, nodeId, null, indices[0], indices[1])
+                        { Kind = PatchConflictKind.Text, Language = lang });
+
         return conflicts
             .DistinctBy(c => (c.ConversationName, c.NodeId, c.FieldName, c.Kind, c.LinkToNodeId,
-                              c.FirstPatchIndex, c.SecondPatchIndex))
+                              c.Language, c.FirstPatchIndex, c.SecondPatchIndex))
             .ToList();
     }
 
