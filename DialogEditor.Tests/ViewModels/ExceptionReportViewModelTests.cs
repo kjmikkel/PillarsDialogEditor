@@ -1,4 +1,6 @@
+using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
+using DialogEditor.ViewModels.Resources;
 using Xunit;
 
 namespace DialogEditor.Tests.ViewModels;
@@ -7,6 +9,8 @@ public class ExceptionReportViewModelTests
 {
     private const string LogPath   = @"C:\logs\app.log";
     private const string IssuesUrl = "https://example.com/issues";
+
+    public ExceptionReportViewModelTests() => Loc.Configure(new StubStringProvider());
 
     private static ExceptionReportViewModel Make(Exception ex)
         => new(ex, LogPath, IssuesUrl);
@@ -93,5 +97,59 @@ public class ExceptionReportViewModelTests
     {
         var vm = Make(new Exception("x"));
         Assert.Equal(IssuesUrl, vm.IssuesUrl);
+    }
+
+    // ── Issue #72: pre-filled "new issue" link ───────────────────────────────
+
+    [Fact]
+    public void ReportUrl_ComesFromTheInjectedBuilder()
+    {
+        var ex = new Exception("x");
+        Exception? seen = null;
+
+        var vm = new ExceptionReportViewModel(ex, LogPath, IssuesUrl,
+            reportUrlBuilder: e => { seen = e; return "https://example.com/issues/new?title=t"; });
+
+        Assert.Same(ex, seen);
+        Assert.Equal("https://example.com/issues/new?title=t", vm.ReportUrl);
+    }
+
+    [Fact]
+    public void ReportUrl_FallsBackToTheIssuesList_WhenBuildingFails()
+    {
+        var vm = new ExceptionReportViewModel(new Exception("x"), LogPath, IssuesUrl,
+            reportUrlBuilder: _ => throw new InvalidOperationException("boom"));
+
+        Assert.Equal(IssuesUrl, vm.ReportUrl);
+    }
+
+    [Fact]
+    public void ReportUrl_ByDefault_OpensTheNewIssuePageWithTitleAndBody()
+    {
+        var vm = Make(WithStack());
+
+        Assert.StartsWith(IssuesUrl + "/new?", vm.ReportUrl);
+        Assert.Contains("title=", vm.ReportUrl);
+        Assert.Contains("body=", vm.ReportUrl);
+        Assert.Contains("oops", Uri.UnescapeDataString(vm.ReportUrl));
+    }
+
+    [Fact]
+    public void ReportUrl_ByDefault_ContainsNoLocalProfilePathOrUserName()
+    {
+        // The real environment: whatever machine this runs on, its profile path and
+        // account name must not survive into a URL bound for a public tracker.
+        var profile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        var logPath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Ed", "app.log");
+        var ex = new IOException($"Could not open {Path.Combine(profile, "Documents", "a.json")}");
+
+        var decoded = Uri.UnescapeDataString(
+            new ExceptionReportViewModel(ex, logPath, IssuesUrl).ReportUrl);
+
+        Assert.StartsWith(IssuesUrl + "/new?", decoded);
+        Assert.DoesNotContain(profile, decoded, StringComparison.OrdinalIgnoreCase);
+        if (Environment.UserName.Length >= DialogEditor.Core.Diagnostics.CrashReportScrubber.MinWordLength)
+            Assert.DoesNotContain(Environment.UserName, decoded, StringComparison.OrdinalIgnoreCase);
     }
 }

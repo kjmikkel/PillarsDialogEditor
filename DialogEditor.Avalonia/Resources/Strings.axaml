@@ -1565,8 +1565,27 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="ExceptionReport_Copy">Copy to clipboard</sys:String>
     <sys:String x:Key="ExceptionReport_Close">Close</sys:String>
     <sys:String x:Key="ToolTip_ExceptionReport_Copy">Copy the error details to the clipboard so you can paste them into a bug report.</sys:String>
-    <sys:String x:Key="ToolTip_ExceptionReport_IssuesLink">Open the GitHub Issues page to file a bug report for this error.</sys:String>
-    <sys:String x:Key="AutomationName_ExceptionReport_IssuesLink">Open GitHub Issues page</sys:String>
+    <sys:String x:Key="ExceptionReport_ReportButton">Report this error on GitHub</sys:String>
+    <sys:String x:Key="ToolTip_ExceptionReport_IssuesLink">Open a new GitHub issue in your browser, already filled in with the editor version, your operating system and the error details. Your user name and personal folder paths are replaced with placeholders first. Nothing is sent until you review the text and submit it yourself.</sys:String>
+    <sys:String x:Key="AutomationName_ExceptionReport_IssuesLink">Report this error on GitHub</sys:String>
+
+    <!-- Pre-filled GitHub issue (issue #72). The user sees and can edit this text in the
+         browser before submitting. Markdown (bullets, headings, code fences) is added by
+         the code; translate the words only. -->
+    <!-- {0} = exception type name, {1} = first line of the exception message -->
+    <sys:String x:Key="ExceptionReport_IssueTitle">Crash: {0}: {1}</sys:String>
+    <!-- {0} = editor version -->
+    <sys:String x:Key="ExceptionReport_IssueVersion">Editor version: {0}</sys:String>
+    <!-- {0} = operating system description -->
+    <sys:String x:Key="ExceptionReport_IssueOs">Operating system: {0}</sys:String>
+    <!-- {0} = full exception type name -->
+    <sys:String x:Key="ExceptionReport_IssueException">Exception: {0}</sys:String>
+    <sys:String x:Key="ExceptionReport_IssueMessageHeading">Error message</sys:String>
+    <sys:String x:Key="ExceptionReport_IssueStackTraceHeading">Stack trace (top)</sys:String>
+    <sys:String x:Key="ExceptionReport_IssueTruncated">… (truncated to fit in a link; the full details are in the log file below)</sys:String>
+    <!-- {0} = log file path, with personal folders replaced by placeholders -->
+    <sys:String x:Key="ExceptionReport_IssueLogFile">Full log file: {0} (please check it for anything private before attaching it)</sys:String>
+    <sys:String x:Key="ExceptionReport_IssueStepsHeading">What were you doing when the error occurred?</sys:String>
 
     <!-- ── Voice-Over validation ───────────────────────────────────────── -->
     <sys:String x:Key="VoStatus_Found">VO file found</sys:String>

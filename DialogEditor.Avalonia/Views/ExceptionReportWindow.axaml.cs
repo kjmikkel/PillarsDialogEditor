@@ -24,11 +24,14 @@ public partial class ExceptionReportWindow : Window
         await clipboard.SetTextAsync(vm.CopyText);
     }
 
+    // Thin shell call only — the URL is built (and scrubbed) by the view-model. If the shell
+    // refuses the long pre-filled URL, retry with the plain issues list. ExternalLauncher
+    // logs each failure via AppLog.Warn.
     private void IssuesLink_Click(object? sender, RoutedEventArgs e)
     {
         if (DataContext is not ExceptionReportViewModel vm) return;
-        try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(vm.IssuesUrl) { UseShellExecute = true }); }
-        catch (Exception ex) { AppLog.Warn($"ExceptionReportWindow: could not open issues link — {ex.Message}"); }
+        if (!ExternalLauncher.Open(vm.ReportUrl) && vm.ReportUrl != vm.IssuesUrl)
+            ExternalLauncher.Open(vm.IssuesUrl);
     }
 
     private void Close_Click(object? sender, RoutedEventArgs e) => Close();
