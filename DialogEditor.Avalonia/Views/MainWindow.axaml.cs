@@ -370,9 +370,6 @@ public partial class MainWindow : Window
     /// <see cref="FindCanvasView"/> — it may be null if the tool is closed).
     private NodeDetailView? FindDetailView() => FindDockedView<NodeDetailView>();
 
-    /// Locates the live GameBrowserView hosted by the Dock conversations tool.
-    private GameBrowserView? FindBrowserView() => FindDockedView<GameBrowserView>();
-
     /// Finds a Dock-hosted view by TYPE rather than by name. Tool content is instantiated
     /// lazily from Application.DataTemplates and therefore carries no compile-time x:Name
     /// in MainWindow's scope, so type is the only stable handle we have on it.
@@ -381,23 +378,19 @@ public partial class MainWindow : Window
     /// reparents its content into a separate TopLevel, where this window's visual tree can
     /// no longer see it. Returns null when the tool is closed entirely, or when Dock has
     /// not realised the content yet — callers must treat null as "not now", not "never".
-    private T? FindDockedView<T>() where T : Control
-    {
-        if (this.GetVisualDescendants().OfType<T>().FirstOrDefault() is { } here)
-            return here;
+    private T? FindDockedView<T>() where T : Control =>
+        TourTargetResolver.FindFirstOfType(typeof(T), this.GetVisualDescendants()) as T
+            ?? FloatingHostWindows()
+                .Select(host => TourTargetResolver.FindFirstOfType(typeof(T), host.GetVisualDescendants()) as T)
+                .FirstOrDefault(v => v is not null);
 
-        // Application.Current already tracks every open top-level, so floating hosts need
-        // no registry of their own — Dock opens and closes them behind our back.
-        if (global::Avalonia.Application.Current?.ApplicationLifetime
-            is IClassicDesktopStyleApplicationLifetime desktop)
-        {
-            foreach (var host in desktop.Windows.OfType<EditorHostWindow>())
-                if (host.GetVisualDescendants().OfType<T>().FirstOrDefault() is { } floated)
-                    return floated;
-        }
-
-        return null;
-    }
+    /// Floating dock hosts currently open. Application.Current already tracks every open
+    /// top-level, so these need no registry of their own — Dock opens and closes them
+    /// behind our back.
+    private static IEnumerable<Visual> FloatingHostWindows() =>
+        global::Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop
+            ? desktop.Windows.OfType<EditorHostWindow>()
+            : [];
 
     // ── View menu: show/focus a tool, re-opening it if the user closed its tab ────
     private void ShowBrowserTool_Click(object? sender, RoutedEventArgs e)         => ShowToolById(EditorDockFactory.BrowserId);
@@ -1010,22 +1003,6 @@ public partial class MainWindow : Window
 
     // ── Guided tour adorner ───────────────────────────────────────────────
 
-    /// Maps a step's opaque TargetName to (a) the Dock tool that must be on screen before
-    /// the target can exist, and (b) how to find the live Control once it does.
-    ///
-    /// The first three targets are Dock-hosted tool content. They have no x:Name in this
-    /// window's scope, so FindControl can never see them — they are found by view type
-    /// instead. Anything else falls through to the classic named-control lookup, which is
-    /// still correct for chrome that lives directly in MainWindow.axaml (HelpToggle).
-    private (string? DockId, Func<Control?> Resolve) ResolveTourTarget(string targetName) =>
-        targetName switch
-        {
-            "BrowserPanel" => (EditorDockFactory.BrowserId, () => FindBrowserView()),
-            "CanvasView"   => (EditorDockFactory.CanvasId,  () => FindCanvasView()),
-            "DetailPanel"  => (EditorDockFactory.DetailsId, () => FindDetailView()),
-            _              => (null, () => this.FindControl<Control>(targetName)),
-        };
-
     private void OnTourStepChanged()
     {
         RemoveTourAdorner();
@@ -1034,7 +1011,11 @@ public partial class MainWindow : Window
         var vm = (MainWindowViewModel)DataContext!;
         if (!vm.Tour.IsVisible) return;
 
-        var (dockId, resolve) = ResolveTourTarget(vm.Tour.CurrentStep.TargetName);
+        // Target resolution (docked views by type, window chrome by name) lives in
+        // TourTargetResolver so it is unit-testable — issue #10.
+        var targetName = vm.Tour.CurrentStep.TargetName;
+        var dockId     = TourTargetResolver.DockedTargetFor(targetName)?.DockToolId;
+        Control? resolve() => TourTargetResolver.Resolve(targetName, this, FloatingHostWindows());
 
         // Reveal before highlighting. The tour is onboarding: a step describing the Node
         // Details pane is worthless if the user closed that tab, and ShowToolById already
