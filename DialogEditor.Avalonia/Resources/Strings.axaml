@@ -1569,8 +1569,9 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="ExceptionReport_Copy">Copy to clipboard</sys:String>
     <sys:String x:Key="ExceptionReport_Close">Close</sys:String>
     <sys:String x:Key="ToolTip_ExceptionReport_Copy">Copy the error details to the clipboard so you can paste them into a bug report.</sys:String>
-    <sys:String x:Key="ToolTip_ExceptionReport_IssuesLink">Open the GitHub Issues page to file a bug report for this error.</sys:String>
-    <sys:String x:Key="AutomationName_ExceptionReport_IssuesLink">Open GitHub Issues page</sys:String>
+    <sys:String x:Key="ExceptionReport_ReportButton">Report this error on GitHub</sys:String>
+    <sys:String x:Key="ToolTip_ExceptionReport_IssuesLink">Open a new GitHub issue in your browser, already filled in with the editor version, your operating system and the error details. Your user name and personal folder paths are replaced with placeholders first. Nothing is sent until you review the text and submit it yourself.</sys:String>
+    <sys:String x:Key="AutomationName_ExceptionReport_IssuesLink">Report this error on GitHub</sys:String>
 
     <!-- ── Voice-Over validation ───────────────────────────────────────── -->
     <sys:String x:Key="VoStatus_Found">VO file found</sys:String>
