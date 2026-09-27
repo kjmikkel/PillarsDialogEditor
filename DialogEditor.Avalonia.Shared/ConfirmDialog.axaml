@@ -13,7 +13,8 @@
          editor's Test Patch warning). The caller passes already-localised title, message
          and confirm-button text; the optional details list shows file names. The two
          buttons are the OK/Cancel pair CLAUDE.md exempts from tooltips: the message above
-         them is the explanation. -->
+         them is the explanation. With showCancel: false it doubles as a one-button message
+         (GitHub issue 62, "newer file format"), where OK also answers Esc. -->
     <StackPanel Margin="20" Spacing="12">
         <TextBlock x:Name="MessageText"
                    TextWrapping="Wrap"

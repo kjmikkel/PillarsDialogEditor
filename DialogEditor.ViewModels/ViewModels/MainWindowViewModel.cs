@@ -11,6 +11,7 @@ using DialogEditor.Core.Import;
 using DialogEditor.Core.Layout;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
+using DialogEditor.Patch.Schema;
 using DialogEditor.Patch.Install;
 using DialogEditor.Patch.Changelog;
 using DialogEditor.Patch.Diff;
@@ -114,6 +115,19 @@ public partial class MainWindowViewModel : ObservableObject
     /// import, …) in the exception report window — status-bar text alone is too
     /// easy to miss for a failed operation.
     public Action<Exception>? ReportError { get; set; }
+
+    /// Set by the UI layer: shows a one-button message (title, text). Used for files saved by a
+    /// newer editor (GitHub issue 62). That's not a bug, so it must not go through ReportError's
+    /// crash report.
+    public Func<string, string, Task>? ShowUnsupportedFormat { get; set; }
+
+    private async Task RefuseNewerFormatAsync(UnsupportedSchemaVersionException ex, string path)
+    {
+        AppLog.Warn($"Refused '{path}': {ex.Message}");
+        StatusText = SchemaVersionMessages.TooNew(ex, Path.GetFileName(path));
+        if (ShowUnsupportedFormat is not null)
+            await ShowUnsupportedFormat(SchemaVersionMessages.Title, StatusText);
+    }
 
     /// Conditions from the catalogue filtered to the currently loaded game.
     public IReadOnlyList<ConditionEntry> ActiveConditions
@@ -989,6 +1003,12 @@ public partial class MainWindowViewModel : ObservableObject
                     StatusText = Loc.Get("Status_AutosaveRestored");
                     return;              // sidecar is KEPT until that save (double-crash protection)
                 }
+                catch (UnsupportedSchemaVersionException ex)
+                {
+                    // A newer editor's unsaved work: keep the sidecar (it isn't corrupt) and
+                    // load the saved file, which may be refused in its own right.
+                    AppLog.Warn($"Autosave sidecar for '{path}' is from a newer version, kept: {ex.Message}");
+                }
                 catch (Exception ex)
                 {
                     AppLog.Warn($"Autosave restore failed for '{path}': {ex.Message} — loading saved file");
@@ -1015,6 +1035,10 @@ public partial class MainWindowViewModel : ObservableObject
             FinishLoad(loaded, path);
             ClearPendingConflict();
         }
+        catch (UnsupportedSchemaVersionException ex)
+        {
+            await RefuseNewerFormatAsync(ex, path);
+        }
         catch (Exception ex)
         {
             AppLog.Error($"Failed to open project '{path}'", ex);
@@ -1034,6 +1058,11 @@ public partial class MainWindowViewModel : ObservableObject
             mine      = DialogProjectSerializer.Deserialize(mineText);
             theirs    = DialogProjectSerializer.Deserialize(theirsText);
             conflicts = GitMergeAnalyzer.Analyze(mine, theirs);
+        }
+        catch (UnsupportedSchemaVersionException ex)
+        {
+            await RefuseNewerFormatAsync(ex, path);
+            return;
         }
         catch (Exception ex)
         {
@@ -1627,11 +1656,13 @@ public partial class MainWindowViewModel : ObservableObject
             Loc.Get("FileType_DialogProject"));
         if (paths.Count == 0) return;
 
+        string? loading = null;
         try
         {
             var merged = _project;
             foreach (var path in paths)
             {
+                loading = path;
                 var other = DialogProjectSerializer.LoadFromFile(path);
                 merged = merged.MergeWith(other);
             }
@@ -1642,6 +1673,11 @@ public partial class MainWindowViewModel : ObservableObject
             DialogProjectSerializer.SaveToFile(_projectPath!, merged);
             AppLog.Info($"Merged {paths.Count} project(s) into '{merged.Name}'");
             StatusText = Loc.FormatCount("Status_MergeComplete", paths.Count, merged.Name);
+        }
+        catch (UnsupportedSchemaVersionException ex)
+        {
+            // Every file is loaded before SetProject / SaveToFile, so the open project is untouched.
+            await RefuseNewerFormatAsync(ex, loading!);
         }
         catch (Exception ex)
         {

@@ -144,6 +144,10 @@ public partial class MainWindow : Window
         // alias index rebuild in Task.Run), and window creation must not.
         vm.ReportError = ex =>
             Dispatcher.UIThread.Post(() => (Application.Current as App)?.ShowExceptionReport(ex));
+        // A file from a newer editor is not a bug, so a plain message rather than the crash report.
+        vm.ShowUnsupportedFormat = (title, message) =>
+            new DialogEditor.Avalonia.Shared.ConfirmDialog(title, message, Loc.Get("Schema_TooNew_Ok"),
+                details: null, showCancel: false).ShowAsync(this);
         vm.ShowGitConflictResolution = async resolutionVm =>
         {
             var dialog = new GitConflictResolutionWindow(resolutionVm);
