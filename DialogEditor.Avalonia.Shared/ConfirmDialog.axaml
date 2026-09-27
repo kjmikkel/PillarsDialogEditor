@@ -1,0 +1,50 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="DialogEditor.Avalonia.Shared.ConfirmDialog"
+        Icon="avares://DialogEditor.Avalonia.Shared/Assets/app.ico"
+        SizeToContent="WidthAndHeight" MinWidth="360" MaxWidth="560"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource Brush.Surface.Window}"
+        x:CompileBindings="False">
+
+    <!-- Generic yes/no confirmation, shared by the editor and the standalone Patch Manager
+         (issue #76: "Remove all mods", "treat changed files as new originals", and the
+         editor's Test Patch warning). The caller passes already-localised title, message
+         and confirm-button text; the optional details list shows file names. The two
+         buttons are the OK/Cancel pair CLAUDE.md exempts from tooltips: the message above
+         them is the explanation. -->
+    <StackPanel Margin="20" Spacing="12">
+        <TextBlock x:Name="MessageText"
+                   TextWrapping="Wrap"
+                   Foreground="{DynamicResource Brush.Text.Primary}"
+                   FontSize="{DynamicResource FontSize.Body}"/>
+
+        <Border x:Name="DetailsBorder"
+                IsVisible="False"
+                Background="{DynamicResource Brush.Surface.Input}"
+                BorderBrush="{DynamicResource Brush.Border.Strong}"
+                BorderThickness="1" Padding="8,6">
+            <ScrollViewer MaxHeight="200">
+                <ItemsControl x:Name="DetailsList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}" TextWrapping="Wrap"
+                                       Foreground="{DynamicResource Brush.Text.Secondary}"
+                                       FontSize="{DynamicResource FontSize.Small}"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button x:Name="ConfirmButton"
+                    Background="{DynamicResource Brush.Button.Primary.Background}"
+                    Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0" Padding="16,6"/>
+            <Button x:Name="CancelButton"
+                    Content="{DynamicResource Confirm_Cancel}"
+                    IsCancel="True" Padding="16,6"/>
+        </StackPanel>
+    </StackPanel>
+</Window>

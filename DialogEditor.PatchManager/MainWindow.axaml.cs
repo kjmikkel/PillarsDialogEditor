@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using DialogEditor.Avalonia.Shared;
 using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.ViewModels;
 
@@ -13,6 +14,7 @@ public partial class MainWindow : Window
         var vm = new PatchManagerViewModel(
             new AvaloniaFolderPicker(this),
             new AvaloniaFilePicker(this));
+        PatchManagerDialogs.Attach(vm, this);
         DataContext = vm;
     }
 
