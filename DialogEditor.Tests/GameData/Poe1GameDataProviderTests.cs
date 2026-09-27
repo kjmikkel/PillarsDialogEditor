@@ -232,6 +232,35 @@ public class Poe1GameDataProviderTests : IDisposable
         Assert.Equal(Path.GetFileName(enPath), Path.GetFileName(frPath));
     }
 
+    // #84: a genuinely missing string table must be distinguishable from a loaded
+    // table that simply has no entry for some (e.g. script) nodes.
+    [Fact]
+    public void LoadConversation_NoStringTableFile_MarksStringsMissing()
+    {
+        var path = WriteConv("test", TwoNodeXml);
+        var file = new ConversationFile("test", "", path, "");
+
+        var conversation = _provider.LoadConversation(file);
+
+        Assert.True(conversation.Strings.IsMissing);
+    }
+
+    [Fact]
+    public void LoadConversation_WithStringTableFile_StringsNotMissing()
+    {
+        var path   = WriteConv("test", TwoNodeXml);
+        var file   = new ConversationFile("test", "", path, "");
+        var stPath = _provider.GetStringTablePath(file);
+        Directory.CreateDirectory(Path.GetDirectoryName(stPath)!);
+        File.WriteAllText(stPath,
+            "<StringTableFile><Entries><Entry><ID>0</ID><DefaultText>Hi</DefaultText><FemaleText /></Entry></Entries></StringTableFile>");
+
+        var conversation = _provider.LoadConversation(file);
+
+        Assert.False(conversation.Strings.IsMissing);
+        Assert.Null(conversation.Strings.Get(1));   // loaded table, node 1 simply has no entry
+    }
+
     [Fact]
     public void SaveConversation_DoesNotWriteStringtable()
     {

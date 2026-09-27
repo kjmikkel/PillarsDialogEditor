@@ -48,8 +48,12 @@
          {0} = node ID (integer), {1} = speaker name, {2} = optional suffix
          (Node_PlayerChoiceSuffix when the node is a player response, else empty) -->
     <sys:String x:Key="Node_Title">Node {0} · {1}{2}</sys:String>
-    <!-- Shown as the node body text when the stringtable file cannot be located -->
+    <!-- Muted display-only hint in an empty node body when the conversation's stringtable
+         file cannot be located. Never stored as the node's text (#84). -->
     <sys:String x:Key="Node_TextUnavailable">[text unavailable — stringtable not found]</sys:String>
+    <!-- Muted display-only hint in the body of a script node that has no text, which is
+         normal (script nodes run scripts rather than show dialogue). Never stored as text. -->
+    <sys:String x:Key="Node_NoTextScript">(no text — script node)</sys:String>
     <!-- Appended to the node title for player-choice nodes; includes a leading space -->
     <sys:String x:Key="Node_PlayerChoiceSuffix"> ✦</sys:String>
     <!-- Appended to the node footer when a female text variant exists;

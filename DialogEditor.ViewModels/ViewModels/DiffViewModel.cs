@@ -446,7 +446,7 @@ public partial class DiffViewModel : ObservableObject
                         if (vm.Nodes.Any(n => n.NodeId == leftNode.NodeId)) continue;
 
                         var entry   = leftConv.Strings.Get(leftNode.NodeId);
-                        var ghost   = new NodeViewModel(leftNode, entry);
+                        var ghost   = new NodeViewModel(leftNode, entry, leftConv.Strings.IsMissing);
                         ghost.OnSelected   = n => vm.SelectedNode = n;
                         ghost.Input.Owner  = ghost;
                         ghost.Output.Owner = ghost;
