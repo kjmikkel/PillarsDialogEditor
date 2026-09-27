@@ -1,4 +1,5 @@
 using DialogEditor.Core.Editing;
+using DialogEditor.Core.Models;
 
 namespace DialogEditor.Patch;
 
@@ -44,12 +45,43 @@ public static class PatchMerger
             }
         }
 
+        // Translations (GitHub issue 100): per language, per NodeId, later wins — the same rule
+        // as fields. Since schema 2 this is where all node text lives, so leaving it out
+        // silently dropped every line of text of every mod sharing this conversation.
+        // Entries for deleted nodes are dropped with the node, as TranslationApplier has
+        // nothing left to write them to.
+        var deletedSet = deleted.ToHashSet();
+        var translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>();
+        foreach (var language in patches.SelectMany(p => p.Translations.Keys).Distinct())
+        {
+            var byNode = new Dictionary<int, NodeTranslation>();
+            foreach (var patch in patches)
+                if (patch.Translations.TryGetValue(language, out var entries))
+                    foreach (var entry in entries)
+                        byNode[entry.NodeId] = entry;
+
+            var kept = byNode.Values.Where(t => !deletedSet.Contains(t.NodeId)).ToList();
+            if (kept.Count > 0)
+                translations[language] = kept;
+        }
+
+        // NodeComments: translator context, same last-wins rule per NodeId.
+        var comments = new Dictionary<int, string>();
+        foreach (var patch in patches)
+            foreach (var (nodeId, comment) in patch.NodeComments)
+                if (!deletedSet.Contains(nodeId))
+                    comments[nodeId] = comment;
+
         return new ConversationPatch(
             conversationName,
             ConversationPatch.CurrentSchemaVersion,
             addedById.Values.ToList(),
             deleted,
-            modifiedById.Values.ToList());
+            modifiedById.Values.ToList())
+        {
+            Translations = translations,
+            NodeComments = comments,
+        };
     }
 
     private static NodeModification MergeModifications(NodeModification earlier, NodeModification later)

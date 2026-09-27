@@ -64,6 +64,16 @@ public class PatchConflictRowLabelTests
 
         Assert.Equal("PatchManager_LinkField", Row(c).FieldLabel);
     }
+
+    // Issue #100: two packs rewriting the same line in the same language.
+    [Fact]
+    public void TextConflict_LabelComesFromResources()
+    {
+        Loc.Configure(new StubStringProvider());
+        var c = new PatchConflict("conv1", 5, null, 0, 1) { Kind = PatchConflictKind.Text, Language = "fr" };
+
+        Assert.Equal("PatchManager_TextField", Row(c).FieldLabel);
+    }
 }
 
 public class PatchConflictRowResourceEndToEndTests
@@ -96,5 +106,13 @@ public class PatchConflictRowResourceEndToEndTests
 
         Assert.Equal("(added by both)", new PatchConflictRowViewModel(added, "ModA", "ModB").FieldLabel);
         Assert.Equal("link to node 9",  new PatchConflictRowViewModel(link,  "ModA", "ModB").FieldLabel);
+    }
+
+    [AvaloniaFact]
+    public void TextLabel_RendersFromSharedStringsWithTheLanguage()
+    {
+        var text = new PatchConflict("conv1", 5, null, 0, 1) { Kind = PatchConflictKind.Text, Language = "fr" };
+
+        Assert.Equal("text (fr)", new PatchConflictRowViewModel(text, "ModA", "ModB").FieldLabel);
     }
 }
