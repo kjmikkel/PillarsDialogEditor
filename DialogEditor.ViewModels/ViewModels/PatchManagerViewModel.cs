@@ -144,22 +144,27 @@ public partial class PatchManagerViewModel : ObservableObject
 
     private void Analyse()
     {
-        var projects = Entries
-            .Where(e => e.IsLoaded)
+        // Conflict indices refer to THIS list (loaded entries only), not to Entries: an
+        // entry that failed to load has no patches to compare. Map them back through it,
+        // or a broken entry above a clashing pair shifts the badges onto the wrong rows.
+        var loaded = Entries.Where(e => e.IsLoaded).ToList();
+        var projects = loaded
             .Select(e => (e.ProjectName, e.Project!.Patches as IReadOnlyDictionary<string, ConversationPatch>))
             .ToList();
 
         Conflicts    = ConflictDetector.Detect(projects)
-                                       .Select(c => new PatchConflictRowViewModel(c))
+                                       .Select(c => new PatchConflictRowViewModel(c,
+                                           loaded[c.FirstPatchIndex].ProjectName,
+                                           loaded[c.SecondPatchIndex].ProjectName))
                                        .ToList();
         HasConflicts = Conflicts.Count > 0;
 
         var conflictedEntries = Conflicts
-            .SelectMany(c => new[] { c.Conflict.FirstPatchIndex, c.Conflict.SecondPatchIndex })
+            .SelectMany(c => new[] { loaded[c.Conflict.FirstPatchIndex], loaded[c.Conflict.SecondPatchIndex] })
             .ToHashSet();
 
-        for (int i = 0; i < Entries.Count; i++)
-            Entries[i].HasConflict = conflictedEntries.Contains(i);
+        foreach (var entry in Entries)
+            entry.HasConflict = conflictedEntries.Contains(entry);
 
         StatusText = HasConflicts
             ? Loc.FormatCount("PatchManager_ConflictsFound", Conflicts.Count)

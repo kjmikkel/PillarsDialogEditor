@@ -10,6 +10,11 @@ namespace DialogEditor.Patch;
 /// language. DialogEditor.Patch references only Core and cannot reach Loc in any case.
 /// The kind is reported as data and PatchConflictRowViewModel renders the label, the
 /// same split as MergeConflict.DeletedSide for git merges.
+///
+/// Kind (issue #6) distinguishes the clashes that have no field name: a deletion, two
+/// packs adding a node under the same id, and two packs editing the same link. It
+/// defaults from FieldName so the original field / delete-vs-modify construction is
+/// unchanged; the new kinds set it explicitly.
 public record PatchConflict(
     string  ConversationName,
     int     NodeId,
@@ -17,8 +22,30 @@ public record PatchConflict(
     int     FirstPatchIndex,
     int     SecondPatchIndex)
 {
+    public PatchConflictKind Kind { get; init; } =
+        FieldName is null ? PatchConflictKind.Deletion : PatchConflictKind.Field;
+
+    /// For a Link conflict, the target of the contested NodeId → LinkToNodeId link.
+    public int? LinkToNodeId { get; init; }
+
     /// True when one patch deletes the node that another patch modifies.
-    public bool IsDeletion => FieldName is null;
+    public bool IsDeletion => Kind == PatchConflictKind.Deletion;
+}
+
+public enum PatchConflictKind
+{
+    /// Two patches change the same field of the same node.
+    Field,
+    /// One patch deletes a node another patch modifies.
+    Deletion,
+    /// Two patches add a node under the same id. PatchMerger keeps only the later node,
+    /// so the earlier pack's node is replaced wholesale — and its own links then lead to
+    /// a node it never wrote. Likely whenever two mods extend the same base conversation,
+    /// because both allocate new ids from the same max+1.
+    AddedNode,
+    /// Two patches add or modify the same NodeId → LinkToNodeId link (PatchMerger keys
+    /// added and modified links by target alike, later wins).
+    Link,
 }
 
 public static class ConflictDetector
@@ -39,6 +66,10 @@ public static class ConflictDetector
         // Collect deletions per conversation: key = nodeId, value = project indices
         var deletions = new Dictionary<string, Dictionary<int, List<int>>>();
 
+        // Added node ids and added/modified links, same shape (issue #6).
+        var additions = new Dictionary<string, Dictionary<int, List<int>>>();
+        var linkTouches = new Dictionary<string, Dictionary<(int from, int to), List<int>>>();
+
         for (int pi = 0; pi < projects.Count; pi++)
         {
             var (_, patches) = projects[pi];
@@ -49,8 +80,18 @@ public static class ConflictDetector
                 if (!fieldTouches.TryGetValue(convName, out var convFields))
                     fieldTouches[convName] = convFields = [];
 
+                foreach (var node in patch.AddedNodes)
+                    Touch(additions, convName, node.NodeId, pi);
+
                 foreach (var mod in patch.ModifiedNodes)
                 {
+                    // One touch per link per project, even if a patch both adds and
+                    // modifies it, so a single pack never conflicts with itself.
+                    foreach (var to in mod.AddedLinks.Select(l => l.ToNodeId)
+                                         .Concat(mod.ModifiedLinks.Select(l => l.ToNodeId))
+                                         .Distinct())
+                        Touch(linkTouches, convName, (mod.NodeId, to), pi);
+
                     foreach (var fieldName in mod.FieldChanges.Keys)
                     {
                         var key = (mod.NodeId, fieldName);
@@ -125,8 +166,32 @@ public static class ConflictDetector
             }
         }
 
+        // Added-node and link conflicts: the same id / link from more than one project
+        foreach (var (convName, nodes) in additions)
+            foreach (var (nodeId, indices) in nodes)
+                if (indices.Count >= 2)
+                    conflicts.Add(new PatchConflict(convName, nodeId, null, indices[0], indices[1])
+                        { Kind = PatchConflictKind.AddedNode });
+
+        foreach (var (convName, links) in linkTouches)
+            foreach (var ((from, to), indices) in links)
+                if (indices.Count >= 2)
+                    conflicts.Add(new PatchConflict(convName, from, null, indices[0], indices[1])
+                        { Kind = PatchConflictKind.Link, LinkToNodeId = to });
+
         return conflicts
-            .DistinctBy(c => (c.ConversationName, c.NodeId, c.FieldName, c.FirstPatchIndex, c.SecondPatchIndex))
+            .DistinctBy(c => (c.ConversationName, c.NodeId, c.FieldName, c.Kind, c.LinkToNodeId,
+                              c.FirstPatchIndex, c.SecondPatchIndex))
             .ToList();
+    }
+
+    private static void Touch<TKey>(Dictionary<string, Dictionary<TKey, List<int>>> touches,
+                                    string convName, TKey key, int projectIndex) where TKey : notnull
+    {
+        if (!touches.TryGetValue(convName, out var byKey))
+            touches[convName] = byKey = [];
+        if (!byKey.TryGetValue(key, out var list))
+            byKey[key] = list = [];
+        list.Add(projectIndex);
     }
 }
