@@ -1,6 +1,7 @@
 using System.IO;
 using System.Text.Json;
 using DialogEditor.Core.GameData;
+using DialogEditor.Core.Logging;
 
 namespace DialogEditor.ViewModels.Services;
 

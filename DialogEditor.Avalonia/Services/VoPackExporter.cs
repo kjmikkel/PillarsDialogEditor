@@ -1,4 +1,5 @@
 using System.IO.Compression;
+using DialogEditor.Core.Logging;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Avalonia.Services;

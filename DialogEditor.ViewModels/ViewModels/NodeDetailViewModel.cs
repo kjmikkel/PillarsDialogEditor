@@ -8,6 +8,7 @@ using DialogEditor.Core.Audio;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch.Diff;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.Core.Logging;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.ViewModels;

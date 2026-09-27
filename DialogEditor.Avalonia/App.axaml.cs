@@ -9,6 +9,7 @@ using DialogEditor.Avalonia.Views;
 using DialogEditor.Core.Resources;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.Core.Logging;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Avalonia;

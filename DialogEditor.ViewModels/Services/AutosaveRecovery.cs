@@ -1,3 +1,5 @@
+using DialogEditor.Core.Logging;
+
 namespace DialogEditor.ViewModels.Services;
 
 /// Whether a project has a recoverable autosave sidecar.

@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using DialogEditor.Core.Logging;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests;

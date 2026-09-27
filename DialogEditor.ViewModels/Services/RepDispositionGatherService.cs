@@ -1,6 +1,7 @@
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
 using DialogEditor.Patch;
+using DialogEditor.Core.Logging;
 
 namespace DialogEditor.ViewModels.Services;
 
