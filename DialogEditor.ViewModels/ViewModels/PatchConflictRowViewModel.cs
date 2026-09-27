@@ -11,8 +11,13 @@ namespace DialogEditor.ViewModels;
 /// and DialogEditor.Patch references only Core, so it cannot reach Loc. Every string the
 /// conflict list shows is therefore resolved here, at the first layer allowed to speak a
 /// language. Mirrors ConflictRowViewModel for git merges.
+///
+/// It also carries the names of the two packs involved (issue #6): the conflict itself
+/// only knows their positions in the load order, and a row that says what clashes but
+/// not between whom leaves the user to guess which entry to move.
 /// </summary>
-public sealed class PatchConflictRowViewModel(PatchConflict conflict)
+public sealed class PatchConflictRowViewModel(
+    PatchConflict conflict, string firstProjectName, string secondProjectName)
 {
     /// The conflict this row renders. PatchManagerViewModel reads the patch indices off
     /// it to flag the entries involved.
@@ -20,17 +25,26 @@ public sealed class PatchConflictRowViewModel(PatchConflict conflict)
 
     public string ConversationName => conflict.ConversationName;
     public int    NodeId           => conflict.NodeId;
+    public string FirstProjectName  => firstProjectName;
+    public string SecondProjectName => secondProjectName;
 
-    /// The field the two patches disagree about — or, for a delete-vs-modify conflict,
-    /// the localised "(deleted)" marker. PatchConflict.FieldName is null there because
-    /// there is no single field to name; it used to carry the English marker itself,
-    /// which made the de-duplication key depend on the UI language.
-    public string FieldLabel => conflict.FieldName ?? Loc.Get("PatchManager_DeletedField");
+    /// The field the two patches disagree about — or, for the kinds with no single field
+    /// to name, a localised marker: "(deleted)", "(added by both)" or "link to node N".
+    /// PatchConflict.FieldName is null for those; it used to carry the English "(deleted)"
+    /// itself, which made the de-duplication key depend on the UI language.
+    public string FieldLabel => conflict.Kind switch
+    {
+        PatchConflictKind.Deletion  => Loc.Get("PatchManager_DeletedField"),
+        PatchConflictKind.AddedNode => Loc.Get("PatchManager_AddedNodeField"),
+        PatchConflictKind.Link      => Loc.Format("PatchManager_LinkField", conflict.LinkToNodeId ?? 0),
+        _                           => conflict.FieldName ?? string.Empty,
+    };
 
     /// The whole row as one sentence. The view used to assemble this from a hard-coded
     /// MultiBinding StringFormat, which put the word "conversation" and the separators
     /// out of a translator's reach — and word order differs between languages, so the
     /// line has to be a single resource rather than three bindings glued together.
     public string Description =>
-        Loc.Format("PatchManager_ConflictRow", ConversationName, NodeId, FieldLabel);
+        Loc.Format("PatchManager_ConflictRow", ConversationName, NodeId, FieldLabel,
+                   FirstProjectName, SecondProjectName);
 }
