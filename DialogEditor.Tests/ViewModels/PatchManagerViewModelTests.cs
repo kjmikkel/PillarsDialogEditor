@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using DialogEditor.Patch;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
@@ -145,5 +146,58 @@ public class PatchManagerViewModelTests
         vm.Entries.Add(new PatchEntryViewModel("mod1.dialogproject", p1));
         vm.Entries.Add(new PatchEntryViewModel("mod2.dialogproject", p2));
         Assert.False(vm.HasConflicts);
+    }
+
+    // ── Save / Load load order ────────────────────────────────────────────
+
+    /// A .patchlist stores the .dialogpack path itself (FullPath), so reloading it
+    /// must extract the pack again rather than JSON-parse the zip — otherwise the
+    /// entry shows as "could not load" and its vo/ folder is lost.
+    [Fact]
+    public async Task LoadFromFile_ReloadsDialogPackEntry_WithVoFolder()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), $"PMTest_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(dir);
+        var entryTempDirs = new List<string?>();
+        try
+        {
+            var packPath = Path.Combine(dir, "mod.dialogpack");
+            using (var archive = ZipFile.Open(packPath, ZipArchiveMode.Create))
+            {
+                var projectEntry = archive.CreateEntry("project.dialogproject");
+                using (var sw = new StreamWriter(projectEntry.Open()))
+                    sw.Write(DialogProjectSerializer.Serialize(DialogProject.Empty("PackMod")));
+                var voEntry = archive.CreateEntry("vo/line.wem");
+                using (var sw = new StreamWriter(voEntry.Open()))
+                    sw.Write("fakewem");
+            }
+            var patchlistPath = Path.Combine(dir, "order.patchlist");
+
+            var saving = new PatchManagerViewModel(new StubFolderPicker(),
+                new StubFilePicker(saveResult: patchlistPath, multiResult: [packPath]));
+            await saving.AddEntriesCommand.ExecuteAsync(null);
+            entryTempDirs.AddRange(saving.Entries.Select(e => e.TempDir));
+            await saving.SaveLoadOrderCommand.ExecuteAsync(null);
+
+            var loading = MakeVm();
+            loading.LoadFromFile(patchlistPath);
+            entryTempDirs.AddRange(loading.Entries.Select(e => e.TempDir));
+
+            var entry = Assert.Single(loading.Entries);
+            Assert.True(entry.IsLoaded, $"Expected the pack to load, got: {entry.LoadError}");
+            Assert.Equal("PackMod", entry.ProjectName);
+            Assert.Equal(Path.GetFullPath(packPath), Path.GetFullPath(entry.FullPath));
+            Assert.NotNull(entry.TempDir);
+            Assert.NotNull(entry.VoFolder);
+            Assert.True(File.Exists(Path.Combine(entry.VoFolder!, "line.wem")));
+        }
+        finally
+        {
+            foreach (var d in entryTempDirs.Append(dir).OfType<string>())
+            {
+                try { Directory.Delete(d, recursive: true); }
+                catch { /* best-effort cleanup */ }
+            }
+        }
     }
 }
