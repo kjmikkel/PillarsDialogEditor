@@ -21,19 +21,19 @@ account — see the **UI Automation Support** rule in `CLAUDE.md`.
 
 | Project | Target | Contents |
 |---|---|---|
-| `DialogEditor.UiaMcp.Core` | `net8.0` | `SettingsGuard`, `Resolver`, `RefTable`, `Selector`, `ActionStrategy`, `SendKeysEscaper`, `AddressabilityWarnings`, output parsers, `IUiaTree` |
-| `DialogEditor.UiaMcp` | `net8.0-windows` | MCP host, tool classes, `EditorSession`, `UiaTree`, `ActionStrategy` execution |
-| `DialogEditor.UiaMcp.Tests` | `net8.0-windows` | `Gui`-traited live-app tests, excluded from the default run |
+| `DialogEditor.UiaMcp.Core` | `net10.0` | `SettingsGuard`, `Resolver`, `RefTable`, `Selector`, `ActionStrategy`, `SendKeysEscaper`, `AddressabilityWarnings`, output parsers, `IUiaTree` |
+| `DialogEditor.UiaMcp` | `net10.0-windows` | MCP host, tool classes, `EditorSession`, `UiaTree`, `ActionStrategy` execution |
+| `DialogEditor.UiaMcp.Tests` | `net10.0-windows` | `Gui`-traited live-app tests, excluded from the default run |
 
 Core deliberately has **no** UI Automation reference. That is what lets
-`DialogEditor.Tests` (which targets `net8.0`) reference and unit-test it; `IUiaTree`
+`DialogEditor.Tests` (which targets `net10.0`) reference and unit-test it; `IUiaTree`
 speaks in plain `ElementInfo` records, never `AutomationElement`.
 
 ## Registering with Claude Code
 
 ```
 claude mcp add dialog-editor-uia -- \
-  "<repo>/tools/DialogEditor.UiaMcp/bin/Debug/net8.0-windows/DialogEditor.UiaMcp.exe"
+  "<repo>/tools/DialogEditor.UiaMcp/bin/Debug/net10.0-windows/DialogEditor.UiaMcp.exe"
 ```
 
 Requires a Debug build and a real interactive desktop; GUI tools cannot run headless.

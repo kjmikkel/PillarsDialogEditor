@@ -129,8 +129,8 @@ function New-ScratchProject {
         [Parameter(Mandatory)][string]$Path,
         [string]$Name = "ScratchProject"
     )
-    Add-Type -Path "$RepoRoot\DialogEditor.Core\bin\Debug\net8.0\DialogEditor.Core.dll"
-    Add-Type -Path "$RepoRoot\DialogEditor.Patch\bin\Debug\net8.0\DialogEditor.Patch.dll"
+    Add-Type -Path "$RepoRoot\DialogEditor.Core\bin\Debug\net10.0\DialogEditor.Core.dll"
+    Add-Type -Path "$RepoRoot\DialogEditor.Patch\bin\Debug\net10.0\DialogEditor.Patch.dll"
     $empty = [DialogEditor.Patch.DialogProject]::Empty($Name)
     [DialogEditor.Patch.DialogProjectSerializer]::SaveToFile($Path, $empty)
 }
@@ -143,7 +143,7 @@ function Start-DialogEditor {
         [Parameter(Mandatory)][string]$RepoRoot,
         [int]$StartupSeconds = 6
     )
-    $exe = "$RepoRoot\DialogEditor.Avalonia\bin\Debug\net8.0\DialogEditor.Avalonia.exe"
+    $exe = "$RepoRoot\DialogEditor.Avalonia\bin\Debug\net10.0\DialogEditor.Avalonia.exe"
     if (-not (Test-Path $exe)) { throw "Not built: $exe — run 'dotnet build' first." }
     $p = Start-Process $exe -PassThru
     Start-Sleep -Seconds $StartupSeconds

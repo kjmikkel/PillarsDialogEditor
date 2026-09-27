@@ -31,8 +31,8 @@ $repo = Resolve-Path (Join-Path $PSScriptRoot '..\..')
 
 # Throwaway project written through the app's own serializer (see New-ScratchProject).
 $project = Join-Path ([System.IO.Path]::GetTempPath()) 'CaptureDock.dialogproject'
-Add-Type -Path "$repo\DialogEditor.Core\bin\Debug\net8.0\DialogEditor.Core.dll"
-Add-Type -Path "$repo\DialogEditor.Patch\bin\Debug\net8.0\DialogEditor.Patch.dll"
+Add-Type -Path "$repo\DialogEditor.Core\bin\Debug\net10.0\DialogEditor.Core.dll"
+Add-Type -Path "$repo\DialogEditor.Patch\bin\Debug\net10.0\DialogEditor.Patch.dll"
 $p0 = [DialogEditor.Patch.DialogProject]::Empty('CaptureDock').WithNewConversation('my_new_conversation')
 [DialogEditor.Patch.DialogProjectSerializer]::SaveToFile($project, $p0)
 

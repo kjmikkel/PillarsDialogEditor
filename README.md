@@ -8,11 +8,18 @@ original game files directly, making the workflow safe, reversible, and shareabl
 
 ## Prerequisites
 
-- [.NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)
+The release archives (`PillarsDialogEditor-<ver>.zip`, `PatchManager-<ver>.zip`,
+`dialog-patcher-<ver>.zip`) are self-contained — no .NET installation is needed
+to run them.
+
 - A PoE1 or PoE2 installation
 - **Git** *(optional)* — required only for the built-in version-control features
   (Compare, History, Attribution, Branches). See
   [Git-powered features](#git-powered-features). Everything else works without it.
+
+Building from source instead requires the
+[.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0). See
+[Building for distribution](#building-for-distribution).
 
 ---
 

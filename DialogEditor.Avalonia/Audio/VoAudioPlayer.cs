@@ -17,6 +17,13 @@ namespace DialogEditor.Avalonia.Audio;
 /// still-current output does. This is enforced by a sender-identity check in the
 /// stop handler (see OnNaturalPlaybackStopped), not by unsubscription alone,
 /// because NAudio's event can already be in flight when Play/Stop supersedes it.
+///
+/// NAudio.WinMM's WaveOutEvent is Windows-only. DialogEditor.Avalonia targets plain
+/// net10.0 (not net10.0-windows) because most of the app is cross-platform — only this
+/// class touches a Windows-only API, and only the win-x64 self-contained build (the sole
+/// shipped binary, per build-dist.ps1) ever runs it. CA1416 is suppressed at the call
+/// sites below rather than at the assembly/class level, so the compatibility analyzer
+/// keeps checking every other Windows-specific API surface added to this project later.
 /// </summary>
 public sealed class VoAudioPlayer : IVoAudioPlayer, IDisposable
 {
@@ -44,11 +51,13 @@ public sealed class VoAudioPlayer : IVoAudioPlayer, IDisposable
             try
             {
                 _reader = new AudioFileReader(path);
+#pragma warning disable CA1416 // WaveOutEvent (NAudio.WinMM) is Windows-only; see class doc.
                 _output = new WaveOutEvent();
                 _output.PlaybackStopped += OnNaturalPlaybackStopped;
                 _output.Init(_reader);
                 // _tempFile stays null — no temp file to clean up for direct WAV playback.
                 _output.Play();
+#pragma warning restore CA1416
             }
             catch (Exception ex)
             {
@@ -87,11 +96,13 @@ public sealed class VoAudioPlayer : IVoAudioPlayer, IDisposable
                     try
                     {
                         _reader = new AudioFileReader(tempFile);
+#pragma warning disable CA1416 // WaveOutEvent (NAudio.WinMM) is Windows-only; see class doc.
                         _output = new WaveOutEvent();
                         _output.PlaybackStopped += OnNaturalPlaybackStopped;
                         _output.Init(_reader);
                         _tempFile = tempFile;
                         _output.Play();
+#pragma warning restore CA1416
                     }
                     catch (Exception ex)
                     {
@@ -118,7 +129,9 @@ public sealed class VoAudioPlayer : IVoAudioPlayer, IDisposable
     private void StopAndCleanup()
     {
         _generation++;          // invalidates any in-flight Task.Run
+#pragma warning disable CA1416 // WaveOutEvent (NAudio.WinMM) is Windows-only; see class doc.
         _output?.Stop();
+#pragma warning restore CA1416
         Cleanup();
     }
 
@@ -147,9 +160,11 @@ public sealed class VoAudioPlayer : IVoAudioPlayer, IDisposable
         var output   = _output;   _output   = null;
         var reader   = _reader;   _reader   = null;
         var tempFile = _tempFile; _tempFile = null;
+#pragma warning disable CA1416 // WaveOutEvent (NAudio.WinMM) is Windows-only; see class doc.
         if (output is not null)
             output.PlaybackStopped -= OnNaturalPlaybackStopped; // unsubscribe before dispose
         output?.Dispose();
+#pragma warning restore CA1416
         reader?.Dispose();
         TryDeleteTemp(tempFile);
     }
