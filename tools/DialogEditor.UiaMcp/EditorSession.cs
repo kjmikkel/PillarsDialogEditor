@@ -51,7 +51,7 @@ internal sealed class EditorSession
 
     public string Launch(string repoRoot, string project)
     {
-        var exe = Path.Combine(repoRoot, "DialogEditor.Avalonia", "bin", "Debug", "net8.0",
+        var exe = Path.Combine(repoRoot, "DialogEditor.Avalonia", "bin", "Debug", "net10.0",
                                "DialogEditor.Avalonia.exe");
         if (!File.Exists(exe))
             throw new FileNotFoundException($"NotBuilt: {exe} — run the build tool first.");

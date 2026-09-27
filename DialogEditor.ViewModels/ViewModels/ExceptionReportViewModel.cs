@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using DialogEditor.Core.Diagnostics;
 using DialogEditor.Core.Localisation;
+using DialogEditor.Core.Logging;
 using DialogEditor.Patch;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
