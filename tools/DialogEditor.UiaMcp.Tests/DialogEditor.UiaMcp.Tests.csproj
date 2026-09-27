@@ -1,8 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <!-- net8.0-windows because it references the server, which needs the UIA client.
-         This is why these tests cannot live in DialogEditor.Tests (net8.0). -->
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <!-- net10.0-windows because it references the server, which needs the UIA client.
+         This is why these tests cannot live in DialogEditor.Tests (net10.0). -->
+    <TargetFramework>net10.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>

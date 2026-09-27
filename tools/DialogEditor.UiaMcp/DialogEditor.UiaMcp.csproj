@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <!-- net8.0-windows + UseWPF is what supplies UIAutomationClient / UIAutomationTypes,
+    <!-- net10.0-windows + UseWPF is what supplies UIAutomationClient / UIAutomationTypes,
          the same assemblies DriveApp.ps1 loads with Add-Type. NOTE: UseWPF swaps in the
          WPF implicit-usings set, which does NOT include System.IO — import it explicitly. -->
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <!-- Supplies System.Windows.Forms.SendKeys (used by send_keys and the focus-and-type
          fallback) and System.Drawing for the screenshot tool. UseWPF alone does not. -->

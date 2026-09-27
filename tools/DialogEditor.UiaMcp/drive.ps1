@@ -31,7 +31,7 @@ param(
     # Where image content blocks get written, so screenshots can be inspected.
     [string]$ImageOutDir = ".",
     [switch]$KeepAlive,
-    [string]$Exe = "tools/DialogEditor.UiaMcp/bin/Debug/net8.0-windows/DialogEditor.UiaMcp.exe",
+    [string]$Exe = "tools/DialogEditor.UiaMcp/bin/Debug/net10.0-windows/DialogEditor.UiaMcp.exe",
     [int]$TimeoutSec = 120
 )
 $ErrorActionPreference = 'Stop'
