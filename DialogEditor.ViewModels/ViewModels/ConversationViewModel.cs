@@ -7,6 +7,7 @@ using DialogEditor.Core.Models;
 using DialogEditor.ViewModels.Editing;
 using DialogEditor.ViewModels.Models;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.Core.Logging;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.ViewModels;

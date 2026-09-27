@@ -1,3 +1,4 @@
+using DialogEditor.Core.Logging;
 using WeCantSpell.Hunspell;
 
 namespace DialogEditor.ViewModels.Services;

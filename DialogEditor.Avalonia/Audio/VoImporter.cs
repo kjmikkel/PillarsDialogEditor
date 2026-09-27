@@ -1,6 +1,7 @@
 ﻿using System.IO.Compression;
 using Avalonia.Platform;
 using Microsoft.Win32;
+using DialogEditor.Core.Logging;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Avalonia.Audio;

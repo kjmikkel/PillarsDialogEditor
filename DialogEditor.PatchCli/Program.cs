@@ -1,7 +1,8 @@
 using System.Reflection;
 using DialogEditor.Core.GameData;
+using DialogEditor.Core.Logging;
 using DialogEditor.Patch;
-using DialogEditor.ViewModels.Services;
+using DialogEditor.Patch.Packaging;
 
 var Version = AppVersion.FromAssembly(Assembly.GetExecutingAssembly());
 

@@ -3,6 +3,7 @@ using System.IO;
 using Dock.Model.Controls;
 using Dock.Model.Core;
 using Dock.Serializer.SystemTextJson;
+using DialogEditor.Core.Logging;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Avalonia.Docking;

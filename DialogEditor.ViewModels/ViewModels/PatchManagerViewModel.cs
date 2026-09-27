@@ -2,7 +2,9 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.GameData;
+using DialogEditor.Core.Logging;
 using DialogEditor.Patch;
+using DialogEditor.Patch.Packaging;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
 

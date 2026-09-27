@@ -1,4 +1,5 @@
 using System.Text.Json;
+using DialogEditor.Core.Logging;
 
 namespace DialogEditor.ViewModels.Services;
 
