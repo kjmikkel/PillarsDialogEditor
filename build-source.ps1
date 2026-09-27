@@ -11,15 +11,24 @@
     run alongside build-dist.ps1. Use build.ps1 to run both together with a clean
     slate and a test gate.
 
+.PARAMETER Product
+    Editor, Patcher, or All (default). See build-dist.ps1 for the two products.
+
 .PARAMETER Version
-    Version string embedded in zip names. Reads ./VERSION if omitted.
+    Editor version, embedded in its zip name. Reads ./VERSION if omitted.
+
+.PARAMETER PatcherVersion
+    Patcher version, embedded in its zip name. Reads ./PATCHER_VERSION if omitted.
 
 .EXAMPLE
     .\build-source.ps1
-    .\build-source.ps1 -Version 1.2.0
+    .\build-source.ps1 -Product Patcher -PatcherVersion 1.0.1
 #>
 param(
-    [string]$Version = ""
+    [ValidateSet("All", "Editor", "Patcher")]
+    [string]$Product        = "All",
+    [string]$Version        = "",
+    [string]$PatcherVersion = ""
 )
 
 $ErrorActionPreference = "Stop"
@@ -27,11 +36,13 @@ $Root                  = $PSScriptRoot
 $Dist                  = Join-Path $Root "dist"
 $Staging               = Join-Path $Dist "_src-staging"
 
-if (-not $Version) {
-    $versionFile = Join-Path $Root "VERSION"
-    if (-not (Test-Path $versionFile)) { throw "VERSION file not found at $versionFile" }
-    $Version = (Get-Content $versionFile -Raw).Trim()
-}
+. (Join-Path $Root "tools\build\Read-VersionFile.ps1")
+
+$buildEditor  = $Product -in "All", "Editor"
+$buildPatcher = $Product -in "All", "Patcher"
+
+if ($buildEditor  -and -not $Version)        { $Version        = Read-VersionFile -Root $Root -Product Editor }
+if ($buildPatcher -and -not $PatcherVersion) { $PatcherVersion = Read-VersionFile -Root $Root -Product Patcher }
 
 # Directories to exclude when copying source trees
 $ExcludeDirs = @("bin", "obj", ".vs", ".git", ".idea", ".vscode", "dist", "_staging", "_src-staging", "_bin-staging")
@@ -90,6 +101,7 @@ function Write-SolutionFile {
 function New-SourcePackage {
     param(
         [string]   $ZipBaseName,
+        [string]   $ZipVersion,
         [string]   $StagingSubDir,
         [string]   $SolutionName,
         [string[]] $Projects,
@@ -113,7 +125,7 @@ function New-SourcePackage {
     # Root files recipients need to build and orient themselves.
     # Directory.Packages.props is required: projects carry no package versions of
     # their own (Central Package Management), so without it nothing restores.
-    foreach ($file in @("README.md", "VERSION", "LICENSE", "THIRD_PARTY_LICENSES.md", "Directory.Packages.props")) {
+    foreach ($file in @("README.md", "VERSION", "PATCHER_VERSION", "LICENSE", "THIRD_PARTY_LICENSES.md", "Directory.Packages.props")) {
         $src = Join-Path $Root $file
         if (Test-Path $src) { Copy-Item $src -Destination $stageDir -Force }
     }
@@ -130,7 +142,7 @@ function New-SourcePackage {
 
     Write-SolutionFile -DestRoot $stageDir -SolutionName $SolutionName -Projects $Projects
 
-    $zipPath = Join-Path $Dist "$ZipBaseName-$Version-src.zip"
+    $zipPath = Join-Path $Dist "$ZipBaseName-$ZipVersion-src.zip"
     Compress-Archive -Path "$stageDir\*" -DestinationPath $zipPath -Force
     Write-Host "  -> $(Split-Path $zipPath -Leaf)" -ForegroundColor Green
 }
@@ -152,46 +164,44 @@ New-Item $Staging -ItemType Directory        | Out-Null
 # included). No per-app subset can satisfy that, so the tests live in the full
 # repository checkout only.
 
-New-SourcePackage `
-    -ZipBaseName   "PillarsDialogEditor" `
-    -StagingSubDir "editor-src" `
-    -SolutionName  "PillarsDialogEditor" `
-    -Projects      @(
-        "DialogEditor.Core",
-        "DialogEditor.Patch",
-        "DialogEditor.ViewModels",
-        "DialogEditor.Avalonia.Shared",
-        "DialogEditor.Avalonia"
-    ) `
-    -ExtraFiles    @(
-        # Both copied to the editor's output by DialogEditor.Avalonia.csproj
-        # (Help > Changelog and Help > Open Walkthrough).
-        "CHANGELOG.md",
-        "docs/walkthrough.md"
-    )
+if ($buildEditor) {
+    New-SourcePackage `
+        -ZipBaseName   "PillarsDialogEditor" `
+        -ZipVersion    $Version `
+        -StagingSubDir "editor-src" `
+        -SolutionName  "PillarsDialogEditor" `
+        -Projects      @(
+            "DialogEditor.Core",
+            "DialogEditor.Patch",
+            "DialogEditor.ViewModels",
+            "DialogEditor.Avalonia.Shared",
+            "DialogEditor.Avalonia"
+        ) `
+        -ExtraFiles    @(
+            # Both copied to the editor's output by DialogEditor.Avalonia.csproj
+            # (Help > Changelog and Help > Open Walkthrough).
+            "CHANGELOG.md",
+            "docs/walkthrough.md"
+        )
+}
 
-New-SourcePackage `
-    -ZipBaseName   "PatchManager" `
-    -StagingSubDir "patchmanager-src" `
-    -SolutionName  "PatchManager" `
-    -Projects      @(
-        "DialogEditor.Core",
-        "DialogEditor.Patch",
-        "DialogEditor.ViewModels",
-        "DialogEditor.Avalonia.Shared",
-        "DialogEditor.PatchManager"
-    )
-
-New-SourcePackage `
-    -ZipBaseName   "dialog-patcher" `
-    -StagingSubDir "cli-src" `
-    -SolutionName  "dialog-patcher" `
-    -Projects      @(
-        "DialogEditor.Core",
-        "DialogEditor.Patch",
-        "DialogEditor.ViewModels",
-        "DialogEditor.PatchCli"
-    )
+if ($buildPatcher) {
+    # One archive for the whole Pillars Dialog Patcher (issue #77), matching its
+    # binary zip: the Patch Manager GUI and the dialog-patcher CLI in one solution.
+    New-SourcePackage `
+        -ZipBaseName   "PillarsDialogPatcher" `
+        -ZipVersion    $PatcherVersion `
+        -StagingSubDir "patcher-src" `
+        -SolutionName  "PillarsDialogPatcher" `
+        -Projects      @(
+            "DialogEditor.Core",
+            "DialogEditor.Patch",
+            "DialogEditor.ViewModels",
+            "DialogEditor.Avalonia.Shared",
+            "DialogEditor.PatchManager",
+            "DialogEditor.PatchCli"
+        )
+}
 
 # ── Tidy ──────────────────────────────────────────────────────────────────────
 
