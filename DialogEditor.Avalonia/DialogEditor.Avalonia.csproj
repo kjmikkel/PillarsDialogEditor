@@ -15,6 +15,7 @@
     <PackageReference Include="NodifyAvalonia" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="NAudio" />
+    <PackageReference Include="NAudio.WinMM" />
     <PackageReference Include="Dock.Avalonia" />
     <PackageReference Include="Dock.Avalonia.Themes.Fluent" />
     <PackageReference Include="Dock.Model.Mvvm" />
