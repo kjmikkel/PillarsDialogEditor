@@ -42,7 +42,8 @@ public partial class NodeViewModel : ObservableObject
     {
         get => _speakerCategory;
         set => Push(_speakerCategory, value, "Undo_EditSpeakerCategory",
-            v => { _speakerCategory = v; OnPropertyChanged(nameof(SpeakerCategory)); });
+            v => { _speakerCategory = v; OnPropertyChanged(nameof(SpeakerCategory));
+                   OnPropertyChanged(nameof(TextPlaceholder)); OnPropertyChanged(nameof(HasTextPlaceholder)); });
     }
 
     public string SpeakerGuid
@@ -66,6 +67,8 @@ public partial class NodeViewModel : ObservableObject
             v => { _defaultText = v;
                    OnPropertyChanged(nameof(DefaultText));
                    OnPropertyChanged(nameof(TextPreview));
+                   OnPropertyChanged(nameof(TextPlaceholder));
+                   OnPropertyChanged(nameof(HasTextPlaceholder));
                    OnPropertyChanged(nameof(BarkWarnings)); });
     }
 
@@ -262,8 +265,26 @@ public partial class NodeViewModel : ObservableObject
     }
 
     // ── Constructor ───────────────────────────────────────────────────────
-    public NodeViewModel(ConversationNode node, StringEntry? entry)
+    // ── Text placeholder (display-only, #84) ──────────────────────────────
+    // A node with no text used to get the "stringtable not found" message stored in
+    // _defaultText itself, so it leaked into save diffs, export, search and Replace All.
+    // The placeholder now lives only here; DefaultText always holds the real text.
+    private readonly bool _stringTableMissing;
+
+    /// Muted canvas hint shown in place of empty node text. "Not found" only when the
+    /// conversation's string table genuinely failed to load; otherwise a quiet label for
+    /// script nodes (text-less by design) and nothing for everything else.
+    public string TextPlaceholder =>
+        _defaultText.Length > 0                     ? string.Empty
+        : _stringTableMissing                       ? Loc.Get("Node_TextUnavailable")
+        : _speakerCategory == SpeakerCategory.Script ? Loc.Get("Node_NoTextScript")
+        : string.Empty;
+
+    public bool HasTextPlaceholder => TextPlaceholder.Length > 0;
+
+    public NodeViewModel(ConversationNode node, StringEntry? entry, bool stringTableMissing = false)
     {
+        _stringTableMissing = stringTableMissing;
         NodeId           = node.NodeId;
         _isPlayerChoice  = node.IsPlayerChoice;
         _speakerCategory = node.SpeakerCategory;
@@ -276,7 +297,7 @@ public partial class NodeViewModel : ObservableObject
         _externalVO      = node.ExternalVO;
         _hasVO           = node.HasVO;
         _hideSpeaker     = node.HideSpeaker;
-        _defaultText     = entry?.DefaultText ?? Loc.Get("Node_TextUnavailable");
+        _defaultText     = entry?.DefaultText ?? string.Empty;
         _femaleText      = entry?.FemaleText  ?? string.Empty;
 
         _conditions = node.Conditions;

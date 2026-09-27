@@ -2448,7 +2448,7 @@ public partial class MainWindowViewModel : ObservableObject
                 }
                 var translations = storedPatch.Translations.GetValueOrDefault(_provider.Language);
                 var patched = ConversationSnapshotBuilder.ToConversation(file.Name, patchedSnap, translations);
-                Canvas.Load(patched, vanillaSnap);
+                Canvas.Load(patched, vanillaSnap, conversation.Strings.IsMissing);
             }
             else
             {

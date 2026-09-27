@@ -329,10 +329,20 @@
                                             <Binding Source="{x:Static theming:ThemeService.Current}" Path="Revision"/>
                                         </MultiBinding>
                                     </Border.Background>
-                                    <TextBlock Text="{Binding TextPreview}"
-                                               TextWrapping="Wrap"
-                                               Padding="6,4" FontSize="{DynamicResource FontSize.Small}"
-                                               Foreground="{DynamicResource Brush.Text.OnLight}" MaxHeight="70"/>
+                                    <Panel>
+                                        <TextBlock Text="{Binding TextPreview}"
+                                                   TextWrapping="Wrap"
+                                                   Padding="6,4" FontSize="{DynamicResource FontSize.Small}"
+                                                   Foreground="{DynamicResource Brush.Text.OnLight}" MaxHeight="70"/>
+                                        <!-- Display-only hint for empty text (#84): kept out of DefaultText so it
+                                             can never be saved, exported, searched or replaced. Muted + italic,
+                                             matching the footer's secondary styling. -->
+                                        <TextBlock Text="{Binding TextPlaceholder}"
+                                                   IsVisible="{Binding HasTextPlaceholder}"
+                                                   TextWrapping="Wrap" FontStyle="Italic"
+                                                   Padding="6,4" FontSize="{DynamicResource FontSize.Small}"
+                                                   Foreground="{DynamicResource Brush.Text.OnLight.Muted}" MaxHeight="70"/>
+                                    </Panel>
                                 </Border>
 
                                 <!-- Footer -->

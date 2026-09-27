@@ -53,7 +53,7 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
         var stPath = StringTablePathFor(file.ConversationPath, Language);
         var strings = File.Exists(stPath)
             ? StringTableParser.ParseFile(stPath)
-            : StringTable.Empty;
+            : StringTable.Missing;
         return new Conversation(file.Name, nodes, strings);
     }
 
