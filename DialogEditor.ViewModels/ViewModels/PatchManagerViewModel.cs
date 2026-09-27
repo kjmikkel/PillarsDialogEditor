@@ -6,6 +6,7 @@ using DialogEditor.Core.Logging;
 using DialogEditor.Patch;
 using DialogEditor.Patch.Install;
 using DialogEditor.Patch.Packaging;
+using DialogEditor.Patch.Schema;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
 
@@ -77,8 +78,15 @@ public partial class PatchManagerViewModel : ObservableObject
             if (Entries.Any(e => string.Equals(e.FullPath, path, StringComparison.OrdinalIgnoreCase)))
                 continue;
 
-            var entry = LoadEntry(path);
-            Entries.Add(entry);
+            try
+            {
+                Entries.Add(LoadEntry(path));
+            }
+            catch (UnsupportedSchemaVersionException ex)
+            {
+                AppLog.Warn($"PatchManager: refused '{path}': {ex.Message}");
+                StatusText = SchemaVersionMessages.TooNew(ex, Path.GetFileName(path));
+            }
         }
     }
 
@@ -86,7 +94,8 @@ public partial class PatchManagerViewModel : ObservableObject
     /// LoadFromFile: a saved .patchlist records the pack path itself, so a reload must
     /// extract the pack again — JSON-parsing the zip fails and the vo/ folder is lost.
     /// A load failure yields an error entry rather than throwing, so one bad file
-    /// doesn't abort the rest of the list.
+    /// doesn't abort the rest of the list — except a newer file format, which is rethrown
+    /// (see the catch below).
     private static PatchEntryViewModel LoadEntry(string path)
     {
         string? tempDir = null;
@@ -108,17 +117,27 @@ public partial class PatchManagerViewModel : ObservableObject
             return new PatchEntryViewModel(path, project, voFolder, tempDir);
         }
         catch (OperationCanceledException) { throw; }
+        catch (UnsupportedSchemaVersionException)
+        {
+            // Not an error entry: Apply skips unloaded entries, which would half-apply the
+            // stack without this mod (GitHub issue 62). The callers refuse it instead.
+            DeleteTempDir(tempDir);
+            throw;
+        }
         catch (Exception ex)
         {
             AppLog.Error($"Failed to load '{path}'", ex);
             // An error entry owns no temp dir, so nothing would ever delete it.
-            if (tempDir is not null)
-            {
-                try { Directory.Delete(tempDir, recursive: true); }
-                catch (Exception cleanupEx) { AppLog.Warn($"PatchManager: failed to delete temp dir '{tempDir}': {cleanupEx.Message}"); }
-            }
+            DeleteTempDir(tempDir);
             return new PatchEntryViewModel(path, ex.Message);
         }
+    }
+
+    private static void DeleteTempDir(string? tempDir)
+    {
+        if (tempDir is null) return;
+        try { Directory.Delete(tempDir, recursive: true); }
+        catch (Exception cleanupEx) { AppLog.Warn($"PatchManager: failed to delete temp dir '{tempDir}': {cleanupEx.Message}"); }
     }
 
     [RelayCommand]
@@ -228,21 +247,36 @@ public partial class PatchManagerViewModel : ObservableObject
 
     public void LoadFromFile(string path)
     {
+        // Entries are loaded into a local list and only committed once all of them have
+        // loaded, so a refused load order leaves the current one untouched.
+        var loaded = new List<PatchEntryViewModel>();
+        string? current = null;
         try
         {
             var list = PatchListSerializer.LoadFromFile(path);
+            foreach (var entry in list.Entries)
+            {
+                current = PatchListSerializer.ResolvePath(path, entry);
+                loaded.Add(LoadEntry(current));
+            }
+
             _patchlistPath = path;
             GameFolder     = list.GameFolder;
             Entries.Clear();
-
-            foreach (var entry in list.Entries)
-            {
-                var resolved = PatchListSerializer.ResolvePath(path, entry);
-                Entries.Add(LoadEntry(resolved));
-            }
+            foreach (var e in loaded) Entries.Add(e);
+        }
+        catch (UnsupportedSchemaVersionException ex)
+        {
+            // One newer mod refuses the whole load order, so the rest is never applied
+            // without it (GitHub issues 62, 79). current is null when the .patchlist itself is newer.
+            foreach (var e in loaded) DeleteTempDir(e.TempDir);
+            var offender = Path.GetFileName(current ?? path);
+            AppLog.Warn($"PatchManager: refused load order '{path}' ({offender}): {ex.Message}");
+            StatusText = SchemaVersionMessages.TooNew(ex, offender);
         }
         catch (Exception ex)
         {
+            foreach (var e in loaded) DeleteTempDir(e.TempDir);
             AppLog.Error($"Failed to load load order '{path}'", ex);
             StatusText = Loc.Format("PatchManager_LoadError", path, ex.Message);
         }
