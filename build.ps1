@@ -1,19 +1,27 @@
 <#
 .SYNOPSIS
-    Run tests, then produce all binary and source distribution archives.
+    Run tests, then produce the binary and source distribution archives.
 
 .DESCRIPTION
-    Single entry point for a release build:
-      1. Reads the version from ./VERSION (or -Version parameter)
+    Single entry point for a release build of one or both products — the editor
+    (./VERSION, tags v*) and the Pillars Dialog Patcher (./PATCHER_VERSION, tags
+    patcher-v*), which are versioned and released independently (issue #77):
+      1. Resolves each selected product's version (file, or -Version / -PatcherVersion)
       2. Runs the full test suite — aborts on failure unless -SkipTests
       3. Wipes and recreates ./dist/
-      4. Calls build-dist.ps1  — three self-contained win-x64 binary zips
-      5. Calls build-source.ps1 — three source-code zips
-      6. Prints a final summary of all six archives
+      4. Calls build-dist.ps1   — one self-contained win-x64 binary zip per product
+      5. Calls build-source.ps1 — one source-code zip per product
+      6. Writes dist/SHA256SUMS.txt (sha256sum format) covering every zip
+      7. Prints a final summary
+
+.PARAMETER Product
+    Editor, Patcher, or All (default).
 
 .PARAMETER Version
-    Version string to embed in file names and the CLI binary.
-    Reads ./VERSION if omitted.
+    Editor version. Reads ./VERSION if omitted.
+
+.PARAMETER PatcherVersion
+    Patcher version. Reads ./PATCHER_VERSION if omitted.
 
 .PARAMETER SkipTests
     Skip the test gate. Use only when you know the tests pass.
@@ -23,28 +31,38 @@
 
 .EXAMPLE
     .\build.ps1
-    .\build.ps1 -Version 1.2.0
-    .\build.ps1 -SkipTests
+    .\build.ps1 -Product Patcher
+    .\build.ps1 -Version 1.2.0 -SkipTests
 #>
 param(
-    [string]$Version       = "",
+    [ValidateSet("All", "Editor", "Patcher")]
+    [string]$Product        = "All",
+    [string]$Version        = "",
+    [string]$PatcherVersion = "",
     [switch]$SkipTests,
-    [string]$Configuration = "Release"
+    [string]$Configuration  = "Release"
 )
 
 $ErrorActionPreference = "Stop"
 $Root = $PSScriptRoot
 $Dist = Join-Path $Root "dist"
 
-# ── Resolve version ───────────────────────────────────────────────────────────
+# ── Resolve versions ──────────────────────────────────────────────────────────
 
-if (-not $Version) {
-    $versionFile = Join-Path $Root "VERSION"
-    if (-not (Test-Path $versionFile)) { throw "VERSION file not found at $versionFile" }
-    $Version = (Get-Content $versionFile -Raw).Trim()
-}
+. (Join-Path $Root "tools\build\Read-VersionFile.ps1")
 
-Write-Host "=== Pillars Dialog Editor — release build v$Version ===" -ForegroundColor White
+$buildEditor  = $Product -in "All", "Editor"
+$buildPatcher = $Product -in "All", "Patcher"
+
+if ($buildEditor  -and -not $Version)        { $Version        = Read-VersionFile -Root $Root -Product Editor }
+if ($buildPatcher -and -not $PatcherVersion) { $PatcherVersion = Read-VersionFile -Root $Root -Product Patcher }
+
+$Title = @(
+    if ($buildEditor)  { "Pillars Dialog Editor v$Version" }
+    if ($buildPatcher) { "Pillars Dialog Patcher v$PatcherVersion" }
+) -join " + "
+
+Write-Host "=== Release build: $Title ===" -ForegroundColor White
 
 # ── Test gate ─────────────────────────────────────────────────────────────────
 
@@ -73,16 +91,26 @@ New-Item $Dist -ItemType Directory | Out-Null
 
 # ── Binary archives ───────────────────────────────────────────────────────────
 
-& (Join-Path $Root "build-dist.ps1") -Version $Version -Configuration $Configuration
+& (Join-Path $Root "build-dist.ps1") -Product $Product -Version $Version -PatcherVersion $PatcherVersion `
+    -Configuration $Configuration
 
 # ── Source archives ───────────────────────────────────────────────────────────
 
-& (Join-Path $Root "build-source.ps1") -Version $Version
+& (Join-Path $Root "build-source.ps1") -Product $Product -Version $Version -PatcherVersion $PatcherVersion
+
+# ── Checksums ─────────────────────────────────────────────────────────────────
+# sha256sum's own format ("<hash>  <file>"), so `sha256sum -c SHA256SUMS.txt` verifies
+# a download in Git Bash or on Linux; on Windows, Get-FileHash prints the same hash.
+
+$sums = Get-ChildItem $Dist -Filter "*.zip" | Sort-Object Name | ForEach-Object {
+    "{0}  {1}" -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant(), $_.Name
+}
+[IO.File]::WriteAllText((Join-Path $Dist "SHA256SUMS.txt"), (($sums -join "`n") + "`n"))
 
 # ── Final summary ─────────────────────────────────────────────────────────────
 
 Write-Host ""
-Write-Host "=== Release build complete — v$Version ===" -ForegroundColor Green
+Write-Host "=== Release build complete: $Title ===" -ForegroundColor Green
 Write-Host ""
 Write-Host "Binary archives:" -ForegroundColor White
 Get-ChildItem $Dist -Filter "*.zip" | Where-Object { $_.Name -notlike "*-src.zip" } |
@@ -96,3 +124,5 @@ Get-ChildItem $Dist -Filter "*-src.zip" | Sort-Object Name | ForEach-Object {
     $sizeKB = [math]::Round($_.Length / 1KB, 0)
     Write-Host ("  {0,-50} {1,6} KB" -f $_.Name, $sizeKB)
 }
+Write-Host ""
+Write-Host "Checksums: dist/SHA256SUMS.txt" -ForegroundColor White

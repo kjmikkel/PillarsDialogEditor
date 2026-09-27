@@ -1,25 +1,46 @@
 <#
 .SYNOPSIS
-    Publish the three distributable applications as self-contained win-x64 binaries.
+    Publish the two distributable products as self-contained win-x64 binaries.
 
 .DESCRIPTION
-    Produces one zip per app under ./dist/. Does NOT wipe existing dist/ contents,
-    so it can be run alongside build-source.ps1. Use build.ps1 to run both together
-    with a clean slate and a test gate.
+    Produces one zip per product under ./dist/:
+
+      PillarsDialogEditor-<VERSION>.zip          the editor
+      PillarsDialogPatcher-<PATCHER_VERSION>.zip the mod installer for players:
+          DialogEditor.PatchManager.exe  (GUI, at the top so it's the obvious one to run)
+          README.md                      (player-facing)
+          cli\dialog-patcher.exe         (command line, for scripts and installers)
+
+    The two are versioned and released independently (issue #77): a player who only
+    wants to install a mod never has to download the editor, and an editor-only fix
+    doesn't produce a "new" patcher.
+
+    Does NOT wipe existing dist/ contents, so it can be run alongside
+    build-source.ps1. Use build.ps1 to run both together with a clean slate and a
+    test gate.
+
+.PARAMETER Product
+    Editor, Patcher, or All (default).
 
 .PARAMETER Version
-    Version string embedded in zip names and the CLI binary. Reads ./VERSION if omitted.
+    Editor version. Reads ./VERSION if omitted.
+
+.PARAMETER PatcherVersion
+    Patcher version. Reads ./PATCHER_VERSION if omitted.
 
 .PARAMETER Configuration
     Build configuration. Defaults to "Release".
 
 .EXAMPLE
     .\build-dist.ps1
-    .\build-dist.ps1 -Version 1.2.0
+    .\build-dist.ps1 -Product Patcher -PatcherVersion 1.0.1
 #>
 param(
-    [string]$Version       = "",
-    [string]$Configuration = "Release"
+    [ValidateSet("All", "Editor", "Patcher")]
+    [string]$Product        = "All",
+    [string]$Version        = "",
+    [string]$PatcherVersion = "",
+    [string]$Configuration  = "Release"
 )
 
 $ErrorActionPreference = "Stop"
@@ -28,11 +49,13 @@ $Root                  = $PSScriptRoot
 $Dist                  = Join-Path $Root "dist"
 $Staging               = Join-Path $Dist "_bin-staging"
 
-if (-not $Version) {
-    $versionFile = Join-Path $Root "VERSION"
-    if (-not (Test-Path $versionFile)) { throw "VERSION file not found at $versionFile" }
-    $Version = (Get-Content $versionFile -Raw).Trim()
-}
+. (Join-Path $Root "tools\build\Read-VersionFile.ps1")
+
+$buildEditor  = $Product -in "All", "Editor"
+$buildPatcher = $Product -in "All", "Patcher"
+
+if ($buildEditor  -and -not $Version)        { $Version        = Read-VersionFile -Root $Root -Product Editor }
+if ($buildPatcher -and -not $PatcherVersion) { $PatcherVersion = Read-VersionFile -Root $Root -Product Patcher }
 
 # ── Clean only our own staging area ───────────────────────────────────────────
 
@@ -40,30 +63,26 @@ if (Test-Path $Staging) { Remove-Item $Staging -Recurse -Force }
 New-Item $Dist    -ItemType Directory -Force | Out-Null
 New-Item $Staging -ItemType Directory        | Out-Null
 
-# ── Publish helper ────────────────────────────────────────────────────────────
+# ── Helpers ───────────────────────────────────────────────────────────────────
 
-function Publish-And-Zip {
+function Publish-Project {
     param(
         [string]$ProjectPath,
-        [string]$ZipBaseName,
-        [string]$StagingSubDir,
+        [string]$OutDir,
+        [string]$ProjectVersion,
         [switch]$SingleFile
     )
 
-    $projectFull = Join-Path $Root $ProjectPath
-    $outDir      = Join-Path $Staging $StagingSubDir
-    $zipPath     = Join-Path $Dist "$ZipBaseName-$Version.zip"
-
     Write-Host ""
-    Write-Host "Publishing $ZipBaseName..." -ForegroundColor Cyan
+    Write-Host "Publishing $(Split-Path $ProjectPath -Leaf) $ProjectVersion..." -ForegroundColor Cyan
 
     $publishArgs = @(
-        "publish", $projectFull
+        "publish", (Join-Path $Root $ProjectPath)
         "-c", $Configuration
         "-r", $Runtime
         "--self-contained", "true"
-        "-o", $outDir
-        "/p:Version=$Version"
+        "-o", $OutDir
+        "/p:Version=$ProjectVersion"
         "/p:DebugType=None"
         "/p:DebugSymbols=false"
     )
@@ -74,31 +93,51 @@ function Publish-And-Zip {
     }
 
     & dotnet @publishArgs
-    if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed for $ZipBaseName" }
+    if ($LASTEXITCODE -ne 0) { throw "dotnet publish failed for $ProjectPath" }
 
-    Get-ChildItem $outDir -Include "*.pdb", "*.xml" -Recurse | Remove-Item -Force
-
-    Compress-Archive -Path "$outDir\*" -DestinationPath $zipPath -Force
-    Write-Host "  -> $(Split-Path $zipPath -Leaf)" -ForegroundColor Green
+    Get-ChildItem $OutDir -Include "*.pdb", "*.xml" -Recurse | Remove-Item -Force
 }
 
-# ── Build each app ────────────────────────────────────────────────────────────
+function Compress-Staged {
+    param([string]$StageDir, [string]$ZipName)
 
-Publish-And-Zip `
-    -ProjectPath   "DialogEditor.Avalonia\DialogEditor.Avalonia.csproj" `
-    -ZipBaseName   "PillarsDialogEditor" `
-    -StagingSubDir "editor"
+    $zipPath = Join-Path $Dist $ZipName
+    Compress-Archive -Path "$StageDir\*" -DestinationPath $zipPath -Force
+    Write-Host "  -> $ZipName" -ForegroundColor Green
+}
 
-Publish-And-Zip `
-    -ProjectPath   "DialogEditor.PatchManager\DialogEditor.PatchManager.csproj" `
-    -ZipBaseName   "PatchManager" `
-    -StagingSubDir "patchmanager"
+# ── Editor ────────────────────────────────────────────────────────────────────
 
-Publish-And-Zip `
-    -ProjectPath   "DialogEditor.PatchCli\DialogEditor.PatchCli.csproj" `
-    -ZipBaseName   "dialog-patcher" `
-    -StagingSubDir "cli" `
-    -SingleFile
+if ($buildEditor) {
+    $editorStage = Join-Path $Staging "editor"
+    Publish-Project -ProjectPath "DialogEditor.Avalonia\DialogEditor.Avalonia.csproj" `
+                    -OutDir $editorStage -ProjectVersion $Version
+    Compress-Staged -StageDir $editorStage -ZipName "PillarsDialogEditor-$Version.zip"
+}
+
+# ── Pillars Dialog Patcher ────────────────────────────────────────────────────
+
+if ($buildPatcher) {
+    $patcherStage = Join-Path $Staging "patcher"
+
+    Publish-Project -ProjectPath "DialogEditor.PatchManager\DialogEditor.PatchManager.csproj" `
+                    -OutDir $patcherStage -ProjectVersion $PatcherVersion
+
+    # The self-contained runtime drops createdump.exe (debugger crash dumps) beside the
+    # app. Nothing here uses it, and a second top-level .exe is exactly the "which one
+    # do I run?" confusion the layout below exists to avoid.
+    Remove-Item (Join-Path $patcherStage "createdump.exe") -Force -ErrorAction SilentlyContinue
+
+    # cli\ keeps the console exe out of the top level, so the only .exe a player sees
+    # there is the GUI. Double-clicking it anyway gets a note pointing back up to the
+    # Patch Manager (SystemConsoleLaunch in DialogEditor.PatchCli).
+    Publish-Project -ProjectPath "DialogEditor.PatchCli\DialogEditor.PatchCli.csproj" `
+                    -OutDir (Join-Path $patcherStage "cli") -ProjectVersion $PatcherVersion -SingleFile
+
+    Copy-Item (Join-Path $Root "docs\patcher\README.md") -Destination $patcherStage -Force
+
+    Compress-Staged -StageDir $patcherStage -ZipName "PillarsDialogPatcher-$PatcherVersion.zip"
+}
 
 # ── Tidy ──────────────────────────────────────────────────────────────────────
 

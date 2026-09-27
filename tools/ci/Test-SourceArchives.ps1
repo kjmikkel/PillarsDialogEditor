@@ -17,7 +17,7 @@
     an ::error annotation.
 
 .PARAMETER Version
-    Version string passed to build-source.ps1. Only affects zip names.
+    Version string passed to build-source.ps1 for both products. Only affects zip names.
 
 .EXAMPLE
     ./tools/ci/Test-SourceArchives.ps1
@@ -30,7 +30,8 @@ $ErrorActionPreference = "Stop"
 $Root = (Resolve-Path (Join-Path $PSScriptRoot "..\..")).Path
 $Dist = Join-Path $Root "dist"
 
-& (Join-Path $Root "build-source.ps1") -Version $Version
+# Both products get the same throwaway version so one filter finds every archive.
+& (Join-Path $Root "build-source.ps1") -Version $Version -PatcherVersion $Version
 
 $zips = @(Get-ChildItem $Dist -Filter "*-$Version-src.zip")
 if ($zips.Count -eq 0) { throw "build-source.ps1 produced no *-$Version-src.zip in $Dist" }
