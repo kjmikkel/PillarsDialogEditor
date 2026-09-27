@@ -92,7 +92,7 @@ reads up to project format 1. Update the editor to open it."*
 
 | Surface | Behaviour |
 |---|---|
-| Editor: open project | Status message plus the error dialog (existing `ReportError`). The current project is untouched. |
+| Editor: open project | Status message plus a one-button message dialog through a new `ShowUnsupportedFormat` seam. Not `ReportError`: that opens the crash / report-an-issue dialog, and a newer file is not a bug. The current project is untouched. |
 | Editor: autosave recovery | A newer sidecar is **kept**, not deleted as corrupt, because it is someone's work. The editor falls back to loading the saved file, which may be refused in its own right. |
 | Editor: git-conflicted project | If either side is newer, the same message replaces "unparseable sides". |
 | Editor: merge another project in | Refused with the message. The open project is unchanged. |
