@@ -21,4 +21,16 @@ public static class TranslationApplier
             StringTableSerializer.SaveToFile(stPath, translations);
         }
     }
+
+    /// The string-table paths WriteTranslations will write for this patch — the installer
+    /// backs each one up before the write. Must stay in step with WriteTranslations' filter.
+    public static IReadOnlyList<string> TargetPaths(
+        ConversationFile file, ConversationPatch patch, IGameDataProvider provider)
+    {
+        var installed = provider.AvailableLanguages.ToHashSet(StringComparer.OrdinalIgnoreCase);
+        return patch.Translations.Keys
+            .Where(installed.Contains)
+            .Select(lang => provider.GetStringTablePath(file, lang))
+            .ToList();
+    }
 }

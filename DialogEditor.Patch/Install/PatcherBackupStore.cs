@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text.Json;
 using DialogEditor.Core.Localisation;
+using DialogEditor.Core.Logging;
 
 namespace DialogEditor.Patch.Install;
 
@@ -201,6 +202,28 @@ public sealed class PatcherBackupStore
             _entries);
         var tmp = ManifestPath + ".tmp";
         File.WriteAllText(tmp, JsonSerializer.Serialize(manifest, JsonOptions));
-        File.Move(tmp, ManifestPath, overwrite: true);
+        MoveWithRetry(tmp, ManifestPath);
+    }
+
+    /// Replacing a file that was written a moment ago can fail with "access denied" on Windows
+    /// while an antivirus scanner or the search indexer still holds it open — seen in practice
+    /// on the test suite, and game folders are scanned just the same. Such locks last
+    /// milliseconds, so retry briefly before giving up.
+    private static void MoveWithRetry(string source, string dest)
+    {
+        const int attempts = 6;
+        for (var i = 1; ; i++)
+        {
+            try
+            {
+                File.Move(source, dest, overwrite: true);
+                return;
+            }
+            catch (Exception ex) when (i < attempts && ex is UnauthorizedAccessException or IOException)
+            {
+                AppLog.Warn($"Replacing '{dest}' failed (attempt {i} of {attempts}), retrying: {ex.Message}");
+                Thread.Sleep(25 * i);
+            }
+        }
     }
 }
