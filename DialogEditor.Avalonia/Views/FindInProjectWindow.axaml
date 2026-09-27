@@ -83,18 +83,18 @@
                         <Grid ColumnDefinitions="160,50,110,90,*" Margin="0,2"
                               DoubleTapped="OnResultActivated">
                             <TextBlock Grid.Column="0" Text="{Binding Row.ConversationName}"
-                                       Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"
+                                       Classes="list-primary" FontSize="{DynamicResource FontSize.Body}"
                                        TextTrimming="CharacterEllipsis"/>
                             <TextBlock Grid.Column="1" Text="{Binding Row.NodeId}"
-                                       Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"/>
+                                       Classes="list-secondary" FontSize="{DynamicResource FontSize.Body}"/>
                             <TextBlock Grid.Column="2" Text="{Binding Row.FieldLabel}"
-                                       Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"
+                                       Classes="list-secondary" FontSize="{DynamicResource FontSize.Body}"
                                        TextTrimming="CharacterEllipsis"/>
                             <TextBlock Grid.Column="3" Text="{Binding LanguageDisplay}"
-                                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Body}"
+                                       Classes="list-muted" FontSize="{DynamicResource FontSize.Body}"
                                        TextTrimming="CharacterEllipsis"/>
                             <TextBlock Grid.Column="4" Text="{Binding Row.Snippet}"
-                                       Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"
+                                       Classes="list-secondary" FontSize="{DynamicResource FontSize.Body}"
                                        TextTrimming="CharacterEllipsis"/>
                         </Grid>
                     </DataTemplate>

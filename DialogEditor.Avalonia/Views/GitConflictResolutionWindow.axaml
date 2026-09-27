@@ -8,6 +8,19 @@
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource Brush.Surface.Panel}">
 
+    <Window.Styles>
+        <!-- "Unresolved" marker colour, as a STYLE rather than a local Foreground (issue #94): a
+             local value would outrank the app-wide selected-row rule
+             (Resources/ListSelection.axaml). Window styles apply after the application ones, so
+             this view needs its own selected rule, declared after the resting one. -->
+        <Style Selector="TextBlock.conflict-unresolved">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Meta.Commit}"/>
+        </Style>
+        <Style Selector="ListBoxItem:selected TextBlock.conflict-unresolved">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Selection.Foreground}"/>
+        </Style>
+    </Window.Styles>
+
     <Grid Margin="16" RowDefinitions="Auto,*,Auto,Auto" ColumnDefinitions="260,*">
 
         <TextBlock Grid.Row="0" Grid.ColumnSpan="2"
@@ -28,9 +41,9 @@
                     <DataTemplate>
                         <StackPanel Margin="0,2">
                             <TextBlock Text="{Binding Title}"
-                                       Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
+                                       Classes="list-primary" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
                             <TextBlock Text="{DynamicResource GitConflictWindow_Unresolved}"
-                                       Foreground="{DynamicResource Brush.Text.Meta.Commit}" FontSize="{DynamicResource FontSize.Small}"
+                                       Classes="conflict-unresolved" FontSize="{DynamicResource FontSize.Small}"
                                        IsVisible="{Binding IsUnresolved}"/>
                         </StackPanel>
                     </DataTemplate>
