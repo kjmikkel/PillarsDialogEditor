@@ -30,8 +30,10 @@ public sealed class ExceptionReportViewModel
     // English whatever the UI language is, so translating them would only make a
     // maintainer's triage harder without helping the reporter.
     //
-    // The pre-filled issue (ReportUrl) is different: the user reads and edits it in the
-    // browser before submitting, so its labels ARE user-visible and come from Loc.
+    // The pre-filled issue (ReportUrl) follows the same rule: it lands on that same
+    // public, English-language tracker, so its labels are English too (EnglishIssueText),
+    // even though the user sees them in the browser before submitting. Only the window's
+    // own button, tooltip and automation name are localised.
     //
     // reportUrlBuilder is a test seam; production passes null and gets
     // BuildDefaultReportUrl, which reads the real environment.
@@ -78,18 +80,23 @@ public sealed class ExceptionReportViewModel
                 Message:           ex.Message,
                 StackTrace:        ex.StackTrace ?? string.Empty,
                 LogPath:           logPath),
-            LocalisedIssueText(),
+            EnglishIssueText,
             CrashReportScrubber.FromEnvironment());
 
-    /// <summary>The pre-filled issue's labels, from the string resources.</summary>
-    public static IssueReportText LocalisedIssueText() => new(
-        TitleFormat:         Loc.Get("ExceptionReport_IssueTitle"),
-        VersionLine:         Loc.Get("ExceptionReport_IssueVersion"),
-        OperatingSystemLine: Loc.Get("ExceptionReport_IssueOs"),
-        ExceptionLine:       Loc.Get("ExceptionReport_IssueException"),
-        MessageHeading:      Loc.Get("ExceptionReport_IssueMessageHeading"),
-        StackTraceHeading:   Loc.Get("ExceptionReport_IssueStackTraceHeading"),
-        TruncatedMarker:     Loc.Get("ExceptionReport_IssueTruncated"),
-        LogFileLine:         Loc.Get("ExceptionReport_IssueLogFile"),
-        StepsHeading:        Loc.Get("ExceptionReport_IssueStepsHeading"));
+    /// <summary>
+    /// The pre-filled issue's labels. Always English, whatever the UI language (see the
+    /// constructor comment): a maintainer triages a public English-language tracker, and
+    /// the exception type and stack trace beside these labels are English anyway.
+    /// </summary>
+    [NotLocalised("GitHub issue body for an English-language tracker, not shown in the UI")]
+    public static IssueReportText EnglishIssueText { get; } = new(
+        TitleFormat:         "Crash: {0}: {1}",
+        VersionLine:         "Editor version: {0}",
+        OperatingSystemLine: "Operating system: {0}",
+        ExceptionLine:       "Exception: {0}",
+        MessageHeading:      "Error message",
+        StackTraceHeading:   "Stack trace (top)",
+        TruncatedMarker:     "… (truncated to fit in a link; the full details are in the log file below)",
+        LogFileLine:         "Full log file: {0} (please check it for anything private before attaching it)",
+        StepsHeading:        "What were you doing when the error occurred?");
 }
