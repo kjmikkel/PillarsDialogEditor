@@ -29,7 +29,7 @@ public sealed class PatchConflictRowViewModel(
     public string SecondProjectName => secondProjectName;
 
     /// The field the two patches disagree about — or, for the kinds with no single field
-    /// to name, a localised marker: "(deleted)", "(added by both)" or "link to node N".
+    /// to name, a localised marker: "(deleted)", "(added by both)", "link to node N" or "text (fr)".
     /// PatchConflict.FieldName is null for those; it used to carry the English "(deleted)"
     /// itself, which made the de-duplication key depend on the UI language.
     public string FieldLabel => conflict.Kind switch
@@ -37,6 +37,7 @@ public sealed class PatchConflictRowViewModel(
         PatchConflictKind.Deletion  => Loc.Get("PatchManager_DeletedField"),
         PatchConflictKind.AddedNode => Loc.Get("PatchManager_AddedNodeField"),
         PatchConflictKind.Link      => Loc.Format("PatchManager_LinkField", conflict.LinkToNodeId ?? 0),
+        PatchConflictKind.Text      => Loc.Format("PatchManager_TextField", conflict.Language ?? string.Empty),
         _                           => conflict.FieldName ?? string.Empty,
     };
 
