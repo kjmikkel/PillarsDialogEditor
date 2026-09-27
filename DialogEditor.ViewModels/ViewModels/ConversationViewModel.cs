@@ -340,17 +340,21 @@ public partial class ConversationViewModel : ObservableObject
         RefreshUndoRedo();
     }
 
-    public void Load(Conversation conversation, ConversationEditSnapshot? baseSnapshot = null)
+    public void Load(Conversation conversation, ConversationEditSnapshot? baseSnapshot = null,
+                     bool? stringTableMissing = null)
     {
         Clear();
         ConversationName = conversation.Name;
 
         var nodeMap = new Dictionary<int, NodeViewModel>();
+        // The patched-load path rebuilds Strings from the snapshot, which loses the
+        // "table missing" state — callers pass it explicitly then (#84).
+        var tableMissing = stringTableMissing ?? conversation.Strings.IsMissing;
 
         foreach (var node in conversation.Nodes)
         {
             var entry = conversation.Strings.Get(node.NodeId);
-            var vm    = new NodeViewModel(node, entry);
+            var vm    = new NodeViewModel(node, entry, tableMissing);
             vm.OnSelected = n => SelectedNode = n;
             vm.UndoStack  = _undoStack;
             // Wire Owner on connectors so GetNodeId() works
