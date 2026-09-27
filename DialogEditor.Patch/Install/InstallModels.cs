@@ -24,3 +24,10 @@ public abstract record InstallResult
     /// patcher, and the caller did not set AcceptCurrentFiles.
     public sealed record ExternalChanges(IReadOnlyList<string> Paths) : InstallResult;
 }
+
+public sealed record RestoreResult(int Restored, IReadOnlyList<string> Skipped);
+
+public sealed record InstallPlan(
+    int                   ConversationsToPatch,
+    int                   FilesToRestoreFirst,
+    IReadOnlyList<string> ExternallyChanged);
