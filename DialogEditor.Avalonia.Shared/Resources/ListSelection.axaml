@@ -1,0 +1,59 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Selected ListBox rows (issue #94), app-wide.
+
+         Fluent draws the selected ListBoxItem from its own accent brushes (the Windows accent
+         colour), not from our tokens, so no palette contrast gate covered it: resting row text
+         such as Brush.Text.Muted sat at ~2.3:1 on it in Dark/Colourblind. Every list now uses the
+         same Brush.Selection.Background/Foreground PAIR as the Conversations tree (#83), which
+         PaletteContrastTests gates per palette.
+
+         The pair only works if a selected row's text actually switches to the selection
+         foreground:
+           * Text WITHOUT its own colour inherits it from the item presenter (set below).
+           * Text WITH a resting colour must get it from one of the list-* role classes below,
+             NEVER from a local Foreground="..." attribute: a local value outranks every style,
+             so the selected rule could not replace it. ListSelectionContrastTests fails the
+             build on any local Foreground inside a ListBox.ItemTemplate.
+
+         Order matters: class selectors and :selected are both "activated" styles, so of two
+         matching rules the LATER one wins — the selected rule therefore comes LAST. For the
+         same reason a view that defines its own resting-colour class in Window.Styles (applied
+         after these application styles) must add its own selected rule after it; see
+         RepDispositionBalanceWindow, GitConflictResolutionWindow and DiffWindow.
+
+         The role classes are for TextBlocks only; other row content with a resting colour (the
+         Diff window's conversation ToggleButton) gets a view-local pair in the same way. -->
+
+    <Style Selector="ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.Selection.Background}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Selection.Foreground}"/>
+    </Style>
+    <!-- Fluent gives the selected row a different shade on hover/press; keep the tested pair. -->
+    <Style Selector="ListBoxItem:selected:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.Selection.Background}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Selection.Foreground}"/>
+    </Style>
+    <Style Selector="ListBoxItem:selected:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource Brush.Selection.Background}"/>
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Selection.Foreground}"/>
+    </Style>
+
+    <!-- Resting colours for list row text, by role. -->
+    <Style Selector="TextBlock.list-primary">
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}"/>
+    </Style>
+    <Style Selector="TextBlock.list-secondary">
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}"/>
+    </Style>
+    <Style Selector="TextBlock.list-muted">
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Muted}"/>
+    </Style>
+
+    <!-- LAST: on a selected row every role takes the selection foreground. -->
+    <Style Selector="ListBoxItem:selected TextBlock.list-primary, ListBoxItem:selected TextBlock.list-secondary, ListBoxItem:selected TextBlock.list-muted">
+        <Setter Property="Foreground" Value="{DynamicResource Brush.Selection.Foreground}"/>
+    </Style>
+
+</Styles>
