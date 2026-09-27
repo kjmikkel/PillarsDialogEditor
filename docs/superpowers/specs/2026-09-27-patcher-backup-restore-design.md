@@ -81,8 +81,10 @@ The single apply/restore routine for the CLI and the Patch Manager.
 3. `RestoreAll()`: every apply starts from the originals.
 4. Merge the load order (existing `PatchMerger` / `MergeWith` behaviour, last-wins, #6 warnings unchanged).
 5. For every conversation file, string table (every installed language via `TranslationApplier`) and VO
-   file: `EnsureBackedUp` → write → `RecordWritten`. File writes go through a small `IInstallFileWriter`
-   seam, so tests can inject a failure partway through.
+   file: `EnsureBackedUp` → write → `RecordWritten`. The serializers also leave a `<file>.bak` sidecar
+   next to every conversation and string table they overwrite; each sidecar is a write target too, so
+   restore removes it (Created) or puts it back (Overwritten). An `InstallOptions.BeforeWrite(absPath)` hook
+   runs before each write, so tests can inject a failure partway through.
 6. Return `InstallResult.Applied(counts, skipped conversations, restore-skipped paths)`.
 
 On `PatchConflictException` the installer runs `RestoreAll()` again before rethrowing, so the game is left
