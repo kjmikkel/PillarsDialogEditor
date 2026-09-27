@@ -10,6 +10,7 @@ to install them.
 |---|---|
 | `DialogEditor.PatchManager.exe` | **Start here.** The Patch Manager: add mods, choose your game folder, apply. |
 | `cli\dialog-patcher.exe` | The command-line version, for mod installers and scripts. Run `dialog-patcher --help` in a terminal. |
+| `runtime\` | The .NET runtime both programs use, so you don't need to install .NET. Keep it next to the other files. |
 
 ## Installing a mod
 

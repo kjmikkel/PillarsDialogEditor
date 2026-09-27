@@ -415,10 +415,14 @@ required on the target machine) and zips it:
 | Archive | Contents |
 |---------|----------|
 | `PillarsDialogEditor-<ver>.zip` | The editor |
-| `PillarsDialogPatcher-<ver>.zip` | `DialogEditor.PatchManager.exe` and a player README at the top; the single-file `dialog-patcher.exe` in `cli\` |
+| `PillarsDialogPatcher-<ver>.zip` | `DialogEditor.PatchManager.exe` and a player README at the top; the single-file `dialog-patcher.exe` in `cli\`; one shared .NET runtime in `runtime\` |
 
-The patcher zip keeps the console tool in `cli\` so the only `.exe` a player
-sees at the top is the GUI. Double-clicking `dialog-patcher.exe` anyway shows a
+The two patcher apps share one bundled runtime rather than each carrying its
+own: they are published framework-dependent with `AppHostDotNetSearch=AppRelative`,
+so each exe looks for .NET *only* in `runtime\` next to it (never a system
+install), and `build-dist.ps1` copies that runtime from the build machine's .NET
+install and smoke-tests the staged CLI against it. The patcher zip keeps the
+console tool in `cli\` so the only `.exe` a player sees at the top is the GUI. Double-clicking `dialog-patcher.exe` anyway shows a
 note pointing to the Patch Manager and waits for a key; runs from a terminal or
 script are unaffected. The player README is `docs/patcher/README.md`.
 
