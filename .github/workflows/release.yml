@@ -49,9 +49,7 @@ jobs:
 
       - uses: actions/setup-dotnet@v6
         with:
-          dotnet-version: |
-            8.0.x
-            10.0.x
+          dotnet-version: 10.0.x
 
       # build.ps1's own test gate runs DialogEditor.Tests unfiltered, which
       # includes the audio-device tests a hosted runner can't run. Gate here
