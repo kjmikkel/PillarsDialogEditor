@@ -60,4 +60,33 @@ public class PatchManagerViewTests
     public void DeleteVsModifyRow_RendersTheLocalisedDeletedMarker()
         => Assert.Equal("conversation 'conv1' \u00b7 node 7 \u00b7 (deleted) \u00b7 between 'mod' and 'mod'",
                         FirstRowText(VmWith(Modifies(7, "DefaultText"), Deletes(7))));
+
+    // ── "Get the latest patcher" link (GitHub issue 79) ──────────────────
+
+    private static Button GetLatestPatcherButton(PatchManagerViewModel vm)
+    {
+        var view = new PatchManagerView { DataContext = vm };
+        new Window { Content = view }.Show();
+        return view.FindControl<Button>("GetLatestPatcherButton")!;
+    }
+
+    [AvaloniaFact]
+    public void GetLatestPatcher_IsHiddenByDefault()
+        => Assert.False(GetLatestPatcherButton(VmWith()).IsVisible);
+
+    [AvaloniaFact]
+    public void GetLatestPatcher_ShowsWithTheFlag_AndOpensTheReleasesPage()
+    {
+        var vm = VmWith();
+        string? opened = null;
+        vm.UrlOpener = url => { opened = url; return true; };
+        var button = GetLatestPatcherButton(vm);
+
+        vm.ShowGetLatestPatcher = true;
+        button.Command!.Execute(null);
+
+        Assert.True(button.IsVisible);
+        Assert.Equal(DialogEditor.Patch.Schema.SchemaFormats.PatcherReleasesUrl, opened);
+        Assert.False(string.IsNullOrEmpty(ToolTip.GetTip(button) as string));
+    }
 }
