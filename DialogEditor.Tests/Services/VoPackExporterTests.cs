@@ -1,7 +1,7 @@
 using System.IO.Compression;
 using DialogEditor.Avalonia.Services;
 using DialogEditor.Patch;
-using DialogEditor.ViewModels.Services;
+using DialogEditor.Patch.Packaging;
 
 namespace DialogEditor.Tests.Services;
 

@@ -18,6 +18,7 @@ using DialogEditor.Avalonia.Shared.Theming;
 using DialogEditor.Patch.Diff;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.Core.Logging;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Avalonia.Views;

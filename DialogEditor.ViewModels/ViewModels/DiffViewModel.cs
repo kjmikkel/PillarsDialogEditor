@@ -8,6 +8,7 @@ using DialogEditor.Core.Models;
 using DialogEditor.Patch;
 using DialogEditor.Patch.Diff;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.Core.Logging;
 using DialogEditor.ViewModels.Services;
 using DialogEditor.Core.Localisation;
 

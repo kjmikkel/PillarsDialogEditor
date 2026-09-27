@@ -5,6 +5,7 @@ using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
 using DialogEditor.Patch;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.Core.Logging;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.ViewModels;

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Avalonia.Threading;
 using NAudio.Wave;
+using DialogEditor.Core.Logging;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Avalonia.Audio;
