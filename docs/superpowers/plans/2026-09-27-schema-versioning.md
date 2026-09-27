@@ -56,7 +56,7 @@
 **Interfaces:**
 - Produces:
   - `enum SchemaFileKind { Project, ConversationPatch, PatchList }`
-  - `sealed class UnsupportedSchemaVersionException : InvalidDataException` with `SchemaFileKind Kind`, `int Found`, `int Supported`, `string? ConversationName`, ctor `(SchemaFileKind kind, int found, int supported, string? conversationName = null)`
+  - `sealed class UnsupportedSchemaVersionException : Exception` with `SchemaFileKind Kind`, `int Found`, `int Supported`, `string? ConversationName`, ctor `(SchemaFileKind kind, int found, int supported, string? conversationName = null)`
   - `interface ISchemaMigrationStep { SchemaFileKind Kind { get; } int FromVersion { get; } void Apply(JsonObject root); }`
   - `sealed class SchemaMigrator(IReadOnlyList<ISchemaMigrationStep> steps, IReadOnlyDictionary<SchemaFileKind,int> currentVersions)`, with:
     - `static IReadOnlyList<ISchemaMigrationStep> RegisteredSteps`
@@ -131,7 +131,7 @@ public class SchemaMigratorTests
     [Fact]
     public void StepsForOtherKinds_AreIgnored()
     {
-        var root = Doc(3);
+        var root = Doc(4);
         new SchemaMigrator([new TrailStep(SchemaFileKind.Project, 3)], Four)
             .Migrate(root, SchemaFileKind.PatchList);
 
@@ -289,7 +289,7 @@ namespace DialogEditor.Patch.Schema;
 /// localised text from Kind / Found / Supported via SchemaVersionMessages.
 public sealed class UnsupportedSchemaVersionException(
     SchemaFileKind kind, int found, int supported, string? conversationName = null)
-    : InvalidDataException(BuildMessage(kind, found, supported, conversationName))
+    : Exception(BuildMessage(kind, found, supported, conversationName))
 {
     public SchemaFileKind Kind             { get; } = kind;
     public int            Found            { get; } = found;
