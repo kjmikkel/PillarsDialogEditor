@@ -41,20 +41,41 @@
             <ctrl:ConversationTreeView.Styles>
                 <!-- Selection highlight -->
                 <Style Selector="TreeViewItem:selected /template/ ContentPresenter#PART_HeaderPresenter">
-                    <Setter Property="Background" Value="{DynamicResource Brush.Border.Focus}"/>
+                    <Setter Property="Background" Value="{DynamicResource Brush.Selection.Background}"/>
                 </Style>
                 <Style Selector="TreeViewItem:selected:focus /template/ ContentPresenter#PART_HeaderPresenter">
-                    <Setter Property="Background" Value="{DynamicResource Brush.Border.Focus}"/>
+                    <Setter Property="Background" Value="{DynamicResource Brush.Selection.Background}"/>
+                </Style>
+
+                <!-- Row label colours (issue #83). Set through STYLES, never as local
+                     Foreground values on the TextBlocks: a local value outranks every style, so
+                     the selected-row rule below could not replace it, and a selected row kept
+                     its resting colour on the highlight (Light: dark grey on dark blue, ~1.5:1).
+                     Order matters: the selected rule must come LAST so it wins over the resting
+                     rules when both match. The 'selectedRow' class is bound per label to its OWN
+                     row's container ($parent[TreeViewItem] is the nearest one), rather than
+                     using a "TreeViewItem:selected TextBlock" selector, which would also recolour
+                     every child row of a selected folder. -->
+                <Style Selector="TextBlock.folderLabel">
+                    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Muted}"/>
+                </Style>
+                <Style Selector="TextBlock.conversationLabel">
+                    <Setter Property="Foreground" Value="{Binding IsNew, Converter={StaticResource BoolToNewConversationBrush}}"/>
+                </Style>
+                <Style Selector="TextBlock.selectedRow">
+                    <Setter Property="Foreground" Value="{DynamicResource Brush.Selection.Foreground}"/>
                 </Style>
             </ctrl:ConversationTreeView.Styles>
 
             <ctrl:ConversationTreeView.DataTemplates>
                 <TreeDataTemplate DataType="{x:Type vm:ConversationFolderViewModel}" ItemsSource="{Binding Items}">
-                    <TextBlock Text="{Binding DisplayName}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}" Padding="2"/>
+                    <TextBlock Text="{Binding DisplayName}" Classes="folderLabel"
+                               Classes.selectedRow="{Binding $parent[TreeViewItem].IsSelected}"
+                               FontSize="{DynamicResource FontSize.Small}" Padding="2"/>
                 </TreeDataTemplate>
                 <DataTemplate DataType="{x:Type vm:ConversationItemViewModel}">
-                    <TextBlock Text="{Binding DisplayName}"
-                               Foreground="{Binding IsNew, Converter={StaticResource BoolToNewConversationBrush}}"
+                    <TextBlock Text="{Binding DisplayName}" Classes="conversationLabel"
+                               Classes.selectedRow="{Binding $parent[TreeViewItem].IsSelected}"
                                FontSize="{DynamicResource FontSize.Small}" Padding="2"
                                Cursor="Hand"
                                Tapped="ConversationItem_Tapped"/>

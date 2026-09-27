@@ -56,6 +56,7 @@ public class TokenRegistryTests
         "Brush.Surface.Inset","Brush.Surface.Subtle","Brush.Surface.Header","Brush.Surface.Info","Brush.Surface.Overlay.Scrim",
         "Brush.Border.Default","Brush.Border.Subtle","Brush.Border.Strong","Brush.Border.Muted",
         "Brush.Border.OnDark","Brush.Border.Focus",
+        "Brush.Selection.Background","Brush.Selection.Foreground",
         "Brush.Text.Primary","Brush.Text.Emphasis","Brush.Text.Secondary","Brush.Text.Tertiary",
         "Brush.Text.Muted.Light","Brush.Text.Caption","Brush.Text.Muted","Brush.Text.Disabled",
         "Brush.Text.OnAccent","Brush.Text.Female.Active","Brush.Text.Female.Dim",
