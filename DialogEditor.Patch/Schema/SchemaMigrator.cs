@@ -1,15 +1,17 @@
+using DialogEditor.Core.Localisation;
 using System.Text.Json.Nodes;
 using DialogEditor.Patch.Schema.Steps;
 
 namespace DialogEditor.Patch.Schema;
 
-/// The single place older files are brought forward and newer files refused (issues
-/// #62 + #104). The three serializers call Default.Migrate on the parsed JSON before
+/// The single place older files are brought forward and newer files refused (GitHub issues
+/// 62 + 104). The three serializers call Default.Migrate on the parsed JSON before
 /// deserialising, so no load path can bypass it.
 ///
 /// To bump a format: raise the model's CurrentSchemaVersion, add ONE step here from the
 /// old version, and add a fixture file at the old version under
 /// DialogEditor.Tests/Patch/Schema/Fixtures. The registry test fails until the step exists.
+[NotLocalised("Diagnostic messages: corrupt-file errors surface through the generic load-error text; registry problems are test output")]
 public sealed class SchemaMigrator(
     IReadOnlyList<ISchemaMigrationStep> steps,
     IReadOnlyDictionary<SchemaFileKind, int> currentVersions)
@@ -73,7 +75,7 @@ public sealed class SchemaMigrator(
             $"Not a valid {kind} file: '{VersionKey}' is missing or is not a whole number of at least 1.");
     }
 
-    /// Registry invariants (#104): for each kind, versions 1 .. current-1 each have exactly
+    /// Registry invariants (GitHub issue 104): for each kind, versions 1 .. current-1 each have exactly
     /// one step, and no step starts at or past current. Checked by a unit test, not at runtime.
     public static IReadOnlyList<string> FindRegistryProblems(
         IReadOnlyList<ISchemaMigrationStep> steps,

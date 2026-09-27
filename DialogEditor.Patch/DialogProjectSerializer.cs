@@ -1,6 +1,8 @@
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Nodes;
+using DialogEditor.Patch.Schema;
 
 namespace DialogEditor.Patch;
 
@@ -16,9 +18,15 @@ public static class DialogProjectSerializer
     public static string Serialize(DialogProject project)
         => JsonSerializer.Serialize(project, Options);
 
+    /// Parses, refuses newer / migrates older (SchemaMigrator, GitHub issues 62 + 104), then binds.
     public static DialogProject Deserialize(string json)
-        => JsonSerializer.Deserialize<DialogProject>(json, Options)
-           ?? throw new InvalidOperationException("Deserialised project was null.");
+    {
+        var root = JsonNode.Parse(json) as JsonObject
+                   ?? throw new InvalidDataException("Project file is not a JSON object.");
+        SchemaMigrator.Default.Migrate(root, SchemaFileKind.Project);
+        return root.Deserialize<DialogProject>(Options)
+               ?? throw new InvalidOperationException("Deserialised project was null.");
+    }
 
     public static void SaveToFile(string path, DialogProject project)
     {

@@ -2,7 +2,7 @@ using System.Text.Json.Nodes;
 
 namespace DialogEditor.Patch.Schema;
 
-/// Rewrites one file kind's raw JSON from FromVersion to FromVersion + 1 (issue #104).
+/// Rewrites one file kind's raw JSON from FromVersion to FromVersion + 1 (GitHub issue 104).
 /// Steps work on JSON rather than records because an old shape may no longer bind to
 /// today's records: a renamed field would be silently dropped by the deserializer before
 /// a post-deserialise step could move it.
