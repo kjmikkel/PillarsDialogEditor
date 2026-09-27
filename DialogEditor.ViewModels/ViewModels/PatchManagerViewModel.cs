@@ -12,6 +12,11 @@ using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.ViewModels;
 
+/// Which app the shared Patch Manager runs in. It decides who the player is told to update
+/// when a mod is too new (GitHub issue 79): inside the editor that's the editor; in the
+/// standalone Patch Manager it's the Pillars Dialog Patcher, which versions separately (#77).
+public enum PatchManagerHost { Editor, Standalone }
+
 public partial class PatchManagerViewModel : ObservableObject
 {
     private readonly IFolderPicker _folderPicker;
@@ -37,6 +42,15 @@ public partial class PatchManagerViewModel : ObservableObject
     private bool _hasInstalledMods;
 
     [ObservableProperty] private string _backupStatusText = string.Empty;
+
+    public PatchManagerHost Host { get; init; } = PatchManagerHost.Editor;
+
+    /// True while the status is a standalone "needs a newer patcher" refusal: shows the
+    /// "Get the latest patcher" link. Any later status hides it (OnStatusTextChanged).
+    [ObservableProperty] private bool _showGetLatestPatcher;
+
+    /// Link-opening seam, as on AboutViewModel.
+    public Func<string, bool> UrlOpener { get; set; } = ExternalLauncher.Open;
 
     /// Set by the host view: shows the files changed outside the patcher and returns true
     /// when the user chooses to treat them as the new originals.
@@ -85,7 +99,7 @@ public partial class PatchManagerViewModel : ObservableObject
             catch (UnsupportedSchemaVersionException ex)
             {
                 AppLog.Warn($"PatchManager: refused '{path}': {ex.Message}");
-                StatusText = SchemaVersionMessages.TooNew(ex, Path.GetFileName(path));
+                RefuseNewer(ex, Path.GetFileName(path));
             }
         }
     }
@@ -272,7 +286,7 @@ public partial class PatchManagerViewModel : ObservableObject
             foreach (var e in loaded) DeleteTempDir(e.TempDir);
             var offender = Path.GetFileName(current ?? path);
             AppLog.Warn($"PatchManager: refused load order '{path}' ({offender}): {ex.Message}");
-            StatusText = SchemaVersionMessages.TooNew(ex, offender);
+            RefuseNewer(ex, offender);
         }
         catch (Exception ex)
         {
@@ -404,6 +418,30 @@ public partial class PatchManagerViewModel : ObservableObject
     // ── Backup status ─────────────────────────────────────────────────────
 
     partial void OnGameFolderChanged(string value) => RefreshBackupStatus();
+
+    partial void OnStatusTextChanged(string value) => ShowGetLatestPatcher = false;
+
+    // Sets the flag after StatusText, whose change handler clears it.
+    private void RefuseNewer(UnsupportedSchemaVersionException ex, string fileName)
+    {
+        if (Host == PatchManagerHost.Standalone)
+        {
+            StatusText           = SchemaVersionMessages.TooNewForPatcher(ex, fileName);
+            ShowGetLatestPatcher = true;
+        }
+        else
+        {
+            StatusText = SchemaVersionMessages.TooNew(ex, fileName);
+        }
+    }
+
+    [RelayCommand]
+    private void OpenPatcherReleases()
+    {
+        if (UrlOpener(SchemaFormats.PatcherReleasesUrl)) return;
+        AppLog.Warn($"PatchManager: failed to open '{SchemaFormats.PatcherReleasesUrl}'.");
+        StatusText = Loc.Get("PatchManager_OpenReleasesFailed");
+    }
 
     /// Tells the player whether mods are installed in the chosen folder (and so whether
     /// "Remove all mods" has anything to undo).

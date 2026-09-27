@@ -348,7 +348,7 @@ wins on any contested field), matching the Patch Manager's load-order semantics.
 | `-v`, `--verbose` | Print each conversation as it is patched |
 | `-q`, `--quiet` | Suppress all output except errors; only the exit code signals success |
 | `--dry-run` | List what would be patched without writing any files |
-| `--version` | Print version and exit |
+| `--version` | Print version and the newest file formats it reads, then exit (see [Patcher compatibility](PROJECT-FORMAT.md#patcher-compatibility)) |
 | `-h`, `--help` | Show usage |
 
 **Exit codes:** `0` success · `1` conflict (re-run with `--force`) · `2` error · `3` managed files were changed outside the patcher (re-run with `--accept-current-files` or `--restore`) · `4` a mod uses a newer file format than this patcher reads (nothing was changed; update `dialog-patcher`)

@@ -61,6 +61,8 @@ A diff against the game's conversation, keyed by node ID.
   `DialogEditor.Tests/Patch/Schema/Fixtures`. A test fails if any version is missing its step.
 - **Steps chain.** A file several versions behind is brought forward one step at a time, so
   no step ever has to know about more than one change.
+- **Every bump adds a row** to [Patcher compatibility](#patcher-compatibility). A test fails
+  if the latest row doesn't match what the code reads.
 
 ## What happens on load
 
@@ -68,10 +70,29 @@ A diff against the game's conversation, keyed by node ID.
 - **Older version:** migrated in memory. The project is *not* marked modified; the new
   version is written the next time it's saved.
 - **Newer version:** refused before anything is read into the editor or written to the game.
-  - The editor and Patch Manager explain that a newer version of Pillars Dialog Editor is
-    needed.
+  - The editor, and the Patch Manager inside it, explain that a newer version of Pillars
+    Dialog Editor is needed.
+  - The standalone Patch Manager says the mod needs a newer Pillars Dialog Patcher and links
+    to the releases page.
   - A load order is refused as a whole if any of its mods is newer, so the rest is never
     applied without it.
-  - `dialog-patcher` exits with code **4**.
+  - `dialog-patcher` exits with code **4** and prints the releases link. Installer scripts
+    can treat exit code 4 as "update the patcher".
 - **Missing, non-numeric or below-1 version:** treated as a damaged file. Every save writes
   the field.
+
+## Patcher compatibility
+
+A patcher installs a mod only if it reads every format the mod uses, at the mod's version
+or newer. Each row gives the newest version of each format that the patcher reads. A mod
+made with a newer editor needs a patcher whose row covers its versions.
+
+`dialog-patcher --version` and the standalone Patch Manager's **About** window show the
+same versions for the build you're running.
+
+| Patcher | Project | Conversation patch | Load order |
+|---|---|---|---|
+| 1.0 | ≤ 1 | ≤ 2 | ≤ 1 |
+
+Until the patcher has its own release numbering (GitHub issue 77), "Patcher 1.0" means the
+Patch Manager and `dialog-patcher` shipped with Pillars Dialog Editor 1.0.
