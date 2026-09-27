@@ -22,12 +22,7 @@ public sealed class UnsupportedSchemaVersionException(
 
     private static string BuildMessage(SchemaFileKind kind, int found, int supported, string? conversation)
     {
-        var what  = kind switch
-        {
-            SchemaFileKind.Project           => "project format",
-            SchemaFileKind.ConversationPatch => "conversation patch format",
-            _                                => "load-order format",
-        };
+        var what  = SchemaFormats.EnglishName(kind);
         var where = conversation is null ? "" : $" (conversation '{conversation}')";
         return $"This file uses {what} {found}{where}, but this version reads up to {what} {supported}. " +
                "It was saved by a newer Pillars Dialog Editor; update the editor / dialog-patcher to read it.";
