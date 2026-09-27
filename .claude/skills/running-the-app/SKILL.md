@@ -87,6 +87,27 @@ finally {
 | Persisted state changes | Read `%LOCALAPPDATA%\PillarsDialogEditor\settings.json` after the action |
 | Anything visual | `Save-WindowScreenshot`, then **Read the png and look at it**; send before/after shots to the user via SendUserFile |
 
+## Screenshot matrices (look-and-feel reviews)
+
+For theme × font-scale sweeps, don't hand-roll the loop. Use
+`tools/ui-automation/CaptureSurfaces.ps1`, and its ready-made captures:
+
+```powershell
+# Canvas, as opened + fit-to-screen (issue #82)
+./tools/ui-automation/Capture-Canvas.ps1 -OutDir $env:TEMP\canvas -Conversation companion_eder_hub
+# Conversations dock, collapsed + expanded, cropped to the dock (issue #85)
+./tools/ui-automation/Capture-ConversationsDock.ps1 -OutDir $env:TEMP\dock -GameDirectory '<game folder>'
+```
+
+`Invoke-CaptureMatrix -Capture { param($p, $win, $tag, $out) … }` is the
+building block for new surfaces. It refuses to start while an editor is
+running, backs up and restores settings, and clears `PendingRestores` in the
+temporary copy, so a capture can't write to the game folder. It also stops a
+game folder that has never been backed up from starting the first-run backup
+flow, and waits until the window really is maximized. Screenshots include the
+desktop at the window edges if it isn't. Don't post captures publicly without
+looking at them.
+
 ## Rules of the road
 
 - **Never run against the user's real project/settings.** Backup → scratch
