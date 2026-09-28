@@ -144,6 +144,10 @@
     <sys:String x:Key="Schema_TooNewForPatcherInConversation">'{0}' contains conversation '{4}', which needs a newer Pillars Dialog Patcher ({1} {2}). This version reads up to {1} {3}. Nothing was changed.</sys:String>
     <sys:String x:Key="PatchManager_GetLatestPatcher">Get the latest patcher</sys:String>
     <sys:String x:Key="ToolTip_GetLatestPatcher">Open the Pillars Dialog Patcher releases page in your browser. Download the newest version to install mods made with a newer editor.</sys:String>
+    <!-- Non-affiliation / trademark notice, shown in both About windows (issue #64).
+         Kept in step with README.md, docs/patcher/README.md, docs/nexus/patcher.md and
+         .github/release-notice.md by NonAffiliationNoticeTests. -->
+    <sys:String x:Key="About_NonAffiliation">This is a free fan-made tool. It is not made, endorsed or supported by Obsidian Entertainment or the games' publishers. Pillars of Eternity and Pillars of Eternity II: Deadfire are trademarks of their respective owners. It contains no game files: you need your own copy of the game.</sys:String>
     <sys:String x:Key="PatchManager_OpenReleasesFailed">Couldn't open the releases page. Please check your internet connection or browser.</sys:String>
 
 </ResourceDictionary>

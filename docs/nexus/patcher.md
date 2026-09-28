@@ -72,7 +72,7 @@ Make conversation mods with the [url=https://github.com/kjmikkel/PillarsDialogEd
 The patcher is free and open source. Report problems on [url=https://github.com/kjmikkel/PillarsDialogEditor/issues]GitHub[/url]; the source and every release are there too.
 
 [size=4][b]Not affiliated with Obsidian[/b][/size]
-Pillars Dialog Patcher is a free fan-made tool. It is not made, endorsed or supported by Obsidian Entertainment. [i]Pillars of Eternity[/i] and [i]Pillars of Eternity II: Deadfire[/i] are trademarks of their respective owners. Please don't contact Obsidian about problems with mods or with this tool.
+Pillars Dialog Patcher is a free fan-made tool. It is not made, endorsed or supported by Obsidian Entertainment or the games' publishers. [i]Pillars of Eternity[/i] and [i]Pillars of Eternity II: Deadfire[/i] are trademarks of their respective owners. The patcher contains no game files: it changes the files of a copy of the game you own. Please don't contact Obsidian about problems with mods or with this tool.
 ```
 
 ## On each patcher release

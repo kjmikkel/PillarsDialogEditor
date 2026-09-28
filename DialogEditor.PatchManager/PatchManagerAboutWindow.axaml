@@ -30,6 +30,8 @@
             </ItemsControl.ItemTemplate>
         </ItemsControl>
         <TextBlock Text="{DynamicResource PatchManagerAbout_FormatsHint}" Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap"/>
+        <!-- Non-affiliation notice (issue #64); the string is shared with the editor's About. -->
+        <TextBlock Text="{DynamicResource About_NonAffiliation}" Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap" Margin="0,4,0,0"/>
 
         <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
             <!-- First: the question a player opening About most likely has is "how do I use this?" (issue #80). -->
