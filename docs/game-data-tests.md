@@ -53,5 +53,7 @@ first 25 of them.
 - After any change to a parser or serializer in `DialogEditor.Core/Parsing` or
   `DialogEditor.Core/Serialization`.
 
-Last verified passing on GOG Pillars of Eternity (1,434 conversations, 8 languages) and GOG
-Deadfire (1,130 conversations, 10 languages), 2026-09-28.
+Last verified passing on 2026-09-28 against:
+
+- Pillars of Eternity, GOG and Epic (1,434 conversations, 8 languages);
+- Deadfire, GOG (1,130 conversations, 10 languages).
