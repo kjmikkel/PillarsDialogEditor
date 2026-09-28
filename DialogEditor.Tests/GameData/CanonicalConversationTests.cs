@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using System.Xml.Linq;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Logging;
@@ -70,6 +71,67 @@ public class CanonicalConversationTests
         AssertLoadsCleanly(game.Provider, game.File);
     }
 
+    // ── PoE2: coverage ──────────────────────────────────────────────────────────
+
+    [Fact]
+    public void Poe2_Fixture_CoversEveryConstruct()
+    {
+        using var game = FakePoe2Game.Canonical();
+        var conv  = JsonNode.Parse(File.ReadAllText(game.ConvPath("canonical")))!["Conversations"]![0]!;
+        var nodes = conv["Nodes"]!.AsArray().Select(n => n!).ToList();
+        var shown = nodes.Where(n => n["NodeID"]!.GetValue<int>() >= 0).ToList();
+        var links = nodes.SelectMany(n => n["Links"]!.AsArray().Select(l => l!)).ToList();
+        string Type(JsonNode n) => n["$type"]!.GetValue<string>().Split(',')[0].Split('.')[^1];
+        IEnumerable<JsonNode> Components(JsonNode? c) =>
+            c?["Components"]?.AsArray().Select(x => x!).SelectMany(x => Components(x).Prepend(x)) ?? [];
+
+        // The conversation-level script node, both where the bundle declares it and as the
+        // hidden node -200 in Nodes, which the editor must carry through untouched (#115).
+        Assert.NotNull(conv["ConversationScriptNode"]);
+        Assert.Contains(nodes, n => n["NodeID"]!.GetValue<int>() == -200 && Type(n) == "ScriptNode");
+
+        Assert.Equal(["BankNode", "PlayerResponseNode", "ScriptNode", "TalkNode", "TriggerConversationNode"],
+            shown.Select(Type).Distinct().Order());
+        Assert.Equal([0, 1, 2, 3],   // Hidden, Conversation, Bark, Overlay (#114)
+            shown.Select(n => n["DisplayType"]?.GetValue<int>()).OfType<int>().Distinct().Order());
+        Assert.Equal([0, 1, 2, 3],   // None, OnceEver, OncePerConversation, MarkAsRead (#114)
+            shown.Select(n => n["Persistence"]?.GetValue<int>()).OfType<int>().Distinct().Order());
+        Assert.Contains(shown, n => n["BankNodePlayType"]?.GetValue<int>() == 2);   // PlayRandom
+
+        Assert.Contains(links, l => l["RandomWeight"]!.GetValue<int>() != 1);
+        Assert.Equal([0, 1, 2], links.Select(l => l["QuestionNodeTextDisplay"]!.GetValue<int>()).Distinct().Order());
+        Assert.Contains(links, l => l["Conditionals"]!["Components"]!.AsArray().Count > 0);
+
+        var conditions = shown.SelectMany(n => Components(n["Conditionals"]))
+            .Concat(links.SelectMany(l => Components(l["Conditionals"]))).ToList();
+        Assert.Contains(conditions, c => Type(c) == "ConditionalExpression"
+                                         && Components(c).Any(x => Type(x) == "ConditionalExpression"));
+        Assert.Contains(conditions, c => c["Operator"]!.GetValue<int>() == 1);
+        Assert.Contains(conditions, c => c["Not"]?.GetValue<bool>() == true);
+
+        string[] lists = ["OnEnterScripts", "OnExitScripts", "OnUpdateScripts"];
+        foreach (var list in lists)
+            Assert.Contains(shown, n => n[list]!.AsArray().Count > 0);
+        var scripts = nodes.SelectMany(n => lists.SelectMany(k => n[k]!.AsArray().Select(s => s!))).ToList();
+        Assert.Contains(scripts, s => s["Conditional"]!["Components"]!.AsArray().Count > 0);   // #115
+        Assert.All(scripts, s => Assert.NotNull(s["Data"]!["FunctionHash"]));
+
+        // VO: a node with its own file (and female variant), and another aliasing it.
+        Assert.Contains(shown, n => n["HasVO"]?.GetValue<bool>() == true);
+        var alias = shown.Select(n => n["ExternalVO"]?.GetValue<string>()).Single(v => !string.IsNullOrEmpty(v))!;
+        Assert.True(File.Exists(Path.Combine(game.VoDir, alias + ".wem")));
+        Assert.True(File.Exists(Path.Combine(game.VoDir, alias + "_fem.wem")));
+
+        AssertTextCoverage(game.Provider, game.CanonicalFile, ["de", "en"]);
+    }
+
+    [Fact]
+    public void Poe2_Fixture_LoadsWithoutWarnings()
+    {
+        using var game = FakePoe2Game.Canonical();
+        AssertLoadsCleanly(game.Provider, game.CanonicalFile);
+    }
+
     // ── Shared assertions ───────────────────────────────────────────────────────
 
     /// The node every fixture leaves without a stringtable entry, on purpose (README).
@@ -98,8 +160,8 @@ public class CanonicalConversationTests
             var logBefore = LogLength();
             var conv      = provider.LoadConversation(file);
             var logged    = NewLogText(logBefore);
-            Assert.DoesNotContain("WARN", logged);
-            Assert.DoesNotContain("ERROR", logged);
+            Assert.DoesNotContain("[WARN]", logged);
+            Assert.DoesNotContain("[ERROR]", logged);
 
             var ids = conv.Nodes.Select(n => n.NodeId).ToHashSet();
             Assert.All(conv.Nodes.SelectMany(n => n.Links), l => Assert.Contains(l.ToNodeId, ids));
@@ -117,7 +179,8 @@ public class CanonicalConversationTests
     {
         if (!File.Exists(AppLog.LogPath)) return "";
         using var stream = new FileStream(AppLog.LogPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-        stream.Seek(Math.Min(from, stream.Length), SeekOrigin.Begin);
+        // Shorter than before means AppLog rotated mid-load: everything in it is new.
+        stream.Seek(stream.Length < from ? 0 : from, SeekOrigin.Begin);
         return new StreamReader(stream).ReadToEnd();
     }
 }
