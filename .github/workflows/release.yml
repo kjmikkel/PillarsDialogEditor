@@ -84,7 +84,7 @@ jobs:
       - name: Test gate
         run: >-
           dotnet test DialogEditor.Tests/DialogEditor.Tests.csproj -c Release
-          --filter "Requires!=AudioDevice&Category!=Gui"
+          --filter "Requires!=AudioDevice&Category!=Gui&Category!=GameData"
           --logger "console;verbosity=minimal"
 
       - name: Build release archives

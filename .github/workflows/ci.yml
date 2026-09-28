@@ -80,11 +80,15 @@ jobs:
       #     the developer's own settings.json and game install (conversation rows
       #     come from LastGameDirectory). A runner has neither, and game data must
       #     never be put on a public runner, so GUI verification stays local.
+      #   Category!=GameData — the save-fidelity tests round-trip a real game
+      #     install (docs/game-data-tests.md). They already skip without the
+      #     DIALOGEDITOR_POE1_DIR / _POE2_DIR variables; the filter makes sure a
+      #     runner never runs them even if one were set.
       # coverage.runsettings adds coverlet coverage (product assemblies only).
       - name: Test
         run: >-
           dotnet test DialogEditor.slnx -c Debug --no-build
-          --filter "Requires!=AudioDevice&Category!=Gui"
+          --filter "Requires!=AudioDevice&Category!=Gui&Category!=GameData"
           --settings coverage.runsettings
           --logger "trx"
           --logger "console;verbosity=minimal"
