@@ -36,21 +36,30 @@ the builds the editor and patcher have been checked against:
 
 | Game | Storefront | Build checked | DLC installed | Read (open, browse, all languages) | Write (Test Patch, patcher) |
 |---|---|---|---|---|---|
-| Pillars of Eternity | GOG | build 59799714601848948 | The White March 1 + 2 | ✅ 1,434 conversations, 8 languages | ❌ see known issues |
-| Pillars of Eternity | Steam | build 23036766 | The White March 1 + 2 | ✅ identical data to GOG | ❌ see known issues |
-| Pillars of Eternity (Definitive Edition) | Epic | version 3.9.5.89801 | included | ✅ identical data to GOG | ❌ see known issues |
-| Pillars of Eternity II: Deadfire | GOG | build 52232433653243275 | all three expansions + free DLC | ✅ 1,130 conversations, 10 languages | ❌ see known issues |
-| Pillars of Eternity II: Deadfire | Steam | build 12181035 | all three expansions + free DLC | ✅ identical data to GOG | ❌ see known issues |
+| Pillars of Eternity | GOG | build 59799714601848948 | The White March 1 + 2 | ✅ 1,434 conversations, 8 languages | ✅ 1,434 conversations, 8 languages |
+| Pillars of Eternity | Steam | build 23036766 | The White March 1 + 2 | ✅ identical data to GOG | ✅ identical data to GOG |
+| Pillars of Eternity (Definitive Edition) | Epic | version 3.9.5.89801 | included | ✅ identical data to GOG | ✅ 1,434 conversations, 8 languages |
+| Pillars of Eternity II: Deadfire | GOG | build 52232433653243275 | all three expansions + free DLC | ✅ 1,130 conversations, 10 languages | ✅ 1,130 conversations, 10 languages |
+| Pillars of Eternity II: Deadfire | Steam | build 12181035 | all three expansions + free DLC | ✅ identical data to GOG | ✅ identical data to GOG |
 
-*Checked 2026-09-28 ([#65](https://github.com/kjmikkel/PillarsDialogEditor/issues/65)).*
+*Reading checked 2026-09-28 ([#65](https://github.com/kjmikkel/PillarsDialogEditor/issues/65)); writing checked 2026-09-28 ([#117](https://github.com/kjmikkel/PillarsDialogEditor/issues/117)).*
 
 Every storefront ships byte-identical conversation and text files for the same game, so what holds
 for one build holds for all of them. The Microsoft Store / Game Pass builds haven't been checked.
 
-**Known issues blocking writes.** Saving a conversation (which is what Test Patch, `dialog-patcher`
-and the Patch Manager all do) currently changes game data the editor doesn't display. Until these
-are fixed, don't use either tool to write to a game you care about:
-[#111](https://github.com/kjmikkel/PillarsDialogEditor/issues/111), [#112](https://github.com/kjmikkel/PillarsDialogEditor/issues/112), [#113](https://github.com/kjmikkel/PillarsDialogEditor/issues/113) (PoE1); [#113](https://github.com/kjmikkel/PillarsDialogEditor/issues/113), [#114](https://github.com/kjmikkel/PillarsDialogEditor/issues/114), [#115](https://github.com/kjmikkel/PillarsDialogEditor/issues/115), [#116](https://github.com/kjmikkel/PillarsDialogEditor/issues/116) (PoE2). This section will be updated when they're fixed.
+**Writing.** Saving a conversation is what Test Patch, `dialog-patcher` and the Patch Manager all
+do. Saving used to change game data the editor doesn't display. That was fixed in
+[#111](https://github.com/kjmikkel/PillarsDialogEditor/issues/111)–[#116](https://github.com/kjmikkel/PillarsDialogEditor/issues/116).
+Every shipped conversation and text file above now survives an unchanged save:
+
+- **PoE1:** the saved file loads identically in the game's own conversation loader.
+- **PoE2:** the saved file is identical to the original.
+
+This is checked by an opt-in test against a real install ([docs/game-data-tests.md](docs/game-data-tests.md)),
+run before each release. It has not yet been confirmed by playing through edited conversations
+in-game. If a patched conversation misbehaves in the game, please
+[open an issue](https://github.com/kjmikkel/PillarsDialogEditor/issues). Test Patch always backs up
+the files it changes, so **Restore Conversation (F6)** puts the originals back.
 
 **DLC.** Nothing in the editor or patcher depends on which DLC you own. Conversations are found by
 walking the game's data folders, so an install without DLC simply has fewer of them. A mod that
@@ -64,10 +73,9 @@ warning. Nothing else is written or broken.
   you. Reinstalling stops and asks before treating the new file as the original
   (`--accept-current-files`). Your update is never overwritten with an older copy.
 - **Test Patch (F5) / Restore Conversation (F6).** F5 backs up the files it's about to change, so
-  the backup is always fresh. Restore with F6 before updating or verifying the game. F6 currently
-  leaves `.bak` files next to the restored game files
-  ([#121](https://github.com/kjmikkel/PillarsDialogEditor/issues/121)). The game ignores them, and
-  you can delete them.
+  the backup is always fresh. Restore with F6 before updating or verifying the game. F6 puts
+  every file F5 changed back byte for byte and removes the files it added. A folder F5 had to
+  create can be left behind empty ([#125](https://github.com/kjmikkel/PillarsDialogEditor/issues/125)).
 - **Restore Full Backup (Ctrl+Shift+B).** This restores the snapshot taken the first time you opened
   the game folder, and can put back pre-update files after a game update ([#118](https://github.com/kjmikkel/PillarsDialogEditor/issues/118)). Don't use it
   after the game has been updated or verified. Use the storefront's "verify files" instead.
