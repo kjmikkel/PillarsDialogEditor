@@ -83,9 +83,12 @@ warning. Nothing else is written or broken.
   ([#118](https://github.com/kjmikkel/PillarsDialogEditor/issues/118)). While a test patch is
   active, use F6 first.
 
-**Unreadable files.** If one language's text file for a conversation is damaged, that
-conversation won't open in that language ([#119](https://github.com/kjmikkel/PillarsDialogEditor/issues/119)). Other languages are unaffected. Use the
-storefront's "verify files" to repair it.
+**Unreadable files.** If one language's text file for a conversation is damaged, the conversation
+still opens in that language, without its text. The status bar names the file
+([#119](https://github.com/kjmikkel/PillarsDialogEditor/issues/119)). Test Patch and the patcher
+never write to a damaged file: they leave it exactly as it is and say so, and that language shows
+no new text in-game. Other languages are unaffected. Use the storefront's "verify files" to repair
+the file.
 
 ---
 

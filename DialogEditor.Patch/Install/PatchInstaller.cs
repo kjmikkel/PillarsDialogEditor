@@ -1,4 +1,4 @@
-using DialogEditor.Core.GameData;
+﻿using DialogEditor.Core.GameData;
 
 namespace DialogEditor.Patch.Install;
 
@@ -31,8 +31,9 @@ public static class PatchInstaller
         try
         {
             var merged  = Merge(loadOrder);
-            var missing = new List<string>();
-            var patched = 0;
+            var missing    = new List<string>();
+            var unreadable = new List<string>();
+            var patched    = 0;
             foreach (var name in merged.Patches.Keys.Order())
             {
                 var patch = merged.Patches[name];
@@ -49,14 +50,17 @@ public static class PatchInstaller
                 if (!File.Exists(file.ConversationPath)) provider.InitializeConversationFile(file);
                 var baseSnap = ConversationSnapshotBuilder.Build(provider.LoadConversation(file));
                 provider.SaveConversation(file, PatchApplier.Apply(baseSnap, patch, options.Force));
-                TranslationApplier.WriteTranslations(file, patch, provider);
+                unreadable.AddRange(TranslationApplier.WriteTranslations(file, patch, provider));
 
                 foreach (var t in targets.Where(File.Exists)) store.RecordWritten(t);
                 patched++;
             }
 
             var voCopied = CopyVo(provider, gameDir, loadOrder, store, options);
-            return new InstallResult.Applied(patched, missing, restoreSkipped, voCopied);
+            return new InstallResult.Applied(patched, missing, restoreSkipped, voCopied)
+            {
+                UnreadableStringTables = unreadable,
+            };
         }
         catch (PatchConflictException)
         {

@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Localisation;
 using DialogEditor.Core.Logging;
@@ -320,6 +320,8 @@ public static class PatcherCommand
                     stderr.WriteLine($"Warning: conversation not found on disk, skipping: {m}");
                 foreach (var p in a.RestoreSkipped)
                     stderr.WriteLine($"Warning: left as is (changed outside the patcher): {p}");
+                foreach (var p in a.UnreadableStringTables)
+                    stderr.WriteLine($"Warning: text file is damaged (not XML) and was left untouched; that language shows no new text. Use \"verify files\" to repair it: {p}");
                 Verbose($"  restored originals, then applied {entries.Count} project(s)");
                 Info(a.MissingConversations.Count > 0
                     ? $"Done: {a.ConversationsPatched} patched, {a.MissingConversations.Count} skipped (conversation not found)."
