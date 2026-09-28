@@ -429,6 +429,113 @@ public class Poe2ConversationSerializerTests
                                         node0["Links"]![0]!["Conditionals"]));
     }
 
+    // ── #116: a node gets only the properties its type declares ──────────────────
+    // Shipped Deadfire bundles (key sets checked over all 52k nodes): only TalkNode has
+    // SpeakerGuid / ListenerGuid / HasVO / ExternalVO; PlayerResponse / Script /
+    // TriggerConversation nodes have the DialogueNode set; BankNode has Persistence only.
+    // Anything else makes the game log "Parse read unexpected property" and drop it.
+
+    private const string EveryNodeTypeJson = """
+        {"Conversations": [{
+          "Nodes": [
+            {"$type": "OEIFormats.FlowCharts.Conversations.TalkNode, OEIFormats",
+             "EmotionType": "", "EmotionStrength": 0.5, "PersistEmotion": true, "EmotionDelay": 0.0,
+             "SpeakerGuid": "aaaa-0000", "ListenerGuid": "bbbb-0000", "ExternalVO": "", "HasVO": false,
+             "NotSkippable": false, "IsQuestionNode": false, "HideSpeaker": false, "IsTempText": false,
+             "PlayVOAs3DSound": false, "PlayType": 0, "Persistence": 0, "NoPlayRandomWeight": 0,
+             "VOPositioning": 0, "DisplayType": 1, "NodeID": 0, "ContainerNodeID": -1, "Links": [],
+             "ClassExtender": {"ExtendedProperties": []}, "Conditionals": {"Operator": 0, "Components": []},
+             "OnEnterScripts": [], "OnExitScripts": [], "OnUpdateScripts": []},
+            {"$type": "OEIFormats.FlowCharts.Conversations.PlayerResponseNode, OEIFormats",
+             "NotSkippable": false, "IsQuestionNode": false, "HideSpeaker": false, "IsTempText": false,
+             "PlayVOAs3DSound": false, "PlayType": 0, "Persistence": 0, "NoPlayRandomWeight": 0,
+             "VOPositioning": 0, "DisplayType": 1, "NodeID": 1, "ContainerNodeID": -1, "Links": [],
+             "ClassExtender": {"ExtendedProperties": []}, "Conditionals": {"Operator": 0, "Components": []},
+             "OnEnterScripts": [], "OnExitScripts": [], "OnUpdateScripts": []},
+            {"$type": "OEIFormats.FlowCharts.Conversations.ScriptNode, OEIFormats",
+             "RequiresValidChildNode": false,
+             "NotSkippable": false, "IsQuestionNode": false, "HideSpeaker": false, "IsTempText": false,
+             "PlayVOAs3DSound": false, "PlayType": 0, "Persistence": 0, "NoPlayRandomWeight": 0,
+             "VOPositioning": 0, "DisplayType": 1, "NodeID": 2, "ContainerNodeID": -1, "Links": [],
+             "ClassExtender": {"ExtendedProperties": []}, "Conditionals": {"Operator": 0, "Components": []},
+             "OnEnterScripts": [], "OnExitScripts": [], "OnUpdateScripts": []},
+            {"$type": "OEIFormats.FlowCharts.Conversations.TriggerConversationNode, OEIFormats",
+             "ConversationGuid": "d6231ed2-cb9a-4d6f-ac71-37142fa6a8e3", "StartNodeID": 1,
+             "NotSkippable": false, "IsQuestionNode": false, "HideSpeaker": false, "IsTempText": false,
+             "PlayVOAs3DSound": false, "PlayType": 0, "Persistence": 1, "NoPlayRandomWeight": 0,
+             "VOPositioning": 0, "DisplayType": 1, "NodeID": 3, "ContainerNodeID": -1, "Links": [],
+             "ClassExtender": {"ExtendedProperties": []}, "Conditionals": {"Operator": 0, "Components": []},
+             "OnEnterScripts": [], "OnExitScripts": [], "OnUpdateScripts": []},
+            {"$type": "OEIFormats.FlowCharts.BankNode, OEIFormats",
+             "BankNodePlayType": 2, "Persistence": 0, "ChildNodeIDs": [0],
+             "NodeID": 4, "ContainerNodeID": -1, "Links": [],
+             "ClassExtender": {"ExtendedProperties": []}, "Conditionals": {"Operator": 0, "Components": []},
+             "OnEnterScripts": [], "OnExitScripts": [], "OnUpdateScripts": []}
+          ]
+        }]}
+        """;
+
+    private static readonly string[] SpeakerKeys = ["SpeakerGuid", "ListenerGuid", "HasVO", "ExternalVO"];
+
+    private static IEnumerable<string> KeysOf(JsonNode node) => node.AsObject().Select(p => p.Key);
+
+    [Theory]
+    [InlineData(0)] [InlineData(1)] [InlineData(2)] [InlineData(3)] [InlineData(4)]
+    public void Serialize_UnchangedNode_HasExactlyItsOriginalKeys(int id)
+    {
+        var original = NodesOf(EveryNodeTypeJson).First(n => n!["NodeID"]!.GetValue<int>() == id)!;
+        var saved    = SavedNode(EveryNodeTypeJson, UnchangedSnapshot(EveryNodeTypeJson), id);
+
+        Assert.Equal(KeysOf(original).Order(), KeysOf(saved).Order());
+    }
+
+    [Theory]
+    [InlineData(SpeakerCategory.Player)]
+    [InlineData(SpeakerCategory.Script)]
+    public void Serialize_NewNonTalkNode_HasNoSpeakerKeys(SpeakerCategory category)
+    {
+        var unchanged = UnchangedSnapshot(EveryNodeTypeJson);
+        var snapshot  = new ConversationEditSnapshot([.. unchanged.Nodes, Node(99) with { SpeakerCategory = category }]);
+        var saved     = SavedNode(EveryNodeTypeJson, snapshot, 99);
+
+        Assert.Empty(KeysOf(saved).Intersect(SpeakerKeys));
+    }
+
+    [Fact]
+    public void Serialize_ScriptNodeChangedToNpc_GainsSpeakerKeys()
+    {
+        var unchanged = UnchangedSnapshot(EveryNodeTypeJson);
+        var nodes     = unchanged.Nodes.Select(n => n.NodeId == 2
+            ? n with { SpeakerCategory = SpeakerCategory.Npc, SpeakerGuid = "eeee-0000" } : n).ToList();
+        var saved     = SavedNode(EveryNodeTypeJson, new ConversationEditSnapshot(nodes), 2);
+
+        Assert.Contains("TalkNode", saved["$type"]!.GetValue<string>());
+        Assert.Equal("eeee-0000", saved["SpeakerGuid"]!.GetValue<string>());
+    }
+
+    [Fact]
+    public void Serialize_TalkNodeChangedToPlayer_DropsSpeakerKeys()
+    {
+        var unchanged = UnchangedSnapshot(EveryNodeTypeJson);
+        var nodes     = unchanged.Nodes.Select(n => n.NodeId == 0
+            ? n with { SpeakerCategory = SpeakerCategory.Player, IsPlayerChoice = true } : n).ToList();
+        var saved     = SavedNode(EveryNodeTypeJson, new ConversationEditSnapshot(nodes), 0);
+
+        Assert.Contains("PlayerResponseNode", saved["$type"]!.GetValue<string>());
+        Assert.Empty(KeysOf(saved).Intersect(SpeakerKeys));
+    }
+
+    [Fact]
+    public void Serialize_ScriptNodePollutedByAnOlderSave_IsCleanedUp()
+    {
+        // Earlier builds wrote SpeakerGuid & co. onto every node.
+        var polluted = EveryNodeTypeJson.Replace("\"RequiresValidChildNode\": false,",
+            "\"RequiresValidChildNode\": false, \"SpeakerGuid\": \"\", \"ListenerGuid\": \"\", \"HasVO\": false, \"ExternalVO\": \"\",");
+        var saved = SavedNode(polluted, UnchangedSnapshot(polluted), 2);
+
+        Assert.Empty(KeysOf(saved).Intersect(SpeakerKeys));
+    }
+
     [Fact]
     public void Serialize_ConditionGroup_WritesOnlyTheGamesProperties()
     {
