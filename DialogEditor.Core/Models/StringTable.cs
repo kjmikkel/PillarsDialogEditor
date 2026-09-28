@@ -20,6 +20,18 @@ public class StringTable
 
     public int Count => _entries.Count;
 
-    /// True only when the string table could not be found on disk.
+    /// A stringtable file that exists but is not readable XML (issue 119 — e.g. a damaged install
+    /// file). The conversation still opens: the table counts as missing, so its text shows
+    /// the missing-text placeholder, and <see cref="IsUnreadable"/> lets the UI say why.
+    public static StringTable Unreadable(string path) =>
+        new([]) { IsMissing = true, IsUnreadable = true, UnreadablePath = path };
+
+    /// True when the string table could not be found on disk, or could not be read.
     public bool IsMissing { get; private init; }
+
+    /// True when the file exists but is not readable XML (see <see cref="Unreadable"/>).
+    public bool IsUnreadable { get; private init; }
+
+    /// The damaged file, when <see cref="IsUnreadable"/>.
+    public string? UnreadablePath { get; private init; }
 }
