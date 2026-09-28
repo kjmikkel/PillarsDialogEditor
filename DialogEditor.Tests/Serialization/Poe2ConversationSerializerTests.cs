@@ -293,4 +293,194 @@ public class Poe2ConversationSerializerTests
 
         Assert.Equal(expected, SavedNode(UnmodelledTypesJson, snapshot, 0)["$type"]!.GetValue<string>());
     }
+
+    // ── #115: logic the editor does not model survives a save ────────────────────
+    // Every Deadfire bundle has a conversation-level ScriptNode with NodeID -200 (at
+    // varying positions in Nodes); the parser skips it, and the serializer used to
+    // rebuild Nodes from the snapshot only, deleting it. Scripts and condition leaves
+    // were rebuilt from FullName + Parameters, dropping each script's own Conditional
+    // and the Flags / UnrealCall / FunctionHash / ParameterHash data. Shapes below are
+    // taken from shipped bundles.
+
+    private const string HiddenLogicJson = """
+        {"Conversations": [{
+          "Nodes": [
+            {
+              "$type": "OEIFormats.FlowCharts.Conversations.TalkNode, OEIFormats",
+              "SpeakerGuid": "aaaa-0000", "ListenerGuid": "bbbb-0000",
+              "DisplayType": 1, "Persistence": 0, "NodeID": 0, "ContainerNodeID": -1,
+              "Links": [{
+                "$type": "OEIFormats.FlowCharts.Conversations.DialogueLink, OEIFormats",
+                "FromNodeID": 0, "ToNodeID": 1, "PointsToGhost": false,
+                "Conditionals": {"Operator": 0, "Components": [{
+                  "$type": "OEIFormats.FlowCharts.ConditionalCall, OEIFormats",
+                  "Data": {"FullName": "Boolean IsGlobalValue(String, Operator, Int32)",
+                           "Parameters": ["n_link", "EqualTo", "1"], "Flags": "", "UnrealCall": "",
+                           "FunctionHash": 901380568, "ParameterHash": 111},
+                  "Not": false, "Operator": 0}]},
+                "ClassExtender": {"ExtendedProperties": []},
+                "RandomWeight": 1, "PlayQuestionNodeVO": true, "QuestionNodeTextDisplay": 0
+              }],
+              "ClassExtender": {"ExtendedProperties": []},
+              "Conditionals": {"Operator": 1, "Components": [{
+                "$type": "OEIFormats.FlowCharts.ConditionalCall, OEIFormats",
+                "Data": {"FullName": "Boolean IsGlobalValue(String, Operator, Int32)",
+                         "Parameters": ["n_node", "EqualTo", "2"], "Flags": "", "UnrealCall": "",
+                         "FunctionHash": 901380568, "ParameterHash": 222},
+                "Not": false, "Operator": 0}]},
+              "OnEnterScripts": [
+                {"Data": {"FullName": "Void SetEndGameSlide(String)",
+                          "Parameters": ["gui\\endgameslides\\endgameslide_04.png"], "Flags": "", "UnrealCall": "",
+                          "FunctionHash": -2009207772, "ParameterHash": -512340832},
+                 "Conditional": {"Operator": 0, "Components": [{
+                   "$type": "OEIFormats.FlowCharts.ConditionalCall, OEIFormats",
+                   "Data": {"FullName": "Boolean IsGlobalValue(String, Operator, Int32)",
+                            "Parameters": ["n_PX2_end_decision", "EqualTo", "2"], "Flags": "", "UnrealCall": "",
+                            "FunctionHash": 901380568, "ParameterHash": 1407746067},
+                   "Not": true, "Operator": 0}]}},
+                {"Data": {"FullName": "Void SetEndGameSlide(String)",
+                          "Parameters": ["gui\\endgameslides\\endgameslide_04.png"], "Flags": "", "UnrealCall": "",
+                          "FunctionHash": -2009207772, "ParameterHash": -512340832},
+                 "Conditional": {"Operator": 0, "Components": [{
+                   "$type": "OEIFormats.FlowCharts.ConditionalCall, OEIFormats",
+                   "Data": {"FullName": "Boolean IsGlobalValue(String, Operator, Int32)",
+                            "Parameters": ["n_PX2_end_decision", "EqualTo", "3"], "Flags": "", "UnrealCall": "",
+                            "FunctionHash": 901380568, "ParameterHash": 1407746066},
+                   "Not": true, "Operator": 0}]}}
+              ],
+              "OnExitScripts": [], "OnUpdateScripts": []
+            },
+            {
+              "$type": "OEIFormats.FlowCharts.Conversations.ScriptNode, OEIFormats",
+              "RequiresValidChildNode": false, "DisplayType": 1, "Persistence": 0,
+              "NodeID": -200, "ContainerNodeID": -1, "Links": [],
+              "ClassExtender": {"ExtendedProperties": []},
+              "Conditionals": {"Operator": 0, "Components": []},
+              "OnEnterScripts": [{"Data": {"FullName": "Void LoadAudioBank(String)",
+                                           "Parameters": ["SI_EndGame_EothasChallenge"], "Flags": "", "UnrealCall": "",
+                                           "FunctionHash": 1132628044, "ParameterHash": 1762804768},
+                                  "Conditional": {"Operator": 0, "Components": []}}],
+              "OnExitScripts": [], "OnUpdateScripts": []
+            },
+            {
+              "$type": "OEIFormats.FlowCharts.Conversations.TalkNode, OEIFormats",
+              "SpeakerGuid": "cccc-0000", "ListenerGuid": "dddd-0000",
+              "DisplayType": 1, "Persistence": 0, "NodeID": 1, "ContainerNodeID": -1, "Links": [],
+              "ClassExtender": {"ExtendedProperties": []},
+              "Conditionals": {"Operator": 0, "Components": []},
+              "OnEnterScripts": [], "OnExitScripts": [], "OnUpdateScripts": []
+            }
+          ]
+        }]}
+        """;
+
+    // The snapshot an unchanged save produces: everything the parser models, as parsed.
+    private static ConversationEditSnapshot UnchangedSnapshot(string json) =>
+        new(Poe2ConversationParser.ParseJson(json).Select(n => new NodeEditSnapshot(
+            n.NodeId, n.IsPlayerChoice, n.SpeakerCategory, n.SpeakerGuid, n.ListenerGuid,
+            "", "", n.DisplayType, n.Persistence, n.ActorDirection, n.Comments, n.ExternalVO,
+            n.HasVO, n.HideSpeaker,
+            n.Links.Select(l => new LinkEditSnapshot(l.FromNodeId, l.ToNodeId, l.RandomWeight,
+                                                     l.QuestionNodeTextDisplay, l.Conditions.Count > 0)
+                                { Conditions = l.Conditions }).ToList(),
+            n.Conditions, n.Scripts)).ToList());
+
+    private static JsonArray NodesOf(string json) =>
+        JsonNode.Parse(json)!["Conversations"]![0]!["Nodes"]!.AsArray();
+
+    private static JsonNode OriginalNode(int id) =>
+        NodesOf(HiddenLogicJson).First(n => n!["NodeID"]!.GetValue<int>() == id)!;
+
+    [Fact]
+    public void Serialize_ConversationScriptNode_IsKeptVerbatimInPlace()
+    {
+        var saved = NodesOf(Poe2ConversationSerializer.Serialize(HiddenLogicJson, UnchangedSnapshot(HiddenLogicJson)));
+
+        Assert.Equal([0, -200, 1], saved.Select(n => n!["NodeID"]!.GetValue<int>()));
+        Assert.True(JsonNode.DeepEquals(OriginalNode(-200), saved[1]));
+    }
+
+    [Fact]
+    public void Serialize_ConversationScriptNode_SurvivesDeletingAndAddingNodes()
+    {
+        var unchanged = UnchangedSnapshot(HiddenLogicJson);
+        var snapshot  = new ConversationEditSnapshot([unchanged.Nodes[0], Node(99)]);   // node 1 deleted
+        var saved     = NodesOf(Poe2ConversationSerializer.Serialize(HiddenLogicJson, snapshot));
+
+        Assert.Equal([0, -200, 99], saved.Select(n => n!["NodeID"]!.GetValue<int>()));
+    }
+
+    [Fact]
+    public void Serialize_UnchangedNode_KeepsScriptConditionalsAndHashes()
+    {
+        var node0 = SavedNode(HiddenLogicJson, UnchangedSnapshot(HiddenLogicJson), 0);
+
+        Assert.True(JsonNode.DeepEquals(OriginalNode(0)["OnEnterScripts"], node0["OnEnterScripts"]));
+    }
+
+    [Fact]
+    public void Serialize_UnchangedNode_KeepsConditionAndLinkConditionData()
+    {
+        var node0 = SavedNode(HiddenLogicJson, UnchangedSnapshot(HiddenLogicJson), 0);
+
+        // Includes the root Operator (1), which the model does not carry.
+        Assert.True(JsonNode.DeepEquals(OriginalNode(0)["Conditionals"], node0["Conditionals"]));
+        Assert.True(JsonNode.DeepEquals(OriginalNode(0)["Links"]![0]!["Conditionals"],
+                                        node0["Links"]![0]!["Conditionals"]));
+    }
+
+    [Fact]
+    public void Serialize_ConditionGroup_WritesOnlyTheGamesProperties()
+    {
+        // OEIFormats' ConditionalExpression has Operator and Components only; Not exists
+        // on ConditionalCall. Shipped groups carry no "Not", so none may be added.
+        var group = new ConditionBranch(
+            [new ConditionLeaf("Boolean IsGlobalValue(String, Operator, Int32)", ["a", "EqualTo", "1"], false, "And")],
+            false, "Or");
+        var snapshot = new ConversationEditSnapshot([Node(0) with { Conditions = [group] }, Node(1)]);
+
+        var saved = SavedNode(TwoNodeJson, snapshot, 0)["Conditionals"]!["Components"]![0]!.AsObject();
+
+        Assert.Equal(["$type", "Operator", "Components"], saved.Select(p => p.Key));
+        Assert.Equal(1, saved["Operator"]!.GetValue<int>());
+    }
+
+    [Fact]
+    public void Serialize_EditedConditionFlags_KeepHashesAndApplyEdit()
+    {
+        var unchanged = UnchangedSnapshot(HiddenLogicJson);
+        var leaf      = (ConditionLeaf)unchanged.Nodes[0].Conditions[0];
+        var edited    = unchanged.Nodes[0] with { Conditions = [leaf with { Not = true }] };
+        var node0     = SavedNode(HiddenLogicJson, new ConversationEditSnapshot([edited, unchanged.Nodes[1]]), 0);
+
+        var saved = node0["Conditionals"]!["Components"]![0]!;
+        Assert.True(saved["Not"]!.GetValue<bool>());
+        Assert.Equal(222, saved["Data"]!["ParameterHash"]!.GetValue<int>());
+    }
+
+    [Fact]
+    public void Serialize_RemovingOneOfTwoIdenticalScripts_KeepsTheOtherConditional()
+    {
+        // Both scripts share FullName + Parameters and differ only in their Conditional.
+        // Matching is one-to-one in order, so the first original entry is reused.
+        var unchanged = UnchangedSnapshot(HiddenLogicJson);
+        var edited    = unchanged.Nodes[0] with { Scripts = [unchanged.Nodes[0].Scripts[0]] };
+        var node0     = SavedNode(HiddenLogicJson, new ConversationEditSnapshot([edited, unchanged.Nodes[1]]), 0);
+
+        var scripts = node0["OnEnterScripts"]!.AsArray();
+        Assert.Single(scripts);
+        Assert.True(JsonNode.DeepEquals(OriginalNode(0)["OnEnterScripts"]![0], scripts[0]));
+    }
+
+    [Fact]
+    public void Serialize_EditedScriptParameters_WritesTheEdit()
+    {
+        var unchanged = UnchangedSnapshot(HiddenLogicJson);
+        var script    = unchanged.Nodes[0].Scripts[0] with { Parameters = ["gui\\endgameslides\\other.png"] };
+        var edited    = unchanged.Nodes[0] with { Scripts = [script] };
+        var node0     = SavedNode(HiddenLogicJson, new ConversationEditSnapshot([edited, unchanged.Nodes[1]]), 0);
+
+        var saved = Assert.Single(node0["OnEnterScripts"]!.AsArray())!;
+        Assert.Equal("gui\\endgameslides\\other.png", saved["Data"]!["Parameters"]![0]!.GetValue<string>());
+    }
 }
