@@ -71,10 +71,6 @@ public partial class MainWindowViewModel : ObservableObject
     private string             _currentGameDirectory = string.Empty;
     private string             _activeGameId         = string.Empty;
 
-    // Paths of conversation files created during the current test session.
-    // On restore, these are deleted (there was no original to restore to).
-    private readonly List<string> _createdConversationPaths = [];
-
     /// Set by the UI layer to provide a name-input dialog for new conversations.
     public Func<Task<string?>>? RequestConversationName { get; set; }
 
@@ -2156,6 +2152,16 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
+        // Already in test mode (issue #66): a second F5 would back up the *patched* files
+        // as the new "originals" and overwrite the manifest, so F6 would then restore the
+        // test state permanently. The player must restore (F6) before testing again.
+        if (AppSettings.GetPendingRestores() is { Count: > 0 })
+        {
+            AppLog.Warn("Test Patch refused: a previous test has not been restored yet");
+            StatusText = Loc.Get("Status_TestPatchAlreadyActive");
+            return;
+        }
+
         // Mods installed with the Patch Manager / dialog-patcher manage some of these files
         // (issue #76): testing now would patch the modded versions, and the patcher would see
         // this test's writes as outside changes. Ask once; the forced re-run doesn't ask again.
@@ -2179,14 +2185,31 @@ public partial class MainWindowViewModel : ObservableObject
         var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
         Directory.CreateDirectory(tempDir);
         var restoreEntries = new List<PendingRestoreEntry>();
+        var tracked        = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-        _createdConversationPaths.Clear();
+        // Records one game file the apply loop may write (issue #66). An existing file is
+        // copied to tempDir and restored byte-for-byte; a missing one gets an empty backup
+        // path, which restore reads as "didn't exist — delete it". New conversations and
+        // their stringtables are covered by the second case, so they live in the persisted
+        // manifest and survive a crash or restart in test mode. Every write also has a
+        // ".bak" sidecar (the serializers copy the old file there first — issue 121),
+        // tracked the same way so a pre-existing .bak comes back unclobbered.
+        void Track(string path)
+        {
+            foreach (var p in new[] { path, path + ".bak" })
+            {
+                if (!tracked.Add(p)) continue;
+                var backup = Path.Combine(tempDir, $"{restoreEntries.Count:D4}_{Path.GetFileName(p)}");
+                if (File.Exists(p)) File.Copy(p, backup);
+                else backup = string.Empty;
+                restoreEntries.Add(new PendingRestoreEntry(backup, string.Empty, p, string.Empty));
+            }
+        }
 
         try
         {
             foreach (var (convName, patch) in _project.Patches)
             {
-                // For new (not-yet-on-disk) conversations, skip the backup step
                 var file = _provider.FindConversation(convName)
                         ?? (_project.IsNewConversation(convName)
                                ? _provider.BuildNewConversationFile(convName)
@@ -2198,38 +2221,14 @@ public partial class MainWindowViewModel : ObservableObject
                     continue;
                 }
 
-                if (File.Exists(file.ConversationPath))
-                {
-                    var origConv   = file.ConversationPath;
-                    var origSt     = _provider.GetStringTablePath(file);
-                    var backupConv = Path.Combine(tempDir, convName + ".conversation.bak");
-                    var backupSt   = Path.Combine(tempDir, convName + ".stringtable.bak");
-
-                    File.Copy(origConv, backupConv);
-                    // An empty BackupStPath means "no original existed" — restore then
-                    // deletes the stringtable the patch created instead of copying back.
-                    if (File.Exists(origSt)) File.Copy(origSt, backupSt);
-                    else backupSt = string.Empty;
-                    restoreEntries.Add(new PendingRestoreEntry(backupConv, backupSt, origConv, origSt));
-                }
-                // else: new conversation — nothing to back up
+                Track(file.ConversationPath);
+                Track(_provider.GetStringTablePath(file));
 
                 // The apply loop below also writes stringtables for every *other*
-                // installed language carried by the patch (TranslationApplier) —
-                // back those up too, as stringtable-only entries.
+                // installed language carried by the patch (TranslationApplier).
                 var installed = _provider.AvailableLanguages.ToHashSet(StringComparer.OrdinalIgnoreCase);
-                foreach (var lang in patch.Translations.Keys)
-                {
-                    if (string.Equals(lang, _provider.Language, StringComparison.OrdinalIgnoreCase)
-                        || !installed.Contains(lang))
-                        continue;
-                    var langSt       = _provider.GetStringTablePath(file, lang);
-                    var backupLangSt = Path.Combine(tempDir, $"{convName}.{lang}.stringtable.bak");
-                    if (File.Exists(langSt)) File.Copy(langSt, backupLangSt);
-                    else backupLangSt = string.Empty;
-                    restoreEntries.Add(new PendingRestoreEntry(
-                        string.Empty, backupLangSt, string.Empty, langSt));
-                }
+                foreach (var lang in patch.Translations.Keys.Where(installed.Contains))
+                    Track(_provider.GetStringTablePath(file, lang));
             }
 
             // Persist restore info before writing game files (crash safety)
@@ -2252,12 +2251,10 @@ public partial class MainWindowViewModel : ObservableObject
                                : null);
                 if (file is null) continue;
 
-                // Create blank template if file doesn't exist yet
+                // Create blank template if file doesn't exist yet (tracked above as
+                // "didn't exist", so restore deletes it)
                 if (!File.Exists(file.ConversationPath))
-                {
                     _provider.InitializeConversationFile(file);
-                    _createdConversationPaths.Add(file.ConversationPath);
-                }
 
                 var conversation = _provider.LoadConversation(file);
                 var baseSnap     = ConversationSnapshotBuilder.Build(conversation);
@@ -2282,8 +2279,7 @@ public partial class MainWindowViewModel : ObservableObject
             if (!ignoreConflicts && RequestConflictResolution is not null)
             {
                 // Restore partial writes before asking — keeps game files clean while user decides
-                RestoreFilesFromBackup(restoreEntries);
-                AppSettings.ClearPendingRestores();
+                RollBackFailedTest(restoreEntries, tempDir);
 
                 var force = await RequestConflictResolution(ex);
                 if (force)
@@ -2293,18 +2289,39 @@ public partial class MainWindowViewModel : ObservableObject
             }
             else
             {
-                AppSettings.ClearPendingRestores();
+                RollBackFailedTest(restoreEntries, tempDir);
                 StatusText = Loc.Format("Status_PatchConflict",
                     ex.NodeId, ex.FieldName, ex.ExpectedFrom, ex.ActualValue);
             }
         }
         catch (Exception ex)
         {
-            AppSettings.ClearPendingRestores();
             AppLog.Error($"Failed to test project '{_project?.Name}'", ex);
+            RollBackFailedTest(restoreEntries, tempDir);
             StatusText = Loc.Format("Status_TestApplyError", _project!.Name, ex.Message);
             ReportError?.Invoke(ex);
         }
+    }
+
+    /// Undoes a test that failed part-way: puts back whatever it already wrote, then drops
+    /// the manifest and backups. Clearing the manifest *without* restoring (the old
+    /// behaviour) stranded partial writes in the game folder with no way back via F6 (#66).
+    /// If the rollback itself fails, the manifest is kept so F6 can finish the job.
+    private void RollBackFailedTest(IReadOnlyList<PendingRestoreEntry> entries, string tempDir)
+    {
+        try
+        {
+            RestoreFilesFromBackup(entries);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error("Could not roll back a failed test; press Restore (F6) to retry", ex);
+            ReportError?.Invoke(ex);
+            return;
+        }
+        AppSettings.ClearPendingRestores();
+        try { Directory.Delete(tempDir, recursive: true); }
+        catch (Exception ex) { AppLog.Warn($"Could not delete temp backup folder: {ex.Message}"); }
     }
 
     private static void RestoreFilesFromBackup(IReadOnlyList<PendingRestoreEntry> entries)
@@ -2405,37 +2422,18 @@ public partial class MainWindowViewModel : ObservableObject
         if (entries is null || entries.Count == 0) return;
         try
         {
-            var tempDirsToDelete = new HashSet<string>();
-            foreach (var r in entries)
-            {
-                // Restore the backed-up file, or remove a file that was newly added by the patch.
-                if (!string.IsNullOrEmpty(r.BackupConvPath) && File.Exists(r.BackupConvPath))
-                {
-                    File.Copy(r.BackupConvPath, r.OriginalConvPath, overwrite: true);
-                    tempDirsToDelete.Add(Path.GetDirectoryName(r.BackupConvPath)!);
-                }
-                else if (string.IsNullOrEmpty(r.BackupConvPath) && File.Exists(r.OriginalConvPath))
-                    File.Delete(r.OriginalConvPath); // VO file added by patch — remove on restore
+            // Created files (new conversations, their stringtables, .bak sidecars, added
+            // VO) are manifest entries with an empty backup path, so this also deletes them.
+            RestoreFilesFromBackup(entries);
 
-                if (!string.IsNullOrEmpty(r.BackupStPath) && File.Exists(r.BackupStPath)
-                    && !string.IsNullOrEmpty(r.OriginalStPath))
-                    File.Copy(r.BackupStPath, r.OriginalStPath, overwrite: true);
-                else if (string.IsNullOrEmpty(r.BackupStPath) && !string.IsNullOrEmpty(r.OriginalStPath)
-                    && File.Exists(r.OriginalStPath))
-                    File.Delete(r.OriginalStPath); // stringtable created by the patch — remove on restore
-            }
-
+            var tempDirsToDelete = entries
+                .SelectMany(r => new[] { r.BackupConvPath, r.BackupStPath })
+                .Where(p => !string.IsNullOrEmpty(p))
+                .Select(p => Path.GetDirectoryName(p)!)
+                .ToHashSet(StringComparer.OrdinalIgnoreCase);
             foreach (var dir in tempDirsToDelete)
-                try { Directory.Delete(dir, recursive: true); }
+                try { if (Directory.Exists(dir)) Directory.Delete(dir, recursive: true); }
                 catch (Exception ex) { AppLog.Warn($"Could not delete temp backup folder: {ex.Message}"); }
-
-            // Delete any conversation files that were created from scratch
-            foreach (var created in _createdConversationPaths)
-            {
-                try { if (File.Exists(created)) File.Delete(created); }
-                catch (Exception ex) { AppLog.Warn($"Could not delete created conversation file: {ex.Message}"); }
-            }
-            _createdConversationPaths.Clear();
 
             AppSettings.ClearPendingRestores();
             AppLog.Info($"Restored {entries.Count} conversation(s)");
