@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
+using DialogEditor.Core.Parsing;
 
 namespace DialogEditor.Core.Serialization;
 
@@ -56,8 +57,8 @@ public static class Poe2ConversationSerializer
             original["$type"]?.GetValue<string>(), snap.SpeakerCategory, NodeType(snap));
         node["SpeakerGuid"]  = snap.SpeakerGuid;
         node["ListenerGuid"] = snap.ListenerGuid;
-        node["DisplayType"]  = MapDisplayType(snap.DisplayType);
-        node["Persistence"]  = MapPersistence(snap.Persistence);
+        SetEnumOrRemove(node, "DisplayType", Poe2EnumMaps.DisplayTypeValue(snap.DisplayType));
+        SetEnumOrRemove(node, "Persistence", Poe2EnumMaps.PersistenceValue(snap.Persistence));
         node["HideSpeaker"]  = snap.HideSpeaker;
         node["HasVO"]        = snap.HasVO;
         node["ExternalVO"]   = snap.ExternalVO;
@@ -95,9 +96,19 @@ public static class Poe2ConversationSerializer
         return arr;
     }
 
+    // null (the snapshot value was "" or a name neither game uses) leaves the property
+    // out, so the game's DialogueNode constructor default applies (issue 114).
+    private static void SetEnumOrRemove(JsonNode node, string name, int? value)
+    {
+        if (value is { } v) node[name] = v;
+        else                node.AsObject().Remove(name);
+    }
+
     private static JsonNode BuildNewNode(NodeEditSnapshot snap)
     {
         var node = BuildNewNodeBase(snap);
+        SetEnumOrRemove(node, "DisplayType", Poe2EnumMaps.DisplayTypeValue(snap.DisplayType));
+        SetEnumOrRemove(node, "Persistence", Poe2EnumMaps.PersistenceValue(snap.Persistence));
         // No original JSON to merge with — every link on a brand-new node is new.
         node["Links"]           = BuildLinks(snap.Links, null);
         node["Conditionals"]    = BuildConditionJson(snap.Conditions);
@@ -134,8 +145,6 @@ public static class Poe2ConversationSerializer
           "SpeakerGuid":  "{{snap.SpeakerGuid}}",
           "ListenerGuid": "{{snap.ListenerGuid}}",
           "IsQuestionNode": false,
-          "DisplayType": {{MapDisplayType(snap.DisplayType)}},
-          "Persistence": {{MapPersistence(snap.Persistence)}},
           "NodeID": {{snap.NodeId}},
           "ContainerNodeID": -1,
           "Links": [],
@@ -208,8 +217,6 @@ public static class Poe2ConversationSerializer
         };
     }
 
-    private static int MapDisplayType(string s)     => s == "Bark"     ? 1 : 0;
-    private static int MapPersistence(string s)     => s == "OnceEver" ? 1 : 0;
     private static int MapQuestionDisplay(string s) => s switch
     {
         "Always" => 1,
