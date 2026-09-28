@@ -149,4 +149,122 @@ public class Poe1ConversationSerializerTests
         var node99   = doc.Descendants("FlowChartNode").First(n => (int)n.Element("NodeID")! == 99);
         Assert.Equal("ScriptNode", node99.Attribute(ns + "type")?.Value);
     }
+
+    // ── #111: saved files must deserialize with the game's own model ─────────────
+    // In OEIFormats, ScriptCall is a plain class; ConditionalCall derives from
+    // ExpressionComponent. XmlSerializer rejects <ScriptCall xsi:type="ConditionalCall">
+    // ("The specified type was not recognized"), so the game cannot load the file.
+
+    private static readonly XNamespace XsiNs = "http://www.w3.org/2001/XMLSchema-instance";
+
+    private static NodeEditSnapshot WithScript(NodeEditSnapshot n, ScriptCategory category) =>
+        n with { Scripts = [new ScriptCall("Void SetGlobal(String, Int32)", ["g_x", "1"], category)] };
+
+    [Theory]
+    [InlineData(ScriptCategory.Enter)]
+    [InlineData(ScriptCategory.Exit)]
+    [InlineData(ScriptCategory.Update)]
+    public void Serialize_ExistingNode_ScriptCallsCarryNoXsiType(ScriptCategory category)
+    {
+        var snapshot = new ConversationEditSnapshot([WithScript(Node(0), category), Node(1)]);
+        var doc      = XDocument.Parse(Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot));
+
+        var calls = doc.Descendants("ScriptCall").ToList();
+        Assert.Single(calls);
+        Assert.Null(calls[0].Attribute(XsiNs + "type"));
+    }
+
+    [Fact]
+    public void Serialize_NewNode_ScriptCallsCarryNoXsiType()
+    {
+        var snapshot = new ConversationEditSnapshot(
+            [Node(0), Node(1), WithScript(Node(99), ScriptCategory.Enter)]);
+        var doc = XDocument.Parse(Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot));
+
+        var calls = doc.Descendants("ScriptCall").ToList();
+        Assert.Single(calls);
+        Assert.Null(calls[0].Attribute(XsiNs + "type"));
+    }
+
+    [Fact]
+    public void Serialize_ScriptCalls_StillRoundTrip()
+    {
+        var snapshot = new ConversationEditSnapshot([WithScript(Node(0), ScriptCategory.Exit), Node(1)]);
+        var nodes    = Poe1ConversationParser.ParseXml(
+            Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot));
+
+        var script = Assert.Single(nodes.First(n => n.NodeId == 0).Scripts);
+        Assert.Equal("Void SetGlobal(String, Int32)", script.FullName);
+        Assert.Equal(["g_x", "1"], script.Parameters);
+        Assert.Equal(ScriptCategory.Exit, script.Category);
+    }
+
+    // A node without <DisplayType>/<Persistence> (e.g. a BankNode) parses to "".
+    // Writing that back as an empty element is not a valid enum value for the game's
+    // XmlSerializer; leaving it out lets the DialogueNode constructor default apply.
+
+    private const string NodeWithoutEnumsXml = """
+        <FlowChartFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <Nodes>
+            <FlowChartNode xsi:type="BankNode">
+              <NodeID>0</NodeID>
+              <Links/>
+              <Conditionals><Components/></Conditionals>
+              <OnEnterScripts/><OnExitScripts/><OnUpdateScripts/>
+            </FlowChartNode>
+          </Nodes>
+        </FlowChartFile>
+        """;
+
+    private static NodeEditSnapshot NodeWithoutEnums(int id) =>
+        Node(id) with { DisplayType = "", Persistence = "" };
+
+    [Theory]
+    [InlineData("DisplayType")]
+    [InlineData("Persistence")]
+    public void Serialize_ExistingNode_DoesNotAddEmptyEnumElement(string element)
+    {
+        var snapshot = new ConversationEditSnapshot([NodeWithoutEnums(0)]);
+        var doc      = XDocument.Parse(Poe1ConversationSerializer.Serialize(NodeWithoutEnumsXml, snapshot));
+
+        Assert.Empty(doc.Descendants(element));
+    }
+
+    [Theory]
+    [InlineData("DisplayType")]
+    [InlineData("Persistence")]
+    public void Serialize_NewNode_DoesNotAddEmptyEnumElement(string element)
+    {
+        var snapshot = new ConversationEditSnapshot([Node(0), Node(1), NodeWithoutEnums(99)]);
+        var doc      = XDocument.Parse(Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot));
+
+        var node99 = doc.Descendants("FlowChartNode").First(n => (int)n.Element("NodeID")! == 99);
+        Assert.Null(node99.Element(element));
+    }
+
+    [Theory]
+    [InlineData("DisplayType")]
+    [InlineData("Persistence")]
+    public void Serialize_ExistingNode_RemovesEmptyEnumElementAlreadyPresent(string element)
+    {
+        // A file an earlier build already broke: <DisplayType/> must not survive a re-save.
+        var broken   = TwoNodeXml.Replace("<DisplayType>Conversation</DisplayType><Persistence>None</Persistence>",
+                                          "<DisplayType/><Persistence/>");
+        var snapshot = new ConversationEditSnapshot([NodeWithoutEnums(0), NodeWithoutEnums(1)]);
+        var doc      = XDocument.Parse(Poe1ConversationSerializer.Serialize(broken, snapshot));
+
+        Assert.Empty(doc.Descendants(element));
+    }
+
+    [Fact]
+    public void Serialize_NonEmptyEnumValues_AreStillWritten()
+    {
+        var snapshot = new ConversationEditSnapshot(
+            [Node(0) with { DisplayType = "Bark", Persistence = "OncePerConversation" }, Node(1)]);
+        var doc   = XDocument.Parse(Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot));
+        var node0 = doc.Descendants("FlowChartNode").First(n => (int)n.Element("NodeID")! == 0);
+
+        Assert.Equal("Bark",                (string?)node0.Element("DisplayType"));
+        Assert.Equal("OncePerConversation", (string?)node0.Element("Persistence"));
+    }
 }
