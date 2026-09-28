@@ -1254,7 +1254,6 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Dialog_OpenProject">Open project</sys:String>
     <sys:String x:Key="Dialog_SaveProjectAs">Save project as</sys:String>
     <sys:String x:Key="FileType_DialogProject">Dialog Project (*.dialogproject)</sys:String>
-    <sys:String x:Key="FileType_DialogProjectOrPack">Dialog Project / Pack (*.dialogproject, *.dialogpack)</sys:String>
     <sys:String x:Key="Menu_MergeProjects">Merge Projects…</sys:String>
     <sys:String x:Key="ToolTip_MergeProjects">Merge one or more other .dialogproject files into the current project. Later projects win on conflict.</sys:String>
     <sys:String x:Key="Menu_CloseProject">Close Project</sys:String>

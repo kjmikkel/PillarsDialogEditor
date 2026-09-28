@@ -1652,7 +1652,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         var paths = await _filePicker.PickOpenFilesAsync(
             Loc.Get("Dialog_MergeProjects"),
-            ".dialogproject",
+            [".dialogproject"],
             Loc.Get("FileType_DialogProject"));
         if (paths.Count == 0) return;
 

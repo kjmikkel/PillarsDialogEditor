@@ -62,8 +62,10 @@ public partial class PatchManagerViewModel : ObservableObject
     public bool HasEntries => Entries.Count > 0;
 
     /// Conflict rows for the summary list. Rows rather than raw PatchConflicts because
-    /// the list shows text, and only this layer can reach Loc.
-    public IReadOnlyList<PatchConflictRowViewModel> Conflicts { get; private set; } = [];
+    /// the list shows text, and only this layer can reach Loc. Observable: the view binds
+    /// to it, and a plain setter left the list empty on screen (issue #80).
+    [ObservableProperty]
+    private IReadOnlyList<PatchConflictRowViewModel> _conflicts = [];
 
     public PatchManagerViewModel(IFolderPicker folderPicker, IFilePicker filePicker)
     {
@@ -84,7 +86,7 @@ public partial class PatchManagerViewModel : ObservableObject
     {
         var paths = await _filePicker.PickOpenFilesAsync(
             Loc.Get("PatchManager_AddProjects"),
-            ".dialogproject",
+            [".dialogpack", ".dialogproject"],
             Loc.Get("FileType_DialogProjectOrPack"));
 
         foreach (var path in paths)

@@ -1,4 +1,4 @@
-﻿using DialogEditor.ViewModels.Services;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.Helpers;
 
@@ -10,6 +10,9 @@ public sealed class StubFilePicker(
     /// Dialog titles this picker was asked for, in call order. Localisation tests
     /// assert on these — a picker title is user-visible text like any other.
     public List<string> Titles { get; } = [];
+
+    /// Extensions the last multi-file open was filtered to.
+    public IReadOnlyList<string> OpenFilesExtensions { get; private set; } = [];
 
     public Task<string?> PickOpenFileAsync(string title, string extension, string extensionDescription)
     {
@@ -38,9 +41,10 @@ public sealed class StubFilePicker(
         return Task.FromResult(saveResult);
     }
 
-    public Task<IReadOnlyList<string>> PickOpenFilesAsync(string title, string extension, string extensionDescription)
+    public Task<IReadOnlyList<string>> PickOpenFilesAsync(string title, IReadOnlyList<string> extensions, string extensionDescription)
     {
         Titles.Add(title);
+        OpenFilesExtensions = extensions;
         return Task.FromResult(multiResult ?? (IReadOnlyList<string>)Array.Empty<string>());
     }
 }
