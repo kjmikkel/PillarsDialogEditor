@@ -209,6 +209,79 @@ public class Poe2ConversationSerializerTests
         Assert.Equal(7, node1["StartNodeID"]!.GetValue<int>());
     }
 
+    // ── #114: enum values follow OEIFormats' declaration order ───────────────
+    // DisplayType     { Hidden, Conversation, Bark, Overlay }
+    // PersistenceType { None, OnceEver, OncePerConversation, MarkAsRead }
+    // The old tables wrote Conversation as 0 (Hidden), Bark as 1 (Conversation), and
+    // collapsed Overlay / OncePerConversation / MarkAsRead to 0.
+
+    [Theory]
+    [InlineData("Hidden",       0)]
+    [InlineData("Conversation", 1)]
+    [InlineData("Bark",         2)]
+    [InlineData("Overlay",      3)]
+    [InlineData("Unknown(9)",   9)]
+    public void Serialize_DisplayType_WritesGameEnumValue(string name, int expected)
+    {
+        var snapshot = new ConversationEditSnapshot([Node(0) with { DisplayType = name }, Node(1)]);
+        Assert.Equal(expected, SavedNode(TwoNodeJson, snapshot, 0)["DisplayType"]!.GetValue<int>());
+    }
+
+    [Theory]
+    [InlineData("None",                0)]
+    [InlineData("OnceEver",            1)]
+    [InlineData("OncePerConversation", 2)]
+    [InlineData("MarkAsRead",          3)]
+    [InlineData("Unknown(9)",          9)]
+    public void Serialize_Persistence_WritesGameEnumValue(string name, int expected)
+    {
+        var snapshot = new ConversationEditSnapshot([Node(0) with { Persistence = name }, Node(1)]);
+        Assert.Equal(expected, SavedNode(TwoNodeJson, snapshot, 0)["Persistence"]!.GetValue<int>());
+    }
+
+    [Fact]
+    public void Serialize_NewNode_WritesGameEnumValues()
+    {
+        var snapshot = new ConversationEditSnapshot(
+            [Node(0), Node(1), Node(99) with { DisplayType = "Bark", Persistence = "MarkAsRead" }]);
+        var node99 = SavedNode(TwoNodeJson, snapshot, 99);
+
+        Assert.Equal(2, node99["DisplayType"]!.GetValue<int>());
+        Assert.Equal(3, node99["Persistence"]!.GetValue<int>());
+    }
+
+    [Fact]
+    public void Serialize_EmptyEnumValues_AreLeftOut()
+    {
+        // "" is what the parser reports for an absent property (e.g. a BankNode's
+        // DisplayType); absent lets the game's constructor default apply.
+        var snapshot = new ConversationEditSnapshot(
+            [Node(0) with { DisplayType = "", Persistence = "" }, Node(1),
+             Node(99) with { DisplayType = "", Persistence = "" }]);
+
+        foreach (var id in new[] { 0, 99 })
+        {
+            var node = SavedNode(TwoNodeJson, snapshot, id).AsObject();
+            Assert.False(node.ContainsKey("DisplayType"), $"node {id}");
+            Assert.False(node.ContainsKey("Persistence"), $"node {id}");
+        }
+    }
+
+    [Theory]
+    [InlineData(0)] [InlineData(1)] [InlineData(2)] [InlineData(3)]
+    public void Serialize_ParsedEnumValues_RoundTripUnchanged(int value)
+    {
+        var json = TwoNodeJson.Replace("\"DisplayType\": 0, \"Persistence\": 0,",
+                                       $"\"DisplayType\": {value}, \"Persistence\": {value},");
+        var parsed   = Poe2ConversationParser.ParseJson(json);
+        var snapshot = new ConversationEditSnapshot(parsed.Select(n =>
+            Node(n.NodeId) with { DisplayType = n.DisplayType, Persistence = n.Persistence }).ToList());
+        var node0 = SavedNode(json, snapshot, 0);
+
+        Assert.Equal(value, node0["DisplayType"]!.GetValue<int>());
+        Assert.Equal(value, node0["Persistence"]!.GetValue<int>());
+    }
+
     [Theory]
     [InlineData(SpeakerCategory.Npc,      "OEIFormats.FlowCharts.Conversations.TalkNode, OEIFormats")]
     [InlineData(SpeakerCategory.Narrator, "OEIFormats.FlowCharts.Conversations.TalkNode, OEIFormats")]
