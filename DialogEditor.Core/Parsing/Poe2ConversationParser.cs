@@ -62,8 +62,8 @@ public static class Poe2ConversationParser
             Links: links,
             Conditions: conditions,
             Scripts: scripts,
-            DisplayType: MapDisplayType(node["DisplayType"]?.GetValue<int>() ?? 0),
-            Persistence: MapPersistence(node["Persistence"]?.GetValue<int>() ?? 0),
+            DisplayType: Poe2EnumMaps.DisplayTypeName(node["DisplayType"]),
+            Persistence: Poe2EnumMaps.PersistenceName(node["Persistence"]),
             ExternalVO: node["ExternalVO"]?.GetValue<string>() ?? string.Empty,
             HasVO: node["HasVO"]?.GetValue<bool>() ?? false,
             HideSpeaker: node["HideSpeaker"]?.GetValue<bool>() ?? false
@@ -133,20 +133,6 @@ public static class Poe2ConversationParser
         0 => "ShowOnce",
         1 => "Always",
         2 => "Never",
-        _ => $"Unknown({value})"
-    };
-
-    private static string MapDisplayType(int value) => value switch
-    {
-        0 => "Conversation",
-        1 => "Bark",
-        _ => $"Unknown({value})"
-    };
-
-    private static string MapPersistence(int value) => value switch
-    {
-        0 => "None",
-        1 => "OnceEver",
         _ => $"Unknown({value})"
     };
 }
