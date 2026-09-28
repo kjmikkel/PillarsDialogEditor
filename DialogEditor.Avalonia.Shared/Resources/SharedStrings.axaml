@@ -12,7 +12,7 @@
     <sys:String x:Key="PatchManager_LoadOrder">Load Order</sys:String>
     <sys:String x:Key="PatchManager_SaveLoadOrder">Save load order…</sys:String>
     <sys:String x:Key="PatchManager_LoadLoadOrder">Load load order…</sys:String>
-    <sys:String x:Key="PatchManager_AddProjects">Add projects…</sys:String>
+    <sys:String x:Key="PatchManager_AddProjects">Add mods…</sys:String>
     <sys:String x:Key="PatchManager_Apply">Apply patches</sys:String>
     <sys:String x:Key="PatchManager_Applying">Applying…</sys:String>
     <!-- Remove all mods / backup status (issue #76) -->
@@ -34,7 +34,7 @@
     <sys:String x:Key="PatchManager_ExternalChanges_More">…and {0} more</sys:String>
     <sys:String x:Key="Confirm_Cancel">Cancel</sys:String>
     <sys:String x:Key="ToolTip_RemoveAllMods">Undo every mod installed into this game folder: restore each game file the patcher changed to its original version and delete the files it added. The load order list is kept.</sys:String>
-    <sys:String x:Key="PatchManager_EmptyHint">Add .dialogproject files above. Lower entries win on conflict.</sys:String>
+    <sys:String x:Key="PatchManager_EmptyHint">Add mods (.dialogpack files) above. Lower entries win on conflict.</sys:String>
     <sys:String x:Key="PatchManager_OrderHint">↑ First applied   ↓ Last applied (wins on conflict)</sys:String>
 
     <!-- Status and error messages (used via Loc.Get/Format) -->
@@ -65,23 +65,25 @@
          in the same language, so the later one's text replaces the earlier one's.
          {0} is the language code, e.g. "en" or "fr". Display only. -->
     <sys:String x:Key="PatchManager_TextField">text ({0})</sys:String>
-    <sys:String x:Key="PatchManager_EntryConflict">⚠ conflicts with another project</sys:String>
-    <sys:String x:Key="PatchManager_EntryConflictDetail">Conflicts with another project — move lower to override the other, or higher to be overridden</sys:String>
+    <sys:String x:Key="PatchManager_EntryConflict">⚠ conflicts with another mod</sys:String>
+    <sys:String x:Key="PatchManager_EntryConflictDetail">Conflicts with another mod — move lower to override the other, or higher to be overridden</sys:String>
     <sys:String x:Key="PatchManager_EntryLoadError">⚠ could not load</sys:String>
     <sys:String x:Key="ToolTip_PatchManagerOpen">Open the Patch Manager to combine and apply multiple .dialogproject files in a defined load order</sys:String>
 
     <!-- Tooltips -->
     <sys:String x:Key="ToolTip_BrowseGameFolder">Select the root folder of your PoE1 or PoE2 installation</sys:String>
-    <sys:String x:Key="ToolTip_AddProjects">Add one or more .dialogproject files to the load order</sys:String>
+    <sys:String x:Key="ToolTip_AddProjects">Add one or more mods to the load order. Mods are .dialogpack files; mod authors can also add .dialogproject files straight from the editor.</sys:String>
     <sys:String x:Key="ToolTip_SaveLoadOrder">Save the current load order to a .patchlist file for later reuse</sys:String>
     <sys:String x:Key="ToolTip_LoadLoadOrder">Open a previously saved .patchlist file</sys:String>
     <sys:String x:Key="ToolTip_MoveEntryUp">Move up — lower index is applied first; lower position wins on conflict</sys:String>
     <sys:String x:Key="ToolTip_MoveEntryDown">Move down — lower position in the list wins on conflict</sys:String>
     <sys:String x:Key="ToolTip_RemoveEntry">Remove from load order</sys:String>
-    <sys:String x:Key="ToolTip_ApplyPatches">Reset the game to its original files, then apply every patch in load order. Lower entries win on conflict. Removing a project from the list and applying again removes that mod.</sys:String>
+    <sys:String x:Key="ToolTip_ApplyPatches">Reset the game to its original files, then apply every patch in load order. Lower entries win on conflict. Removing a mod from the list and applying again uninstalls it.</sys:String>
 
     <!-- FileType descriptions (used by file pickers) -->
     <sys:String x:Key="FileType_PatchList">Patch list (*.patchlist)</sys:String>
+    <!-- Shared, not editor-only: the standalone Patch Manager loads only this file and its own (issue #80) -->
+    <sys:String x:Key="FileType_DialogProjectOrPack">Mods (*.dialogpack, *.dialogproject)</sys:String>
 
     <!-- ─── Accessibility — screen-reader names for icon-only buttons ─────────── -->
     <sys:String x:Key="AutomationName_MovePatchUp">Move patch up</sys:String>

@@ -2,8 +2,10 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=System.Runtime">
 
-    <!-- Standalone-app-only strings (general editor keys not in the shared lib) -->
-    <sys:String x:Key="PatchManager_WindowTitle">Patch Manager — Pillars Dialog Editor</sys:String>
+    <!-- Standalone-app-only strings (general editor keys not in the shared lib).
+         The title names the patcher, not the editor: this app ships as its own product
+         (issue #77) to players who never downloaded the editor (issue #80). -->
+    <sys:String x:Key="PatchManager_WindowTitle">Patch Manager — Pillars Dialog Patcher</sys:String>
     <sys:String x:Key="Dialog_SelectFolder">Select game root folder</sys:String>
     <sys:String x:Key="FileType_DialogProject">Dialog Project (*.dialogproject)</sys:String>
     <sys:String x:Key="Status_FolderNotRecognized">Folder not recognised as PoE1 or PoE2 root.</sys:String>
@@ -26,6 +28,8 @@
     <!-- {0} format name (Schema_Format_*), {1} newest version of it this patcher reads -->
     <sys:String x:Key="PatchManagerAbout_FormatLine">{0} {1} or earlier</sys:String>
     <sys:String x:Key="PatchManagerAbout_FormatsHint">A mod saved by a newer editor may need a newer patcher. Such a mod is refused before anything is changed.</sys:String>
+    <sys:String x:Key="PatchManagerAbout_OpenPlayerGuide">Player guide</sys:String>
+    <sys:String x:Key="PatchManagerAbout_OpenPlayerGuideTip">Open the player guide in your browser: how to install mods, choose their load order, remove them again, and what to do after a game update.</sys:String>
     <sys:String x:Key="PatchManagerAbout_OpenReleases">Get the latest patcher</sys:String>
     <sys:String x:Key="PatchManagerAbout_OpenReleasesTip">Open the Pillars Dialog Patcher releases page in your browser to download the newest version.</sys:String>
     <sys:String x:Key="PatchManagerAbout_OpenRepository">Repository</sys:String>

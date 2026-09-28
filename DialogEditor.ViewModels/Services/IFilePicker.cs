@@ -23,6 +23,9 @@ public interface IFilePicker
         string suggestedName,
         IReadOnlyList<(string Extension, string Description)> fileTypes);
 
-    /// <summary>Returns selected paths (multi-select), or empty list if cancelled.</summary>
-    Task<IReadOnlyList<string>> PickOpenFilesAsync(string title, string extension, string extensionDescription);
+    /// <summary>
+    /// Returns selected paths (multi-select), or empty list if cancelled. The filter shows
+    /// every file matching any of <paramref name="extensions"/> under one description.
+    /// </summary>
+    Task<IReadOnlyList<string>> PickOpenFilesAsync(string title, IReadOnlyList<string> extensions, string extensionDescription);
 }

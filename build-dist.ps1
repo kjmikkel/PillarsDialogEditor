@@ -9,6 +9,7 @@
       PillarsDialogPatcher-<PATCHER_VERSION>.zip the mod installer for players:
           DialogEditor.PatchManager.exe  (GUI, at the top so it's the obvious one to run)
           README.md                      (player-facing)
+          images\                        (the README's screenshots)
           cli\dialog-patcher.exe         (command line, for scripts and installers)
           runtime\                       (one .NET runtime both exes use)
 
@@ -185,7 +186,10 @@ if ($buildPatcher) {
     Copy-SharedRuntime -RuntimeConfig (Join-Path $patcherStage "DialogEditor.PatchManager.runtimeconfig.json") `
                        -DestDir (Join-Path $patcherStage "runtime")
 
+    # The player guide (issue #80). Its screenshots travel with it so the image links
+    # work in the zip too; the same file is the GitHub page About > Player guide opens.
     Copy-Item (Join-Path $Root "docs\patcher\README.md") -Destination $patcherStage -Force
+    Copy-Item (Join-Path $Root "docs\patcher\images") -Destination $patcherStage -Recurse -Force
 
     # Smoke test from the staged layout: the CLI only starts if it finds runtime\ where
     # its exe was told to look, and never falls back to a system .NET — so a zip that

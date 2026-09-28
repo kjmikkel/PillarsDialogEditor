@@ -61,6 +61,34 @@ public class PatchManagerAboutViewModelTests
     }
 
     [Fact]
+    public void OpenPlayerGuide_OpensThePatcherReadmeOnGitHub()
+    {
+        string? opened = null;
+        var vm = Make(url => { opened = url; return true; });
+
+        vm.OpenPlayerGuideCommand.Execute(null);
+
+        Assert.Equal("https://github.com/kjmikkel/PillarsDialogEditor/blob/main/docs/patcher/README.md", opened);
+    }
+
+    [Fact]
+    public void PlayerGuideUrl_PointsAtAFileInTheRepository()
+    {
+        // The link is to the default branch, so moving or renaming the guide breaks it for
+        // every patcher already on players' machines. Fail here instead (issue #80).
+        const string prefix = "https://github.com/kjmikkel/PillarsDialogEditor/blob/main/";
+        Assert.StartsWith(prefix, PatchManagerAboutViewModel.PlayerGuideUrl);
+
+        var dir = new DirectoryInfo(AppContext.BaseDirectory);
+        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "DialogEditor.slnx")))
+            dir = dir.Parent;
+        Assert.NotNull(dir);
+
+        var relative = PatchManagerAboutViewModel.PlayerGuideUrl[prefix.Length..];
+        Assert.True(File.Exists(Path.Combine(dir!.FullName, relative)), $"Missing: {relative}");
+    }
+
+    [Fact]
     public void OpenFailure_SetsLocalisedStatus()
     {
         var vm = Make(_ => false);

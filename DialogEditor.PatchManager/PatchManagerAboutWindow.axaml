@@ -32,6 +32,11 @@
         <TextBlock Text="{DynamicResource PatchManagerAbout_FormatsHint}" Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap"/>
 
         <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+            <!-- First: the question a player opening About most likely has is "how do I use this?" (issue #80). -->
+            <Button Content="{DynamicResource PatchManagerAbout_OpenPlayerGuide}"
+                    ToolTip.Tip="{DynamicResource PatchManagerAbout_OpenPlayerGuideTip}"
+                    AutomationProperties.HelpText="{DynamicResource PatchManagerAbout_OpenPlayerGuideTip}"
+                    Command="{Binding OpenPlayerGuideCommand}"/>
             <Button Content="{DynamicResource PatchManagerAbout_OpenReleases}"
                     ToolTip.Tip="{DynamicResource PatchManagerAbout_OpenReleasesTip}"
                     AutomationProperties.HelpText="{DynamicResource PatchManagerAbout_OpenReleasesTip}"

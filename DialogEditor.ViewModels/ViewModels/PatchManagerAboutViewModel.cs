@@ -37,8 +37,15 @@ public sealed partial class PatchManagerAboutViewModel : ObservableObject
         };
     }
 
-    [RelayCommand] private void OpenReleases()   => Open(SchemaFormats.PatcherReleasesUrl);
-    [RelayCommand] private void OpenRepository() => Open(MainWindowViewModel.RepositoryUrl);
+    /// The player guide (issue #80): the same README that ships in the patcher zip, on
+    /// GitHub so its screenshots render. On main rather than a tag so an old patcher still
+    /// opens the current guide; a test keeps the path in step with the repository.
+    public const string PlayerGuideUrl =
+        MainWindowViewModel.RepositoryUrl + "/blob/main/docs/patcher/README.md";
+
+    [RelayCommand] private void OpenReleases()    => Open(SchemaFormats.PatcherReleasesUrl);
+    [RelayCommand] private void OpenRepository()  => Open(MainWindowViewModel.RepositoryUrl);
+    [RelayCommand] private void OpenPlayerGuide() => Open(PlayerGuideUrl);
 
     private void Open(string url)
     {
