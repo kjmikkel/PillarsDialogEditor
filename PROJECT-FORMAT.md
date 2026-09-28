@@ -94,5 +94,5 @@ same versions for the build you're running.
 |---|---|---|---|
 | 1.0 | ≤ 1 | ≤ 2 | ≤ 1 |
 
-Until the patcher has its own release numbering (GitHub issue 77), "Patcher 1.0" means the
-Patch Manager and `dialog-patcher` shipped with Pillars Dialog Editor 1.0.
+"Patcher" is the Pillars Dialog Patcher version (`PATCHER_VERSION`, released under
+`patcher-v*` tags), not the editor's: the two are released independently (GitHub issue 77).

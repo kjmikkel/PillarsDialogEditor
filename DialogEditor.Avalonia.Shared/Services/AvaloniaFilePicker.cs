@@ -44,7 +44,7 @@ public sealed class AvaloniaFilePicker(TopLevel topLevel) : IFilePicker
     }
 
     public async Task<IReadOnlyList<string>> PickOpenFilesAsync(
-        string title, string extension, string extensionDescription)
+        string title, IReadOnlyList<string> extensions, string extensionDescription)
     {
         var results = await topLevel.StorageProvider.OpenFilePickerAsync(
             new FilePickerOpenOptions
@@ -54,7 +54,7 @@ public sealed class AvaloniaFilePicker(TopLevel topLevel) : IFilePicker
                 FileTypeFilter =
                 [
                     new FilePickerFileType(extensionDescription)
-                        { Patterns = [$"*{extension}"] },
+                        { Patterns = [.. extensions.Select(e => $"*{e}")] },
                     FilePickerFileTypes.All,
                 ],
             });
