@@ -155,6 +155,7 @@ so running it with a different list replaces the previous mods.
 ## Not affiliated with Obsidian
 
 Pillars Dialog Patcher is a free fan-made tool. It is not made, endorsed or supported by
-Obsidian Entertainment. *Pillars of Eternity* and *Pillars of Eternity II:
-Deadfire* are trademarks of their respective owners. Please don't contact Obsidian about
-problems with mods or with this tool.
+Obsidian Entertainment or the games' publishers. *Pillars of Eternity* and *Pillars of
+Eternity II: Deadfire* are trademarks of their respective owners. The patcher
+contains no game files: it changes the files of a copy of the game you own. Please don't
+contact Obsidian about problems with mods or with this tool.

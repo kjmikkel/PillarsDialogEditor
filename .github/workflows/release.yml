@@ -107,4 +107,5 @@ jobs:
           $assets = @((Get-ChildItem dist -Filter *.zip).FullName) + (Resolve-Path dist/SHA256SUMS.txt).Path
           $notes  = if ($env:PREVIOUS) { @('--notes-start-tag', $env:PREVIOUS) } else { @() }
           gh release create $env:TAG @assets `
-            --draft --verify-tag --generate-notes @notes --title $env:TITLE
+            --draft --verify-tag --generate-notes @notes --title $env:TITLE `
+            --notes-file .github/release-notice.md
