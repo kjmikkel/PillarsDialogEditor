@@ -62,7 +62,9 @@ public static class StringTableSerializer
         File.WriteAllText(path, SerializeTranslations(original, translations), Encoding.UTF8);
     }
 
-    private static string SerializeTranslations(string originalXml, IEnumerable<NodeTranslation> translations)
+    // Internal (not private) so the opt-in game-data test can round-trip every shipped
+    // stringtable through the exact code F5 and the patcher use (issue 117).
+    internal static string SerializeTranslations(string originalXml, IEnumerable<NodeTranslation> translations)
     {
         XElement entries;
         XDocument doc;
