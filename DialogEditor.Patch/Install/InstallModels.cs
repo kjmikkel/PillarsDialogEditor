@@ -1,4 +1,4 @@
-﻿namespace DialogEditor.Patch.Install;
+namespace DialogEditor.Patch.Install;
 
 /// One load-order entry: a project, plus the extracted vo/ folder when it came from a .dialogpack.
 public sealed record InstallEntry(DialogProject Project, string? VoFolder = null);

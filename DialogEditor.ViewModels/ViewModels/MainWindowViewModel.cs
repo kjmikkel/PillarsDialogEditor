@@ -1,4 +1,4 @@
-﻿using DialogEditor.Core.Analytics;
+using DialogEditor.Core.Analytics;
 using System.Collections.ObjectModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;

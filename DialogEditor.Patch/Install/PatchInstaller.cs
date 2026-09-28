@@ -1,4 +1,4 @@
-﻿using DialogEditor.Core.GameData;
+using DialogEditor.Core.GameData;
 
 namespace DialogEditor.Patch.Install;
 

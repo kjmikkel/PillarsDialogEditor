@@ -1,4 +1,4 @@
-﻿using DialogEditor.Core.Logging;
+using DialogEditor.Core.Logging;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
 using DialogEditor.Core.Serialization;

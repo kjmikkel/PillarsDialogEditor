@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Localisation;
 using DialogEditor.Core.Logging;
