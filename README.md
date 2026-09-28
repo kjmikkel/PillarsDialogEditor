@@ -29,6 +29,51 @@ Building from source instead requires the
 
 ---
 
+## Supported game builds
+
+Both games have had their last patch, so "the latest build" is a fixed target. These are
+the builds the editor and patcher have been checked against:
+
+| Game | Storefront | Build checked | DLC installed | Read (open, browse, all languages) | Write (Test Patch, patcher) |
+|---|---|---|---|---|---|
+| Pillars of Eternity | GOG | build 59799714601848948 | The White March 1 + 2 | ✅ 1,434 conversations, 8 languages | ❌ see known issues |
+| Pillars of Eternity | Steam | build 23036766 | The White March 1 + 2 | ✅ same data as GOG | ❌ see known issues |
+| Pillars of Eternity II: Deadfire | GOG | build 52232433653243275 | all three expansions + free DLC | ✅ 1,130 conversations, 10 languages | ❌ see known issues |
+| Pillars of Eternity II: Deadfire | Steam | not checked yet | | | |
+
+*Checked 2026-09-28 ([#65](https://github.com/kjmikkel/PillarsDialogEditor/issues/65)).*
+
+The Steam and GOG builds of Pillars of Eternity ship identical conversation data. Other storefronts
+(Epic, Microsoft Store / Game Pass) haven't been checked.
+
+**Known issues blocking writes.** Saving a conversation (which is what Test Patch, `dialog-patcher`
+and the Patch Manager all do) currently changes game data the editor doesn't display. Until these
+are fixed, don't use either tool to write to a game you care about:
+[#111](https://github.com/kjmikkel/PillarsDialogEditor/issues/111), [#112](https://github.com/kjmikkel/PillarsDialogEditor/issues/112), [#113](https://github.com/kjmikkel/PillarsDialogEditor/issues/113) (PoE1); [#113](https://github.com/kjmikkel/PillarsDialogEditor/issues/113), [#114](https://github.com/kjmikkel/PillarsDialogEditor/issues/114), [#115](https://github.com/kjmikkel/PillarsDialogEditor/issues/115), [#116](https://github.com/kjmikkel/PillarsDialogEditor/issues/116) (PoE2). This section will be updated when they're fixed.
+
+**DLC.** Nothing in the editor or patcher depends on which DLC you own. Conversations are found by
+walking the game's data folders, so an install without DLC simply has fewer of them. A mod that
+edits a DLC conversation is skipped on an install without that DLC, with a "conversation not found"
+warning. Nothing else is written or broken.
+
+**Game updates and your backups.**
+
+- **Patcher (`dialog-patcher`, Patch Manager).** Suppose the game or the storefront's "verify files"
+  replaces a file a mod changed. **Remove all mods / Restore** then leaves that file alone and tells
+  you. Reinstalling stops and asks before treating the new file as the original
+  (`--accept-current-files`). Your update is never overwritten with an older copy.
+- **Test Patch (F5) / Restore Conversation (F6).** F5 backs up the files it's about to change, so
+  the backup is always fresh. Restore with F6 before updating or verifying the game.
+- **Restore Full Backup (Ctrl+Shift+B).** This restores the snapshot taken the first time you opened
+  the game folder, and can put back pre-update files after a game update ([#118](https://github.com/kjmikkel/PillarsDialogEditor/issues/118)). Don't use it
+  after the game has been updated or verified. Use the storefront's "verify files" instead.
+
+**Unreadable files.** If one language's text file for a conversation is damaged, that
+conversation won't open in that language ([#119](https://github.com/kjmikkel/PillarsDialogEditor/issues/119)). Other languages are unaffected. Use the
+storefront's "verify files" to repair it.
+
+---
+
 ## Third-party software
 
 The editor bundles `vgmstream-cli.exe` for PoE2 voice-over audio preview.
