@@ -76,9 +76,12 @@ warning. Nothing else is written or broken.
   the backup is always fresh. Restore with F6 before updating or verifying the game. F6 puts
   every file F5 changed back byte for byte and removes the files it added. A folder F5 had to
   create can be left behind empty ([#125](https://github.com/kjmikkel/PillarsDialogEditor/issues/125)).
-- **Restore Full Backup (Ctrl+Shift+B).** This restores the snapshot taken the first time you opened
-  the game folder, and can put back pre-update files after a game update ([#118](https://github.com/kjmikkel/PillarsDialogEditor/issues/118)). Don't use it
-  after the game has been updated or verified. Use the storefront's "verify files" instead.
+- **Restore Full Backup (Ctrl+Shift+B).** This puts back files from the snapshot taken the first
+  time you opened the game folder, but only files the editor itself changed since. A file a game
+  update, "verify files" or the Patch Manager changed is left alone and listed in the log, so an
+  old snapshot never downgrades an updated game
+  ([#118](https://github.com/kjmikkel/PillarsDialogEditor/issues/118)). While a test patch is
+  active, use F6 first.
 
 **Unreadable files.** If one language's text file for a conversation is damaged, that
 conversation won't open in that language ([#119](https://github.com/kjmikkel/PillarsDialogEditor/issues/119)). Other languages are unaffected. Use the

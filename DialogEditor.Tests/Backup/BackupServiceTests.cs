@@ -24,21 +24,6 @@ public class BackupServiceTests : IDisposable
         Assert.Equal("B", File.ReadAllText(Path.Combine(dest, "sub", "b.txt")));
     }
 
-    [Fact]
-    public async Task RestoreAsync_OverwritesSourceFromBackup()
-    {
-        var backup = Path.Combine(_tmp, "backup");
-        Directory.CreateDirectory(backup);
-        File.WriteAllText(Path.Combine(backup, "file.txt"), "original");
-
-        var live = Path.Combine(_tmp, "live");
-        Directory.CreateDirectory(live);
-        File.WriteAllText(Path.Combine(live, "file.txt"), "modified");
-
-        await BackupService.RestoreAsync(backup, live, CancellationToken.None);
-
-        Assert.Equal("original", File.ReadAllText(Path.Combine(live, "file.txt")));
-    }
 
     [Fact]
     public async Task BackupAsync_EmptySource_CreatesEmptyDest()

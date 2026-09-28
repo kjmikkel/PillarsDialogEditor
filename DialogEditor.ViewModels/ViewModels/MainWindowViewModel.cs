@@ -2080,6 +2080,39 @@ public partial class MainWindowViewModel : ObservableObject
         await BackupService.BackupAsync(stRoot,   Path.Combine(backupRoot, "stringtables"),  default);
     }
 
+    // Appends this test's writes to the journal next to the full backup (issue 118), so
+    // Restore Full Backup can later tell them from a game update. No backup, no journal:
+    // there is nothing for it to protect. A failure here must not fail the test itself.
+    private void RecordEditorWrites(IReadOnlyDictionary<string, string?> hashBefore)
+    {
+        var backupPick = AppSettings.GetBackupPath(_currentGameDirectory);
+        if (backupPick is null) return;
+        try
+        {
+            var writes = hashBefore
+                .Select(kv => (kv.Key, kv.Value, After: FileHash.Of(kv.Key)))
+                .Where(x => x.After is not null && x.After != x.Value)
+                .Select(x => new EditorWrite(x.Key, x.Value, x.After!))
+                .ToList();
+            EditorWriteJournal.Append(Path.Combine(backupPick, EditorWriteJournal.FileName), writes);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            AppLog.Warn($"Could not record Test Patch writes for Restore Full Backup: {ex.Message}");
+        }
+    }
+
+    // The live counterparts of the snapshot's files that the patcher manages. An unreadable
+    // patcher manifest counts as managing all of them (PatcherBackupInfo), so they're skipped.
+    private static IReadOnlySet<string> PatcherManaged(string gameDir, string snapshotRoot, string liveRoot)
+    {
+        var none = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        if (PatcherBackupInfo.TryOpen(gameDir) is not { } patcher || !Directory.Exists(snapshotRoot)) return none;
+        var livePaths = Directory.EnumerateFiles(snapshotRoot, "*", SearchOption.AllDirectories)
+            .Select(f => Path.GetFullPath(Path.Combine(liveRoot, Path.GetRelativePath(snapshotRoot, f))));
+        return patcher.CoveredPaths(livePaths).ToHashSet(StringComparer.OrdinalIgnoreCase);
+    }
+
     // ── Restore backup ────────────────────────────────────────────────────
     [RelayCommand]
     private async Task RestoreBackup()
@@ -2088,6 +2121,14 @@ public partial class MainWindowViewModel : ObservableObject
         if (backupPick is null)
         {
             StatusText = Loc.Get("Status_NoBackupFound");
+            return;
+        }
+
+        // An active test has its own exact undo; restoring under it would leave F6 to put
+        // the test's files back on top afterwards.
+        if (AppSettings.GetPendingRestores() is { Count: > 0 })
+        {
+            StatusText = Loc.Get("Status_FullRestoreTestActive");
             return;
         }
 
@@ -2102,12 +2143,28 @@ public partial class MainWindowViewModel : ObservableObject
         try
         {
             var (convRoot, stRoot) = _provider!.GetBackupRoots();
-            await BackupService.RestoreAsync(
-                Path.Combine(backupRoot, "conversations"), convRoot, default);
-            await BackupService.RestoreAsync(
-                Path.Combine(backupRoot, "stringtables"),  stRoot,  default);
-            AppLog.Info("Backup restored");
-            StatusText = Loc.Get("Status_RestoreComplete");
+            var writes   = EditorWriteJournal.Load(Path.Combine(backupPick, EditorWriteJournal.FileName));
+            var gameDir  = _currentGameDirectory;
+            var pairs    = new[]
+            {
+                (Snapshot: Path.Combine(backupRoot, "conversations"), Live: convRoot),
+                (Snapshot: Path.Combine(backupRoot, "stringtables"),  Live: stRoot),
+            };
+
+            var results = await Task.Run(() => pairs.Select(p =>
+                FullBackupRestore.Restore(p.Snapshot, p.Live, writes, PatcherManaged(gameDir, p.Snapshot, p.Live)))
+                .ToList());
+
+            var restored = results.Sum(r => r.Restored.Count);
+            var skipped  = results.SelectMany(r => r.Skipped).ToList();
+            foreach (var s in skipped)
+                AppLog.Warn($"Restore Full Backup left {s.Path} as is ({s.Reason}): it differs from the " +
+                            $"backup of {Path.GetFileName(backupRoot)} and the editor didn't write it");
+            AppLog.Info($"Backup {Path.GetFileName(backupRoot)} restored: {restored} file(s), {skipped.Count} left as is");
+            StatusText = skipped.Count == 0
+                ? Loc.FormatCount("Status_FullRestoreComplete", restored)
+                : Loc.FormatCount("Status_FullRestoreComplete", restored) + " "
+                  + Loc.FormatCount("Status_FullRestoreSkipped", skipped.Count);
             if (_currentFile is not null)
                 LoadConversationFile(_currentFile);
         }
@@ -2186,6 +2243,9 @@ public partial class MainWindowViewModel : ObservableObject
         Directory.CreateDirectory(tempDir);
         var restoreEntries = new List<PendingRestoreEntry>();
         var tracked        = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        // Content hash of every tracked file before this test wrote it (null = absent), for
+        // the editor-write journal that Restore Full Backup relies on (issue 118).
+        var hashBefore     = new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
 
         // Records one game file the apply loop may write (issue #66). An existing file is
         // copied to tempDir and restored byte-for-byte; a missing one gets an empty backup
@@ -2199,6 +2259,7 @@ public partial class MainWindowViewModel : ObservableObject
             foreach (var p in new[] { path, path + ".bak" })
             {
                 if (!tracked.Add(p)) continue;
+                hashBefore[p] = FileHash.Of(p);
                 var backup = Path.Combine(tempDir, $"{restoreEntries.Count:D4}_{Path.GetFileName(p)}");
                 if (File.Exists(p)) File.Copy(p, backup);
                 else backup = string.Empty;
@@ -2266,6 +2327,7 @@ public partial class MainWindowViewModel : ObservableObject
                 TranslationApplier.WriteTranslations(file, patch, _provider);
             }
 
+            RecordEditorWrites(hashBefore);
             AppLog.Info($"Test: applied {_project.Patches.Count} patch(es) from project '{_project.Name}'");
             TestModeEntered?.Invoke();
         }
