@@ -147,4 +147,77 @@ public class Poe2ConversationSerializerTests
         var node99 = nodes.First(n => n!["NodeID"]!.GetValue<int>() == 99)!;
         Assert.Equal(ScriptNodeType, node99["$type"]!.GetValue<string>());
     }
+
+    // ── #113: node types the editor does not model survive a save ────────────────
+    // The parser files BankNode and TriggerConversationNode under SpeakerCategory.Script.
+    // Deriving $type from the category alone rewrote them as ScriptNode, and the game
+    // then discarded BankNodePlayType / ChildNodeIDs / ConversationGuid / StartNodeID.
+
+    private const string BankNodeType    = "OEIFormats.FlowCharts.BankNode, OEIFormats";
+    private const string TriggerNodeType = "OEIFormats.FlowCharts.Conversations.TriggerConversationNode, OEIFormats";
+
+    // Shapes taken from shipped Deadfire conversations.
+    private const string UnmodelledTypesJson = """
+        {"Conversations": [{
+          "Nodes": [
+            {
+              "$type": "OEIFormats.FlowCharts.BankNode, OEIFormats",
+              "BankNodePlayType": 2, "Persistence": 0, "ChildNodeIDs": [1],
+              "NodeID": 0, "ContainerNodeID": -1, "Links": [],
+              "Conditionals": {"Operator": 0, "Components": []},
+              "OnEnterScripts": [], "OnExitScripts": [], "OnUpdateScripts": []
+            },
+            {
+              "$type": "OEIFormats.FlowCharts.Conversations.TriggerConversationNode, OEIFormats",
+              "ConversationGuid": "d6231ed2-cb9a-4d6f-ac71-37142fa6a8e3", "StartNodeID": 7,
+              "DisplayType": 1, "Persistence": 1,
+              "NodeID": 1, "ContainerNodeID": -1, "Links": [],
+              "Conditionals": {"Operator": 0, "Components": []},
+              "OnEnterScripts": [], "OnExitScripts": [], "OnUpdateScripts": []
+            }
+          ]
+        }]}
+        """;
+
+    private static NodeEditSnapshot ScriptCategoryNode(int id) =>
+        Node(id) with { SpeakerCategory = SpeakerCategory.Script };
+
+    private static JsonNode SavedNode(string json, ConversationEditSnapshot snapshot, int id) =>
+        JsonNode.Parse(Poe2ConversationSerializer.Serialize(json, snapshot))!
+            ["Conversations"]![0]!["Nodes"]!.AsArray()
+            .First(n => n!["NodeID"]!.GetValue<int>() == id)!;
+
+    [Fact]
+    public void Serialize_BankNode_KeepsTypeAndBankData()
+    {
+        var snapshot = new ConversationEditSnapshot([ScriptCategoryNode(0), ScriptCategoryNode(1)]);
+        var node0    = SavedNode(UnmodelledTypesJson, snapshot, 0);
+
+        Assert.Equal(BankNodeType, node0["$type"]!.GetValue<string>());
+        Assert.Equal(2,            node0["BankNodePlayType"]!.GetValue<int>());
+        Assert.Equal([1],          node0["ChildNodeIDs"]!.AsArray().Select(n => n!.GetValue<int>()));
+    }
+
+    [Fact]
+    public void Serialize_TriggerConversationNode_KeepsTypeAndTarget()
+    {
+        var snapshot = new ConversationEditSnapshot([ScriptCategoryNode(0), ScriptCategoryNode(1)]);
+        var node1    = SavedNode(UnmodelledTypesJson, snapshot, 1);
+
+        Assert.Equal(TriggerNodeType, node1["$type"]!.GetValue<string>());
+        Assert.Equal("d6231ed2-cb9a-4d6f-ac71-37142fa6a8e3", node1["ConversationGuid"]!.GetValue<string>());
+        Assert.Equal(7, node1["StartNodeID"]!.GetValue<int>());
+    }
+
+    [Theory]
+    [InlineData(SpeakerCategory.Npc,      "OEIFormats.FlowCharts.Conversations.TalkNode, OEIFormats")]
+    [InlineData(SpeakerCategory.Narrator, "OEIFormats.FlowCharts.Conversations.TalkNode, OEIFormats")]
+    [InlineData(SpeakerCategory.Player,   "OEIFormats.FlowCharts.Conversations.PlayerResponseNode, OEIFormats")]
+    public void Serialize_BankNode_UserChangesCategory_TypeFollowsCategory(SpeakerCategory category, string expected)
+    {
+        var snapshot = new ConversationEditSnapshot(
+            [ScriptCategoryNode(0) with { SpeakerCategory = category }, ScriptCategoryNode(1)]);
+
+        Assert.Equal(expected, SavedNode(UnmodelledTypesJson, snapshot, 0)["$type"]!.GetValue<string>());
+    }
 }

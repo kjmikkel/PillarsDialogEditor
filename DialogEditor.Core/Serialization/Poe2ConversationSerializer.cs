@@ -52,7 +52,8 @@ public static class Poe2ConversationSerializer
 
     private static void ApplyNodeSnapshot(JsonNode node, NodeEditSnapshot snap, JsonNode original)
     {
-        node["$type"]        = NodeType(snap);
+        node["$type"]        = NodeTypeFamily.Resolve(
+            original["$type"]?.GetValue<string>(), snap.SpeakerCategory, NodeType(snap));
         node["SpeakerGuid"]  = snap.SpeakerGuid;
         node["ListenerGuid"] = snap.ListenerGuid;
         node["DisplayType"]  = MapDisplayType(snap.DisplayType);
