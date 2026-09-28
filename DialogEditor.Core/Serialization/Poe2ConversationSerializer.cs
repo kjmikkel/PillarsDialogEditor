@@ -27,25 +27,31 @@ public static class Poe2ConversationSerializer
         var conv    = root["Conversations"]![0]!;
         var origArr = conv["Nodes"]!.AsArray();
 
-        var origByNodeId = origArr
-            .Where(n => n!["NodeID"] is not null)
-            .ToDictionary(n => n!["NodeID"]!.GetValue<int>(), n => n!);
+        var snapById = new Dictionary<int, NodeEditSnapshot>();
+        foreach (var s in snapshot.Nodes) snapById.TryAdd(s.NodeId, s);
 
-        var newArr = new JsonArray();
-
-        foreach (var nodeSnap in snapshot.Nodes)
+        // Walk the original array so every node keeps its position (issue 115). Nodes the
+        // parser never shows — NodeID -200, the conversation-level ScriptNode present in
+        // every bundle — are copied verbatim; the snapshot cannot express them, so it
+        // cannot have deleted them. Existing nodes missing from the snapshot were deleted.
+        var newArr      = new JsonArray();
+        var originalIds = new HashSet<int>();
+        foreach (var orig in origArr)
         {
-            if (origByNodeId.TryGetValue(nodeSnap.NodeId, out var orig))
-            {
-                var updated = JsonNode.Parse(orig.ToJsonString())!;
-                ApplyNodeSnapshot(updated, nodeSnap, orig);
-                newArr.Add(updated);
-            }
-            else
-            {
-                newArr.Add(BuildNewNode(nodeSnap));
-            }
+            if (orig is null) continue;
+            if (IsHiddenFromEditor(orig)) { newArr.Add(orig.DeepClone()); continue; }
+
+            var id = orig["NodeID"]!.GetValue<int>();
+            originalIds.Add(id);
+            if (!snapById.TryGetValue(id, out var nodeSnap)) continue;
+
+            var updated = orig.DeepClone();
+            ApplyNodeSnapshot(updated, nodeSnap, orig);
+            newArr.Add(updated);
         }
+
+        foreach (var nodeSnap in snapshot.Nodes.Where(s => !originalIds.Contains(s.NodeId)))
+            newArr.Add(BuildNewNode(nodeSnap));
 
         conv["Nodes"] = newArr;
         return root.ToJsonString(new JsonSerializerOptions { WriteIndented = true });
@@ -63,11 +69,35 @@ public static class Poe2ConversationSerializer
         node["HasVO"]        = snap.HasVO;
         node["ExternalVO"]   = snap.ExternalVO;
         node["Links"]            = BuildLinks(snap.Links, original["Links"]?.AsArray());
-        node["Conditionals"]     = BuildConditionJson(snap.Conditions);
-        node["OnEnterScripts"]   = BuildScriptListJson(snap.Scripts, ScriptCategory.Enter);
-        node["OnExitScripts"]    = BuildScriptListJson(snap.Scripts, ScriptCategory.Exit);
-        node["OnUpdateScripts"]  = BuildScriptListJson(snap.Scripts, ScriptCategory.Update);
+        node["Conditionals"]     = BuildConditionJson(snap.Conditions, original["Conditionals"]);
+        node["OnEnterScripts"]   = BuildScriptListJson(snap.Scripts, ScriptCategory.Enter,  original["OnEnterScripts"]?.AsArray());
+        node["OnExitScripts"]    = BuildScriptListJson(snap.Scripts, ScriptCategory.Exit,   original["OnExitScripts"]?.AsArray());
+        node["OnUpdateScripts"]  = BuildScriptListJson(snap.Scripts, ScriptCategory.Update, original["OnUpdateScripts"]?.AsArray());
     }
+
+    // Mirrors Poe2ConversationParser.ParseJson, which only surfaces NodeID >= 0.
+    private static bool IsHiddenFromEditor(JsonNode node) =>
+        node["NodeID"] is not { } id || id.GetValue<int>() < 0;
+
+    // A script call or condition leaf whose FullName and Parameters are unchanged keeps
+    // its original JSON (issue 115): a script's own Conditional, plus Flags, UnrealCall,
+    // FunctionHash and ParameterHash, none of which the model carries. Matching is
+    // one-to-one in order, so identical calls with different Conditionals stay distinct.
+    private static JsonNode? TakeMatch(List<JsonNode> unused, string fullName, IReadOnlyList<string> parameters)
+    {
+        var match = unused.FirstOrDefault(e =>
+            e["Data"]?["FullName"]?.GetValue<string>() == fullName &&
+            (e["Data"]?["Parameters"]?.AsArray().Select(p => p?.GetValue<string>()) ?? [])
+                .SequenceEqual(parameters));
+        if (match is not null) unused.Remove(match);
+        return match?.DeepClone();
+    }
+
+    private static IEnumerable<JsonNode> ConditionLeaves(JsonNode? components) =>
+        components is JsonArray arr
+            ? arr.OfType<JsonNode>().SelectMany(c =>
+                c["Data"] is not null ? [c] : ConditionLeaves(c["Components"]))
+            : [];
 
     private static JsonArray BuildLinks(IReadOnlyList<LinkEditSnapshot> links, JsonArray? originalLinks)
     {
@@ -85,7 +115,7 @@ public static class Poe2ConversationSerializer
                 cloned["QuestionNodeTextDisplay"] = MapQuestionDisplay(link.QuestionNodeTextDisplay);
                 // Update link conditions when the snapshot carries them
                 if (link.Conditions is { Count: >= 0 })
-                    cloned["Conditionals"] = BuildConditionJson(link.Conditions);
+                    cloned["Conditionals"] = BuildConditionJson(link.Conditions, orig["Conditionals"]);
                 arr.Add(cloned);
             }
             else
@@ -120,11 +150,15 @@ public static class Poe2ConversationSerializer
 
     private static JsonArray BuildScriptListJson(
         IReadOnlyList<ScriptCall> scripts,
-        ScriptCategory category)
+        ScriptCategory category,
+        JsonArray? original = null)
     {
-        var arr = new JsonArray();
+        var unused = original?.OfType<JsonNode>().ToList() ?? [];
+        var arr    = new JsonArray();
         foreach (var s in scripts.Where(sc => sc.Category == category))
         {
+            if (TakeMatch(unused, s.FullName, s.Parameters) is { } kept) { arr.Add(kept); continue; }
+
             var parameters = new JsonArray();
             foreach (var p in s.Parameters) parameters.Add(JsonValue.Create(p));
             arr.Add(new JsonObject
@@ -179,18 +213,32 @@ public static class Poe2ConversationSerializer
         return node;
     }
 
-    private static JsonNode BuildConditionJson(IReadOnlyList<ConditionNode> conditions)
+    private static JsonNode BuildConditionJson(IReadOnlyList<ConditionNode> conditions, JsonNode? original = null)
     {
-        var components = new JsonArray();
+        var unusedLeaves = ConditionLeaves(original?["Components"]).ToList();
+        var components   = new JsonArray();
         foreach (var c in conditions)
-            components.Add(BuildConditionComponentJson(c));
-        return new JsonObject { ["Operator"] = 0, ["Components"] = components };
+            components.Add(BuildConditionComponentJson(c, unusedLeaves));
+        // The root Operator is not modelled (the game combines components by their own
+        // Operator), so keep whatever the file had.
+        return new JsonObject
+        {
+            ["Operator"]   = original?["Operator"]?.DeepClone() ?? JsonValue.Create(0),
+            ["Components"] = components,
+        };
     }
 
-    private static JsonNode BuildConditionComponentJson(ConditionNode node)
+    private static JsonNode BuildConditionComponentJson(ConditionNode node, List<JsonNode> unusedLeaves)
     {
         if (node is ConditionLeaf leaf)
         {
+            if (TakeMatch(unusedLeaves, leaf.FullName, leaf.Parameters) is { } kept)
+            {
+                kept["Not"]      = leaf.Not;
+                kept["Operator"] = leaf.Operator == "Or" ? 1 : 0;
+                return kept;
+            }
+
             var parameters = new JsonArray();
             foreach (var p in leaf.Parameters) parameters.Add(JsonValue.Create(p));
             return new JsonObject
@@ -207,13 +255,14 @@ public static class Poe2ConversationSerializer
         }
         var branch     = (ConditionBranch)node;
         var childComps = new JsonArray();
-        foreach (var c in branch.Components) childComps.Add(BuildConditionComponentJson(c));
+        foreach (var c in branch.Components) childComps.Add(BuildConditionComponentJson(c, unusedLeaves));
+        // OEIFormats' ConditionalExpression has only Operator and Components (Not lives on
+        // ConditionalCall), so no "Not" is written; property order matches shipped files.
         return new JsonObject
         {
             ["$type"]      = "OEIFormats.FlowCharts.ConditionalExpression, OEIFormats",
-            ["Components"] = childComps,
-            ["Not"]        = branch.Not,
             ["Operator"]   = branch.Operator == "Or" ? 1 : 0,
+            ["Components"] = childComps,
         };
     }
 
