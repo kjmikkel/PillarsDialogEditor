@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<StringTableFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Name>conversations\canonical\canonical</Name>
+  <EntryCount>7</EntryCount>
+  <Entries>
+    <Entry>
+      <Language>german</Language>
+      <ID>0</ID>
+      <DefaultText>Seid gegrüßt, [Player Name]. Dies ist das kanonische Gespräch.</DefaultText>
+      <FemaleText>Seid gegrüßt, [Player Name]. Dies ist das kanonische Gespräch, meine Dame.</FemaleText>
+      <GenderNeutralText />
+    </Entry>
+    <Entry>
+      <Language>german</Language>
+      <ID>1</ID>
+      <DefaultText>Den geskripteten Weg nehmen.</DefaultText>
+      <FemaleText />
+      <GenderNeutralText />
+    </Entry>
+    <Entry>
+      <Language>german</Language>
+      <ID>2</ID>
+      <DefaultText>Aus der Bank ziehen.</DefaultText>
+      <FemaleText />
+      <GenderNeutralText />
+    </Entry>
+    <Entry>
+      <Language>german</Language>
+      <ID>3</ID>
+      <DefaultText>An ein anderes Gespräch übergeben.</DefaultText>
+      <FemaleText />
+      <GenderNeutralText />
+    </Entry>
+    <Entry>
+      <Language>german</Language>
+      <ID>7</ID>
+      <DefaultText>Der Erzähler bemerkt &lt;i&gt;leise&lt;/i&gt;, dass ein Ausruf abgespielt wurde.</DefaultText>
+      <FemaleText />
+      <GenderNeutralText />
+    </Entry>
+    <Entry>
+      <Language>german</Language>
+      <ID>8</ID>
+      <DefaultText>Eine Einblendung aus der Bank.</DefaultText>
+      <FemaleText />
+      <GenderNeutralText />
+    </Entry>
+    <Entry>
+      <Language>german</Language>
+      <ID>10</ID>
+      <DefaultText>Das ist alles. Lebt wohl.</DefaultText>
+      <FemaleText />
+      <GenderNeutralText />
+    </Entry>
+  </Entries>
+</StringTableFile>

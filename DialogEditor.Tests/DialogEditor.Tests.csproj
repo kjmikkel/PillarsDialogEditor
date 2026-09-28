@@ -39,6 +39,8 @@
   <ItemGroup>
     <!-- Schema fixtures: one file per historical format version (issue #104). -->
     <None Update="Patch\Schema\Fixtures\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Canonical conversations (issue #122): each is a miniature game install. -->
+    <None Update="Fixtures\Canonical\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
