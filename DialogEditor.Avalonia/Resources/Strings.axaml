@@ -375,7 +375,7 @@
     <sys:String x:Key="ToolTip_Redo_Format">Redo: {0} (Ctrl+Y)</sys:String>
     <sys:String x:Key="ToolTip_Redo_NoHistory">Nothing to redo (Ctrl+Y)</sys:String>
     <sys:String x:Key="ToolTip_Save">Save conversation to disk (Ctrl+S)</sys:String>
-    <sys:String x:Key="ToolTip_RestoreBackup">Restore all conversation files from the original backup</sys:String>
+    <sys:String x:Key="ToolTip_RestoreBackup">Undo the editor's changes to the game's conversation and text files, using the backup taken the first time you opened this game folder. Files a game update, "verify files" or the Patch Manager changed are left alone and listed in the log.</sys:String>
 
     <!-- ─── Editing — canvas context menus ──────────────────────────────── -->
     <sys:String x:Key="Menu_DeleteNode">Delete node</sys:String>
@@ -394,7 +394,14 @@
     <!-- {0} = error message -->
     <sys:String x:Key="Status_BackupError">Backup failed: {0}</sys:String>
     <sys:String x:Key="Status_RestoreInProgress">Restoring from backup…</sys:String>
-    <sys:String x:Key="Status_RestoreComplete">Restore complete — reload to see changes.</sys:String>
+    <!-- {0} = number of files copied back from the backup -->
+    <sys:String x:Key="Status_FullRestoreComplete_One">Backup restored — 1 file put back.</sys:String>
+    <sys:String x:Key="Status_FullRestoreComplete_Other">Backup restored — {0} files put back.</sys:String>
+    <!-- Appended to Status_FullRestoreComplete when files were skipped. {0} = files left alone
+         because something other than the editor changed them. -->
+    <sys:String x:Key="Status_FullRestoreSkipped_One">1 file was left as is because something other than the editor changed it, probably a game update (see the log).</sys:String>
+    <sys:String x:Key="Status_FullRestoreSkipped_Other">{0} files were left as is because something other than the editor changed them, probably a game update (see the log).</sys:String>
+    <sys:String x:Key="Status_FullRestoreTestActive">A test patch is active. Restore it first with Test › Restore Conversation (F6), then restore the backup.</sys:String>
     <!-- {0} = error message -->
     <sys:String x:Key="Status_RestoreError">Restore failed: {0}</sys:String>
     <sys:String x:Key="Status_NoBackupFound">No backup found for this game folder.</sys:String>
