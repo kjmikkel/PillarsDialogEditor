@@ -1149,6 +1149,7 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- Shown when Test Patch is pressed but project has no patches -->
     <sys:String x:Key="Status_ProjectNoPatch">The project has no patches yet — save a conversation first.</sys:String>
     <!-- Test Patch over patcher-installed mods (issue #76). {0} is a file count. -->
+    <sys:String x:Key="Status_TestPatchAlreadyActive">A test is already in the game folder. Press Restore (F6) to put the original files back before testing again.</sys:String>
     <sys:String x:Key="Status_TestPatchCancelledPatcherMods">Test cancelled — nothing was changed. Remove the installed mods in the Patch Manager first, then test again.</sys:String>
     <sys:String x:Key="TestOverPatcher_Title">Mods are installed over these files</sys:String>
     <sys:String x:Key="TestOverPatcher_Message">{0} of the files this test writes are managed by mods installed with the Patch Manager or dialog-patcher. Testing now patches the modded versions, and the Patch Manager will ask about these files on its next apply. For a clean test, cancel and use "Remove all mods" in the Patch Manager first.</sys:String>
