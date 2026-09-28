@@ -5,8 +5,8 @@ inspect or extract its contents with any archive tool.
 
 ## Contents
 
-- `project.dialogproject` — the dialog diff (JSON); apply with the
-  Pillars Dialog Editor Patch Manager or the `dialog-patcher` CLI.
+- `project.dialogproject` — the dialog diff (JSON); apply with Pillars Dialog Patcher
+  (its Patch Manager or its `dialog-patcher` CLI).
 - `vo/` — voice-over audio files in Wwise `.wem` format, laid out to
   mirror the game's VO directory structure. Present only when the mod
   contains voice-over; the Patch Manager and CLI copy these to the
@@ -15,8 +15,13 @@ inspect or extract its contents with any archive tool.
 
 ## Applying a .dialogpack
 
-**GUI:** Open the Pillars Dialog Editor Patch Manager, add the `.dialogpack`
-file, set your game folder, and click Apply.
+You need **Pillars Dialog Patcher**. Download it from the mod's requirements on
+Nexus Mods, or from the `patcher-v…` releases at
+<https://github.com/kjmikkel/PillarsDialogEditor/releases>. Its player guide, with
+steps for installing and removing mods, is the `README.md` in the patcher's folder.
+
+**GUI:** Start `DialogEditor.PatchManager.exe`, click **Add mods…** and pick the
+`.dialogpack` file, choose your game folder, and click **Apply patches**.
 
 **CLI:**
 ```

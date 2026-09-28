@@ -222,10 +222,19 @@ editing.
 
 ### 8 — Distribute and combine patches
 
-#### Single patch
+#### Releasing a mod
 
-Share your `.dialogproject` file. Recipients open the **Patch Manager** (see below)
-to apply it, or use the [`dialog-patcher` CLI](#dialog-patcher-cli) for scripted installs.
+**File › Export Mod Bundle…** packs the project into one `.dialogpack` file, with its
+voice-over files if it has any. Ship that file to players, not the `.dialogproject`: it
+is the file the [player guide](docs/patcher/README.md) tells them to add.
+
+Players install `.dialogpack` files with **Pillars Dialog Patcher**, the Patch Manager
+and `dialog-patcher` CLI on their own, released as `patcher-v*` on the
+[releases page](https://github.com/kjmikkel/PillarsDialogEditor/releases). They don't
+need the editor. When you publish on Nexus Mods, add Pillars Dialog Patcher as a
+**requirement** on your mod page (*Edit mod → Requirements → Nexus requirements*), so the
+page tells players to install it and links to it. For a script or installer, use the
+[`dialog-patcher` CLI](#dialog-patcher-cli).
 
 #### Combining patches from multiple authors
 
@@ -238,20 +247,22 @@ positions. The merged file is saved immediately.
 
 #### Patch Manager — load order and conflict detection
 
-**File › Patch Manager…** (also available as a standalone `DialogEditor.PatchManager.exe`)
+**File › Patch Manager…** (also the standalone `DialogEditor.PatchManager.exe` in
+Pillars Dialog Patcher)
 
-Lets you maintain an ordered stack of `.dialogproject` files, detect conflicts
-before applying, and write all patches to the game folder in one step:
+Lets you maintain an ordered stack of mods, detect conflicts before applying, and
+write all patches to the game folder in one step. Use it to check your mod against
+other mods before you release it:
 
-1. **Add project(s)…** — pick one or more `.dialogproject` files
+1. **Add mods…** — pick one or more `.dialogpack` or `.dialogproject` files
 2. **Reorder** with ↑ ↓ — entries lower in the list win on any conflict
 3. The **conflict panel** identifies every contested field before you apply
 4. **Apply patches** — writes every conversation patch to the selected game folder
 5. **Save / Load load order** — persists the list as a `.patchlist` file;
    double-clicking a `.patchlist` opens the standalone app directly
 
-The standalone app requires no editor installation and is suitable for end users
-applying community mods.
+Players see the same window in the standalone patcher. What it looks like to them is
+in the [player guide](docs/patcher/README.md).
 
 ---
 

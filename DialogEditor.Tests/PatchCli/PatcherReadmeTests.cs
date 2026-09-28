@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Xml.Linq;
 using DialogEditor.PatchCli;
 
 namespace DialogEditor.Tests.PatchCli;
@@ -60,5 +61,26 @@ public class PatcherReadmeTests
 
         Assert.NotEmpty(codes);
         Assert.All(codes, c => Assert.Contains($"| `{c}` |", readme));
+    }
+
+    [Theory]
+    [InlineData("docs/patcher/README.md")]
+    [InlineData("README.md")]   // the mod-author section on the Patch Manager (#81)
+    [InlineData("FORMAT.md")]   // bundled into every .dialogpack, so players read it too
+    public void TheGuide_NamesTheButtonsThePatchManagerShows(string guide)
+    {
+        // Both guides tell the reader which button to click. When a label is renamed
+        // (as "Add projects…" became "Add mods…" in #80), a guide still quoting the old
+        // one sends players looking for a button that isn't there.
+        var strings = XDocument.Load(Path.Combine(SolutionRoot(),
+            "DialogEditor.Avalonia.Shared", "Resources", "SharedStrings.axaml"));
+        string Label(string key) => strings.Descendants()
+            .Single(e => (string?)e.Attribute(XName.Get("Key", "http://schemas.microsoft.com/winfx/2006/xaml")) == key)
+            .Value;
+
+        var text = File.ReadAllText(Path.Combine(SolutionRoot(), guide));
+
+        Assert.All(new[] { "PatchManager_AddProjects", "PatchManager_Apply" },
+            key => Assert.Contains($"**{Label(key)}**", text));
     }
 }
