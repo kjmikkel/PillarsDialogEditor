@@ -45,8 +45,8 @@ public static class Poe1ConversationSerializer
         node.SetAttributeValue(Xsi + "type", XsiType(snap));
         SetOrAdd(node, "SpeakerGuid",    snap.SpeakerGuid);
         SetOrAdd(node, "ListenerGuid",   snap.ListenerGuid);
-        SetOrAdd(node, "DisplayType",    snap.DisplayType);
-        SetOrAdd(node, "Persistence",    snap.Persistence);
+        SetEnumOrRemove(node, "DisplayType", snap.DisplayType);
+        SetEnumOrRemove(node, "Persistence", snap.Persistence);
         SetOrAdd(node, "ActorDirection", snap.ActorDirection);
         SetOrAdd(node, "Comments",       snap.Comments);
         SetOrAdd(node, "VOFilename",     snap.ExternalVO);
@@ -111,8 +111,8 @@ public static class Poe1ConversationSerializer
         BuildScriptListXml("OnEnterScripts",  snap.Scripts, ScriptCategory.Enter),
         BuildScriptListXml("OnExitScripts",   snap.Scripts, ScriptCategory.Exit),
         BuildScriptListXml("OnUpdateScripts", snap.Scripts, ScriptCategory.Update),
-        new XElement("DisplayType",    snap.DisplayType),
-        new XElement("Persistence",    snap.Persistence),
+        EnumElementOrNull("DisplayType", snap.DisplayType),
+        EnumElementOrNull("Persistence", snap.Persistence),
         new XElement("ActorDirection", snap.ActorDirection),
         new XElement("Comments",       snap.Comments),
         new XElement("VOFilename",     snap.ExternalVO));
@@ -152,17 +152,18 @@ public static class Poe1ConversationSerializer
     private static XElement BuildScriptListXml(
         string elementName,
         IReadOnlyList<ScriptCall> scripts,
-        ScriptCategory category)
-    {
-        var calls = scripts.Where(s => s.Category == category)
-            .Select(s => new XElement("ScriptCall",
-                new XAttribute(Xsi + "type", "ConditionalCall"),
-                new XElement("Data",
-                    new XElement("FullName", s.FullName),
-                    new XElement("Parameters",
-                        s.Parameters.Select(p => new XElement("string", p))))));
-        return new XElement(elementName, calls);
-    }
+        ScriptCategory category) =>
+        new(elementName, scripts.Where(s => s.Category == category).Select(BuildScriptCallXml));
+
+    // No xsi:type (issue 111). In the game's OEIFormats model ScriptCall is a plain class and
+    // ConditionalCall derives from ExpressionComponent, so <ScriptCall xsi:type="ConditionalCall">
+    // makes the game's XmlSerializer throw "The specified type was not recognized" and the
+    // whole conversation fails to load. Shipped files write a bare <ScriptCall>.
+    private static XElement BuildScriptCallXml(ScriptCall s) => new("ScriptCall",
+        new XElement("Data",
+            new XElement("FullName", s.FullName),
+            new XElement("Parameters",
+                s.Parameters.Select(p => new XElement("string", p)))));
 
     private static void ReplaceScripts(
         XElement node,
@@ -173,13 +174,7 @@ public static class Poe1ConversationSerializer
         var elem = node.Element(elementName);
         if (elem is null) { node.Add(BuildScriptListXml(elementName, scripts, category)); return; }
         elem.RemoveAll();
-        foreach (var s in scripts.Where(sc => sc.Category == category))
-            elem.Add(new XElement("ScriptCall",
-                new XAttribute(Xsi + "type", "ConditionalCall"),
-                new XElement("Data",
-                    new XElement("FullName", s.FullName),
-                    new XElement("Parameters",
-                        s.Parameters.Select(p => new XElement("string", p))))));
+        elem.Add(scripts.Where(sc => sc.Category == category).Select(BuildScriptCallXml));
     }
 
     private static void SetOrAdd(XElement parent, string name, string value)
@@ -188,6 +183,19 @@ public static class Poe1ConversationSerializer
         if (elem is not null) elem.Value = value;
         else parent.Add(new XElement(name, value));
     }
+
+    // Enum-typed game fields (DisplayType, Persistence) must never be written empty (issue 111):
+    // "" is not a valid enum value, so the game's XmlSerializer rejects the whole file.
+    // The parser yields "" when the element was absent (e.g. a BankNode), and an absent
+    // element lets the game's DialogueNode constructor default apply (Conversation / None).
+    private static void SetEnumOrRemove(XElement parent, string name, string value)
+    {
+        if (string.IsNullOrEmpty(value)) parent.Element(name)?.Remove();
+        else SetOrAdd(parent, name, value);
+    }
+
+    private static XElement? EnumElementOrNull(string name, string value) =>
+        string.IsNullOrEmpty(value) ? null : new XElement(name, value);
 
     public static void SaveToFile(string path, ConversationEditSnapshot snapshot)
     {
