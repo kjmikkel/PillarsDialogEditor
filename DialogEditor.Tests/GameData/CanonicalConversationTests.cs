@@ -3,6 +3,8 @@ using System.Xml.Linq;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Logging;
 using DialogEditor.Core.Models;
+using DialogEditor.Core.Parsing;
+using DialogEditor.Core.Serialization;
 using DialogEditor.Tests.Helpers;
 
 namespace DialogEditor.Tests.GameData;
@@ -130,6 +132,70 @@ public class CanonicalConversationTests
     {
         using var game = FakePoe2Game.Canonical();
         AssertLoadsCleanly(game.Provider, game.CanonicalFile);
+    }
+
+    // ── Round-trip: load → unchanged save → load (the #117 checks) ──────────────
+
+    [Fact]
+    public void Poe1_UnchangedSave_KeepsTheEditorModel()
+    {
+        using var game = new FakePoe1Game();
+        var original = File.ReadAllText(game.ConvPath());
+        var saved    = Poe1ConversationSerializer.Serialize(original, RoundTripChecks.UnchangedSnapshot(game.Provider, game.File));
+        Assert.Null(RoundTripChecks.ModelDifference(
+            Poe1ConversationParser.ParseXml(original), Poe1ConversationParser.ParseXml(saved)));
+    }
+
+    /// PoE1's file-level check needs the game's own XmlSerializer model, which only an
+    /// install has (docs/game-data-tests.md), so it runs only when DIALOGEDITOR_POE1_DIR is
+    /// set and CI filters it out with the rest of Category=GameData.
+    [GameInstallFact(GameInstallFactAttribute.Poe1Variable)]
+    [Trait("Category", "GameData")]
+    public void Poe1_UnchangedSave_IsEquivalentInTheGamesOwnModel()
+    {
+        using var game   = new FakePoe1Game();
+        var serializer   = RoundTripChecks.Poe1GameSerializer(GameInstallFactAttribute.InstallDir(GameInstallFactAttribute.Poe1Variable));
+        var original     = File.ReadAllText(game.ConvPath());
+        var saved        = Poe1ConversationSerializer.Serialize(original, RoundTripChecks.UnchangedSnapshot(game.Provider, game.File));
+        Assert.Null(RoundTripChecks.FirstLineDifference(
+            RoundTripChecks.Poe1GameCanonical(serializer, original), RoundTripChecks.Poe1GameCanonical(serializer, saved)));
+    }
+
+    [Fact]
+    public void Poe2_UnchangedSave_KeepsTheEditorModel()
+    {
+        using var game = FakePoe2Game.Canonical();
+        var original = File.ReadAllText(game.ConvPath("canonical"));
+        var saved    = Poe2ConversationSerializer.Serialize(original, RoundTripChecks.UnchangedSnapshot(game.Provider, game.CanonicalFile));
+        Assert.Null(RoundTripChecks.ModelDifference(
+            Poe2ConversationParser.ParseJson(original), Poe2ConversationParser.ParseJson(saved)));
+    }
+
+    [Fact]
+    public void Poe2_UnchangedSave_IsIdenticalJson()
+    {
+        using var game = FakePoe2Game.Canonical();
+        var original = File.ReadAllText(game.ConvPath("canonical"));
+        var saved    = Poe2ConversationSerializer.Serialize(original, RoundTripChecks.UnchangedSnapshot(game.Provider, game.CanonicalFile));
+        Assert.Null(RoundTripChecks.JsonDifference(original, saved));
+    }
+
+    [Theory]
+    [InlineData("poe1", "en")]
+    [InlineData("poe1", "de")]
+    [InlineData("poe2", "en")]
+    [InlineData("poe2", "de")]
+    public void UnchangedStringTable_KeepsEveryEntry(string gameId, string lang)
+    {
+        using var poe1 = gameId == "poe1" ? new FakePoe1Game() : null;
+        using var poe2 = gameId == "poe2" ? FakePoe2Game.Canonical() : null;
+        var path = poe1?.StPath(lang) ?? poe2!.StPath(lang, "canonical");
+
+        var original = File.ReadAllText(path);
+        var entries  = RoundTripChecks.StringTableEntries(original);
+        var saved    = StringTableSerializer.SerializeTranslations(original,
+            entries.Select(e => new NodeTranslation(e.Id, e.DefaultText!, e.FemaleText!)));
+        Assert.Equal(entries, RoundTripChecks.StringTableEntries(saved));
     }
 
     // ── Shared assertions ───────────────────────────────────────────────────────
