@@ -42,7 +42,8 @@ public static class Poe1ConversationSerializer
 
     private static void ApplyNodeSnapshot(XElement node, NodeEditSnapshot snap)
     {
-        node.SetAttributeValue(Xsi + "type", XsiType(snap));
+        node.SetAttributeValue(Xsi + "type",
+            NodeTypeFamily.Resolve((string?)node.Attribute(Xsi + "type"), snap.SpeakerCategory, XsiType(snap)));
         SetOrAdd(node, "SpeakerGuid",    snap.SpeakerGuid);
         SetOrAdd(node, "ListenerGuid",   snap.ListenerGuid);
         SetEnumOrRemove(node, "DisplayType", snap.DisplayType);
