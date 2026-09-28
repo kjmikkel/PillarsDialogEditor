@@ -77,8 +77,8 @@ public static class Poe1ConversationSerializer
 
             if (orig is not null)
             {
-                orig.Element("RandomWeight")!.Value            = link.RandomWeight.ToString();
-                orig.Element("QuestionNodeTextDisplay")!.Value = link.QuestionNodeTextDisplay;
+                SetLinkValue(orig, "RandomWeight",            WeightText(link.RandomWeight), DefaultRandomWeight);
+                SetLinkValue(orig, "QuestionNodeTextDisplay", link.QuestionNodeTextDisplay,  DefaultQuestionNodeTextDisplay);
                 // Update link conditions when the snapshot carries them
                 if (link.Conditions is { Count: >= 0 })
                 {
@@ -140,11 +140,35 @@ public static class Poe1ConversationSerializer
             new XElement("Operator", branch.Operator));
     }
 
+    // Game defaults from OEIFormats' DialogueLink constructor (RandomWeight = 1,
+    // QuestionNodeTextDisplay = ShowOnce). Shipped files omit either element when it
+    // holds the default (issue 112: 13 conversations, e.g. 03_cv_aldwyn), and the
+    // parser then reports weight 1 and display "".
+    private const string DefaultRandomWeight            = "1";
+    private const string DefaultQuestionNodeTextDisplay = "ShowOnce";
+
+    private static string WeightText(float weight) =>
+        weight.ToString(System.Globalization.CultureInfo.InvariantCulture);
+
+    // An element the file already has keeps being written; an absent one is added only
+    // when the value differs from the game default. "" is never written: it is not a
+    // valid QuestionNodeDisplayType, and absent already means the default to the game.
+    private static void SetLinkValue(XElement link, string name, string value, string gameDefault)
+    {
+        if (string.IsNullOrEmpty(value)) { link.Element(name)?.Remove(); return; }
+        var elem = link.Element(name);
+        if (elem is not null)           elem.Value = value;
+        else if (value != gameDefault)  link.Add(new XElement(name, value));
+    }
+
+    private static XElement? LinkElementOrNull(string name, string value, string gameDefault) =>
+        string.IsNullOrEmpty(value) || value == gameDefault ? null : new XElement(name, value);
+
     private static XElement BuildNewLink(LinkEditSnapshot link) => new("FlowChartLink",
         new XElement("FromNodeID",              link.FromNodeId),
         new XElement("ToNodeID",                link.ToNodeId),
-        new XElement("RandomWeight",            link.RandomWeight),
-        new XElement("QuestionNodeTextDisplay", link.QuestionNodeTextDisplay),
+        LinkElementOrNull("RandomWeight",            WeightText(link.RandomWeight), DefaultRandomWeight),
+        LinkElementOrNull("QuestionNodeTextDisplay", link.QuestionNodeTextDisplay,  DefaultQuestionNodeTextDisplay),
         new XElement("Conditionals",
             new XElement("Components",
                 (link.Conditions ?? []).Select(c => BuildConditionXml(c)))));
