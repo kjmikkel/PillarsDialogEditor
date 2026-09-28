@@ -1120,6 +1120,11 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- {0} = conversation name, {1} = error message -->
     <sys:String x:Key="Status_TestApplyError">Test apply failed for {0}: {1}</sys:String>
     <!-- {0} = conversation name. Shown when a saved patch no longer matches the game files (e.g. after a game update) and was force-applied for display. -->
+    <!-- {0} = conversation name, {1} = path of the damaged stringtable (issue 119) -->
+    <sys:String x:Key="Status_StringTableUnreadable">{0} opened without its text: the text file for this language is damaged ({1}). Other languages are unaffected. Use your storefront's "verify files" to repair it.</sys:String>
+    <!-- {0} = number of damaged stringtables left untouched by Test Patch, {1} = the first one's path (issue 119) -->
+    <sys:String x:Key="Status_TestPatchSkippedUnreadable_One">Test patch applied, but one text file is damaged and was left untouched, so that language shows no new text in-game: {1}. Use your storefront's "verify files" to repair it.</sys:String>
+    <sys:String x:Key="Status_TestPatchSkippedUnreadable_Other">Test patch applied, but {0} text files are damaged and were left untouched, so those languages show no new text in-game (first: {1}). Use your storefront's "verify files" to repair them.</sys:String>
     <sys:String x:Key="Status_PatchBaselineMismatch">The game files for {0} have changed since this patch was saved — your edits are shown, but review them before testing (F5 will report the exact conflicts).</sys:String>
 
     <!-- ─── Conflict resolution dialog ──────────────────────────────────── -->
