@@ -1,7 +1,9 @@
 using System.Text;
 using System.Xml.Linq;
 using DialogEditor.Core.Editing;
+using DialogEditor.Core.Localisation;
 using DialogEditor.Core.Models;
+using DialogEditor.Core.Parsing;
 
 namespace DialogEditor.Core.Serialization;
 
@@ -47,6 +49,7 @@ public static class StringTableSerializer
 
     public static void SaveToFile(string path, IEnumerable<NodeEditSnapshot> nodes)
     {
+        RefuseUnreadable(path);
         var original = File.Exists(path) ? File.ReadAllText(path) : string.Empty;
         if (File.Exists(path))
             File.Copy(path, path + ".bak", overwrite: true);
@@ -55,11 +58,19 @@ public static class StringTableSerializer
 
     public static void SaveToFile(string path, IEnumerable<NodeTranslation> translations)
     {
+        RefuseUnreadable(path);
         var exists   = File.Exists(path);
         var original = exists ? File.ReadAllText(path) : string.Empty;
         if (exists)
             File.Copy(path, path + ".bak", overwrite: true);
         File.WriteAllText(path, SerializeTranslations(original, translations), Encoding.UTF8);
+    }
+
+    // Checked before the .bak copy and before any write: a damaged file is left exactly as
+    // it is, so the storefront's "verify files" can still repair it (issue 119).
+    private static void RefuseUnreadable(string path)
+    {
+        if (!StringTableParser.IsReadableOrAbsent(path)) throw new StringTableUnreadableException(path);
     }
 
     // Internal (not private) so the opt-in game-data test can round-trip every shipped
@@ -101,4 +112,12 @@ public static class StringTableSerializer
 
         return doc.ToString(SaveOptions.None);
     }
+}
+
+/// <summary>A stringtable exists but isn't readable XML, so it was not written (issue 119).</summary>
+[NotLocalised("Developer diagnostic for the log; the editor, Patch Manager and CLI each report it with their own text")]
+public sealed class StringTableUnreadableException(string path)
+    : IOException($"Stringtable '{path}' is not readable XML; it was left untouched.")
+{
+    public string FilePath { get; } = path;
 }

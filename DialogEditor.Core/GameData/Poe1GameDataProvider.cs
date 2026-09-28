@@ -51,9 +51,7 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
     {
         var nodes = Poe1ConversationParser.ParseFile(file.ConversationPath);
         var stPath = StringTablePathFor(file.ConversationPath, Language);
-        var strings = File.Exists(stPath)
-            ? StringTableParser.ParseFile(stPath)
-            : StringTable.Missing;
+        var strings = StringTableParser.LoadFile(stPath);   // missing or damaged → shown as missing (issue 119)
         return new Conversation(file.Name, nodes, strings);
     }
 

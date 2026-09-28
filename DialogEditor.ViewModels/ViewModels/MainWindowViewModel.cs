@@ -2292,6 +2292,8 @@ public partial class MainWindowViewModel : ObservableObject
                     Track(_provider.GetStringTablePath(file, lang));
             }
 
+            var unreadable = new List<string>();
+
             // Persist restore info before writing game files (crash safety)
             AppSettings.SetPendingRestores(restoreEntries);
 
@@ -2324,11 +2326,14 @@ public partial class MainWindowViewModel : ObservableObject
                 // The bundle/XML above only carries structure — node text lives in the
                 // per-language stringtables. Without this, added or edited lines are
                 // invisible in-game (B-005). Mirrors the dialog-patcher CLI.
-                TranslationApplier.WriteTranslations(file, patch, _provider);
+                unreadable.AddRange(TranslationApplier.WriteTranslations(file, patch, _provider));
             }
 
             RecordEditorWrites(hashBefore);
             AppLog.Info($"Test: applied {_project.Patches.Count} patch(es) from project '{_project.Name}'");
+            if (unreadable.Count > 0)
+                // Damaged stringtables are left untouched (issue 119); that language shows no new text in-game.
+                StatusText = Loc.FormatCount("Status_TestPatchSkippedUnreadable", unreadable.Count, unreadable[0]);
             TestModeEntered?.Invoke();
         }
         catch (PatchConflictException ex)
@@ -2598,7 +2603,11 @@ public partial class MainWindowViewModel : ObservableObject
             IsModified = false;
             CurrentConversationName = file.Name;
             OnPropertyChanged(nameof(CanValidateVO));
-            if (_project is null)
+            if (conversation.Strings.IsUnreadable)
+                // The structure loaded, but this language's text file is damaged (issue 119):
+                // name it, so the text placeholders aren't a mystery. Logged by the parser.
+                StatusText = Loc.Format("Status_StringTableUnreadable", file.Name, conversation.Strings.UnreadablePath!);
+            else if (_project is null)
                 StatusText = Loc.Get("Status_NoProjectReadOnly");
             else
                 StatusText = Loc.Format("Status_ConversationLoaded", file.Name, conversation.Nodes.Count);

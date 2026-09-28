@@ -18,7 +18,11 @@ public abstract record InstallResult
         int                   ConversationsPatched,
         IReadOnlyList<string> MissingConversations,
         IReadOnlyList<string> RestoreSkipped,
-        int                   VoFilesCopied) : InstallResult;
+        int                   VoFilesCopied) : InstallResult
+    {
+        /// Stringtables left untouched because they aren't readable XML (issue 119).
+        public IReadOnlyList<string> UnreadableStringTables { get; init; } = [];
+    }
 
     /// Nothing was written: these managed files (relative paths) were changed outside the
     /// patcher, and the caller did not set AcceptCurrentFiles.

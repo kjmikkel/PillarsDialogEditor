@@ -354,6 +354,9 @@ public partial class PatchManagerViewModel : ObservableObject
                 AppLog.Warn($"Left as is (changed outside the patcher): {p}");
             AppLog.Info($"Applied {applied.ConversationsPatched} conversation(s) from {entries.Count} project(s)");
             StatusText = Loc.FormatCount("PatchManager_ApplySuccess", applied.ConversationsPatched, gameFolder);
+            if (applied.UnreadableStringTables.Count > 0)   // damaged, left untouched (issue 119); logged by TranslationApplier
+                StatusText += " " + Loc.FormatCount("PatchManager_UnreadableStringTables",
+                                                    applied.UnreadableStringTables.Count, applied.UnreadableStringTables[0]);
         }
         catch (PatcherBackupCorruptException ex)
         {

@@ -24,6 +24,9 @@
     <sys:String x:Key="PatchManager_ApplyCancelledExternal">Apply cancelled — nothing was changed.</sys:String>
     <sys:String x:Key="PatchManager_RemoveAllDone_One">Removed all mods: 1 game file is back as it was.</sys:String>
     <sys:String x:Key="PatchManager_RemoveAllDone_Other">Removed all mods: {0} game files are back as they were.</sys:String>
+    <!-- Appended to the apply status. {0} = damaged text files left untouched, {1} = the first one's path (issue 119) -->
+    <sys:String x:Key="PatchManager_UnreadableStringTables_One">One text file is damaged and was left untouched, so that language shows no new text: {1}. Use your storefront's "verify files" to repair it.</sys:String>
+    <sys:String x:Key="PatchManager_UnreadableStringTables_Other">{0} text files are damaged and were left untouched, so those languages show no new text (first: {1}). Use your storefront's "verify files" to repair them.</sys:String>
     <sys:String x:Key="PatchManager_RemoveAllPartial">Removed mods: {0} files restored; {1} left as is because something else changed them (see the log).</sys:String>
     <sys:String x:Key="PatchManager_RemoveAllError">Remove all mods failed: {0}</sys:String>
     <sys:String x:Key="PatchManager_RemoveAllConfirm_Title">Remove all mods?</sys:String>
