@@ -34,6 +34,21 @@ public class PatchManagerViewModelTests
         Assert.True(vm.HasEntries);
     }
 
+    // ── AddEntries ────────────────────────────────────────────────────────
+
+    [Fact]
+    public async Task AddEntries_PickerShowsPacksAndProjects()
+    {
+        // Players install .dialogpack files; a filter matching only *.dialogproject showed
+        // them an empty folder until they switched to "All files" (issue #80).
+        var picker = new StubFilePicker();
+        var vm     = new PatchManagerViewModel(new StubFolderPicker(), picker);
+
+        await vm.AddEntriesCommand.ExecuteAsync(null);
+
+        Assert.Equal([".dialogpack", ".dialogproject"], picker.OpenFilesExtensions);
+    }
+
     // ── RemoveEntry ───────────────────────────────────────────────────────
 
     [Fact]
@@ -171,6 +186,27 @@ public class PatchManagerViewModelTests
         Assert.Equal(PatchConflictKind.AddedNode, row.Conflict.Kind);
         Assert.Equal(("Mod1", "Mod2"), (row.FirstProjectName, row.SecondProjectName));
         Assert.All(vm.Entries, e => Assert.True(e.HasConflict));
+    }
+
+    [Fact]
+    public void Analyse_RaisesConflictsChanged_SoTheViewShowsTheRows()
+    {
+        // The conflict list is bound to Conflicts. Without a change notification the view
+        // kept the empty list it read at startup and showed only the "N conflicts" summary,
+        // never which conversation or mods were involved (issue #80).
+        var mod = new Dictionary<string, FieldChange> { ["DefaultText"] = new("\"a\"", "\"b\"") };
+        ConversationPatch Patch() => new("conv1", ConversationPatch.CurrentSchemaVersion, [], [],
+            [new NodeModification(5, mod, [], [])]);
+
+        var vm      = MakeVm();
+        var changed = new List<string?>();
+        vm.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+
+        vm.Entries.Add(new PatchEntryViewModel("mod1.dialogproject", DialogProject.Empty("Mod1").WithPatch(Patch())));
+        vm.Entries.Add(new PatchEntryViewModel("mod2.dialogproject", DialogProject.Empty("Mod2").WithPatch(Patch())));
+
+        Assert.NotEmpty(vm.Conflicts);
+        Assert.Contains(nameof(PatchManagerViewModel.Conflicts), changed);
     }
 
     [Fact]
