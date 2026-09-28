@@ -256,6 +256,129 @@ public class Poe1ConversationSerializerTests
         Assert.Empty(doc.Descendants(element));
     }
 
+    // ── #112: links may omit RandomWeight / QuestionNodeTextDisplay ──────────────
+    // 13 shipped conversations (e.g. 03_cv_aldwyn) write links with neither element;
+    // the game's DialogueLink constructor defaults them to 1 / ShowOnce. The save must
+    // not crash, and must add an element only when the value differs from that default.
+
+    private const string LinkWithoutDefaultsXml = """
+        <ConversationData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <Nodes>
+            <FlowChartNode xsi:type="TalkNode">
+              <NodeID>0</NodeID>
+              <SpeakerGuid>aaaa</SpeakerGuid><ListenerGuid>bbbb</ListenerGuid>
+              <Links>
+                <FlowChartLink xsi:type="DialogueLink">
+                  <FromNodeID>0</FromNodeID><ToNodeID>1</ToNodeID><PointsToGhost>false</PointsToGhost>
+                  <Conditionals><Components/></Conditionals><ClassExtender><ExtendedProperties/></ClassExtender>
+                </FlowChartLink>
+              </Links>
+              <Conditionals><Components/></Conditionals>
+              <OnEnterScripts/><OnExitScripts/><OnUpdateScripts/>
+              <DisplayType>Conversation</DisplayType><Persistence>None</Persistence>
+            </FlowChartNode>
+            <FlowChartNode xsi:type="TalkNode">
+              <NodeID>1</NodeID>
+              <SpeakerGuid>cccc</SpeakerGuid><ListenerGuid>dddd</ListenerGuid>
+              <Links/>
+              <Conditionals><Components/></Conditionals>
+              <OnEnterScripts/><OnExitScripts/><OnUpdateScripts/>
+              <DisplayType>Conversation</DisplayType><Persistence>None</Persistence>
+            </FlowChartNode>
+          </Nodes>
+        </ConversationData>
+        """;
+
+    private static XElement OnlyLink(string xml) => XDocument.Parse(xml).Descendants("FlowChartLink").Single();
+
+    private static string SaveLink(string originalXml, float weight, string display) =>
+        Poe1ConversationSerializer.Serialize(originalXml, new ConversationEditSnapshot(
+            [Node(0, links: [new LinkEditSnapshot(0, 1, weight, display, false)]), Node(1)]));
+
+    [Fact]
+    public void Serialize_LinkWithoutDefaults_Unchanged_DoesNotAddElements()
+    {
+        // What the parser yields for the missing elements: weight 1, display "".
+        var link = OnlyLink(SaveLink(LinkWithoutDefaultsXml, 1f, ""));
+
+        Assert.Null(link.Element("RandomWeight"));
+        Assert.Null(link.Element("QuestionNodeTextDisplay"));
+        Assert.NotNull(link.Element("PointsToGhost"));   // the rest of the link is preserved
+        Assert.NotNull(link.Element("ClassExtender"));
+    }
+
+    [Fact]
+    public void Serialize_LinkWithoutDefaults_ExplicitDefaults_DoesNotAddElements()
+    {
+        var link = OnlyLink(SaveLink(LinkWithoutDefaultsXml, 1f, "ShowOnce"));
+
+        Assert.Null(link.Element("RandomWeight"));
+        Assert.Null(link.Element("QuestionNodeTextDisplay"));
+    }
+
+    [Fact]
+    public void Serialize_LinkWithoutDefaults_NonDefaultValues_AreAdded()
+    {
+        var link = OnlyLink(SaveLink(LinkWithoutDefaultsXml, 3f, "ShowAlways"));
+
+        Assert.Equal("3",          (string?)link.Element("RandomWeight"));
+        Assert.Equal("ShowAlways", (string?)link.Element("QuestionNodeTextDisplay"));
+    }
+
+    [Fact]
+    public void Serialize_LinkWithElements_UpdatesThem()
+    {
+        // Elements the original file already writes keep being written, even at the default.
+        var link = OnlyLink(SaveLink(TwoNodeXml, 1f, "ShowAlways"));
+
+        Assert.Equal("1",          (string?)link.Element("RandomWeight"));
+        Assert.Equal("ShowAlways", (string?)link.Element("QuestionNodeTextDisplay"));
+    }
+
+    [Fact]
+    public void Serialize_LinkWithElements_EmptyDisplay_RemovesElement()
+    {
+        // "" is not a valid QuestionNodeDisplayType; absent means ShowOnce to the game.
+        var link = OnlyLink(SaveLink(TwoNodeXml, 1f, ""));
+
+        Assert.Null(link.Element("QuestionNodeTextDisplay"));
+    }
+
+    [Fact]
+    public void Serialize_NewLink_DefaultValues_AreOmitted()
+    {
+        // Importers and the canvas create links with display "" and weight 1.
+        var snapshot = new ConversationEditSnapshot(
+            [Node(0), Node(1, links: [new LinkEditSnapshot(1, 0, 1f, "", false)])]);
+        var doc  = XDocument.Parse(Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot));
+        var link = doc.Descendants("FlowChartLink").Single(l => (int)l.Element("FromNodeID")! == 1);
+
+        Assert.Null(link.Element("RandomWeight"));
+        Assert.Null(link.Element("QuestionNodeTextDisplay"));
+    }
+
+    [Fact]
+    public void Serialize_NewLink_NonDefaultValues_AreWritten()
+    {
+        var snapshot = new ConversationEditSnapshot(
+            [Node(0), Node(1, links: [new LinkEditSnapshot(1, 0, 2f, "ShowNever", false)])]);
+        var doc  = XDocument.Parse(Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot));
+        var link = doc.Descendants("FlowChartLink").Single(l => (int)l.Element("FromNodeID")! == 1);
+
+        Assert.Equal("2",         (string?)link.Element("RandomWeight"));
+        Assert.Equal("ShowNever", (string?)link.Element("QuestionNodeTextDisplay"));
+    }
+
+    [Fact]
+    public void Serialize_LinkWithoutDefaults_RoundTripsThroughParser()
+    {
+        var nodes = Poe1ConversationParser.ParseXml(SaveLink(LinkWithoutDefaultsXml, 1f, ""));
+        var link  = Assert.Single(nodes.First(n => n.NodeId == 0).Links);
+
+        Assert.Equal(1f, link.RandomWeight);
+        Assert.Equal("", link.QuestionNodeTextDisplay);
+    }
+
     [Fact]
     public void Serialize_NonEmptyEnumValues_AreStillWritten()
     {
