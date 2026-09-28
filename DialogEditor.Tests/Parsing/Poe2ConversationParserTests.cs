@@ -100,9 +100,62 @@ public class Poe2ConversationParserTests
     [Fact]
     public void Parse_Node1_DisplayTypeAndPersistenceMappedToStrings()
     {
+        // DisplayType 1 is Conversation, not Bark: the game enum is
+        // Hidden, Conversation, Bark, Overlay (#114).
         var nodes = Poe2ConversationParser.ParseJson(TwoNodeJson);
-        Assert.Equal("Bark", nodes[1].DisplayType);
+        Assert.Equal("Conversation", nodes[1].DisplayType);
         Assert.Equal("OnceEver", nodes[1].Persistence);
+    }
+
+    // ── #114: enum values follow OEIFormats' declaration order ───────────────
+    // DisplayType     { Hidden, Conversation, Bark, Overlay }
+    // PersistenceType { None, OnceEver, OncePerConversation, MarkAsRead }
+
+    private static string OneNodeJson(string enumProperties) => $$"""
+        {"Conversations": [{
+          "Nodes": [{
+            "$type": "OEIFormats.FlowCharts.Conversations.TalkNode, OEIFormats",
+            "SpeakerGuid": "aaaa", "ListenerGuid": "bbbb",
+            {{enumProperties}}
+            "NodeID": 0, "ContainerNodeID": -1, "Links": [],
+            "Conditionals": {"Operator": 0, "Components": []},
+            "OnEnterScripts": [], "OnExitScripts": [], "OnUpdateScripts": []
+          }]
+        }]}
+        """;
+
+    [Theory]
+    [InlineData(0, "Hidden")]
+    [InlineData(1, "Conversation")]
+    [InlineData(2, "Bark")]
+    [InlineData(3, "Overlay")]
+    [InlineData(9, "Unknown(9)")]
+    public void Parse_DisplayType_MapsGameEnum(int value, string expected)
+    {
+        var node = Poe2ConversationParser.ParseJson(OneNodeJson($"\"DisplayType\": {value},")).Single();
+        Assert.Equal(expected, node.DisplayType);
+    }
+
+    [Theory]
+    [InlineData(0, "None")]
+    [InlineData(1, "OnceEver")]
+    [InlineData(2, "OncePerConversation")]
+    [InlineData(3, "MarkAsRead")]
+    [InlineData(9, "Unknown(9)")]
+    public void Parse_Persistence_MapsGameEnum(int value, string expected)
+    {
+        var node = Poe2ConversationParser.ParseJson(OneNodeJson($"\"Persistence\": {value},")).Single();
+        Assert.Equal(expected, node.Persistence);
+    }
+
+    [Fact]
+    public void Parse_MissingEnumProperties_AreEmpty()
+    {
+        // e.g. a BankNode, which has no DisplayType. Same convention as the PoE1 parser:
+        // "" means absent, and the serializer then leaves the property out.
+        var node = Poe2ConversationParser.ParseJson(OneNodeJson("")).Single();
+        Assert.Equal("", node.DisplayType);
+        Assert.Equal("", node.Persistence);
     }
 
     [Fact]
