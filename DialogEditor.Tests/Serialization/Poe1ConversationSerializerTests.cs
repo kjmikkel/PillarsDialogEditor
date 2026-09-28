@@ -379,6 +379,86 @@ public class Poe1ConversationSerializerTests
         Assert.Equal("", link.QuestionNodeTextDisplay);
     }
 
+    // ── #113: node types the editor does not model survive a save ────────────────
+    // The parser files BankNode and TriggerConversationNode under SpeakerCategory.Script.
+    // Deriving xsi:type from the category alone rewrote them as ScriptNode, and the game
+    // then dropped their type-specific data (ChildNodeIDs, ConversationFilename, ...).
+
+    private const string UnmodelledTypesXml = """
+        <ConversationData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <Nodes>
+            <FlowChartNode xsi:type="BankNode">
+              <NodeID>0</NodeID>
+              <Links/>
+              <Conditionals><Components/></Conditionals>
+              <OnEnterScripts/><OnExitScripts/><OnUpdateScripts/>
+              <BankNodePlayType>PlayRandom</BankNodePlayType>
+              <ChildNodeIDs><int>1</int></ChildNodeIDs>
+            </FlowChartNode>
+            <FlowChartNode xsi:type="TriggerConversationNode">
+              <NodeID>1</NodeID>
+              <Links/>
+              <Conditionals><Components/></Conditionals>
+              <OnEnterScripts/><OnExitScripts/><OnUpdateScripts/>
+              <DisplayType>Conversation</DisplayType><Persistence>None</Persistence>
+              <ConversationFilename>companions/cv_other</ConversationFilename>
+              <StartNodeID>7</StartNodeID>
+            </FlowChartNode>
+          </Nodes>
+        </ConversationData>
+        """;
+
+    private static XElement NodeById(XDocument doc, int id) =>
+        doc.Descendants("FlowChartNode").First(n => (int)n.Element("NodeID")! == id);
+
+    private static NodeEditSnapshot ScriptCategoryNode(int id) =>
+        Node(id) with { SpeakerCategory = SpeakerCategory.Script, DisplayType = "", Persistence = "" };
+
+    [Fact]
+    public void Serialize_BankNode_KeepsTypeAndBankData()
+    {
+        var snapshot = new ConversationEditSnapshot([ScriptCategoryNode(0), ScriptCategoryNode(1)]);
+        var node0    = NodeById(XDocument.Parse(Poe1ConversationSerializer.Serialize(UnmodelledTypesXml, snapshot)), 0);
+
+        Assert.Equal("BankNode",   node0.Attribute(XsiNs + "type")?.Value);
+        Assert.Equal("PlayRandom", (string?)node0.Element("BankNodePlayType"));
+        Assert.Equal("1",          (string?)node0.Element("ChildNodeIDs")?.Element("int"));
+    }
+
+    [Fact]
+    public void Serialize_TriggerConversationNode_KeepsTypeAndTarget()
+    {
+        var snapshot = new ConversationEditSnapshot([ScriptCategoryNode(0), ScriptCategoryNode(1)]);
+        var node1    = NodeById(XDocument.Parse(Poe1ConversationSerializer.Serialize(UnmodelledTypesXml, snapshot)), 1);
+
+        Assert.Equal("TriggerConversationNode", node1.Attribute(XsiNs + "type")?.Value);
+        Assert.Equal("companions/cv_other",     (string?)node1.Element("ConversationFilename"));
+        Assert.Equal("7",                       (string?)node1.Element("StartNodeID"));
+    }
+
+    [Theory]
+    [InlineData(SpeakerCategory.Npc,      "TalkNode")]
+    [InlineData(SpeakerCategory.Narrator, "TalkNode")]
+    [InlineData(SpeakerCategory.Player,   "PlayerResponseNode")]
+    public void Serialize_BankNode_UserChangesCategory_TypeFollowsCategory(SpeakerCategory category, string expected)
+    {
+        var snapshot = new ConversationEditSnapshot(
+            [ScriptCategoryNode(0) with { SpeakerCategory = category }, ScriptCategoryNode(1)]);
+        var node0 = NodeById(XDocument.Parse(Poe1ConversationSerializer.Serialize(UnmodelledTypesXml, snapshot)), 0);
+
+        Assert.Equal(expected, node0.Attribute(XsiNs + "type")?.Value);
+    }
+
+    [Fact]
+    public void Serialize_TalkNode_UserChangesToScript_BecomesScriptNode()
+    {
+        // The existing explicit-change path is unaffected.
+        var snapshot = new ConversationEditSnapshot([ScriptNode(0), Node(1)]);
+        var node0    = NodeById(XDocument.Parse(Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot)), 0);
+
+        Assert.Equal("ScriptNode", node0.Attribute(XsiNs + "type")?.Value);
+    }
+
     [Fact]
     public void Serialize_NonEmptyEnumValues_AreStillWritten()
     {
