@@ -37,14 +37,15 @@ the builds the editor and patcher have been checked against:
 | Game | Storefront | Build checked | DLC installed | Read (open, browse, all languages) | Write (Test Patch, patcher) |
 |---|---|---|---|---|---|
 | Pillars of Eternity | GOG | build 59799714601848948 | The White March 1 + 2 | ✅ 1,434 conversations, 8 languages | ❌ see known issues |
-| Pillars of Eternity | Steam | build 23036766 | The White March 1 + 2 | ✅ same data as GOG | ❌ see known issues |
+| Pillars of Eternity | Steam | build 23036766 | The White March 1 + 2 | ✅ identical data to GOG | ❌ see known issues |
+| Pillars of Eternity (Definitive Edition) | Epic | version 3.9.5.89801 | included | ✅ identical data to GOG | ❌ see known issues |
 | Pillars of Eternity II: Deadfire | GOG | build 52232433653243275 | all three expansions + free DLC | ✅ 1,130 conversations, 10 languages | ❌ see known issues |
-| Pillars of Eternity II: Deadfire | Steam | not checked yet | | | |
+| Pillars of Eternity II: Deadfire | Steam | build 12181035 | all three expansions + free DLC | ✅ identical data to GOG | ❌ see known issues |
 
 *Checked 2026-09-28 ([#65](https://github.com/kjmikkel/PillarsDialogEditor/issues/65)).*
 
-The Steam and GOG builds of Pillars of Eternity ship identical conversation data. Other storefronts
-(Epic, Microsoft Store / Game Pass) haven't been checked.
+Every storefront ships byte-identical conversation and text files for the same game, so what holds
+for one build holds for all of them. The Microsoft Store / Game Pass builds haven't been checked.
 
 **Known issues blocking writes.** Saving a conversation (which is what Test Patch, `dialog-patcher`
 and the Patch Manager all do) currently changes game data the editor doesn't display. Until these
@@ -63,7 +64,10 @@ warning. Nothing else is written or broken.
   you. Reinstalling stops and asks before treating the new file as the original
   (`--accept-current-files`). Your update is never overwritten with an older copy.
 - **Test Patch (F5) / Restore Conversation (F6).** F5 backs up the files it's about to change, so
-  the backup is always fresh. Restore with F6 before updating or verifying the game.
+  the backup is always fresh. Restore with F6 before updating or verifying the game. F6 currently
+  leaves `.bak` files next to the restored game files
+  ([#121](https://github.com/kjmikkel/PillarsDialogEditor/issues/121)). The game ignores them, and
+  you can delete them.
 - **Restore Full Backup (Ctrl+Shift+B).** This restores the snapshot taken the first time you opened
   the game folder, and can put back pre-update files after a game update ([#118](https://github.com/kjmikkel/PillarsDialogEditor/issues/118)). Don't use it
   after the game has been updated or verified. Use the storefront's "verify files" instead.
