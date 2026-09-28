@@ -73,6 +73,7 @@ public static class Poe2ConversationSerializer
         node["OnEnterScripts"]   = BuildScriptListJson(snap.Scripts, ScriptCategory.Enter,  original["OnEnterScripts"]?.AsArray());
         node["OnExitScripts"]    = BuildScriptListJson(snap.Scripts, ScriptCategory.Exit,   original["OnExitScripts"]?.AsArray());
         node["OnUpdateScripts"]  = BuildScriptListJson(snap.Scripts, ScriptCategory.Update, original["OnUpdateScripts"]?.AsArray());
+        Poe2NodeProperties.RemoveUndeclared(node, original);
     }
 
     // Mirrors Poe2ConversationParser.ParseJson, which only surfaces NodeID >= 0.
@@ -145,6 +146,7 @@ public static class Poe2ConversationSerializer
         node["OnEnterScripts"]  = BuildScriptListJson(snap.Scripts, ScriptCategory.Enter);
         node["OnExitScripts"]   = BuildScriptListJson(snap.Scripts, ScriptCategory.Exit);
         node["OnUpdateScripts"] = BuildScriptListJson(snap.Scripts, ScriptCategory.Update);
+        Poe2NodeProperties.RemoveUndeclared(node, original: null);
         return node;
     }
 
