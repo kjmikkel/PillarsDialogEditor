@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<StringTableFile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Name>conversations\canonical\canonical</Name>
+  <EntryCount>7</EntryCount>
+  <Entries>
+    <Entry>
+      <Language>english</Language>
+      <ID>0</ID>
+      <DefaultText>Greetings, [Player Name]. This is the canonical conversation.</DefaultText>
+      <FemaleText>Greetings, [Player Name]. This is the canonical conversation, my lady.</FemaleText>
+      <GenderNeutralText />
+    </Entry>
+    <Entry>
+      <Language>english</Language>
+      <ID>1</ID>
+      <DefaultText>Take the scripted path.</DefaultText>
+      <FemaleText />
+      <GenderNeutralText />
+    </Entry>
+    <Entry>
+      <Language>english</Language>
+      <ID>2</ID>
+      <DefaultText>Draw from the bank.</DefaultText>
+      <FemaleText />
+      <GenderNeutralText />
+    </Entry>
+    <Entry>
+      <Language>english</Language>
+      <ID>3</ID>
+      <DefaultText>Hand over to another conversation.</DefaultText>
+      <FemaleText />
+      <GenderNeutralText />
+    </Entry>
+    <Entry>
+      <Language>english</Language>
+      <ID>7</ID>
+      <DefaultText>The narrator notes, &lt;i&gt;quietly&lt;/i&gt;, that a bark was played.</DefaultText>
+      <FemaleText />
+      <GenderNeutralText />
+    </Entry>
+    <Entry>
+      <Language>english</Language>
+      <ID>8</ID>
+      <DefaultText>An overlay line from the bank.</DefaultText>
+      <FemaleText />
+      <GenderNeutralText />
+    </Entry>
+    <Entry>
+      <Language>english</Language>
+      <ID>10</ID>
+      <DefaultText>That is everything. Farewell.</DefaultText>
+      <FemaleText />
+      <GenderNeutralText />
+    </Entry>
+  </Entries>
+</StringTableFile>

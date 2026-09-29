@@ -57,6 +57,15 @@ public sealed class FakePoe2Game : IDisposable
         File.WriteAllBytes(Path.Combine(VoDir, "existing.wem"), [1, 2, 3]);
     }
 
+    /// The canonical PoE2 conversation (issue 122) instead of the one-node test_conv:
+    /// "canonical" in "en" and "de", with its .wem files. See Fixtures/Canonical/README.md.
+    public static FakePoe2Game Canonical() => new(canonical: true);
+
+    private FakePoe2Game(bool canonical) => CanonicalFixture.CopyTo("poe2", Root);
+
+    public ConversationFile CanonicalFile =>
+        Provider.EnumerateConversations().Single(f => f.Name == "canonical");
+
     public IGameDataProvider Provider => new Poe2GameDataProvider(Root);
 
     /// Every file under the game's data folder (not the patcher backup), keyed by relative path.
