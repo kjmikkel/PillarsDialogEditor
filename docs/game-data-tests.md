@@ -47,6 +47,17 @@ happens in memory, and the result is only compared.
 There is no allow-list. On failure, the test reports how many files failed and what differs in the
 first 25 of them.
 
+## The canonical conversations: the same checks, no install needed
+
+For a small, deterministic baseline that runs on every `dotnet test`, CI included, use the
+canonical conversations in
+[`DialogEditor.Tests/Fixtures/Canonical`](../DialogEditor.Tests/Fixtures/Canonical/README.md)
+([#122](https://github.com/kjmikkel/PillarsDialogEditor/issues/122)). There is one per game,
+written to cover every construct, and each is laid out as a miniature install.
+`CanonicalConversationTests` runs the checks above on them through the shared
+`Helpers/RoundTripChecks`. The one exception is the PoE1 game-model check. It needs
+`OEIFormats.dll`, so it still waits for `DIALOGEDITOR_POE1_DIR`.
+
 ## When to run them
 
 - Before every release, as part of the release checklist.
