@@ -99,6 +99,12 @@ For theme × font-scale sweeps, don't hand-roll the loop. Use
 ./tools/ui-automation/Capture-ConversationsDock.ps1 -OutDir $env:TEMP\dock -GameDirectory '<game folder>'
 ```
 
+**A known conversation to verify against:** `DialogEditor.Tests/Fixtures/Canonical/{poe1,poe2}`
+each hold a miniature game install with one conversation, `canonical`, covering every node
+type, enum value, condition/script shape, text variant and (PoE2) VO case. Copy the folder to
+`$env:TEMP` first, never point `-GameDirectory` at the source tree, then pass
+`-GameDirectory <copy> -Conversation canonical`. Its README maps each node ID to what it covers.
+
 `Invoke-CaptureMatrix -Capture { param($p, $win, $tag, $out) … }` is the
 building block for new surfaces. It refuses to start while an editor is
 running, backs up and restores settings, and clears `PendingRestores` in the
