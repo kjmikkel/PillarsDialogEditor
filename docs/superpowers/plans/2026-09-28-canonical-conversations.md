@@ -21,6 +21,20 @@
 - No BOM on new files. CHANGELOG.md is frozen — do not touch it.
 - Commit messages reference `#122` and end with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`.
 
+## Deviations during execution
+
+- **PoE1 has no link conditions and uses different enum names.** The decompiled `OEIFormats`
+  model shows that `DialogueLink` has no `Conditionals` and that QuestionNodeTextDisplay takes
+  `ShowOnce`/`ShowAlways`/`ShowNever`. So the PoE1 fixture puts its nested condition on node 1,
+  uses the game's own names, and the coverage test asserts both points. Filed the editor bugs this
+  turned up: #139, #140 (RandomWeight is an int in both games), #141.
+- **PoE1 stringtables** carry `<Language>` and `<GenderNeutralText>` per entry and have no
+  `<NextEntryID>`. The fixture follows that shape.
+- **PoE2 node −200** comes last in `Nodes`, as shipped. The bundle was generated with a
+  throwaway script so property order stays consistent.
+- **App verification** used a temp copy of each fixture, never the source tree. It found #142
+  (selecting a linked node marks the conversation modified).
+
 ## File Structure
 
 | File | Responsibility |
