@@ -45,7 +45,7 @@
 
   <ItemGroup Label="Application">
     <PackageVersion Include="CommunityToolkit.Mvvm"          Version="8.4.2" />
-    <PackageVersion Include="NAudio"                         Version="2.4.0" />
+    <PackageVersion Include="NAudio"                         Version="3.1.0" />
     <!-- Referenced directly because NAudio 2.4.0's plain net6.0 dependency group (which a
          net10.0 app resolves to) no longer pulls in NAudio.WinMM — only its net6.0-windows
          group does. VoAudioPlayer needs WaveOutEvent from it. Keep in step with NAudio. -->
