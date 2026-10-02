@@ -81,7 +81,12 @@ warning. Nothing else is written or broken.
   update, "verify files" or the Patch Manager changed is left alone and listed in the log, so an
   old snapshot never downgrades an updated game
   ([#118](https://github.com/kjmikkel/PillarsDialogEditor/issues/118)). While a test patch is
-  active, use F6 first.
+  active, use F6 first. It covers conversations and the text of every installed language, each
+  restored into its own language's folder, and the original of every shipped voice-over line that
+  Test Patch replaced. A voice-over file the editor *added* is removed by F6, not by Restore Full
+  Backup. Backups taken before this change cover one language: it's identified automatically, and
+  only that language is restored
+  ([#123](https://github.com/kjmikkel/PillarsDialogEditor/issues/123)).
 
 **Unreadable files.** If one language's text file for a conversation is damaged, the conversation
 still opens in that language, without its text. The status bar names the file
