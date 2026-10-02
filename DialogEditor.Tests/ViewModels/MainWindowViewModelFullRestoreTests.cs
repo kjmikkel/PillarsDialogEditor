@@ -14,7 +14,7 @@ namespace DialogEditor.Tests.ViewModels;
 /// silently downgraded every file a game update or "verify files" had changed since.
 public class MainWindowViewModelFullRestoreTests : IDisposable
 {
-    private readonly FakePoe2Game _game = new("en");
+    private readonly FakePoe2Game _game = new("en", "de");
     private readonly string _settingsPath;
     private readonly string _backupPick;
     private readonly string _projectDir;
@@ -159,6 +159,47 @@ public class MainWindowViewModelFullRestoreTests : IDisposable
         Assert.Contains(journal, w => string.Equals(w.Path, _game.ConvPath(), StringComparison.OrdinalIgnoreCase));
         Assert.Contains(journal, w => string.Equals(w.Path, _game.StPath("en"), StringComparison.OrdinalIgnoreCase));
     }
+
+    /// Issue 123's worst case, pinned before the format changes: a one-language backup
+    /// (taken with "en" selected) restored while "de" is selected pairs the English snapshot
+    /// with the German folder. The #118 guard must skip every such file — the editor never
+    /// wrote German text on top of English bytes — so German is never overwritten with English.
+    [Fact]
+    public async Task LegacyBackup_RestoredWithAnotherLanguageSelected_NeverOverwritesThatLanguage()
+    {
+        await TakeSnapshot();                       // one-language (format 1) snapshot, "en" selected
+        var english = File.ReadAllBytes(_game.StPath("en"));
+        var vm       = MakeVm(EditBothLanguages());
+        await vm.TestPatchCommand.ExecuteAsync(null);
+        var germanAfterTest = File.ReadAllBytes(_game.StPath("de"));
+        Assert.NotEqual(english, germanAfterTest);
+        LoseTestBookkeeping();
+
+        ((Core.GameData.IGameDataProvider)typeof(MainWindowViewModel)
+            .GetField("_provider", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+            .GetValue(vm)!).Language = "de";
+        await vm.RestoreBackupCommand.ExecuteAsync(null);
+
+        Assert.Equal(germanAfterTest, File.ReadAllBytes(_game.StPath("de")));
+        // Proof the English snapshot really was aimed at the German folder, and that it was
+        // the guard that stopped it: today that shows up as a misleading "changed outside the
+        // editor" skip. Issue 123 replaces this with a restore into each language's own folder.
+        Assert.Contains("Status_FullRestoreSkipped", vm.StatusText);
+    }
+
+    private static DialogProject EditBothLanguages() =>
+        DialogProject.Empty("FullRestore").WithPatch(
+            new ConversationPatch("test_conv", ConversationPatch.CurrentSchemaVersion,
+                [new NodeEditSnapshot(99, false, SpeakerCategory.Npc, "spk", "lst", "", "",
+                    "Conversation", "None", "", "", "", false, false,
+                    [new LinkEditSnapshot(99, 1, 1f, "", false)], [], [])], [], [])
+            {
+                Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
+                {
+                    ["en"] = [new NodeTranslation(99, "added line", "")],
+                    ["de"] = [new NodeTranslation(99, "neue Zeile", "")],
+                },
+            });
 
     [Fact]
     public async Task TestPatch_WithoutABackup_WritesNoJournal()

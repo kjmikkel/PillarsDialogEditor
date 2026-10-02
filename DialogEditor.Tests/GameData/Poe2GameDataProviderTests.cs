@@ -94,6 +94,20 @@ public class Poe2GameDataProviderTests : IDisposable
 
     // ── Tests ─────────────────────────────────────────────────────────────
 
+    // The full backup snapshots every language's folder (issue 123), so it must not depend
+    // on whichever language happens to be selected.
+    [Fact]
+    public void GetStringTablesRoot_IsThatLanguagesFolder_WhateverLanguageIsSelected()
+    {
+        _provider.Language = "en";
+
+        var root = _provider.GetStringTablesRoot("de");
+
+        Assert.Equal(
+            Path.Combine(_root, "PillarsOfEternityII_Data", "exported", "localized", "de", "text", "conversations"),
+            root);
+    }
+
     [Fact]
     public void EnumerateConversations_ReturnsConversationBundleFiles()
     {
