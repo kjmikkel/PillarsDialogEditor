@@ -112,6 +112,22 @@ public class Poe1GameDataProviderTests : IDisposable
         </StringTableFile>
         """;
 
+    // ── Backup roots ──────────────────────────────────────────────────────
+
+    // The full backup snapshots every language's folder (issue 123), so it must not depend
+    // on whichever language happens to be selected.
+    [Fact]
+    public void GetStringTablesRoot_IsThatLanguagesFolder_WhateverLanguageIsSelected()
+    {
+        _provider.Language = "en";
+
+        var root = _provider.GetStringTablesRoot("de");
+
+        Assert.Equal(
+            Path.Combine(_root, "PillarsOfEternity_Data", "data", "localized", "de", "text", "conversations"),
+            root);
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────
 
     private string ConvDir => Path.Combine(_root, "PillarsOfEternity_Data", "data", "conversations");
