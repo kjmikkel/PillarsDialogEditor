@@ -68,11 +68,20 @@ public class MainWindowViewModelFullRestoreTests : IDisposable
                 Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
                 {
                     ["en"] = [new NodeTranslation(99, "added line", "")],
+                    ["de"] = [new NodeTranslation(99, "neue Zeile", "")],
                 },
             });
 
     /// What OfferBackupAsync does the first time a game folder is opened.
     private async Task TakeSnapshot()
+    {
+        await FullBackup.TakeAsync(_game.Provider, Path.Combine(_backupPick, "2026-09-28T10-00"), default);
+        AppSettings.SetBackupPath(_game.Root, _backupPick);
+    }
+
+    /// A backup from before issue 123: conversations plus ONE flat stringtables folder for the
+    /// language that was selected at the time, and no manifest.
+    private async Task TakeLegacySnapshot()
     {
         var (convRoot, stRoot) = _game.Provider.GetBackupRoots();
         var root = Path.Combine(_backupPick, "2026-09-28T10-00");
@@ -80,6 +89,11 @@ public class MainWindowViewModelFullRestoreTests : IDisposable
         await BackupService.BackupAsync(stRoot,   Path.Combine(root, "stringtables"),  default);
         AppSettings.SetBackupPath(_game.Root, _backupPick);
     }
+
+    private static void SelectLanguage(MainWindowViewModel vm, string language) =>
+        ((Core.GameData.IGameDataProvider)typeof(MainWindowViewModel)
+            .GetField("_provider", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+            .GetValue(vm)!).Language = language;
 
     // F6's bookkeeping lost (crash, reset settings): Full Restore is the only undo left.
     private static void LoseTestBookkeeping() => AppSettings.ClearPendingRestores();
@@ -160,46 +174,86 @@ public class MainWindowViewModelFullRestoreTests : IDisposable
         Assert.Contains(journal, w => string.Equals(w.Path, _game.StPath("en"), StringComparison.OrdinalIgnoreCase));
     }
 
-    /// Issue 123's worst case, pinned before the format changes: a one-language backup
-    /// (taken with "en" selected) restored while "de" is selected pairs the English snapshot
-    /// with the German folder. The #118 guard must skip every such file — the editor never
-    /// wrote German text on top of English bytes — so German is never overwritten with English.
+    /// Issue 123's worst case: a one-language backup (taken with "en" selected) restored
+    /// while "de" is selected must never write English over German. The language is inferred
+    /// from which live stringtables still equal the snapshot's, not taken from the selection.
+    /// A second, untouched stringtable per language gives the inference something to match:
+    /// test_conv's own file was rewritten by F5, so it can no longer vouch for any language.
     [Fact]
     public async Task LegacyBackup_RestoredWithAnotherLanguageSelected_NeverOverwritesThatLanguage()
     {
-        await TakeSnapshot();                       // one-language (format 1) snapshot, "en" selected
+        foreach (var lang in new[] { "en", "de" })
+            File.WriteAllText(_game.StPath(lang, "untouched"), FakePoe2Game.StringTable($"untouched {lang}"));
+        await TakeLegacySnapshot();                 // one-language (format 1) snapshot, "en" selected
         var english = File.ReadAllBytes(_game.StPath("en"));
-        var vm       = MakeVm(EditBothLanguages());
+        var vm       = MakeVm();
         await vm.TestPatchCommand.ExecuteAsync(null);
         var germanAfterTest = File.ReadAllBytes(_game.StPath("de"));
         Assert.NotEqual(english, germanAfterTest);
         LoseTestBookkeeping();
 
-        ((Core.GameData.IGameDataProvider)typeof(MainWindowViewModel)
-            .GetField("_provider", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
-            .GetValue(vm)!).Language = "de";
+        SelectLanguage(vm, "de");
         await vm.RestoreBackupCommand.ExecuteAsync(null);
 
         Assert.Equal(germanAfterTest, File.ReadAllBytes(_game.StPath("de")));
-        // Proof the English snapshot really was aimed at the German folder, and that it was
-        // the guard that stopped it: today that shows up as a misleading "changed outside the
-        // editor" skip. Issue 123 replaces this with a restore into each language's own folder.
-        Assert.Contains("Status_FullRestoreSkipped", vm.StatusText);
+        // The inferred language is "en", so the English pair restores into the English folder
+        // (and nothing was skipped); the selected language played no part.
+        Assert.Equal(english, File.ReadAllBytes(_game.StPath("en")));
+        Assert.DoesNotContain("Status_FullRestoreSkipped", vm.StatusText);
+        Assert.DoesNotContain("Status_FullRestoreLanguageUnknown", vm.StatusText);
     }
 
-    private static DialogProject EditBothLanguages() =>
-        DialogProject.Empty("FullRestore").WithPatch(
-            new ConversationPatch("test_conv", ConversationPatch.CurrentSchemaVersion,
-                [new NodeEditSnapshot(99, false, SpeakerCategory.Npc, "spk", "lst", "", "",
-                    "Conversation", "None", "", "", "", false, false,
-                    [new LinkEditSnapshot(99, 1, 1f, "", false)], [], [])], [], [])
-            {
-                Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
-                {
-                    ["en"] = [new NodeTranslation(99, "added line", "")],
-                    ["de"] = [new NodeTranslation(99, "neue Zeile", "")],
-                },
-            });
+    [Fact]
+    public async Task OtherLanguagesWrittenByTestPatch_AreRestored()
+    {
+        await TakeSnapshot();
+        var en = File.ReadAllBytes(_game.StPath("en"));
+        var de = File.ReadAllBytes(_game.StPath("de"));
+        var vm = MakeVm();
+        await vm.TestPatchCommand.ExecuteAsync(null);
+        Assert.NotEqual(de, File.ReadAllBytes(_game.StPath("de")));
+        LoseTestBookkeeping();
+
+        await vm.RestoreBackupCommand.ExecuteAsync(null);
+
+        Assert.Equal(en, File.ReadAllBytes(_game.StPath("en")));
+        Assert.Equal(de, File.ReadAllBytes(_game.StPath("de")));
+    }
+
+    [Fact]
+    public async Task LanguageSwitchedSinceTheBackup_RestoresEachLanguageIntoItsOwnFolder()
+    {
+        await TakeSnapshot();                       // "en" selected
+        var en = File.ReadAllBytes(_game.StPath("en"));
+        var de = File.ReadAllBytes(_game.StPath("de"));
+        var vm = MakeVm();
+        await vm.TestPatchCommand.ExecuteAsync(null);
+        LoseTestBookkeeping();
+
+        SelectLanguage(vm, "de");
+        await vm.RestoreBackupCommand.ExecuteAsync(null);
+
+        Assert.Equal(en, File.ReadAllBytes(_game.StPath("en")));
+        Assert.Equal(de, File.ReadAllBytes(_game.StPath("de")));
+        Assert.DoesNotContain("Status_FullRestoreSkipped", vm.StatusText);
+    }
+
+    [Fact]
+    public async Task LegacyBackupWithUnknownLanguage_RestoresConversationsAndSaysSo()
+    {
+        await TakeLegacySnapshot();
+        File.WriteAllText(Path.Combine(_backupPick, "2026-09-28T10-00", "stringtables", "test_conv.stringtable"),
+            "matches no installed language");
+        var conv = File.ReadAllBytes(_game.ConvPath());
+        var vm = MakeVm();
+        await vm.TestPatchCommand.ExecuteAsync(null);
+        LoseTestBookkeeping();
+
+        await vm.RestoreBackupCommand.ExecuteAsync(null);
+
+        Assert.Equal(conv, File.ReadAllBytes(_game.ConvPath()));
+        Assert.Contains("Status_FullRestoreLanguageUnknown", vm.StatusText);
+    }
 
     [Fact]
     public async Task TestPatch_WithoutABackup_WritesNoJournal()
