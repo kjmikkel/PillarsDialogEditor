@@ -9,6 +9,13 @@ namespace DialogEditor.Core.Backup;
 /// stringtable folders; a backup without a manifest is format 1 (one flat stringtables folder).</summary>
 public sealed record FullBackupManifest(int Format, string GameId, IReadOnlyList<string> Languages);
 
+/// <summary>One snapshot folder and the live folder it restores into.</summary>
+public sealed record RestorePair(string Snapshot, string Live);
+
+/// <summary>What to restore, and whether an older backup's text had to be left out because
+/// its language couldn't be determined.</summary>
+public sealed record RestorePlan(IReadOnlyList<RestorePair> Pairs, bool TextLanguageUnknown);
+
 /// <summary>
 /// The on-disk layout of the full backup (issues 118, 123): conversations, one stringtables
 /// folder per installed language, and a backup.json manifest. Restoring each snapshot/live
@@ -20,6 +27,7 @@ public static class FullBackup
 {
     public const string ManifestFileName = "backup.json";
     private const int CurrentFormat = 2;
+    private const string VoiceOverFolder = "voice-over";
 
     private static readonly JsonSerializerOptions ManifestJson = new() { WriteIndented = true };
 
@@ -64,4 +72,71 @@ public static class FullBackup
         Directory.Exists(backupPick)
             ? Directory.GetDirectories(backupPick).OrderByDescending(d => d, StringComparer.Ordinal).FirstOrDefault()
             : null;
+
+    /// <summary>
+    /// Which snapshot folder restores into which live folder. Format 2 names its languages in
+    /// the manifest; format 1 has one unlabelled stringtables folder, whose language is
+    /// inferred (never assumed from the language currently selected — issue 123).
+    /// </summary>
+    public static RestorePlan PlanRestore(IGameDataProvider provider, string backupRoot, string? voicesRoot)
+    {
+        var pairs = new List<RestorePair>
+        {
+            new(Path.Combine(backupRoot, "conversations"), provider.GetBackupRoots().ConversationsRoot),
+        };
+        var textLanguageUnknown = false;
+
+        if (ReadManifest(backupRoot) is { } manifest)
+        {
+            var installed = provider.AvailableLanguages.ToHashSet(StringComparer.OrdinalIgnoreCase);
+            foreach (var lang in manifest.Languages.Where(installed.Contains))
+            {
+                var live = provider.GetStringTablesRoot(lang);
+                if (Directory.Exists(live))
+                    pairs.Add(new RestorePair(Path.Combine(backupRoot, "stringtables", lang), live));
+            }
+
+            var voiceSnapshot = Path.Combine(backupRoot, VoiceOverFolder);
+            if (voicesRoot is not null && Directory.Exists(voiceSnapshot) && Directory.Exists(voicesRoot))
+                pairs.Add(new RestorePair(voiceSnapshot, voicesRoot));
+        }
+        else
+        {
+            var flat = Path.Combine(backupRoot, "stringtables");
+            if (Directory.Exists(flat))
+            {
+                if (InferLegacyLanguage(provider, flat) is { } lang)
+                    pairs.Add(new RestorePair(flat, provider.GetStringTablesRoot(lang)));
+                else
+                    textLanguageUnknown = true;
+            }
+        }
+        return new RestorePlan(pairs, textLanguageUnknown);
+    }
+
+    /// <summary>
+    /// The language an older (single-folder) backup was taken in: the installed language whose
+    /// live stringtables most often equal the snapshot's, provided it has at least one match
+    /// and no other language ties it. Translations differ, so only the original language
+    /// matches. Read-only; <c>null</c> means unknown.
+    /// </summary>
+    public static string? InferLegacyLanguage(IGameDataProvider provider, string legacyStringTablesRoot)
+    {
+        if (!Directory.Exists(legacyStringTablesRoot)) return null;
+        var snapshot = Directory.EnumerateFiles(legacyStringTablesRoot, "*", SearchOption.AllDirectories)
+            .Select(f => (Relative: Path.GetRelativePath(legacyStringTablesRoot, f), Hash: FileHash.Of(f)))
+            .ToList();
+
+        var scores = provider.AvailableLanguages
+            .Select(lang =>
+            {
+                var live = provider.GetStringTablesRoot(lang);
+                return (Lang: lang, Matches: snapshot.Count(s => s.Hash == FileHash.Of(Path.Combine(live, s.Relative))));
+            })
+            .ToList();
+
+        var best = scores.Select(s => s.Matches).DefaultIfEmpty(0).Max();
+        var winners = scores.Where(s => s.Matches == best).ToList();
+        return best > 0 && winners.Count == 1 ? winners[0].Lang : null;
+    }
 }
