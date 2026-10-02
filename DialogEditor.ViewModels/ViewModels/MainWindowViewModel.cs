@@ -2073,12 +2073,8 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    private static async Task RunProviderBackupAsync(string backupRoot, IGameDataProvider provider)
-    {
-        var (convRoot, stRoot) = provider.GetBackupRoots();
-        await BackupService.BackupAsync(convRoot, Path.Combine(backupRoot, "conversations"), default);
-        await BackupService.BackupAsync(stRoot,   Path.Combine(backupRoot, "stringtables"),  default);
-    }
+    private static Task RunProviderBackupAsync(string backupRoot, IGameDataProvider provider)
+        => FullBackup.TakeAsync(provider, backupRoot, default);
 
     // Appends this test's writes to the journal next to the full backup (issue 118), so
     // Restore Full Backup can later tell them from a game update. No backup, no journal:
@@ -2132,24 +2128,19 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        // Find the most recent timestamped subfolder
-        var subdirs = Directory.GetDirectories(backupPick)
-            .OrderByDescending(d => d)
-            .ToList();
-        if (subdirs.Count == 0) { StatusText = Loc.Get("Status_NoBackupFound"); return; }
+        var backupRoot = FullBackup.Latest(backupPick);
+        if (backupRoot is null) { StatusText = Loc.Get("Status_NoBackupFound"); return; }
 
-        var backupRoot = subdirs[0];
         StatusText     = Loc.Get("Status_RestoreInProgress");
         try
         {
-            var (convRoot, stRoot) = _provider!.GetBackupRoots();
             var writes   = EditorWriteJournal.Load(Path.Combine(backupPick, EditorWriteJournal.FileName));
             var gameDir  = _currentGameDirectory;
-            var pairs    = new[]
-            {
-                (Snapshot: Path.Combine(backupRoot, "conversations"), Live: convRoot),
-                (Snapshot: Path.Combine(backupRoot, "stringtables"),  Live: stRoot),
-            };
+            // Each snapshot folder goes back into its own language's folder, never the one
+            // currently selected (issue 123).
+            var plan     = FullBackup.PlanRestore(_provider!, backupRoot,
+                string.Equals(_activeGameId, "poe2", StringComparison.OrdinalIgnoreCase) ? VoPathResolver.VoicesRoot(gameDir) : null);
+            var pairs    = plan.Pairs;
 
             var results = await Task.Run(() => pairs.Select(p =>
                 FullBackupRestore.Restore(p.Snapshot, p.Live, writes, PatcherManaged(gameDir, p.Snapshot, p.Live)))
@@ -2165,6 +2156,12 @@ public partial class MainWindowViewModel : ObservableObject
                 ? Loc.FormatCount("Status_FullRestoreComplete", restored)
                 : Loc.FormatCount("Status_FullRestoreComplete", restored) + " "
                   + Loc.FormatCount("Status_FullRestoreSkipped", skipped.Count);
+            if (plan.TextLanguageUnknown)
+            {
+                AppLog.Warn($"Backup {Path.GetFileName(backupRoot)} predates per-language backups and its text " +
+                            "matches no installed language; only conversations were restored");
+                StatusText += " " + Loc.Get("Status_FullRestoreLanguageUnknown");
+            }
             if (_currentFile is not null)
                 LoadConversationFile(_currentFile);
         }
