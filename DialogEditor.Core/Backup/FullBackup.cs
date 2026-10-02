@@ -139,4 +139,28 @@ public static class FullBackup
         var winners = scores.Where(s => s.Matches == best).ToList();
         return best > 0 && winners.Count == 1 ? winners[0].Lang : null;
     }
+
+    /// <summary>
+    /// Keeps the original of a shipped file the editor is about to overwrite (Test Patch's
+    /// voice-over sync), under <c>voice-over/</c> in the backup. Only the first time: a copy
+    /// already there is the true original, and a later one could be the editor's own output.
+    /// Returns <c>false</c> (and logs) when it couldn't, e.g. the backup folder is unreachable;
+    /// the caller carries on, as the test itself doesn't depend on the backup.
+    /// </summary>
+    public static bool PreserveOriginal(string backupRoot, string liveRoot, string liveFile)
+    {
+        try
+        {
+            var target = Path.Combine(backupRoot, VoiceOverFolder, Path.GetRelativePath(liveRoot, liveFile));
+            if (File.Exists(target)) return true;
+            Directory.CreateDirectory(Path.GetDirectoryName(target)!);
+            File.Copy(liveFile, target);
+            return true;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            AppLog.Warn($"Could not keep the original of {liveFile} in the backup: {ex.Message}");
+            return false;
+        }
+    }
 }

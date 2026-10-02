@@ -168,4 +168,42 @@ public class FullBackupTests : IDisposable
 
         Assert.Null(FullBackup.InferLegacyLanguage(_game.Provider, Path.Combine(_root, "stringtables")));
     }
+
+    // ── PreserveOriginal ─────────────────────────────────────────────────
+
+    [Fact]
+    public void PreserveOriginal_CopiesTheFileTheFirstTime()
+    {
+        var live = Path.Combine(_game.VoDir, "narrator", "canonical_0007.wem");
+
+        Assert.True(FullBackup.PreserveOriginal(_root, _game.VoDir, live));
+
+        Assert.Equal(File.ReadAllBytes(live),
+            File.ReadAllBytes(Path.Combine(_root, "voice-over", "narrator", "canonical_0007.wem")));
+    }
+
+    [Fact]
+    public void PreserveOriginal_SecondCallKeepsTheFirstCopy()
+    {
+        var live = Path.Combine(_game.VoDir, "narrator", "canonical_0007.wem");
+        var original = File.ReadAllBytes(live);
+        FullBackup.PreserveOriginal(_root, _game.VoDir, live);
+        File.WriteAllBytes(live, [9, 9, 9]);   // what Test Patch left behind
+
+        FullBackup.PreserveOriginal(_root, _game.VoDir, live);
+
+        Assert.Equal(original,
+            File.ReadAllBytes(Path.Combine(_root, "voice-over", "narrator", "canonical_0007.wem")));
+    }
+
+    [Fact]
+    public void PreserveOriginal_UnreachableBackupRoot_ReturnsFalseWithoutThrowing()
+    {
+        var live = Path.Combine(_game.VoDir, "narrator", "canonical_0007.wem");
+        var blocker = Path.Combine(_root, "blocker");   // a file where the backup folder should go
+        Directory.CreateDirectory(_root);
+        File.WriteAllText(blocker, "not a folder");
+
+        Assert.False(FullBackup.PreserveOriginal(Path.Combine(blocker, "backup"), _game.VoDir, live));
+    }
 }
