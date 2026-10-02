@@ -58,7 +58,12 @@ public static class FullBackup
         if (!File.Exists(path)) return null;
         try
         {
-            return JsonSerializer.Deserialize<FullBackupManifest>(File.ReadAllText(path));
+            // Valid JSON can still lack the language list (truncated, hand-edited); without it
+            // the manifest says nothing usable, so it is treated like a missing one.
+            if (JsonSerializer.Deserialize<FullBackupManifest>(File.ReadAllText(path)) is { Languages: not null } manifest)
+                return manifest;
+            AppLog.Warn($"Backup manifest {ManifestFileName} in {backupRoot} lists no languages, treating it as an older backup");
+            return null;
         }
         catch (Exception ex) when (ex is JsonException or IOException or UnauthorizedAccessException)
         {
@@ -95,10 +100,6 @@ public static class FullBackup
                 if (Directory.Exists(live))
                     pairs.Add(new RestorePair(Path.Combine(backupRoot, "stringtables", lang), live));
             }
-
-            var voiceSnapshot = Path.Combine(backupRoot, VoiceOverFolder);
-            if (voicesRoot is not null && Directory.Exists(voiceSnapshot) && Directory.Exists(voicesRoot))
-                pairs.Add(new RestorePair(voiceSnapshot, voicesRoot));
         }
         else
         {
@@ -111,6 +112,13 @@ public static class FullBackup
                     textLanguageUnknown = true;
             }
         }
+
+        // In any format: voice-over/ is only ever written by PreserveOriginal, into whichever
+        // backup is latest — and every backup taken before issue 123 is format 1.
+        var voiceSnapshot = Path.Combine(backupRoot, VoiceOverFolder);
+        if (voicesRoot is not null && Directory.Exists(voiceSnapshot) && Directory.Exists(voicesRoot))
+            pairs.Add(new RestorePair(voiceSnapshot, voicesRoot));
+
         return new RestorePlan(pairs, textLanguageUnknown);
     }
 

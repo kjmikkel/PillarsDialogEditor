@@ -118,6 +118,33 @@ public class FullBackupTests : IDisposable
         Assert.Contains(new RestorePair(Path.Combine(_root, "voice-over"), _game.VoDir), plan.Pairs);
     }
 
+    // Every backup that exists today is format 1, and Test Patch keeps voice-over originals in
+    // the latest backup whatever its format. Only this code ever creates voice-over/, so it is
+    // trusted in any format — otherwise existing users' originals would be kept and never used.
+    [Fact]
+    public void PlanRestore_Format1_StillRestoresVoiceOverOriginals()
+    {
+        WriteLegacyBackup("en");
+        Directory.CreateDirectory(Path.Combine(_root, "voice-over"));
+
+        var plan = FullBackup.PlanRestore(_game.Provider, _root, _game.VoDir);
+
+        Assert.Contains(new RestorePair(Path.Combine(_root, "voice-over"), _game.VoDir), plan.Pairs);
+    }
+
+    // A manifest that parses but lacks its language list (truncated, hand-edited) must not
+    // crash the restore: it is treated as an older backup, whose language is inferred.
+    [Fact]
+    public void ReadManifest_WithoutLanguages_IsNullAndLogged()
+    {
+        Directory.CreateDirectory(_root);
+        File.WriteAllText(Path.Combine(_root, FullBackup.ManifestFileName), """{ "Format": 2, "GameId": "poe2" }""");
+
+        Assert.Null(FullBackup.ReadManifest(_root));
+
+        Assert.Contains("backup.json", File.ReadAllText(AppLog.LogPath));
+    }
+
     [Fact]
     public async Task PlanRestore_Format2_LanguageUninstalledSince_OmitsItsPair()
     {
