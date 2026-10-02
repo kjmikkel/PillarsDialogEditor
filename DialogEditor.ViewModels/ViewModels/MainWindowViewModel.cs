@@ -2298,7 +2298,7 @@ public partial class MainWindowViewModel : ObservableObject
             // backup entries so that F6 can restore or remove them.
             if (string.Equals(_activeGameId, "poe2", StringComparison.OrdinalIgnoreCase))
             {
-                SyncVoToGame(restoreEntries);
+                SyncVoToGame(restoreEntries, hashBefore);
                 // Re-persist so the VO entries survive a crash between here and the patch writes.
                 AppSettings.SetPendingRestores(restoreEntries);
             }
@@ -2420,15 +2420,17 @@ public partial class MainWindowViewModel : ObservableObject
     /// existed); <c>OriginalConvPath</c> stores the game destination path. String-table
     /// fields are left empty because audio files have no associated string table.
     /// </remarks>
-    private void SyncVoToGame(IList<PendingRestoreEntry> restoreEntries)
+    private void SyncVoToGame(IList<PendingRestoreEntry> restoreEntries, IDictionary<string, string?> hashBefore)
     {
         if (ProjectPath is null) return;
 
         var voFolder = Path.Combine(Path.GetDirectoryName(ProjectPath)!, "_vo");
         if (!Directory.Exists(voFolder)) return;
 
-        var gameVoRoot = Path.Combine(_currentGameDirectory,
-            "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
+        var gameVoRoot = VoPathResolver.VoicesRoot(_currentGameDirectory);
+        // Where the originals of overwritten shipped files are kept (issue 123); none without a backup.
+        var backupPick   = AppSettings.GetBackupPath(_currentGameDirectory);
+        var latestBackup = backupPick is null ? null : FullBackup.Latest(backupPick);
 
         foreach (var localFile in Directory.EnumerateFiles(voFolder, "*.wem", SearchOption.AllDirectories))
         {
@@ -2440,6 +2442,14 @@ public partial class MainWindowViewModel : ObservableObject
                     "vobackup", Guid.NewGuid().ToString("N")[..8]);
 
                 Directory.CreateDirectory(Path.GetDirectoryName(gameDest)!);
+
+                // Journalled like the conversation files, so Restore Full Backup's editor-writes guard (issue 118)
+                // recognises this write as the editor's.
+                hashBefore[gameDest] = FileHash.Of(gameDest);
+                // First overwrite only: PreserveOriginal keeps the earliest copy. A failure is
+                // already logged there and must not stop the test.
+                if (latestBackup is not null && File.Exists(gameDest))
+                    FullBackup.PreserveOriginal(latestBackup, gameVoRoot, gameDest);
 
                 var backupPath = Path.Combine(backupDir, Path.GetFileName(gameDest));
 
