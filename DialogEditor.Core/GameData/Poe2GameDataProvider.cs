@@ -17,7 +17,10 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
     private string ExportedRoot    => Path.Combine(rootPath, "PillarsOfEternityII_Data", "exported");
     private string LocalizedRoot   => Path.Combine(ExportedRoot, "localized");
     internal string ConversationsRoot => Path.Combine(ExportedRoot, "design", "conversations");
-    internal string StringTablesRoot  => Path.Combine(LocalizedRoot, Language, "text", "conversations");
+    internal string StringTablesRoot  => GetStringTablesRoot(Language);
+
+    public string GetStringTablesRoot(string language) =>
+        Path.Combine(LocalizedRoot, language, "text", "conversations");
     private string SpeakersBundle  => Path.Combine(ExportedRoot, "design", "gamedata", "speakers.gamedatabundle");
 
     public IReadOnlyList<string> AvailableLanguages =>

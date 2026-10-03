@@ -29,6 +29,11 @@ public interface IGameDataProvider
     string GetStringTablePath(ConversationFile file, string language);
     (string ConversationsRoot, string StringTablesRoot) GetBackupRoots();
 
+    /// The folder holding every conversation stringtable for <paramref name="language"/>,
+    /// whatever <see cref="Language"/> is selected — what the full backup snapshots per
+    /// language (issue 123). Test doubles that never back up a game folder needn't implement it.
+    string GetStringTablesRoot(string language) => throw new NotSupportedException();
+
     /// Returns a ConversationFile record for a not-yet-existing conversation,
     /// using this game's path conventions. Does not create any files.
     ConversationFile BuildNewConversationFile(string name);

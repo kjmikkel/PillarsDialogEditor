@@ -401,6 +401,7 @@
          because something other than the editor changed them. -->
     <sys:String x:Key="Status_FullRestoreSkipped_One">1 file was left as is because something other than the editor changed it, probably a game update (see the log).</sys:String>
     <sys:String x:Key="Status_FullRestoreSkipped_Other">{0} files were left as is because something other than the editor changed them, probably a game update (see the log).</sys:String>
+    <sys:String x:Key="Status_FullRestoreLanguageUnknown">This backup's text files couldn't be matched to an installed language, so only conversations were restored (see the log).</sys:String>
     <sys:String x:Key="Status_FullRestoreTestActive">A test patch is active. Restore it first with Test › Restore Conversation (F6), then restore the backup.</sys:String>
     <!-- {0} = error message -->
     <sys:String x:Key="Status_RestoreError">Restore failed: {0}</sys:String>

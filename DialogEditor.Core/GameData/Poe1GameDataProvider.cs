@@ -17,7 +17,10 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
     private string DataRoot        => Path.Combine(rootPath, "PillarsOfEternity_Data", "data");
     private string LocalizedRoot   => Path.Combine(DataRoot, "localized");
     internal string ConversationsRoot => Path.Combine(DataRoot, "conversations");
-    internal string StringTablesRoot  => Path.Combine(LocalizedRoot, Language, "text", "conversations");
+    internal string StringTablesRoot  => GetStringTablesRoot(Language);
+
+    public string GetStringTablesRoot(string language) =>
+        Path.Combine(LocalizedRoot, language, "text", "conversations");
 
     public IReadOnlyList<string> AvailableLanguages =>
         Directory.Exists(LocalizedRoot)
