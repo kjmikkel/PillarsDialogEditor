@@ -2073,12 +2073,8 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    private static async Task RunProviderBackupAsync(string backupRoot, IGameDataProvider provider)
-    {
-        var (convRoot, stRoot) = provider.GetBackupRoots();
-        await BackupService.BackupAsync(convRoot, Path.Combine(backupRoot, "conversations"), default);
-        await BackupService.BackupAsync(stRoot,   Path.Combine(backupRoot, "stringtables"),  default);
-    }
+    private static Task RunProviderBackupAsync(string backupRoot, IGameDataProvider provider)
+        => FullBackup.TakeAsync(provider, backupRoot, default);
 
     // Appends this test's writes to the journal next to the full backup (issue 118), so
     // Restore Full Backup can later tell them from a game update. No backup, no journal:
@@ -2132,24 +2128,19 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        // Find the most recent timestamped subfolder
-        var subdirs = Directory.GetDirectories(backupPick)
-            .OrderByDescending(d => d)
-            .ToList();
-        if (subdirs.Count == 0) { StatusText = Loc.Get("Status_NoBackupFound"); return; }
+        var backupRoot = FullBackup.Latest(backupPick);
+        if (backupRoot is null) { StatusText = Loc.Get("Status_NoBackupFound"); return; }
 
-        var backupRoot = subdirs[0];
         StatusText     = Loc.Get("Status_RestoreInProgress");
         try
         {
-            var (convRoot, stRoot) = _provider!.GetBackupRoots();
             var writes   = EditorWriteJournal.Load(Path.Combine(backupPick, EditorWriteJournal.FileName));
             var gameDir  = _currentGameDirectory;
-            var pairs    = new[]
-            {
-                (Snapshot: Path.Combine(backupRoot, "conversations"), Live: convRoot),
-                (Snapshot: Path.Combine(backupRoot, "stringtables"),  Live: stRoot),
-            };
+            // Each snapshot folder goes back into its own language's folder, never the one
+            // currently selected (issue 123).
+            var plan     = FullBackup.PlanRestore(_provider!, backupRoot,
+                string.Equals(_activeGameId, "poe2", StringComparison.OrdinalIgnoreCase) ? VoPathResolver.VoicesRoot(gameDir) : null);
+            var pairs    = plan.Pairs;
 
             var results = await Task.Run(() => pairs.Select(p =>
                 FullBackupRestore.Restore(p.Snapshot, p.Live, writes, PatcherManaged(gameDir, p.Snapshot, p.Live)))
@@ -2165,6 +2156,12 @@ public partial class MainWindowViewModel : ObservableObject
                 ? Loc.FormatCount("Status_FullRestoreComplete", restored)
                 : Loc.FormatCount("Status_FullRestoreComplete", restored) + " "
                   + Loc.FormatCount("Status_FullRestoreSkipped", skipped.Count);
+            if (plan.TextLanguageUnknown)
+            {
+                AppLog.Warn($"Backup {Path.GetFileName(backupRoot)} predates per-language backups and its text " +
+                            "matches no installed language; only conversations were restored");
+                StatusText += " " + Loc.Get("Status_FullRestoreLanguageUnknown");
+            }
             if (_currentFile is not null)
                 LoadConversationFile(_currentFile);
         }
@@ -2301,7 +2298,7 @@ public partial class MainWindowViewModel : ObservableObject
             // backup entries so that F6 can restore or remove them.
             if (string.Equals(_activeGameId, "poe2", StringComparison.OrdinalIgnoreCase))
             {
-                SyncVoToGame(restoreEntries);
+                SyncVoToGame(restoreEntries, hashBefore);
                 // Re-persist so the VO entries survive a crash between here and the patch writes.
                 AppSettings.SetPendingRestores(restoreEntries);
             }
@@ -2423,15 +2420,17 @@ public partial class MainWindowViewModel : ObservableObject
     /// existed); <c>OriginalConvPath</c> stores the game destination path. String-table
     /// fields are left empty because audio files have no associated string table.
     /// </remarks>
-    private void SyncVoToGame(IList<PendingRestoreEntry> restoreEntries)
+    private void SyncVoToGame(IList<PendingRestoreEntry> restoreEntries, IDictionary<string, string?> hashBefore)
     {
         if (ProjectPath is null) return;
 
         var voFolder = Path.Combine(Path.GetDirectoryName(ProjectPath)!, "_vo");
         if (!Directory.Exists(voFolder)) return;
 
-        var gameVoRoot = Path.Combine(_currentGameDirectory,
-            "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
+        var gameVoRoot = VoPathResolver.VoicesRoot(_currentGameDirectory);
+        // Where the originals of overwritten shipped files are kept (issue 123); none without a backup.
+        var backupPick   = AppSettings.GetBackupPath(_currentGameDirectory);
+        var latestBackup = backupPick is null ? null : FullBackup.Latest(backupPick);
 
         foreach (var localFile in Directory.EnumerateFiles(voFolder, "*.wem", SearchOption.AllDirectories))
         {
@@ -2443,6 +2442,14 @@ public partial class MainWindowViewModel : ObservableObject
                     "vobackup", Guid.NewGuid().ToString("N")[..8]);
 
                 Directory.CreateDirectory(Path.GetDirectoryName(gameDest)!);
+
+                // Journalled like the conversation files, so Restore Full Backup's editor-writes guard (issue 118)
+                // recognises this write as the editor's.
+                hashBefore[gameDest] = FileHash.Of(gameDest);
+                // First overwrite only: PreserveOriginal keeps the earliest copy. A failure is
+                // already logged there and must not stop the test.
+                if (latestBackup is not null && File.Exists(gameDest))
+                    FullBackup.PreserveOriginal(latestBackup, gameVoRoot, gameDest);
 
                 var backupPath = Path.Combine(backupDir, Path.GetFileName(gameDest));
 
