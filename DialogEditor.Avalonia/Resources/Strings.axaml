@@ -1,4 +1,4 @@
-<ResourceDictionary xmlns="https://github.com/avaloniaui"
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=System.Runtime">
 
@@ -693,7 +693,7 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_Duplicate_GoToNode">Jump to the first node of this duplicate (switches conversation if needed).</sys:String>
     <!-- ─── Batch Find / Replace ─────────────────────────────────────────── -->
     <sys:String x:Key="Menu_BatchReplace">Batch Find / Replace…</sys:String>
-    <sys:String x:Key="ToolTip_BatchReplace">Find and replace text, GUIDs, and parameter values across all conversations on disk</sys:String>
+    <sys:String x:Key="ToolTip_BatchReplace">Find and replace text, GUIDs, and parameter values across every conversation in the game, including your project's edits. Changes are added to the open project, never written to the game files directly</sys:String>
     <sys:String x:Key="BatchReplace_Title">Batch Find / Replace</sys:String>
     <sys:String x:Key="BatchReplace_Find">Find:</sys:String>
     <sys:String x:Key="BatchReplace_Replace">Replace:</sys:String>
@@ -881,9 +881,11 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="BatchReplace_ConversationCount_Other">{0} conversations</sys:String>
     <sys:String x:Key="BatchReplace_StatusMatches">{0} across {1}</sys:String>
     <sys:String x:Key="BatchReplace_StatusNoMatches">No matches found</sys:String>
-    <sys:String x:Key="BatchReplace_StatusApplied">Applied {0} across {1}</sys:String>
-    <sys:String x:Key="BatchReplace_StatusSkipped_One">1 open conversation skipped — save it first</sys:String>
-    <sys:String x:Key="BatchReplace_StatusSkipped_Other">{0} open conversations skipped — save them first</sys:String>
+    <sys:String x:Key="BatchReplace_StatusApplied">Added {0} across {1} to the project — save it to keep them, Test Patch (F5) to try them in-game</sys:String>
+    <sys:String x:Key="BatchReplace_StatusNoProject">Open a project first — Batch Replace adds its changes to the project</sys:String>
+    <sys:String x:Key="BatchReplace_StatusTestActive">A test is active — restore it (F6) before batch replacing, so the changes are made against the original game files</sys:String>
+    <sys:String x:Key="BatchReplace_StatusSkipped_One">1 open conversation skipped — save and close it first</sys:String>
+    <sys:String x:Key="BatchReplace_StatusSkipped_Other">{0} open conversations skipped — save and close them first</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace_Find">Text to search for across all conversations</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace_Replace">Replacement text</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace_CaseSensitive">Match exact capitalisation</sys:String>
@@ -891,8 +893,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_BatchReplace_InSpeakerGuids">Search in Speaker GUID and Listener GUID fields</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace_InScriptParams">Search in script call parameter values</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace_InConditionParams">Search in condition parameter values</sys:String>
-    <sys:String x:Key="ToolTip_BatchReplace_Preview">Scan all conversations and show a preview of changes without writing to disk</sys:String>
-    <sys:String x:Key="ToolTip_BatchReplace_Apply">Write the previewed replacements to disk for all selected conversations</sys:String>
+    <sys:String x:Key="ToolTip_BatchReplace_Preview">Scan all conversations and show a preview of the changes without changing anything</sys:String>
+    <sys:String x:Key="ToolTip_BatchReplace_Apply">Add the previewed replacements to the project. Game files change only when you test the patch (F5)</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace_ConvCheckbox">Uncheck to exclude this conversation from the apply step</sys:String>
 
     <!-- ─── Diff / Compare Versions window ──────────────────────────────── -->

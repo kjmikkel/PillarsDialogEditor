@@ -1,4 +1,4 @@
-using DialogEditor.Core.Analytics;
+﻿using DialogEditor.Core.Analytics;
 using System.Collections.ObjectModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -340,6 +340,7 @@ public partial class MainWindowViewModel : ObservableObject
         ImportTranslationCommand.NotifyCanExecuteChanged();
         BatchImportVoAllCommand.NotifyCanExecuteChanged();
         FindInProjectCommand.NotifyCanExecuteChanged();
+        BatchReplaceCommand.NotifyCanExecuteChanged();
         ShowRepDispositionBalanceWindowCommand.NotifyCanExecuteChanged();
         BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
         // Only re-scan the game folder when NewConversations actually changes —
@@ -792,6 +793,7 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
         FindInProjectCommand.NotifyCanExecuteChanged();
+        BatchReplaceCommand.NotifyCanExecuteChanged();
         ShowRepDispositionBalanceWindowCommand.NotifyCanExecuteChanged();
         BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
         DialogProjectSerializer.SaveToFile(path, _project!);
@@ -910,6 +912,7 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
         FindInProjectCommand.NotifyCanExecuteChanged();
+        BatchReplaceCommand.NotifyCanExecuteChanged();
         ShowRepDispositionBalanceWindowCommand.NotifyCanExecuteChanged();
         BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
         CurrentProjectName = null;
@@ -1115,6 +1118,7 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on _projectPath
         FindInProjectCommand.NotifyCanExecuteChanged();
+        BatchReplaceCommand.NotifyCanExecuteChanged();
         ShowRepDispositionBalanceWindowCommand.NotifyCanExecuteChanged();
         BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
         AppSettings.LastProjectPath = path;
@@ -1465,6 +1469,7 @@ public partial class MainWindowViewModel : ObservableObject
         OnPropertyChanged(nameof(CanExportModBundle));
         BatchImportVoAllCommand.NotifyCanExecuteChanged();
         FindInProjectCommand.NotifyCanExecuteChanged();
+        BatchReplaceCommand.NotifyCanExecuteChanged();
         ShowRepDispositionBalanceWindowCommand.NotifyCanExecuteChanged();
         BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
         AppSettings.LastProjectPath = path;
@@ -1528,19 +1533,9 @@ public partial class MainWindowViewModel : ObservableObject
 
         // WithPatch replaces the stored patch wholesale, but the diff only knows
         // the canvas language — carry over imported translations for every other
-        // language, or they would be silently erased on each save. The current
-        // language always takes the freshly diffed value (including "no entry"
-        // when the text was reverted to vanilla).
-        if (_project!.Patches.TryGetValue(_currentFile.Name, out var prior)
-            && prior.Translations.Count > 0)
-        {
-            var mergedTranslations =
-                new Dictionary<string, IReadOnlyList<NodeTranslation>>(prior.Translations);
-            mergedTranslations.Remove(_provider.Language);
-            foreach (var (lang, entries) in patch.Translations)
-                mergedTranslations[lang] = entries;
-            patch = patch with { Translations = mergedTranslations };
-        }
+        // language, or they would be silently erased on each save.
+        patch = patch.CarryingTranslationsFrom(
+            _project!.Patches.GetValueOrDefault(_currentFile.Name), _provider.Language);
 
         // Prevention: the canvas holds the full effective conversation, so its live
         // node-ID set is authoritative (game-folder-free). Drop comment/translation
@@ -1839,6 +1834,7 @@ public partial class MainWindowViewModel : ObservableObject
             OnPropertyChanged(nameof(CanValidateVO));
             BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on game folder + id
             FindInProjectCommand.NotifyCanExecuteChanged();
+            BatchReplaceCommand.NotifyCanExecuteChanged();
             ShowRepDispositionBalanceWindowCommand.NotifyCanExecuteChanged();
             BrowseSpeakerLinesCommand.NotifyCanExecuteChanged();
             AvailableLanguages = provider.AvailableLanguages;
@@ -2651,6 +2647,36 @@ public partial class MainWindowViewModel : ObservableObject
         vm.RequestNavigate += NavigateToFoundNode;
         if (ShowFindInProject is not null)
             await ShowFindInProject(vm);
+    }
+
+    /// Batch Replace adds its changes to the open project, never to the game folder
+    /// (issue 124), so it needs a project as well as the game data it searches.
+    public bool CanBatchReplace => _project is not null && _provider is not null;
+
+    /// The View shows the (non-modal) Batch Replace window.
+    public Func<BatchReplaceViewModel, Task>? ShowBatchReplace { get; set; }
+
+    [RelayCommand(CanExecute = nameof(CanBatchReplace))]
+    private async Task BatchReplace()
+    {
+        if (_project is null || _provider is null) return;
+        var vm = new BatchReplaceViewModel(
+            _provider, _provider.EnumerateConversations(),
+            // The open conversation's canvas holds edits the project doesn't have yet;
+            // folding over them would lose one or the other.
+            f => f.Name == CurrentConversationName,
+            () => _project,
+            CommitBatchReplace,
+            () => AppSettings.GetPendingRestores() is { Count: > 0 });
+        if (ShowBatchReplace is not null)
+            await ShowBatchReplace(vm);
+    }
+
+    // Unsaved like any other edit: Ctrl+S writes it, autosave covers it meanwhile.
+    private void CommitBatchReplace(DialogProject updated)
+    {
+        SetProject(updated);
+        IsModified = true;
     }
 
     /// Opens the read-only Reputation & Disposition Balance window. Same gate as Find in
