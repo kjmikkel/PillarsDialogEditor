@@ -1,4 +1,4 @@
-using DialogEditor.Core.Editing;
+﻿using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
@@ -35,7 +35,8 @@ public class BatchFieldIdentityTests
     {
         var file    = MakeFile("conv");
         var results = BatchReplaceService.DryRun(
-            query, [file], new StubProvider(file, new ConversationEditSnapshot(nodes)));
+            query, [file], new StubProvider(file, new ConversationEditSnapshot(nodes)),
+            DialogProject.Empty("p"));
         return results[0].Matches[0];
     }
 
@@ -67,7 +68,8 @@ public class BatchFieldIdentityTests
             new BatchReplaceQuery("aaa", "bbb", false, InNodeText: false, InSpeakerGuids: true),
             [file],
             new StubProvider(file, new ConversationEditSnapshot(
-                [MakeNode(1, speakerGuid: "aaa-1", listenerGuid: "aaa-2")])));
+                [MakeNode(1, speakerGuid: "aaa-1", listenerGuid: "aaa-2")])),
+            DialogProject.Empty("p"));
 
         Assert.Equal(
             [new BatchField(BatchFieldKind.SpeakerGuid), new BatchField(BatchFieldKind.ListenerGuid)],

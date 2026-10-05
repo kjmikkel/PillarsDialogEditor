@@ -4,12 +4,19 @@ using DialogEditor.Core.Models;
 
 namespace DialogEditor.Patch;
 
+/// Find and replace across many conversations at once. It edits the *project*, never the
+/// game folder (issue 124): each conversation is searched as the project sees it (vanilla plus
+/// its patch), and the result is diffed back against vanilla into the project's patch, just
+/// as Ctrl+S folds the canvas. The game files only change through Test Patch (F5), which
+/// Restore (F6) and the patcher can undo; a direct write here could be undone by neither,
+/// and it would never have become part of the mod.
 public static class BatchReplaceService
 {
     public static IReadOnlyList<BatchConversationResult> DryRun(
         BatchReplaceQuery               query,
         IReadOnlyList<ConversationFile> files,
-        IGameDataProvider               provider)
+        IGameDataProvider               provider,
+        DialogProject                   project)
     {
         var results    = new List<BatchConversationResult>();
         var comparison = query.CaseSensitive
@@ -18,9 +25,8 @@ public static class BatchReplaceService
 
         foreach (var file in files)
         {
-            var conversation = provider.LoadConversation(file);
-            var snapshot     = ConversationSnapshotBuilder.Build(conversation);
-            var matches      = new List<BatchFieldMatch>();
+            var snapshot = Load(file, provider, project).Effective;
+            var matches  = new List<BatchFieldMatch>();
 
             foreach (var node in snapshot.Nodes)
                 CollectMatches(node, query, comparison, matches);
@@ -32,25 +38,24 @@ public static class BatchReplaceService
         return results;
     }
 
-    public static void Apply(
+    /// Returns <paramref name="project"/> with each result's replacements folded into its
+    /// conversation's patch. Writes nothing to disk.
+    public static DialogProject Apply(
         IReadOnlyList<BatchConversationResult> results,
-        IGameDataProvider                      provider)
+        IGameDataProvider                      provider,
+        DialogProject                          project)
     {
         foreach (var result in results)
         {
-            // Re-load to pick up any changes since DryRun
-            var conversation = provider.LoadConversation(result.File);
-            var snapshot     = ConversationSnapshotBuilder.Build(conversation);
+            // Re-load to pick up any changes since DryRun, then replay the DryRun's
+            // before→after pairs onto the fresh snapshot by field identity.
+            var (vanilla, effective) = Load(result.File, provider, project);
 
-            // Rebuild the match set for this fresh load using the matches' field identities as a guide —
-            // simpler: re-derive the query from the result's own Before/After pairs per node.
-            // Since Apply is always called immediately after DryRun in practice, we re-run the
-            // replacement directly on the fresh snapshot using the same before→after pairs.
             var nodePatches = result.Matches
                 .GroupBy(m => m.NodeId)
                 .ToDictionary(g => g.Key, g => g.ToList());
 
-            var newNodes = snapshot.Nodes.Select(node =>
+            var newNodes = effective.Nodes.Select(node =>
             {
                 if (!nodePatches.TryGetValue(node.NodeId, out var patches))
                     return node;
@@ -58,11 +63,50 @@ public static class BatchReplaceService
                 return ApplyToNode(node, patches);
             }).ToList();
 
-            provider.SaveConversation(result.File, new ConversationEditSnapshot(newNodes));
+            // Diffing against vanilla re-states the project's earlier edits along with the
+            // replacements. Translator comments are language-neutral and untouched by a
+            // batch edit, so they come over as they were.
+            var prior = project.Patches.GetValueOrDefault(result.File.Name);
+            var patch = DiffEngine.Diff(result.File.Name, vanilla,
+                                        new ConversationEditSnapshot(newNodes), provider.Language)
+                .CarryingTranslationsFrom(prior, provider.Language);
+            if (prior is not null)
+                patch = patch with { NodeComments = prior.NodeComments };
+
+            project = project.WithPatch(patch);
         }
+
+        return project;
     }
 
     // ── Private helpers ───────────────────────────────────────────────────
+
+    /// A conversation as vanilla and as the project sees it: the patch replayed and the
+    /// provider language's text laid over the nodes — what the canvas shows when it is
+    /// opened (MainWindowViewModel.LoadConversationFile).
+    private static (ConversationEditSnapshot Vanilla, ConversationEditSnapshot Effective) Load(
+        ConversationFile  file,
+        IGameDataProvider provider,
+        DialogProject     project)
+    {
+        var vanilla = ConversationSnapshotBuilder.Build(provider.LoadConversation(file));
+        if (!project.Patches.TryGetValue(file.Name, out var patch))
+            return (vanilla, vanilla);
+
+        // Forced like the canvas: a game update can move a field the patch also changes.
+        // The project's edit still wins; only F5 keeps the strict conflict check, because
+        // only F5 writes the game.
+        var patched = PatchApplier.Apply(vanilla, patch, ignoreConflicts: true);
+        var text    = patch.Translations.GetValueOrDefault(provider.Language);
+        if (text is null)
+            return (vanilla, patched);
+
+        var byId = text.ToDictionary(t => t.NodeId);
+        return (vanilla, new ConversationEditSnapshot(patched.Nodes.Select(n =>
+            byId.TryGetValue(n.NodeId, out var t)
+                ? n with { DefaultText = t.DefaultText, FemaleText = t.FemaleText }
+                : n).ToList()));
+    }
 
     private static void CollectMatches(
         NodeEditSnapshot      node,

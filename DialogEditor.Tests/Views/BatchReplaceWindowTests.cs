@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
@@ -8,6 +8,7 @@ using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
 using DialogEditor.Tests.Helpers;
+using DialogEditor.Patch;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
 
@@ -44,7 +45,9 @@ public class BatchReplaceWindowTests : IDisposable
             new ConversationEditSnapshot([.. nodeTexts.Select((t, i) => Node(i + 1, t))]));
 
         var vm = new BatchReplaceViewModel(
-            provider, provider.EnumerateConversations(), isOpenInEditor: _ => false)
+            provider, provider.EnumerateConversations(), isOpenInEditor: _ => false,
+            currentProject: () => DialogProject.Empty("p"), commitProject: _ => { },
+            isTestActive: () => false)
         {
             SearchText  = "world",
             ReplaceText = "earth",

@@ -72,6 +72,22 @@ public record ConversationPatch(
     public IReadOnlyDictionary<int, string> NodeComments { get; init; }
         = new Dictionary<int, string>();
 
+    /// A freshly diffed patch only knows the one language it was diffed in. Every
+    /// other language's translations come over from <paramref name="prior"/> (the patch
+    /// this one replaces), or a re-diff would silently erase imported translations.
+    /// <paramref name="language"/> always keeps this patch's value, including "no
+    /// entry" when its text was reverted to vanilla.
+    public ConversationPatch CarryingTranslationsFrom(ConversationPatch? prior, string language)
+    {
+        if (prior is null || prior.Translations.Count == 0) return this;
+
+        var merged = new Dictionary<string, IReadOnlyList<NodeTranslation>>(prior.Translations);
+        merged.Remove(language);
+        foreach (var (lang, entries) in Translations)
+            merged[lang] = entries;
+        return this with { Translations = merged };
+    }
+
     public bool IsEmpty =>
         AddedNodes.Count     == 0 &&
         DeletedNodeIds.Count == 0 &&
