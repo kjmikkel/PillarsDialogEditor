@@ -82,7 +82,7 @@
     <!-- ─── Links formatting (LINKS TO section) ───────────────────────── -->
     <!-- Arrow prefix before each target node ID, e.g. "→ 5" -->
     <sys:String x:Key="Link_Arrow">→</sys:String>
-    <!-- Prefix for the random-weight annotation, e.g. "w:0.5" -->
+    <!-- Prefix for the random-weight annotation, e.g. "w:2" -->
     <sys:String x:Key="Link_WeightPrefix">w:</sys:String>
 
     <!-- ─── Dialogs ────────────────────────────────────────────────────── -->
@@ -494,7 +494,7 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- ─── Detail panel — link property labels and tooltips ───────────── -->
     <sys:String x:Key="Label_LinkWeight">Wt.</sys:String>
     <sys:String x:Key="ToolTip_LinkQTD">Controls whether this player choice reappears after selection (ShowOnce / Always / Never)</sys:String>
-    <sys:String x:Key="ToolTip_LinkWeight">Random weight — relative probability when multiple links compete for selection. A link with weight 2 is twice as likely to be chosen as one with weight 1. Default: 1</sys:String>
+    <sys:String x:Key="ToolTip_LinkWeight">Random weight — relative probability when multiple links compete for selection. A link with weight 2 is twice as likely to be chosen as one with weight 1; weight 0 is never chosen. Whole numbers only, as the game stores them. Default: 1</sys:String>
 
     <!-- ─── Node detail panel — watermarks ──────────────────────────────── -->
     <sys:String x:Key="Placeholder_FemaleText">(same as default — leave blank)</sys:String>

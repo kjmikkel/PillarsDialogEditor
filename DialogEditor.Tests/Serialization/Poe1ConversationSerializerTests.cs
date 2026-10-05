@@ -369,6 +369,38 @@ public class Poe1ConversationSerializerTests
         Assert.Equal("ShowNever", (string?)link.Element("QuestionNodeTextDisplay"));
     }
 
+    // ── #129: the game reads RandomWeight as an int ──────────────────────────────
+    // XmlSerializer cannot parse "1.5" into DialogueLink.RandomWeight (int), so the whole
+    // conversation would fail to load.
+
+    [Fact]
+    public void Serialize_ExistingLink_FractionalWeight_IsWrittenAsWholeNumber()
+    {
+        var link = OnlyLink(SaveLink(TwoNodeXml, 1.5f, "ShowOnce"));
+
+        Assert.Equal("2", (string?)link.Element("RandomWeight"));
+    }
+
+    [Fact]
+    public void Serialize_NewLink_FractionalWeight_IsWrittenAsWholeNumber()
+    {
+        var snapshot = new ConversationEditSnapshot(
+            [Node(0), Node(1, links: [new LinkEditSnapshot(1, 0, 2.4f, "", false)])]);
+        var doc  = XDocument.Parse(Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot));
+        var link = doc.Descendants("FlowChartLink").Single(l => (int)l.Element("FromNodeID")! == 1);
+
+        Assert.Equal("2", (string?)link.Element("RandomWeight"));
+    }
+
+    [Fact]
+    public void Serialize_LinkWithoutDefaults_WeightRoundingToOne_StaysOmitted()
+    {
+        // 0.6 is written as the game default 1, so a link without the element stays without it.
+        var link = OnlyLink(SaveLink(LinkWithoutDefaultsXml, 0.6f, ""));
+
+        Assert.Null(link.Element("RandomWeight"));
+    }
+
     [Fact]
     public void Serialize_LinkWithoutDefaults_RoundTripsThroughParser()
     {
