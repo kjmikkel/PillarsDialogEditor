@@ -32,7 +32,7 @@ public class SampleProjectServiceTests
         ConversationNode N(int id, int? linkTo) => new(
             NodeId: id, IsPlayerChoice: false, SpeakerCategory: SpeakerCategory.Npc,
             SpeakerGuid: "", ListenerGuid: "",
-            Links: linkTo is int t ? [new NodeLink(id, t, [], 1f, "")] : [],
+            Links: linkTo is int t ? [new NodeLink(id, t, [], 1, "")] : [],
             Conditions: [], Scripts: [], DisplayType: "ConversationLine", Persistence: "None",
             ActorDirection: "", Comments: "", ExternalVO: "", HasVO: false, HideSpeaker: false);
 

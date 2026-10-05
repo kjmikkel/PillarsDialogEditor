@@ -27,7 +27,7 @@ public class LinkConditionTests
     [Fact]
     public void Diff_LinkConditionAdded_EmitsModifiedLinkWithConditions()
     {
-        var baseLink = new LinkEditSnapshot(1, 5, 1f, "ShowOnce", false);
+        var baseLink = new LinkEditSnapshot(1, 5, 1, "ShowOnce", false);
         var newLink  = baseLink with { Conditions = [Leaf] };
 
         var patch = DiffEngine.Diff("c",
@@ -43,7 +43,7 @@ public class LinkConditionTests
     [Fact]
     public void Diff_LinkConditionUnchanged_NoModifiedLink()
     {
-        var link = new LinkEditSnapshot(1, 5, 1f, "ShowOnce", false)
+        var link = new LinkEditSnapshot(1, 5, 1, "ShowOnce", false)
             { Conditions = [Leaf] };
         var patch = DiffEngine.Diff("c", Snap(MakeNode(1, [link])), Snap(MakeNode(1, [link])), "en");
         Assert.True(patch.IsEmpty);
@@ -54,9 +54,9 @@ public class LinkConditionTests
     [Fact]
     public void Apply_ModifiedLink_AppliesConditions()
     {
-        var link = new LinkEditSnapshot(1, 5, 1f, "ShowOnce", false);
+        var link = new LinkEditSnapshot(1, 5, 1, "ShowOnce", false);
         var snap = Snap(MakeNode(1, [link]));
-        var ml   = new ModifiedLink(5, 1f, "ShowOnce", [Leaf]);
+        var ml   = new ModifiedLink(5, 1, "ShowOnce", [Leaf]);
         var mod  = new NodeModification(1, new Dictionary<string, FieldChange>(),
             [], [], [ml]);
         var result = PatchApplier.Apply(snap, new ConversationPatch("c", 1, [], [], [mod]));
@@ -69,11 +69,11 @@ public class LinkConditionTests
     [Fact]
     public void Apply_ModifiedLink_NullConditions_PreservesExisting()
     {
-        var link = new LinkEditSnapshot(1, 5, 1f, "ShowOnce", false)
+        var link = new LinkEditSnapshot(1, 5, 1, "ShowOnce", false)
             { Conditions = [Leaf] };
         var snap = Snap(MakeNode(1, [link]));
         // ModifiedLink with null Conditions — should not touch existing
-        var ml   = new ModifiedLink(5, 2f, "Always");   // only weight changed
+        var ml   = new ModifiedLink(5, 2, "Always");   // only weight changed
         var mod  = new NodeModification(1, new Dictionary<string, FieldChange>(),
             [], [], [ml]);
         var result = PatchApplier.Apply(snap, new ConversationPatch("c", 1, [], [], [mod]));
@@ -88,7 +88,7 @@ public class LinkConditionTests
     [Fact]
     public void PatchSerializer_RoundTrip_PreservesLinkConditions()
     {
-        var ml     = new ModifiedLink(5, 1f, "ShowOnce", [Leaf]);
+        var ml     = new ModifiedLink(5, 1, "ShowOnce", [Leaf]);
         var mod    = new NodeModification(1, new Dictionary<string, FieldChange>(),
             [], [], [ml]);
         var patch  = new ConversationPatch("conv", 1, [], [], [mod]);

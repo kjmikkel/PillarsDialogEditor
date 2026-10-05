@@ -132,7 +132,7 @@
                 </Style>
             </ControlTheme>
 
-            <converters:FloatDecimalConverter           x:Key="FloatDecimal"/>
+            <converters:WeightDecimalConverter          x:Key="WeightDecimal"/>
             <converters:QTDDisplayConverter             x:Key="QTDDisplay"/>
             <converters:OptionLabelConverter            x:Key="OptionLabel"/>
             <converters:LayoutPointConverter             x:Key="LayoutPointConverter"/>

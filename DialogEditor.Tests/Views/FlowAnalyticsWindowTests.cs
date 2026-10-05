@@ -18,7 +18,7 @@ public class FlowAnalyticsWindowTests
     private static ConversationEditSnapshot Snapshot() => new([
         new NodeEditSnapshot(0, false, SpeakerCategory.Npc, "", "", "one two three", "",
                              "Conversation", "None", "", "", "", false, false,
-                             [new LinkEditSnapshot(0, 1, 1f, "", false)], [], []),
+                             [new LinkEditSnapshot(0, 1, 1, "", false)], [], []),
         new NodeEditSnapshot(1, true, SpeakerCategory.Player, "", "", "four five", "",
                              "Conversation", "None", "", "", "", false, false, [], [], [])
     ]);
@@ -65,13 +65,13 @@ public class FlowAnalyticsWindowTests
     private static ConversationEditSnapshot NestedSnapshot() => new([
         new NodeEditSnapshot(0, false, SpeakerCategory.Npc, "", "", "start", "",
                              "Conversation", "None", "", "", "", false, false,
-                             [new LinkEditSnapshot(0, 1, 1f, "", false)], [], []),
+                             [new LinkEditSnapshot(0, 1, 1, "", false)], [], []),
         new NodeEditSnapshot(1, true, SpeakerCategory.Player, "", "", "A", "",
                              "Conversation", "None", "", "", "", false, false,
-                             [new LinkEditSnapshot(1, 2, 1f, "", false)], [], []),
+                             [new LinkEditSnapshot(1, 2, 1, "", false)], [], []),
         new NodeEditSnapshot(2, false, SpeakerCategory.Npc, "", "", "npc line", "",
                              "Conversation", "None", "", "", "", false, false,
-                             [new LinkEditSnapshot(2, 3, 1f, "", false)], [], []),
+                             [new LinkEditSnapshot(2, 3, 1, "", false)], [], []),
         new NodeEditSnapshot(3, true, SpeakerCategory.Player, "", "", "A1", "",
                              "Conversation", "None", "", "", "", false, false, [], [], [])
     ]);
@@ -110,7 +110,7 @@ public class FlowAnalyticsWindowTests
         var b = new ConversationEditSnapshot([
             new NodeEditSnapshot(0, false, SpeakerCategory.Npc, "", "", "hub", "",
                                  "Conversation", "None", "", "", "", false, false,
-                                 [new LinkEditSnapshot(0, 1, 1f, "", false)], [], []),
+                                 [new LinkEditSnapshot(0, 1, 1, "", false)], [], []),
             new NodeEditSnapshot(1, true, SpeakerCategory.Player, "", "", "pick me", "",
                                  "Conversation", "None", "", "", "", false, false, [], [], [])]);
 

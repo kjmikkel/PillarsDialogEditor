@@ -292,7 +292,7 @@ public class NodeViewModelTests
     public void ToSnapshot_IncludesLinksProvided()
     {
         var vm   = MakeNode(id: 1);
-        var link = new LinkEditSnapshot(1, 2, 1f, "", false);
+        var link = new LinkEditSnapshot(1, 2, 1, "", false);
         var snap = vm.ToSnapshot([link]);
         Assert.Single(snap.Links);
         Assert.Equal(2, snap.Links[0].ToNodeId);

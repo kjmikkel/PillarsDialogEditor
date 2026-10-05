@@ -201,7 +201,7 @@ public class BatchReplaceServiceTests
         // rewrite "ShowOnce" to "ShowInce": PoE2's serializer maps any unknown
         // name to 0 (ShowOnce) with no error, and PoE1 writes the garbage
         // straight into the XML.
-        var link     = new LinkEditSnapshot(1, 2, 1f, "ShowOnce", false);
+        var link     = new LinkEditSnapshot(1, 2, 1, "ShowOnce", false);
         var file     = MakeFile("conv");
         var provider = MakeProvider(file, MakeNode(1, defaultText: "Come on in", links: [link]));
         // Every field toggle the query supports is enabled, so this fails the moment

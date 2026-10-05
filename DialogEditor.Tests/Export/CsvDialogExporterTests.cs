@@ -33,7 +33,7 @@ public class CsvDialogExporterTests
             Scripts: []);
 
     private static LinkEditSnapshot MakeLink(int from, int to) =>
-        new(FromNodeId: from, ToNodeId: to, RandomWeight: 1f,
+        new(FromNodeId: from, ToNodeId: to, RandomWeight: 1,
             QuestionNodeTextDisplay: "", HasConditions: false)
         { Conditions = null };
 

@@ -123,7 +123,7 @@ public class UndoDescriptionTests
 
         conn.QuestionNodeTextDisplay = "Always";
         Assert.Equal("Undo_EditLinkDisplay", stack.UndoDescription);
-        conn.RandomWeight = 2f;
+        conn.RandomWeight = 2;
         Assert.Equal("Undo_EditLinkWeight", stack.UndoDescription);
         conn.Conditions = new List<ConditionNode>();
         Assert.Equal("Undo_EditLinkConditions", stack.UndoDescription);

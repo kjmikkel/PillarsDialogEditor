@@ -17,7 +17,7 @@ public partial class ConnectionViewModel : ObservableObject
     public ConnectorViewModel Target { get; }
 
     private string _questionNodeTextDisplay;
-    private float  _randomWeight;
+    private int    _randomWeight;
     private IReadOnlyList<ConditionNode> _conditions = [];
 
     public string QuestionNodeTextDisplay
@@ -28,12 +28,11 @@ public partial class ConnectionViewModel : ObservableObject
                    OnPropertyChanged(nameof(IsAlways)); OnPropertyChanged(nameof(IsNever)); });
     }
 
-    /// Always a whole number: the games store it as an int (issue 129), so a typed or
-    /// pasted fraction is rounded here, where the user sees it, not silently on save.
-    public float RandomWeight
+    /// An int, as both games store it (issue 129).
+    public int RandomWeight
     {
         get => _randomWeight;
-        set => Push(_randomWeight, LinkWeight.ToGame(value), "Undo_EditLinkWeight",
+        set => Push(_randomWeight, value, "Undo_EditLinkWeight",
             v => { _randomWeight = v; OnPropertyChanged(nameof(RandomWeight)); });
     }
 
@@ -61,7 +60,7 @@ public partial class ConnectionViewModel : ObservableObject
         ConnectorViewModel source,
         ConnectorViewModel target,
         string questionNodeTextDisplay = "",
-        float  randomWeight            = 1f,
+        int    randomWeight            = 1,
         IReadOnlyList<ConditionNode>? conditions = null)
     {
         Source                    = source;
