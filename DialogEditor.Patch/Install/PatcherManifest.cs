@@ -8,11 +8,15 @@ public enum BackupEntryKind { Overwritten, Created }
 /// so a manifest stays valid if the install folder is moved. LastWrittenSha256 is the hash of
 /// what the patcher itself last wrote (null = not written since backup or restore); a file
 /// matching neither hash was changed by someone else (a game update, the editor, another tool).
+/// CreatedFolders (Created entries only, relative like Path) are the folders the first write
+/// had to make; restore removes them again when empty (issue 125). It is optional, so the
+/// schema version stays 1: older manifests read it as null, older patchers ignore it.
 public sealed record BackupEntry(
-    string          Path,
-    BackupEntryKind Kind,
-    string?         OriginalSha256,
-    string?         LastWrittenSha256);
+    string                 Path,
+    BackupEntryKind        Kind,
+    string?                OriginalSha256,
+    string?                LastWrittenSha256,
+    IReadOnlyList<string>? CreatedFolders = null);
 
 public sealed record PatcherManifest(
     int                        SchemaVersion,
