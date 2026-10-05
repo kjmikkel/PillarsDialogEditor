@@ -1143,6 +1143,15 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ConflictDialog_CancelTooltip">Cancel the test and leave game files unchanged.</sys:String>
     <!-- Shown after successful Restore Conversation -->
     <sys:String x:Key="Status_RestoreComplete2">Conversation restored — ready to edit.</sys:String>
+    <!-- Restore (F6) when the test's temporary backups were deleted (issue 125). {0} = count, {1} = first game file -->
+    <sys:String x:Key="Status_RestoreBackupsMissing_One">Still in test mode: the temporary backup of one file is gone, so it keeps the test's changes: {1}. Everything else was restored. Restore Full Backup or your storefront's "verify files" can repair it.</sys:String>
+    <sys:String x:Key="Status_RestoreBackupsMissing_Other">Still in test mode: the temporary backups of {0} files are gone, so they keep the test's changes (first: {1}). Everything else was restored. Restore Full Backup or your storefront's "verify files" can repair them.</sys:String>
+    <sys:String x:Key="Status_RestoreLeftUnrestored_One">Left test mode, but one file still has the test's changes: {1}. Use Restore Full Backup or your storefront's "verify files" to repair it.</sys:String>
+    <sys:String x:Key="Status_RestoreLeftUnrestored_Other">Left test mode, but {0} files still have the test's changes (first: {1}). Use Restore Full Backup or your storefront's "verify files" to repair them.</sys:String>
+    <sys:String x:Key="RestoreUnrestored_Title">Some files can't be restored</sys:String>
+    <sys:String x:Key="RestoreUnrestored_Message_One">The temporary backup of one file was deleted while the game was in test mode — usually by Windows or a cleanup tool. Everything else has been restored; the file listed below still has the test's changes. Leave test mode anyway? You can then use Restore Full Backup, or your storefront's "verify files", to repair it. Cancel stays in test mode.</sys:String>
+    <sys:String x:Key="RestoreUnrestored_Message_Other">The temporary backups of {0} files were deleted while the game was in test mode — usually by Windows or a cleanup tool. Everything else has been restored; the files listed below still have the test's changes. Leave test mode anyway? You can then use Restore Full Backup, or your storefront's "verify files", to repair them. Cancel stays in test mode.</sys:String>
+    <sys:String x:Key="RestoreUnrestored_Continue">Leave test mode</sys:String>
 
     <!-- ─── Project — status messages ────────────────────────────────────── -->
     <!-- {0} = project name -->

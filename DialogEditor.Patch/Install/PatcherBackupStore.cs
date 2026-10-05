@@ -1,5 +1,6 @@
 using System.Security.Cryptography;
 using System.Text.Json;
+using DialogEditor.Core.Backup;
 using DialogEditor.Core.Localisation;
 using DialogEditor.Core.Logging;
 
@@ -79,7 +80,8 @@ public sealed class PatcherBackupStore
         }
         else
         {
-            _entries.Add(new BackupEntry(rel, BackupEntryKind.Created, null, null));
+            _entries.Add(new BackupEntry(rel, BackupEntryKind.Created, null, null,
+                [.. CreatedFolders.MissingAncestors(absPath).Select(ToRelative)]));
         }
         Save();
     }
@@ -145,6 +147,11 @@ public sealed class PatcherBackupStore
             }
             _entries[i] = e with { LastWrittenSha256 = null };
         }
+        // Last, once every created file is gone, so the folders can be empty (issue 125).
+        CreatedFolders.RemoveIfEmpty(_entries
+            .Where(e => !skipped.Contains(e.Path))
+            .SelectMany(e => e.CreatedFolders ?? [])
+            .Select(ToAbsolute));
         Save();
         return skipped;
     }

@@ -145,6 +145,39 @@ public class MainWindowViewModelTestRestoreSafetyTests : IDisposable
         Assert.Equal(before, _game.SnapshotGameData());
     }
 
+    [Fact]
+    public async Task VoiceOver_InNewNestedFolders_RestoreRemovesTheFolders()
+    {
+        // F5 creates "a" and "a/b" to hold the .wem; F6 must take both away again (issue 125).
+        var vo = Path.Combine(_projectDir, "_vo", "a", "b");
+        Directory.CreateDirectory(vo);
+        File.WriteAllBytes(Path.Combine(vo, "added.wem"), [7, 7]);
+        var before = _game.SnapshotGameData();
+
+        await TestThenRestore(EditExisting());
+
+        Assert.Equal(before, _game.SnapshotGameData());
+    }
+
+    [Fact]
+    public async Task CreatedFolder_KeptWhenSomethingElseWasPutInIt()
+    {
+        // Restore only removes the folders it made *if they are empty*: a file someone else
+        // dropped there during the test must survive, and so must its folder.
+        var vo = Path.Combine(_projectDir, "_vo", "a");
+        Directory.CreateDirectory(vo);
+        File.WriteAllBytes(Path.Combine(vo, "added.wem"), [7]);
+
+        var vm = MakeVm(EditExisting());
+        await vm.TestPatchCommand.ExecuteAsync(null);
+        var foreign = Path.Combine(_game.VoDir, "a", "someone_elses.wem");
+        File.WriteAllBytes(foreign, [5]);
+        vm.RestoreConversationCommand.Execute(null);
+
+        Assert.True(File.Exists(foreign));
+        Assert.False(File.Exists(Path.Combine(_game.VoDir, "a", "added.wem")));
+    }
+
     // ── Lifecycle hazards ────────────────────────────────────────────────
 
     [Fact]
@@ -190,5 +223,60 @@ public class MainWindowViewModelTestRestoreSafetyTests : IDisposable
 
         Assert.Equal(before, _game.SnapshotGameData());
         Assert.Null(AppSettings.GetPendingRestores());
+    }
+
+    // ── Lost temp backups (issue 125) ────────────────────────────────────
+
+    /// Runs F5, then deletes the temp backup of test_conv's bundle — as the OS or a
+    /// cleanup tool might while the game sits in test mode.
+    private async Task<MainWindowViewModel> TestThenLoseConvBackup()
+    {
+        var vm = MakeVm(EditExisting());
+        await vm.TestPatchCommand.ExecuteAsync(null);
+        var entry = AppSettings.GetPendingRestores()!.Single(e => e.OriginalConvPath == _game.ConvPath());
+        File.Delete(entry.BackupConvPath);
+        return vm;
+    }
+
+    [Fact]
+    public async Task MissingBackup_UserStaysInTestMode_RestoresTheRestAndKeepsTheManifest()
+    {
+        var stBefore = File.ReadAllText(_game.StPath("en"));
+        var vm = await TestThenLoseConvBackup();
+        IReadOnlyList<string>? asked = null;
+        vm.ConfirmLeaveTestModeUnrestored = files => { asked = files; return Task.FromResult(false); };
+
+        await vm.RestoreConversationCommand.ExecuteAsync(null);
+
+        Assert.Equal([_game.ConvPath()], asked);                          // told exactly what is lost
+        Assert.Equal(stBefore, File.ReadAllText(_game.StPath("en")));    // everything else put back
+        Assert.NotNull(AppSettings.GetPendingRestores());                 // F6 can be retried
+        Assert.Contains("Status_RestoreBackupsMissing", vm.StatusText);
+    }
+
+    [Fact]
+    public async Task MissingBackup_UserLeavesTestMode_ClearsTheManifest()
+    {
+        var vm = await TestThenLoseConvBackup();
+        vm.ConfirmLeaveTestModeUnrestored = _ => Task.FromResult(true);
+        var exited = false;
+        vm.TestModeExited += () => exited = true;
+
+        await vm.RestoreConversationCommand.ExecuteAsync(null);
+
+        Assert.Null(AppSettings.GetPendingRestores());
+        Assert.True(exited);
+        Assert.Contains("Status_RestoreLeftUnrestored", vm.StatusText);
+    }
+
+    [Fact]
+    public async Task MissingBackup_NobodyToAsk_KeepsTheManifest()
+    {
+        // Never report success over a file still in its test state (the old behaviour).
+        var vm = await TestThenLoseConvBackup();
+
+        await vm.RestoreConversationCommand.ExecuteAsync(null);
+
+        Assert.NotNull(AppSettings.GetPendingRestores());
     }
 }
