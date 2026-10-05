@@ -5,11 +5,15 @@ using DialogEditor.Core.Logging;
 
 namespace DialogEditor.ViewModels.Services;
 
+/// <param name="CreatedFolders">Folders that did not exist before this entry's file was
+/// written, deepest first; F6 removes them again if empty (issue 125). Null in manifests
+/// written before that, which then leave such folders behind as they always did.</param>
 public record PendingRestoreEntry(
     string BackupConvPath,
     string BackupStPath,
     string OriginalConvPath,
-    string OriginalStPath);
+    string OriginalStPath,
+    IReadOnlyList<string>? CreatedFolders = null);
 
 public static class AppSettings
 {

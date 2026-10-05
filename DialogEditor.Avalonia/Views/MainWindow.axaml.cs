@@ -76,6 +76,12 @@ public partial class MainWindow : Window
             Loc.Format("TestOverPatcher_Message", count),
             Loc.Get("TestOverPatcher_Continue"),
             details: null).ShowAsync(this);
+        // Restore (F6) after the test's temp backups were deleted (issue 125).
+        vm.ConfirmLeaveTestModeUnrestored = files => new DialogEditor.Avalonia.Shared.ConfirmDialog(
+            Loc.Get("RestoreUnrestored_Title"),
+            Loc.FormatCount("RestoreUnrestored_Message", files.Count),
+            Loc.Get("RestoreUnrestored_Continue"),
+            details: files).ShowAsync(this);
         vm.ShowExportConversations = exportVm =>
         {
             var window = new ExportConversationsWindow(exportVm);
