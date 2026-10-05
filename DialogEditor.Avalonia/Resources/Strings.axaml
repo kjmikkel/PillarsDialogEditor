@@ -427,8 +427,21 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Option_QTD_Default">(default)</sys:String>
     <sys:String x:Key="Option_NpcLine">NPC Line</sys:String>
     <sys:String x:Key="Option_PlayerChoice">Player Choice</sys:String>
+    <!-- Display Type / Persistence options (issue 132). The dropdown items are the game's
+         enum names; these are their labels ("Option_Display" + name) and per-item tooltips
+         ("ToolTip_Option_Display" + name). "NotSet" = the property is absent on the node;
+         "_Fallback" ({0} = the stored value) covers values the editor doesn't recognise. -->
+    <sys:String x:Key="Option_DisplayHidden">Hidden</sys:String>
     <sys:String x:Key="Option_DisplayConversation">Conversation</sys:String>
     <sys:String x:Key="Option_DisplayBark">Bark</sys:String>
+    <sys:String x:Key="Option_DisplayOverlay">Overlay</sys:String>
+    <sys:String x:Key="Option_DisplayNotSet">(not set)</sys:String>
+    <sys:String x:Key="ToolTip_Option_DisplayHidden">Shows no text on screen. The node still runs its scripts and plays its voice-over (positioned in the world); barks skip straight past it.</sys:String>
+    <sys:String x:Key="ToolTip_Option_DisplayConversation">Shown in the conversation window, with the speaker's portrait.</sys:String>
+    <sys:String x:Key="ToolTip_Option_DisplayBark">Shown as floating text above the speaker, without opening the conversation window.</sys:String>
+    <sys:String x:Key="ToolTip_Option_DisplayOverlay">Shown as overlay text on top of the screen, e.g. for narration.</sys:String>
+    <sys:String x:Key="ToolTip_Option_DisplayNotSet">This node has no display type, and the game uses its default. Pick a value to set one.</sys:String>
+    <sys:String x:Key="ToolTip_Option_Display_Fallback">"{0}" is a display type this editor doesn't recognise. It is kept unchanged when you save.</sys:String>
     <sys:String x:Key="Bark_Warning_TextTooLong">Bark text is {1} characters — exceeds the {0}-character yardstick (longest bark in either shipped game) and may overflow the in-game bubble.</sys:String>
     <sys:String x:Key="Bark_Warning_PlayerChoiceChild">Bark nodes should not lead to player choice responses.</sys:String>
     <sys:String x:Key="Validation_UnknownToken_Suggest">Unknown tag "{0}" — did you mean "{1}"?</sys:String>
@@ -438,6 +451,15 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Spelling_Misspelled">Possible misspelling "{0}".</sys:String>
     <sys:String x:Key="Option_PersistenceNone">None</sys:String>
     <sys:String x:Key="Option_PersistenceOnceEver">OnceEver</sys:String>
+    <sys:String x:Key="Option_PersistenceOncePerConversation">OncePerConversation</sys:String>
+    <sys:String x:Key="Option_PersistenceMarkAsRead">MarkAsRead</sys:String>
+    <sys:String x:Key="Option_PersistenceNotSet">(not set)</sys:String>
+    <sys:String x:Key="ToolTip_Option_PersistenceNone">The node can be shown every time the conversation reaches it.</sys:String>
+    <sys:String x:Key="ToolTip_Option_PersistenceOnceEver">Once shown, the node never appears again, even in later conversations and after loading a save.</sys:String>
+    <sys:String x:Key="ToolTip_Option_PersistenceOncePerConversation">Once shown, the node is skipped for the rest of this conversation, and can appear again the next time the conversation starts.</sys:String>
+    <sys:String x:Key="ToolTip_Option_PersistenceMarkAsRead">For player responses: once the player has read everything that follows this response, it is shown as already read. It is not hidden.</sys:String>
+    <sys:String x:Key="ToolTip_Option_PersistenceNotSet">This node has no persistence, and the game uses its default. Pick a value to set one.</sys:String>
+    <sys:String x:Key="ToolTip_Option_Persistence_Fallback">"{0}" is a persistence this editor doesn't recognise. It is kept unchanged when you save.</sys:String>
 
     <!-- ─── Detail panel — script editor ───────────────────────────────── -->
     <sys:String x:Key="Button_EditScripts">Edit…</sys:String>
@@ -506,10 +528,10 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_NodeType">Whether this node is an NPC line or a player response choice</sys:String>
     <sys:String x:Key="ToolTip_SpeakerGuid">GUID of the speaking character — edit directly or use the name picker above</sys:String>
     <sys:String x:Key="ToolTip_ListenerGuid">GUID of the listening character — edit directly or use the name picker above</sys:String>
-    <sys:String x:Key="ToolTip_DisplayType">How this node is presented to the player (Conversation = full portrait, Bark = floating text)</sys:String>
+    <sys:String x:Key="ToolTip_DisplayType">How this node is presented to the player: Hidden, Conversation, Bark or Overlay. Hover an option for what it does.</sys:String>
     <sys:String x:Key="ToolTip_BarkWarnings">Bark-specific validation warnings. These do not block saving — they help writers avoid common mistakes.</sys:String>
     <sys:String x:Key="ToolTip_TokenWarnings">Possible problems with substitution tokens or markup in this line's text. These are warnings, not errors — free-text stage directions are never flagged.</sys:String>
-    <sys:String x:Key="ToolTip_Persistence">OnceEver hides this node after it has been shown once, even across saves</sys:String>
+    <sys:String x:Key="ToolTip_Persistence">Whether this node can be shown again after the player has seen it: None, OnceEver, OncePerConversation or MarkAsRead. Hover an option for what it does.</sys:String>
     <sys:String x:Key="ToolTip_ActorDirection">Optional director's note for the voice actor — not shown to players</sys:String>
     <sys:String x:Key="ToolTip_HasVO">Check if a voice-over recording exists for this line</sys:String>
     <sys:String x:Key="ToolTip_HideSpeaker">Hide the speaker name label during dialogue playback</sys:String>
