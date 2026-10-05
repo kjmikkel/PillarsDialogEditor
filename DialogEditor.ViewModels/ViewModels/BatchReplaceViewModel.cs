@@ -67,6 +67,11 @@ public partial class BatchReplaceViewModel : ObservableObject
     private readonly IGameDataProvider           _provider;
     private readonly IReadOnlyList<ConversationFile> _allFiles;
     private readonly Func<ConversationFile, bool>    _isOpenInEditor;
+    // Read at preview and again at apply time: the window is non-modal, so the user
+    // can keep editing (or close the project) in between.
+    private readonly Func<DialogProject?>            _currentProject;
+    private readonly Action<DialogProject>           _commitProject;
+    private readonly Func<bool>                      _isTestActive;
 
     // ── Search form ───────────────────────────────────────────────────────
 
@@ -99,16 +104,35 @@ public partial class BatchReplaceViewModel : ObservableObject
     public BatchReplaceViewModel(
         IGameDataProvider            provider,
         IReadOnlyList<ConversationFile> allFiles,
-        Func<ConversationFile, bool> isOpenInEditor)
+        Func<ConversationFile, bool> isOpenInEditor,
+        Func<DialogProject?>         currentProject,
+        Action<DialogProject>        commitProject,
+        Func<bool>                   isTestActive)
     {
         _provider       = provider;
         _allFiles       = allFiles;
         _isOpenInEditor = isOpenInEditor;
+        _currentProject = currentProject;
+        _commitProject  = commitProject;
+        _isTestActive   = isTestActive;
+    }
+
+    /// Why the project can't be batch-edited right now, or null when it can. During a
+    /// test (F5) the game files already carry the project's patch, so diffing against
+    /// them as "vanilla" would drop every earlier edit to the conversation (issue 124).
+    private string? Blocker(out DialogProject project)
+    {
+        project = _currentProject()!;
+        if (project is null)  return Loc.Get("BatchReplace_StatusNoProject");
+        if (_isTestActive())  return Loc.Get("BatchReplace_StatusTestActive");
+        return null;
     }
 
     [RelayCommand(CanExecute = nameof(CanPreview))]
     private async Task PreviewAsync()
     {
+        if (Blocker(out var project) is { } blocked) { StatusText = blocked; return; }
+
         IsBusy = true;
         Results.Clear();
         ResultCount = 0;
@@ -118,7 +142,7 @@ public partial class BatchReplaceViewModel : ObservableObject
         var filesToSearch = _allFiles.Where(f => !_isOpenInEditor(f)).ToList();
 
         var rawResults = await Task.Run(
-            () => BatchReplaceService.DryRun(query, filesToSearch, _provider));
+            () => BatchReplaceService.DryRun(query, filesToSearch, _provider, project));
 
         foreach (var r in rawResults)
         {
@@ -143,6 +167,9 @@ public partial class BatchReplaceViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanApply))]
     private async Task ApplyAsync()
     {
+        // Results stay put on a refusal, so Apply works once the blocker is gone.
+        if (Blocker(out var project) is { } blocked) { StatusText = blocked; return; }
+
         IsBusy = true;
 
         var selected = Results
@@ -153,7 +180,8 @@ public partial class BatchReplaceViewModel : ObservableObject
                          .ToList()))
             .ToList();
 
-        await Task.Run(() => BatchReplaceService.Apply(selected, _provider));
+        var updated = await Task.Run(() => BatchReplaceService.Apply(selected, _provider, project));
+        _commitProject(updated);
 
         Results.Clear();
         ResultCount = 0;

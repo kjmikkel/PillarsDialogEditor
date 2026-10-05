@@ -1,6 +1,7 @@
-using DialogEditor.Core.Editing;
+﻿using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
+using DialogEditor.Patch;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
@@ -28,7 +29,10 @@ public class BatchReplaceViewModelTests
         var files = provider.EnumerateConversations();
         return new BatchReplaceViewModel(
             provider, files,
-            isOpenInEditor: f => open is not null && f.Name == open.Name);
+            isOpenInEditor: f => open is not null && f.Name == open.Name,
+            currentProject: () => DialogProject.Empty("p"),
+            commitProject:  _ => { },
+            isTestActive:   () => false);
     }
 
     // ── Initial state ─────────────────────────────────────────────────────
@@ -139,23 +143,109 @@ public class BatchReplaceViewModelTests
         Assert.False(vm.ApplyCommand.CanExecute(null));
     }
 
-    // ── Apply calls save ──────────────────────────────────────────────────
+    // ── Apply edits the project, never the game folder (#124) ─────────────
 
     [Fact]
-    public async Task Apply_CallsSaveOnProvider()
+    public async Task Apply_CommitsTheEditedProject_AndWritesNoGameFile()
     {
         var file     = MakeFile("conv");
         var provider = new StubProvider(file,
             new ConversationEditSnapshot([MakeNode(1, "Hello world")]));
+        DialogProject? committed = null;
         var vm = new BatchReplaceViewModel(
-            provider, provider.EnumerateConversations(), _ => false);
+            provider, provider.EnumerateConversations(), _ => false,
+            currentProject: () => DialogProject.Empty("p"),
+            commitProject:  p => committed = p,
+            isTestActive:   () => false);
         vm.SearchText  = "world";
         vm.ReplaceText = "earth";
         await vm.PreviewCommand.ExecuteAsync(null);
         await vm.ApplyCommand.ExecuteAsync(null);
 
-        Assert.NotNull(provider.SavedSnapshot);
-        Assert.Equal("Hello earth", provider.SavedSnapshot!.Nodes[0].DefaultText);
+        Assert.Null(provider.SavedSnapshot);
+        Assert.Equal([new NodeTranslation(1, "Hello earth", "")],
+                     committed!.Patches["conv"].Translations["en"]);
+        Assert.Equal("BatchReplace_StatusApplied", vm.StatusText);
+    }
+
+    [Fact]
+    public async Task Apply_ReadsTheProjectAtApplyTime()
+    {
+        // The window is non-modal: the user can keep editing (and saving) between
+        // Preview and Apply, so Apply must build on the project as it is now.
+        var file     = MakeFile("conv");
+        var provider = new StubProvider(file,
+            new ConversationEditSnapshot([MakeNode(1, "Hello world")]));
+        var current  = DialogProject.Empty("p");
+        DialogProject? committed = null;
+        var vm = new BatchReplaceViewModel(
+            provider, provider.EnumerateConversations(), _ => false,
+            currentProject: () => current,
+            commitProject:  p => committed = p,
+            isTestActive:   () => false);
+        vm.SearchText  = "world";
+        vm.ReplaceText = "earth";
+        await vm.PreviewCommand.ExecuteAsync(null);
+
+        var other = new ConversationPatch("other", ConversationPatch.CurrentSchemaVersion, [], [], []);
+        current = current.WithPatch(other);
+        await vm.ApplyCommand.ExecuteAsync(null);
+
+        Assert.Same(other, committed!.Patches["other"]);
+    }
+
+    [Fact]
+    public async Task Apply_WhileATestIsActive_CommitsNothing()
+    {
+        // During a test (F5) the game files already carry the project's patch, so the
+        // "vanilla" Apply diffs against would be the patched file and the new patch would
+        // silently drop every earlier edit to the conversation. Restore (F6) first.
+        var file     = MakeFile("conv");
+        var provider = new StubProvider(file,
+            new ConversationEditSnapshot([MakeNode(1, "Hello world")]));
+        var testActive = false;
+        var commits    = 0;
+        var vm = new BatchReplaceViewModel(
+            provider, provider.EnumerateConversations(), _ => false,
+            currentProject: () => DialogProject.Empty("p"),
+            commitProject:  _ => commits++,
+            isTestActive:   () => testActive);
+        vm.SearchText  = "world";
+        vm.ReplaceText = "earth";
+        await vm.PreviewCommand.ExecuteAsync(null);
+
+        testActive = true;
+        await vm.ApplyCommand.ExecuteAsync(null);
+
+        Assert.Equal(0, commits);
+        Assert.Equal("BatchReplace_StatusTestActive", vm.StatusText);
+        Assert.NotEmpty(vm.Results);   // kept, so Apply works once the test is restored
+    }
+
+    [Fact]
+    public async Task Apply_WithNoProjectOpen_CommitsNothing()
+    {
+        // The project was closed while the window stayed open: nothing to edit.
+        var file     = MakeFile("conv");
+        var provider = new StubProvider(file,
+            new ConversationEditSnapshot([MakeNode(1, "Hello world")]));
+        DialogProject? open = DialogProject.Empty("p");
+        var commits = 0;
+        var vm = new BatchReplaceViewModel(
+            provider, provider.EnumerateConversations(), _ => false,
+            currentProject: () => open,
+            commitProject:  _ => commits++,
+            isTestActive:   () => false);
+        vm.SearchText  = "world";
+        vm.ReplaceText = "earth";
+        await vm.PreviewCommand.ExecuteAsync(null);
+
+        open = null;
+        await vm.ApplyCommand.ExecuteAsync(null);
+
+        Assert.Equal(0, commits);
+        Assert.Equal("BatchReplace_StatusNoProject", vm.StatusText);
+        Assert.Null(provider.SavedSnapshot);
     }
 
     [Fact]
@@ -181,7 +271,10 @@ public class BatchReplaceViewModelTests
             new ConversationEditSnapshot([MakeNode(1, "Hello world")]));
         var vm = new BatchReplaceViewModel(
             provider, provider.EnumerateConversations(),
-            isOpenInEditor: f => f.Name == "open_conv");
+            isOpenInEditor: f => f.Name == "open_conv",
+            currentProject: () => DialogProject.Empty("p"),
+            commitProject:  _ => { },
+            isTestActive:   () => false);
 
         vm.SearchText  = "world";
         vm.ReplaceText = "earth";
@@ -198,7 +291,10 @@ public class BatchReplaceViewModelTests
             new ConversationEditSnapshot([MakeNode(1, "Hello world")]));
         var vm = new BatchReplaceViewModel(
             provider, provider.EnumerateConversations(),
-            isOpenInEditor: f => f.Name == "open_conv");
+            isOpenInEditor: f => f.Name == "open_conv",
+            currentProject: () => DialogProject.Empty("p"),
+            commitProject:  _ => { },
+            isTestActive:   () => false);
 
         vm.SearchText  = "world";
         vm.ReplaceText = "earth";
