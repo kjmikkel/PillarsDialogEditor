@@ -68,11 +68,16 @@ public sealed class FakePoe2Game : IDisposable
 
     public IGameDataProvider Provider => new Poe2GameDataProvider(Root);
 
-    /// Every file under the game's data folder (not the patcher backup), keyed by relative path.
+    /// Every file under the game's data folder (not the patcher backup), keyed by relative path,
+    /// plus every folder (key ending in a separator, empty value) — so a restore that leaves
+    /// behind a folder it created no longer compares equal (issue 125).
     public SortedDictionary<string, string> SnapshotGameData() =>
         new(Directory.EnumerateFiles(DataRoot, "*", SearchOption.AllDirectories)
             .ToDictionary(f => Path.GetRelativePath(DataRoot, f),
-                          f => Convert.ToHexString(File.ReadAllBytes(f))));
+                          f => Convert.ToHexString(File.ReadAllBytes(f)))
+            .Concat(Directory.EnumerateDirectories(DataRoot, "*", SearchOption.AllDirectories)
+                .Select(d => KeyValuePair.Create(Path.GetRelativePath(DataRoot, d) + Path.DirectorySeparatorChar, "")))
+            .ToDictionary());
 
     public string ReadExternalVo(string name = "test_conv")
     {

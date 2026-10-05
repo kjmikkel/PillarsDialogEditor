@@ -86,6 +86,11 @@ public partial class MainWindowViewModel : ObservableObject
     /// Patch Manager / dialog-patcher also manage (argument: how many). True = continue.
     public Func<int, Task<bool>>? ConfirmTestOverPatcherMods { get; set; }
 
+    /// Set by the UI layer. Asked when Restore (F6) cannot put some game files back because
+    /// their temp backups are gone (argument: those game files). True = leave test mode
+    /// anyway; false, or no UI, keeps test mode so F6 can be retried (issue 125).
+    public Func<IReadOnlyList<string>, Task<bool>>? ConfirmLeaveTestModeUnrestored { get; set; }
+
     /// Set by the UI: asks the user to save the current copy before bringing in
     /// changes. Returns true to proceed (after saving), false to abort.
     public Func<Task<bool>>? ConfirmSaveBeforeApply { get; set; }
@@ -2256,7 +2261,10 @@ public partial class MainWindowViewModel : ObservableObject
                 var backup = Path.Combine(tempDir, $"{restoreEntries.Count:D4}_{Path.GetFileName(p)}");
                 if (File.Exists(p)) File.Copy(p, backup);
                 else backup = string.Empty;
-                restoreEntries.Add(new PendingRestoreEntry(backup, string.Empty, p, string.Empty));
+                // A missing file may also need folders created for it (a new language's
+                // text folder, say), which restore must take away again (issue 125).
+                restoreEntries.Add(new PendingRestoreEntry(backup, string.Empty, p, string.Empty,
+                    CreatedFolders.MissingAncestors(p)));
             }
         }
 
@@ -2371,7 +2379,12 @@ public partial class MainWindowViewModel : ObservableObject
     {
         try
         {
-            RestoreFilesFromBackup(entries);
+            // The backups were made moments ago, so one missing here is a real fault:
+            // keep the manifest, exactly as for a failed copy.
+            var unrestored = RestoreFilesFromBackup(entries);
+            if (unrestored.Count > 0)
+                throw new FileNotFoundException(
+                    $"Test backup missing for {unrestored.Count} file(s), first '{unrestored[0]}'");
         }
         catch (Exception ex)
         {
@@ -2384,23 +2397,33 @@ public partial class MainWindowViewModel : ObservableObject
         catch (Exception ex) { AppLog.Warn($"Could not delete temp backup folder: {ex.Message}"); }
     }
 
-    private static void RestoreFilesFromBackup(IReadOnlyList<PendingRestoreEntry> entries)
+    /// Puts back every file it can and returns the game files it could not, because their
+    /// temp backup is gone (issue 125) — those still hold the test's version.
+    private static IReadOnlyList<string> RestoreFilesFromBackup(IReadOnlyList<PendingRestoreEntry> entries)
     {
+        var unrestored = new List<string>();
         foreach (var r in entries)
         {
-            // Restore the original file if a backup exists, or remove the file that was
-            // added by the patch (e.g. a new VO .wem) when there was no original to back up.
-            if (!string.IsNullOrEmpty(r.BackupConvPath) && File.Exists(r.BackupConvPath))
-                File.Copy(r.BackupConvPath, r.OriginalConvPath, overwrite: true);
-            else if (string.IsNullOrEmpty(r.BackupConvPath) && File.Exists(r.OriginalConvPath))
-                File.Delete(r.OriginalConvPath); // VO file added by patch — remove on restore
+            Restore(r.BackupConvPath, r.OriginalConvPath);
+            Restore(r.BackupStPath, r.OriginalStPath);
+        }
+        // Last, once every file the test created is gone, so the folders can be empty.
+        CreatedFolders.RemoveIfEmpty(entries.SelectMany(r => r.CreatedFolders ?? []));
+        return unrestored;
 
-            if (!string.IsNullOrEmpty(r.BackupStPath) && File.Exists(r.BackupStPath)
-                && !string.IsNullOrEmpty(r.OriginalStPath))
-                File.Copy(r.BackupStPath, r.OriginalStPath, overwrite: true);
-            else if (string.IsNullOrEmpty(r.BackupStPath) && !string.IsNullOrEmpty(r.OriginalStPath)
-                && File.Exists(r.OriginalStPath))
-                File.Delete(r.OriginalStPath); // stringtable created by the patch — remove on restore
+        void Restore(string backup, string original)
+        {
+            if (string.IsNullOrEmpty(original)) return;
+            // No backup path = the test created this file (a new conversation, an added VO
+            // .wem, a .bak sidecar): remove it.
+            if (string.IsNullOrEmpty(backup))
+            {
+                if (File.Exists(original)) File.Delete(original);
+            }
+            else if (File.Exists(backup))
+                File.Copy(backup, original, overwrite: true);
+            else
+                unrestored.Add(original);
         }
     }
 
@@ -2437,6 +2460,8 @@ public partial class MainWindowViewModel : ObservableObject
                 var backupDir = Path.Combine(Path.GetTempPath(), "PillarsDialogEditor",
                     "vobackup", Guid.NewGuid().ToString("N")[..8]);
 
+                // Before CreateDirectory, so F6 knows which folders this sync made (issue 125).
+                var createdFolders = CreatedFolders.MissingAncestors(gameDest);
                 Directory.CreateDirectory(Path.GetDirectoryName(gameDest)!);
 
                 // Journalled like the conversation files, so Restore Full Backup's editor-writes guard (issue 118)
@@ -2463,7 +2488,8 @@ public partial class MainWindowViewModel : ObservableObject
                     File.Exists(backupPath) ? backupPath : string.Empty,
                     string.Empty,
                     gameDest,
-                    string.Empty));
+                    string.Empty,
+                    createdFolders));
 
                 File.Copy(localFile, gameDest, overwrite: true);
                 AppLog.Info($"VO sync: {relative} → {gameDest}");
@@ -2486,7 +2512,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     // ── Restore Conversations (all entries in project) ────────────────────
     [RelayCommand]
-    private void RestoreConversation()
+    private async Task RestoreConversation()
     {
         var entries = AppSettings.GetPendingRestores();
         if (entries is null || entries.Count == 0) return;
@@ -2494,7 +2520,24 @@ public partial class MainWindowViewModel : ObservableObject
         {
             // Created files (new conversations, their stringtables, .bak sidecars, added
             // VO) are manifest entries with an empty backup path, so this also deletes them.
-            RestoreFilesFromBackup(entries);
+            var unrestored = RestoreFilesFromBackup(entries);
+            var leftUnrestored = false;
+            if (unrestored.Count > 0)
+            {
+                // The temp backups were deleted under us (OS or cleanup tool). Never report
+                // success over files still in their test state (issue 125): only the user
+                // can decide to leave test mode with them, e.g. to then Restore Full Backup.
+                AppLog.Error($"Restore: test backups missing for {unrestored.Count} file(s): "
+                             + string.Join(", ", unrestored));
+                if (ConfirmLeaveTestModeUnrestored is null
+                    || !await ConfirmLeaveTestModeUnrestored(unrestored))
+                {
+                    StatusText = Loc.FormatCount("Status_RestoreBackupsMissing", unrestored.Count, unrestored[0]);
+                    return;
+                }
+                AppLog.Warn($"Restore: leaving test mode with {unrestored.Count} file(s) not restored, at the user's request");
+                leftUnrestored = true;
+            }
 
             var tempDirsToDelete = entries
                 .SelectMany(r => new[] { r.BackupConvPath, r.BackupStPath })
@@ -2507,7 +2550,9 @@ public partial class MainWindowViewModel : ObservableObject
 
             AppSettings.ClearPendingRestores();
             AppLog.Info($"Restored {entries.Count} conversation(s)");
-            StatusText = Loc.Get("Status_RestoreComplete2");
+            StatusText = leftUnrestored
+                ? Loc.FormatCount("Status_RestoreLeftUnrestored", unrestored.Count, unrestored[0])
+                : Loc.Get("Status_RestoreComplete2");
 
             if (_currentFile is not null)
             {

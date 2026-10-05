@@ -36,6 +36,28 @@ public class PatchInstallerSafetyTests
     }
 
     [Fact]
+    public void Restore_RemovesFoldersTheInstallCreated()
+    {
+        // VO in nested folders the game doesn't have: "Remove all mods" must take the
+        // folders away too, not just the files (issue 125).
+        using var game = new FakePoe2Game("en");
+        var before = game.SnapshotGameData();
+        var vo = Directory.CreateTempSubdirectory().FullName;
+        Directory.CreateDirectory(Path.Combine(vo, "a", "b"));
+        File.WriteAllBytes(Path.Combine(vo, "a", "b", "added.wem"), [7]);
+        try
+        {
+            Install(game, new InstallOptions(), Entry(FakePoe2Game.ExternalVoMod("A", "a"), vo));
+            Assert.True(Directory.Exists(Path.Combine(game.VoDir, "a", "b")));
+
+            PatchInstaller.Restore(game.Root);
+
+            Assert.Equal(before, game.SnapshotGameData());
+        }
+        finally { Directory.Delete(vo, true); }
+    }
+
+    [Fact]
     public void Install_ExternallyChangedFile_StopsWithoutWriting()
     {
         using var game = new FakePoe2Game();
