@@ -12,7 +12,7 @@ public class ConnectionViewModelTests
 
     private static ConnectionViewModel MakeConn(
         string qtd = "",
-        float  weight = 1f,
+        int    weight = 1,
         IReadOnlyList<ConditionNode>? conditions = null)
         => new(new ConnectorViewModel(), new ConnectorViewModel(), qtd, weight, conditions);
 
@@ -54,31 +54,12 @@ public class ConnectionViewModelTests
     [Fact]
     public void SetRandomWeight_WithUndoStack_IsUndoable()
     {
-        var conn  = MakeConn(weight: 1f);
+        var conn  = MakeConn(weight: 1);
         var stack = new UndoRedoStack();
         conn.UndoStack    = stack;
-        conn.RandomWeight = 2.5f;
+        conn.RandomWeight = 3;
         stack.Undo();
-        Assert.Equal(1f, conn.RandomWeight);
-    }
-
-    [Fact]
-    public void SetRandomWeight_Fraction_IsStoredAsTheWholeNumberTheGameWillRead()
-    {
-        // Issue 129: what the canvas shows, diffs and patches is what the game gets.
-        var conn = MakeConn(weight: 1f);
-        conn.RandomWeight = 1.5f;
-        Assert.Equal(2f, conn.RandomWeight);
-    }
-
-    [Fact]
-    public void SetRandomWeight_FractionRoundingToCurrentValue_PushesNoUndo()
-    {
-        var conn  = MakeConn(weight: 1f);
-        var stack = new UndoRedoStack();
-        conn.UndoStack    = stack;
-        conn.RandomWeight = 1.2f;   // rounds to 1, the current value
-        Assert.False(stack.CanUndo);
+        Assert.Equal(1, conn.RandomWeight);
     }
 
     // ── IsAlways / IsNever ────────────────────────────────────────────────

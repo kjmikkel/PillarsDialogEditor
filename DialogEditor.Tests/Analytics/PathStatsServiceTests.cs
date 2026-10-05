@@ -16,7 +16,7 @@ public class PathStatsServiceTests
             "Conversation", "None", "", "", "", false, false,
             links ?? [], [], scripts ?? []);
 
-    private static LinkEditSnapshot Link(int from, int to) => new(from, to, 1f, "", false);
+    private static LinkEditSnapshot Link(int from, int to) => new(from, to, 1, "", false);
     private static ConversationEditSnapshot Snap(params NodeEditSnapshot[] n) => new(n);
 
     [Fact]

@@ -22,7 +22,7 @@ public class FlowAnalyticsViewModelTests
             links ?? [], [], []);
 
     private static LinkEditSnapshot Link(int from, int to) =>
-        new(from, to, 1f, "", false);
+        new(from, to, 1, "", false);
 
     private static ConversationEditSnapshot SimpleSnapshot() => new([
         MakeNode(0, defaultText: "Hello", links: [Link(0, 1)]),

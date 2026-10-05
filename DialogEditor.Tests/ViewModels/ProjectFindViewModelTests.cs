@@ -85,7 +85,7 @@ public class ProjectFindViewModelTests
 
     private static (DialogProject, IGameDataProvider) ProjectWithLink(string conv, int nodeId, string linkText)
     {
-        var link = new NodeLink(nodeId, nodeId + 1, [], 1f, linkText);
+        var link = new NodeLink(nodeId, nodeId + 1, [], 1, linkText);
         var node = MakeNode(nodeId, [link]);
         var strings = new StringTable([new StringEntry(nodeId, "unrelated text", "")]);
         var convObj = new Conversation(conv, [node], strings);

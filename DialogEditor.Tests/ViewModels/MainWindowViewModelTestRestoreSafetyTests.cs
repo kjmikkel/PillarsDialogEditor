@@ -63,7 +63,7 @@ public class MainWindowViewModelTestRestoreSafetyTests : IDisposable
     /// A patch adding node 99 (→ node 1) to <paramref name="conv"/>, with en and fr text.
     private static ConversationPatch AddNodePatch(string conv, bool linkToOne = true) =>
         new(conv, ConversationPatch.CurrentSchemaVersion,
-            [AddedNode(99, linkToOne ? [new LinkEditSnapshot(99, 1, 1f, "", false)] : [])], [], [])
+            [AddedNode(99, linkToOne ? [new LinkEditSnapshot(99, 1, 1, "", false)] : [])], [], [])
         {
             Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
             {

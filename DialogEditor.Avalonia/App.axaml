@@ -132,7 +132,7 @@
                 </Style>
             </ControlTheme>
 
-            <converters:FloatDecimalConverter           x:Key="FloatDecimal"/>
+            <converters:WeightDecimalConverter          x:Key="WeightDecimal"/>
             <converters:QTDDisplayConverter             x:Key="QTDDisplay"/>
             <converters:LayoutPointConverter             x:Key="LayoutPointConverter"/>
             <converters:SpeakerCategoryToBrushConverter x:Key="SpeakerCategoryToBrush"/>

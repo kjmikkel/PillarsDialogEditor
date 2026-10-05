@@ -78,7 +78,7 @@ public class Poe1ConversationSerializerTests
     {
         // Regression (B-005): a node added by the editor (absent from the original
         // XML) must be written with its outgoing links, or it is a dead end in-game.
-        var links    = new[] { new LinkEditSnapshot(99, 1, 1f, "ShowOnce", false) };
+        var links    = new[] { new LinkEditSnapshot(99, 1, 1, "ShowOnce", false) };
         var snapshot = new ConversationEditSnapshot([Node(0), Node(1), Node(99, links: links)]);
 
         var result = Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot);
@@ -291,7 +291,7 @@ public class Poe1ConversationSerializerTests
 
     private static XElement OnlyLink(string xml) => XDocument.Parse(xml).Descendants("FlowChartLink").Single();
 
-    private static string SaveLink(string originalXml, float weight, string display) =>
+    private static string SaveLink(string originalXml, int weight, string display) =>
         Poe1ConversationSerializer.Serialize(originalXml, new ConversationEditSnapshot(
             [Node(0, links: [new LinkEditSnapshot(0, 1, weight, display, false)]), Node(1)]));
 
@@ -299,7 +299,7 @@ public class Poe1ConversationSerializerTests
     public void Serialize_LinkWithoutDefaults_Unchanged_DoesNotAddElements()
     {
         // What the parser yields for the missing elements: weight 1, display "".
-        var link = OnlyLink(SaveLink(LinkWithoutDefaultsXml, 1f, ""));
+        var link = OnlyLink(SaveLink(LinkWithoutDefaultsXml, 1, ""));
 
         Assert.Null(link.Element("RandomWeight"));
         Assert.Null(link.Element("QuestionNodeTextDisplay"));
@@ -310,7 +310,7 @@ public class Poe1ConversationSerializerTests
     [Fact]
     public void Serialize_LinkWithoutDefaults_ExplicitDefaults_DoesNotAddElements()
     {
-        var link = OnlyLink(SaveLink(LinkWithoutDefaultsXml, 1f, "ShowOnce"));
+        var link = OnlyLink(SaveLink(LinkWithoutDefaultsXml, 1, "ShowOnce"));
 
         Assert.Null(link.Element("RandomWeight"));
         Assert.Null(link.Element("QuestionNodeTextDisplay"));
@@ -319,7 +319,7 @@ public class Poe1ConversationSerializerTests
     [Fact]
     public void Serialize_LinkWithoutDefaults_NonDefaultValues_AreAdded()
     {
-        var link = OnlyLink(SaveLink(LinkWithoutDefaultsXml, 3f, "ShowAlways"));
+        var link = OnlyLink(SaveLink(LinkWithoutDefaultsXml, 3, "ShowAlways"));
 
         Assert.Equal("3",          (string?)link.Element("RandomWeight"));
         Assert.Equal("ShowAlways", (string?)link.Element("QuestionNodeTextDisplay"));
@@ -329,7 +329,7 @@ public class Poe1ConversationSerializerTests
     public void Serialize_LinkWithElements_UpdatesThem()
     {
         // Elements the original file already writes keep being written, even at the default.
-        var link = OnlyLink(SaveLink(TwoNodeXml, 1f, "ShowAlways"));
+        var link = OnlyLink(SaveLink(TwoNodeXml, 1, "ShowAlways"));
 
         Assert.Equal("1",          (string?)link.Element("RandomWeight"));
         Assert.Equal("ShowAlways", (string?)link.Element("QuestionNodeTextDisplay"));
@@ -339,7 +339,7 @@ public class Poe1ConversationSerializerTests
     public void Serialize_LinkWithElements_EmptyDisplay_RemovesElement()
     {
         // "" is not a valid QuestionNodeDisplayType; absent means ShowOnce to the game.
-        var link = OnlyLink(SaveLink(TwoNodeXml, 1f, ""));
+        var link = OnlyLink(SaveLink(TwoNodeXml, 1, ""));
 
         Assert.Null(link.Element("QuestionNodeTextDisplay"));
     }
@@ -349,7 +349,7 @@ public class Poe1ConversationSerializerTests
     {
         // Importers and the canvas create links with display "" and weight 1.
         var snapshot = new ConversationEditSnapshot(
-            [Node(0), Node(1, links: [new LinkEditSnapshot(1, 0, 1f, "", false)])]);
+            [Node(0), Node(1, links: [new LinkEditSnapshot(1, 0, 1, "", false)])]);
         var doc  = XDocument.Parse(Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot));
         var link = doc.Descendants("FlowChartLink").Single(l => (int)l.Element("FromNodeID")! == 1);
 
@@ -361,7 +361,7 @@ public class Poe1ConversationSerializerTests
     public void Serialize_NewLink_NonDefaultValues_AreWritten()
     {
         var snapshot = new ConversationEditSnapshot(
-            [Node(0), Node(1, links: [new LinkEditSnapshot(1, 0, 2f, "ShowNever", false)])]);
+            [Node(0), Node(1, links: [new LinkEditSnapshot(1, 0, 2, "ShowNever", false)])]);
         var doc  = XDocument.Parse(Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot));
         var link = doc.Descendants("FlowChartLink").Single(l => (int)l.Element("FromNodeID")! == 1);
 
@@ -371,40 +371,20 @@ public class Poe1ConversationSerializerTests
 
     // ── #129: the game reads RandomWeight as an int ──────────────────────────────
     // XmlSerializer cannot parse "1.5" into DialogueLink.RandomWeight (int), so the whole
-    // conversation would fail to load.
+    // conversation would fail to load. The weight is an int end to end; this pins the text.
 
     [Fact]
-    public void Serialize_ExistingLink_FractionalWeight_IsWrittenAsWholeNumber()
+    public void Serialize_ExistingLink_Weight_IsWrittenAsInteger()
     {
-        var link = OnlyLink(SaveLink(TwoNodeXml, 1.5f, "ShowOnce"));
+        var link = OnlyLink(SaveLink(TwoNodeXml, 4, "ShowOnce"));
 
-        Assert.Equal("2", (string?)link.Element("RandomWeight"));
-    }
-
-    [Fact]
-    public void Serialize_NewLink_FractionalWeight_IsWrittenAsWholeNumber()
-    {
-        var snapshot = new ConversationEditSnapshot(
-            [Node(0), Node(1, links: [new LinkEditSnapshot(1, 0, 2.4f, "", false)])]);
-        var doc  = XDocument.Parse(Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot));
-        var link = doc.Descendants("FlowChartLink").Single(l => (int)l.Element("FromNodeID")! == 1);
-
-        Assert.Equal("2", (string?)link.Element("RandomWeight"));
-    }
-
-    [Fact]
-    public void Serialize_LinkWithoutDefaults_WeightRoundingToOne_StaysOmitted()
-    {
-        // 0.6 is written as the game default 1, so a link without the element stays without it.
-        var link = OnlyLink(SaveLink(LinkWithoutDefaultsXml, 0.6f, ""));
-
-        Assert.Null(link.Element("RandomWeight"));
+        Assert.Equal("4", (string?)link.Element("RandomWeight"));
     }
 
     [Fact]
     public void Serialize_LinkWithoutDefaults_RoundTripsThroughParser()
     {
-        var nodes = Poe1ConversationParser.ParseXml(SaveLink(LinkWithoutDefaultsXml, 1f, ""));
+        var nodes = Poe1ConversationParser.ParseXml(SaveLink(LinkWithoutDefaultsXml, 1, ""));
         var link  = Assert.Single(nodes.First(n => n.NodeId == 0).Links);
 
         Assert.Equal(1f, link.RandomWeight);
