@@ -45,10 +45,16 @@
 
   <ItemGroup Label="Application">
     <PackageVersion Include="CommunityToolkit.Mvvm"          Version="8.4.2" />
-    <PackageVersion Include="NAudio"                         Version="3.1.0" />
+    <!-- Held on 2.4.x (see #150). NAudio.WinMM 3.x ships only lib/net9.0-windows7.0, so a
+         plain net10.0 project cannot reference it (NU1202). Mixing NAudio 3.x with WinMM 2.4.0
+         restores but fails at runtime (TypeLoadException for NAudio.MmResult, which moved out
+         of NAudio.Core), which crashes the test host. Moving to 3.x means retargeting
+         DialogEditor.Avalonia to net10.0-windows. dependabot.yml ignores NAudio majors until then. -->
+    <PackageVersion Include="NAudio"                         Version="2.4.0" />
     <!-- Referenced directly because NAudio 2.4.0's plain net6.0 dependency group (which a
          net10.0 app resolves to) no longer pulls in NAudio.WinMM — only its net6.0-windows
-         group does. VoAudioPlayer needs WaveOutEvent from it. Keep in step with NAudio. -->
+         group does. VoAudioPlayer needs WaveOutEvent from it. Keep in step with NAudio
+         (dependabot.yml groups the two). -->
     <PackageVersion Include="NAudio.WinMM"                   Version="2.4.0" />
     <PackageVersion Include="NodifyAvalonia"                 Version="6.6.0" />
     <PackageVersion Include="WeCantSpell.Hunspell"           Version="7.0.1" />

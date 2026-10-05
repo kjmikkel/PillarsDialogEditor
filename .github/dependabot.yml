@@ -25,7 +25,19 @@ updates:
           - "xunit*"
           - "Microsoft.NET.Test.Sdk"
           - "coverlet.*"
+      # NAudio.WinMM is referenced directly (see Directory.Packages.props) and must
+      # match NAudio's version: NAudio 3.1.0 with WinMM 2.4.0 restored cleanly but
+      # threw TypeLoadException at runtime and crashed the test host.
+      naudio:
+        patterns:
+          - "NAudio"
+          - "NAudio.*"
     ignore:
+      # NAudio.WinMM 3.x targets only net9.0-windows, which our plain net10.0
+      # projects can't reference. Stay on 2.x until DialogEditor.Avalonia is
+      # retargeted to net10.0-windows (#150).
+      - dependency-name: "NAudio*"
+        update-types: ["version-update:semver-major"]
       # A major Avalonia/Dock bump (12.x) is a migration project, not a routine
       # update — do it deliberately rather than via a bot PR that can't pass.
       - dependency-name: "Avalonia*"
