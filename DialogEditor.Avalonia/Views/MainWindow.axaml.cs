@@ -1,4 +1,4 @@
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Automation;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Primitives;
@@ -225,6 +225,23 @@ public partial class MainWindow : Window
             var win = new FindInProjectWindow(findVm);
             win.Show(this);          // non-modal, owned — results stay visible while browsing
             await Task.CompletedTask;
+        };
+
+        // One Batch Replace window at a time; reopening hands it a fresh search.
+        vm.ShowBatchReplace = brVm =>
+        {
+            if (_batchReplaceWindow is null || !_batchReplaceWindow.IsVisible)
+            {
+                _batchReplaceWindow = new BatchReplaceWindow(brVm);
+                _batchReplaceWindow.Closed += (_, _) => _batchReplaceWindow = null;
+            }
+            else
+            {
+                _batchReplaceWindow.DataContext = brVm;
+            }
+            _batchReplaceWindow.Show();
+            _batchReplaceWindow.Activate();
+            return Task.CompletedTask;
         };
 
         vm.ShowRepDispositionBalance = async balanceVm =>
@@ -476,7 +493,9 @@ public partial class MainWindow : Window
                 break;
 
             case Key.H when e.KeyModifiers == (KeyModifiers.Control | KeyModifiers.Shift):
-                BatchReplace_Click(null, null!);
+                // Gated like Ctrl+Shift+F: no project open → silently no-op.
+                if (vm.BatchReplaceCommand.CanExecute(null))
+                    vm.BatchReplaceCommand.Execute(null);
                 e.Handled = true;
                 break;
 
@@ -587,30 +606,6 @@ public partial class MainWindow : Window
         }
         _findReplaceWindow.Show();
         _findReplaceWindow.Activate();
-    }
-
-    private void BatchReplace_Click(object? sender, RoutedEventArgs e)
-    {
-        var vm = (MainWindowViewModel)DataContext!;
-        if (vm.Provider is null) return;
-
-        var allFiles = vm.Provider.EnumerateConversations();
-        var brVm = new BatchReplaceViewModel(
-            vm.Provider,
-            allFiles,
-            f => f.Name == vm.CurrentConversationName);
-
-        if (_batchReplaceWindow is null || !_batchReplaceWindow.IsVisible)
-        {
-            _batchReplaceWindow = new BatchReplaceWindow(brVm);
-            _batchReplaceWindow.Closed += (_, _) => _batchReplaceWindow = null;
-        }
-        else
-        {
-            _batchReplaceWindow.DataContext = brVm;
-        }
-        _batchReplaceWindow.Show();
-        _batchReplaceWindow.Activate();
     }
 
     private void FlowAnalytics_Click(object? sender, RoutedEventArgs e)
