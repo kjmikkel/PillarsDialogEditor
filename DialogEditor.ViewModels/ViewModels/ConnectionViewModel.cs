@@ -28,10 +28,12 @@ public partial class ConnectionViewModel : ObservableObject
                    OnPropertyChanged(nameof(IsAlways)); OnPropertyChanged(nameof(IsNever)); });
     }
 
+    /// Always a whole number: the games store it as an int (issue 129), so a typed or
+    /// pasted fraction is rounded here, where the user sees it, not silently on save.
     public float RandomWeight
     {
         get => _randomWeight;
-        set => Push(_randomWeight, value, "Undo_EditLinkWeight",
+        set => Push(_randomWeight, LinkWeight.ToGame(value), "Undo_EditLinkWeight",
             v => { _randomWeight = v; OnPropertyChanged(nameof(RandomWeight)); });
     }
 

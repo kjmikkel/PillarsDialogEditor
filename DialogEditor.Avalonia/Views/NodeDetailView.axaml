@@ -177,7 +177,7 @@
                                             <NumericUpDown Grid.Column="4"
                                                            Value="{Binding RandomWeight, Mode=TwoWay, Converter={StaticResource FloatDecimal}}"
                                                            Minimum="0" Maximum="100"
-                                                           Increment="0.1" FormatString="0.##"
+                                                           Increment="1" FormatString="0"
                                                            Background="{DynamicResource Brush.Surface.Card}" Foreground="{DynamicResource Brush.Text.Secondary}"
                                                            BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                                                            FontSize="{DynamicResource FontSize.Small}" Padding="2,0" Width="72"

@@ -52,6 +52,34 @@ public class Poe2ConversationSerializerTests
             "text", "", "Conversation", "None", "", "", "", false, false,
             links ?? [], [], []);
 
+    // ── #129: the game reads RandomWeight with ReadAsInt32, which throws on 1.5 ──
+
+    private static JsonNode SavedLink(string json, int fromNode) =>
+        JsonNode.Parse(json)!["Conversations"]![0]!["Nodes"]!.AsArray()
+            .First(n => n!["NodeID"]!.GetValue<int>() == fromNode)!["Links"]![0]!;
+
+    [Fact]
+    public void Serialize_ExistingLink_FractionalWeight_IsWrittenAsInteger()
+    {
+        var snapshot = new ConversationEditSnapshot(
+            [Node(0, links: [new LinkEditSnapshot(0, 1, 1.5f, "", false)]), Node(1)]);
+
+        var weight = SavedLink(Poe2ConversationSerializer.Serialize(TwoNodeJson, snapshot), 0)["RandomWeight"]!;
+
+        Assert.Equal("2", weight.ToJsonString());
+    }
+
+    [Fact]
+    public void Serialize_NewLink_FractionalWeight_IsWrittenAsInteger()
+    {
+        var snapshot = new ConversationEditSnapshot(
+            [Node(0), Node(1, links: [new LinkEditSnapshot(1, 0, 2.4f, "", false)])]);
+
+        var weight = SavedLink(Poe2ConversationSerializer.Serialize(TwoNodeJson, snapshot), 1)["RandomWeight"]!;
+
+        Assert.Equal("2", weight.ToJsonString());
+    }
+
     [Fact]
     public void Serialize_UpdatesSpeakerGuid()
     {
