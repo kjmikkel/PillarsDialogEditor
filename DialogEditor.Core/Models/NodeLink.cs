@@ -4,7 +4,7 @@ public record NodeLink(
     int FromNodeId,
     int ToNodeId,
     IReadOnlyList<ConditionNode> Conditions,
-    float RandomWeight = 1f,
+    int RandomWeight = 1,
     string QuestionNodeTextDisplay = ""
 )
 {

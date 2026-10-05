@@ -82,7 +82,7 @@ public class DiffEngineTests
     [Fact]
     public void Diff_AddedLink_AppearsInNodeModificationAddedLinks()
     {
-        var link = new LinkEditSnapshot(1, 5, 1f, "", false);
+        var link = new LinkEditSnapshot(1, 5, 1, "", false);
         var baseSnap    = Snap(MakeNode(1, links: []));
         var currentSnap = Snap(MakeNode(1, links: [link]));
         var patch = DiffEngine.Diff("conv", baseSnap, currentSnap, "en");
@@ -94,7 +94,7 @@ public class DiffEngineTests
     [Fact]
     public void Diff_DeletedLink_AppearsInNodeModificationDeletedLinks()
     {
-        var link = new LinkEditSnapshot(1, 5, 1f, "", false);
+        var link = new LinkEditSnapshot(1, 5, 1, "", false);
         var baseSnap    = Snap(MakeNode(1, links: [link]));
         var currentSnap = Snap(MakeNode(1, links: []));
         var patch = DiffEngine.Diff("conv", baseSnap, currentSnap, "en");
@@ -108,8 +108,8 @@ public class DiffEngineTests
     [Fact]
     public void Diff_ChangedQuestionNodeTextDisplay_AppearsInModifiedLinks()
     {
-        var baseLink    = new LinkEditSnapshot(1, 5, 1f, "ShowOnce", false);
-        var currentLink = new LinkEditSnapshot(1, 5, 1f, "Always",   false);
+        var baseLink    = new LinkEditSnapshot(1, 5, 1, "ShowOnce", false);
+        var currentLink = new LinkEditSnapshot(1, 5, 1, "Always",   false);
         var patch = DiffEngine.Diff("conv",
             Snap(MakeNode(1, links: [baseLink])),
             Snap(MakeNode(1, links: [currentLink])),
@@ -123,20 +123,20 @@ public class DiffEngineTests
     [Fact]
     public void Diff_ChangedRandomWeight_AppearsInModifiedLinks()
     {
-        var baseLink    = new LinkEditSnapshot(1, 5, 1f,  "ShowOnce", false);
-        var currentLink = new LinkEditSnapshot(1, 5, 2.5f,"ShowOnce", false);
+        var baseLink    = new LinkEditSnapshot(1, 5, 1,  "ShowOnce", false);
+        var currentLink = new LinkEditSnapshot(1, 5, 3, "ShowOnce", false);
         var patch = DiffEngine.Diff("conv",
             Snap(MakeNode(1, links: [baseLink])),
             Snap(MakeNode(1, links: [currentLink])),
             "en");
         Assert.Single(patch.ModifiedNodes[0].ModifiedLinks);
-        Assert.Equal(2.5f, patch.ModifiedNodes[0].ModifiedLinks[0].RandomWeight);
+        Assert.Equal(3, patch.ModifiedNodes[0].ModifiedLinks[0].RandomWeight);
     }
 
     [Fact]
     public void Diff_UnchangedLink_ProducesNoModifiedLink()
     {
-        var link = new LinkEditSnapshot(1, 5, 1f, "ShowOnce", false);
+        var link = new LinkEditSnapshot(1, 5, 1, "ShowOnce", false);
         var patch = DiffEngine.Diff("conv",
             Snap(MakeNode(1, links: [link])),
             Snap(MakeNode(1, links: [link])),

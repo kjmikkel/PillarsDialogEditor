@@ -84,7 +84,7 @@ public class SampleProjectService(IGitRunner git)
 
         var v2Nodes = v1.Nodes
             .Select(n => n.NodeId == anchor.NodeId
-                ? n with { Links = [.. n.Links, new LinkEditSnapshot(anchor.NodeId, newId, 1f, "", false)] }
+                ? n with { Links = [.. n.Links, new LinkEditSnapshot(anchor.NodeId, newId, 1, "", false)] }
                 : n)
             .Where(n => leafId is null || n.NodeId != leafId)
             .Select(n => leafId is null ? n

@@ -17,7 +17,7 @@ public class NodeConditionSearchServiceTests
     {
         var links = linkConds is null
             ? (IReadOnlyList<LinkEditSnapshot>)[]
-            : new[] { new LinkEditSnapshot(id, id + 1, 0f, "", HasConditions: true) { Conditions = linkConds } };
+            : new[] { new LinkEditSnapshot(id, id + 1, 0, "", HasConditions: true) { Conditions = linkConds } };
         return new NodeEditSnapshot(id, false, SpeakerCategory.Npc, "", "", "", "", "", "", "", "", "", false, false,
             links, nodeConds ?? [], scripts ?? []);
     }

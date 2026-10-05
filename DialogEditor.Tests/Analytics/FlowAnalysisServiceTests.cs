@@ -23,7 +23,7 @@ public class FlowAnalysisServiceTests
             links ?? [], [], scripts ?? []);
 
     private static LinkEditSnapshot Link(int from, int to, bool hasConditions = false) =>
-        new(from, to, 1f, "", hasConditions);
+        new(from, to, 1, "", hasConditions);
 
     private static ConversationEditSnapshot Snapshot(params NodeEditSnapshot[] nodes) =>
         new(nodes);

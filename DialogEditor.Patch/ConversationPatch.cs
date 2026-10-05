@@ -13,7 +13,7 @@ public record DeletedLink(int ToNodeId, bool HasConditions);
 
 public record ModifiedLink(
     int    ToNodeId,
-    float  RandomWeight,
+    int    RandomWeight,
     string QuestionNodeTextDisplay,
     IReadOnlyList<ConditionNode>? Conditions = null);
 

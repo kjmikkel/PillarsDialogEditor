@@ -6,7 +6,7 @@ namespace DialogEditor.Core.Editing;
 public record LinkEditSnapshot(
     int FromNodeId,
     int ToNodeId,
-    float RandomWeight,
+    int RandomWeight,
     string QuestionNodeTextDisplay,
     bool HasConditions)
 {

@@ -204,7 +204,7 @@ public class DiffViewModelApplyTests : IDisposable
 
     private static NodeEditSnapshot NodeWithLink(int id, int toId) =>
         new(id, false, SpeakerCategory.Npc, "", "", "", "", "Conversation", "None", "", "", "", false, false,
-            [new LinkEditSnapshot(id, toId, 1f, "", false)], [], []);
+            [new LinkEditSnapshot(id, toId, 1, "", false)], [], []);
 
     private static FakeGit MakeFakeGit(string projectDir, string? refContent, string branchOutput = "")
         => new(args =>

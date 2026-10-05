@@ -85,7 +85,7 @@ public class JsonDialogImporter : IDialogImporter
                 links.Add(new LinkEditSnapshot(
                     FromNodeId: fromNodeId,
                     ToNodeId: item.GetValue<int>(),
-                    RandomWeight: 1f,
+                    RandomWeight: 1,
                     QuestionNodeTextDisplay: "",
                     HasConditions: false)
                 {

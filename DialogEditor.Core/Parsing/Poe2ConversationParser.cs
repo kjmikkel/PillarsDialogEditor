@@ -97,7 +97,7 @@ public static class Poe2ConversationParser
             FromNodeId: link!["FromNodeID"]!.GetValue<int>(),
             ToNodeId:   link["ToNodeID"]!.GetValue<int>(),
             Conditions: ParseConditionTree(link["Conditionals"]?["Components"]?.AsArray()),
-            RandomWeight: link["RandomWeight"]?.GetValue<float>() ?? 1f,
+            RandomWeight: link["RandomWeight"]?.GetValue<int>() ?? 1,
             QuestionNodeTextDisplay: MapQuestionNodeTextDisplay(
                 link["QuestionNodeTextDisplay"]?.GetValue<int>() ?? 0)
         );

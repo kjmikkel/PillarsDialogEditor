@@ -20,7 +20,7 @@ public class NodeLinkAnalyzerTests
 
     private static NodeEditSnapshot NodeWithLink(int id, int toId) =>
         new(id, false, default, "", "", "", "", "", "", "", "", "", false, false,
-            [new LinkEditSnapshot(id, toId, 1f, "", false)], [], []);
+            [new LinkEditSnapshot(id, toId, 1, "", false)], [], []);
 
     [Fact]
     public void Analyze_FlagsAddedNodeLink_ToADeletedNode()
@@ -37,7 +37,7 @@ public class NodeLinkAnalyzerTests
     public void Analyze_FlagsModifiedNodeAddedLink_ToADeletedNode()
     {
         var mod = new NodeModification(5, new Dictionary<string, FieldChange>(),
-            [new LinkEditSnapshot(5, 8, 1f, "", false)], [], []);
+            [new LinkEditSnapshot(5, 8, 1, "", false)], [], []);
         var project = Project("c", Patch("c", deleted: [8], modified: [mod]));
 
         var dangling = NodeLinkAnalyzer.Analyze(project);
@@ -49,7 +49,7 @@ public class NodeLinkAnalyzerTests
     public void Analyze_FlagsModifiedNodeModifiedLink_ToADeletedNode()
     {
         var mod = new NodeModification(5, new Dictionary<string, FieldChange>(),
-            [], [], [new ModifiedLink(8, 1f, "")]);
+            [], [], [new ModifiedLink(8, 1, "")]);
         var project = Project("c", Patch("c", deleted: [8], modified: [mod]));
 
         var dangling = NodeLinkAnalyzer.Analyze(project);

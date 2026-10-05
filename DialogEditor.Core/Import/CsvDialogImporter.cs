@@ -119,7 +119,7 @@ public class CsvDialogImporter : IDialogImporter
                 links.Add(new LinkEditSnapshot(
                     FromNodeId: fromNodeId,
                     ToNodeId: toNodeId,
-                    RandomWeight: 1f,
+                    RandomWeight: 1,
                     QuestionNodeTextDisplay: "",
                     HasConditions: false)
                 {

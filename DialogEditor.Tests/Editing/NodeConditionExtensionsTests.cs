@@ -13,7 +13,7 @@ public class NodeConditionExtensionsTests
         params IReadOnlyList<ConditionNode>?[] linkConds)
     {
         var links = linkConds.Select((c, i) =>
-            new LinkEditSnapshot(0, i + 1, 0f, "", HasConditions: c is { Count: > 0 })
+            new LinkEditSnapshot(0, i + 1, 0, "", HasConditions: c is { Count: > 0 })
             { Conditions = c }).ToList();
         return new NodeEditSnapshot(
             0, false, SpeakerCategory.Npc, "", "", "", "", "", "", "", "", "", false, false,

@@ -91,7 +91,7 @@ public class MainWindowViewModelTestPatchTests : IDisposable
     {
         var addedNode = new NodeEditSnapshot(99, false, SpeakerCategory.Npc, "spk", "lst",
             "", "", "Conversation", "None", "", "", "", false, false,
-            [new LinkEditSnapshot(99, 1, 1f, "", false)], [], []);
+            [new LinkEditSnapshot(99, 1, 1, "", false)], [], []);
         var patch = new ConversationPatch(
             "test_conv", ConversationPatch.CurrentSchemaVersion, [addedNode], [], [])
         {

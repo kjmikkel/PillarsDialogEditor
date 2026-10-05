@@ -59,7 +59,7 @@ public class MainWindowViewModelUnreadableStringTableTests : IDisposable
         new("test_conv", ConversationPatch.CurrentSchemaVersion,
             [new NodeEditSnapshot(99, false, SpeakerCategory.Npc, "spk", "lst", "", "",
                 "Conversation", "None", "", "", "", false, false,
-                [new LinkEditSnapshot(99, 1, 1f, "", false)], [], [])], [], [])
+                [new LinkEditSnapshot(99, 1, 1, "", false)], [], [])], [], [])
         {
             Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
             {

@@ -216,7 +216,7 @@ public class DiffWindowTests : IDisposable
 
     private static NodeEditSnapshot NodeWithLink(int id, int toId) =>
         new(id, false, SpeakerCategory.Npc, "", "", "", "", "Conversation", "None", "", "", "", false, false,
-            [new LinkEditSnapshot(id, toId, 1f, "", false)], [], []);
+            [new LinkEditSnapshot(id, toId, 1, "", false)], [], []);
 
     [AvaloniaFact]
     public void DanglingPanel_Hidden_WhenApplyLeavesNoDanglingLinks()
