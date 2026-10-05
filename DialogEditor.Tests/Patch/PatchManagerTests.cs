@@ -162,7 +162,7 @@ public class ConflictDetectorTests
             "", "", "", false, false, [], [], []);
 
     private static NodeModification LinkEdit(int fromNodeId, int toNodeId,
-                                             bool added = false, float weight = 1f) =>
+                                             bool added = false, int weight = 1) =>
         new(fromNodeId, new Dictionary<string, FieldChange>(),
             added ? [new LinkEditSnapshot(fromNodeId, toNodeId, weight, "", false)] : [],
             [],
@@ -197,8 +197,8 @@ public class ConflictDetectorTests
     {
         var projects = new[]
         {
-            Project("ModA", new ConversationPatch("conv1", 2, [], [], [LinkEdit(5, 9, weight: 2f)])),
-            Project("ModB", new ConversationPatch("conv1", 2, [], [], [LinkEdit(5, 9, weight: 3f)])),
+            Project("ModA", new ConversationPatch("conv1", 2, [], [], [LinkEdit(5, 9, weight: 2)])),
+            Project("ModB", new ConversationPatch("conv1", 2, [], [], [LinkEdit(5, 9, weight: 3)])),
         };
 
         var c = Assert.Single(ConflictDetector.Detect(projects));

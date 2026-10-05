@@ -12,7 +12,7 @@ public class PatchSerializerTests
             99, true, SpeakerCategory.Player, "spkr", "lstnr",
             "Added text", "Female text", "Bark", "OnceEver",
             "direction", "comment", "vo.wav", true, false,
-            [new LinkEditSnapshot(99, 100, 1.5f, "Always", true)], [], []);
+            [new LinkEditSnapshot(99, 100, 2, "Always", true)], [], []);
 
         var mod = new NodeModification(7,
             new Dictionary<string, FieldChange>
@@ -20,7 +20,7 @@ public class PatchSerializerTests
                 ["DefaultText"] = new("\"old\"", "\"new\""),
                 ["HasVO"]       = new("false", "true"),
             },
-            [new LinkEditSnapshot(7, 8, 1f, "", false)],
+            [new LinkEditSnapshot(7, 8, 1, "", false)],
             [new DeletedLink(9, false)]);
 
         return new ConversationPatch(
@@ -48,7 +48,7 @@ public class PatchSerializerTests
         Assert.True(node.IsPlayerChoice);
         Assert.Single(node.Links);
         Assert.Equal(100,     node.Links[0].ToNodeId);
-        Assert.Equal(1.5f,    node.Links[0].RandomWeight);
+        Assert.Equal(2,       node.Links[0].RandomWeight);
         Assert.Equal("Always",node.Links[0].QuestionNodeTextDisplay);
 
         // Deleted node IDs

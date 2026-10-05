@@ -107,7 +107,7 @@ public class PatchApplierTests
     public void Apply_AddedLink_AppearsInNodeLinks()
     {
         var snap = Snap(MakeNode(1, links: []));
-        var newLink = new LinkEditSnapshot(1, 5, 1f, "", false);
+        var newLink = new LinkEditSnapshot(1, 5, 1, "", false);
         var mod  = new NodeModification(1, new Dictionary<string, FieldChange>(), [newLink], []);
         var patch  = new ConversationPatch("conv", 1, [], [], [mod]);
         var result = PatchApplier.Apply(snap, patch);
@@ -118,7 +118,7 @@ public class PatchApplierTests
     [Fact]
     public void Apply_DeletedLink_RemovedFromNodeLinks()
     {
-        var link = new LinkEditSnapshot(1, 5, 1f, "", false);
+        var link = new LinkEditSnapshot(1, 5, 1, "", false);
         var snap = Snap(MakeNode(1, links: [link]));
         var mod  = new NodeModification(1, new Dictionary<string, FieldChange>(),
             [], [new DeletedLink(5, false)]);
@@ -132,11 +132,11 @@ public class PatchApplierTests
     [Fact]
     public void Apply_ModifiedLink_UpdatesProperties()
     {
-        var link = new LinkEditSnapshot(1, 5, 1f, "ShowOnce", false);
+        var link = new LinkEditSnapshot(1, 5, 1, "ShowOnce", false);
         var snap = Snap(MakeNode(1, links: [link]));
         var mod  = new NodeModification(1, new Dictionary<string, FieldChange>(),
             [], [],
-            [new ModifiedLink(5, 2f, "Always")]);
+            [new ModifiedLink(5, 2, "Always")]);
         var patch  = new ConversationPatch("conv", 1, [], [], [mod]);
         var result = PatchApplier.Apply(snap, patch);
         Assert.Single(result.Nodes[0].Links);
@@ -147,12 +147,12 @@ public class PatchApplierTests
     [Fact]
     public void Apply_ModifiedLink_PreservesOtherLinks()
     {
-        var link1 = new LinkEditSnapshot(1, 5, 1f, "ShowOnce", false);
-        var link2 = new LinkEditSnapshot(1, 9, 1f, "ShowOnce", false);
+        var link1 = new LinkEditSnapshot(1, 5, 1, "ShowOnce", false);
+        var link2 = new LinkEditSnapshot(1, 9, 1, "ShowOnce", false);
         var snap = Snap(MakeNode(1, links: [link1, link2]));
         var mod  = new NodeModification(1, new Dictionary<string, FieldChange>(),
             [], [],
-            [new ModifiedLink(5, 0.5f, "Always")]);
+            [new ModifiedLink(5, 2, "Always")]);
         var patch  = new ConversationPatch("conv", 1, [], [], [mod]);
         var result = PatchApplier.Apply(snap, patch);
         Assert.Equal(2, result.Nodes[0].Links.Count);

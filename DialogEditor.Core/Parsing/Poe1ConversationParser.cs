@@ -56,7 +56,7 @@ public static class Poe1ConversationParser
             FromNodeId: (int)link.Element("FromNodeID")!,
             ToNodeId: (int)link.Element("ToNodeID")!,
             Conditions: ParseConditionTree(link.Element("Conditionals")?.Element("Components")),
-            RandomWeight: (float?)link.Element("RandomWeight") ?? 1f,
+            RandomWeight: (int?)link.Element("RandomWeight") ?? 1,
             QuestionNodeTextDisplay: (string?)link.Element("QuestionNodeTextDisplay") ?? string.Empty
         );
 

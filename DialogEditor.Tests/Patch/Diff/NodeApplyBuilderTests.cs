@@ -53,7 +53,7 @@ public class NodeApplyBuilderTests
     {
         var target = Project("c", Patch("c", modified: [Mod(7)]));
         var srcMod = new NodeModification(7, new Dictionary<string, FieldChange>(),
-            [new LinkEditSnapshot(7, 99, 1f, "", false)], [], []);
+            [new LinkEditSnapshot(7, 99, 1, "", false)], [], []);
         var source = Project("c", Patch("c", modified: [srcMod]));
 
         var result = NodeApplyBuilder.Apply(target, source, [new("c", 7)]);

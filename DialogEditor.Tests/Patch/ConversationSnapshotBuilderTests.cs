@@ -62,7 +62,7 @@ public class ConversationSnapshotBuilderTests
     [Fact]
     public void Build_PreservesLinks()
     {
-        var link = new NodeLink(1, 5, Conditions: [new ConditionLeaf("Boolean A()", [], false, "And")], RandomWeight: 2f, QuestionNodeTextDisplay: "Always");
+        var link = new NodeLink(1, 5, Conditions: [new ConditionLeaf("Boolean A()", [], false, "And")], RandomWeight: 2, QuestionNodeTextDisplay: "Always");
         var snap = ConversationSnapshotBuilder.Build(
             new Conversation("c", [MakeNode(1, [link])], StringTable.Empty));
 

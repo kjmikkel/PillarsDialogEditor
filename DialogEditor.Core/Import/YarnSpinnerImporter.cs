@@ -387,7 +387,7 @@ public class YarnSpinnerImporter : IDialogImporter
     private static LinkEditSnapshot MakeLink(int fromId, int toId) =>
         new(FromNodeId: fromId,
             ToNodeId: toId,
-            RandomWeight: 1f,
+            RandomWeight: 1,
             QuestionNodeTextDisplay: "",
             HasConditions: false)
         {

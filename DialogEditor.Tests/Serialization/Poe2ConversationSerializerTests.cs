@@ -53,31 +53,32 @@ public class Poe2ConversationSerializerTests
             links ?? [], [], []);
 
     // ── #129: the game reads RandomWeight with ReadAsInt32, which throws on 1.5 ──
+    // The weight is an int end to end; these pin that it lands in the JSON as an integer.
 
     private static JsonNode SavedLink(string json, int fromNode) =>
         JsonNode.Parse(json)!["Conversations"]![0]!["Nodes"]!.AsArray()
             .First(n => n!["NodeID"]!.GetValue<int>() == fromNode)!["Links"]![0]!;
 
     [Fact]
-    public void Serialize_ExistingLink_FractionalWeight_IsWrittenAsInteger()
+    public void Serialize_ExistingLink_Weight_IsWrittenAsInteger()
     {
         var snapshot = new ConversationEditSnapshot(
-            [Node(0, links: [new LinkEditSnapshot(0, 1, 1.5f, "", false)]), Node(1)]);
+            [Node(0, links: [new LinkEditSnapshot(0, 1, 4, "", false)]), Node(1)]);
 
         var weight = SavedLink(Poe2ConversationSerializer.Serialize(TwoNodeJson, snapshot), 0)["RandomWeight"]!;
 
-        Assert.Equal("2", weight.ToJsonString());
+        Assert.Equal("4", weight.ToJsonString());
     }
 
     [Fact]
-    public void Serialize_NewLink_FractionalWeight_IsWrittenAsInteger()
+    public void Serialize_NewLink_Weight_IsWrittenAsInteger()
     {
         var snapshot = new ConversationEditSnapshot(
-            [Node(0), Node(1, links: [new LinkEditSnapshot(1, 0, 2.4f, "", false)])]);
+            [Node(0), Node(1, links: [new LinkEditSnapshot(1, 0, 4, "", false)])]);
 
         var weight = SavedLink(Poe2ConversationSerializer.Serialize(TwoNodeJson, snapshot), 1)["RandomWeight"]!;
 
-        Assert.Equal("2", weight.ToJsonString());
+        Assert.Equal("4", weight.ToJsonString());
     }
 
     [Fact]
@@ -126,7 +127,7 @@ public class Poe2ConversationSerializerTests
     {
         // Regression (B-005): a node added by the editor (absent from the original
         // JSON) must be written with its outgoing links, or it is a dead end in-game.
-        var links    = new[] { new LinkEditSnapshot(99, 1, 1f, "", false) };
+        var links    = new[] { new LinkEditSnapshot(99, 1, 1, "", false) };
         var snapshot = new ConversationEditSnapshot([Node(0), Node(1), Node(99, links: links)]);
 
         var result = Poe2ConversationSerializer.Serialize(TwoNodeJson, snapshot);
@@ -140,7 +141,7 @@ public class Poe2ConversationSerializerTests
     [Fact]
     public void Serialize_RebuildLinks()
     {
-        var links = new[] { new LinkEditSnapshot(0, 1, 1f, "ShowOnce", false) };
+        var links = new[] { new LinkEditSnapshot(0, 1, 1, "ShowOnce", false) };
         var snapshot = new ConversationEditSnapshot([Node(0, links: links), Node(1)]);
         var result = Poe2ConversationSerializer.Serialize(TwoNodeJson, snapshot);
         var nodes = Poe2ConversationParser.ParseJson(result);

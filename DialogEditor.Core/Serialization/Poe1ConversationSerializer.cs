@@ -148,9 +148,8 @@ public static class Poe1ConversationSerializer
     private const string DefaultRandomWeight            = "1";
     private const string DefaultQuestionNodeTextDisplay = "ShowOnce";
 
-    // The game's XmlSerializer reads an int: "1.5" fails the whole conversation (issue 129).
-    private static string WeightText(float weight) =>
-        LinkWeight.ToGame(weight).ToString(System.Globalization.CultureInfo.InvariantCulture);
+    private static string WeightText(int weight) =>
+        weight.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
     // An element the file already has keeps being written; an absent one is added only
     // when the value differs from the game default. "" is never written: it is not a

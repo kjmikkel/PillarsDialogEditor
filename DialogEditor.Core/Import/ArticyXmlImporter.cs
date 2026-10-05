@@ -148,7 +148,7 @@ public class ArticyXmlImporter : IDialogImporter
             links.Add(new LinkEditSnapshot(
                 FromNodeId: fromIntId,
                 ToNodeId: toIntId,
-                RandomWeight: 1f,
+                RandomWeight: 1,
                 QuestionNodeTextDisplay: "",
                 HasConditions: false)
             {
