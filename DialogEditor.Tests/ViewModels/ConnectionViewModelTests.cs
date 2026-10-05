@@ -62,6 +62,25 @@ public class ConnectionViewModelTests
         Assert.Equal(1f, conn.RandomWeight);
     }
 
+    [Fact]
+    public void SetRandomWeight_Fraction_IsStoredAsTheWholeNumberTheGameWillRead()
+    {
+        // Issue 129: what the canvas shows, diffs and patches is what the game gets.
+        var conn = MakeConn(weight: 1f);
+        conn.RandomWeight = 1.5f;
+        Assert.Equal(2f, conn.RandomWeight);
+    }
+
+    [Fact]
+    public void SetRandomWeight_FractionRoundingToCurrentValue_PushesNoUndo()
+    {
+        var conn  = MakeConn(weight: 1f);
+        var stack = new UndoRedoStack();
+        conn.UndoStack    = stack;
+        conn.RandomWeight = 1.2f;   // rounds to 1, the current value
+        Assert.False(stack.CanUndo);
+    }
+
     // ── IsAlways / IsNever ────────────────────────────────────────────────
 
     [Fact]

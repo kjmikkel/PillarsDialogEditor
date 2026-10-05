@@ -112,7 +112,8 @@ public static class Poe2ConversationSerializer
             if (orig is not null)
             {
                 var cloned = JsonNode.Parse(orig.ToJsonString())!;
-                cloned["RandomWeight"]            = link.RandomWeight;
+                // The game reads it with ReadAsInt32, which throws on 1.5 (issue 129).
+                cloned["RandomWeight"]            = LinkWeight.ToGame(link.RandomWeight);
                 cloned["QuestionNodeTextDisplay"] = MapQuestionDisplay(link.QuestionNodeTextDisplay);
                 // Update link conditions when the snapshot carries them
                 if (link.Conditions is { Count: >= 0 })
@@ -205,7 +206,7 @@ public static class Poe2ConversationSerializer
               "PointsToGhost": false,
               "Conditionals": {"Operator": 0, "Components": []},
               "ClassExtender": {"ExtendedProperties": []},
-              "RandomWeight": {{link.RandomWeight}},
+              "RandomWeight": {{LinkWeight.ToGame(link.RandomWeight)}},
               "PlayQuestionNodeVO": true,
               "QuestionNodeTextDisplay": {{MapQuestionDisplay(link.QuestionNodeTextDisplay)}}
             }
