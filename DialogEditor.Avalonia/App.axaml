@@ -134,6 +134,7 @@
 
             <converters:FloatDecimalConverter           x:Key="FloatDecimal"/>
             <converters:QTDDisplayConverter             x:Key="QTDDisplay"/>
+            <converters:OptionLabelConverter            x:Key="OptionLabel"/>
             <converters:LayoutPointConverter             x:Key="LayoutPointConverter"/>
             <converters:SpeakerCategoryToBrushConverter x:Key="SpeakerCategoryToBrush"/>
             <converters:NodeColorConverter              x:Key="NodeColorConverter"/>

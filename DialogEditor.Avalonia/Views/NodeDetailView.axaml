@@ -331,12 +331,24 @@
                     <StackPanel>
 
                 <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_DisplayType}"/>
+                <!-- Items are the stored enum names, fixed for every node; the template
+                     localises each one, so a translated UI never writes a translated word into
+                     the model (issue 132). A value outside them ("Unknown(7)", or none at all)
+                     selects nothing and is shown as the placeholder instead. -->
                 <ComboBox Classes="detail-combo"
                           ItemsSource="{x:Static vm:NodeDetailViewModel.DisplayTypeOptions}"
                           SelectedItem="{Binding DisplayType, Mode=TwoWay}"
+                          PlaceholderText="{Binding DisplayTypeUnlisted, Converter={StaticResource OptionLabel}, ConverterParameter=Option_Display}"
                           ToolTip.Tip="{DynamicResource ToolTip_DisplayType}"
                           AutomationProperties.HelpText="{DynamicResource ToolTip_DisplayType}"
-                          AutomationProperties.Name="{DynamicResource PropertyRow_DisplayType}"/>
+                          AutomationProperties.Name="{DynamicResource PropertyRow_DisplayType}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource OptionLabel}, ConverterParameter=Option_Display}"
+                                       ToolTip.Tip="{Binding Converter={StaticResource OptionLabel}, ConverterParameter=ToolTip_Option_Display}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
 
                 <Border Background="{DynamicResource Brush.Bark.Detail.Background}" BorderBrush="{DynamicResource Brush.Bark.Detail.Border}" BorderThickness="1"
                         CornerRadius="2" Padding="6,4" Margin="0,0,0,4"
@@ -371,9 +383,17 @@
                 <ComboBox Classes="detail-combo"
                           ItemsSource="{x:Static vm:NodeDetailViewModel.PersistenceOptions}"
                           SelectedItem="{Binding Persistence, Mode=TwoWay}"
+                          PlaceholderText="{Binding PersistenceUnlisted, Converter={StaticResource OptionLabel}, ConverterParameter=Option_Persistence}"
                           ToolTip.Tip="{DynamicResource ToolTip_Persistence}"
                           AutomationProperties.HelpText="{DynamicResource ToolTip_Persistence}"
-                          AutomationProperties.Name="{DynamicResource PropertyRow_Persistence}"/>
+                          AutomationProperties.Name="{DynamicResource PropertyRow_Persistence}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={StaticResource OptionLabel}, ConverterParameter=Option_Persistence}"
+                                       ToolTip.Tip="{Binding Converter={StaticResource OptionLabel}, ConverterParameter=ToolTip_Option_Persistence}"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
 
                 <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_ActorDirection}"/>
                 <TextBox Classes="detail-field"
