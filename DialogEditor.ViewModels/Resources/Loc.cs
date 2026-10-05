@@ -18,6 +18,10 @@ public static class Loc
 
     public static string Get(string key) => Provider.Get(key);
 
+    /// For keys built at runtime that may legitimately not exist (e.g. a label per enum
+    /// value, where an unknown value has none).
+    public static bool TryGet(string key, out string value) => Provider.TryGet(key, out value);
+
     public static string Format(string key, params object[] args) =>
         string.Format(Provider.Get(key), args);
 

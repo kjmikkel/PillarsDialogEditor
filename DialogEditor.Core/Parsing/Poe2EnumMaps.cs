@@ -1,5 +1,6 @@
 using System.Globalization;
 using System.Text.Json.Nodes;
+using DialogEditor.Core.Models;
 
 namespace DialogEditor.Core.Parsing;
 
@@ -19,11 +20,9 @@ namespace DialogEditor.Core.Parsing;
 /// </remarks>
 internal static class Poe2EnumMaps
 {
-    // OEIFormats.FlowCharts.Conversations.DisplayType
-    private static readonly string[] DisplayTypes = ["Hidden", "Conversation", "Bark", "Overlay"];
-
-    // OEIFormats.FlowCharts.PersistenceType
-    private static readonly string[] Persistences = ["None", "OnceEver", "OncePerConversation", "MarkAsRead"];
+    // Shared with the detail pane's dropdowns (issue 132), so the two can never drift apart.
+    private static readonly string[] DisplayTypes = [.. NodeEnumNames.DisplayTypes];
+    private static readonly string[] Persistences = [.. NodeEnumNames.Persistences];
 
     private const string UnknownPrefix = "Unknown(";
 

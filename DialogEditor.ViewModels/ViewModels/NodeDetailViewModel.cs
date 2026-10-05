@@ -107,16 +107,19 @@ public partial class NodeDetailViewModel : ObservableObject
         set { if (_node != null) _node.ListenerGuid = value; }
     }
 
+    // A value outside the dropdown's fixed items (e.g. "Unknown(7)") leaves the ComboBox
+    // with nothing selected, and it writes null back through its TwoWay binding. Ignoring
+    // null keeps that value intact (issue 132); the user can only ever pick a real name.
     public string DisplayType
     {
         get => _node?.DisplayType ?? string.Empty;
-        set { if (_node != null) _node.DisplayType = value; }
+        set { if (_node != null && value is not null) _node.DisplayType = value; }
     }
 
     public string Persistence
     {
         get => _node?.Persistence ?? string.Empty;
-        set { if (_node != null) _node.Persistence = value; }
+        set { if (_node != null && value is not null) _node.Persistence = value; }
     }
 
     public string ActorDirection
@@ -482,11 +485,23 @@ public partial class NodeDetailViewModel : ObservableObject
     public static IReadOnlyList<string> NodeTypeOptions
         => [Loc.Get("Option_NpcLine"), Loc.Get("Option_PlayerChoice")];
 
-    public static IReadOnlyList<string> DisplayTypeOptions
-        => [Loc.Get("Option_DisplayConversation"), Loc.Get("Option_DisplayBark")];
+    /// The stored names, never localised labels — the view localises each item (issue 132).
+    /// Fixed, never per node: replacing a ComboBox's items under a selection makes it
+    /// re-select the previous node's value and write it into the new node, and leaves the
+    /// SelectedItem binding stuck on it.
+    public static IReadOnlyList<string> DisplayTypeOptions => NodeEnumNames.DisplayTypes;
 
-    public static IReadOnlyList<string> PersistenceOptions
-        => [Loc.Get("Option_PersistenceNone"), Loc.Get("Option_PersistenceOnceEver")];
+    public static IReadOnlyList<string> PersistenceOptions => NodeEnumNames.Persistences;
+
+    /// The node's value when it is not one of the options ("Unknown(7)", or "" when the
+    /// property is absent), else null. The dropdown shows it as placeholder text, so such a
+    /// value is visible without being selectable — and so without being overwritten.
+    public string? DisplayTypeUnlisted => Unlisted(DisplayTypeOptions, DisplayType);
+
+    public string? PersistenceUnlisted => Unlisted(PersistenceOptions, Persistence);
+
+    private string? Unlisted(IReadOnlyList<string> options, string value) =>
+        _node is null || options.Contains(value) ? null : value;
 
     // ── Read-only display ─────────────────────────────────────────────────
     public string FemaleTextDisplay =>
@@ -794,6 +809,8 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(ListenerGuid));
         OnPropertyChanged(nameof(DisplayType));
         OnPropertyChanged(nameof(Persistence));
+        OnPropertyChanged(nameof(DisplayTypeUnlisted));
+        OnPropertyChanged(nameof(PersistenceUnlisted));
         OnPropertyChanged(nameof(ActorDirection));
         OnPropertyChanged(nameof(Comments));
         OnPropertyChanged(nameof(ExternalVO));
