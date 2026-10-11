@@ -106,6 +106,17 @@ public sealed class CanonicalModSession : IDisposable
     public static string ScriptName(string method) =>
         ScriptCatalogue.Instance.ForGame("poe2").First(e => e.MethodName == method).ReflectionFullName;
 
+    /// The detail pane's Import VO button with the real importer; the file dialog is
+    /// answered with <paramref name="sourceWem"/> (a .wem is copied, no Wwise needed).
+    public async Task ImportVoAsync(int nodeId, string sourceWem)
+    {
+        Vm.Canvas.SelectNode(Node(nodeId));
+        Vm.Detail.Importer         = new DialogEditor.Avalonia.Audio.VoImporter();
+        Vm.Detail.ShowImportDialog = _ => Task.FromResult<VoImportDialogResult?>(new VoImportDialogResult(sourceWem, null));
+        Assert.True(Vm.Detail.ImportVoCommand.CanExecute(null), "Import VO is unavailable for this node");
+        await Vm.Detail.ImportVoCommand.ExecuteAsync(null);
+    }
+
     /// The GUI's Save Project path: folds the canvas into the project, writes the file.
     public void Save() => Invoke("SaveProject");
 
