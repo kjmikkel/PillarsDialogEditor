@@ -281,4 +281,25 @@ public class PatchManagerViewModelTests
             }
         }
     }
+
+    // ── After a game update (#147) ───────────────────────────────────────
+
+    [Fact]
+    public async Task ShowGameUpdateHelp_PassesTheLocalisedTitleAndMessage()
+    {
+        var vm = MakeVm();
+        (string Title, string Message)? shown = null;
+        vm.ShowGameUpdateHelp = (title, message) => { shown = (title, message); return Task.CompletedTask; };
+
+        await vm.ShowGameUpdateHelpCommand.ExecuteAsync(null);
+
+        Assert.Equal(("PatchManager_GameUpdateHelp_Title", "PatchManager_GameUpdateHelp_Message"), shown);
+    }
+
+    [Fact]
+    public async Task ShowGameUpdateHelp_WithoutAHost_DoesNothing()
+    {
+        var vm = MakeVm();
+        await vm.ShowGameUpdateHelpCommand.ExecuteAsync(null);   // no hook set: must not throw
+    }
 }
