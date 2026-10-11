@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using DialogEditor.Core.Editing;
@@ -268,12 +268,12 @@ public static class Poe2ConversationSerializer
         };
     }
 
-    private static int MapQuestionDisplay(string s) => s switch
-    {
-        "Always" => 1,
-        "Never"  => 2,
-        _        => 0
-    };
+    // The enum's position (issue 139); "" and anything unrecognised fall back to the
+    // game default, ShowOnce (0).
+    private static readonly string[] QuestionDisplays = [.. NodeEnumNames.QuestionNodeTextDisplays];
+
+    private static int MapQuestionDisplay(string s) =>
+        Math.Max(0, Array.IndexOf(QuestionDisplays, NodeEnumNames.QuestionNodeTextDisplayName(s)));
 
     public static void SaveToFile(string path, ConversationEditSnapshot snapshot)
     {
