@@ -51,6 +51,27 @@ public sealed class DeliveryPaths : IDisposable
         await session.Vm.TestPatchCommand.ExecuteAsync(null);
     }
 
+    /// The Patch Manager's Remove all mods, with its confirmation answered yes.
+    public static async Task RemoveAllModsAsync(string gameRoot)
+    {
+        Loc.Configure(new StubStringProvider());
+        var vm = new PatchManagerViewModel(new StubFolderPicker(), new StubFilePicker())
+        {
+            GameFolder           = gameRoot,
+            ConfirmRemoveAllMods = () => Task.FromResult(true),
+        };
+        await vm.RemoveAllModsCommand.ExecuteAsync(null);
+    }
+
+    /// Test Patch (F5), then Restore Conversation (F6) in the same editor session.
+    public async Task ViaTestPatchAndRestoreAsync(string gameRoot, string projectPath)
+    {
+        using var session = new CanonicalModSession();
+        await session.LoadExistingAsync(gameRoot, projectPath);
+        await session.Vm.TestPatchCommand.ExecuteAsync(null);
+        await session.Vm.RestoreConversationCommand.ExecuteAsync(null);
+    }
+
     /// Relative path → SHA-256 of every file the game reads (under the data folder). The
     /// patcher's and the editor's own backup folders live outside it.
     public static SortedDictionary<string, string> GameFiles(string gameRoot)
