@@ -1,4 +1,4 @@
-using DialogEditor.Core.Models;
+﻿using DialogEditor.Core.Models;
 using DialogEditor.Core.Parsing;
 
 namespace DialogEditor.Tests.Parsing;
@@ -425,5 +425,18 @@ public class Poe2ConversationParserTests
     {
         var id = Poe2ConversationParser.ParseRootId("""{"Conversations":[]}""");
         Assert.Null(id);
+    }
+
+    // ── #139: PoE2's integer maps to the same names PoE1 stores ─────────────────
+
+    [Theory]
+    [InlineData(0, "ShowOnce")]
+    [InlineData(1, "ShowAlways")]
+    [InlineData(2, "ShowNever")]
+    public void Parse_LinkDisplay_IsTheGamesEnumName(int stored, string expected)
+    {
+        var json  = TwoNodeJson.Replace("\"QuestionNodeTextDisplay\": 0", $"\"QuestionNodeTextDisplay\": {stored}");
+        var nodes = Poe2ConversationParser.ParseJson(json);
+        Assert.Equal(expected, nodes[0].Links[0].QuestionNodeTextDisplay);
     }
 }

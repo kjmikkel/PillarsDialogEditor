@@ -98,7 +98,7 @@
                           AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_InScriptParams}"/>
                 <!-- There is deliberately no "link choice text" checkbox. The only link
                      field it ever searched was QuestionNodeTextDisplay, an enum
-                     (ShowOnce/Always/Never) that a substring replace corrupts; it is
+                     (ShowOnce/ShowAlways/ShowNever) that a substring replace corrupts; it is
                      edited through the node detail dropdown instead. See issue #24. -->
                 <CheckBox IsChecked="{Binding InConditionParams, Mode=TwoWay}"
                           Content="{DynamicResource BatchReplace_InConditionParams}"

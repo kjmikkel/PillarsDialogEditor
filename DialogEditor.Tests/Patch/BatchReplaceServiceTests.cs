@@ -196,7 +196,7 @@ public class BatchReplaceServiceTests
     public void Apply_ReplaceMatchingEnumName_DoesNotCorruptQuestionNodeTextDisplay()
     {
         // QuestionNodeTextDisplay holds one of exactly three values — ShowOnce,
-        // Always, Never — controlling whether a question node's text is shown.
+        // ShowAlways, ShowNever — controlling whether a question node's text is shown.
         // A writer replacing "on" with "in" across node prose must not silently
         // rewrite "ShowOnce" to "ShowInce": PoE2's serializer maps any unknown
         // name to 0 (ShowOnce) with no error, and PoE1 writes the garbage
