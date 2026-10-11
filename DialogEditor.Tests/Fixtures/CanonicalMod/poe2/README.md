@@ -21,7 +21,7 @@ Each row is one scenario step. Its expectation is checked after applying the mod
 | `nodes.add-npc-line` | New NPC line 11, linked from 10 |  |
 | `nodes.add-player-choice` | New player choice 12 under 0 |  |
 | `nodes.add-script` | New script node 13 after 12 |  |
-| `nodes.convert-player-to-npc` | Player choice 3 converted to an NPC line with the detail pane's Node Type control (#160) | #160 |
+| `nodes.convert-player-to-npc` | Player choice 3 converted to an NPC line with the detail pane's Node Type control, NPC speaking to the player (#160) | #160 |
 | `nodes.delete` | Node 9 deleted; bank 5 keeps child 8 |  |
 | `kept.bank-and-trigger` | Bank 5 and trigger 6 get a new Persistence; their bank and trigger fields survive |  |
 | `links.remove` | Link 2→5 removed |  |

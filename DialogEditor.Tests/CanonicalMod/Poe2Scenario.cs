@@ -65,8 +65,11 @@ public static class Poe2Scenario
                 Assert.Contains(v.Node(Edited, 12).Links, l => l.ToNodeId == 13);
             }),
 
+        // One step on purpose: while #160 keeps node 3 a PlayerResponseNode, PoE2 drops its
+        // SpeakerGuid/ListenerGuid on save (that type doesn't declare them, #116), so the
+        // speaker change can't be checked apart from the type change.
         new("nodes.convert-player-to-npc",
-            "Player choice 3 converted to an NPC line with the detail pane's Node Type control (#160)",
+            "Player choice 3 converted to an NPC line with the detail pane's Node Type control, NPC speaking to the player (#160)",
             async s =>
             {
                 s.Open(Edited);
@@ -80,7 +83,7 @@ public static class Poe2Scenario
             v =>
             {
                 Assert.False(v.Node(Edited, 3).IsPlayerChoice);
-                Assert.Equal(CanonicalIds.Npc, v.Node(Edited, 3).SpeakerGuid);
+                Assert.Equal((CanonicalIds.Npc, CanonicalIds.Player), (v.Node(Edited, 3).SpeakerGuid, v.Node(Edited, 3).ListenerGuid));
             },
             KnownIssue: "#160"),
 

@@ -69,6 +69,11 @@ public sealed class DeliveryPaths : IDisposable
         using var session = new CanonicalModSession();
         await session.LoadExistingAsync(gameRoot, projectPath);
         await session.Vm.TestPatchCommand.ExecuteAsync(null);
+        // Test Patch reports a refusal only in the status bar, and a restore with nothing to
+        // undo leaves the fixture as it was. Prove F5 really wrote before checking F6.
+        Assert.True(File.Exists(Path.Combine(gameRoot, "PillarsOfEternityII_Data", "exported", "design", "conversations",
+                                             Poe2Scenario.NewConversation + ".conversationbundle")),
+                    $"Test Patch wrote nothing: {session.Vm.StatusText}");
         await session.Vm.RestoreConversationCommand.ExecuteAsync(null);
     }
 
