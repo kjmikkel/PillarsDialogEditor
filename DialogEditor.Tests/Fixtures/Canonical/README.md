@@ -77,13 +77,16 @@ These differences are not gaps in the fixture. The fixture follows each game's o
 
 ## Known gaps
 
-Unchanged saves of both fixtures are exact. Writing up the PoE1 fixture turned up two new bugs and confirmed a third.
-They only appear once a link is **edited**, so an unchanged save can't catch them;
-[#138](https://github.com/kjmikkel/PillarsDialogEditor/issues/138) (canonical mods) is meant to:
+Unchanged saves of both fixtures are exact. Writing up the PoE1 fixture turned up bugs that only appear once a link is
+**edited**, so an unchanged save can't catch them. All three are fixed:
 
-- [#139](https://github.com/kjmikkel/PillarsDialogEditor/issues/139): PoE1 QuestionNodeTextDisplay is saved as `Always`/`Never`, which the game can't load.
-- [#129](https://github.com/kjmikkel/PillarsDialogEditor/issues/129): Random Weight accepts fractions, but both games store an integer (already filed; the fixture work confirmed it for PoE2).
-- [#141](https://github.com/kjmikkel/PillarsDialogEditor/issues/141): PoE1 link conditions are editable and saved, but PoE1 links have none.
+- [#139](https://github.com/kjmikkel/PillarsDialogEditor/issues/139): PoE1 QuestionNodeTextDisplay was saved as `Always`/`Never`.
+- [#129](https://github.com/kjmikkel/PillarsDialogEditor/issues/129): Random Weight accepted fractions; both games store an integer.
+- [#141](https://github.com/kjmikkel/PillarsDialogEditor/issues/141): PoE1 link conditions were editable and saved, but PoE1 links have none.
+
+Coverage of what the editor *writes* now lives in the canonical mods under [`../CanonicalMod`](../CanonicalMod)
+([#138](https://github.com/kjmikkel/PillarsDialogEditor/issues/138)). Each mod's README lists its features and any open
+issue a feature currently exposes.
 
 ## Changing a fixture
 
