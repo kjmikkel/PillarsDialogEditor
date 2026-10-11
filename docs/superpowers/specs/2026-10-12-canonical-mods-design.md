@@ -1,7 +1,8 @@
 # Canonical mods — design
 
 GitHub issue [#138](https://github.com/kjmikkel/PillarsDialogEditor/issues/138). Follows #122
-(canonical conversations). Approved in brainstorming on 2026-10-12.
+(canonical conversations). Approved in brainstorming on 2026-10-12; amended while planning (bank/trigger and per-script
+conditionals are carried, not edited; the #116 oracle is the fixture; the README is generated).
 
 ## Goal
 
@@ -40,9 +41,9 @@ DialogEditor.Tests/
 
 - **`CanonicalModScenario`** — per-game edit scripts written against a thin facade over the real
   view models (`MainWindowViewModel`, `ConversationViewModel`, `NodeDetailViewModel`,
-  `ConditionEditorViewModel`). Each step carries a feature tag (e.g. `[Covers("links.weight")]`).
-  A test asserts the tags and the README's feature rows match exactly, both ways, so they cannot
-  drift apart.
+  `ConditionEditorViewModel`, `ScriptEditorViewModel`). Each step carries a feature tag (e.g.
+  `links.weight`), a one-line description and its own expectation. The feature README is
+  *generated* from the steps and golden-checked like the mod, so the two cannot drift apart.
 - **`CanonicalModBuilder`** — copies `Fixtures/Canonical/<game>` to a temp folder, creates a project
   the way *New Project* does, runs the scenario, saves through `SaveProject` (the GUI's own
   diff-to-patch path), then builds the pack with `VoPackExporter.ExportAsync`. VO import goes through
@@ -60,10 +61,10 @@ DialogEditor.Tests/
 |---|---|
 | Nodes — add | New NPC line 11 after 10; new player choice 12 under 0; new script node 13 |
 | Nodes — convert / delete | Convert player 3 → NPC line; delete node 9 (bank 5 keeps child 8) |
-| Kept types | Edit bank 5 (add new child 14) and trigger 6 (re-point its start node); node −200 untouched |
+| Kept types | Edit an ordinary property of bank 5 and trigger 6 and check their type-specific fields (bank children, play type, trigger target) survive; node −200 untouched. The editor has no way to edit bank children or a trigger's target, so those are carried, not edited |
 | Links | Add 0→12 and 10→11; remove 2→5; re-weight 0→2 to 3; all three QuestionNodeTextDisplay values; change link 1→4's conditions |
 | Conditions | On a node and on a link: nested AND/OR, negation, a multi-parameter call; clear one condition entirely |
-| Scripts | Add OnEnter/OnExit/OnUpdate on 13; edit node 4's per-script conditional (#115); remove one script |
+| Scripts | Add OnEnter/OnExit/OnUpdate on 13; add a script to node 4 and check its existing per-script conditional (#115) survives — `ScriptCall` has no conditional, so the editor carries it rather than edits it; remove one script |
 | Properties | Every DisplayType and Persistence value across new/edited nodes (#114); speaker and listener change; comments; HideSpeaker on and off |
 | Text | Edit node 0 text and female variant; new text with a token and `<i>` markup; a `de` translation for new and edited nodes |
 | VO | Import a placeholder `.wem` for node 11 (HasVO); ExternalVO alias on node 12 → node 7's file; turn one HasVO off |
@@ -99,9 +100,10 @@ Each `CanonicalModApplyTests` case starts from a fresh `FakePoe2Game.Canonical()
 - **The three paths agree** — the written game files are byte-identical across all three paths.
 - **Untouched stays untouched** — node −200, and conversations and stringtables the mod does not
   touch, are byte-identical to the fixture.
-- **PoE2 property check (#116)** — every written node carries only the properties its `$type`
-  declares in OEIFormats. The allowed-property table is derived from the decompiled model once and
-  checked in (property names only, no game data).
+- **PoE2 property check (#116)** — every written node's property set is a subset of the properties
+  the canonical fixture's nodes of the same `$type` carry. The fixture is hand-written from the
+  OEIFormats model and covers every node type, so it is the oracle; the product's own
+  `Poe2NodeProperties` table is not used, since checking it against itself proves nothing.
 - **VO** — each `.wem` lands where the game resolves it; the ExternalVO alias points at an existing
   file.
 - **Reversibility** — *Remove all mods* (patcher paths) and *Restore Conversation* (F6, Test Patch
