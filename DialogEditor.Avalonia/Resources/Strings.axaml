@@ -513,7 +513,7 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Button_LinkConditions">⚙</sys:String>
     <sys:String x:Key="ToolTip_LinkConditions_None">No conditions — click to add</sys:String>
     <!-- Issue 141: PoE1's game model has no conditions on links, only on nodes. -->
-    <sys:String x:Key="ToolTip_LinkConditions_Poe1">Pillars of Eternity links can't carry conditions; the game ignores them. To show this choice only when something is true, put the condition on the node this link leads to.</sys:String>
+    <sys:String x:Key="ToolTip_LinkConditions_Poe1">Pillars of Eternity links can't carry conditions; the game ignores them. To show this choice only when something is true, put the condition on the node this link leads to. That condition applies to every link into that node; to gate only this route, link to a separate copy of the node.</sys:String>
 
     <!-- ─── Detail panel — link property labels and tooltips ───────────── -->
     <sys:String x:Key="Label_LinkWeight">Wt.</sys:String>
