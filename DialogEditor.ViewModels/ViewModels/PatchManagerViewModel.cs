@@ -59,6 +59,10 @@ public partial class PatchManagerViewModel : ObservableObject
     /// Set by the host view: returns true when the user confirms "Remove all mods".
     public Func<Task<bool>>? ConfirmRemoveAllMods { get; set; }
 
+    /// Set by the host view: shows a one-button message (title, message). Used by the
+    /// "After a game update…" link (issue 147).
+    public Func<string, string, Task>? ShowGameUpdateHelp { get; set; }
+
     public bool HasEntries => Entries.Count > 0;
 
     /// Conflict rows for the summary list. Rows rather than raw PatchConflicts because
@@ -439,6 +443,15 @@ public partial class PatchManagerViewModel : ObservableObject
             StatusText = SchemaVersionMessages.TooNew(ex, fileName);
         }
     }
+
+    /// Issue 147: a game update can undo or invalidate installed mods, and the patcher can't
+    /// re-base them itself. This only tells the player what to do (verify the game files,
+    /// then apply again). It is a link the player opens, never a prompt or banner.
+    [RelayCommand]
+    private Task ShowGameUpdateHelpAsync() =>
+        ShowGameUpdateHelp?.Invoke(Loc.Get("PatchManager_GameUpdateHelp_Title"),
+                                   Loc.Get("PatchManager_GameUpdateHelp_Message"))
+        ?? Task.CompletedTask;
 
     [RelayCommand]
     private void OpenPatcherReleases()

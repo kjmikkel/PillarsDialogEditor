@@ -421,15 +421,12 @@ public partial class MainWindowViewModel : ObservableObject
             }
         };
 
-        Canvas.Connections.CollectionChanged += (_, args) =>
-        {
-            RefreshDetailLinks();
-            // Subscribe to property changes on newly added connections so edits
-            // (QuestionNodeTextDisplay, RandomWeight) mark the canvas as modified.
-            if (args.NewItems is not null)
-                foreach (ConnectionViewModel conn in args.NewItems)
-                    conn.PropertyChanged += (_, _) => Canvas.IsModified = true;
-        };
+        // No PropertyChanged hook on the connections themselves (issue 142). Link edits
+        // (display, weight, conditions) go through the shared undo stack, whose
+        // CommandExecuted already marks the canvas modified. A blanket hook also fired for
+        // IsHighlighted, which selecting a node sets, so merely viewing a linked node
+        // marked the conversation modified.
+        Canvas.Connections.CollectionChanged += (_, _) => RefreshDetailLinks();
 
         Canvas.ConnectModeChanged += (_, e) =>
         {

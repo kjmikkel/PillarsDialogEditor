@@ -191,7 +191,7 @@
                    FontSize="{DynamicResource FontSize.Small}"/>
 
         <!-- ── Footer ──────────────────────────────────────────────── -->
-        <Grid Grid.Row="5" ColumnDefinitions="*,Auto,Auto" Margin="0,10,0,0">
+        <Grid Grid.Row="5" ColumnDefinitions="*,Auto,Auto,Auto" Margin="0,10,0,0">
             <!-- Wraps rather than trims: a "newer file format" refusal (issues 62, 79) is a
                  full sentence the player has to read to the end. -->
             <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0">
@@ -210,18 +210,27 @@
                         ToolTip.Tip="{DynamicResource ToolTip_GetLatestPatcher}"
                         AutomationProperties.HelpText="{DynamicResource ToolTip_GetLatestPatcher}"/>
             </StackPanel>
-            <Button Grid.Column="1" Classes="action-btn" Margin="0,0,8,0"
+            <!-- Issue 147: a quiet text link, never a banner or start-up prompt. It explains
+                 what to do after a game update (verify the files, then apply again). -->
+            <HyperlinkButton x:Name="GameUpdateHelpLink" Grid.Column="1" Margin="0,0,12,0"
+                             VerticalAlignment="Center"
+                             Content="{DynamicResource PatchManager_GameUpdateHelp_Link}"
+                             Command="{Binding ShowGameUpdateHelpCommand}"
+                             FontSize="{DynamicResource FontSize.Small}"
+                             ToolTip.Tip="{DynamicResource ToolTip_GameUpdateHelp}"
+                             AutomationProperties.HelpText="{DynamicResource ToolTip_GameUpdateHelp}"/>
+            <Button Grid.Column="2" Classes="action-btn" Margin="0,0,8,0"
                     Content="{DynamicResource PatchManager_RemoveAllMods}"
                     Command="{Binding RemoveAllModsCommand}"
                     ToolTip.Tip="{DynamicResource ToolTip_RemoveAllMods}"
                     AutomationProperties.HelpText="{DynamicResource ToolTip_RemoveAllMods}"/>
-            <Button Grid.Column="2" Classes="primary-btn"
+            <Button Grid.Column="3" Classes="primary-btn"
                     Content="{DynamicResource PatchManager_Apply}"
                     Command="{Binding ApplyCommand}"
                     IsVisible="{Binding IsApplying, Converter={StaticResource InverseBoolToVis}}"
                     ToolTip.Tip="{DynamicResource ToolTip_ApplyPatches}"
                     AutomationProperties.HelpText="{DynamicResource ToolTip_ApplyPatches}"/>
-            <Button Grid.Column="2" Classes="primary-btn"
+            <Button Grid.Column="3" Classes="primary-btn"
                     Content="{DynamicResource PatchManager_Applying}"
                     IsEnabled="False"
                     IsVisible="{Binding IsApplying}"/>
