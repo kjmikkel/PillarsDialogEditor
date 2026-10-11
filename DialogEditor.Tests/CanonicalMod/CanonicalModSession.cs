@@ -84,6 +84,28 @@ public sealed class CanonicalModSession : IDisposable
         Vm.Canvas.Connections.Single(c => c.Source.Owner == Node(from) && c.Target.Owner == Node(to));
     public void Delete(int id) => Vm.Canvas.DeleteNode(Node(id));
 
+    /// Opens the condition editor on a tree and confirms it: the same tree → rows → tree round
+    /// trip the dialog performs, so nesting, negation and operators go through the editor's code.
+    public void EditConditions(NodeViewModel node, IReadOnlyList<ConditionNode> conditions) =>
+        new ConditionEditorViewModel("canonical", conditions, c => node.Conditions = c, "poe2").ConfirmCommand.Execute(null);
+
+    public void EditLinkConditions(int from, int to, IReadOnlyList<ConditionNode> conditions)
+    {
+        var link = LinkOf(from, to);
+        new ConditionEditorViewModel("canonical", conditions, c => link.Conditions = c, "poe2").ConfirmCommand.Execute(null);
+    }
+
+    public void EditScripts(NodeViewModel node, IReadOnlyList<ScriptCall> scripts) =>
+        new ScriptEditorViewModel("canonical", scripts, s => node.Scripts = s, "poe2").ConfirmCommand.Execute(null);
+
+    /// The PoE2 catalogue's FullName for a method; throws if absent, because an unknown
+    /// function would be written into the mod and fail in the game.
+    public static string ConditionName(string method) =>
+        ConditionCatalogue.Instance.ForGame("poe2").First(e => e.MethodName == method).ReflectionFullName;
+
+    public static string ScriptName(string method) =>
+        ScriptCatalogue.Instance.ForGame("poe2").First(e => e.MethodName == method).ReflectionFullName;
+
     /// The GUI's Save Project path: folds the canvas into the project, writes the file.
     public void Save() => Invoke("SaveProject");
 

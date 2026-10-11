@@ -159,5 +159,98 @@ public static class Poe2Scenario
                 Assert.Equal("ShowOnce",   links.Single(l => l.ToNodeId == 2).QuestionNodeTextDisplay);
                 Assert.Equal("ShowAlways", links.Single(l => l.ToNodeId == 12).QuestionNodeTextDisplay);
             }),
+
+        new("conditions.node-nested",
+            "Node 12: A and (B or not C), each a multi-parameter call",
+            async s =>
+            {
+                s.Open(Edited);
+                var name = CanonicalModSession.ConditionName("IsGlobalValue");
+                var a = new ConditionLeaf(name, ["cm_flag_a", "EqualTo", "1"], false, "And");
+                var b = new ConditionLeaf(name, ["cm_flag_b", "GreaterThan", "2"], false, "Or");
+                var c = new ConditionLeaf(name, ["cm_flag_c", "EqualTo", "0"], true, "And");
+                s.EditConditions(s.Node(12), [a, new ConditionBranch([b, c], false, "And")]);
+                s.Save();
+                await Task.CompletedTask;
+            },
+            v =>
+            {
+                var conds  = v.Node(Edited, 12).Conditions;
+                Assert.Equal(2, conds.Count);
+                var branch = Assert.IsType<ConditionBranch>(conds[1]);
+                Assert.True(Assert.IsType<ConditionLeaf>(branch.Components[1]).Not);
+                Assert.Equal(["cm_flag_b", "GreaterThan", "2"], Assert.IsType<ConditionLeaf>(branch.Components[0]).Parameters);
+            }),
+
+        new("conditions.link",
+            "Link 1→4's conditions replaced by one negated call (PoE2 links carry conditions)",
+            async s =>
+            {
+                s.Open(Edited);
+                s.EditLinkConditions(1, 4,
+                    [new ConditionLeaf(CanonicalModSession.ConditionName("IsGlobalValue"), ["cm_flag_link", "EqualTo", "1"], true, "And")]);
+                s.Save();
+                await Task.CompletedTask;
+            },
+            v =>
+            {
+                var leaf = Assert.IsType<ConditionLeaf>(Assert.Single(v.Node(Edited, 1).Links.Single(l => l.ToNodeId == 4).Conditions));
+                Assert.True(leaf.Not);
+                Assert.Equal("cm_flag_link", leaf.Parameters[0]);
+            }),
+
+        new("conditions.clear",
+            "Node 2's condition removed entirely",
+            async s =>
+            {
+                s.Open(Edited);
+                s.EditConditions(s.Node(2), []);
+                s.Save();
+                await Task.CompletedTask;
+            },
+            v => Assert.Empty(v.Node(Edited, 2).Conditions)),
+
+        new("scripts.add-all-categories",
+            "Node 13 gets OnEnter, OnExit and OnUpdate scripts",
+            async s =>
+            {
+                s.Open(Edited);
+                var set = CanonicalModSession.ScriptName("SetGlobalValue");
+                s.EditScripts(s.Node(13),
+                [
+                    new ScriptCall(set, ["cm_enter", "1"],  ScriptCategory.Enter),
+                    new ScriptCall(set, ["cm_exit", "2"],   ScriptCategory.Exit),
+                    new ScriptCall(set, ["cm_update", "3"], ScriptCategory.Update),
+                ]);
+                s.Save();
+                await Task.CompletedTask;
+            },
+            v => Assert.Equal([ScriptCategory.Enter, ScriptCategory.Exit, ScriptCategory.Update],
+                              v.Node(Edited, 13).Scripts.Select(x => x.Category).Order())),
+
+        new("scripts.keep-per-script-conditional",
+            "Node 4 gains an OnExit script; its existing OnEnter script keeps its own conditional (#115)",
+            async s =>
+            {
+                s.Open(Edited);
+                var n = s.Node(4);
+                s.EditScripts(n, [.. n.Scripts,
+                    new ScriptCall(CanonicalModSession.ScriptName("SetGlobalValue"), ["cm_extra", "1"], ScriptCategory.Exit)]);
+                s.Save();
+                await Task.CompletedTask;
+            },
+            // The conditional itself is checked on the raw bundle (CanonicalModRawChecks).
+            v => Assert.Contains(v.Node(Edited, 4).Scripts, x => x.Parameters.SequenceEqual(["cm_extra", "1"]))),
+
+        new("scripts.remove",
+            "Node 0's OnEnter script removed",
+            async s =>
+            {
+                s.Open(Edited);
+                s.EditScripts(s.Node(0), []);
+                s.Save();
+                await Task.CompletedTask;
+            },
+            v => Assert.Empty(v.Node(Edited, 0).Scripts)),
     ];
 }
