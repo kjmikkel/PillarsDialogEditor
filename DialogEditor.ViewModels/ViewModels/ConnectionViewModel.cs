@@ -7,9 +7,10 @@ namespace DialogEditor.ViewModels;
 
 public partial class ConnectionViewModel : ObservableObject
 {
-    /// All valid QTD values in display order; "" is the engine default.
+    /// All valid QTD values in display order; "" is the engine default. The rest are the
+    /// game's own enum names, which PoE1 writes verbatim (issue 139).
     public static IReadOnlyList<string> QTDOptions { get; } =
-        ["", "ShowOnce", "Always", "Never"];
+        ["", .. NodeEnumNames.QuestionNodeTextDisplays];
 
     public UndoRedoStack? UndoStack { get; set; }
 
@@ -46,8 +47,8 @@ public partial class ConnectionViewModel : ObservableObject
                    OnPropertyChanged(nameof(ConditionCountLabel)); });
     }
 
-    public bool IsAlways      => _questionNodeTextDisplay == "Always";
-    public bool IsNever       => _questionNodeTextDisplay == "Never";
+    public bool IsAlways      => _questionNodeTextDisplay == "ShowAlways";
+    public bool IsNever       => _questionNodeTextDisplay == "ShowNever";
     public bool HasConditions => _conditions.Count > 0;
     public int  ConditionCount => _conditions.Count;
 

@@ -128,11 +128,9 @@ public static class Poe2ConversationParser
         return new ConditionBranch(children, not, op);
     }
 
-    private static string MapQuestionNodeTextDisplay(int value) => value switch
-    {
-        0 => "ShowOnce",
-        1 => "Always",
-        2 => "Never",
-        _ => $"Unknown({value})"
-    };
+    // The same names PoE1 stores, so a link means the same in both games (issue 139).
+    private static string MapQuestionNodeTextDisplay(int value) =>
+        value >= 0 && value < NodeEnumNames.QuestionNodeTextDisplays.Count
+            ? NodeEnumNames.QuestionNodeTextDisplays[value]
+            : $"Unknown({value})";
 }
