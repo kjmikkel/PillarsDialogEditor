@@ -12,6 +12,10 @@ public static class PatchManagerDialogs
 
     public static void Attach(PatchManagerViewModel vm, Window owner)
     {
+        // Issue 147: one-button message, so no Cancel; OK also answers Esc.
+        vm.ShowGameUpdateHelp = (title, message) => new ConfirmDialog(
+            title, message, Loc.Get("Schema_TooNew_Ok"), details: null, showCancel: false).ShowAsync(owner);
+
         vm.ConfirmRemoveAllMods = () => new ConfirmDialog(
             Loc.Get("PatchManager_RemoveAllConfirm_Title"),
             Loc.Get("PatchManager_RemoveAllConfirm_Message"),
