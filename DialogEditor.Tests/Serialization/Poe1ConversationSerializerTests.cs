@@ -482,4 +482,57 @@ public class Poe1ConversationSerializerTests
         Assert.Equal("Bark",                (string?)node0.Element("DisplayType"));
         Assert.Equal("OncePerConversation", (string?)node0.Element("Persistence"));
     }
+
+    // ── #141: PoE1 links have no conditions ─────────────────────────────────────
+    // PoE1's FlowChartLink has no Conditionals (only PoE2's does), so a condition saved on a
+    // link does nothing in game. The serializer must never add the element. 1,437 shipped
+    // links do carry an empty one, which an unchanged save keeps as it is.
+
+    private static readonly ConditionLeaf AnyCondition =
+        new("Boolean IsGlobalValue(String, Operator, Int32)", ["a", "EqualTo", "1"], false, "And");
+
+    private static LinkEditSnapshot ConditionedLink(int from, int to) =>
+        new LinkEditSnapshot(from, to, 1, "", true) { Conditions = [AnyCondition] };
+
+    [Fact]
+    public void Serialize_NewLink_HasNoConditionals_EvenWhenTheSnapshotHasConditions()
+    {
+        var snapshot = new ConversationEditSnapshot([Node(0), Node(1, links: [ConditionedLink(1, 0)])]);
+        var doc  = XDocument.Parse(Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot));
+        var link = doc.Descendants("FlowChartLink").Single(l => (int)l.Element("FromNodeID")! == 1);
+
+        Assert.Null(link.Element("Conditionals"));
+    }
+
+    [Fact]
+    public void Serialize_LinkOnNewNode_HasNoConditionals()
+    {
+        var snapshot = new ConversationEditSnapshot([Node(0), Node(1), Node(2, links: [ConditionedLink(2, 0)])]);
+        var doc  = XDocument.Parse(Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot));
+        var link = doc.Descendants("FlowChartLink").Single(l => (int)l.Element("FromNodeID")! == 2);
+
+        Assert.Null(link.Element("Conditionals"));
+    }
+
+    [Fact]
+    public void Serialize_ExistingLinkWithoutConditionals_DoesNotGainOne()
+    {
+        var xml = LinkWithoutDefaultsXml.Replace(
+            "<Conditionals><Components/></Conditionals><ClassExtender>", "<ClassExtender>");
+        var snapshot = new ConversationEditSnapshot([Node(0, links: [ConditionedLink(0, 1)]), Node(1)]);
+
+        var link = OnlyLink(Poe1ConversationSerializer.Serialize(xml, snapshot));
+
+        Assert.Null(link.Element("Conditionals"));
+    }
+
+    [Fact]
+    public void Serialize_ExistingLinkWithEmptyConditionals_KeepsItEmpty()
+    {
+        var snapshot = new ConversationEditSnapshot([Node(0, links: [ConditionedLink(0, 1)]), Node(1)]);
+
+        var link = OnlyLink(Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot));
+
+        Assert.Empty(link.Element("Conditionals")!.Element("Components")!.Elements());
+    }
 }
