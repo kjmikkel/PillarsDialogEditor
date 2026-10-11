@@ -36,6 +36,14 @@
     <sys:String x:Key="PatchManager_ExternalChanges_Confirm">Treat as new originals</sys:String>
     <sys:String x:Key="PatchManager_ExternalChanges_More">…and {0} more</sys:String>
     <sys:String x:Key="Confirm_Cancel">Cancel</sys:String>
+    <!-- "After a game update…" link and its message (issue 147). Keep the message in step
+         with README.md's "Game updates and your backups" section, which uses the same
+         verify-then-apply-again wording. "Apply patches" and "Treat as new originals" name
+         the Patch Manager's own buttons (PatchManager_Apply, PatchManager_ExternalChanges_Confirm). -->
+    <sys:String x:Key="PatchManager_GameUpdateHelp_Link">After a game update…</sys:String>
+    <sys:String x:Key="ToolTip_GameUpdateHelp">What to do after the game updates or you verify its files: how to get a clean install and put your conversation mods back.</sys:String>
+    <sys:String x:Key="PatchManager_GameUpdateHelp_Title">After a game update</sys:String>
+    <sys:String x:Key="PatchManager_GameUpdateHelp_Message">A game update can replace or change the files your conversation mods edit. Afterwards those mods may be partly missing, or sit on top of files they no longer match.&#10;&#10;To put things right:&#10;1. Verify / repair the game files in your storefront (Steam, GOG Galaxy or the Epic Games Launcher). This gives you a clean, current install.&#10;2. Come back here and click Apply patches to install your mods again. If you're asked whether to treat changed files as the new originals, choose Treat as new originals.</sys:String>
     <sys:String x:Key="ToolTip_RemoveAllMods">Undo every mod installed into this game folder: restore each game file the patcher changed to its original version and delete the files it added. The load order list is kept.</sys:String>
     <sys:String x:Key="PatchManager_EmptyHint">Add mods (.dialogpack files) above. Lower entries win on conflict.</sys:String>
     <sys:String x:Key="PatchManager_OrderHint">↑ First applied   ↓ Last applied (wins on conflict)</sys:String>
