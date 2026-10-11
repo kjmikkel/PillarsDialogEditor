@@ -535,4 +535,27 @@ public class Poe1ConversationParserTests
             ")";
         Assert.Equal(expected, nodes[0].ConditionExpression);
     }
+
+    // ── #141: PoE1 links have no conditions ─────────────────────────────────────
+    // OEIFormats' PoE1 FlowChartLink has no Conditionals, so the game's XmlSerializer skips
+    // the element. Anything inside it has no effect in game, and the editor must not show it.
+
+    [Fact]
+    public void Parse_Poe1LinkConditionals_AreIgnored()
+    {
+        var xml = TwoNodeXml.Replace("<PointsToGhost>false</PointsToGhost>", """
+            <PointsToGhost>false</PointsToGhost>
+            <Conditionals><Operator>And</Operator><Components>
+              <ExpressionComponent xsi:type="ConditionalCall">
+                <Data><FullName>Boolean IsGlobalValue(String, Operator, Int32)</FullName>
+                  <Parameters><string>a</string><string>EqualTo</string><string>1</string></Parameters></Data>
+                <Not>false</Not><Operator>And</Operator>
+              </ExpressionComponent>
+            </Components></Conditionals>
+            """);
+
+        var link = Poe1ConversationParser.ParseXml(xml)[0].Links.Single();
+
+        Assert.Empty(link.Conditions);
+    }
 }
