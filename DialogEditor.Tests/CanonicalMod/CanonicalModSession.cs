@@ -24,7 +24,13 @@ public sealed class CanonicalModSession : IDisposable
     public string ProjectPath { get; private set; } = "";
     public MainWindowViewModel Vm { get; }
 
-    private CanonicalModSession()
+    // Synchronous on purpose. AppSettings.SettingsPathOverride is an AsyncLocal, and a value
+    // set inside an async method does not flow back to its caller. Creating the session in
+    // the caller's own (synchronous) context keeps the override visible to everything the
+    // caller does next — Save, Test Patch, Restore. Set inside an async factory, it was lost
+    // on return, so Test Patch wrote its pending restore to the run-wide fallback settings
+    // file and every later Test Patch in the run refused to start (the #66 guard).
+    public CanonicalModSession()
     {
         Loc.Configure(new StubStringProvider());
         Directory.CreateDirectory(Root);
@@ -32,16 +38,31 @@ public sealed class CanonicalModSession : IDisposable
         Vm = new MainWindowViewModel(new StubDispatcher(), new StubFolderPicker(), new StubFilePicker());
     }
 
-    public static async Task<CanonicalModSession> OpenAsync(string game, string projectName)
+    /// A fresh copy of the canonical install with a new, empty project.
+    public async Task LoadNewProjectAsync(string game, string projectName)
     {
-        var s = new CanonicalModSession();
-        CanonicalFixture.CopyTo(game, s.GameRoot);
-        s.Invoke("LoadDirectory", s.GameRoot);
+        CanonicalFixture.CopyTo(game, GameRoot);
+        Invoke("LoadDirectory", GameRoot);
 
-        s.ProjectPath = Path.Combine(s.Root, "project", projectName + ".dialogproject");
-        DialogProjectSerializer.SaveToFile(s.ProjectPath, DialogProject.Empty(projectName));
-        await (Task)s.Invoke("LoadProjectAsync", s.ProjectPath, false)!;
-        return s;
+        ProjectPath = Path.Combine(Root, "project", projectName + ".dialogproject");
+        DialogProjectSerializer.SaveToFile(ProjectPath, DialogProject.Empty(projectName));
+        await (Task)Invoke("LoadProjectAsync", ProjectPath, false)!;
+    }
+
+    /// Opens an existing project (with its _vo/ beside it) over an existing install, as File ›
+    /// Open Project does after the game folder is chosen. The project is copied into the
+    /// session folder first, so the checked-in copy is never written to.
+    public async Task LoadExistingAsync(string gameRoot, string projectPath)
+    {
+        Invoke("LoadDirectory", gameRoot);
+
+        var projectDir = Directory.CreateDirectory(Path.Combine(Root, "project")).FullName;
+        ProjectPath = Path.Combine(projectDir, Path.GetFileName(projectPath));
+        File.Copy(projectPath, ProjectPath);
+        var voSource = Path.Combine(Path.GetDirectoryName(projectPath)!, "_vo");
+        if (Directory.Exists(voSource)) GoldenDiff.CopyTree(voSource, Path.Combine(projectDir, "_vo"));
+
+        await (Task)Invoke("LoadProjectAsync", ProjectPath, false)!;
     }
 
     private IGameDataProvider Provider =>
