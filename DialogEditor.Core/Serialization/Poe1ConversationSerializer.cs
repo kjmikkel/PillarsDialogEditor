@@ -80,16 +80,9 @@ public static class Poe1ConversationSerializer
             {
                 SetLinkValue(orig, "RandomWeight",            WeightText(link.RandomWeight), DefaultRandomWeight);
                 SetLinkValue(orig, "QuestionNodeTextDisplay", link.QuestionNodeTextDisplay,  DefaultQuestionNodeTextDisplay);
-                // Update link conditions when the snapshot carries them
-                if (link.Conditions is { Count: >= 0 })
-                {
-                    var lc = orig.Element("Conditionals") ?? new XElement("Conditionals");
-                    if (orig.Element("Conditionals") is null) orig.Add(lc);
-                    var lcc = lc.Element("Components") ?? new XElement("Components");
-                    if (lc.Element("Components") is null) lc.Add(lcc);
-                    lcc.RemoveAll();
-                    foreach (var c in link.Conditions) lcc.Add(BuildConditionXml(c));
-                }
+                // Link conditions are deliberately not written (issue 141): PoE1's FlowChartLink
+                // has no Conditionals, so the game ignores them. An element the file already has
+                // (1,437 shipped links carry an empty one) is kept as it is.
                 linksElem.Add(orig);
             }
             else
@@ -169,10 +162,8 @@ public static class Poe1ConversationSerializer
         new XElement("FromNodeID",              link.FromNodeId),
         new XElement("ToNodeID",                link.ToNodeId),
         LinkElementOrNull("RandomWeight",            WeightText(link.RandomWeight), DefaultRandomWeight),
-        LinkElementOrNull("QuestionNodeTextDisplay", link.QuestionNodeTextDisplay,  DefaultQuestionNodeTextDisplay),
-        new XElement("Conditionals",
-            new XElement("Components",
-                (link.Conditions ?? []).Select(c => BuildConditionXml(c)))));
+        LinkElementOrNull("QuestionNodeTextDisplay", link.QuestionNodeTextDisplay,  DefaultQuestionNodeTextDisplay));
+        // No <Conditionals>: PoE1 links have none in the game's model (issue 141).
 
     private static XElement BuildScriptListXml(
         string elementName,

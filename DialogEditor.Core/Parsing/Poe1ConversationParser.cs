@@ -55,7 +55,9 @@ public static class Poe1ConversationParser
         => new(
             FromNodeId: (int)link.Element("FromNodeID")!,
             ToNodeId: (int)link.Element("ToNodeID")!,
-            Conditions: ParseConditionTree(link.Element("Conditionals")?.Element("Components")),
+            // PoE1's FlowChartLink has no Conditionals, so the game skips the element and
+            // anything in it never fires. Reporting none keeps the editor honest (issue 141).
+            Conditions: [],
             RandomWeight: (int?)link.Element("RandomWeight") ?? 1,
             QuestionNodeTextDisplay: (string?)link.Element("QuestionNodeTextDisplay") ?? string.Empty
         );
