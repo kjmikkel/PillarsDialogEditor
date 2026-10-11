@@ -1,3 +1,4 @@
+using Avalonia.Automation;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.VisualTree;
@@ -88,5 +89,40 @@ public class PatchManagerViewTests
         Assert.True(button.IsVisible);
         Assert.Equal(DialogEditor.Patch.Schema.SchemaFormats.PatcherReleasesUrl, opened);
         Assert.False(string.IsNullOrEmpty(ToolTip.GetTip(button) as string));
+    }
+
+    // ── "After a game update…" link (GitHub issue 147) ───────────────────
+    // A small text link by Apply / Remove all mods, in both the editor's Patch Manager and the
+    // standalone patcher (both host this view). It is always there, never a banner or prompt.
+
+    private static Button GameUpdateHelpLink(PatchManagerViewModel vm)
+    {
+        var view = new PatchManagerView { DataContext = vm };
+        new Window { Content = view }.Show();
+        return view.FindControl<Button>("GameUpdateHelpLink")!;
+    }
+
+    [AvaloniaFact]
+    public void GameUpdateHelpLink_IsVisible_WithLocalisedTextTooltipAndAutomationName()
+    {
+        var link = GameUpdateHelpLink(VmWith());
+
+        Assert.True(link.IsVisible);
+        Assert.Equal(Loc.Get("PatchManager_GameUpdateHelp_Link"), link.Content);
+        Assert.Equal(Loc.Get("ToolTip_GameUpdateHelp"), ToolTip.GetTip(link));
+        Assert.Equal(Loc.Get("ToolTip_GameUpdateHelp"), AutomationProperties.GetHelpText(link));
+    }
+
+    [AvaloniaFact]
+    public void GameUpdateHelpLink_ShowsTheExplanation()
+    {
+        var vm = VmWith();
+        (string Title, string Message)? shown = null;
+        vm.ShowGameUpdateHelp = (title, message) => { shown = (title, message); return Task.CompletedTask; };
+
+        GameUpdateHelpLink(vm).Command!.Execute(null);
+
+        Assert.Equal((Loc.Get("PatchManager_GameUpdateHelp_Title"), Loc.Get("PatchManager_GameUpdateHelp_Message")), shown);
+        Assert.DoesNotContain("[", shown!.Value.Message);   // a real string, not a missing-key marker
     }
 }

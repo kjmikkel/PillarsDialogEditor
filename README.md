@@ -68,6 +68,13 @@ warning. Nothing else is written or broken.
 
 **Game updates and your backups.**
 
+- **After a game update.** A game update can replace or change the files your conversation mods
+  edit. Afterwards those mods may be partly missing, or sit on top of files they no longer match.
+  To put things right, verify / repair the game files in your storefront (Steam, GOG Galaxy or the
+  Epic Games Launcher), then apply your mods again. If you're asked whether to treat changed files
+  as the new originals, choose **Treat as new originals**. The Patch Manager's *After a game
+  update…* link says the same ([#147](https://github.com/kjmikkel/PillarsDialogEditor/issues/147)).
+
 - **Patcher (`dialog-patcher`, Patch Manager).** Suppose the game or the storefront's "verify files"
   replaces a file a mod changed. **Remove all mods / Restore** then leaves that file alone and tells
   you. Reinstalling stops and asks before treating the new file as the original
