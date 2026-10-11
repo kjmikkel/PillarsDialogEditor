@@ -117,6 +117,14 @@ public sealed class CanonicalModSession : IDisposable
         await Vm.Detail.ImportVoCommand.ExecuteAsync(null);
     }
 
+    /// File › New Conversation, with the name dialog answered; opens an empty canvas.
+    public async Task NewConversationAsync(string name)
+    {
+        Save();
+        Vm.RequestConversationName = () => Task.FromResult<string?>(name);
+        await Vm.NewConversationCommand.ExecuteAsync(null);
+    }
+
     /// The GUI's Save Project path: folds the canvas into the project, writes the file.
     public void Save() => Invoke("SaveProject");
 
