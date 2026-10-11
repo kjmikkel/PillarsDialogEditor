@@ -21,7 +21,8 @@ public static class CanonicalModBuilder
 
     public static async Task<string> BuildAsync(string game, IReadOnlyList<ScenarioStep> steps, string outDir)
     {
-        using var session = await CanonicalModSession.OpenAsync(game, ProjectName);
+        using var session = new CanonicalModSession();
+        await session.LoadNewProjectAsync(game, ProjectName);
         foreach (var step in steps) await step.Edit(session);
         session.Save();
 
