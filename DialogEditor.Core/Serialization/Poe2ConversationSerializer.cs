@@ -273,7 +273,7 @@ public static class Poe2ConversationSerializer
     private static readonly string[] QuestionDisplays = [.. NodeEnumNames.QuestionNodeTextDisplays];
 
     private static int MapQuestionDisplay(string s) =>
-        Math.Max(0, Array.IndexOf(QuestionDisplays, NodeEnumNames.QuestionNodeTextDisplayName(s)));
+        Math.Max(0, Array.IndexOf(QuestionDisplays, s));
 
     public static void SaveToFile(string path, ConversationEditSnapshot snapshot)
     {

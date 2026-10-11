@@ -34,7 +34,7 @@ public class SerializerSchemaTests
         var project = DialogProject.Empty("P")
             .WithPatch(new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [], [7], []));
         var json = DialogProjectSerializer.Serialize(project)
-            .Replace("\"SchemaVersion\": 2", "\"SchemaVersion\": 3");
+            .Replace($"\"SchemaVersion\": {ConversationPatch.CurrentSchemaVersion}", $"\"SchemaVersion\": {ConversationPatch.CurrentSchemaVersion + 1}");
 
         var ex = Assert.Throws<UnsupportedSchemaVersionException>(() => DialogProjectSerializer.Deserialize(json));
         Assert.Equal(SchemaFileKind.ConversationPatch, ex.Kind);
@@ -71,10 +71,23 @@ public class SerializerSchemaTests
     }
 
     [Fact]
+    public void Fixture_V2PatchWithPreGameLinkDisplayNames_OpensWithTheGamesNames()
+    {
+        // #139: before v3 the editor stored "Always"/"Never", which neither game accepts.
+        var patch = DialogProjectSerializer.Deserialize(Fixture("project-v1-patch-v2.dialogproject")).Patches["greeting"];
+
+        Assert.Equal(ConversationPatch.CurrentSchemaVersion, patch.SchemaVersion);
+        Assert.Equal("ShowAlways", patch.AddedNodes.Single().Links.Single().QuestionNodeTextDisplay);
+        var modified = patch.ModifiedNodes.Single();
+        Assert.Equal("ShowNever",  modified.AddedLinks.Single().QuestionNodeTextDisplay);
+        Assert.Equal("ShowAlways", modified.ModifiedLinks.Single().QuestionNodeTextDisplay);
+    }
+
+    [Fact]
     public void Patch_NewerVersion_IsRefused()
     {
         var json = PatchSerializer.Serialize(new ConversationPatch("c", ConversationPatch.CurrentSchemaVersion, [], [], []))
-            .Replace("\"SchemaVersion\": 2", "\"SchemaVersion\": 3");
+            .Replace($"\"SchemaVersion\": {ConversationPatch.CurrentSchemaVersion}", $"\"SchemaVersion\": {ConversationPatch.CurrentSchemaVersion + 1}");
 
         var ex = Assert.Throws<UnsupportedSchemaVersionException>(() => PatchSerializer.Deserialize(json));
         Assert.Equal(SchemaFileKind.ConversationPatch, ex.Kind);
