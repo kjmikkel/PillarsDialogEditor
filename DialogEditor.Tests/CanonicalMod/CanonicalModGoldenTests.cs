@@ -29,7 +29,9 @@ public class CanonicalModGoldenTests
                 Assert.Fail($"Regenerated {golden}. Review the diff, commit it, and rerun without {RegenerateVar}.");
             }
 
-            Assert.Null(GoldenDiff.First(golden, fresh));
+            var diff = GoldenDiff.First(golden, fresh);
+            Assert.True(diff is null,
+                $"{diff}\nIf the editor's output changed on purpose, rerun this test with {RegenerateVar}=1, review the diff and commit it.");
         }
         finally { try { Directory.Delete(fresh, true); } catch (Exception) { /* best-effort */ } }
     }
