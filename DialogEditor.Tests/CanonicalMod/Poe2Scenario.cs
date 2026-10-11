@@ -350,5 +350,39 @@ public static class Poe2Scenario
                 Assert.Equal("Willkommen zurück, [Player Name]. Der Mod hat diese Zeile geändert.", v.Text(Edited, "de", 0)!.DefaultText);
                 Assert.Equal("A new closing line, written by the canonical mod.", v.Text(Edited, "en", 11)!.DefaultText);
             }),
+
+        new("vo.import",
+            "Node 11 becomes a narrator line and gets an imported .wem (HasVO)",
+            async s =>
+            {
+                s.Open(Edited);
+                s.Node(11).SpeakerGuid = CanonicalIds.Narrator;   // the narrator has a VO folder
+                await s.ImportVoAsync(11, CanonicalModInputs.Poe2Wem);
+                s.Save();
+            },
+            // Where the file lands is checked on disk (CanonicalModRawChecks).
+            v => Assert.True(v.Node(Edited, 11).HasVO)),
+
+        new("vo.alias",
+            "Node 10 aliases node 7's VO (ExternalVO; only TalkNodes declare it in PoE2)",
+            async s =>
+            {
+                s.Open(Edited);
+                s.Node(10).ExternalVO = "narrator/canonical_0007";
+                s.Save();
+                await Task.CompletedTask;
+            },
+            v => Assert.Equal("narrator/canonical_0007", v.Node(Edited, 10).ExternalVO)),
+
+        new("vo.off",
+            "Node 7's HasVO switched off",
+            async s =>
+            {
+                s.Open(Edited);
+                s.Node(7).HasVO = false;
+                s.Save();
+                await Task.CompletedTask;
+            },
+            v => Assert.False(v.Node(Edited, 7).HasVO)),
     ];
 }

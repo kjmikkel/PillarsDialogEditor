@@ -41,6 +41,7 @@
     <None Update="Patch\Schema\Fixtures\**\*" CopyToOutputDirectory="PreserveNewest" />
     <!-- Canonical conversations (issue #122): each is a miniature game install. -->
     <None Update="Fixtures\Canonical\**\*" CopyToOutputDirectory="PreserveNewest" />
+    <None Update="Fixtures\CanonicalMod\**\*" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
 </Project>
