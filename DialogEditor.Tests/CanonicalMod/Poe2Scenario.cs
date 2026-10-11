@@ -11,7 +11,7 @@ public static class Poe2Scenario
     public const string Edited          = "canonical";
     public const string NewConversation = "canonical_mod_new";
 
-    public static IReadOnlyList<string> Conversations { get; } = [Edited];
+    public static IReadOnlyList<string> Conversations { get; } = [Edited, NewConversation];
 
     public static IReadOnlyList<ScenarioStep> Steps { get; } =
     [
@@ -384,5 +384,41 @@ public static class Poe2Scenario
                 await Task.CompletedTask;
             },
             v => Assert.False(v.Node(Edited, 7).HasVO)),
+
+        // Last on purpose: the new conversation exists only in the project until installed,
+        // so no later step has to reopen it.
+        new("conversation.new",
+            "New conversation canonical_mod_new: NPC → two player choices (one conditioned) → end, in en and de",
+            async s =>
+            {
+                await s.NewConversationAsync(NewConversation);
+                var start = s.AddNode(s.Vm.Canvas.NextNodeId(), false, SpeakerCategory.Npc, CanonicalIds.Npc, CanonicalIds.Player, 0, 100);
+                start.DefaultText = "Hello from a conversation the mod created.";
+                var a = s.AddNode(s.Vm.Canvas.NextNodeId(), true, SpeakerCategory.Player, CanonicalIds.Player, CanonicalIds.Npc, 300, 0);
+                a.DefaultText = "First choice.";
+                var b = s.AddNode(s.Vm.Canvas.NextNodeId(), true, SpeakerCategory.Player, CanonicalIds.Player, CanonicalIds.Npc, 300, 200);
+                b.DefaultText = "Second choice, only when cm_flag_a is set.";
+                s.EditConditions(b, [new ConditionLeaf(CanonicalModSession.ConditionName("IsGlobalValue"), ["cm_flag_a", "EqualTo", "1"], false, "And")]);
+                var end = s.AddNode(s.Vm.Canvas.NextNodeId(), false, SpeakerCategory.Npc, CanonicalIds.Npc, CanonicalIds.Player, 600, 100);
+                end.DefaultText = "Goodbye.";
+                s.Link(start.NodeId, a.NodeId);
+                s.Link(start.NodeId, b.NodeId);
+                s.Link(a.NodeId, end.NodeId);
+                s.Link(b.NodeId, end.NodeId);
+                s.Save();
+
+                await s.SwitchLanguageAsync("de");
+                s.Node(start.NodeId).DefaultText = "Hallo aus einem Gespräch, das der Mod erstellt hat.";
+                s.Save();
+                await s.SwitchLanguageAsync("en");
+            },
+            v =>
+            {
+                var ids = Enumerable.Range(0, 16).Where(id => v.Has(NewConversation, id)).ToList();
+                Assert.Equal(4, ids.Count);
+                Assert.Single(ids, id => v.Node(NewConversation, id).Conditions.Count == 1);
+                Assert.Contains(ids, id => v.Text(NewConversation, "en", id)?.DefaultText == "Hello from a conversation the mod created.");
+                Assert.Contains(ids, id => v.Text(NewConversation, "de", id)?.DefaultText == "Hallo aus einem Gespräch, das der Mod erstellt hat.");
+            }),
     ];
 }
