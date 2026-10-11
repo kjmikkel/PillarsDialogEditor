@@ -147,9 +147,11 @@
                                                     FontSize="{DynamicResource FontSize.Small}" Padding="3,1" Margin="0,0,8,0"
                                                     Foreground="{Binding HasConditions,
                                                         Converter={StaticResource BoolToFemaleTextBrush}}"
-                                                    ToolTip.Tip="{DynamicResource ToolTip_LinkConditions_None}"
+                                                    IsEnabled="{Binding $parent[ItemsControl].DataContext.SupportsLinkConditions}"
+                                                    ToolTip.Tip="{Binding $parent[ItemsControl].DataContext.LinkConditionsToolTip}"
+                                                    ToolTip.ShowOnDisabled="True"
                                                     AutomationProperties.Name="{DynamicResource AutomationName_LinkConditions}"
-                                                    AutomationProperties.HelpText="{DynamicResource ToolTip_LinkConditions_None}"/>
+                                                    AutomationProperties.HelpText="{Binding $parent[ItemsControl].DataContext.LinkConditionsToolTip}"/>
                                             <TextBlock Grid.Column="1"
                                                        Text="{DynamicResource Link_DisplayLabel}"
                                                        Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Caption}"

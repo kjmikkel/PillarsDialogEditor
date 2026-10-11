@@ -21,7 +21,28 @@ public partial class NodeDetailViewModel : ObservableObject
     private readonly TokenValidationService _tokenValidator = new();
 
     /// Set by MainWindowViewModel when a game folder is opened.
-    public string ActiveGameId { get; set; } = string.Empty;
+    public string ActiveGameId
+    {
+        get => _activeGameId;
+        set
+        {
+            if (_activeGameId == value) return;
+            _activeGameId = value;
+            OnPropertyChanged(nameof(SupportsLinkConditions));
+            OnPropertyChanged(nameof(LinkConditionsToolTip));
+        }
+    }
+    private string _activeGameId = string.Empty;
+
+    /// Only PoE2's FlowChartLink has Conditionals (issue 141). PoE1's game model has none, so
+    /// a condition put on a PoE1 link would look saved here yet never fire in game; the shipped
+    /// PoE1 data gates a choice by putting the condition on the target node instead.
+    public bool SupportsLinkConditions =>
+        string.Equals(_activeGameId, "poe2", StringComparison.OrdinalIgnoreCase);
+
+    /// The link-conditions button's tooltip. For PoE1 it says where the condition goes.
+    public string LinkConditionsToolTip =>
+        Loc.Get(SupportsLinkConditions ? "ToolTip_LinkConditions_None" : "ToolTip_LinkConditions_Poe1");
 
     /// The provider's text language ("en" etc.) — the language Default/Female text
     /// is written in. Set by MainWindowViewModel alongside ActiveGameId; drives
