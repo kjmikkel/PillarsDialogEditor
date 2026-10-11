@@ -1,4 +1,4 @@
-using DialogEditor.Core.Editing;
+﻿using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
@@ -62,20 +62,30 @@ public class ConnectionViewModelTests
         Assert.Equal(1, conn.RandomWeight);
     }
 
+    // ── #139: the options are the game's QuestionNodeDisplayType names ────
+    // Both games declare ShowOnce/ShowAlways/ShowNever; PoE1 writes the name verbatim,
+    // so an invented "Always" made the whole conversation unloadable.
+
+    [Fact]
+    public void QTDOptions_AreTheGamesEnumNames_PlusTheEmptyDefault()
+    {
+        Assert.Equal(["", "ShowOnce", "ShowAlways", "ShowNever"], ConnectionViewModel.QTDOptions);
+    }
+
     // ── IsAlways / IsNever ────────────────────────────────────────────────
 
     [Fact]
-    public void IsAlways_TrueWhenQTDIsAlways()
+    public void IsAlways_TrueWhenQTDIsShowAlways()
     {
-        var conn = MakeConn(qtd: "Always");
+        var conn = MakeConn(qtd: "ShowAlways");
         Assert.True(conn.IsAlways);
         Assert.False(conn.IsNever);
     }
 
     [Fact]
-    public void IsNever_TrueWhenQTDIsNever()
+    public void IsNever_TrueWhenQTDIsShowNever()
     {
-        var conn = MakeConn(qtd: "Never");
+        var conn = MakeConn(qtd: "ShowNever");
         Assert.True(conn.IsNever);
         Assert.False(conn.IsAlways);
     }

@@ -1,4 +1,4 @@
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Core.Parsing;
@@ -79,6 +79,24 @@ public class Poe2ConversationSerializerTests
         var weight = SavedLink(Poe2ConversationSerializer.Serialize(TwoNodeJson, snapshot), 1)["RandomWeight"]!;
 
         Assert.Equal("4", weight.ToJsonString());
+    }
+
+    // ── #139: one name set for both games; PoE2 stores the enum's position ──────
+
+    [Theory]
+    [InlineData("",           0)]
+    [InlineData("ShowOnce",   0)]
+    [InlineData("ShowAlways", 1)]
+    [InlineData("ShowNever",  2)]
+    public void Serialize_LinkDisplay_IsWrittenAsTheEnumPosition(string stored, int written)
+    {
+        var existing = new ConversationEditSnapshot(
+            [Node(0, links: [new LinkEditSnapshot(0, 1, 1, stored, false)]), Node(1)]);
+        var added    = new ConversationEditSnapshot(
+            [Node(0), Node(1, links: [new LinkEditSnapshot(1, 0, 1, stored, false)])]);
+
+        Assert.Equal(written, SavedLink(Poe2ConversationSerializer.Serialize(TwoNodeJson, existing), 0)["QuestionNodeTextDisplay"]!.GetValue<int>());
+        Assert.Equal(written, SavedLink(Poe2ConversationSerializer.Serialize(TwoNodeJson, added), 1)["QuestionNodeTextDisplay"]!.GetValue<int>());
     }
 
     [Fact]

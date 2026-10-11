@@ -5,7 +5,7 @@
 /// translation overlays, writer node comments).
 ///
 /// InLinkDisplaySetting searches NodeLink.QuestionNodeTextDisplay, which is NOT
-/// prose: it is an enum whose only legal values are ShowOnce, Always and Never.
+/// prose: it is an enum whose only legal values are ShowOnce, ShowAlways and ShowNever.
 /// Searching it is useful ("find every link set to Never"); the flag and its
 /// labels are named for what it holds because the old name — "link choice text" —
 /// read as writer-authored text and led to batch replace rewriting it by

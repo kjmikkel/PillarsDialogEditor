@@ -1,6 +1,7 @@
 using System.Text.Json.Nodes;
 using DialogEditor.Patch;
 using DialogEditor.Patch.Schema;
+using DialogEditor.Patch.Schema.Steps;
 
 namespace DialogEditor.Tests.Patch.Schema;
 
@@ -181,10 +182,61 @@ public class SchemaMigratorTests
             ["AddedNodes"] = new JsonArray(), ["DeletedNodeIds"] = new JsonArray(), ["ModifiedNodes"] = new JsonArray(),
         };
         var before = root.DeepClone();
-        before["SchemaVersion"] = 2;
+
+        new ConversationPatchV1ToV2().Apply(root);
+
+        Assert.True(JsonNode.DeepEquals(before, root));
+    }
+
+    // ── v2 → v3: link display names (#139) ───────────────────────────────
+
+    private static JsonObject Link(string display) => new()
+    {
+        ["FromNodeId"] = 1, ["ToNodeId"] = 2, ["RandomWeight"] = 1,
+        ["QuestionNodeTextDisplay"] = display, ["HasConditions"] = false,
+    };
+
+    private static JsonObject PatchWithLinks(params string[] displays) => new()
+    {
+        ["ConversationName"] = "c", ["SchemaVersion"] = 2,
+        ["AddedNodes"] = new JsonArray(new JsonObject { ["NodeId"] = 5, ["Links"] = new JsonArray([.. displays.Select(Link)]) }),
+        ["DeletedNodeIds"] = new JsonArray(),
+        ["ModifiedNodes"] = new JsonArray(new JsonObject
+        {
+            ["NodeId"]        = 1,
+            ["FieldChanges"]  = new JsonObject { ["Comments"] = new JsonObject { ["From"] = "\"\"", ["To"] = "\"Always\"" } },
+            ["AddedLinks"]    = new JsonArray([.. displays.Select(Link)]),
+            ["DeletedLinks"]  = new JsonArray(),
+            ["ModifiedLinks"] = new JsonArray([.. displays.Select(d => new JsonObject { ["ToNodeId"] = 2, ["RandomWeight"] = 1, ["QuestionNodeTextDisplay"] = d })]),
+        }),
+    };
+
+    private static IEnumerable<string> Displays(JsonNode root) =>
+        root["AddedNodes"]![0]!["Links"]!.AsArray()
+            .Concat(root["ModifiedNodes"]![0]!["AddedLinks"]!.AsArray())
+            .Concat(root["ModifiedNodes"]![0]!["ModifiedLinks"]!.AsArray())
+            .Select(l => l!["QuestionNodeTextDisplay"]!.GetValue<string>());
+
+    [Fact]
+    public void RealPatchStep_2To3_RenamesAlwaysAndNever_InEveryKindOfLink()
+    {
+        var root = PatchWithLinks("Always", "Never");
 
         SchemaMigrator.Default.Migrate(root, SchemaFileKind.ConversationPatch);
 
+        Assert.Equal(["ShowAlways", "ShowNever", "ShowAlways", "ShowNever", "ShowAlways", "ShowNever"], Displays(root));
+        Assert.Equal(3, root["SchemaVersion"]!.GetValue<int>());
+    }
+
+    [Fact]
+    public void RealPatchStep_2To3_LeavesOtherValuesAndOtherFieldsAlone()
+    {
+        var root   = PatchWithLinks("", "ShowOnce", "ShowAlways", "ShowNever");
+        var before = root.DeepClone();
+
+        new ConversationPatchV2ToV3().Apply(root);
+
+        // Includes a node comment whose text is "Always": only link display values are renamed.
         Assert.True(JsonNode.DeepEquals(before, root));
     }
 }

@@ -8,8 +8,8 @@
         • {0}, {1} … are positional placeholders — preserve them exactly.
         • Symbols used as button icons (?, +, −, ⊞, ⊟, 📌, ✦, ♀, ⚙) are
           universal UI glyphs and do not need translating.
-        • Game-data enum values that appear verbatim in files (ShowOnce, Always,
-          Never, Conversation, Bark, None, OnceEver) are intentionally NOT in
+        • Game-data enum values that appear verbatim in files (ShowOnce, ShowAlways,
+          ShowNever, Conversation, Bark, None, OnceEver) are intentionally NOT in
           this file — they are technical identifiers, not UI copy.
         • Script-prefix tokens ([Enter], [Exit], [Update]) and the condition
           operator "NOT" originate in DialogEditor.Core, which has no UI
@@ -178,9 +178,9 @@
     <sys:String x:Key="Legend_ShowOnce">ShowOnce</sys:String>
     <!-- Leading space is intentional — it follows the bold name inline -->
     <sys:String x:Key="Legend_ShowOnce_Desc"> — shown once, hidden after selection</sys:String>
-    <sys:String x:Key="Legend_Always">Always</sys:String>
+    <sys:String x:Key="Legend_Always">ShowAlways</sys:String>
     <sys:String x:Key="Legend_Always_Desc"> — always available, even after selection</sys:String>
-    <sys:String x:Key="Legend_Never">Never</sys:String>
+    <sys:String x:Key="Legend_Never">ShowNever</sys:String>
     <sys:String x:Key="Legend_Never_Desc"> — never shown to the player</sys:String>
 
     <!-- ─── Legend panel — node type descriptions ─────────────────────── -->
@@ -515,7 +515,7 @@ Saving records your edits to the open project — game files are not touched unt
 
     <!-- ─── Detail panel — link property labels and tooltips ───────────── -->
     <sys:String x:Key="Label_LinkWeight">Wt.</sys:String>
-    <sys:String x:Key="ToolTip_LinkQTD">Controls whether this player choice reappears after selection (ShowOnce / Always / Never)</sys:String>
+    <sys:String x:Key="ToolTip_LinkQTD">Controls whether this player choice reappears after selection (ShowOnce / ShowAlways / ShowNever). (default) leaves the setting out of the file, which the game treats as ShowOnce</sys:String>
     <sys:String x:Key="ToolTip_LinkWeight">Random weight — relative probability when multiple links compete for selection. A link with weight 2 is twice as likely to be chosen as one with weight 1; weight 0 is never chosen. Whole numbers only, as the game stores them. Default: 1</sys:String>
 
     <!-- ─── Node detail panel — watermarks ──────────────────────────────── -->
@@ -616,10 +616,10 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="FindInProject_CaseSensitive">Case sensitive</sys:String>
     <sys:String x:Key="ToolTip_FindInProject_CaseSensitive">Match upper- and lower-case exactly.</sys:String>
     <!-- This searches a link's QuestionNodeTextDisplay, which is not prose: it is
-         an enum whose only legal values are ShowOnce, Always and Never. The label
+         an enum whose only legal values are ShowOnce, ShowAlways and ShowNever. The label
          must say so, so nobody mistakes it for choice text again (see issue #24). -->
     <sys:String x:Key="FindInProject_InLinkDisplaySetting">Link display setting</sys:String>
-    <sys:String x:Key="ToolTip_FindInProject_InLinkDisplaySetting">Also search each link's display setting — one of ShowOnce, Always or Never. This is a policy flag, not writer-authored text.</sys:String>
+    <sys:String x:Key="ToolTip_FindInProject_InLinkDisplaySetting">Also search each link's display setting — one of ShowOnce, ShowAlways or ShowNever. This is a policy flag, not writer-authored text.</sys:String>
     <sys:String x:Key="FindInProject_InTranslations">Translations (all languages)</sys:String>
     <sys:String x:Key="ToolTip_FindInProject_InTranslations">Also search your translated text in every language. Each match shows its language.</sys:String>
     <sys:String x:Key="FindInProject_InNodeComments">Node comments</sys:String>

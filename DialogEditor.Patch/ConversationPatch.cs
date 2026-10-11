@@ -62,7 +62,8 @@ public record ConversationPatch(
     IReadOnlyList<int>              DeletedNodeIds,
     IReadOnlyList<NodeModification> ModifiedNodes)
 {
-    public static readonly int CurrentSchemaVersion = 2;
+    // v3 (issue 139): link display values use the game's names, ShowAlways / ShowNever.
+    public static readonly int CurrentSchemaVersion = 3;
 
     // key = language code e.g. "en", "fr", "de"
     public IReadOnlyDictionary<string, IReadOnlyList<NodeTranslation>> Translations { get; init; }

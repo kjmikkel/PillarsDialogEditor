@@ -1,11 +1,13 @@
-using System.Text.Json.Nodes;
+﻿using System.Text.Json.Nodes;
 using System.Xml.Linq;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Logging;
 using DialogEditor.Core.Models;
 using DialogEditor.Core.Parsing;
 using DialogEditor.Core.Serialization;
+using DialogEditor.Core.Editing;
 using DialogEditor.Tests.Helpers;
+using DialogEditor.ViewModels;
 
 namespace DialogEditor.Tests.GameData;
 
@@ -159,6 +161,34 @@ public class CanonicalConversationTests
         var saved        = Poe1ConversationSerializer.Serialize(original, RoundTripChecks.UnchangedSnapshot(game.Provider, game.File));
         Assert.Null(RoundTripChecks.FirstLineDifference(
             RoundTripChecks.Poe1GameCanonical(serializer, original), RoundTripChecks.Poe1GameCanonical(serializer, saved)));
+    }
+
+    /// Issue 139: every display value the link panel offers, set on every link, must still
+    /// load in the game's own model. Before the fix "Always"/"Never" were written verbatim,
+    /// which the game's XmlSerializer rejects, failing the whole conversation.
+    [GameInstallFact(GameInstallFactAttribute.Poe1Variable)]
+    [Trait("Category", "GameData")]
+    public void Poe1_LinkEditedToEachDisplayOption_LoadsInTheGamesOwnModel()
+    {
+        using var game = new FakePoe1Game();
+        var serializer = RoundTripChecks.Poe1GameSerializer(GameInstallFactAttribute.InstallDir(GameInstallFactAttribute.Poe1Variable));
+        var original   = File.ReadAllText(game.ConvPath());
+        var snapshot   = RoundTripChecks.UnchangedSnapshot(game.Provider, game.File);
+        // An absent element and "" both mean the game's default, ShowOnce.
+        static string Effective(string display) => display is "" ? "ShowOnce" : display;
+
+        foreach (var display in ConnectionViewModel.QTDOptions)
+        {
+            var edited = new ConversationEditSnapshot([.. snapshot.Nodes.Select(n => n with
+            {
+                Links = [.. n.Links.Select(l => l with { QuestionNodeTextDisplay = display })]
+            })]);
+            var saved = Poe1ConversationSerializer.Serialize(original, edited);
+
+            RoundTripChecks.Poe1GameCanonical(serializer, saved);   // throws if the game can't load it
+            Assert.All(Poe1ConversationParser.ParseXml(saved).SelectMany(n => n.Links),
+                l => Assert.Equal(Effective(display), Effective(l.QuestionNodeTextDisplay)));
+        }
     }
 
     [Fact]
