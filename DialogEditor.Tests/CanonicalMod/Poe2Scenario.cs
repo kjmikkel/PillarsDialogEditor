@@ -252,5 +252,103 @@ public static class Poe2Scenario
                 await Task.CompletedTask;
             },
             v => Assert.Empty(v.Node(Edited, 0).Scripts)),
+
+        // Every value of both enums is written as a change from the fixture: new nodes start
+        // at Conversation/None, so those two are covered by editing 8 and 3 back to them.
+        new("props.display-and-persistence",
+            "Every DisplayType and Persistence value: 11 Hidden/OnceEver, 12 Bark/OncePerConversation, 13 Overlay/MarkAsRead, 8 Conversation, 3 None",
+            async s =>
+            {
+                s.Open(Edited);
+                s.Node(11).DisplayType = "Hidden";  s.Node(11).Persistence = "OnceEver";
+                s.Node(12).DisplayType = "Bark";    s.Node(12).Persistence = "OncePerConversation";
+                s.Node(13).DisplayType = "Overlay"; s.Node(13).Persistence = "MarkAsRead";
+                s.Node(8).DisplayType  = "Conversation";
+                s.Node(3).Persistence  = "None";
+                s.Save();
+                await Task.CompletedTask;
+            },
+            v =>
+            {
+                Assert.Equal(("Hidden", "OnceEver"),              (v.Node(Edited, 11).DisplayType, v.Node(Edited, 11).Persistence));
+                Assert.Equal(("Bark", "OncePerConversation"),     (v.Node(Edited, 12).DisplayType, v.Node(Edited, 12).Persistence));
+                Assert.Equal(("Overlay", "MarkAsRead"),           (v.Node(Edited, 13).DisplayType, v.Node(Edited, 13).Persistence));
+                Assert.Equal("Conversation", v.Node(Edited, 8).DisplayType);
+                Assert.Equal("None",         v.Node(Edited, 3).Persistence);
+            }),
+
+        new("props.speaker-listener",
+            "Node 10's speaker becomes the narrator and its listener the NPC",
+            async s =>
+            {
+                s.Open(Edited);
+                s.Node(10).SpeakerGuid  = CanonicalIds.Narrator;
+                s.Node(10).ListenerGuid = CanonicalIds.Npc;
+                s.Save();
+                await Task.CompletedTask;
+            },
+            v => Assert.Equal((CanonicalIds.Narrator, CanonicalIds.Npc),
+                              (v.Node(Edited, 10).SpeakerGuid, v.Node(Edited, 10).ListenerGuid))),
+
+        new("props.hide-speaker",
+            "HideSpeaker turned on for 11 and off for 10",
+            async s =>
+            {
+                s.Open(Edited);
+                s.Node(11).HideSpeaker = true;
+                s.Node(10).HideSpeaker = false;
+                s.Save();
+                await Task.CompletedTask;
+            },
+            v =>
+            {
+                Assert.True(v.Node(Edited, 11).HideSpeaker);
+                Assert.False(v.Node(Edited, 10).HideSpeaker);
+            }),
+
+        new("text.edit-with-female",
+            "Node 0's text and its female variant edited (keeping the [Player Name] token)",
+            async s =>
+            {
+                s.Open(Edited);
+                s.Node(0).DefaultText = "Welcome back, [Player Name]. The mod changed this line.";
+                s.Node(0).FemaleText  = "Welcome back, [Player Name]. The mod changed this line, too.";
+                s.Save();
+                await Task.CompletedTask;
+            },
+            v =>
+            {
+                Assert.Equal("Welcome back, [Player Name]. The mod changed this line.",      v.Text(Edited, "en", 0)!.DefaultText);
+                Assert.Equal("Welcome back, [Player Name]. The mod changed this line, too.", v.Text(Edited, "en", 0)!.FemaleText);
+            }),
+
+        new("text.markup",
+            "Node 12's text uses <i> markup",
+            async s =>
+            {
+                s.Open(Edited);
+                s.Node(12).DefaultText = "Ask about the <i>canonical</i> mod.";
+                s.Save();
+                await Task.CompletedTask;
+            },
+            v => Assert.Equal("Ask about the <i>canonical</i> mod.", v.Text(Edited, "en", 12)!.DefaultText)),
+
+        new("text.second-language",
+            "German text for new node 11 and edited node 0; English stays as edited",
+            async s =>
+            {
+                s.Open(Edited);
+                await s.SwitchLanguageAsync("de");
+                s.Node(11).DefaultText = "Eine neue Schlusszeile aus dem Kanon-Mod.";
+                s.Node(0).DefaultText  = "Willkommen zurück, [Player Name]. Der Mod hat diese Zeile geändert.";
+                s.Save();
+                await s.SwitchLanguageAsync("en");
+            },
+            v =>
+            {
+                Assert.Equal("Eine neue Schlusszeile aus dem Kanon-Mod.", v.Text(Edited, "de", 11)!.DefaultText);
+                Assert.Equal("Willkommen zurück, [Player Name]. Der Mod hat diese Zeile geändert.", v.Text(Edited, "de", 0)!.DefaultText);
+                Assert.Equal("A new closing line, written by the canonical mod.", v.Text(Edited, "en", 11)!.DefaultText);
+            }),
     ];
 }
