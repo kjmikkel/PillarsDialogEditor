@@ -10,11 +10,11 @@ shipped inside every pack.)
 | File | Format | Current `SchemaVersion` |
 |---|---|---|
 | `.dialogproject` | `DialogProject` | 1 |
-| inside a project's `Patches` | `ConversationPatch`, one per conversation | 2 |
+| inside a project's `Patches` | `ConversationPatch`, one per conversation | 3 |
 | `.patchlist` | `PatchList` (Patch Manager load order) | 1 |
 
 A patch's `SchemaVersion` is independent of its project's. A version-1 project can hold
-version-2 patches, and each is checked on its own.
+version-3 patches, and each is checked on its own.
 
 ## `.dialogproject`
 
@@ -41,6 +41,11 @@ A diff against the game's conversation, keyed by node ID.
 | `ModifiedNodes` | yes | Per node: `FieldChanges` (each a JSON-encoded `From` / `To` pair, so a patch can check the game still holds the expected value), `AddedLinks`, `DeletedLinks`, `ModifiedLinks`, and optional replace-all `UpdatedConditions` / `UpdatedScripts`. |
 | `Translations` | no (added in v2) | Node text per language code, e.g. `"fr"`. |
 | `NodeComments` | no (added in v2) | Language-neutral translator notes, keyed by node ID. |
+
+Each link (in `AddedNodes[].Links`, `AddedLinks` and `ModifiedLinks`) has a
+`QuestionNodeTextDisplay` of `""` (the game default), `ShowOnce`, `ShowAlways` or `ShowNever`,
+the game's own names. Up to v2 the editor wrote `Always` and `Never`, which PoE1 can't load;
+the v2 → v3 migration renames them (GitHub issue 139).
 
 ## `.patchlist`
 
@@ -92,7 +97,7 @@ same versions for the build you're running.
 
 | Patcher | Project | Conversation patch | Load order |
 |---|---|---|---|
-| 1.0 | ≤ 1 | ≤ 2 | ≤ 1 |
+| 1.0 | ≤ 1 | ≤ 3 | ≤ 1 |
 
 "Patcher" is the Pillars Dialog Patcher version (`PATCHER_VERSION`, released under
 `patcher-v*` tags), not the editor's: the two are released independently (GitHub issue 77).

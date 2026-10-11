@@ -82,15 +82,12 @@ public class Poe2ConversationSerializerTests
     }
 
     // ── #139: one name set for both games; PoE2 stores the enum's position ──────
-    // "Always"/"Never" are the names the editor stored before #139 (a patch may still hold them).
 
     [Theory]
     [InlineData("",           0)]
     [InlineData("ShowOnce",   0)]
     [InlineData("ShowAlways", 1)]
     [InlineData("ShowNever",  2)]
-    [InlineData("Always",     1)]
-    [InlineData("Never",      2)]
     public void Serialize_LinkDisplay_IsWrittenAsTheEnumPosition(string stored, int written)
     {
         var existing = new ConversationEditSnapshot(

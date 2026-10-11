@@ -369,20 +369,6 @@ public class Poe1ConversationSerializerTests
         Assert.Equal("ShowNever", (string?)link.Element("QuestionNodeTextDisplay"));
     }
 
-    // ── #139: the game's enum is ShowOnce/ShowAlways/ShowNever ──────────────────
-    // Before #139 the editor stored "Always"/"Never", and a patch made then can still carry
-    // them. Written verbatim, XmlSerializer rejects the value and the conversation fails to
-    // load, so the serializer writes the game's name instead.
-
-    [Theory]
-    [InlineData("Always", "ShowAlways")]
-    [InlineData("Never",  "ShowNever")]
-    public void Serialize_PreGameNameDisplay_IsWrittenAsTheGamesName(string stored, string written)
-    {
-        Assert.Equal(written, (string?)OnlyLink(SaveLink(TwoNodeXml, 1, stored)).Element("QuestionNodeTextDisplay"));
-        Assert.Equal(written, (string?)OnlyLink(SaveLink(LinkWithoutDefaultsXml, 1, stored)).Element("QuestionNodeTextDisplay"));
-    }
-
     // ── #129: the game reads RandomWeight as an int ──────────────────────────────
     // XmlSerializer cannot parse "1.5" into DialogueLink.RandomWeight (int), so the whole
     // conversation would fail to load. The weight is an int end to end; this pins the text.

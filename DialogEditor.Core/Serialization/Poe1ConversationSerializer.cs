@@ -79,7 +79,7 @@ public static class Poe1ConversationSerializer
             if (orig is not null)
             {
                 SetLinkValue(orig, "RandomWeight",            WeightText(link.RandomWeight), DefaultRandomWeight);
-                SetLinkValue(orig, "QuestionNodeTextDisplay", DisplayText(link),             DefaultQuestionNodeTextDisplay);
+                SetLinkValue(orig, "QuestionNodeTextDisplay", link.QuestionNodeTextDisplay,  DefaultQuestionNodeTextDisplay);
                 // Update link conditions when the snapshot carries them
                 if (link.Conditions is { Count: >= 0 })
                 {
@@ -148,10 +148,6 @@ public static class Poe1ConversationSerializer
     private const string DefaultRandomWeight            = "1";
     private const string DefaultQuestionNodeTextDisplay = "ShowOnce";
 
-    // The game's QuestionNodeDisplayType name, also for a pre-139 "Always"/"Never" (issue 139).
-    private static string DisplayText(LinkEditSnapshot link) =>
-        NodeEnumNames.QuestionNodeTextDisplayName(link.QuestionNodeTextDisplay);
-
     private static string WeightText(int weight) =>
         weight.ToString(System.Globalization.CultureInfo.InvariantCulture);
 
@@ -173,7 +169,7 @@ public static class Poe1ConversationSerializer
         new XElement("FromNodeID",              link.FromNodeId),
         new XElement("ToNodeID",                link.ToNodeId),
         LinkElementOrNull("RandomWeight",            WeightText(link.RandomWeight), DefaultRandomWeight),
-        LinkElementOrNull("QuestionNodeTextDisplay", DisplayText(link),             DefaultQuestionNodeTextDisplay),
+        LinkElementOrNull("QuestionNodeTextDisplay", link.QuestionNodeTextDisplay,  DefaultQuestionNodeTextDisplay),
         new XElement("Conditionals",
             new XElement("Components",
                 (link.Conditions ?? []).Select(c => BuildConditionXml(c)))));
