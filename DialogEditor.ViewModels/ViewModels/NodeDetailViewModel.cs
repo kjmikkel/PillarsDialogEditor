@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using DialogEditor.Core.Analytics;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
@@ -30,6 +31,7 @@ public partial class NodeDetailViewModel : ObservableObject
             _activeGameId = value;
             OnPropertyChanged(nameof(SupportsLinkConditions));
             OnPropertyChanged(nameof(LinkConditionsToolTip));
+            OnPropertyChanged(nameof(ScriptWarnings));
         }
     }
     private string _activeGameId = string.Empty;
@@ -415,6 +417,18 @@ public partial class NodeDetailViewModel : ObservableObject
             return warnings;
         }
     }
+
+    /// Scripts on a Deadfire script node that the game never runs (issue 167). The rule
+    /// is shared with flow analysis (ScriptNodeRules); recomputed on selection, link,
+    /// script and game changes.
+    public IReadOnlyList<string> ScriptWarnings =>
+        _node is null ? []
+        : ScriptNodeRules.NeverRun(_activeGameId, _node.SpeakerCategory, _node.ScriptKind,
+                                   Links.Count > 0, _node.Scripts)
+            .Select(kind => Loc.Get(kind == FlowIssueKind.ScriptExitNeverRuns
+                ? "NodeDetail_ScriptWarning_ExitNeverRuns"
+                : "NodeDetail_ScriptWarning_UpdateNeverRuns"))
+            .ToList();
 
     /// Text validation warnings for the selected node's Default (and, when present,
     /// Female) text — likely token typos, unbalanced markup, and (when a spell
@@ -846,6 +860,7 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(SelectedListenerEntry));
         OnPropertyChanged(nameof(BarkWarnings));
         OnPropertyChanged(nameof(TokenWarnings));
+        OnPropertyChanged(nameof(ScriptWarnings));
 
         _voCheck = _node is null ? null
             : VoPathResolver.Check(
@@ -920,6 +935,7 @@ public partial class NodeDetailViewModel : ObservableObject
     {
         Links = connections.ToList();
         OnPropertyChanged(nameof(BarkWarnings));
+        OnPropertyChanged(nameof(ScriptWarnings));
     }
 
     public void NotifyConditionSummary()
