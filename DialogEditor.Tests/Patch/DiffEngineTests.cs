@@ -197,4 +197,18 @@ public class DiffEngineTests
         var patch = DiffEngine.Diff("c", Snap(base_), Snap(curr), "en");
         Assert.Empty(patch.Translations);
     }
+
+    // ── Node type (#160) ──────────────────────────────────────────────────
+    // The serializers write the game type from SpeakerCategory, so the patch must carry it.
+    // By name, not number: the patch file must not change meaning if the enum is reordered.
+
+    [Fact]
+    public void Diff_CategoryChange_IsRecordedByName()
+    {
+        var base_ = MakeNode(3) with { IsPlayerChoice = true, SpeakerCategory = SpeakerCategory.Player };
+        var curr  = MakeNode(3);
+        var mod   = Assert.Single(DiffEngine.Diff("c", Snap(base_), Snap(curr), "en").ModifiedNodes);
+
+        Assert.Equal(new FieldChange("\"Player\"", "\"Npc\""), mod.FieldChanges["SpeakerCategory"]);
+    }
 }

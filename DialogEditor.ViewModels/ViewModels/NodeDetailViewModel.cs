@@ -518,7 +518,7 @@ public partial class NodeDetailViewModel : ObservableObject
             if (_node is null) return;
             // The game type follows the category (issue 160). "NPC line" is what the dropdown
             // already shows for every non-player node, so it changes only a player choice:
-            // narrator, script, bank and trigger nodes keep their category and type (#113).
+            // narrator, script, bank and trigger nodes keep their category and type (issue 113).
             if (value == Loc.Get("Option_PlayerChoice"))   _node.SetCategory(SpeakerCategory.Player);
             else if (_node.SpeakerCategory == SpeakerCategory.Player) _node.SetCategory(SpeakerCategory.Npc);
         }
