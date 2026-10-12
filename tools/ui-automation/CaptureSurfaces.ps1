@@ -23,6 +23,10 @@
 #   * ShowWindow(SW_MAXIMIZE) sent before the window exists silently does
 #     nothing. Wait-EditorMaximized retries until IsZoomed confirms it — an
 #     unmaximized run produces differently-framed shots with desktop at the edges.
+#   * Dialogs and tool windows are separate windows. UIA lists an owned one as a
+#     child of its owner and an unowned one beside the main window, so a search of
+#     either place alone misses some. Get-EditorSecondaryWindows looks in both, and
+#     Save-ElementScreenshot captures what it finds (#86).
 #   * Number formatting in file names uses the invariant culture: under a
 #     Danish (or any comma-decimal) locale "{0:0.00}" gives "1,50".
 #
@@ -182,6 +186,90 @@ function Open-BrowserConversation {
     Start-Sleep -Seconds 4   # let the canvas lay out the conversation
 }
 
+# The main window's HWND per process, recorded at launch by Invoke-CaptureMatrix.
+# Process.MainWindowHandle is not stable: once an unowned window such as Diff or History
+# is active, .NET can report THAT window as the main one, and the real main window would
+# then be treated as a dialog (and closed with it).
+$script:EditorMainHandles = @{}
+
+function Get-EditorSecondaryWindows {
+    # Every window of the editor except the main one: dialogs and tool windows.
+    # Avalonia gives each Window its own HWND. UIA lists an OWNED window (a dialog shown
+    # with an owner, e.g. Settings) as a child of its owner, not of the desktop, and an
+    # unowned one beside the main window under the root, so both places are searched.
+    # Emitted one by one (not as a wrapped array), so callers can pipe or use @(...).
+    param([Parameter(Mandatory)][System.Diagnostics.Process]$Process)
+    $Process.Refresh()
+    $main = if ($script:EditorMainHandles.ContainsKey($Process.Id)) { $script:EditorMainHandles[$Process.Id] }
+            else { [int64]$Process.MainWindowHandle }
+    $ae = [System.Windows.Automation.AutomationElement]
+    $byPid = New-Object System.Windows.Automation.PropertyCondition($ae::ProcessIdProperty, $Process.Id)
+    $isWindow = New-Object System.Windows.Automation.PropertyCondition(
+        $ae::ControlTypeProperty, [System.Windows.Automation.ControlType]::Window)
+    $seen = @{}
+    foreach ($top in $ae::RootElement.FindAll([System.Windows.Automation.TreeScope]::Children, $byPid)) {
+        # Two levels: windows owned by the main window, and windows owned by those (Diff
+        # Help belongs to Diff). A full Descendants walk would crawl the whole canvas.
+        $owned = @($top.FindAll([System.Windows.Automation.TreeScope]::Children, $isWindow))
+        $nested = foreach ($o in $owned) { $o.FindAll([System.Windows.Automation.TreeScope]::Children, $isWindow) }
+        $candidates = @($top) + $owned + @($nested)
+        foreach ($w in $candidates) {
+            $h = $w.Current.NativeWindowHandle
+            # Handle 0 = a Window-typed element inside a window (the main window exposes
+            # one for its client area), not a window of its own. Closing that closes the app.
+            if ($h -eq 0 -or $h -eq $main -or $seen.ContainsKey($h)) { continue }
+            $seen[$h] = $true
+            $w
+        }
+    }
+}
+
+function Wait-EditorSecondaryWindow {
+    # The secondary window whose title is -Name (or, without -Name, the first one to
+    # appear), waiting up to -TimeoutSeconds for it to open.
+    param(
+        [Parameter(Mandatory)][System.Diagnostics.Process]$Process,
+        [string]$Name,
+        [int]$TimeoutSeconds = 10
+    )
+    for ($i = 0; $i -lt $TimeoutSeconds * 2; $i++) {
+        $found = @(Get-EditorSecondaryWindows -Process $Process) |
+                 Where-Object { -not $Name -or $_.Current.Name -eq $Name } | Select-Object -First 1
+        if ($found) { Start-Sleep -Milliseconds 800; return $found }   # let it finish laying out
+        Start-Sleep -Milliseconds 500
+    }
+    throw "Wait-EditorSecondaryWindow: no window '$Name' opened within $TimeoutSeconds s."
+}
+
+function Save-ElementScreenshot {
+    # PNG of any UIA element's on-screen box: a secondary window, or a dock or control
+    # inside one. The element's top-level window is brought to the front first, because
+    # this copies screen pixels. LOOK at the result, as with Save-WindowScreenshot.
+    param([Parameter(Mandatory)]$Element, [Parameter(Mandatory)][string]$Path)
+    $top = $Element
+    $walker = [System.Windows.Automation.TreeWalker]::ControlViewWalker
+    $root = [System.Windows.Automation.AutomationElement]::RootElement
+    while ($true) {
+        $parent = $walker.GetParent($top)
+        if ($null -eq $parent -or $parent -eq $root) { break }
+        $top = $parent
+    }
+    [DriveAppWin32]::SetForegroundWindow([IntPtr][int64]$top.Current.NativeWindowHandle) | Out-Null
+    Start-Sleep -Milliseconds 400
+
+    $b = $Element.Current.BoundingRectangle
+    if ($b.IsEmpty -or $b.Width -le 0 -or $b.Height -le 0) {
+        throw "Save-ElementScreenshot: '$($Element.Current.Name)' has no on-screen area."
+    }
+    $bmp = New-Object System.Drawing.Bitmap ([int]$b.Width), ([int]$b.Height)
+    try {
+        $g = [System.Drawing.Graphics]::FromImage($bmp)
+        try { $g.CopyFromScreen([int]$b.X, [int]$b.Y, 0, 0, $bmp.Size) } finally { $g.Dispose() }
+        $bmp.Save($Path, [System.Drawing.Imaging.ImageFormat]::Png)
+    }
+    finally { $bmp.Dispose() }
+}
+
 function Invoke-CaptureMatrix {
     # Launch the editor once per theme × font scale, maximize it, and hand the
     # running app to -Capture. Settings are backed up first and restored last,
@@ -217,6 +305,7 @@ function Invoke-CaptureMatrix {
                     Wait-EditorMaximized -Process $p
                     Start-Sleep -Seconds 2
                     $win = Get-EditorWindow -Process $p
+                    $script:EditorMainHandles[$p.Id] = [int64]$win.Current.NativeWindowHandle
                     $tag = Format-CaptureTag -Theme $theme -FontScale $scale
                     & $Capture $p $win $tag $OutDir
                     Write-Host "captured $tag"
