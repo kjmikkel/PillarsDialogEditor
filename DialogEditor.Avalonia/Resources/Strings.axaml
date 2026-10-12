@@ -864,6 +864,7 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- Structural edits. {0}/{1} are node numbers, and the arrow shows direction:
          "Add connection 1 → 2" means from node 1 to node 2, so keep the order. -->
     <sys:String x:Key="Undo_AddNode">Add node {0}</sys:String>
+    <sys:String x:Key="Undo_MakeStartNode">Make node {0} the start node</sys:String>
     <sys:String x:Key="Undo_DeleteNode">Delete node {0}</sys:String>
     <sys:String x:Key="Undo_AddAnnotation">Add annotation</sys:String>
     <sys:String x:Key="Undo_DeleteAnnotation">Delete annotation</sys:String>
