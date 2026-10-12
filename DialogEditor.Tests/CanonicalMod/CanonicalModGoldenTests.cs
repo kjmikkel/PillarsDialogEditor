@@ -14,6 +14,7 @@ public class CanonicalModGoldenTests
     private static string TempDir(string tag) => Path.Combine(Path.GetTempPath(), $"canonical {tag} {Guid.NewGuid():N}");
 
     [Theory]
+    [InlineData("poe1")]
     [InlineData("poe2")]
     public async Task CheckedInMod_MatchesAFreshBuild(string gameId)
     {
@@ -40,6 +41,7 @@ public class CanonicalModGoldenTests
 
     // Review Focus 1: nothing nondeterministic (layout, ordering, clock) leaks into the output.
     [Theory]
+    [InlineData("poe1")]
     [InlineData("poe2")]
     public async Task TwoBuilds_AreIdentical(string gameId)
     {
@@ -61,6 +63,7 @@ public class CanonicalModGoldenTests
 
     // Review Focus 5: the pack and the project beside it can't drift apart.
     [Theory]
+    [InlineData("poe1")]
     [InlineData("poe2")]
     public void PackCarriesTheCheckedInProject(string gameId)
     {

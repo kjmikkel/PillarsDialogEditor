@@ -27,8 +27,12 @@ public sealed record CanonicalGame(
     public static CanonicalGame Poe2 { get; } = new("poe2", Poe2Scenario.Steps, Poe2Scenario.Edited,
         Poe2Scenario.NewConversation, root => new Poe2GameDataProvider(root));
 
+    public static CanonicalGame Poe1 { get; } = new("poe1", Poe1Scenario.Steps, Poe1Scenario.Edited,
+        Poe1Scenario.NewConversation, root => new Poe1GameDataProvider(root));
+
     public static CanonicalGame For(string id) => id switch
     {
+        "poe1" => Poe1,
         "poe2" => Poe2,
         _      => throw new ArgumentOutOfRangeException(nameof(id), id, null),
     };

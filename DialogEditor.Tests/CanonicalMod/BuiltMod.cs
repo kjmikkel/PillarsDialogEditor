@@ -31,3 +31,4 @@ public abstract class BuiltMod : IDisposable
 }
 
 public sealed class BuiltPoe2Mod() : BuiltMod(CanonicalGame.Poe2);
+public sealed class BuiltPoe1Mod() : BuiltMod(CanonicalGame.Poe1);
