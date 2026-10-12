@@ -112,8 +112,9 @@ The Pillars of Eternity template is unchanged.
 
 **Who writes it.** Both write paths write the manifest for every conversation the project
 or load order marks as new (`IsNewConversation`). This doesn't depend on whether the
-conversation's file already exists: on a second Test Patch the bundle is already there and
-`FindConversation` finds it, but the manifest must still be tracked and written.
+conversation's file already exists: once the patcher has installed the conversation, its
+bundle is there and `FindConversation` finds it, but a Test Patch must still track and write
+the manifest.
 - **`PatchInstaller.Install`** treats the manifest path as one more target: backed up with
   `EnsureBackedUp` before writing (it didn't exist, so restore deletes it), then
   `RecordWritten`.
@@ -159,7 +160,7 @@ All tests are written first (strict TDD).
   - an existing conversation gets no manifest.
 - Test Patch:
   - F5 writes the manifest, and F6 deletes it;
-  - a second F5 still tracks it.
+  - F5 still tracks it when the conversation's bundle already exists (installed by the patcher).
 
 **Canonical mods (issue 138):**
 - These tests are no longer skipped:
