@@ -287,6 +287,9 @@
     <sys:String x:Key="Status_ConnectMode_Started">Connecting: select target node, then press Enter to confirm or Escape to cancel.</sys:String>
     <sys:String x:Key="Status_ConnectMode_Connected">Connected node {0} → {1}.</sys:String>
     <sys:String x:Key="Status_ConnectMode_Cancelled">Connect mode cancelled.</sys:String>
+    <sys:String x:Key="Canvas_NoStartNode_New">This conversation has no node 0, so the game can't start it from its first line.</sys:String>
+    <sys:String x:Key="Canvas_NoStartNode_Game">Node 0 was removed, so the game can't start this conversation. Undo the deletion, or remove it from the patch.</sys:String>
+    <sys:String x:Key="Canvas_ChooseStartNode_Prompt">Click the node that should start the conversation. Esc cancels.</sys:String>
 
     <!-- ─── Tooltips — toolbar ─────────────────────────────────────────── -->
     <sys:String x:Key="ToolTip_OpenFolder">Open a PoE1 or PoE2 game root folder</sys:String>
