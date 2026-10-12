@@ -1,0 +1,76 @@
+{
+  "GlobalVariablesSets": [
+    {
+      "GlobalVariables": [
+        {
+          "Tag": "canonical_flag_a",
+          "InitialValue": 0
+        },
+        {
+          "Tag": "canonical_flag_b",
+          "InitialValue": 0
+        },
+        {
+          "Tag": "canonical_flag_c",
+          "InitialValue": 0
+        },
+        {
+          "Tag": "canonical_flag_d",
+          "InitialValue": 0
+        },
+        {
+          "Tag": "canonical_flag_e",
+          "InitialValue": 0
+        },
+        {
+          "Tag": "canonical_seen",
+          "InitialValue": 0
+        },
+        {
+          "Tag": "canonical_stage",
+          "InitialValue": 0
+        },
+        {
+          "Tag": "canonical_started",
+          "InitialValue": 0
+        },
+        {
+          "Tag": "canonical_ticks",
+          "InitialValue": 0
+        },
+        {
+          "Tag": "cm_enter",
+          "InitialValue": 0
+        },
+        {
+          "Tag": "cm_exit",
+          "InitialValue": 0
+        },
+        {
+          "Tag": "cm_extra",
+          "InitialValue": 0
+        },
+        {
+          "Tag": "cm_flag_a",
+          "InitialValue": 0
+        },
+        {
+          "Tag": "cm_flag_b",
+          "InitialValue": 0
+        },
+        {
+          "Tag": "cm_flag_c",
+          "InitialValue": 0
+        },
+        {
+          "Tag": "cm_flag_link",
+          "InitialValue": 0
+        },
+        {
+          "Tag": "cm_update",
+          "InitialValue": 0
+        }
+      ]
+    }
+  ]
+}
