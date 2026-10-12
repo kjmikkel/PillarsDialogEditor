@@ -63,6 +63,15 @@ internal static class RoundTripChecks
         return new XmlSerializer(type);
     }
 
+    /// The game's own stringtable model, loaded the same way as Poe1GameSerializer.
+    public static XmlSerializer Poe1GameStringTableSerializer(string installDir)
+    {
+        var dll = Path.Combine(installDir, "PillarsOfEternity_Data", "Managed", "OEIFormats.dll");
+        Assert.True(File.Exists(dll), $"OEIFormats.dll not found at {dll}");
+        var type = Assembly.LoadFrom(dll).GetType("OEIFormats.Strings.StringTableFile", throwOnError: true)!;
+        return new XmlSerializer(type);
+    }
+
     /// The XML as the game sees it: deserialized into its own model and written back, so
     /// formatting (&lt;X /&gt; vs &lt;X&gt;&lt;/X&gt;) and elements the game ignores drop out.
     public static string Poe1GameCanonical(XmlSerializer gameSerializer, string xml)
