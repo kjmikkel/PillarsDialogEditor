@@ -34,6 +34,26 @@ public class NodeIdRemapTests
         Assert.Equal((0, "salut"), (only.NodeId, only.DefaultText));
     }
 
+    // Review I2: a language with no entry for the moved node still holds the deleted node 0's
+    // text under 0; it must not ship on the new start node.
+    [Fact]
+    public void Apply_DropsTheStaleTarget_EvenWhenTheLanguageLacksTheMovedNode()
+    {
+        var result = NodeIdRemap.Apply(Fr(new NodeTranslation(0, "old", "")), [(4, 0)]);
+        Assert.DoesNotContain(result["fr"], t => t.NodeId == 0);
+    }
+
+    // Review I2: renumber then Undo is no change at all, so a node 0 restored by undoing its
+    // deletion keeps its own translation.
+    [Fact]
+    public void Apply_RenumberThenUndo_KeepsTheOriginalNode0()
+    {
+        var result = NodeIdRemap.Apply(
+            Fr(new NodeTranslation(0, "orig", ""), new NodeTranslation(5, "fünf", "")), [(5, 0), (0, 5)]);
+        Assert.Contains(result["fr"], t => t.NodeId == 0 && t.DefaultText == "orig");
+        Assert.Contains(result["fr"], t => t.NodeId == 5 && t.DefaultText == "fünf");
+    }
+
     [Fact]
     public void Apply_LeavesOtherEntriesAlone()
     {

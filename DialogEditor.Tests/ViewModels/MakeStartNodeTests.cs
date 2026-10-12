@@ -246,16 +246,97 @@ public class MakeStartNodeTests : IDisposable
     // ── Pick mode ─────────────────────────────────────────────────────────
 
     [Fact]
-    public void PickMode_SelectingANode_MakesItTheStart_AndEndsTheMode()
+    public void PickMode_ConfirmingANode_MakesItTheStart_AndEndsTheMode()
     {
         var vm = Canvas();
         vm.ChooseStartNodeCommand.Execute(null);
         Assert.True(vm.IsChoosingStartNode);
 
+        Assert.True(vm.TryConfirmStartNode(ById(vm, 2)));
+
+        Assert.Equal(0, vm.Nodes.Single(n => n.DefaultText == "second").NodeId);
+        Assert.False(vm.IsChoosingStartNode);
+    }
+
+    // Review I3: keyboard focus, navigation and "add connected node" all move the selection;
+    // none of them is the user choosing a start node.
+    [Fact]
+    public void PickMode_SelectionAlone_DoesNotCommit()
+    {
+        var vm = Canvas();
+        vm.ChooseStartNodeCommand.Execute(null);
+
         vm.SelectedNode = ById(vm, 2);
 
+        Assert.Equal(2, ById(vm, 2).NodeId);
+        Assert.True(vm.IsChoosingStartNode);
+    }
+
+    // Review I3: clicking the node that is already selected changes no selection, but must
+    // still confirm it.
+    [Fact]
+    public void PickMode_TheAlreadySelectedNode_CanBeConfirmed()
+    {
+        var vm = Canvas();
+        vm.SelectedNode = ById(vm, 2);
+        vm.ChooseStartNodeCommand.Execute(null);
+
+        Assert.True(vm.TryConfirmStartNode(vm.SelectedNode));
+
         Assert.Equal(0, vm.SelectedNode!.NodeId);
-        Assert.False(vm.IsChoosingStartNode);
+    }
+
+    [Fact]
+    public void Confirm_OutsidePickMode_DoesNothing()
+    {
+        var vm = Canvas();
+        Assert.False(vm.TryConfirmStartNode(ById(vm, 2)));
+        Assert.Equal(2, ById(vm, 2).NodeId);
+    }
+
+    // ── Review I1: a comment left under key 0 by a deleted node 0 ─────────
+
+    [Fact]
+    public void Comment_StaleUnderNode0_DoesNotAttachToTheNewStart()
+    {
+        var vm = Canvas();
+        vm.LoadNodeComments(new Dictionary<int, string> { [0] = "Greeting" });
+
+        vm.MakeStartNode(ById(vm, 1));
+
+        Assert.Equal("", vm.GetNodeComment(0));
+    }
+
+    [Fact]
+    public void Comment_Undo_PutsBothCommentsBack()
+    {
+        var vm = Canvas();
+        vm.LoadNodeComments(new Dictionary<int, string> { [0] = "A", [1] = "B" });
+        vm.MakeStartNode(ById(vm, 1));
+        Assert.Equal("B", vm.GetNodeComment(0));
+
+        vm.Undo();
+
+        Assert.Equal("B", vm.GetNodeComment(1));
+        Assert.Equal("A", vm.GetNodeComment(0));
+    }
+
+    // ── Review I4: VO staged after the renumber follows the node on Undo ──
+
+    [Fact]
+    public void Vo_StagedAfterTheRenumber_FollowsUndoAndRedo()
+    {
+        var vm = Canvas();
+        vm.MakeStartNode(ById(vm, 1));   // nothing staged yet
+        Stage("fresh_0000.wem");         // VO imported on node 0 afterwards
+
+        vm.Undo();
+        Assert.True(File.Exists(Staged("fresh_0001.wem")));
+        Assert.False(File.Exists(Staged("fresh_0000.wem")));
+
+        vm.Redo();
+        Assert.True(File.Exists(Staged("fresh_0000.wem")));
+        Assert.False(File.Exists(Staged("fresh_0001.wem")));
     }
 
     [Fact]
@@ -266,7 +347,7 @@ public class MakeStartNodeTests : IDisposable
         vm.CancelChooseStartNodeCommand.Execute(null);
 
         Assert.False(vm.IsChoosingStartNode);
-        vm.SelectedNode = ById(vm, 2);
+        Assert.False(vm.TryConfirmStartNode(ById(vm, 2)));
         Assert.Equal(2, ById(vm, 2).NodeId);
     }
 
