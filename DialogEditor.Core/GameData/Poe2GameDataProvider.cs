@@ -238,6 +238,31 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
         File.WriteAllText(file.ConversationPath, NewConversationTemplate(file.Name), System.Text.Encoding.UTF8);
     }
 
+    /// One manifest per new conversation, prefixed so it can't collide with a shipped or DLC
+    /// manifest, and so a Test Patch of one project can't overwrite another mod's entries.
+    /// The game loads every *conversations.manifest (issue 162).
+    public string? ConversationManifestPath(string name) =>
+        Path.Combine(ExportedRoot, "design", "manifests", $"dialogeditor_{name}.conversations.manifest");
+
+    /// The entry maps the conversation's ID to its bundle, relative to design/. The game
+    /// resolves a name by the file name of Filename.
+    public void WriteConversationManifest(string name)
+    {
+        var path  = ConversationManifestPath(name)!;
+        var entry = new JsonObject
+        {
+            ["$type"]          = "OEIFormats.Tools.ManifestData+ConversationManifestEntry, OEIFormats",
+            ["DisplayType"]    = 0,
+            ["IncludesPlayer"] = true,
+            ["ID"]             = NewConversationId.For(name).ToString(),
+            ["Filename"]       = $"/conversations/{name}.conversationbundle",
+        };
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        File.WriteAllText(path,
+            new JsonObject { ["Entries"] = new JsonArray(entry) }.ToJsonString(new JsonSerializerOptions { WriteIndented = true }),
+            System.Text.Encoding.UTF8);
+    }
+
     private const string ScriptNodeTypeName = "OEIFormats.FlowCharts.Conversations.ScriptNode, OEIFormats";
 
     /// A new conversation's bundle, with the conversation-level shape a shipped one has

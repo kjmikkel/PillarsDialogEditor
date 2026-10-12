@@ -418,6 +418,45 @@ public class Poe2GameDataProviderTests : IDisposable
         Assert.Equal([-200, 0], conv["Nodes"]!.AsArray().Select(n => n!["NodeID"]!.GetValue<int>()));
     }
 
+    // Issue 162: Deadfire only finds conversations listed in a
+    // design/manifests/*conversations.manifest, and resolves a name by the file name of
+    // each entry's Filename.
+    [Fact]
+    public void ConversationManifestPath_IsAnEditorOwnedConversationsManifest()
+    {
+        var path = _provider.ConversationManifestPath("newconv")!;
+
+        Assert.Equal(Path.Combine(_root, "PillarsOfEternityII_Data", "exported", "design", "manifests",
+                                  "dialogeditor_newconv.conversations.manifest"), path);
+        Assert.EndsWith("conversations.manifest", path);   // the game's *conversations.manifest
+    }
+
+    [Fact]
+    public void WriteConversationManifest_RegistersTheBundleUnderItsId()
+    {
+        _provider.WriteConversationManifest("newconv");
+
+        var manifest = JsonNode.Parse(File.ReadAllText(_provider.ConversationManifestPath("newconv")!))!;
+        var entry    = Assert.Single(manifest["Entries"]!.AsArray())!;
+        Assert.Equal("OEIFormats.Tools.ManifestData+ConversationManifestEntry, OEIFormats", entry["$type"]!.GetValue<string>());
+        Assert.Equal(0, entry["DisplayType"]!.GetValue<int>());
+        Assert.True(entry["IncludesPlayer"]!.GetValue<bool>());
+        Assert.Equal(NewConversationId.For("newconv").ToString(), entry["ID"]!.GetValue<string>());
+        Assert.Equal("/conversations/newconv.conversationbundle", entry["Filename"]!.GetValue<string>());
+    }
+
+    [Fact]
+    public void WriteConversationManifest_IdMatchesTheNewBundle()
+    {
+        var file = _provider.BuildNewConversationFile("newconv");
+        _provider.InitializeConversationFile(file);
+        _provider.WriteConversationManifest("newconv");
+
+        var bundleId = JsonNode.Parse(File.ReadAllText(file.ConversationPath))!["Conversations"]![0]!["ID"]!.GetValue<string>();
+        var entryId  = JsonNode.Parse(File.ReadAllText(_provider.ConversationManifestPath("newconv")!))!["Entries"]![0]!["ID"]!.GetValue<string>();
+        Assert.Equal(bundleId, entryId);
+    }
+
     [Fact]
     public void GetStringTablePath_WithLanguage_ReturnsCorrectPath()
     {
