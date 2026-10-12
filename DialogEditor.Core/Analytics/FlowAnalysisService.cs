@@ -5,7 +5,8 @@ namespace DialogEditor.Core.Analytics;
 
 public static class FlowAnalysisService
 {
-    public static FlowAnalysisReport Analyze(ConversationEditSnapshot snapshot)
+    /// <param name="gameId">"poe1", "poe2" or "" — some checks apply to one game only.</param>
+    public static FlowAnalysisReport Analyze(ConversationEditSnapshot snapshot, string gameId = "")
     {
         var nodes = snapshot.Nodes;
         if (nodes.Count == 0)
@@ -99,6 +100,10 @@ public static class FlowAnalysisService
             if (node.Links.Count > 0 &&
                 node.Scripts.Any(sc => ConversationJumpVerbs.IsJump(sc.DisplayName)))
                 issues.Add(new FlowIssue(node.NodeId, FlowIssueKind.ConversationJumpWhileContinuing));
+
+            foreach (var kind in ScriptNodeRules.NeverRun(
+                         gameId, node.SpeakerCategory, node.ScriptKind, node.Links.Count > 0, node.Scripts))
+                issues.Add(new FlowIssue(node.NodeId, kind));
 
             if (node.DisplayType == "Bark")
             {

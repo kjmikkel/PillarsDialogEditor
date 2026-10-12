@@ -279,6 +279,17 @@ public class NodeViewModelTests
         Assert.True(snapshot.IsPlayerChoice);
     }
 
+    // Issue 167: flow analysis tells a bank node from a plain script node by this.
+    [Fact]
+    public void ToSnapshot_CapturesScriptKind()
+    {
+        var vm = new NodeViewModel(
+            new ConversationNode(3, false, SpeakerCategory.Script, "", "", [], [], [], "Conversation", "None",
+                                 ScriptKind: ScriptNodeKind.Bank),
+            null);
+        Assert.Equal(ScriptNodeKind.Bank, vm.ToSnapshot([]).ScriptKind);
+    }
+
     [Fact]
     public void ToSnapshot_ReflectsMutatedState()
     {

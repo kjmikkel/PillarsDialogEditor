@@ -66,7 +66,8 @@ public static class Poe2ConversationParser
             Persistence: Poe2EnumMaps.PersistenceName(node["Persistence"]),
             ExternalVO: node["ExternalVO"]?.GetValue<string>() ?? string.Empty,
             HasVO: node["HasVO"]?.GetValue<bool>() ?? false,
-            HideSpeaker: node["HideSpeaker"]?.GetValue<bool>() ?? false
+            HideSpeaker: node["HideSpeaker"]?.GetValue<bool>() ?? false,
+            ScriptKind: ScriptNodeKinds.FromType(node["$type"]?.GetValue<string>())
         );
     }
 

@@ -15,7 +15,8 @@ public record ConversationNode(
     string Comments = "",
     string ExternalVO = "",
     bool HasVO = false,
-    bool HideSpeaker = false
+    bool HideSpeaker = false,
+    ScriptNodeKind ScriptKind = ScriptNodeKind.Script
 )
 {
     public bool HasConditions => Conditions.Count > 0;
