@@ -97,7 +97,13 @@ For theme × font-scale sweeps, don't hand-roll the loop. Use
 ./tools/ui-automation/Capture-Canvas.ps1 -OutDir $env:TEMP\canvas -Conversation companion_eder_hub
 # Conversations dock, collapsed + expanded, cropped to the dock (issue #85)
 ./tools/ui-automation/Capture-ConversationsDock.ps1 -OutDir $env:TEMP\dock -GameDirectory '<game folder>'
+# Every dock, pane and secondary window it can open, one PNG each (issue #86).
+# Self-contained: canonical PoE2 fixture + canonical mod project in a scratch git repo.
+./tools/ui-automation/Capture-Windows.ps1 -OutDir $env:TEMP\windows -Only settings,about
 ```
+
+Pass array parameters (`-Only`, `-Themes`, `-FontScales`) from inside pwsh or through
+`pwsh -Command "& './…ps1' -Only a,b"`: with `pwsh -File`, `a,b` arrives as one string.
 
 **A known conversation to verify against:** `DialogEditor.Tests/Fixtures/Canonical/{poe1,poe2}`
 each hold a miniature game install with one conversation, `canonical`, covering every node
@@ -113,6 +119,20 @@ game folder that has never been backed up from starting the first-run backup
 flow, and waits until the window really is maximized. Screenshots include the
 desktop at the window edges if it isn't. Don't post captures publicly without
 looking at them.
+
+**Dialogs and tool windows** are separate windows. UIA lists an owned one (most
+dialogs) as a child of its owner and an unowned one beside the main window, so
+look for them with `Get-EditorSecondaryWindows`, which searches both. Inside a
+`-Capture` block, open the window (menu item or shortcut), then:
+
+```powershell
+$dlg = Wait-EditorSecondaryWindow -Process $p -Name 'Settings'   # by title; omit -Name for "the first one"
+Save-ElementScreenshot -Element $dlg -Path (Join-Path $out "$tag-settings.png")
+Send-EditorKeys -Process $p -Keys '{ESC}'                        # close it before the next one
+```
+
+`Save-ElementScreenshot` also crops to any element inside a window (a dock, a
+pane). `Get-EditorSecondaryWindows` lists every open one.
 
 ## Rules of the road
 
