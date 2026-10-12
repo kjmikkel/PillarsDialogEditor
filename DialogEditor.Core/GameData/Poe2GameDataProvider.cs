@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Nodes;
+﻿using DialogEditor.Core.Localisation;
+using System.Text.Json.Nodes;
 using System.Text.Json;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
@@ -246,6 +247,7 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
 
     /// The entry maps the conversation's ID to its bundle, relative to design/. The game
     /// resolves a name by the file name of Filename.
+    [NotLocalised("Deadfire file format: type names and property values the game reads")]
     public void WriteConversationManifest(string name)
     {
         var path  = ConversationManifestPath(name)!;
@@ -271,6 +273,7 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
     /// .stringtable), so both must be set. The -200 conversation script node appears both
     /// as ConversationScriptNode and in Nodes, as in shipped bundles. The serializer copies
     /// -200 nodes verbatim and the parser never shows them.
+    [NotLocalised("Deadfire file format: type names and property values the game reads")]
     private static string NewConversationTemplate(string name)
     {
         JsonObject ScriptNode() => new()
