@@ -69,7 +69,7 @@ full path: PoE1 matches the typed name against *any part* of a conversation's fi
 - [ ] `kept.bank-and-trigger`: continue from the line above (started at node 3). The trigger hands over to `canonical` and the first line plays again. The comments the mod added aren't visible in play; the automated tests check them.
 - [ ] `nodes.delete`: not reachable in play, because the bank is cut off (`links.remove`). The automated tests check that the bank no longer lists the deleted node.
 - [ ] `links.weight`: not visible in play (weights only matter between NPC lines picked at random); checked by the automated tests.
-- [ ] `links.display-values` (#164): not visible in play, because no choice here is a question node. #164 predicts that the game ignores the new link's ShowAlways. Note anything the log says about the conversation's links.
+- [ ] `links.display-values`: not visible in play, because no choice here is a question node. The new link's ShowAlways is checked against the game's own model by the automated tests. Note anything the log says about the conversation's links.
 - [ ] `props.comments-and-direction`: not visible in play; comments and actor directions are author notes. Checked by the automated tests.
 - [ ] `text.second-language`: switch the game to German, if your build offers it. The first line reads "Willkommen zurück, [Player Name]. Der Mod hat diese Zeile geändert."
 - [ ] `conversation.new`: `StartConversationFacingListener oei_player canonical_mod_new 0`. The NPC says "Hello from a conversation the mod created.", then two choices. "Second choice, only when cm_flag_a is set." shows only with `cm_flag_a` at 1. Both choices lead to "Goodbye."
