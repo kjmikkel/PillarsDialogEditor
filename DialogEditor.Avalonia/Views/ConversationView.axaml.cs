@@ -125,6 +125,7 @@ public partial class ConversationView : UserControl
             Key.Apps                                          => OpenSelectedNodeContextMenu(vm),
             Key.F10 when e.KeyModifiers == KeyModifiers.Shift => OpenSelectedNodeContextMenu(vm),
 
+            Key.Escape when none && vm.IsChoosingStartNode => CancelChoosingStartNode(vm),
             Key.Escape when none && vm.IsConnecting => vm.CancelConnect(),
             Key.Escape when none                    => vm.Deselect(),
 
@@ -134,6 +135,13 @@ public partial class ConversationView : UserControl
         if (!handled) return;
         FollowSelection(vm);
         e.Handled = true;
+    }
+
+    // Issue 172: Esc leaves start-node pick mode without changing anything.
+    private static bool CancelChoosingStartNode(ConversationViewModel vm)
+    {
+        vm.CancelChooseStartNodeCommand.Execute(null);
+        return true;
     }
 
     private bool RaiseFocusDetail()
