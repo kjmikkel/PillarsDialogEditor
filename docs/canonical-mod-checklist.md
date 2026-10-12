@@ -39,6 +39,9 @@ None of the files exist in a real install.
    `PillarsOfEternity_Data`). This adds the `canonical` conversation and its `en` and `de` stringtables.
 2. Run `dialog-patcher "<game folder>" DialogEditor.Tests/Fixtures/CanonicalMod/poe1/canonical_mod.dialogpack`.
 3. Start the game, load the throwaway save, open the console and type `iroll20s`.
+4. PoE1 reads a global that was never set as **-1**, not 0, which would change how the conditions below come out.
+   Set each one the rows use to 0 first: `SetGlobalValue <name> 0` for `cm_flag_a`, `cm_flag_b`, `cm_flag_c`,
+   `cm_flag_node`, `canonical_flag_d`, `canonical_seen` and `cm_extra`.
 
 **Start the edited conversation** with
 `StartConversationFacingListener oei_player Assets/Data/Conversations/Canonical/canonical.conversation 0`. Use the
@@ -48,10 +51,10 @@ full path: PoE1 matches the typed name against *any part* of a conversation's fi
 **Rows, in play order**
 
 - [ ] `text.edit-with-female`: the first line reads "Welcome back, [Player Name]. The mod changed this line." with your character's name. A female main character sees "…, too." at the end.
-- [ ] `scripts.remove`: after the first line, `PrintGlobal canonical_seen` is still 0 (the mod removed node 0's script that set it).
+- [ ] `scripts.remove`: after the first line, `PrintGlobal canonical_seen` is still 0, the value setup gave it (the mod removed node 0's script that set it to 1).
 - [ ] `nodes.add-player-choice`: with all flags at 0 there are three choices. The new fourth choice is hidden (see the next row).
 - [ ] `conditions.node-nested`: `SetGlobalValue cm_flag_a 1` and `SetGlobalValue cm_flag_b 3`, then start a fresh run. The fourth choice appears. `SetGlobalValue cm_flag_b 0` (with `cm_flag_c` still 0) hides it again; set it back to 3 for the next rows.
-- [ ] `text.markup`: the fourth choice reads "Ask about the *canonical* mod.", with *canonical* in italics.
+- [ ] `text.markup`: the fourth choice's text is "Ask about the <i>canonical</i> mod.". PoE1's text renderer probably doesn't understand `<i>`, so record whether *canonical* shows in italics or the tags show literally.
 - [ ] `nodes.add-script`: pick the fourth choice. The conversation passes through a script node and ends.
 - [ ] `scripts.add-all-categories`: after picking the fourth choice, `PrintGlobal cm_enter` is 1 and `cm_exit` is 2. `cm_update` is 3 if the game ran the node's update script; record which.
 - [ ] `conditions.replace-nested`: `SetGlobalValue cm_flag_node 1` hides the first choice ("Take the scripted path."). `SetGlobalValue cm_flag_node 0` brings it back.
@@ -69,7 +72,7 @@ full path: PoE1 matches the typed name against *any part* of a conversation's fi
 - [ ] `links.display-values` (#164): not visible in play, because no choice here is a question node. #164 predicts that the game ignores the new link's ShowAlways. Note anything the log says about the conversation's links.
 - [ ] `props.comments-and-direction`: not visible in play; comments and actor directions are author notes. Checked by the automated tests.
 - [ ] `text.second-language`: switch the game to German, if your build offers it. The first line reads "Willkommen zurück, [Player Name]. Der Mod hat diese Zeile geändert."
-- [ ] `conversation.new` (#162): `StartConversationFacingListener oei_player canonical_mod_new 1` (start node **1**: #162 means the new conversation has no node 0). The NPC says "Hello from a conversation the mod created.", then two choices. "Second choice, only when cm_flag_a is set." shows only with `cm_flag_a` at 1. Both choices lead to "Goodbye." Then try start node `0` and record the failure #162 predicts.
+- [ ] `conversation.new` (#162): `StartConversationFacingListener oei_player canonical_mod_new 1` (start node **1**: #162 means the new conversation has no node 0). The NPC says "Hello from a conversation the mod created.", then two choices. "Second choice, only when cm_flag_a is set." shows only with `cm_flag_a` at 1. Both choices lead to "Goodbye." Then try start node `0`: expect nothing on screen and a NullReferenceException in the log (the command asks the missing node for its listener). That is the failure #162 predicts.
 
 **After the run:** read the log for errors that mention `canonical`.
 
@@ -95,12 +98,12 @@ name. Start it again whenever a row asks for a fresh run.
 - [ ] `text.edit-with-female`: the first line reads "Welcome back, [Player Name]. The mod changed this line." with your character's name. A female main character sees "…, too." at the end.
 - [ ] `scripts.remove`: after the first line, `PrintGlobal canonical_seen` is still 0 (the mod removed node 0's script that set it).
 - [ ] `nodes.add-player-choice`: with all flags at 0 there are three choices. The new fourth choice is hidden (see the next row).
-- [ ] `conditions.node-nested`: `SetGlobalValue cm_flag_a 1` and `SetGlobalValue cm_flag_b 3`, then start a fresh run. The fourth choice appears. The editor writes new condition calls **without a function hash**, so this row also answers whether Deadfire runs them. Record what you see, including log errors.
+- [ ] `conditions.node-nested`: `SetGlobalValue cm_flag_a 1` and `SetGlobalValue cm_flag_b 3`, then start a fresh run. The fourth choice appears. `SetGlobalValue cm_flag_b 0` (with `cm_flag_c` still 0) hides it again; set it back to 3 for the next rows. The editor writes new calls without a function hash; Deadfire ignores stored hashes when it loads a call, so they are expected to work.
 - [ ] `text.markup`: the fourth choice reads "Ask about the *canonical* mod.", with *canonical* in italics.
 - [ ] `nodes.add-script`: pick the fourth choice. The conversation passes through a script node and ends.
-- [ ] `scripts.add-all-categories`: after picking the fourth choice, `PrintGlobal cm_enter` is 1 and `cm_exit` is 2. `cm_update` is 3 if the game ran the node's update script; record which. These calls are new and hash-less too: 0 everywhere means Deadfire didn't run them.
-- [ ] `conditions.link`: `SetGlobalValue cm_flag_link 1`, then pick the first choice ("Take the scripted path."). The conversation ends, because the mod's negated condition on that link fails. At 0 it continues to the script node and the narrator.
-- [ ] `scripts.keep-per-script-conditional`: with `cm_flag_link` at 0 and `canonical_stage` at 0, take the first choice twice (two fresh runs). `PrintGlobal canonical_stage` reads 3, then 5, because the OnEnter script runs only while the stage is 0 (#115). `cm_extra` is 1.
+- [ ] `scripts.add-all-categories`: after picking the fourth choice, `PrintGlobal cm_enter` is 1 and `cm_exit` is 2 (node 13 ends the conversation, so its OnExit runs). `cm_update` stays 0: Deadfire never runs a script node's update scripts.
+- [ ] `conditions.link`: `SetGlobalValue cm_flag_link 1`, then pick the first choice ("Take the scripted path."). The conversation ends, because the mod's negated condition on that link fails. The choice is now marked read (it is OnceEver): run `ClearConversationNodeAsRead canonical 1` before every later pick of it. With `cm_flag_link` at 0 it continues to the script node and the narrator.
+- [ ] `scripts.keep-per-script-conditional`: with `cm_flag_link` at 0, `SetGlobalValue canonical_stage 0`, clear node 1 as above and take the first choice: `PrintGlobal canonical_stage` reads 1. Then `SetGlobalValue canonical_stage 7`, clear node 1 and take it again: it still reads 7, because node 4's OnEnter script runs only while the stage is 0 (#115). Reading 1 means the conditional was lost. `cm_extra` stays 0 and the stage gets no +2: Deadfire skips a script node's exit scripts when the node leads on.
 - [ ] `conditions.clear`: `SetGlobalValue canonical_flag_d 9`. The second choice ("Draw from the bank.") is still offered; before the mod it needed `canonical_flag_d` below 5.
 - [ ] `links.remove`: pick the second choice. The conversation ends there (the mod cut its link to the bank).
 - [ ] `vo.off`: the narrator's line after the script node plays no voice (the mod turned its VO off).
@@ -116,7 +119,7 @@ name. Start it again whenever a row asks for a fresh run.
 - [ ] `links.weight`: not visible in play (weights only matter between NPC lines picked at random); checked by the automated tests.
 - [ ] `links.display-values`: not visible in play, because no choice here is a question node; checked by the automated tests.
 - [ ] `text.second-language`: switch the game to German, if your build offers it. The first line reads "Willkommen zurück, [Player Name]. Der Mod hat diese Zeile geändert."
-- [ ] `conversation.new` (#162): `StartConversation oei_player canonical_mod_new 0` is expected to fail with "couldn't find a Conversation named 'canonical_mod_new'". #162 predicts this: the patcher writes no manifest entry and no conversation ID. Record the message.
+- [ ] `conversation.new` (#162): `StartConversation oei_player canonical_mod_new 0` shows no console message and nothing happens; the log says "Attempting to start an empty conversation." #162 predicts this: the patcher writes no manifest entry and no conversation ID, so the name resolves to nothing.
 
 **After the run:** read the log for errors that mention `canonical`, and for warnings about undeclared globals.
 
@@ -124,8 +127,9 @@ name. Start it again whenever a row asks for a fresh run.
 
 - How each game presents a conversation whose speaker isn't in the world.
 - Every row that didn't match: the row, what you saw, and any log line.
-- The answer to the open question: whether Deadfire runs condition and script calls the editor wrote without a function
-  hash (`conditions.node-nested`, `scripts.add-all-categories`).
+- Whether Deadfire runs the condition and script calls the editor wrote without a function hash
+  (`conditions.node-nested`, `scripts.add-all-categories`). The decompiled loader says it ignores stored hashes;
+  this run confirms it.
 
 ## Results
 
