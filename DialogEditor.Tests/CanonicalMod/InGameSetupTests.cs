@@ -30,6 +30,25 @@ public class InGameSetupTests
         Assert.StartsWith("OEIFormats.Tools.ManifestData+ConversationManifestEntry", entry["$type"]!.GetValue<string>());
     }
 
+    // Deadfire finds a conversation's stringtable from the bundle's inner Filename, not from
+    // where the bundle sits (Conversation.GetStringTableName): the part after "conversations/",
+    // with .stringtable, under localized/<lang>/text/conversations. The editor uses the
+    // bundle's location instead, so a mismatch passes every editor test and fails in the game.
+    [Theory]
+    [InlineData("en")]
+    [InlineData("de")]
+    public void FixtureStringTable_IsWhereTheGameLooks(string lang)
+    {
+        var filename = JsonNode.Parse(File.ReadAllText(FixtureBundle))!["Conversations"]![0]!["Filename"]!.GetValue<string>();
+        const string marker = "conversations/";
+        var at       = filename.IndexOf(marker, StringComparison.OrdinalIgnoreCase);
+        Assert.True(at >= 0, filename);
+        var relative = Path.ChangeExtension(filename[(at + marker.Length)..], ".stringtable");
+        var expected = Path.Combine(CanonicalFixture.SourceDir("poe2"), "PillarsOfEternityII_Data", "exported", "localized",
+                                    lang, "text", "conversations", relative.Replace('/', Path.DirectorySeparatorChar));
+        Assert.True(File.Exists(expected), $"the game looks for {relative} (from Filename '{filename}')");
+    }
+
     /// Every global the fixture and the PoE2 mod read or write: the first parameter of each
     /// *GlobalValue call, found in the raw JSON so the check shares no code with the editor.
     private static SortedSet<string> GlobalsUsed()
