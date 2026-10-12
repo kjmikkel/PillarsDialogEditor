@@ -497,8 +497,7 @@ public partial class NodeDetailViewModel : ObservableObject
                 value == Loc.Get("Speaker_Narrator") ? SpeakerCategory.Narrator :
                 value == Loc.Get("Speaker_Script")   ? SpeakerCategory.Script   :
                                                         SpeakerCategory.Npc;
-            _node.SpeakerCategory  = category;
-            _node.IsPlayerChoice   = category == SpeakerCategory.Player;
+            _node.SetCategory(category);
         }
     }
 
@@ -514,7 +513,15 @@ public partial class NodeDetailViewModel : ObservableObject
     public string NodeTypeString
     {
         get => IsPlayerChoice ? Loc.Get("Option_PlayerChoice") : Loc.Get("Option_NpcLine");
-        set { if (_node != null) _node.IsPlayerChoice = value == Loc.Get("Option_PlayerChoice"); }
+        set
+        {
+            if (_node is null) return;
+            // The game type follows the category (issue 160). "NPC line" is what the dropdown
+            // already shows for every non-player node, so it changes only a player choice:
+            // narrator, script, bank and trigger nodes keep their category and type (#113).
+            if (value == Loc.Get("Option_PlayerChoice"))   _node.SetCategory(SpeakerCategory.Player);
+            else if (_node.SpeakerCategory == SpeakerCategory.Player) _node.SetCategory(SpeakerCategory.Npc);
+        }
     }
 
     public static IReadOnlyList<string> NodeTypeOptions
