@@ -1,8 +1,6 @@
-using DialogEditor.Core.GameData;
-
 namespace DialogEditor.Tests.CanonicalMod;
 
-/// Issue 138, spec §3: the checked-in PoE2 canonical mod applied through each delivery path
+/// Issue 138, spec §3: each game's checked-in canonical mod applied through each delivery path
 /// a player or author uses — dialog-patcher, the Patch Manager, Test Patch (F5) — into a
 /// fresh copy of the canonical install, then verified.
 [Trait("Category", "Canonical")]
@@ -11,41 +9,44 @@ public sealed class CanonicalModApplyTests : IDisposable
     private readonly DeliveryPaths _paths = new();
     public void Dispose() => _paths.Dispose();
 
-    private static string Pack    => Path.Combine(CanonicalModBuilder.GoldenDir("poe2"), CanonicalModBuilder.ProjectName + ".dialogpack");
-    private static string Project => Path.Combine(CanonicalModBuilder.GoldenDir("poe2"), CanonicalModBuilder.ProjectName + ".dialogproject");
-
-    public static TheoryData<string> Routes => ["patcher", "patchmanager", "testpatch"];
-
-    private async Task<string> ApplyAsync(string route)
+    public static TheoryData<string, string> Routes => new()
     {
-        var root = _paths.FreshInstall("poe2");
+        { "poe2", "patcher" }, { "poe2", "patchmanager" }, { "poe2", "testpatch" },
+    };
+
+    private async Task<string> ApplyAsync(CanonicalGame game, string route)
+    {
+        var root = _paths.FreshInstall(game.Id);
         switch (route)
         {
-            case "patcher":      DeliveryPaths.ViaPatcher(root, Pack); break;
-            case "patchmanager": await DeliveryPaths.ViaPatchManagerAsync(root, Pack); break;
-            default:             await _paths.ViaTestPatchAsync(root, Project); break;
+            case "patcher":      DeliveryPaths.ViaPatcher(root, game.Pack); break;
+            case "patchmanager": await DeliveryPaths.ViaPatchManagerAsync(root, game.Pack); break;
+            default:             await DeliveryPaths.ViaTestPatchAsync(game, root); break;
         }
         return root;
     }
 
     [Theory]
     [MemberData(nameof(Routes))]
-    public async Task EveryStep_HoldsAfter(string route)
+    public async Task EveryStep_HoldsAfter(string gameId, string route)
     {
-        var root = await ApplyAsync(route);
-        var view = ModView.FromGame(new Poe2GameDataProvider(root), Poe2Scenario.Conversations, ["en", "de"]);
+        var game = CanonicalGame.For(gameId);
+        var root = await ApplyAsync(game, route);
+        var view = ModView.FromGame(game.Provider(root), game.Conversations, game.Languages);
         var failures = new List<string>();
-        foreach (var step in Poe2Scenario.Steps.Where(s => s.KnownIssue is null))
+        foreach (var step in game.Steps.Where(s => s.KnownIssue is null))
             try { step.Expect(view); } catch (Exception ex) { failures.Add($"{step.Tag}: {ex.Message}"); }
         Assert.Empty(failures);
     }
 
-    [Fact]
-    public async Task AllThreeRoutes_WriteIdenticalGameFiles()
+    [Theory]
+    [InlineData("poe2")]
+    public async Task AllThreeRoutes_WriteIdenticalGameFiles(string gameId)
     {
-        var patcher      = DeliveryPaths.GameFiles(await ApplyAsync("patcher"));
-        var patchManager = DeliveryPaths.GameFiles(await ApplyAsync("patchmanager"));
-        var testPatch    = DeliveryPaths.GameFiles(await ApplyAsync("testpatch"));
+        var game         = CanonicalGame.For(gameId);
+        var patcher      = DeliveryPaths.GameFiles(await ApplyAsync(game, "patcher"));
+        var patchManager = DeliveryPaths.GameFiles(await ApplyAsync(game, "patchmanager"));
+        var testPatch    = DeliveryPaths.GameFiles(await ApplyAsync(game, "testpatch"));
         var vsPatchManager = DeliveryPaths.Describe(patcher, patchManager);
         var vsTestPatch    = DeliveryPaths.Describe(patcher, testPatch);
         Assert.True(vsPatchManager is null, "patcher vs Patch Manager:\n" + vsPatchManager);
@@ -53,28 +54,32 @@ public sealed class CanonicalModApplyTests : IDisposable
     }
 
     // Review Focus 2: every install starts from the originals, so applying twice changes nothing.
-    [Fact]
-    public async Task ApplyingTwice_GivesTheSameFiles()
+    [Theory]
+    [InlineData("poe2")]
+    public async Task ApplyingTwice_GivesTheSameFiles(string gameId)
     {
-        var root = _paths.FreshInstall("poe2");
-        await DeliveryPaths.ViaPatchManagerAsync(root, Pack);
+        var game = CanonicalGame.For(gameId);
+        var root = _paths.FreshInstall(game.Id);
+        await DeliveryPaths.ViaPatchManagerAsync(root, game.Pack);
         var once = DeliveryPaths.GameFiles(root);
-        await DeliveryPaths.ViaPatchManagerAsync(root, Pack);
+        await DeliveryPaths.ViaPatchManagerAsync(root, game.Pack);
         Assert.Equal(once, DeliveryPaths.GameFiles(root));
     }
 
     // Review Focus 4: a mod language the install lacks is skipped; the rest still applies.
-    [Fact]
-    public async Task MissingModLanguage_IsSkipped_AndEnglishStillApplies()
+    [Theory]
+    [InlineData("poe2")]
+    public async Task MissingModLanguage_IsSkipped_AndEnglishStillApplies(string gameId)
     {
-        var root  = _paths.FreshInstall("poe2");
-        var deDir = Path.Combine(root, "PillarsOfEternityII_Data", "exported", "localized", "de");
+        var game  = CanonicalGame.For(gameId);
+        var root  = _paths.FreshInstall(game.Id);
+        var deDir = Directory.EnumerateDirectories(root, "de", SearchOption.AllDirectories).Single();
         Directory.Delete(deDir, true);
 
-        await DeliveryPaths.ViaPatchManagerAsync(root, Pack);
+        await DeliveryPaths.ViaPatchManagerAsync(root, game.Pack);
 
-        var view = ModView.FromGame(new Poe2GameDataProvider(root), Poe2Scenario.Conversations, ["en"]);
-        Assert.Equal("A new closing line, written by the canonical mod.", view.Text(Poe2Scenario.Edited, "en", 11)!.DefaultText);
+        var view = ModView.FromGame(game.Provider(root), game.Conversations, ["en"]);
+        Assert.Equal("A new closing line, written by the canonical mod.", view.Text(game.Edited, "en", 11)!.DefaultText);
         Assert.False(Directory.Exists(deDir));
     }
 }

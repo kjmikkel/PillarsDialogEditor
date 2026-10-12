@@ -22,6 +22,7 @@ public sealed class CanonicalModSession : IDisposable
     public string Root        { get; } = Path.Combine(Path.GetTempPath(), $"canonical mod {Guid.NewGuid():N}");
     public string GameRoot    => Path.Combine(Root, "game");
     public string ProjectPath { get; private set; } = "";
+    public string Game        { get; private set; } = "";
     public MainWindowViewModel Vm { get; }
 
     // Synchronous on purpose. AppSettings.SettingsPathOverride is an AsyncLocal, and a value
@@ -41,6 +42,7 @@ public sealed class CanonicalModSession : IDisposable
     /// A fresh copy of the canonical install with a new, empty project.
     public async Task LoadNewProjectAsync(string game, string projectName)
     {
+        Game = game;
         CanonicalFixture.CopyTo(game, GameRoot);
         Invoke("LoadDirectory", GameRoot);
 
@@ -52,8 +54,9 @@ public sealed class CanonicalModSession : IDisposable
     /// Opens an existing project (with its _vo/ beside it) over an existing install, as File ›
     /// Open Project does after the game folder is chosen. The project is copied into the
     /// session folder first, so the checked-in copy is never written to.
-    public async Task LoadExistingAsync(string gameRoot, string projectPath)
+    public async Task LoadExistingAsync(string game, string gameRoot, string projectPath)
     {
+        Game = game;
         Invoke("LoadDirectory", gameRoot);
 
         var projectDir = Directory.CreateDirectory(Path.Combine(Root, "project")).FullName;
@@ -108,24 +111,24 @@ public sealed class CanonicalModSession : IDisposable
     /// Opens the condition editor on a tree and confirms it: the same tree → rows → tree round
     /// trip the dialog performs, so nesting, negation and operators go through the editor's code.
     public void EditConditions(NodeViewModel node, IReadOnlyList<ConditionNode> conditions) =>
-        new ConditionEditorViewModel("canonical", conditions, c => node.Conditions = c, "poe2").ConfirmCommand.Execute(null);
+        new ConditionEditorViewModel("canonical", conditions, c => node.Conditions = c, Game).ConfirmCommand.Execute(null);
 
     public void EditLinkConditions(int from, int to, IReadOnlyList<ConditionNode> conditions)
     {
         var link = LinkOf(from, to);
-        new ConditionEditorViewModel("canonical", conditions, c => link.Conditions = c, "poe2").ConfirmCommand.Execute(null);
+        new ConditionEditorViewModel("canonical", conditions, c => link.Conditions = c, Game).ConfirmCommand.Execute(null);
     }
 
     public void EditScripts(NodeViewModel node, IReadOnlyList<ScriptCall> scripts) =>
-        new ScriptEditorViewModel("canonical", scripts, s => node.Scripts = s, "poe2").ConfirmCommand.Execute(null);
+        new ScriptEditorViewModel("canonical", scripts, s => node.Scripts = s, Game).ConfirmCommand.Execute(null);
 
-    /// The PoE2 catalogue's FullName for a method; throws if absent, because an unknown
-    /// function would be written into the mod and fail in the game.
-    public static string ConditionName(string method) =>
-        ConditionCatalogue.Instance.ForGame("poe2").First(e => e.MethodName == method).ReflectionFullName;
+    /// The catalogue's FullName for a method in this session's game; throws if absent,
+    /// because an unknown function would be written into the mod and fail in the game.
+    public string ConditionName(string method) =>
+        ConditionCatalogue.Instance.ForGame(Game).First(e => e.MethodName == method).ReflectionFullName;
 
-    public static string ScriptName(string method) =>
-        ScriptCatalogue.Instance.ForGame("poe2").First(e => e.MethodName == method).ReflectionFullName;
+    public string ScriptName(string method) =>
+        ScriptCatalogue.Instance.ForGame(Game).First(e => e.MethodName == method).ReflectionFullName;
 
     /// The detail pane's Import VO button with the real importer; the file dialog is
     /// answered with <paramref name="sourceWem"/> (a .wem is copied, no Wwise needed).
