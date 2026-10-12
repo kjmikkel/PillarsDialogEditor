@@ -80,6 +80,20 @@ public sealed class Poe1CanonicalModRawChecks : IDisposable
         }
     }
 
+    // Issue 164: without xsi:type="DialogueLink" the game reads a plain FlowChartLink and drops
+    // RandomWeight and QuestionNodeTextDisplay. New links, kept links and the new conversation's.
+    [Fact]
+    public async Task EveryLink_IsADialogueLink()
+    {
+        var root = await InstalledAsync();
+        foreach (var conv in WrittenConversations(root))
+        {
+            Assert.NotEmpty(conv.Descendants("FlowChartLink"));
+            Assert.All(conv.Descendants("FlowChartLink"),
+                l => Assert.Equal("DialogueLink", (string?)l.Attribute(Xsi + "type")));
+        }
+    }
+
     [Fact]
     public async Task NewConversation_StartsAtNode0()
     {
