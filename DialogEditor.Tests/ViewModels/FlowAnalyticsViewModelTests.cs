@@ -111,10 +111,44 @@ public class FlowAnalyticsViewModelTests
     [InlineData(FlowIssueKind.NoIncomingLinks,          "FlowAnalytics_Severity_Warning")]
     [InlineData(FlowIssueKind.BarkTextTooLong,          "FlowAnalytics_Severity_Warning")]
     [InlineData(FlowIssueKind.BarkHasPlayerChoiceChild, "FlowAnalytics_Severity_Warning")]
+    [InlineData(FlowIssueKind.ScriptExitNeverRuns,      "FlowAnalytics_Severity_Warning")]
+    [InlineData(FlowIssueKind.ScriptUpdateNeverRuns,    "FlowAnalytics_Severity_Warning")]
     public void SeverityLabel_MapsKindToTierKey(FlowIssueKind kind, string expectedKey)
     {
         var vm = new FlowIssueViewModel(new FlowIssue(1, kind), "snippet", _ => { });
         Assert.Equal(expectedKey, vm.SeverityLabel);   // StubStringProvider echoes keys
+    }
+
+    // Every kind asks the resource layer for its label. The fallback is Kind.ToString(),
+    // an English enum name, so a kind added without a label would ship untranslatable.
+    [Theory]
+    [MemberData(nameof(AllIssueKinds))]
+    public void KindLabel_ComesFromAResourceKey_ForEveryKind(FlowIssueKind kind)
+    {
+        var vm = new FlowIssueViewModel(new FlowIssue(1, kind), "snippet", _ => { });
+        Assert.StartsWith("FlowAnalytics_Issue_", vm.KindLabel);   // StubStringProvider echoes keys
+    }
+
+    public static TheoryData<FlowIssueKind> AllIssueKinds() => new(Enum.GetValues<FlowIssueKind>());
+
+    // Issue 167: the script-node checks are Deadfire-only, so the window has to hand the
+    // analysis the game it was opened for.
+    [Theory]
+    [InlineData("poe2", true)]
+    [InlineData("poe1", false)]
+    public void Refresh_PassesTheGameToTheAnalysis(string gameId, bool expectFlag)
+    {
+        var exit = new ScriptCall("Void SetGlobalValue(String, Int32)", ["g", "1"], ScriptCategory.Exit);
+        var snapshot = new ConversationEditSnapshot([
+            new NodeEditSnapshot(0, false, SpeakerCategory.Script, "", "", "", "",
+                "Conversation", "None", "", "", "", false, false, [Link(0, 1)], [], [exit]),
+            MakeNode(1, defaultText: "World")
+        ]);
+        var vm = new FlowAnalyticsViewModel(() => snapshot, _ => { }, gameId: gameId);
+
+        vm.RefreshCommand.Execute(null);
+
+        Assert.Equal(expectFlag, vm.Issues.Any(i => i.Kind == FlowIssueKind.ScriptExitNeverRuns));
     }
 
     // ── Row text is localised (CLAUDE.md localisation rule) ─────────
