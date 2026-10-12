@@ -12,8 +12,7 @@ public sealed class CanonicalModRawChecks : IDisposable
     private readonly DeliveryPaths _paths = new();
     public void Dispose() => _paths.Dispose();
 
-    private static string Pack    => Path.Combine(CanonicalModBuilder.GoldenDir("poe2"), CanonicalModBuilder.ProjectName + ".dialogpack");
-    private static string Project => Path.Combine(CanonicalModBuilder.GoldenDir("poe2"), CanonicalModBuilder.ProjectName + ".dialogproject");
+    private static string Pack => CanonicalGame.Poe2.Pack;
     private static string Fixture => CanonicalFixture.SourceDir("poe2");
 
     private static string BundlePath(string root, string conv) =>
@@ -165,7 +164,7 @@ public sealed class CanonicalModRawChecks : IDisposable
     public async Task TestPatchRestore_RestoresTheFixtureExactly()
     {
         var root = _paths.FreshInstall("poe2");
-        await _paths.ViaTestPatchAndRestoreAsync(root, Project);
+        await DeliveryPaths.ViaTestPatchAndRestoreAsync(CanonicalGame.Poe2, root);
         var diff = DeliveryPaths.Describe(DeliveryPaths.GameFiles(_paths.FreshInstall("poe2")), DeliveryPaths.GameFiles(root));
         Assert.True(diff is null, diff);
     }

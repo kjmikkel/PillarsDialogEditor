@@ -1,0 +1,662 @@
+﻿{
+  "Name": "canonical_mod",
+  "SchemaVersion": 1,
+  "Patches": {
+    "canonical": {
+      "ConversationName": "canonical",
+      "SchemaVersion": 3,
+      "AddedNodes": [
+        {
+          "NodeId": 11,
+          "IsPlayerChoice": false,
+          "SpeakerCategory": 0,
+          "SpeakerGuid": "c0a1c0a1-0000-4000-8000-000000000122",
+          "ListenerGuid": "b1a8e901-0000-0000-0000-000000000000",
+          "DisplayType": "Hidden",
+          "Persistence": "OnceEver",
+          "ActorDirection": "Nods slowly.",
+          "Comments": "Added by the canonical mod.",
+          "ExternalVO": "canonical_mod_0011",
+          "HasVO": false,
+          "HideSpeaker": false,
+          "Links": [],
+          "Conditions": [],
+          "Scripts": []
+        },
+        {
+          "NodeId": 12,
+          "IsPlayerChoice": true,
+          "SpeakerCategory": 1,
+          "SpeakerGuid": "b1a8e901-0000-0000-0000-000000000000",
+          "ListenerGuid": "c0a1c0a1-0000-4000-8000-000000000122",
+          "DisplayType": "Bark",
+          "Persistence": "OncePerConversation",
+          "ActorDirection": "",
+          "Comments": "",
+          "ExternalVO": "",
+          "HasVO": false,
+          "HideSpeaker": false,
+          "Links": [
+            {
+              "FromNodeId": 12,
+              "ToNodeId": 13,
+              "RandomWeight": 1,
+              "QuestionNodeTextDisplay": "",
+              "HasConditions": false,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [
+            {
+              "$kind": "leaf",
+              "FullName": "Boolean IsGlobalValue(String, Operator, Int32)",
+              "Parameters": [
+                "cm_flag_a",
+                "EqualTo",
+                "1"
+              ],
+              "Not": false,
+              "Operator": "And"
+            },
+            {
+              "$kind": "branch",
+              "Components": [
+                {
+                  "$kind": "leaf",
+                  "FullName": "Boolean IsGlobalValue(String, Operator, Int32)",
+                  "Parameters": [
+                    "cm_flag_b",
+                    "GreaterThan",
+                    "2"
+                  ],
+                  "Not": false,
+                  "Operator": "Or"
+                },
+                {
+                  "$kind": "leaf",
+                  "FullName": "Boolean IsGlobalValue(String, Operator, Int32)",
+                  "Parameters": [
+                    "cm_flag_c",
+                    "EqualTo",
+                    "0"
+                  ],
+                  "Not": true,
+                  "Operator": "And"
+                }
+              ],
+              "Not": false,
+              "Operator": "And"
+            }
+          ],
+          "Scripts": []
+        },
+        {
+          "NodeId": 13,
+          "IsPlayerChoice": false,
+          "SpeakerCategory": 3,
+          "SpeakerGuid": "",
+          "ListenerGuid": "",
+          "DisplayType": "Overlay",
+          "Persistence": "MarkAsRead",
+          "ActorDirection": "",
+          "Comments": "",
+          "ExternalVO": "",
+          "HasVO": false,
+          "HideSpeaker": false,
+          "Links": [],
+          "Conditions": [],
+          "Scripts": [
+            {
+              "FullName": "Void SetGlobalValue(String, Int32)",
+              "Parameters": [
+                "cm_enter",
+                "1"
+              ],
+              "Category": 0,
+              "DisplayName": "SetGlobalValue"
+            },
+            {
+              "FullName": "Void SetGlobalValue(String, Int32)",
+              "Parameters": [
+                "cm_exit",
+                "2"
+              ],
+              "Category": 1,
+              "DisplayName": "SetGlobalValue"
+            },
+            {
+              "FullName": "Void SetGlobalValue(String, Int32)",
+              "Parameters": [
+                "cm_update",
+                "3"
+              ],
+              "Category": 2,
+              "DisplayName": "SetGlobalValue"
+            }
+          ]
+        }
+      ],
+      "DeletedNodeIds": [
+        9
+      ],
+      "ModifiedNodes": [
+        {
+          "UpdatedConditions": null,
+          "UpdatedScripts": [],
+          "NodeId": 0,
+          "FieldChanges": {},
+          "AddedLinks": [
+            {
+              "FromNodeId": 0,
+              "ToNodeId": 12,
+              "RandomWeight": 1,
+              "QuestionNodeTextDisplay": "ShowAlways",
+              "HasConditions": false,
+              "Conditions": []
+            }
+          ],
+          "DeletedLinks": [],
+          "ModifiedLinks": [
+            {
+              "ToNodeId": 1,
+              "RandomWeight": 1,
+              "QuestionNodeTextDisplay": "ShowNever",
+              "Conditions": null
+            },
+            {
+              "ToNodeId": 2,
+              "RandomWeight": 3,
+              "QuestionNodeTextDisplay": "ShowOnce",
+              "Conditions": null
+            }
+          ]
+        },
+        {
+          "UpdatedConditions": [
+            {
+              "$kind": "leaf",
+              "FullName": "Boolean IsGlobalValue(String, Operator, Int32)",
+              "Parameters": [
+                "cm_flag_node",
+                "EqualTo",
+                "1"
+              ],
+              "Not": true,
+              "Operator": "And"
+            }
+          ],
+          "UpdatedScripts": null,
+          "NodeId": 1,
+          "FieldChanges": {},
+          "AddedLinks": [],
+          "DeletedLinks": [],
+          "ModifiedLinks": []
+        },
+        {
+          "UpdatedConditions": [],
+          "UpdatedScripts": null,
+          "NodeId": 2,
+          "FieldChanges": {},
+          "AddedLinks": [],
+          "DeletedLinks": [
+            {
+              "ToNodeId": 5,
+              "HasConditions": false
+            }
+          ],
+          "ModifiedLinks": []
+        },
+        {
+          "UpdatedConditions": null,
+          "UpdatedScripts": null,
+          "NodeId": 3,
+          "FieldChanges": {
+            "IsPlayerChoice": {
+              "From": "true",
+              "To": "false"
+            },
+            "SpeakerGuid": {
+              "From": "\u0022\u0022",
+              "To": "\u0022c0a1c0a1-0000-4000-8000-000000000122\u0022"
+            },
+            "ListenerGuid": {
+              "From": "\u0022\u0022",
+              "To": "\u0022b1a8e901-0000-0000-0000-000000000000\u0022"
+            },
+            "Persistence": {
+              "From": "\u0022MarkAsRead\u0022",
+              "To": "\u0022None\u0022"
+            }
+          },
+          "AddedLinks": [],
+          "DeletedLinks": [],
+          "ModifiedLinks": []
+        },
+        {
+          "UpdatedConditions": null,
+          "UpdatedScripts": [
+            {
+              "FullName": "Void SetGlobalValue(String, Int32)",
+              "Parameters": [
+                "canonical_stage",
+                "1"
+              ],
+              "Category": 0,
+              "DisplayName": "SetGlobalValue"
+            },
+            {
+              "FullName": "Void IncrementGlobalValue(String, Int32)",
+              "Parameters": [
+                "canonical_stage",
+                "2"
+              ],
+              "Category": 1,
+              "DisplayName": "IncrementGlobalValue"
+            },
+            {
+              "FullName": "Void SetGlobalValue(String, Int32)",
+              "Parameters": [
+                "cm_extra",
+                "1"
+              ],
+              "Category": 1,
+              "DisplayName": "SetGlobalValue"
+            },
+            {
+              "FullName": "Void SetGlobalValue(String, Int32)",
+              "Parameters": [
+                "canonical_ticks",
+                "0"
+              ],
+              "Category": 2,
+              "DisplayName": "SetGlobalValue"
+            }
+          ],
+          "NodeId": 4,
+          "FieldChanges": {},
+          "AddedLinks": [],
+          "DeletedLinks": [],
+          "ModifiedLinks": []
+        },
+        {
+          "UpdatedConditions": null,
+          "UpdatedScripts": null,
+          "NodeId": 5,
+          "FieldChanges": {
+            "Comments": {
+              "From": "\u0022\u0022",
+              "To": "\u0022Bank comment from the canonical mod.\u0022"
+            }
+          },
+          "AddedLinks": [],
+          "DeletedLinks": [],
+          "ModifiedLinks": []
+        },
+        {
+          "UpdatedConditions": null,
+          "UpdatedScripts": null,
+          "NodeId": 6,
+          "FieldChanges": {
+            "Comments": {
+              "From": "\u0022\u0022",
+              "To": "\u0022Trigger comment from the canonical mod.\u0022"
+            }
+          },
+          "AddedLinks": [],
+          "DeletedLinks": [],
+          "ModifiedLinks": []
+        },
+        {
+          "UpdatedConditions": null,
+          "UpdatedScripts": null,
+          "NodeId": 8,
+          "FieldChanges": {
+            "DisplayType": {
+              "From": "\u0022Overlay\u0022",
+              "To": "\u0022Conversation\u0022"
+            }
+          },
+          "AddedLinks": [],
+          "DeletedLinks": [],
+          "ModifiedLinks": []
+        },
+        {
+          "UpdatedConditions": null,
+          "UpdatedScripts": null,
+          "NodeId": 10,
+          "FieldChanges": {
+            "SpeakerGuid": {
+              "From": "\u0022c0a1c0a1-0000-4000-8000-000000000122\u0022",
+              "To": "\u00226a99a109-0000-0000-0000-000000000000\u0022"
+            },
+            "ListenerGuid": {
+              "From": "\u0022b1a8e901-0000-0000-0000-000000000000\u0022",
+              "To": "\u0022c0a1c0a1-0000-4000-8000-000000000122\u0022"
+            },
+            "ActorDirection": {
+              "From": "\u0022Looks up.\u0022",
+              "To": "\u0022\u0022"
+            },
+            "Comments": {
+              "From": "\u0022End of the canonical conversation.\u0022",
+              "To": "\u0022\u0022"
+            }
+          },
+          "AddedLinks": [
+            {
+              "FromNodeId": 10,
+              "ToNodeId": 11,
+              "RandomWeight": 1,
+              "QuestionNodeTextDisplay": "",
+              "HasConditions": false,
+              "Conditions": []
+            }
+          ],
+          "DeletedLinks": [],
+          "ModifiedLinks": []
+        }
+      ],
+      "Translations": {
+        "en": [
+          {
+            "NodeId": 11,
+            "DefaultText": "A new closing line, written by the canonical mod.",
+            "FemaleText": ""
+          },
+          {
+            "NodeId": 12,
+            "DefaultText": "Ask about the \u003Ci\u003Ecanonical\u003C/i\u003E mod.",
+            "FemaleText": ""
+          },
+          {
+            "NodeId": 13,
+            "DefaultText": "",
+            "FemaleText": ""
+          },
+          {
+            "NodeId": 0,
+            "DefaultText": "Welcome back, [Player Name]. The mod changed this line.",
+            "FemaleText": "Welcome back, [Player Name]. The mod changed this line, too."
+          }
+        ],
+        "de": [
+          {
+            "NodeId": 11,
+            "DefaultText": "Eine neue Schlusszeile aus dem Kanon-Mod.",
+            "FemaleText": ""
+          },
+          {
+            "NodeId": 12,
+            "DefaultText": "",
+            "FemaleText": ""
+          },
+          {
+            "NodeId": 13,
+            "DefaultText": "",
+            "FemaleText": ""
+          },
+          {
+            "NodeId": 0,
+            "DefaultText": "Willkommen zur\u00FCck, [Player Name]. Der Mod hat diese Zeile ge\u00E4ndert.",
+            "FemaleText": "Seid gegr\u00FC\u00DFt, [Player Name]. Dies ist das kanonische Gespr\u00E4ch, meine Dame."
+          }
+        ]
+      },
+      "NodeComments": {},
+      "IsEmpty": false
+    },
+    "canonical_mod_new": {
+      "ConversationName": "canonical_mod_new",
+      "SchemaVersion": 3,
+      "AddedNodes": [
+        {
+          "NodeId": 1,
+          "IsPlayerChoice": false,
+          "SpeakerCategory": 0,
+          "SpeakerGuid": "c0a1c0a1-0000-4000-8000-000000000122",
+          "ListenerGuid": "b1a8e901-0000-0000-0000-000000000000",
+          "DisplayType": "Conversation",
+          "Persistence": "None",
+          "ActorDirection": "",
+          "Comments": "",
+          "ExternalVO": "",
+          "HasVO": false,
+          "HideSpeaker": false,
+          "Links": [
+            {
+              "FromNodeId": 1,
+              "ToNodeId": 2,
+              "RandomWeight": 1,
+              "QuestionNodeTextDisplay": "",
+              "HasConditions": false,
+              "Conditions": []
+            },
+            {
+              "FromNodeId": 1,
+              "ToNodeId": 3,
+              "RandomWeight": 1,
+              "QuestionNodeTextDisplay": "",
+              "HasConditions": false,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Scripts": []
+        },
+        {
+          "NodeId": 2,
+          "IsPlayerChoice": true,
+          "SpeakerCategory": 1,
+          "SpeakerGuid": "b1a8e901-0000-0000-0000-000000000000",
+          "ListenerGuid": "c0a1c0a1-0000-4000-8000-000000000122",
+          "DisplayType": "Conversation",
+          "Persistence": "None",
+          "ActorDirection": "",
+          "Comments": "",
+          "ExternalVO": "",
+          "HasVO": false,
+          "HideSpeaker": false,
+          "Links": [
+            {
+              "FromNodeId": 2,
+              "ToNodeId": 4,
+              "RandomWeight": 1,
+              "QuestionNodeTextDisplay": "",
+              "HasConditions": false,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Scripts": []
+        },
+        {
+          "NodeId": 3,
+          "IsPlayerChoice": true,
+          "SpeakerCategory": 1,
+          "SpeakerGuid": "b1a8e901-0000-0000-0000-000000000000",
+          "ListenerGuid": "c0a1c0a1-0000-4000-8000-000000000122",
+          "DisplayType": "Conversation",
+          "Persistence": "None",
+          "ActorDirection": "",
+          "Comments": "",
+          "ExternalVO": "",
+          "HasVO": false,
+          "HideSpeaker": false,
+          "Links": [
+            {
+              "FromNodeId": 3,
+              "ToNodeId": 4,
+              "RandomWeight": 1,
+              "QuestionNodeTextDisplay": "",
+              "HasConditions": false,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [
+            {
+              "$kind": "leaf",
+              "FullName": "Boolean IsGlobalValue(String, Operator, Int32)",
+              "Parameters": [
+                "cm_flag_a",
+                "EqualTo",
+                "1"
+              ],
+              "Not": false,
+              "Operator": "And"
+            }
+          ],
+          "Scripts": []
+        },
+        {
+          "NodeId": 4,
+          "IsPlayerChoice": false,
+          "SpeakerCategory": 0,
+          "SpeakerGuid": "c0a1c0a1-0000-4000-8000-000000000122",
+          "ListenerGuid": "b1a8e901-0000-0000-0000-000000000000",
+          "DisplayType": "Conversation",
+          "Persistence": "None",
+          "ActorDirection": "",
+          "Comments": "",
+          "ExternalVO": "",
+          "HasVO": false,
+          "HideSpeaker": false,
+          "Links": [],
+          "Conditions": [],
+          "Scripts": []
+        }
+      ],
+      "DeletedNodeIds": [],
+      "ModifiedNodes": [],
+      "Translations": {
+        "en": [
+          {
+            "NodeId": 1,
+            "DefaultText": "Hello from a conversation the mod created.",
+            "FemaleText": ""
+          },
+          {
+            "NodeId": 2,
+            "DefaultText": "First choice.",
+            "FemaleText": ""
+          },
+          {
+            "NodeId": 3,
+            "DefaultText": "Second choice, only when cm_flag_a is set.",
+            "FemaleText": ""
+          },
+          {
+            "NodeId": 4,
+            "DefaultText": "Goodbye.",
+            "FemaleText": ""
+          }
+        ],
+        "de": [
+          {
+            "NodeId": 1,
+            "DefaultText": "Hallo aus einem Gespr\u00E4ch, das der Mod erstellt hat.",
+            "FemaleText": ""
+          },
+          {
+            "NodeId": 2,
+            "DefaultText": "",
+            "FemaleText": ""
+          },
+          {
+            "NodeId": 3,
+            "DefaultText": "",
+            "FemaleText": ""
+          },
+          {
+            "NodeId": 4,
+            "DefaultText": "",
+            "FemaleText": ""
+          }
+        ]
+      },
+      "NodeComments": {},
+      "IsEmpty": false
+    }
+  },
+  "Layouts": {
+    "canonical": {
+      "0": {
+        "X": 0,
+        "Y": -130
+      },
+      "1": {
+        "X": 420,
+        "Y": -130
+      },
+      "2": {
+        "X": 420,
+        "Y": 0
+      },
+      "3": {
+        "X": 420,
+        "Y": 130
+      },
+      "4": {
+        "X": 840,
+        "Y": -130
+      },
+      "5": {
+        "X": 840,
+        "Y": 0
+      },
+      "6": {
+        "X": 840,
+        "Y": 130
+      },
+      "7": {
+        "X": 1260,
+        "Y": -130
+      },
+      "8": {
+        "X": 0,
+        "Y": 0
+      },
+      "11": {
+        "X": 1500,
+        "Y": 0
+      },
+      "10": {
+        "X": 1260,
+        "Y": 0
+      },
+      "12": {
+        "X": 300,
+        "Y": 400
+      },
+      "13": {
+        "X": 600,
+        "Y": 400
+      }
+    },
+    "canonical_mod_new": {
+      "1": {
+        "X": 0,
+        "Y": 100
+      },
+      "2": {
+        "X": 300,
+        "Y": 0
+      },
+      "3": {
+        "X": 300,
+        "Y": 200
+      },
+      "4": {
+        "X": 600,
+        "Y": 100
+      }
+    }
+  },
+  "NewConversations": [
+    "canonical_mod_new"
+  ],
+  "Annotations": {
+    "canonical": [],
+    "canonical_mod_new": []
+  },
+  "IgnoredDuplicates": null
+}
