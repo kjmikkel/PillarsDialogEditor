@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text.Json.Nodes;
+using System.Text.Json;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Core.Parsing;
@@ -231,12 +232,49 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
             StringTablePath: stPath);
     }
 
-    private const string Poe2BlankTemplate =
-        """{"Conversations":[{"Nodes":[]}]}""";
-
     public void InitializeConversationFile(ConversationFile file)
     {
         Directory.CreateDirectory(Path.GetDirectoryName(file.ConversationPath)!);
-        File.WriteAllText(file.ConversationPath, Poe2BlankTemplate, System.Text.Encoding.UTF8);
+        File.WriteAllText(file.ConversationPath, NewConversationTemplate(file.Name), System.Text.Encoding.UTF8);
+    }
+
+    private const string ScriptNodeTypeName = "OEIFormats.FlowCharts.Conversations.ScriptNode, OEIFormats";
+
+    /// A new conversation's bundle, with the conversation-level shape a shipped one has
+    /// (issue 162). Deadfire loads a conversation by the ID its manifest entry names, and
+    /// finds its text from the inner Filename (the part after "conversations/", as a
+    /// .stringtable), so both must be set. The -200 conversation script node appears both
+    /// as ConversationScriptNode and in Nodes, as in shipped bundles. The serializer copies
+    /// -200 nodes verbatim and the parser never shows them.
+    private static string NewConversationTemplate(string name)
+    {
+        JsonObject ScriptNode() => new()
+        {
+            ["RequiresValidChildNode"] = false, ["NotSkippable"] = false, ["IsQuestionNode"] = false,
+            ["HideSpeaker"] = false, ["IsTempText"] = false, ["PlayVOAs3DSound"] = false,
+            ["PlayType"] = 0, ["Persistence"] = 0, ["NoPlayRandomWeight"] = 0, ["VOPositioning"] = 0,
+            ["DisplayType"] = 1, ["NodeID"] = -200, ["ContainerNodeID"] = -1,
+            ["Links"] = new JsonArray(),
+            ["ClassExtender"] = new JsonObject { ["ExtendedProperties"] = new JsonArray() },
+            ["Conditionals"] = new JsonObject { ["Operator"] = 0, ["Components"] = new JsonArray() },
+            ["OnEnterScripts"] = new JsonArray(), ["OnExitScripts"] = new JsonArray(), ["OnUpdateScripts"] = new JsonArray(),
+        };
+
+        var nodeInList = new JsonObject { ["$type"] = ScriptNodeTypeName };
+        foreach (var (key, value) in ScriptNode()) nodeInList[key] = value?.DeepClone();
+
+        var conversation = new JsonObject
+        {
+            ["ID"]                     = NewConversationId.For(name).ToString(),
+            ["Filename"]               = $"Conversations/{name}.conversation",
+            ["ConversationScriptNode"] = ScriptNode(),
+            ["Nodes"]                  = new JsonArray(nodeInList),
+            ["ConversationType"]       = 0,
+            ["CharacterMappings"]      = new JsonArray(),
+            ["ClassExtender"]          = new JsonObject { ["ExtendedProperties"] = new JsonArray("DisplayType,Conversation") },
+            ["UObjectName"]            = $"{name}_Base Game",
+        };
+        return new JsonObject { ["Conversations"] = new JsonArray(conversation) }
+            .ToJsonString(new JsonSerializerOptions { WriteIndented = true });
     }
 }
