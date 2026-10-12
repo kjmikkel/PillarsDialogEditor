@@ -290,6 +290,18 @@ public class Poe2ConversationParserTests
         Assert.Equal(SpeakerCategory.Script, nodes[0].SpeakerCategory);
     }
 
+    // Issue 167: see the PoE1 twin. PoE2 writes assembly-qualified type names.
+    [Theory]
+    [InlineData("OEIFormats.FlowCharts.Conversations.ScriptNode, OEIFormats",              ScriptNodeKind.Script)]
+    [InlineData("OEIFormats.FlowCharts.BankNode, OEIFormats",                              ScriptNodeKind.Bank)]
+    [InlineData("OEIFormats.FlowCharts.Conversations.TriggerConversationNode, OEIFormats", ScriptNodeKind.TriggerConversation)]
+    public void Parse_Poe2ScriptFamilyNode_KeepsItsKind(string type, ScriptNodeKind expected)
+    {
+        var json  = ScriptNodePoe2Json.Replace("OEIFormats.FlowCharts.Conversations.ScriptNode, OEIFormats", type);
+        var nodes = Poe2ConversationParser.ParseJson(json);
+        Assert.Equal(expected, nodes[0].ScriptKind);
+    }
+
     private const string ScriptedTalkNodeJson = """
         {"Conversations": [{"ID": "00000000-0000-0000-0000-000000000000",
           "ConversationScriptNode": {"NodeID": -200, "Links": [], "ClassExtender": {"ExtendedProperties": []},

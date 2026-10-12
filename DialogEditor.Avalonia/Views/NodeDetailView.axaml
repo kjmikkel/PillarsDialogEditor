@@ -366,6 +366,23 @@
                     </ItemsControl>
                 </Border>
 
+                <!-- Issue 167: Deadfire moves straight past a script node, so some of its
+                     scripts never run. Same validation styling as the token warnings below. -->
+                <Border Background="{DynamicResource Brush.Validation.Background}" BorderBrush="{DynamicResource Brush.Validation.Border}" BorderThickness="1"
+                        CornerRadius="2" Padding="6,4" Margin="0,0,0,4"
+                        IsVisible="{Binding ScriptWarnings.Count, Converter={StaticResource CountToVis}}"
+                        ToolTip.Tip="{DynamicResource ToolTip_ScriptWarnings}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_ScriptWarnings}">
+                    <ItemsControl ItemsSource="{Binding ScriptWarnings}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Foreground="{DynamicResource Brush.Validation.Text}"
+                                           FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+
                 <Border Background="{DynamicResource Brush.Validation.Background}" BorderBrush="{DynamicResource Brush.Validation.Border}" BorderThickness="1"
                         CornerRadius="2" Padding="6,4" Margin="0,0,0,4"
                         IsVisible="{Binding TokenWarnings.Count, Converter={StaticResource CountToVis}}"
