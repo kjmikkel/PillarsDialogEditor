@@ -295,8 +295,7 @@ public partial class NodeDetailViewModel : ObservableObject
             return;
         }
 
-        var voRoot = Path.Combine(GameRoot,
-            "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
+        var voRoot = VoPathResolver.VoicesRoot(GameRoot);
         var voDir       = Path.Combine(Path.GetDirectoryName(ProjectPath)!, "_vo");
         var rel         = Path.GetRelativePath(voRoot, _voCheck.PrimaryWemPath);
         var destPrimary = Path.Combine(voDir, rel);
