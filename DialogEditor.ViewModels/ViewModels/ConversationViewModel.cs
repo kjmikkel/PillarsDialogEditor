@@ -877,8 +877,7 @@ public partial class ConversationViewModel : ObservableObject
     {
         if (ProjectPath is null) return [];
 
-        var voRoot = Path.Combine(gameRoot,
-            "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
+        var voRoot = VoPathResolver.VoicesRoot(gameRoot);
         var voDir  = Path.Combine(Path.GetDirectoryName(ProjectPath)!, "_vo");
 
         var rows = new List<BatchVoRowViewModel>();
