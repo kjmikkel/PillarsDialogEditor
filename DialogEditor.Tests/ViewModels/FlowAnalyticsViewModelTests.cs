@@ -543,4 +543,47 @@ public class FlowAnalyticsViewModelTests
         Assert.False(string.IsNullOrEmpty(row.TargetLabel));   // resolver left it empty
         Assert.False(string.IsNullOrEmpty(row.ReasonText));
     }
+
+    // ── Issue 172 ─────────────────────────────────────────────────────────
+
+    private static ConversationEditSnapshot NoNode0Snapshot() => new([
+        MakeNode(1, defaultText: "Hello", links: [Link(1, 2)]),
+        MakeNode(2, defaultText: "World")
+    ]);
+
+    [Fact]
+    public void Refresh_NoNode0_ShowsNoStartNode_AndNoUnreachableRows()
+    {
+        var vm = new FlowAnalyticsViewModel(() => NoNode0Snapshot(), _ => { });
+        vm.RefreshCommand.Execute(null);
+
+        Assert.True(vm.HasNoStartNode);
+        Assert.True(vm.PathStatsNoStartNode);
+        Assert.DoesNotContain(vm.Issues, i => i.Kind == FlowIssueKind.Unreachable);
+    }
+
+    [Fact]
+    public void Refresh_NoNode0_CountsTheErrorInTheStatus()
+    {
+        // A 1 <-> 2 cycle with text has no other issue, so only the no-start-node error can
+        // turn "no issues" into "issues".
+        var cycle = new ConversationEditSnapshot([
+            MakeNode(1, defaultText: "Hello", links: [Link(1, 2)]),
+            MakeNode(2, defaultText: "World", links: [Link(2, 1)])
+        ]);
+        var vm = new FlowAnalyticsViewModel(() => cycle, _ => { });
+        vm.RefreshCommand.Execute(null);
+
+        Assert.Equal("FlowAnalytics_Issues", vm.StatusText);   // stub: the key, not "NoIssues"
+    }
+
+    [Fact]
+    public void Refresh_WithNode0_HidesNoStartNode()
+    {
+        var vm = new FlowAnalyticsViewModel(() => SimpleSnapshot(), _ => { });
+        vm.RefreshCommand.Execute(null);
+
+        Assert.False(vm.HasNoStartNode);
+        Assert.False(vm.PathStatsNoStartNode);
+    }
 }
