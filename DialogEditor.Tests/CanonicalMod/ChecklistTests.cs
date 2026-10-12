@@ -45,18 +45,16 @@ public class ChecklistTests
     }
 
     // Issues the raw-file and game-model checks are skipped against, outside a step's own
-    // KnownIssue. The tester should expect them in play too.
-    public static TheoryData<string, string, string> SkippedElsewhere => new()
-    {
-        { "poe1", "links.display-values", "#164" },
-    };
+    // KnownIssue. The tester should expect them in play too. Empty while no such issue is
+    // open; a Fact rather than a Theory, because xUnit fails a Theory with no data.
+    private static readonly (string GameId, string Tag, string Issue)[] SkippedElsewhere = [];
 
-    [Theory]
-    [MemberData(nameof(SkippedElsewhere))]
-    public void RowsNameTheIssuesTheRawAndGameChecksSkip(string gameId, string tag, string issue)
-    {
-        var row = RowFor(gameId, tag);
-        Assert.NotNull(row);
-        Assert.Contains(issue, row);
-    }
+    [Fact]
+    public void RowsNameTheIssuesTheRawAndGameChecksSkip() =>
+        Assert.All(SkippedElsewhere, s =>
+        {
+            var row = RowFor(s.GameId, s.Tag);
+            Assert.NotNull(row);
+            Assert.Contains(s.Issue, row);
+        });
 }

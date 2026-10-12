@@ -36,10 +36,8 @@ public sealed class Poe1CanonicalModGameModelTests(BuiltPoe1Mod mod) : IClassFix
     // Steps with a KnownIssue fail in the editor's own view too; Poe1ScenarioStepTests
     // carries their skipped tests. GameOnlyIssues are steps that hold for the editor's
     // parser but not for the game (step tag -> issue), each with its own skipped test below.
-    private static readonly Dictionary<string, string> GameOnlyIssues = new()
-    {
-        ["links.display-values"] = "#164",
-    };
+    // Empty while no such issue is open.
+    private static readonly Dictionary<string, string> GameOnlyIssues = [];
 
     public static TheoryData<string> Tags =>
         [.. Poe1Scenario.Steps.Where(s => s.KnownIssue is null && !GameOnlyIssues.ContainsKey(s.Tag)).Select(s => s.Tag)];
@@ -53,10 +51,7 @@ public sealed class Poe1CanonicalModGameModelTests(BuiltPoe1Mod mod) : IClassFix
         Poe1Scenario.Steps.Single(s => s.Tag == tag).Expect(view);
     }
 
-    [Fact(Skip = "#164: new PoE1 links lack xsi:type, so the game drops their display value")]
-    public void Step_LinksDisplayValues_AsTheGameSeesIt() => Step_HoldsAsTheGameSeesIt("links.display-values");
-
     [Fact]
-    public void EveryGameOnlyIssue_NamesARealStepAndHasItsOwnSkippedTest() =>
-        Assert.Equal(["links.display-values"], GameOnlyIssues.Keys.Where(k => Poe1Scenario.Steps.Any(s => s.Tag == k)));
+    public void EveryGameOnlyIssue_NamesARealStep() =>
+        Assert.All(GameOnlyIssues.Keys, k => Assert.Contains(Poe1Scenario.Steps, s => s.Tag == k));
 }
