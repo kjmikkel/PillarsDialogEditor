@@ -2283,6 +2283,12 @@ public partial class MainWindowViewModel : ObservableObject
                 Track(file.ConversationPath);
                 Track(_provider.GetStringTablePath(file));
 
+                // A conversation created in the editor is also registered with the game
+                // (issue 162), keyed on the project rather than on the file being missing:
+                // the patcher may already have installed it.
+                if (_project.IsNewConversation(convName) && _provider.ConversationManifestPath(convName) is { } manifest)
+                    Track(manifest);
+
                 // The apply loop below also writes stringtables for every *other*
                 // installed language carried by the patch (TranslationApplier).
                 var installed = _provider.AvailableLanguages.ToHashSet(StringComparer.OrdinalIgnoreCase);
@@ -2316,6 +2322,8 @@ public partial class MainWindowViewModel : ObservableObject
                 // "didn't exist", so restore deletes it)
                 if (!File.Exists(file.ConversationPath))
                     _provider.InitializeConversationFile(file);
+                if (_project.IsNewConversation(convName))
+                    _provider.WriteConversationManifest(convName);
 
                 var conversation = _provider.LoadConversation(file);
                 var baseSnap     = ConversationSnapshotBuilder.Build(conversation);
