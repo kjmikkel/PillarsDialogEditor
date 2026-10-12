@@ -1,0 +1,108 @@
+using Avalonia;
+using DialogEditor.Avalonia.Shared.Theming;
+
+namespace DialogEditor.Tests.Theming;
+
+/// <summary>Issue 177: the pure rule that sizes windows from their design size, the font
+/// scale and the screen. See docs/superpowers/specs/2026-10-13-window-sizing-design.md.</summary>
+public class WindowSizingRuleTests
+{
+    private static readonly Size Small = new(1366, 768);   // limits: 1334 × 736
+    private static WindowSize Design(double w = 420, double h = double.NaN, double minW = 420,
+        double minH = 0, double maxW = double.PositiveInfinity, double maxH = double.PositiveInfinity)
+        => new(w, h, minW, minH, maxW, maxH);
+
+    [Fact]
+    public void Compute_AtOne_WithoutScreen_IsIdentity()
+        => Assert.Equal(Design(), WindowSizingRule.Compute(Design(), 1.0, null, WindowSizingMode.Scale));
+
+    [Fact]
+    public void Compute_AtTwo_DoublesFiniteDimensions()
+    {
+        var s = WindowSizingRule.Compute(Design(w: 420, h: 300, minW: 400, minH: 200, maxW: 500, maxH: 520),
+                                         2.0, null, WindowSizingMode.Scale);
+        Assert.Equal(new WindowSize(840, 600, 800, 400, 1000, 1040), s);
+    }
+
+    [Fact]
+    public void Compute_KeepsNaNZeroAndInfinity()
+    {
+        var s = WindowSizingRule.Compute(Design(h: double.NaN, minH: 0), 2.0, null, WindowSizingMode.Scale);
+        Assert.True(double.IsNaN(s.Height));
+        Assert.Equal(0, s.MinHeight);
+        Assert.True(double.IsPositiveInfinity(s.MaxWidth));
+    }
+
+    [Fact]
+    public void Compute_ClampsEverythingToTheWorkingAreaLessMargins()
+    {
+        var s = WindowSizingRule.Compute(Design(w: 820, h: 620, minW: 700, minH: 400), 2.0, Small, WindowSizingMode.Scale);
+        Assert.Equal(new WindowSize(1334, 736, 1334, 736, 1334, 736), s);
+    }
+
+    [Fact]
+    public void Compute_ClampsMinimumsSoTheyCannotForceAnOversizeWindow()
+    {
+        var s = WindowSizingRule.Compute(Design(w: 500, minW: 500, minH: 420), 2.0, Small, WindowSizingMode.Scale);
+        Assert.Equal(1000, s.Width);
+        Assert.Equal(1000, s.MinWidth);
+        Assert.Equal(736, s.MinHeight);
+        Assert.Equal(736, s.MaxHeight);
+    }
+
+    [Fact]
+    public void Compute_ClampOnly_DoesNotScaleButStillClamps()
+    {
+        var s = WindowSizingRule.Compute(Design(w: 1400, h: 850, minW: 0), 2.0, Small, WindowSizingMode.ClampOnly);
+        Assert.Equal(new WindowSize(1334, 736, 0, 0, 1334, 736), s);
+    }
+
+    [Fact]
+    public void Compute_WithoutScreen_ScalesButDoesNotClamp()
+    {
+        var s = WindowSizingRule.Compute(Design(w: 1400, minW: 0), 2.0, null, WindowSizingMode.Scale);
+        Assert.Equal(2800, s.Width);
+        Assert.True(double.IsPositiveInfinity(s.MaxWidth));
+    }
+
+    [Fact]
+    public void Rescale_KeepsUserResizeInProportion()
+    {
+        var design  = Design(w: 420, minW: 420);
+        var current = design with { Width = 600 };            // you widened it at 1.0
+        var s = WindowSizingRule.Rescale(current, design, 1.0, 2.0, null, WindowSizingMode.Scale);
+        Assert.Equal(1200, s.Width);
+        Assert.Equal(840, s.MinWidth);
+    }
+
+    [Fact]
+    public void Rescale_ClampsToScreen()
+    {
+        var design  = Design(w: 420, minW: 420);
+        var current = design with { Width = 900 };
+        var s = WindowSizingRule.Rescale(current, design, 1.0, 2.0, Small, WindowSizingMode.Scale);
+        Assert.Equal(1334, s.Width);
+    }
+
+    [Fact]
+    public void Rescale_BackDown_RestoresTheDesignMinimum()
+    {
+        var design  = Design(w: 420, minW: 420);
+        var current = design with { Width = 840, MinWidth = 840 };
+        var s = WindowSizingRule.Rescale(current, design, 2.0, 1.0, null, WindowSizingMode.Scale);
+        Assert.Equal(420, s.Width);
+        Assert.Equal(420, s.MinWidth);
+    }
+
+    [Fact]
+    public void Rescale_KeepsAutoHeightAuto()
+    {
+        var design = Design(h: double.NaN);
+        var s = WindowSizingRule.Rescale(design, design, 1.0, 2.0, Small, WindowSizingMode.Scale);
+        Assert.True(double.IsNaN(s.Height));
+    }
+
+    [Fact]
+    public void WorkingAreaInDips_DividesByScaling()
+        => Assert.Equal(new Size(1366, 768), WindowSizingRule.WorkingAreaInDips(new PixelSize(2732, 1536), 2.0));
+}
