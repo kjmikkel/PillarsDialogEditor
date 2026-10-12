@@ -32,6 +32,14 @@ public record NodeEditSnapshot(
     IReadOnlyList<LinkEditSnapshot> Links,
     IReadOnlyList<ConditionNode> Conditions,
     IReadOnlyList<ScriptCall> Scripts
-);
+)
+{
+    /// Which script-family node type this is (issue 167). Non-positional so existing
+    /// callers compile; importers and new nodes get the plain ScriptNode default.
+    /// Not saved: a project is reloaded by re-parsing the patched game file, whose node
+    /// type NodeTypeFamily preserves, so persisting it would only change the project format.
+    [JsonIgnore]
+    public ScriptNodeKind ScriptKind { get; init; } = ScriptNodeKind.Script;
+}
 
 public record ConversationEditSnapshot(IReadOnlyList<NodeEditSnapshot> Nodes);

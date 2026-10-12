@@ -297,6 +297,7 @@ public partial class NodeViewModel : ObservableObject
         _externalVO      = node.ExternalVO;
         _hasVO           = node.HasVO;
         _hideSpeaker     = node.HideSpeaker;
+        ScriptKind       = node.ScriptKind;
         _defaultText     = entry?.DefaultText ?? string.Empty;
         _femaleText      = entry?.FemaleText  ?? string.Empty;
 
@@ -319,6 +320,10 @@ public partial class NodeViewModel : ObservableObject
             () => Loc.Get(descriptionKey), apply, current, value));
     }
 
+    /// The node's game type within the script family (issue 167). Read-only: the editor
+    /// never converts a bank or trigger node into another kind.
+    public ScriptNodeKind ScriptKind { get; }
+
     // ── Snapshot helper (links provided by ConversationViewModel) ─────────
     public NodeEditSnapshot ToSnapshot(IReadOnlyList<LinkEditSnapshot> links) =>
         new(NodeId, _isPlayerChoice, _speakerCategory,
@@ -326,5 +331,6 @@ public partial class NodeViewModel : ObservableObject
             _defaultText, _femaleText,
             _displayType, _persistence,
             _actorDirection, _comments, _externalVO,
-            _hasVO, _hideSpeaker, links, _conditions, _scripts);
+            _hasVO, _hideSpeaker, links, _conditions, _scripts)
+        { ScriptKind = ScriptKind };
 }

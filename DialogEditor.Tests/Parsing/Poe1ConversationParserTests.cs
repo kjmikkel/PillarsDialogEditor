@@ -261,6 +261,19 @@ public class Poe1ConversationParserTests
         Assert.Equal(SpeakerCategory.Script, nodes[1].SpeakerCategory);
     }
 
+    // Issue 167: the parser folds three node types into SpeakerCategory.Script, but the game
+    // runs their exit scripts differently, so the model keeps which one it was.
+    [Theory]
+    [InlineData("ScriptNode",              ScriptNodeKind.Script)]
+    [InlineData("BankNode",                ScriptNodeKind.Bank)]
+    [InlineData("TriggerConversationNode", ScriptNodeKind.TriggerConversation)]
+    public void Parse_Poe1ScriptFamilyNode_KeepsItsKind(string type, ScriptNodeKind expected)
+    {
+        var xml   = ScriptNodeXml.Replace("xsi:type=\"ScriptNode\"", $"xsi:type=\"{type}\"");
+        var nodes = Poe1ConversationParser.ParseXml(xml);
+        Assert.Equal(expected, nodes[1].ScriptKind);
+    }
+
     private const string ScriptedNodeXml = """
         <?xml version="1.0" encoding="utf-8"?>
         <ConversationData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

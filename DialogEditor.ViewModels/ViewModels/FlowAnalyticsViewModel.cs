@@ -27,6 +27,8 @@ public partial class FlowIssueViewModel : ObservableObject
         FlowIssueKind.BarkHasPlayerChoiceChild  => Loc.Get("FlowAnalytics_Issue_BarkHasPlayerChoiceChild"),
         FlowIssueKind.ConversationJumpWhileContinuing
                                                 => Loc.Get("FlowAnalytics_Issue_ConversationJumpWhileContinuing"),
+        FlowIssueKind.ScriptExitNeverRuns       => Loc.Get("FlowAnalytics_Issue_ScriptExitNeverRuns"),
+        FlowIssueKind.ScriptUpdateNeverRuns     => Loc.Get("FlowAnalytics_Issue_ScriptUpdateNeverRuns"),
         _                                       => Kind.ToString()
     };
 
@@ -293,7 +295,7 @@ public partial class FlowAnalyticsViewModel : ObservableObject
             return;
         }
 
-        var report = FlowAnalysisService.Analyze(snapshot);
+        var report = FlowAnalysisService.Analyze(snapshot, _gameId);
 
         Statistics = report.Statistics;
         HasData    = true;

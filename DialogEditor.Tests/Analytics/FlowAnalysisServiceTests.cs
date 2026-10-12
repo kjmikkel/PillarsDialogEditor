@@ -433,4 +433,111 @@ public class FlowAnalysisServiceTests
         Assert.DoesNotContain(report.Issues,
             i => i.Kind == FlowIssueKind.ConversationJumpWhileContinuing);
     }
+
+    // ── Script-node scripts Deadfire never runs (#167) ────────────────────
+    // FlowChart.MoveToNode: entering a ScriptNode runs its OnEnter scripts, then moves
+    // straight on to the next node, so the script node is never the current node. Its
+    // OnExit scripts run only when no link can be followed; its OnUpdate scripts never.
+
+    private static ScriptCall Script(ScriptCategory category) =>
+        new("Void SetGlobalValue(String, Int32)", ["g", "1"], category);
+
+    private static NodeEditSnapshot ScriptNode(int id, ScriptNodeKind kind = ScriptNodeKind.Script,
+        IReadOnlyList<LinkEditSnapshot>? links = null, params ScriptCall[] scripts) =>
+        MakeNode(id, SpeakerCategory.Script, links: links, scripts: scripts) with { ScriptKind = kind };
+
+    private static IEnumerable<FlowIssueKind> ScriptIssues(string gameId, params NodeEditSnapshot[] nodes) =>
+        FlowAnalysisService.Analyze(Snapshot(nodes), gameId).Issues
+            .Where(i => i.Kind is FlowIssueKind.ScriptExitNeverRuns or FlowIssueKind.ScriptUpdateNeverRuns)
+            .Select(i => i.Kind)
+            .Order(); // Analyze sorts by node only, and List.Sort is not stable
+
+    [Fact]
+    public void Poe2ScriptNode_ThatLeadsOn_FlagsItsExitScripts()
+    {
+        var kinds = ScriptIssues("poe2",
+            ScriptNode(0, links: [Link(0, 1)], scripts: Script(ScriptCategory.Exit)),
+            MakeNode(1, defaultText: "next"));
+        Assert.Equal([FlowIssueKind.ScriptExitNeverRuns], kinds);
+    }
+
+    // With conditions on every link the exit scripts run whenever all of them fail, but the
+    // warning still applies: the wording says they run only when no link can be followed.
+    [Fact]
+    public void Poe2ScriptNode_WithOnlyConditionalLinks_StillFlagsItsExitScripts()
+    {
+        var kinds = ScriptIssues("poe2",
+            ScriptNode(0, links: [Link(0, 1, hasConditions: true)], scripts: Script(ScriptCategory.Exit)),
+            MakeNode(1, defaultText: "next"));
+        Assert.Equal([FlowIssueKind.ScriptExitNeverRuns], kinds);
+    }
+
+    [Fact]
+    public void Poe2ScriptNode_WithNoLinks_RunsItsExitScripts()
+    {
+        Assert.Empty(ScriptIssues("poe2", ScriptNode(0, scripts: Script(ScriptCategory.Exit))));
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public void Poe2ScriptNode_FlagsUpdateScripts_WithOrWithoutLinks(bool leadsOn)
+    {
+        var kinds = ScriptIssues("poe2",
+            ScriptNode(0, links: leadsOn ? [Link(0, 1)] : [], scripts: Script(ScriptCategory.Update)),
+            MakeNode(1, defaultText: "next"));
+        Assert.Equal([FlowIssueKind.ScriptUpdateNeverRuns], kinds);
+    }
+
+    [Fact]
+    public void Poe2ScriptNode_WithBothKinds_ReportsEachOnce()
+    {
+        var kinds = ScriptIssues("poe2",
+            ScriptNode(0, links: [Link(0, 1)], scripts:
+                [Script(ScriptCategory.Exit), Script(ScriptCategory.Exit), Script(ScriptCategory.Update)]),
+            MakeNode(1, defaultText: "next"));
+        Assert.Equal([FlowIssueKind.ScriptExitNeverRuns, FlowIssueKind.ScriptUpdateNeverRuns], kinds);
+    }
+
+    [Fact]
+    public void Poe2ScriptNode_WithOnlyEnterScripts_IsNotFlagged()
+    {
+        Assert.Empty(ScriptIssues("poe2",
+            ScriptNode(0, links: [Link(0, 1)], scripts: Script(ScriptCategory.Enter)),
+            MakeNode(1, defaultText: "next")));
+    }
+
+    // Bank and trigger-conversation nodes have their own branches in MoveToNode, and both
+    // run their exit scripts.
+    [Theory]
+    [InlineData(ScriptNodeKind.Bank)]
+    [InlineData(ScriptNodeKind.TriggerConversation)]
+    public void Poe2BankAndTriggerNodes_AreNotFlagged(ScriptNodeKind kind)
+    {
+        Assert.Empty(ScriptIssues("poe2",
+            ScriptNode(0, kind, links: [Link(0, 1)],
+                       scripts: [Script(ScriptCategory.Exit), Script(ScriptCategory.Update)]),
+            MakeNode(1, defaultText: "next")));
+    }
+
+    // PoE1's MoveToNode has no ScriptNode branch: a script node becomes the current node and
+    // runs its exit scripts on the way out like any other.
+    [Theory]
+    [InlineData("poe1")]
+    [InlineData("")]
+    public void NonDeadfireConversations_AreNotFlagged(string gameId)
+    {
+        Assert.Empty(ScriptIssues(gameId,
+            ScriptNode(0, links: [Link(0, 1)], scripts: [Script(ScriptCategory.Exit), Script(ScriptCategory.Update)]),
+            MakeNode(1, defaultText: "next")));
+    }
+
+    [Fact]
+    public void Poe2TalkNode_WithExitAndUpdateScripts_IsNotFlagged()
+    {
+        Assert.Empty(ScriptIssues("poe2",
+            MakeNode(0, defaultText: "hi", links: [Link(0, 1)],
+                     scripts: [Script(ScriptCategory.Exit), Script(ScriptCategory.Update)]),
+            MakeNode(1, defaultText: "next")));
+    }
 }
