@@ -9,8 +9,17 @@ namespace DialogEditor.ViewModels;
 
 public partial class NodeViewModel : ObservableObject
 {
-    // ── Read-only identity ────────────────────────────────────────────────
-    public int NodeId { get; }
+    // ── Identity ──────────────────────────────────────────────────────────
+    // Fixed for the node's life except through MakeStartNodeCommand (issue 172), which
+    // renumbers a conversation's chosen first node to 0.
+    public int NodeId { get; private set; }
+
+    internal void Renumber(int newId)
+    {
+        NodeId = newId;
+        OnPropertyChanged(nameof(NodeId));
+        OnPropertyChanged(nameof(Title));
+    }
 
     // ── Undo stack (wired after construction by ConversationViewModel) ────
     public UndoRedoStack? UndoStack { get; set; }
