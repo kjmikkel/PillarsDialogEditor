@@ -18,5 +18,15 @@ public sealed partial class FontScaleService : ObservableObject
 
     [ObservableProperty] private int _revision;
 
+    private double _scale = 1.0;
+
+    /// <summary>The font scale currently applied (1.0–2.0). Set only by FontScaleApplier.Apply;
+    /// WindowSizing subscribes to it to resize open windows live (issue 177).</summary>
+    public double Scale
+    {
+        get => _scale;
+        internal set => SetProperty(ref _scale, value);
+    }
+
     internal void Bump() => Revision++;
 }
