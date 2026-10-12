@@ -72,7 +72,7 @@ full path: PoE1 matches the typed name against *any part* of a conversation's fi
 - [ ] `links.display-values` (#164): not visible in play, because no choice here is a question node. #164 predicts that the game ignores the new link's ShowAlways. Note anything the log says about the conversation's links.
 - [ ] `props.comments-and-direction`: not visible in play; comments and actor directions are author notes. Checked by the automated tests.
 - [ ] `text.second-language`: switch the game to German, if your build offers it. The first line reads "Willkommen zurück, [Player Name]. Der Mod hat diese Zeile geändert."
-- [ ] `conversation.new` (#162): `StartConversationFacingListener oei_player canonical_mod_new 1` (start node **1**: #162 means the new conversation has no node 0). The NPC says "Hello from a conversation the mod created.", then two choices. "Second choice, only when cm_flag_a is set." shows only with `cm_flag_a` at 1. Both choices lead to "Goodbye." Then try start node `0`: expect nothing on screen and a NullReferenceException in the log (the command asks the missing node for its listener). That is the failure #162 predicts.
+- [ ] `conversation.new`: `StartConversationFacingListener oei_player canonical_mod_new 0`. The NPC says "Hello from a conversation the mod created.", then two choices. "Second choice, only when cm_flag_a is set." shows only with `cm_flag_a` at 1. Both choices lead to "Goodbye."
 
 **After the run:** read the log for errors that mention `canonical`.
 
@@ -119,7 +119,7 @@ name. Start it again whenever a row asks for a fresh run.
 - [ ] `links.weight`: not visible in play (weights only matter between NPC lines picked at random); checked by the automated tests.
 - [ ] `links.display-values`: not visible in play, because no choice here is a question node; checked by the automated tests.
 - [ ] `text.second-language`: switch the game to German, if your build offers it. The first line reads "Willkommen zurück, [Player Name]. Der Mod hat diese Zeile geändert."
-- [ ] `conversation.new` (#162): `StartConversation oei_player canonical_mod_new 0` shows no console message and nothing happens; the log says "Attempting to start an empty conversation." #162 predicts this: the patcher writes no manifest entry and no conversation ID, so the name resolves to nothing.
+- [ ] `conversation.new`: `StartConversation oei_player canonical_mod_new 0`. Deadfire finds it through the manifest the patcher wrote (`design/manifests/dialogeditor_canonical_mod_new.conversations.manifest`). The NPC says "Hello from a conversation the mod created.", then two choices. "Second choice, only when cm_flag_a is set." shows only with `cm_flag_a` at 1. Both choices lead to "Goodbye."
 
 **After the run:** read the log for errors that mention `canonical`, and for warnings about undeclared globals.
 

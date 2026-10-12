@@ -20,9 +20,12 @@ public class YarnSpinnerImporter : IDialogImporter
         // First pass: generate nodes for every block and build title → first-node-id map.
         var allPendingNodes = new List<PendingNode>();
         var blockFirstNodeId = new Dictionary<string, int>(StringComparer.Ordinal);
-        int nextId = 1;
+        int nextId = 0;
 
-        foreach (var block in rawBlocks)
+        // The games start a conversation at node 0 (issue 162), and Yarn starts a dialogue at
+        // the block titled Start, so that block is numbered first wherever it sits in the
+        // file. Without one, the file's first block is the start. OrderBy is stable.
+        foreach (var block in rawBlocks.OrderBy(b => b.Title == "Start" ? 0 : 1))
         {
             int firstId = nextId;
             var pending = GeneratePendingNodes(block, ref nextId);

@@ -1,3 +1,6 @@
+using DialogEditor.Core.Models;
+using DialogEditor.Core.Editing;
+using System.Text.Json.Nodes;
 using DialogEditor.Core.GameData;
 using DialogEditor.Patch;
 
@@ -355,6 +358,103 @@ public class Poe2GameDataProviderTests : IDisposable
 
         Assert.True(File.Exists(file.ConversationPath));
         Assert.NotEmpty(File.ReadAllText(file.ConversationPath));
+    }
+
+    // Issue 162: Deadfire loads a conversation by the ID in its manifest entry, and finds
+    // its text through the bundle's inner Filename, so a new bundle needs the whole
+    // conversation-level shape a shipped one has, not just an empty Nodes list.
+    private JsonObject NewTemplate(string name)
+    {
+        var file = _provider.BuildNewConversationFile(name);
+        _provider.InitializeConversationFile(file);
+        return JsonNode.Parse(File.ReadAllText(file.ConversationPath))!["Conversations"]![0]!.AsObject();
+    }
+
+    [Fact]
+    public void InitializeConversationFile_WritesTheConversationLevelProperties()
+    {
+        var conv = NewTemplate("newconv");
+
+        Assert.Equal(
+            ["CharacterMappings", "ClassExtender", "ConversationScriptNode", "ConversationType",
+             "Filename", "ID", "Nodes", "UObjectName"],
+            conv.Select(kv => kv.Key).Order(StringComparer.Ordinal));
+        Assert.Equal(NewConversationId.For("newconv").ToString(), conv["ID"]!.GetValue<string>());
+        Assert.Equal("Conversations/newconv.conversation", conv["Filename"]!.GetValue<string>());
+        Assert.Equal(-200, conv["ConversationScriptNode"]!["NodeID"]!.GetValue<int>());
+        Assert.Equal(0, conv["ConversationType"]!.GetValue<int>());
+        Assert.Empty(conv["CharacterMappings"]!.AsArray());
+        Assert.Equal("DisplayType,Conversation",
+            Assert.Single(conv["ClassExtender"]!["ExtendedProperties"]!.AsArray())!.GetValue<string>());
+        Assert.Equal("newconv_Base Game", conv["UObjectName"]!.GetValue<string>());
+
+        var scriptNode = Assert.Single(conv["Nodes"]!.AsArray())!;
+        Assert.Equal(-200, scriptNode["NodeID"]!.GetValue<int>());
+        Assert.Equal("OEIFormats.FlowCharts.Conversations.ScriptNode, OEIFormats", scriptNode["$type"]!.GetValue<string>());
+    }
+
+    [Fact]
+    public void InitializeConversationFile_ReadsAsAnEmptyConversation()
+    {
+        var file = _provider.BuildNewConversationFile("newconv");
+        _provider.InitializeConversationFile(file);
+
+        Assert.Empty(_provider.LoadConversation(file).Nodes);   // -200 is never shown
+    }
+
+    [Fact]
+    public void InitializeConversationFile_SavingNodesKeepsTheIdentity()
+    {
+        var file = _provider.BuildNewConversationFile("newconv");
+        _provider.InitializeConversationFile(file);
+        var node0 = new NodeEditSnapshot(0, false, SpeakerCategory.Npc, "", "", "", "",
+            "Conversation", "None", "", "", "", false, false, [], [], []);
+
+        _provider.SaveConversation(file, new ConversationEditSnapshot([node0]));
+
+        var conv = JsonNode.Parse(File.ReadAllText(file.ConversationPath))!["Conversations"]![0]!;
+        Assert.Equal(NewConversationId.For("newconv").ToString(), conv["ID"]!.GetValue<string>());
+        Assert.Equal("Conversations/newconv.conversation", conv["Filename"]!.GetValue<string>());
+        Assert.Equal([-200, 0], conv["Nodes"]!.AsArray().Select(n => n!["NodeID"]!.GetValue<int>()));
+    }
+
+    // Issue 162: Deadfire only finds conversations listed in a
+    // design/manifests/*conversations.manifest, and resolves a name by the file name of
+    // each entry's Filename.
+    [Fact]
+    public void ConversationManifestPath_IsAnEditorOwnedConversationsManifest()
+    {
+        var path = _provider.ConversationManifestPath("newconv")!;
+
+        Assert.Equal(Path.Combine(_root, "PillarsOfEternityII_Data", "exported", "design", "manifests",
+                                  "dialogeditor_newconv.conversations.manifest"), path);
+        Assert.EndsWith("conversations.manifest", path);   // the game's *conversations.manifest
+    }
+
+    [Fact]
+    public void WriteConversationManifest_RegistersTheBundleUnderItsId()
+    {
+        _provider.WriteConversationManifest("newconv");
+
+        var manifest = JsonNode.Parse(File.ReadAllText(_provider.ConversationManifestPath("newconv")!))!;
+        var entry    = Assert.Single(manifest["Entries"]!.AsArray())!;
+        Assert.Equal("OEIFormats.Tools.ManifestData+ConversationManifestEntry, OEIFormats", entry["$type"]!.GetValue<string>());
+        Assert.Equal(0, entry["DisplayType"]!.GetValue<int>());
+        Assert.True(entry["IncludesPlayer"]!.GetValue<bool>());
+        Assert.Equal(NewConversationId.For("newconv").ToString(), entry["ID"]!.GetValue<string>());
+        Assert.Equal("/conversations/newconv.conversationbundle", entry["Filename"]!.GetValue<string>());
+    }
+
+    [Fact]
+    public void WriteConversationManifest_IdMatchesTheNewBundle()
+    {
+        var file = _provider.BuildNewConversationFile("newconv");
+        _provider.InitializeConversationFile(file);
+        _provider.WriteConversationManifest("newconv");
+
+        var bundleId = JsonNode.Parse(File.ReadAllText(file.ConversationPath))!["Conversations"]![0]!["ID"]!.GetValue<string>();
+        var entryId  = JsonNode.Parse(File.ReadAllText(_provider.ConversationManifestPath("newconv")!))!["Entries"]![0]!["ID"]!.GetValue<string>();
+        Assert.Equal(bundleId, entryId);
     }
 
     [Fact]

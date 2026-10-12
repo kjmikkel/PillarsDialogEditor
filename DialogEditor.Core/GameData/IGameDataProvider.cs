@@ -41,4 +41,13 @@ public interface IGameDataProvider
     /// Writes a minimal blank template file to disk so that SaveConversation
     /// can subsequently apply a patch onto it. Creates parent directories.
     void InitializeConversationFile(ConversationFile file);
+
+    /// Where a conversation created in the editor is registered with the game, or null when
+    /// the game finds conversations by path and needs no registration (PoE1). Deadfire
+    /// resolves names only through design/manifests/*conversations.manifest (issue 162).
+    string? ConversationManifestPath(string name) => null;
+
+    /// Writes the registration at <see cref="ConversationManifestPath"/>. Does nothing when
+    /// that is null.
+    void WriteConversationManifest(string name) { }
 }

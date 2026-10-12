@@ -80,7 +80,7 @@ public sealed class Poe1CanonicalModRawChecks : IDisposable
         }
     }
 
-    [Fact(Skip = "#162: a new conversation starts at node 1, but the game starts at node 0")]
+    [Fact]
     public async Task NewConversation_StartsAtNode0()
     {
         var root = await InstalledAsync();

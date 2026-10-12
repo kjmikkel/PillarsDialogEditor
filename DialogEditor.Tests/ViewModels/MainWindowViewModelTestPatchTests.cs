@@ -166,4 +166,60 @@ public class MainWindowViewModelTestPatchTests : IDisposable
         Assert.DoesNotContain("added line", st);
         Assert.Contains("vanilla line", st);
     }
+
+    // ── New conversations are registered with the game (issue #162) ───────
+
+    private static DialogProject NewConversationProject()
+    {
+        var node0 = new NodeEditSnapshot(0, false, SpeakerCategory.Npc, "spk", "lst",
+            "", "", "Conversation", "None", "", "", "", false, false, [], [], []);
+        var patch = new ConversationPatch("brand_new", ConversationPatch.CurrentSchemaVersion, [node0], [], [])
+        {
+            Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
+            {
+                ["en"] = [new NodeTranslation(0, "first line", "")],
+            },
+        };
+        return DialogProject.Empty("NewConvProj").WithNewConversation("brand_new").WithPatch(patch);
+    }
+
+    [Fact]
+    public async Task TestPatch_NewConversation_WritesItsManifest_AndRestoreRemovesIt()
+    {
+        var provider = new Poe2GameDataProvider(_gameRoot);
+        var vm       = MakeVm();
+        Inject(vm, "_provider", provider);
+        InjectProject(vm, NewConversationProject());
+        var manifest = provider.ConversationManifestPath("brand_new")!;
+
+        await vm.TestPatchCommand.ExecuteAsync(null);
+        Assert.True(File.Exists(manifest), "F5 should register the new conversation");
+
+        vm.RestoreConversationCommand.Execute(null);
+        Assert.False(File.Exists(manifest), "F6 should remove the manifest it created");
+    }
+
+    // The patcher may already have installed this conversation: its bundle exists, so
+    // FindConversation finds it. F5 must still track and write the manifest, and F6 must
+    // put the earlier one back rather than delete it.
+    [Fact]
+    public async Task TestPatch_NewConversationAlreadyInstalled_StillTracksItsManifest()
+    {
+        var provider = new Poe2GameDataProvider(_gameRoot);
+        provider.InitializeConversationFile(provider.BuildNewConversationFile("brand_new"));
+        provider.WriteConversationManifest("brand_new");
+        var manifest = provider.ConversationManifestPath("brand_new")!;
+        File.AppendAllText(manifest, " ");   // mark the pre-existing copy
+        var before = File.ReadAllText(manifest);
+
+        var vm = MakeVm();
+        Inject(vm, "_provider", provider);
+        InjectProject(vm, NewConversationProject());
+
+        await vm.TestPatchCommand.ExecuteAsync(null);
+        Assert.NotEqual(before, File.ReadAllText(manifest));   // F5 rewrote it
+
+        vm.RestoreConversationCommand.Execute(null);
+        Assert.Equal(before, File.ReadAllText(manifest));
+    }
 }

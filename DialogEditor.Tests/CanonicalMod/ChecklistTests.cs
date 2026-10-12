@@ -49,8 +49,6 @@ public class ChecklistTests
     public static TheoryData<string, string, string> SkippedElsewhere => new()
     {
         { "poe1", "links.display-values", "#164" },
-        { "poe1", "conversation.new",     "#162" },
-        { "poe2", "conversation.new",     "#162" },
     };
 
     [Theory]
