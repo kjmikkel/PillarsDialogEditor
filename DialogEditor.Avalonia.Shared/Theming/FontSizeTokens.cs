@@ -18,5 +18,11 @@ public static class FontSizeTokens
         ["FontSize.Subtitle"] = 14,
         ["FontSize.Title"]    = 18,
         ["FontSize.Display"]  = 32,
+
+        // Theme keys Fluent and Dock read for controls with no FontSize of their own
+        // (issue 176). Base = FontSize.Body; see the comment beside them in Tokens.axaml.
+        ["ControlContentThemeFontSize"] = 12,
+        ["ToolTipContentThemeFontSize"] = 12,
+        ["DockFontSizeNormal"]          = 12,
     };
 }
