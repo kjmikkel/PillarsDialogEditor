@@ -16,13 +16,16 @@ public sealed class GameInstallFactAttribute : FactAttribute
     public const string Poe1Variable = "DIALOGEDITOR_POE1_DIR";
     public const string Poe2Variable = "DIALOGEDITOR_POE2_DIR";
 
-    public GameInstallFactAttribute(string environmentVariable)
+    public GameInstallFactAttribute(string environmentVariable) => Skip = SkipReason(environmentVariable);
+
+    /// Null when the variable names an existing folder; otherwise why the test is skipped.
+    /// Shared with GameInstallTheoryAttribute.
+    public static string? SkipReason(string environmentVariable)
     {
         var dir = Environment.GetEnvironmentVariable(environmentVariable);
         if (string.IsNullOrWhiteSpace(dir))
-            Skip = $"Set {environmentVariable} to a game install folder to run this test (docs/game-data-tests.md).";
-        else if (!Directory.Exists(dir))
-            Skip = $"{environmentVariable} is set but '{dir}' does not exist.";
+            return $"Set {environmentVariable} to a game install folder to run this test (docs/game-data-tests.md).";
+        return Directory.Exists(dir) ? null : $"{environmentVariable} is set but '{dir}' does not exist.";
     }
 
     public static string InstallDir(string environmentVariable) =>
