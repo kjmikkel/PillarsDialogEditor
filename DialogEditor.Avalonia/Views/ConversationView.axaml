@@ -35,7 +35,7 @@
         </Style>
     </UserControl.Styles>
 
-    <Grid RowDefinitions="Auto,*">
+    <Grid RowDefinitions="Auto,Auto,*">
 
         <!-- Toolbar. Bottom divider so the toolbar/canvas edge reads in every theme — a faint
              hairline in Dark/Light, a bright separator in High-Contrast (where panel and canvas
@@ -103,8 +103,37 @@
             </DockPanel>
         </Border>
 
+        <!-- Issue 172: the game starts every conversation at node 0. Shown while this one has
+             nodes but no node 0; for a conversation the project created it offers the fix. -->
+        <Border Grid.Row="1" Padding="8,4" BorderThickness="0,0,0,1"
+                Background="{DynamicResource Brush.Validation.Background}"
+                BorderBrush="{DynamicResource Brush.Validation.Border}"
+                IsVisible="{Binding ShowStartNodeWarning}"
+                ToolTip.Tip="{DynamicResource ToolTip_StartNodeWarning}"
+                AutomationProperties.Name="{DynamicResource AutomationName_StartNodeWarning}"
+                AutomationProperties.HelpText="{DynamicResource ToolTip_StartNodeWarning}">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6">
+                    <Button Content="{DynamicResource Canvas_ChooseStartNode}"
+                            Command="{Binding ChooseStartNodeCommand}"
+                            IsVisible="{Binding CanMakeStartNode}"
+                            ToolTip.Tip="{DynamicResource ToolTip_ChooseStartNode}"
+                            AutomationProperties.Name="{DynamicResource Canvas_ChooseStartNode}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_ChooseStartNode}"/>
+                    <Button Content="{DynamicResource Canvas_CancelChooseStartNode}"
+                            Command="{Binding CancelChooseStartNodeCommand}"
+                            IsVisible="{Binding IsChoosingStartNode}"
+                            ToolTip.Tip="{DynamicResource ToolTip_CancelChooseStartNode}"
+                            AutomationProperties.Name="{DynamicResource Canvas_CancelChooseStartNode}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_CancelChooseStartNode}"/>
+                </StackPanel>
+                <TextBlock Text="{Binding StartNodeWarningText}" VerticalAlignment="Center"
+                           Foreground="{DynamicResource Brush.Validation.Text}" TextWrapping="Wrap"/>
+            </DockPanel>
+        </Border>
+
         <!-- Canvas -->
-        <Grid Grid.Row="1" ClipToBounds="True">
+        <Grid Grid.Row="2" ClipToBounds="True">
             <nodify:NodifyEditor x:Name="Editor"
                                  Background="{DynamicResource Brush.Canvas.Background}"
                                  ItemsSource="{Binding Nodes}"
@@ -186,6 +215,13 @@
                                               CommandParameter="{Binding}"
                                               ToolTip.Tip="{DynamicResource ToolTip_ConnectToNode}"
                                               AutomationProperties.HelpText="{DynamicResource ToolTip_ConnectToNode}"/>
+                                    <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_MakeStartNode}"
+                                              AutomationProperties.AutomationId="NodeMenu_MakeStartNode"
+                                              Command="{Binding $parent[UserControl].DataContext.MakeStartNodeCmdCommand}"
+                                              CommandParameter="{Binding}"
+                                              IsVisible="{Binding $parent[UserControl].DataContext.CanMakeStartNode}"
+                                              ToolTip.Tip="{DynamicResource ToolTip_MakeStartNode}"
+                                              AutomationProperties.HelpText="{DynamicResource ToolTip_MakeStartNode}"/>
                                     <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_Canvas_BrowseSpeakerLinesForNode}"
                                               AutomationProperties.AutomationId="NodeMenu_BrowseSpeakerLines"
                                               Command="{Binding $parent[UserControl].DataContext.BrowseSpeakerLinesForNodeCommand}"
