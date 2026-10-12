@@ -41,4 +41,9 @@ public record FlowIssue(int NodeId, FlowIssueKind Kind);
 
 public record FlowAnalysisReport(
     FlowStatistics           Statistics,
-    IReadOnlyList<FlowIssue> Issues);
+    IReadOnlyList<FlowIssue> Issues)
+{
+    /// False when the conversation has nodes but no node 0 (issue 172). Unreachable is then
+    /// not reported: walking from a start node that doesn't exist would flag every node.
+    public bool HasStartNode { get; init; } = true;
+}
