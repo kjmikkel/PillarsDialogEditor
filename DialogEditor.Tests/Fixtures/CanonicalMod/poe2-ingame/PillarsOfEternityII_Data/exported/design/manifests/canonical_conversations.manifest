@@ -1,0 +1,11 @@
+{
+  "Entries": [
+    {
+      "$type": "OEIFormats.Tools.ManifestData+ConversationManifestEntry, OEIFormats",
+      "DisplayType": 0,
+      "IncludesPlayer": true,
+      "ID": "c0a1c0a1-0000-4000-8000-00000000c122",
+      "Filename": "/conversations/canonical.conversationbundle"
+    }
+  ]
+}
