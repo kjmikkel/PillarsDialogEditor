@@ -302,7 +302,6 @@
     <sys:String x:Key="Canvas_CancelChooseStartNode">Cancel</sys:String>
     <sys:String x:Key="ToolTip_CancelChooseStartNode">Stop choosing a start node without changing anything (Esc does the same).</sys:String>
     <sys:String x:Key="ToolTip_StartNodeWarning">Both games start a conversation at node 0 unless a script names another node. Without a node 0 the conversation can't be started from its first line.</sys:String>
-    <sys:String x:Key="AutomationName_StartNodeWarning">No start node warning</sys:String>
     <sys:String x:Key="Menu_MakeStartNode">Make this the start node</sys:String>
     <sys:String x:Key="ToolTip_MakeStartNode">Renumber this node to node 0, where the game starts the conversation. Links, text, the node comment and staged voice-over follow it. Undo reverses it.</sys:String>
 
