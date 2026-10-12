@@ -222,6 +222,10 @@
               "From": "true",
               "To": "false"
             },
+            "SpeakerCategory": {
+              "From": "\u0022Player\u0022",
+              "To": "\u0022Npc\u0022"
+            },
             "SpeakerGuid": {
               "From": "\u0022\u0022",
               "To": "\u0022c0a1c0a1-0000-4000-8000-000000000122\u0022"

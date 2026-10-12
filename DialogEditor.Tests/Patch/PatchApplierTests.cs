@@ -193,4 +193,60 @@ public class PatchApplierTests
 
         Assert.Throws<PatchConflictException>(() => PatchApplier.ApplyAll(snap, [patchA, patchB]));
     }
+
+    // ── Node type (#160) ──────────────────────────────────────────────────
+
+    private static NodeEditSnapshot PlayerNode(int id) =>
+        MakeNode(id) with { IsPlayerChoice = true, SpeakerCategory = SpeakerCategory.Player };
+
+    private static ConversationEditSnapshot ApplyChanges(NodeEditSnapshot node, Dictionary<string, FieldChange> changes) =>
+        PatchApplier.Apply(Snap(node),
+            new ConversationPatch("conv", 3, [], [], [new NodeModification(node.NodeId, changes, [], [])]));
+
+    [Fact]
+    public void Apply_CategoryChange_SetsTheCategory()
+    {
+        var result = ApplyChanges(PlayerNode(3), new()
+        {
+            ["IsPlayerChoice"]  = new("true", "false"),
+            ["SpeakerCategory"] = new("\"Player\"", "\"Npc\""),
+        });
+        Assert.Equal(SpeakerCategory.Npc, result.Nodes[0].SpeakerCategory);
+        Assert.False(result.Nodes[0].IsPlayerChoice);
+    }
+
+    [Fact]
+    public void Apply_CategoryChange_ConflictingFrom_Throws()
+    {
+        Assert.Throws<PatchConflictException>(() => ApplyChanges(MakeNode(3), new()
+        {
+            ["SpeakerCategory"] = new("\"Player\"", "\"Npc\""),
+        }));
+    }
+
+    // Patches saved before #160 record only IsPlayerChoice. Applying one still has to give
+    // the node the matching category, or the type change is lost on save as before.
+    [Fact]
+    public void Apply_LegacyPlayerChoiceOff_MakesThePlayerNodeAnNpc()
+    {
+        var result = ApplyChanges(PlayerNode(3), new() { ["IsPlayerChoice"] = new("true", "false") });
+        Assert.Equal(SpeakerCategory.Npc, result.Nodes[0].SpeakerCategory);
+    }
+
+    [Fact]
+    public void Apply_LegacyPlayerChoiceOn_MakesTheNodeAPlayer()
+    {
+        var result = ApplyChanges(MakeNode(3), new() { ["IsPlayerChoice"] = new("false", "true") });
+        Assert.Equal(SpeakerCategory.Player, result.Nodes[0].SpeakerCategory);
+    }
+
+    // Before #160 the Node Type dropdown could set IsPlayerChoice = false on a narrator or
+    // script node only as a no-op; anything not Player keeps its category.
+    [Fact]
+    public void Apply_LegacyPlayerChoiceOff_LeavesANonPlayerCategoryAlone()
+    {
+        var narrator = MakeNode(3) with { IsPlayerChoice = true, SpeakerCategory = SpeakerCategory.Narrator };
+        var result   = ApplyChanges(narrator, new() { ["IsPlayerChoice"] = new("true", "false") });
+        Assert.Equal(SpeakerCategory.Narrator, result.Nodes[0].SpeakerCategory);
+    }
 }

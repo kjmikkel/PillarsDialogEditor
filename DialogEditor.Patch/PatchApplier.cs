@@ -49,6 +49,7 @@ public static class PatchApplier
         bool ignoreConflicts = false)
     {
         var isPlayerChoice = node.IsPlayerChoice;
+        var category       = node.SpeakerCategory;
         var speakerGuid    = node.SpeakerGuid;
         var listenerGuid   = node.ListenerGuid;
         var displayType    = node.DisplayType;
@@ -64,6 +65,7 @@ public static class PatchApplier
             var actualJson = field switch
             {
                 "IsPlayerChoice" => JsonSerializer.Serialize(isPlayerChoice),
+                "SpeakerCategory" => JsonSerializer.Serialize(category.ToString()),
                 "SpeakerGuid"    => JsonSerializer.Serialize(speakerGuid),
                 "ListenerGuid"   => JsonSerializer.Serialize(listenerGuid),
                 "DisplayType"    => JsonSerializer.Serialize(displayType),
@@ -82,6 +84,7 @@ public static class PatchApplier
             switch (field)
             {
                 case "IsPlayerChoice": isPlayerChoice = JsonSerializer.Deserialize<bool>(change.To); break;
+                case "SpeakerCategory": category      = Enum.Parse<SpeakerCategory>(JsonSerializer.Deserialize<string>(change.To)!); break;
                 case "SpeakerGuid":    speakerGuid    = JsonSerializer.Deserialize<string>(change.To)!; break;
                 case "ListenerGuid":   listenerGuid   = JsonSerializer.Deserialize<string>(change.To)!; break;
                 case "DisplayType":    displayType    = JsonSerializer.Deserialize<string>(change.To)!; break;
@@ -93,6 +96,13 @@ public static class PatchApplier
                 case "HideSpeaker":    hideSpeaker    = JsonSerializer.Deserialize<bool>(change.To); break;
             }
         }
+
+        // Patches saved before issue 160 record a Node Type change as IsPlayerChoice alone. The
+        // serializers write the type from the category, so derive it, as the editor now does.
+        if (mod.FieldChanges.ContainsKey("IsPlayerChoice") && !mod.FieldChanges.ContainsKey("SpeakerCategory"))
+            category = isPlayerChoice ? SpeakerCategory.Player
+                     : category == SpeakerCategory.Player ? SpeakerCategory.Npc
+                     : category;
 
         var deletedToIds = mod.DeletedLinks.Select(d => d.ToNodeId).ToHashSet();
         var modifiedById = mod.ModifiedLinks.ToDictionary(m => m.ToNodeId);
@@ -115,6 +125,7 @@ public static class PatchApplier
         return node with
         {
             IsPlayerChoice = isPlayerChoice,
+            SpeakerCategory = category,
             SpeakerGuid    = speakerGuid,
             ListenerGuid   = listenerGuid,
             DisplayType    = displayType,
