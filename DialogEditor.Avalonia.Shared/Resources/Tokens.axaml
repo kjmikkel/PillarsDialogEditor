@@ -17,6 +17,18 @@
     <x:Double x:Key="FontSize.Title">18</x:Double>
     <x:Double x:Key="FontSize.Display">32</x:Double>
 
+    <!-- Theme font-size keys (issue 176). Fluent's control themes (Button, ComboBox, CheckBox,
+         TextBox, MenuItem, Window, ...) and Dock's chrome take their size from these keys, not
+         from FontSize.*, so without them every control with no FontSize of its own stayed at
+         Fluent's fixed 14 px at any font scale. Defining them here wins over the themes because
+         Application.Resources is searched before Application.Styles. They are listed in
+         FontSizeTokens.BaseValues, so FontScaleApplier scales them with everything else.
+         The 1.0x base is FontSize.Body (12), not Fluent's 14: controls sit at body size beside
+         the 10-11 px labels instead of towering over them, which suits a dense editor. -->
+    <x:Double x:Key="ControlContentThemeFontSize">12</x:Double>
+    <x:Double x:Key="ToolTipContentThemeFontSize">12</x:Double>
+    <x:Double x:Key="DockFontSizeNormal">12</x:Double>
+
     <!--  TOKENS — semantic brush layer (Layer 0, public contract).
           Every view, converter, and dependent gap binds THESE keys (never Palette.*).
           Each brush references exactly one Palette.* colour; two tokens may share a

@@ -31,6 +31,21 @@ public class FontScaleApplierTests
         finally { new FontScaleApplier().Apply(1.0); }
     }
 
+    // Issue 176: the theme keys Fluent and Dock read for unstyled controls are scaled tokens.
+    [AvaloniaTheory]
+    [InlineData("ControlContentThemeFontSize")]
+    [InlineData("ToolTipContentThemeFontSize")]
+    [InlineData("DockFontSizeNormal")]
+    public void Apply_ScalesThemeFontSizeKeys(string key)
+    {
+        try
+        {
+            new FontScaleApplier().Apply(2.0);
+            Assert.Equal(FontSizeTokens.BaseValues["FontSize.Body"] * 2, Size(key));
+        }
+        finally { new FontScaleApplier().Apply(1.0); }
+    }
+
     [AvaloniaFact]
     public void Apply_OneScale_RestoresBaseValues()
     {
