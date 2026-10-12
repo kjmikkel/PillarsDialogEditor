@@ -51,8 +51,6 @@ public class ChecklistTests
         { "poe1", "nodes.delete",         "#161" },
         { "poe2", "nodes.delete",         "#161" },
         { "poe1", "links.display-values", "#164" },
-        { "poe1", "conversation.new",     "#162" },
-        { "poe2", "conversation.new",     "#162" },
     };
 
     [Theory]
