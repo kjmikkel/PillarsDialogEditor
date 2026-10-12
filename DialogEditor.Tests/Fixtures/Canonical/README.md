@@ -86,7 +86,8 @@ Unchanged saves of both fixtures are exact. Writing up the PoE1 fixture turned u
 
 Coverage of what the editor *writes* now lives in the canonical mods under [`../CanonicalMod`](../CanonicalMod)
 ([#138](https://github.com/kjmikkel/PillarsDialogEditor/issues/138)). Each mod's README lists its features and any open
-issue a feature currently exposes.
+issue a feature currently exposes. [`docs/canonical-mod-checklist.md`](../../../docs/canonical-mod-checklist.md) is the
+by-hand run of both mods in the real games.
 
 ## Changing a fixture
 
