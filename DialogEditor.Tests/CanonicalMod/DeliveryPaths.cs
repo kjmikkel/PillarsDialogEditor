@@ -43,11 +43,11 @@ public sealed class DeliveryPaths : IDisposable
         Assert.True(PatcherBackupInfo.TryOpen(gameRoot) is not null, $"Patch Manager did not install: {vm.StatusText}");
     }
 
-    /// Test Patch (F5) from the editor, with the project open over the install.
-    public async Task ViaTestPatchAsync(string gameRoot, string projectPath)
+    /// Test Patch (F5) from the editor, with the game's checked-in project open over the install.
+    public static async Task ViaTestPatchAsync(CanonicalGame game, string gameRoot)
     {
         using var session = new CanonicalModSession();
-        await session.LoadExistingAsync(gameRoot, projectPath);
+        await session.LoadExistingAsync(game.Id, gameRoot, game.Project);
         await session.Vm.TestPatchCommand.ExecuteAsync(null);
     }
 
@@ -64,16 +64,14 @@ public sealed class DeliveryPaths : IDisposable
     }
 
     /// Test Patch (F5), then Restore Conversation (F6) in the same editor session.
-    public async Task ViaTestPatchAndRestoreAsync(string gameRoot, string projectPath)
+    public static async Task ViaTestPatchAndRestoreAsync(CanonicalGame game, string gameRoot)
     {
         using var session = new CanonicalModSession();
-        await session.LoadExistingAsync(gameRoot, projectPath);
+        await session.LoadExistingAsync(game.Id, gameRoot, game.Project);
         await session.Vm.TestPatchCommand.ExecuteAsync(null);
         // Test Patch reports a refusal only in the status bar, and a restore with nothing to
         // undo leaves the fixture as it was. Prove F5 really wrote before checking F6.
-        Assert.True(File.Exists(Path.Combine(gameRoot, "PillarsOfEternityII_Data", "exported", "design", "conversations",
-                                             Poe2Scenario.NewConversation + ".conversationbundle")),
-                    $"Test Patch wrote nothing: {session.Vm.StatusText}");
+        Assert.True(File.Exists(game.NewConversationPath(gameRoot)), $"Test Patch wrote nothing: {session.Vm.StatusText}");
         await session.Vm.RestoreConversationCommand.ExecuteAsync(null);
     }
 

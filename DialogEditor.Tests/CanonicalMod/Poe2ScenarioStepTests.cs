@@ -31,7 +31,7 @@ public class Poe2ScenarioStepTests(BuiltPoe2Mod mod) : IClassFixture<BuiltPoe2Mo
         try
         {
             DialogEditor.Tests.Helpers.CanonicalFixture.CopyTo("poe2", root);
-            var provider = new DialogEditor.Core.GameData.Poe2GameDataProvider(root);
+            var provider = CanonicalGame.Poe2.Provider(root);
             var vanilla  = ModView.FromGame(provider, [Poe2Scenario.Edited], ["en", "de"]);
             var holding  = Poe2Scenario.Steps
                 .Where(s => { try { s.Expect(vanilla); return true; } catch (Exception) { return false; } })
