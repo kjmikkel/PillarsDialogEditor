@@ -287,6 +287,13 @@
     <sys:String x:Key="Status_ConnectMode_Started">Connecting: select target node, then press Enter to confirm or Escape to cancel.</sys:String>
     <sys:String x:Key="Status_ConnectMode_Connected">Connected node {0} → {1}.</sys:String>
     <sys:String x:Key="Status_ConnectMode_Cancelled">Connect mode cancelled.</sys:String>
+    <sys:String x:Key="Status_StartNodeMade">Node {0} is now node 0, the start node.</sys:String>
+    <sys:String x:Key="Status_StartNodeMadeWithReferences_One">Node {1} is now node 0, the start node. 1 reference in another conversation still names node {1}.</sys:String>
+    <sys:String x:Key="Status_StartNodeMadeWithReferences_Other">Node {1} is now node 0, the start node. {0} references in other conversations still name node {1}.</sys:String>
+    <sys:String x:Key="Status_StartNodeNotAllowed">Only a conversation created in this project can have a new start node.</sys:String>
+    <sys:String x:Key="Status_StartNodeExists">This conversation already has a node 0.</sys:String>
+    <sys:String x:Key="Status_StartNodeVoTargetExists">Node {0} wasn't changed: its voice-over can't be renamed, because {1} already exists.</sys:String>
+    <sys:String x:Key="Status_StartNodeVoRenameFailed">Node {0} wasn't changed: its voice-over couldn't be renamed ({1}).</sys:String>
     <sys:String x:Key="Canvas_NoStartNode_New">This conversation has no node 0, so the game can't start it from its first line.</sys:String>
     <sys:String x:Key="Canvas_NoStartNode_Game">Node 0 was removed, so the game can't start this conversation. Undo the deletion, or remove it from the patch.</sys:String>
     <sys:String x:Key="Canvas_ChooseStartNode_Prompt">Click the node that should start the conversation. Esc cancels.</sys:String>
