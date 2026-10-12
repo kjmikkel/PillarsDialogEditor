@@ -522,4 +522,27 @@ public class YarnSpinnerImporterTests : IDisposable
 
         Assert.Contains(result.Warnings, w => w.Construct == "if" && w.Count == 3);
     }
+
+    // Issue #162: the games start a conversation at node 0, and Yarn starts a dialogue at
+    // the node titled Start, so the Start block's first line must be node 0 wherever the
+    // block sits in the file.
+    [Fact]
+    public void Import_StartBlockNotFirst_ItsFirstLineIsNode0()
+    {
+        var path = WriteTempYarn("""
+            title: Later
+            ---
+            Guard: This comes later.
+            ===
+            title: Start
+            ---
+            Guard: Halt! Who goes there?
+            <<jump Later>>
+            ===
+            """);
+
+        var result = Importer.Import(path);
+
+        Assert.Equal("Halt! Who goes there?", result.Nodes.Single(n => n.NodeId == 0).DefaultText);
+    }
 }

@@ -265,4 +265,42 @@ public class ArticyXmlImporterTests : IDisposable
             Assert.Equal("", text.FemaleText);
         }
     }
+
+    // Issue #162: the games start a conversation at node 0, so node 0 must be the
+    // dialogue's entry, the fragment nothing links to, even when its Id doesn't sort first.
+    private const string EntrySortsLastXml = """
+        <ArticyExport>
+          <Content>
+            <Packages>
+              <Package Name="Default">
+                <Models>
+                  <Dialogue Id="0x00010001" TechnicalName="my_conv" DisplayName="My Conversation"/>
+                  <DialogueFragment Id="0x00020001" DisplayName="">
+                    <Properties><Text>Goodbye!</Text></Properties>
+                    <Connections/>
+                  </DialogueFragment>
+                  <DialogueFragment Id="0x00020009" DisplayName="">
+                    <Properties><Text>Hello adventurer!</Text></Properties>
+                    <Connections>
+                      <OutgoingConnections>
+                        <Connection Id="0x00040001" Target="0x00020001"/>
+                      </OutgoingConnections>
+                    </Connections>
+                  </DialogueFragment>
+                </Models>
+              </Package>
+            </Packages>
+          </Content>
+        </ArticyExport>
+        """;
+
+    [Fact]
+    public void Import_EntryFragmentIsNode0_EvenWhenItsIdSortsLast()
+    {
+        var result = Importer.Import(WriteTempXml(EntrySortsLastXml));
+
+        var start = result.Nodes.Single(n => n.NodeId == 0);
+        Assert.Equal("Hello adventurer!", start.DefaultText);
+        Assert.Equal(1, Assert.Single(start.Links).ToNodeId);
+    }
 }

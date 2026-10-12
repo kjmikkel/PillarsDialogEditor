@@ -94,7 +94,10 @@ public class ArticyXmlImporter : IDialogImporter
         return map;
     }
 
-    // Sort all fragment IDs lexicographically and assign 1, 2, 3... for a stable mapping.
+    // The games start a conversation at node 0 (issue 162), so the dialogue's entry gets 0:
+    // the first fragment, in Id order, that no other fragment links to. The rest follow
+    // in Id order from 1, for a stable mapping. When every fragment has an incoming link
+    // (a loop), Id order alone decides.
     private static Dictionary<string, int> BuildIdMap(List<XElement> fragments)
     {
         var ids = fragments
@@ -103,9 +106,22 @@ public class ArticyXmlImporter : IDialogImporter
             .OrderBy(id => id, StringComparer.Ordinal)
             .ToList();
 
+        var linkedTo = fragments
+            .SelectMany(f => f.Element("Connections")?.Element("OutgoingConnections")?.Elements("Connection") ?? [])
+            .Select(c => c.Attribute("Target")?.Value)
+            .OfType<string>()
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var entry = ids.FirstOrDefault(id => !linkedTo.Contains(id));
+        if (entry is not null)
+        {
+            ids.Remove(entry);
+            ids.Insert(0, entry);
+        }
+
         var map = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         for (int i = 0; i < ids.Count; i++)
-            map[ids[i]] = i;   // from 0, the games' start node (issue 162)
+            map[ids[i]] = i;
 
         return map;
     }
