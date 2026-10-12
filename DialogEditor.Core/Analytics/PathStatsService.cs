@@ -16,7 +16,8 @@ namespace DialogEditor.Core.Analytics;
 /// per-node weight functions — Default text words, and Female text words (falling back to
 /// Default where a node has no female text) — with a 10% total-difference significance gate.
 ///
-/// Conventions shared with FlowAnalysisService: root is node 0 of the root conversation;
+/// Conventions shared with FlowAnalysisService: root is the start node (StartNode.Id, node 0)
+/// of the root conversation; without one there is no playthrough (HasStartNode, issue 172);
 /// reachability is from root. The overall longest/shortest include the root line; each
 /// branch's content/longest are measured from the choice onward (the root is shared, so it's
 /// excluded for comparison).
@@ -60,7 +61,7 @@ public static class PathStatsService
                                        graph.Unfollowed, spanned);
 
         var allNodes = nodeById.Values.ToList();
-        var root     = new NodeRef(graph.RootConversation, 0);
+        var root     = new NodeRef(graph.RootConversation, StartNode.Id);
 
         static int Words(string? t) =>
             string.IsNullOrEmpty(t) ? 0 : t.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
@@ -83,7 +84,7 @@ public static class PathStatsService
 
         if (!nodeById.ContainsKey(root))
             return new PathStatsReport(significant, defaultTotal, femaleTotal, 0, 0, 0, 0,
-                wordsPerSpeaker, [], [], graph.Unfollowed, spanned);
+                wordsPerSpeaker, [], [], graph.Unfollowed, spanned) { HasStartNode = false };
 
         // ── Out-edges: two SEPARATE sets ──────────────────────────────────
         // Links are ALTERNATIVES (the player takes one); jumps are SPAWNS (they all happen,

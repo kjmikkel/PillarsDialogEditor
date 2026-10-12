@@ -60,4 +60,9 @@ public record PathStatsReport(
     IReadOnlyList<BranchStat>       Branches,
     IReadOnlyList<EndingStat>       Endings,
     IReadOnlyList<UnfollowedJump>   Unfollowed,
-    int                             ConversationsSpanned);
+    int                             ConversationsSpanned)
+{
+    /// False when the root conversation has nodes but no node 0 (issue 172): there is no
+    /// playthrough to measure, though the word totals still count every line.
+    public bool HasStartNode { get; init; } = true;
+}
