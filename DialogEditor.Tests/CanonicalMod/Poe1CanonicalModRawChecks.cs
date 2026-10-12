@@ -62,11 +62,30 @@ public sealed class Poe1CanonicalModRawChecks : IDisposable
             Assert.True(after.TryGetValue(rel, out var h) && h == hash, $"{rel} changed");
     }
 
+    /// Every conversation the mod writes, the new one included: it goes through a different
+    /// write path (a blank template, not an existing file).
+    private static IReadOnlyList<XDocument> WrittenConversations(string root) =>
+        [.. Game.Conversations.Select(c => XDocument.Load(Game.Provider(root).FindConversation(c)!.ConversationPath))];
+
     [Fact]
     public async Task NoLink_GainsConditionals()   // #141: PoE1's DialogueLink has none
     {
+        var root          = await InstalledAsync();
+        var conversations = WrittenConversations(root);
+        Assert.Equal(2, conversations.Count);
+        foreach (var conv in conversations)
+        {
+            Assert.NotEmpty(conv.Descendants("FlowChartLink"));   // otherwise the check below proves nothing
+            Assert.DoesNotContain(conv.Descendants("FlowChartLink"), l => l.Element("Conditionals") is not null);
+        }
+    }
+
+    [Fact(Skip = "#162: a new conversation starts at node 1, but the game starts at node 0")]
+    public async Task NewConversation_StartsAtNode0()
+    {
         var root = await InstalledAsync();
-        Assert.DoesNotContain(Conversation(root).Descendants("FlowChartLink"), l => l.Element("Conditionals") is not null);
+        var conv = XDocument.Load(Game.Provider(root).FindConversation(Game.NewConversation)!.ConversationPath);
+        Assert.Contains(conv.Descendants("FlowChartNode"), n => (int)n.Element("NodeID")! == 0);
     }
 
     private static List<int> BankChildren(string root) =>
