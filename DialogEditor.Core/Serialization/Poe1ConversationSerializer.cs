@@ -30,7 +30,26 @@ public static class Poe1ConversationSerializer
                 nodes.Add(BuildNewNode(snap));
         }
 
+        ReconcileBankMembership(nodes, snapshotIds);
         return doc.ToString(SaveOptions.None);
+    }
+
+    /// Bank membership is stored twice — the bank's ChildNodeIDs and each child's
+    /// ContainerNodeID — and the model carries neither (they are copied, issue 113), so a delete
+    /// is reconciled here (issue 161): a bank drops IDs that no longer exist, keeping the
+    /// rest in order, and a node whose bank was deleted is no longer in one (-1).
+    private static void ReconcileBankMembership(XElement nodes, IReadOnlySet<int> ids)
+    {
+        foreach (var node in nodes.Elements("FlowChartNode"))
+        {
+            node.Element("ChildNodeIDs")?.Elements("int")
+                .Where(e => !ids.Contains((int)e)).ToList()
+                .ForEach(e => e.Remove());
+
+            if (node.Element("ContainerNodeID") is { } container
+                && (int)container != -1 && !ids.Contains((int)container))
+                container.Value = "-1";
+        }
     }
 
     private static string XsiType(NodeEditSnapshot snap) => snap.SpeakerCategory switch
