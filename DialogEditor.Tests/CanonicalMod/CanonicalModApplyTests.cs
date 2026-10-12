@@ -11,6 +11,7 @@ public sealed class CanonicalModApplyTests : IDisposable
 
     public static TheoryData<string, string> Routes => new()
     {
+        { "poe1", "patcher" }, { "poe1", "patchmanager" }, { "poe1", "testpatch" },
         { "poe2", "patcher" }, { "poe2", "patchmanager" }, { "poe2", "testpatch" },
     };
 
@@ -40,6 +41,7 @@ public sealed class CanonicalModApplyTests : IDisposable
     }
 
     [Theory]
+    [InlineData("poe1")]
     [InlineData("poe2")]
     public async Task AllThreeRoutes_WriteIdenticalGameFiles(string gameId)
     {
@@ -55,6 +57,7 @@ public sealed class CanonicalModApplyTests : IDisposable
 
     // Review Focus 2: every install starts from the originals, so applying twice changes nothing.
     [Theory]
+    [InlineData("poe1")]
     [InlineData("poe2")]
     public async Task ApplyingTwice_GivesTheSameFiles(string gameId)
     {
@@ -68,6 +71,7 @@ public sealed class CanonicalModApplyTests : IDisposable
 
     // Review Focus 4: a mod language the install lacks is skipped; the rest still applies.
     [Theory]
+    [InlineData("poe1")]
     [InlineData("poe2")]
     public async Task MissingModLanguage_IsSkipped_AndEnglishStillApplies(string gameId)
     {
