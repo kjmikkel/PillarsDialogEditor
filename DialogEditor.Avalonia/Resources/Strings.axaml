@@ -1079,6 +1079,9 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="FlowAnalytics_LastAnalysed">Last analysed: {0}</sys:String>
     <sys:String x:Key="FlowAnalytics_Refresh">Refresh</sys:String>
     <sys:String x:Key="FlowAnalytics_Issue_Unreachable">Unreachable</sys:String>
+    <sys:String x:Key="FlowAnalytics_Issue_NoStartNode">No start node: the game starts this conversation at node 0, which doesn't exist.</sys:String>
+    <sys:String x:Key="ToolTip_FlowAnalytics_NoStartNode">Both games start a conversation at node 0. For a conversation you created, use "Choose start node…" above the canvas to make one of its nodes node 0. For a game conversation, undo the deletion of node 0, or remove the deletion from the patch.</sys:String>
+    <sys:String x:Key="PathStats_NoStartNode">No start node, so there are no playthroughs to measure. The word totals still count every line.</sys:String>
     <sys:String x:Key="FlowAnalytics_Issue_PlayerDeadEnd">Dead end</sys:String>
     <sys:String x:Key="FlowAnalytics_Issue_EmptyText">Empty text</sys:String>
     <sys:String x:Key="FlowAnalytics_Issue_NoIncomingLinks">No incoming links</sys:String>

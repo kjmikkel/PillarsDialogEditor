@@ -97,6 +97,10 @@
 
             <!-- ── Playthrough stats ─────────────────────────────────────── -->
             <StackPanel Spacing="4" IsVisible="{Binding HasPathStats}">
+                <TextBlock Text="{DynamicResource PathStats_NoStartNode}"
+                           IsVisible="{Binding PathStatsNoStartNode}"
+                           Foreground="{DynamicResource Brush.Validation.Text}"
+                           FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
                 <!-- The reading speed sits here rather than in Settings because it is only
                      meaningful next to the times it changes: the writer adjusts it and reads
                      the result in the same glance. Changing it re-runs the analysis. -->
@@ -146,14 +150,16 @@
                            Foreground="{DynamicResource Brush.Text.Secondary}"
                            TextWrapping="Wrap"/>
 
+                <!-- Without a start node (issue 172) there is no playthrough to measure, so
+                     Longest and Shortest are hidden; Total counts every line and stays. -->
                 <Grid ColumnDefinitions="*,*,*">
-                    <StackPanel Grid.Column="0">
+                    <StackPanel Grid.Column="0" IsVisible="{Binding !PathStatsNoStartNode}">
                         <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_Longest}"/>
                         <TextBlock Foreground="{DynamicResource Brush.Text.Primary}"
                                    FontSize="{DynamicResource FontSize.Body}"
                                    Text="{Binding LongestPlaythroughText}" TextWrapping="Wrap"/>
                     </StackPanel>
-                    <StackPanel Grid.Column="1">
+                    <StackPanel Grid.Column="1" IsVisible="{Binding !PathStatsNoStartNode}">
                         <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_Shortest}"/>
                         <TextBlock Foreground="{DynamicResource Brush.Text.Primary}"
                                    FontSize="{DynamicResource FontSize.Body}"
@@ -331,6 +337,18 @@
 
             <!-- Issues header -->
             <TextBlock Classes="section-header" Text="{Binding StatusText}"/>
+
+            <!-- Issue 172: one conversation-level error instead of "Unreachable" on every node. -->
+            <Border Background="{DynamicResource Brush.Validation.Background}" BorderBrush="{DynamicResource Brush.Validation.Border}" BorderThickness="1"
+                    CornerRadius="2" Padding="6,4" Margin="0,2,0,2"
+                    IsVisible="{Binding HasNoStartNode}"
+                    ToolTip.Tip="{DynamicResource ToolTip_FlowAnalytics_NoStartNode}"
+                    AutomationProperties.Name="{DynamicResource FlowAnalytics_Issue_NoStartNode}"
+                    AutomationProperties.HelpText="{DynamicResource ToolTip_FlowAnalytics_NoStartNode}">
+                <TextBlock Text="{DynamicResource FlowAnalytics_Issue_NoStartNode}"
+                           Foreground="{DynamicResource Brush.Validation.Text}"
+                           FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
+            </Border>
 
         </StackPanel>
 
