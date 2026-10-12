@@ -95,7 +95,7 @@ public sealed class Poe1CanonicalModRawChecks : IDisposable
     public async Task Bank_KeepsItsRemainingChild()
         => Assert.Contains(8, BankChildren(await InstalledAsync()));
 
-    [Fact(Skip = "#161: a deleted bank child stays in ChildNodeIDs")]
+    [Fact]
     public async Task Bank_DropsTheDeletedChild()
         => Assert.DoesNotContain(9, BankChildren(await InstalledAsync()));   // node 9 was deleted
 

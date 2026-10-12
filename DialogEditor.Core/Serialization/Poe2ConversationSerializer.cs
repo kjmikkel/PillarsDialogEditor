@@ -53,8 +53,27 @@ public static class Poe2ConversationSerializer
         foreach (var nodeSnap in snapshot.Nodes.Where(s => !originalIds.Contains(s.NodeId)))
             newArr.Add(BuildNewNode(nodeSnap));
 
+        ReconcileBankMembership(newArr);
         conv["Nodes"] = newArr;
         return root.ToJsonString(new JsonSerializerOptions { WriteIndented = true });
+    }
+
+    /// Bank membership is stored twice — the bank's ChildNodeIDs and each child's
+    /// ContainerNodeID — and the model carries neither (they are copied, issue 113), so a delete
+    /// is reconciled here (issue 161): a bank drops IDs that no longer exist, keeping the
+    /// rest in order, and a node whose bank was deleted is no longer in one (-1).
+    private static void ReconcileBankMembership(JsonArray nodes)
+    {
+        var ids = nodes.Select(n => n?["NodeID"]?.GetValue<int>()).OfType<int>().ToHashSet();
+        foreach (var node in nodes.OfType<JsonNode>())
+        {
+            if (node["ChildNodeIDs"] is JsonArray children)
+                foreach (var gone in children.Where(c => c is null || !ids.Contains(c.GetValue<int>())).ToList())
+                    children.Remove(gone);
+
+            if (node["ContainerNodeID"]?.GetValue<int>() is int container && container != -1 && !ids.Contains(container))
+                node["ContainerNodeID"] = -1;
+        }
     }
 
     private static void ApplyNodeSnapshot(JsonNode node, NodeEditSnapshot snap, JsonNode original)
