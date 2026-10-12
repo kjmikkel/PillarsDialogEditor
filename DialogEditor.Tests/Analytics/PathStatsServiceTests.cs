@@ -433,4 +433,26 @@ public class PathStatsServiceTests
 
         Assert.Equal(3, report.WordsPerSpeaker.Single(s => s.SpeakerGuid == "serafen").DefaultWords);
     }
+
+    // ── Issue 172: no start node ─────────────────────────────────────────
+
+    [Fact]
+    public void NoNode0_HasNoStartNode_ButStillCountsWords()
+    {
+        var report = PathStatsService.Analyze(Snap(
+            Node(1, "one two", links: [Link(1, 2)]),
+            Node(2, "three")));
+
+        Assert.False(report.HasStartNode);
+        Assert.Equal(3, report.DefaultTotalWords);
+        Assert.NotEmpty(report.WordsPerSpeaker);
+    }
+
+    [Fact]
+    public void WithNode0_HasStartNode() =>
+        Assert.True(PathStatsService.Analyze(Snap(Node(0, "a"))).HasStartNode);
+
+    [Fact]
+    public void Empty_HasStartNode() =>
+        Assert.True(PathStatsService.Analyze(Snap()).HasStartNode);
 }
