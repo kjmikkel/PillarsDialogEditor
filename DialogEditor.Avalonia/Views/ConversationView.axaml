@@ -104,14 +104,13 @@
         </Border>
 
         <!-- Issue 172: the game starts every conversation at node 0. Shown while this one has
-             nodes but no node 0; for a conversation the project created it offers the fix. -->
+             nodes but no node 0; for a conversation the project created it offers the fix.
+             Avalonia gives a plain Border no automation peer, so the tooltip and help text sit
+             on the message itself, whose UIA name is the visible warning. -->
         <Border Grid.Row="1" Padding="8,4" BorderThickness="0,0,0,1"
                 Background="{DynamicResource Brush.Validation.Background}"
                 BorderBrush="{DynamicResource Brush.Validation.Border}"
-                IsVisible="{Binding ShowStartNodeWarning}"
-                ToolTip.Tip="{DynamicResource ToolTip_StartNodeWarning}"
-                AutomationProperties.Name="{DynamicResource AutomationName_StartNodeWarning}"
-                AutomationProperties.HelpText="{DynamicResource ToolTip_StartNodeWarning}">
+                IsVisible="{Binding ShowStartNodeWarning}">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="6">
                     <Button Content="{DynamicResource Canvas_ChooseStartNode}"
@@ -128,7 +127,9 @@
                             AutomationProperties.HelpText="{DynamicResource ToolTip_CancelChooseStartNode}"/>
                 </StackPanel>
                 <TextBlock Text="{Binding StartNodeWarningText}" VerticalAlignment="Center"
-                           Foreground="{DynamicResource Brush.Validation.Text}" TextWrapping="Wrap"/>
+                           Foreground="{DynamicResource Brush.Validation.Text}" TextWrapping="Wrap"
+                           ToolTip.Tip="{DynamicResource ToolTip_StartNodeWarning}"
+                           AutomationProperties.HelpText="{DynamicResource ToolTip_StartNodeWarning}"/>
             </DockPanel>
         </Border>
 
