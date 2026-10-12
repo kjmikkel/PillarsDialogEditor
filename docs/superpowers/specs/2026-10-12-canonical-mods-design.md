@@ -2,7 +2,8 @@
 
 GitHub issue [#138](https://github.com/kjmikkel/PillarsDialogEditor/issues/138). Follows #122
 (canonical conversations). Approved in brainstorming on 2026-10-12; amended while planning (bank/trigger and per-script
-conditionals are carried, not edited; the #116 oracle is the fixture; the README is generated).
+conditionals are carried, not edited; the #116 oracle is the fixture; the README is generated) and
+again for PR 3 (in-game setup files, console forms and globals, from the decompiled code).
 
 ## Goal
 
@@ -127,21 +128,34 @@ in CI. A regenerated mod is an ordinary reviewable diff.
 
 **In-game checklist** (`docs/canonical-mod-checklist.md`, PR 3):
 
-- Back up / verify the game; install the pack with the standalone patcher.
-- Reach the content through the game console. Neither game has a dedicated conversation command,
-  but the console resolves script functions (`CommandLineRun` searches `Scripts` as well as
-  `CommandLine`) and accepts the special object name `oei_player`:
-  - PoE2: `StartConversation oei_player <conversation> 0`
-  - PoE1: `StartConversationFacingListener oei_player <conversation> 0`
+- Back up / verify the game, and play on a throwaway save.
+- **Setup.** The real games don't contain `canonical`, so the run first copies the fixture into
+  the install (only new files; nothing the game ships is overwritten). Deadfire needs two more
+  files, checked in under `Fixtures/CanonicalMod/poe2-ingame/` and kept in step by tests:
+  - a `canonical_conversations.manifest` entry, because the game finds conversations only through
+    `design/manifests/*conversations.manifest` (`ConversationDataManager`);
+  - a `canonical.globalvariablesbundle` declaring every global the fixture and the mod use,
+    because `SetGlobalValue` on an undeclared global throws in Deadfire (PoE1 creates globals on
+    demand).
+- Install the pack with the standalone patcher.
+- Reach the content through the game console, with cheats on (`iroll20s`): both games make
+  `Scripts` functions available from the console only then. The console accepts the special
+  object name `oei_player`.
+  - PoE2: `StartConversation oei_player canonical 0` (exact file-name match through the manifest).
+  - PoE1: `StartConversationFacingListener oei_player Assets/Data/Conversations/Canonical/canonical.conversation 0`.
+    PoE1 matches a *substring* of the file name, so plain `canonical` would match both
+    conversations and be refused; the full path matches nothing and is passed through as a path.
 
-  Verified from the decompiled code; the first in-game run confirms the exact argument form and
-  whether cheats (`iroll20s`) must be on, and the checklist is corrected if needed. The mod's NPC
-  speaker GUID is invented and not in the world; the first run also records how the game presents a
-  conversation whose speaker is absent.
-- One checkbox per README feature row, in play order, each saying what you should see.
+  Verified from the decompiled code; the first in-game run confirms the argument forms, and the
+  checklist is corrected if needed. The mod's NPC speaker GUID is invented and not in the world;
+  the first run also records how the game presents a conversation whose speaker is absent.
+- Globals are set and read with `SetGlobalValue` and `PrintGlobal`, which is how the run sees
+  conditions and scripts (including whether PoE2 runs new calls without their function hashes).
+- One checkbox per README feature row of both mods, each saying what you should see. Known issues
+  (#160–#164) are listed with the behaviour they predict, so they are recorded rather than failed.
 - Check the game's output log for conversation errors.
 - A results table (date, game build, pass/fail) filled in once per game; failures filed as issues.
-- Clean-up: *Remove all mods*, then verify the game files.
+- Clean-up: *Remove all mods*, delete the copied setup files (listed), then verify the game files.
 
 **Delivery.**
 
