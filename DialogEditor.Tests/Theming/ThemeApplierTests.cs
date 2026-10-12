@@ -137,4 +137,23 @@ public class ThemeApplierTests
         }
         finally { new ThemeApplier().Apply("Dark"); }
     }
+
+    // Issue 177: ThemeApplier reloads Tokens.axaml, which used to reset every font token to
+    // its 1.0 value while the windows (and AppSettings.FontScale) stayed scaled.
+    [AvaloniaFact]
+    public void ThemeSwitch_KeepsFontScale()
+    {
+        try
+        {
+            new FontScaleApplier().Apply(2.0);
+            new ThemeApplier().Apply("Light");
+            Assert.True(Application.Current!.TryGetResource("FontSize.Body", Application.Current.ActualThemeVariant, out var v));
+            Assert.Equal(24.0, v);
+        }
+        finally
+        {
+            new FontScaleApplier().Apply(1.0);
+            new ThemeApplier().Apply("Dark");
+        }
+    }
 }
