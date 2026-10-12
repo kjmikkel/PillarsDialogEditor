@@ -32,6 +32,11 @@ public record NodeEditSnapshot(
     IReadOnlyList<LinkEditSnapshot> Links,
     IReadOnlyList<ConditionNode> Conditions,
     IReadOnlyList<ScriptCall> Scripts
-);
+)
+{
+    /// Which script-family node type this is (issue 167). Non-positional so existing
+    /// callers compile; importers and new nodes get the plain ScriptNode default.
+    public ScriptNodeKind ScriptKind { get; init; } = ScriptNodeKind.Script;
+}
 
 public record ConversationEditSnapshot(IReadOnlyList<NodeEditSnapshot> Nodes);
