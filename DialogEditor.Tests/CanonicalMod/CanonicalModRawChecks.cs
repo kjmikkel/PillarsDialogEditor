@@ -135,7 +135,7 @@ public sealed class CanonicalModRawChecks : IDisposable
         Assert.True(File.Exists(Path.Combine(voices, alias.Replace('/', Path.DirectorySeparatorChar) + ".wem")), alias);
     }
 
-    [Fact(Skip = "#162: a new PoE2 conversation is written without its conversation-level properties")]
+    [Fact]
     public async Task NewConversation_HasTheConversationLevelProperties()
     {
         var root     = await InstalledAsync();
@@ -144,11 +144,23 @@ public sealed class CanonicalModRawChecks : IDisposable
         Assert.Equal(expected, actual);
     }
 
-    [Fact(Skip = "#162: a new conversation starts at node 1, but the game starts at node 0")]
+    [Fact]
     public async Task NewConversation_StartsAtNode0()
     {
         var root = await InstalledAsync();
         Assert.Contains(Conversation(root, Poe2Scenario.NewConversation)["Nodes"]!.AsArray(), n => n!["NodeID"]!.GetValue<int>() == 0);
+    }
+
+    // Issue #162: Deadfire finds a conversation only through a manifest entry, by the file
+    // name of its Filename, and loads it by the entry's ID.
+    [Fact]
+    public async Task NewConversation_IsRegisteredUnderItsBundleId()
+    {
+        var root     = await InstalledAsync();
+        var path     = CanonicalGame.Poe2.Provider(root).ConversationManifestPath(Poe2Scenario.NewConversation)!;
+        var entry    = Assert.Single(JsonNode.Parse(File.ReadAllText(path))!["Entries"]!.AsArray())!;
+        Assert.Equal(Conversation(root, Poe2Scenario.NewConversation)["ID"]!.GetValue<string>(), entry["ID"]!.GetValue<string>());
+        Assert.Equal(Poe2Scenario.NewConversation, Path.GetFileNameWithoutExtension(entry["Filename"]!.GetValue<string>()));
     }
 
     [Fact]
