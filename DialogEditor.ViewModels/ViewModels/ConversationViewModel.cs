@@ -237,13 +237,6 @@ public partial class ConversationViewModel : ObservableObject
 
     partial void OnSelectedNodeChanged(NodeViewModel? value)
     {
-        // Pick mode (issue 172): the node picked becomes the start node.
-        if (IsChoosingStartNode && value is not null)
-        {
-            IsChoosingStartNode = false;
-            MakeStartNode(value);
-        }
-
         // Remember the last real selection (mouse or keyboard) so keyboard focus
         // can resume where the user left off (spec: entry = restore last selection).
         if (value is not null) _lastSelection = value;
@@ -540,13 +533,13 @@ public partial class ConversationViewModel : ObservableObject
         if (HasStartNode)
             return Report(StartNodeOutcome.StartNodeExists);
 
-        var vo = StartNodeVoFiles.For(ProjectPath, node, ConversationName, Core.Analytics.StartNode.Id);
+        var vo = StartNodeVoFiles.For(ProjectPath, node, ConversationName, oldId, Core.Analytics.StartNode.Id);
         if (vo?.ExistingTarget is { } taken)
             return Report(StartNodeOutcome.VoTargetExists, taken);
 
         try
         {
-            _undoStack.Execute(new MakeStartNodeCommand(this, node, oldId, vo));
+            _undoStack.Execute(new MakeStartNodeCommand(this, node, oldId, ProjectPath));
         }
         catch (Exception ex)   // StartNodeVoFiles has logged it and put the files back
         {
@@ -558,8 +551,8 @@ public partial class ConversationViewModel : ObservableObject
         return Report(StartNodeOutcome.Made);
     }
 
-    // Pick mode: the warning strip's "Choose start node…" arms it; selecting a node then
-    // makes that node the start node.
+    // Pick mode: the warning strip's "Choose start node…" arms it; clicking a node, or Enter
+    // on the selected one, then makes that node the start node (TryConfirmStartNode).
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(StartNodeWarningText))]
     private bool _isChoosingStartNode;
@@ -579,6 +572,17 @@ public partial class ConversationViewModel : ObservableObject
 
     [RelayCommand]
     private void CancelChooseStartNode() => IsChoosingStartNode = false;
+
+    /// Confirms the picked node: a click on a node, or Enter on the selected one. Selection
+    /// alone never commits; keyboard focus, navigation and new nodes all move it without the
+    /// user choosing anything (as in connect mode). False outside pick mode.
+    public bool TryConfirmStartNode(NodeViewModel? node)
+    {
+        if (!IsChoosingStartNode || node is null) return false;
+        IsChoosingStartNode = false;
+        MakeStartNode(node);
+        return true;
+    }
 
     [RelayCommand(CanExecute = nameof(CanMakeStartNode))]
     private void MakeStartNodeCmd(NodeViewModel? node)
@@ -602,6 +606,11 @@ public partial class ConversationViewModel : ObservableObject
         ChooseStartNodeCommand.NotifyCanExecuteChanged();
         MakeStartNodeCmdCommand.NotifyCanExecuteChanged();
     }
+
+    internal string? TakeNodeComment(int nodeId) =>
+        _nodeComments.Remove(nodeId, out var comment) ? comment : null;
+
+    internal void RestoreNodeComment(int nodeId, string comment) => _nodeComments[nodeId] = comment;
 
     internal void ApplyRenumber(NodeViewModel node, int from, int to)
     {

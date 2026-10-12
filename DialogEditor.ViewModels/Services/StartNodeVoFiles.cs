@@ -12,13 +12,15 @@ internal sealed class StartNodeVoFiles
 
     private StartNodeVoFiles(IReadOnlyList<(string From, string To)> moves) => _moves = moves;
 
-    /// Null when nothing is staged under the old name.
+    /// What is staged under <paramref name="fromId"/>'s name right now; null when nothing is.
+    /// Worked out on every run, not once, because VO can be imported between an edit and its
+    /// Undo or Redo.
     public static StartNodeVoFiles? For(string? projectPath, NodeViewModel node,
-                                        string conversation, int newId)
+                                        string conversation, int fromId, int toId)
     {
         if (projectPath is null || !string.IsNullOrEmpty(node.ExternalVO)) return null;
-        var oldRel = VoPathResolver.ExpectedRelativePath(node.SpeakerGuid, "", node.NodeId, conversation);
-        var newRel = VoPathResolver.ExpectedRelativePath(node.SpeakerGuid, "", newId, conversation);
+        var oldRel = VoPathResolver.ExpectedRelativePath(node.SpeakerGuid, "", fromId, conversation);
+        var newRel = VoPathResolver.ExpectedRelativePath(node.SpeakerGuid, "", toId, conversation);
         if (oldRel is null || newRel is null) return null;
 
         var voDir = Path.Combine(Path.GetDirectoryName(projectPath)!, "_vo");
@@ -34,7 +36,6 @@ internal sealed class StartNodeVoFiles
     public string? ExistingTarget => _moves.Select(m => m.To).FirstOrDefault(File.Exists);
 
     public void Forward() => Move(_moves);
-    public void Back()    => Move([.. _moves.Select(m => (m.To, m.From))]);
 
     /// All or nothing: a failed move puts back the files already moved, then rethrows.
     private static void Move(IReadOnlyList<(string From, string To)> moves)

@@ -296,7 +296,7 @@
     <sys:String x:Key="Status_StartNodeVoRenameFailed">Node {0} wasn't changed: its voice-over couldn't be renamed ({1}).</sys:String>
     <sys:String x:Key="Canvas_NoStartNode_New">This conversation has no node 0, so the game can't start it from its first line.</sys:String>
     <sys:String x:Key="Canvas_NoStartNode_Game">Node 0 was removed, so the game can't start this conversation. Undo the deletion, or remove it from the patch.</sys:String>
-    <sys:String x:Key="Canvas_ChooseStartNode_Prompt">Click the node that should start the conversation. Esc cancels.</sys:String>
+    <sys:String x:Key="Canvas_ChooseStartNode_Prompt">Click the node that should start the conversation, or select it and press Enter. Esc cancels.</sys:String>
     <sys:String x:Key="Canvas_ChooseStartNode">Choose start node…</sys:String>
     <sys:String x:Key="ToolTip_ChooseStartNode">Pick the node the game should start this conversation with. After clicking this, click a node on the canvas: it becomes node 0, its links, text, comment and staged voice-over follow it, and Undo reverses it.</sys:String>
     <sys:String x:Key="Canvas_CancelChooseStartNode">Cancel</sys:String>

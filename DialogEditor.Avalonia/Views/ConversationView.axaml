@@ -193,7 +193,8 @@
 
                 <nodify:NodifyEditor.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:NodeViewModel}">
-                        <nodify:Node Input="{Binding Inputs}" Output="{Binding Outputs}">
+                        <nodify:Node Input="{Binding Inputs}" Output="{Binding Outputs}"
+                                     Tapped="Node_Tapped">
 
                             <nodify:Node.ContextMenu>
                                 <ContextMenu AutomationProperties.AutomationId="NodeContextMenu">
