@@ -535,4 +535,48 @@ public class Poe1ConversationSerializerTests
 
         Assert.Empty(link.Element("Conditionals")!.Element("Components")!.Elements());
     }
+
+    // â”€â”€ issue 164: every link is a DialogueLink to the game â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    // Without xsi:type="DialogueLink" the game's XmlSerializer reads a plain FlowChartLink,
+    // which has no RandomWeight or QuestionNodeTextDisplay, and silently drops both.
+
+    private static string? LinkXsiType(string xml, int from, int to) =>
+        (string?)XDocument.Parse(xml).Descendants("FlowChartLink")
+            .Single(l => (int)l.Element("FromNodeID")! == from && (int)l.Element("ToNodeID")! == to)
+            .Attribute(XsiNs + "type");
+
+    [Fact]
+    public void Serialize_NewLinkOnExistingNode_IsADialogueLink()
+    {
+        var snapshot = new ConversationEditSnapshot(
+            [Node(0), Node(1, links: [new LinkEditSnapshot(1, 0, 1, "ShowAlways", false)])]);
+
+        Assert.Equal("DialogueLink",
+            LinkXsiType(Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot), 1, 0));
+    }
+
+    [Fact]
+    public void Serialize_LinkOnNewNode_IsADialogueLink()
+    {
+        var snapshot = new ConversationEditSnapshot(
+            [Node(0), Node(1), Node(99, links: [new LinkEditSnapshot(99, 1, 1, "", false)])]);
+
+        Assert.Equal("DialogueLink",
+            LinkXsiType(Poe1ConversationSerializer.Serialize(TwoNodeXml, snapshot), 99, 1));
+    }
+
+    // Repairs files written by editor builds that had issue 164.
+    [Fact]
+    public void Serialize_KeptLinkWithoutXsiType_BecomesADialogueLink() =>
+        Assert.Equal("DialogueLink", LinkXsiType(SaveLink(TwoNodeXml, 1, "ShowOnce"), 0, 1));
+
+    [Fact]
+    public void Serialize_KeptDialogueLink_KeepsOneXsiType()
+    {
+        var xml  = SaveLink(LinkWithoutDefaultsXml, 1, "");
+        var link = OnlyLink(xml);
+
+        Assert.Equal("DialogueLink", LinkXsiType(xml, 0, 1));
+        Assert.Single(link.Attributes());
+    }
 }

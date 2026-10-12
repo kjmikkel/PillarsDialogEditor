@@ -102,6 +102,8 @@ public static class Poe1ConversationSerializer
                 // Link conditions are deliberately not written (issue 141): PoE1's FlowChartLink
                 // has no Conditionals, so the game ignores them. An element the file already has
                 // (1,437 shipped links carry an empty one) is kept as it is.
+                // Editor builds before issue 164 wrote links without xsi:type; repair them.
+                if (orig.Attribute(Xsi + "type") is null) orig.Add(DialogueLinkType());
                 linksElem.Add(orig);
             }
             else
@@ -177,7 +179,13 @@ public static class Poe1ConversationSerializer
     private static XElement? LinkElementOrNull(string name, string value, string gameDefault) =>
         string.IsNullOrEmpty(value) || value == gameDefault ? null : new XElement(name, value);
 
+    // Every shipped link is a DialogueLink (issue 164). Without the xsi:type the game's
+    // XmlSerializer reads a plain FlowChartLink, which declares neither RandomWeight nor
+    // QuestionNodeTextDisplay, and silently drops both.
+    private static XAttribute DialogueLinkType() => new(Xsi + "type", "DialogueLink");
+
     private static XElement BuildNewLink(LinkEditSnapshot link) => new("FlowChartLink",
+        DialogueLinkType(),
         new XElement("FromNodeID",              link.FromNodeId),
         new XElement("ToNodeID",                link.ToNodeId),
         LinkElementOrNull("RandomWeight",            WeightText(link.RandomWeight), DefaultRandomWeight),
