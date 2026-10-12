@@ -287,6 +287,23 @@
     <sys:String x:Key="Status_ConnectMode_Started">Connecting: select target node, then press Enter to confirm or Escape to cancel.</sys:String>
     <sys:String x:Key="Status_ConnectMode_Connected">Connected node {0} → {1}.</sys:String>
     <sys:String x:Key="Status_ConnectMode_Cancelled">Connect mode cancelled.</sys:String>
+    <sys:String x:Key="Status_StartNodeMade">Node {0} is now node 0, the start node.</sys:String>
+    <sys:String x:Key="Status_StartNodeMadeWithReferences_One">Node {1} is now node 0, the start node. 1 reference in another conversation still names node {1}.</sys:String>
+    <sys:String x:Key="Status_StartNodeMadeWithReferences_Other">Node {1} is now node 0, the start node. {0} references in other conversations still name node {1}.</sys:String>
+    <sys:String x:Key="Status_StartNodeNotAllowed">Only a conversation created in this project can have a new start node.</sys:String>
+    <sys:String x:Key="Status_StartNodeExists">This conversation already has a node 0.</sys:String>
+    <sys:String x:Key="Status_StartNodeVoTargetExists">Node {0} wasn't changed: its voice-over can't be renamed, because {1} already exists.</sys:String>
+    <sys:String x:Key="Status_StartNodeVoRenameFailed">Node {0} wasn't changed: its voice-over couldn't be renamed ({1}).</sys:String>
+    <sys:String x:Key="Canvas_NoStartNode_New">This conversation has no node 0, so the game can't start it from its first line.</sys:String>
+    <sys:String x:Key="Canvas_NoStartNode_Game">Node 0 was removed, so the game can't start this conversation. Undo the deletion, or remove it from the patch.</sys:String>
+    <sys:String x:Key="Canvas_ChooseStartNode_Prompt">Click the node that should start the conversation, or select it and press Enter. Esc cancels.</sys:String>
+    <sys:String x:Key="Canvas_ChooseStartNode">Choose start node…</sys:String>
+    <sys:String x:Key="ToolTip_ChooseStartNode">Pick the node the game should start this conversation with. After clicking this, click a node on the canvas: it becomes node 0, its links, text, comment and staged voice-over follow it, and Undo reverses it.</sys:String>
+    <sys:String x:Key="Canvas_CancelChooseStartNode">Cancel</sys:String>
+    <sys:String x:Key="ToolTip_CancelChooseStartNode">Stop choosing a start node without changing anything (Esc does the same).</sys:String>
+    <sys:String x:Key="ToolTip_StartNodeWarning">Both games start a conversation at node 0 unless a script names another node. Without a node 0 the conversation can't be started from its first line.</sys:String>
+    <sys:String x:Key="Menu_MakeStartNode">Make this the start node</sys:String>
+    <sys:String x:Key="ToolTip_MakeStartNode">Renumber this node to node 0, where the game starts the conversation. Links, text, the node comment and staged voice-over follow it. Undo reverses it.</sys:String>
 
     <!-- ─── Tooltips — toolbar ─────────────────────────────────────────── -->
     <sys:String x:Key="ToolTip_OpenFolder">Open a PoE1 or PoE2 game root folder</sys:String>
@@ -864,6 +881,7 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- Structural edits. {0}/{1} are node numbers, and the arrow shows direction:
          "Add connection 1 → 2" means from node 1 to node 2, so keep the order. -->
     <sys:String x:Key="Undo_AddNode">Add node {0}</sys:String>
+    <sys:String x:Key="Undo_MakeStartNode">Make node {0} the start node</sys:String>
     <sys:String x:Key="Undo_DeleteNode">Delete node {0}</sys:String>
     <sys:String x:Key="Undo_AddAnnotation">Add annotation</sys:String>
     <sys:String x:Key="Undo_DeleteAnnotation">Delete annotation</sys:String>
@@ -1079,6 +1097,9 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="FlowAnalytics_LastAnalysed">Last analysed: {0}</sys:String>
     <sys:String x:Key="FlowAnalytics_Refresh">Refresh</sys:String>
     <sys:String x:Key="FlowAnalytics_Issue_Unreachable">Unreachable</sys:String>
+    <sys:String x:Key="FlowAnalytics_Issue_NoStartNode">No start node: the game starts this conversation at node 0, which doesn't exist.</sys:String>
+    <sys:String x:Key="ToolTip_FlowAnalytics_NoStartNode">Both games start a conversation at node 0. For a conversation you created, use "Choose start node…" above the canvas to make one of its nodes node 0. For a game conversation, undo the deletion of node 0, or remove the deletion from the patch.</sys:String>
+    <sys:String x:Key="PathStats_NoStartNode">No start node, so there are no playthroughs to measure. The word totals still count every line.</sys:String>
     <sys:String x:Key="FlowAnalytics_Issue_PlayerDeadEnd">Dead end</sys:String>
     <sys:String x:Key="FlowAnalytics_Issue_EmptyText">Empty text</sys:String>
     <sys:String x:Key="FlowAnalytics_Issue_NoIncomingLinks">No incoming links</sys:String>

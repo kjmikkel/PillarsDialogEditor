@@ -305,20 +305,42 @@ public class FlowAnalysisServiceTests
         Assert.Equal(ids.OrderBy(x => x).ToList(), ids);
     }
 
-    // ── Edge case: no root node ───────────────────────────────────────────
+    // ── Edge case: no start node (issue 172) ──────────────────────────────
 
     [Fact]
-    public void Analyze_NoRootNode_AllNodesUnreachable()
+    public void Analyze_NoNode0_ReportsNoStartNode_AndNoUnreachable()
     {
-        // No NodeId 0 in the snapshot — all nodes should be flagged Unreachable
         var snapshot = Snapshot(
-            MakeNode(1, links: [Link(1, 2)]),
-            MakeNode(2));
+            MakeNode(1, defaultText: "a", links: [Link(1, 2)]),
+            MakeNode(2, defaultText: "b"));
 
         var report = FlowAnalysisService.Analyze(snapshot);
 
-        Assert.Equal(2, report.Issues.Count(i => i.Kind == FlowIssueKind.Unreachable));
+        Assert.False(report.HasStartNode);
+        Assert.DoesNotContain(report.Issues, i => i.Kind == FlowIssueKind.Unreachable);
     }
+
+    [Fact]
+    public void Analyze_NoNode0_OtherChecksStillRun()
+    {
+        var snapshot = Snapshot(
+            MakeNode(1, links: [Link(1, 2)]),                    // empty text
+            MakeNode(2, isPlayerChoice: true, defaultText: "b")); // player dead end
+
+        var kinds = FlowAnalysisService.Analyze(snapshot).Issues.Select(i => i.Kind).ToList();
+
+        Assert.Contains(FlowIssueKind.EmptyText, kinds);
+        Assert.Contains(FlowIssueKind.PlayerDeadEnd, kinds);
+        Assert.Contains(FlowIssueKind.NoIncomingLinks, kinds);   // node 1: the would-be start
+    }
+
+    [Fact]
+    public void Analyze_WithNode0_HasStartNode() =>
+        Assert.True(FlowAnalysisService.Analyze(Snapshot(MakeNode(0, defaultText: "a"))).HasStartNode);
+
+    [Fact]
+    public void Analyze_Empty_HasStartNode() =>
+        Assert.True(FlowAnalysisService.Analyze(Snapshot()).HasStartNode);
 
     // ── Issue: BarkTextTooLong ────────────────────────────────────────
 

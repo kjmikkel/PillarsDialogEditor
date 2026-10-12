@@ -439,6 +439,17 @@ public partial class MainWindowViewModel : ObservableObject
             };
         };
 
+        Canvas.StartNodeAttempted += (_, e) => StatusText = e.Outcome switch
+        {
+            StartNodeOutcome.Made => StartNodeReferences(e) is var refs and > 0
+                ? Loc.FormatCount("Status_StartNodeMadeWithReferences", refs, e.OldNodeId)
+                : Loc.Format("Status_StartNodeMade", e.OldNodeId),
+            StartNodeOutcome.StartNodeExists => Loc.Get("Status_StartNodeExists"),
+            StartNodeOutcome.VoTargetExists  => Loc.Format("Status_StartNodeVoTargetExists", e.OldNodeId, e.Detail),
+            StartNodeOutcome.VoRenameFailed  => Loc.Format("Status_StartNodeVoRenameFailed", e.OldNodeId, e.Detail),
+            _                                => Loc.Get("Status_StartNodeNotAllowed"),
+        };
+
         // Canvas context action: "Show all lines by this speaker" forwards the node's
         // speaker GUID up here (we own the project/provider and the dirty guard).
         Canvas.RequestBrowseSpeakerLines += guid => _ = OpenSpeakerLineBrowserAsync(guid);
@@ -1329,6 +1340,10 @@ public partial class MainWindowViewModel : ObservableObject
             Canvas.Load(empty);
         }
 
+        // Issue 172: only a conversation the project created can be renumbered; in a game
+        // conversation the patch would see a delete plus an add.
+        Canvas.CanChooseStartNode = true;
+
         var savedLayout = _project?.GetLayout(file.Name);
         if (savedLayout is not null) Canvas.RestoreLayout(savedLayout);
 
@@ -1522,6 +1537,12 @@ public partial class MainWindowViewModel : ObservableObject
             CopyDirectoryRecursive(dir, Path.Combine(destination, Path.GetFileName(dir)));
     }
 
+    /// References elsewhere in the project that still name the renumbered node's old ID
+    /// (issue 172); counted for the status bar, never rewritten.
+    private int StartNodeReferences(StartNodeChangedEventArgs e) =>
+        _project is null ? 0
+        : StartNodeReferenceScanner.Count(_project, Canvas.ConversationName, e.OldNodeId, e.OldVoPath);
+
     /// With a conversation open, folds the canvas edits into its patch on _project.
     /// With no conversation open (e.g. a freshly conflict-merged project), the
     /// in-memory _project is already complete — no-op.
@@ -1536,8 +1557,14 @@ public partial class MainWindowViewModel : ObservableObject
         // WithPatch replaces the stored patch wholesale, but the diff only knows
         // the canvas language — carry over imported translations for every other
         // language, or they would be silently erased on each save.
-        patch = patch.CarryingTranslationsFrom(
-            _project!.Patches.GetValueOrDefault(_currentFile.Name), _provider.Language);
+        // A start-node renumber (issue 172) moved nodes the stored translations still key by
+        // their old IDs; re-key them before carrying them over, or the stale-data filter below
+        // drops them.
+        var prior  = _project!.Patches.GetValueOrDefault(_currentFile.Name);
+        var remaps = Canvas.TakePendingRemaps();
+        if (prior is not null && remaps.Count > 0)
+            prior = prior with { Translations = NodeIdRemap.Apply(prior.Translations, remaps) };
+        patch = patch.CarryingTranslationsFrom(prior, _provider.Language);
 
         // Prevention: the canvas holds the full effective conversation, so its live
         // node-ID set is authoritative (game-folder-free). Drop comment/translation

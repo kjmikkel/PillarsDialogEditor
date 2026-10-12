@@ -146,6 +146,14 @@ public class MainWindowViewModelPersistenceTests : IDisposable
     }
 
     [Fact]
+    public async Task ShippedConversation_DoesNotOfferTheStartNodeFix()   // issue 172
+    {
+        var (vm, provider, _) = await OpenProjectWithGreetingPatch(GreetingTextPatch("edited line"));
+        SelectConversation(vm, provider.BuildNewConversationFile("greeting"));
+        Assert.False(vm.Canvas.CanChooseStartNode);
+    }
+
+    [Fact]
     public async Task SaveAfterReopen_PreservesOtherLanguageTranslations()
     {
         // Session 1 saved a text edit and imported a French translation for it.
