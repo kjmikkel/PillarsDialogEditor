@@ -324,4 +324,9 @@ public class Poe1GameDataProviderTests : IDisposable
         var names = _provider.LoadGameDataNames();
         Assert.Empty(names);
     }
+
+    // Issue 162: PoE1 finds conversations by path; it has no manifest to register in.
+    [Fact]
+    public void ConversationManifestPath_IsNull() =>
+        Assert.Null(((IGameDataProvider)_provider).ConversationManifestPath("newconv"));
 }

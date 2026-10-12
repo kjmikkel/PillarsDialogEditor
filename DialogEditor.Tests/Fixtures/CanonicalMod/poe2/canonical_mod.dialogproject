@@ -435,7 +435,7 @@
       "SchemaVersion": 3,
       "AddedNodes": [
         {
-          "NodeId": 1,
+          "NodeId": 0,
           "IsPlayerChoice": false,
           "SpeakerCategory": 0,
           "SpeakerGuid": "c0a1c0a1-0000-4000-8000-000000000122",
@@ -449,13 +449,39 @@
           "HideSpeaker": false,
           "Links": [
             {
-              "FromNodeId": 1,
-              "ToNodeId": 2,
+              "FromNodeId": 0,
+              "ToNodeId": 1,
               "RandomWeight": 1,
               "QuestionNodeTextDisplay": "",
               "HasConditions": false,
               "Conditions": []
             },
+            {
+              "FromNodeId": 0,
+              "ToNodeId": 2,
+              "RandomWeight": 1,
+              "QuestionNodeTextDisplay": "",
+              "HasConditions": false,
+              "Conditions": []
+            }
+          ],
+          "Conditions": [],
+          "Scripts": []
+        },
+        {
+          "NodeId": 1,
+          "IsPlayerChoice": true,
+          "SpeakerCategory": 1,
+          "SpeakerGuid": "b1a8e901-0000-0000-0000-000000000000",
+          "ListenerGuid": "c0a1c0a1-0000-4000-8000-000000000122",
+          "DisplayType": "Conversation",
+          "Persistence": "None",
+          "ActorDirection": "",
+          "Comments": "",
+          "ExternalVO": "",
+          "HasVO": false,
+          "HideSpeaker": false,
+          "Links": [
             {
               "FromNodeId": 1,
               "ToNodeId": 3,
@@ -484,33 +510,7 @@
           "Links": [
             {
               "FromNodeId": 2,
-              "ToNodeId": 4,
-              "RandomWeight": 1,
-              "QuestionNodeTextDisplay": "",
-              "HasConditions": false,
-              "Conditions": []
-            }
-          ],
-          "Conditions": [],
-          "Scripts": []
-        },
-        {
-          "NodeId": 3,
-          "IsPlayerChoice": true,
-          "SpeakerCategory": 1,
-          "SpeakerGuid": "b1a8e901-0000-0000-0000-000000000000",
-          "ListenerGuid": "c0a1c0a1-0000-4000-8000-000000000122",
-          "DisplayType": "Conversation",
-          "Persistence": "None",
-          "ActorDirection": "",
-          "Comments": "",
-          "ExternalVO": "",
-          "HasVO": false,
-          "HideSpeaker": false,
-          "Links": [
-            {
-              "FromNodeId": 3,
-              "ToNodeId": 4,
+              "ToNodeId": 3,
               "RandomWeight": 1,
               "QuestionNodeTextDisplay": "",
               "HasConditions": false,
@@ -533,7 +533,7 @@
           "Scripts": []
         },
         {
-          "NodeId": 4,
+          "NodeId": 3,
           "IsPlayerChoice": false,
           "SpeakerCategory": 0,
           "SpeakerGuid": "c0a1c0a1-0000-4000-8000-000000000122",
@@ -555,30 +555,35 @@
       "Translations": {
         "en": [
           {
-            "NodeId": 1,
+            "NodeId": 0,
             "DefaultText": "Hello from a conversation the mod created.",
             "FemaleText": ""
           },
           {
-            "NodeId": 2,
+            "NodeId": 1,
             "DefaultText": "First choice.",
             "FemaleText": ""
           },
           {
-            "NodeId": 3,
+            "NodeId": 2,
             "DefaultText": "Second choice, only when cm_flag_a is set.",
             "FemaleText": ""
           },
           {
-            "NodeId": 4,
+            "NodeId": 3,
             "DefaultText": "Goodbye.",
             "FemaleText": ""
           }
         ],
         "de": [
           {
-            "NodeId": 1,
+            "NodeId": 0,
             "DefaultText": "Hallo aus einem Gespr\u00E4ch, das der Mod erstellt hat.",
+            "FemaleText": ""
+          },
+          {
+            "NodeId": 1,
+            "DefaultText": "",
             "FemaleText": ""
           },
           {
@@ -588,11 +593,6 @@
           },
           {
             "NodeId": 3,
-            "DefaultText": "",
-            "FemaleText": ""
-          },
-          {
-            "NodeId": 4,
             "DefaultText": "",
             "FemaleText": ""
           }
@@ -658,19 +658,19 @@
       }
     },
     "canonical_mod_new": {
-      "1": {
+      "0": {
         "X": 0,
         "Y": 100
       },
-      "2": {
+      "1": {
         "X": 300,
         "Y": 0
       },
-      "3": {
+      "2": {
         "X": 300,
         "Y": 200
       },
-      "4": {
+      "3": {
         "X": 600,
         "Y": 100
       }

@@ -41,13 +41,20 @@ public static class PatchInstaller
                          ?? (merged.IsNewConversation(name) ? provider.BuildNewConversationFile(name) : null);
                 if (file is null) { missing.Add(name); continue; }
 
+                // A conversation created in the editor must also be registered with the game
+                // (issue 162). Keyed on the load order, not on the file being missing: the
+                // manifest is a target like any other, so restore removes it.
+                var manifest = merged.IsNewConversation(name) ? provider.ConversationManifestPath(name) : null;
+
                 // Back up every target before the first write, so a crash anywhere below
                 // leaves a manifest that covers all of them.
                 var targets = WithSidecars([file.ConversationPath, .. TranslationApplier.TargetPaths(file, patch, provider)]);
+                if (manifest is not null) targets.Add(manifest);
                 foreach (var t in targets) store.EnsureBackedUp(t);
                 foreach (var t in targets) options.BeforeWrite?.Invoke(t);
 
                 if (!File.Exists(file.ConversationPath)) provider.InitializeConversationFile(file);
+                if (manifest is not null) provider.WriteConversationManifest(name);
                 var baseSnap = ConversationSnapshotBuilder.Build(provider.LoadConversation(file));
                 provider.SaveConversation(file, PatchApplier.Apply(baseSnap, patch, options.Force));
                 unreadable.AddRange(TranslationApplier.WriteTranslations(file, patch, provider));
