@@ -14,6 +14,8 @@ public static class FlowAnalysisService
                 new FlowStatistics(0, 0, 0, 0, 0, 0, 0, 0.0, 0, 0),
                 []);
 
+        var hasStartNode = StartNode.IsPresent(nodes.Select(n => n.NodeId));
+
         // ── Build adjacency and incoming-link sets ────────────────────────
         var linksByFrom      = nodes.ToDictionary(n => n.NodeId, n => n.Links);
         var nodeById         = nodes.ToDictionary(n => n.NodeId);
@@ -31,16 +33,16 @@ public static class FlowAnalysisService
             }
         }
 
-        // ── BFS from root (NodeId 0) ──────────────────────────────────────
+        // ── BFS from the start node (StartNode.Id) ────────────────────────
         var reachable = new HashSet<int>();
         var depth     = new Dictionary<int, int>();
         var queue     = new Queue<int>();
 
-        if (nodes.Any(n => n.NodeId == 0))
+        if (hasStartNode)
         {
-            queue.Enqueue(0);
-            reachable.Add(0);
-            depth[0] = 0;
+            queue.Enqueue(StartNode.Id);
+            reachable.Add(StartNode.Id);
+            depth[StartNode.Id] = 0;
         }
 
         while (queue.Count > 0)
@@ -80,7 +82,7 @@ public static class FlowAnalysisService
             }
 
             // Issues
-            if (!reachable.Contains(node.NodeId))
+            if (hasStartNode && !reachable.Contains(node.NodeId))
                 issues.Add(new FlowIssue(node.NodeId, FlowIssueKind.Unreachable));
 
             if (node.IsPlayerChoice && node.Links.Count == 0)
@@ -91,7 +93,7 @@ public static class FlowAnalysisService
                 && string.IsNullOrWhiteSpace(node.FemaleText))
                 issues.Add(new FlowIssue(node.NodeId, FlowIssueKind.EmptyText));
 
-            if (node.NodeId != 0 && !nodesWithIncoming.Contains(node.NodeId))
+            if (node.NodeId != StartNode.Id && !nodesWithIncoming.Contains(node.NodeId))
                 issues.Add(new FlowIssue(node.NodeId, FlowIssueKind.NoIncomingLinks));
 
             // A handoff is a SPAWN, not a replace — ConversationManager.StartConversation
@@ -137,6 +139,6 @@ public static class FlowAnalysisService
             TotalLinkCount:       totalLinks);
 
         issues.Sort((a, b) => a.NodeId.CompareTo(b.NodeId));
-        return new FlowAnalysisReport(stats, issues);
+        return new FlowAnalysisReport(stats, issues) { HasStartNode = hasStartNode };
     }
 }
