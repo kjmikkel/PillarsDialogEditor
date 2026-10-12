@@ -64,6 +64,9 @@ public static class DiffEngine
         var changes = new Dictionary<string, FieldChange>();
 
         TryAddChange(changes, "IsPlayerChoice", @base.IsPlayerChoice,    current.IsPlayerChoice);
+        // The serializers write the game node type from the category (issue 160). By name, so the
+        // patch keeps its meaning if the enum is ever reordered.
+        TryAddChange(changes, "SpeakerCategory", @base.SpeakerCategory.ToString(), current.SpeakerCategory.ToString());
         TryAddChange(changes, "SpeakerGuid",    @base.SpeakerGuid,       current.SpeakerGuid);
         TryAddChange(changes, "ListenerGuid",   @base.ListenerGuid,      current.ListenerGuid);
         // DefaultText and FemaleText are now in Translations, not FieldChanges

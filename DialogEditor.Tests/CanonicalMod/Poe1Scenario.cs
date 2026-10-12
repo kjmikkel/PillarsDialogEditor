@@ -65,7 +65,7 @@ public static class Poe1Scenario
             }),
 
         new("nodes.convert-player-to-npc",
-            "Player choice 3 converted to an NPC line with the detail pane's Node Type control, NPC speaking to the player (#160)",
+            "Player choice 3 converted to an NPC line with the detail pane's Node Type control, NPC speaking to the player",
             async s =>
             {
                 s.Open(Edited);
@@ -79,9 +79,9 @@ public static class Poe1Scenario
             v =>
             {
                 Assert.False(v.Node(Edited, 3).IsPlayerChoice);
+                Assert.Equal(SpeakerCategory.Npc, v.Node(Edited, 3).SpeakerCategory);   // written as a TalkNode (#160)
                 Assert.Equal((CanonicalIds.Npc, CanonicalIds.Player), (v.Node(Edited, 3).SpeakerGuid, v.Node(Edited, 3).ListenerGuid));
-            },
-            KnownIssue: "#160"),
+            }),
 
         new("nodes.delete",
             "Node 9 deleted; bank 5 keeps child 8",

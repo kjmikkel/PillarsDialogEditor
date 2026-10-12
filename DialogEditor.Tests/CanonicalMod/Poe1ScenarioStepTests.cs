@@ -16,13 +16,9 @@ public class Poe1ScenarioStepTests(BuiltPoe1Mod mod) : IClassFixture<BuiltPoe1Mo
     public void Step_HoldsAfterInstall(string tag) =>
         Poe1Scenario.Steps.Single(s => s.Tag == tag).Expect(mod.Applied);
 
-    [Fact(Skip = "#160: a Node Type change is lost on save")]
-    public void Step_NodesConvertPlayerToNpc() => Step_HoldsAfterInstall("nodes.convert-player-to-npc");
-
     [Fact]
     public void EveryKnownIssueStep_HasItsOwnSkippedTest() =>
-        Assert.Equal(["nodes.convert-player-to-npc"],
-            Poe1Scenario.Steps.Where(s => s.KnownIssue is not null).Select(s => s.Tag));
+        Assert.Empty(Poe1Scenario.Steps.Where(s => s.KnownIssue is not null).Select(s => s.Tag));
 
     /// Every expectation must FAIL on the unmodified canonical install: an expectation that
     /// already holds there proves nothing about the edit (the red half of red/green).
