@@ -1,3 +1,5 @@
+using DialogEditor.Core.Audio;
+
 namespace DialogEditor.ViewModels.Services;
 
 /// <summary>
@@ -18,10 +20,9 @@ public static class VoPathResolver
 {
     private const string NarratorGuid = "6a99a109-0000-0000-0000-000000000000";
 
-    /// Canonical Voices root for a PoE2 game folder — single definition so the
-    /// picker, importer, and resolver can never disagree on the layout.
-    public static string VoicesRoot(string gameRoot) => Path.Combine(gameRoot,
-        "PillarsOfEternityII_Data", "StreamingAssets", "Audio", "Windows", "Voices", "English(US)");
+    /// Canonical Voices root for a PoE2 game folder, so the picker, importer, and resolver
+    /// can never disagree on the layout. The path itself lives in Poe2VoicePaths.
+    public static string VoicesRoot(string gameRoot) => Poe2VoicePaths.VoicesRoot(gameRoot);
 
     /// <summary>
     /// Checks whether the VO file for <paramref name="nodeId"/> in
