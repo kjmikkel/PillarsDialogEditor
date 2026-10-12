@@ -58,6 +58,13 @@ written to cover every construct, and each is laid out as a miniature install.
 `Helpers/RoundTripChecks`. The one exception is the PoE1 game-model check. It needs
 `OEIFormats.dll`, so it still waits for `DIALOGEDITOR_POE1_DIR`.
 
+The canonical *mods* in
+[`DialogEditor.Tests/Fixtures/CanonicalMod`](../DialogEditor.Tests/Fixtures/CanonicalMod)
+([#138](https://github.com/kjmikkel/PillarsDialogEditor/issues/138)) cover what the editor
+*writes*. One check needs the install too: `Poe1CanonicalModGameModelTests` passes the
+installed PoE1 mod through the game's own model, then reruns every scenario expectation on what
+the game kept, so an edit the game silently ignores fails.
+
 ## When to run them
 
 - Before every release, as part of the release checklist.

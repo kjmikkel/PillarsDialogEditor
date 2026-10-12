@@ -168,7 +168,7 @@ public static class Poe2Scenario
             async s =>
             {
                 s.Open(Edited);
-                var name = CanonicalModSession.ConditionName("IsGlobalValue");
+                var name = s.ConditionName("IsGlobalValue");
                 var a = new ConditionLeaf(name, ["cm_flag_a", "EqualTo", "1"], false, "And");
                 var b = new ConditionLeaf(name, ["cm_flag_b", "GreaterThan", "2"], false, "Or");
                 var c = new ConditionLeaf(name, ["cm_flag_c", "EqualTo", "0"], true, "And");
@@ -191,7 +191,7 @@ public static class Poe2Scenario
             {
                 s.Open(Edited);
                 s.EditLinkConditions(1, 4,
-                    [new ConditionLeaf(CanonicalModSession.ConditionName("IsGlobalValue"), ["cm_flag_link", "EqualTo", "1"], true, "And")]);
+                    [new ConditionLeaf(s.ConditionName("IsGlobalValue"), ["cm_flag_link", "EqualTo", "1"], true, "And")]);
                 s.Save();
                 await Task.CompletedTask;
             },
@@ -218,7 +218,7 @@ public static class Poe2Scenario
             async s =>
             {
                 s.Open(Edited);
-                var set = CanonicalModSession.ScriptName("SetGlobalValue");
+                var set = s.ScriptName("SetGlobalValue");
                 s.EditScripts(s.Node(13),
                 [
                     new ScriptCall(set, ["cm_enter", "1"],  ScriptCategory.Enter),
@@ -238,7 +238,7 @@ public static class Poe2Scenario
                 s.Open(Edited);
                 var n = s.Node(4);
                 s.EditScripts(n, [.. n.Scripts,
-                    new ScriptCall(CanonicalModSession.ScriptName("SetGlobalValue"), ["cm_extra", "1"], ScriptCategory.Exit)]);
+                    new ScriptCall(s.ScriptName("SetGlobalValue"), ["cm_extra", "1"], ScriptCategory.Exit)]);
                 s.Save();
                 await Task.CompletedTask;
             },
@@ -401,7 +401,7 @@ public static class Poe2Scenario
                 a.DefaultText = "First choice.";
                 var b = s.AddNode(s.Vm.Canvas.NextNodeId(), true, SpeakerCategory.Player, CanonicalIds.Player, CanonicalIds.Npc, 300, 200);
                 b.DefaultText = "Second choice, only when cm_flag_a is set.";
-                s.EditConditions(b, [new ConditionLeaf(CanonicalModSession.ConditionName("IsGlobalValue"), ["cm_flag_a", "EqualTo", "1"], false, "And")]);
+                s.EditConditions(b, [new ConditionLeaf(s.ConditionName("IsGlobalValue"), ["cm_flag_a", "EqualTo", "1"], false, "And")]);
                 var end = s.AddNode(s.Vm.Canvas.NextNodeId(), false, SpeakerCategory.Npc, CanonicalIds.Npc, CanonicalIds.Player, 600, 100);
                 end.DefaultText = "Goodbye.";
                 s.Link(start.NodeId, a.NodeId);

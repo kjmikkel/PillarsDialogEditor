@@ -2,7 +2,7 @@ using System.IO.Compression;
 
 namespace DialogEditor.Tests.CanonicalMod;
 
-/// The checked-in PoE2 canonical mod must equal a fresh build (issue 138, spec §4). If the
+/// Each checked-in canonical mod must equal a fresh build (issue 138, spec §4). If the
 /// editor's output changed on purpose, rerun with DIALOGEDITOR_REGENERATE_CANONICAL_MOD=1:
 /// that rewrites the files AND fails, so a regeneration is always a reviewed diff, never a
 /// silent pass.
@@ -13,14 +13,17 @@ public class CanonicalModGoldenTests
 
     private static string TempDir(string tag) => Path.Combine(Path.GetTempPath(), $"canonical {tag} {Guid.NewGuid():N}");
 
-    [Fact]
-    public async Task Poe2_CheckedInMod_MatchesAFreshBuild()
+    [Theory]
+    [InlineData("poe1")]
+    [InlineData("poe2")]
+    public async Task CheckedInMod_MatchesAFreshBuild(string gameId)
     {
+        var game  = CanonicalGame.For(gameId);
         var fresh = TempDir("golden");
         try
         {
-            await CanonicalModBuilder.BuildAllAsync("poe2", Poe2Scenario.Steps, fresh);
-            var golden = CanonicalModBuilder.GoldenDir("poe2");
+            await CanonicalModBuilder.BuildAllAsync(game.Id, game.Steps, fresh);
+            var golden = CanonicalModBuilder.GoldenDir(game.Id);
 
             if (Environment.GetEnvironmentVariable(RegenerateVar) == "1")
             {
@@ -37,15 +40,18 @@ public class CanonicalModGoldenTests
     }
 
     // Review Focus 1: nothing nondeterministic (layout, ordering, clock) leaks into the output.
-    [Fact]
-    public async Task Poe2_TwoBuilds_AreIdentical()
+    [Theory]
+    [InlineData("poe1")]
+    [InlineData("poe2")]
+    public async Task TwoBuilds_AreIdentical(string gameId)
     {
+        var game = CanonicalGame.For(gameId);
         var a = TempDir("a");
         var b = TempDir("b");
         try
         {
-            await CanonicalModBuilder.BuildAllAsync("poe2", Poe2Scenario.Steps, a);
-            await CanonicalModBuilder.BuildAllAsync("poe2", Poe2Scenario.Steps, b);
+            await CanonicalModBuilder.BuildAllAsync(game.Id, game.Steps, a);
+            await CanonicalModBuilder.BuildAllAsync(game.Id, game.Steps, b);
             Assert.Null(GoldenDiff.First(a, b));
         }
         finally
@@ -56,10 +62,12 @@ public class CanonicalModGoldenTests
     }
 
     // Review Focus 5: the pack and the project beside it can't drift apart.
-    [Fact]
-    public void Poe2_PackCarriesTheCheckedInProject()
+    [Theory]
+    [InlineData("poe1")]
+    [InlineData("poe2")]
+    public void PackCarriesTheCheckedInProject(string gameId)
     {
-        var golden = CanonicalModBuilder.GoldenDir("poe2");
+        var golden = CanonicalModBuilder.GoldenDir(gameId);
         using var zip    = ZipFile.OpenRead(Path.Combine(golden, CanonicalModBuilder.ProjectName + ".dialogpack"));
         using var reader = new StreamReader(zip.GetEntry("project.dialogproject")!.Open());
         Assert.Equal(GoldenDiff.Normalize(File.ReadAllText(Path.Combine(golden, CanonicalModBuilder.ProjectName + ".dialogproject"))),
