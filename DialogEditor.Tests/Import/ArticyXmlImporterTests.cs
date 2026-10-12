@@ -170,11 +170,12 @@ public class ArticyXmlImporterTests : IDisposable
 
         var result = Importer.Import(path);
 
-        // Fragment 0x00020001 maps to int id 1 (lex sort), 0x00020002 to id 2.
-        var node1 = result.Nodes.Single(n => n.NodeId == 1);
-        var link = node1.Links.Single();
-        Assert.Equal(1, link.FromNodeId);
-        Assert.Equal(2, link.ToNodeId);
+        // Fragment 0x00020001 maps to int id 0 (lex sort), 0x00020002 to id 1 (issue 162:
+        // an imported conversation must start at node 0).
+        var node0 = result.Nodes.Single(n => n.NodeId == 0);
+        var link = node0.Links.Single();
+        Assert.Equal(0, link.FromNodeId);
+        Assert.Equal(1, link.ToNodeId);
         Assert.Equal(1f, link.RandomWeight);
         Assert.Equal("", link.QuestionNodeTextDisplay);
         Assert.False(link.HasConditions);

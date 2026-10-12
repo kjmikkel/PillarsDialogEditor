@@ -40,7 +40,7 @@ public class YarnSpinnerImporterTests : IDisposable
 
         Assert.Single(result.Nodes);
         var node = result.Nodes[0];
-        Assert.Equal(1, node.NodeId);
+        Assert.Equal(0, node.NodeId);   // issue 162: an imported conversation starts at node 0
         Assert.False(node.IsPlayerChoice);
         Assert.Equal(SpeakerCategory.Npc, node.SpeakerCategory);
         Assert.Equal("Halt! Who goes there?", node.DefaultText);
@@ -70,8 +70,8 @@ public class YarnSpinnerImporterTests : IDisposable
         Assert.Equal(SpeakerCategory.Npc, npcNode.SpeakerCategory);
         Assert.Equal("Hello there!", npcNode.DefaultText);
         Assert.Equal(2, npcNode.Links.Count);
+        Assert.Contains(npcNode.Links, l => l.ToNodeId == 1);
         Assert.Contains(npcNode.Links, l => l.ToNodeId == 2);
-        Assert.Contains(npcNode.Links, l => l.ToNodeId == 3);
 
         var choice1 = result.Nodes[1];
         Assert.True(choice1.IsPlayerChoice);
@@ -102,13 +102,13 @@ public class YarnSpinnerImporterTests : IDisposable
         Assert.Equal(2, result.Nodes.Count);
 
         var node1 = result.Nodes[0];
-        Assert.Equal(1, node1.NodeId);
+        Assert.Equal(0, node1.NodeId);
         Assert.Equal("Line one.", node1.DefaultText);
         Assert.Single(node1.Links);
-        Assert.Equal(2, node1.Links[0].ToNodeId);
+        Assert.Equal(1, node1.Links[0].ToNodeId);
 
         var node2 = result.Nodes[1];
-        Assert.Equal(2, node2.NodeId);
+        Assert.Equal(1, node2.NodeId);
         Assert.Equal("Line two.", node2.DefaultText);
         Assert.Empty(node2.Links);
     }
@@ -137,18 +137,18 @@ public class YarnSpinnerImporterTests : IDisposable
 
         var result = Importer.Import(path);
 
-        // Start block: nodes 1 (NPC), 2 (choice Yes), 3 (choice No)
-        // WorkNode block: node 4
-        // EndNode block: node 5
+        // Start block: nodes 0 (NPC), 1 (choice Yes), 2 (choice No)
+        // WorkNode block: node 3
+        // EndNode block: node 4
         Assert.Equal(5, result.Nodes.Count);
 
         var choiceYes = result.Nodes.Single(n => n.DefaultText == "Yes, I do.");
         Assert.Single(choiceYes.Links);
-        Assert.Equal(4, choiceYes.Links[0].ToNodeId);
+        Assert.Equal(3, choiceYes.Links[0].ToNodeId);
 
         var choiceNo = result.Nodes.Single(n => n.DefaultText == "No thanks.");
         Assert.Single(choiceNo.Links);
-        Assert.Equal(5, choiceNo.Links[0].ToNodeId);
+        Assert.Equal(4, choiceNo.Links[0].ToNodeId);
     }
 
     // ── Dangling jump ─────────────────────────────────────────────────────
