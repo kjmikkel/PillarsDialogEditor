@@ -195,6 +195,9 @@ public partial class ConversationViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(DeleteNodeCmdCommand))]
     [NotifyCanExecuteChangedFor(nameof(AddConnectedNodeCmdCommand))]
     [NotifyCanExecuteChangedFor(nameof(DeleteConnectionCmdCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ChooseStartNodeCommand))]
+    [NotifyCanExecuteChangedFor(nameof(MakeStartNodeCmdCommand))]
+    [NotifyPropertyChangedFor(nameof(CanMakeStartNode))]
     private bool _isEditable;
 
     // ── Undo/Redo state ───────────────────────────────────────────────────
@@ -234,6 +237,13 @@ public partial class ConversationViewModel : ObservableObject
 
     partial void OnSelectedNodeChanged(NodeViewModel? value)
     {
+        // Pick mode (issue 172): the node picked becomes the start node.
+        if (IsChoosingStartNode && value is not null)
+        {
+            IsChoosingStartNode = false;
+            MakeStartNode(value);
+        }
+
         // Remember the last real selection (mouse or keyboard) so keyboard focus
         // can resume where the user left off (spec: entry = restore last selection).
         if (value is not null) _lastSelection = value;
@@ -340,7 +350,8 @@ public partial class ConversationViewModel : ObservableObject
         SearchQuery  = string.Empty;
         BaseSnapshot = null;
         _pendingRemaps.Clear();
-        CanChooseStartNode = false;
+        IsChoosingStartNode = false;
+        CanChooseStartNode  = false;
         RefreshUndoRedo();
     }
 
@@ -545,6 +556,51 @@ public partial class ConversationViewModel : ObservableObject
         IsModified = true;
         RefreshUndoRedo();
         return Report(StartNodeOutcome.Made);
+    }
+
+    // Pick mode: the warning strip's "Choose start node…" arms it; selecting a node then
+    // makes that node the start node.
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StartNodeWarningText))]
+    private bool _isChoosingStartNode;
+
+    public bool ShowStartNodeWarning => !HasStartNode;
+
+    /// For the right-click item and the strip's button: the fix is on offer.
+    public bool CanMakeStartNode => IsEditable && CanChooseStartNode && !HasStartNode;
+
+    public string StartNodeWarningText =>
+        IsChoosingStartNode ? Loc.Get("Canvas_ChooseStartNode_Prompt")
+        : CanChooseStartNode ? Loc.Get("Canvas_NoStartNode_New")
+        : Loc.Get("Canvas_NoStartNode_Game");
+
+    [RelayCommand(CanExecute = nameof(CanMakeStartNode))]
+    private void ChooseStartNode() => IsChoosingStartNode = true;
+
+    [RelayCommand]
+    private void CancelChooseStartNode() => IsChoosingStartNode = false;
+
+    [RelayCommand(CanExecute = nameof(CanMakeStartNode))]
+    private void MakeStartNodeCmd(NodeViewModel? node)
+    {
+        if (node is not null) MakeStartNode(node);
+    }
+
+    partial void OnHasStartNodeChanged(bool value)
+    {
+        if (value) IsChoosingStartNode = false;
+        StartNodeStateChanged();
+    }
+
+    partial void OnCanChooseStartNodeChanged(bool value) => StartNodeStateChanged();
+
+    private void StartNodeStateChanged()
+    {
+        OnPropertyChanged(nameof(ShowStartNodeWarning));
+        OnPropertyChanged(nameof(CanMakeStartNode));
+        OnPropertyChanged(nameof(StartNodeWarningText));
+        ChooseStartNodeCommand.NotifyCanExecuteChanged();
+        MakeStartNodeCmdCommand.NotifyCanExecuteChanged();
     }
 
     internal void ApplyRenumber(NodeViewModel node, int from, int to)

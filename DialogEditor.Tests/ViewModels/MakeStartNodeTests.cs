@@ -242,4 +242,75 @@ public class MakeStartNodeTests : IDisposable
         Assert.True(File.Exists(Staged("fresh_0001.wem")));
         Assert.False(vm.CanUndo);
     }
+
+    // ── Pick mode ─────────────────────────────────────────────────────────
+
+    [Fact]
+    public void PickMode_SelectingANode_MakesItTheStart_AndEndsTheMode()
+    {
+        var vm = Canvas();
+        vm.ChooseStartNodeCommand.Execute(null);
+        Assert.True(vm.IsChoosingStartNode);
+
+        vm.SelectedNode = ById(vm, 2);
+
+        Assert.Equal(0, vm.SelectedNode!.NodeId);
+        Assert.False(vm.IsChoosingStartNode);
+    }
+
+    [Fact]
+    public void PickMode_Cancel_ChangesNothing()
+    {
+        var vm = Canvas();
+        vm.ChooseStartNodeCommand.Execute(null);
+        vm.CancelChooseStartNodeCommand.Execute(null);
+
+        Assert.False(vm.IsChoosingStartNode);
+        vm.SelectedNode = ById(vm, 2);
+        Assert.Equal(2, ById(vm, 2).NodeId);
+    }
+
+    [Fact]
+    public void PickMode_UnavailableForAShippedConversation()
+    {
+        var vm = Canvas(canChoose: false);
+        Assert.False(vm.ChooseStartNodeCommand.CanExecute(null));
+        Assert.False(vm.CanMakeStartNode);
+    }
+
+    [Fact]
+    public void PickMode_EndsWhenNode0Appears()
+    {
+        var vm = Canvas();
+        vm.MakeStartNode(ById(vm, 1));
+        vm.DeleteNode(ById(vm, 0));
+        vm.ChooseStartNodeCommand.Execute(null);
+
+        vm.Undo();   // the delete is undone: node 0 is back
+
+        Assert.False(vm.IsChoosingStartNode);
+    }
+
+    [Fact]
+    public void WarningText_FollowsTheState()
+    {
+        var vm = Canvas();
+        Assert.True(vm.ShowStartNodeWarning);
+        Assert.Equal("Canvas_NoStartNode_New", vm.StartNodeWarningText);
+
+        vm.ChooseStartNodeCommand.Execute(null);
+        Assert.Equal("Canvas_ChooseStartNode_Prompt", vm.StartNodeWarningText);
+
+        Assert.Equal("Canvas_NoStartNode_Game", Canvas(canChoose: false).StartNodeWarningText);
+    }
+
+    [Fact]
+    public void ContextMenuCommand_MakesTheStartNode()
+    {
+        var vm = Canvas();
+        Assert.True(vm.CanMakeStartNode);
+        vm.MakeStartNodeCmdCommand.Execute(ById(vm, 2));
+        Assert.Equal(0, vm.Nodes.Single(n => n.DefaultText == "second").NodeId);
+        Assert.False(vm.CanMakeStartNode);
+    }
 }
