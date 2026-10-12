@@ -72,6 +72,7 @@ public partial class ConversationViewModel : ObservableObject
         // Node field edits from the detail pane reach the stack via NodeViewModel.Push
         // without passing through any canvas method, so dirty-flag centrally here.
         _undoStack.CommandExecuted += () => IsModified = true;
+        Nodes.CollectionChanged += (_, _) => RefreshStartNode();
         LocaleService.Current.PropertyChanged += (_, e) =>
         {
             if (e.PropertyName == nameof(LocaleService.Revision))
@@ -194,6 +195,9 @@ public partial class ConversationViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(DeleteNodeCmdCommand))]
     [NotifyCanExecuteChangedFor(nameof(AddConnectedNodeCmdCommand))]
     [NotifyCanExecuteChangedFor(nameof(DeleteConnectionCmdCommand))]
+    [NotifyCanExecuteChangedFor(nameof(ChooseStartNodeCommand))]
+    [NotifyCanExecuteChangedFor(nameof(MakeStartNodeCmdCommand))]
+    [NotifyPropertyChangedFor(nameof(CanMakeStartNode))]
     private bool _isEditable;
 
     // ── Undo/Redo state ───────────────────────────────────────────────────
@@ -338,6 +342,9 @@ public partial class ConversationViewModel : ObservableObject
         SelectedNode = null;
         SearchQuery  = string.Empty;
         BaseSnapshot = null;
+        _pendingRemaps.Clear();
+        IsChoosingStartNode = false;
+        CanChooseStartNode  = false;
         RefreshUndoRedo();
     }
 
@@ -480,6 +487,138 @@ public partial class ConversationViewModel : ObservableObject
         IsModified   = true;
         SelectedNode = newNode;
         RefreshUndoRedo();
+    }
+
+    // ── Start node (issue 172) ────────────────────────────────────────────
+    // Both games start a conversation at node 0. A conversation the project created can have
+    // a chosen node renumbered to 0 as one undoable edit.
+
+    /// False only when the conversation has nodes and none is node 0: the game would have
+    /// nowhere to start it.
+    [ObservableProperty] private bool _hasStartNode = true;
+
+    /// Set by MainWindowViewModel: true for conversations created in this project. Renumbering
+    /// a game conversation's node would turn it into a delete plus an add in the patch.
+    [ObservableProperty] private bool _canChooseStartNode;
+
+    public event EventHandler<StartNodeChangedEventArgs>? StartNodeAttempted;
+
+    // ID changes not yet folded into the stored patch's translations (NodeIdRemap).
+    private readonly List<(int From, int To)> _pendingRemaps = [];
+
+    internal IReadOnlyList<(int From, int To)> TakePendingRemaps()
+    {
+        var taken = _pendingRemaps.ToList();
+        _pendingRemaps.Clear();
+        return taken;
+    }
+
+    private void RefreshStartNode() =>
+        HasStartNode = Core.Analytics.StartNode.IsPresent(Nodes.Select(n => n.NodeId));
+
+    public StartNodeOutcome MakeStartNode(NodeViewModel node)
+    {
+        var oldId = node.NodeId;
+        var oldVo = string.IsNullOrEmpty(node.ExternalVO)
+            ? VoPathResolver.ExpectedRelativePath(node.SpeakerGuid, "", oldId, ConversationName)
+            : null;
+        StartNodeOutcome Report(StartNodeOutcome outcome, string detail = "")
+        {
+            StartNodeAttempted?.Invoke(this, new StartNodeChangedEventArgs(outcome, oldId, oldVo, detail));
+            return outcome;
+        }
+
+        if (!IsEditable || !CanChooseStartNode || !Nodes.Contains(node))
+            return Report(StartNodeOutcome.NotAllowed);
+        if (HasStartNode)
+            return Report(StartNodeOutcome.StartNodeExists);
+
+        var vo = StartNodeVoFiles.For(ProjectPath, node, ConversationName, oldId, Core.Analytics.StartNode.Id);
+        if (vo?.ExistingTarget is { } taken)
+            return Report(StartNodeOutcome.VoTargetExists, taken);
+
+        try
+        {
+            _undoStack.Execute(new MakeStartNodeCommand(this, node, oldId, ProjectPath));
+        }
+        catch (Exception ex)   // StartNodeVoFiles has logged it and put the files back
+        {
+            AppLog.Warn($"Make start node: node {oldId} unchanged: {ex.Message}");
+            return Report(StartNodeOutcome.VoRenameFailed, ex.Message);
+        }
+        IsModified = true;
+        RefreshUndoRedo();
+        return Report(StartNodeOutcome.Made);
+    }
+
+    // Pick mode: the warning strip's "Choose start node…" arms it; clicking a node, or Enter
+    // on the selected one, then makes that node the start node (TryConfirmStartNode).
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(StartNodeWarningText))]
+    private bool _isChoosingStartNode;
+
+    public bool ShowStartNodeWarning => !HasStartNode;
+
+    /// For the right-click item and the strip's button: the fix is on offer.
+    public bool CanMakeStartNode => IsEditable && CanChooseStartNode && !HasStartNode;
+
+    public string StartNodeWarningText =>
+        IsChoosingStartNode ? Loc.Get("Canvas_ChooseStartNode_Prompt")
+        : CanChooseStartNode ? Loc.Get("Canvas_NoStartNode_New")
+        : Loc.Get("Canvas_NoStartNode_Game");
+
+    [RelayCommand(CanExecute = nameof(CanMakeStartNode))]
+    private void ChooseStartNode() => IsChoosingStartNode = true;
+
+    [RelayCommand]
+    private void CancelChooseStartNode() => IsChoosingStartNode = false;
+
+    /// Confirms the picked node: a click on a node, or Enter on the selected one. Selection
+    /// alone never commits; keyboard focus, navigation and new nodes all move it without the
+    /// user choosing anything (as in connect mode). False outside pick mode.
+    public bool TryConfirmStartNode(NodeViewModel? node)
+    {
+        if (!IsChoosingStartNode || node is null) return false;
+        IsChoosingStartNode = false;
+        MakeStartNode(node);
+        return true;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanMakeStartNode))]
+    private void MakeStartNodeCmd(NodeViewModel? node)
+    {
+        if (node is not null) MakeStartNode(node);
+    }
+
+    partial void OnHasStartNodeChanged(bool value)
+    {
+        if (value) IsChoosingStartNode = false;
+        StartNodeStateChanged();
+    }
+
+    partial void OnCanChooseStartNodeChanged(bool value) => StartNodeStateChanged();
+
+    private void StartNodeStateChanged()
+    {
+        OnPropertyChanged(nameof(ShowStartNodeWarning));
+        OnPropertyChanged(nameof(CanMakeStartNode));
+        OnPropertyChanged(nameof(StartNodeWarningText));
+        ChooseStartNodeCommand.NotifyCanExecuteChanged();
+        MakeStartNodeCmdCommand.NotifyCanExecuteChanged();
+    }
+
+    internal string? TakeNodeComment(int nodeId) =>
+        _nodeComments.Remove(nodeId, out var comment) ? comment : null;
+
+    internal void RestoreNodeComment(int nodeId, string comment) => _nodeComments[nodeId] = comment;
+
+    internal void ApplyRenumber(NodeViewModel node, int from, int to)
+    {
+        node.Renumber(to);
+        if (_nodeComments.Remove(from, out var comment)) _nodeComments[to] = comment;
+        _pendingRemaps.Add((from, to));
+        RefreshStartNode();
+        IsModified = true;
     }
 
     // ── Relay commands for UI binding (context menus, keyboard) ───────────

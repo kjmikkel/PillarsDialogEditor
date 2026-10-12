@@ -196,6 +196,10 @@ public partial class FlowAnalyticsViewModel : ObservableObject
     [ObservableProperty] private string          _conditionalLinksDisplay = string.Empty;
     [ObservableProperty] private bool            _hasData;
 
+    /// The conversation has nodes but no node 0 (issue 172): one error replaces the
+    /// Unreachable flag every node would otherwise get.
+    [ObservableProperty] private bool _hasNoStartNode;
+
     public ObservableCollection<FlowIssueViewModel>   Issues      { get; } = [];
     public ObservableCollection<TokenIssueRowViewModel> TokenIssues { get; } = [];
     public ObservableCollection<PathBranchRowViewModel> Branches       { get; } = [];
@@ -231,6 +235,7 @@ public partial class FlowAnalyticsViewModel : ObservableObject
     [ObservableProperty] private string _conversationsSpannedText = string.Empty;
 
     [ObservableProperty] private bool   _hasPathStats;
+    [ObservableProperty] private bool   _pathStatsNoStartNode;
     [ObservableProperty] private bool   _hasEndings;
     [ObservableProperty] private bool   _hasSignificantFemaleVariant;
     [ObservableProperty] private string _longestPlaythroughText  = string.Empty;
@@ -297,8 +302,9 @@ public partial class FlowAnalyticsViewModel : ObservableObject
 
         var report = FlowAnalysisService.Analyze(snapshot, _gameId);
 
-        Statistics = report.Statistics;
-        HasData    = true;
+        Statistics     = report.Statistics;
+        HasData        = true;
+        HasNoStartNode = !report.HasStartNode;
 
         Issues.Clear();
         foreach (var issue in report.Issues)
@@ -319,7 +325,7 @@ public partial class FlowAnalyticsViewModel : ObservableObject
             ? $"{cond} ({(int)(cond * 100.0 / total)}%)"
             : cond.ToString();
 
-        var issueCount = report.Issues.Count;
+        var issueCount = report.Issues.Count + (report.HasStartNode ? 0 : 1);
         StatusText  = issueCount > 0
             ? Loc.Format("FlowAnalytics_Issues", issueCount)
             : Loc.Get("FlowAnalytics_NoIssues");
@@ -413,6 +419,7 @@ public partial class FlowAnalyticsViewModel : ObservableObject
         }
         HasEndings = Endings.Count > 0;
 
+        PathStatsNoStartNode = !report.HasStartNode;
         HasPathStats = report.DefaultTotalWords > 0 || report.WordsPerSpeaker.Count > 0;
     }
 

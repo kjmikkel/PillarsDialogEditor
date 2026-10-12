@@ -119,12 +119,14 @@ public partial class ConversationView : UserControl
 
             // Order matters: connect-mode arms must win over the unconditional
             // SelectedNode-based arms below (same Key, both `when none`).
+            Key.Enter when none && vm.IsChoosingStartNode => vm.TryConfirmStartNode(vm.SelectedNode),
             Key.Enter when none && vm.IsConnecting => vm.TryConfirmConnection(),
             Key.Enter when none && vm.SelectedNode is not null => RaiseFocusDetail(),
 
             Key.Apps                                          => OpenSelectedNodeContextMenu(vm),
             Key.F10 when e.KeyModifiers == KeyModifiers.Shift => OpenSelectedNodeContextMenu(vm),
 
+            Key.Escape when none && vm.IsChoosingStartNode => CancelChoosingStartNode(vm),
             Key.Escape when none && vm.IsConnecting => vm.CancelConnect(),
             Key.Escape when none                    => vm.Deselect(),
 
@@ -134,6 +136,22 @@ public partial class ConversationView : UserControl
         if (!handled) return;
         FollowSelection(vm);
         e.Handled = true;
+    }
+
+    // Issue 172: in pick mode a click on a node confirms it as the start node. Selection
+    // alone doesn't, so clicking the node that is already selected must still count.
+    private void Node_Tapped(object? sender, TappedEventArgs e)
+    {
+        if (DataContext is ConversationViewModel { IsChoosingStartNode: true } vm
+            && (sender as Control)?.DataContext is NodeViewModel node)
+            e.Handled = vm.TryConfirmStartNode(node);
+    }
+
+    // Issue 172: Esc leaves start-node pick mode without changing anything.
+    private static bool CancelChoosingStartNode(ConversationViewModel vm)
+    {
+        vm.CancelChooseStartNodeCommand.Execute(null);
+        return true;
     }
 
     private bool RaiseFocusDetail()
