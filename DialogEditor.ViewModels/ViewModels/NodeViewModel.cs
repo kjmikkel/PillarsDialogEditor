@@ -34,16 +34,38 @@ public partial class NodeViewModel : ObservableObject
     public bool IsPlayerChoice
     {
         get => _isPlayerChoice;
-        set => Push(_isPlayerChoice, value, "Undo_EditNodeType",
-            v => { _isPlayerChoice = v; OnPropertyChanged(nameof(IsPlayerChoice)); OnPropertyChanged(nameof(Title)); });
+        set => Push(_isPlayerChoice, value, "Undo_EditNodeType", ApplyIsPlayerChoice);
+    }
+
+    private void ApplyIsPlayerChoice(bool v)
+    {
+        _isPlayerChoice = v; OnPropertyChanged(nameof(IsPlayerChoice)); OnPropertyChanged(nameof(Title));
+    }
+
+    /// Changes the node's category as one undoable edit, keeping IsPlayerChoice in step
+    /// (true only for Player). The serializers write the game node type from the category,
+    /// so a type change made through IsPlayerChoice alone was lost on save (issue 160).
+    public void SetCategory(SpeakerCategory category)
+    {
+        var current = (_speakerCategory, _isPlayerChoice);
+        var target  = (category, category == SpeakerCategory.Player);
+        Push(current, target, "Undo_EditNodeType", v =>
+        {
+            ApplySpeakerCategory(v.Item1);
+            ApplyIsPlayerChoice(v.Item2);
+        });
     }
 
     public SpeakerCategory SpeakerCategory
     {
         get => _speakerCategory;
-        set => Push(_speakerCategory, value, "Undo_EditSpeakerCategory",
-            v => { _speakerCategory = v; OnPropertyChanged(nameof(SpeakerCategory));
-                   OnPropertyChanged(nameof(TextPlaceholder)); OnPropertyChanged(nameof(HasTextPlaceholder)); });
+        set => Push(_speakerCategory, value, "Undo_EditSpeakerCategory", ApplySpeakerCategory);
+    }
+
+    private void ApplySpeakerCategory(SpeakerCategory v)
+    {
+        _speakerCategory = v; OnPropertyChanged(nameof(SpeakerCategory));
+        OnPropertyChanged(nameof(TextPlaceholder)); OnPropertyChanged(nameof(HasTextPlaceholder));
     }
 
     public string SpeakerGuid
