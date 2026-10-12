@@ -1,3 +1,5 @@
+using DialogEditor.Core.GameData;
+using System.Text.Json.Nodes;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
@@ -91,5 +93,73 @@ public class PatchInstallerTests
 
         Assert.Equal(1, result.ConversationsPatched);
         Assert.True(File.Exists(game.ConvPath("brand_new")));
+    }
+
+    // ── New conversations are registered with the game (issue #162) ───────
+
+    private static DialogProject NewConversationMod(string modName = "N")
+    {
+        var node0 = new NodeEditSnapshot(0, false, SpeakerCategory.Npc, "spk", "lst",
+            "", "", "Conversation", "None", "", "", "", false, false, [], [], []);
+        return DialogProject.Empty(modName)
+            .WithNewConversation("brand_new")
+            .WithPatch(new ConversationPatch("brand_new", ConversationPatch.CurrentSchemaVersion, [node0], [], []));
+    }
+
+    private static string ManifestPath(FakePoe2Game g) => g.Provider.ConversationManifestPath("brand_new")!;
+
+    private static string EntryId(FakePoe2Game g) =>
+        Assert.Single(JsonNode.Parse(File.ReadAllText(ManifestPath(g)))!["Entries"]!.AsArray())!["ID"]!.GetValue<string>();
+
+    [Fact]
+    public void Install_NewConversation_RegistersItUnderItsBundleId()
+    {
+        using var game = new FakePoe2Game();
+        Install(game, NewConversationMod());
+
+        var bundleId = JsonNode.Parse(File.ReadAllText(game.ConvPath("brand_new")))!["Conversations"]![0]!["ID"]!.GetValue<string>();
+        Assert.Equal(bundleId, EntryId(game));
+    }
+
+    [Fact]
+    public void Restore_RemovesTheManifest_AndTheFolderItCreated()
+    {
+        using var game = new FakePoe2Game();
+        Install(game, NewConversationMod());
+
+        PatchInstaller.Restore(game.Root);
+
+        Assert.False(File.Exists(ManifestPath(game)));
+        Assert.False(Directory.Exists(Path.GetDirectoryName(ManifestPath(game))));
+    }
+
+    [Fact]
+    public void Install_Twice_KeepsTheSameId()
+    {
+        using var game = new FakePoe2Game();
+        Install(game, NewConversationMod());
+        var first = EntryId(game);
+
+        Install(game, NewConversationMod());
+
+        Assert.Equal(first, EntryId(game));
+    }
+
+    [Fact]
+    public void Install_TwoModsCreatingTheSameConversation_RegisterItOnce()
+    {
+        using var game = new FakePoe2Game();
+        Install(game, NewConversationMod("A"), NewConversationMod("B"));
+
+        Assert.Equal(NewConversationId.For("brand_new").ToString(), EntryId(game));
+    }
+
+    [Fact]
+    public void Install_EditingOnlyExistingConversations_WritesNoManifest()
+    {
+        using var game = new FakePoe2Game();
+        Install(game, FakePoe2Game.ExternalVoMod("A", "a"));
+
+        Assert.False(Directory.Exists(Path.GetDirectoryName(ManifestPath(game))));
     }
 }
