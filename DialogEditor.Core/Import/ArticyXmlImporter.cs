@@ -105,7 +105,7 @@ public class ArticyXmlImporter : IDialogImporter
 
         var map = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
         for (int i = 0; i < ids.Count; i++)
-            map[ids[i]] = i + 1;
+            map[ids[i]] = i;   // from 0, the games' start node (issue 162)
 
         return map;
     }

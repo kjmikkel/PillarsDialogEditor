@@ -20,7 +20,7 @@ public class YarnSpinnerImporter : IDialogImporter
         // First pass: generate nodes for every block and build title → first-node-id map.
         var allPendingNodes = new List<PendingNode>();
         var blockFirstNodeId = new Dictionary<string, int>(StringComparer.Ordinal);
-        int nextId = 1;
+        int nextId = 0;   // the first block's first line is the start node (issue 162)
 
         foreach (var block in rawBlocks)
         {

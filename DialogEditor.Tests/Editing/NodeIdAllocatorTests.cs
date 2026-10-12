@@ -4,10 +4,12 @@ namespace DialogEditor.Tests.Editing;
 
 public class NodeIdAllocatorTests
 {
+    // Issue 162: both games start a conversation at node 0 unless told otherwise, so a new
+    // conversation's first node must be 0.
     [Fact]
-    public void Next_EmptyList_ReturnsOne()
+    public void Next_EmptyList_ReturnsZero()
     {
-        Assert.Equal(1, NodeIdAllocator.Next([]));
+        Assert.Equal(0, NodeIdAllocator.Next([]));
     }
 
     [Fact]
