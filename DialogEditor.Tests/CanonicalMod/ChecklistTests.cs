@@ -48,8 +48,6 @@ public class ChecklistTests
     // KnownIssue. The tester should expect them in play too.
     public static TheoryData<string, string, string> SkippedElsewhere => new()
     {
-        { "poe1", "nodes.delete",         "#161" },
-        { "poe2", "nodes.delete",         "#161" },
         { "poe1", "links.display-values", "#164" },
         { "poe1", "conversation.new",     "#162" },
         { "poe2", "conversation.new",     "#162" },
