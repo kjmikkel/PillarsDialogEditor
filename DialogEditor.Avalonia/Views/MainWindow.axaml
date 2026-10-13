@@ -4,11 +4,15 @@
         xmlns:controls="clr-namespace:DialogEditor.Avalonia.Controls"
         xmlns:dock="using:Dock.Avalonia.Controls"
         xmlns:ctrl="clr-namespace:DialogEditor.Avalonia.Controls"
+        xmlns:theming="clr-namespace:DialogEditor.Avalonia.Shared.Theming;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.MainWindow"
         Title="{Binding WindowTitle}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="1400" Height="850"
-        Background="{DynamicResource Brush.Surface.Window}" x:CompileBindings="False">
+        Background="{DynamicResource Brush.Surface.Window}" x:CompileBindings="False"
+        theming:WindowSizing.Mode="ClampOnly">
+
+    <!-- ClampOnly (issue 177): the panes already resize, so the main window is only kept on screen, never scaled. -->
 
     <Grid RowDefinitions="Auto,*,Auto,Auto">
 

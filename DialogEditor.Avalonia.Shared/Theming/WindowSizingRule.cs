@@ -1,0 +1,135 @@
+using Avalonia;
+using Avalonia.Controls;
+
+namespace DialogEditor.Avalonia.Shared.Theming;
+
+/// <summary>The six size values of a window. NaN means "auto" (SizeToContent), as in Avalonia.</summary>
+public readonly record struct WindowSize(
+    double Width, double Height,
+    double MinWidth, double MinHeight,
+    double MaxWidth, double MaxHeight)
+{
+    public static WindowSize Of(Window w) =>
+        new(w.Width, w.Height, w.MinWidth, w.MinHeight, w.MaxWidth, w.MaxHeight);
+
+    // Limits first, so Width/Height are never briefly outside them.
+    public void ApplyTo(Window w)
+    {
+        w.MinWidth = MinWidth;   w.MinHeight = MinHeight;
+        w.MaxWidth = MaxWidth;   w.MaxHeight = MaxHeight;
+        w.Width    = Width;      w.Height    = Height;
+    }
+}
+
+/// <summary>Scale: window geometry follows the font scale. ClampOnly: only kept on screen
+/// (main windows, whose panes already resize).</summary>
+public enum WindowSizingMode { Scale, ClampOnly }
+
+/// <summary>
+/// The pure sizing rule behind issue 177. The font scale changes text size but not layout
+/// units, so a Width="420" dialog stays 420 while its text doubles and its buttons are cut
+/// off. This multiplies a window's XAML design size by the scale, then clamps Width, Height and
+/// the minimums to the screen's working area. Clamping only Width would not be enough: Avalonia
+/// lets MinWidth win over MaxWidth, so a doubled MinWidth could still push a window off a
+/// 1366×768 screen.
+///
+/// The maximums are NOT capped at the screen, except on an axis the window sizes to its content.
+/// A finite MaxWidth/MaxHeight becomes the OS's maximum track size, so a screen-capped maximum
+/// stops a maximized window filling its screen and stops any window growing on a larger second
+/// monitor. A SizeToContent axis has no Height/Width to cap, so its maximum is the only thing
+/// that keeps a tall dialog (Settings, About) on screen; ClampOnly windows never get one.
+/// See docs/superpowers/specs/2026-10-13-window-sizing-design.md.
+/// </summary>
+public static class WindowSizingRule
+{
+    /// <summary>DIPs kept free between a clamped window and each screen edge.</summary>
+    public const double ScreenMargin = 16;
+
+    public static WindowSize Compute(WindowSize design, double scale, Size? workingArea, WindowSizingMode mode,
+                                     SizeToContent sizeToContent = SizeToContent.Manual)
+    {
+        var k = mode == WindowSizingMode.Scale ? scale : 1.0;
+        // NaN, 0 and Infinity survive multiplication by a positive k, which is what we want.
+        var scaled = new WindowSize(
+            design.Width * k, design.Height * k,
+            design.MinWidth * k, design.MinHeight * k,
+            design.MaxWidth * k, design.MaxHeight * k);
+        return Clamp(scaled, workingArea, mode, sizeToContent);
+    }
+
+    /// <summary>
+    /// Live rescale of an open window. Width and Height scale by newScale/oldScale from their
+    /// CURRENT values, so a window you resized keeps that size in proportion. The limits are
+    /// recomputed from the design size, so they never drift.
+    /// </summary>
+    public static WindowSize Rescale(WindowSize current, WindowSize design, double oldScale, double newScale,
+                                     Size? workingArea, WindowSizingMode mode,
+                                     SizeToContent sizeToContent = SizeToContent.Manual)
+    {
+        var ratio  = mode == WindowSizingMode.Scale ? newScale / oldScale : 1.0;
+        var limits = Compute(design, newScale, workingArea, mode, sizeToContent);
+        var sized  = limits with
+        {
+            Width  = Fit(current.Width  * ratio, limits.MinWidth,  limits.MaxWidth),
+            Height = Fit(current.Height * ratio, limits.MinHeight, limits.MaxHeight),
+        };
+        return Clamp(sized, workingArea, mode, sizeToContent);
+    }
+
+    /// <summary>Screen.WorkingArea is in physical pixels; window sizes are in DIPs.</summary>
+    public static Size WorkingAreaInDips(PixelSize workingArea, double scaling) =>
+        workingArea.ToSize(scaling);
+
+    /// <summary>
+    /// The room a window's CLIENT area has: the working area less the window's chrome (title bar
+    /// and borders). Width, Height and the limits are client sizes, so clamping them against the
+    /// whole working area let a clamped window's frame run off the screen by the chrome's height.
+    /// </summary>
+    public static Size ClientArea(Size workingArea, Size chrome) =>
+        new(Math.Max(0, workingArea.Width - chrome.Width), Math.Max(0, workingArea.Height - chrome.Height));
+
+    /// <summary>
+    /// Which screen a window must fit: its own once it is shown (it may have been moved to
+    /// another monitor), else its owner's, else the main window's, else the primary screen.
+    /// </summary>
+    public static T? PickScreen<T>(T? own, T? owner, T? main, T? primary) where T : class =>
+        own ?? owner ?? main ?? primary;
+
+    /// <summary>
+    /// Where to put a window so it is on screen (all values in physical pixels). A window that
+    /// already lies inside the working area on an axis stays where it is; one that sticks out is
+    /// moved back to <paramref name="margin"/> from the edge. If it is bigger than the area, its
+    /// top-left stays on screen. Sizing alone is not enough: the OS's default placement, or a
+    /// position saved at a smaller font scale, can put a screen-sized window half off the screen.
+    /// </summary>
+    public static PixelPoint FitPosition(PixelRect window, PixelRect workingArea, int margin)
+    {
+        static int Fit(int pos, int length, int start, int end, int margin)
+        {
+            if (pos >= start && pos + length <= end) return pos;
+            return Math.Max(start + margin, Math.Min(pos, end - margin - length));
+        }
+        return new PixelPoint(
+            Fit(window.X, window.Width,  workingArea.X, workingArea.Right,  margin),
+            Fit(window.Y, window.Height, workingArea.Y, workingArea.Bottom, margin));
+    }
+
+    private static WindowSize Clamp(WindowSize s, Size? workingArea, WindowSizingMode mode, SizeToContent sizeToContent)
+    {
+        if (workingArea is not { } area) return s;
+        var maxW = Math.Max(0, area.Width  - 2 * ScreenMargin);
+        var maxH = Math.Max(0, area.Height - 2 * ScreenMargin);
+        var capMaxW = mode == WindowSizingMode.Scale && sizeToContent.HasFlag(SizeToContent.Width);
+        var capMaxH = mode == WindowSizingMode.Scale && sizeToContent.HasFlag(SizeToContent.Height);
+        return new WindowSize(
+            Cap(s.Width, maxW), Cap(s.Height, maxH),
+            Math.Min(s.MinWidth, maxW), Math.Min(s.MinHeight, maxH),
+            capMaxW ? Math.Min(s.MaxWidth, maxW) : s.MaxWidth,
+            capMaxH ? Math.Min(s.MaxHeight, maxH) : s.MaxHeight);
+    }
+
+    private static double Cap(double v, double limit) => double.IsNaN(v) ? v : Math.Min(v, limit);
+
+    private static double Fit(double v, double min, double max) =>
+        double.IsNaN(v) ? v : Math.Max(min, Math.Min(v, max));
+}

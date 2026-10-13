@@ -6,38 +6,43 @@
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="420" MinWidth="420" SizeToContent="Height" CanResize="True"
         ShowInTaskbar="False" Background="{DynamicResource Brush.Surface.Info}">
-    <StackPanel Margin="18,16,18,16" Spacing="8">
-        <TextBlock Text="{Binding AppName}" Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Title}" FontWeight="Bold"/>
-        <StackPanel Orientation="Horizontal" Spacing="6">
-            <TextBlock Text="{DynamicResource About_VersionLabel}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Body}"/>
-            <TextBlock Text="{Binding Version}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"/>
-        </StackPanel>
-        <TextBlock Text="{Binding Description}" Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
-        <TextBlock Text="{Binding License}" Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap" Margin="0,4,0,0"/>
-        <TextBlock Text="{Binding Credits}" Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap"/>
-        <!-- Non-affiliation notice (issue #64); the string is shared with the patcher's About. -->
-        <TextBlock Text="{DynamicResource About_NonAffiliation}" Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap"/>
+    <!-- The body scrolls and Close stays below it (issue 177); see SettingsWindow.axaml. -->
+    <Grid RowDefinitions="*,Auto,Auto" Margin="18,16,18,16">
+        <ScrollViewer Grid.Row="0">
+            <StackPanel Spacing="8">
+                <TextBlock Text="{Binding AppName}" Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Title}" FontWeight="Bold"/>
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <TextBlock Text="{DynamicResource About_VersionLabel}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Body}"/>
+                    <TextBlock Text="{Binding Version}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"/>
+                </StackPanel>
+                <TextBlock Text="{Binding Description}" Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding License}" Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                <TextBlock Text="{Binding Credits}" Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap"/>
+                <!-- Non-affiliation notice (issue #64); the string is shared with the patcher's About. -->
+                <TextBlock Text="{DynamicResource About_NonAffiliation}" Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap"/>
 
-        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
-            <Button Content="{DynamicResource About_OpenRepository}"
-                    ToolTip.Tip="{DynamicResource About_OpenRepositoryTip}"
-                    AutomationProperties.HelpText="{DynamicResource About_OpenRepositoryTip}"
-                    Command="{Binding OpenRepositoryCommand}"/>
-            <Button Content="{DynamicResource About_OpenDocs}"
-                    ToolTip.Tip="{DynamicResource About_OpenDocsTip}"
-                    AutomationProperties.HelpText="{DynamicResource About_OpenDocsTip}"
-                    Command="{Binding OpenDocsCommand}"/>
-        </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+                    <Button Content="{DynamicResource About_OpenRepository}"
+                            ToolTip.Tip="{DynamicResource About_OpenRepositoryTip}"
+                            AutomationProperties.HelpText="{DynamicResource About_OpenRepositoryTip}"
+                            Command="{Binding OpenRepositoryCommand}"/>
+                    <Button Content="{DynamicResource About_OpenDocs}"
+                            ToolTip.Tip="{DynamicResource About_OpenDocsTip}"
+                            AutomationProperties.HelpText="{DynamicResource About_OpenDocsTip}"
+                            Command="{Binding OpenDocsCommand}"/>
+                </StackPanel>
 
-        <TextBlock Text="{Binding Status}" Foreground="{DynamicResource Brush.Text.Status.Pending}" FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap"/>
+                <TextBlock Text="{Binding Status}" Foreground="{DynamicResource Brush.Text.Status.Pending}" FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap"/>
+            </StackPanel>
+        </ScrollViewer>
 
-        <Button HorizontalAlignment="Right" Margin="0,8,0,0"
+        <Button Grid.Row="1" x:Name="CloseButton" HorizontalAlignment="Right" Margin="0,8,0,0"
                 Content="{DynamicResource About_Close}"
                 ToolTip.Tip="{DynamicResource About_Close}"
                 AutomationProperties.HelpText="{DynamicResource About_Close}"
                 Click="Close_Click"/>
 
         <!-- Focus hint bar (Gaps item 16) -->
-        <shared:FocusHintBar x:Name="HintBar"/>
-    </StackPanel>
+        <shared:FocusHintBar Grid.Row="2" x:Name="HintBar"/>
+    </Grid>
 </Window>

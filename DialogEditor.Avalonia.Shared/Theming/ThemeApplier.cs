@@ -93,6 +93,11 @@ public sealed class ThemeApplier : IThemeApplier
         };
         dicts.Insert(0, wrapper);
 
+        // The fresh Tokens.axaml carries unscaled FontSize.* values (issue 177): re-apply the
+        // current font scale, or a theme switch silently shrinks the text back to 1.0 while the
+        // windows sized for it stay scaled.
+        new FontScaleApplier().Apply(FontScaleService.Current.Scale);
+
         app.RequestedThemeVariant = entry.Variant;
         ThemeService.Current.Bump();
     }

@@ -47,6 +47,17 @@ public class FontScaleApplierTests
     }
 
     [AvaloniaFact]
+    public void Apply_PublishesTheScale()
+    {
+        try
+        {
+            new FontScaleApplier().Apply(1.5);
+            Assert.Equal(1.5, FontScaleService.Current.Scale);
+        }
+        finally { new FontScaleApplier().Apply(1.0); }
+    }
+
+    [AvaloniaFact]
     public void Apply_OneScale_RestoresBaseValues()
     {
         new FontScaleApplier().Apply(1.5);
