@@ -6,8 +6,10 @@ using DialogEditor.Core.Logging;
 namespace DialogEditor.Core.Backup;
 
 /// <summary>What a full backup folder holds. Format 2 (issue 123) adds the per-language
-/// stringtable folders; a backup without a manifest is format 1 (one flat stringtables folder).</summary>
-public sealed record FullBackupManifest(int Format, string GameId, IReadOnlyList<string> Languages);
+/// stringtable folders; format 3 (issue 198) adds <see cref="ExtraFolders"/>, the PoE2 DLC data
+/// folders, as paths relative to the backup. A backup without a manifest is format 1.</summary>
+public sealed record FullBackupManifest(int Format, string GameId, IReadOnlyList<string> Languages,
+                                        IReadOnlyList<string>? ExtraFolders = null);
 
 /// <summary>One snapshot folder and the live folder it restores into.</summary>
 public sealed record RestorePair(string Snapshot, string Live);
@@ -26,7 +28,7 @@ public sealed record RestorePlan(IReadOnlyList<RestorePair> Pairs, bool TextLang
 public static class FullBackup
 {
     public const string ManifestFileName = "backup.json";
-    private const int CurrentFormat = 2;
+    private const int CurrentFormat = 3;
     private const string VoiceOverFolder = "voice-over";
 
     private static readonly JsonSerializerOptions ManifestJson = new() { WriteIndented = true };
@@ -45,10 +47,42 @@ public static class FullBackup
             languages.Add(lang);
         }
 
+        var extras = new List<string>();
+        foreach (var folder in provider.GetExtraBackupFolders())
+        {
+            await BackupService.BackupAsync(folder.LivePath, Path.Combine(backupRoot, folder.SnapshotPath), ct);
+            extras.Add(folder.SnapshotPath);
+        }
+
         // Written last on purpose: a backup interrupted part-way then has no manifest and is
         // treated as an untrusted format-1 backup rather than a complete format-2 one.
         File.WriteAllText(Path.Combine(backupRoot, ManifestFileName),
-            JsonSerializer.Serialize(new FullBackupManifest(CurrentFormat, provider.GameId, languages), ManifestJson));
+            JsonSerializer.Serialize(new FullBackupManifest(CurrentFormat, provider.GameId, languages, extras), ManifestJson));
+    }
+
+    /// <summary>
+    /// Adds the folders a backup lacks (issue 198): a backup taken before PoE2's DLC folders were
+    /// read has none of them. Nothing could write those files until then, so the live copies are
+    /// still the originals. Only a format-2 backup is topped up: a format-1 backup (no manifest)
+    /// would read its single text folder differently once it had one, and a format-3 backup
+    /// already holds every DLC folder the game had, so a folder that appears later can only be
+    /// the editor's or the patcher's output, never an original. Returns how many were added.
+    /// </summary>
+    public static async Task<int> TopUpAsync(IGameDataProvider provider, string backupRoot, CancellationToken ct)
+    {
+        if (ReadManifest(backupRoot) is not { Format: < 3 } manifest) return 0;
+        var have = (manifest.ExtraFolders ?? []).ToHashSet(StringComparer.Ordinal);
+        var missing = provider.GetExtraBackupFolders().Where(f => !have.Contains(f.SnapshotPath)).ToList();
+        if (missing.Count == 0) return 0;
+
+        foreach (var folder in missing)
+            await BackupService.BackupAsync(folder.LivePath, Path.Combine(backupRoot, folder.SnapshotPath), ct);
+
+        File.WriteAllText(Path.Combine(backupRoot, ManifestFileName), JsonSerializer.Serialize(
+            manifest with { Format = Math.Max(manifest.Format, CurrentFormat),
+                            ExtraFolders = [.. have.Order(StringComparer.Ordinal), .. missing.Select(f => f.SnapshotPath)] },
+            ManifestJson));
+        return missing.Count;
     }
 
     /// <summary>The backup's manifest, or <c>null</c> for a format-1 backup (none) or an unreadable one.</summary>
@@ -99,6 +133,13 @@ public static class FullBackup
                 var live = provider.GetStringTablesRoot(lang);
                 if (Directory.Exists(live))
                     pairs.Add(new RestorePair(Path.Combine(backupRoot, "stringtables", lang), live));
+            }
+
+            var kept = (manifest.ExtraFolders ?? []).ToHashSet(StringComparer.Ordinal);
+            foreach (var folder in provider.GetExtraBackupFolders().Where(f => kept.Contains(f.SnapshotPath)))
+            {
+                var snapshot = Path.Combine(backupRoot, folder.SnapshotPath);
+                if (Directory.Exists(snapshot)) pairs.Add(new RestorePair(snapshot, folder.LivePath));
             }
         }
         else

@@ -38,7 +38,7 @@ public static class Poe2GameDataBundleParser
         string? typeFilter = null,
         Func<IReadOnlyList<JsonElement>, bool>? componentFilter = null)
     {
-        var root = JsonSerializer.Deserialize<BundleRoot>(json, Options);
+        var root = JsonSerializer.Deserialize<BundleRoot>(EscapeControlCharactersInStrings(json), Options);
         if (root is null) return [];
 
         return root.GameDataObjects
@@ -73,7 +73,7 @@ public static class Poe2GameDataBundleParser
     /// docs/superpowers/specs/2026-07-09-lookup-kind-sweep-design.md.
     public static IReadOnlyDictionary<string, IReadOnlyList<GameDataEntry>> ParseAllByType(string json)
     {
-        var root = JsonSerializer.Deserialize<BundleRoot>(json, Options);
+        var root = JsonSerializer.Deserialize<BundleRoot>(EscapeControlCharactersInStrings(json), Options);
         if (root is null) return new Dictionary<string, IReadOnlyList<GameDataEntry>>();
 
         var byType = new Dictionary<string, List<GameDataEntry>>(StringComparer.Ordinal);
@@ -88,6 +88,34 @@ public static class Poe2GameDataBundleParser
             list.Add(new GameDataEntry(Id: o.Id, Name: o.DebugName));
         }
         return byType.ToDictionary(kv => kv.Key, kv => (IReadOnlyList<GameDataEntry>)kv.Value);
+    }
+
+    /// <summary>
+    /// Escapes raw control characters (line breaks, tabs) that sit inside JSON strings. Some
+    /// shipped DLC bundles have them (lax1_progressiontables, lax1_worldmap, lax3_ and
+    /// laxg_progressiontables, issue 198); the game's reader accepts them, strict JSON doesn't.
+    /// Text outside strings is left alone, where such characters are ordinary whitespace.
+    /// </summary>
+    internal static string EscapeControlCharactersInStrings(string json)
+    {
+        System.Text.StringBuilder? fixedJson = null;
+        var inString = false;
+        var escaped = false;
+        for (var i = 0; i < json.Length; i++)
+        {
+            var c = json[i];
+            if (inString && c < ' ')
+            {
+                fixedJson ??= new System.Text.StringBuilder(json, 0, i, json.Length + 16);
+                fixedJson.Append("\\u").Append(((int)c).ToString("x4"));
+                continue;
+            }
+            fixedJson?.Append(c);
+            if (escaped) { escaped = false; continue; }
+            if (c == '\\' && inString) escaped = true;
+            else if (c == '"') inString = !inString;
+        }
+        return fixedJson?.ToString() ?? json;
     }
 
     public static IReadOnlyDictionary<string, IReadOnlyList<GameDataEntry>> ParseAllByTypeFile(string path)

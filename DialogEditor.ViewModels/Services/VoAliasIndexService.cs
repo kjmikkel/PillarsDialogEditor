@@ -34,7 +34,9 @@ public static class VoAliasIndexService
                 files[Path.GetFileNameWithoutExtension(f).ToLowerInvariant()] = f; // later wins
         }
 
-        AddTree(Path.Combine(gameRoot, "PillarsOfEternityII_Data", "exported", "design", "conversations"));
+        // Every data folder, base first, in the game's order (issue 198), then mods.
+        foreach (var root in DialogEditor.Core.GameData.Poe2DataRoots.Existing(gameRoot))
+            AddTree(Path.Combine(root.Path, "design", "conversations"));
         var overrideRoot = Path.Combine(gameRoot, "override");
         if (Directory.Exists(overrideRoot))
             foreach (var mod in Directory.EnumerateDirectories(overrideRoot).OrderBy(d => d, StringComparer.OrdinalIgnoreCase))

@@ -106,4 +106,18 @@ public class VoAliasIndexServiceTests : IDisposable
         Assert.True(VoAliasIndexService.IsReady);
         Assert.Single(VoAliasIndexService.GetReferences("narrator/z_0009"));
     }
+
+    // Issue 198: PoE2's DLC conversations live in their own data folders (lax2_exported, …).
+    [Fact]
+    public void Rebuild_IndexesDlcConversations()
+    {
+        var dlcDir = Path.Combine(_gameRoot, "PillarsOfEternityII_Data", "lax2_exported", "design", "conversations", "x");
+        Directory.CreateDirectory(dlcDir);
+        File.WriteAllText(Path.Combine(dlcDir, "lax02_cv_x.conversationbundle"),
+            ConvJson((3, "carver/lax02_01_cv_ice_carver_0008")));
+
+        VoAliasIndexService.Rebuild(_gameRoot);
+
+        Assert.Contains(new VoAliasRef("lax02_cv_x", 3), VoAliasIndexService.GetReferences("carver/lax02_01_cv_ice_carver_0008"));
+    }
 }

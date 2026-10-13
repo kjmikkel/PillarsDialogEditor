@@ -42,4 +42,21 @@ public class Poe2GameDataBundleParserSweepTests
     public void ParseAllByTypeFile_MissingFile_ReturnsEmpty()
         => Assert.Empty(Poe2GameDataBundleParser.ParseAllByTypeFile(
             Path.Combine(Path.GetTempPath(), "does-not-exist.gamedatabundle")));
+
+    // Issue 198: four DLC bundles (lax1_progressiontables, lax1_worldmap, lax3_ and
+    // laxg_progressiontables) have raw line breaks inside strings. The game reads them; strict
+    // JSON doesn't, and one such bundle used to fail opening the whole game folder.
+    [Fact]
+    public void ParseAllByType_ToleratesRawLineBreaksInsideStrings()
+    {
+        var json = "{\"GameDataObjects\":[{\"$type\":\"Game.GameData.ShipGameData, Assembly-CSharp\"," +
+                   "\"DebugName\":\"SHP_Defiant\",\"ID\":\"11111111-1111-1111-1111-111111111111\"," +
+                   "\"Note\":\"two\nlines\ttabbed\"}]}";
+        Assert.Contains('\n', json);   // a raw line break inside a string, not an escape
+
+        var byType = Poe2GameDataBundleParser.ParseAllByType(json);
+
+        Assert.Equal("SHP_Defiant", Assert.Single(byType["ShipGameData"]).Name);
+        Assert.Equal("SHP_Defiant", Assert.Single(Poe2GameDataBundleParser.Parse(json)).Name);
+    }
 }

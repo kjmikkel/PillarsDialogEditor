@@ -94,6 +94,18 @@
          Conversations dock (issue 85). -->
     <sys:String x:Key="Browser_Dlc_WhiteMarch1">The White March – Part I</sys:String>
     <sys:String x:Key="Browser_Dlc_WhiteMarch2">The White March – Part II</sys:String>
+    <!-- PoE2's DLC, grouped in the Conversations dock (issue 198). -->
+    <sys:String x:Key="Browser_Dlc_Lax1">Seeker, Slayer, Survivor</sys:String>
+    <sys:String x:Key="Browser_Dlc_Lax2">Beast of Winter</sys:String>
+    <sys:String x:Key="Browser_Dlc_Lax3">The Forgotten Sanctum</sys:String>
+    <sys:String x:Key="Browser_Dlc_LaxA">Rum Runner's Pack</sys:String>
+    <sys:String x:Key="Browser_Dlc_LaxB">Beard and Hair Pack</sys:String>
+    <sys:String x:Key="Browser_Dlc_LaxC">Scalawags Pack</sys:String>
+    <sys:String x:Key="Browser_Dlc_LaxD">Deck of Many Things Pack</sys:String>
+    <sys:String x:Key="Browser_Dlc_LaxE">Critical Role Pack</sys:String>
+    <sys:String x:Key="Browser_Dlc_LaxF">Mega Bosses</sys:String>
+    <sys:String x:Key="Browser_Dlc_LaxG">Mega Boss – The Hellfire Colossus</sys:String>
+    <sys:String x:Key="Browser_Dlc_LaxI">Woedica's Book</sys:String>
     <!-- Developer prototypes and tests that ship with the games, grouped last (issue 85). -->
     <sys:String x:Key="Browser_PrototypesFolder">Prototype and test content</sys:String>
     <sys:String x:Key="ToolTip_PrototypesFolder">Developer prototypes and tests that ship with the game. Kept here so they don't crowd the real content.</sys:String>
