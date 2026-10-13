@@ -28,17 +28,25 @@ public enum WindowSizingMode { Scale, ClampOnly }
 /// <summary>
 /// The pure sizing rule behind issue 177. The font scale changes text size but not layout
 /// units, so a Width="420" dialog stays 420 while its text doubles and its buttons are cut
-/// off. This multiplies a window's XAML design size by the scale, then clamps every dimension,
-/// minimums included, to the screen's working area. Clamping only Width would not be enough:
-/// Avalonia lets MinWidth win over MaxWidth, so a doubled MinWidth could still push a window
-/// off a 1366×768 screen. See docs/superpowers/specs/2026-10-13-window-sizing-design.md.
+/// off. This multiplies a window's XAML design size by the scale, then clamps Width, Height and
+/// the minimums to the screen's working area. Clamping only Width would not be enough: Avalonia
+/// lets MinWidth win over MaxWidth, so a doubled MinWidth could still push a window off a
+/// 1366×768 screen.
+///
+/// The maximums are NOT capped at the screen, except on an axis the window sizes to its content.
+/// A finite MaxWidth/MaxHeight becomes the OS's maximum track size, so a screen-capped maximum
+/// stops a maximized window filling its screen and stops any window growing on a larger second
+/// monitor. A SizeToContent axis has no Height/Width to cap, so its maximum is the only thing
+/// that keeps a tall dialog (Settings, About) on screen; ClampOnly windows never get one.
+/// See docs/superpowers/specs/2026-10-13-window-sizing-design.md.
 /// </summary>
 public static class WindowSizingRule
 {
     /// <summary>DIPs kept free between a clamped window and each screen edge.</summary>
     public const double ScreenMargin = 16;
 
-    public static WindowSize Compute(WindowSize design, double scale, Size? workingArea, WindowSizingMode mode)
+    public static WindowSize Compute(WindowSize design, double scale, Size? workingArea, WindowSizingMode mode,
+                                     SizeToContent sizeToContent = SizeToContent.Manual)
     {
         var k = mode == WindowSizingMode.Scale ? scale : 1.0;
         // NaN, 0 and Infinity survive multiplication by a positive k, which is what we want.
@@ -46,7 +54,7 @@ public static class WindowSizingRule
             design.Width * k, design.Height * k,
             design.MinWidth * k, design.MinHeight * k,
             design.MaxWidth * k, design.MaxHeight * k);
-        return Clamp(scaled, workingArea);
+        return Clamp(scaled, workingArea, mode, sizeToContent);
     }
 
     /// <summary>
@@ -55,30 +63,35 @@ public static class WindowSizingRule
     /// recomputed from the design size, so they never drift.
     /// </summary>
     public static WindowSize Rescale(WindowSize current, WindowSize design, double oldScale, double newScale,
-                                     Size? workingArea, WindowSizingMode mode)
+                                     Size? workingArea, WindowSizingMode mode,
+                                     SizeToContent sizeToContent = SizeToContent.Manual)
     {
         var ratio  = mode == WindowSizingMode.Scale ? newScale / oldScale : 1.0;
-        var limits = Compute(design, newScale, workingArea, mode);
-        return limits with
+        var limits = Compute(design, newScale, workingArea, mode, sizeToContent);
+        var sized  = limits with
         {
             Width  = Fit(current.Width  * ratio, limits.MinWidth,  limits.MaxWidth),
             Height = Fit(current.Height * ratio, limits.MinHeight, limits.MaxHeight),
         };
+        return Clamp(sized, workingArea, mode, sizeToContent);
     }
 
     /// <summary>Screen.WorkingArea is in physical pixels; window sizes are in DIPs.</summary>
     public static Size WorkingAreaInDips(PixelSize workingArea, double scaling) =>
         workingArea.ToSize(scaling);
 
-    private static WindowSize Clamp(WindowSize s, Size? workingArea)
+    private static WindowSize Clamp(WindowSize s, Size? workingArea, WindowSizingMode mode, SizeToContent sizeToContent)
     {
         if (workingArea is not { } area) return s;
         var maxW = Math.Max(0, area.Width  - 2 * ScreenMargin);
         var maxH = Math.Max(0, area.Height - 2 * ScreenMargin);
+        var capMaxW = mode == WindowSizingMode.Scale && sizeToContent.HasFlag(SizeToContent.Width);
+        var capMaxH = mode == WindowSizingMode.Scale && sizeToContent.HasFlag(SizeToContent.Height);
         return new WindowSize(
             Cap(s.Width, maxW), Cap(s.Height, maxH),
             Math.Min(s.MinWidth, maxW), Math.Min(s.MinHeight, maxH),
-            Math.Min(s.MaxWidth, maxW), Math.Min(s.MaxHeight, maxH));
+            capMaxW ? Math.Min(s.MaxWidth, maxW) : s.MaxWidth,
+            capMaxH ? Math.Min(s.MaxHeight, maxH) : s.MaxHeight);
     }
 
     private static double Cap(double v, double limit) => double.IsNaN(v) ? v : Math.Min(v, limit);

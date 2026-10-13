@@ -2,6 +2,8 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using DialogEditor.Avalonia.Shared.Theming;
+using DialogEditor.Tests.Helpers;
+using DialogEditor.ViewModels.Resources;
 
 namespace DialogEditor.Tests.Theming;
 
@@ -10,6 +12,9 @@ namespace DialogEditor.Tests.Theming;
 /// working-area provider.</summary>
 public class WindowSizingTests
 {
+    // The main-window cases construct MainWindowViewModel, which looks up strings.
+    public WindowSizingTests() => Loc.Configure(new StubStringProvider());
+
     private static void Run(Size? workingArea, Action body)
     {
         WindowSizing.Register();

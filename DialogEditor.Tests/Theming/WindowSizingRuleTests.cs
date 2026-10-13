@@ -1,4 +1,5 @@
 using Avalonia;
+using Avalonia.Controls;
 using DialogEditor.Avalonia.Shared.Theming;
 
 namespace DialogEditor.Tests.Theming;
@@ -34,10 +35,37 @@ public class WindowSizingRuleTests
     }
 
     [Fact]
-    public void Compute_ClampsEverythingToTheWorkingAreaLessMargins()
+    public void Compute_ClampsSizesAndMinimumsToTheWorkingAreaLessMargins()
     {
         var s = WindowSizingRule.Compute(Design(w: 820, h: 620, minW: 700, minH: 400), 2.0, Small, WindowSizingMode.Scale);
-        Assert.Equal(new WindowSize(1334, 736, 1334, 736, 1334, 736), s);
+        Assert.Equal(new WindowSize(1334, 736, 1334, 736, double.PositiveInfinity, double.PositiveInfinity), s);
+    }
+
+    // Review finding: a finite MaxWidth/MaxHeight becomes the OS's maximum track size, so capping
+    // the maximums at the screen stopped a maximized window filling the screen, and stopped any
+    // window growing on a larger second monitor. Maximums stay as authored unless the window sizes
+    // itself to its content on that axis.
+    [Fact]
+    public void Compute_LeavesMaximumsUncapped_ForAManuallySizedWindow()
+    {
+        var s = WindowSizingRule.Compute(Design(w: 820, h: 620), 2.0, Small, WindowSizingMode.Scale, SizeToContent.Manual);
+        Assert.True(double.IsPositiveInfinity(s.MaxWidth));
+        Assert.True(double.IsPositiveInfinity(s.MaxHeight));
+    }
+
+    [Fact]
+    public void Compute_CapsTheMaximum_OnlyOnASizeToContentAxis()
+    {
+        var s = WindowSizingRule.Compute(Design(w: 500, minW: 500, minH: 420), 2.0, Small, WindowSizingMode.Scale, SizeToContent.Height);
+        Assert.Equal(736, s.MaxHeight);
+        Assert.True(double.IsPositiveInfinity(s.MaxWidth));
+    }
+
+    [Fact]
+    public void Compute_KeepsAnAuthoredMaximumBelowTheScreen()
+    {
+        var s = WindowSizingRule.Compute(Design(maxH: 520), 1.0, Small, WindowSizingMode.Scale, SizeToContent.Height);
+        Assert.Equal(520, s.MaxHeight);
     }
 
     [Fact]
@@ -47,14 +75,20 @@ public class WindowSizingRuleTests
         Assert.Equal(1000, s.Width);
         Assert.Equal(1000, s.MinWidth);
         Assert.Equal(736, s.MinHeight);
-        Assert.Equal(736, s.MaxHeight);
     }
 
     [Fact]
     public void Compute_ClampOnly_DoesNotScaleButStillClamps()
     {
         var s = WindowSizingRule.Compute(Design(w: 1400, h: 850, minW: 0), 2.0, Small, WindowSizingMode.ClampOnly);
-        Assert.Equal(new WindowSize(1334, 736, 0, 0, 1334, 736), s);
+        Assert.Equal(new WindowSize(1334, 736, 0, 0, double.PositiveInfinity, double.PositiveInfinity), s);
+    }
+
+    [Fact]
+    public void Compute_ClampOnly_NeverCapsTheMaximum()
+    {
+        var s = WindowSizingRule.Compute(Design(w: 1400, h: double.NaN, minW: 0), 1.0, Small, WindowSizingMode.ClampOnly, SizeToContent.Height);
+        Assert.True(double.IsPositiveInfinity(s.MaxHeight));
     }
 
     [Fact]

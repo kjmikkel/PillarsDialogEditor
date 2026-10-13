@@ -68,9 +68,14 @@ public static WindowSize Compute(WindowSize design, double scale, Size? workingA
    - `NaN` (auto) stays `NaN`, so `SizeToContent` keeps working.
    - `0` minimums and `Infinity` maximums stay as they are.
 2. **Clamp.** If `workingArea` is known, the limit is the working area minus a margin of 16 DIP
-   on each axis. Every finite dimension, minimums included, is clamped to the limit. Then
-   `MaxWidth` and `MaxHeight` become `min(scaled max, limit)`. Clamping the minimums means a
-   2.0× `MinWidth` can never force a window wider than the screen.
+   from each edge. `Width`, `Height` and the minimums are clamped to the limit. Clamping the
+   minimums means a 2.0× `MinWidth` can never force a window wider than the screen.
+   - The maximums are capped at the limit only on an axis where the window uses
+     `SizeToContent`, and never for a `ClampOnly` window. Such an axis has no `Width`/`Height`
+     to cap, so the maximum is what keeps a tall dialog on screen.
+   - *Corrected after the final review:* this spec first capped every `MaxWidth`/`MaxHeight`.
+     A finite maximum becomes the OS's maximum track size, so that stopped a maximized window
+     filling its screen and stopped any window growing on a larger second monitor.
 3. **No screen.** If `workingArea` is `null` (no screen found, which happens in headless
    tests), the clamp step is skipped.
 
