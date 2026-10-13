@@ -96,7 +96,6 @@
     <!-- Panel header label -->
     <sys:String x:Key="Browser_Header">CONVERSATIONS</sys:String>
     <!-- New conversation feature -->
-    <sys:String x:Key="Label_NewConversation_Suffix"> (new)</sys:String>
     <sys:String x:Key="Label_NewConversationsFolder">(new)</sys:String>
     <sys:String x:Key="Dialog_NewConversation_Create">Create</sys:String>
     <sys:String x:Key="ConversationName_Cancel">Cancel</sys:String>

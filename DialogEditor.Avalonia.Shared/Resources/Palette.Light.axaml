@@ -82,7 +82,7 @@
     <Color x:Key="Palette.Green.600">#FF2D6A2D</Color>
     <Color x:Key="Palette.Green.550">#FFCDEBD5</Color>
     <Color x:Key="Palette.Green.500">#FF1E7D34</Color>
-    <Color x:Key="Palette.Green.400">#FF1F7A3D</Color>
+    <Color x:Key="Palette.Green.400">#FF1A6B35</Color>  <!-- new conversations, added text, script syntax; darkened for 4.5:1 on Surface.Subtle (issue 85) -->
     <Color x:Key="Palette.Amber.500">#FF8F5E00</Color>
     <Color x:Key="Palette.Amber.600">#FF8A6508</Color>
     <Color x:Key="Palette.Amber.610">#FFF2E2B0</Color>

@@ -94,11 +94,12 @@ public class ConversationItemViewModelTests
     }
 
     [Fact]
-    public void DisplayName_WhenNew_ContainsName()
+    public void DisplayName_WhenNew_IsJustItsName()
     {
         var vm = new ConversationItemViewModel(MakeFile("intro"), isNew: true);
-        // Stub Loc returns the key; suffix key is "Label_NewConversation_Suffix"
-        Assert.Contains("intro", vm.DisplayName);
+        // Issue 85 A: the (new) folder and the green colour already mark it, so the name is
+        // not suffixed with "(new)" a second time.
+        Assert.Equal("intro", vm.DisplayName);
     }
 }
 
