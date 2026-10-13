@@ -90,13 +90,14 @@
     <sys:String x:Key="Dialog_SelectFolder">Select game root folder</sys:String>
 
     <!-- ─── Conversation browser ──────────────────────────────────────── -->
-    <!-- Display name for the virtual root folder when a conversation file
-         sits directly in the root without a sub-folder -->
-    <sys:String x:Key="Browser_RootFolder">(root)</sys:String>
+    <!-- PoE1's White March folders (px1_*, px2_*) are grouped under these in the
+         Conversations dock (issue 85). -->
+    <sys:String x:Key="Browser_Dlc_WhiteMarch1">The White March – Part I</sys:String>
+    <sys:String x:Key="Browser_Dlc_WhiteMarch2">The White March – Part II</sys:String>
     <!-- Panel header label -->
     <sys:String x:Key="Browser_Header">CONVERSATIONS</sys:String>
     <!-- New conversation feature -->
-    <sys:String x:Key="Label_NewConversationsFolder">(new)</sys:String>
+    <sys:String x:Key="Label_NewConversationsFolder">New conversations</sys:String>
     <sys:String x:Key="Dialog_NewConversation_Create">Create</sys:String>
     <sys:String x:Key="ConversationName_Cancel">Cancel</sys:String>
     <sys:String x:Key="Button_NewConversation">New conversation…</sys:String>

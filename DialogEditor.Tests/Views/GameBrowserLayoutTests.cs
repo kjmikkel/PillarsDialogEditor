@@ -26,7 +26,7 @@ public class GameBrowserLayoutTests
     private const string LongName = "00_bs_poi_poko_kohara_desert_with_a_very_long_conversation_name";
 
     private static ConversationItemViewModel MakeItem(string name, bool isNew = false) =>
-        new(new ConversationFile(name, $@"companions\{name}.conversation", "companions",
+        new(new ConversationFile(name, "companions", $@"companions\{name}.conversation",
                                  $@"companions\{name}.stringtable"), isNew);
 
     private sealed record Dock(Window Window, GameBrowserView View, GameBrowserViewModel Vm,
@@ -141,6 +141,41 @@ public class GameBrowserLayoutTests
             Assert.Equal(primary, ((ISolidColorBrush)label.Foreground!).Color);
             Assert.Equal(FontWeight.SemiBold, label.FontWeight);
         });
+
+    // Issue 85, part B: a nested game folder renders inside its parent, with its raw path as
+    // the tooltip; a top-level conversation renders at the top level, after the folders.
+    [AvaloniaFact]
+    public void NestedFolders_RenderInsideTheirParent_WithTheRawPathAsTooltip()
+    {
+        var tree = ConversationTreeBuilder.Build(
+        [
+            new ConversationFile("eder", "companions", @"companions\eder.conversation", @"companions\eder.stringtable"),
+            new ConversationFile("x", @"companions\poi", @"companions\poi\x.conversation", @"companions\poi\x.stringtable"),
+            new ConversationFile("gather_your_party", "", "gather_your_party.conversation", "gather_your_party.stringtable"),
+        ]);
+        var vm = new GameBrowserViewModel(new StubDispatcher());
+        foreach (var f in tree.Folders) vm.Folders.Add(f);
+        foreach (var i in tree.RootItems) vm.RootItems.Add(i);
+        vm.Folders[0].IsExpanded = true;
+
+        var view = new GameBrowserView { DataContext = vm };
+        var window = new Window { Content = view, Width = 300, Height = 600 };
+        try
+        {
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+            var treeView = view.GetVisualDescendants().OfType<TreeView>().Single();
+
+            var companions = Assert.IsAssignableFrom<TreeViewItem>(treeView.TreeContainerFromItem(vm.Folders[0]));
+            var poi = Assert.IsAssignableFrom<TreeViewItem>(companions.ContainerFromItem(vm.Folders[0].Subfolders[0]));
+            var label = poi.GetVisualDescendants().OfType<TextBlock>().First();
+            Assert.Equal("Poi", label.Text);
+            Assert.Equal(@"companions\poi", ToolTip.GetTip(label));
+
+            Assert.Equal(2, treeView.ItemCount);   // the Companions folder, then gather_your_party
+        }
+        finally { window.Close(); }
+    }
 
     [AvaloniaFact]
     public void Footer_UsesTheSmallFontSize()

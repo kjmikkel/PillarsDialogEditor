@@ -37,7 +37,7 @@
         <ctrl:ConversationTreeView Grid.Row="1" Background="{DynamicResource Brush.Surface.Subtle}"
                   BorderThickness="0"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                  ItemsSource="{Binding FilteredFolders}"
+                  ItemsSource="{Binding FilteredRoots}"
                   SelectedItem="{Binding SelectedTreeItem, Mode=TwoWay}"
                   SelectionChanged="TreeView_SelectionChanged">
 
@@ -75,15 +75,18 @@
             </ctrl:ConversationTreeView.Styles>
 
             <ctrl:ConversationTreeView.DataTemplates>
-                <TreeDataTemplate DataType="{x:Type vm:ConversationFolderViewModel}" ItemsSource="{Binding Items}">
+                <!-- Folders nest, subfolders before conversations (issue 85, part B). -->
+                <TreeDataTemplate DataType="{x:Type vm:ConversationFolderViewModel}" ItemsSource="{Binding Children}">
                     <!-- Body-size text (issue 85): the app's reading size, and it follows the font
                          scale. Padding 2,4 with the row's MinHeight 0 (below) gives a 24 px row at
                          1.0x, the WCAG 2.5.8 target size, that grows with the text. -->
+                    <!-- The tooltip is the raw folder path (issue 85, part B): the label is tidied,
+                         and a writer who knows the file layout can still see it. -->
                     <TextBlock Text="{Binding DisplayName}" Classes="folderLabel"
                                Classes.selectedRow="{Binding $parent[TreeViewItem].IsSelected}"
                                FontSize="{DynamicResource FontSize.Body}" Padding="2,4"
                                TextTrimming="CharacterEllipsis"
-                               ToolTip.Tip="{Binding DisplayName}"/>
+                               ToolTip.Tip="{Binding ToolTip}"/>
                 </TreeDataTemplate>
                 <DataTemplate DataType="{x:Type vm:ConversationItemViewModel}">
                     <TextBlock Text="{Binding DisplayName}" Classes="conversationLabel"
