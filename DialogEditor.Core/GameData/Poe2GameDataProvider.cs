@@ -19,6 +19,10 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
     private string ExportedRoot    => Path.Combine(rootPath, "PillarsOfEternityII_Data", "exported");
     private string LocalizedRoot   => Path.Combine(ExportedRoot, "localized");
     internal string ConversationsRoot => Path.Combine(ExportedRoot, "design", "conversations");
+
+    // Every data folder the install has, base first, in the game's order (issue 198).
+    private IReadOnlyList<Poe2DataRoot> Roots => Poe2DataRoots.Existing(rootPath);
+    private static string ConversationsOf(Poe2DataRoot root) => Path.Combine(root.Path, "design", "conversations");
     internal string StringTablesRoot  => GetStringTablesRoot(Language);
 
     public string GetStringTablesRoot(string language) =>
@@ -30,49 +34,51 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
             ? [.. Directory.GetDirectories(LocalizedRoot).Select(Path.GetFileName).Order()!]
             : ["en"];
 
-    public IReadOnlyList<ConversationFile> EnumerateConversations()
-    {
-        if (!Directory.Exists(ConversationsRoot)) return [];
-
-        return Directory
-            .EnumerateFiles(ConversationsRoot, "*.conversationbundle", SearchOption.AllDirectories)
-            .Select(BuildConversationFile)
-            .OrderBy(f => f.FolderPath)
-            .ThenBy(f => f.Name)
+    public IReadOnlyList<ConversationFile> EnumerateConversations() =>
+        Roots.SelectMany<Poe2DataRoot, ConversationFile>(root =>
+            {
+                var conversations = ConversationsOf(root);
+                return Directory.Exists(conversations)
+                    ? Directory.EnumerateFiles(conversations, "*.conversationbundle", SearchOption.AllDirectories)
+                        .Select(path => BuildConversationFile(root, conversations, path))
+                        .OrderBy(f => f.FolderPath).ThenBy(f => f.Name)
+                    : [];
+            })
             .ToList();
-    }
 
-    private ConversationFile BuildConversationFile(string convPath)
+    private static ConversationFile BuildConversationFile(Poe2DataRoot root, string conversationsRoot, string convPath)
     {
-        var relative = Path.GetRelativePath(ConversationsRoot, convPath);
+        var relative = Path.GetRelativePath(conversationsRoot, convPath);
         return new ConversationFile(
             Name: Path.GetFileNameWithoutExtension(convPath),
             FolderPath: Path.GetDirectoryName(relative) ?? string.Empty,
             ConversationPath: convPath,
-            StringTablePath: string.Empty
-        );
+            StringTablePath: string.Empty,
+            DataRoot: root.Folder);
     }
 
     public Conversation LoadConversation(ConversationFile file)
     {
         var nodes = Poe2ConversationParser.ParseFile(file.ConversationPath);
-        var stPath = StringTablePathFor(file.ConversationPath, Language);
+        var stPath = StringTablePathFor(file, Language);
         var strings = StringTableParser.LoadFile(stPath);   // missing or damaged → shown as missing (issue 119)
         return new Conversation(file.Name, nodes, strings);
     }
 
     public string GetStringTablePath(ConversationFile file)
-        => StringTablePathFor(file.ConversationPath, Language);
+        => StringTablePathFor(file, Language);
 
     public string GetStringTablePath(ConversationFile file, string language)
-        => StringTablePathFor(file.ConversationPath, language);
+        => StringTablePathFor(file, language);
 
-    private string StringTablePathFor(string convPath, string language)
+    // A conversation's text sits in its own data folder's localized/, under the same relative
+    // path as the bundle (issue 198; the game's StringTableManager does the same per package).
+    private string StringTablePathFor(ConversationFile file, string language)
     {
-        var relative   = Path.GetRelativePath(ConversationsRoot, convPath);
+        var dataRoot   = Path.Combine(rootPath, Poe2DataRoots.DataFolder, file.DataRoot);
+        var relative   = Path.GetRelativePath(Path.Combine(dataRoot, "design", "conversations"), file.ConversationPath);
         var withoutExt = Path.ChangeExtension(relative, null);
-        var root       = Path.Combine(LocalizedRoot, language, "text", "conversations");
-        return Path.Combine(root, withoutExt + ".stringtable");
+        return Path.Combine(dataRoot, "localized", language, "text", "conversations", withoutExt + ".stringtable");
     }
 
     public IReadOnlyDictionary<string, string> LoadSpeakerNames() =>
