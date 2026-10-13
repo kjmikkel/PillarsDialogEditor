@@ -34,6 +34,7 @@ internal static class TableWindowFixtures
         ["RepDisposition"] = RepDisposition,
         ["BatchVoImport"]  = BatchVoImport,
         ["VoValidation"]   = VoValidation,
+        ["FlowAnalytics"]  = FlowAnalytics,
     };
 
     // These view models finish their work on the UI thread, so blocking it with GetResult()
@@ -182,5 +183,20 @@ internal static class TableWindowFixtures
         var vm = new VoValidationViewModel(nodes, LongName, gameRoot, "poe2");
         Wait(vm.RunAsync());
         return new VoValidationWindow(vm);
+    }
+
+    // ── Flow Analytics (FlowAnalyticsViewModelTests) ──────────────────────────────
+    // Not a table, but issue 178 found its stat columns and its "Playthrough stats" heading
+    // overlapping at 2.0x, and they only appear once there are statistics.
+
+    private static Window FlowAnalytics()
+    {
+        static NodeEditSnapshot Node(int id, string text, params int[] to) =>
+            new(id, false, SpeakerCategory.Npc, "", "", text, "", "Conversation", "None", "", "", "", false, false,
+                to.Select(t => new LinkEditSnapshot(id, t, 1, "", false)).ToList(), [], []);
+        var snapshot = new ConversationEditSnapshot([Node(0, LongText, 1), Node(1, LongText)]);
+        var vm = new FlowAnalyticsViewModel(() => snapshot, _ => { });
+        vm.RefreshCommand.Execute(null);
+        return new FlowAnalyticsWindow(vm);
     }
 }
