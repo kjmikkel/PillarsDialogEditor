@@ -40,15 +40,22 @@ public static partial class Poe1SpeakerNameParser
     public static IReadOnlyDictionary<string, string> ParseFromDisk(
         string conversationsRoot,
         string charactersStringtablePath)
+        => ParseFromDisk(conversationsRoot, [charactersStringtablePath]);
+
+    /// Several data folders' characters.stringtable, in the game's folder order (issue 201): The
+    /// White March's names are in the expansions. A later folder's spelling of a name is tried first.
+    public static IReadOnlyDictionary<string, string> ParseFromDisk(
+        string conversationsRoot,
+        IReadOnlyList<string> charactersStringtablePaths)
     {
         var convXmls = Directory.Exists(conversationsRoot)
             ? Directory.EnumerateFiles(conversationsRoot, "*.conversation", SearchOption.AllDirectories)
                        .Select(p => File.ReadAllText(p, Encoding.UTF8))
             : [];
-        var stXml = File.Exists(charactersStringtablePath)
-            ? File.ReadAllText(charactersStringtablePath, Encoding.UTF8)
-            : "<StringTableFile><Entries/></StringTableFile>";
-        return Parse(convXmls, stXml);
+        var names = charactersStringtablePaths.Reverse().Where(File.Exists)
+            .SelectMany(p => ParseStringtable(File.ReadAllText(p, Encoding.UTF8)))
+            .ToList();
+        return Resolve(ParseCharacterMappings(convXmls), names);
     }
 
     private static Dictionary<string, string> ParseCharacterMappings(IEnumerable<string> xmls)

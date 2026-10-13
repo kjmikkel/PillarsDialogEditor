@@ -92,18 +92,8 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
     // The game looks each line up from the last folder back to the first
     // (StringTableManager.LoadedStringTable.GetEntry), so the text is merged per line, the later
     // folder winning. A damaged table is reported as before (issue 119).
-    private StringTable LoadText(ConversationFile file, string language)
-    {
-        var tables = TextTablesFor(file, language).Select(StringTableParser.LoadFile).ToList();
-        if (tables.Count == 0) return StringTable.Missing;
-        if (tables.FirstOrDefault(t => t.IsUnreadable) is { } unreadable) return unreadable;
-        if (tables.Count == 1) return tables[0];
-
-        var lines = new Dictionary<int, StringEntry>();
-        foreach (var table in tables)
-            foreach (var entry in table.Entries) lines[entry.Id] = entry;
-        return new StringTable(lines.Values);
-    }
+    private StringTable LoadText(ConversationFile file, string language) =>
+        StringTable.MergeLaterWins(TextTablesFor(file, language).Select(StringTableParser.LoadFile).ToList());
 
     // Where the conversation's text is written: the last folder that already has a table for it
     // in this language, which the game reads first for every line it holds, so an edit there

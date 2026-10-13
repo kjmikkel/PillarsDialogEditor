@@ -23,6 +23,21 @@ public class StringTable
     /// Every entry, e.g. to merge several data folders' tables line by line (issue 198).
     public IEnumerable<StringEntry> Entries => _entries.Values;
 
+    /// Several data folders' tables for one conversation, in the game's folder order, merged as
+    /// both games read them: each line from the last folder that has it (issues 198, 201). No
+    /// table is <see cref="Missing"/>; a damaged one is reported as before (issue 119).
+    public static StringTable MergeLaterWins(IReadOnlyList<StringTable> tables)
+    {
+        if (tables.Count == 0) return Missing;
+        if (tables.FirstOrDefault(t => t.IsUnreadable) is { } unreadable) return unreadable;
+        if (tables.Count == 1) return tables[0];
+
+        var lines = new Dictionary<int, StringEntry>();
+        foreach (var table in tables)
+            foreach (var entry in table.Entries) lines[entry.Id] = entry;
+        return new StringTable(lines.Values);
+    }
+
     /// A stringtable file that exists but is not readable XML (issue 119 — e.g. a damaged install
     /// file). The conversation still opens: the table counts as missing, so its text shows
     /// the missing-text placeholder, and <see cref="IsUnreadable"/> lets the UI say why.
