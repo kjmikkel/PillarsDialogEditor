@@ -136,4 +136,53 @@ public class ConversationTreeBuilderTests
         var tree = Build(File(folder, "x"));
         Assert.Equal(folder, Assert.Single(tree.Folders).FolderPath);
     }
+
+    // ── Prototype and test content (issue 85, part D) ──────────────────────
+
+    [Fact]
+    public void PrototypeAndTestFolders_GoInALastCollapsedGroup()
+    {
+        var tree = Build(
+            File("00_prototype", "a"),          // PoE2
+            File("prototype_2", "b"),           // PoE1
+            File("test", "c"),                  // PoE1
+            File("00_dyrwood", "d"),
+            File("px1_00_stalwart_village", "e"));
+
+        Assert.Equal(
+            ["00_dyrwood", ConversationTreeBuilder.WhiteMarch1Path, ConversationTreeBuilder.PrototypesPath],
+            tree.Folders.Select(f => f.FolderPath));
+        var group = tree.Folders[^1];
+        Assert.False(group.IsExpanded);
+        Assert.Equal("Browser_PrototypesFolder", group.DisplayName);   // the stub returns the key
+        Assert.Equal("ToolTip_PrototypesFolder", group.ToolTip);
+        Assert.Equal(["00_prototype", "prototype_2", "test"], group.Subfolders.Select(f => f.FolderPath));
+    }
+
+    [Fact]
+    public void TopLevelTestConversations_GoInTheGroup_OthersStay()
+    {
+        var tree = Build(
+            File("", "si_test"), File("", "test_cv_zuhira_stub"), File("", "cv_test_pet_sac"),
+            File("", "gather_your_party"), File("", "contest_scene"), File("", "testament"));
+
+        var group = Assert.Single(tree.Folders);
+        Assert.Equal(ConversationTreeBuilder.PrototypesPath, group.FolderPath);
+        Assert.Equal(["si_test", "test_cv_zuhira_stub", "cv_test_pet_sac"], group.Items.Select(i => i.Name));
+        Assert.Equal(["gather_your_party", "contest_scene", "testament"], tree.RootItems.Select(i => i.Name));
+    }
+
+    [Fact]
+    public void ATestConversationInsideARealFolder_StaysThere()
+    {
+        var tree = Build(File("companions", "eder_test"));
+        Assert.Equal("eder_test", Assert.Single(Assert.Single(tree.Folders).Items).Name);
+    }
+
+    [Fact]
+    public void NoGroup_WhenNothingMatches()
+    {
+        var tree = Build(File("companions", "eder"), File("", "gather_your_party"));
+        Assert.DoesNotContain(tree.Folders, f => f.FolderPath == ConversationTreeBuilder.PrototypesPath);
+    }
 }
