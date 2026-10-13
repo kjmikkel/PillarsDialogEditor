@@ -200,6 +200,19 @@ public class GameBrowserViewModelTests
     }
 
     [Fact]
+    public void Filter_KeepsAFoldersNameAndTooltip()
+    {
+        // Issue 85, part D: the prototype group explains itself in its tooltip; a filtered copy
+        // of it must not fall back to its virtual path.
+        var vm = VmWith(FileIn("", "si_test"));
+        vm.FilterText = "si_";
+
+        var group = Assert.Single(vm.FilteredFolders);
+        Assert.Equal(vm.Folders[0].DisplayName, group.DisplayName);
+        Assert.Equal(vm.Folders[0].ToolTip, group.ToolTip);
+    }
+
+    [Fact]
     public void FilteredRoots_ListsFoldersThenTopLevelConversations()
     {
         var vm = VmWith(FileIn("", "gather_your_party"), FileIn("companions", "eder"));
