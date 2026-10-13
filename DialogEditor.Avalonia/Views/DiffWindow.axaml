@@ -199,10 +199,17 @@
                                         <CheckBox IsChecked="{Binding IsAllSelected, Mode=TwoWay}" IsThreeState="True"
                                                   ToolTip.Tip="{DynamicResource ToolTip_Diff_BringIn}"
                                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_BringIn}"/>
-                                        <ToggleButton Content="{Binding Name}" IsChecked="{Binding IsExpanded, Mode=TwoWay}"
+                                        <!-- TextBlock content, not Content="{Binding Name}": a string Content
+                                             goes through AccessText and loses the first '_' of the
+                                             conversation name (issue 181). The UIA Name is set explicitly because a
+                                             TextBlock child no longer supplies it. -->
+                                        <ToggleButton IsChecked="{Binding IsExpanded, Mode=TwoWay}"
                                                       Background="Transparent" Classes="diff-conversation" BorderThickness="0" Padding="4,0"
+                                                      AutomationProperties.Name="{Binding Name}"
                                                       ToolTip.Tip="{DynamicResource ToolTip_Diff_ExpandConversation}"
-                                                      AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_ExpandConversation}"/>
+                                                      AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_ExpandConversation}">
+                                            <TextBlock Text="{Binding Name}"/>
+                                        </ToggleButton>
                                     </StackPanel>
                                     <ItemsControl ItemsSource="{Binding Nodes}" IsVisible="{Binding IsExpanded}" Margin="20,0,0,0">
                                         <ItemsControl.ItemTemplate>
