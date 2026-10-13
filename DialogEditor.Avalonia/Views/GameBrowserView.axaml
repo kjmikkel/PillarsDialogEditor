@@ -58,10 +58,13 @@
         </Border>
 
         <!-- Conversation tree. It doesn't scroll sideways (issue 85): a long name trims with an
-             ellipsis and shows in full in its tooltip, instead of running off the dock's edge. -->
+             ellipsis and shows in full in its tooltip, instead of running off the dock's edge.
+             The right padding keeps rows clear of Fluent's overlay scrollbar, which otherwise
+             covers the last 16 px of every row (and hid the "changed" dot). -->
         <ctrl:ConversationTreeView Grid.Row="2" Background="{DynamicResource Brush.Surface.Subtle}"
                   BorderThickness="0"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  Padding="0,0,16,0"
                   ItemsSource="{Binding FilteredRoots}"
                   SelectedItem="{Binding SelectedTreeItem, Mode=TwoWay}"
                   SelectionChanged="TreeView_SelectionChanged">
