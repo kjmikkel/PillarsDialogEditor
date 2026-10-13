@@ -65,14 +65,14 @@
                        Foreground="{DynamicResource Brush.Text.Muted}"
                        VerticalAlignment="Center"
                        TextWrapping="Wrap"/>
-            <Button Grid.Column="1"
+            <Button Grid.Column="1" Background="{DynamicResource Brush.Button.Primary.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     x:Name="ExportButton"
                     Content="{DynamicResource ExportConversations_Export}"
                     Command="{Binding ExportCommand}"
                     ToolTip.Tip="{DynamicResource ToolTip_ExportConversations_Export}"
                     AutomationProperties.HelpText="{DynamicResource ToolTip_ExportConversations_Export}"
                     MinWidth="80"/>
-            <Button Grid.Column="3"
+            <Button Grid.Column="3" Classes="secondary"
                     x:Name="CloseButton"
                     Content="{DynamicResource ExportConversations_Close}"
                     Click="CloseButton_Click"

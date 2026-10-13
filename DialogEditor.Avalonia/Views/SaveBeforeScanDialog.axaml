@@ -19,15 +19,13 @@
               IsDefault="True"
               ToolTip.Tip="{DynamicResource ToolTip_SaveBeforeScan_SaveAndScan}"
               AutomationProperties.HelpText="{DynamicResource ToolTip_SaveBeforeScan_SaveAndScan}"/>
-      <Button x:Name="ScanSavedOnlyButton"
+      <Button Classes="secondary" x:Name="ScanSavedOnlyButton"
               Content="{DynamicResource SaveBeforeScan_ScanSavedOnly}"
-              Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
               Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
               ToolTip.Tip="{DynamicResource ToolTip_SaveBeforeScan_ScanSavedOnly}"
               AutomationProperties.HelpText="{DynamicResource ToolTip_SaveBeforeScan_ScanSavedOnly}"/>
-      <Button x:Name="CancelButton"
+      <Button Classes="secondary" x:Name="CancelButton"
               Content="{DynamicResource Button_Cancel}"
-              Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
               Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
               IsCancel="True"
               ToolTip.Tip="{DynamicResource Button_Cancel}"

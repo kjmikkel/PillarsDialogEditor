@@ -25,10 +25,9 @@
                  AutomationProperties.Name="{DynamicResource Localization_LanguageCodeDialog_Prompt}"/>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-            <Button x:Name="CancelButton"
+            <Button Classes="secondary" x:Name="CancelButton"
                     Content="{DynamicResource LanguageCode_Cancel}"
                     IsCancel="True"
-                    Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
                     Padding="16,5"/>
             <Button x:Name="OkButton"
                     Content="{DynamicResource LanguageCode_OK}"

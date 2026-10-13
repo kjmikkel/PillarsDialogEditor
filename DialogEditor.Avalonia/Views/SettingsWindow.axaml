@@ -26,10 +26,8 @@
             <Setter Property="IsReadOnly"   Value="True"/>
             <Setter Property="Padding"      Value="4,3"/>
         </Style>
+        <!-- Layout only: the colours come from Button.secondary (Resources/Buttons.axaml, issue 179). -->
         <Style Selector="Button.browse">
-            <Setter Property="Background"   Value="{DynamicResource Brush.Surface.Header}"/>
-            <Setter Property="Foreground"   Value="{DynamicResource Brush.Text.Secondary}"/>
-            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"      Value="10,4"/>
             <Setter Property="Margin"       Value="6,0,0,0"/>
             <Setter Property="FontSize"     Value="{DynamicResource FontSize.Label}"/>
@@ -48,7 +46,7 @@
                 <!-- Backup directory -->
                 <DockPanel ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}">
                     <TextBlock Classes="label" Text="{DynamicResource Settings_BackupDirectory}"/>
-                    <Button Classes="browse"
+                    <Button Classes="browse secondary"
                             DockPanel.Dock="Right"
                             Content="{DynamicResource Settings_Browse}"
                             Command="{Binding BrowseBackupDirectoryCommand}"
@@ -156,11 +154,11 @@
                                FontSize="{DynamicResource FontSize.Small}"
                                TextWrapping="Wrap"/>
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <Button Content="{DynamicResource Settings_OpenDictionariesFolder}"
+                        <Button Classes="secondary" Content="{DynamicResource Settings_OpenDictionariesFolder}"
                                 Command="{Binding OpenDictionariesFolderCommand}"
                                 ToolTip.Tip="{DynamicResource ToolTip_OpenDictionariesFolder}"
                                 AutomationProperties.HelpText="{DynamicResource ToolTip_OpenDictionariesFolder}"/>
-                        <Button Content="{DynamicResource Settings_DictionarySource}"
+                        <Button Classes="secondary" Content="{DynamicResource Settings_DictionarySource}"
                                 Command="{Binding OpenDictionarySourceCommand}"
                                 ToolTip.Tip="{DynamicResource ToolTip_DictionarySource}"
                                 AutomationProperties.HelpText="{DynamicResource ToolTip_DictionarySource}"/>
@@ -180,10 +178,9 @@
         </ScrollViewer>
 
         <!-- Close button -->
-        <Button Grid.Row="1" x:Name="CloseButton"
+        <Button Classes="secondary" Grid.Row="1" x:Name="CloseButton"
                 Content="{DynamicResource Settings_Close}"
                 HorizontalAlignment="Right"
-                Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
                 Padding="16,5" Margin="0,12,0,0"
                 Click="Close_Click"/>
 

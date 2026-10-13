@@ -22,6 +22,10 @@
              brushes (issue #94). After FluentTheme so it overrides the stock selection. -->
         <StyleInclude Source="avares://DialogEditor.Avalonia.Shared/Resources/ListSelection.axaml"/>
 
+        <!-- Secondary buttons use the tested Brush.Button.Secondary.* tokens (issue 179). After
+             FluentTheme so its hover/pressed rules override Fluent's pale ones. -->
+        <StyleInclude Source="avares://DialogEditor.Avalonia.Shared/Resources/Buttons.axaml"/>
+
         <!-- Accessible names for Dock.Avalonia's pane chrome buttons (issue #15 finding 2).
              ToolChromeControl's template gives each button a <Viewbox> as its Content, and
              Avalonia's ButtonAutomationPeer derives the accessible name from

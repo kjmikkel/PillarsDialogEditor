@@ -110,11 +110,10 @@
         <!-- Footer -->
         <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal"
                     HorizontalAlignment="Right" Spacing="8" Margin="0,14,0,0">
-            <Button x:Name="CancelButton"
+            <Button Classes="secondary" x:Name="CancelButton"
                     Content="{DynamicResource GitConflictWindow_Cancel}"
                     ToolTip.Tip="{DynamicResource GitConflictWindow_CancelTooltip}"
                     AutomationProperties.HelpText="{DynamicResource GitConflictWindow_CancelTooltip}"
-                    Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="{DynamicResource FontSize.Body}"/>
             <Button x:Name="ApplyButton"
                     Content="{DynamicResource GitConflictWindow_Apply}"

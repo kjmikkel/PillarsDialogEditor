@@ -39,6 +39,7 @@ public class TokenRegistryTests
     [InlineData("Brush.Button.Secondary.Background", 0xFF, 0x33, 0x33, 0x33)] // issue 179 -> Neutral.200
     [InlineData("Brush.Button.Secondary.Foreground", 0xFF, 0xe8, 0xe8, 0xe8)] // -> Neutral.910
     [InlineData("Brush.Button.Secondary.Border",     0xFF, 0x76, 0x76, 0x76)] // -> Palette.Button.Edge
+    [InlineData("Brush.Button.Secondary.Hover",      0xFF, 0x40, 0x40, 0x40)] // -> Palette.Button.Hover
     public void TokenResolvesToExpectedColor(string key, byte a, byte r, byte g, byte b)
         => Assert.Equal(Color.FromArgb(a, r, g, b), Brush(key).Color);
 

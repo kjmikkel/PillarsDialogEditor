@@ -38,6 +38,7 @@ Palette.Dark	Palette.Azure.600	#FF1A5276
 Palette.Dark	Palette.Black	#FF000000
 Palette.Dark	Palette.Burnt.600	#FF8E4912
 Palette.Dark	Palette.Button.Edge	#FF767676
+Palette.Dark	Palette.Button.Hover	#FF404040
 Palette.Dark	Palette.Connection.Base	#FFAAAAAA
 Palette.Dark	Palette.Control.Background	#FF333333
 Palette.Dark	Palette.Cream.100	#FFFFF8DC
@@ -136,6 +137,7 @@ Palette.Light	Palette.Azure.600	#FF1A5276
 Palette.Light	Palette.Black	#FF000000
 Palette.Light	Palette.Burnt.600	#FF8E4912
 Palette.Light	Palette.Button.Edge	#FF808080
+Palette.Light	Palette.Button.Hover	#FFC4C4C2
 Palette.Light	Palette.Connection.Base	#FF4F4F4F
 Palette.Light	Palette.Control.Background	#FFD6D6D4
 Palette.Light	Palette.Cream.100	#FFFFF8DC
@@ -234,6 +236,7 @@ Palette.Colourblind	Palette.Azure.600	#FF1A5276
 Palette.Colourblind	Palette.Black	#FF000000
 Palette.Colourblind	Palette.Burnt.600	#FF8E4912
 Palette.Colourblind	Palette.Button.Edge	#FF767676
+Palette.Colourblind	Palette.Button.Hover	#FF404040
 Palette.Colourblind	Palette.Connection.Base	#FFAAAAAA
 Palette.Colourblind	Palette.Control.Background	#FF333333
 Palette.Colourblind	Palette.Cream.100	#FFFFF8DC
@@ -332,6 +335,7 @@ Palette.HighContrast	Palette.Azure.600	#FF1A5276
 Palette.HighContrast	Palette.Black	#FF000000
 Palette.HighContrast	Palette.Burnt.600	#FF6E3A0E
 Palette.HighContrast	Palette.Button.Edge	#FFFFFFFF
+Palette.HighContrast	Palette.Button.Hover	#FF1F1F1F
 Palette.HighContrast	Palette.Connection.Base	#FFAAAAAA
 Palette.HighContrast	Palette.Control.Background	#FF4D4D4D
 Palette.HighContrast	Palette.Cream.100	#FFFFFFFF

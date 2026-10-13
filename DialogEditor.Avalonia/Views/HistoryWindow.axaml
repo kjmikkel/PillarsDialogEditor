@@ -48,9 +48,8 @@
                     AutomationProperties.HelpText="{DynamicResource HistoryWindow_CompareTooltip}"
                     Background="{DynamicResource Brush.Button.Confirm.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="{DynamicResource FontSize.Body}"/>
-            <Button x:Name="CloseButton"
+            <Button Classes="secondary" x:Name="CloseButton"
                     Content="{DynamicResource HistoryWindow_Close}"
-                    Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="{DynamicResource FontSize.Body}"/>
         </StackPanel>
 

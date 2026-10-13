@@ -18,9 +18,8 @@
              AutomationProperties.HelpText="{DynamicResource BranchName_Label}"
              AutomationProperties.Name="{DynamicResource BranchName_Label}"/>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
-      <Button x:Name="CancelButton"
+      <Button Classes="secondary" x:Name="CancelButton"
               Content="{DynamicResource BranchName_Cancel}"
-              Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
               Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
               IsCancel="True"/>
       <Button x:Name="OkButton"
