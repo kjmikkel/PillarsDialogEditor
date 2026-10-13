@@ -27,6 +27,12 @@ public class PaletteContrastTests
         new("Text.OnAccent / Button.Primary",     "Palette.White", "Palette.Azure.600",   true),
         new("Text.OnAccent / Button.Destructive", "Palette.White", "Palette.Crimson.700", true),
         new("Selection.Foreground / Selection.Background", "Palette.White", "Palette.Azure.600", true), // #83
+        // Secondary buttons (issue 179): readable text on the fill, and an edge that marks the
+        // button out from every surface it sits on (WCAG 1.4.11 non-text contrast).
+        new("Button.Secondary.Foreground / Background", "Palette.Neutral.910", "Palette.Neutral.200", true),
+        new("Button.Secondary.Border / Surface.Window", "Palette.Button.Edge", "Palette.Neutral.115", false),
+        new("Button.Secondary.Border / Surface.Panel",  "Palette.Button.Edge", "Palette.Neutral.145", false),
+        new("Button.Secondary.Border / Surface.Card",   "Palette.Button.Edge", "Palette.Neutral.100", false),
         new("Text.Status.Added / Surface.Card",  "Palette.Green.400", "Palette.Neutral.100", true),
         new("Text.Status.Changed / Surface.Card", "Palette.Amber.540", "Palette.Neutral.100", true),
         new("Text.Status.Removed / Surface.Card", "Palette.Red.450",   "Palette.Neutral.100", true),
