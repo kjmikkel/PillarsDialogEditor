@@ -352,6 +352,10 @@ public partial class MainWindowViewModel : ObservableObject
         // not on every patch save, which would re-enumerate all conversations.
         if (_provider is not null && !ReferenceEquals(prevNew, nextNew))
             Browser.Load(_provider, nextNew);
+        // Every project change comes through here, so the dock's "changed in this project" marks
+        // follow it (issue 85, part C). An empty patch (opened, not changed) isn't an edit.
+        Browser.SetProjectConversations(project is null ? null
+            : project.Patches.Where(kv => !kv.Value.IsEmpty).Select(kv => kv.Key).ToHashSet());
     }
 
     // ── Partial hooks ─────────────────────────────────────────────────────

@@ -98,6 +98,10 @@
     <sys:String x:Key="Browser_Header">CONVERSATIONS</sys:String>
     <!-- New conversation feature -->
     <sys:String x:Key="Label_NewConversationsFolder">New conversations</sys:String>
+    <!-- Conversations the open project changes (issue 85, part C). -->
+    <sys:String x:Key="Browser_EditedInProject">Changed in this project</sys:String>
+    <sys:String x:Key="Browser_OnlyProjectConversations">Only this project's conversations</sys:String>
+    <sys:String x:Key="ToolTip_OnlyProjectConversations">Show only the conversations this project changes or adds. Works together with the filter box.</sys:String>
     <sys:String x:Key="Dialog_NewConversation_Create">Create</sys:String>
     <sys:String x:Key="ConversationName_Cancel">Cancel</sys:String>
     <sys:String x:Key="Button_NewConversation">New conversation…</sys:String>
