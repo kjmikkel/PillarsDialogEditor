@@ -27,6 +27,8 @@ public class LabelColumnGapTests
         [typeof(LegendWindow).AssemblyQualifiedName!],
         [typeof(ConflictResolutionDialog).AssemblyQualifiedName!],
         [typeof(VoImportDialog).AssemblyQualifiedName!],
+        [typeof(FindReplaceWindow).AssemblyQualifiedName!],
+        [typeof(BatchReplaceWindow).AssemblyQualifiedName!],
     ];
 
     [AvaloniaTheory]
