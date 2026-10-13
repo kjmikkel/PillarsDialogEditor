@@ -62,9 +62,10 @@ in-game. If a patched conversation misbehaves in the game, please
 the files it changes, so **Restore Conversation (F6)** puts the originals back.
 
 **DLC.** Nothing in the editor or patcher depends on which DLC you own. Pillars of Eternity's
-White March conversations sit in the normal conversations folder; Deadfire keeps each DLC's data
-in its own folder (`lax1_exported`, `lax2_exported`, …), which the editor reads in the game's own
-order, as the game does: where several folders hold the same conversation or line, the later one
+White March conversations sit in the normal conversations folder, with their text in
+`data_expansion1` and `data_expansion2` (read since [#201](https://github.com/kjmikkel/PillarsDialogEditor/issues/201));
+Deadfire keeps each DLC's data in its own folder (`lax1_exported`, `lax2_exported`, …). The editor
+reads these folders in the game's own order, as the game does: where several folders hold the same conversation or line, the later one
 wins. The Conversations dock groups DLC content under the DLC's title. An install without a DLC
 simply has fewer conversations, and a mod that edits a DLC conversation is skipped on such an
 install, with a "conversation not found" warning. Nothing else is written or broken.
