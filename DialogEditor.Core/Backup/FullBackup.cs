@@ -63,12 +63,14 @@ public static class FullBackup
     /// <summary>
     /// Adds the folders a backup lacks (issue 198): a backup taken before PoE2's DLC folders were
     /// read has none of them. Nothing could write those files until then, so the live copies are
-    /// still the originals. A format-1 backup (no manifest) is left alone: writing a manifest
-    /// would change how its single text folder is read. Returns how many folders were added.
+    /// still the originals. Only a format-2 backup is topped up: a format-1 backup (no manifest)
+    /// would read its single text folder differently once it had one, and a format-3 backup
+    /// already holds every DLC folder the game had, so a folder that appears later can only be
+    /// the editor's or the patcher's output, never an original. Returns how many were added.
     /// </summary>
     public static async Task<int> TopUpAsync(IGameDataProvider provider, string backupRoot, CancellationToken ct)
     {
-        if (ReadManifest(backupRoot) is not { } manifest) return 0;
+        if (ReadManifest(backupRoot) is not { Format: < 3 } manifest) return 0;
         var have = (manifest.ExtraFolders ?? []).ToHashSet(StringComparer.Ordinal);
         var missing = provider.GetExtraBackupFolders().Where(f => !have.Contains(f.SnapshotPath)).ToList();
         if (missing.Count == 0) return 0;
