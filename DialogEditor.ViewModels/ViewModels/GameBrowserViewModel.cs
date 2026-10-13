@@ -136,7 +136,8 @@ public partial class GameBrowserViewModel : ObservableObject
         var items = folder.Items.Where(keep).ToList();
         if (subfolders.Count == 0 && items.Count == 0) return null;
 
-        var copy = new ConversationFolderViewModel(folder.FolderPath, items, isExpanded: true, displayName: folder.DisplayName);
+        var copy = new ConversationFolderViewModel(folder.FolderPath, items, isExpanded: true,
+                                                   displayName: folder.DisplayName, toolTip: folder.ToolTip);
         foreach (var f in subfolders) copy.Subfolders.Add(f);
         return copy;
     }
