@@ -4,6 +4,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Interactivity;
 using Avalonia.Platform;
+using Avalonia.Threading;
 
 namespace DialogEditor.Avalonia.Shared.Theming;
 
@@ -37,11 +38,18 @@ public static class WindowSizing
     {
         public required WindowSize Design;
         public double AppliedScale;
+        public bool KeepsOnScreen;
+        public bool RefittedForChrome;
     }
 
     private static readonly ConditionalWeakTable<Window, State> States = new();
     private static readonly HashSet<Window> Open = new();
     private static bool _registered;
+
+    // The size of a window's chrome (title bar + borders) in DIPs, learned from the first window
+    // that opens (normally the main window) — every window here uses the same system chrome.
+    // Unknown until then, which only the first window pays for (see KeepOnScreen).
+    private static Size _chrome;
 
     public static double? GetAppliedScale(Window w) =>
         States.TryGetValue(w, out var s) ? s.AppliedScale : null;
@@ -69,6 +77,13 @@ public static class WindowSizing
         }
         WindowSizingRule.Compute(state.Design, scale, WorkingAreaProvider(w), GetMode(w), w.SizeToContent).ApplyTo(w);
         state.AppliedScale = scale;
+        if (!state.KeepsOnScreen)
+        {
+            // Opened fires once the window is placed, but its frame size (title bar included) is
+            // only settled after the first layout, so the check waits for the dispatcher.
+            w.Opened += (_, _) => Dispatcher.UIThread.Post(() => KeepOnScreen(w), DispatcherPriority.Background);
+            state.KeepsOnScreen = true;
+        }
         Open.Add(w);
     }
 
@@ -81,7 +96,45 @@ public static class WindowSizing
             WindowSizingRule.Rescale(WindowSize.Of(w), state.Design, state.AppliedScale, scale,
                                      WorkingAreaProvider(w), GetMode(w), w.SizeToContent).ApplyTo(w);
             state.AppliedScale = scale;
+            // A window that grew may now stick out below or to the right; move it once the
+            // resize has been laid out.
+            Dispatcher.UIThread.Post(() => KeepOnScreen(w), DispatcherPriority.Background);
         }
+    }
+
+    // Keeps a shown, normal-state window inside its screen's working area (issue 177).
+    // Maximized and minimized windows are placed by the OS and left alone.
+    private static void KeepOnScreen(Window w)
+    {
+        if (!w.IsVisible || w.WindowState != WindowState.Normal || w.Screens is not { } screens) return;
+        var screen = screens.ScreenFromWindow(w) ?? screens.Primary;
+        if (screen is null) return;
+
+        var frame = w.FrameSize ?? w.ClientSize;
+        var chrome = new Size(Math.Max(0, frame.Width - w.ClientSize.Width), Math.Max(0, frame.Height - w.ClientSize.Height));
+        if (chrome != default) _chrome = chrome;
+
+        // A window opened before the chrome was known was sized against the whole working area;
+        // size it once more now that its chrome is known, then place it on the next pass.
+        var area = WindowSizingRule.WorkingAreaInDips(screen.WorkingArea.Size, screen.Scaling);
+        if (States.TryGetValue(w, out var state) && !state.RefittedForChrome)
+        {
+            state.RefittedForChrome = true;
+            var limit = WindowSizingRule.ClientArea(area, chrome);
+            if (frame.Width > area.Width - 2 * WindowSizingRule.ScreenMargin ||
+                frame.Height > area.Height - 2 * WindowSizingRule.ScreenMargin)
+            {
+                WindowSizingRule.Rescale(WindowSize.Of(w), state.Design, state.AppliedScale, state.AppliedScale,
+                                         limit, GetMode(w), w.SizeToContent).ApplyTo(w);
+                Dispatcher.UIThread.Post(() => KeepOnScreen(w), DispatcherPriority.Background);
+                return;
+            }
+        }
+
+        var size   = PixelSize.FromSize(frame, screen.Scaling);
+        var margin = (int)Math.Round(WindowSizingRule.ScreenMargin * screen.Scaling);
+        var target = WindowSizingRule.FitPosition(new PixelRect(w.Position, size), screen.WorkingArea, margin);
+        if (target != w.Position) w.Position = target;
     }
 
     // At open the window has no position and its owner is not assigned yet (WindowOpenedEvent
@@ -95,6 +148,7 @@ public static class WindowSizing
         var main = Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } m }
                    && !ReferenceEquals(m, w) ? m : null;
         var screen = WindowSizingRule.PickScreen(ScreenOf(w), ScreenOf(w.Owner as Window), ScreenOf(main), screens.Primary);
-        return screen is null ? null : WindowSizingRule.WorkingAreaInDips(screen.WorkingArea.Size, screen.Scaling);
+        return screen is null ? null
+            : WindowSizingRule.ClientArea(WindowSizingRule.WorkingAreaInDips(screen.WorkingArea.Size, screen.Scaling), _chrome);
     }
 }

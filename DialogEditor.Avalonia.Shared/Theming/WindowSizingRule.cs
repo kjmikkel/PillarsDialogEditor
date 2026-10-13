@@ -81,11 +81,38 @@ public static class WindowSizingRule
         workingArea.ToSize(scaling);
 
     /// <summary>
+    /// The room a window's CLIENT area has: the working area less the window's chrome (title bar
+    /// and borders). Width, Height and the limits are client sizes, so clamping them against the
+    /// whole working area let a clamped window's frame run off the screen by the chrome's height.
+    /// </summary>
+    public static Size ClientArea(Size workingArea, Size chrome) =>
+        new(Math.Max(0, workingArea.Width - chrome.Width), Math.Max(0, workingArea.Height - chrome.Height));
+
+    /// <summary>
     /// Which screen a window must fit: its own once it is shown (it may have been moved to
     /// another monitor), else its owner's, else the main window's, else the primary screen.
     /// </summary>
     public static T? PickScreen<T>(T? own, T? owner, T? main, T? primary) where T : class =>
         own ?? owner ?? main ?? primary;
+
+    /// <summary>
+    /// Where to put a window so it is on screen (all values in physical pixels). A window that
+    /// already lies inside the working area on an axis stays where it is; one that sticks out is
+    /// moved back to <paramref name="margin"/> from the edge. If it is bigger than the area, its
+    /// top-left stays on screen. Sizing alone is not enough: the OS's default placement, or a
+    /// position saved at a smaller font scale, can put a screen-sized window half off the screen.
+    /// </summary>
+    public static PixelPoint FitPosition(PixelRect window, PixelRect workingArea, int margin)
+    {
+        static int Fit(int pos, int length, int start, int end, int margin)
+        {
+            if (pos >= start && pos + length <= end) return pos;
+            return Math.Max(start + margin, Math.Min(pos, end - margin - length));
+        }
+        return new PixelPoint(
+            Fit(window.X, window.Width,  workingArea.X, workingArea.Right,  margin),
+            Fit(window.Y, window.Height, workingArea.Y, workingArea.Bottom, margin));
+    }
 
     private static WindowSize Clamp(WindowSize s, Size? workingArea, WindowSizingMode mode, SizeToContent sizeToContent)
     {

@@ -155,4 +155,41 @@ public class WindowSizingRuleTests
         Assert.Equal("primary", WindowSizingRule.PickScreen<string>(null, null, null, "primary"));
         Assert.Null(WindowSizingRule.PickScreen<string>(null, null, null, null));
     }
+
+    // Found in the final GUI check: Legend (default placement, or a position saved at a smaller
+    // scale) opened at y=265 with a 1048 px height on a 1080 px screen, so its bottom third was
+    // off-screen. A window that fits the screen is moved back inside it.
+    private static readonly PixelRect Screen1080 = new(0, 0, 1920, 1080);
+
+    [Fact]
+    public void FitPosition_MovesAWindowUpWhenItsBottomIsOffScreen() =>
+        Assert.Equal(new PixelPoint(242, 16), WindowSizingRule.FitPosition(new PixelRect(242, 265, 720, 1048), Screen1080, 16));
+
+    [Fact]
+    public void FitPosition_MovesAWindowLeftWhenItsRightEdgeIsOffScreen() =>
+        Assert.Equal(new PixelPoint(1104, 100), WindowSizingRule.FitPosition(new PixelRect(1500, 100, 800, 400), Screen1080, 16));
+
+    [Fact]
+    public void FitPosition_LeavesAWindowThatAlreadyFitsAlone() =>
+        Assert.Equal(new PixelPoint(5, 5), WindowSizingRule.FitPosition(new PixelRect(5, 5, 400, 300), Screen1080, 16));
+
+    [Fact]
+    public void FitPosition_KeepsTheTopLeftOnScreenWhenTheWindowIsTooBig() =>
+        Assert.Equal(new PixelPoint(16, 16), WindowSizingRule.FitPosition(new PixelRect(300, 300, 2400, 1400), Screen1080, 16));
+
+    [Fact]
+    public void FitPosition_PullsAWindowBackFromAboveOrLeftOfTheScreen() =>
+        Assert.Equal(new PixelPoint(16, 16), WindowSizingRule.FitPosition(new PixelRect(-200, -50, 400, 300), Screen1080, 16));
+
+    // Found in the final GUI check: the clamp limited the CLIENT area to the working area, but the
+    // title bar and borders sit outside it (39 px tall on Windows 11), so a clamped window's frame
+    // still ran 23 px off a 1080 px screen. Client sizes are clamped against the working area
+    // less the window's chrome.
+    [Fact]
+    public void ClientArea_SubtractsTheWindowChrome() =>
+        Assert.Equal(new Size(1904, 1041), WindowSizingRule.ClientArea(new Size(1920, 1080), new Size(16, 39)));
+
+    [Fact]
+    public void ClientArea_NeverGoesNegative() =>
+        Assert.Equal(new Size(0, 0), WindowSizingRule.ClientArea(new Size(10, 10), new Size(16, 39)));
 }
