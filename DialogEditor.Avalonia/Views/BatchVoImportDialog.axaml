@@ -69,38 +69,44 @@
         </StackPanel>
 
         <!-- ── Column header row ─────────────────────────────────────────── -->
-        <!-- Widths must match the ItemTemplate grid below (Conv=140, Node=60, Text=*, Status=50, Primary=220, Fem=220, Result=50) -->
+        <!-- Issue 178: the fixed columns take their width from ColumnWidth.BatchVo.* tokens, which
+             scale with the font, so headers and cells no longer run into each other at large
+             scales. Header and row cells share each token and the 8 px column spacing, and the
+             header is inset by the row's 12 px item padding (Fluent's ListBoxItem), so the
+             columns line up. The headers are at row size (FontSize.Body). The text and the two
+             file columns share what is left: at 2.0x the fixed widths alone would be wider than
+             a 1366 px screen, and the file names trim with their full name as a tooltip. -->
         <Grid DockPanel.Dock="Top"
-              ColumnDefinitions="140,60,*,50,220,220,50"
-              Margin="8,0,0,2">
-            <TextBlock Grid.Column="0"
+              ColumnDefinitions="Auto,Auto,*,Auto,*,*,Auto" ColumnSpacing="8"
+              Margin="12,0,12,2">
+            <TextBlock Grid.Column="0" Width="{DynamicResource ColumnWidth.BatchVo.Conversation}"
                        Text="{DynamicResource BatchVoImport_ConversationColumn}"
                        IsVisible="{Binding !IsSingleConversation}"
-                       FontSize="{DynamicResource FontSize.Small}"
+                       FontSize="{DynamicResource FontSize.Body}"
                        Foreground="{DynamicResource Brush.Text.Secondary}"/>
-            <TextBlock Grid.Column="1"
+            <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.BatchVo.Node}"
                        Text="{DynamicResource BatchVoImport_NodeColumn}"
-                       FontSize="{DynamicResource FontSize.Small}"
+                       FontSize="{DynamicResource FontSize.Body}"
                        Foreground="{DynamicResource Brush.Text.Secondary}"/>
             <TextBlock Grid.Column="2"
                        Text="{DynamicResource BatchVoImport_TextColumn}"
-                       FontSize="{DynamicResource FontSize.Small}"
+                       FontSize="{DynamicResource FontSize.Body}"
                        Foreground="{DynamicResource Brush.Text.Secondary}"/>
-            <TextBlock Grid.Column="3"
+            <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.BatchVo.Status}"
                        Text="{DynamicResource BatchVoImport_StatusColumn}"
-                       FontSize="{DynamicResource FontSize.Small}"
+                       FontSize="{DynamicResource FontSize.Body}"
                        Foreground="{DynamicResource Brush.Text.Secondary}"/>
             <TextBlock Grid.Column="4"
                        Text="{DynamicResource BatchVoImport_PrimaryColumn}"
-                       FontSize="{DynamicResource FontSize.Small}"
+                       FontSize="{DynamicResource FontSize.Body}"
                        Foreground="{DynamicResource Brush.Text.Secondary}"/>
             <TextBlock Grid.Column="5"
                        Text="{DynamicResource BatchVoImport_FemColumn}"
-                       FontSize="{DynamicResource FontSize.Small}"
+                       FontSize="{DynamicResource FontSize.Body}"
                        Foreground="{DynamicResource Brush.Text.Secondary}"/>
-            <TextBlock Grid.Column="6"
+            <TextBlock Grid.Column="6" Width="{DynamicResource ColumnWidth.BatchVo.Result}"
                        Text="{DynamicResource BatchVoImport_RowStatusColumn}"
-                       FontSize="{DynamicResource FontSize.Small}"
+                       FontSize="{DynamicResource FontSize.Body}"
                        Foreground="{DynamicResource Brush.Text.Secondary}"/>
         </Grid>
 
@@ -111,12 +117,12 @@
                  Background="{DynamicResource Brush.Surface.Panel}">
             <ListBox.ItemTemplate>
                 <DataTemplate x:DataType="vm:BatchVoRowViewModel">
-                    <!-- Widths must match the header row above -->
-                    <Grid ColumnDefinitions="140,60,*,50,220,220,50" Margin="0,2">
+                    <!-- Column widths: the same ColumnWidth.BatchVo.* tokens as the header row above (issue 178) -->
+                    <Grid ColumnDefinitions="Auto,Auto,*,Auto,*,*,Auto" ColumnSpacing="8" Margin="0,2">
 
                         <!-- Conversation name — hidden in single-conversation mode -->
-                        <TextBlock Grid.Column="0"
-                                   Text="{Binding ConversationName}"
+                        <TextBlock Grid.Column="0" Width="{DynamicResource ColumnWidth.BatchVo.Conversation}"
+                                   Text="{Binding ConversationName}" ToolTip.Tip="{Binding ConversationName}"
                                    IsVisible="{Binding DataContext.IsSingleConversation,
                                        RelativeSource={RelativeSource AncestorType=Window},
                                        Converter={StaticResource InverseBoolToVis}}"
@@ -124,28 +130,29 @@
                                    VerticalAlignment="Center"/>
 
                         <!-- Node ID -->
-                        <TextBlock Grid.Column="1"
+                        <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.BatchVo.Node}"
                                    Text="{Binding NodeId}"
                                    VerticalAlignment="Center"/>
 
                         <!-- Text preview -->
                         <TextBlock Grid.Column="2"
-                                   Text="{Binding TextPreview}"
+                                   Text="{Binding TextPreview}" ToolTip.Tip="{Binding TextPreview}"
                                    TextTrimming="CharacterEllipsis"
                                    VerticalAlignment="Center"/>
 
                         <!-- Existing VO status glyph, or "shared" marker for ExternalVO-aliased
                              nodes — those rows are skipped by batch import (see StatusDisplay). -->
-                        <TextBlock Grid.Column="3"
+                        <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.BatchVo.Status}"
                                    Text="{Binding StatusDisplay}"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"
                                    ToolTip.Tip="{DynamicResource ToolTip_BatchAliasedRow}"/>
 
                         <!-- Primary slot: filename + play + browse + clear -->
-                        <Grid Grid.Column="4" ColumnDefinitions="*,Auto,Auto,Auto" Margin="2,0">
+                        <Grid Grid.Column="4" ColumnDefinitions="*,Auto,Auto,Auto">
                             <TextBlock Grid.Column="0"
                                        Text="{Binding PrimaryFileLabel}"
+                                       ToolTip.Tip="{Binding PrimaryFileLabel}"
                                        VerticalAlignment="Center"
                                        TextTrimming="CharacterEllipsis"/>
                             <Button Grid.Column="1"
@@ -174,9 +181,10 @@
                         </Grid>
 
                         <!-- Female slot: filename + play + browse + clear -->
-                        <Grid Grid.Column="5" ColumnDefinitions="*,Auto,Auto,Auto" Margin="2,0">
+                        <Grid Grid.Column="5" ColumnDefinitions="*,Auto,Auto,Auto">
                             <TextBlock Grid.Column="0"
                                        Text="{Binding FemFileLabel}"
+                                       ToolTip.Tip="{Binding FemFileLabel}"
                                        VerticalAlignment="Center"
                                        TextTrimming="CharacterEllipsis"/>
                             <Button Grid.Column="1"
@@ -205,7 +213,7 @@
                         </Grid>
 
                         <!-- Import result glyph -->
-                        <TextBlock Grid.Column="6"
+                        <TextBlock Grid.Column="6" Width="{DynamicResource ColumnWidth.BatchVo.Result}"
                                    Text="{Binding RowStatusGlyph}"
                                    HorizontalAlignment="Center"
                                    VerticalAlignment="Center"/>

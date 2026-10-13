@@ -28,7 +28,6 @@ public static class ColumnWidthTokens
         ["ColumnWidth.BatchVo.Conversation"] = 140,
         ["ColumnWidth.BatchVo.Node"]         = 60,
         ["ColumnWidth.BatchVo.Status"]       = 50,
-        ["ColumnWidth.BatchVo.File"]         = 220,
         ["ColumnWidth.BatchVo.Result"]       = 50,
     };
 }
