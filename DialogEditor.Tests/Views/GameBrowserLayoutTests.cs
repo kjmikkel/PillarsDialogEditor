@@ -177,6 +177,43 @@ public class GameBrowserLayoutTests
         finally { window.Close(); }
     }
 
+    // Issue 85, part C: a conversation the project changed shows a dot (with a tooltip), and its
+    // row reports the same as its accessible item status; its accessible name is unchanged.
+    [AvaloniaFact]
+    public void EditedConversation_ShowsTheDot_AndReportsItsStatus()
+        => WithDock(1.0, d =>
+        {
+            d.Vm.SetProjectConversations(new HashSet<string> { d.Short.Name });
+            Dispatcher.UIThread.RunJobs();
+
+            TextBlock Dot(object item) => Row(d, item).GetVisualDescendants().OfType<TextBlock>()
+                .Single(t => t.Classes.Contains("editedMark"));
+
+            Assert.True(Dot(d.Short).IsEffectivelyVisible);
+            Assert.False(Dot(d.Long).IsEffectivelyVisible);
+            Assert.Equal(global::Avalonia.Application.Current!.FindResource("Browser_EditedInProject"), ToolTip.GetTip(Dot(d.Short)));
+
+            Assert.Equal(Loc.Get("Browser_EditedInProject"), global::Avalonia.Automation.AutomationProperties.GetItemStatus(Row(d, d.Short)));
+            Assert.True(string.IsNullOrEmpty(global::Avalonia.Automation.AutomationProperties.GetItemStatus(Row(d, d.Long))));
+            Assert.Equal(d.Short.Name, global::Avalonia.Automation.AutomationProperties.GetName(Row(d, d.Short)));
+        });
+
+    [AvaloniaFact]
+    public void OnlyProjectCheckbox_ShowsOnlyWithAProjectOpen()
+        => WithDock(1.0, d =>
+        {
+            var box = d.View.GetVisualDescendants().OfType<CheckBox>().Single();
+            Assert.False(box.IsEffectivelyVisible);
+
+            d.Vm.SetProjectConversations(new HashSet<string>());
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(box.IsEffectivelyVisible);
+            Assert.NotNull(ToolTip.GetTip(box));
+
+            box.IsChecked = true;
+            Assert.True(d.Vm.OnlyProjectConversations);
+        });
+
     [AvaloniaFact]
     public void Footer_UsesTheSmallFontSize()
         => WithDock(1.0, d =>
