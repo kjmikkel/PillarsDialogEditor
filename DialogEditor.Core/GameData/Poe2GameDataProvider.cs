@@ -27,7 +27,6 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
 
     public string GetStringTablesRoot(string language) =>
         Path.Combine(LocalizedRoot, language, "text", "conversations");
-    private string SpeakersBundle  => Path.Combine(ExportedRoot, "design", "gamedata", "speakers.gamedatabundle");
 
     public IReadOnlyList<string> AvailableLanguages =>
         Directory.Exists(LocalizedRoot)
@@ -81,22 +80,31 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
         return Path.Combine(dataRoot, "localized", language, "text", "conversations", withoutExt + ".stringtable");
     }
 
+    // A bundle every data folder may have, named with that folder's prefix
+    // (speakers.gamedatabundle, lax2_speakers.gamedatabundle, …), in the game's order (issue 198).
+    private IEnumerable<string> BundlesNamed(string subfolder, string name) =>
+        Roots.Select(r => Path.Combine(r.Path, "design", subfolder, r.Prefix + name)).Where(File.Exists);
+
+    // Later folders win, as the game loads them in this order.
+    private static IReadOnlyDictionary<string, string> MergeLaterWins(IEnumerable<IReadOnlyDictionary<string, string>> maps)
+    {
+        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var map in maps)
+            foreach (var (key, value) in map) result[key] = value;
+        return result;
+    }
+
     public IReadOnlyDictionary<string, string> LoadSpeakerNames() =>
-        File.Exists(SpeakersBundle)
-            ? Poe2SpeakerNameParser.ParseFile(SpeakersBundle)
-            : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        MergeLaterWins(BundlesNamed("gamedata", "speakers.gamedatabundle").Select(Poe2SpeakerNameParser.ParseFile));
 
     public IReadOnlyDictionary<string, string> LoadChatterPrefixes() =>
-        File.Exists(SpeakersBundle)
-            ? Poe2SpeakerNameParser.ParseChatterPrefixesFile(SpeakersBundle)
-            : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        MergeLaterWins(BundlesNamed("gamedata", "speakers.gamedatabundle").Select(Poe2SpeakerNameParser.ParseChatterPrefixesFile));
 
     private string GameDataRoot => Path.Combine(ExportedRoot, "design", "gamedata");
 
     public IReadOnlyDictionary<string, IReadOnlyList<GameDataEntry>> LoadGameDataNames()
     {
         var result = new Dictionary<string, IReadOnlyList<GameDataEntry>>();
-        var gdRoot = GameDataRoot;
 
         // ── Phase 1 — generic sweep ──────────────────────────────────────────
         // Parse every bundle once, bucket objects by short $type, and register each
@@ -104,10 +112,11 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
         // bundle-backed lookup kind the generated catalogue references (Ship, Team,
         // Affliction, Schedule, CreatureType, …) and any future kind, with zero
         // per-kind code. Spec: docs/superpowers/specs/2026-07-09-lookup-kind-sweep-design.md.
-        if (Directory.Exists(gdRoot))
+        var gameDataFolders = Roots.Select(r => Path.Combine(r.Path, "design", "gamedata")).Where(Directory.Exists).ToList();
+        if (gameDataFolders.Count > 0)
         {
             var byKind = new Dictionary<string, List<GameDataEntry>>(StringComparer.Ordinal);
-            foreach (var file in Directory.EnumerateFiles(gdRoot, "*.gamedatabundle"))
+            foreach (var file in gameDataFolders.SelectMany(d => Directory.EnumerateFiles(d, "*.gamedatabundle")))
             {
                 foreach (var (shortType, entries) in Poe2GameDataBundleParser.ParseAllByTypeFile(file))
                 {
@@ -152,9 +161,9 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
         // Only kinds needing cleaning/filtering the sweep can't express.
         void FactionBundle(string kind, string typeFilter, Func<string, string>? clean = null)
         {
-            var entries = Poe2GameDataBundleParser.ParseFile(
-                Path.Combine(gdRoot, "factions.gamedatabundle"), clean, typeFilter);
-            if (entries.Count > 0) result[kind] = entries;
+            var entries = BundlesNamed("gamedata", "factions.gamedatabundle")
+                .SelectMany(f => Poe2GameDataBundleParser.ParseFile(f, clean, typeFilter)).ToList();
+            if (entries.Count > 0) result[kind] = LastOfEach(entries);
         }
 
         // Disposition DebugName format: "<Name>Disposition" — strip the suffix.
@@ -167,45 +176,40 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
 
         // Class: BaseStatsGameData includes NPC creature archetypes — keep only
         // playable classes (IsPlayerClass:"true"); the sweep's bucket is unfiltered.
-        var classEntries = Poe2GameDataBundleParser.ParseFile(
-            Path.Combine(gdRoot, "characters.gamedatabundle"),
-            typeFilter: "BaseStatsGameData", componentFilter: IsPlayerClassComponent);
-        if (classEntries.Count > 0) result["Class"] = classEntries;
+        var classEntries = BundlesNamed("gamedata", "characters.gamedatabundle")
+            .SelectMany(f => Poe2GameDataBundleParser.ParseFile(f, typeFilter: "BaseStatsGameData", componentFilter: IsPlayerClassComponent))
+            .ToList();
+        if (classEntries.Count > 0) result["Class"] = LastOfEach(classEntries);
 
-        // WeaponType conditions store DebugName (e.g. "Unarmed"), not the GUID → strip Id.
-        var weaponEntries = Poe2GameDataBundleParser
-            .ParseFile(Path.Combine(gdRoot, "global.gamedatabundle"), typeFilter: "WeaponTypeGameData")
+        var weaponEntries = BundlesNamed("gamedata", "global.gamedatabundle")
+            .SelectMany(f => Poe2GameDataBundleParser.ParseFile(f, typeFilter: "WeaponTypeGameData"))
             .Select(e => new GameDataEntry(Id: string.Empty, Name: e.Name))
             .ToList();
-        if (weaponEntries.Count > 0) result["WeaponType"] = weaponEntries;
+        if (weaponEntries.Count > 0) result["WeaponType"] = LastOfEach(weaponEntries);
 
         // ── Quest ────────────────────────────────────────────────────────────
         // quests.questbundle lives in design/quests/, not design/gamedata/, and uses a
         // different JSON envelope {Hash, Quests:[{ID, Filename}]} — requires its own parser.
-        var quests = Poe2QuestBundleParser.ParseFile(
-            Path.Combine(ExportedRoot, "design", "quests", "quests.questbundle"));
-        if (quests.Count > 0) result["Quest"] = quests;
+        var quests = BundlesNamed("quests", "quests.questbundle").SelectMany(Poe2QuestBundleParser.ParseFile).ToList();
+        if (quests.Count > 0) result["Quest"] = LastOfEach(quests);
 
         // ── GlobalVariables.csv ──────────────────────────────────────────────
-        var vars = GlobalVariablesCsvParser.ParseFile(Path.Combine(gdRoot, "GlobalVariables.csv"));
+        var vars = GlobalVariablesCsvParser.ParseFile(Path.Combine(GameDataRoot, "GlobalVariables.csv"));   // base only: issue 199
         if (vars.Count > 0) result["GlobalVariable"] = vars;
 
         // ── Conversations ─────────────────────────────────────────────────────
         // Each .conversationbundle has a root Conversations[0].ID GUID — parse all
         // bundles and expose the filename (without extension) as the display name.
-        if (Directory.Exists(ConversationsRoot))
-        {
-            var conversations = Directory
-                .EnumerateFiles(ConversationsRoot, "*.conversationbundle", SearchOption.AllDirectories)
-                .Select(path => (
-                    id:   Poe2ConversationParser.ParseRootId(File.ReadAllText(path)),
-                    name: Path.GetFileNameWithoutExtension(path)))
-                .Where(t => !string.IsNullOrWhiteSpace(t.id))
-                .Select(t => new GameDataEntry(Id: t.id!, Name: t.name))
-                .OrderBy(e => e.Name)
-                .ToList();
-            if (conversations.Count > 0) result["Conversation"] = conversations;
-        }
+        var conversations = Roots.Select(ConversationsOf).Where(Directory.Exists)
+            .SelectMany(d => Directory.EnumerateFiles(d, "*.conversationbundle", SearchOption.AllDirectories))
+            .Select(path => (
+                id:   Poe2ConversationParser.ParseRootId(File.ReadAllText(path)),
+                name: Path.GetFileNameWithoutExtension(path)))
+            .Where(t => !string.IsNullOrWhiteSpace(t.id))
+            .Select(t => new GameDataEntry(Id: t.id!, Name: t.name))
+            .OrderBy(e => e.Name)
+            .ToList();
+        if (conversations.Count > 0) result["Conversation"] = conversations;
 
         // Kinds with no bundle-backed $type stay dormant (empty suggestions, raw GUID
         // display — safe): ProgressionUnlockable, AttackBase, and the generic "GameData"
@@ -214,6 +218,11 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
 
         return result;
     }
+
+    // Entries merged from several data folders: the last copy of each (same ID and name) wins,
+    // as the game loads later folders after earlier ones (issue 198).
+    private static IReadOnlyList<GameDataEntry> LastOfEach(IReadOnlyList<GameDataEntry> entries) =>
+        entries.Reverse().DistinctBy(e => (e.Id, e.Name)).Reverse().ToList();
 
     private static bool IsPlayerClassComponent(IReadOnlyList<JsonElement> components) =>
         components.Any(c =>
