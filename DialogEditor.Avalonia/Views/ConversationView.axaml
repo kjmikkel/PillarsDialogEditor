@@ -80,19 +80,20 @@
                            Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}" VerticalAlignment="Center" Margin="0,0,8,0"
                            ToolTip.Tip="{Binding StatisticsTooltip}"/>
                 <Grid VerticalAlignment="Center" Margin="0,0,8,0">
+                    <!-- Min, not fixed, sizes (issue 177): the text follows the font scale. -->
                     <TextBox x:Name="SearchBox"
                              Text="{Binding SearchQuery}"
                              Watermark="{DynamicResource Placeholder_SearchNodes}"
                              AutomationProperties.Name="{DynamicResource Placeholder_SearchNodes}"
                              Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" CaretBrush="{DynamicResource Brush.Text.Secondary}"
                              BorderBrush="{DynamicResource Brush.Border.Muted}" BorderThickness="1"
-                             Padding="6,2,24,2" FontSize="{DynamicResource FontSize.Body}" Height="26"
+                             Padding="6,2,24,2" FontSize="{DynamicResource FontSize.Body}" MinHeight="26"
                              VerticalContentAlignment="Center"
                              KeyDown="SearchBox_KeyDown"
                              ToolTip.Tip="{DynamicResource ToolTip_SearchNodes}"
                              AutomationProperties.HelpText="{DynamicResource ToolTip_SearchNodes}"/>
                     <Button Command="{Binding ClearSearchCommand}"
-                            HorizontalAlignment="Right" Width="24" Height="24"
+                            HorizontalAlignment="Right" MinWidth="24" MinHeight="24"
                             Content="✕" VerticalAlignment="Center"
                             Background="Transparent" BorderThickness="0"
                             Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Small}" Cursor="Hand"
