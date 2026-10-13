@@ -94,11 +94,12 @@ public class ConversationItemViewModelTests
     }
 
     [Fact]
-    public void DisplayName_WhenNew_ContainsName()
+    public void DisplayName_WhenNew_IsJustItsName()
     {
         var vm = new ConversationItemViewModel(MakeFile("intro"), isNew: true);
-        // Stub Loc returns the key; suffix key is "Label_NewConversation_Suffix"
-        Assert.Contains("intro", vm.DisplayName);
+        // Issue 85 A: the (new) folder and the green colour already mark it, so the name is
+        // not suffixed with "(new)" a second time.
+        Assert.Equal("intro", vm.DisplayName);
     }
 }
 
@@ -115,19 +116,23 @@ public class ConversationFolderViewModelTests
         Assert.Equal("quests", vm.FolderPath);
     }
 
+    // Issue 85, part B: a folder shows its own (last) path segment, tidied; the raw path is
+    // its tooltip.
     [Fact]
-    public void DisplayName_WhenPathIsEmpty_UsesLocKey()
+    public void DisplayName_IsTheTidiedLastSegment()
     {
-        // Stub returns the key itself; the real app would return a localised label
-        var vm = new ConversationFolderViewModel(string.Empty);
-        Assert.Equal("Browser_RootFolder", vm.DisplayName);
+        var vm = new ConversationFolderViewModel(@"07_neketaka_temple_district\07_animancer_one_offs");
+        Assert.Equal("Animancer One Offs", vm.DisplayName);
+        Assert.Equal(@"07_neketaka_temple_district\07_animancer_one_offs", vm.ToolTip);
     }
 
     [Fact]
-    public void DisplayName_WhenPathIsSet_EqualsFolderPath()
+    public void DisplayName_CanBeGivenByTheCaller()
     {
-        var vm = new ConversationFolderViewModel("quests");
-        Assert.Equal("quests", vm.DisplayName);
+        // The New conversations folder and the DLC groups have no real folder name to tidy.
+        var vm = new ConversationFolderViewModel(string.Empty, displayName: "New conversations");
+        Assert.Equal("New conversations", vm.DisplayName);
+        Assert.Equal("New conversations", vm.ToolTip);
     }
 
     [Fact]

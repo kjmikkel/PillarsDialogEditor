@@ -142,7 +142,7 @@ Palette.Light	Palette.Connection.Base	#FF4F4F4F
 Palette.Light	Palette.Control.Background	#FFD6D6D4
 Palette.Light	Palette.Cream.100	#FFFFF8DC
 Palette.Light	Palette.Crimson.700	#FF7B241C
-Palette.Light	Palette.Green.400	#FF1F7A3D
+Palette.Light	Palette.Green.400	#FF1A6B35
 Palette.Light	Palette.Green.500	#FF1E7D34
 Palette.Light	Palette.Green.550	#FFCDEBD5
 Palette.Light	Palette.Green.600	#FF2D6A2D

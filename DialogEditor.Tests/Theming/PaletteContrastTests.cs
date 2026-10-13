@@ -39,6 +39,13 @@ public class PaletteContrastTests
         new("Text.Status.Removed / Surface.Card", "Palette.Red.450",   "Palette.Neutral.100", true),
         new("Text.Caption / Surface.Card",  "Palette.Neutral.600", "Palette.Neutral.100", false),
         new("Text.Muted / Surface.Card",    "Palette.Neutral.535", "Palette.Neutral.100", false),
+        // Conversations dock rows (issue 85): folders, conversations and new conversations on the
+        // tree background.
+        new("Text.Primary / Surface.Subtle",    "Palette.Neutral.910", "Palette.Neutral.175", true),
+        new("Text.Secondary / Surface.Subtle",  "Palette.Neutral.800", "Palette.Neutral.175", true),
+        new("Text.Status.New / Surface.Subtle", "Palette.Green.400",   "Palette.Neutral.175", true),
+        // The "changed in this project" dot (issue 85, part C) is a non-text indicator.
+        new("Text.Status.Changed / Surface.Subtle", "Palette.Amber.540", "Palette.Neutral.175", false),
         // Hint and empty-state text (issue 180) is active text, so it must read as normal text on
         // every surface it sits on. Text.Muted fails this on Surface.Panel in Dark and Light.
         new("Text.Hint / Surface.Window", "Palette.Neutral.600", "Palette.Neutral.115", true),
