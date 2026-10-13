@@ -41,6 +41,25 @@ public class Poe2DlcInstallTests
         Assert.NotEmpty(provider.LoadSpeakerNames());
     }
 
+    // Issue 199: the global-variable suggestions are the game's declarations, every data
+    // folder's *.globalvariablesbundle (the editor used to read a CSV no build ships).
+    [GameInstallFact(GameInstallFactAttribute.Poe2Variable)]
+    public void GlobalVariables_ListEveryDataFoldersDeclarations()
+    {
+        var dir = GameInstallFactAttribute.InstallDir(GameInstallFactAttribute.Poe2Variable);
+        var dlcBundle = Poe2DataRoots.Existing(dir).Where(r => r.Key is not null)
+            .Select(r => Path.Combine(r.Path, "design", "globalvariables"))
+            .Where(Directory.Exists)
+            .SelectMany(d => Directory.EnumerateFiles(d, "*.globalvariablesbundle"))
+            .First();
+        var dlcTag = DialogEditor.Core.Parsing.Poe2GlobalVariablesBundleParser.ParseFile(dlcBundle)[0].Name;
+
+        var vars = Provider().LoadGameDataNames()["GlobalVariable"];
+
+        Assert.Contains(vars, v => v.Name == dlcTag);
+        Assert.Contains(vars, v => v.Name == "n_(NPC)_State");   // the base game's first declaration
+    }
+
     [GameInstallFact(GameInstallFactAttribute.Poe2Variable)]
     public void EveryDlcConversation_LoadsWithItsText()
     {

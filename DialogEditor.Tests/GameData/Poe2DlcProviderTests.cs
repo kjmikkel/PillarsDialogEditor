@@ -145,6 +145,30 @@ public class Poe2DlcProviderTests : IDisposable
         Assert.Equal("SHP_Dlc", Assert.Single(ships).Name);
     }
 
+    // Issue 199: the game reads every data folder's design/globalvariables/*.globalvariablesbundle
+    // (GlobalVariables.LoadMetadata), keyed on Tag, and keeps pillars1's names aside for PoE1 save
+    // import only.
+    private void GlobalVariables(string dataFolder, string file, params string[] tags)
+    {
+        var dir = Path.Combine(_game.DataRoot, dataFolder, "design", "globalvariables");
+        Directory.CreateDirectory(dir);
+        File.WriteAllText(Path.Combine(dir, file), "{\"GlobalVariablesSets\":[{\"GlobalVariables\":[" +
+            string.Join(",", tags.Select(t => $"{{\"ID\":\"00000000-0000-0000-0000-000000000000\",\"Tag\":\"{t}\",\"InitialValue\":0}}")) +
+            "]}]}");
+    }
+
+    [Fact]
+    public void GlobalVariableLookup_ListsEveryFoldersVariablesOnce_WithoutPillars1()
+    {
+        GlobalVariables("exported", "game.globalvariablesbundle", "b_Met_Eder", "n_Shared");
+        GlobalVariables("exported", "pillars1.globalvariablesbundle", "poe1_only");
+        GlobalVariables("lax2_exported", "lax2_game.globalvariablesbundle", "b_Ice_Carver", "n_Shared");
+
+        var vars = _game.Provider.LoadGameDataNames()["GlobalVariable"];
+
+        Assert.Equal(["b_Ice_Carver", "b_Met_Eder", "n_Shared"], vars.Select(v => v.Name));
+    }
+
     [Fact]
     public void ConversationLookup_ListsASharedPathOnce()
     {
