@@ -129,6 +129,37 @@ public class Poe2DlcProviderTests : IDisposable
         Assert.Contains(conversations, c => c.Name == "lax02_cv_x");
     }
 
+    // Final review: lookups list each object once, as the game keeps it (the last folder's copy).
+    [Fact]
+    public void GameDataLookups_ListAnOverriddenObjectOnce_TheLaterFolderWinning()
+    {
+        string Ship(string name) => $$"""
+            {"GameDataObjects":[{"$type":"Game.GameData.ShipGameData, Assembly-CSharp",
+              "DebugName":"{{name}}","ID":"11111111-1111-1111-1111-111111111111"}]}
+            """;
+        File.WriteAllText(Path.Combine(GameData("exported"), "ships.gamedatabundle"), Ship("SHP_Base"));
+        File.WriteAllText(Path.Combine(GameData("lax2_exported"), "lax2_ships.gamedatabundle"), Ship("SHP_Dlc"));
+
+        var ships = _game.Provider.LoadGameDataNames()["Ship"];
+
+        Assert.Equal("SHP_Dlc", Assert.Single(ships).Name);
+    }
+
+    [Fact]
+    public void ConversationLookup_ListsASharedPathOnce()
+    {
+        foreach (var dlc in new[] { "lax1_exported", "lax2_exported" })
+        {
+            var bundle = _game.AddDlcConversation(dlc, "lax", "lax_cv_craftsperson", "en");
+            File.WriteAllText(bundle, File.ReadAllText(bundle).Replace("{\"Conversations\": [{",
+                "{\"Conversations\": [{\"ID\": \"745a9191-fd3e-4b9c-be41-7cba7f54ae86\","));
+        }
+
+        var conversations = _game.Provider.LoadGameDataNames()["Conversation"];
+
+        Assert.Single(conversations, c => c.Name == "lax_cv_craftsperson");
+    }
+
     // ── Several folders, one conversation (issue 198, from the game's own loaders) ──────────
     // ConversationDataManager loads a relative path from every data folder in order and keeps
     // the last; StringTableManager looks each line up from the last folder back to the first.
