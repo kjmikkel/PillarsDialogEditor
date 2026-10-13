@@ -124,7 +124,7 @@ public class GameBrowserSelectionContrastTests
         Color Token(string key) => ((ISolidColorBrush)global::Avalonia.Application.Current!
             .FindResource(key)!).Color;
 
-        Assert.Equal(Token("Brush.Text.Muted"),            LabelColour(folder));
+        Assert.Equal(Token("Brush.Text.Primary"),          LabelColour(folder)); // issue 85: strong folder labels
         Assert.Equal(Token("Brush.Text.Status.New"),       LabelColour(fresh));
         Assert.Equal(Token("Brush.Selection.Foreground"),  LabelColour(existing));
     }
