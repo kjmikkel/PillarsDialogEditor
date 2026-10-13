@@ -28,7 +28,7 @@
         <!-- Column 1 (Current) is collapsed from code-behind via
              VariantGrid.ColumnDefinitions[1] — x:Name on a ColumnDefinition
              generates no field, so the grid itself carries the name. -->
-        <Grid x:Name="VariantGrid" RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,12">
+        <Grid x:Name="VariantGrid" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="8" Margin="0,0,0,12">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" MinWidth="68"/>
                 <ColumnDefinition Width="*"/>
@@ -146,8 +146,8 @@
         </Grid>
 
         <!-- Encoding quality — only visible when a .wav source file is selected -->
-        <!-- Auto label columns with the old width as a MinWidth (issue 177): a fixed column cut the label off once its text followed the font scale. -->
-        <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,12"
+        <!-- Auto label columns with the old width as a MinWidth (issue 177): a fixed column cut the label off once its text followed the font scale. ColumnSpacing keeps the gap the fixed width used to leave. -->
+        <Grid ColumnSpacing="8" ColumnDefinitions="Auto,*" Margin="0,0,0,12"
               x:Name="QualityPanel" IsVisible="False">
             <TextBlock MinWidth="68" Grid.Column="0" Text="{DynamicResource VoImport_QualityLabel}"
                        VerticalAlignment="Center"/>
