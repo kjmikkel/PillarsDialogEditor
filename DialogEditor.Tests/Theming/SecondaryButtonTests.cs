@@ -66,34 +66,13 @@ public class SecondaryButtonTests
 
     // ── The markup ───────────────────────────────────────────────────────────────
 
-    private static string SolutionRoot()
-    {
-        var dir = new DirectoryInfo(AppContext.BaseDirectory);
-        while (dir is not null && !File.Exists(Path.Combine(dir.FullName, "DialogEditor.slnx")))
-            dir = dir.Parent;
-        Assert.NotNull(dir);
-        return dir!.FullName;
-    }
-
-    private static IEnumerable<(string File, XElement Element)> Markup()
-    {
-        var root = SolutionRoot();
-        foreach (var file in Directory.EnumerateFiles(root, "*.axaml", SearchOption.AllDirectories))
-        {
-            var segments = Path.GetRelativePath(root, file).Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
-            if (segments.Intersect(["bin", "obj", ".worktrees", "worktrees", ".claude"]).Any()) continue;
-            foreach (var el in XDocument.Load(file).Descendants())
-                yield return (Path.GetFileName(file), el);
-        }
-    }
-
     // A Button's fill, set either on the element or by a Style whose selector targets Buttons.
     private static IEnumerable<(string Where, string? Background, string? Foreground)> ButtonFills() =>
-        Markup().SelectMany(m =>
+        MarkupScan.Elements().SelectMany(m =>
         {
             var (file, el) = m;
             if (el.Name.LocalName == "Button")
-                return [($"{file}: Button {(string?)el.Attribute("Content") ?? (string?)el.Attribute(XName.Get("Name", "http://schemas.microsoft.com/winfx/2006/xaml"))}",
+                return [($"{file}: Button {(string?)el.Attribute("Content") ?? (string?)el.Attribute(MarkupScan.X + "Name")}",
                          (string?)el.Attribute("Background"), (string?)el.Attribute("Foreground"))];
             if (el.Name.LocalName == "Style" && ((string?)el.Attribute("Selector"))?.StartsWith("Button") == true)
             {
@@ -132,7 +111,7 @@ public class SecondaryButtonTests
     {
         // White accent text is only readable on the accent fills it is tested against. A
         // transparent or unset fill shows whatever is behind it, which this markup check can't see.
-        var offenders = Markup()
+        var offenders = MarkupScan.Elements()
             .Where(m => ((string?)m.Element.Attribute("Foreground"))?.Contains("Brush.Text.OnAccent") == true)
             .Select(m => (m.File, Tag: m.Element.Name.LocalName, Bg: (string?)m.Element.Attribute("Background")))
             .Where(m => m.Bg is { } bg && bg != "Transparent" && !AccentFills.Any(bg.Contains))

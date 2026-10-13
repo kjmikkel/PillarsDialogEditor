@@ -46,7 +46,7 @@
             <Panel>
                 <!-- Empty-state message shown after a completed scan with no issues -->
                 <TextBlock Text="{DynamicResource VoValidation_AllFound}"
-                           Foreground="{DynamicResource Brush.Text.Disabled}"
+                           Foreground="{DynamicResource Brush.Text.Hint}"
                            FontStyle="Italic"
                            HorizontalAlignment="Center" VerticalAlignment="Center"
                            IsVisible="{Binding ShowAllFound}"/>
