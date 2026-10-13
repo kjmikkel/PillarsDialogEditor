@@ -41,10 +41,17 @@
                     <ItemsControl ItemsSource="{Binding ConversationItems}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="{x:Type vm:ConversationExportItem}">
-                                <CheckBox Content="{Binding Name}"
-                                          IsChecked="{Binding IsChecked}"
+                                <!-- The name goes in a TextBlock, not straight into Content: a string
+                                     Content is rendered through AccessText, which hides the first '_'
+                                     of names like companion_eder_hub and makes the next letter an Alt
+                                     shortcut (issue 181). A TextBlock child no longer names the automation
+                                     peer, so the UIA Name is set explicitly. -->
+                                <CheckBox IsChecked="{Binding IsChecked}"
+                                          AutomationProperties.Name="{Binding Name}"
                                           Foreground="{DynamicResource Brush.Text.Emphasis}"
-                                          Padding="8,4"/>
+                                          Padding="8,4">
+                                    <TextBlock Text="{Binding Name}"/>
+                                </CheckBox>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
