@@ -421,6 +421,18 @@ git commit -m "feat: PoE2 reads DLC conversations and their text from every data
 
 ---
 
+### Task 2b (added during execution): shared paths and cross-folder text
+
+See the spec's Amendment and the ledger's Task 2b ruling.
+
+- `EnumerateConversations` lists one file per relative path, from the last folder that has it.
+- `LoadConversation` merges every folder's table per line, the later folder winning.
+- `GetStringTablePath` returns the last folder that has a table, else the bundle's folder.
+- `StringTable.Entries` is added.
+- Tests in `Poe2DlcProviderTests`: `ASharedPath_IsListedOnce_FromTheLastFolderThatHasIt`, `Text_IsMergedPerLine_TheLaterFolderWinning`, `TextIsWritten_ToTheLastFolderWithATable_ElseTheBundlesFolder`, `TheLastBundleWithoutText_TakesItsTextFromAnEarlierFolder`, `NoTableAnywhere_IsMissing`.
+
+---
+
 ### Task 3: Speakers, chatter prefixes, game data and quests from every data folder
 
 **Files:**

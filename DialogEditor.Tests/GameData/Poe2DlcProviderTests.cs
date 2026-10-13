@@ -128,4 +128,79 @@ public class Poe2DlcProviderTests : IDisposable
 
         Assert.Contains(conversations, c => c.Name == "lax02_cv_x");
     }
+
+    // ── Several folders, one conversation (issue 198, from the game's own loaders) ──────────
+    // ConversationDataManager loads a relative path from every data folder in order and keeps
+    // the last; StringTableManager looks each line up from the last folder back to the first.
+
+    private string TextTable(string dataFolder, string lang, string relative, params (int Id, string Text)[] lines)
+    {
+        var path = Path.Combine(_game.DataRoot, dataFolder, "localized", lang, "text", "conversations", relative + ".stringtable");
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        File.WriteAllText(path, "<StringTableFile><Entries>" +
+            string.Concat(lines.Select(l => $"<Entry><ID>{l.Id}</ID><DefaultText>{l.Text}</DefaultText><FemaleText></FemaleText></Entry>")) +
+            "</Entries></StringTableFile>");
+        return path;
+    }
+
+    [Fact]
+    public void ASharedPath_IsListedOnce_FromTheLastFolderThatHasIt()
+    {
+        foreach (var dlc in new[] { "lax1_exported", "lax2_exported", "lax3_exported" })
+            _game.AddDlcConversation(dlc, "lax", "lax_cv_craftsperson", "en");
+
+        var file = Assert.Single(_game.Provider.EnumerateConversations(), f => f.Name == "lax_cv_craftsperson");
+
+        Assert.Equal("lax3_exported", file.DataRoot);
+        Assert.Equal(Path.Combine(_game.DataRoot, "lax3_exported", "design", "conversations", "lax", "lax_cv_craftsperson.conversationbundle"),
+                     file.ConversationPath);
+    }
+
+    [Fact]
+    public void Text_IsMergedPerLine_TheLaterFolderWinning()
+    {
+        // A DLC table for a base-game conversation: line 1 overridden, line 2 added.
+        TextTable("lax2_exported", "en", "test_conv", (1, "dlc line"), (2, "added line"));
+        var provider = _game.Provider;
+
+        var strings = provider.LoadConversation(provider.FindConversation("test_conv")!).Strings;
+
+        Assert.Equal("dlc line", strings.Get(1)!.DefaultText);
+        Assert.Equal("added line", strings.Get(2)!.DefaultText);
+    }
+
+    [Fact]
+    public void TextIsWritten_ToTheLastFolderWithATable_ElseTheBundlesFolder()
+    {
+        var dlcTable = TextTable("lax2_exported", "en", "test_conv", (1, "dlc line"));
+        var provider = _game.Provider;
+        var file = provider.FindConversation("test_conv")!;
+
+        Assert.Equal(dlcTable, provider.GetStringTablePath(file, "en"));     // a DLC table wins every line it has
+        Assert.Equal(_game.StPath("de"), provider.GetStringTablePath(file, "de"));   // no DLC table in de
+    }
+
+    [Fact]
+    public void TheLastBundleWithoutText_TakesItsTextFromAnEarlierFolder()
+    {
+        // lax_re_city_ambush_mag: the bundle is in lax1, lax2 and lax3; English text only in lax1 and lax2.
+        _game.AddDlcConversation("lax1_exported", "lax", "lax_re_city_ambush_mag", "en");
+        _game.AddDlcConversation("lax2_exported", "lax", "lax_re_city_ambush_mag", "en");
+        _game.AddDlcConversation("lax3_exported", "lax", "lax_re_city_ambush_mag");
+        var provider = _game.Provider;
+        var file = provider.FindConversation("lax_re_city_ambush_mag")!;
+
+        Assert.Equal("lax3_exported", file.DataRoot);
+        Assert.Equal("lax_re_city_ambush_mag en", provider.LoadConversation(file).Strings.Get(1)!.DefaultText);
+        Assert.StartsWith(Path.Combine(_game.DataRoot, "lax2_exported"), provider.GetStringTablePath(file, "en"));
+    }
+
+    [Fact]
+    public void NoTableAnywhere_IsMissing()
+    {
+        _game.AddDlcConversation("laxi_exported", "laxi", "laxi_00_si_god");   // no text in any language
+        var provider = _game.Provider;
+
+        Assert.True(provider.LoadConversation(provider.FindConversation("laxi_00_si_god")!).Strings.IsMissing);
+    }
 }
