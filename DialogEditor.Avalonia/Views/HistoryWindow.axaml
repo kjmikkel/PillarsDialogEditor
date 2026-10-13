@@ -23,14 +23,17 @@
                  IsVisible="{Binding HasCommits}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid ColumnDefinitions="110,140,90,*" Margin="0,3">
-                        <TextBlock Grid.Column="0"
+                    <!-- Issue 178: the fixed columns take their width from ColumnWidth.* tokens, which scale
+                         with the font, so text no longer runs into the next column at large scales.
+                         The same tokens as the Attribution window's columns. -->
+                    <Grid ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="8" Margin="0,3">
+                        <TextBlock Grid.Column="0" Width="{DynamicResource ColumnWidth.Date}"
                                    Text="{Binding Date, Converter={StaticResource CommitDate}}"
                                    ToolTip.Tip="{Binding Date}"
                                    Classes="list-secondary" FontSize="{DynamicResource FontSize.Body}"/>
-                        <TextBlock Grid.Column="1" Text="{Binding Author}"
+                        <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.Author}" Text="{Binding Author}" ToolTip.Tip="{Binding Author}"
                                    Classes="list-secondary" FontSize="{DynamicResource FontSize.Body}" TextTrimming="CharacterEllipsis"/>
-                        <TextBlock Grid.Column="2" Text="{Binding ShortSha}"
+                        <TextBlock Grid.Column="2" Width="{DynamicResource ColumnWidth.CommitSha}" Text="{Binding ShortSha}"
                                    Classes="list-muted" FontSize="{DynamicResource FontSize.Body}" FontFamily="Consolas,monospace"/>
                         <TextBlock Grid.Column="3" Text="{Binding Subject}"
                                    Classes="list-primary" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>

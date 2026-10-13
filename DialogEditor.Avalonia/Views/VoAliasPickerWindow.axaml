@@ -25,7 +25,7 @@
                  AutomationProperties.HelpText="{DynamicResource ToolTip_AliasPickerConvList}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock Text="{Binding Name}" ToolTip.Tip="{Binding Name}" TextTrimming="CharacterEllipsis"/>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
@@ -39,19 +39,23 @@
                  AutomationProperties.HelpText="{DynamicResource ToolTip_AliasPickerNodeFilter}"
                  Margin="0,0,0,4"/>
         <DockPanel Grid.Row="1" Grid.Column="2">
-            <!-- Column headers; widths must match the row template below -->
-            <Grid DockPanel.Dock="Top" ColumnDefinitions="60,140,*,60" Margin="8,0,0,2">
-                <TextBlock Grid.Column="0" Text="{DynamicResource AliasPicker_NodeColumn}"
-                           FontSize="{DynamicResource FontSize.Small}"
+            <!-- Issue 178: the fixed columns take their width from ColumnWidth.* tokens, which scale
+                 with the font, so text no longer runs into the next column at large scales.
+                 Header and row cells share each token and the 8 px column spacing, and the header
+                 is inset by the row's 12 px item padding (Fluent's ListBoxItem), so the columns
+                 line up. The headers are at row size (FontSize.Body). -->
+            <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8" Margin="12,0,12,2">
+                <TextBlock Grid.Column="0" Width="{DynamicResource ColumnWidth.NodeId}" Text="{DynamicResource AliasPicker_NodeColumn}"
+                           FontSize="{DynamicResource FontSize.Body}"
                            Foreground="{DynamicResource Brush.Text.Secondary}"/>
-                <TextBlock Grid.Column="1" Text="{DynamicResource AliasPicker_SpeakerColumn}"
-                           FontSize="{DynamicResource FontSize.Small}"
+                <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.Speaker}" Text="{DynamicResource AliasPicker_SpeakerColumn}"
+                           FontSize="{DynamicResource FontSize.Body}"
                            Foreground="{DynamicResource Brush.Text.Secondary}"/>
                 <TextBlock Grid.Column="2" Text="{DynamicResource AliasPicker_TextColumn}"
-                           FontSize="{DynamicResource FontSize.Small}"
+                           FontSize="{DynamicResource FontSize.Body}"
                            Foreground="{DynamicResource Brush.Text.Secondary}"/>
-                <TextBlock Grid.Column="3" Text="{DynamicResource AliasPicker_WemColumn}"
-                           FontSize="{DynamicResource FontSize.Small}"
+                <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.WemGlyph}" Text="{DynamicResource AliasPicker_WemColumn}"
+                           FontSize="{DynamicResource FontSize.Body}"
                            Foreground="{DynamicResource Brush.Text.Secondary}"/>
             </Grid>
             <!--
@@ -73,14 +77,14 @@
                      AutomationProperties.HelpText="{DynamicResource ToolTip_AliasPickerNodeList}">
                 <ListBox.ItemTemplate>
                     <DataTemplate x:DataType="vm:VoAliasPickerRow">
-                        <Grid ColumnDefinitions="60,140,*,60" Margin="0,1"
+                        <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8" Margin="0,1"
                               IsEnabled="{Binding IsPickable}">
-                            <TextBlock Grid.Column="0" Text="{Binding NodeId}" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Text="{Binding SpeakerName}"
+                            <TextBlock Grid.Column="0" Width="{DynamicResource ColumnWidth.NodeId}" Text="{Binding NodeId}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.Speaker}" Text="{Binding SpeakerName}" ToolTip.Tip="{Binding SpeakerName}"
                                        TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="2" Text="{Binding TextPreview}"
+                            <TextBlock Grid.Column="2" Text="{Binding TextPreview}" ToolTip.Tip="{Binding TextPreview}"
                                        TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="3" Text="{Binding WemGlyph}"
+                            <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.WemGlyph}" Text="{Binding WemGlyph}"
                                        HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Grid>
                     </DataTemplate>
