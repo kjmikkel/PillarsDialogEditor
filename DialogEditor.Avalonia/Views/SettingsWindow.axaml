@@ -36,145 +36,151 @@
         </Style>
     </Window.Styles>
 
-    <Grid RowDefinitions="Auto,Auto,Auto" Margin="16">
+    <Grid RowDefinitions="*,Auto,Auto" Margin="16">
 
-        <StackPanel Grid.Row="0" Spacing="12">
+        <!-- The body scrolls and the Close row stays below it (issue 177): at large font
+             scales WindowSizing clamps the window to the screen height, and the * row then
+             gives the body only what is left. With SizeToContent="Height" the * row behaves
+             like Auto until the clamp applies. -->
+        <ScrollViewer Grid.Row="0">
+            <StackPanel Spacing="12">
 
-            <!-- Backup directory -->
-            <DockPanel ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}">
-                <TextBlock Classes="label" Text="{DynamicResource Settings_BackupDirectory}"/>
-                <Button Classes="browse"
-                        DockPanel.Dock="Right"
-                        Content="{DynamicResource Settings_Browse}"
-                        Command="{Binding BrowseBackupDirectoryCommand}"
-                        ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}"
-                        AutomationProperties.HelpText="{DynamicResource Settings_BackupDirectoryTooltip}"/>
-                <TextBox Classes="path"
-                         Text="{Binding BackupDirectory}"
-                         Watermark="{DynamicResource Settings_PathNotSet}"
-                         ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}"
-                         AutomationProperties.HelpText="{DynamicResource Settings_BackupDirectoryTooltip}"
-                         AutomationProperties.Name="{DynamicResource Settings_BackupDirectory}"/>
-            </DockPanel>
+                <!-- Backup directory -->
+                <DockPanel ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}">
+                    <TextBlock Classes="label" Text="{DynamicResource Settings_BackupDirectory}"/>
+                    <Button Classes="browse"
+                            DockPanel.Dock="Right"
+                            Content="{DynamicResource Settings_Browse}"
+                            Command="{Binding BrowseBackupDirectoryCommand}"
+                            ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}"
+                            AutomationProperties.HelpText="{DynamicResource Settings_BackupDirectoryTooltip}"/>
+                    <TextBox Classes="path"
+                             Text="{Binding BackupDirectory}"
+                             Watermark="{DynamicResource Settings_PathNotSet}"
+                             ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}"
+                             AutomationProperties.HelpText="{DynamicResource Settings_BackupDirectoryTooltip}"
+                             AutomationProperties.Name="{DynamicResource Settings_BackupDirectory}"/>
+                </DockPanel>
 
-            <!-- Default localization format -->
-            <DockPanel ToolTip.Tip="{DynamicResource Settings_LocalizationFormatTooltip}">
-                <TextBlock Classes="label" Text="{DynamicResource Settings_LocalizationFormat}"/>
-                <ComboBox x:Name="LocalizationFormatComboBox"
-                          ItemsSource="{Binding LocalizationFormatOptions}"
-                          SelectedItem="{Binding LocalizationFormat, Mode=TwoWay}"
-                          MinWidth="120"
-                          ToolTip.Tip="{DynamicResource Settings_LocalizationFormatTooltip}"
-                          AutomationProperties.HelpText="{DynamicResource Settings_LocalizationFormatTooltip}"
-                          AutomationProperties.Name="{DynamicResource Settings_LocalizationFormat}"/>
-            </DockPanel>
+                <!-- Default localization format -->
+                <DockPanel ToolTip.Tip="{DynamicResource Settings_LocalizationFormatTooltip}">
+                    <TextBlock Classes="label" Text="{DynamicResource Settings_LocalizationFormat}"/>
+                    <ComboBox x:Name="LocalizationFormatComboBox"
+                              ItemsSource="{Binding LocalizationFormatOptions}"
+                              SelectedItem="{Binding LocalizationFormat, Mode=TwoWay}"
+                              MinWidth="120"
+                              ToolTip.Tip="{DynamicResource Settings_LocalizationFormatTooltip}"
+                              AutomationProperties.HelpText="{DynamicResource Settings_LocalizationFormatTooltip}"
+                              AutomationProperties.Name="{DynamicResource Settings_LocalizationFormat}"/>
+                </DockPanel>
 
-            <!-- Font scale (Gaps item 6 part B) -->
-            <DockPanel ToolTip.Tip="{DynamicResource Settings_FontScaleTooltip}">
-                <TextBlock Classes="label" Text="{DynamicResource Settings_FontScale}"/>
-                <ComboBox ItemsSource="{Binding FontScaleOptions}"
-                          SelectedItem="{Binding SelectedFontScale, Mode=TwoWay}"
-                          MinWidth="120"
-                          ToolTip.Tip="{DynamicResource Settings_FontScaleTooltip}"
-                          AutomationProperties.HelpText="{DynamicResource Settings_FontScaleTooltip}"
-                          AutomationProperties.Name="{DynamicResource Settings_FontScale}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Converter={StaticResource DoubleToPercent}}"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-            </DockPanel>
+                <!-- Font scale (Gaps item 6 part B) -->
+                <DockPanel ToolTip.Tip="{DynamicResource Settings_FontScaleTooltip}">
+                    <TextBlock Classes="label" Text="{DynamicResource Settings_FontScale}"/>
+                    <ComboBox ItemsSource="{Binding FontScaleOptions}"
+                              SelectedItem="{Binding SelectedFontScale, Mode=TwoWay}"
+                              MinWidth="120"
+                              ToolTip.Tip="{DynamicResource Settings_FontScaleTooltip}"
+                              AutomationProperties.HelpText="{DynamicResource Settings_FontScaleTooltip}"
+                              AutomationProperties.Name="{DynamicResource Settings_FontScale}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource DoubleToPercent}}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </DockPanel>
 
-            <!-- Autosave (issue #11). Both apply immediately: the interval reschedules
-                 the running timer via IAutosaveScheduler, and the generation count only
-                 affects what the next tick writes. -->
-            <DockPanel ToolTip.Tip="{DynamicResource Settings_AutosaveIntervalTooltip}">
-                <TextBlock Classes="label" Text="{DynamicResource Settings_AutosaveInterval}"/>
-                <ComboBox x:Name="AutosaveIntervalComboBox"
-                          ItemsSource="{Binding AutosaveIntervalOptions}"
-                          SelectedItem="{Binding SelectedAutosaveInterval, Mode=TwoWay}"
-                          MinWidth="120"
-                          ToolTip.Tip="{DynamicResource Settings_AutosaveIntervalTooltip}"
-                          AutomationProperties.HelpText="{DynamicResource Settings_AutosaveIntervalTooltip}"
-                          AutomationProperties.Name="{DynamicResource Settings_AutosaveInterval}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Converter={StaticResource AutosaveInterval}}"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-            </DockPanel>
+                <!-- Autosave (issue #11). Both apply immediately: the interval reschedules
+                     the running timer via IAutosaveScheduler, and the generation count only
+                     affects what the next tick writes. -->
+                <DockPanel ToolTip.Tip="{DynamicResource Settings_AutosaveIntervalTooltip}">
+                    <TextBlock Classes="label" Text="{DynamicResource Settings_AutosaveInterval}"/>
+                    <ComboBox x:Name="AutosaveIntervalComboBox"
+                              ItemsSource="{Binding AutosaveIntervalOptions}"
+                              SelectedItem="{Binding SelectedAutosaveInterval, Mode=TwoWay}"
+                              MinWidth="120"
+                              ToolTip.Tip="{DynamicResource Settings_AutosaveIntervalTooltip}"
+                              AutomationProperties.HelpText="{DynamicResource Settings_AutosaveIntervalTooltip}"
+                              AutomationProperties.Name="{DynamicResource Settings_AutosaveInterval}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource AutosaveInterval}}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </DockPanel>
 
-            <DockPanel ToolTip.Tip="{DynamicResource Settings_AutosaveGenerationsTooltip}">
-                <TextBlock Classes="label" Text="{DynamicResource Settings_AutosaveGenerations}"/>
-                <ComboBox x:Name="AutosaveGenerationsComboBox"
-                          ItemsSource="{Binding AutosaveGenerationOptions}"
-                          SelectedItem="{Binding SelectedAutosaveGenerations, Mode=TwoWay}"
-                          MinWidth="120"
-                          ToolTip.Tip="{DynamicResource Settings_AutosaveGenerationsTooltip}"
-                          AutomationProperties.HelpText="{DynamicResource Settings_AutosaveGenerationsTooltip}"
-                          AutomationProperties.Name="{DynamicResource Settings_AutosaveGenerations}">
-                    <ComboBox.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Converter={StaticResource AutosaveGenerations}}"/>
-                        </DataTemplate>
-                    </ComboBox.ItemTemplate>
-                </ComboBox>
-            </DockPanel>
+                <DockPanel ToolTip.Tip="{DynamicResource Settings_AutosaveGenerationsTooltip}">
+                    <TextBlock Classes="label" Text="{DynamicResource Settings_AutosaveGenerations}"/>
+                    <ComboBox x:Name="AutosaveGenerationsComboBox"
+                              ItemsSource="{Binding AutosaveGenerationOptions}"
+                              SelectedItem="{Binding SelectedAutosaveGenerations, Mode=TwoWay}"
+                              MinWidth="120"
+                              ToolTip.Tip="{DynamicResource Settings_AutosaveGenerationsTooltip}"
+                              AutomationProperties.HelpText="{DynamicResource Settings_AutosaveGenerationsTooltip}"
+                              AutomationProperties.Name="{DynamicResource Settings_AutosaveGenerations}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource AutosaveGenerations}}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </DockPanel>
 
-            <!-- Font scale live preview: independent of the static FontSize.* tokens,
-                 so it reflects the *selected* (not-yet-applied) scale immediately. -->
-            <Border BorderBrush="{DynamicResource Brush.Border.Default}" BorderThickness="1" CornerRadius="3"
-                    Padding="8" Background="{DynamicResource Brush.Surface.Inset}">
-                <StackPanel Spacing="4">
-                    <TextBlock Text="{DynamicResource Settings_FontScalePreviewBody}"
-                               FontSize="{Binding PreviewBodyFontSize}"
-                               Foreground="{DynamicResource Brush.Text.Primary}"/>
-                    <TextBlock Text="{DynamicResource Settings_FontScalePreviewSubtitle}"
-                               FontSize="{Binding PreviewSubtitleFontSize}"
-                               Foreground="{DynamicResource Brush.Text.Primary}" FontWeight="SemiBold"/>
-                    <TextBlock Text="{DynamicResource Settings_FontScalePreviewTitle}"
-                               FontSize="{Binding PreviewTitleFontSize}"
-                               Foreground="{DynamicResource Brush.Text.Primary}" FontWeight="Bold"/>
+                <!-- Font scale live preview: independent of the static FontSize.* tokens,
+                     so it reflects the *selected* (not-yet-applied) scale immediately. -->
+                <Border BorderBrush="{DynamicResource Brush.Border.Default}" BorderThickness="1" CornerRadius="3"
+                        Padding="8" Background="{DynamicResource Brush.Surface.Inset}">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{DynamicResource Settings_FontScalePreviewBody}"
+                                   FontSize="{Binding PreviewBodyFontSize}"
+                                   Foreground="{DynamicResource Brush.Text.Primary}"/>
+                        <TextBlock Text="{DynamicResource Settings_FontScalePreviewSubtitle}"
+                                   FontSize="{Binding PreviewSubtitleFontSize}"
+                                   Foreground="{DynamicResource Brush.Text.Primary}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{DynamicResource Settings_FontScalePreviewTitle}"
+                                   FontSize="{Binding PreviewTitleFontSize}"
+                                   Foreground="{DynamicResource Brush.Text.Primary}" FontWeight="Bold"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Spelling: user-supplied Hunspell dictionaries (layer 1 of the
+                     three-layer spell checker; spec 2026-07-11) -->
+                <StackPanel Spacing="6">
+                    <TextBlock Text="{DynamicResource Settings_SpellingHeader}"
+                               Foreground="{DynamicResource Brush.Text.Primary}"
+                               FontWeight="Bold"/>
+                    <TextBlock Text="{DynamicResource Settings_SpellingInstructions}"
+                               Foreground="{DynamicResource Brush.Text.Muted}"
+                               FontSize="{DynamicResource FontSize.Small}"
+                               TextWrapping="Wrap"/>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <Button Content="{DynamicResource Settings_OpenDictionariesFolder}"
+                                Command="{Binding OpenDictionariesFolderCommand}"
+                                ToolTip.Tip="{DynamicResource ToolTip_OpenDictionariesFolder}"
+                                AutomationProperties.HelpText="{DynamicResource ToolTip_OpenDictionariesFolder}"/>
+                        <Button Content="{DynamicResource Settings_DictionarySource}"
+                                Command="{Binding OpenDictionarySourceCommand}"
+                                ToolTip.Tip="{DynamicResource ToolTip_DictionarySource}"
+                                AutomationProperties.HelpText="{DynamicResource ToolTip_DictionarySource}"/>
+                    </StackPanel>
+                    <TextBlock Text="{Binding DetectedDictionariesText}"
+                               Foreground="{DynamicResource Brush.Text.Tertiary}"
+                               FontSize="{DynamicResource FontSize.Small}"/>
                 </StackPanel>
-            </Border>
 
-            <!-- Spelling: user-supplied Hunspell dictionaries (layer 1 of the
-                 three-layer spell checker; spec 2026-07-11) -->
-            <StackPanel Spacing="6">
-                <TextBlock Text="{DynamicResource Settings_SpellingHeader}"
-                           Foreground="{DynamicResource Brush.Text.Primary}"
-                           FontWeight="Bold"/>
-                <TextBlock Text="{DynamicResource Settings_SpellingInstructions}"
-                           Foreground="{DynamicResource Brush.Text.Muted}"
-                           FontSize="{DynamicResource FontSize.Small}"
-                           TextWrapping="Wrap"/>
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <Button Content="{DynamicResource Settings_OpenDictionariesFolder}"
-                            Command="{Binding OpenDictionariesFolderCommand}"
-                            ToolTip.Tip="{DynamicResource ToolTip_OpenDictionariesFolder}"
-                            AutomationProperties.HelpText="{DynamicResource ToolTip_OpenDictionariesFolder}"/>
-                    <Button Content="{DynamicResource Settings_DictionarySource}"
-                            Command="{Binding OpenDictionarySourceCommand}"
-                            ToolTip.Tip="{DynamicResource ToolTip_DictionarySource}"
-                            AutomationProperties.HelpText="{DynamicResource ToolTip_DictionarySource}"/>
-                </StackPanel>
-                <TextBlock Text="{Binding DetectedDictionariesText}"
-                           Foreground="{DynamicResource Brush.Text.Tertiary}"
-                           FontSize="{DynamicResource FontSize.Small}"/>
+                <!-- Language picker (own DataContext set in code-behind; shared with PatchManager) -->
+                <shared:LanguagePickerView x:Name="LanguagePicker"/>
+
+                <!-- Theme picker (own DataContext set in code-behind; shared with PatchManager) -->
+                <shared:ThemePickerView x:Name="ThemePicker"/>
+
             </StackPanel>
-
-            <!-- Language picker (own DataContext set in code-behind; shared with PatchManager) -->
-            <shared:LanguagePickerView x:Name="LanguagePicker"/>
-
-            <!-- Theme picker (own DataContext set in code-behind; shared with PatchManager) -->
-            <shared:ThemePickerView x:Name="ThemePicker"/>
-
-        </StackPanel>
+        </ScrollViewer>
 
         <!-- Close button -->
-        <Button Grid.Row="1"
+        <Button Grid.Row="1" x:Name="CloseButton"
                 Content="{DynamicResource Settings_Close}"
                 HorizontalAlignment="Right"
                 Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" BorderThickness="0"
