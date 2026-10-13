@@ -7,6 +7,9 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using DialogEditor.Avalonia.Shared.Theming;
+using DialogEditor.Avalonia.Views;
+using DialogEditor.Core.Models;
+using DialogEditor.ViewModels;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels.Resources;
 
@@ -56,12 +59,36 @@ public class NoClippedTextTests
 
     [AvaloniaTheory]
     [MemberData(nameof(Cases))]
-    public void Window_ClipsNoText(string typeName, double scale)
+    public void Window_ClipsNoText(string typeName, double scale) =>
+        AssertClipsNoText(() => (Window)Activator.CreateInstance(Type.GetType(typeName)!)!, scale);
+
+    // Windows whose parameterless form is empty hide the rows that clip in real use, so these are
+    // opened with representative content too.
+    private static readonly Dictionary<string, Func<Window>> Populated = new()
+    {
+        // One condition row: its And/Or combo sat in a fixed 70 px column and showed "An" at 2.0x.
+        ["ConditionEditor"] = () => new ConditionEditorWindow(new ConditionEditorViewModel(
+            "canonical",
+            [new ConditionLeaf("Boolean IsGlobalValue(String, Operator, Int32)", ["flag", "EqualTo", "1"], false, "And")],
+            _ => { })),
+    };
+
+    public static IEnumerable<object[]> PopulatedCases() =>
+        from name in Populated.Keys
+        from scale in new[] { 1.0, 2.0 }
+        select new object[] { name, scale };
+
+    [AvaloniaTheory]
+    [MemberData(nameof(PopulatedCases))]
+    public void PopulatedWindow_ClipsNoText(string name, double scale) =>
+        AssertClipsNoText(Populated[name], scale);
+
+    private static void AssertClipsNoText(Func<Window> create, double scale)
     {
         WindowSizing.Register();
         var provider = WindowSizing.WorkingAreaProvider;
         WindowSizing.WorkingAreaProvider = _ => new Size(1366, 768);
-        var w = (Window)Activator.CreateInstance(Type.GetType(typeName)!)!;
+        var w = create();
         try
         {
             new FontScaleApplier().Apply(scale);
@@ -96,24 +123,31 @@ public class NoClippedTextTests
                     yield return (text, $"needs {needed:0} px, box is {tb.Bounds.Width:0}");
             }
 
-            // 2. The box must lie inside the nearest non-scrolling viewport on each axis.
-            var (viewport, clipX, clipY) = NearestViewport(tb, w);
-            if (tb.TransformToVisual(viewport) is not { } m) continue;
-            var r = new Rect(tb.Bounds.Size).TransformToAABB(m);
-            if (clipX && (r.X < -0.5 || r.Right > viewport.Bounds.Width + 0.5))
-                yield return (text, $"spans x {r.X:0}–{r.Right:0}, viewport is {viewport.Bounds.Width:0} wide");
-            if (clipY && (r.Y < -0.5 || r.Bottom > viewport.Bounds.Height + 0.5))
-                yield return (text, $"spans y {r.Y:0}–{r.Bottom:0}, viewport is {viewport.Bounds.Height:0} tall");
+            // 2. The box must lie inside every ancestor that clips it: the window, a ScrollViewer's
+            //    viewport, or any element with ClipToBounds (a ComboBox's content presenter, for
+            //    one, cuts "And" to "An" without squeezing the TextBlock itself). Once the walk
+            //    passes a viewport that scrolls on an axis, overflow on that axis is reachable by
+            //    scrolling and is no longer checked further up.
+            var (clipX, clipY) = (true, true);
+            foreach (var a in tb.GetVisualAncestors())
+            {
+                var scrolls = a as ScrollContentPresenter;
+                if (scrolls is not null)
+                {
+                    clipX &= !scrolls.CanHorizontallyScroll;
+                    clipY &= !scrolls.CanVerticallyScroll;
+                }
+                if ((a.ClipToBounds || scrolls is not null || a == w) && tb.TransformToVisual(a) is { } m)
+                {
+                    var r = new Rect(tb.Bounds.Size).TransformToAABB(m);
+                    var name = a.GetType().Name;
+                    if (clipX && (r.X < -0.5 || r.Right > a.Bounds.Width + 0.5))
+                        yield return (text, $"spans x {r.X:0}–{r.Right:0}, {name} is {a.Bounds.Width:0} wide");
+                    if (clipY && (r.Y < -0.5 || r.Bottom > a.Bounds.Height + 0.5))
+                        yield return (text, $"spans y {r.Y:0}–{r.Bottom:0}, {name} is {a.Bounds.Height:0} tall");
+                }
+                if (a == w) break;
+            }
         }
-    }
-
-    // The nearest ScrollContentPresenter ancestor clips its content; on an axis its ScrollViewer
-    // can scroll, overflow is reachable and therefore fine. Without one, the window is the viewport.
-    private static (Visual Viewport, bool ClipX, bool ClipY) NearestViewport(Visual v, Window w)
-    {
-        foreach (var a in v.GetVisualAncestors())
-            if (a is ScrollContentPresenter scp)
-                return (scp, !scp.CanHorizontallyScroll, !scp.CanVerticallyScroll);
-        return (w, true, true);
     }
 }
