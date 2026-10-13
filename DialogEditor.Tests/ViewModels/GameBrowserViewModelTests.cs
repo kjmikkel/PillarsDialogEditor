@@ -170,6 +170,73 @@ public class GameBrowserViewModelTests
         Assert.DoesNotContain(vm.Folders, f => f.DisplayName == Loc.Get("Label_NewConversationsFolder"));
     }
 
+    // ── Nested tree (issue 85, part B) ──────────────────────────────────
+
+    private static GameBrowserViewModel VmWith(params ConversationFile[] files)
+    {
+        var vm = MakeVm();
+        var tree = ConversationTreeBuilder.Build(files);
+        foreach (var f in tree.Folders) vm.Folders.Add(f);
+        foreach (var i in tree.RootItems) vm.RootItems.Add(i);
+        return vm;
+    }
+
+    private static ConversationFile FileIn(string folder, string name) =>
+        new(name, folder, $@"{folder}\{name}.conversation", $@"{folder}\{name}.stringtable");
+
+    [Fact]
+    public void Filter_KeepsANestedMatch_InsideItsExpandedAncestors()
+    {
+        var vm = VmWith(FileIn("re_scripted_interactions", "other"),
+                        FileIn(@"re_scripted_interactions\bounty encounters", "bounty_hunter"));
+        vm.FilterText = "hunter";
+
+        var top = Assert.Single(vm.FilteredFolders);
+        Assert.True(top.IsExpanded);
+        Assert.Empty(top.Items);
+        var nested = Assert.Single(top.Subfolders);
+        Assert.True(nested.IsExpanded);
+        Assert.Equal("bounty_hunter", Assert.Single(nested.Items).Name);
+    }
+
+    [Fact]
+    public void FilteredRoots_ListsFoldersThenTopLevelConversations()
+    {
+        var vm = VmWith(FileIn("", "gather_your_party"), FileIn("companions", "eder"));
+        var roots = vm.FilteredRoots.ToList();
+        Assert.IsType<ConversationFolderViewModel>(roots[0]);
+        Assert.Equal("gather_your_party", Assert.IsType<ConversationItemViewModel>(roots[1]).Name);
+
+        vm.FilterText = "eder";
+        Assert.IsType<ConversationFolderViewModel>(Assert.Single(vm.FilteredRoots));
+        vm.FilterText = "party";
+        Assert.Equal("gather_your_party", Assert.IsType<ConversationItemViewModel>(Assert.Single(vm.FilteredRoots)).Name);
+    }
+
+    [Fact]
+    public async Task ExpandAll_AndCollapseAll_ReachNestedFolders()
+    {
+        var vm = VmWith(FileIn(@"companions\poi", "x"));
+        var nested = vm.Folders[0].Subfolders[0];
+
+        await vm.ExpandAllCommand.ExecuteAsync(null);
+        Assert.True(nested.IsExpanded);
+        await vm.CollapseAllCommand.ExecuteAsync(null);
+        Assert.False(nested.IsExpanded);
+    }
+
+    [Fact]
+    public void Load_BuildsTheTreeWithTidiedFolderNames()
+    {
+        // FakeGameDataProvider files every conversation under "conversations".
+        var vm = MakeVm();
+        vm.Load(new FakeGameDataProvider("test-game", "en", new Conversation("scene", [], new StringTable([]))));
+        var folder = Assert.Single(vm.Folders);
+        Assert.Equal("conversations", folder.FolderPath);
+        Assert.Equal("Conversations", folder.DisplayName);
+        Assert.Empty(vm.RootItems);
+    }
+
     // ── Helpers ───────────────────────────────────────────────────────────
 
     private static ConversationItemViewModel MakeItem(string name)
