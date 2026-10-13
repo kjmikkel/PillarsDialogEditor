@@ -4,7 +4,7 @@
              xmlns:ctrl="clr-namespace:DialogEditor.Avalonia.Controls"
              x:Class="DialogEditor.Avalonia.Views.GameBrowserView" x:CompileBindings="False">
 
-    <Grid RowDefinitions="Auto,*,Auto">
+    <Grid RowDefinitions="Auto,Auto,*,Auto">
 
         <!-- Filter box -->
         <Border Grid.Row="0" Background="{DynamicResource Brush.Surface.Panel}" Padding="4" BorderBrush="{DynamicResource Brush.Border.Default}" BorderThickness="0,0,0,1">
@@ -32,10 +32,23 @@
             </Grid>
         </Border>
 
-        <!-- Conversation tree -->
-        <ctrl:ConversationTreeView Grid.Row="1" Background="{DynamicResource Brush.Surface.Subtle}"
+        <!-- Only this project's conversations (issue 85, part C). Shown while a project is open. -->
+        <Border Grid.Row="1" Background="{DynamicResource Brush.Surface.Panel}" Padding="6,2,4,4"
+                IsVisible="{Binding HasProject}">
+            <CheckBox IsChecked="{Binding OnlyProjectConversations}"
+                      Content="{DynamicResource Browser_OnlyProjectConversations}"
+                      FontSize="{DynamicResource FontSize.Body}"
+                      Foreground="{DynamicResource Brush.Text.Secondary}"
+                      ToolTip.Tip="{DynamicResource ToolTip_OnlyProjectConversations}"
+                      AutomationProperties.HelpText="{DynamicResource ToolTip_OnlyProjectConversations}"/>
+        </Border>
+
+        <!-- Conversation tree. It doesn't scroll sideways (issue 85): a long name trims with an
+             ellipsis and shows in full in its tooltip, instead of running off the dock's edge. -->
+        <ctrl:ConversationTreeView Grid.Row="2" Background="{DynamicResource Brush.Surface.Subtle}"
                   BorderThickness="0"
-                  ItemsSource="{Binding FilteredFolders}"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  ItemsSource="{Binding FilteredRoots}"
                   SelectedItem="{Binding SelectedTreeItem, Mode=TwoWay}"
                   SelectionChanged="TreeView_SelectionChanged">
 
@@ -57,8 +70,12 @@
                      row's container ($parent[TreeViewItem] is the nearest one), rather than
                      using a "TreeViewItem:selected TextBlock" selector, which would also recolour
                      every child row of a selected folder. -->
+                <!-- Folders in strong, semi-bold text (issue 85): with every folder collapsed, which
+                     is how the dock opens, they are all you see, and Text.Muted made them the
+                     faintest text in the dock. Weight, not only colour, sets them apart. -->
                 <Style Selector="TextBlock.folderLabel">
-                    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Muted}"/>
+                    <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}"/>
+                    <Setter Property="FontWeight" Value="SemiBold"/>
                 </Style>
                 <Style Selector="TextBlock.conversationLabel">
                     <Setter Property="Foreground" Value="{Binding IsNew, Converter={StaticResource BoolToNewConversationBrush}}"/>
@@ -69,23 +86,48 @@
             </ctrl:ConversationTreeView.Styles>
 
             <ctrl:ConversationTreeView.DataTemplates>
-                <TreeDataTemplate DataType="{x:Type vm:ConversationFolderViewModel}" ItemsSource="{Binding Items}">
+                <!-- Folders nest, subfolders before conversations (issue 85, part B). -->
+                <TreeDataTemplate DataType="{x:Type vm:ConversationFolderViewModel}" ItemsSource="{Binding Children}">
+                    <!-- Body-size text (issue 85): the app's reading size, and it follows the font
+                         scale. Padding 2,4 with the row's MinHeight 0 (below) gives a 24 px row at
+                         1.0x, the WCAG 2.5.8 target size, that grows with the text. -->
+                    <!-- The tooltip is the raw folder path (issue 85, part B): the label is tidied,
+                         and a writer who knows the file layout can still see it. -->
                     <TextBlock Text="{Binding DisplayName}" Classes="folderLabel"
                                Classes.selectedRow="{Binding $parent[TreeViewItem].IsSelected}"
-                               FontSize="{DynamicResource FontSize.Small}" Padding="2"/>
+                               FontSize="{DynamicResource FontSize.Body}" Padding="2,4"
+                               TextTrimming="CharacterEllipsis"
+                               ToolTip.Tip="{Binding ToolTip}"/>
                 </TreeDataTemplate>
+                <!-- A conversation the project changes shows a dot after its name (issue 85,
+                     part C): a glyph, so the cue doesn't rest on colour alone, in the colour the
+                     diff and history windows use for "changed". The dots sit at the row's right
+                     edge, one column you can scan, and the name trims before them. -->
                 <DataTemplate DataType="{x:Type vm:ConversationItemViewModel}">
-                    <TextBlock Text="{Binding DisplayName}" Classes="conversationLabel"
-                               Classes.selectedRow="{Binding $parent[TreeViewItem].IsSelected}"
-                               FontSize="{DynamicResource FontSize.Small}" Padding="2"
-                               Cursor="Hand"
-                               Tapped="ConversationItem_Tapped"/>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="{Binding DisplayName}" Classes="conversationLabel"
+                                   Classes.selectedRow="{Binding $parent[TreeViewItem].IsSelected}"
+                                   FontSize="{DynamicResource FontSize.Body}" Padding="2,4"
+                                   TextTrimming="CharacterEllipsis"
+                                   ToolTip.Tip="{Binding DisplayName}"
+                                   Cursor="Hand"
+                                   Tapped="ConversationItem_Tapped"/>
+                        <TextBlock Grid.Column="1" Text="●" Classes="editedMark"
+                                   IsVisible="{Binding IsEdited}"
+                                   Foreground="{DynamicResource Brush.Text.Status.Changed}"
+                                   FontSize="{DynamicResource FontSize.Small}"
+                                   VerticalAlignment="Center" Margin="4,0,0,0"
+                                   ToolTip.Tip="{DynamicResource Browser_EditedInProject}"/>
+                    </Grid>
                 </DataTemplate>
             </ctrl:ConversationTreeView.DataTemplates>
 
             <ctrl:ConversationTreeView.ItemContainerTheme>
                 <ControlTheme TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                    <!-- Fluent's 32 px row floor held 12 px text in wide empty bands (issue 85).
+                         The label's padding sets the height instead; see the row templates. -->
+                    <Setter Property="MinHeight" Value="0"/>
                     <!-- Name the CONTAINER, not just the templated TextBlock inside it
                          (issue #15 finding 1). Without this a TreeViewItem's accessible name
                          is empty and the label lives only on its child Text element, so a
@@ -94,14 +136,18 @@
                          selected or expanded. DisplayName is data, not UI chrome, so a
                          binding is the correct source here rather than a localised resource. -->
                     <Setter Property="AutomationProperties.Name" Value="{Binding DisplayName}"/>
+                    <!-- "Changed in this project" for an edited conversation (issue 85, part C);
+                         the name stays the conversation name, so lookups by name still work. -->
+                    <Setter Property="AutomationProperties.ItemStatus" Value="{Binding EditedStatus}"/>
                 </ControlTheme>
             </ctrl:ConversationTreeView.ItemContainerTheme>
 
         </ctrl:ConversationTreeView>
 
         <!-- Game name footer -->
-        <Border Grid.Row="2" Background="{DynamicResource Brush.Surface.Card}" Padding="8,5">
-            <TextBlock Text="{Binding GameName}" Foreground="{DynamicResource Brush.Text.Hint}" FontSize="{DynamicResource FontSize.Caption}"/>
+        <Border Grid.Row="3" Background="{DynamicResource Brush.Surface.Card}" Padding="8,5">
+            <!-- Small, not Caption (issue 85): 9 px was the smallest text in the app. -->
+            <TextBlock Text="{Binding GameName}" Foreground="{DynamicResource Brush.Text.Hint}" FontSize="{DynamicResource FontSize.Small}"/>
         </Border>
     </Grid>
 </UserControl>
