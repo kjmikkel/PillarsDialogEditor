@@ -371,11 +371,13 @@
                     <ItemsControl ItemsSource="{Binding Issues}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="vm:FlowIssueViewModel">
-                                <Grid ColumnDefinitions="16,Auto,*,Auto"
+                                <Grid ColumnDefinitions="Auto,Auto,*,Auto"
                                       Margin="0,2" Height="32">
-                                    <!-- Severity icon -->
+                                    <!-- Severity icon. The badge and the kind label take font-scaled
+                                         ColumnWidth.* sizes (issue 178): at fixed sizes the glyph and
+                                         labels such as "No incoming links" overflowed at 2.0x. -->
                                     <Border Grid.Column="0"
-                                            Width="16" Height="16"
+                                            Width="{DynamicResource ColumnWidth.SeverityBadge}" Height="{DynamicResource ColumnWidth.SeverityBadge}"
                                             CornerRadius="3"
                                             Background="{Binding Kind, Converter={StaticResource FlowIssueSeverityBrush}}"
                                             ToolTip.Tip="{Binding SeverityLabel}"
@@ -387,10 +389,10 @@
                                     </Border>
                                     <!-- Kind label -->
                                     <TextBlock Grid.Column="1"
-                                               Text="{Binding KindLabel}"
+                                               Text="{Binding KindLabel}" ToolTip.Tip="{Binding KindLabel}"
                                                Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"
-                                               VerticalAlignment="Center"
-                                               Width="110" Margin="8,0,6,0"/>
+                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                                               Width="{DynamicResource ColumnWidth.FlowIssueKind}" Margin="8,0,6,0"/>
                                     <!-- Node snippet -->
                                     <TextBlock Grid.Column="2"
                                                Text="{Binding DisplayText}" ToolTip.Tip="{Binding DisplayText}"

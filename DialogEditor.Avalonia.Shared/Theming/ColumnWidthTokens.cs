@@ -29,5 +29,10 @@ public static class ColumnWidthTokens
         ["ColumnWidth.BatchVo.Node"]         = 60,
         ["ColumnWidth.BatchVo.Status"]       = 50,
         ["ColumnWidth.BatchVo.Result"]       = 50,
+        ["ColumnWidth.Speaker"]               = 140,
+        ["ColumnWidth.WemGlyph"]              = 60,
+        ["ColumnWidth.FlowIssueKind"]         = 110,
+        // The Flow Analytics severity badge is square: this is its width and its height.
+        ["ColumnWidth.SeverityBadge"]        = 16,
     };
 }
