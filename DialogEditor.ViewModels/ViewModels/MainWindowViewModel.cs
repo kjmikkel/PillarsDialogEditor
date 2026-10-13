@@ -2126,7 +2126,7 @@ public partial class MainWindowViewModel : ObservableObject
         catch (Exception ex)
         {
             // Fire-and-forget: anything else would vanish with the discarded task.
-            AppLog.Error($"Adding the DLC folders to the backup {latest} failed", ex);
+            AppLog.Warn($"Adding the DLC folders to the backup {latest} failed: {ex}");
         }
     }
 
