@@ -51,7 +51,8 @@
         <StackPanel Grid.Row="0" Spacing="7">
 
             <!-- Find row -->
-            <Grid ColumnDefinitions="70,*,Auto">
+            <!-- Auto label columns with the old width as a MinWidth (issue 177): a fixed column cut the label off once its text followed the font scale. -->
+            <Grid ColumnDefinitions="Auto,*,Auto">
                 <TextBlock Classes="label" Text="{DynamicResource BatchReplace_Find}"/>
                 <TextBox Grid.Column="1" Classes="find-box" Name="SearchBox"
                          Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -67,7 +68,7 @@
             </Grid>
 
             <!-- Replace row -->
-            <Grid ColumnDefinitions="70,*">
+            <Grid ColumnDefinitions="Auto,*">
                 <TextBlock Classes="label" Text="{DynamicResource BatchReplace_Replace}"/>
                 <TextBox Grid.Column="1" Classes="find-box"
                          Text="{Binding ReplaceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
