@@ -2111,6 +2111,8 @@ public partial class MainWindowViewModel : ObservableObject
     // time the game folder is opened still captures the originals (nothing wrote them before).
     private static async Task TopUpBackupAsync(string gameDirectory, IGameDataProvider provider)
     {
+        // A Test Patch waiting for F6 means the game folder holds the test's writes.
+        if (AppSettings.GetPendingRestores() is { Count: > 0 }) return;
         if (FullBackup.Latest(AppSettings.GetBackupPath(gameDirectory) ?? string.Empty) is not { } latest) return;
         try
         {
@@ -2120,6 +2122,11 @@ public partial class MainWindowViewModel : ObservableObject
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             AppLog.Warn($"Could not add the DLC folders to the backup {latest}: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            // Fire-and-forget: anything else would vanish with the discarded task.
+            AppLog.Error($"Adding the DLC folders to the backup {latest} failed", ex);
         }
     }
 

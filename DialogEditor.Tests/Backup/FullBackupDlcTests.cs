@@ -41,10 +41,19 @@ public class FullBackupDlcTests : IDisposable
             p.Live == Path.Combine(_game.DataRoot, "lax2_exported", "design", "conversations"));
     }
 
+    /// A backup as taken before issue 198: format 2, no extra folders.
+    internal static void MakeFormatTwo(string backupRoot)
+    {
+        var path = Path.Combine(backupRoot, FullBackup.ManifestFileName);
+        var manifest = FullBackup.ReadManifest(backupRoot)!;
+        File.WriteAllText(path, System.Text.Json.JsonSerializer.Serialize(manifest with { Format = 2, ExtraFolders = null }));
+    }
+
     [Fact]
     public async Task TopUp_AddsTheDlcFoldersAnOlderBackupLacks()
     {
         await FullBackup.TakeAsync(_game.Provider, _backup, default);   // no DLC yet
+        MakeFormatTwo(_backup);
         _game.AddDlcConversation("lax2_exported", "x", "lax02_cv_x", "en");
 
         var added = await FullBackup.TopUpAsync(_game.Provider, _backup, default);
@@ -52,6 +61,19 @@ public class FullBackupDlcTests : IDisposable
         Assert.Equal(2, added);   // conversations + "en" text
         Assert.True(File.Exists(Path.Combine(_backup, "dlc", "lax2_exported", "conversations", "x", "lax02_cv_x.conversationbundle")));
         Assert.Equal(0, await FullBackup.TopUpAsync(_game.Provider, _backup, default));   // once
+    }
+
+    // Final review: a format-3 backup already holds the DLC folders the game had when it was
+    // taken. A folder that appears later can only come from the editor or the patcher (a new
+    // language's text, say), so it is never captured as an "original".
+    [Fact]
+    public async Task TopUp_AFormatThreeBackup_IsLeftAlone()
+    {
+        await FullBackup.TakeAsync(_game.Provider, _backup, default);   // format 3
+        _game.AddDlcConversation("lax2_exported", "x", "lax02_cv_x", "en");
+
+        Assert.Equal(0, await FullBackup.TopUpAsync(_game.Provider, _backup, default));
+        Assert.False(Directory.Exists(Path.Combine(_backup, "dlc")));
     }
 
     [Fact]

@@ -67,6 +67,7 @@ public class MainWindowViewModelDlcBackupTests : IDisposable
     {
         var backupRoot = Path.Combine(_backupPick, "2026-09-28T10-00");
         await FullBackup.TakeAsync(_game.Provider, backupRoot, default);   // before the DLC existed
+        DialogEditor.Tests.Backup.FullBackupDlcTests.MakeFormatTwo(backupRoot);
         AppSettings.SetBackupPath(_game.Root, _backupPick);
         AppSettings.MarkGameDirectoryKnown(_game.Root);
         _game.AddDlcConversation("lax2_exported", "x", "lax02_cv_x", "en");
@@ -77,5 +78,25 @@ public class MainWindowViewModelDlcBackupTests : IDisposable
         var expected = Path.Combine(backupRoot, "dlc", "lax2_exported", "conversations", "x", "lax02_cv_x.conversationbundle");
         for (var i = 0; i < 50 && !File.Exists(expected); i++) await Task.Delay(100);
         Assert.True(File.Exists(expected));
+    }
+
+    // Final review: while a Test Patch is waiting for F6, the game folder holds the test's
+    // writes, so nothing is added to the backup until it's restored.
+    [Fact]
+    public async Task OpeningAKnownGameFolder_WithATestPending_DoesNotTopUp()
+    {
+        var backupRoot = Path.Combine(_backupPick, "2026-09-28T10-00");
+        await FullBackup.TakeAsync(_game.Provider, backupRoot, default);
+        DialogEditor.Tests.Backup.FullBackupDlcTests.MakeFormatTwo(backupRoot);
+        AppSettings.SetBackupPath(_game.Root, _backupPick);
+        AppSettings.MarkGameDirectoryKnown(_game.Root);
+        AppSettings.SetPendingRestores([new PendingRestoreEntry("", "", Path.Combine(_game.Root, "x"), "", [])]);
+        _game.AddDlcConversation("lax2_exported", "x", "lax02_cv_x", "en");
+
+        var vm = new MainWindowViewModel(new StubDispatcher(), new StubFolderPicker(), new StubFilePicker());
+        Invoke(vm, "LoadDirectory", _game.Root);
+        await Task.Delay(1500);
+
+        Assert.False(Directory.Exists(Path.Combine(backupRoot, "dlc")));
     }
 }
