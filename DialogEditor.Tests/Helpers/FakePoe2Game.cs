@@ -43,6 +43,23 @@ public sealed class FakePoe2Game : IDisposable
     public string ConvPath(string name = "test_conv") => Path.Combine(ConvDir, name + ".conversationbundle");
     public string StPath(string lang, string name = "test_conv") => Path.Combine(StDir(lang), name + ".stringtable");
 
+    /// A DLC conversation (issue 198) in its own data folder, e.g. "lax2_exported", with a
+    /// string table per language whose text is "<name> <lang>". Returns the bundle path.
+    public string AddDlcConversation(string dataFolder, string folder, string name, params string[] languages)
+    {
+        var dlc  = Path.Combine(DataRoot, dataFolder);
+        var conv = Path.Combine(dlc, "design", "conversations", folder, name + ".conversationbundle");
+        Directory.CreateDirectory(Path.GetDirectoryName(conv)!);
+        File.WriteAllText(conv, OneNodeBundle);
+        foreach (var lang in languages)
+        {
+            var st = Path.Combine(dlc, "localized", lang, "text", "conversations", folder, name + ".stringtable");
+            Directory.CreateDirectory(Path.GetDirectoryName(st)!);
+            File.WriteAllText(st, StringTable($"{name} {lang}"));
+        }
+        return conv;
+    }
+
     public FakePoe2Game(params string[] languages)
     {
         if (languages.Length == 0) languages = ["en"];
