@@ -69,7 +69,10 @@ public class FullBackupDlcTests : IDisposable
     [Fact]
     public async Task TopUp_AFormatThreeBackup_IsLeftAlone()
     {
-        await FullBackup.TakeAsync(_game.Provider, _backup, default);   // format 3
+        await FullBackup.TakeAsync(_game.Provider, _backup, default);
+        var manifest = FullBackup.ReadManifest(_backup)!;   // as taken between issues 198 and 201
+        File.WriteAllText(Path.Combine(_backup, FullBackup.ManifestFileName),
+            System.Text.Json.JsonSerializer.Serialize(manifest with { Format = 3 }));
         _game.AddDlcConversation("lax2_exported", "x", "lax02_cv_x", "en");
 
         Assert.Equal(0, await FullBackup.TopUpAsync(_game.Provider, _backup, default));

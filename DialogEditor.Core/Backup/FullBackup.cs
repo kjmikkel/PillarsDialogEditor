@@ -7,7 +7,8 @@ namespace DialogEditor.Core.Backup;
 
 /// <summary>What a full backup folder holds. Format 2 (issue 123) adds the per-language
 /// stringtable folders; format 3 (issue 198) adds <see cref="ExtraFolders"/>, the PoE2 DLC data
-/// folders, as paths relative to the backup. A backup without a manifest is format 1.</summary>
+/// folders, as paths relative to the backup; format 4 (issue 201) adds PoE1's expansion text to
+/// them. A backup without a manifest is format 1.</summary>
 public sealed record FullBackupManifest(int Format, string GameId, IReadOnlyList<string> Languages,
                                         IReadOnlyList<string>? ExtraFolders = null);
 
@@ -28,7 +29,7 @@ public sealed record RestorePlan(IReadOnlyList<RestorePair> Pairs, bool TextLang
 public static class FullBackup
 {
     public const string ManifestFileName = "backup.json";
-    private const int CurrentFormat = 3;
+    private const int CurrentFormat = 4;
     private const string VoiceOverFolder = "voice-over";
 
     private static readonly JsonSerializerOptions ManifestJson = new() { WriteIndented = true };
@@ -61,18 +62,21 @@ public static class FullBackup
     }
 
     /// <summary>
-    /// Adds the folders a backup lacks (issue 198): a backup taken before PoE2's DLC folders were
-    /// read has none of them. Nothing could write those files until then, so the live copies are
-    /// still the originals. Only a format-2 backup is topped up: a format-1 backup (no manifest)
-    /// would read its single text folder differently once it had one, and a format-3 backup
-    /// already holds every DLC folder the game had, so a folder that appears later can only be
-    /// the editor's or the patcher's output, never an original. Returns how many were added.
+    /// Adds the folders a backup lacks because it predates them: PoE2's DLC folders (format 3,
+    /// issue 198) and PoE1's expansion text (format 4, issue 201). Nothing could write those files
+    /// until the editor read them, so the live copies are still the originals. A folder is only
+    /// added to a backup older than its <see cref="ExtraBackupFolder.SinceFormat"/>: a newer one
+    /// already holds every such folder the game had, so one that appears later can only be the
+    /// editor's or the patcher's output, never an original. A format-1 backup (no manifest) is
+    /// left alone, as it would read its single text folder differently once it had one.
+    /// Returns how many were added.
     /// </summary>
     public static async Task<int> TopUpAsync(IGameDataProvider provider, string backupRoot, CancellationToken ct)
     {
-        if (ReadManifest(backupRoot) is not { Format: < 3 } manifest) return 0;
+        if (ReadManifest(backupRoot) is not { Format: < CurrentFormat } manifest) return 0;
         var have = (manifest.ExtraFolders ?? []).ToHashSet(StringComparer.Ordinal);
-        var missing = provider.GetExtraBackupFolders().Where(f => !have.Contains(f.SnapshotPath)).ToList();
+        var missing = provider.GetExtraBackupFolders()
+            .Where(f => manifest.Format < f.SinceFormat && !have.Contains(f.SnapshotPath)).ToList();
         if (missing.Count == 0) return 0;
 
         foreach (var folder in missing)

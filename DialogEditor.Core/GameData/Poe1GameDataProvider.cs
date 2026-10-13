@@ -53,30 +53,52 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
     public Conversation LoadConversation(ConversationFile file)
     {
         var nodes = Poe1ConversationParser.ParseFile(file.ConversationPath);
-        var stPath = StringTablePathFor(file.ConversationPath, Language);
-        var strings = StringTableParser.LoadFile(stPath);   // missing or damaged → shown as missing (issue 119)
-        return new Conversation(file.Name, nodes, strings);
+        return new Conversation(file.Name, nodes, LoadText(file, Language));
     }
 
     public string GetStringTablePath(ConversationFile file)
-        => StringTablePathFor(file.ConversationPath, Language);
+        => StringTablePathFor(file, Language);
 
     public string GetStringTablePath(ConversationFile file, string language)
-        => StringTablePathFor(file.ConversationPath, language);
+        => StringTablePathFor(file, language);
 
-    private string StringTablePathFor(string convPath, string language)
+    private IReadOnlyList<Poe1DataRoot> Roots => Poe1DataRoots.Existing(rootPath);
+
+    // One text table per data folder that has one, in the game's folder order, with the folder it
+    // is in. A folder without the language falls back to its English table, as the game's
+    // StringTableManager does per folder (issue 201).
+    private IReadOnlyList<(Poe1DataRoot Root, string Path)> TablesFor(string relative, string language) =>
+        Roots.Select(r => (Root: r, Path: new[] { language, "en" }.Distinct()
+                 .Select(lang => Path.Combine(r.Path, "localized", lang, "text", relative))
+                 .FirstOrDefault(File.Exists)))
+             .Where(t => t.Path is not null)
+             .Select(t => (t.Root, t.Path!))
+             .ToList();
+
+    private string TextRelativePath(ConversationFile file) =>
+        Path.Combine("conversations", Path.ChangeExtension(Path.GetRelativePath(ConversationsRoot, file.ConversationPath), null) + ".stringtable");
+
+    // The White March's text is in data_expansion1 and _2, beside the base game's lines it
+    // replaces; the game looks each line up from the last folder back (issue 201).
+    private StringTable LoadText(ConversationFile file, string language) =>
+        StringTable.MergeLaterWins(TablesFor(TextRelativePath(file), language).Select(t => StringTableParser.LoadFile(t.Path)).ToList());
+
+    // Written to the last folder that has a table for the conversation, which the game reads first
+    // for every line it holds, in the chosen language even when that folder only had an English
+    // table: the game would show that English line, so the edit belongs beside it. With no table
+    // anywhere, the base game's folder, as before (issue 201).
+    private string StringTablePathFor(ConversationFile file, string language)
     {
-        var relative   = Path.GetRelativePath(ConversationsRoot, convPath);
-        var withoutExt = Path.ChangeExtension(relative, null);
-        var root       = Path.Combine(LocalizedRoot, language, "text", "conversations");
-        return Path.Combine(root, withoutExt + ".stringtable");
+        var relative = TextRelativePath(file);
+        var folder = TablesFor(relative, language) is { Count: > 0 } tables ? tables[^1].Root.Path : DataRoot;
+        return Path.Combine(folder, "localized", language, "text", relative);
     }
 
-    private string CharactersStringtablePath =>
-        Path.Combine(LocalizedRoot, Language, "text", "game", "characters.stringtable");
-
+    // Every folder's character names (The White March's are in the expansions), so a speaker tag
+    // resolves to the name the game shows (issue 201).
     public IReadOnlyDictionary<string, string> LoadSpeakerNames() =>
-        Poe1SpeakerNameParser.ParseFromDisk(ConversationsRoot, CharactersStringtablePath);
+        Poe1SpeakerNameParser.ParseFromDisk(ConversationsRoot,
+            TablesFor(Path.Combine("game", "characters.stringtable"), Language).Select(t => t.Path).ToList());
 
     private string GlobalVariablesPath =>
         Path.Combine(DataRoot, "design", "global", "game.globalvariables");
@@ -95,6 +117,15 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
 
     public (string ConversationsRoot, string StringTablesRoot) GetBackupRoots()
         => (ConversationsRoot, StringTablesRoot);
+
+    // Each expansion folder's conversation text per installed language (issue 201). Its
+    // conversations are in data, which the base backup already keeps.
+    public IReadOnlyList<ExtraBackupFolder> GetExtraBackupFolders() =>
+        Roots.Where(r => r.Folder != Poe1DataRoots.Base).SelectMany(r => AvailableLanguages
+            .Select(lang => (Lang: lang, Text: Path.Combine(r.Path, "localized", lang, "text", "conversations")))
+            .Where(t => Directory.Exists(t.Text))
+            .Select(t => new ExtraBackupFolder($"dlc/{r.Folder}/stringtables/{t.Lang}", t.Text, SinceFormat: 4)))
+        .ToList();
 
     public void SaveConversation(ConversationFile file, ConversationEditSnapshot snapshot)
     {
