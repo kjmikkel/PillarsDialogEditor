@@ -37,269 +37,376 @@
         </Style>
     </Window.Styles>
 
-    <Grid RowDefinitions="Auto,*,Auto,Auto" Margin="14,12,14,12">
+    <Grid RowDefinitions="*,Auto,Auto" Margin="14,12,14,12">
 
-        <!-- ── Statistics panel (visible after first Refresh) ─────────────── -->
-        <StackPanel Grid.Row="0" Spacing="6" IsVisible="{Binding HasData}">
+        <!-- One scrolling body (issue 177): the stats panel sits above the issue lists, so on a
+             short or clamped window it pushed the text-tag section and the Refresh bar below
+             the bottom edge. The body now scrolls as a whole and the bottom bar stays pinned. -->
+        <ScrollViewer Grid.Row="0">
+            <Grid RowDefinitions="Auto,Auto">
+                <!-- ── Statistics panel (visible after first Refresh) ─────────────── -->
+                <StackPanel Grid.Row="0" Spacing="6" IsVisible="{Binding HasData}">
 
-            <TextBlock Classes="section-header"
-                       Text="{DynamicResource FlowAnalytics_Statistics}"/>
+                    <TextBlock Classes="section-header"
+                               Text="{DynamicResource FlowAnalytics_Statistics}"/>
 
-            <!-- Row 1: Nodes, Words, Max depth -->
-            <Grid ColumnDefinitions="*,*,*">
-                <StackPanel Grid.Column="0">
-                    <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_Nodes}"/>
-                    <TextBlock Classes="stat-value" Text="{Binding Statistics.TotalNodes}"/>
-                </StackPanel>
-                <StackPanel Grid.Column="1">
-                    <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_Words}"/>
-                    <TextBlock Classes="stat-value" Text="{Binding Statistics.WordCount}"/>
-                </StackPanel>
-                <StackPanel Grid.Column="2">
-                    <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_MaxDepth}"/>
-                    <TextBlock Classes="stat-value" Text="{Binding Statistics.MaxDepth}"/>
-                </StackPanel>
-            </Grid>
+                    <!-- Row 1: Nodes, Words, Max depth -->
+                    <Grid ColumnDefinitions="*,*,*">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_Nodes}"/>
+                            <TextBlock Classes="stat-value" Text="{Binding Statistics.TotalNodes}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_Words}"/>
+                            <TextBlock Classes="stat-value" Text="{Binding Statistics.WordCount}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_MaxDepth}"/>
+                            <TextBlock Classes="stat-value" Text="{Binding Statistics.MaxDepth}"/>
+                        </StackPanel>
+                    </Grid>
 
-            <!-- Row 2: Player, NPC, Narrator -->
-            <Grid ColumnDefinitions="*,*,*">
-                <StackPanel Grid.Column="0">
-                    <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_Player}"/>
-                    <TextBlock Classes="stat-value" Text="{Binding Statistics.PlayerCount}"/>
-                </StackPanel>
-                <StackPanel Grid.Column="1">
-                    <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_NPC}"/>
-                    <TextBlock Classes="stat-value" Text="{Binding Statistics.NpcCount}"/>
-                </StackPanel>
-                <StackPanel Grid.Column="2">
-                    <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_Narrator}"/>
-                    <TextBlock Classes="stat-value" Text="{Binding Statistics.NarratorCount}"/>
-                </StackPanel>
-            </Grid>
+                    <!-- Row 2: Player, NPC, Narrator -->
+                    <Grid ColumnDefinitions="*,*,*">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_Player}"/>
+                            <TextBlock Classes="stat-value" Text="{Binding Statistics.PlayerCount}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_NPC}"/>
+                            <TextBlock Classes="stat-value" Text="{Binding Statistics.NpcCount}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_Narrator}"/>
+                            <TextBlock Classes="stat-value" Text="{Binding Statistics.NarratorCount}"/>
+                        </StackPanel>
+                    </Grid>
 
-            <!-- Row 3: Script, Avg links/node, Conditional links -->
-            <Grid ColumnDefinitions="*,*,*">
-                <StackPanel Grid.Column="0">
-                    <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_Script}"/>
-                    <TextBlock Classes="stat-value" Text="{Binding Statistics.ScriptCount}"/>
-                </StackPanel>
-                <StackPanel Grid.Column="1">
-                    <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_AvgLinks}"/>
-                    <TextBlock Classes="stat-value" Text="{Binding Statistics.AvgLinksPerNode, StringFormat='{}{0:F1}'}"/>
-                </StackPanel>
-                <StackPanel Grid.Column="2">
-                    <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_ConditionalLinks}"/>
-                    <TextBlock Classes="stat-value" Text="{Binding ConditionalLinksDisplay}"/>
-                </StackPanel>
-            </Grid>
+                    <!-- Row 3: Script, Avg links/node, Conditional links -->
+                    <Grid ColumnDefinitions="*,*,*">
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_Script}"/>
+                            <TextBlock Classes="stat-value" Text="{Binding Statistics.ScriptCount}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_AvgLinks}"/>
+                            <TextBlock Classes="stat-value" Text="{Binding Statistics.AvgLinksPerNode, StringFormat='{}{0:F1}'}"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Classes="stat-label" Text="{DynamicResource FlowAnalytics_Stat_ConditionalLinks}"/>
+                            <TextBlock Classes="stat-value" Text="{Binding ConditionalLinksDisplay}"/>
+                        </StackPanel>
+                    </Grid>
 
-            <Separator Background="{DynamicResource Brush.Border.Default}" Height="1" Margin="0,2,0,2"/>
+                    <Separator Background="{DynamicResource Brush.Border.Default}" Height="1" Margin="0,2,0,2"/>
 
-            <!-- ── Playthrough stats ─────────────────────────────────────── -->
-            <StackPanel Spacing="4" IsVisible="{Binding HasPathStats}">
-                <TextBlock Text="{DynamicResource PathStats_NoStartNode}"
-                           IsVisible="{Binding PathStatsNoStartNode}"
-                           Foreground="{DynamicResource Brush.Validation.Text}"
-                           FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
-                <!-- The reading speed sits here rather than in Settings because it is only
-                     meaningful next to the times it changes: the writer adjusts it and reads
-                     the result in the same glance. Changing it re-runs the analysis. -->
-                <Grid ColumnDefinitions="*,Auto,Auto">
-                    <TextBlock Grid.Column="0"
-                               Classes="section-header"
-                               VerticalAlignment="Center"
-                               Text="{DynamicResource PathStats_Header}"
-                               ToolTip.Tip="{DynamicResource ToolTip_PathStats}"
-                               AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats}"/>
-                    <!-- Following handoffs is opt-in (issue #14): turning it on changes
-                         existing figures, so the writer asks for it rather than finding a
-                         doubled number one day. Sits beside the reading speed for the same
-                         reason that does — it is only meaningful next to what it changes. -->
-                    <CheckBox Grid.Column="1"
-                              x:Name="FollowJumpsCheckBox"
-                              Margin="0,0,8,0"
-                              VerticalAlignment="Center"
-                              FontSize="{DynamicResource FontSize.Small}"
-                              IsChecked="{Binding FollowConversationJumps, Mode=TwoWay}"
-                              Content="{DynamicResource FlowAnalytics_FollowJumps}"
-                              ToolTip.Tip="{DynamicResource FlowAnalytics_FollowJumps_Tip}"
-                              AutomationProperties.Name="{DynamicResource FlowAnalytics_FollowJumps}"
-                              AutomationProperties.HelpText="{DynamicResource FlowAnalytics_FollowJumps_Tip}"/>
-                    <ComboBox Grid.Column="2"
-                              x:Name="ReadingSpeedComboBox"
-                              ItemsSource="{Binding WordsPerMinuteOptions}"
-                              SelectedItem="{Binding WordsPerMinute, Mode=TwoWay}"
-                              MinWidth="110"
-                              FontSize="{DynamicResource FontSize.Small}"
-                              ToolTip.Tip="{DynamicResource PathStats_ReadingSpeedTooltip}"
-                              AutomationProperties.Name="{DynamicResource PathStats_ReadingSpeed}"
-                              AutomationProperties.HelpText="{DynamicResource PathStats_ReadingSpeedTooltip}">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Converter={StaticResource WordsPerMinute}}"/>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                </Grid>
+                    <!-- ── Playthrough stats ─────────────────────────────────────── -->
+                    <StackPanel Spacing="4" IsVisible="{Binding HasPathStats}">
+                        <TextBlock Text="{DynamicResource PathStats_NoStartNode}"
+                                   IsVisible="{Binding PathStatsNoStartNode}"
+                                   Foreground="{DynamicResource Brush.Validation.Text}"
+                                   FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
+                        <!-- The reading speed sits here rather than in Settings because it is only
+                             meaningful next to the times it changes: the writer adjusts it and reads
+                             the result in the same glance. Changing it re-runs the analysis. -->
+                        <Grid ColumnDefinitions="*,Auto,Auto">
+                            <TextBlock Grid.Column="0"
+                                       Classes="section-header"
+                                       VerticalAlignment="Center"
+                                       Text="{DynamicResource PathStats_Header}"
+                                       ToolTip.Tip="{DynamicResource ToolTip_PathStats}"
+                                       AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats}"/>
+                            <!-- Following handoffs is opt-in (issue #14): turning it on changes
+                                 existing figures, so the writer asks for it rather than finding a
+                                 doubled number one day. Sits beside the reading speed for the same
+                                 reason that does — it is only meaningful next to what it changes. -->
+                            <CheckBox Grid.Column="1"
+                                      x:Name="FollowJumpsCheckBox"
+                                      Margin="0,0,8,0"
+                                      VerticalAlignment="Center"
+                                      FontSize="{DynamicResource FontSize.Small}"
+                                      IsChecked="{Binding FollowConversationJumps, Mode=TwoWay}"
+                                      Content="{DynamicResource FlowAnalytics_FollowJumps}"
+                                      ToolTip.Tip="{DynamicResource FlowAnalytics_FollowJumps_Tip}"
+                                      AutomationProperties.Name="{DynamicResource FlowAnalytics_FollowJumps}"
+                                      AutomationProperties.HelpText="{DynamicResource FlowAnalytics_FollowJumps_Tip}"/>
+                            <ComboBox Grid.Column="2"
+                                      x:Name="ReadingSpeedComboBox"
+                                      ItemsSource="{Binding WordsPerMinuteOptions}"
+                                      SelectedItem="{Binding WordsPerMinute, Mode=TwoWay}"
+                                      MinWidth="110"
+                                      FontSize="{DynamicResource FontSize.Small}"
+                                      ToolTip.Tip="{DynamicResource PathStats_ReadingSpeedTooltip}"
+                                      AutomationProperties.Name="{DynamicResource PathStats_ReadingSpeed}"
+                                      AutomationProperties.HelpText="{DynamicResource PathStats_ReadingSpeedTooltip}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Converter={StaticResource WordsPerMinute}}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </Grid>
 
-                <!-- Only when it actually spans: this is what makes a suddenly larger
-                     longest playthrough self-explaining rather than alarming. -->
-                <TextBlock Text="{Binding ConversationsSpannedText}"
-                           IsVisible="{Binding HasSpannedConversations}"
-                           FontSize="{DynamicResource FontSize.Small}"
-                           Foreground="{DynamicResource Brush.Text.Secondary}"
-                           TextWrapping="Wrap"/>
+                        <!-- Only when it actually spans: this is what makes a suddenly larger
+                             longest playthrough self-explaining rather than alarming. -->
+                        <TextBlock Text="{Binding ConversationsSpannedText}"
+                                   IsVisible="{Binding HasSpannedConversations}"
+                                   FontSize="{DynamicResource FontSize.Small}"
+                                   Foreground="{DynamicResource Brush.Text.Secondary}"
+                                   TextWrapping="Wrap"/>
 
-                <!-- Without a start node (issue 172) there is no playthrough to measure, so
-                     Longest and Shortest are hidden; Total counts every line and stays. -->
-                <Grid ColumnDefinitions="*,*,*">
-                    <StackPanel Grid.Column="0" IsVisible="{Binding !PathStatsNoStartNode}">
-                        <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_Longest}"/>
-                        <TextBlock Foreground="{DynamicResource Brush.Text.Primary}"
-                                   FontSize="{DynamicResource FontSize.Body}"
-                                   Text="{Binding LongestPlaythroughText}" TextWrapping="Wrap"/>
-                    </StackPanel>
-                    <StackPanel Grid.Column="1" IsVisible="{Binding !PathStatsNoStartNode}">
-                        <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_Shortest}"/>
-                        <TextBlock Foreground="{DynamicResource Brush.Text.Primary}"
-                                   FontSize="{DynamicResource FontSize.Body}"
-                                   Text="{Binding ShortestPlaythroughText}" TextWrapping="Wrap"/>
-                    </StackPanel>
-                    <StackPanel Grid.Column="2">
-                        <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_Total}"/>
-                        <TextBlock Foreground="{DynamicResource Brush.Text.Primary}"
-                                   FontSize="{DynamicResource FontSize.Body}"
-                                   Text="{Binding TotalContentText}" TextWrapping="Wrap"/>
-                    </StackPanel>
-                </Grid>
+                        <!-- Without a start node (issue 172) there is no playthrough to measure, so
+                             Longest and Shortest are hidden; Total counts every line and stays. -->
+                        <Grid ColumnDefinitions="*,*,*">
+                            <StackPanel Grid.Column="0" IsVisible="{Binding !PathStatsNoStartNode}">
+                                <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_Longest}"/>
+                                <TextBlock Foreground="{DynamicResource Brush.Text.Primary}"
+                                           FontSize="{DynamicResource FontSize.Body}"
+                                           Text="{Binding LongestPlaythroughText}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="1" IsVisible="{Binding !PathStatsNoStartNode}">
+                                <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_Shortest}"/>
+                                <TextBlock Foreground="{DynamicResource Brush.Text.Primary}"
+                                           FontSize="{DynamicResource FontSize.Body}"
+                                           Text="{Binding ShortestPlaythroughText}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_Total}"/>
+                                <TextBlock Foreground="{DynamicResource Brush.Text.Primary}"
+                                           FontSize="{DynamicResource FontSize.Body}"
+                                           Text="{Binding TotalContentText}" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Grid>
 
-                <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_WordsPerSpeaker}" Margin="0,4,0,0"/>
-                <ItemsControl ItemsSource="{Binding WordsPerSpeaker}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="vm:SpeakerWordRowViewModel">
-                            <TextBlock Text="{Binding Display}"
-                                       Foreground="{DynamicResource Brush.Text.Secondary}"
-                                       FontSize="{DynamicResource FontSize.Label}"/>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-
-                <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_OpeningChoices}" Margin="0,4,0,0"/>
-                <TextBlock Text="{DynamicResource PathStats_NoOpeningChoices}"
-                           Foreground="{DynamicResource Brush.Text.Disabled}"
-                           FontSize="{DynamicResource FontSize.Small}" FontStyle="Italic"
-                           IsVisible="{Binding Branches.Count, Converter={StaticResource CountToVis}, ConverterParameter=invert}"/>
-                <!-- A TreeView rather than a flat list because forks nest: expanding a
-                     choice shows the choices it leads to. Follows the GameBrowserView
-                     pattern - IsExpanded bound two-way to the row (top level opens, deeper
-                     levels stay folded) and AutomationProperties.Name set on the CONTAINER,
-                     without which a UIA lookup resolves to the inner Text element, which
-                     cannot be expanded or selected (issue #15 finding 1). -->
-                <TreeView x:Name="ForkTreeView" ItemsSource="{Binding Branches}"
-                          MaxHeight="180"
-                          Background="Transparent" BorderThickness="0"
-                          ToolTip.Tip="{DynamicResource ToolTip_PathStats_Forks}"
-                          AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats_Forks}">
-                    <TreeView.ItemContainerTheme>
-                        <ControlTheme TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
-                            <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
-                            <Setter Property="AutomationProperties.Name" Value="{Binding ChoiceText}"/>
-                        </ControlTheme>
-                    </TreeView.ItemContainerTheme>
-                    <TreeView.DataTemplates>
-                        <TreeDataTemplate DataType="{x:Type vm:PathBranchRowViewModel}"
-                                          ItemsSource="{Binding SubBranches}">
-                            <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,2">
-                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                    <!-- Shown only for a row in another conversation, so the
-                                         common single-file report gains no redundant prefix. -->
-                                    <TextBlock Text="{Binding ConversationName}"
-                                               IsVisible="{Binding IsInAnotherConversation}"
+                        <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_WordsPerSpeaker}" Margin="0,4,0,0"/>
+                        <ItemsControl ItemsSource="{Binding WordsPerSpeaker}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="vm:SpeakerWordRowViewModel">
+                                    <TextBlock Text="{Binding Display}"
                                                Foreground="{DynamicResource Brush.Text.Secondary}"
-                                               FontSize="{DynamicResource FontSize.Small}"
-                                               TextTrimming="CharacterEllipsis"/>
-                                    <TextBlock Text="{Binding ChoiceText}"
-                                               Foreground="{DynamicResource Brush.Text.Primary}"
-                                               FontSize="{DynamicResource FontSize.Label}"
-                                               TextTrimming="CharacterEllipsis"/>
-                                    <StackPanel Orientation="Horizontal" Spacing="10">
-                                        <TextBlock Text="{Binding DefaultContentText}"
-                                                   Foreground="{DynamicResource Brush.Text.Muted}"
-                                                   FontSize="{DynamicResource FontSize.Small}"/>
-                                        <TextBlock Text="{Binding DefaultLongestText}"
-                                                   Foreground="{DynamicResource Brush.Text.Muted}"
-                                                   FontSize="{DynamicResource FontSize.Small}"/>
-                                    </StackPanel>
-                                    <!-- $parent[TreeView], not $parent[ItemsControl]: for a
-                                         nested row the nearest ItemsControl ancestor is its
-                                         parent TreeViewItem, whose DataContext is a row and
-                                         not the window view model. -->
-                                    <StackPanel Orientation="Horizontal" Spacing="10"
-                                                IsVisible="{Binding $parent[TreeView].DataContext.HasSignificantFemaleVariant}">
-                                        <TextBlock Text="{Binding FemaleContentText}"
-                                                   Foreground="{DynamicResource Brush.Text.Tertiary}"
-                                                   FontSize="{DynamicResource FontSize.Small}"/>
-                                        <TextBlock Text="{Binding FemaleLongestText}"
-                                                   Foreground="{DynamicResource Brush.Text.Tertiary}"
-                                                   FontSize="{DynamicResource FontSize.Small}"/>
-                                    </StackPanel>
-                                </StackPanel>
-                                <Button Grid.Column="2" Content="&#x2192;"
-                                        Command="{Binding NavigateCommand}"
-                                        Background="Transparent" BorderThickness="0"
-                                        Foreground="{DynamicResource Brush.Text.Muted}"
-                                        FontSize="{DynamicResource FontSize.Subtitle}"
-                                        Padding="8,0" Margin="4,0,0,0" VerticalAlignment="Center"
-                                        ToolTip.Tip="{DynamicResource ToolTip_PathStats_Navigate}"
-                                        AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats_Navigate}"
-                                        AutomationProperties.Name="{DynamicResource AutomationName_GoToNode}"/>
-                            </Grid>
-                        </TreeDataTemplate>
-                    </TreeView.DataTemplates>
-                </TreeView>
+                                               FontSize="{DynamicResource FontSize.Label}"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
 
-                <!-- Endings: where the conversation can actually stop. Collapsed to a plain
-                     list because an ending has no structure under it, unlike a fork. -->
-                <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_Endings}"
-                           Margin="0,4,0,0"
-                           ToolTip.Tip="{DynamicResource ToolTip_PathStats_EndingsSection}"
-                           AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats_EndingsSection}"/>
-                <TextBlock Text="{DynamicResource PathStats_NoEndings}"
-                           Foreground="{DynamicResource Brush.Text.Disabled}"
-                           FontSize="{DynamicResource FontSize.Small}" FontStyle="Italic"
-                           TextWrapping="Wrap"
-                           IsVisible="{Binding !HasEndings}"/>
-                <ScrollViewer MaxHeight="140" IsVisible="{Binding HasEndings}">
-                    <ItemsControl x:Name="EndingsList" ItemsSource="{Binding Endings}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate DataType="vm:PathEndingRowViewModel">
-                                <Grid ColumnDefinitions="*,Auto" Margin="0,2">
-                                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding ConversationName}"
-                                                   IsVisible="{Binding IsInAnotherConversation}"
-                                                   Foreground="{DynamicResource Brush.Text.Secondary}"
-                                                   FontSize="{DynamicResource FontSize.Small}"
-                                                   TextTrimming="CharacterEllipsis"/>
-                                        <TextBlock Text="{Binding EndingText}"
-                                                   Foreground="{DynamicResource Brush.Text.Primary}"
-                                                   FontSize="{DynamicResource FontSize.Label}"
-                                                   TextTrimming="CharacterEllipsis"/>
-                                        <TextBlock Text="{Binding DefaultRangeText}"
-                                                   Foreground="{DynamicResource Brush.Text.Muted}"
+                        <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_OpeningChoices}" Margin="0,4,0,0"/>
+                        <TextBlock Text="{DynamicResource PathStats_NoOpeningChoices}"
+                                   Foreground="{DynamicResource Brush.Text.Disabled}"
+                                   FontSize="{DynamicResource FontSize.Small}" FontStyle="Italic"
+                                   IsVisible="{Binding Branches.Count, Converter={StaticResource CountToVis}, ConverterParameter=invert}"/>
+                        <!-- A TreeView rather than a flat list because forks nest: expanding a
+                             choice shows the choices it leads to. Follows the GameBrowserView
+                             pattern - IsExpanded bound two-way to the row (top level opens, deeper
+                             levels stay folded) and AutomationProperties.Name set on the CONTAINER,
+                             without which a UIA lookup resolves to the inner Text element, which
+                             cannot be expanded or selected (issue #15 finding 1). -->
+                        <TreeView x:Name="ForkTreeView" ItemsSource="{Binding Branches}"
+                                  MaxHeight="180"
+                                  Background="Transparent" BorderThickness="0"
+                                  ToolTip.Tip="{DynamicResource ToolTip_PathStats_Forks}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats_Forks}">
+                            <TreeView.ItemContainerTheme>
+                                <ControlTheme TargetType="TreeViewItem" BasedOn="{StaticResource {x:Type TreeViewItem}}">
+                                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}"/>
+                                    <Setter Property="AutomationProperties.Name" Value="{Binding ChoiceText}"/>
+                                </ControlTheme>
+                            </TreeView.ItemContainerTheme>
+                            <TreeView.DataTemplates>
+                                <TreeDataTemplate DataType="{x:Type vm:PathBranchRowViewModel}"
+                                                  ItemsSource="{Binding SubBranches}">
+                                    <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,2">
+                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                            <!-- Shown only for a row in another conversation, so the
+                                                 common single-file report gains no redundant prefix. -->
+                                            <TextBlock Text="{Binding ConversationName}"
+                                                       IsVisible="{Binding IsInAnotherConversation}"
+                                                       Foreground="{DynamicResource Brush.Text.Secondary}"
+                                                       FontSize="{DynamicResource FontSize.Small}"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Text="{Binding ChoiceText}"
+                                                       Foreground="{DynamicResource Brush.Text.Primary}"
+                                                       FontSize="{DynamicResource FontSize.Label}"
+                                                       TextTrimming="CharacterEllipsis"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                                <TextBlock Text="{Binding DefaultContentText}"
+                                                           Foreground="{DynamicResource Brush.Text.Muted}"
+                                                           FontSize="{DynamicResource FontSize.Small}"/>
+                                                <TextBlock Text="{Binding DefaultLongestText}"
+                                                           Foreground="{DynamicResource Brush.Text.Muted}"
+                                                           FontSize="{DynamicResource FontSize.Small}"/>
+                                            </StackPanel>
+                                            <!-- $parent[TreeView], not $parent[ItemsControl]: for a
+                                                 nested row the nearest ItemsControl ancestor is its
+                                                 parent TreeViewItem, whose DataContext is a row and
+                                                 not the window view model. -->
+                                            <StackPanel Orientation="Horizontal" Spacing="10"
+                                                        IsVisible="{Binding $parent[TreeView].DataContext.HasSignificantFemaleVariant}">
+                                                <TextBlock Text="{Binding FemaleContentText}"
+                                                           Foreground="{DynamicResource Brush.Text.Tertiary}"
+                                                           FontSize="{DynamicResource FontSize.Small}"/>
+                                                <TextBlock Text="{Binding FemaleLongestText}"
+                                                           Foreground="{DynamicResource Brush.Text.Tertiary}"
+                                                           FontSize="{DynamicResource FontSize.Small}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <Button Grid.Column="2" Content="&#x2192;"
+                                                Command="{Binding NavigateCommand}"
+                                                Background="Transparent" BorderThickness="0"
+                                                Foreground="{DynamicResource Brush.Text.Muted}"
+                                                FontSize="{DynamicResource FontSize.Subtitle}"
+                                                Padding="8,0" Margin="4,0,0,0" VerticalAlignment="Center"
+                                                ToolTip.Tip="{DynamicResource ToolTip_PathStats_Navigate}"
+                                                AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats_Navigate}"
+                                                AutomationProperties.Name="{DynamicResource AutomationName_GoToNode}"/>
+                                    </Grid>
+                                </TreeDataTemplate>
+                            </TreeView.DataTemplates>
+                        </TreeView>
+
+                        <!-- Endings: where the conversation can actually stop. Collapsed to a plain
+                             list because an ending has no structure under it, unlike a fork. -->
+                        <TextBlock Classes="stat-label" Text="{DynamicResource PathStats_Endings}"
+                                   Margin="0,4,0,0"
+                                   ToolTip.Tip="{DynamicResource ToolTip_PathStats_EndingsSection}"
+                                   AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats_EndingsSection}"/>
+                        <TextBlock Text="{DynamicResource PathStats_NoEndings}"
+                                   Foreground="{DynamicResource Brush.Text.Disabled}"
+                                   FontSize="{DynamicResource FontSize.Small}" FontStyle="Italic"
+                                   TextWrapping="Wrap"
+                                   IsVisible="{Binding !HasEndings}"/>
+                        <ScrollViewer MaxHeight="140" IsVisible="{Binding HasEndings}">
+                            <ItemsControl x:Name="EndingsList" ItemsSource="{Binding Endings}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate DataType="vm:PathEndingRowViewModel">
+                                        <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                            <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding ConversationName}"
+                                                           IsVisible="{Binding IsInAnotherConversation}"
+                                                           Foreground="{DynamicResource Brush.Text.Secondary}"
+                                                           FontSize="{DynamicResource FontSize.Small}"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding EndingText}"
+                                                           Foreground="{DynamicResource Brush.Text.Primary}"
+                                                           FontSize="{DynamicResource FontSize.Label}"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding DefaultRangeText}"
+                                                           Foreground="{DynamicResource Brush.Text.Muted}"
+                                                           FontSize="{DynamicResource FontSize.Small}"/>
+                                                <TextBlock Text="{Binding FemaleRangeText}"
+                                                           Foreground="{DynamicResource Brush.Text.Tertiary}"
+                                                           FontSize="{DynamicResource FontSize.Small}"
+                                                           IsVisible="{Binding $parent[ItemsControl].DataContext.HasSignificantFemaleVariant}"/>
+                                            </StackPanel>
+                                            <Button Grid.Column="1" Content="&#x2192;"
+                                                    Command="{Binding NavigateCommand}"
+                                                    Background="Transparent" BorderThickness="0"
+                                                    Foreground="{DynamicResource Brush.Text.Muted}"
+                                                    FontSize="{DynamicResource FontSize.Subtitle}"
+                                                    Padding="8,0" Margin="4,0,0,0" VerticalAlignment="Center"
+                                                    ToolTip.Tip="{DynamicResource ToolTip_PathStats_NavigateEnding}"
+                                                    AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats_NavigateEnding}"
+                                                    AutomationProperties.Name="{DynamicResource AutomationName_GoToNode}"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </ScrollViewer>
+
+                        <!-- Handoffs the report found but did not walk. Listed so the
+                             project-patched-only boundary never silently drops content off the end
+                             of a report — the writer sees the figure stops here, and why. Reasons
+                             are words, not colour (Layer 2.5). -->
+                        <TextBlock Classes="stat-label"
+                                   Text="{DynamicResource FlowAnalytics_UnfollowedHeader}"
+                                   Margin="0,4,0,0"
+                                   IsVisible="{Binding HasUnfollowedJumps}"/>
+                        <ItemsControl x:Name="UnfollowedJumpsList"
+                                      ItemsSource="{Binding UnfollowedJumpRows}"
+                                      IsVisible="{Binding HasUnfollowedJumps}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,1,0,1">
+                                        <TextBlock Text="{Binding TargetLabel}"
                                                    FontSize="{DynamicResource FontSize.Small}"/>
-                                        <TextBlock Text="{Binding FemaleRangeText}"
-                                                   Foreground="{DynamicResource Brush.Text.Tertiary}"
+                                        <TextBlock Text="{Binding ReasonText}"
                                                    FontSize="{DynamicResource FontSize.Small}"
-                                                   IsVisible="{Binding $parent[ItemsControl].DataContext.HasSignificantFemaleVariant}"/>
+                                                   FontStyle="Italic"
+                                                   Foreground="{DynamicResource Brush.Text.Secondary}"/>
                                     </StackPanel>
-                                    <Button Grid.Column="1" Content="&#x2192;"
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Separator Background="{DynamicResource Brush.Border.Default}" Height="1" Margin="0,2,0,2"/>
+                    </StackPanel>
+
+                    <!-- Issues header -->
+                    <TextBlock Classes="section-header" Text="{Binding StatusText}"/>
+
+                    <!-- Issue 172: one conversation-level error instead of "Unreachable" on every node. -->
+                    <Border Background="{DynamicResource Brush.Validation.Background}" BorderBrush="{DynamicResource Brush.Validation.Border}" BorderThickness="1"
+                            CornerRadius="2" Padding="6,4" Margin="0,2,0,2"
+                            IsVisible="{Binding HasNoStartNode}"
+                            ToolTip.Tip="{DynamicResource ToolTip_FlowAnalytics_NoStartNode}"
+                            AutomationProperties.Name="{DynamicResource FlowAnalytics_Issue_NoStartNode}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_FlowAnalytics_NoStartNode}">
+                        <TextBlock Text="{DynamicResource FlowAnalytics_Issue_NoStartNode}"
+                                   Foreground="{DynamicResource Brush.Validation.Text}"
+                                   FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
+                    </Border>
+
+                </StackPanel>
+
+                <!-- ── No-data placeholder ────────────────────────────────────────── -->
+                <TextBlock Grid.Row="0"
+                           Text="{DynamicResource FlowAnalytics_NoData}"
+                           Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Medium}" FontStyle="Italic"
+                           HorizontalAlignment="Center" VerticalAlignment="Center"
+                           IsVisible="{Binding !HasData}"/>
+
+                <!-- ── Issues area: flow issues (top) + text-tag issues (bottom) ──── -->
+                <Grid Grid.Row="1" RowDefinitions="*,Auto,*" Margin="0,6,0,6">
+
+                <ScrollViewer Grid.Row="0">
+                    <ItemsControl ItemsSource="{Binding Issues}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="vm:FlowIssueViewModel">
+                                <Grid ColumnDefinitions="16,Auto,*,Auto"
+                                      Margin="0,2" Height="32">
+                                    <!-- Severity icon -->
+                                    <Border Grid.Column="0"
+                                            Width="16" Height="16"
+                                            CornerRadius="3"
+                                            Background="{Binding Kind, Converter={StaticResource FlowIssueSeverityBrush}}"
+                                            ToolTip.Tip="{Binding SeverityLabel}"
+                                            AutomationProperties.Name="{Binding SeverityLabel}"
+                                            HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Kind, Converter={StaticResource FlowIssueSeverityGlyph}}"
+                                                   FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.OnAccent}"
+                                                   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <!-- Kind label -->
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding KindLabel}"
+                                               Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"
+                                               VerticalAlignment="Center"
+                                               Width="110" Margin="8,0,6,0"/>
+                                    <!-- Node snippet -->
+                                    <TextBlock Grid.Column="2"
+                                               Text="{Binding DisplayText}"
+                                               Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Label}"
+                                               VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    <!-- Navigate button -->
+                                    <Button Grid.Column="3"
+                                            Content="→"
                                             Command="{Binding NavigateCommand}"
                                             Background="Transparent" BorderThickness="0"
-                                            Foreground="{DynamicResource Brush.Text.Muted}"
-                                            FontSize="{DynamicResource FontSize.Subtitle}"
-                                            Padding="8,0" Margin="4,0,0,0" VerticalAlignment="Center"
-                                            ToolTip.Tip="{DynamicResource ToolTip_PathStats_NavigateEnding}"
-                                            AutomationProperties.HelpText="{DynamicResource ToolTip_PathStats_NavigateEnding}"
+                                            Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Subtitle}"
+                                            Padding="8,0" Margin="4,0,0,0"
+                                            VerticalAlignment="Center"
+                                            ToolTip.Tip="{DynamicResource ToolTip_FlowAnalytics_Navigate}"
+                                            AutomationProperties.HelpText="{DynamicResource ToolTip_FlowAnalytics_Navigate}"
                                             AutomationProperties.Name="{DynamicResource AutomationName_GoToNode}"/>
                                 </Grid>
                             </DataTemplate>
@@ -307,153 +414,53 @@
                     </ItemsControl>
                 </ScrollViewer>
 
-                <!-- Handoffs the report found but did not walk. Listed so the
-                     project-patched-only boundary never silently drops content off the end
-                     of a report — the writer sees the figure stops here, and why. Reasons
-                     are words, not colour (Layer 2.5). -->
-                <TextBlock Classes="stat-label"
-                           Text="{DynamicResource FlowAnalytics_UnfollowedHeader}"
-                           Margin="0,4,0,0"
-                           IsVisible="{Binding HasUnfollowedJumps}"/>
-                <ItemsControl x:Name="UnfollowedJumpsList"
-                              ItemsSource="{Binding UnfollowedJumpRows}"
-                              IsVisible="{Binding HasUnfollowedJumps}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,1,0,1">
-                                <TextBlock Text="{Binding TargetLabel}"
-                                           FontSize="{DynamicResource FontSize.Small}"/>
-                                <TextBlock Text="{Binding ReasonText}"
-                                           FontSize="{DynamicResource FontSize.Small}"
-                                           FontStyle="Italic"
-                                           Foreground="{DynamicResource Brush.Text.Secondary}"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    <!-- Section divider + header for text-tag issues -->
+                    <StackPanel Grid.Row="1" Spacing="4" IsVisible="{Binding HasData}">
+                        <Separator Background="{DynamicResource Brush.Border.Default}" Height="1" Margin="0,4"/>
+                        <TextBlock Classes="section-header"
+                                   Text="{DynamicResource FlowAnalytics_TagIssues}"
+                                   ToolTip.Tip="{DynamicResource ToolTip_TokenWarnings}"
+                                   AutomationProperties.HelpText="{DynamicResource ToolTip_TokenWarnings}"/>
+                        <TextBlock Text="{DynamicResource FlowAnalytics_TagIssues_None}"
+                                   Foreground="{DynamicResource Brush.Text.Disabled}"
+                                   FontSize="{DynamicResource FontSize.Small}" FontStyle="Italic"
+                                   IsVisible="{Binding TokenIssues.Count, Converter={StaticResource CountToVis}, ConverterParameter=invert}"/>
+                    </StackPanel>
 
-                <Separator Background="{DynamicResource Brush.Border.Default}" Height="1" Margin="0,2,0,2"/>
-            </StackPanel>
-
-            <!-- Issues header -->
-            <TextBlock Classes="section-header" Text="{Binding StatusText}"/>
-
-            <!-- Issue 172: one conversation-level error instead of "Unreachable" on every node. -->
-            <Border Background="{DynamicResource Brush.Validation.Background}" BorderBrush="{DynamicResource Brush.Validation.Border}" BorderThickness="1"
-                    CornerRadius="2" Padding="6,4" Margin="0,2,0,2"
-                    IsVisible="{Binding HasNoStartNode}"
-                    ToolTip.Tip="{DynamicResource ToolTip_FlowAnalytics_NoStartNode}"
-                    AutomationProperties.Name="{DynamicResource FlowAnalytics_Issue_NoStartNode}"
-                    AutomationProperties.HelpText="{DynamicResource ToolTip_FlowAnalytics_NoStartNode}">
-                <TextBlock Text="{DynamicResource FlowAnalytics_Issue_NoStartNode}"
-                           Foreground="{DynamicResource Brush.Validation.Text}"
-                           FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
-            </Border>
-
-        </StackPanel>
-
-        <!-- ── No-data placeholder ────────────────────────────────────────── -->
-        <TextBlock Grid.Row="0"
-                   Text="{DynamicResource FlowAnalytics_NoData}"
-                   Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Medium}" FontStyle="Italic"
-                   HorizontalAlignment="Center" VerticalAlignment="Center"
-                   IsVisible="{Binding !HasData}"/>
-
-        <!-- ── Issues area: flow issues (top) + text-tag issues (bottom) ──── -->
-        <Grid Grid.Row="1" RowDefinitions="*,Auto,*" Margin="0,6,0,6">
-
-        <ScrollViewer Grid.Row="0">
-            <ItemsControl ItemsSource="{Binding Issues}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="vm:FlowIssueViewModel">
-                        <Grid ColumnDefinitions="16,Auto,*,Auto"
-                              Margin="0,2" Height="32">
-                            <!-- Severity icon -->
-                            <Border Grid.Column="0"
-                                    Width="16" Height="16"
-                                    CornerRadius="3"
-                                    Background="{Binding Kind, Converter={StaticResource FlowIssueSeverityBrush}}"
-                                    ToolTip.Tip="{Binding SeverityLabel}"
-                                    AutomationProperties.Name="{Binding SeverityLabel}"
-                                    HorizontalAlignment="Center" VerticalAlignment="Center">
-                                <TextBlock Text="{Binding Kind, Converter={StaticResource FlowIssueSeverityGlyph}}"
-                                           FontSize="{DynamicResource FontSize.Small}" Foreground="{DynamicResource Brush.Text.OnAccent}"
-                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                            </Border>
-                            <!-- Kind label -->
-                            <TextBlock Grid.Column="1"
-                                       Text="{Binding KindLabel}"
-                                       Foreground="{DynamicResource Brush.Text.Tertiary}" FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"
-                                       VerticalAlignment="Center"
-                                       Width="110" Margin="8,0,6,0"/>
-                            <!-- Node snippet -->
-                            <TextBlock Grid.Column="2"
-                                       Text="{Binding DisplayText}"
-                                       Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Label}"
-                                       VerticalAlignment="Center"
-                                       TextTrimming="CharacterEllipsis"/>
-                            <!-- Navigate button -->
-                            <Button Grid.Column="3"
-                                    Content="→"
-                                    Command="{Binding NavigateCommand}"
-                                    Background="Transparent" BorderThickness="0"
-                                    Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Subtitle}"
-                                    Padding="8,0" Margin="4,0,0,0"
-                                    VerticalAlignment="Center"
-                                    ToolTip.Tip="{DynamicResource ToolTip_FlowAnalytics_Navigate}"
-                                    AutomationProperties.HelpText="{DynamicResource ToolTip_FlowAnalytics_Navigate}"
-                                    AutomationProperties.Name="{DynamicResource AutomationName_GoToNode}"/>
-                        </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                    <!-- Text-tag issues list -->
+                    <ScrollViewer Grid.Row="2">
+                        <ItemsControl ItemsSource="{Binding TokenIssues}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate DataType="vm:TokenIssueRowViewModel">
+                                    <Grid ColumnDefinitions="*,Auto" Margin="0,2" Height="28">
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding DisplayText}"
+                                                   Foreground="{DynamicResource Brush.Text.Secondary}"
+                                                   FontSize="{DynamicResource FontSize.Label}"
+                                                   VerticalAlignment="Center"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <Button Grid.Column="1"
+                                                Content="→"
+                                                Command="{Binding NavigateCommand}"
+                                                Background="Transparent" BorderThickness="0"
+                                                Foreground="{DynamicResource Brush.Text.Muted}"
+                                                FontSize="{DynamicResource FontSize.Subtitle}"
+                                                Padding="8,0" Margin="4,0,0,0"
+                                                VerticalAlignment="Center"
+                                                ToolTip.Tip="{DynamicResource ToolTip_FlowAnalytics_Navigate}"
+                                                AutomationProperties.HelpText="{DynamicResource ToolTip_FlowAnalytics_Navigate}"
+                                                AutomationProperties.Name="{DynamicResource AutomationName_GoToNode}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
         </ScrollViewer>
 
-            <!-- Section divider + header for text-tag issues -->
-            <StackPanel Grid.Row="1" Spacing="4" IsVisible="{Binding HasData}">
-                <Separator Background="{DynamicResource Brush.Border.Default}" Height="1" Margin="0,4"/>
-                <TextBlock Classes="section-header"
-                           Text="{DynamicResource FlowAnalytics_TagIssues}"
-                           ToolTip.Tip="{DynamicResource ToolTip_TokenWarnings}"
-                           AutomationProperties.HelpText="{DynamicResource ToolTip_TokenWarnings}"/>
-                <TextBlock Text="{DynamicResource FlowAnalytics_TagIssues_None}"
-                           Foreground="{DynamicResource Brush.Text.Disabled}"
-                           FontSize="{DynamicResource FontSize.Small}" FontStyle="Italic"
-                           IsVisible="{Binding TokenIssues.Count, Converter={StaticResource CountToVis}, ConverterParameter=invert}"/>
-            </StackPanel>
-
-            <!-- Text-tag issues list -->
-            <ScrollViewer Grid.Row="2">
-                <ItemsControl ItemsSource="{Binding TokenIssues}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="vm:TokenIssueRowViewModel">
-                            <Grid ColumnDefinitions="*,Auto" Margin="0,2" Height="28">
-                                <TextBlock Grid.Column="0"
-                                           Text="{Binding DisplayText}"
-                                           Foreground="{DynamicResource Brush.Text.Secondary}"
-                                           FontSize="{DynamicResource FontSize.Label}"
-                                           VerticalAlignment="Center"
-                                           TextTrimming="CharacterEllipsis"/>
-                                <Button Grid.Column="1"
-                                        Content="→"
-                                        Command="{Binding NavigateCommand}"
-                                        Background="Transparent" BorderThickness="0"
-                                        Foreground="{DynamicResource Brush.Text.Muted}"
-                                        FontSize="{DynamicResource FontSize.Subtitle}"
-                                        Padding="8,0" Margin="4,0,0,0"
-                                        VerticalAlignment="Center"
-                                        ToolTip.Tip="{DynamicResource ToolTip_FlowAnalytics_Navigate}"
-                                        AutomationProperties.HelpText="{DynamicResource ToolTip_FlowAnalytics_Navigate}"
-                                        AutomationProperties.Name="{DynamicResource AutomationName_GoToNode}"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
-        </Grid>
-
         <!-- ── Bottom bar ─────────────────────────────────────────────────── -->
-        <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+        <Grid Grid.Row="1" ColumnDefinitions="*,Auto">
             <TextBlock Grid.Column="0"
                        Text="{Binding LastAnalysed}"
                        Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Small}"
@@ -466,7 +473,7 @@
         </Grid>
 
         <!-- Focus hint bar (Gaps item 13) -->
-        <shared:FocusHintBar Grid.Row="3" x:Name="HintBar"/>
+        <shared:FocusHintBar Grid.Row="2" x:Name="HintBar"/>
 
     </Grid>
 
