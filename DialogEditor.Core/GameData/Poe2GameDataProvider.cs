@@ -33,17 +33,26 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
             ? [.. Directory.GetDirectories(LocalizedRoot).Select(Path.GetFileName).Order()!]
             : ["en"];
 
-    public IReadOnlyList<ConversationFile> EnumerateConversations() =>
-        Roots.SelectMany<Poe2DataRoot, ConversationFile>(root =>
-            {
-                var conversations = ConversationsOf(root);
-                return Directory.Exists(conversations)
-                    ? Directory.EnumerateFiles(conversations, "*.conversationbundle", SearchOption.AllDirectories)
-                        .Select(path => BuildConversationFile(root, conversations, path))
-                        .OrderBy(f => f.FolderPath).ThenBy(f => f.Name)
-                    : [];
-            })
+    // A relative path can be in several data folders: the three expansions each ship their own
+    // lax/lax_cv_craftsperson, with the same ID. The game's ConversationDataManager loads the
+    // path from every folder in order and keeps the last (ResourceManager.LoadBundles), so the
+    // editor lists one conversation per path, from the last folder that has it (issue 198).
+    public IReadOnlyList<ConversationFile> EnumerateConversations()
+    {
+        var byPath = new Dictionary<string, (int Order, ConversationFile File)>(StringComparer.OrdinalIgnoreCase);
+        var roots = Roots;
+        for (var i = 0; i < roots.Count; i++)
+        {
+            var conversations = ConversationsOf(roots[i]);
+            if (!Directory.Exists(conversations)) continue;
+            foreach (var path in Directory.EnumerateFiles(conversations, "*.conversationbundle", SearchOption.AllDirectories))
+                byPath[Path.GetRelativePath(conversations, path)] = (i, BuildConversationFile(roots[i], conversations, path));
+        }
+        return byPath.Values
+            .OrderBy(v => v.Order).ThenBy(v => v.File.FolderPath).ThenBy(v => v.File.Name)
+            .Select(v => v.File)
             .ToList();
+    }
 
     private static ConversationFile BuildConversationFile(Poe2DataRoot root, string conversationsRoot, string convPath)
     {
@@ -59,9 +68,7 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
     public Conversation LoadConversation(ConversationFile file)
     {
         var nodes = Poe2ConversationParser.ParseFile(file.ConversationPath);
-        var stPath = StringTablePathFor(file, Language);
-        var strings = StringTableParser.LoadFile(stPath);   // missing or damaged → shown as missing (issue 119)
-        return new Conversation(file.Name, nodes, strings);
+        return new Conversation(file.Name, nodes, LoadText(file, Language));
     }
 
     public string GetStringTablePath(ConversationFile file)
@@ -70,10 +77,40 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
     public string GetStringTablePath(ConversationFile file, string language)
         => StringTablePathFor(file, language);
 
-    // A conversation's text sits in its own data folder's localized/, under the same relative
-    // path as the bundle (issue 198; the game's StringTableManager does the same per package).
+    // Every data folder's table for the conversation's relative path in one language, in the
+    // game's folder order (issue 198). A DLC can ship text for a conversation whose bundle is in
+    // another folder: lax2_exported has lines for the base game's 12_cv_eothas_final.
+    private IReadOnlyList<string> TextTablesFor(ConversationFile file, string language)
+    {
+        var relative = Path.ChangeExtension(Path.GetRelativePath(
+            Path.Combine(rootPath, Poe2DataRoots.DataFolder, file.DataRoot, "design", "conversations"), file.ConversationPath), null);
+        return Roots.Select(r => Path.Combine(r.Path, "localized", language, "text", "conversations", relative + ".stringtable"))
+                    .Where(File.Exists)
+                    .ToList();
+    }
+
+    // The game looks each line up from the last folder back to the first
+    // (StringTableManager.LoadedStringTable.GetEntry), so the text is merged per line, the later
+    // folder winning. A damaged table is reported as before (issue 119).
+    private StringTable LoadText(ConversationFile file, string language)
+    {
+        var tables = TextTablesFor(file, language).Select(StringTableParser.LoadFile).ToList();
+        if (tables.Count == 0) return StringTable.Missing;
+        if (tables.FirstOrDefault(t => t.IsUnreadable) is { } unreadable) return unreadable;
+        if (tables.Count == 1) return tables[0];
+
+        var lines = new Dictionary<int, StringEntry>();
+        foreach (var table in tables)
+            foreach (var entry in table.Entries) lines[entry.Id] = entry;
+        return new StringTable(lines.Values);
+    }
+
+    // Where the conversation's text is written: the last folder that already has a table for it
+    // in this language, which the game reads first for every line it holds, so an edit there
+    // always shows. With no table anywhere, the bundle's own folder (issue 198).
     private string StringTablePathFor(ConversationFile file, string language)
     {
+        if (TextTablesFor(file, language) is { Count: > 0 } tables) return tables[^1];
         var dataRoot   = Path.Combine(rootPath, Poe2DataRoots.DataFolder, file.DataRoot);
         var relative   = Path.GetRelativePath(Path.Combine(dataRoot, "design", "conversations"), file.ConversationPath);
         var withoutExt = Path.ChangeExtension(relative, null);

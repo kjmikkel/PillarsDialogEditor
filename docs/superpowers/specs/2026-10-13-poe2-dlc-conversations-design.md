@@ -84,6 +84,34 @@ Each one mirrors the base layout:
 5. **Documentation.** The README's PoE2 rows give the real counts, and its DLC note describes both
    games correctly.
 
+## Amendment (found during implementation)
+
+The real-install test showed that the "one folder per conversation" assumption is wrong:
+
+- **Shared expansion conversations:** `lax/lax_cv_craftsperson`, `lax_re_city_ambush_mag` and
+  `lax_re_city_ambush_wed` are each shipped by all three expansions, as variants with the same ID.
+- **Cross-folder text:** about 60 DLC string tables belong to conversations whose bundle is in
+  another folder, about 30 of them base-game conversations (for example `lax2_exported`'s table
+  for `12_ukaizo/12_cv_eothas_final`).
+
+The decompiled game settles both:
+
+- **Bundles:** `ConversationDataManager` loads a relative path from every data folder in order
+  and keeps the last copy (`ResourceManager.LoadBundles`).
+- **Text:** `StringTableManager` looks each line up from the last folder back to the first.
+
+So the editor works the same way:
+
+1. **One conversation per relative path,** read from the last folder that has it. Names are
+   unique again: 1,400 on a full GOG install, from 1,403 files.
+2. **Text is merged per line,** the later folder winning.
+3. **Text is written to the last folder that already has a table** for that path and language,
+   which the game reads first for every line it holds. With no table anywhere, it goes to the
+   bundle's own folder.
+
+This also fixes base-game conversations whose lines a DLC overrides. Before, the editor showed
+the base text and wrote edits where the game never reads them.
+
 ## Non-goals
 
 - No change for PoE1, which already reads its DLC.
