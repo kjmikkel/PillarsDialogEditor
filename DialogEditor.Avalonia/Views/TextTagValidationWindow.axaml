@@ -40,7 +40,7 @@
         <ScrollViewer Grid.Row="3" Margin="0,0,0,6">
             <Panel>
                 <TextBlock Text="{DynamicResource TextTagValidation_NoIssues}"
-                           Foreground="{DynamicResource Brush.Text.Disabled}"
+                           Foreground="{DynamicResource Brush.Text.Hint}"
                            FontStyle="Italic"
                            HorizontalAlignment="Center" VerticalAlignment="Center"
                            IsVisible="{Binding !HasIssues}"/>
@@ -114,7 +114,7 @@
         <ScrollViewer Grid.Row="5" MaxHeight="150" Margin="0,0,0,4">
             <Panel>
                 <TextBlock Text="{DynamicResource StaleData_NoIssues}"
-                           Foreground="{DynamicResource Brush.Text.Disabled}"
+                           Foreground="{DynamicResource Brush.Text.Hint}"
                            FontStyle="Italic"
                            HorizontalAlignment="Center" VerticalAlignment="Center"
                            IsVisible="{Binding !HasStaleData}"/>
@@ -263,7 +263,7 @@
         <ScrollViewer Grid.Row="9" MaxHeight="150" Margin="0,0,0,4">
             <Panel>
                 <TextBlock Text="{DynamicResource Duplicate_NoIssues}"
-                           Foreground="{DynamicResource Brush.Text.Disabled}" FontStyle="Italic"
+                           Foreground="{DynamicResource Brush.Text.Hint}" FontStyle="Italic"
                            HorizontalAlignment="Center" VerticalAlignment="Center"
                            IsVisible="{Binding !HasDuplicates}"/>
                 <ItemsControl ItemsSource="{Binding DuplicateRows}">

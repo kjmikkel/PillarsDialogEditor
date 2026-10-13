@@ -96,7 +96,7 @@
                             HorizontalAlignment="Right" MinWidth="24" MinHeight="24"
                             Content="✕" VerticalAlignment="Center"
                             Background="Transparent" BorderThickness="0"
-                            Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Small}" Cursor="Hand"
+                            Foreground="{DynamicResource Brush.Text.Hint}" FontSize="{DynamicResource FontSize.Small}" Cursor="Hand"
                             ToolTip.Tip="{DynamicResource ToolTip_ClearSearch}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_ClearSearch}"
                             AutomationProperties.Name="{DynamicResource AutomationName_ClearSearch}"/>

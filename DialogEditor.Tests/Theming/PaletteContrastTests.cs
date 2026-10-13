@@ -39,6 +39,12 @@ public class PaletteContrastTests
         new("Text.Status.Removed / Surface.Card", "Palette.Red.450",   "Palette.Neutral.100", true),
         new("Text.Caption / Surface.Card",  "Palette.Neutral.600", "Palette.Neutral.100", false),
         new("Text.Muted / Surface.Card",    "Palette.Neutral.535", "Palette.Neutral.100", false),
+        // Hint and empty-state text (issue 180) is active text, so it must read as normal text on
+        // every surface it sits on. Text.Muted fails this on Surface.Panel in Dark and Light.
+        new("Text.Hint / Surface.Window", "Palette.Neutral.600", "Palette.Neutral.115", true),
+        new("Text.Hint / Surface.Panel", "Palette.Neutral.600", "Palette.Neutral.145", true),
+        new("Text.Hint / Surface.Card", "Palette.Neutral.600", "Palette.Neutral.100", true),
+        new("Text.Hint / Surface.Inset", "Palette.Neutral.600", "Palette.Neutral.125", true),
         new("Severity.Warning / Surface.Panel", "Palette.Amber.500", "Palette.Neutral.145", false),
         new("Severity.Error / Surface.Panel",   "Palette.Red.500",   "Palette.Neutral.145", false),
         new("Severity.Info / Surface.Panel",    "Palette.Sky.450",   "Palette.Neutral.145", false),
