@@ -156,12 +156,13 @@
                                                        Text="{DynamicResource Link_DisplayLabel}"
                                                        Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Caption}"
                                                        VerticalAlignment="Center" Margin="0,0,4,0"/>
+                                            <!-- Min, not fixed, sizes (issue 177): the text follows the font scale. -->
                                             <ComboBox Grid.Column="2"
                                                       SelectedItem="{Binding QuestionNodeTextDisplay, Mode=TwoWay}"
                                                       ItemsSource="{x:Static vm:ConnectionViewModel.QTDOptions}"
                                                       Background="{DynamicResource Brush.Surface.Card}" Foreground="{DynamicResource Brush.Text.Secondary}"
                                                       BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
-                                                      FontSize="{DynamicResource FontSize.Small}" Padding="3,1" Height="22"
+                                                      FontSize="{DynamicResource FontSize.Small}" Padding="3,1" MinHeight="22"
                                                       ToolTip.Tip="{DynamicResource ToolTip_LinkQTD}"
                                                       AutomationProperties.HelpText="{DynamicResource ToolTip_LinkQTD}"
                                                       AutomationProperties.Name="{DynamicResource AutomationName_LinkQTD}">
@@ -182,7 +183,7 @@
                                                            Increment="1" FormatString="0"
                                                            Background="{DynamicResource Brush.Surface.Card}" Foreground="{DynamicResource Brush.Text.Secondary}"
                                                            BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
-                                                           FontSize="{DynamicResource FontSize.Small}" Padding="2,0" Width="72"
+                                                           FontSize="{DynamicResource FontSize.Small}" Padding="2,0" MinWidth="72"
                                                            ShowButtonSpinner="False"
                                                            ClipValueToMinMax="True"
                                                            ToolTip.Tip="{DynamicResource ToolTip_LinkWeight}"

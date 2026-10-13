@@ -40,7 +40,8 @@
 
     <DockPanel Margin="14,12">
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
-            <TextBox Width="280"
+            <!-- Min, not fixed, sizes (issue 177): the text follows the font scale. -->
+            <TextBox MinWidth="280"
                      Text="{Binding SearchText}"
                      Watermark="{DynamicResource TagRef_SearchWatermark}"
                      ToolTip.Tip="{DynamicResource ToolTip_TagRef_Search}"
