@@ -39,10 +39,10 @@ the builds the editor and patcher have been checked against:
 | Pillars of Eternity | GOG | build 59799714601848948 | The White March 1 + 2 | ✅ 1,434 conversations, 8 languages | ✅ 1,434 conversations, 8 languages |
 | Pillars of Eternity | Steam | build 23036766 | The White March 1 + 2 | ✅ identical data to GOG | ✅ identical data to GOG |
 | Pillars of Eternity (Definitive Edition) | Epic | version 3.9.5.89801 | included | ✅ identical data to GOG | ✅ 1,434 conversations, 8 languages |
-| Pillars of Eternity II: Deadfire | GOG | build 52232433653243275 | all three expansions + free DLC | ✅ 1,130 conversations, 10 languages | ✅ 1,130 conversations, 10 languages |
+| Pillars of Eternity II: Deadfire | GOG | build 52232433653243275 | all three expansions + free DLC | ✅ 1,400 conversations, 10 languages | ✅ 1,400 conversations, 10 languages |
 | Pillars of Eternity II: Deadfire | Steam | build 12181035 | all three expansions + free DLC | ✅ identical data to GOG | ✅ identical data to GOG |
 
-*Reading checked 2026-09-28 ([#65](https://github.com/kjmikkel/PillarsDialogEditor/issues/65)); writing checked 2026-09-28 ([#117](https://github.com/kjmikkel/PillarsDialogEditor/issues/117)).*
+*Reading checked 2026-09-28 ([#65](https://github.com/kjmikkel/PillarsDialogEditor/issues/65)); writing checked 2026-09-28 ([#117](https://github.com/kjmikkel/PillarsDialogEditor/issues/117)). Deadfire's DLC conversations, in their own `lax*_exported` data folders, are read since [#198](https://github.com/kjmikkel/PillarsDialogEditor/issues/198) (GOG count re-checked 2026-10-13); the Steam row's DLC count has not been re-checked.*
 
 Every storefront ships byte-identical conversation and text files for the same game, so what holds
 for one build holds for all of them. The Microsoft Store / Game Pass builds haven't been checked.
@@ -61,10 +61,13 @@ in-game. If a patched conversation misbehaves in the game, please
 [open an issue](https://github.com/kjmikkel/PillarsDialogEditor/issues). Test Patch always backs up
 the files it changes, so **Restore Conversation (F6)** puts the originals back.
 
-**DLC.** Nothing in the editor or patcher depends on which DLC you own. Conversations are found by
-walking the game's data folders, so an install without DLC simply has fewer of them. A mod that
-edits a DLC conversation is skipped on an install without that DLC, with a "conversation not found"
-warning. Nothing else is written or broken.
+**DLC.** Nothing in the editor or patcher depends on which DLC you own. Pillars of Eternity's
+White March conversations sit in the normal conversations folder; Deadfire keeps each DLC's data
+in its own folder (`lax1_exported`, `lax2_exported`, …), which the editor reads in the game's own
+order, as the game does: where several folders hold the same conversation or line, the later one
+wins. The Conversations dock groups DLC content under the DLC's title. An install without a DLC
+simply has fewer conversations, and a mod that edits a DLC conversation is skipped on such an
+install, with a "conversation not found" warning. Nothing else is written or broken.
 
 **Game updates and your backups.**
 
