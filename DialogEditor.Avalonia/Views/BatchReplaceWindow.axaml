@@ -52,7 +52,8 @@
 
             <!-- Find row -->
             <!-- Auto label columns with the old width as a MinWidth (issue 177): a fixed column cut the label off once its text followed the font scale. -->
-            <Grid ColumnDefinitions="Auto,*,Auto">
+            <!-- ColumnSpacing (issue 177): the Auto label column ends where the label does, so without it the label touched its box. -->
+            <Grid ColumnSpacing="8" ColumnDefinitions="Auto,*,Auto">
                 <TextBlock Classes="label" Text="{DynamicResource BatchReplace_Find}"/>
                 <TextBox Grid.Column="1" Classes="find-box" Name="SearchBox"
                          Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -68,7 +69,7 @@
             </Grid>
 
             <!-- Replace row -->
-            <Grid ColumnDefinitions="Auto,*">
+            <Grid ColumnSpacing="8" ColumnDefinitions="Auto,*">
                 <TextBlock Classes="label" Text="{DynamicResource BatchReplace_Replace}"/>
                 <TextBox Grid.Column="1" Classes="find-box"
                          Text="{Binding ReplaceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
