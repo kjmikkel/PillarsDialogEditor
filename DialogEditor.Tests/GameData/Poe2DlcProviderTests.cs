@@ -69,4 +69,63 @@ public class Poe2DlcProviderTests : IDisposable
         Assert.All(changed, k => Assert.StartsWith("lax2_exported", k));
         Assert.True(File.Exists(path));
     }
+
+    private string GameData(string dataFolder)
+    {
+        var dir = Path.Combine(_game.DataRoot, dataFolder, "design", "gamedata");
+        Directory.CreateDirectory(dir);
+        return dir;
+    }
+
+    private static string Speakers(params (string Id, string DebugName)[] speakers) =>
+        "{\"GameDataObjects\":[" +
+        string.Join(",", speakers.Select(s => $"{{\"ID\":\"{s.Id}\",\"DebugName\":\"{s.DebugName}\"}}")) +
+        "]}";
+
+    [Fact]
+    public void SpeakerNames_IncludeEachDlcsSpeakers_LaterFolderWins()
+    {
+        File.WriteAllText(Path.Combine(GameData("exported"), "speakers.gamedatabundle"),
+            Speakers(("aaaaaaaa-0000-0000-0000-000000000001", "SPK_Base"), ("aaaaaaaa-0000-0000-0000-000000000003", "SPK_Old")));
+        File.WriteAllText(Path.Combine(GameData("lax2_exported"), "lax2_speakers.gamedatabundle"),
+            Speakers(("aaaaaaaa-0000-0000-0000-000000000002", "SPK_Carver"), ("aaaaaaaa-0000-0000-0000-000000000003", "SPK_New")));
+
+        var names = _game.Provider.LoadSpeakerNames();
+
+        Assert.Equal("Base",   names["aaaaaaaa-0000-0000-0000-000000000001"]);
+        Assert.Equal("Carver", names["aaaaaaaa-0000-0000-0000-000000000002"]);
+        Assert.Equal("New",    names["aaaaaaaa-0000-0000-0000-000000000003"]);
+    }
+
+    [Fact]
+    public void Quests_IncludeEachDlcsQuestBundle()
+    {
+        void Quests(string dataFolder, string file, string id, string name)
+        {
+            var dir = Path.Combine(_game.DataRoot, dataFolder, "design", "quests");
+            Directory.CreateDirectory(dir);
+            File.WriteAllText(Path.Combine(dir, file),
+                $"{{\"Hash\":0,\"Quests\":[{{\"ID\":\"{id}\",\"Filename\":\"quests/{name}.quest\"}}]}}");
+        }
+        Quests("exported", "quests.questbundle", "11111111-0000-0000-0000-000000000001", "base_quest");
+        Quests("lax1_exported", "lax1_quests.questbundle", "11111111-0000-0000-0000-000000000002", "arena_quest");
+
+        var quests = _game.Provider.LoadGameDataNames()["Quest"];
+
+        Assert.Contains(quests, q => q.Id == "11111111-0000-0000-0000-000000000002");
+        Assert.Contains(quests, q => q.Id == "11111111-0000-0000-0000-000000000001");
+    }
+
+    [Fact]
+    public void ConversationLookup_IncludesDlcConversations()
+    {
+        _game.AddDlcConversation("lax2_exported", "x", "lax02_cv_x", "en");
+        var bundle = Path.Combine(_game.DataRoot, "lax2_exported", "design", "conversations", "x", "lax02_cv_x.conversationbundle");
+        File.WriteAllText(bundle, File.ReadAllText(bundle).Replace("{\"Conversations\": [{",
+            "{\"Conversations\": [{\"ID\": \"22222222-0000-0000-0000-000000000002\","));
+
+        var conversations = _game.Provider.LoadGameDataNames()["Conversation"];
+
+        Assert.Contains(conversations, c => c.Name == "lax02_cv_x");
+    }
 }
