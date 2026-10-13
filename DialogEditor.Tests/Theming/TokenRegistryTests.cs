@@ -27,6 +27,7 @@ public class TokenRegistryTests
     [InlineData("Brush.Border.Default",          0xFF, 0x33, 0x33, 0x33)]
     [InlineData("Brush.Text.Primary",            0xFF, 0xe8, 0xe8, 0xe8)]
     [InlineData("Brush.Text.Muted",              0xFF, 0x88, 0x88, 0x88)]
+    [InlineData("Brush.Text.Hint",               0xFF, 0x99, 0x99, 0x99)] // issue 180 -> Neutral.600
     [InlineData("Brush.Text.Female.Active",      0xFF, 0xe8, 0xe8, 0xe8)]
     [InlineData("Brush.Text.Status.Changed",     0xFF, 0xf0, 0xad, 0x4e)] // #e0a030 absorbed
     [InlineData("Brush.Syntax.Code",             0xFF, 0x9c, 0xdc, 0xfe)]
@@ -62,7 +63,7 @@ public class TokenRegistryTests
         "Brush.Border.OnDark","Brush.Border.Focus",
         "Brush.Selection.Background","Brush.Selection.Foreground",
         "Brush.Text.Primary","Brush.Text.Emphasis","Brush.Text.Secondary","Brush.Text.Tertiary",
-        "Brush.Text.Muted.Light","Brush.Text.Caption","Brush.Text.Muted","Brush.Text.Disabled",
+        "Brush.Text.Muted.Light","Brush.Text.Caption","Brush.Text.Muted","Brush.Text.Hint","Brush.Text.Disabled",
         "Brush.Text.OnAccent","Brush.Text.Female.Active","Brush.Text.Female.Dim",
         "Brush.Text.OnLight","Brush.Text.OnLight.Muted",
         "Brush.Connection.Default","Brush.Connection.Always","Brush.Connection.Never",

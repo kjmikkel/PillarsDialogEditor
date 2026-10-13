@@ -241,7 +241,7 @@
                                         <TextBlock Text="{Binding DisplayName}"
                                                    Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"/>
                                         <TextBlock Text="{Binding Category}"
-                                                   Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Small}"
+                                                   Foreground="{DynamicResource Brush.Text.Hint}" FontSize="{DynamicResource FontSize.Small}"
                                                    VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </DataTemplate>

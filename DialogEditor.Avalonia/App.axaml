@@ -26,6 +26,9 @@
              FluentTheme so its hover/pressed rules override Fluent's pale ones. -->
         <StyleInclude Source="avares://DialogEditor.Avalonia.Shared/Resources/Buttons.axaml"/>
 
+        <!-- Every window gets a theme surface unless it sets its own (issue 180). -->
+        <StyleInclude Source="avares://DialogEditor.Avalonia.Shared/Resources/Windows.axaml"/>
+
         <!-- Accessible names for Dock.Avalonia's pane chrome buttons (issue #15 finding 2).
              ToolChromeControl's template gives each button a <Viewbox> as its Content, and
              Avalonia's ButtonAutomationPeer derives the accessible name from

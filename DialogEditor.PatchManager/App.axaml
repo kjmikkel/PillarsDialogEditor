@@ -13,6 +13,9 @@
         <!-- Secondary buttons use the tested Brush.Button.Secondary.* tokens (issue 179). After
              FluentTheme so its hover/pressed rules override Fluent's pale ones. -->
         <StyleInclude Source="avares://DialogEditor.Avalonia.Shared/Resources/Buttons.axaml"/>
+
+        <!-- Every window gets a theme surface unless it sets its own (issue 180). -->
+        <StyleInclude Source="avares://DialogEditor.Avalonia.Shared/Resources/Windows.axaml"/>
     </Application.Styles>
 
     <Application.Resources>

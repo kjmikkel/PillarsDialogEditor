@@ -5,8 +5,7 @@
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="360" Height="640" MinWidth="300" MinHeight="300" MaxHeight="840"
         CanResize="True"
-        ShowInTaskbar="False"
-        Background="{DynamicResource Brush.Surface.Info}">
+        ShowInTaskbar="False">
 
     <Window.Styles>
         <!-- legendRow: makes a legend swatch row a focusable tab stop while keeping
@@ -29,6 +28,20 @@
         </Style>
         <Style Selector="Button.legendRow:pressed /template/ ContentPresenter#PART_ContentPresenter">
             <Setter Property="Background" Value="Transparent"/>
+        </Style>
+        <!-- nodeSwatch (issue 180): a small node, header strip over body, the way the canvas
+             draws one. The canvas tells node types apart by the header; the bodies are pastel
+             in Light and all white in High Contrast, so a body-only swatch could not. The
+             outline keeps the swatch visible against the window in every theme. -->
+        <Style Selector="Border.nodeSwatch">
+            <Setter Property="Width" Value="14"/>
+            <Setter Property="Height" Value="14"/>
+            <Setter Property="CornerRadius" Value="2"/>
+            <Setter Property="ClipToBounds" Value="True"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Brush.Border.Strong}"/>
+            <Setter Property="Margin" Value="0,0,10,0"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
         </Style>
     </Window.Styles>
 
@@ -78,7 +91,12 @@
                     ToolTip.Tip="{DynamicResource Legend_NpcLine_Help}"
                     AutomationProperties.HelpText="{DynamicResource Legend_NpcLine_Help}">
                 <StackPanel Orientation="Horizontal">
-                    <Border Width="14" Height="14" Background="{DynamicResource Brush.Node.Npc.Body}" CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                    <Border Classes="nodeSwatch">
+                        <Grid RowDefinitions="*,*">
+                            <Border Background="{DynamicResource Brush.Node.Npc.Header}"/>
+                            <Border Grid.Row="1" Background="{DynamicResource Brush.Node.Npc.Body}"/>
+                        </Grid>
+                    </Border>
                     <TextBlock Text="{DynamicResource Legend_NpcLine}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}" VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>
@@ -87,7 +105,12 @@
                     ToolTip.Tip="{DynamicResource Legend_PlayerChoice_Help}"
                     AutomationProperties.HelpText="{DynamicResource Legend_PlayerChoice_Help}">
                 <StackPanel Orientation="Horizontal">
-                    <Border Width="14" Height="14" Background="{DynamicResource Brush.Node.Player.Body}" CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                    <Border Classes="nodeSwatch">
+                        <Grid RowDefinitions="*,*">
+                            <Border Background="{DynamicResource Brush.Node.Player.Header}"/>
+                            <Border Grid.Row="1" Background="{DynamicResource Brush.Node.Player.Body}"/>
+                        </Grid>
+                    </Border>
                     <TextBlock FontSize="{DynamicResource FontSize.Body}" VerticalAlignment="Center">
                         <Run Text="{DynamicResource Legend_PlayerChoice}" Foreground="{DynamicResource Brush.Text.Secondary}"/>
                         <Run Text="{DynamicResource Legend_PlayerChoiceMark}" Foreground="{DynamicResource Brush.Text.Muted.Light}"/>
@@ -99,7 +122,12 @@
                     ToolTip.Tip="{DynamicResource Legend_Narrator_Help}"
                     AutomationProperties.HelpText="{DynamicResource Legend_Narrator_Help}">
                 <StackPanel Orientation="Horizontal">
-                    <Border Width="14" Height="14" Background="{DynamicResource Brush.Node.Narrator.Body}" CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                    <Border Classes="nodeSwatch">
+                        <Grid RowDefinitions="*,*">
+                            <Border Background="{DynamicResource Brush.Node.Narrator.Header}"/>
+                            <Border Grid.Row="1" Background="{DynamicResource Brush.Node.Narrator.Body}"/>
+                        </Grid>
+                    </Border>
                     <TextBlock Text="{DynamicResource Legend_Narrator}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}" VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>
@@ -108,7 +136,12 @@
                     ToolTip.Tip="{DynamicResource Legend_ScriptAction_Help}"
                     AutomationProperties.HelpText="{DynamicResource Legend_ScriptAction_Help}">
                 <StackPanel Orientation="Horizontal">
-                    <Border Width="14" Height="14" Background="{DynamicResource Brush.Node.Script.Body}" CornerRadius="2" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                    <Border Classes="nodeSwatch">
+                        <Grid RowDefinitions="*,*">
+                            <Border Background="{DynamicResource Brush.Node.Script.Header}"/>
+                            <Border Grid.Row="1" Background="{DynamicResource Brush.Node.Script.Body}"/>
+                        </Grid>
+                    </Border>
                     <TextBlock Text="{DynamicResource Legend_ScriptAction}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}" VerticalAlignment="Center"/>
                 </StackPanel>
             </Button>
