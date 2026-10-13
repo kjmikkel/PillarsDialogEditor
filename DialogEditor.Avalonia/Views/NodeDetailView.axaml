@@ -208,10 +208,9 @@
                              ToolTip.Tip="{DynamicResource ToolTip_AddLinkTargetId}"
                              AutomationProperties.HelpText="{DynamicResource ToolTip_AddLinkTargetId}"
                              AutomationProperties.Name="{DynamicResource Placeholder_AddLinkTargetId}"/>
-                    <Button Grid.Column="1"
+                    <Button Classes="secondary" Grid.Column="1"
                             Content="{DynamicResource Button_AddLink}"
                             Command="{Binding AddLinkCommand}"
-                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0"
                             Padding="6,2" Margin="4,0,0,0"
                             ToolTip.Tip="{DynamicResource ToolTip_AddLink}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_AddLink}"/>
@@ -567,10 +566,9 @@
                                Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
                                VerticalAlignment="Center"
                                TextTrimming="CharacterEllipsis"/>
-                    <Button Grid.Column="1"
+                    <Button Classes="secondary" Grid.Column="1"
                             Content="{DynamicResource Button_EditScripts}"
                             Click="EditScripts_Click"
-                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0"
                             Padding="8,3" FontSize="{DynamicResource FontSize.Small}"
                             ToolTip.Tip="{DynamicResource ToolTip_EditScripts}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_EditScripts}"/>
@@ -584,11 +582,10 @@
                                Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
                                VerticalAlignment="Center"
                                TextTrimming="CharacterEllipsis"/>
-                    <Button Grid.Column="1"
+                    <Button Classes="secondary" Grid.Column="1"
                             x:Name="EditConditionsButton"
                             Content="{DynamicResource Button_EditConditions}"
                             Click="EditConditions_Click"
-                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0"
                             Padding="8,3" FontSize="{DynamicResource FontSize.Small}"
                             ToolTip.Tip="{DynamicResource ToolTip_EditConditions}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_EditConditions}"/>

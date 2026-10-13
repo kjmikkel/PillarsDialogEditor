@@ -1,0 +1,40 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Secondary (non-primary) buttons, issue 179: Cancel, Close, Refresh, "+ Add" and the like.
+
+         Before this class, dialogs borrowed colours meant for other things: Brush.Surface.Header
+         with white Brush.Text.OnAccent text (white on light grey in Light, and no edge at all in
+         High Contrast, where the header fill is the window colour), or a canvas node-header
+         colour (dark text on dark navy in Light). Brush.Button.Secondary.* are gated by
+         PaletteContrastTests in every theme: text passes AA on the fill and on the hover fill,
+         and the 1 px edge passes 3:1 against every surface, so the button reads as a control.
+
+         Use Classes="secondary" and set no Background/Foreground/BorderBrush on the element:
+         a local value outranks these styles. SecondaryButtonTests fails the build on a button
+         that borrows a header fill again.
+
+         Fluent paints hover and pressed on the template's ContentPresenter from its own pale
+         brushes, so those states are restyled here too; otherwise the button turns unreadable
+         the moment the pointer is on it. -->
+
+    <Style Selector="Button.secondary">
+        <Setter Property="Background"      Value="{DynamicResource Brush.Button.Secondary.Background}"/>
+        <Setter Property="Foreground"      Value="{DynamicResource Brush.Button.Secondary.Foreground}"/>
+        <Setter Property="BorderBrush"     Value="{DynamicResource Brush.Button.Secondary.Border}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+    </Style>
+
+    <Style Selector="Button.secondary:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background"  Value="{DynamicResource Brush.Button.Secondary.Hover}"/>
+        <Setter Property="Foreground"  Value="{DynamicResource Brush.Button.Secondary.Foreground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Brush.Button.Secondary.Border}"/>
+    </Style>
+
+    <Style Selector="Button.secondary:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background"  Value="{DynamicResource Brush.Button.Secondary.Hover}"/>
+        <Setter Property="Foreground"  Value="{DynamicResource Brush.Button.Secondary.Foreground}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource Brush.Button.Secondary.Border}"/>
+    </Style>
+
+</Styles>

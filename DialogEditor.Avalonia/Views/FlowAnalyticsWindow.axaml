@@ -28,10 +28,8 @@
             <Setter Property="FontWeight"  Value="Bold"/>
             <Setter Property="LetterSpacing" Value="1"/>
         </Style>
+        <!-- Layout only: the colours come from Button.secondary (Resources/Buttons.axaml, issue 179). -->
         <Style Selector="Button.action-btn">
-            <Setter Property="Background"      Value="{DynamicResource Brush.Surface.Header}"/>
-            <Setter Property="Foreground"      Value="{DynamicResource Brush.Text.Secondary}"/>
-            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"         Value="12,5"/>
             <Setter Property="FontSize"        Value="{DynamicResource FontSize.Body}"/>
         </Style>
@@ -465,7 +463,7 @@
                        Text="{Binding LastAnalysed}"
                        Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Small}"
                        VerticalAlignment="Center"/>
-            <Button Grid.Column="1" Classes="action-btn"
+            <Button Grid.Column="1" Classes="action-btn secondary"
                     Content="{DynamicResource FlowAnalytics_Refresh}"
                     Command="{Binding RefreshCommand}"
                     ToolTip.Tip="{DynamicResource ToolTip_FlowAnalytics_Refresh}"

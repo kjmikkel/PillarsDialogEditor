@@ -39,9 +39,8 @@
                       ToolTip.Tip="{DynamicResource ToolTip_SpeakerLines_OnlyMyLines}"
                       AutomationProperties.HelpText="{DynamicResource ToolTip_SpeakerLines_OnlyMyLines}"/>
 
-            <Button Grid.Column="4" Content="{DynamicResource SpeakerLines_Refresh}"
+            <Button Classes="secondary" Grid.Column="4" Content="{DynamicResource SpeakerLines_Refresh}"
                     Command="{Binding RefreshCommand}"
-                    Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
                     AutomationProperties.Name="{DynamicResource AutomationName_SpeakerLines_Refresh}"
                     ToolTip.Tip="{DynamicResource ToolTip_SpeakerLines_Refresh}"
@@ -95,9 +94,8 @@
                     <ProgressBar IsIndeterminate="True" Width="220" Height="6"/>
                     <TextBlock Text="{Binding StatusText}" HorizontalAlignment="Center"
                                Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"/>
-                    <Button Content="{DynamicResource SpeakerLines_Cancel}" HorizontalAlignment="Center"
+                    <Button Classes="secondary" Content="{DynamicResource SpeakerLines_Cancel}" HorizontalAlignment="Center"
                             Command="{Binding CancelScanCommand}"
-                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                             Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
                             AutomationProperties.Name="{DynamicResource AutomationName_SpeakerLines_Cancel}"
                             ToolTip.Tip="{DynamicResource ToolTip_SpeakerLines_Cancel}"

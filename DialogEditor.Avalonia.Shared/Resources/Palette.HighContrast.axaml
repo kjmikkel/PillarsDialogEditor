@@ -43,6 +43,11 @@
     <Color x:Key="Palette.Line.Default">#FFA8A8A8</Color>
     <Color x:Key="Palette.Line.Strong">#FFFFFFFF</Color>
     <Color x:Key="Palette.Line.Muted">#FF6A6A6A</Color>
+    <!-- Secondary-button edge (issue 179): at least 3:1 against the window, panel and card
+         surfaces, so a secondary button reads as a control and not as plain text. -->
+    <Color x:Key="Palette.Button.Edge">#FFFFFFFF</Color>
+    <!-- Secondary-button hover/pressed fill (issue 179): text stays AA on it. -->
+    <Color x:Key="Palette.Button.Hover">#FF1F1F1F</Color>
     <Color x:Key="Palette.Control.Background">#FF4D4D4D</Color>
     <Color x:Key="Palette.Connection.Base">#FFAAAAAA</Color>  <!-- resting connection stroke: grey, NOT white, so the white highlighted link stands out (>=1.8:1) while staying visible on the canvas (~5.8:1) -->
 
