@@ -94,6 +94,9 @@
          Conversations dock (issue 85). -->
     <sys:String x:Key="Browser_Dlc_WhiteMarch1">The White March – Part I</sys:String>
     <sys:String x:Key="Browser_Dlc_WhiteMarch2">The White March – Part II</sys:String>
+    <!-- Developer prototypes and tests that ship with the games, grouped last (issue 85). -->
+    <sys:String x:Key="Browser_PrototypesFolder">Prototype and test content</sys:String>
+    <sys:String x:Key="ToolTip_PrototypesFolder">Developer prototypes and tests that ship with the game. Kept here so they don't crowd the real content.</sys:String>
     <!-- Panel header label -->
     <sys:String x:Key="Browser_Header">CONVERSATIONS</sys:String>
     <!-- New conversation feature -->

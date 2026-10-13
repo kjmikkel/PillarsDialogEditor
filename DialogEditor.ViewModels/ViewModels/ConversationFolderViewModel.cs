@@ -10,7 +10,8 @@ namespace DialogEditor.ViewModels;
 public partial class ConversationFolderViewModel(string folderPath,
     IEnumerable<ConversationItemViewModel>? items = null,
     bool isExpanded = false,
-    string? displayName = null) : ObservableObject
+    string? displayName = null,
+    string? toolTip = null) : ObservableObject
 {
     /// <summary>The raw game folder path; the dock sorts by it and shows it as the tooltip.</summary>
     public string FolderPath { get; } = folderPath;
@@ -20,8 +21,9 @@ public partial class ConversationFolderViewModel(string folderPath,
     public string DisplayName { get; } = displayName ?? FolderDisplayName.For(LastSegment(folderPath));
 
     /// <summary>The raw path, so a writer who knows the file layout can still see it. Folders with
-    /// no real path (New conversations) show their name.</summary>
-    public string ToolTip => string.IsNullOrEmpty(FolderPath) ? DisplayName : FolderPath;
+    /// no real path (New conversations) show their name, unless a caller explains them (the
+    /// prototype and test group).</summary>
+    public string ToolTip { get; } = toolTip ?? (string.IsNullOrEmpty(folderPath) ? displayName ?? string.Empty : folderPath);
 
     [ObservableProperty]
     private bool _isExpanded = isExpanded;
