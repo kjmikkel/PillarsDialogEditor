@@ -10,7 +10,6 @@
         Width="420" MinWidth="420" SizeToContent="Height" CanResize="True"
         ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource Brush.Surface.Info}"
         x:CompileBindings="False">
     <StackPanel Margin="18,16,18,16" Spacing="8">
         <TextBlock Text="{DynamicResource PatchManagerAbout_AppName}" Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Title}" FontWeight="Bold"/>

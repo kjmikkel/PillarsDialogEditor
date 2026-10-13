@@ -50,7 +50,7 @@
 
     <Grid>
         <TextBlock Text="{DynamicResource Label_SelectNode}"
-                   Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Label}"
+                   Foreground="{DynamicResource Brush.Text.Hint}" FontSize="{DynamicResource FontSize.Label}"
                    HorizontalAlignment="Center" VerticalAlignment="Center"
                    IsVisible="{Binding HasContent, Converter={StaticResource InverseBoolToVis}}"/>
 
@@ -154,7 +154,7 @@
                                                     AutomationProperties.HelpText="{Binding $parent[ItemsControl].DataContext.LinkConditionsToolTip}"/>
                                             <TextBlock Grid.Column="1"
                                                        Text="{DynamicResource Link_DisplayLabel}"
-                                                       Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Caption}"
+                                                       Foreground="{DynamicResource Brush.Text.Hint}" FontSize="{DynamicResource FontSize.Caption}"
                                                        VerticalAlignment="Center" Margin="0,0,4,0"/>
                                             <!-- Min, not fixed, sizes (issue 177): the text follows the font scale. -->
                                             <ComboBox Grid.Column="2"
@@ -175,7 +175,7 @@
                                             </ComboBox>
                                             <TextBlock Grid.Column="3"
                                                        Text="{DynamicResource Label_LinkWeight}"
-                                                       Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Caption}"
+                                                       Foreground="{DynamicResource Brush.Text.Hint}" FontSize="{DynamicResource FontSize.Caption}"
                                                        VerticalAlignment="Center" Margin="6,0,4,0"/>
                                             <NumericUpDown Grid.Column="4"
                                                            Value="{Binding RandomWeight, Mode=TwoWay, Converter={StaticResource WeightDecimal}}"

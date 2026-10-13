@@ -274,7 +274,7 @@
                                                 <TextBlock Text="{Binding LanguageName}"
                                                            Foreground="{DynamicResource Brush.Text.Tertiary}" FontWeight="SemiBold" FontSize="{DynamicResource FontSize.Label}"/>
                                                 <TextBlock Text="{DynamicResource Diff_Detail_PrimaryMarker}"
-                                                           Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Small}"
+                                                           Foreground="{DynamicResource Brush.Text.Hint}" FontSize="{DynamicResource FontSize.Small}"
                                                            IsVisible="{Binding IsPrimary}"/>
                                             </StackPanel>
 
@@ -339,7 +339,7 @@
                                        Margin="0,0,0,8"
                                        IsVisible="{Binding Selected, Converter={StaticResource IsNotNull}}"/>
                             <TextBlock Text="{Binding CanvasHint}"
-                                       Foreground="{DynamicResource Brush.Text.Disabled}"
+                                       Foreground="{DynamicResource Brush.Text.Hint}"
                                        FontSize="{DynamicResource FontSize.Label}"
                                        HorizontalAlignment="Center"
                                        TextWrapping="Wrap"
@@ -347,7 +347,7 @@
                                        MaxWidth="260"
                                        IsVisible="{Binding CanvasHint, Converter={StaticResource NullOrEmptyToVis}}"/>
                             <TextBlock Text="{DynamicResource DiffWindow_SelectHint}"
-                                       Foreground="{DynamicResource Brush.Text.Disabled}"
+                                       Foreground="{DynamicResource Brush.Text.Hint}"
                                        FontSize="{DynamicResource FontSize.Label}"
                                        HorizontalAlignment="Center"
                                        TextWrapping="Wrap"

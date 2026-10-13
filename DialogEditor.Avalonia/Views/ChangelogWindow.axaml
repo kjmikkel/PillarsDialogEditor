@@ -4,7 +4,7 @@
         Title="{Binding WindowTitle}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="460" Height="560" MinHeight="320" CanResize="True"
-        ShowInTaskbar="False" Background="{DynamicResource Brush.Surface.Info}">
+        ShowInTaskbar="False">
     <DockPanel Margin="14,12,14,12">
         <TextBlock DockPanel.Dock="Top"
                    IsVisible="{Binding ShowHeader}"

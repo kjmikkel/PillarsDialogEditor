@@ -25,7 +25,7 @@
                         HorizontalAlignment="Right" MinWidth="24" MinHeight="24"
                         Content="✕" VerticalAlignment="Center"
                         Background="Transparent" BorderThickness="0"
-                        Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Small}" Cursor="Hand"
+                        Foreground="{DynamicResource Brush.Text.Hint}" FontSize="{DynamicResource FontSize.Small}" Cursor="Hand"
                         ToolTip.Tip="{DynamicResource ToolTip_ClearFilter}"
                         AutomationProperties.HelpText="{DynamicResource ToolTip_ClearFilter}"
                         AutomationProperties.Name="{DynamicResource AutomationName_ClearFilter}"/>
@@ -101,7 +101,7 @@
 
         <!-- Game name footer -->
         <Border Grid.Row="2" Background="{DynamicResource Brush.Surface.Card}" Padding="8,5">
-            <TextBlock Text="{Binding GameName}" Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Caption}"/>
+            <TextBlock Text="{Binding GameName}" Foreground="{DynamicResource Brush.Text.Hint}" FontSize="{DynamicResource FontSize.Caption}"/>
         </Border>
     </Grid>
 </UserControl>

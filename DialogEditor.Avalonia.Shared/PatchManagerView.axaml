@@ -111,7 +111,7 @@
                                                            ToolTip.Tip="{Binding LoadError}"/>
                                             </StackPanel>
                                             <TextBlock Text="{Binding DisplayPath}"
-                                                       Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Small}"/>
+                                                       Foreground="{DynamicResource Brush.Text.Hint}" FontSize="{DynamicResource FontSize.Small}"/>
                                         </StackPanel>
                                         <Button Grid.Column="1" Content="↑"
                                                 Command="{Binding DataContext.MoveUpCommand,
@@ -147,7 +147,7 @@
                     </ItemsControl>
                 </ScrollViewer>
                 <TextBlock Text="{DynamicResource PatchManager_EmptyHint}"
-                           Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Label}"
+                           Foreground="{DynamicResource Brush.Text.Hint}" FontSize="{DynamicResource FontSize.Label}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"
                            IsVisible="{Binding HasEntries,
                                        Converter={StaticResource InverseBoolToVis}}"/>
@@ -155,7 +155,7 @@
 
             <TextBlock Grid.Row="2"
                        Text="{DynamicResource PatchManager_OrderHint}"
-                       Foreground="{DynamicResource Brush.Text.Disabled}" FontSize="{DynamicResource FontSize.Caption}"
+                       Foreground="{DynamicResource Brush.Text.Hint}" FontSize="{DynamicResource FontSize.Caption}"
                        HorizontalAlignment="Center" Margin="0,4,0,0"/>
         </Grid>
 
