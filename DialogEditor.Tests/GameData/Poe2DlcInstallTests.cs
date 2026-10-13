@@ -27,6 +27,20 @@ public class Poe2DlcInstallTests
         Assert.Equal(files.Count, files.Select(f => f.Name).Distinct(StringComparer.OrdinalIgnoreCase).Count());
     }
 
+    // Opening the game folder loads every data folder's game data. Four shipped DLC bundles have
+    // raw line breaks inside strings, which once failed the whole folder (issue 198).
+    [GameInstallFact(GameInstallFactAttribute.Poe2Variable)]
+    public void GameData_LoadsFromEveryDataFolder()
+    {
+        var provider = Provider();
+
+        var names = provider.LoadGameDataNames();
+
+        Assert.Equal(provider.EnumerateConversations().Count, names["Conversation"].Count);
+        Assert.NotEmpty(names["Quest"]);
+        Assert.NotEmpty(provider.LoadSpeakerNames());
+    }
+
     [GameInstallFact(GameInstallFactAttribute.Poe2Variable)]
     public void EveryDlcConversation_LoadsWithItsText()
     {
