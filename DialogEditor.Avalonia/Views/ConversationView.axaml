@@ -44,33 +44,33 @@
                 BorderBrush="{DynamicResource Brush.Border.Default}" BorderThickness="0,0,0,1">
             <DockPanel>
                 <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
-                    <Button Content="{DynamicResource Legend_Control_Fit}"
+                    <Button Classes="secondary" Content="{DynamicResource Legend_Control_Fit}"
                             Click="FitToScreen_Click"
-                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2"
+                            Padding="8,2"
                             ToolTip.Tip="{DynamicResource ToolTip_FitToScreen}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_FitToScreen}"/>
-                    <Button Content="+"
+                    <Button Classes="secondary" Content="+"
                             Click="ZoomIn_Click"
-                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2" Margin="4,0,0,0"
+                            Padding="8,2" Margin="4,0,0,0"
                             ToolTip.Tip="{DynamicResource ToolTip_ZoomIn}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_ZoomIn}"
                             AutomationProperties.Name="{DynamicResource AutomationName_ZoomIn}"/>
-                    <Button Content="−"
+                    <Button Classes="secondary" Content="−"
                             Click="ZoomOut_Click"
-                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2" Margin="2,0,0,0"
+                            Padding="8,2" Margin="2,0,0,0"
                             ToolTip.Tip="{DynamicResource ToolTip_ZoomOut}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_ZoomOut}"
                             AutomationProperties.Name="{DynamicResource AutomationName_ZoomOut}"/>
-                    <Button Content="{DynamicResource Label_AddAnnotation}"
+                    <Button Classes="secondary" Content="{DynamicResource Label_AddAnnotation}"
                             Click="AddAnnotation_Click"
                             IsVisible="{Binding IsEditable}"
-                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2" Margin="4,0,0,0"
+                            Padding="8,2" Margin="4,0,0,0"
                             ToolTip.Tip="{DynamicResource ToolTip_AddAnnotation}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_AddAnnotation}"
                             AutomationProperties.Name="{DynamicResource AutomationName_AddAnnotation}"/>
-                    <Button Content="⌂"
+                    <Button Classes="secondary" Content="⌂"
                             Click="CenterOnRoot_Click"
-                            Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Muted.Light}" BorderThickness="0" Padding="8,2" Margin="8,0,0,0"
+                            Padding="8,2" Margin="8,0,0,0"
                             ToolTip.Tip="{DynamicResource ToolTip_JumpToRoot}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_JumpToRoot}"
                             AutomationProperties.Name="{DynamicResource AutomationName_JumpToRoot}"/>

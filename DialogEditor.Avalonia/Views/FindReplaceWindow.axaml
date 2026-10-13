@@ -20,10 +20,8 @@
             <Setter Property="FontSize"         Value="{DynamicResource FontSize.Body}"/>
             <Setter Property="Padding"          Value="6,3"/>
         </Style>
+        <!-- Layout only: the colours come from Button.secondary (Resources/Buttons.axaml, issue 179). -->
         <Style Selector="Button.action-btn">
-            <Setter Property="Background"      Value="{DynamicResource Brush.Surface.Header}"/>
-            <Setter Property="Foreground"      Value="{DynamicResource Brush.Text.Secondary}"/>
-            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"         Value="10,4"/>
             <Setter Property="FontSize"        Value="{DynamicResource FontSize.Label}"/>
             <Setter Property="MinWidth"        Value="80"/>
@@ -89,22 +87,22 @@
         <!-- No ItemWidth (issue 177): a fixed item width cut the button labels off once their text
              followed the font scale. The buttons' MinWidth keeps the row even. -->
         <WrapPanel Grid.Row="3" Orientation="Horizontal">
-            <Button Classes="action-btn" Margin="0,0,4,4"
+            <Button Classes="action-btn secondary" Margin="0,0,4,4"
                     Content="{DynamicResource FindReplace_FindAll}"
                     Command="{Binding FindCommand}"
                     ToolTip.Tip="{DynamicResource ToolTip_FindAll}"
                     AutomationProperties.HelpText="{DynamicResource ToolTip_FindAll}"/>
-            <Button Classes="action-btn" Margin="0,0,4,4"
+            <Button Classes="action-btn secondary" Margin="0,0,4,4"
                     Content="{DynamicResource FindReplace_FindPrev}"
                     Command="{Binding FindPrevCommand}"
                     ToolTip.Tip="{DynamicResource ToolTip_FindPrev}"
                     AutomationProperties.HelpText="{DynamicResource ToolTip_FindPrev}"/>
-            <Button Classes="action-btn" Margin="0,0,4,4"
+            <Button Classes="action-btn secondary" Margin="0,0,4,4"
                     Content="{DynamicResource FindReplace_FindNext}"
                     Command="{Binding FindNextCommand}"
                     ToolTip.Tip="{DynamicResource ToolTip_FindNext}"
                     AutomationProperties.HelpText="{DynamicResource ToolTip_FindNext}"/>
-            <Button Classes="action-btn" Margin="0,0,4,4"
+            <Button Classes="action-btn secondary" Margin="0,0,4,4"
                     Content="{DynamicResource FindReplace_ReplaceOne}"
                     Command="{Binding ReplaceCommand}"
                     ToolTip.Tip="{DynamicResource ToolTip_Replace}"

@@ -184,6 +184,7 @@
     <SolidColorBrush x:Key="Brush.Button.Secondary.Background" Color="{StaticResource Palette.Neutral.200}"/>
     <SolidColorBrush x:Key="Brush.Button.Secondary.Foreground" Color="{StaticResource Palette.Neutral.910}"/>
     <SolidColorBrush x:Key="Brush.Button.Secondary.Border"     Color="{StaticResource Palette.Button.Edge}"/>
+    <SolidColorBrush x:Key="Brush.Button.Secondary.Hover"      Color="{StaticResource Palette.Button.Hover}"/>
 
     <!-- Bark detail block + canvas bark outline -->
     <SolidColorBrush x:Key="Brush.Bark.Detail.Background" Color="{StaticResource Palette.Amber.950}"/>

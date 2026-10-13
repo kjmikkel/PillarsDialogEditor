@@ -53,6 +53,8 @@
     <!-- Secondary-button edge (issue 179): at least 3:1 against the window, panel and card
          surfaces, so a secondary button reads as a control and not as plain text. -->
     <Color x:Key="Palette.Button.Edge">#FF767676</Color>
+    <!-- Secondary-button hover/pressed fill (issue 179): text stays AA on it. -->
+    <Color x:Key="Palette.Button.Hover">#FF404040</Color>
     <Color x:Key="Palette.Control.Background">#FF333333</Color>
     <Color x:Key="Palette.Connection.Base">#FFAAAAAA</Color>  <!-- resting connection stroke (split off Neutral.665 so HC can dim it below the white highlight) -->
 

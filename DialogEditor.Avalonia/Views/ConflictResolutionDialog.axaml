@@ -46,11 +46,10 @@
         </Border>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-            <Button x:Name="CancelButton"
+            <Button Classes="secondary" x:Name="CancelButton"
                     Content="{DynamicResource ConflictDialog_Cancel}"
                     ToolTip.Tip="{DynamicResource ConflictDialog_CancelTooltip}"
                     AutomationProperties.HelpText="{DynamicResource ConflictDialog_CancelTooltip}"
-                    Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" FontSize="{DynamicResource FontSize.Body}"/>
             <Button x:Name="ForceButton"
                     Content="{DynamicResource ConflictDialog_Force}"

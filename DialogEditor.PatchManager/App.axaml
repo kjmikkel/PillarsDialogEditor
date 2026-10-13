@@ -9,6 +9,10 @@
         <!-- Same tested list-selection pair as the editor (issue #94), so any list in the
              shared PatchManagerView looks and contrasts the same in both hosts. -->
         <StyleInclude Source="avares://DialogEditor.Avalonia.Shared/Resources/ListSelection.axaml"/>
+
+        <!-- Secondary buttons use the tested Brush.Button.Secondary.* tokens (issue 179). After
+             FluentTheme so its hover/pressed rules override Fluent's pale ones. -->
+        <StyleInclude Source="avares://DialogEditor.Avalonia.Shared/Resources/Buttons.axaml"/>
     </Application.Styles>
 
     <Application.Resources>

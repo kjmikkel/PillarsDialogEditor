@@ -34,11 +34,8 @@
         </StackPanel>
 
         <!-- Close -->
-        <Button Content="{DynamicResource Settings_Close}"
+        <Button Classes="secondary" Content="{DynamicResource Settings_Close}"
                 HorizontalAlignment="Right"
-                Background="{DynamicResource Brush.Surface.Header}"
-                Foreground="{DynamicResource Brush.Text.Secondary}"
-                BorderThickness="0"
                 Padding="16,5"
                 Click="Close_Click"/>
 

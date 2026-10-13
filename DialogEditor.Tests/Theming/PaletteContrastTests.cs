@@ -30,6 +30,7 @@ public class PaletteContrastTests
         // Secondary buttons (issue 179): readable text on the fill, and an edge that marks the
         // button out from every surface it sits on (WCAG 1.4.11 non-text contrast).
         new("Button.Secondary.Foreground / Background", "Palette.Neutral.910", "Palette.Neutral.200", true),
+        new("Button.Secondary.Foreground / Hover",      "Palette.Neutral.910", "Palette.Button.Hover", true),
         new("Button.Secondary.Border / Surface.Window", "Palette.Button.Edge", "Palette.Neutral.115", false),
         new("Button.Secondary.Border / Surface.Panel",  "Palette.Button.Edge", "Palette.Neutral.145", false),
         new("Button.Secondary.Border / Surface.Card",   "Palette.Button.Edge", "Palette.Neutral.100", false),
