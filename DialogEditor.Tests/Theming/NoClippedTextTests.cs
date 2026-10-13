@@ -6,6 +6,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.Avalonia.Shared.Theming;
 using DialogEditor.Avalonia.Views;
 using DialogEditor.Core.Models;
@@ -28,19 +29,9 @@ namespace DialogEditor.Tests.Theming;
 /// </summary>
 public class NoClippedTextTests
 {
-    public NoClippedTextTests() => Loc.Configure(new StubStringProvider());
-
-    // Known clipping that belongs to issue 178 (grid columns that overlap). Remove each entry
-    // when 178 fixes it. Format: "<window type name>|<text>".
-    private static readonly HashSet<string> TrackedByIssue178 =
-    [
-        "RepDispositionBalanceWindow|Count",   // Count/Share column headers
-        "FindInProjectWindow|Node",            // results table headers
-        "FindInProjectWindow|Language",
-        "BlameWindow|Node",                    // attribution table header
-        "BatchVoImportDialog|Status",          // file table headers (same layout as the 178 tables)
-        "BatchVoImportDialog|Result",
-    ];
+    // The real strings: the stub provider returns resource keys, which are longer than any real
+    // text and would make text set from code (table cells, issue 178) look clipped when it is not.
+    public NoClippedTextTests() => Loc.Configure(new AvaloniaStringProvider());
 
     private static readonly Assembly[] Apps =
     [
@@ -64,14 +55,14 @@ public class NoClippedTextTests
 
     // Windows whose parameterless form is empty hide the rows that clip in real use, so these are
     // opened with representative content too.
-    private static readonly Dictionary<string, Func<Window>> Populated = new()
+    private static readonly Dictionary<string, Func<Window>> Populated = new Dictionary<string, Func<Window>>
     {
         // One condition row: its And/Or combo sat in a fixed 70 px column and showed "An" at 2.0x.
         ["ConditionEditor"] = () => new ConditionEditorWindow(new ConditionEditorViewModel(
             "canonical",
             [new ConditionLeaf("Boolean IsGlobalValue(String, Operator, Int32)", ["flag", "EqualTo", "1"], false, "And")],
             _ => { })),
-    };
+    }.Concat(TableWindowFixtures.All).ToDictionary();   // the tables of issue 178, with rows
 
     public static IEnumerable<object[]> PopulatedCases() =>
         from name in Populated.Keys
@@ -94,7 +85,7 @@ public class NoClippedTextTests
             new FontScaleApplier().Apply(scale);
             w.Show();
             Dispatcher.UIThread.RunJobs();   // let SizeToContent and the clamp settle (see TallWindowsFitTests)
-            var clipped = Clipped(w).Where(c => !TrackedByIssue178.Contains($"{w.GetType().Name}|{c.Text}")).ToList();
+            var clipped = Clipped(w).ToList();
             Assert.True(clipped.Count == 0,
                 $"{w.GetType().Name} at {scale}x clips:\n" + string.Join("\n", clipped.Select(c => $"  \"{c.Text}\": {c.Why}")));
         }

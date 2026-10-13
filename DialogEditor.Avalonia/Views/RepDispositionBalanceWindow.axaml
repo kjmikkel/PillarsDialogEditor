@@ -14,7 +14,7 @@
     <Window.Styles>
         <Style Selector="TextBlock.col-header">
             <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}"/>
-            <Setter Property="FontSize"   Value="{DynamicResource FontSize.Small}"/>
+            <Setter Property="FontSize"   Value="{DynamicResource FontSize.Body}"/>   <!-- issue 178: headers at row size -->
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
         <Style Selector="TextBlock.table-title">
@@ -65,6 +65,10 @@
                     Padding="16,6"/>
         </StackPanel>
 
+        <!-- Issue 178: the fixed columns take their width from ColumnWidth.* tokens, which scale
+             with the font, so text no longer runs into the next column at large scales. Header and
+             row cells share each token and the 8 px column spacing, and the header is inset by the
+             row's 12 px item padding (Fluent's ListBoxItem), so the columns line up. -->
         <!-- ── Two tables side by side ───────────────────────────────────────── -->
         <Grid Grid.Row="1" ColumnDefinitions="*,12,*">
 
@@ -72,25 +76,25 @@
             <DockPanel Grid.Column="0">
                 <TextBlock DockPanel.Dock="Top" Classes="table-title"
                            Text="{DynamicResource RepBalance_DispositionsHeader}"/>
-                <Grid DockPanel.Dock="Top" ColumnDefinitions="*,50,70,110" Margin="4,0,4,2">
+                <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8" Margin="12,0,12,2">
                     <TextBlock Grid.Column="0" Classes="col-header" Text="{DynamicResource RepBalance_Col_Value}"/>
-                    <TextBlock Grid.Column="1" Classes="col-header" Text="{DynamicResource RepBalance_Col_Count}"/>
-                    <TextBlock Grid.Column="2" Classes="col-header" Text="{DynamicResource RepBalance_Col_Share}"/>
-                    <TextBlock Grid.Column="3" Classes="col-header" Text="{DynamicResource RepBalance_Col_Flag}"/>
+                    <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.Count}" Classes="col-header" Text="{DynamicResource RepBalance_Col_Count}"/>
+                    <TextBlock Grid.Column="2" Width="{DynamicResource ColumnWidth.Share}" Classes="col-header" Text="{DynamicResource RepBalance_Col_Share}"/>
+                    <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.Flag}" Classes="col-header" Text="{DynamicResource RepBalance_Col_Flag}"/>
                 </Grid>
                 <ListBox ItemsSource="{Binding DispositionRows}"
                          ToolTip.Tip="{DynamicResource RepBalance_Tip_Table}"
                          Background="{DynamicResource Brush.Surface.Card}" BorderThickness="0">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Grid ColumnDefinitions="*,50,70,110" Margin="0,2">
-                                <TextBlock Grid.Column="0" Text="{Binding DisplayValue}"
+                            <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8" Margin="0,2">
+                                <TextBlock Grid.Column="0" Text="{Binding DisplayValue}" ToolTip.Tip="{Binding DisplayValue}"
                                            Classes="list-primary" TextTrimming="CharacterEllipsis"/>
-                                <TextBlock Grid.Column="1" Text="{Binding Count}"
+                                <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.Count}" Text="{Binding Count}"
                                            Classes="list-secondary"/>
-                                <TextBlock Grid.Column="2" Text="{Binding ShareText}"
+                                <TextBlock Grid.Column="2" Width="{DynamicResource ColumnWidth.Share}" Text="{Binding ShareText}"
                                            Classes="list-secondary"/>
-                                <TextBlock Grid.Column="3" Text="{Binding FlagLabel}"
+                                <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.Flag}" Text="{Binding FlagLabel}" ToolTip.Tip="{Binding FlagLabel}"
                                            Classes="balance-flag"
                                            FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
                             </Grid>
@@ -103,25 +107,25 @@
             <DockPanel Grid.Column="2">
                 <TextBlock DockPanel.Dock="Top" Classes="table-title"
                            Text="{DynamicResource RepBalance_ReputationsHeader}"/>
-                <Grid DockPanel.Dock="Top" ColumnDefinitions="*,50,70,110" Margin="4,0,4,2">
+                <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8" Margin="12,0,12,2">
                     <TextBlock Grid.Column="0" Classes="col-header" Text="{DynamicResource RepBalance_Col_Value}"/>
-                    <TextBlock Grid.Column="1" Classes="col-header" Text="{DynamicResource RepBalance_Col_Count}"/>
-                    <TextBlock Grid.Column="2" Classes="col-header" Text="{DynamicResource RepBalance_Col_Share}"/>
-                    <TextBlock Grid.Column="3" Classes="col-header" Text="{DynamicResource RepBalance_Col_Flag}"/>
+                    <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.Count}" Classes="col-header" Text="{DynamicResource RepBalance_Col_Count}"/>
+                    <TextBlock Grid.Column="2" Width="{DynamicResource ColumnWidth.Share}" Classes="col-header" Text="{DynamicResource RepBalance_Col_Share}"/>
+                    <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.Flag}" Classes="col-header" Text="{DynamicResource RepBalance_Col_Flag}"/>
                 </Grid>
                 <ListBox ItemsSource="{Binding ReputationRows}"
                          ToolTip.Tip="{DynamicResource RepBalance_Tip_Table}"
                          Background="{DynamicResource Brush.Surface.Card}" BorderThickness="0">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
-                            <Grid ColumnDefinitions="*,50,70,110" Margin="0,2">
-                                <TextBlock Grid.Column="0" Text="{Binding DisplayValue}"
+                            <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8" Margin="0,2">
+                                <TextBlock Grid.Column="0" Text="{Binding DisplayValue}" ToolTip.Tip="{Binding DisplayValue}"
                                            Classes="list-primary" TextTrimming="CharacterEllipsis"/>
-                                <TextBlock Grid.Column="1" Text="{Binding Count}"
+                                <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.Count}" Text="{Binding Count}"
                                            Classes="list-secondary"/>
-                                <TextBlock Grid.Column="2" Text="{Binding ShareText}"
+                                <TextBlock Grid.Column="2" Width="{DynamicResource ColumnWidth.Share}" Text="{Binding ShareText}"
                                            Classes="list-secondary"/>
-                                <TextBlock Grid.Column="3" Text="{Binding FlagLabel}"
+                                <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.Flag}" Text="{Binding FlagLabel}" ToolTip.Tip="{Binding FlagLabel}"
                                            Classes="balance-flag"
                                            FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
                             </Grid>
