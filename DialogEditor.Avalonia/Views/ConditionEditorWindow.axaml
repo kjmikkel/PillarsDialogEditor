@@ -79,9 +79,11 @@
                                 <StackPanel Spacing="6">
 
                                     <!-- Row header -->
-                                    <Grid ColumnDefinitions="70,Auto,*,28,28,28">
+                                    <!-- Auto columns with the old widths as MinWidth (issue 177): the fixed 70 px column cut
+                                         "And" to "An", and the 28 px ones clipped the glyphs, once their text followed the font scale. -->
+                                    <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto">
                                         <!-- And / Or -->
-                                        <ComboBox Grid.Column="0"
+                                        <ComboBox Grid.Column="0" MinWidth="70"
                                                   ItemsSource="{x:Static vm:ConditionRowViewModel.OperatorOptions}"
                                                   SelectedItem="{Binding Operator, Mode=TwoWay}"
                                                   Background="{DynamicResource Brush.Surface.Card}" BorderBrush="{DynamicResource Brush.Border.Muted}"
@@ -133,7 +135,7 @@
                                                     AutomationProperties.HelpText="{DynamicResource ToolTip_EditBranchGroup}"/>
                                         </Grid>
                                         <!-- Move up -->
-                                        <Button Grid.Column="3" Content="↑"
+                                        <Button Grid.Column="3" MinWidth="28" Content="↑"
                                                 Command="{Binding DataContext.MoveUpCommand,
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
@@ -143,7 +145,7 @@
                                                 AutomationProperties.HelpText="{DynamicResource ToolTip_MoveConditionUp}"
                                                 AutomationProperties.Name="{DynamicResource AutomationName_MoveConditionUp}"/>
                                         <!-- Move down -->
-                                        <Button Grid.Column="4" Content="↓"
+                                        <Button Grid.Column="4" MinWidth="28" Content="↓"
                                                 Command="{Binding DataContext.MoveDownCommand,
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"
@@ -153,7 +155,7 @@
                                                 AutomationProperties.HelpText="{DynamicResource ToolTip_MoveConditionDown}"
                                                 AutomationProperties.Name="{DynamicResource AutomationName_MoveConditionDown}"/>
                                         <!-- Delete -->
-                                        <Button Grid.Column="5" Content="✕"
+                                        <Button Grid.Column="5" MinWidth="28" Content="✕"
                                                 Command="{Binding DataContext.DeleteRowCommand,
                                                           RelativeSource={RelativeSource AncestorType=Window}}"
                                                 CommandParameter="{Binding}"

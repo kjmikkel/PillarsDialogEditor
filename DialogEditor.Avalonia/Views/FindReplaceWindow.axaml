@@ -38,10 +38,16 @@
         </Style>
     </Window.Styles>
 
-    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="14,10,14,10">
+    <!-- Shared label column (issue 188): each row is its own Grid, so without a shared size group every box started right after its own label and "Find:" left the Find box further left than the Replace box. -->
+    <Grid Grid.IsSharedSizeScope="True" RowDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="14,10,14,10">
 
         <!-- Find row -->
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,6">
+        <!-- ColumnSpacing (issue 177): the Auto label column ends where the label does, so without it the label touched its box. -->
+        <Grid Grid.Row="0" ColumnSpacing="8" Margin="0,0,0,6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="{DynamicResource FindReplace_FindLabel}"
                        Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
             <TextBox Grid.Column="1" Classes="find-box"
@@ -53,7 +59,11 @@
         </Grid>
 
         <!-- Replace row -->
-        <Grid Grid.Row="1" ColumnDefinitions="Auto,*" Margin="0,0,0,8">
+        <Grid Grid.Row="1" ColumnSpacing="8" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
             <TextBlock Grid.Column="0" Text="{DynamicResource FindReplace_ReplaceLabel}"
                        Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
             <TextBox Grid.Column="1" Classes="find-box"
@@ -76,7 +86,9 @@
         </StackPanel>
 
         <!-- Buttons -->
-        <WrapPanel Grid.Row="3" Orientation="Horizontal" ItemWidth="88">
+        <!-- No ItemWidth (issue 177): a fixed item width cut the button labels off once their text
+             followed the font scale. The buttons' MinWidth keeps the row even. -->
+        <WrapPanel Grid.Row="3" Orientation="Horizontal">
             <Button Classes="action-btn" Margin="0,0,4,4"
                     Content="{DynamicResource FindReplace_FindAll}"
                     Command="{Binding FindCommand}"

@@ -30,6 +30,7 @@ public sealed class FontScaleApplier : IFontScaleApplier
         foreach (var (key, baseValue) in FontSizeTokens.BaseValues)
             dict[key] = baseValue * scale;
 
+        FontScaleService.Current.Scale = scale;
         FontScaleService.Current.Bump();
     }
 

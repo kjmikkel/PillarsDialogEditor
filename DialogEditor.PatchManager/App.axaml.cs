@@ -20,6 +20,10 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
+        // Every window follows the font scale and fits the screen (issue 177). Outside the
+        // desktop-lifetime branch so headless tests get the same behaviour.
+        WindowSizing.Register();
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             // Honour the theme the user picked in the editor (or here) on the previous run,
