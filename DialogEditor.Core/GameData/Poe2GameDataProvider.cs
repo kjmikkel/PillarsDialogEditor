@@ -164,7 +164,7 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
                 }
             }
             foreach (var (kind, entries) in byKind)
-                result[kind] = entries;
+                result[kind] = LastOfEach(entries);   // a DLC overriding an object by ID (issue 198)
 
             // ── Phase 1.5 — inheritance composition ─────────────────────────
             // The sweep buckets by EXACT $type, but a param whose DataTypeID names a
@@ -237,8 +237,8 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
         // ── Conversations ─────────────────────────────────────────────────────
         // Each .conversationbundle has a root Conversations[0].ID GUID — parse all
         // bundles and expose the filename (without extension) as the display name.
-        var conversations = Roots.Select(ConversationsOf).Where(Directory.Exists)
-            .SelectMany(d => Directory.EnumerateFiles(d, "*.conversationbundle", SearchOption.AllDirectories))
+        // One per relative path, the copy the game loads (issue 198).
+        var conversations = EnumerateConversations().Select(f => f.ConversationPath)
             .Select(path => (
                 id:   Poe2ConversationParser.ParseRootId(File.ReadAllText(path)),
                 name: Path.GetFileNameWithoutExtension(path)))
@@ -256,10 +256,11 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
         return result;
     }
 
-    // Entries merged from several data folders: the last copy of each (same ID and name) wins,
-    // as the game loads later folders after earlier ones (issue 198).
+    // Entries merged from several data folders: the last copy of each object wins, as the game
+    // loads later folders after earlier ones (issue 198). Objects are keyed by ID, or by name for
+    // the kinds that store no ID (WeaponType).
     private static IReadOnlyList<GameDataEntry> LastOfEach(IReadOnlyList<GameDataEntry> entries) =>
-        entries.Reverse().DistinctBy(e => (e.Id, e.Name)).Reverse().ToList();
+        entries.Reverse().DistinctBy(e => e.Id.Length > 0 ? "id:" + e.Id : "name:" + e.Name).Reverse().ToList();
 
     private static bool IsPlayerClassComponent(IReadOnlyList<JsonElement> components) =>
         components.Any(c =>
