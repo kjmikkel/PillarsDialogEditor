@@ -20,6 +20,9 @@ public class StringTable
 
     public int Count => _entries.Count;
 
+    /// Every entry, e.g. to merge several data folders' tables line by line (issue 198).
+    public IEnumerable<StringEntry> Entries => _entries.Values;
+
     /// A stringtable file that exists but is not readable XML (issue 119 — e.g. a damaged install
     /// file). The conversation still opens: the table counts as missing, so its text shows
     /// the missing-text placeholder, and <see cref="IsUnreadable"/> lets the UI say why.

@@ -1879,6 +1879,8 @@ public partial class MainWindowViewModel : ObservableObject
 
             if (!AppSettings.IsKnownGameDirectory(path))
                 _ = OfferBackupAsync(path);
+            else
+                _ = TopUpBackupAsync(path, provider);
             AppSettings.MarkGameDirectoryKnown(path);
         }
         catch (Exception ex)
@@ -2104,6 +2106,29 @@ public partial class MainWindowViewModel : ObservableObject
 
     private static Task RunProviderBackupAsync(string backupRoot, IGameDataProvider provider)
         => FullBackup.TakeAsync(provider, backupRoot, default);
+
+    // A backup taken before issue 198 has none of PoE2's DLC data folders; adding them the next
+    // time the game folder is opened still captures the originals (nothing wrote them before).
+    private static async Task TopUpBackupAsync(string gameDirectory, IGameDataProvider provider)
+    {
+        // A Test Patch waiting for F6 means the game folder holds the test's writes.
+        if (AppSettings.GetPendingRestores() is { Count: > 0 }) return;
+        if (FullBackup.Latest(AppSettings.GetBackupPath(gameDirectory) ?? string.Empty) is not { } latest) return;
+        try
+        {
+            var added = await FullBackup.TopUpAsync(provider, latest, default);
+            if (added > 0) AppLog.Info($"Backup {latest} topped up with {added} DLC folder(s)");
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            AppLog.Warn($"Could not add the DLC folders to the backup {latest}: {ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            // Fire-and-forget: anything else would vanish with the discarded task.
+            AppLog.Warn($"Adding the DLC folders to the backup {latest} failed: {ex}");
+        }
+    }
 
     // Appends this test's writes to the journal next to the full backup (issue 118), so
     // Restore Full Backup can later tell them from a game update. No backup, no journal:

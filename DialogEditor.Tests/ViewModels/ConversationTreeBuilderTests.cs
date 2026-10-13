@@ -127,10 +127,9 @@ public class ConversationTreeBuilderTests
     }
 
     [Theory]
-    // Prefixes that can't be mapped to a named DLC with confidence are only tidied.
-    [InlineData("lax02_01_iceberg_dungeon")]
+    // PoE1's px4 has no known DLC title, so it is only tidied (PoE2's lax prefixes are grouped
+    // since issue 198: see the PoE2 DLC tests below).
     [InlineData("px4")]
-    [InlineData("laxi")]
     public void OtherPrefixes_AreNotGrouped(string folder)
     {
         var tree = Build(File(folder, "x"));
@@ -184,5 +183,92 @@ public class ConversationTreeBuilderTests
     {
         var tree = Build(File("companions", "eder"), File("", "gather_your_party"));
         Assert.DoesNotContain(tree.Folders, f => f.FolderPath == ConversationTreeBuilder.PrototypesPath);
+    }
+
+    // ── PoE2 DLC (issue 198) ─────────────────────────────────────────────────
+
+    private static ConversationFile Dlc(string dataRoot, string folder, string name) =>
+        new(name, folder, $@"{folder}\{name}.conversationbundle", "", dataRoot);
+
+    [Fact]
+    public void DlcConversations_GoUnderTheirDlcsTitle_InTheTablesOrder()
+    {
+        var tree = Build(
+            File("02_poko_kohara", "a"),
+            Dlc("laxi_exported", "laxi", "laxi_00_si_god"),
+            Dlc("lax2_exported", "lax02_01_iceberg_dungeon", "lax02_01_cv_ice_carver"),
+            Dlc("lax1_exported", "lax01_00_arena_island", "lax01_cv_arena"));
+
+        Assert.Equal(
+            ["02_poko_kohara", ConversationTreeBuilder.GroupPath("lax1"), ConversationTreeBuilder.GroupPath("lax2"),
+             ConversationTreeBuilder.GroupPath("laxi")],
+            tree.Folders.Select(f => f.FolderPath));
+        Assert.Equal(["Browser_Dlc_Lax1", "Browser_Dlc_Lax2", "Browser_Dlc_LaxI"], tree.Folders.Skip(1).Select(f => f.DisplayName));
+        Assert.Equal("Arena Island", Assert.Single(tree.Folders[1].Subfolders).DisplayName);
+        Assert.Equal("Iceberg Dungeon", Assert.Single(tree.Folders[2].Subfolders).DisplayName);
+    }
+
+    [Fact]
+    public void ABaseGameLaxFolder_JoinsItsDlc_AndMergesWithTheDlcsSameFolder()
+    {
+        var tree = Build(
+            File("lax02_01_iceberg_dungeon", "lax02_01_bs_townie"),                      // base game data
+            Dlc("lax2_exported", "lax02_01_iceberg_dungeon", "lax02_01_cv_ice_carver"));
+
+        var group = Assert.Single(tree.Folders);
+        Assert.Equal("Browser_Dlc_Lax2", group.DisplayName);
+        var iceberg = Assert.Single(group.Subfolders);
+        Assert.Equal(["lax02_01_bs_townie", "lax02_01_cv_ice_carver"], iceberg.Items.Select(i => i.Name));
+    }
+
+    [Fact]
+    public void AFolderNamedJustTheKey_IsTheGroupItself()
+    {
+        // The base game's "laxi" folder, and laxi_exported's own "laxi" folder: their
+        // conversations sit directly in Woedica's Book, not in a "Laxi" subfolder.
+        var tree = Build(File("laxi", "laxi_00_bs_book"), Dlc("laxi_exported", "laxi", "laxi_00_si_god"),
+                         Dlc("laxi_exported", "", "si_endgame_ultimatechallenge"));
+
+        var group = Assert.Single(tree.Folders);
+        Assert.Empty(group.Subfolders);
+        Assert.Equal(["laxi_00_bs_book", "laxi_00_si_god", "si_endgame_ultimatechallenge"], group.Items.Select(i => i.Name).Order());
+    }
+
+    [Fact]
+    public void SameFolderInBaseAndDlc_StaySeparate()   // Review Focus 1
+    {
+        var tree = Build(File("16_wahaki_island", "base_conv"), Dlc("lax2_exported", "16_wahaki_island", "lax02_16_cv_trader"));
+
+        Assert.Equal("base_conv", Assert.Single(tree.Folders[0].Items).Name);
+        Assert.Equal("lax02_16_cv_trader", Assert.Single(Assert.Single(tree.Folders[1].Subfolders).Items).Name);
+    }
+
+    [Theory]
+    [InlineData("lax02_x", "lax2")]
+    [InlineData("lax2_x", "lax2")]
+    [InlineData("laxa_x", "laxa")]
+    [InlineData("laxi", "laxi")]
+    public void BothPrefixSpellings_MapToTheSameDlc(string folder, string key)
+        => Assert.Equal(ConversationTreeBuilder.GroupPath(key), Assert.Single(Build(File(folder, "c")).Folders).FolderPath);
+
+    [Theory]
+    [InlineData("lax")]          // laxN_exported's own "lax" folder, in the base game: not a key
+    [InlineData("laxative")]
+    [InlineData("lax10_x")]      // no such DLC
+    public void FolderNamesThatOnlyLookLikeAKey_StayWithTheBaseGame(string folder)
+        => Assert.Equal(folder, Assert.Single(Build(File(folder, "c")).Folders).FolderPath);
+
+    [Fact]
+    public void AnUntitledDataFolder_IsGroupedUnderItsTidiedKey_AfterTheTitledOnes()
+    {
+        var tree = Build(Dlc("bb_exported", "x", "a"), Dlc("lax3_exported", "x", "b"));
+        Assert.Equal(["Browser_Dlc_Lax3", "Bb"], tree.Folders.Select(f => f.DisplayName));
+    }
+
+    [Fact]
+    public void ThePrototypeGroup_StaysLast()
+    {
+        var tree = Build(File("00_prototype", "p"), Dlc("lax2_exported", "x", "d"));
+        Assert.Equal(ConversationTreeBuilder.PrototypesPath, tree.Folders[^1].FolderPath);
     }
 }
