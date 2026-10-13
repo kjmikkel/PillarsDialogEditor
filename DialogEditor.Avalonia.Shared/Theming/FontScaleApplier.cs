@@ -30,6 +30,10 @@ public sealed class FontScaleApplier : IFontScaleApplier
         foreach (var (key, baseValue) in FontSizeTokens.BaseValues)
             dict[key] = baseValue * scale;
 
+        // Table column widths grow with the text they hold (issue 178).
+        foreach (var (key, baseValue) in ColumnWidthTokens.BaseValues)
+            dict[key] = baseValue * scale;
+
         FontScaleService.Current.Scale = scale;
         FontScaleService.Current.Bump();
     }
