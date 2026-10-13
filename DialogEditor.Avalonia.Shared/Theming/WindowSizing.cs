@@ -84,17 +84,17 @@ public static class WindowSizing
         }
     }
 
-    // The owner is not assigned yet when WindowOpenedEvent fires, so use the main window's
-    // screen (it owns nearly every dialog), else the primary screen.
+    // At open the window has no position and its owner is not assigned yet (WindowOpenedEvent
+    // fires first), so it falls back to the main window's screen, which owns nearly every
+    // dialog. On a live rescale it is shown, so its own screen counts.
     private static Size? ScreenWorkingArea(Window w)
     {
         var screens = w.Screens;
         if (screens is null) return null;
-        Screen? screen = null;
-        if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } main }
-            && !ReferenceEquals(main, w) && main.IsVisible)
-            screen = screens.ScreenFromWindow(main);
-        screen ??= screens.Primary;
+        Screen? ScreenOf(Window? x) => x is { IsVisible: true } ? screens.ScreenFromWindow(x) : null;
+        var main = Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime { MainWindow: { } m }
+                   && !ReferenceEquals(m, w) ? m : null;
+        var screen = WindowSizingRule.PickScreen(ScreenOf(w), ScreenOf(w.Owner as Window), ScreenOf(main), screens.Primary);
         return screen is null ? null : WindowSizingRule.WorkingAreaInDips(screen.WorkingArea.Size, screen.Scaling);
     }
 }

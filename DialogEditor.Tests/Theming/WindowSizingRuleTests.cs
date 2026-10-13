@@ -139,4 +139,20 @@ public class WindowSizingRuleTests
     [Fact]
     public void WorkingAreaInDips_DividesByScaling()
         => Assert.Equal(new Size(1366, 768), WindowSizingRule.WorkingAreaInDips(new PixelSize(2732, 1536), 2.0));
+
+    // Review finding: a window moved to another monitor was rescaled against the main window's
+    // screen. Prefer the window's own screen once it is shown, then its owner's, then the main
+    // window's, then the primary.
+    [Fact]
+    public void PickScreen_PrefersTheWindowsOwnScreen() =>
+        Assert.Equal("own", WindowSizingRule.PickScreen("own", "owner", "main", "primary"));
+
+    [Fact]
+    public void PickScreen_FallsBackToOwnerThenMainThenPrimary()
+    {
+        Assert.Equal("owner",   WindowSizingRule.PickScreen(null, "owner", "main", "primary"));
+        Assert.Equal("main",    WindowSizingRule.PickScreen<string>(null, null, "main", "primary"));
+        Assert.Equal("primary", WindowSizingRule.PickScreen<string>(null, null, null, "primary"));
+        Assert.Null(WindowSizingRule.PickScreen<string>(null, null, null, null));
+    }
 }

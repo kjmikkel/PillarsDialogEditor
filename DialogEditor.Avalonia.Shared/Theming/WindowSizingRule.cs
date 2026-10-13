@@ -80,6 +80,13 @@ public static class WindowSizingRule
     public static Size WorkingAreaInDips(PixelSize workingArea, double scaling) =>
         workingArea.ToSize(scaling);
 
+    /// <summary>
+    /// Which screen a window must fit: its own once it is shown (it may have been moved to
+    /// another monitor), else its owner's, else the main window's, else the primary screen.
+    /// </summary>
+    public static T? PickScreen<T>(T? own, T? owner, T? main, T? primary) where T : class =>
+        own ?? owner ?? main ?? primary;
+
     private static WindowSize Clamp(WindowSize s, Size? workingArea, WindowSizingMode mode, SizeToContent sizeToContent)
     {
         if (workingArea is not { } area) return s;
