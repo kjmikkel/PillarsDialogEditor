@@ -48,12 +48,18 @@
     <Grid RowDefinitions="Auto,*,Auto,Auto" Margin="14,12,14,12">
 
         <!-- ── Search form ──────────────────────────────────────────────── -->
-        <StackPanel Grid.Row="0" Spacing="7">
+        <!-- Shared label column (issue 188): each row is its own Grid, so without a shared size group every box started right after its own label and "Find:" left the Find box further left than the Replace box. -->
+        <StackPanel Grid.IsSharedSizeScope="True" Grid.Row="0" Spacing="7">
 
             <!-- Find row -->
             <!-- Auto label columns with the old width as a MinWidth (issue 177): a fixed column cut the label off once its text followed the font scale. -->
             <!-- ColumnSpacing (issue 177): the Auto label column ends where the label does, so without it the label touched its box. -->
-            <Grid ColumnSpacing="8" ColumnDefinitions="Auto,*,Auto">
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
                 <TextBlock Classes="label" Text="{DynamicResource BatchReplace_Find}"/>
                 <TextBox Grid.Column="1" Classes="find-box" Name="SearchBox"
                          Text="{Binding SearchText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
@@ -69,7 +75,11 @@
             </Grid>
 
             <!-- Replace row -->
-            <Grid ColumnSpacing="8" ColumnDefinitions="Auto,*">
+            <Grid ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="Label"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
                 <TextBlock Classes="label" Text="{DynamicResource BatchReplace_Replace}"/>
                 <TextBox Grid.Column="1" Classes="find-box"
                          Text="{Binding ReplaceText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
