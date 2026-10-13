@@ -34,6 +34,10 @@ public interface IGameDataProvider
     /// language (issue 123). Test doubles that never back up a game folder needn't implement it.
     string GetStringTablesRoot(string language) => throw new NotSupportedException();
 
+    /// Further folders the full backup keeps: PoE2's DLC data folders (issue 198). Empty for
+    /// PoE1, whose DLC sits inside the base folders.
+    IReadOnlyList<ExtraBackupFolder> GetExtraBackupFolders() => [];
+
     /// Returns a ConversationFile record for a not-yet-existing conversation,
     /// using this game's path conventions. Does not create any files.
     ConversationFile BuildNewConversationFile(string name);

@@ -30,14 +30,14 @@ public class FullBackupTests : IDisposable
     }
 
     [Fact]
-    public async Task TakeAsync_WritesAFormat2Manifest()
+    public async Task TakeAsync_WritesAFormat3Manifest()   // format 3 adds the PoE2 DLC folders (issue 198)
     {
         await FullBackup.TakeAsync(_game.Provider, _root, default);
 
         var manifest = FullBackup.ReadManifest(_root);
 
         Assert.NotNull(manifest);
-        Assert.Equal(2, manifest.Format);
+        Assert.Equal(3, manifest.Format);
         Assert.Equal("poe2", manifest.GameId);
         Assert.Equal(["de", "en"], manifest.Languages);
     }

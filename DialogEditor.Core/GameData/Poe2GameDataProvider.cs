@@ -232,6 +232,21 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
     public (string ConversationsRoot, string StringTablesRoot) GetBackupRoots()
         => (ConversationsRoot, StringTablesRoot);
 
+    // Each DLC data folder's conversations and its text per installed language (issue 198).
+    public IReadOnlyList<ExtraBackupFolder> GetExtraBackupFolders() =>
+        Roots.Where(r => r.Key is not null).SelectMany(r =>
+        {
+            var folders = new List<ExtraBackupFolder>();
+            if (Directory.Exists(ConversationsOf(r)))
+                folders.Add(new($"dlc/{r.Folder}/conversations", ConversationsOf(r)));
+            foreach (var lang in AvailableLanguages)
+            {
+                var text = Path.Combine(r.Path, "localized", lang, "text", "conversations");
+                if (Directory.Exists(text)) folders.Add(new($"dlc/{r.Folder}/stringtables/{lang}", text));
+            }
+            return folders;
+        }).ToList();
+
     public void SaveConversation(ConversationFile file, ConversationEditSnapshot snapshot)
     {
         Poe2ConversationSerializer.SaveToFile(file.ConversationPath, snapshot);
