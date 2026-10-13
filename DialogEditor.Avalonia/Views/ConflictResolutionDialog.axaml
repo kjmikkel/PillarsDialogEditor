@@ -17,26 +17,27 @@
 
         <Border Background="{DynamicResource Brush.Surface.Card}" CornerRadius="4" Padding="12,8" Margin="0,0,0,16">
             <StackPanel>
-                <Grid ColumnDefinitions="120,*" Margin="0,3">
-                    <TextBlock Text="{DynamicResource ConflictDialog_NodeLabel}"
+                <!-- Auto label columns with the old width as a MinWidth (issue 177): a fixed column cut the label off once its text followed the font scale. -->
+                <Grid ColumnDefinitions="Auto,*" Margin="0,3">
+                    <TextBlock MinWidth="120" Text="{DynamicResource ConflictDialog_NodeLabel}"
                                Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
                     <TextBlock x:Name="NodeIdBlock" Grid.Column="1"
                                Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
                 </Grid>
-                <Grid ColumnDefinitions="120,*" Margin="0,3">
-                    <TextBlock Text="{DynamicResource ConflictDialog_FieldLabel}"
+                <Grid ColumnDefinitions="Auto,*" Margin="0,3">
+                    <TextBlock MinWidth="120" Text="{DynamicResource ConflictDialog_FieldLabel}"
                                Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
                     <TextBlock x:Name="FieldNameBlock" Grid.Column="1"
                                Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
                 </Grid>
-                <Grid ColumnDefinitions="120,*" Margin="0,3">
-                    <TextBlock Text="{DynamicResource ConflictDialog_ExpectedLabel}"
+                <Grid ColumnDefinitions="Auto,*" Margin="0,3">
+                    <TextBlock MinWidth="120" Text="{DynamicResource ConflictDialog_ExpectedLabel}"
                                Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
                     <TextBlock x:Name="ExpectedBlock" Grid.Column="1"
                                Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
                 </Grid>
-                <Grid ColumnDefinitions="120,*" Margin="0,3">
-                    <TextBlock Text="{DynamicResource ConflictDialog_ActualLabel}"
+                <Grid ColumnDefinitions="Auto,*" Margin="0,3">
+                    <TextBlock MinWidth="120" Text="{DynamicResource ConflictDialog_ActualLabel}"
                                Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
                     <TextBlock x:Name="ActualBlock" Grid.Column="1"
                                Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>

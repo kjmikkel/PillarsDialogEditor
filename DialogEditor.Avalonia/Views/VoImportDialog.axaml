@@ -30,7 +30,7 @@
              generates no field, so the grid itself carries the name. -->
         <Grid x:Name="VariantGrid" RowDefinitions="Auto,Auto,Auto" Margin="0,0,0,12">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="68"/>
+                <ColumnDefinition Width="Auto" MinWidth="68"/>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="1.35*"/>
             </Grid.ColumnDefinitions>
@@ -146,9 +146,10 @@
         </Grid>
 
         <!-- Encoding quality — only visible when a .wav source file is selected -->
-        <Grid ColumnDefinitions="68,*" Margin="0,0,0,12"
+        <!-- Auto label columns with the old width as a MinWidth (issue 177): a fixed column cut the label off once its text followed the font scale. -->
+        <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,12"
               x:Name="QualityPanel" IsVisible="False">
-            <TextBlock Grid.Column="0" Text="{DynamicResource VoImport_QualityLabel}"
+            <TextBlock MinWidth="68" Grid.Column="0" Text="{DynamicResource VoImport_QualityLabel}"
                        VerticalAlignment="Center"/>
             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16">
                 <RadioButton x:Name="QualityLow"
