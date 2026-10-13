@@ -34,9 +34,8 @@
              AutomationProperties.HelpText="{DynamicResource CommitConsent_MessageLabel}"
              AutomationProperties.Name="{DynamicResource CommitConsent_MessageLabel}"/>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
-      <Button x:Name="CancelButton"
+      <Button Classes="secondary" x:Name="CancelButton"
               Content="{DynamicResource CommitConsent_Cancel}"
-              Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
               Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
               IsCancel="True"/>
       <Button x:Name="CommitButton"

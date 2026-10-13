@@ -12,9 +12,8 @@
                Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"
                TextWrapping="Wrap"/>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
-      <Button x:Name="CancelButton"
+      <Button Classes="secondary" x:Name="CancelButton"
               Content="{DynamicResource ForceDelete_Cancel}"
-              Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
               Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
               IsCancel="True"
               IsDefault="True"

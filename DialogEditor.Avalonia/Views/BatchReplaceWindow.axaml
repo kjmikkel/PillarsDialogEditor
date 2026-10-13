@@ -21,10 +21,8 @@
             <Setter Property="FontSize"        Value="{DynamicResource FontSize.Body}"/>
             <Setter Property="Padding"         Value="6,3"/>
         </Style>
+        <!-- Layout only: the colours come from Button.secondary (Resources/Buttons.axaml, issue 179). -->
         <Style Selector="Button.action-btn">
-            <Setter Property="Background"      Value="{DynamicResource Brush.Surface.Header}"/>
-            <Setter Property="Foreground"      Value="{DynamicResource Brush.Text.Secondary}"/>
-            <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Padding"         Value="12,5"/>
             <Setter Property="FontSize"        Value="{DynamicResource FontSize.Body}"/>
             <Setter Property="MinWidth"        Value="80"/>
@@ -121,7 +119,7 @@
 
             <!-- Action buttons -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-                <Button Classes="action-btn"
+                <Button Classes="action-btn secondary"
                         Content="{DynamicResource BatchReplace_Preview}"
                         Command="{Binding PreviewCommand}"
                         ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_Preview}"
