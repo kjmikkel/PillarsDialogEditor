@@ -1,3 +1,13 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Headless.XUnit;
+using Avalonia.Media;
+using Avalonia.Threading;
+using DialogEditor.Avalonia.Views;
+using DialogEditor.PatchManager;
+using DialogEditor.Tests.Helpers;
+using DialogEditor.ViewModels.Resources;
+
 namespace DialogEditor.Tests.Theming;
 
 /// <summary>
@@ -6,6 +16,9 @@ namespace DialogEditor.Tests.Theming;
 /// </summary>
 public class TokenPurposeTests
 {
+    // Some windows look up strings while they are built (Tag Reference does).
+    public TokenPurposeTests() => Loc.Configure(new StubStringProvider());
+
     [Fact]
     public void DisabledText_OnlyStylesDisabledControls()
     {
@@ -20,5 +33,48 @@ public class TokenPurposeTests
             .ToList();
         Assert.True(offenders.Count == 0,
             "Brush.Text.Disabled outside a :disabled style (use Brush.Text.Hint):\n" + string.Join("\n", offenders));
+    }
+
+    // ── Window surfaces ──────────────────────────────────────────────────────────
+
+    [AvaloniaTheory]
+    // No Background of their own: they fell back to Fluent's (pure black in Dark, pure white in Light).
+    [InlineData(typeof(TagReferenceWindow))]
+    [InlineData(typeof(VoAliasPickerWindow))]
+    [InlineData(typeof(BranchesWindow))]
+    [InlineData(typeof(AliasImportConfirmDialog))]
+    [InlineData(typeof(BatchVoImportDialog))]
+    [InlineData(typeof(ExceptionReportWindow))]
+    [InlineData(typeof(VoImportDialog))]
+    // "Info" windows had a navy/lavender surface no other window used.
+    [InlineData(typeof(AboutWindow))]
+    [InlineData(typeof(LegendWindow))]
+    [InlineData(typeof(ChangelogWindow))]
+    [InlineData(typeof(DiffHelpWindow))]
+    [InlineData(typeof(PatchManagerAboutWindow))]
+    public void Window_UsesTheWindowSurface(Type windowType)
+    {
+        var w = (Window)Activator.CreateInstance(windowType)!;
+        try
+        {
+            w.Show();
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(Application.Current!.TryGetResource("Brush.Surface.Window", null, out var token));
+            Assert.Equal(((ISolidColorBrush)token!).Color, Assert.IsAssignableFrom<ISolidColorBrush>(w.Background).Color);
+        }
+        finally { w.Close(); }
+    }
+
+    [Fact]
+    public void NoWindow_UsesTheInfoSurface()
+    {
+        // Brush.Surface.Info stays for the canvas minimap, which has to stand apart from the
+        // canvas behind it. A window that looks different for being "info" has no meaning.
+        var offenders = MarkupScan.Elements()
+            .Where(m => m.Element.Parent is null && m.Element.Name.LocalName == "Window" &&
+                        ((string?)m.Element.Attribute("Background"))?.Contains("Brush.Surface.Info") == true)
+            .Select(m => m.File)
+            .ToList();
+        Assert.True(offenders.Count == 0, "Window on Brush.Surface.Info:\n" + string.Join("\n", offenders));
     }
 }
