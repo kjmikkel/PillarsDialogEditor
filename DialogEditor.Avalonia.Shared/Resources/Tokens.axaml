@@ -50,6 +50,10 @@
     <x:Double x:Key="ColumnWidth.BatchVo.Node">60</x:Double>
     <x:Double x:Key="ColumnWidth.BatchVo.Status">50</x:Double>
     <x:Double x:Key="ColumnWidth.BatchVo.Result">50</x:Double>
+    <x:Double x:Key="ColumnWidth.Speaker">140</x:Double>
+    <x:Double x:Key="ColumnWidth.WemGlyph">60</x:Double>
+    <x:Double x:Key="ColumnWidth.FlowIssueKind">110</x:Double>
+    <x:Double x:Key="ColumnWidth.SeverityBadge">16</x:Double>
 
     <!--  TOKENS — semantic brush layer (Layer 0, public contract).
           Every view, converter, and dependent gap binds THESE keys (never Palette.*).

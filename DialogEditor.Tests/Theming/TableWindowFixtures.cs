@@ -35,6 +35,7 @@ internal static class TableWindowFixtures
         ["BatchVoImport"]  = BatchVoImport,
         ["VoValidation"]   = VoValidation,
         ["FlowAnalytics"]  = FlowAnalytics,
+        ["VoAliasPicker"]  = VoAliasPicker,
     };
 
     // These view models finish their work on the UI thread, so blocking it with GetResult()
@@ -194,9 +195,27 @@ internal static class TableWindowFixtures
         static NodeEditSnapshot Node(int id, string text, params int[] to) =>
             new(id, false, SpeakerCategory.Npc, "", "", text, "", "Conversation", "None", "", "", "", false, false,
                 to.Select(t => new LinkEditSnapshot(id, t, 1, "", false)).ToList(), [], []);
-        var snapshot = new ConversationEditSnapshot([Node(0, LongText, 1), Node(1, LongText)]);
-        var vm = new FlowAnalyticsViewModel(() => snapshot, _ => { });
+        // Node 2 is unreachable (a flow issue) and carries a misspelt tag (a text-tag issue), so
+        // both issue lists have a row to lay out.
+        var snapshot = new ConversationEditSnapshot(
+            [Node(0, LongText, 1), Node(1, LongText), Node(2, "Hi [Player Nmae]. " + LongText)]);
+        var vm = new FlowAnalyticsViewModel(() => snapshot, _ => { },
+            () => new Dictionary<string, IReadOnlyList<NodeTranslation>>());
         vm.RefreshCommand.Execute(null);
         return new FlowAnalyticsWindow(vm);
+    }
+
+    // ── VO Alias Picker (VoAliasPickerViewModelTests) ──────────────────────────────
+
+    private static Window VoAliasPicker()
+    {
+        const string speaker = "9c5f12c9-e93d-4952-9f1a-726c9498f8fb";
+        SpeakerNameService.Register(new Dictionary<string, string> { [speaker] = "Speaker With A Very Long Name Indeed" });
+        var node = new ConversationNode(12345, false, SpeakerCategory.Npc, speaker, "", [], [], [], "Conversation", "None");
+        var conv = new Conversation(LongName, [node], new StringTable([new StringEntry(12345, LongText, "")]));
+        var gameRoot = Path.Combine(Path.GetTempPath(), $"VoPickTable_{Guid.NewGuid():N}");
+        var vm = new VoAliasPickerViewModel(new FakeGameDataProvider("poe2", "en", conv), gameRoot, currentAlias: null);
+        vm.SelectedConversation = vm.AllConversations.Single();
+        return new VoAliasPickerWindow(vm);
     }
 }
