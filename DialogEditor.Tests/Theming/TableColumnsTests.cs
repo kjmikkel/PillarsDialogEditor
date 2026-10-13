@@ -66,7 +66,7 @@ public class TableColumnsTests
         {
             var bare = Items(w)
                 .SelectMany(items => items.GetVisualDescendants().OfType<TextBlock>())
-                .Where(t => t.TextTrimming != TextTrimming.None && IsInItem(t))
+                .Where(t => t.TextTrimming != TextTrimming.None && !string.IsNullOrEmpty(t.Text) && IsInItem(t))   // an empty cell has nothing to trim
                 .Where(t => ToolTip.GetTip(t) is not string { Length: > 0 })
                 .Select(t => $"\"{t.Text}\"")
                 .ToList();

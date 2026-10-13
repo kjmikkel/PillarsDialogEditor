@@ -218,12 +218,12 @@
                                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
                                             <!-- Shown only for a row in another conversation, so the
                                                  common single-file report gains no redundant prefix. -->
-                                            <TextBlock Text="{Binding ConversationName}"
+                                            <TextBlock Text="{Binding ConversationName}" ToolTip.Tip="{Binding ConversationName}"
                                                        IsVisible="{Binding IsInAnotherConversation}"
                                                        Foreground="{DynamicResource Brush.Text.Secondary}"
                                                        FontSize="{DynamicResource FontSize.Small}"
                                                        TextTrimming="CharacterEllipsis"/>
-                                            <TextBlock Text="{Binding ChoiceText}"
+                                            <TextBlock Text="{Binding ChoiceText}" ToolTip.Tip="{Binding ChoiceText}"
                                                        Foreground="{DynamicResource Brush.Text.Primary}"
                                                        FontSize="{DynamicResource FontSize.Label}"
                                                        TextTrimming="CharacterEllipsis"/>
@@ -280,12 +280,12 @@
                                     <DataTemplate DataType="vm:PathEndingRowViewModel">
                                         <Grid ColumnDefinitions="*,Auto" Margin="0,2">
                                             <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding ConversationName}"
+                                                <TextBlock Text="{Binding ConversationName}" ToolTip.Tip="{Binding ConversationName}"
                                                            IsVisible="{Binding IsInAnotherConversation}"
                                                            Foreground="{DynamicResource Brush.Text.Secondary}"
                                                            FontSize="{DynamicResource FontSize.Small}"
                                                            TextTrimming="CharacterEllipsis"/>
-                                                <TextBlock Text="{Binding EndingText}"
+                                                <TextBlock Text="{Binding EndingText}" ToolTip.Tip="{Binding EndingText}"
                                                            Foreground="{DynamicResource Brush.Text.Primary}"
                                                            FontSize="{DynamicResource FontSize.Label}"
                                                            TextTrimming="CharacterEllipsis"/>
@@ -393,7 +393,7 @@
                                                Width="110" Margin="8,0,6,0"/>
                                     <!-- Node snippet -->
                                     <TextBlock Grid.Column="2"
-                                               Text="{Binding DisplayText}"
+                                               Text="{Binding DisplayText}" ToolTip.Tip="{Binding DisplayText}"
                                                Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Label}"
                                                VerticalAlignment="Center"
                                                TextTrimming="CharacterEllipsis"/>
@@ -434,7 +434,7 @@
                                 <DataTemplate DataType="vm:TokenIssueRowViewModel">
                                     <Grid ColumnDefinitions="*,Auto" Margin="0,2" Height="28">
                                         <TextBlock Grid.Column="0"
-                                                   Text="{Binding DisplayText}"
+                                                   Text="{Binding DisplayText}" ToolTip.Tip="{Binding DisplayText}"
                                                    Foreground="{DynamicResource Brush.Text.Secondary}"
                                                    FontSize="{DynamicResource FontSize.Label}"
                                                    VerticalAlignment="Center"
