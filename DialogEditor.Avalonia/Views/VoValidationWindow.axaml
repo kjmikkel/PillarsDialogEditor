@@ -54,16 +54,17 @@
                 <ItemsControl ItemsSource="{Binding Results}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="vm:VoValidationIssue">
-                            <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,3" Height="28">
-                                <!-- Node ID -->
+                            <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,3" MinHeight="28">
+                                <!-- Node ID: a font-scaled width, and the row a minimum height, so a large
+                                     font scale neither cuts the label nor the row (issue 178) -->
                                 <TextBlock Grid.Column="0"
                                            Text="{Binding NodeLabel}"
                                            Foreground="{DynamicResource Brush.Text.Muted}"
                                            FontSize="{DynamicResource FontSize.Small}"
-                                           Width="70" VerticalAlignment="Center"/>
+                                           Width="{DynamicResource ColumnWidth.NodeId}" VerticalAlignment="Center"/>
                                 <!-- Text preview -->
                                 <TextBlock Grid.Column="1"
-                                           Text="{Binding TextPreview}"
+                                           Text="{Binding TextPreview}" ToolTip.Tip="{Binding TextPreview}"
                                            Foreground="{DynamicResource Brush.Text.Secondary}"
                                            FontSize="{DynamicResource FontSize.Label}"
                                            TextTrimming="CharacterEllipsis"
@@ -93,7 +94,7 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="vm:VoOrphanIssue">
                             <Grid ColumnDefinitions="*,Auto" Margin="0,2">
-                                <TextBlock Grid.Column="0" Text="{Binding RelativePath}"
+                                <TextBlock Grid.Column="0" Text="{Binding RelativePath}" ToolTip.Tip="{Binding RelativePath}"
                                            Foreground="{DynamicResource Brush.Text.Secondary}"
                                            FontSize="{DynamicResource FontSize.Label}"
                                            TextTrimming="CharacterEllipsis"
