@@ -828,8 +828,8 @@ Saving records your edits to the open project — game files are not touched unt
         expects. Aim for one short sentence.
 
         Identifiers inside these hints are values the game itself parses and must NOT
-        be translated: the operator names (EqualTo …), the file name
-        GlobalVariables.csv, and the example flag name npc_met_edér. Translate the
+        be translated: the operator names (EqualTo …) and the example flag name
+        npc_met_edér. Translate the
         prose around them. Examples introduced by "e.g." may be swapped for ones that
         read naturally in your language, as long as they stay valid values.
     -->
@@ -841,9 +841,9 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ConditionHint_Boolean">true or false</sys:String>
     <!-- The six operator names are written verbatim into game data — keep them exactly -->
     <sys:String x:Key="ConditionHint_Operator">Comparison operator: EqualTo, NotEqualTo, GreaterThan, LessThan, GreaterThanOrEqualTo, LessThanOrEqualTo</sys:String>
-    <!-- GlobalVariables.csv is a real file in the game install; npc_met_edér is a
-         sample flag name. Keep both spellings intact. -->
-    <sys:String x:Key="ConditionHint_GlobalVariable">Name of a global integer flag (e.g. npc_met_edér). Check GlobalVariables.csv for valid names.</sys:String>
+    <!-- npc_met_edér is a sample flag name; keep its spelling intact. The suggestions
+         come from the game's own global-variable declarations (issue 199). -->
+    <sys:String x:Key="ConditionHint_GlobalVariable">Name of a global integer flag (e.g. npc_met_edér). Type to pick from the game's own global variables.</sys:String>
     <sys:String x:Key="ConditionHint_ObjectGuid">GUID of an in-scene game object. Type a name or GUID prefix to search, or paste any GUID directly.</sys:String>
     <sys:String x:Key="ConditionHint_Guid">GUID value. Type a name or GUID prefix to search, or paste any GUID directly.</sys:String>
     <!-- "edér" is the companion Edér's conversation file; keep the spelling -->

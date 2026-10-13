@@ -127,8 +127,6 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
     public IReadOnlyDictionary<string, string> LoadChatterPrefixes() =>
         MergeLaterWins(BundlesNamed("gamedata", "speakers.gamedatabundle").Select(Poe2SpeakerNameParser.ParseChatterPrefixesFile));
 
-    private string GameDataRoot => Path.Combine(ExportedRoot, "design", "gamedata");
-
     public IReadOnlyDictionary<string, IReadOnlyList<GameDataEntry>> LoadGameDataNames()
     {
         var result = new Dictionary<string, IReadOnlyList<GameDataEntry>>();
@@ -220,8 +218,19 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
         var quests = BundlesNamed("quests", "quests.questbundle").SelectMany(Poe2QuestBundleParser.ParseFile).ToList();
         if (quests.Count > 0) result["Quest"] = LastOfEach(quests);
 
-        // ── GlobalVariables.csv ──────────────────────────────────────────────
-        var vars = GlobalVariablesCsvParser.ParseFile(Path.Combine(GameDataRoot, "GlobalVariables.csv"));   // base only: issue 199
+        // ── Global variables ─────────────────────────────────────────────────
+        // Every data folder's design/globalvariables/*.globalvariablesbundle, keyed on the tag,
+        // as GlobalVariables.LoadMetadata reads them. pillars1's names are only kept aside by the
+        // game for importing a PoE1 save, not declared as variables, so they aren't offered
+        // (issue 199). Sorted by name, as the suggestions are browsed alphabetically.
+        var vars = Roots.Select(r => Path.Combine(r.Path, "design", "globalvariables"))
+            .Where(Directory.Exists)
+            .SelectMany(d => Directory.EnumerateFiles(d, "*.globalvariablesbundle"))
+            .Where(f => !Path.GetFileNameWithoutExtension(f).Equals("pillars1", StringComparison.OrdinalIgnoreCase))
+            .SelectMany(Poe2GlobalVariablesBundleParser.ParseFile)
+            .DistinctBy(v => v.Name, StringComparer.Ordinal)
+            .OrderBy(v => v.Name, StringComparer.OrdinalIgnoreCase)
+            .ToList();
         if (vars.Count > 0) result["GlobalVariable"] = vars;
 
         // ── Conversations ─────────────────────────────────────────────────────
