@@ -79,8 +79,8 @@
                                 <StackPanel Spacing="6">
 
                                     <!-- Row header -->
-                                    <!-- Auto columns with the old widths as MinWidth (issue 177): the fixed 70 px column cut
-                                         "And" to "An", and the 28 px ones clipped the glyphs, once their text followed the font scale. -->
+                                    <!-- Auto columns with the old widths as MinWidth (issue 177): the fixed 70 px column cut
+                                         "And" to "An", and the 28 px ones clipped the glyphs, once their text followed the font scale. -->
                                     <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto">
                                         <!-- And / Or -->
                                         <ComboBox Grid.Column="0" MinWidth="70"
