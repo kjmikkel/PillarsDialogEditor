@@ -67,7 +67,7 @@ public static class WindowSizing
             state = new State { Design = WindowSize.Of(w) };
             States.Add(w, state);
         }
-        WindowSizingRule.Compute(state.Design, scale, WorkingAreaProvider(w), GetMode(w)).ApplyTo(w);
+        WindowSizingRule.Compute(state.Design, scale, WorkingAreaProvider(w), GetMode(w), w.SizeToContent).ApplyTo(w);
         state.AppliedScale = scale;
         Open.Add(w);
     }
@@ -79,7 +79,7 @@ public static class WindowSizing
         {
             if (!States.TryGetValue(w, out var state) || state.AppliedScale == scale) continue;
             WindowSizingRule.Rescale(WindowSize.Of(w), state.Design, state.AppliedScale, scale,
-                                     WorkingAreaProvider(w), GetMode(w)).ApplyTo(w);
+                                     WorkingAreaProvider(w), GetMode(w), w.SizeToContent).ApplyTo(w);
             state.AppliedScale = scale;
         }
     }
