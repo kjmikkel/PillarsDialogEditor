@@ -1,0 +1,21 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Every window gets a theme surface (issue 180).
+
+         A window that sets no Background falls back to Fluent's own: pure black in Dark (the
+         High Contrast colour) and pure white in Light, which matches none of our palettes. This
+         style gives every window Brush.Surface.Window instead, so a new window can't miss it.
+         Dialogs that set Brush.Surface.Panel on the element keep it: a local value outranks a
+         style.
+
+         There is no separate "info" window look. About, Legend, Changelog and Diff Help used
+         Brush.Surface.Info, a navy or lavender no other window had; they now use the window
+         surface like everything else. Brush.Surface.Info stays for the canvas minimap, which has
+         to stand apart from the canvas behind it. TokenPurposeTests checks both. -->
+
+    <Style Selector="Window">
+        <Setter Property="Background" Value="{DynamicResource Brush.Surface.Window}"/>
+    </Style>
+
+</Styles>

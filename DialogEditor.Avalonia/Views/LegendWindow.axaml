@@ -5,8 +5,7 @@
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="360" Height="640" MinWidth="300" MinHeight="300" MaxHeight="840"
         CanResize="True"
-        ShowInTaskbar="False"
-        Background="{DynamicResource Brush.Surface.Info}">
+        ShowInTaskbar="False">
 
     <Window.Styles>
         <!-- legendRow: makes a legend swatch row a focusable tab stop while keeping

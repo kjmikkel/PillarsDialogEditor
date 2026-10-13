@@ -4,7 +4,7 @@
         Title="{DynamicResource DiffHelp_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="380" Height="560" MinHeight="300" CanResize="True"
-        ShowInTaskbar="False" Background="{DynamicResource Brush.Surface.Info}">
+        ShowInTaskbar="False">
     <ScrollViewer>
         <StackPanel Margin="14,12,14,16" Spacing="6">
             <TextBlock Text="{DynamicResource DiffHelp_ColourKeyHeader}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"/>
