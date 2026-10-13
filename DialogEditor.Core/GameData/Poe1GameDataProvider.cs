@@ -118,6 +118,15 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
     public (string ConversationsRoot, string StringTablesRoot) GetBackupRoots()
         => (ConversationsRoot, StringTablesRoot);
 
+    // Each expansion folder's conversation text per installed language (issue 201). Its
+    // conversations are in data, which the base backup already keeps.
+    public IReadOnlyList<ExtraBackupFolder> GetExtraBackupFolders() =>
+        Roots.Where(r => r.Folder != Poe1DataRoots.Base).SelectMany(r => AvailableLanguages
+            .Select(lang => (Lang: lang, Text: Path.Combine(r.Path, "localized", lang, "text", "conversations")))
+            .Where(t => Directory.Exists(t.Text))
+            .Select(t => new ExtraBackupFolder($"dlc/{r.Folder}/stringtables/{t.Lang}", t.Text, SinceFormat: 4)))
+        .ToList();
+
     public void SaveConversation(ConversationFile file, ConversationEditSnapshot snapshot)
     {
         Poe1ConversationSerializer.SaveToFile(file.ConversationPath, snapshot);
