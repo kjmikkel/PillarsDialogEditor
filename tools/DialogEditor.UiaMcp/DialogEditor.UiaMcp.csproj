@@ -5,6 +5,9 @@
          the same assemblies DriveApp.ps1 loads with Add-Type. NOTE: UseWPF swaps in the
          WPF implicit-usings set, which does NOT include System.IO — import it explicitly. -->
     <TargetFramework>net10.0-windows</TargetFramework>
+    <!-- Lets GitHub's dependency submission restore this Windows-only project on its Linux runner (#212);
+         it changes nothing when building on Windows. -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UseWPF>true</UseWPF>
     <!-- Supplies System.Windows.Forms.SendKeys (used by send_keys and the focus-and-type
          fallback) and System.Drawing for the screenshot tool. UseWPF alone does not. -->
