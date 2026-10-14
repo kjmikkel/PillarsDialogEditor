@@ -532,6 +532,12 @@ public partial class MainWindowViewModel : ObservableObject
         => new(_currentGameDirectory, _folderPicker, fontScaleApplier,
                SpellStoreFactory?.Invoke(), autosaveScheduler);
 
+    /// The Patch Manager opened from File → Patch Manager starts on the editor's game
+    /// folder, so the writer doesn't browse to it a second time (issue 183). Set through
+    /// the property, not a field, so the backup status refreshes for that folder.
+    public PatchManagerViewModel CreatePatchManagerViewModel(IFolderPicker folderPicker, IFilePicker filePicker)
+        => new(folderPicker, filePicker) { GameFolder = _currentGameDirectory };
+
     /// Returns a ready-to-run VoValidationViewModel for the current conversation,
     /// or null if CanValidateVO is false (e.g. wrong game, no nodes loaded).
     public VoValidationViewModel? CreateVoValidationViewModel()
