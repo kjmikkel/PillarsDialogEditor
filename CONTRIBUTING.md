@@ -46,7 +46,7 @@ cd tools/catalogue-gen; python -m pytest -q
 cd tools/lexicon-gen;   python -m pytest -q
 ```
 
-To build release archives, see [Building for distribution](README.md#building-for-distribution).
+To build release archives, see [docs/building.md](docs/building.md).
 
 ## Rules for every change
 

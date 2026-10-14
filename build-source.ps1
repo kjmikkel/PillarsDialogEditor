@@ -125,9 +125,14 @@ function New-SourcePackage {
     # Root files recipients need to build and orient themselves.
     # Directory.Packages.props is required: projects carry no package versions of
     # their own (Central Package Management), so without it nothing restores.
-    foreach ($file in @("README.md", "VERSION", "PATCHER_VERSION", "LICENSE", "THIRD_PARTY_LICENSES.md", "Directory.Packages.props")) {
+    # CONTRIBUTING.md and docs/building.md hold the build instructions the README links to
+    # (issue 70), so they keep their relative paths.
+    foreach ($file in @("README.md", "CONTRIBUTING.md", "docs/building.md", "VERSION", "PATCHER_VERSION", "LICENSE", "THIRD_PARTY_LICENSES.md", "Directory.Packages.props")) {
         $src = Join-Path $Root $file
-        if (Test-Path $src) { Copy-Item $src -Destination $stageDir -Force }
+        if (-not (Test-Path $src)) { continue }
+        $target = Join-Path $stageDir $file
+        New-Item (Split-Path $target -Parent) -ItemType Directory -Force | Out-Null
+        Copy-Item $src -Destination $target -Force
     }
 
     # Unlike the root files above, a missing extra file is a hard error: the
