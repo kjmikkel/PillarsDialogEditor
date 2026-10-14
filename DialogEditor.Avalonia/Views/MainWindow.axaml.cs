@@ -771,7 +771,7 @@ public partial class MainWindow : Window
     {
         if (_patchManagerWindow is null || !_patchManagerWindow.IsVisible)
         {
-            var vm = new PatchManagerViewModel(
+            var vm = ((MainWindowViewModel)DataContext!).CreatePatchManagerViewModel(
                 new AvaloniaFolderPicker(this),
                 new AvaloniaFilePicker(this));
             _patchManagerWindow = new PatchManagerWindow(vm);
