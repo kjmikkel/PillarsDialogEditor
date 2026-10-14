@@ -17,7 +17,10 @@
             <Setter Property="Foreground"        Value="{DynamicResource Brush.Text.Muted}"/>
             <Setter Property="FontSize"          Value="{DynamicResource FontSize.Label}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="MinWidth"          Value="110"/>
+            <!-- Issue 190: the label column takes the font-scaled ColumnWidth.ParameterName in the row grid,
+                 so a longer name trims (with its full text as a tooltip) instead of being cut off. -->
+            <Setter Property="TextTrimming"      Value="CharacterEllipsis"/>
+            <Setter Property="Width"             Value="{DynamicResource ColumnWidth.ParameterName}"/>
         </Style>
         <Style Selector="Button.type-hint">
             <Setter Property="Background"        Value="Transparent"/>
@@ -170,12 +173,13 @@
                                                   IsVisible="{Binding IsLeaf}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate DataType="vm:ParameterValueViewModel">
-                                                <Grid ColumnDefinitions="110,*,Auto"
+                                                <Grid ColumnDefinitions="Auto,*,Auto"
                                                       Margin="0,2,0,0" MinHeight="32">
                                                     <!-- Parameter label -->
                                                     <TextBlock Grid.Column="0"
                                                                Classes="param-label"
-                                                               Text="{Binding Name}"/>
+                                                               Text="{Binding Name}"
+                                                               ToolTip.Tip="{Binding Name}"/>
                                                     <!-- Text input (shown when not an enum type) -->
                                                     <TextBox Grid.Column="1"
                                                              Classes="param-input"

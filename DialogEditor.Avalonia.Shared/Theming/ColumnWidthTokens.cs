@@ -32,6 +32,14 @@ public static class ColumnWidthTokens
         ["ColumnWidth.Speaker"]               = 140,
         ["ColumnWidth.WemGlyph"]              = 60,
         ["ColumnWidth.FlowIssueKind"]         = 110,
+        // Issue 190: Text Tag Validation lists and the Script/Condition parameter rows.
+        ["ColumnWidth.IssueType"]            = 60,
+        ["ColumnWidth.Category"]             = 110,
+        ["ColumnWidth.Confidence"]           = 70,
+        ["ColumnWidth.Tier"]                 = 70,
+        ["ColumnWidth.ParameterName"]        = 110,
+        // Minimum width of a Batch VO Import file column: the file name plus its Play, Browse and Clear buttons.
+        ["ColumnWidth.BatchVo.FileMin"]      = 150,
         // The Flow Analytics severity badge is square: this is its width and its height.
         ["ColumnWidth.SeverityBadge"]        = 16,
     };
