@@ -52,37 +52,40 @@
                     AutomationProperties.Name="{DynamicResource Legend_ShowOnce_Help}"
                     ToolTip.Tip="{DynamicResource Legend_ShowOnce_Help}"
                     AutomationProperties.HelpText="{DynamicResource Legend_ShowOnce_Help}">
-                <StackPanel Orientation="Horizontal">
+                <!-- Grid, not a horizontal StackPanel: the text gets the width left of the swatch and wraps (issue 190). -->
+                <Grid ColumnDefinitions="Auto,*">
                     <Border Width="34" Height="2.5" Background="{DynamicResource Brush.Connection.Default}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                    <TextBlock FontSize="{DynamicResource FontSize.Body}" VerticalAlignment="Center">
+                    <TextBlock FontSize="{DynamicResource FontSize.Body}" VerticalAlignment="Center" TextWrapping="Wrap" Grid.Column="1">
                         <Run FontWeight="Bold" Text="{DynamicResource Legend_ShowOnce}" Foreground="{DynamicResource Brush.Text.Secondary}"/>
                         <Run Text="{DynamicResource Legend_ShowOnce_Desc}" Foreground="{DynamicResource Brush.Text.Muted}"/>
                     </TextBlock>
-                </StackPanel>
+                </Grid>
             </Button>
             <Button Classes="legendRow" Margin="0,0,0,5"
                     AutomationProperties.Name="{DynamicResource Legend_Always_Help}"
                     ToolTip.Tip="{DynamicResource Legend_Always_Help}"
                     AutomationProperties.HelpText="{DynamicResource Legend_Always_Help}">
-                <StackPanel Orientation="Horizontal">
+                <!-- Grid, not a horizontal StackPanel: the text gets the width left of the swatch and wraps (issue 190). -->
+                <Grid ColumnDefinitions="Auto,*">
                     <Border Width="34" Height="2.5" Background="{DynamicResource Brush.Connection.Always}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                    <TextBlock FontSize="{DynamicResource FontSize.Body}" VerticalAlignment="Center">
+                    <TextBlock FontSize="{DynamicResource FontSize.Body}" VerticalAlignment="Center" TextWrapping="Wrap" Grid.Column="1">
                         <Run FontWeight="Bold" Text="{DynamicResource Legend_Always}" Foreground="{DynamicResource Brush.Text.Secondary}"/>
                         <Run Text="{DynamicResource Legend_Always_Desc}" Foreground="{DynamicResource Brush.Text.Muted}"/>
                     </TextBlock>
-                </StackPanel>
+                </Grid>
             </Button>
             <Button Classes="legendRow" Margin="0,0,0,14"
                     AutomationProperties.Name="{DynamicResource Legend_Never_Help}"
                     ToolTip.Tip="{DynamicResource Legend_Never_Help}"
                     AutomationProperties.HelpText="{DynamicResource Legend_Never_Help}">
-                <StackPanel Orientation="Horizontal">
+                <!-- Grid, not a horizontal StackPanel: the text gets the width left of the swatch and wraps (issue 190). -->
+                <Grid ColumnDefinitions="Auto,*">
                     <Border Width="34" Height="2.5" Background="{DynamicResource Brush.Connection.Never}" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                    <TextBlock FontSize="{DynamicResource FontSize.Body}" VerticalAlignment="Center">
+                    <TextBlock FontSize="{DynamicResource FontSize.Body}" VerticalAlignment="Center" TextWrapping="Wrap" Grid.Column="1">
                         <Run FontWeight="Bold" Text="{DynamicResource Legend_Never}" Foreground="{DynamicResource Brush.Text.Secondary}"/>
                         <Run Text="{DynamicResource Legend_Never_Desc}" Foreground="{DynamicResource Brush.Text.Muted}"/>
                     </TextBlock>
-                </StackPanel>
+                </Grid>
             </Button>
 
             <TextBlock Text="{DynamicResource Legend_NodeTypes}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold" Margin="0,0,0,6"/>

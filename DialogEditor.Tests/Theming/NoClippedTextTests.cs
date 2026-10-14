@@ -58,7 +58,7 @@ public class NoClippedTextTests
     private static readonly Dictionary<string, Func<Window>> Populated = new Dictionary<string, Func<Window>>
     {
         // One condition row: its And/Or combo sat in a fixed 70 px column and showed "An" at 2.0x.
-        ["ConditionEditor"] = () => new ConditionEditorWindow(new ConditionEditorViewModel(
+        ["ConditionEditor_AndOrCombo"] = () => new ConditionEditorWindow(new ConditionEditorViewModel(
             "canonical",
             [new ConditionLeaf("Boolean IsGlobalValue(String, Operator, Int32)", ["flag", "EqualTo", "1"], false, "And")],
             _ => { })),
@@ -74,7 +74,72 @@ public class NoClippedTextTests
     public void PopulatedWindow_ClipsNoText(string name, double scale) =>
         AssertClipsNoText(Populated[name], scale);
 
-    private static void AssertClipsNoText(Func<Window> create, double scale)
+    // The Legend's Connections rows were cut off at the right edge (issue 190). They only clip when
+    // the window is narrower than the text, and the sizing rules grow the window with the font, so the
+    // default size never shows it: shrink the window to its own MinWidth, the narrowest a user can go.
+    [AvaloniaTheory]
+    [InlineData(1.0)]
+    [InlineData(2.0)]
+    public void LegendWindow_AtMinWidth_ClipsNoText(double scale) =>
+        AssertClipsNoText(() => new LegendWindow(), scale, w =>
+        {
+            w.Width = w.MinWidth;
+            Dispatcher.UIThread.RunJobs();
+        });
+
+    // Batch VO Import at its narrowest (issue 190): the two file columns share what is left of the
+    // row, and without a minimum the Play, Browse and Clear buttons are squeezed out of them.
+    [AvaloniaTheory]
+    [InlineData("BatchVoImport_Files", 1.0)]
+    [InlineData("BatchVoImport_AllConversations", 1.0)]
+    [InlineData("BatchVoImport_Files", 1.5)]
+    [InlineData("BatchVoImport_AllConversations", 1.5)]
+    public void BatchVoImport_AtMinWidth_ClipsNoText(string fixture, double scale) =>
+        AssertClipsNoText(TableWindowFixtures.All[fixture], scale, w =>
+        {
+            w.Width = w.MinWidth;
+            Dispatcher.UIThread.RunJobs();
+        });
+
+    // ...and the file name must keep room to be read: at least four em beside the buttons, so a
+    // name is more than an ellipsis.
+    [AvaloniaTheory]
+    [InlineData("BatchVoImport_Files", 1.0)]
+    [InlineData("BatchVoImport_AllConversations", 1.0)]
+    [InlineData("BatchVoImport_Files", 1.5)]
+    [InlineData("BatchVoImport_AllConversations", 1.5)]
+    public void BatchVoImport_AtMinWidth_FileNamesKeepRoom(string fixture, double scale)
+    {
+        WindowSizing.Register();
+        var provider = WindowSizing.WorkingAreaProvider;
+        WindowSizing.WorkingAreaProvider = _ => new Size(1366, 768);
+        var w = TableWindowFixtures.All[fixture]();
+        try
+        {
+            new FontScaleApplier().Apply(scale);
+            w.Show();
+            Dispatcher.UIThread.RunJobs();
+            w.Width = w.MinWidth;
+            Dispatcher.UIThread.RunJobs();
+            w.UpdateLayout();
+            var names = w.GetVisualDescendants().OfType<TextBlock>()
+                .Where(t => t.IsEffectivelyVisible && t.TextTrimming != TextTrimming.None
+                            && t.Text is { } x && x.EndsWith(".wav", StringComparison.Ordinal))
+                .ToList();
+            Assert.Equal(2, names.Count);
+            foreach (var n in names)
+                Assert.True(n.Bounds.Width >= n.FontSize * 4,
+                    $"{fixture} at {scale}x: file name \"{n.Text}\" has {n.Bounds.Width:0} px, wants {n.FontSize * 4:0}");
+        }
+        finally
+        {
+            w.Close();
+            new FontScaleApplier().Apply(1.0);
+            WindowSizing.WorkingAreaProvider = provider;
+        }
+    }
+
+    private static void AssertClipsNoText(Func<Window> create, double scale, Action<Window>? adjust = null)
     {
         WindowSizing.Register();
         var provider = WindowSizing.WorkingAreaProvider;
@@ -85,6 +150,7 @@ public class NoClippedTextTests
             new FontScaleApplier().Apply(scale);
             w.Show();
             Dispatcher.UIThread.RunJobs();   // let SizeToContent and the clamp settle (see TallWindowsFitTests)
+            if (adjust is not null) { adjust(w); w.UpdateLayout(); }
             var clipped = Clipped(w).ToList();
             Assert.True(clipped.Count == 0,
                 $"{w.GetType().Name} at {scale}x clips:\n" + string.Join("\n", clipped.Select(c => $"  \"{c.Text}\": {c.Why}")));
