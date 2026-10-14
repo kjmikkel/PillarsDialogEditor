@@ -22,7 +22,10 @@
             <Setter Property="Foreground"        Value="{DynamicResource Brush.Text.Muted}"/>
             <Setter Property="FontSize"          Value="{DynamicResource FontSize.Label}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="MinWidth"          Value="110"/>
+            <!-- Issue 190: the label column takes the font-scaled ColumnWidth.ParameterName in the row grid,
+                 so a longer name trims (with its full text as a tooltip) instead of being cut off. -->
+            <Setter Property="TextTrimming"      Value="CharacterEllipsis"/>
+            <Setter Property="Width"             Value="{DynamicResource ColumnWidth.ParameterName}"/>
         </Style>
         <Style Selector="TextBox.param-input">
             <Setter Property="Background"       Value="{DynamicResource Brush.Surface.Input}"/>
@@ -65,13 +68,14 @@
                         <Border Background="{DynamicResource Brush.Surface.Panel}" CornerRadius="4" Margin="0,0,0,4" Padding="10,8">
                             <StackPanel Spacing="6">
                                 <!-- Row header: name + ↑↓✕ -->
-                                <Grid ColumnDefinitions="*,28,28,28">
+                                <!-- Auto columns with MinWidth="28" buttons: a fixed 28 squeezed the glyph at 2.0x (issue 190). -->
+                                <Grid ColumnDefinitions="*,Auto,Auto,Auto">
                                     <TextBlock Grid.Column="0"
                                                Text="{Binding DisplayName}"
                                                Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Medium}"
                                                FontWeight="SemiBold"
                                                VerticalAlignment="Center"/>
-                                    <Button Grid.Column="1" Content="↑"
+                                    <Button Grid.Column="1" MinWidth="28" Content="↑"
                                             Command="{Binding DataContext.MoveUpCommand,
                                                       RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding}"
@@ -80,7 +84,7 @@
                                             ToolTip.Tip="{DynamicResource ToolTip_MoveScriptUp}"
                                             AutomationProperties.HelpText="{DynamicResource ToolTip_MoveScriptUp}"
                                             AutomationProperties.Name="{DynamicResource AutomationName_MoveScriptUp}"/>
-                                    <Button Grid.Column="2" Content="↓"
+                                    <Button Grid.Column="2" MinWidth="28" Content="↓"
                                             Command="{Binding DataContext.MoveDownCommand,
                                                       RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding}"
@@ -89,7 +93,7 @@
                                             ToolTip.Tip="{DynamicResource ToolTip_MoveScriptDown}"
                                             AutomationProperties.HelpText="{DynamicResource ToolTip_MoveScriptDown}"
                                             AutomationProperties.Name="{DynamicResource AutomationName_MoveScriptDown}"/>
-                                    <Button Grid.Column="3" Content="✕"
+                                    <Button Grid.Column="3" MinWidth="28" Content="✕"
                                             Command="{Binding DataContext.DeleteRowCommand,
                                                       RelativeSource={RelativeSource AncestorType=Window}}"
                                             CommandParameter="{Binding}"
@@ -105,8 +109,8 @@
                                                           Converter={StaticResource CountToVis}}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate DataType="vm:ParameterValueViewModel">
-                                            <Grid ColumnDefinitions="110,*,Auto" Margin="0,2,0,0" MinHeight="32">
-                                                <TextBlock Grid.Column="0" Classes="param-label" Text="{Binding Name}"/>
+                                            <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,2,0,0" MinHeight="32">
+                                                <TextBlock Grid.Column="0" Classes="param-label" Text="{Binding Name}" ToolTip.Tip="{Binding Name}"/>
                                                 <TextBox Grid.Column="1" Classes="param-input"
                                                          Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
                                                          IsVisible="{Binding IsText}"

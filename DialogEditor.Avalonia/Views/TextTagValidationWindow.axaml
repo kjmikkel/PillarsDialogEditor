@@ -54,24 +54,28 @@
                                            Foreground="{DynamicResource Brush.Text.Emphasis}"
                                            FontSize="{DynamicResource FontSize.Small}"
                                            FontWeight="Bold"
-                                           Width="150" VerticalAlignment="Center"
+                                           Width="{DynamicResource ColumnWidth.Conversation}" VerticalAlignment="Center"
+                                           ToolTip.Tip="{Binding ConversationName}"
                                            TextTrimming="CharacterEllipsis"/>
                                 <TextBlock Grid.Column="1"
                                            Text="{Binding NodeLabel}"
                                            Foreground="{DynamicResource Brush.Text.Muted}"
                                            FontSize="{DynamicResource FontSize.Small}"
-                                           Width="66" VerticalAlignment="Center"/>
+                                           Width="{DynamicResource ColumnWidth.NodeLabel}" VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding NodeLabel}"/>
                                 <TextBlock Grid.Column="2"
                                            Text="{Binding LanguageLabel}"
                                            Foreground="{DynamicResource Brush.Text.Tertiary}"
                                            FontSize="{DynamicResource FontSize.Small}"
-                                           Width="60" VerticalAlignment="Center"/>
+                                           Width="{DynamicResource ColumnWidth.Language}" VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding LanguageLabel}"/>
                                 <TextBlock Grid.Column="3"
                                            Text="{Binding TypeLabel}"
                                            Foreground="{DynamicResource Brush.Text.Tertiary}"
                                            FontSize="{DynamicResource FontSize.Small}"
                                            FontWeight="Bold"
-                                           Width="60" VerticalAlignment="Center"/>
+                                           Width="{DynamicResource ColumnWidth.IssueType}" VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding TypeLabel}"/>
                                 <TextBlock Grid.Column="4"
                                            Text="{Binding Message}"
                                            Foreground="{DynamicResource Brush.Text.Secondary}"
@@ -121,22 +125,29 @@
                 <ItemsControl ItemsSource="{Binding StaleRows}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="vm:StaleDataRowViewModel">
-                            <Grid ColumnDefinitions="150,66,Auto,Auto,*,Auto" Margin="0,3">
+                            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*,Auto" Margin="0,3">
                                 <TextBlock Grid.Column="0" Text="{Binding ConversationName}"
+                                           Width="{DynamicResource ColumnWidth.Conversation}"
+                                           ToolTip.Tip="{Binding ConversationName}"
                                            Foreground="{DynamicResource Brush.Text.Emphasis}"
                                            FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"
                                            VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                 <TextBlock Grid.Column="1" Text="{Binding NodeLabel}"
+                                           Width="{DynamicResource ColumnWidth.NodeLabel}"
+                                           ToolTip.Tip="{Binding NodeLabel}"
                                            Foreground="{DynamicResource Brush.Text.Muted}"
-                                           FontSize="{DynamicResource FontSize.Small}" VerticalAlignment="Center"/>
+                                           FontSize="{DynamicResource FontSize.Small}" VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis"/>
                                 <TextBlock Grid.Column="2" Text="{Binding CategoryLabel}"
                                            Foreground="{DynamicResource Brush.Text.Tertiary}"
                                            FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"
-                                           Width="110" VerticalAlignment="Center"/>
+                                           Width="{DynamicResource ColumnWidth.Category}" VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding CategoryLabel}"/>
                                 <TextBlock Grid.Column="3" Text="{Binding ConfidenceLabel}"
                                            Foreground="{DynamicResource Brush.Text.Secondary}"
                                            FontSize="{DynamicResource FontSize.Small}"
-                                           Width="70" VerticalAlignment="Center"/>
+                                           Width="{DynamicResource ColumnWidth.Confidence}" VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding ConfidenceLabel}"/>
                                 <Button Grid.Column="5" Content="{DynamicResource Button_Remove}"
                                         Command="{Binding RemoveCommand}"
                                         IsVisible="{Binding CanRemove}"
@@ -269,10 +280,12 @@
                 <ItemsControl ItemsSource="{Binding DuplicateRows}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="vm:DuplicateRowViewModel">
-                            <Grid ColumnDefinitions="70,*,Auto,Auto" Margin="0,3">
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,3">
                                 <TextBlock Grid.Column="0" Text="{Binding TierLabel}"
                                            Foreground="{DynamicResource Brush.Text.Tertiary}"
                                            FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"
+                                           Width="{DynamicResource ColumnWidth.Tier}"
+                                           TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding TierLabel}"
                                            VerticalAlignment="Center"/>
                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                     <TextBlock Text="{Binding Text}"
@@ -316,10 +329,12 @@
             <ItemsControl ItemsSource="{Binding IgnoredDuplicateRows}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="vm:IgnoredDuplicateRowViewModel">
-                        <Grid ColumnDefinitions="70,*,Auto" Margin="0,3">
+                        <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,3">
                             <TextBlock Grid.Column="0" Text="{Binding TierLabel}"
                                        Foreground="{DynamicResource Brush.Text.Tertiary}"
                                        FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"
+                                       Width="{DynamicResource ColumnWidth.Tier}"
+                                       TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding TierLabel}"
                                        VerticalAlignment="Center"/>
                             <TextBlock Grid.Column="1" Text="{Binding DisplayText}"
                                        Foreground="{DynamicResource Brush.Text.Secondary}"

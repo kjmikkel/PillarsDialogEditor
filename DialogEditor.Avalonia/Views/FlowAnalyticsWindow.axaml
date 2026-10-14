@@ -370,7 +370,7 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="vm:FlowIssueViewModel">
                                 <Grid ColumnDefinitions="Auto,Auto,*,Auto"
-                                      Margin="0,2" Height="32">
+                                      Margin="0,2" MinHeight="32">
                                     <!-- Severity icon. The badge and the kind label take font-scaled
                                          ColumnWidth.* sizes (issue 178): at fixed sizes the glyph and
                                          labels such as "No incoming links" overflowed at 2.0x. -->
@@ -432,7 +432,7 @@
                         <ItemsControl ItemsSource="{Binding TokenIssues}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="vm:TokenIssueRowViewModel">
-                                    <Grid ColumnDefinitions="*,Auto" Margin="0,2" Height="28">
+                                    <Grid ColumnDefinitions="*,Auto" Margin="0,2" MinHeight="28">
                                         <TextBlock Grid.Column="0"
                                                    Text="{Binding DisplayText}" ToolTip.Tip="{Binding DisplayText}"
                                                    Foreground="{DynamicResource Brush.Text.Secondary}"
