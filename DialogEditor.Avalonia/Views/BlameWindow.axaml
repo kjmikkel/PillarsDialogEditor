@@ -17,17 +17,17 @@
         <Grid Grid.Row="0" ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*" ColumnSpacing="8"
               Margin="12,0,12,6" IsVisible="{Binding HasData}">
             <TextBlock Grid.Column="0" Width="{DynamicResource ColumnWidth.Conversation}" Text="{DynamicResource BlameWindow_ColConversation}"
-                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Body}" FontWeight="Bold"/>
+                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Body}" FontWeight="Bold" TextTrimming="CharacterEllipsis" ToolTip.Tip="{DynamicResource BlameWindow_ColConversation}"/>
             <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.NodeId}" Text="{DynamicResource BlameWindow_ColNode}"
-                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Body}" FontWeight="Bold"/>
+                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Body}" FontWeight="Bold" TextTrimming="CharacterEllipsis" ToolTip.Tip="{DynamicResource BlameWindow_ColNode}"/>
             <TextBlock Grid.Column="2" Width="{DynamicResource ColumnWidth.Author}" Text="{DynamicResource BlameWindow_ColAuthor}"
-                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Body}" FontWeight="Bold"/>
+                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Body}" FontWeight="Bold" TextTrimming="CharacterEllipsis" ToolTip.Tip="{DynamicResource BlameWindow_ColAuthor}"/>
             <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.Date}" Text="{DynamicResource BlameWindow_ColDate}"
-                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Body}" FontWeight="Bold"/>
+                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Body}" FontWeight="Bold" TextTrimming="CharacterEllipsis" ToolTip.Tip="{DynamicResource BlameWindow_ColDate}"/>
             <TextBlock Grid.Column="4" Width="{DynamicResource ColumnWidth.CommitSha}" Text="{DynamicResource BlameWindow_ColCommit}"
-                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Body}" FontWeight="Bold"/>
+                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Body}" FontWeight="Bold" TextTrimming="CharacterEllipsis" ToolTip.Tip="{DynamicResource BlameWindow_ColCommit}"/>
             <TextBlock Grid.Column="5" Text="{DynamicResource BlameWindow_ColMessage}"
-                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Body}" FontWeight="Bold"/>
+                       Foreground="{DynamicResource Brush.Text.Caption}" FontSize="{DynamicResource FontSize.Body}" FontWeight="Bold" TextTrimming="CharacterEllipsis" ToolTip.Tip="{DynamicResource BlameWindow_ColMessage}"/>
         </Grid>
 
         <TextBlock Grid.Row="1"

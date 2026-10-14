@@ -73,6 +73,56 @@ public class TableColumnsTests
             Assert.True(bare.Count == 0, $"{name}: trimmed cells without a tooltip: {string.Join(", ", bare)}");
         });
 
+    [AvaloniaTheory]
+    [MemberData(nameof(Cases))]
+    public void HeaderCells_TrimAndOfferTheirFullTextAsTooltip(string name, double scale) =>
+        WithWindow(name, scale, w =>
+        {
+            // A longer translation of a header must be cut with an ellipsis and be readable on hover,
+            // not silently clipped (issue 190).
+            var bad = HeaderRowPairs(w)
+                .SelectMany(p => p.Header.Children.OfType<TextBlock>().Where(t => t.IsEffectivelyVisible))
+                .Where(t => t.TextTrimming == TextTrimming.None || ToolTip.GetTip(t) as string != t.Text)
+                .Select(t => $"\"{t.Text}\"")
+                .ToList();
+            Assert.True(bad.Count == 0, $"{name} at {scale}x: header cells that do not trim or lack a tooltip: {string.Join(", ", bad)}");
+        });
+
+    // The checks above only run over the header/row pairs HeaderRowPairs finds, so a layout change
+    // that stopped it recognising a table would pass them all vacuously. Each fixture states how many
+    // pairs it must yield; fixtures with none (no header grid beside the list) say so explicitly.
+    private static readonly Dictionary<string, int> MinimumPairs = new()
+    {
+        ["FindInProject"]  = 1,
+        ["Blame"]          = 1,
+        ["History"]        = 0,   // a commit list: no header grid
+        ["SpeakerLines"]   = 1,
+        ["RepDisposition"] = 1,
+        ["BatchVoImport"]  = 1,
+        ["VoValidation"]   = 0,   // result rows only: no header grid
+        ["FlowAnalytics"]  = 0,
+        ["VoAliasPicker"]  = 1,
+        ["TextTagValidation"] = 0,
+        ["ScriptEditor"]   = 0,
+        ["ConditionEditor"] = 0,
+        ["BatchVoImport_Files"]            = 1,
+        ["BatchVoImport_AllConversations"] = 1,
+    };
+
+    [Fact]
+    public void EveryFixtureStatesItsMinimumPairs() =>
+        Assert.Equal(TableWindowFixtures.All.Keys.Order(), MinimumPairs.Keys.Order());
+
+    [AvaloniaTheory]
+    [MemberData(nameof(Cases))]
+    public void HeaderRowPairs_AreFound(string name, double scale) =>
+        WithWindow(name, scale, w =>
+        {
+            var found = HeaderRowPairs(w).Count();
+            Assert.True(found >= MinimumPairs[name],
+                $"{name} at {scale}x: found {found} header/row pairs, expected at least {MinimumPairs[name]}");
+        });
+
     [AvaloniaFact]
     public void LiveRescale_WidensAnOpenTable() =>
         WithWindow("FindInProject", 1.0, w =>

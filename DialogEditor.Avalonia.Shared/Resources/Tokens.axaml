@@ -53,6 +53,12 @@
     <x:Double x:Key="ColumnWidth.Speaker">140</x:Double>
     <x:Double x:Key="ColumnWidth.WemGlyph">60</x:Double>
     <x:Double x:Key="ColumnWidth.FlowIssueKind">110</x:Double>
+    <x:Double x:Key="ColumnWidth.IssueType">60</x:Double>
+    <x:Double x:Key="ColumnWidth.Category">110</x:Double>
+    <x:Double x:Key="ColumnWidth.Confidence">70</x:Double>
+    <x:Double x:Key="ColumnWidth.Tier">70</x:Double>
+    <x:Double x:Key="ColumnWidth.ParameterName">110</x:Double>
+    <x:Double x:Key="ColumnWidth.BatchVo.FileMin">150</x:Double>
     <x:Double x:Key="ColumnWidth.SeverityBadge">16</x:Double>
 
     <!--  TOKENS — semantic brush layer (Layer 0, public contract).

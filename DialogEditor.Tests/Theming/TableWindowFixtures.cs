@@ -36,6 +36,11 @@ internal static class TableWindowFixtures
         ["VoValidation"]   = VoValidation,
         ["FlowAnalytics"]  = FlowAnalytics,
         ["VoAliasPicker"]  = VoAliasPicker,
+        ["TextTagValidation"] = TextTagValidation,
+        ["ScriptEditor"]   = ScriptEditor,
+        ["ConditionEditor"] = ConditionEditor,
+        ["BatchVoImport_Files"]            = () => BatchVoImportWithFiles(isSingleConversation: true),
+        ["BatchVoImport_AllConversations"] = () => BatchVoImportWithFiles(isSingleConversation: false),
     };
 
     // These view models finish their work on the UI thread, so blocking it with GetResult()
@@ -217,5 +222,67 @@ internal static class TableWindowFixtures
         var vm = new VoAliasPickerViewModel(new FakeGameDataProvider("poe2", "en", conv), gameRoot, currentAlias: null);
         vm.SelectedConversation = vm.AllConversations.Single();
         return new VoAliasPickerWindow(vm);
+    }
+
+    // ── Text Tag Validation (TextTagValidationViewModelTests, ...StaleTests) ──────
+    // Issue 190: the issue, stale-data, duplicate and ignored-duplicate lists each had fixed
+    // columns; one row of each gives every list a long conversation name and label to lay out.
+
+    private static Window TextTagValidation()
+    {
+        var vm = new TextTagValidationViewModel(
+            scan: () => [new TextTagIssueRow(LongName, 123456, "fr", "Unknown tag [Player Nmae]. " + LongText)],
+            staleScan: _ =>
+            [
+                new StaleDataRow(LongName, 123456, StaleDataKind.Translation, "de", StaleConfidence.Confirmed),
+                new StaleDataRow(LongName, 123457, StaleDataKind.Comment, null, StaleConfidence.Likely),
+            ],
+            canCheckGameFiles: true,
+            dupScan: (_, _) => new DuplicateLineReport(
+                [new ExactDuplicateGroup("key", LongText, [new LineRef(LongName, 1, LongText), new LineRef(LongName, 2, LongText)])],
+                [new NearDuplicatePair(["a", "b"], new LineRef(LongName, 1, LongText), new LineRef(LongName, 2, LongText + "!"), 93)]),
+            ignoredList: () => [new IgnoredDuplicate(DuplicateKind.Exact, ["k"], LongText)]);
+        return new TextTagValidationWindow(vm);
+    }
+
+    // ── Script and Condition editors (ScriptEditorViewModelTests) ────────────────
+    // The parameter rows are label + input, with no header; the catalogue entry with the longest
+    // parameter name stands in for the longest translated label.
+
+    private static Window ScriptEditor()
+    {
+        var entry = ScriptCatalogue.Instance.All
+            .Where(e => e.Parameters.Count > 0)
+            .OrderByDescending(e => e.Parameters.Max(p => p.Name.Length))
+            .First();
+        var call = new ScriptCall(entry.ReflectionFullName, entry.Parameters.Select(_ => "1").ToList(), ScriptCategory.Enter);
+        return new ScriptEditorWindow(new ScriptEditorViewModel("Node 1", [call], _ => { }));
+    }
+
+    private static Window ConditionEditor()
+    {
+        var entry = ConditionCatalogue.Instance.All
+            .Where(e => e.Parameters.Count > 0)
+            .OrderByDescending(e => e.Parameters.Max(p => p.Name.Length))
+            .First();
+        var leaf = new ConditionLeaf(entry.ReflectionFullName, entry.Parameters.Select(_ => "1").ToList(), false, "And");
+        return new ConditionEditorWindow(new ConditionEditorViewModel("canonical", [leaf], _ => { }));
+    }
+
+    // ── Batch VO Import with files assigned ──────────────────────────────────────
+    // A row with source files shows the Play and Clear buttons beside each file name, which the
+    // plain fixture above never lays out. Both modes: single-conversation hides the Conversation
+    // column (its width is released to the others), project-wide shows it.
+
+    private static Window BatchVoImportWithFiles(bool isSingleConversation)
+    {
+        var row = new BatchVoRowViewModel(LongName, 1234, LongText, VoPresence.Missing,
+            $"C:/dest/{LongName}_1234.wem", $"C:/dest/{LongName}_1234_fem.wem")
+        {
+            PrimarySourcePath = $"C:/src/{LongName}_1234.wav",
+            FemSourcePath     = $"C:/src/{LongName}_1234_fem.wav",
+        };
+        var vm = new BatchVoImportViewModel([row], new NoImporter(), isSingleConversation);
+        return new BatchVoImportDialog(vm, new NoPlayer());
     }
 }
