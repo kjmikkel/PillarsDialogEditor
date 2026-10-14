@@ -1,7 +1,8 @@
 # Contributing
 
 Thanks for wanting to help with Pillars Dialog Editor. This page covers how to build and test
-the code, and the rules every change has to follow.
+the code, and the rules every change has to follow. Everyone taking part in the project is
+expected to follow the [code of conduct](CODE_OF_CONDUCT.md).
 
 ## Issues first
 

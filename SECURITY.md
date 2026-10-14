@@ -27,6 +27,12 @@ Bugs that only lose your own unsaved work, or that need someone to already contr
 computer, are ordinary bugs. Please use the
 [bug report form](https://github.com/kjmikkel/PillarsDialogEditor/issues/new/choose) for those.
 
+## Code of conduct reports
+
+The same private channel is used to report behaviour that breaks the
+[code of conduct](CODE_OF_CONDUCT.md). Start the title with "Code of conduct" so it isn't
+mistaken for a security report.
+
 ## Supported versions
 
 Fixes go into the latest release of each tool. There are no backports to older versions.
