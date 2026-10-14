@@ -1,0 +1,11 @@
+# Blank issues stay enabled: the editor's crash window opens /issues/new with a pre-filled,
+# path-scrubbed title and body (ExceptionReportViewModel, issue #72), and that link must keep
+# landing on an editable issue rather than on the template chooser.
+blank_issues_enabled: true
+contact_links:
+  - name: Report a security vulnerability
+    url: https://github.com/kjmikkel/PillarsDialogEditor/security/policy
+    about: Please don't open a public issue for security problems. See the security policy for how to report one privately.
+  - name: Walkthrough and user guide
+    url: https://github.com/kjmikkel/PillarsDialogEditor/blob/main/docs/walkthrough.md
+    about: A guided tour of the editor. Your question may already be answered here.
