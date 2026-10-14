@@ -133,12 +133,10 @@ function Expand-NodeDetailGroups($win) {
     Start-Sleep -Milliseconds 600
 }
 
-function Invoke-ByName($win, [string]$name, [int]$Index = 0) {
+function Invoke-ByName($win, [string]$name) {
     # Invoke a button through UIA (no clickable point needed, works when scrolled out of view).
-    # -Index picks among buttons sharing a name; see the Edit… note on condition-editor.
     # Find-EditorElements returns one wrapped array; the pipeline through ForEach unrolls it.
-    $all = @(Find-EditorElements -Window $win -Name $name -ControlType $Btn | ForEach-Object { $_ })
-    $el = if ($all.Count -gt $Index) { $all[$Index] } else { $null }
+    $el = @(Find-EditorElements -Window $win -Name $name -ControlType $Btn | ForEach-Object { $_ }) | Select-Object -First 1
     if (-not $el) { throw "Button '$name' not found." }
     $el.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern).Invoke()
     Start-Sleep -Milliseconds 800
@@ -173,12 +171,10 @@ $surfaces = [ordered]@{
     'node-details'      = { param($p, $win, $tag, $out) Select-AnyNode $win; Expand-NodeDetailGroups $win
                             Save-WindowScreenshot -Process $p -Path (Join-Path $out "$tag-node-details.png") }
     'condition-editor'  = { param($p, $win, $tag, $out)
-                            # Edit Scripts and Edit Conditions are both named "Edit…" in UIA (an
-                            # addressability defect found by issue 86); conditions is the second.
-                            Invoke-ByName $win (L 'Button_EditConditions') -Index 1
+                            Invoke-ByName $win (L 'AutomationName_EditConditions')
                             Save-Secondary $p $out $tag 'condition-editor' $null }
     'script-editor'     = { param($p, $win, $tag, $out)
-                            Invoke-ByName $win (L 'Button_EditScripts')
+                            Invoke-ByName $win (L 'AutomationName_EditScripts')
                             Save-Secondary $p $out $tag 'script-editor' $null }
     # VO import itself starts with a file picker, which UIA can't drive; the alias picker
     # opens directly. (VoImportDialog is reviewed from its .axaml only.)

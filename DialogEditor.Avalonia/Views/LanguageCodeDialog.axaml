@@ -22,6 +22,8 @@
                  FontSize="{DynamicResource FontSize.Body}"
                  Padding="6,4"
                  AcceptsReturn="False"
+                 ToolTip.Tip="{DynamicResource ToolTip_LanguageCode}"
+                 AutomationProperties.HelpText="{DynamicResource ToolTip_LanguageCode}"
                  AutomationProperties.Name="{DynamicResource Localization_LanguageCodeDialog_Prompt}"/>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">

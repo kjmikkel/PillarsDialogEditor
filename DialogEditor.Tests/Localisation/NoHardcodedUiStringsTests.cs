@@ -10,7 +10,7 @@ namespace DialogEditor.Tests.Localisation;
 /// 14 literals accumulated across 7 views before this guard was added; like
 /// NoStrayHexTests, it turns the convention into a build-breaking contract.
 ///
-/// The scan flags text-bearing attributes whose value starts with a LETTER:
+/// The scan flags text-bearing attributes whose value contains a LETTER:
 /// values starting with '{' are bindings (allowed), and symbol/number-only
 /// values (e.g. Width="400", Content="+") are out of scope for this guard —
 /// symbolic glyphs are governed by the tooltip rule instead.
@@ -49,12 +49,43 @@ public class NoHardcodedUiStringsTests
     private static bool IsResourceDictionary(string path) =>
         path.Contains($"{Path.DirectorySeparatorChar}Resources{Path.DirectorySeparatorChar}");
 
-    // Text-bearing attributes a user (or screen reader) can see. The value must
-    // start with a letter to count: '{' means a binding, and pure symbols/numbers
-    // (icon glyphs, sizes) are not translatable text.
-    private static readonly Regex HardcodedText = new(
-        @"[ <](Content|Text|Watermark|Header|Title)=""[A-Za-z][^""{]*""|ToolTip\.Tip=""[A-Za-z][^""{]*""",
+    // Text-bearing attributes a user (or screen reader) can see, with their literal
+    // (non-binding) value captured for LiteralTexts to judge.
+    private static readonly Regex TextAttribute = new(
+        @"(?:[ <](?:Content|Text|Watermark|Header|Title)|ToolTip\.Tip)=""(?!\{)(?<v>[^""]*)""",
         RegexOptions.Compiled);
+
+    /// <summary>
+    /// Returns the literal text-attribute values on <paramref name="line"/> that carry
+    /// translatable text: any that contain a letter ANYWHERE. Pure symbols/numbers (icon
+    /// glyphs such as "+" or "?", sizes) are not translatable text. Issue #182: this used
+    /// to require the value to START with a letter, which let Content="+ Add" through —
+    /// a glyph prefix hid the English word after it. XML entities are decoded first, so
+    /// '&amp;#x2192;' reads as the arrow it is, not as the letter x.
+    /// </summary>
+    internal static IReadOnlyList<string> LiteralTexts(string line) =>
+        TextAttribute.Matches(line)
+            .Select(m => m.Groups["v"].Value)
+            .Where(v => System.Net.WebUtility.HtmlDecode(v).Any(char.IsLetter))
+            .ToList();
+
+    [Theory]
+    [InlineData("""<Button Content="Save"/>""")]
+    [InlineData("""<Button Content="+ Add"/>""")]
+    [InlineData("""<TextBlock Text="⚙ N"/>""")]
+    [InlineData("""<Button ToolTip.Tip="? Help"/>""")]
+    public void LiteralTexts_FlagsValuesContainingWords(string line) =>
+        Assert.Single(LiteralTexts(line));
+
+    [Theory]
+    [InlineData("""<Button Content="+"/>""")]
+    [InlineData("""<Button Content="✕"/>""")]
+    [InlineData("""<Button Content="&#x2192;"/>""")]
+    [InlineData("""<Button Content="{DynamicResource Button_AddCondition}"/>""")]
+    [InlineData("""<TextBlock Text="{Binding Name}"/>""")]
+    [InlineData("""<ColumnDefinition Width="400"/>""")]
+    public void LiteralTexts_AllowsGlyphsEntitiesBindingsAndNumbers(string line) =>
+        Assert.Empty(LiteralTexts(line));
 
     [Fact]
     public void NoHardcodedUserVisibleTextInAxaml()
@@ -67,7 +98,7 @@ public class NoHardcodedUiStringsTests
             if (IsResourceDictionary(file)) continue;
             var lines = File.ReadAllLines(file);
             for (var i = 0; i < lines.Length; i++)
-                if (HardcodedText.IsMatch(lines[i]))
+                if (LiteralTexts(lines[i]).Count > 0)
                     offenders.Add($"{Path.GetFileName(file)}:{i + 1}: {lines[i].Trim()}");
         }
         Assert.True(offenders.Count == 0,

@@ -86,6 +86,7 @@
                            Click="BrowsePrimary_Click"
                            ToolTip.Tip="{DynamicResource ToolTip_VoImportBrowse_Primary}"
                            AutomationProperties.HelpText="{DynamicResource ToolTip_VoImportBrowse_Primary}"
+                           AutomationProperties.Name="{DynamicResource AutomationName_VoImportBrowse_Primary}"
                            Margin="6,0,4,0"/>
                 <Button    Grid.Column="3" x:Name="ClearPrimaryButton"
                            Content="{DynamicResource VoImport_Clear}"
@@ -134,6 +135,7 @@
                            Click="BrowseFem_Click"
                            ToolTip.Tip="{DynamicResource ToolTip_VoImportBrowse_Fem}"
                            AutomationProperties.HelpText="{DynamicResource ToolTip_VoImportBrowse_Fem}"
+                           AutomationProperties.Name="{DynamicResource AutomationName_VoImportBrowse_Fem}"
                            Margin="6,0,4,0"/>
                 <Button    Grid.Column="3" x:Name="ClearFemButton"
                            Content="{DynamicResource VoImport_Clear}"
