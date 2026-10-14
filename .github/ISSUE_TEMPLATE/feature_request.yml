@@ -1,0 +1,48 @@
+name: Feature request
+description: Suggest something the editor or the patcher could do, or do better.
+labels: [enhancement]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Please search the [existing issues](https://github.com/kjmikkel/PillarsDialogEditor/issues?q=is%3Aissue) first. If someone has already asked for it, a comment there with your use case helps more than a new issue.
+
+  - type: dropdown
+    id: product
+    attributes:
+      label: Which tool?
+      options:
+        - Pillars Dialog Editor
+        - Patch Manager / dialog-patcher
+        - Both
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Describe the task or the problem, not only the solution. "When I write a companion's banter, I can't see ..." is more useful than "add a button for X".
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would help?
+      description: How you picture it working, if you have an idea.
+
+  - type: dropdown
+    id: game
+    attributes:
+      label: Game
+      options:
+        - Pillars of Eternity
+        - "Pillars of Eternity II: Deadfire"
+        - Both
+        - Not game-specific
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: How do you work around it today?
