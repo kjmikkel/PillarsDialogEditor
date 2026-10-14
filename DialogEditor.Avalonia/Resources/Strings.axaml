@@ -124,6 +124,7 @@
     <sys:String x:Key="Dialog_NewConversation_Title">New Conversation</sys:String>
     <sys:String x:Key="Dialog_NewConversation_Prompt">Enter a name for the new conversation file (no extension, e.g. city_market_guard):</sys:String>
     <sys:String x:Key="Dialog_NewConversation_Placeholder">my_new_conversation</sys:String>
+    <sys:String x:Key="ToolTip_ConversationName">The conversation's file name, without the .conversation extension. Use lowercase letters, digits and underscores, like the game's own files (e.g. city_market_guard).</sys:String>
     <sys:String x:Key="Status_NewConversationAdded">New conversation '{0}' added — add nodes, then Ctrl+S to save.</sys:String>
     <sys:String x:Key="Status_NewConversationDuplicate">A conversation named '{0}' already exists.</sys:String>
     <!-- {0} = the name the user entered -->
@@ -224,6 +225,8 @@
     <!-- ─── Legend panel — symbol descriptions ────────────────────────── -->
     <!-- "N" is a literal count, not a placeholder — leave it as-is -->
     <sys:String x:Key="Legend_Symbol_Conditions">node has N visibility conditions</sys:String>
+    <!-- The badge sample shown beside the line above; keep its "N" in step with it -->
+    <sys:String x:Key="Legend_Symbol_Conditions_Sample">⚙ N</sys:String>
     <sys:String x:Key="Legend_Symbol_FemaleText">female text variant exists</sys:String>
     <sys:String x:Key="Legend_Symbol_PlayerChoice">player choice node (in title)</sys:String>
 
@@ -501,12 +504,19 @@ Saving records your edits to the open project — game files are not touched unt
 
     <!-- ─── Detail panel — script editor ───────────────────────────────── -->
     <sys:String x:Key="Button_EditScripts">Edit…</sys:String>
+    <!-- Accessible name: the visible "Edit…" is shared with Edit Conditions, so UIA needs a distinct one (issue 182) -->
+    <sys:String x:Key="AutomationName_EditScripts">Edit scripts…</sys:String>
     <sys:String x:Key="ToolTip_EditScripts">Open the script editor to add, edit, or remove scripts fired when this node is shown, exited, or updated</sys:String>
     <sys:String x:Key="Placeholder_ScriptPicker">Search catalogue or type a FullName…</sys:String>
     <sys:String x:Key="ToolTip_ScriptPicker">Select a known script from the catalogue — parameters and their types will be pre-populated. Or type a C# reflection FullName directly, e.g. Void SetGlobalValue(String, Int32), for scripts not in the catalogue.</sys:String>
     <sys:String x:Key="ToolTip_AddScriptEnter">Add the selected or typed script to the On Enter list</sys:String>
     <sys:String x:Key="ToolTip_AddScriptExit">Add the selected or typed script to the On Exit list</sys:String>
     <sys:String x:Key="ToolTip_AddScriptUpdate">Add the selected or typed script to the On Update list</sys:String>
+    <sys:String x:Key="Button_AddScript">+ Add</sys:String>
+    <!-- Accessible names: the three "+ Add" buttons look alike, so UIA needs one per list (issue 182) -->
+    <sys:String x:Key="AutomationName_AddScriptEnter">Add On Enter script</sys:String>
+    <sys:String x:Key="AutomationName_AddScriptExit">Add On Exit script</sys:String>
+    <sys:String x:Key="AutomationName_AddScriptUpdate">Add On Update script</sys:String>
     <sys:String x:Key="Label_ScriptSection_Enter">ON ENTER  (fires when the node is shown)</sys:String>
     <sys:String x:Key="Label_ScriptSection_Exit">ON EXIT  (fires when the player leaves the node)</sys:String>
     <sys:String x:Key="Label_ScriptSection_Update">ON UPDATE  (fires on each update tick while the node is active)</sys:String>
@@ -518,6 +528,7 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- ─── Detail panel — condition editor ─────────────────────────────── -->
     <sys:String x:Key="Label_GroupConditions">CONDITIONS</sys:String>
     <sys:String x:Key="Button_EditConditions">Edit…</sys:String>
+    <sys:String x:Key="AutomationName_EditConditions">Edit conditions…</sys:String>
     <sys:String x:Key="ToolTip_EditConditions">Open the condition editor to add, edit, or remove conditions</sys:String>
     <sys:String x:Key="Button_AddCondition">+ Add</sys:String>
     <sys:String x:Key="ToolTip_AddCondition">Add selected condition to the list</sys:String>
@@ -1394,6 +1405,7 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ExportConversations_Close">Close</sys:String>
     <sys:String x:Key="ToolTip_ExportConversations_SelectAll">Check all conversations in the list.</sys:String>
     <sys:String x:Key="ToolTip_ExportConversations_SelectNone">Uncheck all conversations in the list.</sys:String>
+    <sys:String x:Key="ToolTip_ExportConversations_Item">Include this conversation in the export.</sys:String>
     <sys:String x:Key="ToolTip_ExportConversations_Export">Export the checked conversations to the selected format.</sys:String>
     <sys:String x:Key="ToolTip_ExportConversations_Csv">Export to comma-separated values. Round-trips cleanly through Import Conversation.</sys:String>
     <sys:String x:Key="ToolTip_ExportConversations_Json">Export to JSON. Round-trips cleanly through Import Conversation.</sys:String>
@@ -1415,6 +1427,7 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_ImportTranslation">Import translated text back into the project from CSV, JSON, or XLIFF.</sys:String>
     <sys:String x:Key="Localization_LanguageCodeDialog_Title">Language Code</sys:String>
     <sys:String x:Key="Localization_LanguageCodeDialog_Prompt">Language code (e.g. en, fr, de, ja):</sys:String>
+    <sys:String x:Key="ToolTip_LanguageCode">The language of the text being imported, as a language code such as en, fr, de, ja or pt-BR. Asked for only when the file doesn't say which language it holds.</sys:String>
     <sys:String x:Key="LanguageCode_Cancel">Cancel</sys:String>
     <sys:String x:Key="LanguageCode_OK">OK</sys:String>
     <!-- {0} = entry count, {1} = file path -->
@@ -1640,6 +1653,7 @@ Remove it from the recent list?</sys:String>
 
     <!-- ─── Accessibility — screen-reader names for input fields ──────────── -->
     <sys:String x:Key="AutomationName_ConditionOperator">Combine with previous row using AND or OR</sys:String>
+    <sys:String x:Key="ToolTip_ConditionOperator">How this condition combines with the one above it. AND: both must pass. OR: either one is enough.</sys:String>
     <sys:String x:Key="AutomationName_LinkQTD">Question node text display option for this link</sys:String>
     <sys:String x:Key="AutomationName_ConversationName">New conversation file name</sys:String>
 
@@ -1821,6 +1835,9 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="ToolTip_VoImportClear_Fem">Clear the selected female voice-over file.</sys:String>
     <sys:String x:Key="ToolTip_VoImportBrowse_Primary">Browse for a .wem or .wav file for the primary (male) voice-over slot.</sys:String>
     <sys:String x:Key="ToolTip_VoImportBrowse_Fem">Browse for a .wem or .wav file for the female voice-over slot (optional).</sys:String>
+    <!-- Accessible names: both slots show "Browse…", so UIA needs one per slot (issue 182) -->
+    <sys:String x:Key="AutomationName_VoImportBrowse_Primary">Browse for primary voice-over file</sys:String>
+    <sys:String x:Key="AutomationName_VoImportBrowse_Fem">Browse for female voice-over file</sys:String>
     <sys:String x:Key="ToolTip_VoImportDownloadWwise">Open the Audiokinetic website to download Wwise, required for encoding .wav files.</sys:String>
     <sys:String x:Key="ToolTip_VoPreviewPlay_Primary">Play the selected primary voice-over file.</sys:String>
     <sys:String x:Key="ToolTip_VoPreviewPlay_Fem">Play the selected female voice-over file.</sys:String>

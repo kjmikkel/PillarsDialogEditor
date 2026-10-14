@@ -136,6 +136,8 @@
                              VerticalContentAlignment="Center"
                              Watermark="{DynamicResource Placeholder_AnnotationTitle}"
                              AutomationProperties.Name="{DynamicResource Placeholder_AnnotationTitle}"
+                             ToolTip.Tip="{DynamicResource ToolTip_AnnotationTitle}"
+                             AutomationProperties.HelpText="{DynamicResource ToolTip_AnnotationTitle}"
                              LostFocus="TitleEdit_LostFocus"
                              KeyDown="TitleEdit_KeyDown"/>
                     <!-- Edit button — hidden while editing -->
@@ -190,6 +192,8 @@
                          CaretBrush="{DynamicResource Brush.Text.Primary}"
                          Watermark="{DynamicResource Placeholder_AnnotationBody}"
                          AutomationProperties.Name="{DynamicResource Placeholder_AnnotationBody}"
+                         ToolTip.Tip="{DynamicResource ToolTip_AnnotationBody}"
+                         AutomationProperties.HelpText="{DynamicResource ToolTip_AnnotationBody}"
                          LostFocus="BodyEdit_LostFocus"
                          KeyDown="BodyEdit_KeyDown"/>
             </Grid>

@@ -18,6 +18,8 @@
                  Background="{DynamicResource Brush.Surface.Input}" Foreground="{DynamicResource Brush.Text.Primary}"
                  BorderBrush="{DynamicResource Brush.Border.Strong}" BorderThickness="1"
                  FontSize="{DynamicResource FontSize.Body}" Padding="6,4" Margin="0,0,0,16"
+                 ToolTip.Tip="{DynamicResource ToolTip_ConversationName}"
+                 AutomationProperties.HelpText="{DynamicResource ToolTip_ConversationName}"
                  AcceptsReturn="False"
                  AutomationProperties.Name="{DynamicResource AutomationName_ConversationName}"/>
 

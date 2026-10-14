@@ -48,6 +48,8 @@
                                      peer, so the UIA Name is set explicitly. -->
                                 <CheckBox IsChecked="{Binding IsChecked}"
                                           AutomationProperties.Name="{Binding Name}"
+                                          ToolTip.Tip="{DynamicResource ToolTip_ExportConversations_Item}"
+                                          AutomationProperties.HelpText="{DynamicResource ToolTip_ExportConversations_Item}"
                                           Foreground="{DynamicResource Brush.Text.Emphasis}"
                                           Padding="8,4">
                                     <TextBlock Text="{Binding Name}"/>

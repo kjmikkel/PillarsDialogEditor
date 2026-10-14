@@ -149,6 +149,57 @@ public class AutomationNameTests
             + "Offenders:\n" + string.Join("\n", offenders));
     }
 
+    /// <summary>
+    /// Issue #182: two controls in one view with the same accessible name can't be told apart
+    /// by UI Automation, or by a screen-reader user tabbing through them. Node Details had
+    /// "Edit…" for both Edit Scripts and Edit Conditions, and the #86 capture script had to pick
+    /// "the second Edit…" — the workaround CLAUDE.md's UI Automation rule says to fix in the app.
+    ///
+    /// The effective name is AutomationProperties.Name when set, else the visible
+    /// Content/Header, resolved through Strings.axaml. Controls inside a DataTemplate,
+    /// ControlTemplate, Style or ControlTheme are skipped: each of those is instantiated once
+    /// per row or per control, so a repeat there is expected rather than a collision.
+    /// </summary>
+    [Fact]
+    public void ControlsInOneViewHaveDistinctAccessibleNames()
+    {
+        var root = SolutionRoot();
+        var strings = LoadStringResources(root);
+        var offenders = new List<string>();
+
+        foreach (var file in Directory.EnumerateFiles(root, "*.axaml", SearchOption.AllDirectories))
+        {
+            if (IsExcluded(file, root)) continue;
+            var doc = XDocument.Load(file, LoadOptions.SetLineInfo);
+
+            var named = doc.Descendants()
+                .Where(e => e.Name.LocalName is "Button" or "ToggleButton" or "MenuItem" or "CheckBox" or "RadioButton")
+                .Where(e => !e.Ancestors().Any(a => a.Name.LocalName
+                    is "DataTemplate" or "ControlTemplate" or "Style" or "ControlTheme"))
+                .Select(e => (Element: e, Name: AccessibleName(e, strings)))
+                .Where(x => !string.IsNullOrEmpty(x.Name));
+
+            foreach (var group in named.GroupBy(x => x.Name, StringComparer.Ordinal).Where(g => g.Count() > 1))
+            {
+                var lines = group.Select(x => ((IXmlLineInfo)x.Element).LineNumber);
+                offenders.Add($"{Path.GetFileName(file)}: \"{group.Key}\" is the accessible name of {group.Count()} controls (lines {string.Join(", ", lines)})");
+            }
+        }
+
+        Assert.True(offenders.Count == 0,
+            "Controls in the same view need distinct accessible names, or UI Automation and "
+            + "screen readers can't tell them apart. Give each an AutomationProperties.Name bound "
+            + "to a localized resource. Offenders:\n" + string.Join("\n", offenders));
+    }
+
+    private static string? AccessibleName(XElement el, Dictionary<string, string> strings)
+    {
+        var explicitName = el.Attribute("AutomationProperties.Name")?.Value;
+        if (explicitName is not null) return ResolveResourceText(explicitName, strings);
+        var raw = el.Attribute("Content")?.Value ?? el.Attribute("Header")?.Value;
+        return raw is null ? null : ResolveResourceText(raw, strings);
+    }
+
     /// <summary>Key to value for every &lt;sys:String&gt; in the app's resource dictionaries.</summary>
     private static Dictionary<string, string> LoadStringResources(string root)
     {
