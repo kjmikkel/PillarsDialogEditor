@@ -1,0 +1,99 @@
+name: Bug report
+description: Something in the editor, the Patch Manager or dialog-patcher doesn't work as it should.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to report this. The details below are what I need to reproduce it.
+
+        **This tracker is public.** Before you paste anything, remove local paths, your Windows user name and anything else you'd rather not publish. For example, change `C:\Users\yourname\...` to `C:\Users\<user>\...`.
+
+  - type: dropdown
+    id: product
+    attributes:
+      label: Which tool?
+      options:
+        - Pillars Dialog Editor
+        - Patch Manager (from the Pillars Dialog Patcher download)
+        - dialog-patcher (command line)
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: In the editor or the Patch Manager, **Help ▸ About…**. For the command line, `dialog-patcher --version`.
+      placeholder: e.g. 1.0.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: game
+    attributes:
+      label: Game
+      options:
+        - Pillars of Eternity
+        - "Pillars of Eternity II: Deadfire"
+        - Both
+        - Not game-specific
+    validations:
+      required: true
+
+  - type: dropdown
+    id: storefront
+    attributes:
+      label: Where is the game from?
+      description: Different stores lay out the install folder differently, so this matters.
+      options:
+        - Steam
+        - GOG
+        - Epic Games Store
+        - Microsoft Store / Xbox Game Pass
+        - Other
+        - Not relevant
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: What did you do, step by step, starting from opening the app?
+      placeholder: |
+        1. Open the game folder
+        2. Open conversation ...
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened instead?
+      description: Include the exact text of any error message. Screenshots are welcome.
+    validations:
+      required: true
+
+  - type: textarea
+    id: log
+    attributes:
+      label: Log excerpt
+      description: |
+        The log is `app.log` in `%LOCALAPPDATA%\PillarsDialogEditor`. Paste the lines from around the time of the problem.
+        **Remove local paths and your user name before you paste.**
+      render: text
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Other mods installed, a project file that shows the problem (if you can share it), and so on.
