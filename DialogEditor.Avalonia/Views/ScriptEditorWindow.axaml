@@ -160,11 +160,12 @@
                              ToolTip.Tip="{DynamicResource ToolTip_ScriptPicker}"
                              AutomationProperties.HelpText="{DynamicResource ToolTip_ScriptPicker}"
                              AutomationProperties.Name="{DynamicResource Placeholder_ScriptPicker}"/>
-                    <Button Classes="secondary" Grid.Column="1" Content="+ Add"
+                    <Button Classes="secondary" Grid.Column="1" Content="{DynamicResource Button_AddScript}"
                             Command="{Binding AddEnterScriptCommand}"
                             Padding="12,4" Margin="6,0,0,0" FontSize="{DynamicResource FontSize.Label}"
                             ToolTip.Tip="{DynamicResource ToolTip_AddScriptEnter}"
-                            AutomationProperties.HelpText="{DynamicResource ToolTip_AddScriptEnter}"/>
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_AddScriptEnter}"
+                            AutomationProperties.Name="{DynamicResource AutomationName_AddScriptEnter}"/>
                 </Grid>
 
                 <!-- ON EXIT -->
@@ -184,11 +185,12 @@
                              ToolTip.Tip="{DynamicResource ToolTip_ScriptPicker}"
                              AutomationProperties.HelpText="{DynamicResource ToolTip_ScriptPicker}"
                              AutomationProperties.Name="{DynamicResource Placeholder_ScriptPicker}"/>
-                    <Button Classes="secondary" Grid.Column="1" Content="+ Add"
+                    <Button Classes="secondary" Grid.Column="1" Content="{DynamicResource Button_AddScript}"
                             Command="{Binding AddExitScriptCommand}"
                             Padding="12,4" Margin="6,0,0,0" FontSize="{DynamicResource FontSize.Label}"
                             ToolTip.Tip="{DynamicResource ToolTip_AddScriptExit}"
-                            AutomationProperties.HelpText="{DynamicResource ToolTip_AddScriptExit}"/>
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_AddScriptExit}"
+                            AutomationProperties.Name="{DynamicResource AutomationName_AddScriptExit}"/>
                 </Grid>
 
                 <!-- ON UPDATE -->
@@ -208,11 +210,12 @@
                              ToolTip.Tip="{DynamicResource ToolTip_ScriptPicker}"
                              AutomationProperties.HelpText="{DynamicResource ToolTip_ScriptPicker}"
                              AutomationProperties.Name="{DynamicResource Placeholder_ScriptPicker}"/>
-                    <Button Classes="secondary" Grid.Column="1" Content="+ Add"
+                    <Button Classes="secondary" Grid.Column="1" Content="{DynamicResource Button_AddScript}"
                             Command="{Binding AddUpdateScriptCommand}"
                             Padding="12,4" Margin="6,0,0,0" FontSize="{DynamicResource FontSize.Label}"
                             ToolTip.Tip="{DynamicResource ToolTip_AddScriptUpdate}"
-                            AutomationProperties.HelpText="{DynamicResource ToolTip_AddScriptUpdate}"/>
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_AddScriptUpdate}"
+                            AutomationProperties.Name="{DynamicResource AutomationName_AddScriptUpdate}"/>
                 </Grid>
 
             </StackPanel>

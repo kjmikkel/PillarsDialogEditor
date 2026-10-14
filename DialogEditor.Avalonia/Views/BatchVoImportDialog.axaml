@@ -19,7 +19,7 @@
                       AutomationProperties.HelpText="{DynamicResource ToolTip_BatchShowOnlyMissing}"
                       VerticalAlignment="Center"/>
 
-            <Separator Width="1" Background="{DynamicResource Brush.Border}" Margin="0,4"/>
+            <Separator Width="1" Background="{DynamicResource Brush.Border.Default}" Margin="0,4"/>
 
             <TextBlock Text="{DynamicResource BatchVoImport_QualityLabel}"
                        VerticalAlignment="Center"/>

@@ -571,7 +571,8 @@
                             Click="EditScripts_Click"
                             Padding="8,3" FontSize="{DynamicResource FontSize.Small}"
                             ToolTip.Tip="{DynamicResource ToolTip_EditScripts}"
-                            AutomationProperties.HelpText="{DynamicResource ToolTip_EditScripts}"/>
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_EditScripts}"
+                            AutomationProperties.Name="{DynamicResource AutomationName_EditScripts}"/>
                 </Grid>
 
                 <TextBlock Classes="field-label" Text="{DynamicResource Label_GroupConditions}"/>
@@ -588,7 +589,8 @@
                             Click="EditConditions_Click"
                             Padding="8,3" FontSize="{DynamicResource FontSize.Small}"
                             ToolTip.Tip="{DynamicResource ToolTip_EditConditions}"
-                            AutomationProperties.HelpText="{DynamicResource ToolTip_EditConditions}"/>
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_EditConditions}"
+                            AutomationProperties.Name="{DynamicResource AutomationName_EditConditions}"/>
                 </Grid>
                     </StackPanel>
                 </Expander>
