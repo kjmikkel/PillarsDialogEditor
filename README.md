@@ -12,6 +12,27 @@ original game files directly, making the workflow safe, reversible, and shareabl
 
 ---
 
+## Get started
+
+<!-- Screenshot of the conversation canvas goes here (#70). -->
+
+1. **Download** the latest `PillarsDialogEditor-<version>.zip` from the
+   [Releases page](https://github.com/kjmikkel/PillarsDialogEditor/releases/latest).
+2. **Unzip** it anywhere and run `DialogEditor.Avalonia.exe`. Nothing needs installing: the
+   archive brings its own .NET runtime.
+3. **Open your game folder** (**File › Open Game Folder…**) and follow the
+   [walkthrough](docs/walkthrough.md), also under **Help › Open Walkthrough…**. It takes you
+   through a safe practice project built with **Help › Create Sample Project…**, from your
+   first edit to testing it in-game.
+
+**Installing mods rather than making them?** Download `PillarsDialogPatcher-<version>.zip`
+from the same page and read the [player guide](docs/patcher/README.md).
+
+The rest of this page is the reference for every feature, in the order you'll use them:
+open your game folder, open or create a project, edit, test in-game, restore, and distribute.
+
+---
+
 ## Prerequisites
 
 The release archives (`PillarsDialogEditor-<ver>.zip` and
@@ -23,95 +44,7 @@ needed to run them.
   (Compare, History, Attribution, Branches). See
   [Git-powered features](#git-powered-features). Everything else works without it.
 
-Building from source instead requires the
-[.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0). See
-[Building for distribution](#building-for-distribution).
-
----
-
-## Supported game builds
-
-Both games have had their last patch, so "the latest build" is a fixed target. These are
-the builds the editor and patcher have been checked against:
-
-| Game | Storefront | Build checked | DLC installed | Read (open, browse, all languages) | Write (Test Patch, patcher) |
-|---|---|---|---|---|---|
-| Pillars of Eternity | GOG | build 59799714601848948 | The White March 1 + 2 | ✅ 1,434 conversations, 8 languages | ✅ 1,434 conversations, 8 languages |
-| Pillars of Eternity | Steam | build 23036766 | The White March 1 + 2 | ✅ identical data to GOG | ✅ identical data to GOG |
-| Pillars of Eternity (Definitive Edition) | Epic | version 3.9.5.89801 | included | ✅ identical data to GOG | ✅ 1,434 conversations, 8 languages |
-| Pillars of Eternity II: Deadfire | GOG | build 52232433653243275 | all three expansions + free DLC | ✅ 1,400 conversations, 10 languages | ✅ 1,400 conversations, 10 languages |
-| Pillars of Eternity II: Deadfire | Steam | build 12181035 | all three expansions + free DLC | ✅ identical data to GOG | ✅ identical data to GOG |
-
-*Reading checked 2026-09-28 ([#65](https://github.com/kjmikkel/PillarsDialogEditor/issues/65)); writing checked 2026-09-28 ([#117](https://github.com/kjmikkel/PillarsDialogEditor/issues/117)). Deadfire's DLC conversations, in their own `lax*_exported` data folders, are read since [#198](https://github.com/kjmikkel/PillarsDialogEditor/issues/198) (GOG count re-checked 2026-10-13); the Steam row's DLC count has not been re-checked.*
-
-Every storefront ships byte-identical conversation and text files for the same game, so what holds
-for one build holds for all of them. The Microsoft Store / Game Pass builds haven't been checked.
-
-**Writing.** Saving a conversation is what Test Patch, `dialog-patcher` and the Patch Manager all
-do. Saving used to change game data the editor doesn't display. That was fixed in
-[#111](https://github.com/kjmikkel/PillarsDialogEditor/issues/111)–[#116](https://github.com/kjmikkel/PillarsDialogEditor/issues/116).
-Every shipped conversation and text file above now survives an unchanged save:
-
-- **PoE1:** the saved file loads identically in the game's own conversation loader.
-- **PoE2:** the saved file is identical to the original.
-
-This is checked by an opt-in test against a real install ([docs/game-data-tests.md](docs/game-data-tests.md)),
-run before each release. It has not yet been confirmed by playing through edited conversations
-in-game. If a patched conversation misbehaves in the game, please
-[open an issue](https://github.com/kjmikkel/PillarsDialogEditor/issues). Test Patch always backs up
-the files it changes, so **Restore Conversation (F6)** puts the originals back.
-
-**DLC.** Nothing in the editor or patcher depends on which DLC you own. Pillars of Eternity's
-White March conversations sit in the normal conversations folder, with their text in
-`data_expansion1` and `data_expansion2` (read since [#201](https://github.com/kjmikkel/PillarsDialogEditor/issues/201));
-Deadfire keeps each DLC's data in its own folder (`lax1_exported`, `lax2_exported`, …). The editor
-reads these folders in the game's own order, as the game does: where several folders hold the same conversation or line, the later one
-wins. The Conversations dock groups DLC content under the DLC's title. An install without a DLC
-simply has fewer conversations, and a mod that edits a DLC conversation is skipped on such an
-install, with a "conversation not found" warning. Nothing else is written or broken.
-
-**Game updates and your backups.**
-
-- **After a game update.** A game update can replace or change the files your conversation mods
-  edit. Afterwards those mods may be partly missing, or sit on top of files they no longer match.
-  To put things right, verify / repair the game files in your storefront (Steam, GOG Galaxy or the
-  Epic Games Launcher), then apply your mods again. If you're asked whether to treat changed files
-  as the new originals, choose **Treat as new originals**. The Patch Manager's *After a game
-  update…* link says the same ([#147](https://github.com/kjmikkel/PillarsDialogEditor/issues/147)).
-
-- **Patcher (`dialog-patcher`, Patch Manager).** Suppose the game or the storefront's "verify files"
-  replaces a file a mod changed. **Remove all mods / Restore** then leaves that file alone and tells
-  you. Reinstalling stops and asks before treating the new file as the original
-  (`--accept-current-files`). Your update is never overwritten with an older copy.
-- **Test Patch (F5) / Restore Conversation (F6).** F5 backs up the files it's about to change, so
-  the backup is always fresh. Restore with F6 before updating or verifying the game. F6 puts
-  every file F5 changed back byte for byte and removes the files it added. A folder F5 had to
-  create can be left behind empty ([#125](https://github.com/kjmikkel/PillarsDialogEditor/issues/125)).
-- **Restore Full Backup (Ctrl+Shift+B).** This puts back files from the snapshot taken the first
-  time you opened the game folder, but only files the editor itself changed since. A file a game
-  update, "verify files" or the Patch Manager changed is left alone and listed in the log, so an
-  old snapshot never downgrades an updated game
-  ([#118](https://github.com/kjmikkel/PillarsDialogEditor/issues/118)). While a test patch is
-  active, use F6 first. It covers conversations and the text of every installed language, each
-  restored into its own language's folder, and the original of every shipped voice-over line that
-  Test Patch replaced. A voice-over file the editor *added* is removed by F6, not by Restore Full
-  Backup. Backups taken before this change cover one language: it's identified automatically, and
-  only that language is restored
-  ([#123](https://github.com/kjmikkel/PillarsDialogEditor/issues/123)).
-
-**Unreadable files.** If one language's text file for a conversation is damaged, the conversation
-still opens in that language, without its text. The status bar names the file
-([#119](https://github.com/kjmikkel/PillarsDialogEditor/issues/119)). Test Patch and the patcher
-never write to a damaged file: they leave it exactly as it is and say so, and that language shows
-no new text in-game. Other languages are unaffected. Use the storefront's "verify files" to repair
-the file.
-
----
-
-## Third-party software
-
-The editor bundles `vgmstream-cli.exe` for PoE2 voice-over audio preview.
-Full copyright notices and license terms are in [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
+To build from source instead, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
@@ -471,106 +404,6 @@ fi
 
 ---
 
-## Building for distribution
-
-The repo ships two products, versioned and released independently:
-
-| Product | Version file | Release tag | Contains |
-|---------|--------------|-------------|----------|
-| Pillars Dialog Editor | `VERSION` | `v<ver>` | the editor |
-| Pillars Dialog Patcher | `PATCHER_VERSION` | `patcher-v<ver>` | the Patch Manager GUI and the `dialog-patcher` CLI, for players installing mods |
-
-The patcher only gets a new version when code that applies patches changes.
-Whether it can read a mod made with a given editor depends on the file formats
-it supports (see `FORMAT.md`), not on matching version numbers.
-
-Three PowerShell scripts are provided at the repo root. Each takes
-`-Product Editor|Patcher|All` (default `All`).
-
-### build.ps1 — full release build (recommended)
-
-Runs the test suite, then produces each selected product's binary and source
-archives under `dist/`, plus `SHA256SUMS.txt` covering them all:
-
-```powershell
-.\build.ps1                          # both products, versions from the version files
-.\build.ps1 -Product Patcher         # the patcher only
-.\build.ps1 -Version 1.2.0           # override the editor version
-.\build.ps1 -PatcherVersion 1.0.1    # override the patcher version
-.\build.ps1 -SkipTests               # skip the test gate
-```
-
-Aborts immediately if any test fails. Cleans `dist/` before each run so old
-files never accumulate.
-
-### build-dist.ps1 — binary archives only
-
-Publishes each app as a self-contained win-x64 executable (no .NET installation
-required on the target machine) and zips it:
-
-| Archive | Contents |
-|---------|----------|
-| `PillarsDialogEditor-<ver>.zip` | The editor |
-| `PillarsDialogPatcher-<ver>.zip` | `DialogEditor.PatchManager.exe` and a player README at the top; the single-file `dialog-patcher.exe` in `cli\`; one shared .NET runtime in `runtime\` |
-
-The two patcher apps share one bundled runtime rather than each carrying its
-own: they are published framework-dependent with `AppHostDotNetSearch=AppRelative`,
-so each exe looks for .NET *only* in `runtime\` next to it (never a system
-install), and `build-dist.ps1` copies that runtime from the build machine's .NET
-install and smoke-tests the staged CLI against it. The patcher zip keeps the
-console tool in `cli\` so the only `.exe` a player sees at the top is the GUI. Double-clicking `dialog-patcher.exe` anyway shows a
-note pointing to the Patch Manager and waits for a key; runs from a terminal or
-script are unaffected. The player README is `docs/patcher/README.md`.
-
-```powershell
-.\build-dist.ps1
-.\build-dist.ps1 -Product Patcher -PatcherVersion 1.0.1
-```
-
-### build-source.ps1 — source archives only
-
-Copies the project folders needed to build each app (excluding `bin/`, `obj/`,
-and editor artefacts), writes a trimmed `.slnx` solution file, and zips:
-
-| Archive | Contents |
-|---------|----------|
-| `PillarsDialogEditor-<ver>-src.zip` | Editor source |
-| `PillarsDialogPatcher-<ver>-src.zip` | Patch Manager and CLI source, one solution |
-
-Each source archive also includes `README.md`, `VERSION`, `PATCHER_VERSION`, `LICENSE`,
-`THIRD_PARTY_LICENSES.md`, `Directory.Packages.props`, and any repo file its
-projects pull in from outside their own folders (the editor's `CHANGELOG.md`
-and `docs/walkthrough.md`), so `dotnet build` on the extracted `.slnx` works
-with no extra setup. CI checks this with `tools/ci/Test-SourceArchives.ps1`.
-
-The archives do not include `DialogEditor.Tests`: it tests the whole repository
-(it references the editor and the UI-automation tooling, and scans every
-project's source), so no single-app subset can build or run it. Clone the
-repository to run the test suite.
-
-```powershell
-.\build-source.ps1
-.\build-source.ps1 -Product Editor -Version 1.2.0
-```
-
-### Versioning and releases
-
-`VERSION` holds the editor's version and `PATCHER_VERSION` the patcher's. The
-scripts read them when `-Version` / `-PatcherVersion` is not supplied, and stamp
-them into the binaries: the editor's and Patch Manager's About windows and
-`dialog-patcher --version` all report their own product's version.
-
-Pushing a tag builds one product and attaches its zips and `SHA256SUMS.txt` to a
-**draft** GitHub Release (`.github/workflows/release.yml`). The tag must match
-that product's version file, or the workflow fails before building:
-
-```powershell
-git tag v1.2.0         ; git push origin v1.2.0           # editor
-git tag patcher-v1.0.1 ; git push origin patcher-v1.0.1   # patcher
-```
-
----
-
 ## Settings
 
 **File › Settings** (`Ctrl+,`)
@@ -588,6 +421,31 @@ Settings are stored in:
 
 Deleting this file resets all settings to defaults (including first-run prompts such as the theme picker and the guided tour).
 The log file (`app.log`) lives in the same folder.
+
+---
+
+## Keyboard Shortcuts
+
+Press **`?`** in the editor to open the floating Legend window, which lists all
+shortcuts alongside connection types, node colours, and canvas controls. The
+Legend window can be moved outside the editor (useful on a second monitor).
+
+| Key | Action |
+|-----|--------|
+| `Ctrl+N` | New project |
+| `Ctrl+O` | Open project |
+| `Ctrl+S` | Save project |
+| `Ctrl+Shift+O` | Open game folder |
+| `Ctrl+,` | Settings |
+| `Ctrl+Z` | Undo |
+| `Ctrl+Y` | Redo |
+| `Ctrl+F` | Focus node search |
+| `Ctrl+H` | Find / Replace |
+| `Delete` | Delete selected node |
+| `F5` | Test Patch |
+| `F6` | Restore Conversation |
+| `Ctrl+Shift+B` | Restore Backup (all conversations) |
+| `Escape` | Clear search / close browser flyout |
 
 ---
 
@@ -648,25 +506,94 @@ add a PoE2-only condition to a PoE1 conversation.
 
 ---
 
-## Keyboard Shortcuts
+## Supported game builds
 
-Press **`?`** in the editor to open the floating Legend window, which lists all
-shortcuts alongside connection types, node colours, and canvas controls. The
-Legend window can be moved outside the editor (useful on a second monitor).
+Both games have had their last patch, so "the latest build" is a fixed target. These are
+the builds the editor and patcher have been checked against:
 
-| Key | Action |
-|-----|--------|
-| `Ctrl+N` | New project |
-| `Ctrl+O` | Open project |
-| `Ctrl+S` | Save project |
-| `Ctrl+Shift+O` | Open game folder |
-| `Ctrl+,` | Settings |
-| `Ctrl+Z` | Undo |
-| `Ctrl+Y` | Redo |
-| `Ctrl+F` | Focus node search |
-| `Ctrl+H` | Find / Replace |
-| `Delete` | Delete selected node |
-| `F5` | Test Patch |
-| `F6` | Restore Conversation |
-| `Ctrl+Shift+B` | Restore Backup (all conversations) |
-| `Escape` | Clear search / close browser flyout |
+| Game | Storefront | Build checked | DLC installed | Read (open, browse, all languages) | Write (Test Patch, patcher) |
+|---|---|---|---|---|---|
+| Pillars of Eternity | GOG | build 59799714601848948 | The White March 1 + 2 | ✅ 1,434 conversations, 8 languages | ✅ 1,434 conversations, 8 languages |
+| Pillars of Eternity | Steam | build 23036766 | The White March 1 + 2 | ✅ identical data to GOG | ✅ identical data to GOG |
+| Pillars of Eternity (Definitive Edition) | Epic | version 3.9.5.89801 | included | ✅ identical data to GOG | ✅ 1,434 conversations, 8 languages |
+| Pillars of Eternity II: Deadfire | GOG | build 52232433653243275 | all three expansions + free DLC | ✅ 1,400 conversations, 10 languages | ✅ 1,400 conversations, 10 languages |
+| Pillars of Eternity II: Deadfire | Steam | build 12181035 | all three expansions + free DLC | ✅ identical data to GOG | ✅ identical data to GOG |
+
+*Reading checked 2026-09-28 ([#65](https://github.com/kjmikkel/PillarsDialogEditor/issues/65)); writing checked 2026-09-28 ([#117](https://github.com/kjmikkel/PillarsDialogEditor/issues/117)). Deadfire's DLC conversations, in their own `lax*_exported` data folders, are read since [#198](https://github.com/kjmikkel/PillarsDialogEditor/issues/198) (GOG count re-checked 2026-10-13); the Steam row's DLC count has not been re-checked.*
+
+Every storefront ships byte-identical conversation and text files for the same game, so what holds
+for one build holds for all of them. The Microsoft Store / Game Pass builds haven't been checked.
+
+**Writing.** Saving a conversation is what Test Patch, `dialog-patcher` and the Patch Manager all
+do. Saving used to change game data the editor doesn't display. That was fixed in
+[#111](https://github.com/kjmikkel/PillarsDialogEditor/issues/111)–[#116](https://github.com/kjmikkel/PillarsDialogEditor/issues/116).
+Every shipped conversation and text file above now survives an unchanged save:
+
+- **PoE1:** the saved file loads identically in the game's own conversation loader.
+- **PoE2:** the saved file is identical to the original.
+
+This is checked by an opt-in test against a real install ([docs/game-data-tests.md](docs/game-data-tests.md)),
+run before each release. It has not yet been confirmed by playing through edited conversations
+in-game. If a patched conversation misbehaves in the game, please
+[open an issue](https://github.com/kjmikkel/PillarsDialogEditor/issues). Test Patch always backs up
+the files it changes, so **Restore Conversation (F6)** puts the originals back.
+
+**DLC.** Nothing in the editor or patcher depends on which DLC you own. Pillars of Eternity's
+White March conversations sit in the normal conversations folder, with their text in
+`data_expansion1` and `data_expansion2` (read since [#201](https://github.com/kjmikkel/PillarsDialogEditor/issues/201));
+Deadfire keeps each DLC's data in its own folder (`lax1_exported`, `lax2_exported`, …). The editor
+reads these folders in the game's own order, as the game does: where several folders hold the same conversation or line, the later one
+wins. The Conversations dock groups DLC content under the DLC's title. An install without a DLC
+simply has fewer conversations, and a mod that edits a DLC conversation is skipped on such an
+install, with a "conversation not found" warning. Nothing else is written or broken.
+
+**Game updates and your backups.**
+
+- **After a game update.** A game update can replace or change the files your conversation mods
+  edit. Afterwards those mods may be partly missing, or sit on top of files they no longer match.
+  To put things right, verify / repair the game files in your storefront (Steam, GOG Galaxy or the
+  Epic Games Launcher), then apply your mods again. If you're asked whether to treat changed files
+  as the new originals, choose **Treat as new originals**. The Patch Manager's *After a game
+  update…* link says the same ([#147](https://github.com/kjmikkel/PillarsDialogEditor/issues/147)).
+
+- **Patcher (`dialog-patcher`, Patch Manager).** Suppose the game or the storefront's "verify files"
+  replaces a file a mod changed. **Remove all mods / Restore** then leaves that file alone and tells
+  you. Reinstalling stops and asks before treating the new file as the original
+  (`--accept-current-files`). Your update is never overwritten with an older copy.
+- **Test Patch (F5) / Restore Conversation (F6).** F5 backs up the files it's about to change, so
+  the backup is always fresh. Restore with F6 before updating or verifying the game. F6 puts
+  every file F5 changed back byte for byte and removes the files it added. A folder F5 had to
+  create can be left behind empty ([#125](https://github.com/kjmikkel/PillarsDialogEditor/issues/125)).
+- **Restore Full Backup (Ctrl+Shift+B).** This puts back files from the snapshot taken the first
+  time you opened the game folder, but only files the editor itself changed since. A file a game
+  update, "verify files" or the Patch Manager changed is left alone and listed in the log, so an
+  old snapshot never downgrades an updated game
+  ([#118](https://github.com/kjmikkel/PillarsDialogEditor/issues/118)). While a test patch is
+  active, use F6 first. It covers conversations and the text of every installed language, each
+  restored into its own language's folder, and the original of every shipped voice-over line that
+  Test Patch replaced. A voice-over file the editor *added* is removed by F6, not by Restore Full
+  Backup. Backups taken before this change cover one language: it's identified automatically, and
+  only that language is restored
+  ([#123](https://github.com/kjmikkel/PillarsDialogEditor/issues/123)).
+
+**Unreadable files.** If one language's text file for a conversation is damaged, the conversation
+still opens in that language, without its text. The status bar names the file
+([#119](https://github.com/kjmikkel/PillarsDialogEditor/issues/119)). Test Patch and the patcher
+never write to a damaged file: they leave it exactly as it is and say so, and that language shows
+no new text in-game. Other languages are unaffected. Use the storefront's "verify files" to repair
+the file.
+
+---
+
+## Building from source
+
+Build and test instructions and the project's rules for changes are in
+[CONTRIBUTING.md](CONTRIBUTING.md). How the release archives are built, versioned and published
+is in [docs/building.md](docs/building.md).
+
+---
+
+## Third-party software
+
+The editor bundles `vgmstream-cli.exe` for PoE2 voice-over audio preview.
+Full copyright notices and license terms are in [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).
