@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
@@ -126,6 +127,35 @@ public class CanvasCardRenderTests
             Assert.Equal(2, ports.Count);
             Assert.All(ports, p => Assert.True(p.Bounds.Width >= 16 && p.Bounds.Height >= 16,
                 $"port is {p.Bounds.Width:0}x{p.Bounds.Height:0}"));
+        }
+        finally { w.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Ports_AreEightPxDotsCentredOnCardEdgesAtHeaderHeight()
+    {
+        var (w, card, _) = Render("Tell me about the storm.");
+        try
+        {
+            var node = card.GetVisualAncestors().OfType<Nodify.Node>().First();
+            var input = node.GetVisualDescendants().OfType<Nodify.NodeInput>().Single();
+            var output = node.GetVisualDescendants().OfType<Nodify.NodeOutput>().Single();
+            var header = card.GetVisualDescendants().OfType<Border>()
+                .First(b => Grid.GetRow(b) == 0 && Grid.GetRowSpan(b) == 1 && b.Child is StackPanel);
+
+            Point Centre(Control c) => c.TranslatePoint(new Point(c.Bounds.Width / 2, c.Bounds.Height / 2), w)!.Value;
+            var cardLeft = card.TranslatePoint(new Point(0, 0), w)!.Value.X;
+            var headerY = Centre(header).Y;
+
+            foreach (var (port, edge) in new (Control, double)[] { (input, cardLeft), (output, cardLeft + card.Bounds.Width) })
+            {
+                var dot = port.GetVisualDescendants().OfType<global::Avalonia.Controls.Shapes.Ellipse>().Single();
+                Assert.Equal(8, dot.Bounds.Width, 0.5);
+                Assert.Equal(8, dot.Bounds.Height, 0.5);
+                var c = Centre(dot);
+                Assert.True(Math.Abs(c.X - edge) <= 2, $"{port.GetType().Name} dot centre x {c.X:0.#} vs card edge {edge:0.#}");
+                Assert.True(Math.Abs(c.Y - headerY) <= 2, $"{port.GetType().Name} dot centre y {c.Y:0.#} vs header centre {headerY:0.#}");
+            }
         }
         finally { w.Close(); }
     }

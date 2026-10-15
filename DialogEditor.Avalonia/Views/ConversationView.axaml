@@ -8,6 +8,18 @@
              xmlns:ctrl="clr-namespace:DialogEditor.Avalonia.Controls"
              x:Class="DialogEditor.Avalonia.Views.ConversationView" x:CompileBindings="False">
 
+    <UserControl.Resources>
+        <!-- Issue 82: one port dot shared by NodeInput and NodeOutput. 16x16 hit area around an 8 px dot,
+             so ports are no harder to grab than before. -->
+        <ControlTemplate x:Key="PortDotTemplate">
+            <Border Width="16" Height="16" Background="Transparent">
+                <Ellipse Width="8" Height="8"
+                         Fill="{DynamicResource Brush.Connection.Default}"
+                         Stroke="{DynamicResource Brush.Canvas.Background}" StrokeThickness="1.5"/>
+            </Border>
+        </ControlTemplate>
+    </UserControl.Resources>
+
     <UserControl.Styles>
         <!-- Issue 82: no connector side columns. Nodify's default Node draws Input/Output in
              padded columns with their own background, which took about a third of the node's
@@ -30,32 +42,14 @@
             <Setter Property="Margin" Value="-3,6,-13,0"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="VerticalAlignment" Value="Top"/>
-            <Setter Property="ConnectorTemplate">
-                <ControlTemplate>
-                    <!-- 16x16 hit area around an 8 px dot, so ports are no harder to grab than before. -->
-                    <Border Width="16" Height="16" Background="Transparent">
-                        <Ellipse Width="8" Height="8"
-                                 Fill="{DynamicResource Brush.Connection.Default}"
-                                 Stroke="{DynamicResource Brush.Canvas.Background}" StrokeThickness="1.5"/>
-                    </Border>
-                </ControlTemplate>
-            </Setter>
+            <Setter Property="ConnectorTemplate" Value="{StaticResource PortDotTemplate}"/>
         </Style>
         <Style Selector="nodify|NodeOutput">
             <Setter Property="Padding" Value="0"/>
             <Setter Property="Margin" Value="-13,6,-3,0"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="VerticalAlignment" Value="Top"/>
-            <Setter Property="ConnectorTemplate">
-                <ControlTemplate>
-                    <!-- 16x16 hit area around an 8 px dot, so ports are no harder to grab than before. -->
-                    <Border Width="16" Height="16" Background="Transparent">
-                        <Ellipse Width="8" Height="8"
-                                 Fill="{DynamicResource Brush.Connection.Default}"
-                                 Stroke="{DynamicResource Brush.Canvas.Background}" StrokeThickness="1.5"/>
-                    </Border>
-                </ControlTemplate>
-            </Setter>
+            <Setter Property="ConnectorTemplate" Value="{StaticResource PortDotTemplate}"/>
         </Style>
 
         <!-- Connection stroke colours — driven by CSS classes set in code -->
@@ -309,7 +303,8 @@
                             <!-- Issue 82: Margin -16,0 cancels the 16 px left/right padding Nodify's Node template puts
                                  around its content (a local value on the template's content Border, which neither
                                  Node.Padding, ContentContainerStyle nor a style selector overrides). Without it the
-                                 node is card + 32 px wide. -->
+                                 node is card + 32 px wide. Measured against NodifyAvalonia 6.6.0; if an upgrade changes
+                                 that padding, CanvasCardRenderTests.Ports_* (node width, dot positions) will fail. -->
                             <Grid Classes="card" Width="{DynamicResource Canvas.CardWidth}" Margin="-16,0" RowDefinitions="Auto,Auto,Auto,Auto"
                                   Opacity="{Binding SearchMatchState, Converter={StaticResource SearchStateOpacity}}">
 
