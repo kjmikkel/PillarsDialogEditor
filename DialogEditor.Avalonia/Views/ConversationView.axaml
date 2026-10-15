@@ -305,8 +305,16 @@
                                  Node.Padding, ContentContainerStyle nor a style selector overrides). Without it the
                                  node is card + 32 px wide. Measured against NodifyAvalonia 6.6.0; if an upgrade changes
                                  that padding, CanvasCardRenderTests.Ports_* (node width, dot positions) will fail. -->
-                            <Grid Classes="card" Width="{DynamicResource Canvas.CardWidth}" Margin="-16,0" RowDefinitions="Auto,Auto,Auto,Auto"
-                                  Opacity="{Binding SearchMatchState, Converter={StaticResource SearchStateOpacity}}">
+                            <Grid Classes="card" Width="{DynamicResource Canvas.CardWidth}" Margin="-16,0" RowDefinitions="Auto,Auto,Auto,Auto">
+
+                                <!-- Issue 82: dimming is a canvas-coloured veil over an opaque card, not an Opacity on the
+                                     card. A translucent card let connection lines show through its text. -->
+                                <Border Classes="dimOverlay" Grid.Row="0" Grid.RowSpan="3"
+                                        CornerRadius="2"
+                                        IsHitTestVisible="False"
+                                        ZIndex="8"
+                                        Background="{DynamicResource Brush.Canvas.Background}"
+                                        Opacity="{Binding SearchMatchState, Converter={StaticResource SearchDimOverlayOpacity}}"/>
 
                                 <!-- Issue 82: 1 px card outline (CardMetrics.BorderThickness). The header, body
                                      and footer are inset by it (Margin) so it never covers their content. -->
