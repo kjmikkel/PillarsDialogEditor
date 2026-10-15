@@ -12,13 +12,19 @@ namespace DialogEditor.Tests.Views;
 /// Issue 82: on the canvas, font scale magnifies the zoom, so a card shows the same text at every scale.
 public class CanvasFontScaleTests
 {
-    private static (Window, NodifyEditor) Open()
+    private static (Window, NodifyEditor, ConversationView) OpenWithView()
     {
         var view = new ConversationView { DataContext = new ConversationViewModel(new StubDispatcher()) };
         var window = new Window { Width = 1200, Height = 800, Content = view };
         window.Show();
         Dispatcher.UIThread.RunJobs();
-        return (window, view.FindControl<NodifyEditor>("Editor")!);
+        return (window, view.FindControl<NodifyEditor>("Editor")!, view);
+    }
+
+    private static (Window, NodifyEditor) Open()
+    {
+        var (w, e, _) = OpenWithView();
+        return (w, e);
     }
 
     [AvaloniaFact]
@@ -87,11 +93,7 @@ public class CanvasFontScaleTests
     [AvaloniaFact]
     public void LiveFontScaleChange_AfterDetachAndReattach_StillFollows()
     {
-        var view = new ConversationView { DataContext = new ConversationViewModel(new StubDispatcher()) };
-        var window = new Window { Width = 1200, Height = 800, Content = view };
-        window.Show();
-        Dispatcher.UIThread.RunJobs();
-        var editor = view.FindControl<NodifyEditor>("Editor")!;
+        var (window, editor, view) = OpenWithView();
         try
         {
             editor.ViewportZoom = 0.8;
@@ -105,5 +107,27 @@ public class CanvasFontScaleTests
             Assert.Equal(1.6, editor.ViewportZoom, 3);
         }
         finally { new FontScaleApplier().Apply(1.0); window.Close(); }
+    }
+
+    // Spec 3: a live change zooms around the viewport centre, not the top-left.
+    [AvaloniaFact]
+    public void LiveFontScaleChange_KeepsTheViewportCentreFixed()
+    {
+        var (w, editor) = Open();
+        try
+        {
+            editor.ViewportLocation = new global::Avalonia.Point(300, 200);
+            Dispatcher.UIThread.RunJobs();
+            global::Avalonia.Point Centre() => editor.ViewportLocation + new global::Avalonia.Vector(
+                editor.Bounds.Width / editor.ViewportZoom / 2, editor.Bounds.Height / editor.ViewportZoom / 2);
+            var before = Centre();
+            new FontScaleApplier().Apply(2.0);
+            // Measured before any layout pass: WindowSizing grows the window on a later pass, which
+            // legitimately changes the viewport. Bounds/zoom, not ViewportSize, which Nodify refreshes lazily.
+            var after = Centre();
+            Assert.InRange(after.X, before.X - 1, before.X + 1);
+            Assert.InRange(after.Y, before.Y - 1, before.Y + 1);
+        }
+        finally { new FontScaleApplier().Apply(1.0); w.Close(); }
     }
 }

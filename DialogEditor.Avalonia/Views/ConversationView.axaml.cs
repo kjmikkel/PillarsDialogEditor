@@ -246,6 +246,7 @@ public partial class ConversationView : UserControl
         {
             ApplyFontScale(FontScaleService.Current.Scale, keepUserZoom: _fontScaleAttachedBefore);
             _fontScaleAttachedBefore = true;
+            FontScaleService.Current.PropertyChanged -= OnFontScaleChanged; // idempotent
             FontScaleService.Current.PropertyChanged += OnFontScaleChanged;
         };
         DetachedFromVisualTree += (_, _) => FontScaleService.Current.PropertyChanged -= OnFontScaleChanged;
