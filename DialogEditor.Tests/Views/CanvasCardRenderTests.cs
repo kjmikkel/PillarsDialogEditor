@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -46,6 +47,73 @@ public class CanvasCardRenderTests
         var card = window.GetVisualDescendants().OfType<Grid>().Single(g => g.Classes.Contains("card"));
         var body = card.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Classes.Contains("cardBody"));
         return (window, card, body);
+    }
+
+    // Spec §6: a link passing under a card is hidden by the card. The GUI screenshots showed a
+    // link drawn across a card's text, so this samples the rendered pixel where a straight link
+    // between A and B passes under card C's body: it must be the body colour, not the link's.
+    [AvaloniaFact]
+    public void Connection_PassingUnderACard_IsHiddenByIt()
+    {
+        NodeViewModel Node(int id, double x, double y)
+        {
+            var n = new NodeViewModel(
+                new ConversationNode(id, false, SpeakerCategory.Npc, "", "", [], [], [], "Conversation", "None"),
+                new StringEntry(id, "Line " + id, "")) { Location = new LayoutPoint(x, y) };
+            n.Input.Owner = n; n.Output.Owner = n;
+            return n;
+        }
+        var a = Node(1, 0, 100);
+        var b = Node(2, 900, 100);
+        var c = Node(3, 400, 75);   // header above the link's y, body across it
+        var vm = new ConversationViewModel(new StubDispatcher());
+        vm.Nodes.Add(a); vm.Nodes.Add(b); vm.Nodes.Add(c);
+        vm.Connections.Add(new ConnectionViewModel(a.Output, b.Input));
+        var view = new ConversationView { DataContext = vm };
+        var window = new Window { Width = 1400, Height = 800, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        try
+        {
+            var cardC = window.GetVisualDescendants().OfType<Grid>()
+                .Single(g => g.Classes.Contains("card") && ReferenceEquals(g.DataContext, c));
+            var bodyC = cardC.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Classes.Contains("cardBody"));
+            var editor = view.FindControl<Nodify.NodifyEditor>("Editor")!;
+            // The link's y in window pixels: A's output anchor, through the editor's viewport.
+            var editorOrigin = editor.TranslatePoint(default, window)!.Value;
+            var linkY = editorOrigin.Y + (a.Output.Anchor.Y - editor.ViewportLocation.Y) * editor.ViewportZoom;
+            var bodyTop = bodyC.TranslatePoint(default, window)!.Value;
+            Assert.True(linkY > bodyTop.Y + 1 && linkY < bodyTop.Y + bodyC.Bounds.Height - 1,
+                $"test setup: link y {linkY:0.#} is not across C's body ({bodyTop.Y:0.#}..{bodyTop.Y + bodyC.Bounds.Height:0.#})");
+            var sampleX = bodyTop.X + bodyC.Bounds.Width - 20;   // right of the short text, inside the body
+
+            using var frame = window.CaptureRenderedFrame()!;
+            using var fb = frame.Lock();
+            var scale = frame.PixelSize.Width / window.Bounds.Width;
+            // The headless Skia frame may be RGBA or BGRA; read the channels in the frame's own order.
+            var bgra = fb.Format == global::Avalonia.Platform.PixelFormat.Bgra8888;
+            Color At(double x, double y)
+            {
+                var o = (int)Math.Round(y * scale) * fb.RowBytes + (int)(x * scale) * 4;
+                var p = new byte[4];
+                System.Runtime.InteropServices.Marshal.Copy(fb.Address + o, p, 0, 4);
+                return bgra ? Color.FromRgb(p[2], p[1], p[0]) : Color.FromRgb(p[0], p[1], p[2]);
+            }
+            static int Distance(Color x, Color y) => Math.Abs(x.R - y.R) + Math.Abs(x.G - y.G) + Math.Abs(x.B - y.B);
+
+            var bodyColour = ((ISolidColorBrush)((Border)((Visual)bodyC.Parent!).GetVisualParent()!).Background!).Color;
+            // Control: on the link left of C, outside every card, the sample must NOT be the body colour,
+            // or the test isn't looking at the link at all.
+            var control = At(bodyTop.X - 60, linkY);
+            Assert.True(Distance(control, bodyColour) > 30, $"test setup: the link isn't where expected (control {control})");
+            for (var dy = -1; dy <= 1; dy++)
+            {
+                var sampled = At(sampleX, linkY + dy / scale);
+                Assert.True(Distance(sampled, bodyColour) <= 30,
+                    $"the link shows through card C's body at ({sampleX:0},{linkY + dy:0}): sampled {sampled}, body {bodyColour}, link {control}");
+            }
+        }
+        finally { window.Close(); }
     }
 
     [AvaloniaTheory]

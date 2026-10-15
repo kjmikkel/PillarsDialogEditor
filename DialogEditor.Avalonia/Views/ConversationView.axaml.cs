@@ -25,6 +25,18 @@ public partial class ConversationView : UserControl
         InitializeComponent();
         InitFontScaleZoom();
 
+        // Issue 82 (spec §6): connections are drawn beneath the cards. NodifyAvalonia 6.6.0's editor
+        // template puts the items presenter and PART_ConnectionsHost in one Canvas, both at ZIndex 0
+        // with the connections declared second, so links drew across card text even with
+        // DisplayConnectionsOnTop=False. A style can't reach the part, so lower it once the template
+        // exists. CanvasCardRenderTests.Connection_PassingUnderACard_IsHiddenByIt samples the
+        // rendered pixel and fails if a Nodify upgrade changes this.
+        Editor.TemplateApplied += (_, e) =>
+        {
+            if (e.NameScope.Find<Control>("PART_ConnectionsHost") is { } connections)
+                connections.ZIndex = -1;
+        };
+
         Editor.PropertyChanged += (_, e) =>
         {
             if (e.Property.Name is nameof(Editor.ViewportZoom) or nameof(Editor.ViewportLocation))
