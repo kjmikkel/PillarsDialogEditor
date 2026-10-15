@@ -100,6 +100,14 @@ and it may not apply cleanly. Check the mod's page for an update.
 
 ## When something goes wrong
 
+**Windows says "Windows protected your PC".** The patcher isn't signed with a paid
+code-signing certificate, so Windows SmartScreen warns about it the first time you run
+it. Click **More info**, then **Run anyway**. To make sure your download is the real one,
+compare it with `SHA256SUMS.txt` on the release page: in PowerShell, run
+`Get-FileHash .\PillarsDialogPatcher-<version>.zip` in the folder you downloaded it to. The
+long number it prints must match the one listed for that file (upper or lower case doesn't
+matter). If it doesn't, download the patcher again.
+
 **"This mod needs a newer patcher."** The mod was made with a newer editor than this
 patcher understands. Nothing was changed. Download the newest Pillars Dialog Patcher
 (releases named `patcher-v…`) from
