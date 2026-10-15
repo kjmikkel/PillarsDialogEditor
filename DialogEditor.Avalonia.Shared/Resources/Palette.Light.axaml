@@ -56,6 +56,7 @@
     <Color x:Key="Palette.Button.Hover">#FFC4C4C2</Color>
     <Color x:Key="Palette.Control.Background">#FFD6D6D4</Color>
     <Color x:Key="Palette.Connection.Base">#FF4F4F4F</Color>  <!-- resting connection stroke (matches Light's old Neutral.665) -->
+    <Color x:Key="Palette.Canvas.Base">#FFE4E4E0</Color>  <!-- canvas backdrop (issue 82): a step darker than panels (#E9E9E7) -->
 
     <!-- Accents -->
     <Color x:Key="Palette.Crimson.700">#FF7B241C</Color>
@@ -99,7 +100,6 @@
     <Color x:Key="Palette.Parchment.100">#FFF5F0D0</Color>
     <Color x:Key="Palette.Parchment.200">#FFE8E0B0</Color>
     <Color x:Key="Palette.Cream.100">#FFFFF8DC</Color>
-    <Color x:Key="Palette.Neutral.520">#FF838585</Color>
     <Color x:Key="Palette.Magenta.500">#FFB8007F</Color>
 
     <!-- Annotation box colours — semi-transparent fill + title header + solid stroke. -->
