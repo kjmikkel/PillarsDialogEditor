@@ -103,6 +103,34 @@ public class CanvasCardRenderTests
     }
 
     [AvaloniaFact]
+    public void Ports_DoNotAddSideColumns()
+    {
+        var (w, card, _) = Render("Tell me about the storm.");
+        try
+        {
+            var node = card.GetVisualAncestors().OfType<Nodify.Node>().First();
+            Assert.True(node.Bounds.Width <= CardMetrics.Width + 16,
+                $"node is {node.Bounds.Width:0} wide for a {CardMetrics.Width} card: connector columns are back");
+        }
+        finally { w.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Ports_HaveAtLeast16pxHitArea()
+    {
+        var (w, card, _) = Render("Tell me about the storm.");
+        try
+        {
+            var node = card.GetVisualAncestors().OfType<Nodify.Node>().First();
+            var ports = node.GetVisualDescendants().OfType<Nodify.Connector>().ToList();
+            Assert.Equal(2, ports.Count);
+            Assert.All(ports, p => Assert.True(p.Bounds.Width >= 16 && p.Bounds.Height >= 16,
+                $"port is {p.Bounds.Width:0}x{p.Bounds.Height:0}"));
+        }
+        finally { w.Close(); }
+    }
+
+    [AvaloniaFact]
     public void CardRender_FourLinesAtMost113()
     {
         var (w, card, _) = Render(string.Concat(Enumerable.Repeat("A long line of dialogue. ", 40)));
