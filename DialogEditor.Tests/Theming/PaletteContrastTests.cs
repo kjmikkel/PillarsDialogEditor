@@ -90,9 +90,9 @@ public class PaletteContrastTests
         ("Palette.Line.Default", "Palette.Neutral.145"), // on Surface.Panel
         ("Palette.Line.Strong",  "Palette.Neutral.115"),
         // The pane GridSplitters (Brush.Border.Default) border the canvas backdrop on their
-        // canvas side (Brush.Canvas.Background → Palette.Neutral.520), not just the dark panels —
+        // canvas side (Brush.Canvas.Background → Palette.Canvas.Base), not just the dark panels —
         // so the divider must stay visible against the canvas too, or it vanishes into it.
-        ("Palette.Line.Default", "Palette.Neutral.520"), // GridSplitter on the canvas backdrop
+        ("Palette.Line.Default", "Palette.Canvas.Base"), // GridSplitter on the canvas backdrop
     };
 
     // A highlighted connection (Brush.Connection.Highlighted = Palette.White) must stand out
@@ -108,6 +108,32 @@ public class PaletteContrastTests
             PaletteHarness.Color(dict, "Palette.Connection.Base"));
         Assert.True(ratio >= 1.8,
             $"highlighted vs resting connection in HC: {ratio:F2}:1 < 1.8:1");
+    }
+
+    // Issue 82: the canvas backdrop follows the theme. Resting connections must stay at least
+    // 3:1 against it (non-text UI), and the backdrop must differ from the panels around it.
+    [AvaloniaTheory]
+    [InlineData("Palette.Dark", "#FF2B2B2B")]
+    [InlineData("Palette.Light", "#FFE4E4E0")]
+    [InlineData("Palette.HighContrast", "#FF3A3A3A")]
+    [InlineData("Palette.Colourblind", "#FF2B2B2B")]
+    public void CanvasBackdrop_HasTheSpecValue(string palette, string expected)
+    {
+        var dict = PaletteHarness.Load(palette);
+        Assert.Equal(global::Avalonia.Media.Color.Parse(expected), PaletteHarness.Color(dict, "Palette.Canvas.Base"));
+    }
+
+    [AvaloniaTheory]
+    [InlineData("Palette.Dark")]
+    [InlineData("Palette.Light")]
+    [InlineData("Palette.HighContrast")]
+    [InlineData("Palette.Colourblind")]
+    public void RestingConnection_IsVisibleOnTheCanvas(string palette)
+    {
+        var dict = PaletteHarness.Load(palette);
+        var ratio = Wcag.ContrastRatio(PaletteHarness.Color(dict, "Palette.Connection.Base"),
+                                       PaletteHarness.Color(dict, "Palette.Canvas.Base"));
+        Assert.True(ratio >= 3.0, $"{palette}: resting connection on canvas {ratio:F2}:1 < 3:1");
     }
 
     [AvaloniaFact]
