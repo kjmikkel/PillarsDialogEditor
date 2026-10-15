@@ -240,4 +240,27 @@ public class CanvasCardRenderTests
         }
         finally { w.Close(); }
     }
+
+    [AvaloniaFact]
+    public void CornerBadges_AreNotClippedByAnyAncestor()
+    {
+        // The badges sit half outside the card (Margin -9); Nodify's Node clips to bounds by default, which cut them.
+        var (w, card, _) = Render("Tell me about the storm.", setup: n => n.IsConnectionSource = true);
+        try
+        {
+            var badges = card.GetVisualDescendants().OfType<Border>()
+                .Where(b => b.Width == 18 && b.Height == 18 && b.Margin.Top < 0).ToList();
+            Assert.Equal(2, badges.Count);
+            foreach (var badge in badges)
+                foreach (var anc in badge.GetVisualAncestors().OfType<Visual>().TakeWhile(a => a is not Nodify.ItemContainer))
+                {
+                    if (anc is not Control c || !c.ClipToBounds) continue;
+                    var tl = badge.TranslatePoint(new Point(0, 0), c)!.Value;
+                    var br = badge.TranslatePoint(new Point(badge.Bounds.Width, badge.Bounds.Height), c)!.Value;
+                    Assert.True(tl.X >= -0.5 && tl.Y >= -0.5 && br.X <= c.Bounds.Width + 0.5 && br.Y <= c.Bounds.Height + 0.5,
+                        $"{c.GetType().Name} clips a badge: badge {tl}..{br} vs {c.Bounds.Width}x{c.Bounds.Height}");
+                }
+        }
+        finally { w.Close(); }
+    }
 }

@@ -32,6 +32,8 @@
             <Setter Property="ContentBrush" Value="Transparent"/>
             <Setter Property="HeaderBrush" Value="Transparent"/>
             <Setter Property="FooterBrush" Value="Transparent"/>
+            <!-- Nodify's Node clips to its bounds; the 18 px diff / connect-source badges sit half outside the card. -->
+            <Setter Property="ClipToBounds" Value="False"/>
         </Style>
         <!-- Two styles, not a comma selector: ConnectorTemplate is declared on NodeInput and NodeOutput
              separately, so a combined selector infers the common base (Connector) and fails to compile. -->
