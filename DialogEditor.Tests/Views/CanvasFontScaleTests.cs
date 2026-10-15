@@ -1,9 +1,12 @@
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
+using Avalonia.VisualTree;
 using DialogEditor.Avalonia.Shared.Theming;
 using DialogEditor.Avalonia.Views;
 using DialogEditor.Tests.Helpers;
+using DialogEditor.Tests.ViewModels;
 using DialogEditor.ViewModels;
 using Nodify;
 
@@ -129,5 +132,35 @@ public class CanvasFontScaleTests
             Assert.InRange(after.Y, before.Y - 1, before.Y + 1);
         }
         finally { new FontScaleApplier().Apply(1.0); w.Close(); }
+    }
+
+    // Issue 82: fit-to-screen must leave the bottom-right minimap free of cards.
+    [AvaloniaFact]
+    public void FitToScreen_KeepsCardsOutFromUnderTheMinimap()
+    {
+        var vm = new ConversationViewModel(new StubDispatcher());
+        for (var i = 0; i < 16; i++)
+            vm.Nodes.Add(CanvasNavigationServiceTests.MakeNode(i, (i % 4) * 340, (i / 4) * 240));
+        var view = new ConversationView { DataContext = vm };
+        var window = new Window { Width = 1000, Height = 700, Content = view };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        try
+        {
+            view.FitToScreenClearOfMinimap();
+            Dispatcher.UIThread.RunJobs();
+            // Measured after layout settled: positions are recomputed from the final bounds.
+            var minimap = view.GetVisualDescendants().OfType<Minimap>().Single();
+            var mmRect = new Rect(minimap.TranslatePoint(default, view)!.Value, minimap.Bounds.Size);
+            var zoom = view.FindControl<NodifyEditor>("Editor")!.ViewportZoom;
+            var cards = view.GetVisualDescendants().OfType<Grid>().Where(g => g.Classes.Contains("card")).ToList();
+            Assert.NotEmpty(cards);
+            foreach (var card in cards)
+            {
+                var r = new Rect(card.TranslatePoint(default, view)!.Value, card.Bounds.Size * zoom);
+                Assert.False(r.Intersects(mmRect), $"a card at {r} is under the minimap {mmRect}");
+            }
+        }
+        finally { window.Close(); }
     }
 }
