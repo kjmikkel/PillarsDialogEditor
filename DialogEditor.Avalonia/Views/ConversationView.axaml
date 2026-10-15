@@ -501,6 +501,7 @@
 
             <!-- Minimap -->
             <nodify:Minimap
+                x:Name="Minimap"
                 HorizontalAlignment="Right" VerticalAlignment="Bottom"
                 Margin="8" Width="160" Height="110"
                 IsReadOnly="False"

@@ -276,7 +276,20 @@ public partial class ConversationView : UserControl
             Editor.ViewportSize.Width / 2, Editor.ViewportSize.Height / 2);
     }
 
-    private void FitToScreen_Click(object? sender, RoutedEventArgs e) => Editor.FitToScreen();
+    // Issue 82: plain FitToScreen fits content to the whole viewport, so the bottom-right minimap
+    // covered cards. Widening the fitted area on the right by the minimap's share of the viewport
+    // width leaves a free strip there for it.
+    internal void FitToScreenClearOfMinimap()
+    {
+        var extent = Editor.ItemsExtent;
+        if (extent.Width <= 0 || Editor.Bounds.Width <= 0) { Editor.FitToScreen(); return; }
+        var reserved = Minimap.Bounds.Width + Minimap.Margin.Left + Minimap.Margin.Right;
+        var usable = Math.Max(1, Editor.Bounds.Width - reserved);
+        var widened = extent.Width * Editor.Bounds.Width / usable;
+        Editor.FitToScreen(new global::Avalonia.Rect(extent.X, extent.Y, widened, extent.Height));
+    }
+
+    private void FitToScreen_Click(object? sender, RoutedEventArgs e) => FitToScreenClearOfMinimap();
     private void ZoomIn_Click(object? sender, RoutedEventArgs e)      => Editor.ZoomIn();
     private void ZoomOut_Click(object? sender, RoutedEventArgs e)     => Editor.ZoomOut();
 
