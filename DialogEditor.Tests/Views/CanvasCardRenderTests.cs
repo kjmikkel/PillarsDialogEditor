@@ -161,6 +161,62 @@ public class CanvasCardRenderTests
     }
 
     [AvaloniaFact]
+    public void Connections_AreNotDrawnOverCards()
+    {
+        var (w, card, _) = Render("Tell me about the storm.");
+        try
+        {
+            var editor = card.GetVisualAncestors().OfType<Nodify.NodifyEditor>().First();
+            Assert.False(editor.DisplayConnectionsOnTop);
+            // No part of the card may be see-through-but-visible: solid fills are fully opaque or fully
+            // transparent (the overlay borders are deliberately Transparent, alpha 0).
+            foreach (var b in card.GetVisualDescendants().OfType<Border>().Where(b => b.Background is ISolidColorBrush))
+            {
+                var a = ((ISolidColorBrush)b.Background!).Color.A;
+                Assert.True(a == 0 || a == 255, $"border background alpha {a}: lines would show through");
+            }
+        }
+        finally { w.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void DimmedCard_StaysOpaque()
+    {
+        // Search dims non-matching cards. Dimming must not make them see-through, or every line
+        // behind them shows through their text.
+        var (w, card, _) = Render("Tell me about the storm.");
+        try
+        {
+            var vm = (ConversationViewModel)card.GetVisualAncestors().OfType<ConversationView>().First().DataContext!;
+            vm.Nodes[0].SearchMatchState = SearchMatchState.Dimmed;
+            Dispatcher.UIThread.RunJobs();
+            var opacity = card.GetSelfAndVisualAncestors().TakeWhile(v => v is not Nodify.ItemContainer)
+                              .Aggregate(1.0, (o, v) => o * v.Opacity);
+            Assert.Equal(1.0, opacity, 3);
+        }
+        finally { w.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void DimmedCard_ShowsDimmingOverlay_OnlyWhenDimmed()
+    {
+        var (w, card, _) = Render("Tell me about the storm.");
+        try
+        {
+            var vm = (ConversationViewModel)card.GetVisualAncestors().OfType<ConversationView>().First().DataContext!;
+            var overlay = card.GetVisualDescendants().OfType<Border>().Single(b => b.Classes.Contains("dimOverlay"));
+            Assert.Equal(0.0, overlay.Opacity, 3);
+            vm.Nodes[0].SearchMatchState = SearchMatchState.Dimmed;
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(0.6, overlay.Opacity, 3);
+            vm.Nodes[0].SearchMatchState = SearchMatchState.Match;
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(0.0, overlay.Opacity, 3);
+        }
+        finally { w.Close(); }
+    }
+
+    [AvaloniaFact]
     public void CardRender_FourLinesAtMost113()
     {
         var (w, card, _) = Render(string.Concat(Enumerable.Repeat("A long line of dialogue. ", 40)));
