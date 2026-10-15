@@ -372,11 +372,14 @@ public partial class ConversationViewModel : ObservableObject
             Nodes.Add(vm);
         }
 
-        AutoLayoutService.Apply(conversation.Nodes, (id, x, y) =>
-        {
-            if (nodeMap.TryGetValue(id, out var vm))
-                vm.Location = new LayoutPoint(x, y);
-        });
+        // Cards are laid out by their estimated height (issue 82), from the text each one shows.
+        AutoLayoutService.Apply(conversation.Nodes,
+            id => CardMetrics.EstimateHeight(nodeMap.TryGetValue(id, out var n) ? n.DefaultText : null),
+            (id, x, y) =>
+            {
+                if (nodeMap.TryGetValue(id, out var vm))
+                    vm.Location = new LayoutPoint(x, y);
+            });
 
         foreach (var node in conversation.Nodes)
         {
