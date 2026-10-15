@@ -61,7 +61,7 @@
   </ItemGroup>
 
   <ItemGroup Label="UI automation tooling (tools/DialogEditor.UiaMcp*)">
-    <PackageVersion Include="Microsoft.Extensions.Hosting"   Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting"   Version="10.0.13" />
     <PackageVersion Include="ModelContextProtocol"           Version="2.2.0" />
   </ItemGroup>
 

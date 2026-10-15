@@ -3,6 +3,9 @@
     <!-- net10.0-windows because it references the server, which needs the UIA client.
          This is why these tests cannot live in DialogEditor.Tests (net10.0). -->
     <TargetFramework>net10.0-windows</TargetFramework>
+    <!-- Lets GitHub's dependency submission restore this Windows-only project on its Linux runner (#212);
+         it changes nothing when building on Windows. -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
