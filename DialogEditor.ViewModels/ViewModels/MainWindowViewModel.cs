@@ -1271,7 +1271,12 @@ public partial class MainWindowViewModel : ObservableObject
             .ToList();
 
         var layout = new Dictionary<int, LayoutPoint>();
-        AutoLayoutService.Apply(layoutNodes, (id, x, y) => layout[id] = new LayoutPoint(x, y));
+        // Cards are laid out by their estimated height (issue 82), from the text each one shows.
+        var importedText = imported.Texts
+            .GroupBy(t => t.NodeId).ToDictionary(g => g.Key, g => g.First().DefaultText);
+        AutoLayoutService.Apply(layoutNodes,
+            id => CardMetrics.EstimateHeight(importedText.GetValueOrDefault(id)),
+            (id, x, y) => layout[id] = new LayoutPoint(x, y));
 
         SetProject(_project
             .WithNewConversation(name)
