@@ -29,11 +29,13 @@ public class CanvasCardRenderTests
         new object[] { "First paragraph.\nSecond paragraph after a line break." },
     };
 
-    private static (Window, Control card, TextBlock body) Render(string text)
+    private static (Window, Control card, TextBlock body) Render(
+        string text, string speakerGuid = "", Action<NodeViewModel>? setup = null)
     {
         var node = new NodeViewModel(
-            new ConversationNode(1, false, SpeakerCategory.Npc, "", "", [], [], [], "Conversation", "None"),
+            new ConversationNode(1, false, SpeakerCategory.Npc, speakerGuid, "", [], [], [], "Conversation", "None"),
             new StringEntry(1, text, ""));
+        setup?.Invoke(node);
         node.Input.Owner = node; node.Output.Owner = node;
         var vm = new ConversationViewModel(new StubDispatcher());
         vm.Nodes.Add(node);
@@ -141,7 +143,7 @@ public class CanvasCardRenderTests
             var input = node.GetVisualDescendants().OfType<Nodify.NodeInput>().Single();
             var output = node.GetVisualDescendants().OfType<Nodify.NodeOutput>().Single();
             var header = card.GetVisualDescendants().OfType<Border>()
-                .First(b => Grid.GetRow(b) == 0 && Grid.GetRowSpan(b) == 1 && b.Child is StackPanel);
+                .First(b => Grid.GetRow(b) == 0 && Grid.GetRowSpan(b) == 1 && b.Child is Grid);
 
             Point Centre(Control c) => c.TranslatePoint(new Point(c.Bounds.Width / 2, c.Bounds.Height / 2), w)!.Value;
             var cardLeft = card.TranslatePoint(new Point(0, 0), w)!.Value.X;
@@ -221,6 +223,21 @@ public class CanvasCardRenderTests
     {
         var (w, card, _) = Render(string.Concat(Enumerable.Repeat("A long line of dialogue. ", 40)));
         try { Assert.True(card.Bounds.Height < 130, $"{card.Bounds.Height} >= the old 130 px pitch"); }
+        finally { w.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void CardRender_LongTitle_IsTrimmedInsideTheCard()
+    {
+        // A speaker name unknown to SpeakerNameService resolves to the raw GUID, so this is a long title.
+        var (w, card, _) = Render("Tell me about the storm.", new string('W', 55));
+        try
+        {
+            var title = card.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Text!.StartsWith("Node 1"));
+            var right = title.TranslatePoint(new Point(title.Bounds.Width, 0), card)!.Value.X;
+            Assert.True(right <= card.Bounds.Width + 0.5, $"title right edge {right:0.#} is past the {card.Bounds.Width:0.#} card");
+            Assert.Contains(title.TextLayout.TextLines, l => l.HasCollapsed);
+        }
         finally { w.Close(); }
     }
 }
