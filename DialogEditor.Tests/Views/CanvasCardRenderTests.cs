@@ -263,4 +263,17 @@ public class CanvasCardRenderTests
         }
         finally { w.Close(); }
     }
+
+    [AvaloniaFact]
+    public void MinimapItems_AreCardWidth()
+    {
+        var (w, card, _) = Render("Tell me about the storm.");
+        try
+        {
+            var item = card.GetVisualAncestors().OfType<ConversationView>().First()
+                .GetVisualDescendants().OfType<Nodify.MinimapItem>().Single();
+            Assert.Equal(CardMetrics.Width, item.Width, 1);
+        }
+        finally { w.Close(); }
+    }
 }

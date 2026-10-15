@@ -519,7 +519,8 @@
                                   BasedOn="{StaticResource {x:Type nodify:MinimapItem}}">
                         <Setter Property="Location" Value="{Binding Location,
                                            Converter={StaticResource LayoutPointConverter}}"/>
-                        <Setter Property="Width" Value="200"/>
+                        <Setter Property="Width" Value="{DynamicResource Canvas.CardWidth}"/>
+                        <!-- 80: a typical one-to-two line card; real heights vary with the text, the minimap is only a sketch. -->
                         <Setter Property="Height" Value="80"/>
                         <Setter Property="Template">
                             <ControlTemplate TargetType="nodify:MinimapItem">
