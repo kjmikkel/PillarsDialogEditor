@@ -9,6 +9,55 @@
              x:Class="DialogEditor.Avalonia.Views.ConversationView" x:CompileBindings="False">
 
     <UserControl.Styles>
+        <!-- Issue 82: no connector side columns. Nodify's default Node draws Input/Output in
+             padded columns with their own background, which took about a third of the node's
+             width. The card's own colours (ContentBrush/HeaderBrush) are unused: the DataTemplate
+             draws the card. -->
+        <Style Selector="nodify|Node">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="ContentBrush" Value="Transparent"/>
+            <Setter Property="HeaderBrush" Value="Transparent"/>
+            <Setter Property="FooterBrush" Value="Transparent"/>
+        </Style>
+        <!-- Two styles, not a comma selector: ConnectorTemplate is declared on NodeInput and NodeOutput
+             separately, so a combined selector infers the common base (Connector) and fails to compile. -->
+        <!-- Margins centre each dot on the card's edge: the 5 px side column holds the NodeInput/Output
+             (21 wide = 16 dot + 5 spacing), and the output draws its dot on the right of that spacing. -->
+        <Style Selector="nodify|NodeInput">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="-3,6,-13,0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="ConnectorTemplate">
+                <ControlTemplate>
+                    <!-- 16x16 hit area around an 8 px dot, so ports are no harder to grab than before. -->
+                    <Border Width="16" Height="16" Background="Transparent">
+                        <Ellipse Width="8" Height="8"
+                                 Fill="{DynamicResource Brush.Connection.Default}"
+                                 Stroke="{DynamicResource Brush.Canvas.Background}" StrokeThickness="1.5"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+        <Style Selector="nodify|NodeOutput">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="-13,6,-3,0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="ConnectorTemplate">
+                <ControlTemplate>
+                    <!-- 16x16 hit area around an 8 px dot, so ports are no harder to grab than before. -->
+                    <Border Width="16" Height="16" Background="Transparent">
+                        <Ellipse Width="8" Height="8"
+                                 Fill="{DynamicResource Brush.Connection.Default}"
+                                 Stroke="{DynamicResource Brush.Canvas.Background}" StrokeThickness="1.5"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+        </Style>
+
         <!-- Connection stroke colours — driven by CSS classes set in code -->
         <Style Selector="nodify|Connection">
             <Setter Property="Stroke" Value="{DynamicResource Brush.Connection.Default}"/>
@@ -257,7 +306,11 @@
                                 </DataTemplate>
                             </nodify:Node.OutputConnectorTemplate>
 
-                            <Grid Classes="card" Width="{DynamicResource Canvas.CardWidth}" RowDefinitions="Auto,Auto,Auto,Auto"
+                            <!-- Issue 82: Margin -16,0 cancels the 16 px left/right padding Nodify's Node template puts
+                                 around its content (a local value on the template's content Border, which neither
+                                 Node.Padding, ContentContainerStyle nor a style selector overrides). Without it the
+                                 node is card + 32 px wide. -->
+                            <Grid Classes="card" Width="{DynamicResource Canvas.CardWidth}" Margin="-16,0" RowDefinitions="Auto,Auto,Auto,Auto"
                                   Opacity="{Binding SearchMatchState, Converter={StaticResource SearchStateOpacity}}">
 
                                 <!-- Issue 82: 1 px card outline (CardMetrics.BorderThickness). The header, body
