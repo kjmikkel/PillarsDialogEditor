@@ -95,10 +95,10 @@ Do these once, with the first editor release (1.0.0):
 ### Publish
 
 - [ ] Press **Publish** on the draft.
-- [ ] Update the editor's Nexus pages (#73), once they exist:
+- [ ] Update the editor's Nexus pages, per [nexus/editor.md](nexus/editor.md):
       upload the zip as the new main file, move the previous one to *Old versions*, set the
       version, and add a changelog entry linking the GitHub release.
-- [ ] For a major or minor release, post the announcement (#73).
+- [ ] For a major or minor release, post the announcement from [nexus/editor.md](nexus/editor.md#release-announcement).
 
 ---
 
