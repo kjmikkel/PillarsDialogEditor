@@ -44,6 +44,7 @@ public class NonAffiliationNoticeTests
     [InlineData("README.md")]
     [InlineData("docs/patcher/README.md")]
     [InlineData("docs/nexus/patcher.md")]
+    [InlineData("docs/nexus/editor.md")]
     [InlineData(".github/release-notice.md")]
     public void Document_CarriesTheNotice(string relativePath) =>
         AssertComplete(Read(relativePath.Split('/')), relativePath);
