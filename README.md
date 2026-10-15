@@ -19,7 +19,9 @@ original game files directly, making the workflow safe, reversible, and shareabl
 1. **Download** the latest `PillarsDialogEditor-<version>.zip` from the
    [Releases page](https://github.com/kjmikkel/PillarsDialogEditor/releases/latest).
 2. **Unzip** it anywhere and run `DialogEditor.Avalonia.exe`. Nothing needs installing: the
-   archive brings its own .NET runtime.
+   archive brings its own .NET runtime. The editor isn't code-signed, so the first time
+   Windows may say *"Windows protected your PC"*: click **More info**, then **Run anyway**.
+   See [Checking your download](#checking-your-download) to confirm it's the real one.
 3. **Open your game folder** (**File › Open Game Folder…**) and follow the
    [walkthrough](docs/walkthrough.md), also under **Help › Open Walkthrough…**. It takes you
    through a safe practice project built with **Help › Create Sample Project…**, from your
@@ -27,6 +29,18 @@ original game files directly, making the workflow safe, reversible, and shareabl
 
 **Installing mods rather than making them?** Download `PillarsDialogPatcher-<version>.zip`
 from the same page and read the [player guide](docs/patcher/README.md).
+
+### Checking your download
+
+Each release lists a SHA-256 checksum for every file in `SHA256SUMS.txt`. In PowerShell, in
+the folder you downloaded to, run:
+
+```powershell
+Get-FileHash .\PillarsDialogEditor-<version>.zip
+```
+
+The `Hash` it prints must match the line for that file in `SHA256SUMS.txt` (upper or lower
+case doesn't matter). If it doesn't, don't run it: download it again from the Releases page.
 
 The rest of this page is the reference for every feature, in the order you'll use them:
 open your game folder, open or create a project, edit, test in-game, restore, and distribute.
