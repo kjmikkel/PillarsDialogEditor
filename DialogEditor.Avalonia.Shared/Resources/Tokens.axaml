@@ -61,6 +61,20 @@
     <x:Double x:Key="ColumnWidth.BatchVo.FileMin">150</x:Double>
     <x:Double x:Key="ColumnWidth.SeverityBadge">16</x:Double>
 
+    <!-- Issue 82: conversation-canvas card sizes, in canvas units. Pinned to
+         DialogEditor.Core/Layout/CardMetrics.cs by CanvasTokenTests. Deliberately NOT in
+         FontSizeTokens / ColumnWidthTokens, so FontScaleApplier never scales them: on the canvas,
+         font scale magnifies the zoom instead (ConversationView), so a card shows the same text
+         at every scale and saved layouts stay valid. -->
+    <x:Double x:Key="Canvas.CardWidth">240</x:Double>
+    <x:Double x:Key="Canvas.FontSize.Header">12</x:Double>
+    <x:Double x:Key="Canvas.FontSize.Body">12</x:Double>
+    <x:Double x:Key="Canvas.FontSize.Footer">10</x:Double>
+    <x:Double x:Key="Canvas.FontSize.Badge">10</x:Double>
+    <x:Double x:Key="Canvas.LineHeight.Header">16</x:Double>
+    <x:Double x:Key="Canvas.LineHeight.Body">16</x:Double>
+    <x:Double x:Key="Canvas.LineHeight.Footer">13</x:Double>
+
     <!--  TOKENS — semantic brush layer (Layer 0, public contract).
           Every view, converter, and dependent gap binds THESE keys (never Palette.*).
           Each brush references exactly one Palette.* colour; two tokens may share a
