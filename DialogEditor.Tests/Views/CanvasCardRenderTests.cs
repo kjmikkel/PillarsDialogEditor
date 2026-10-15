@@ -5,6 +5,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using DialogEditor.Avalonia.Shared.Services;
+using DialogEditor.Avalonia.Shared.Theming;
 using DialogEditor.Avalonia.Views;
 using DialogEditor.Core.Layout;
 using DialogEditor.Core.Models;
@@ -275,5 +276,28 @@ public class CanvasCardRenderTests
             Assert.Equal(CardMetrics.Width, item.Width, 1);
         }
         finally { w.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void CardRender_SameLinesAtFontScale1And2()
+    {
+        // Spec §7: font scale magnifies the zoom, not the text, so a card wraps identically at every scale.
+        const string text = "You're the one asking about the lighthouse keeper? Sit down. Nobody has seen him since the storm put the lamp out.";
+        static int[] LineLengths(string t)
+        {
+            var (w, _, body) = Render(t);
+            try { return body.TextLayout.TextLines.Select(l => l.Length).ToArray(); }
+            finally { w.Close(); }
+        }
+        try
+        {
+            new FontScaleApplier().Apply(1.0);
+            var at1 = LineLengths(text);
+            new FontScaleApplier().Apply(2.0);
+            var at2 = LineLengths(text);
+            Assert.True(at1.Length > 1);
+            Assert.Equal(at1, at2);
+        }
+        finally { new FontScaleApplier().Apply(1.0); }
     }
 }
