@@ -98,6 +98,8 @@
     <SolidColorBrush x:Key="Brush.Node.Bark.Header"      Color="{StaticResource Palette.Amber.900}"/>
     <SolidColorBrush x:Key="Brush.Node.Bark.Body"        Color="{StaticResource Palette.Cream.100}"/>
     <SolidColorBrush x:Key="Brush.Node.Bark.Footer"      Color="{StaticResource Palette.Amber.570}"/>
+    <!-- 1 px outline around canvas cards (#82): separates adjacent cards now that they are taller -->
+    <SolidColorBrush x:Key="Brush.Node.Border"          Color="{StaticResource Palette.Node.Border}"/>
 
     <!-- Diff canvas fills -->
     <!-- Brush.Text.Meta.Commit stays on Amber.600 (commit gold). Diff.Changed.Fill split onto Amber.610 (separate from commit gold) per Layer 1 spec §3.3. -->

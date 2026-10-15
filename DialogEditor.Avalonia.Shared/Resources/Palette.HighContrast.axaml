@@ -80,6 +80,7 @@
     <Color x:Key="Palette.Amber.500">#FFFFC04D</Color>    <!-- severity warning -->
     <Color x:Key="Palette.Amber.600">#FFFFD23B</Color>    <!-- commit-meta gold -->
     <Color x:Key="Palette.Amber.520">#FFFFB000</Color>    <!-- bark outline / highlight -->
+    <Color x:Key="Palette.Node.Border">#FFFFFFFF</Color>    <!-- 1 px canvas-card outline (#82) -->
     <Color x:Key="Palette.Amber.540">#FFFFD23B</Color>    <!-- changed text -->
     <Color x:Key="Palette.Amber.560">#FFFFD24D</Color>    <!-- bark detail text / bark footer -->
     <Color x:Key="Palette.Amber.570">#FFFFE08A</Color>    <!-- bark footer (light) -->
