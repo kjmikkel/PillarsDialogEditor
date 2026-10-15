@@ -87,6 +87,7 @@
     <Color x:Key="Palette.Amber.600">#FF8A6508</Color>
     <Color x:Key="Palette.Amber.610">#FFF2E2B0</Color>
     <Color x:Key="Palette.Amber.520">#FFB26A00</Color>
+    <Color x:Key="Palette.Node.Border">#33000000</Color>    <!-- 1 px canvas-card outline (#82) -->
     <Color x:Key="Palette.Amber.540">#FF9A6300</Color>
     <Color x:Key="Palette.Amber.560">#FFE8C050</Color>
     <Color x:Key="Palette.Amber.570">#FFE8D080</Color>

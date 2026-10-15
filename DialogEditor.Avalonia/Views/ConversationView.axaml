@@ -257,8 +257,16 @@
                                 </DataTemplate>
                             </nodify:Node.OutputConnectorTemplate>
 
-                            <Grid Width="200" RowDefinitions="Auto,Auto,Auto,Auto"
+                            <Grid Classes="card" Width="{DynamicResource Canvas.CardWidth}" RowDefinitions="Auto,Auto,Auto,Auto"
                                   Opacity="{Binding SearchMatchState, Converter={StaticResource SearchStateOpacity}}">
+
+                                <!-- Issue 82: 1 px card outline (CardMetrics.BorderThickness). The header, body
+                                     and footer are inset by it (Margin) so it never covers their content. -->
+                                <Border Grid.Row="0" Grid.RowSpan="3"
+                                        CornerRadius="2"
+                                        IsHitTestVisible="False"
+                                        BorderThickness="1"
+                                        BorderBrush="{DynamicResource Brush.Node.Border}"/>
 
                                 <!-- Search-match emphasis — highlight border on condition/script-search
                                      hits (SearchMatchState.Match); Transparent otherwise -->
@@ -290,7 +298,7 @@
                                         ZIndex="11"
                                         Background="{Binding DiffStatus, Converter={StaticResource DiffStatusToBrushConverter}}">
                                     <TextBlock Text="{Binding DiffStatus, Converter={StaticResource DiffStatusToGlyph}}"
-                                               Foreground="{DynamicResource Brush.Text.OnAccent}" FontWeight="Bold" FontSize="{DynamicResource FontSize.Label}"
+                                               Foreground="{DynamicResource Brush.Text.OnAccent}" FontWeight="Bold" FontSize="{DynamicResource Canvas.FontSize.Badge}"
                                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
 
@@ -318,12 +326,12 @@
                                         Background="{DynamicResource Brush.Severity.Warning}"
                                         IsVisible="{Binding IsConnectionSource}">
                                     <TextBlock Text="🔗"
-                                               FontSize="{DynamicResource FontSize.Label}"
+                                               FontSize="{DynamicResource Canvas.FontSize.Badge}"
                                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
 
                                 <!-- Header — amber when Bark, speaker-color when Conversation -->
-                                <Border Grid.Row="0" CornerRadius="2,2,0,0">
+                                <Border Grid.Row="0" CornerRadius="2,2,0,0" Margin="1,1,1,0">
                                     <Border.Background>
                                         <MultiBinding Converter="{StaticResource NodeColorConverter}">
                                             <Binding Path="SpeakerCategory"/>
@@ -353,13 +361,14 @@
                                         </Path>
                                         <TextBlock Text="{Binding Title}"
                                                    Foreground="{DynamicResource Brush.Text.OnAccent}" FontWeight="Bold"
-                                                   FontSize="{DynamicResource FontSize.Small}" Padding="0,3,6,3"
+                                                   FontSize="{DynamicResource Canvas.FontSize.Header}"
+                                                   LineHeight="{DynamicResource Canvas.LineHeight.Header}" Padding="0,3,6,3"
                                                    TextTrimming="CharacterEllipsis"/>
                                     </StackPanel>
                                 </Border>
 
                                 <!-- Body -->
-                                <Border Grid.Row="1">
+                                <Border Grid.Row="1" Margin="1,0">
                                     <Border.Background>
                                         <MultiBinding Converter="{StaticResource NodeColorConverter}" ConverterParameter="body">
                                             <Binding Path="SpeakerCategory"/>
@@ -369,23 +378,29 @@
                                         </MultiBinding>
                                     </Border.Background>
                                     <Panel>
-                                        <TextBlock Text="{Binding TextPreview}"
-                                                   TextWrapping="Wrap"
-                                                   Padding="6,4" FontSize="{DynamicResource FontSize.Small}"
-                                                   Foreground="{DynamicResource Brush.Text.OnLight}" MaxHeight="70"/>
+                                        <!-- Issue 82: the card grows to fit its line, up to CardMetrics.MaxBodyLines, then ends in "…".
+                                             Full text, not TextPreview: TextPreview's 80-character cut stays for one-line summaries
+                                             elsewhere (Node Details' link list, Batch VO Import, VO Validation, the alias picker). -->
+                                        <TextBlock Classes="cardBody" Text="{Binding DefaultText}"
+                                                   IsVisible="{Binding !HasTextPlaceholder}"
+                                                   TextWrapping="Wrap" MaxLines="4" TextTrimming="CharacterEllipsis"
+                                                   Padding="6,4" FontSize="{DynamicResource Canvas.FontSize.Body}"
+                                                   LineHeight="{DynamicResource Canvas.LineHeight.Body}"
+                                                   Foreground="{DynamicResource Brush.Text.OnLight}"/>
                                         <!-- Display-only hint for empty text (#84): kept out of DefaultText so it
                                              can never be saved, exported, searched or replaced. Muted + italic,
                                              matching the footer's secondary styling. -->
                                         <TextBlock Text="{Binding TextPlaceholder}"
                                                    IsVisible="{Binding HasTextPlaceholder}"
-                                                   TextWrapping="Wrap" FontStyle="Italic"
-                                                   Padding="6,4" FontSize="{DynamicResource FontSize.Small}"
-                                                   Foreground="{DynamicResource Brush.Text.OnLight.Muted}" MaxHeight="70"/>
+                                                   TextWrapping="Wrap" MaxLines="4" TextTrimming="CharacterEllipsis" FontStyle="Italic"
+                                                   Padding="6,4" FontSize="{DynamicResource Canvas.FontSize.Body}"
+                                                   LineHeight="{DynamicResource Canvas.LineHeight.Body}"
+                                                   Foreground="{DynamicResource Brush.Text.OnLight.Muted}"/>
                                     </Panel>
                                 </Border>
 
                                 <!-- Footer -->
-                                <Border Grid.Row="2" Padding="6,2">
+                                <Border Grid.Row="2" Padding="6,2" Margin="1,0,1,1" CornerRadius="0,0,2,2">
                                     <Border.Background>
                                         <MultiBinding Converter="{StaticResource NodeColorConverter}" ConverterParameter="footer">
                                             <Binding Path="SpeakerCategory"/>
@@ -394,7 +409,8 @@
                                             <Binding Source="{x:Static theming:ThemeService.Current}" Path="Revision"/>
                                         </MultiBinding>
                                     </Border.Background>
-                                    <TextBlock Text="{Binding FooterText}" FontSize="{DynamicResource FontSize.Caption}" Foreground="{DynamicResource Brush.Text.OnLight.Muted}"/>
+                                    <TextBlock Text="{Binding FooterText}" FontSize="{DynamicResource Canvas.FontSize.Footer}"
+                                               LineHeight="{DynamicResource Canvas.LineHeight.Footer}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource Brush.Text.OnLight.Muted}"/>
                                 </Border>
 
                             </Grid>

@@ -80,6 +80,7 @@ Palette.Dark	Palette.Neutral.800	#FFCCCCCC
 Palette.Dark	Palette.Neutral.865	#FFDDDDDD
 Palette.Dark	Palette.Neutral.875	#FFE0E0E0
 Palette.Dark	Palette.Neutral.910	#FFE8E8E8
+Palette.Dark	Palette.Node.Border	#4D000000
 Palette.Dark	Palette.Olive.500	#FFBDBD80
 Palette.Dark	Palette.Parchment.100	#FFF5F0D0
 Palette.Dark	Palette.Parchment.200	#FFE8E0B0
@@ -179,6 +180,7 @@ Palette.Light	Palette.Neutral.800	#FF333333
 Palette.Light	Palette.Neutral.865	#FF2A2A2A
 Palette.Light	Palette.Neutral.875	#FFE8E8E8
 Palette.Light	Palette.Neutral.910	#FF1A1A1A
+Palette.Light	Palette.Node.Border	#33000000
 Palette.Light	Palette.Olive.500	#FF6F6F1E
 Palette.Light	Palette.Parchment.100	#FFF5F0D0
 Palette.Light	Palette.Parchment.200	#FFE8E0B0
@@ -278,6 +280,7 @@ Palette.Colourblind	Palette.Neutral.800	#FFCCCCCC
 Palette.Colourblind	Palette.Neutral.865	#FFDDDDDD
 Palette.Colourblind	Palette.Neutral.875	#FFE0E0E0
 Palette.Colourblind	Palette.Neutral.910	#FFE8E8E8
+Palette.Colourblind	Palette.Node.Border	#4D000000
 Palette.Colourblind	Palette.Olive.500	#FFBDBD80
 Palette.Colourblind	Palette.Parchment.100	#FFF5F0D0
 Palette.Colourblind	Palette.Parchment.200	#FFE8E0B0
@@ -377,6 +380,7 @@ Palette.HighContrast	Palette.Neutral.800	#FFE6E6E6
 Palette.HighContrast	Palette.Neutral.865	#FFF0F0F0
 Palette.HighContrast	Palette.Neutral.875	#FFFFFFFF
 Palette.HighContrast	Palette.Neutral.910	#FFFFFFFF
+Palette.HighContrast	Palette.Node.Border	#FFFFFFFF
 Palette.HighContrast	Palette.Olive.500	#FFC8C860
 Palette.HighContrast	Palette.Parchment.100	#FFFFFFFF
 Palette.HighContrast	Palette.Parchment.200	#FFF0F0F0
