@@ -2,6 +2,7 @@ using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
+using DialogEditor.Avalonia.Shared.Theming;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Layout;
 using DialogEditor.Core.Models;
@@ -22,6 +23,7 @@ public partial class ConversationView : UserControl
     public ConversationView()
     {
         InitializeComponent();
+        InitFontScaleZoom();
 
         Editor.PropertyChanged += (_, e) =>
         {
@@ -221,6 +223,56 @@ public partial class ConversationView : UserControl
             Editor.Focus();
             e.Handled = true;
         }
+    }
+
+    // ── Font scale magnifies the canvas (issue 82) ───────────────────────────────
+    // The canvas's text, cards and gaps are fixed canvas units (Canvas.* tokens / CardMetrics)
+    // that FontScaleApplier never touches. Font scale multiplies the zoom instead, so a card
+    // shows exactly the same text at 2.0x as at 1.0x, and saved layouts stay valid at every
+    // scale. The zoom range is scaled too, so the user's zoom range doesn't change.
+    // The subscription lives between attach and detach (not constructor to detach): the docking
+    // shell can re-host this view, and a constructor-only subscription would silently drop live
+    // font-scale changes after a re-attach. Re-attaching re-applies the current scale to catch
+    // any change that happened while detached.
+    private double _baseMinZoom, _baseMaxZoom;
+    private bool _fontScaleAttachedBefore;
+    internal double FontScaleFactor { get; private set; } = 1.0;
+
+    private void InitFontScaleZoom()
+    {
+        _baseMinZoom = Editor.MinViewportZoom;
+        _baseMaxZoom = Editor.MaxViewportZoom;
+        AttachedToVisualTree += (_, _) =>
+        {
+            ApplyFontScale(FontScaleService.Current.Scale, keepUserZoom: _fontScaleAttachedBefore);
+            _fontScaleAttachedBefore = true;
+            FontScaleService.Current.PropertyChanged += OnFontScaleChanged;
+        };
+        DetachedFromVisualTree += (_, _) => FontScaleService.Current.PropertyChanged -= OnFontScaleChanged;
+    }
+
+    private void OnFontScaleChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(FontScaleService.Scale))
+            ApplyFontScale(FontScaleService.Current.Scale, keepUserZoom: true);
+    }
+
+    private void ApplyFontScale(double scale, bool keepUserZoom)
+    {
+        if (scale <= 0) return;
+        var userZoom = keepUserZoom ? Editor.ViewportZoom / FontScaleFactor : 1.0;
+        // Keep the viewport centre in place while the zoom changes.
+        var centre = Editor.ViewportLocation + new global::Avalonia.Vector(
+            Editor.ViewportSize.Width / 2, Editor.ViewportSize.Height / 2);
+        FontScaleFactor = scale;
+        // Widen the range before zooming, so the new zoom is never clamped by the old limits.
+        Editor.MinViewportZoom = Math.Min(_baseMinZoom * scale, Editor.MinViewportZoom);
+        Editor.MaxViewportZoom = Math.Max(_baseMaxZoom * scale, Editor.MaxViewportZoom);
+        Editor.ViewportZoom    = userZoom * scale;
+        Editor.MinViewportZoom = _baseMinZoom * scale;
+        Editor.MaxViewportZoom = _baseMaxZoom * scale;
+        Editor.ViewportLocation = centre - new global::Avalonia.Vector(
+            Editor.ViewportSize.Width / 2, Editor.ViewportSize.Height / 2);
     }
 
     private void FitToScreen_Click(object? sender, RoutedEventArgs e) => Editor.FitToScreen();
