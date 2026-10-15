@@ -396,7 +396,9 @@
                                             <Binding Source="{x:Static theming:ThemeService.Current}" Path="Revision"/>
                                         </MultiBinding>
                                     </Border.Background>
-                                    <StackPanel Orientation="Horizontal">
+                                    <!-- Grid Auto,* (not a horizontal StackPanel): a StackPanel measures the title at infinite
+                                         width, so TextTrimming never applied and a long title ran past the card edge. -->
+                                    <Grid ColumnDefinitions="Auto,*">
                                         <!-- Node-type shape marker: shape encodes type (redundant with colour for
                                              accessibility — Layer 2.5), fill mirrors the speaker colour as before -->
                                         <Path Width="9" Height="9" Margin="6,0,4,0" VerticalAlignment="Center" Stretch="Uniform"
@@ -415,12 +417,12 @@
                                                 </MultiBinding>
                                             </Path.Fill>
                                         </Path>
-                                        <TextBlock Text="{Binding Title}"
+                                        <TextBlock Grid.Column="1" Text="{Binding Title}"
                                                    Foreground="{DynamicResource Brush.Text.OnAccent}" FontWeight="Bold"
                                                    FontSize="{DynamicResource Canvas.FontSize.Header}"
                                                    LineHeight="{DynamicResource Canvas.LineHeight.Header}" Padding="0,3,6,3"
                                                    TextTrimming="CharacterEllipsis"/>
-                                    </StackPanel>
+                                    </Grid>
                                 </Border>
 
                                 <!-- Body -->

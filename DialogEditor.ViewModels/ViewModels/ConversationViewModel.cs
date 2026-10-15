@@ -641,7 +641,7 @@ public partial class ConversationViewModel : ObservableObject
     private void AddConnectedNodeCmd(NodeViewModel? parent)
     {
         if (parent is null) return;
-        AddConnectedNode(parent, new LayoutPoint(parent.Location.X + 250, parent.Location.Y));
+        AddConnectedNode(parent, new LayoutPoint(parent.Location.X + CardMetrics.Width + CardMetrics.ColumnGap, parent.Location.Y));
     }
 
     [RelayCommand(CanExecute = nameof(IsEditable))]
