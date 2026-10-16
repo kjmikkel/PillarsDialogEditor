@@ -1781,6 +1781,10 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="ToolTip_AutosaveRestore_Discard">Delete the automatic save and open the project as last saved.</sys:String>
     <sys:String x:Key="AutosaveRestore_FromFallback">These changes were kept in the editor's own folder ({0}), because the project's folder couldn't be written to when they were saved.</sys:String>
     <sys:String x:Key="Status_AutosaveFallback">The project's folder can't be written to, so recovery copies are being kept in {0} instead. Save the project somewhere writable to keep them next to it.</sys:String>
+    <sys:String x:Key="AutosaveRestore_EarlierCopies">Restore an earlier copy instead</sys:String>
+    <sys:String x:Key="ToolTip_AutosaveRestore_EarlierCopies">The editor keeps several recovery copies, newest first. If the newest one is damaged or caught a mistake, open this and pick an earlier copy before pressing Restore. The newest copy is restored unless you choose another.</sys:String>
+    <sys:String x:Key="ToolTip_AutosaveRestore_CopyList">The recovery copies, newest first, with the time each was saved. The selected copy is the one Restore loads; every copy is kept until you save the project.</sys:String>
+    <sys:String x:Key="AutosaveRestore_CopyInEditorFolder">{0} (kept in the editor's own folder)</sys:String>
     <sys:String x:Key="Status_AutosaveRestored">Restored automatically saved changes — save the project to keep them.</sys:String>
     <sys:String x:Key="Button_CancelCleanUp">Keep files</sys:String>
     <sys:String x:Key="ToolTip_CancelCleanUp">Close the confirmation without deleting anything.</sys:String>

@@ -13,6 +13,10 @@ public enum AutosaveState { None, Stale, Newer }
 public sealed record AutosaveCheckResult(
     AutosaveState State, string SidecarPath, DateTime? SidecarTimeUtc, bool IsFallback = false);
 
+/// One autosave copy on disk: its file, when it was written, and whether it lives in the
+/// per-user fallback folder (issue 37) rather than next to the project.
+public sealed record AutosaveGeneration(string Path, DateTime TimeUtc, bool IsFallback);
+
 /// Pure decisions about the autosave sidecar (`<project>.dialogproject.autosave`):
 /// where it lives, whether it holds newer work than the saved project, and
 /// best-effort deletion. Never throws — IO problems degrade to None + a warning.
@@ -138,6 +142,28 @@ public static class AutosaveRecovery
             AppLog.Warn($"Autosave check failed for '{projectPath}': {ex.Message}");
             return new AutosaveCheckResult(AutosaveState.None, sidecar, null, isFallback);
         }
+    }
+
+    /// Every autosave copy of the project, next to it and in the fallback folder, newest first
+    /// (issue 36: the restore offer lets the user fall back to an earlier copy when the newest
+    /// is damaged or caught a mistake). Never throws: an unreadable copy is just left out.
+    public static IReadOnlyList<AutosaveGeneration> ListGenerations(string projectPath)
+    {
+        var found = new List<AutosaveGeneration>();
+        foreach (var fallback in new[] { false, true })
+        for (var n = 1; n <= MaxGenerations; n++)
+        {
+            var path = GenerationPath(projectPath, n, fallback);
+            try
+            {
+                if (File.Exists(path)) found.Add(new AutosaveGeneration(path, File.GetLastWriteTimeUtc(path), fallback));
+            }
+            catch (Exception ex)
+            {
+                AppLog.Warn($"Could not read autosave copy '{path}': {ex.Message}");
+            }
+        }
+        return found.OrderByDescending(g => g.TimeUtc).ToList();
     }
 
     /// Best-effort deletion of EVERY generation, next to the project and in the fallback

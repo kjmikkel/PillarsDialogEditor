@@ -112,7 +112,7 @@ public partial class MainWindow : Window
         vm.Detail.AddWordToDictionary = SpellDictionaryStore.Default.AddWord;   // issue 9: from the detail panel
         vm.SpellStoreFactory   = () => SpellDictionaryStore.Default;
         // Crash recovery: offer to restore a newer autosave sidecar at project open.
-        vm.ConfirmRestoreAutosave = (t, fallbackFolder) => new AutosaveRestoreDialog(t, fallbackFolder).ShowDialogAsync(this);
+        vm.ConfirmRestoreAutosave = generations => new AutosaveRestoreDialog(generations).ShowDialogAsync(this);
         // Autosave: sidecar written while the project has unsaved changes (spec
         // 2026-07-12), at the cadence chosen in Settings (issue #11). The tick is a
         // no-op on a clean session; it runs on the UI thread so folding the canvas
