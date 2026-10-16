@@ -77,7 +77,7 @@ public class MainWindowViewModelSchemaTests : IDisposable
         File.SetLastWriteTimeUtc(ProjectPath, DateTime.UtcNow.AddMinutes(-10));
         File.SetLastWriteTimeUtc(sidecar,     DateTime.UtcNow.AddMinutes(-1));
         var vm = MakeVm();
-        vm.ConfirmRestoreAutosave = (_, _) => Task.FromResult(true);
+        vm.ConfirmRestoreAutosave = gens => Task.FromResult<AutosaveGeneration?>(gens[0]);
 
         await Load(vm, ProjectPath);
 

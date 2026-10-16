@@ -997,13 +997,12 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    /// Seam for the autosave restore offer (arguments: the copy's local timestamp, and the
-    /// folder it was found in when it is the per-user fallback copy, else null — issue 37,
-    /// so the dialog can say where it came from; true = restore). Null in unit tests that
-    /// don't exercise it — a newer sidecar is then left untouched (never destroy recovery
-    /// data because no dialog was wired) and the saved file loads normally. The View wires
-    /// AutosaveRestoreDialog.
-    public Func<DateTime, string?, Task<bool>>? ConfirmRestoreAutosave { get; set; }
+    /// Seam for the autosave restore offer. Gets every autosave copy, newest first (issue 36;
+    /// each says whether it is the per-user fallback copy, issue 37), and returns the copy to
+    /// restore, or null to discard them. Null in unit tests that don't exercise it — a newer
+    /// sidecar is then left untouched (never destroy recovery data because no dialog was
+    /// wired) and the saved file loads normally. The View wires AutosaveRestoreDialog.
+    public Func<IReadOnlyList<AutosaveGeneration>, Task<AutosaveGeneration?>>? ConfirmRestoreAutosave { get; set; }
 
     private async Task LoadProjectAsync(string path, bool offerDeferred)
     {
@@ -1016,13 +1015,17 @@ public partial class MainWindowViewModel : ObservableObject
         }
         else if (recovery.State == AutosaveState.Newer && ConfirmRestoreAutosave is not null)
         {
-            var restore = await ConfirmRestoreAutosave(recovery.SidecarTimeUtc!.Value.ToLocalTime(),
-                recovery.IsFallback ? Path.GetDirectoryName(recovery.SidecarPath) : null);
-            if (restore)
+            // Check found a copy newer than the saved project; offer every copy, newest first, so
+            // an earlier one is still reachable if the newest is damaged (issue 36).
+            var generations = AutosaveRecovery.ListGenerations(path);
+            if (generations.Count == 0)
+                generations = [new AutosaveGeneration(recovery.SidecarPath, recovery.SidecarTimeUtc!.Value, recovery.IsFallback)];
+            var chosen = await ConfirmRestoreAutosave(generations);
+            if (chosen is not null)
             {
                 try
                 {
-                    var recovered = DialogProjectSerializer.LoadFromFile(recovery.SidecarPath);
+                    var recovered = DialogProjectSerializer.LoadFromFile(chosen.Path);
                     FinishLoad(recovered, path);
                     IsModified = true;   // recovered state is unsaved until an explicit save
                     StatusText = Loc.Get("Status_AutosaveRestored");
