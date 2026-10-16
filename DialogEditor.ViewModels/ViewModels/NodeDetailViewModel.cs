@@ -103,13 +103,13 @@ public partial class NodeDetailViewModel : ObservableObject
     public string DefaultText
     {
         get => _node?.DefaultText ?? string.Empty;
-        set { if (_node != null) { _node.DefaultText = value; OnPropertyChanged(nameof(TokenWarnings)); } }
+        set { if (_node != null) { _node.DefaultText = value; OnPropertyChanged(nameof(TokenWarnings)); OnPropertyChanged(nameof(SpellingIssues)); } }
     }
 
     public string FemaleText
     {
         get => _node?.FemaleText ?? string.Empty;
-        set { if (_node != null) { _node.FemaleText = value; OnPropertyChanged(nameof(TokenWarnings)); } }
+        set { if (_node != null) { _node.FemaleText = value; OnPropertyChanged(nameof(TokenWarnings)); OnPropertyChanged(nameof(SpellingIssues)); } }
     }
 
     public bool IsPlayerChoice
@@ -430,10 +430,10 @@ public partial class NodeDetailViewModel : ObservableObject
             .ToList();
 
     /// Text validation warnings for the selected node's Default (and, when present,
-    /// Female) text — likely token typos, unbalanced markup, and (when a spell
-    /// checker is wired and a dictionary is installed for the active language)
-    /// possible misspellings. Free-text stage directions are never flagged.
-    /// Recomputed on selection change and on Default/Female edits.
+    /// Female) text — likely token typos and unbalanced markup. Free-text stage
+    /// directions are never flagged. Spelling has its own rows (SpellingIssues), so each
+    /// can carry its quick fixes (issue 9). Recomputed on selection change and on
+    /// Default/Female edits.
     public IReadOnlyList<string> TokenWarnings
     {
         get
@@ -443,22 +443,62 @@ public partial class NodeDetailViewModel : ObservableObject
             AppendTokenWarnings(_node.DefaultText, messages);
             if (_node.HasFemaleText)
                 AppendTokenWarnings(_node.FemaleText, messages);
-            AppendSpellingWarnings(_node.DefaultText, messages);
-            if (_node.HasFemaleText)
-                AppendSpellingWarnings(_node.FemaleText, messages);
             return messages;
         }
     }
 
-    private void AppendSpellingWarnings(string? text, List<string> into)
+    /// Possible misspellings in the Default (and, when present, Female) text, when a spell
+    /// checker is wired and a dictionary is installed for the active language. Each row
+    /// offers the suggested word and "Add to dictionary" (issue 9), so a writer fixes or
+    /// accepts a word without leaving the detail panel.
+    public IReadOnlyList<SpellingIssueViewModel> SpellingIssues
+    {
+        get
+        {
+            if (_node is null || SpellChecker is null) return [];
+            var rows = new List<SpellingIssueViewModel>();
+            AppendSpellingIssues(_node.DefaultText, female: false, rows);
+            if (_node.HasFemaleText)
+                AppendSpellingIssues(_node.FemaleText, female: true, rows);
+            return rows;
+        }
+    }
+
+    /// Adds a word to the user dictionary. Wired at app startup (MainWindow) to the same
+    /// store the Validate Text window uses; null in unit tests, which hides the button.
+    public Action<string>? AddWordToDictionary { get; set; }
+
+    private void AppendSpellingIssues(string? text, bool female, List<SpellingIssueViewModel> into)
     {
         if (SpellChecker is null || string.IsNullOrEmpty(text)) return;
         foreach (var issue in SpellChecker.Check(text, ActiveLanguage))
         {
-            into.Add(issue.Suggestion is not null
+            var message = issue.Suggestion is not null
                 ? Loc.Format("Spelling_Misspelled_Suggest", issue.Word, issue.Suggestion)
-                : Loc.Format("Spelling_Misspelled", issue.Word));
+                : Loc.Format("Spelling_Misspelled", issue.Word);
+            into.Add(new SpellingIssueViewModel(issue, message,
+                apply: () => ApplySpellingSuggestion(issue, female),
+                addToDictionary: AddWordToDictionary is null ? null : () =>
+                {
+                    AddWordToDictionary(issue.Word);
+                    OnPropertyChanged(nameof(SpellingIssues));
+                }));
         }
+    }
+
+    /// Replaces every whole-word occurrence of the misspelling in that text, through the normal
+    /// undoable text edit. The checker reports each word once, so one click fixes them all;
+    /// longer words that merely contain it ("captians") are left alone.
+    private void ApplySpellingSuggestion(SpellIssue issue, bool female)
+    {
+        if (_node is null || issue.Suggestion is null) return;
+        var text = female ? _node.FemaleText : _node.DefaultText;
+        var wholeWord = new System.Text.RegularExpressions.Regex(
+            $@"(?<![\w'’-]){System.Text.RegularExpressions.Regex.Escape(issue.Word)}(?![\w'’-])");
+        var fixedText = wholeWord.Replace(text, issue.Suggestion.Replace("$", "$$"));
+        if (fixedText == text) return;   // the text changed since the check; the next recompute shows it
+        if (female) { FemaleText = fixedText; OnPropertyChanged(nameof(FemaleText)); }
+        else        { DefaultText = fixedText; OnPropertyChanged(nameof(DefaultText)); }
     }
 
     private void AppendTokenWarnings(string? text, List<string> into)
@@ -866,6 +906,7 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(SelectedListenerEntry));
         OnPropertyChanged(nameof(BarkWarnings));
         OnPropertyChanged(nameof(TokenWarnings));
+        OnPropertyChanged(nameof(SpellingIssues));
         OnPropertyChanged(nameof(ScriptWarnings));
 
         _voCheck = _node is null ? null
