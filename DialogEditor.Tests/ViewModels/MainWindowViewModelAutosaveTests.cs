@@ -20,13 +20,94 @@ public class MainWindowViewModelAutosaveTests : IDisposable
         AppSettings.SettingsPathOverride = _settingsPath;
         _dir = Path.Combine(Path.GetTempPath(), $"asvm_{Guid.NewGuid():N}");
         Directory.CreateDirectory(_dir);
+        AutosaveRecovery.FallbackRootOverride = _fallback;
     }
+
+    private readonly string _fallback = Path.Combine(Path.GetTempPath(), $"asvm_fb_{Guid.NewGuid():N}");
 
     public void Dispose()
     {
         AppSettings.SettingsPathOverride = null;
         try { if (File.Exists(_settingsPath)) File.Delete(_settingsPath); } catch (Exception) { /* best-effort */ }
         try { Directory.Delete(_dir, recursive: true); } catch (Exception) { /* best-effort */ }
+        AutosaveRecovery.FallbackRootOverride = null;
+        try { Directory.Delete(_fallback, recursive: true); } catch (Exception) { /* best-effort */ }
+    }
+
+    // ── Issue 37: fallback when the project's folder can't be written ────────────
+
+    private MainWindowViewModel DirtyVmInUnwritableFolder(out string projectPath)
+    {
+        // A folder sitting where the sidecar file would go makes the write fail with
+        // UnauthorizedAccessException, the same failure read-only media or a locked share gives.
+        // (A missing folder doesn't work: the serializer creates folders.)
+        projectPath = Path.Combine(_dir, "locked", "p.dialogproject");
+        Directory.CreateDirectory(AutosaveRecovery.SidecarPath(projectPath));
+        var vm = MakeVm();
+        InjectProject(vm, DialogProject.Empty("T"));
+        typeof(MainWindowViewModel)
+            .GetField("_projectPath", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+            .SetValue(vm, projectPath);
+        vm.IsModified = true;
+        return vm;
+    }
+
+    [Fact]
+    public void AutosaveTick_UnwritableFolder_WritesTheFallbackCopy()
+    {
+        var vm = DirtyVmInUnwritableFolder(out var projectPath);
+
+        vm.AutosaveTick();
+
+        var fallback = AutosaveRecovery.FallbackSidecarPath(projectPath);
+        Assert.True(File.Exists(fallback));
+        Assert.Equal("T", DialogProjectSerializer.LoadFromFile(fallback).Name);
+        Assert.True(vm.IsModified);
+    }
+
+    [Fact]
+    public void AutosaveTick_UnwritableFolder_SaysWhereTheCopyLives_Once()
+    {
+        var vm = DirtyVmInUnwritableFolder(out _);
+
+        vm.AutosaveTick();
+        Assert.Contains("Status_AutosaveFallback", vm.StatusText);
+
+        vm.StatusText = "something else";
+        vm.AutosaveTick();
+        Assert.Equal("something else", vm.StatusText);   // not repeated on every tick
+    }
+
+    [Fact]
+    public async Task Open_NewerFallbackCopy_IsOffered_WithItsFolder_AndRestored()
+    {
+        DialogProjectSerializer.SaveToFile(_projectPath, DialogProject.Empty("Saved"));
+        File.SetLastWriteTimeUtc(_projectPath, DateTime.UtcNow.AddMinutes(-10));
+        var fallback = AutosaveRecovery.FallbackSidecarPath(_projectPath);
+        Directory.CreateDirectory(Path.GetDirectoryName(fallback)!);
+        DialogProjectSerializer.SaveToFile(fallback, DialogProject.Empty("Recovered"));
+        File.SetLastWriteTimeUtc(fallback, DateTime.UtcNow.AddMinutes(-1));
+        var vm = MakeVm();
+        string? offeredFrom = "not called";
+        vm.ConfirmRestoreAutosave = (_, from) => { offeredFrom = from; return Task.FromResult(true); };
+
+        await InvokeLoadProjectAsync(vm, _projectPath);
+
+        Assert.Equal(_fallback, offeredFrom);
+        Assert.Equal("Recovered", vm.CurrentProjectName);
+    }
+
+    [Fact]
+    public async Task Open_NewerLocalSidecar_IsOfferedWithoutAFolder()
+    {
+        WriteProjectAndNewerSidecar();
+        var vm = MakeVm();
+        string? offeredFrom = "not called";
+        vm.ConfirmRestoreAutosave = (_, from) => { offeredFrom = from; return Task.FromResult(false); };
+
+        await InvokeLoadProjectAsync(vm, _projectPath);
+
+        Assert.Null(offeredFrom);
     }
 
     private static MainWindowViewModel MakeVm() =>
@@ -132,7 +213,7 @@ public class MainWindowViewModelAutosaveTests : IDisposable
     {
         WriteProjectAndNewerSidecar();
         var vm = MakeVm();
-        vm.ConfirmRestoreAutosave = _ => Task.FromResult(true);
+        vm.ConfirmRestoreAutosave = (_, _) => Task.FromResult(true);
 
         await InvokeLoadProjectAsync(vm, _projectPath);
 
@@ -146,7 +227,7 @@ public class MainWindowViewModelAutosaveTests : IDisposable
     {
         WriteProjectAndNewerSidecar();
         var vm = MakeVm();
-        vm.ConfirmRestoreAutosave = _ => Task.FromResult(false);
+        vm.ConfirmRestoreAutosave = (_, _) => Task.FromResult(false);
 
         await InvokeLoadProjectAsync(vm, _projectPath);
 
@@ -164,7 +245,7 @@ public class MainWindowViewModelAutosaveTests : IDisposable
         File.SetLastWriteTimeUtc(_projectPath, DateTime.UtcNow.AddMinutes(-1));
         var vm = MakeVm();
         var consulted = false;
-        vm.ConfirmRestoreAutosave = _ => { consulted = true; return Task.FromResult(false); };
+        vm.ConfirmRestoreAutosave = (_, _) => { consulted = true; return Task.FromResult(false); };
 
         await InvokeLoadProjectAsync(vm, _projectPath);
 

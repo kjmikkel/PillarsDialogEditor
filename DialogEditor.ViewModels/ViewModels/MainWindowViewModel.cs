@@ -997,11 +997,13 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    /// Seam for the autosave restore offer (argument: the sidecar's local timestamp;
-    /// true = restore). Null in unit tests that don't exercise it — a newer sidecar
-    /// is then left untouched (never destroy recovery data because no dialog was
-    /// wired) and the saved file loads normally. The View wires AutosaveRestoreDialog.
-    public Func<DateTime, Task<bool>>? ConfirmRestoreAutosave { get; set; }
+    /// Seam for the autosave restore offer (arguments: the copy's local timestamp, and the
+    /// folder it was found in when it is the per-user fallback copy, else null — issue 37,
+    /// so the dialog can say where it came from; true = restore). Null in unit tests that
+    /// don't exercise it — a newer sidecar is then left untouched (never destroy recovery
+    /// data because no dialog was wired) and the saved file loads normally. The View wires
+    /// AutosaveRestoreDialog.
+    public Func<DateTime, string?, Task<bool>>? ConfirmRestoreAutosave { get; set; }
 
     private async Task LoadProjectAsync(string path, bool offerDeferred)
     {
@@ -1014,7 +1016,8 @@ public partial class MainWindowViewModel : ObservableObject
         }
         else if (recovery.State == AutosaveState.Newer && ConfirmRestoreAutosave is not null)
         {
-            var restore = await ConfirmRestoreAutosave(recovery.SidecarTimeUtc!.Value.ToLocalTime());
+            var restore = await ConfirmRestoreAutosave(recovery.SidecarTimeUtc!.Value.ToLocalTime(),
+                recovery.IsFallback ? Path.GetDirectoryName(recovery.SidecarPath) : null);
             if (restore)
             {
                 try
@@ -1399,17 +1402,49 @@ public partial class MainWindowViewModel : ObservableObject
         try
         {
             FoldCanvasIntoProject();
-            // Rotate first: this frees generation 1 for the write below.
-            AutosaveRecovery.Rotate(_projectPath, AppSettings.AutosaveGenerations);
-            var sidecar = AutosaveRecovery.SidecarPath(_projectPath);
-            DialogProjectSerializer.SaveToFile(sidecar, _project!);
-            AppLog.Info($"Autosaved to {sidecar}");
+            WriteAutosave(fallback: false);
+            _autosaveFallbackAnnouncedFor = null;   // the project's folder works (again)
+        }
+        catch (Exception ex) when (AutosaveRecovery.IsLocationFailure(ex))
+        {
+            // Issue 37: the project's folder can't be written (read-only media, a locked share,
+            // no permission). Without a fallback every tick failed silently and a crash lost
+            // everything since the last save. Write to the per-user folder instead, and say so
+            // once in the status bar, so the user knows their recovery copy lives elsewhere.
+            AppLog.Warn($"Autosave next to the project failed ({ex.Message}); using the fallback folder");
+            try
+            {
+                WriteAutosave(fallback: true);
+                if (_autosaveFallbackAnnouncedFor != _projectPath)
+                {
+                    _autosaveFallbackAnnouncedFor = _projectPath;
+                    StatusText = Loc.Format("Status_AutosaveFallback", AutosaveRecovery.FallbackRoot);
+                }
+            }
+            catch (Exception fallbackEx)
+            {
+                AppLog.Warn($"Autosave to the fallback folder failed too: {fallbackEx.Message}");
+            }
         }
         catch (Exception ex)
         {
             // Autosave must never interrupt writing — log and carry on.
             AppLog.Warn($"Autosave failed: {ex.Message}");
         }
+    }
+
+    /// The project the fallback status message was last shown for, so it is said once, not
+    /// on every tick (issue 37).
+    private string? _autosaveFallbackAnnouncedFor;
+
+    private void WriteAutosave(bool fallback)
+    {
+        // Rotate first: this frees generation 1 for the write below.
+        AutosaveRecovery.Rotate(_projectPath!, AppSettings.AutosaveGenerations, fallback);
+        var sidecar = AutosaveRecovery.GenerationPath(_projectPath!, 1, fallback);
+        if (fallback) Directory.CreateDirectory(Path.GetDirectoryName(sidecar)!);
+        DialogProjectSerializer.SaveToFile(sidecar, _project!);
+        AppLog.Info($"Autosaved to {sidecar}");
     }
 
     [RelayCommand(CanExecute = nameof(CanSaveProject))]
