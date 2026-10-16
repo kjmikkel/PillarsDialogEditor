@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Canvas Look and Feel</title>
+<!--
+  Issue #82 mockup: the conversation canvas today and three options for its node sizing,
+  text, spacing and chrome. Rendered with HTML/CSS/SVG, not Avalonia, so sizes are close but
+  not pixel-exact. The conversation is invented (no game text); colours are the app's real
+  Palette.Dark / Palette.Light values for node headers, bodies and connections.
+-->
+<style>
+  :root {
+    --page: #f6f6f4; --ink: #1d1d1b; --muted: #5f5f5a; --rule: #d9d9d4; --card: #ffffff;
+    --accent: #1a5276; --chip: #ececE8; --chip-on: #1a5276; --chip-on-ink: #fff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --page: #161616; --ink: #ececea; --muted: #a3a39e; --rule: #333; --card: #1f1f1f;
+      --accent: #7fb3d9; --chip: #2a2a2a; --chip-on: #7fb3d9; --chip-on-ink: #111;
+    }
+  }
+  :root[data-theme="dark"] {
+    --page: #161616; --ink: #ececea; --muted: #a3a39e; --rule: #333; --card: #1f1f1f;
+    --accent: #7fb3d9; --chip: #2a2a2a; --chip-on: #7fb3d9; --chip-on-ink: #111;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--page); color: var(--ink);
+         font: 15px/1.5 "Segoe UI", system-ui, sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { font-size: 19px; margin: 36px 0 6px; }
+  p.lede { color: var(--muted); margin: 0 0 18px; max-width: 760px; }
+  .controls { position: sticky; top: 0; z-index: 5; background: var(--page);
+              display: flex; flex-wrap: wrap; gap: 18px; padding: 10px 0; border-bottom: 1px solid var(--rule); }
+  .group { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .group span { color: var(--muted); font-size: 13px; margin-right: 2px; }
+  button.chip { border: 0; background: var(--chip); color: var(--ink); padding: 5px 11px;
+                border-radius: 999px; font: inherit; font-size: 13px; cursor: pointer; }
+  button.chip[aria-pressed="true"] { background: var(--chip-on); color: var(--chip-on-ink); }
+  .option { background: var(--card); border: 1px solid var(--rule); border-radius: 10px;
+            padding: 16px; margin-top: 18px; }
+  .option header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; }
+  .option h2 { margin: 0; }
+  .tag { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--chip); color: var(--muted); }
+  .tag.rec { background: var(--accent); color: var(--chip-on-ink); }
+  .option p { margin: 6px 0 10px; color: var(--muted); max-width: 820px; }
+  .viewport { position: relative; border-radius: 6px; height: 470px; overflow: hidden; }
+  .scroll { position: absolute; inset: 0; overflow: auto; }
+  .stage { position: relative; transform-origin: 0 0; }
+  .facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 6px 18px;
+           margin: 12px 0 0; padding: 0; list-style: none; font-size: 13px; }
+  .facts li b { display: block; color: var(--ink); font-weight: 600; }
+  .facts li { color: var(--muted); }
+  .verdict { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 24px; font-size: 13.5px; margin-top: 10px; }
+  .verdict div b { display: block; margin-bottom: 2px; }
+  @media (max-width: 640px) { .verdict { grid-template-columns: 1fr; } }
+  table.cmp { border-collapse: collapse; width: 100%; font-size: 13.5px; margin-top: 10px; }
+  table.cmp th, table.cmp td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  table.cmp th { color: var(--muted); font-weight: 600; }
+  .tablewrap { overflow-x: auto; }
+  .note { font-size: 13px; color: var(--muted); }
+
+  /* ── Canvas pieces (sizes in px at zoom 1; JS sets the variables) ── */
+  .canvas { position: absolute; inset: 0; }
+  .node { position: absolute; display: flex; align-items: stretch; }
+  .card { display: flex; flex-direction: column; overflow: hidden; border-radius: 3px;
+          font-family: "Segoe UI", system-ui, sans-serif; }
+  .hdr { color: #fff; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+         display: flex; align-items: center; gap: 5px; }
+  .hdr i { display: inline-block; flex: none; }
+  .body { color: #1b1b1b; }
+  .body .t { overflow: hidden; }
+  .foot { color: #55554f; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .portcol { display: flex; align-items: center; justify-content: center; }
+  .port { border-radius: 50%; }
+  svg.edges { position: absolute; inset: 0; overflow: visible; }
+  .minimap { position: absolute; border-radius: 4px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Conversation canvas: three options</h1>
+  <p class="lede">Issue #82. One invented conversation drawn four ways: as the canvas looks today, then three
+    options. Use the switches to compare them in both themes, at font scale 1.0 and 2.0, and at different zoom
+    levels. These are HTML mockups using the app's real colours, close to but not exactly what Avalonia draws.</p>
+
+  <div class="controls" role="toolbar" aria-label="Mockup settings">
+    <div class="group" data-key="theme"><span>Theme</span>
+      <button class="chip" data-v="dark" aria-pressed="true">Dark</button>
+      <button class="chip" data-v="light" aria-pressed="false">Light</button></div>
+    <div class="group" data-key="scale"><span>Font scale</span>
+      <button class="chip" data-v="1" aria-pressed="true">1.0</button>
+      <button class="chip" data-v="1.5" aria-pressed="false">1.5</button>
+      <button class="chip" data-v="2" aria-pressed="false">2.0</button></div>
+    <div class="group" data-key="zoom"><span>Zoom</span>
+      <button class="chip" data-v="0.5" aria-pressed="false">50%</button>
+      <button class="chip" data-v="0.75" aria-pressed="false">75%</button>
+      <button class="chip" data-v="1" aria-pressed="true">100%</button>
+      <button class="chip" data-v="1.5" aria-pressed="false">150%</button></div>
+  </div>
+
+  <section class="option" id="current">
+    <header><h2>Today</h2><span class="tag">baseline</span></header>
+    <p>What the screenshot review found: 10 px text, a fixed 200 px card with a 70 px clip on top of an 80-character cut,
+      large ports in dark side columns, connections drawn over the cards, a mid-grey canvas in both themes, the minimap
+      over the content, and auto-layout spacing (220 × 110 assumed) that doesn't match the real cards. Switch to 2.0 to
+      see lines lose their ending with no "…".</p>
+    <div class="viewport"><div class="scroll"><div class="stage"></div></div></div>
+  </section>
+
+  <section class="option" id="A">
+    <header><h2>Option A: fix the rules, keep the look</h2><span class="tag">smallest change</span></header>
+    <p>Same compact cards and text sizes. Everything that is a bug or a mismatch gets fixed: one preview rule, a card
+      that widens with the font scale, layout gaps measured from the real card, and the chrome problems (edges behind
+      cards, slimmer ports, a theme-matched canvas, the minimap kept clear).</p>
+    <div class="viewport"><div class="scroll"><div class="stage"></div></div></div>
+    <ul class="facts"></ul>
+  </section>
+
+  <section class="option" id="B">
+    <header><h2>Option B: readable cards</h2><span class="tag rec">recommended</span></header>
+    <p>Everything in A, plus text a writer can read at 100% without opening the detail panel: 12 px body text, wider
+      cards, and cards that grow to fit their line up to four lines. Layout places each card by its real height.</p>
+    <div class="viewport"><div class="scroll"><div class="stage"></div></div></div>
+    <ul class="facts"></ul>
+  </section>
+
+  <section class="option" id="C">
+    <header><h2>Option C: readable cards with zoom levels</h2><span class="tag">most work</span></header>
+    <p>Option B, plus a level of detail that follows the zoom: zoomed out, cards collapse to their header and a single
+      line so a big conversation's shape is readable; zoomed in, cards show up to eight lines. Try the zoom switch.</p>
+    <div class="viewport"><div class="scroll"><div class="stage"></div></div></div>
+    <ul class="facts"></ul>
+  </section>
+
+  <h2>Side by side</h2>
+  <div class="tablewrap">
+  <table class="cmp">
+    <thead><tr><th></th><th>Today</th><th>A: fix the rules</th><th>B: readable cards</th><th>C: zoom levels</th></tr></thead>
+    <tbody>
+      <tr><th>Body / header / footer text</th><td>10 / 10 / 9 px</td><td>10 / 10 / 9 px</td><td>12 / 12 / 10 px</td><td>12 / 12 / 10 px</td></tr>
+      <tr><th>Card width</th><td>200 px, fixed</td><td>200 × font scale</td><td>240 × font scale</td><td>240 × font scale</td></tr>
+      <tr><th>How much text shows</th><td>80 characters, then clipped at 70 px (no "…" when clipped)</td><td>3 lines, then "…"</td><td>Grows to fit, up to 4 lines, then "…"</td><td>1 line zoomed out, 4 at 100%, 8 zoomed in</td></tr>
+      <tr><th>Font scale 2.0 vs 1.0</th><td>Shows less text</td><td>Same text, bigger</td><td>Same text, bigger</td><td>Same text, bigger</td></tr>
+      <tr><th>Layout gaps (between columns / rows)</th><td>200 / 20 px, assumes a 110 px card</td><td>90 / 24 px, from one shared card size</td><td>100 / 28 px, each card placed by its real height</td><td>as B</td></tr>
+      <tr><th>Ports</th><td>Large dots in dark side columns</td><td colspan="3">Small dots on the card's edge, in the connection colour</td></tr>
+      <tr><th>Connections</th><td>Drawn over cards</td><td colspan="3">Drawn behind cards</td></tr>
+      <tr><th>Canvas background</th><td>Same mid-grey in both themes</td><td colspan="3">A shade of each theme's own surface, with a faint dot grid</td></tr>
+      <tr><th>Minimap</th><td>Covers content</td><td colspan="3">Fit-to-screen leaves its corner free</td></tr>
+      <tr><th>Rough size of the work</th><td></td><td>Small: template, layout constants, tokens</td><td>Medium: A plus variable-height layout</td><td>Large: B plus zoom-bound templates, tested at each level</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>Why I recommend B</h2>
+  <div class="verdict">
+    <div><b>It answers the review's main question.</b>At 100% a writer can read a typical line on the card, which is
+      most of what the canvas is for. A fixes the bugs but keeps text that's hard to read on a 1080p screen.</div>
+    <div><b>It's the honest fix for font scale.</b>Cards that widen and grow with the text mean the accessibility
+      setting shows more, never less, which is #82's done-when.</div>
+    <div><b>C can come later.</b>Zoom levels only help on very large conversations, and they need B's growing cards
+      first. B leaves the door open without the cost now.</div>
+    <div><b>What B costs.</b>Bigger cards mean big conversations take more room: about 20% wider and somewhat
+      taller than today. Fit-to-screen shrinks them further on a hub with 100+ nodes.</div>
+  </div>
+
+  <h2>Not part of these options</h2>
+  <p class="note">The review saw every speaker's header in the same olive-brown. The tokens already give NPC, player,
+    narrator, script and bark headers different colours (as drawn here), so that looks like a bug in how the canvas picks
+    the colour, not a design choice. I'd file it separately. The same goes for finding 9 (menus and panel titles ignore
+    font scale), which belongs to the app chrome, not the canvas.</p>
+</main>
+
+<script>
+(() => {
+  // ── Real palette values (Palette.Dark.axaml / Palette.Light.axaml) ──
+  const SPEAKER = {
+    npc:      { hdr: "#7B241C", body: "#F5F0D0" },
+    player:   { hdr: "#1A5276", body: "#D5E8F5" },
+    narrator: { hdr: "#0E6655", body: "#D5F0E8" },
+    script:   { hdr: "#2C3E50", body: { dark: "#E0E0E0", light: "#E8E8E8" } },
+    bark:     { hdr: "#7A5C00", body: "#FFF8DC" },
+  };
+  const THEME = {
+    dark:  { edge: "#AAAAAA", edgeAlways: "#B8760A", edgeNever: "#555555",
+             canvasToday: "#838585", canvasNew: "#262626", dot: "#3a3a3a", minimap: "#2f3b45", frame: "#1E1E1E" },
+    light: { edge: "#4F4F4F", edgeAlways: "#8F5E00", edgeNever: "#9A9A9A",
+             canvasToday: "#838585", canvasNew: "#E4E4E0", dot: "#cfcfca", minimap: "#d7e4ee", frame: "#F4F4F2" },
+  };
+  const SHAPE = { npc: "50%", player: "1px", narrator: "0", script: "0", bark: "50%" };
+
+  // ── An invented conversation (no game text) ──
+  const NODES = [
+    { id: 1, layer: 0, kind: "npc", who: "Maren", text: "You're the one asking about the lighthouse keeper? Sit down. Nobody has seen him since the storm put the lamp out, and the harbour master won't say why.", cond: 0 },
+    { id: 2, layer: 1, kind: "player", who: "Player", choice: true, text: "Tell me about the storm.", cond: 0 },
+    { id: 3, layer: 1, kind: "player", who: "Player", choice: true, text: "Why won't the harbour master talk about it?", cond: 1 },
+    { id: 4, layer: 1, kind: "player", who: "Player", choice: true, text: "[Leave] I've heard enough for one night.", cond: 0 },
+    { id: 8, layer: 2, kind: "narrator", who: "Narrator", text: "Maren glances at the door before she answers, and lowers her voice.", cond: 0 },
+    { id: 6, layer: 2, kind: "npc", who: "Maren", text: "Because he paid the keeper to look the other way, if you ask me. Ships have been coming in at night with no lantern on their masts, and nobody writes them down.", cond: 1, female: true },
+    { id: 5, layer: 3, kind: "npc", who: "Maren", text: "It came out of nowhere. Three nights of it. On the second, someone saw a light out on the rocks, far from the tower, moving against the wind.", cond: 0 },
+    { id: 7, layer: 3, kind: "script", who: "Script", text: "SetGlobalValue(lighthouse_rumour, 1)", cond: 0 },
+    { id: 9, layer: 0, kind: "bark", who: "Dockhand", text: "Mind the step, friend. The boards are rotten.", cond: 0, row: 1 },
+  ];
+  const EDGES = [[1,2],[1,3],[1,4],[2,8],[8,5],[3,6,"always"],[6,7]];
+
+  // ── The four designs ──
+  const DESIGNS = {
+    current: { body: 10, hdr: 10, foot: 9, width: 200, widthScales: false, preview: "today",
+               gapH: 200, gapV: 20, assumedH: 110, variable: false,
+               ports: "column", edgesOver: true, canvas: "today", minimapClear: false },
+    A: { body: 10, hdr: 10, foot: 9, width: 200, widthScales: true, preview: { lines: 3 },
+         gapH: 90, gapV: 24, variable: false, ports: "edge", edgesOver: false, canvas: "new", minimapClear: true },
+    B: { body: 12, hdr: 12, foot: 10, width: 240, widthScales: true, preview: { lines: 4 },
+         gapH: 100, gapV: 28, variable: true, ports: "edge", edgesOver: false, canvas: "new", minimapClear: true },
+    C: { body: 12, hdr: 12, foot: 10, width: 240, widthScales: true, preview: { lod: true },
+         gapH: 100, gapV: 28, variable: true, ports: "edge", edgesOver: false, canvas: "new", minimapClear: true },
+  };
+
+  const state = { theme: "dark", scale: 1, zoom: 1 };
+  try {
+    const saved = JSON.parse(localStorage.getItem("canvas-mockup") || "null");
+    if (saved) Object.assign(state, saved);
+  } catch { /* storage unavailable: defaults */ }
+
+  function linesFor(d) {
+    if (d.preview === "today") return null;
+    if (d.preview.lines) return d.preview.lines;
+    return state.zoom < 0.75 ? 1 : state.zoom > 1.25 ? 8 : 4;   // C's level of detail
+  }
+
+  function render(key) {
+    const d = DESIGNS[key], th = THEME[state.theme], s = state.scale;
+    const section = document.getElementById(key);
+    const stage = section.querySelector(".stage");
+    const vp = section.querySelector(".viewport");
+    stage.innerHTML = "";
+    vp.style.background = th.frame;
+
+    const fBody = d.body * s, fHdr = d.hdr * s, fFoot = d.foot * s;
+    const cardW = d.width * (d.widthScales ? s : 1);
+    const portCol = d.ports === "column" ? 34 : 0;
+    const nodeW = cardW + 2 * portCol;
+    const lines = linesFor(d);
+    const lodCompact = d.preview.lod && state.zoom < 0.75;
+
+    // Build cards first (off-layout) so their real heights can be measured.
+    const els = {};
+    for (const n of NODES) {
+      const sp = SPEAKER[n.kind];
+      const bodyBg = typeof sp.body === "string" ? sp.body : sp.body[state.theme];
+      const node = document.createElement("div");
+      node.className = "node";
+      node.style.width = nodeW + "px";
+
+      const mkPortCol = () => {
+        const c = document.createElement("div");
+        c.className = "portcol";
+        c.style.width = portCol + "px";
+        c.style.background = state.theme === "dark" ? "#2b2b2b" : "#cfcde6";
+        const p = document.createElement("div");
+        p.className = "port"; p.style.width = p.style.height = "14px"; p.style.background = "#3d8bfd";
+        c.appendChild(p); return c;
+      };
+      if (d.ports === "column") node.appendChild(mkPortCol());
+
+      const card = document.createElement("div");
+      card.className = "card";
+      card.style.width = cardW + "px";
+      card.style.boxShadow = d.canvas === "new" ? "0 1px 3px rgba(0,0,0,.35)" : "none";
+
+      const hdr = document.createElement("div");
+      hdr.className = "hdr";
+      hdr.style.background = sp.hdr;
+      hdr.style.fontSize = fHdr + "px";
+      hdr.style.padding = `${3 * s}px ${6 * s}px`;
+      const mark = document.createElement("i");
+      mark.style.width = mark.style.height = (fHdr * 0.75) + "px";
+      mark.style.borderRadius = SHAPE[n.kind];
+      mark.style.background = "rgba(255,255,255,.85)";
+      if (n.kind === "narrator") mark.style.transform = "rotate(45deg)";
+      hdr.appendChild(mark);
+      hdr.appendChild(document.createTextNode(`Node ${n.id} · ${n.who}${n.choice ? " ✦" : ""}`));
+      card.appendChild(hdr);
+
+      const body = document.createElement("div");
+      body.className = "body";
+      body.style.background = bodyBg;
+      body.style.padding = `${4 * s}px ${6 * s}px`;
+      const t = document.createElement("div");
+      t.className = "t";
+      t.style.fontSize = fBody + "px";
+      t.style.lineHeight = "1.3";
+      if (d.preview === "today") {
+        t.textContent = n.text.length > 80 ? n.text.slice(0, 80) + "…" : n.text;
+        t.style.maxHeight = (70 - 8) + "px";   // MaxHeight 70 includes the 4 px top/bottom padding
+      } else {
+        t.textContent = n.text;
+        t.style.display = "-webkit-box";
+        t.style.webkitBoxOrient = "vertical";
+        t.style.webkitLineClamp = String(lines);
+      }
+      body.appendChild(t);
+      card.appendChild(body);
+
+      if (!lodCompact) {
+        const foot = document.createElement("div");
+        foot.className = "foot";
+        foot.style.background = bodyBg;
+        foot.style.borderTop = "1px solid rgba(0,0,0,.08)";
+        foot.style.fontSize = fFoot + "px";
+        foot.style.padding = `${2 * s}px ${6 * s}px`;
+        foot.textContent = (n.cond ? `⚙ ${n.cond} condition` : "No conditions") + (n.female ? "  ♀" : "");
+        card.appendChild(foot);
+      }
+      node.appendChild(card);
+      if (d.ports === "column") node.appendChild(mkPortCol());
+
+      if (d.ports === "edge") {
+        for (const side of ["left", "right"]) {
+          const p = document.createElement("div");
+          p.className = "port";
+          p.style.position = "absolute"; p.style.top = (fHdr * 0.6 + 3 * s) + "px";
+          p.style[side] = "-4px";
+          p.style.width = p.style.height = "8px";
+          p.style.background = th.edge;
+          p.style.border = `1.5px solid ${th.frame}`;
+          node.appendChild(p);
+        }
+      }
+      node.style.visibility = "hidden";
+      stage.appendChild(node);
+      els[n.id] = node;
+    }
+
+    // Layout: columns by layer; rows either on a fixed pitch (today / A) or stacked by real height (B / C).
+    const pos = {};
+    const heights = Object.fromEntries(NODES.map(n => [n.id, els[n.id].offsetHeight]));
+    const fixedH = d.assumedH ?? Math.max(...Object.values(heights));
+    const colW = (d.assumedH ? 220 : nodeW);
+    const pad = 24;
+    const byLayer = {};
+    for (const n of NODES.filter(n => !n.row)) (byLayer[n.layer] ??= []).push(n);
+    let maxY = 0;
+    for (const [layer, list] of Object.entries(byLayer)) {
+      let y = pad;
+      for (const n of list) {
+        const x = pad + layer * (colW + d.gapH);
+        pos[n.id] = { x, y };
+        y += (d.variable ? heights[n.id] : fixedH) + d.gapV;
+        maxY = Math.max(maxY, pos[n.id].y + heights[n.id]);
+      }
+    }
+    for (const n of NODES.filter(n => n.row)) {   // the bark sits apart, below the first column
+      pos[n.id] = { x: pad, y: maxY + 3 * d.gapV + 20 };
+      maxY = pos[n.id].y + heights[n.id];
+    }
+    const maxX = Math.max(...NODES.map(n => pos[n.id].x + nodeW)) + pad;
+    maxY += pad;
+
+    // Canvas background.
+    const bg = document.createElement("div");
+    bg.className = "canvas";
+    if (d.canvas === "today") bg.style.background = th.canvasToday;
+    else {
+      bg.style.background = `${th.canvasNew} radial-gradient(${th.dot} 1px, transparent 1.2px) 0 0 / 20px 20px`;
+    }
+    stage.prepend(bg);
+
+    // Connections: from the source's right edge to the target's left edge, at header height.
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.classList.add("edges");
+    svg.setAttribute("width", maxX); svg.setAttribute("height", maxY);
+    const anchorY = id => pos[id].y + fHdr * 0.6 + 3 * s + 4;
+    for (const [a, b, kind] of EDGES) {
+      const x1 = pos[a].x + nodeW - (d.ports === "column" ? portCol / 2 : 0);
+      const x2 = pos[b].x + (d.ports === "column" ? portCol / 2 : 0);
+      const y1 = anchorY(a), y2 = anchorY(b);
+      const dx = Math.max(40, (x2 - x1) / 2);
+      const path = document.createElementNS(svg.namespaceURI, "path");
+      path.setAttribute("d", `M${x1},${y1} C${x1 + dx},${y1} ${x2 - dx},${y2} ${x2},${y2}`);
+      path.setAttribute("fill", "none");
+      path.setAttribute("stroke", kind === "always" ? th.edgeAlways : th.edge);
+      path.setAttribute("stroke-width", "2");
+      if (kind === "always") path.setAttribute("stroke-dasharray", "6 4");
+      svg.appendChild(path);
+    }
+    // Today: one long edge crosses a card, as in the review (edges drawn over nodes).
+    if (d.edgesOver) {
+      const path = document.createElementNS(svg.namespaceURI, "path");
+      const x1 = pos[4].x + nodeW - portCol / 2, y1 = anchorY(4);
+      const x2 = pos[7].x + portCol / 2, y2 = anchorY(7);
+      path.setAttribute("d", `M${x1},${y1} C${x1 + 260},${y1} ${x2 - 260},${y2} ${x2},${y2}`);
+      path.setAttribute("fill", "none"); path.setAttribute("stroke", th.edge);
+      path.setAttribute("stroke-width", "2"); path.setAttribute("stroke-dasharray", "5 4");
+      svg.appendChild(path);
+      svg.style.zIndex = 3;
+    }
+    if (d.edgesOver) stage.appendChild(svg); else bg.after(svg);
+
+    for (const n of NODES) {
+      const e = els[n.id];
+      e.style.left = pos[n.id].x + "px";
+      e.style.top = pos[n.id].y + "px";
+      e.style.visibility = "visible";
+      e.style.zIndex = 2;
+    }
+
+    // Minimap: pinned to the viewport's bottom-right corner, like the app's. Today it covers
+    // content; the options reserve its corner so fit-to-screen leaves it free.
+    vp.querySelectorAll(".minimap").forEach(m => m.remove());
+    const mm = document.createElement("div");
+    mm.className = "minimap";
+    Object.assign(mm.style, { width: "160px", height: "110px", right: "8px", bottom: "8px", zIndex: 4,
+      background: th.minimap, opacity: ".92",
+      border: `1px solid ${state.theme === "dark" ? "#44525e" : "#9fb4c4"}` });
+    mm.title = "Minimap";
+    vp.appendChild(mm);
+
+    const scroll = section.querySelector(".scroll");
+    scroll.querySelectorAll(".spacer").forEach(x => x.remove());
+    stage.style.width = maxX + "px";
+    stage.style.height = maxY + "px";
+    stage.style.position = "absolute";
+    stage.style.transform = `scale(${state.zoom})`;
+    const reserve = d.minimapClear ? 176 : 0;
+    const spacer = document.createElement("div");
+    spacer.className = "spacer";
+    Object.assign(spacer.style, { width: (maxX * state.zoom + reserve) + "px",
+      height: (maxY * state.zoom + (d.minimapClear ? 126 : 0)) + "px", pointerEvents: "none" });
+    scroll.appendChild(spacer);
+
+    // Facts under each option.
+    const facts = section.querySelector(".facts");
+    if (facts) {
+      const lineTxt = d.preview.lod
+        ? `${lines} line${lines > 1 ? "s" : ""} at this zoom (1 / 4 / 8)`
+        : `up to ${lines} lines, then "…"`;
+      facts.innerHTML = `
+        <li><b>Text at this font scale</b>${fBody} px body, ${fHdr} px header, ${fFoot} px footer</li>
+        <li><b>Card width</b>${Math.round(cardW)} px (${d.width} × ${s})</li>
+        <li><b>Preview</b>${lineTxt}</li>
+        <li><b>Layout</b>${d.variable ? "each card placed by its real height" : "one shared card size"}, gaps ${d.gapH} / ${d.gapV} px</li>`;
+    }
+  }
+
+  function renderAll() {
+    document.documentElement.dataset.theme = state.theme;
+    for (const key of Object.keys(DESIGNS)) render(key);
+    for (const g of document.querySelectorAll(".group")) {
+      for (const b of g.querySelectorAll("button")) {
+        b.setAttribute("aria-pressed", String(String(state[g.dataset.key]) === b.dataset.v));
+      }
+    }
+    try { localStorage.setItem("canvas-mockup", JSON.stringify(state)); } catch { /* ignore */ }
+  }
+
+  document.querySelectorAll(".group").forEach(g => g.addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    const k = g.dataset.key;
+    state[k] = k === "theme" ? b.dataset.v : Number(b.dataset.v);
+    renderAll();
+  }));
+  renderAll();
+  window.addEventListener("resize", renderAll);
+})();
+</script>
+</body>
+</html>

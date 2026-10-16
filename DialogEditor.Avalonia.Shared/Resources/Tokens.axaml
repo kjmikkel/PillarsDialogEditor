@@ -61,6 +61,20 @@
     <x:Double x:Key="ColumnWidth.BatchVo.FileMin">150</x:Double>
     <x:Double x:Key="ColumnWidth.SeverityBadge">16</x:Double>
 
+    <!-- Issue 82: conversation-canvas card sizes, in canvas units. Pinned to
+         DialogEditor.Core/Layout/CardMetrics.cs by CanvasTokenTests. Deliberately NOT in
+         FontSizeTokens / ColumnWidthTokens, so FontScaleApplier never scales them: on the canvas,
+         font scale magnifies the zoom instead (ConversationView), so a card shows the same text
+         at every scale and saved layouts stay valid. -->
+    <x:Double x:Key="Canvas.CardWidth">240</x:Double>
+    <x:Double x:Key="Canvas.FontSize.Header">12</x:Double>
+    <x:Double x:Key="Canvas.FontSize.Body">12</x:Double>
+    <x:Double x:Key="Canvas.FontSize.Footer">10</x:Double>
+    <x:Double x:Key="Canvas.FontSize.Badge">10</x:Double>
+    <x:Double x:Key="Canvas.LineHeight.Header">16</x:Double>
+    <x:Double x:Key="Canvas.LineHeight.Body">16</x:Double>
+    <x:Double x:Key="Canvas.LineHeight.Footer">13</x:Double>
+
     <!--  TOKENS — semantic brush layer (Layer 0, public contract).
           Every view, converter, and dependent gap binds THESE keys (never Palette.*).
           Each brush references exactly one Palette.* colour; two tokens may share a
@@ -84,6 +98,8 @@
     <SolidColorBrush x:Key="Brush.Node.Bark.Header"      Color="{StaticResource Palette.Amber.900}"/>
     <SolidColorBrush x:Key="Brush.Node.Bark.Body"        Color="{StaticResource Palette.Cream.100}"/>
     <SolidColorBrush x:Key="Brush.Node.Bark.Footer"      Color="{StaticResource Palette.Amber.570}"/>
+    <!-- 1 px outline around canvas cards (#82): separates adjacent cards now that they are taller -->
+    <SolidColorBrush x:Key="Brush.Node.Border"          Color="{StaticResource Palette.Node.Border}"/>
 
     <!-- Diff canvas fills -->
     <!-- Brush.Text.Meta.Commit stays on Amber.600 (commit gold). Diff.Changed.Fill split onto Amber.610 (separate from commit gold) per Layer 1 spec §3.3. -->
@@ -263,5 +279,5 @@
     <SolidColorBrush x:Key="Brush.Text.Link.Subtle"  Color="{StaticResource Palette.Sky.350}"/>
     <SolidColorBrush x:Key="Brush.Text.Info"         Color="{StaticResource Palette.Sky.450}"/>
     <SolidColorBrush x:Key="Brush.Text.Highlight"    Color="{StaticResource Palette.Amber.520}"/>
-    <SolidColorBrush x:Key="Brush.Canvas.Background" Color="{StaticResource Palette.Neutral.520}"/>
+    <SolidColorBrush x:Key="Brush.Canvas.Background" Color="{StaticResource Palette.Canvas.Base}"/>
 </ResourceDictionary>

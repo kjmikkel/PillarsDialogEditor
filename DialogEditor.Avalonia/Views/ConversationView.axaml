@@ -8,7 +8,52 @@
              xmlns:ctrl="clr-namespace:DialogEditor.Avalonia.Controls"
              x:Class="DialogEditor.Avalonia.Views.ConversationView" x:CompileBindings="False">
 
+    <UserControl.Resources>
+        <!-- Issue 82: one port dot shared by NodeInput and NodeOutput. 16x16 hit area around an 8 px dot,
+             so ports are no harder to grab than before. -->
+        <ControlTemplate x:Key="PortDotTemplate">
+            <Border Width="16" Height="16" Background="Transparent">
+                <Ellipse Width="8" Height="8"
+                         Fill="{DynamicResource Brush.Connection.Default}"
+                         Stroke="{DynamicResource Brush.Canvas.Background}" StrokeThickness="1.5"/>
+            </Border>
+        </ControlTemplate>
+    </UserControl.Resources>
+
     <UserControl.Styles>
+        <!-- Issue 82: no connector side columns. Nodify's default Node draws Input/Output in
+             padded columns with their own background, which took about a third of the node's
+             width. The card's own colours (ContentBrush/HeaderBrush) are unused: the DataTemplate
+             draws the card. -->
+        <Style Selector="nodify|Node">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="ContentBrush" Value="Transparent"/>
+            <Setter Property="HeaderBrush" Value="Transparent"/>
+            <Setter Property="FooterBrush" Value="Transparent"/>
+            <!-- Nodify's Node clips to its bounds; the 18 px diff / connect-source badges sit half outside the card. -->
+            <Setter Property="ClipToBounds" Value="False"/>
+        </Style>
+        <!-- Two styles, not a comma selector: ConnectorTemplate is declared on NodeInput and NodeOutput
+             separately, so a combined selector infers the common base (Connector) and fails to compile. -->
+        <!-- Margins centre each dot on the card's edge: the 5 px side column holds the NodeInput/Output
+             (21 wide = 16 dot + 5 spacing), and the output draws its dot on the right of that spacing. -->
+        <Style Selector="nodify|NodeInput">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="-3,6,-13,0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="ConnectorTemplate" Value="{StaticResource PortDotTemplate}"/>
+        </Style>
+        <Style Selector="nodify|NodeOutput">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="-13,6,-3,0"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="VerticalAlignment" Value="Top"/>
+            <Setter Property="ConnectorTemplate" Value="{StaticResource PortDotTemplate}"/>
+        </Style>
+
         <!-- Connection stroke colours — driven by CSS classes set in code -->
         <Style Selector="nodify|Connection">
             <Setter Property="Stroke" Value="{DynamicResource Brush.Connection.Default}"/>
@@ -257,8 +302,29 @@
                                 </DataTemplate>
                             </nodify:Node.OutputConnectorTemplate>
 
-                            <Grid Width="200" RowDefinitions="Auto,Auto,Auto,Auto"
-                                  Opacity="{Binding SearchMatchState, Converter={StaticResource SearchStateOpacity}}">
+                            <!-- Issue 82: Margin -16,0 cancels the 16 px left/right padding Nodify's Node template puts
+                                 around its content (a local value on the template's content Border, which neither
+                                 Node.Padding, ContentContainerStyle nor a style selector overrides). Without it the
+                                 node is card + 32 px wide. Measured against NodifyAvalonia 6.6.0; if an upgrade changes
+                                 that padding, CanvasCardRenderTests.Ports_* (node width, dot positions) will fail. -->
+                            <Grid Classes="card" Width="{DynamicResource Canvas.CardWidth}" Margin="-16,0" RowDefinitions="Auto,Auto,Auto,Auto">
+
+                                <!-- Issue 82: dimming is a canvas-coloured veil over an opaque card, not an Opacity on the
+                                     card. A translucent card let connection lines show through its text. -->
+                                <Border Classes="dimOverlay" Grid.Row="0" Grid.RowSpan="3"
+                                        CornerRadius="2"
+                                        IsHitTestVisible="False"
+                                        ZIndex="8"
+                                        Background="{DynamicResource Brush.Canvas.Background}"
+                                        Opacity="{Binding SearchMatchState, Converter={StaticResource SearchDimOverlayOpacity}}"/>
+
+                                <!-- Issue 82: 1 px card outline (CardMetrics.BorderThickness). The header, body
+                                     and footer are inset by it (Margin) so it never covers their content. -->
+                                <Border Grid.Row="0" Grid.RowSpan="3"
+                                        CornerRadius="2"
+                                        IsHitTestVisible="False"
+                                        BorderThickness="1"
+                                        BorderBrush="{DynamicResource Brush.Node.Border}"/>
 
                                 <!-- Search-match emphasis — highlight border on condition/script-search
                                      hits (SearchMatchState.Match); Transparent otherwise -->
@@ -290,7 +356,7 @@
                                         ZIndex="11"
                                         Background="{Binding DiffStatus, Converter={StaticResource DiffStatusToBrushConverter}}">
                                     <TextBlock Text="{Binding DiffStatus, Converter={StaticResource DiffStatusToGlyph}}"
-                                               Foreground="{DynamicResource Brush.Text.OnAccent}" FontWeight="Bold" FontSize="{DynamicResource FontSize.Label}"
+                                               Foreground="{DynamicResource Brush.Text.OnAccent}" FontWeight="Bold" FontSize="{DynamicResource Canvas.FontSize.Badge}"
                                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
 
@@ -318,12 +384,12 @@
                                         Background="{DynamicResource Brush.Severity.Warning}"
                                         IsVisible="{Binding IsConnectionSource}">
                                     <TextBlock Text="🔗"
-                                               FontSize="{DynamicResource FontSize.Label}"
+                                               FontSize="{DynamicResource Canvas.FontSize.Badge}"
                                                HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
 
                                 <!-- Header — amber when Bark, speaker-color when Conversation -->
-                                <Border Grid.Row="0" CornerRadius="2,2,0,0">
+                                <Border Grid.Row="0" CornerRadius="2,2,0,0" Margin="1,1,1,0">
                                     <Border.Background>
                                         <MultiBinding Converter="{StaticResource NodeColorConverter}">
                                             <Binding Path="SpeakerCategory"/>
@@ -332,7 +398,9 @@
                                             <Binding Source="{x:Static theming:ThemeService.Current}" Path="Revision"/>
                                         </MultiBinding>
                                     </Border.Background>
-                                    <StackPanel Orientation="Horizontal">
+                                    <!-- Grid Auto,* (not a horizontal StackPanel): a StackPanel measures the title at infinite
+                                         width, so TextTrimming never applied and a long title ran past the card edge. -->
+                                    <Grid ColumnDefinitions="Auto,*">
                                         <!-- Node-type shape marker: shape encodes type (redundant with colour for
                                              accessibility — Layer 2.5), fill mirrors the speaker colour as before -->
                                         <Path Width="9" Height="9" Margin="6,0,4,0" VerticalAlignment="Center" Stretch="Uniform"
@@ -351,15 +419,16 @@
                                                 </MultiBinding>
                                             </Path.Fill>
                                         </Path>
-                                        <TextBlock Text="{Binding Title}"
+                                        <TextBlock Grid.Column="1" Text="{Binding Title}"
                                                    Foreground="{DynamicResource Brush.Text.OnAccent}" FontWeight="Bold"
-                                                   FontSize="{DynamicResource FontSize.Small}" Padding="0,3,6,3"
+                                                   FontSize="{DynamicResource Canvas.FontSize.Header}"
+                                                   LineHeight="{DynamicResource Canvas.LineHeight.Header}" Padding="0,3,6,3"
                                                    TextTrimming="CharacterEllipsis"/>
-                                    </StackPanel>
+                                    </Grid>
                                 </Border>
 
                                 <!-- Body -->
-                                <Border Grid.Row="1">
+                                <Border Grid.Row="1" Margin="1,0">
                                     <Border.Background>
                                         <MultiBinding Converter="{StaticResource NodeColorConverter}" ConverterParameter="body">
                                             <Binding Path="SpeakerCategory"/>
@@ -369,23 +438,29 @@
                                         </MultiBinding>
                                     </Border.Background>
                                     <Panel>
-                                        <TextBlock Text="{Binding TextPreview}"
-                                                   TextWrapping="Wrap"
-                                                   Padding="6,4" FontSize="{DynamicResource FontSize.Small}"
-                                                   Foreground="{DynamicResource Brush.Text.OnLight}" MaxHeight="70"/>
+                                        <!-- Issue 82: the card grows to fit its line, up to CardMetrics.MaxBodyLines, then ends in "…".
+                                             Full text, not TextPreview: TextPreview's 80-character cut stays for one-line summaries
+                                             elsewhere (Node Details' link list, Batch VO Import, VO Validation, the alias picker). -->
+                                        <TextBlock Classes="cardBody" Text="{Binding DefaultText}"
+                                                   IsVisible="{Binding !HasTextPlaceholder}"
+                                                   TextWrapping="Wrap" MaxLines="4" TextTrimming="CharacterEllipsis"
+                                                   Padding="6,4" FontSize="{DynamicResource Canvas.FontSize.Body}"
+                                                   LineHeight="{DynamicResource Canvas.LineHeight.Body}"
+                                                   Foreground="{DynamicResource Brush.Text.OnLight}"/>
                                         <!-- Display-only hint for empty text (#84): kept out of DefaultText so it
                                              can never be saved, exported, searched or replaced. Muted + italic,
                                              matching the footer's secondary styling. -->
                                         <TextBlock Text="{Binding TextPlaceholder}"
                                                    IsVisible="{Binding HasTextPlaceholder}"
-                                                   TextWrapping="Wrap" FontStyle="Italic"
-                                                   Padding="6,4" FontSize="{DynamicResource FontSize.Small}"
-                                                   Foreground="{DynamicResource Brush.Text.OnLight.Muted}" MaxHeight="70"/>
+                                                   TextWrapping="Wrap" MaxLines="4" TextTrimming="CharacterEllipsis" FontStyle="Italic"
+                                                   Padding="6,4" FontSize="{DynamicResource Canvas.FontSize.Body}"
+                                                   LineHeight="{DynamicResource Canvas.LineHeight.Body}"
+                                                   Foreground="{DynamicResource Brush.Text.OnLight.Muted}"/>
                                     </Panel>
                                 </Border>
 
                                 <!-- Footer -->
-                                <Border Grid.Row="2" Padding="6,2">
+                                <Border Grid.Row="2" Padding="6,2" Margin="1,0,1,1" CornerRadius="0,0,2,2">
                                     <Border.Background>
                                         <MultiBinding Converter="{StaticResource NodeColorConverter}" ConverterParameter="footer">
                                             <Binding Path="SpeakerCategory"/>
@@ -394,7 +469,8 @@
                                             <Binding Source="{x:Static theming:ThemeService.Current}" Path="Revision"/>
                                         </MultiBinding>
                                     </Border.Background>
-                                    <TextBlock Text="{Binding FooterText}" FontSize="{DynamicResource FontSize.Caption}" Foreground="{DynamicResource Brush.Text.OnLight.Muted}"/>
+                                    <TextBlock Text="{Binding FooterText}" FontSize="{DynamicResource Canvas.FontSize.Footer}"
+                                               LineHeight="{DynamicResource Canvas.LineHeight.Footer}" TextTrimming="CharacterEllipsis" Foreground="{DynamicResource Brush.Text.OnLight.Muted}"/>
                                 </Border>
 
                             </Grid>
@@ -429,6 +505,7 @@
 
             <!-- Minimap -->
             <nodify:Minimap
+                x:Name="Minimap"
                 HorizontalAlignment="Right" VerticalAlignment="Bottom"
                 Margin="8" Width="160" Height="110"
                 IsReadOnly="False"
@@ -442,7 +519,8 @@
                                   BasedOn="{StaticResource {x:Type nodify:MinimapItem}}">
                         <Setter Property="Location" Value="{Binding Location,
                                            Converter={StaticResource LayoutPointConverter}}"/>
-                        <Setter Property="Width" Value="200"/>
+                        <Setter Property="Width" Value="{DynamicResource Canvas.CardWidth}"/>
+                        <!-- 80: a typical one-to-two line card; real heights vary with the text, the minimap is only a sketch. -->
                         <Setter Property="Height" Value="80"/>
                         <Setter Property="Template">
                             <ControlTemplate TargetType="nodify:MinimapItem">
