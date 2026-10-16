@@ -11,6 +11,22 @@
     <TextBlock x:Name="MessageText"
                Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"
                TextWrapping="Wrap"/>
+    <!-- Issue 36: earlier recovery copies, for when the newest is damaged or caught a mistake.
+         Collapsed and only shown when there is more than one copy: someone who has just lost
+         work shouldn't have to choose between timestamps to get their editor back. The newest
+         copy stays selected, so Restore does the obvious thing unless the user opens this. -->
+    <Expander x:Name="EarlierCopies" IsExpanded="False" IsVisible="False"
+              HorizontalAlignment="Stretch"
+              Header="{DynamicResource AutosaveRestore_EarlierCopies}"
+              ToolTip.Tip="{DynamicResource ToolTip_AutosaveRestore_EarlierCopies}"
+              AutomationProperties.Name="{DynamicResource AutosaveRestore_EarlierCopies}"
+              AutomationProperties.HelpText="{DynamicResource ToolTip_AutosaveRestore_EarlierCopies}">
+      <ListBox x:Name="CopyList" SelectionMode="Single" MaxHeight="200"
+               FontSize="{DynamicResource FontSize.Body}"
+               ToolTip.Tip="{DynamicResource ToolTip_AutosaveRestore_CopyList}"
+               AutomationProperties.Name="{DynamicResource AutosaveRestore_EarlierCopies}"
+               AutomationProperties.HelpText="{DynamicResource ToolTip_AutosaveRestore_CopyList}"/>
+    </Expander>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
       <Button x:Name="RestoreButton"
               Content="{DynamicResource AutosaveRestore_Restore}"
