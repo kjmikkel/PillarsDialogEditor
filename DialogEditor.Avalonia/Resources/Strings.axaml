@@ -2074,4 +2074,47 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="ToolTip_View_ShowTool">Shows and focuses this panel, reopening it first if you closed its tab.</sys:String>
     <sys:String x:Key="ToolTip_View_ResetLayout">Restores the default panel arrangement — Conversations, Canvas, Node Details, and Condition search back in their original positions and sizes.</sys:String>
 
+    <!-- Docking shell menus (issue 8). These override Dock.Avalonia's own ControlStrings.axaml
+         (Dock 11.3.12.1): app resources are found before the Dock theme's, so a UI translation
+         overlay of this file translates the dock's Float / Dock / Auto Hide / Close menus too.
+         Same keys and English defaults as Dock; "_" marks the access key. Dock's developer
+         debug overlay strings (RootDockDebug*) are left alone: users never see them.
+         DockStringsTests fails if a Dock upgrade adds a user-facing string missing here. -->
+    <sys:String x:Key="DragPreviewControlDockString">Dock</sys:String>
+    <sys:String x:Key="DragPreviewControlFloatString">Float</sys:String>
+    <sys:String x:Key="DragPreviewControlNoneString">None</sys:String>
+    <sys:String x:Key="DocumentTabStripItemFloatString">_Float</sys:String>
+    <sys:String x:Key="DocumentTabStripItemFloatAllString">Float all</sys:String>
+    <sys:String x:Key="DocumentTabStripItemCloseString">_Close</sys:String>
+    <sys:String x:Key="DocumentTabStripItemCloseOtherTabsString">Close other tabs</sys:String>
+    <sys:String x:Key="DocumentTabStripItemCloseAllTabsString">Close all tabs</sys:String>
+    <sys:String x:Key="DocumentTabStripItemCloseTabsLeftString">_Close tabs to the left</sys:String>
+    <sys:String x:Key="DocumentTabStripItemCloseTabsRightString">_Close tabs to the right</sys:String>
+    <sys:String x:Key="DocumentTabStripItemCloseTabsAboveString">_Close all tabs above</sys:String>
+    <sys:String x:Key="DocumentTabStripItemCloseTabsBelowString">_Close all tabs below</sys:String>
+    <sys:String x:Key="DocumentTabStripItemNewHorizontalDockString">New Horizontal Document Dock</sys:String>
+    <sys:String x:Key="DocumentTabStripItemNewVerticalDockString">New Vertical Document Dock</sys:String>
+    <sys:String x:Key="DocumentTabStripItemTabLayoutString">Tab Layout</sys:String>
+    <sys:String x:Key="DocumentTabStripItemTabLayoutLeftString">_Place Tabs on the Left</sys:String>
+    <sys:String x:Key="DocumentTabStripItemTabLayoutTopString">_Place Tabs on the Top</sys:String>
+    <sys:String x:Key="DocumentTabStripItemTabLayoutRightString">_Place Tabs on the Right</sys:String>
+    <sys:String x:Key="DocumentTabStripItemLayoutModeString">Layout Mode</sys:String>
+    <sys:String x:Key="DocumentTabStripItemLayoutModeTabbedString">Tabbed</sys:String>
+    <sys:String x:Key="DocumentTabStripItemLayoutModeMdiString">MDI</sys:String>
+    <sys:String x:Key="ToolPinItemControlFloatString">_Float</sys:String>
+    <sys:String x:Key="ToolPinItemControlShowString">_Show</sys:String>
+    <sys:String x:Key="ToolPinItemControlDockAsDocumentString">Dock as Tabbed Document</sys:String>
+    <sys:String x:Key="ToolPinItemControlCloseString">_Close</sys:String>
+    <sys:String x:Key="ToolChromeControlFloatString">_Float</sys:String>
+    <sys:String x:Key="ToolChromeControlDockString">_Dock</sys:String>
+    <sys:String x:Key="ToolChromeControlAutoHideString">_Auto Hide</sys:String>
+    <sys:String x:Key="ToolChromeControlDockAsDocumentString">Dock as Tabbed Document</sys:String>
+    <sys:String x:Key="ToolChromeControlCloseString">_Close</sys:String>
+    <sys:String x:Key="ToolTabStripItemFloatString">_Float</sys:String>
+    <sys:String x:Key="ToolTabStripItemFloatAllString">Float all</sys:String>
+    <sys:String x:Key="ToolTabStripItemDockString">_Dock</sys:String>
+    <sys:String x:Key="ToolTabStripItemAutoHideString">_Auto Hide</sys:String>
+    <sys:String x:Key="ToolTabStripItemDockAsDocumentString">Dock as Tabbed Document</sys:String>
+    <sys:String x:Key="ToolTabStripItemCloseString">_Close</sys:String>
+
 </ResourceDictionary>
