@@ -398,6 +398,42 @@
                     </ItemsControl>
                 </Border>
 
+                <!-- Possible misspellings, each with its quick fixes (issue 9): use the suggested word
+                     (fixes every occurrence, undoable like any edit) or add the word to the personal
+                     dictionary, the same one the Validate Text window adds to. -->
+                <Border Background="{DynamicResource Brush.Validation.Background}" BorderBrush="{DynamicResource Brush.Validation.Border}" BorderThickness="1"
+                        CornerRadius="2" Padding="6,4" Margin="0,0,0,4"
+                        IsVisible="{Binding SpellingIssues.Count, Converter={StaticResource CountToVis}}"
+                        ToolTip.Tip="{DynamicResource ToolTip_SpellingIssues}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_SpellingIssues}">
+                    <ItemsControl ItemsSource="{Binding SpellingIssues}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SpellingIssueViewModel">
+                                <StackPanel Spacing="2" Margin="0,0,0,4">
+                                    <TextBlock Text="{Binding Message}" Foreground="{DynamicResource Brush.Validation.Text}"
+                                               FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
+                                    <WrapPanel>
+                                        <Button Classes="secondary"
+                                                Content="{Binding ApplyLabel}"
+                                                Command="{Binding ApplySuggestionCommand}"
+                                                IsVisible="{Binding CanApplySuggestion}"
+                                                FontSize="{DynamicResource FontSize.Small}" Padding="8,2" Margin="0,0,6,0"
+                                                ToolTip.Tip="{DynamicResource ToolTip_UseSuggestion}"
+                                                AutomationProperties.HelpText="{DynamicResource ToolTip_UseSuggestion}"/>
+                                        <Button Classes="secondary"
+                                                Content="{DynamicResource Button_AddToDictionary}"
+                                                Command="{Binding AddToDictionaryCommand}"
+                                                IsVisible="{Binding CanAddToDictionary}"
+                                                FontSize="{DynamicResource FontSize.Small}" Padding="8,2"
+                                                ToolTip.Tip="{DynamicResource ToolTip_AddToDictionary}"
+                                                AutomationProperties.HelpText="{DynamicResource ToolTip_AddToDictionary}"/>
+                                    </WrapPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+
                 <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_Persistence}"/>
                 <ComboBox Classes="detail-combo"
                           ItemsSource="{x:Static vm:NodeDetailViewModel.PersistenceOptions}"
