@@ -372,11 +372,14 @@ public partial class ConversationViewModel : ObservableObject
             Nodes.Add(vm);
         }
 
-        AutoLayoutService.Apply(conversation.Nodes, (id, x, y) =>
-        {
-            if (nodeMap.TryGetValue(id, out var vm))
-                vm.Location = new LayoutPoint(x, y);
-        });
+        // Cards are laid out by their estimated height (issue 82), from the text each one shows.
+        AutoLayoutService.Apply(conversation.Nodes,
+            id => CardMetrics.EstimateHeight(nodeMap.TryGetValue(id, out var n) ? n.DefaultText : null),
+            (id, x, y) =>
+            {
+                if (nodeMap.TryGetValue(id, out var vm))
+                    vm.Location = new LayoutPoint(x, y);
+            });
 
         foreach (var node in conversation.Nodes)
         {
@@ -638,7 +641,7 @@ public partial class ConversationViewModel : ObservableObject
     private void AddConnectedNodeCmd(NodeViewModel? parent)
     {
         if (parent is null) return;
-        AddConnectedNode(parent, new LayoutPoint(parent.Location.X + 250, parent.Location.Y));
+        AddConnectedNode(parent, new LayoutPoint(parent.Location.X + CardMetrics.Width + CardMetrics.ColumnGap, parent.Location.Y));
     }
 
     [RelayCommand(CanExecute = nameof(IsEditable))]

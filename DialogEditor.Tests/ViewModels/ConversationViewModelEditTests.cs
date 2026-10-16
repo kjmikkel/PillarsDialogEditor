@@ -248,6 +248,19 @@ public class ConversationViewModelEditTests
     }
 
     [Fact]
+    public void AddConnectedNodeCmd_PlacesChildOneCardWidthPlusColumnGapToTheRight()
+    {
+        // Cards are CardMetrics.Width wide: a fixed offset smaller than width + gap puts the ports on top of each other.
+        var vm     = MakeVm();
+        var parent = MakeNode(1);
+        vm.AddNode(parent, new LayoutPoint(40, 70));
+        vm.AddConnectedNodeCmdCommand.Execute(parent);
+        var child = vm.Nodes.Single(n => n != parent);
+        Assert.Equal(parent.Location.X + DialogEditor.Core.Layout.CardMetrics.Width + DialogEditor.Core.Layout.CardMetrics.ColumnGap, child.Location.X);
+        Assert.Equal(parent.Location.Y, child.Location.Y);
+    }
+
+    [Fact]
     public void AddConnectedNode_SetsSelectedNodeToChild()
     {
         var vm     = MakeVm();
