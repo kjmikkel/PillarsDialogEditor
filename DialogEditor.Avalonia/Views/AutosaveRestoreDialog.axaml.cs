@@ -13,10 +13,16 @@ public partial class AutosaveRestoreDialog : Window
     // Parameterless ctor so the XAML compiler embeds the type (avoids AVLN3000).
     public AutosaveRestoreDialog() => InitializeComponent();
 
-    public AutosaveRestoreDialog(DateTime sidecarLocalTime) : this()
+    /// <param name="fallbackFolder">Where the copy was found when it is the per-user fallback copy
+    /// (issue 37), else null. The user's mental model is "next to my project", so a copy from
+    /// elsewhere says where it came from.</param>
+    public AutosaveRestoreDialog(DateTime sidecarLocalTime, string? fallbackFolder = null) : this()
     {
         MessageText.Text = Loc.Format("AutosaveRestore_Message",
             sidecarLocalTime.ToString("g"));
+        if (fallbackFolder is not null)
+            MessageText.Text += Environment.NewLine + Environment.NewLine
+                              + Loc.Format("AutosaveRestore_FromFallback", fallbackFolder);
         RestoreButton.Click += (_, _) => { Result = true;  Close(); };
         DiscardButton.Click += (_, _) => { Result = false; Close(); };
     }
