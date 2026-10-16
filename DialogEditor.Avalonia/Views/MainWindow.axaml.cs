@@ -109,6 +109,7 @@ public partial class MainWindow : Window
         // lexicons + personal word list). Null checker would just disable spelling.
         EmbeddedLexicons.LoadInto(SpellDictionaryStore.Default);
         vm.Detail.SpellChecker = new SpellCheckService(SpellDictionaryStore.Default);
+        vm.Detail.AddWordToDictionary = SpellDictionaryStore.Default.AddWord;   // issue 9: from the detail panel
         vm.SpellStoreFactory   = () => SpellDictionaryStore.Default;
         // Crash recovery: offer to restore a newer autosave sidecar at project open.
         vm.ConfirmRestoreAutosave = generations => new AutosaveRestoreDialog(generations).ShowDialogAsync(this);

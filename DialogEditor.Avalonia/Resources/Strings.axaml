@@ -490,6 +490,9 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Validation_UnbalancedMarkup">Unbalanced markup "{0}" — check the opening/closing tags match.</sys:String>
     <sys:String x:Key="Spelling_Misspelled_Suggest">Possible misspelling "{0}" — did you mean "{1}"?</sys:String>
     <sys:String x:Key="Spelling_Misspelled">Possible misspelling "{0}".</sys:String>
+    <sys:String x:Key="Spelling_UseSuggestion">Use "{0}"</sys:String>
+    <sys:String x:Key="ToolTip_UseSuggestion">Replace the misspelled word with the suggested one, everywhere it appears in this line. Undo puts it back.</sys:String>
+    <sys:String x:Key="ToolTip_SpellingIssues">Words in this node's text that the spell checker doesn't recognise for the current language. Use the suggestion to fix a word, or add a correct word (a name, a place, a made-up term) to your personal dictionary so it isn't flagged again.</sys:String>
     <sys:String x:Key="Option_PersistenceNone">None</sys:String>
     <sys:String x:Key="Option_PersistenceOnceEver">OnceEver</sys:String>
     <sys:String x:Key="Option_PersistenceOncePerConversation">OncePerConversation</sys:String>

@@ -79,35 +79,108 @@ public class NodeDetailViewModelValidationTests : IDisposable
     public void TokenWarnings_ValidatesFemaleText()
         => Assert.NotEmpty(Loaded("clean", femaleText: "she says [Player Nmae]").TokenWarnings);
 
-    // ── Spelling joins the same warning box (spell checker feature) ─────────
+    // ── Spelling rows (spell checker feature; issue 9 adds the quick fixes) ──────
 
-    [Fact]
-    public void TokenWarnings_Misspelling_AppearsWithChecker()
-    {
-        var vm = Loaded("the captian glows");
-        vm.SpellChecker = FixtureChecker();
-        vm.ActiveLanguage = "en";
-        vm.Load(MakeNode("the captian glows")); // reload to recompute with checker
-        var msg = Assert.Single(vm.TokenWarnings, w => w == "Spelling_Misspelled_Suggest");
-        Assert.NotNull(msg);
-    }
-
-    [Fact]
-    public void TokenWarnings_NullChecker_TagOnly()
-    {
-        // No checker wired (unit-test default): spelling silently off.
-        var vm = Loaded("the captian glows [Player Nmae]");
-        Assert.Single(vm.TokenWarnings); // only the tag warning
-    }
-
-    [Fact]
-    public void TokenWarnings_SpellingRecomputesOnEdit()
+    private NodeDetailViewModel Checked(string defaultText, string femaleText = "")
     {
         var vm = new NodeDetailViewModel { ActiveGameId = "poe2", ActiveLanguage = "en" };
         vm.SpellChecker = FixtureChecker();
-        vm.Load(MakeNode("captain"));
-        Assert.Empty(vm.TokenWarnings);
-        vm.DefaultText = "captian";
-        Assert.Contains("Spelling_Misspelled_Suggest", vm.TokenWarnings);
+        vm.Load(MakeNode(defaultText, femaleText));
+        return vm;
     }
+
+    [Fact]
+    public void SpellingIssues_Misspelling_AppearsWithChecker()
+    {
+        var issue = Assert.Single(Checked("captian glows").SpellingIssues);
+        Assert.Equal("captian", issue.Word);
+        Assert.Equal("captain", issue.Suggestion);
+        Assert.Equal("Spelling_Misspelled_Suggest", issue.Message);
+        Assert.Equal("Spelling_UseSuggestion", issue.ApplyLabel);
+    }
+
+    [Fact]
+    public void TokenWarnings_NoLongerCarrySpelling()
+    {
+        var vm = Checked("captian glows [Player Nmae]");
+        Assert.Equal(["Validation_UnknownToken_Suggest"], vm.TokenWarnings);
+        Assert.Single(vm.SpellingIssues);
+    }
+
+    [Fact]
+    public void SpellingIssues_NullChecker_IsEmpty()
+        => Assert.Empty(Loaded("captian glows").SpellingIssues);
+
+    [Fact]
+    public void SpellingIssues_RecomputeOnEdit()
+    {
+        var vm = Checked("captain");
+        Assert.Empty(vm.SpellingIssues);
+        vm.DefaultText = "captian";
+        Assert.Single(vm.SpellingIssues);
+    }
+
+    // Issue 9: accept the proposed word with one click.
+    [Fact]
+    public void ApplySuggestion_ReplacesTheWordInDefaultText()
+    {
+        var vm = Checked("captian glows");
+        var issue = Assert.Single(vm.SpellingIssues);
+        Assert.True(issue.CanApplySuggestion);
+
+        issue.ApplySuggestionCommand.Execute(null);
+
+        Assert.Equal("captain glows", vm.DefaultText);
+        Assert.Empty(vm.SpellingIssues);
+    }
+
+    [Fact]
+    public void ApplySuggestion_ReplacesTheWordInFemaleText()
+    {
+        var vm = Checked("captain glows", femaleText: "captian glows");
+        Assert.Single(vm.SpellingIssues).ApplySuggestionCommand.Execute(null);
+        Assert.Equal("captain glows", vm.FemaleText);
+        Assert.Equal("captain glows", vm.DefaultText);
+    }
+
+    [Fact]
+    public void ApplySuggestion_FixesEveryOccurrenceOfTheWord_ButNotLongerWords()
+    {
+        // The checker reports each misspelled word once, so its fix covers every occurrence;
+        // "captians" is a different word and is left alone.
+        var vm = Checked("captian ship captian captians");
+        vm.SpellingIssues.Single(i => i.Word == "captian").ApplySuggestionCommand.Execute(null);
+        Assert.Equal("captain ship captain captians", vm.DefaultText);
+    }
+
+    [Fact]
+    public void ApplySuggestion_NoSuggestion_CannotApply()
+    {
+        var issue = Assert.Single(Checked("zzqx").SpellingIssues);
+        Assert.Null(issue.Suggestion);
+        Assert.False(issue.CanApplySuggestion);
+    }
+
+    // Issue 9: add a word to the user dictionary straight from the detail panel.
+    [Fact]
+    public void AddToDictionary_AddsTheWord_AndTheWarningGoes()
+    {
+        var vm = Checked("Harbourmaster glows");
+        var added = new List<string>();
+        var store = new SpellDictionaryStore(_spellDir, Path.Combine(_spellDir, "user.txt"));
+        vm.AddWordToDictionary = w => { added.Add(w); store.AddWord(w); };
+        vm.SpellChecker = new SpellCheckService(store);
+        vm.Load(MakeNode("Harbourmaster glows"));
+        var issue = Assert.Single(vm.SpellingIssues);
+        Assert.True(issue.CanAddToDictionary);
+
+        issue.AddToDictionaryCommand.Execute(null);
+
+        Assert.Equal(["Harbourmaster"], added);
+        Assert.Empty(vm.SpellingIssues);
+    }
+
+    [Fact]
+    public void AddToDictionary_NotWired_CannotAdd()
+        => Assert.False(Assert.Single(Checked("captian glows").SpellingIssues).CanAddToDictionary);
 }
