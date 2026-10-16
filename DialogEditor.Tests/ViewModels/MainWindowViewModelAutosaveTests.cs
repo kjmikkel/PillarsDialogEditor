@@ -88,12 +88,12 @@ public class MainWindowViewModelAutosaveTests : IDisposable
         DialogProjectSerializer.SaveToFile(fallback, DialogProject.Empty("Recovered"));
         File.SetLastWriteTimeUtc(fallback, DateTime.UtcNow.AddMinutes(-1));
         var vm = MakeVm();
-        string? offeredFrom = "not called";
-        vm.ConfirmRestoreAutosave = (_, from) => { offeredFrom = from; return Task.FromResult(true); };
+        bool? offeredFallback = null;
+        vm.ConfirmRestoreAutosave = gens => { offeredFallback = gens[0].IsFallback; return Task.FromResult<AutosaveGeneration?>(gens[0]); };
 
         await InvokeLoadProjectAsync(vm, _projectPath);
 
-        Assert.Equal(_fallback, offeredFrom);
+        Assert.True(offeredFallback);
         Assert.Equal("Recovered", vm.CurrentProjectName);
     }
 
@@ -102,12 +102,57 @@ public class MainWindowViewModelAutosaveTests : IDisposable
     {
         WriteProjectAndNewerSidecar();
         var vm = MakeVm();
-        string? offeredFrom = "not called";
-        vm.ConfirmRestoreAutosave = (_, from) => { offeredFrom = from; return Task.FromResult(false); };
+        bool? offeredFallback = null;
+        vm.ConfirmRestoreAutosave = gens => { offeredFallback = gens[0].IsFallback; return Task.FromResult<AutosaveGeneration?>(null); };
 
         await InvokeLoadProjectAsync(vm, _projectPath);
 
-        Assert.Null(offeredFrom);
+        Assert.False(offeredFallback);
+    }
+
+    // ── Issue 36: choosing which generation to restore ──────────────────────────
+
+    private void WriteProjectAndTwoGenerations()
+    {
+        DialogProjectSerializer.SaveToFile(_projectPath, DialogProject.Empty("Saved"));
+        File.SetLastWriteTimeUtc(_projectPath, DateTime.UtcNow.AddMinutes(-20));
+        var g1 = AutosaveRecovery.GenerationPath(_projectPath, 1);
+        var g2 = AutosaveRecovery.GenerationPath(_projectPath, 2);
+        DialogProjectSerializer.SaveToFile(g1, DialogProject.Empty("Newest"));
+        DialogProjectSerializer.SaveToFile(g2, DialogProject.Empty("Earlier"));
+        File.SetLastWriteTimeUtc(g1, DateTime.UtcNow.AddMinutes(-1));
+        File.SetLastWriteTimeUtc(g2, DateTime.UtcNow.AddMinutes(-6));
+    }
+
+    [Fact]
+    public async Task Open_OffersEveryGeneration_NewestFirst()
+    {
+        WriteProjectAndTwoGenerations();
+        var vm = MakeVm();
+        IReadOnlyList<AutosaveGeneration>? offered = null;
+        vm.ConfirmRestoreAutosave = gens => { offered = gens; return Task.FromResult<AutosaveGeneration?>(null); };
+
+        await InvokeLoadProjectAsync(vm, _projectPath);
+
+        Assert.NotNull(offered);
+        Assert.Equal([AutosaveRecovery.GenerationPath(_projectPath, 1), AutosaveRecovery.GenerationPath(_projectPath, 2)],
+                     offered!.Select(g => g.Path));
+    }
+
+    [Fact]
+    public async Task Open_RestoreAnEarlierGeneration_LoadsIt_AndKeepsEveryCopy()
+    {
+        WriteProjectAndTwoGenerations();
+        var vm = MakeVm();
+        vm.ConfirmRestoreAutosave = gens => Task.FromResult<AutosaveGeneration?>(gens[1]);
+
+        await InvokeLoadProjectAsync(vm, _projectPath);
+
+        Assert.Equal("Earlier", vm.CurrentProjectName);
+        Assert.True(vm.IsModified);
+        // Kept until an explicit save, so a second crash still has every copy (issue 36).
+        Assert.True(File.Exists(AutosaveRecovery.GenerationPath(_projectPath, 1)));
+        Assert.True(File.Exists(AutosaveRecovery.GenerationPath(_projectPath, 2)));
     }
 
     private static MainWindowViewModel MakeVm() =>
@@ -213,7 +258,7 @@ public class MainWindowViewModelAutosaveTests : IDisposable
     {
         WriteProjectAndNewerSidecar();
         var vm = MakeVm();
-        vm.ConfirmRestoreAutosave = (_, _) => Task.FromResult(true);
+        vm.ConfirmRestoreAutosave = gens => Task.FromResult<AutosaveGeneration?>(gens[0]);
 
         await InvokeLoadProjectAsync(vm, _projectPath);
 
@@ -227,7 +272,7 @@ public class MainWindowViewModelAutosaveTests : IDisposable
     {
         WriteProjectAndNewerSidecar();
         var vm = MakeVm();
-        vm.ConfirmRestoreAutosave = (_, _) => Task.FromResult(false);
+        vm.ConfirmRestoreAutosave = _ => Task.FromResult<AutosaveGeneration?>(null);
 
         await InvokeLoadProjectAsync(vm, _projectPath);
 
@@ -245,7 +290,7 @@ public class MainWindowViewModelAutosaveTests : IDisposable
         File.SetLastWriteTimeUtc(_projectPath, DateTime.UtcNow.AddMinutes(-1));
         var vm = MakeVm();
         var consulted = false;
-        vm.ConfirmRestoreAutosave = (_, _) => { consulted = true; return Task.FromResult(false); };
+        vm.ConfirmRestoreAutosave = _ => { consulted = true; return Task.FromResult<AutosaveGeneration?>(null); };
 
         await InvokeLoadProjectAsync(vm, _projectPath);
 
