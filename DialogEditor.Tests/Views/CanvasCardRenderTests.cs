@@ -49,6 +49,35 @@ public class CanvasCardRenderTests
         return (window, card, body);
     }
 
+    // Issue 222: each speaker category draws its own header colour, and only a bark node draws the
+    // bark colour. The #82 review saw every header in the bark colour (the pre-#114 DisplayType map).
+    [AvaloniaTheory]
+    [InlineData(SpeakerCategory.Npc,      "Conversation", "Brush.Node.Npc.Header")]
+    [InlineData(SpeakerCategory.Player,   "Conversation", "Brush.Node.Player.Header")]
+    [InlineData(SpeakerCategory.Narrator, "Conversation", "Brush.Node.Narrator.Header")]
+    [InlineData(SpeakerCategory.Script,   "Conversation", "Brush.Node.Script.Header")]
+    [InlineData(SpeakerCategory.Npc,      "Bark",         "Brush.Node.Bark.Header")]
+    public void CardHeader_UsesTheSpeakerCategorysBrush(SpeakerCategory category, string displayType, string brushKey)
+    {
+        var node = new NodeViewModel(
+            new ConversationNode(1, category == SpeakerCategory.Player, category, "", "", [], [], [], displayType, "None"),
+            new StringEntry(1, "A line.", ""));
+        node.Input.Owner = node; node.Output.Owner = node;
+        var vm = new ConversationViewModel(new StubDispatcher());
+        vm.Nodes.Add(node);
+        var window = new Window { Width = 1200, Height = 800, Content = new ConversationView { DataContext = vm } };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        try
+        {
+            var card = window.GetVisualDescendants().OfType<Grid>().Single(g => g.Classes.Contains("card"));
+            var header = card.Children.OfType<Border>().First(b => Grid.GetRow(b) == 0 && Grid.GetRowSpan(b) == 1 && b.Child is Grid);
+            Assert.True(Application.Current!.TryGetResource(brushKey, null, out var expected), brushKey);
+            Assert.Equal(((ISolidColorBrush)expected!).Color, ((ISolidColorBrush)header.Background!).Color);
+        }
+        finally { window.Close(); }
+    }
+
     // Spec §6: a link passing under a card is hidden by the card. The GUI screenshots showed a
     // link drawn across a card's text, so this samples the rendered pixel where a straight link
     // between A and B passes under card C's body: it must be the body colour, not the link's.
