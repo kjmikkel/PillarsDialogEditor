@@ -47,3 +47,5 @@ palette-golden.received.txt
 .claude/settings.local.json
 # Cache left by trail's old name (graft); trail keeps its cache in .trail/cache/
 graft/
+# Python bytecode (tools/catalogue-gen)
+__pycache__/
