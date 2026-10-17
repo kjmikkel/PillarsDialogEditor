@@ -11,15 +11,18 @@ CLAUDE.md @kjmikkel
 CLAUDE.local.md @kjmikkel
 AGENTS.md @kjmikkel
 .mcp.json @kjmikkel
-# cmd.exe runs these from the current directory before PATH (npm.cmd, node.exe)
-/*.com @kjmikkel
-/*.exe @kjmikkel
-/*.bat @kjmikkel
-/*.cmd @kjmikkel
-/*.vbs @kjmikkel
-/*.vbe @kjmikkel
-/*.js @kjmikkel
-/*.jse @kjmikkel
-/*.wsf @kjmikkel
-/*.wsh @kjmikkel
-/*.msc @kjmikkel
+# cmd.exe runs these from the current directory before PATH (npm.cmd, node.exe),
+# and a session can start in any subdirectory, so they are owned at every depth.
+# /package.json: a root package named @trailhq/trail-code redirects hook.cjs.
+/package.json @kjmikkel
+*.com @kjmikkel
+*.exe @kjmikkel
+*.bat @kjmikkel
+*.cmd @kjmikkel
+*.vbs @kjmikkel
+*.vbe @kjmikkel
+*.js @kjmikkel
+*.jse @kjmikkel
+*.wsf @kjmikkel
+*.wsh @kjmikkel
+*.msc @kjmikkel

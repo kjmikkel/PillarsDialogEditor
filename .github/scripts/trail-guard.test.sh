@@ -13,7 +13,7 @@ expect() { # expect <pass|fail> <description> <author> <owner> <changed files...
 expect pass "owner may change .trail/"            kjmikkel kjmikkel .trail/learnings/a.md
 expect pass "owner may change agent config"       kjmikkel kjmikkel CLAUDE.md .claude/settings.json
 expect pass "others may change files outside"     someone  kjmikkel DialogEditor.Core/Models/Conversation.cs README.md
-expect pass "others may touch a look-alike path"  someone  kjmikkel docs/.trail/x.md .trailer DialogEditor.Avalonia/dist/x.js
+expect pass "others may touch a look-alike path"  someone  kjmikkel docs/.trail/x.md .trailer DialogEditor.Avalonia/dist/x.json
 expect pass "no changed files"                    someone  kjmikkel ""
 expect fail "others may not add a learning"       someone  kjmikkel README.md .trail/learnings/a.md
 expect fail "others may not change the hook"      someone  kjmikkel .trail/hook.cjs
@@ -47,7 +47,7 @@ expect fail "symlink named dist"                  someone  kjmikkel dist
 expect fail "symlink named dist/claude"           someone  kjmikkel dist/claude
 expect fail "symlink named .claude"               someone  kjmikkel .claude
 expect fail "nested symlink named .claude"        someone  kjmikkel DialogEditor.Core/.claude
-expect pass "others may change a dist/ file"      someone  kjmikkel dist/other/x.js
+expect pass "others may change a dist/ file"      someone  kjmikkel dist/other/x.json
 
 # case-insensitive APFS case-folds (long s to s) and HFS+ ignores zero-width characters
 expect fail "long s in .mcp.json"                 someone  kjmikkel $'.mcp.j\xc5\xbfon'
@@ -57,12 +57,22 @@ expect fail "dotless i in .trail/"                someone  kjmikkel $'.tra\xc4\x
 expect fail "fullwidth C in CLAUDE.md"            someone  kjmikkel $'\xef\xbc\xa3LAUDE.md'
 expect pass "others may add non-ASCII elsewhere"  someone  kjmikkel $'docs/Ondra\xe2\x80\x99s notes.md'
 
-# .trail/hook.cjs runs npm through cmd.exe, which looks in the current directory first
+# .trail/hook.cjs runs npm through cmd.exe, which looks in the current directory first,
+# and the hook's current directory can be any subdirectory a session was started in
 expect fail "planted npm.cmd at the root"         someone  kjmikkel npm.cmd
 expect fail "planted node.EXE at the root"        someone  kjmikkel node.EXE
 expect fail "planted npm.bat. at the root"        someone  kjmikkel "npm.bat."
 expect fail "planted git.js at the root"          someone  kjmikkel git.js
-expect pass "others may change a nested .cmd"     someone  kjmikkel tools/ui-automation/run.cmd
+expect fail "planted npm.cmd in a subdirectory"   someone  kjmikkel tools/ui-automation/npm.cmd
+expect fail "changed a nested .exe"               someone  kjmikkel DialogEditor.Avalonia/tools/vgmstream-cli.exe
+expect pass "owner may change a nested .exe"      kjmikkel kjmikkel DialogEditor.Avalonia/tools/vgmstream-cli.exe
 expect pass "owner may add a root script"         kjmikkel kjmikkel setup.cmd
+expect pass "others may change a nested .ps1"     someone  kjmikkel tools/ui-automation/DriveApp.ps1
+
+# hook.cjs resolves @trailhq/trail-code from the repo root: a root package.json with that name
+# self-references, and its "exports" can point the hook at any unguarded directory
+expect fail "others may not add a root package.json" someone kjmikkel package.json
+expect fail "upper-case root PACKAGE.JSON"        someone  kjmikkel PACKAGE.JSON
+expect pass "others may add a nested package.json" someone kjmikkel tools/web/package.json
 
 [ "$failures" -eq 0 ] && echo "all passed" || { echo "$failures failed"; exit 1; }
