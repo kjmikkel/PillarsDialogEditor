@@ -67,6 +67,10 @@ expect fail "planted npm.cmd in a subdirectory"   someone  kjmikkel tools/ui-aut
 expect fail "changed a nested .exe"               someone  kjmikkel DialogEditor.Avalonia/tools/vgmstream-cli.exe
 expect pass "owner may change a nested .exe"      kjmikkel kjmikkel DialogEditor.Avalonia/tools/vgmstream-cli.exe
 expect fail "planted npm.cpl (user PATHEXT)"      someone  kjmikkel tools/npm.cpl
+expect fail "planted npm.py (any PATHEXT entry)"  someone  kjmikkel npm.py
+expect fail "planted nested NODE.pyw"             someone  kjmikkel tools/NODE.pyw
+expect fail "planted extensionless cmd"           someone  kjmikkel tools/cmd
+expect pass "others may add npm-notes.md"         someone  kjmikkel docs/npm-notes.md
 expect pass "owner may add a root script"         kjmikkel kjmikkel setup.cmd
 
 # a submodule's files never show up in the PR's file list, so it could carry any of the above
