@@ -14,12 +14,15 @@ owner=$2
 # ^package.json: hook.cjs resolves @trailhq/trail-code from the repo root, so a
 # root package.json with that name resolves to itself, and its "exports" can
 # point the hook at hooks.js in any unguarded directory.
-protected='^\.trail(/|$)|^node_modules(/|$)|^dist$|^dist/claude(/|$)|(^|/)\.claude(/|$)|(^|/)claude(\.local)?\.md$|(^|/)agents\.md$|(^|/)\.mcp\.json$|^package\.json$'
+# .gitmodules: a submodule's files never appear in the PR's file list, so it
+# could carry anything above unseen.
+protected='^\.trail(/|$)|^node_modules(/|$)|^dist$|^dist/claude(/|$)|(^|/)\.claude(/|$)|(^|/)claude(\.local)?\.md$|(^|/)agents\.md$|(^|/)\.mcp\.json$|^package\.json$|(^|/)\.gitmodules$'
 short_name='(^|/)[^/]*~[0-9][^/]*(/|$)' # 8.3 alias such as TRAIL~1, which Windows may resolve to .trail
 # .trail/hook.cjs runs `npm root -g` through cmd.exe, which tries the current
-# directory first with every default PATHEXT extension. That directory is
-# wherever the session was started, not necessarily the root, so any depth.
-any_exec='(^|/)[^/]+\.(com|exe|bat|cmd|vbs|vbe|js|jse|wsf|wsh|msc)$'
+# directory first with every PATHEXT extension: the default list, plus .cpl,
+# which some machines add. That directory is wherever the session was started,
+# not necessarily the root, so any depth.
+any_exec='(^|/)[^/]+\.(com|exe|bat|cmd|vbs|vbe|js|jse|wsf|wsh|msc|cpl)$'
 
 # Fold look-alikes a filesystem may treat as the same name: compatibility forms
 # (fullwidth letters), case (APFS folds long s to s, Windows upper-cases dotless

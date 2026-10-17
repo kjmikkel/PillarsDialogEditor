@@ -66,7 +66,13 @@ expect fail "planted git.js at the root"          someone  kjmikkel git.js
 expect fail "planted npm.cmd in a subdirectory"   someone  kjmikkel tools/ui-automation/npm.cmd
 expect fail "changed a nested .exe"               someone  kjmikkel DialogEditor.Avalonia/tools/vgmstream-cli.exe
 expect pass "owner may change a nested .exe"      kjmikkel kjmikkel DialogEditor.Avalonia/tools/vgmstream-cli.exe
+expect fail "planted npm.cpl (user PATHEXT)"      someone  kjmikkel tools/npm.cpl
 expect pass "owner may add a root script"         kjmikkel kjmikkel setup.cmd
+
+# a submodule's files never show up in the PR's file list, so it could carry any of the above
+expect fail "others may not add a submodule"      someone  kjmikkel .gitmodules
+expect fail "others may not add a nested .gitmodules" someone kjmikkel tools/.gitmodules
+expect pass "owner may add a submodule"           kjmikkel kjmikkel .gitmodules
 expect pass "others may change a nested .ps1"     someone  kjmikkel tools/ui-automation/DriveApp.ps1
 
 # hook.cjs resolves @trailhq/trail-code from the repo root: a root package.json with that name

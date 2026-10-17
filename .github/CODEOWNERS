@@ -26,3 +26,6 @@ AGENTS.md @kjmikkel
 *.wsf @kjmikkel
 *.wsh @kjmikkel
 *.msc @kjmikkel
+*.cpl @kjmikkel
+# A submodule's files are not in the PR diff.
+.gitmodules @kjmikkel
