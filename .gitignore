@@ -42,3 +42,10 @@ CoverageReport/
 
 # Palette golden test — transient artifact; only the .approved.txt is committed
 palette-golden.received.txt
+
+# Per-machine Claude Code settings (permissions allowlist, trail statusline)
+.claude/settings.local.json
+# Cache left by trail's old name (graft); trail keeps its cache in .trail/cache/
+graft/
+# Python bytecode (tools/catalogue-gen)
+__pycache__/
