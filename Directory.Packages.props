@@ -62,7 +62,7 @@
 
   <ItemGroup Label="UI automation tooling (tools/DialogEditor.UiaMcp*)">
     <PackageVersion Include="Microsoft.Extensions.Hosting"   Version="10.0.13" />
-    <PackageVersion Include="ModelContextProtocol"           Version="2.2.0" />
+    <PackageVersion Include="ModelContextProtocol"           Version="2.3.0" />
   </ItemGroup>
 
   <!-- xunit stays on v2: Avalonia.Headless.XUnit targets it. -->
