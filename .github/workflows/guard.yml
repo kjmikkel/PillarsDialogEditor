@@ -14,7 +14,7 @@ jobs:
   trail-owner-only:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - run: bash .github/scripts/trail-guard.test.sh
       - name: Only the owner may change agent context
         shell: bash # -eo pipefail: a failed API call must fail the job, not pass an empty list
