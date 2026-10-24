@@ -43,8 +43,9 @@ You can also run it by hand: `--staged` for what is about to be committed, or
 ## Images
 
 Git shows no text for a PNG, so the guard cannot read pixels. For added or modified `*.png` files
-it scans the readable bytes of the file, which catches paths in text metadata (`tEXt`, `iTXt`;
-compressed `zTXt` is not seen), and it prints a reminder to look at each image by eye. A path
+it reads the text metadata chunks (`tEXt`, `zTXt`, `iTXt` and `eXIf`, inflating the compressed
+ones) and scans each line of their text. This part needs `perl`, which Git for Windows, macOS and
+Linux all ship. It also prints a reminder to look at each image by eye. A path
 visible in a screenshot cannot be found automatically. The editor's privacy mode (issue #270)
 exists to keep paths and names out of screenshots in the first place.
 

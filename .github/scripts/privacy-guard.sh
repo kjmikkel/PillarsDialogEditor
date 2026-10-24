@@ -37,9 +37,9 @@ words="$work/words" # private words, one per line, "<entry number><TAB><word>"
 : > "$meta"; : > "$texts"; : > "$words"
 
 if [ "$mode" = staged ]; then
-  diffargs=(--cached); blob() { git show ":$1"; }
+  diffargs=(--cached)
 else
-  diffargs=("$base...HEAD"); blob() { git show "HEAD:$1"; }
+  diffargs=("$base...HEAD")
 fi
 # --no-renames: a renamed file shows up as added, so its content is scanned too.
 gd() { git -c core.quotepath=off diff -U0 --no-color --no-renames --diff-filter=AM \
@@ -57,21 +57,57 @@ gd | awk -v mf="$meta" -v tf="$texts" '
   !hdr && /^\+/   { if (f != "") { print f "\t" ln > mf; print substr($0, 2) > tf } ln++ }
 '
 # Paths of added files (line 0), and PNG text metadata.
+gd --name-only | awk -v mf="$meta" -v tf="$texts" -v pf="$work/pngs" '
+  $0 != "" { print $0 "\t0" >> mf; print >> tf; if (tolower($0) ~ /\.png$/) print > pf }'
 png=()
-while IFS= read -r f; do
-  [ -z "$f" ] && continue
-  printf '%s\t0\n' "$f" >> "$meta"; printf '%s\n' "$f" >> "$texts"
-  case "$(printf '%s' "$f" | tr 'A-Z' 'a-z')" in *.png) png+=("$f") ;; esac
-done < <(gd --name-only)
-for f in "${png[@]+"${png[@]}"}"; do
-  # Only the tEXt/iTXt chunks: each starts with its 4-byte type, then readable
-  # keyword and text (zTXt is compressed and is not seen). Matching any printable
-  # run instead would also pick up thousands of random runs from the compressed
-  # pixel data — slow, and a source of false positives.
-  # The keyword and text are separated by NUL bytes, so turn those into spaces first.
-  blob "$f" 2>/dev/null | LC_ALL=C tr '\000' ' ' | LC_ALL=C grep -a -o -E '(tEXt|iTXt)[[:print:]]{4,}' \
-    | LC_ALL=C awk -v f="$f" -v mf="$meta" -v tf="$texts" '{ print f "\t0" >> mf; print substr($0, 5) >> tf }'
-done
+[ -f "$work/pngs" ] && mapfile -t png < "$work/pngs"
+
+# PNG text metadata: the tEXt, zTXt, iTXt and eXIf chunks, inflated where they are
+# compressed, one record per line of text. Pixel data (IDAT) is never read: its
+# random printable runs are slow to scan and a source of false positives.
+# One perl process reads every image through `git cat-file --batch`; a pipeline
+# per image costs several process starts each, which is minutes on Windows.
+pngscan='
+use strict; use warnings; use Compress::Zlib;
+open my $m, ">>", $ENV{MF} or die; open my $t, ">>", $ENV{TF} or die;
+binmode STDIN; binmode $t;
+for my $f (split /\n/, $ENV{PNGS}) {
+  my $hdr = <STDIN>; last unless defined $hdr;
+  next unless $hdr =~ / blob (\d+)$/;
+  read STDIN, my $d, $1; read STDIN, my $lf, 1;
+  next unless substr($d, 0, 8) eq "\x89PNG\r\n\x1a\n";
+  for (my $p = 8; $p + 12 <= length $d; ) {
+    my ($len, $type) = unpack "Na4", substr($d, $p, 8);
+    my $c = substr($d, $p + 8, $len); $p += 12 + $len;
+    my @s;
+    if ($type eq "tEXt" or $type eq "eXIf") { @s = ($c) }
+    elsif ($type eq "zTXt") {
+      my ($k, $z) = $c =~ /^([^\0]*)\0.(.*)$/s or next;
+      @s = ($k, uncompress($z) // "");
+    } elsif ($type eq "iTXt") {
+      my ($k, $flag, $rest) = $c =~ /^([^\0]*)\0(.).(.*)$/s or next;
+      my ($lang, $tk, $text) = split /\0/, $rest, 3; $text //= "";
+      $text = uncompress($text) // "" if $flag eq "\1";
+      @s = ($k, $lang, $tk, $text);
+    }
+    for my $s (@s) {
+      # Control bytes split a value into lines; other bytes (UTF-8 included) are kept.
+      for my $line (split /[\x00-\x1f\x7f]+/, $s // "") {
+        next if $line =~ /^\s*$/;
+        print $m "$f\t0\n"; print $t "$line\n";
+      }
+    }
+  }
+}'
+if [ ${#png[@]} -gt 0 ]; then
+  if ! command -v perl >/dev/null 2>&1; then
+    echo "privacy-guard: perl is needed to read PNG metadata (Git for Windows ships it)." >&2
+    exit 2
+  fi
+  rev=$([ "$mode" = staged ] && echo "" || echo HEAD)
+  printf "$rev:%s\n" "${png[@]}" | git cat-file --batch \
+    | PNGS="$(printf '%s\n' "${png[@]}")" MF="$meta" TF="$texts" perl -e "$pngscan"
+fi
 
 # Drop records for skipped files and for lines carrying the opt-out marker,
 # in one pass (a per-record loop forks a process per line: minutes on a big diff).

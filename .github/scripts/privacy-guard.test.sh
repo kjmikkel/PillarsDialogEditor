@@ -132,10 +132,19 @@ new_repo; private 'acmesecret\n'
 staged fail "--no-private still applies the generic layer" a.txt 'C:\Users\bob\x' --no-private
 
 # --- PNG metadata ---
-png() { # png <file> <tEXt text>: a tiny PNG with one tEXt chunk (CRCs are bogus; the guard only scans bytes)
-  { printf '\211PNG\r\n\032\n'; printf '\0\0\0\15IHDR\0\0\0\1\0\0\0\1\10\2\0\0\0\220wS\336'
-    printf '\0\0\0\100tEXt'; printf 'Comment\0%s' "$2"; printf '\0\0\0\0'
-    printf '\0\0\0\0IEND\256B`\202'; } > "$1"
+mkpng() { # mkpng <file> <chunk type> <payload as a perl expression; the text is $ENV{T}>
+  # A tiny PNG with one extra chunk. Lengths are real, CRCs are zero (the guard does not check them).
+  P="$3" perl -MCompress::Zlib -e '
+    sub c { pack("N", length $_[1]) . $_[0] . $_[1] . "\0\0\0\0" }
+    my $p = eval $ENV{P}; die $@ if $@;
+    binmode STDOUT;
+    print "\x89PNG\r\n\x1a\n", c("IHDR", pack("NNC5", 1, 1, 8, 2, 0, 0, 0)), c($ARGV[0], $p), c("IEND", "")' "$2" > "$1"
+}
+png() { T="$2" mkpng "$1" tEXt '"Comment\0$ENV{T}"'; } # png <file> <tEXt text>
+pngcase() { # pngcase <pass|fail> <description> <chunk type> <payload expr> <text>
+  new_repo; T="$5" mkpng "$repo/a.png" "$3" "$4"; git -C "$repo" add a.png
+  if run --staged --no-private; then got=pass; else got=fail; fi
+  report "$1" "$2" "$got"
 }
 new_repo; png "$repo/a.png" 'saved to C:\Users\bob\Pictures\x.png'; git -C "$repo" add a.png
 if run --staged; then got=pass; else got=fail; fi
@@ -148,6 +157,16 @@ report pass "PNG with harmless metadata passes" "$got"
 new_repo; private 'acmesecret\n'; png "$repo/a.png" 'made for AcmeSecret'; git -C "$repo" add a.png
 if run --staged; then got=pass; else got=fail; fi
 report fail "PNG tEXt chunk with a private word" "$got"
+pngcase fail "PNG tEXt path on the second line of the text"  tEXt '"Comment\0$ENV{T}"' $'first line\nC:\\Users\\bob\\x'
+pngcase fail "PNG tEXt path after a non-ASCII byte"          tEXt '"Comment\0$ENV{T}"' $'caf\xc3\xa9 C:\\Users\\bob\\x'
+pngcase fail "PNG zTXt (compressed) with a user path"        zTXt '"Comment\0\0" . compress($ENV{T})' 'C:\Users\bob\x'
+pngcase fail "PNG iTXt with a user path"                     iTXt '"Comment\0\0\0en\0\0$ENV{T}"' 'C:\Users\bob\x'
+pngcase fail "PNG compressed iTXt with a user path"          iTXt '"Comment\0\1\0en\0\0" . compress($ENV{T})' 'C:\Users\bob\x'
+pngcase fail "PNG eXIf with a user path"                     eXIf '"MM\0*\0\0\0\10$ENV{T}\0"' 'C:\Users\bob\x'
+pngcase pass "PNG path bytes inside pixel data are not text" IDAT '"$ENV{T}"' 'C:\Users\bob\x'
+new_repo; private 'j\xc3\xbcrgen\n'; T=$'by J\xc3\xbcrgen' mkpng "$repo/a.png" iTXt '"Author\0\0\0\0\0$ENV{T}"'; git -C "$repo" add a.png
+if run --staged; then got=pass; else got=fail; fi
+report fail "PNG iTXt with a non-ASCII private word" "$got"
 
 # --- --range mode ---
 new_repo
