@@ -222,4 +222,4 @@ captured colourblind-1.00x
   colourblind-2.00x guided-tour
   colourblind-2.00x unsaved-changes
 captured colourblind-2.00x
-Done. Failures (if any): C:\Users\kjmik\Documents\Programming\Deadfire\Dialog Editor\docs\ui-ux\reports\2026-10-24-whole-app\shots\matrix\failures.txt
+Done. Failures (if any): <repo>\docs\ui-ux\reports\2026-10-24-whole-app\shots\matrix\failures.txt
