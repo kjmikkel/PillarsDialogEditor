@@ -2,6 +2,7 @@ using System.Reflection;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Localisation;
 using DialogEditor.Core.Logging;
+using DialogEditor.Core.Search;
 using DialogEditor.Patch;
 using DialogEditor.Patch.Install;
 using DialogEditor.Patch.Packaging;
@@ -119,8 +120,28 @@ public static class PatcherCommand
 
         // ── Parse arguments ───────────────────────────────────────────────
 
+        // Fail closed on anything flag-shaped we don't know (GitHub issue 237): a misspelled
+        // --dry-run used to be dropped, and the "dry run" then patched the game for real.
+        var unknown = args.FirstOrDefault(a => a.StartsWith('-') && !KnownFlags.Contains(a));
+        if (unknown is not null)
+        {
+            var nearest = NearestFlag(unknown);
+            Error(nearest is null
+                ? $"Unknown option '{unknown}'."
+                : $"Unknown option '{unknown}'. Did you mean {nearest}?");
+            stderr.WriteLine("Run 'dialog-patcher --help' for the list of options.");
+            return 2;
+        }
+
         var positional = args.Where(a => !a.StartsWith('-')).ToArray();
         var required   = restore ? 1 : 2;
+
+        if (restore && positional.Length > 1)
+        {
+            Error("--restore takes only <game-dir>; it undoes every mod, so it can't be combined with projects.");
+            stderr.WriteLine("Run --restore on its own, or leave it out to apply the projects.");
+            return 2;
+        }
 
         if (positional.Length < required)
         {
@@ -332,6 +353,40 @@ public static class PatcherCommand
             default:
                 return 2;
         }
+    }
+
+    // Every option the help text documents. Keep the two in step.
+    private static readonly string[] KnownFlags =
+    [
+        "--restore", "--accept-current-files", "-f", "--force", "-v", "--verbose",
+        "-q", "--quiet", "--dry-run", "--version", "-h", "--help",
+    ];
+
+    /// <summary>
+    /// The known flag the user most likely meant by <paramref name="typed"/>, or null when no
+    /// single flag is a clear match. A wrong suggestion is worse than none: suggesting --force
+    /// to someone who meant a no-op run would steer them into overwriting game files.
+    /// </summary>
+    internal static string? NearestFlag(string typed)
+    {
+        // Compare bare names with case and '_' folded, so --Verbose, --dry_run and a
+        // single-dash -dry-run all land exactly; edit distance is left for real typos.
+        static string Bare(string flag) => flag.TrimStart('-').ToLowerInvariant().Replace('_', '-');
+
+        var probe = Bare(typed);
+        // "n" is one edit from every short flag (-f, -v, -q, -h): any pick is a guess.
+        if (probe.Length < 3) return null;
+
+        var ranked = KnownFlags
+            .Where(f => f.StartsWith("--"))
+            .Select(f => (Flag: f, Dist: EditDistance.DamerauLevenshtein(probe, Bare(f))))
+            .OrderBy(c => c.Dist)
+            .ToList();
+
+        var best      = ranked[0];
+        var threshold = probe.Length <= 6 ? 1 : 2;
+        var tied      = ranked.Count > 1 && ranked[1].Dist == best.Dist;
+        return best.Dist <= threshold && !tied ? best.Flag : null;
     }
 
     private static void CleanupTempDirs(IEnumerable<string> dirs)

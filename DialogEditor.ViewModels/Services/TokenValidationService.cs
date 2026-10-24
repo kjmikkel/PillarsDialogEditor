@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using DialogEditor.Core.Search;
 
 namespace DialogEditor.ViewModels.Services;
 
@@ -158,7 +159,7 @@ public sealed class TokenValidationService
         foreach (var e in tokens)
         {
             var candidate = NormalizeDigits(e.Name);
-            var dist = DamerauLevenshtein(
+            var dist = EditDistance.DamerauLevenshtein(
                 probe.ToLowerInvariant(), candidate.ToLowerInvariant());
             // dist == 0 means a case-only mismatch (the span isn't exact-known, or
             // we would not be here) — suggest the correctly-cased token.
@@ -176,26 +177,4 @@ public sealed class TokenValidationService
 
     private static readonly Regex TrailingDigits = new(@"\d+(?=\]$)", RegexOptions.Compiled);
     private static string NormalizeDigits(string s) => TrailingDigits.Replace(s, "n");
-
-    private static int DamerauLevenshtein(string a, string b)
-    {
-        var n = a.Length;
-        var m = b.Length;
-        var d = new int[n + 1, m + 1];
-        for (var i = 0; i <= n; i++) d[i, 0] = i;
-        for (var j = 0; j <= m; j++) d[0, j] = j;
-
-        for (var i = 1; i <= n; i++)
-        for (var j = 1; j <= m; j++)
-        {
-            var cost = a[i - 1] == b[j - 1] ? 0 : 1;
-            d[i, j] = System.Math.Min(System.Math.Min(
-                d[i - 1, j] + 1,
-                d[i, j - 1] + 1),
-                d[i - 1, j - 1] + cost);
-            if (i > 1 && j > 1 && a[i - 1] == b[j - 2] && a[i - 2] == b[j - 1])
-                d[i, j] = System.Math.Min(d[i, j], d[i - 2, j - 2] + 1);
-        }
-        return d[n, m];
-    }
 }

@@ -153,4 +153,56 @@ public class PatcherCommandTests : IDisposable
     [Fact]
     public void Help_PointsExitCode4AtTheReleasesPage()
         => Assert.Contains(SchemaFormats.PatcherReleasesUrl, Run("--help").Out);
+
+    // ── Unknown flags (GitHub issue 237) ─────────────────────────────────
+    // A misspelled --dry-run used to be dropped silently, so the "dry run" patched the game.
+
+    [Theory]
+    [InlineData("--dryrun")]
+    [InlineData("-n")]
+    [InlineData("--frce")]
+    public void UnknownFlag_ExitsWith2_NamesIt_AndWritesNothing(string flag)
+    {
+        var before = _game.SnapshotGameData();
+
+        var (code, _, err) = Run(_game.Root, SaveProject(FakePoe2Game.ExternalVoMod("A", "a")), flag);
+
+        Assert.Equal(2, code);
+        Assert.Contains($"Unknown option '{flag}'", err);
+        Assert.Equal(before, _game.SnapshotGameData());
+        Assert.False(Directory.Exists(Path.Combine(_game.Root, "PillarsDialogPatcher")));
+    }
+
+    [Theory]
+    [InlineData("--dryrun",  "--dry-run")]
+    [InlineData("--dry_run", "--dry-run")]
+    [InlineData("--frce",    "--force")]
+    [InlineData("--restor",  "--restore")]
+    [InlineData("--Verbose", "--verbose")]
+    public void MisspelledFlag_SuggestsTheNearestOne(string typed, string suggested)
+        => Assert.Contains($"Did you mean {suggested}?", Run(_game.Root, typed).Err);
+
+    [Theory]
+    [InlineData("-n")]          // one letter from -f, -v, -q and -h alike: any pick is a guess
+    [InlineData("--xyzzy")]     // nothing close
+    public void UnknownFlag_WithNoClearMatch_SuggestsNothing(string typed)
+    {
+        var err = Run(_game.Root, typed).Err;
+        Assert.Contains($"Unknown option '{typed}'", err);
+        Assert.DoesNotContain("Did you mean", err);
+    }
+
+    [Fact]
+    public void Restore_WithAProject_IsAUsageError_AndRestoresNothing()
+    {
+        var a = SaveProject(FakePoe2Game.ExternalVoMod("A", "a"));
+        Run(_game.Root, a);
+        var patched = _game.SnapshotGameData();
+
+        var (code, _, err) = Run(_game.Root, a, "--restore");
+
+        Assert.Equal(2, code);
+        Assert.Contains("--restore", err);
+        Assert.Equal(patched, _game.SnapshotGameData());
+    }
 }
