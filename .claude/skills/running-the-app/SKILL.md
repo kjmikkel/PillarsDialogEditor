@@ -139,6 +139,11 @@ pane). `Get-EditorSecondaryWindows` lists every open one.
 - **Never run against the user's real project/settings.** Backup → scratch
   project → restore, every time. The `finally` block is not optional.
 - **Kill the app before restoring settings** — it writes settings on exit.
+- **Privacy mode is on by default.** `Start-DialogEditor` launches the editor with
+  `--privacy-mode` (and `Set-CaptureSettings` sets `PrivacyMode`), so screenshots and
+  logs never show your user name or folder paths. Pass `-NoPrivacyMode` only when you
+  need to see real paths, and never commit or post those captures. If you launch the
+  editor or Patcher exe directly, pass `--privacy-mode` yourself (issue #270).
 - Dialogs that need the file picker (Open/Save As) are not automatable this
   way; arrange the state via settings.json + scratch files instead.
 - One instance at a time: `Get-EditorWindow` finds the window by PID, but
