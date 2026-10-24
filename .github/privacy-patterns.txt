@@ -4,8 +4,8 @@
 # it is dropped (used for shared folders such as Public and for "..." placeholders).
 # Placeholders (%USERPROFILE%, <user>, $env:..., {0}) never match the segment class.
 # Game-store folders are deliberately absent: the docs name the default install paths.
-windows-user-path	[A-Za-z]:[\\/]+Users[\\/]+[^\\/%<>$*?"{}[:space:]]+
-windows-appdata-path	[\\/]+[^\\/%<>$*?"{}[:space:]]+[\\/]+AppData[\\/]+(Local|Roaming|LocalLow)[\\/]
+windows-user-path	[A-Za-z]:[\\/]+Users[\\/]+[^\\/%<>$*?"'`,;{}[:space:]]+
+windows-appdata-path	[\\/]+[^\\/%<>$*?"'`,;{}[:space:]]+[\\/]+AppData[\\/]+(Local|Roaming|LocalLow)[\\/]
 linux-home-path	(^|[^A-Za-z0-9_.-])/home/[A-Za-z0-9._-]+/
 macos-home-path	(^|[^A-Za-z0-9_.-])/Users/[A-Za-z0-9._-]+/
 !shared-profile	[\\/]Users[\\/]+(Public|Default|Shared|All Users)([\\/]|$)

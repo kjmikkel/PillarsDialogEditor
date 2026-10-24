@@ -62,7 +62,9 @@ generic pass "placeholder %LOCALAPPDATA%"                  a.txt 'in %LOCALAPPDA
 generic pass "placeholder %TEMP%"                          a.txt 'in %TEMP%\x'
 generic pass "placeholder <user>"                          a.txt 'C:\Users\<user>\Documents'
 generic pass "placeholder <name>"                          a.txt 'C:\Users\<name>\AppData\Local\x\'
-generic pass "placeholder \$env:"                          a.txt 'C:\Users\$env:USERNAME\x and $env:LOCALAPPDATA\AppData\Local\x'
+generic pass "placeholder name in backticks"               a.txt 'like `C:\Users\name`, or `C:\Users\Public`.'
+generic fail "quoted real name still caught"               a.txt "like 'C:\\Users\\bob' here"
+generic pass "placeholder \$env:"                         a.txt 'C:\Users\$env:USERNAME\x and $env:LOCALAPPDATA\AppData\Local\x'
 generic pass "placeholder ellipsis"                        a.txt 'C:\Users\...\x and C:\Users\…\x'
 generic pass "C:\\Users\\Public is shared"                 a.txt 'C:\Users\Public\Documents'
 generic pass "home-relative AppData"                       a.txt '~/AppData/Local/x and $HOME/AppData/Roaming/y'
