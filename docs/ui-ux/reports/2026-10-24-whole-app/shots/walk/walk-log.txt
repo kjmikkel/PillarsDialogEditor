@@ -1,0 +1,13 @@
+firstrun secondary windows: 
+firstrun after Esc secondary: 
+firstrun title: Choose a Theme status: 
+step firstrun done
+reader title: Pillars Dialog Editor status: Pillars of Eternity II: Deadfire | Node Details | Condition search | Pillars of Eternity II: Deadfire — C:\Users\kjmik\AppData\Local\Temp\PillarsDialogEditor.uxwalk\game\
+reader conv status: Pillars of Eternity II: Deadfire | Node Details | Condition search | Viewing only — open or create a project (File › New Project) to start editing.
+reader detail edits: 
+step reader FAILED: You cannot call a method on a null-valued expression. @ 93
+kbd after F6 focused: Pin pane status: Pillars of Eternity II: Deadfire | Node Details | Condition search | Viewing only — open or create a project (File › New Project) to start editing. secondary: 
+kbd after Alt+F focused: File [ControlType.MenuItem]
+kbd settings closed by Esc: False
+step keyboard done
+restored settings + layout
