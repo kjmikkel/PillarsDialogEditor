@@ -64,20 +64,25 @@ while IFS= read -r f; do
   case "$(printf '%s' "$f" | tr 'A-Z' 'a-z')" in *.png) png+=("$f") ;; esac
 done < <(gd --name-only)
 for f in "${png[@]+"${png[@]}"}"; do
-  # Text chunks are stored as readable bytes (zTXt is compressed and is not seen).
-  blob "$f" 2>/dev/null | LC_ALL=C grep -a -o -E '[[:print:]]{6,}' | while IFS= read -r s; do
-    printf '%s\t0\n' "$f" >> "$meta"; printf '%s\n' "$s" >> "$texts"
-  done
+  # Only the tEXt/iTXt chunks: each starts with its 4-byte type, then readable
+  # keyword and text (zTXt is compressed and is not seen). Matching any printable
+  # run instead would also pick up thousands of random runs from the compressed
+  # pixel data — slow, and a source of false positives.
+  # The keyword and text are separated by NUL bytes, so turn those into spaces first.
+  blob "$f" 2>/dev/null | LC_ALL=C tr '\000' ' ' | LC_ALL=C grep -a -o -E '(tEXt|iTXt)[[:print:]]{4,}' \
+    | LC_ALL=C awk -v f="$f" -v mf="$meta" -v tf="$texts" '{ print f "\t0" >> mf; print substr($0, 5) >> tf }'
 done
 
-# Drop records for skipped files and for lines carrying the opt-out marker.
-: > "$work/m2"; : > "$work/t2"
-while IFS= read -r m && IFS= read -r t <&3; do
-  f=${m%%$'\t'*}
-  if printf '%s' "$f" | grep -qE "$skip"; then continue; fi
-  case "$t" in *"privacy-guard: allow"*) continue ;; esac
-  printf '%s\n' "$m" >> "$work/m2"; printf '%s\n' "$t" >> "$work/t2"
-done < "$meta" 3< "$texts"
+# Drop records for skipped files and for lines carrying the opt-out marker,
+# in one pass (a per-record loop forks a process per line: minutes on a big diff).
+# The regex goes through the environment: awk -v would eat its backslashes.
+SKIP="$skip" awk -v mo="$work/m2" -v to="$work/t2" '
+  NR == FNR { t[FNR] = $0; next }
+  { f = $0; sub(/\t.*$/, "", f)
+    if (f ~ ENVIRON["SKIP"] || index(t[FNR], "privacy-guard: allow")) next
+    print $0 > mo; print t[FNR] > to }
+' "$texts" "$meta"
+touch "$work/m2" "$work/t2"
 meta="$work/m2"; texts="$work/t2"
 
 # Private words, if the file exists and has entries.
