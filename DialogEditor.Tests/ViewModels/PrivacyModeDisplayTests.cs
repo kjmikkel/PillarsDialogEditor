@@ -24,7 +24,7 @@ public class PrivacyModeDisplayTests : IDisposable
         PrivacyMode.ResetForTests();
         var path = AppSettings.SettingsPathOverride;
         AppSettings.SettingsPathOverride = null;
-        if (path is not null && File.Exists(path)) File.Delete(path);
+        if (path is not null) try { File.Delete(path); } catch { /* best-effort */ }
     }
 
     // ── Settings window ───────────────────────────────────────────────────
@@ -89,7 +89,7 @@ public class PrivacyModeDisplayTests : IDisposable
             await vm.SaveLoadOrderCommand.ExecuteAsync(null);
             Assert.Equal(Game, PatchListSerializer.LoadFromFile(file).GameFolder);
         }
-        finally { if (File.Exists(file)) File.Delete(file); }
+        finally { try { File.Delete(file); } catch { /* best-effort */ } }
     }
 
     [Fact]

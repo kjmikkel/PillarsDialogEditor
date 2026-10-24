@@ -30,14 +30,20 @@ public static class PrivacyMode
     /// Subscribes without rooting <paramref name="owner"/>: the view-models that mask paths
     /// have no dispose path, and a plain static-event subscription would keep every one of
     /// them alive. The handler unhooks itself once the owner has been collected.
+    /// It runs on the subscriber's synchronization context: the owner is usually bound to
+    /// UI controls, and Changed is static, so it may be raised from any thread. Calling
+    /// the owner from there is a cross-thread binding update, which silently stopped
+    /// layout for the rest of a headless test run.
     public static void WeakSubscribe<T>(T owner, Action<T> onChanged) where T : class
     {
         var weak = new WeakReference<T>(owner);
+        var context = SynchronizationContext.Current;
         EventHandler? handler = null;
         handler = (_, _) =>
         {
-            if (weak.TryGetTarget(out var target)) onChanged(target);
-            else Changed -= handler;
+            if (!weak.TryGetTarget(out var target)) { Changed -= handler; return; }
+            if (context is null || context == SynchronizationContext.Current) onChanged(target);
+            else context.Post(_ => onChanged(target), null);
         };
         Changed += handler;
     }

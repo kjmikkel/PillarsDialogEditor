@@ -17,7 +17,7 @@ public class PrivacyModeTests : IDisposable
         PrivacyMode.ResetForTests();
         var path = AppSettings.SettingsPathOverride;
         AppSettings.SettingsPathOverride = null;
-        if (path is not null) File.Delete(path);
+        if (path is not null) try { File.Delete(path); } catch { /* best-effort */ }
     }
 
     [Fact]
@@ -134,7 +134,7 @@ public class PrivacyModeWeakSubscribeTests : IDisposable
         PrivacyMode.ResetForTests();
         var path = AppSettings.SettingsPathOverride;
         AppSettings.SettingsPathOverride = null;
-        if (path is not null) File.Delete(path);
+        if (path is not null) try { File.Delete(path); } catch { /* best-effort */ }
     }
 
     private sealed class Owner { public int Calls; }
@@ -163,5 +163,35 @@ public class PrivacyModeWeakSubscribeTests : IDisposable
             PrivacyMode.WeakSubscribe(o, x => x.Calls++);
             return new WeakReference<Owner>(o);
         }
+    }
+
+    // Records posted callbacks instead of running them, standing in for a UI thread's context.
+    private sealed class QueueContext : SynchronizationContext
+    {
+        public readonly Queue<(SendOrPostCallback Cb, object? State)> Posted = new();
+        public override void Post(SendOrPostCallback d, object? state) => Posted.Enqueue((d, state));
+    }
+
+    [Fact]
+    public void WeakSubscribe_RaisedFromAnotherContext_PostsToTheSubscribersContext()
+    {
+        // A view-model subscribed on the UI thread must not be called from whichever thread
+        // flips the switch: that is a cross-thread binding update (it broke headless layout).
+        var ui = new QueueContext();
+        var owner = new Owner();
+        var previous = SynchronizationContext.Current;
+        try
+        {
+            SynchronizationContext.SetSynchronizationContext(ui);
+            PrivacyMode.WeakSubscribe(owner, o => o.Calls++);
+        }
+        finally { SynchronizationContext.SetSynchronizationContext(previous); }
+
+        Task.Run(() => PrivacyMode.SetPersisted(true)).Wait();
+
+        Assert.Equal(0, owner.Calls);
+        var (cb, state) = Assert.Single(ui.Posted);
+        cb(state);
+        Assert.Equal(1, owner.Calls);
     }
 }
