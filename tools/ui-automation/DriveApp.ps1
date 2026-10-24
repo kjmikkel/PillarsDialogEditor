@@ -141,11 +141,16 @@ function Start-DialogEditor {
     # Launches the built exe and waits for the main window. Returns the Process.
     param(
         [Parameter(Mandatory)][string]$RepoRoot,
-        [int]$StartupSeconds = 6
+        [int]$StartupSeconds = 6,
+        # Runs start with --privacy-mode (issue 270) so screenshots and logs never carry
+        # the user's name or folder locations; pass this to see real paths.
+        [switch]$NoPrivacyMode
     )
     $exe = "$RepoRoot\DialogEditor.Avalonia\bin\Debug\net10.0\DialogEditor.Avalonia.exe"
     if (-not (Test-Path $exe)) { throw "Not built: $exe — run 'dotnet build' first." }
-    $p = Start-Process $exe -PassThru
+    $startArgs = @{ FilePath = $exe; PassThru = $true }
+    if (-not $NoPrivacyMode) { $startArgs.ArgumentList = '--privacy-mode' }
+    $p = Start-Process @startArgs
     Start-Sleep -Seconds $StartupSeconds
     $p.Refresh()
     if ($p.HasExited) { throw "Dialog Editor exited during startup." }

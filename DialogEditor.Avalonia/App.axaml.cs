@@ -57,6 +57,8 @@ public partial class App : Application
                 Dispatcher.UIThread.Post(() => ShowExceptionReport(e.Exception));
             };
             Loc.Configure(new AvaloniaStringProvider());
+            // --privacy-mode: hide private paths for this run only (issue 270); not saved.
+            if (LaunchArgs.HasPrivacyMode(desktop.Args)) PrivacyMode.ForceOnForSession();
             // Apply the persisted theme before the first window is shown (overrides the
             // design-time Dark default baked into App.axaml).
             new ThemeApplier().Apply(AppSettings.Theme);

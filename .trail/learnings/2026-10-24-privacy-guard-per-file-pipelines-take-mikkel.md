@@ -19,4 +19,4 @@ touches:
 - grep for `(tEXt|iTXt)` followed by printable bytes: stops at the NUL between keyword and text, at newlines and at non-ASCII bytes, and never sees compressed zTXt/iTXt. The tests passed vacuously until cases for each gap were added.
 ## Watch out
 - In awk, `print > file` truncates on the program's first open of that file; a second awk appending to files the first one wrote must use `>>`.
-- The privacy-guard test suite takes ~4 minutes on Windows; running it alongside `dotnet test` made 6 headless-render tests fail from CPU load (they pass on rerun).
+- The privacy-guard test suite takes ~4 minutes on Windows; run it in the background.

@@ -44,8 +44,20 @@
         <TextBlock Grid.Row="0" Classes="section-label"
                    Text="{DynamicResource PatchManager_GameFolder}"/>
         <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+            <!-- Privacy mode (issue 270): while on, the editable box (bound TwoWay to the real
+                 GameFolder) is hidden and a read-only twin shows the masked GameFolderDisplay,
+                 so masked text can never be typed or written back into GameFolder. -->
             <TextBox Grid.Column="0" Classes="path-box"
+                     IsVisible="{Binding !IsPrivacyMode}"
                      Text="{Binding GameFolder}"
+                     Watermark="{DynamicResource PatchManager_GameFolderWatermark}"
+                     ToolTip.Tip="{DynamicResource ToolTip_BrowseGameFolder}"
+                     AutomationProperties.HelpText="{DynamicResource ToolTip_BrowseGameFolder}"
+                     AutomationProperties.Name="{DynamicResource PatchManager_GameFolder}"/>
+            <TextBox Grid.Column="0" Classes="path-box"
+                     IsVisible="{Binding IsPrivacyMode}"
+                     IsReadOnly="True"
+                     Text="{Binding GameFolderDisplay, Mode=OneWay}"
                      Watermark="{DynamicResource PatchManager_GameFolderWatermark}"
                      ToolTip.Tip="{DynamicResource ToolTip_BrowseGameFolder}"
                      AutomationProperties.HelpText="{DynamicResource ToolTip_BrowseGameFolder}"

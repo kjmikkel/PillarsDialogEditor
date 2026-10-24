@@ -53,7 +53,7 @@
                             ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}"
                             AutomationProperties.HelpText="{DynamicResource Settings_BackupDirectoryTooltip}"/>
                     <TextBox Classes="path"
-                             Text="{Binding BackupDirectory}"
+                             Text="{Binding BackupDirectoryDisplay, Mode=OneWay}"
                              Watermark="{DynamicResource Settings_PathNotSet}"
                              ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}"
                              AutomationProperties.HelpText="{DynamicResource Settings_BackupDirectoryTooltip}"

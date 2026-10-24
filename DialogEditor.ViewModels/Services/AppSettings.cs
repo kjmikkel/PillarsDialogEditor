@@ -59,6 +59,9 @@ public static class AppSettings
         // this only persists the value; FontScaleApplier applies it once at the next
         // launch, so already-open windows are unaffected until restart.
         public double FontScale                      { get; set; } = 1.0;
+        // Privacy mode (issue 270): mask user names / folder locations in displayed paths
+        // so screenshots and screen shares don't reveal them. Display-only; default off.
+        public bool PrivacyMode                      { get; set; }
         // Whether the first-run theme-onboarding dialog (Gaps item 15) has been shown.
         // Defaults to true so that EXISTING installs upgrading to this version (whose
         // settings.json predates this field) silently treat onboarding as already-seen —
@@ -278,6 +281,12 @@ public static class AppSettings
     {
         get => Load().FontScale;
         set { var s = Load(); s.FontScale = value; Save(s); }
+    }
+
+    public static bool PrivacyMode
+    {
+        get => Load().PrivacyMode;
+        set { var s = Load(); s.PrivacyMode = value; Save(s); }
     }
 
     /// Reading speed (words per minute) used to turn path-stats word counts into m:ss.

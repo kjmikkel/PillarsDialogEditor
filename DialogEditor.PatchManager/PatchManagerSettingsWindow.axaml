@@ -33,6 +33,18 @@
             <shared:LanguagePickerView x:Name="LanguagePicker"/>
         </StackPanel>
 
+        <!-- Privacy (issue 270) -->
+        <StackPanel Spacing="8">
+            <TextBlock Classes="sectionHeader" Text="{DynamicResource Settings_PrivacySection}"/>
+            <CheckBox x:Name="PrivacyCheck"
+                      Content="{DynamicResource Settings_PrivacyMode}"
+                      ToolTip.Tip="{DynamicResource Settings_PrivacyModeTooltip}"
+                      AutomationProperties.HelpText="{DynamicResource Settings_PrivacyModeTooltip}"
+                      AutomationProperties.AutomationId="Settings_PrivacyMode"
+                      AutomationProperties.Name="{DynamicResource Settings_PrivacyMode}"
+                      IsCheckedChanged="PrivacyCheck_Changed"/>
+        </StackPanel>
+
         <!-- Close -->
         <Button Classes="secondary" Content="{DynamicResource Settings_Close}"
                 HorizontalAlignment="Right"

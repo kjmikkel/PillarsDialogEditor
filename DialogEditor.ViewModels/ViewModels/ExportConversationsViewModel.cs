@@ -86,7 +86,7 @@ public partial class ExportConversationsViewModel : ObservableObject
                     exporter.FileExtension.TrimStart('.').ToUpperInvariant());
                 if (path is null) return;
                 exporter.Export(new ConversationExport(item.Name, _nodesFetch(item.Name)), path);
-                StatusText = Loc.FormatCount("Status_ExportConversationsSaved", 1, path);
+                StatusText = Loc.FormatCount("Status_ExportConversationsSaved", 1, PathDisplay.ForDisplay(path));
             }
             else
             {
@@ -98,7 +98,7 @@ public partial class ExportConversationsViewModel : ObservableObject
                     exporter.Export(
                         new ConversationExport(item.Name, _nodesFetch(item.Name)), path);
                 }
-                StatusText = Loc.FormatCount("Status_ExportConversationsSaved", selected.Count, folder);
+                StatusText = Loc.FormatCount("Status_ExportConversationsSaved", selected.Count, PathDisplay.ForDisplay(folder));
             }
         }
         catch (Exception ex)
