@@ -1,0 +1,15 @@
+# Generic privacy patterns, scanned by .github/scripts/privacy-guard.sh.
+# Format: <rule-name><TAB><extended regex>. Blank lines and # comments are ignored.
+# A rule name starting with ! is an allow rule: a hit whose matched text also matches
+# it is dropped (used for shared folders such as Public and for "..." placeholders).
+# Placeholders (%USERPROFILE%, <user>, $env:..., {0}) never match the segment class.
+# Game-store folders are deliberately absent: the docs name the default install paths.
+windows-user-path	[A-Za-z]:[\\/]+Users[\\/]+[^\\/%<>$*?"{}[:space:]]+
+windows-appdata-path	[\\/]+[^\\/%<>$*?"{}[:space:]]+[\\/]+AppData[\\/]+(Local|Roaming|LocalLow)[\\/]
+linux-home-path	(^|[^A-Za-z0-9_.-])/home/[A-Za-z0-9._-]+/
+macos-home-path	(^|[^A-Za-z0-9_.-])/Users/[A-Za-z0-9._-]+/
+!shared-profile	[\\/]Users[\\/]+(Public|Default|Shared|All Users)([\\/]|$)
+!placeholder-name	[\\/]Users[\\/]+(user|username|yourname|your-name|name|you)([\\/]|$)
+!ellipsis-placeholder	[\\/]Users[\\/]+(\.\.\.|…)
+!ellipsis-appdata	[\\/]+(\.\.\.|…)[\\/]+AppData
+!ci-home	/home/(runner|user|username|name)/
