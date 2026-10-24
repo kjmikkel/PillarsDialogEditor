@@ -1,4 +1,4 @@
-narrator windows: 
+narrator windows:
 narrator tab walk (UIA focus = what Narrator reads):
   1 'Clear filter' [button] help='Clear filter'
   2 'canonical' [tree view item] help=''

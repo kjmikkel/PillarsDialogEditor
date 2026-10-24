@@ -5,7 +5,7 @@ kbd after Enter -> DEFAULT / MALE TEXT [Edit] id=DefaultTextBox
 edits on screen: 'Filter conversations…'@5; 'Search nodes…'@555; 'DEFAULT / MALE TEXT'@1470; 'FEMALE TEXT'@1470; ''@1832; 'Target node ID…'@1470
 detail 'DEFAULT / MALE TEXT' enabled=True readonly=False before='Take the scripted path.'
 detail after typing='Take the scripted path. TYPO' title='canonical'
-after Ctrl+S secondary: 
+after Ctrl+S secondary:
 game folder changed after typing/Ctrl+S/F5: False
 settings opened, focused: Settings [Window] id=
 settings tab order:
