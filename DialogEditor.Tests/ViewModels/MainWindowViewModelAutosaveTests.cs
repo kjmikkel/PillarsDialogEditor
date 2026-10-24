@@ -89,7 +89,7 @@ public class MainWindowViewModelAutosaveTests : IDisposable
         File.SetLastWriteTimeUtc(fallback, DateTime.UtcNow.AddMinutes(-1));
         var vm = MakeVm();
         bool? offeredFallback = null;
-        vm.ConfirmRestoreAutosave = gens => { offeredFallback = gens[0].IsFallback; return Task.FromResult<AutosaveGeneration?>(gens[0]); };
+        vm.ConfirmRestoreAutosave = gens => { offeredFallback = gens[0].IsFallback; return Task.FromResult(AutosaveDecision.Restore(gens[0])); };
 
         await InvokeLoadProjectAsync(vm, _projectPath);
 
@@ -103,7 +103,7 @@ public class MainWindowViewModelAutosaveTests : IDisposable
         WriteProjectAndNewerSidecar();
         var vm = MakeVm();
         bool? offeredFallback = null;
-        vm.ConfirmRestoreAutosave = gens => { offeredFallback = gens[0].IsFallback; return Task.FromResult<AutosaveGeneration?>(null); };
+        vm.ConfirmRestoreAutosave = gens => { offeredFallback = gens[0].IsFallback; return Task.FromResult(AutosaveDecision.Discard); };
 
         await InvokeLoadProjectAsync(vm, _projectPath);
 
@@ -130,7 +130,7 @@ public class MainWindowViewModelAutosaveTests : IDisposable
         WriteProjectAndTwoGenerations();
         var vm = MakeVm();
         IReadOnlyList<AutosaveGeneration>? offered = null;
-        vm.ConfirmRestoreAutosave = gens => { offered = gens; return Task.FromResult<AutosaveGeneration?>(null); };
+        vm.ConfirmRestoreAutosave = gens => { offered = gens; return Task.FromResult(AutosaveDecision.Discard); };
 
         await InvokeLoadProjectAsync(vm, _projectPath);
 
@@ -144,7 +144,7 @@ public class MainWindowViewModelAutosaveTests : IDisposable
     {
         WriteProjectAndTwoGenerations();
         var vm = MakeVm();
-        vm.ConfirmRestoreAutosave = gens => Task.FromResult<AutosaveGeneration?>(gens[1]);
+        vm.ConfirmRestoreAutosave = gens => Task.FromResult(AutosaveDecision.Restore(gens[1]));
 
         await InvokeLoadProjectAsync(vm, _projectPath);
 
@@ -258,7 +258,7 @@ public class MainWindowViewModelAutosaveTests : IDisposable
     {
         WriteProjectAndNewerSidecar();
         var vm = MakeVm();
-        vm.ConfirmRestoreAutosave = gens => Task.FromResult<AutosaveGeneration?>(gens[0]);
+        vm.ConfirmRestoreAutosave = gens => Task.FromResult(AutosaveDecision.Restore(gens[0]));
 
         await InvokeLoadProjectAsync(vm, _projectPath);
 
@@ -272,12 +272,45 @@ public class MainWindowViewModelAutosaveTests : IDisposable
     {
         WriteProjectAndNewerSidecar();
         var vm = MakeVm();
-        vm.ConfirmRestoreAutosave = _ => Task.FromResult<AutosaveGeneration?>(null);
+        vm.ConfirmRestoreAutosave = _ => Task.FromResult(AutosaveDecision.Discard);
 
         await InvokeLoadProjectAsync(vm, _projectPath);
 
         Assert.Equal("Saved", vm.CurrentProjectName);
         Assert.False(File.Exists(AutosaveRecovery.SidecarPath(_projectPath)));
+    }
+
+    // Issue 236: "decide later" (Esc) must not open the saved file either. Saving would delete
+    // the recovery copies and every autosave tick rotates them, so the only safe "later" is to
+    // leave the project closed and offer the copies again next time it is opened.
+    [Fact]
+    public async Task Open_NewerSidecar_Later_DoesNotOpen_KeepsSidecar_AndSaysSo()
+    {
+        WriteProjectAndNewerSidecar();
+        var vm = MakeVm();
+        var before = vm.CurrentProjectName;
+        vm.ConfirmRestoreAutosave = _ => Task.FromResult(AutosaveDecision.Later);
+
+        await InvokeLoadProjectAsync(vm, _projectPath);
+
+        Assert.Equal(before, vm.CurrentProjectName);
+        Assert.False(vm.IsModified);
+        Assert.True(File.Exists(AutosaveRecovery.SidecarPath(_projectPath)));
+        Assert.Contains("Status_AutosaveKeptNotOpened", vm.StatusText);
+    }
+
+    [Fact]
+    public async Task Open_NewerSidecar_Later_IsOfferedAgainOnTheNextOpen()
+    {
+        WriteProjectAndNewerSidecar();
+        var vm = MakeVm();
+        var offers = 0;
+        vm.ConfirmRestoreAutosave = _ => { offers++; return Task.FromResult(AutosaveDecision.Later); };
+
+        await InvokeLoadProjectAsync(vm, _projectPath);
+        await InvokeLoadProjectAsync(vm, _projectPath);
+
+        Assert.Equal(2, offers);
     }
 
     [Fact]
@@ -290,7 +323,7 @@ public class MainWindowViewModelAutosaveTests : IDisposable
         File.SetLastWriteTimeUtc(_projectPath, DateTime.UtcNow.AddMinutes(-1));
         var vm = MakeVm();
         var consulted = false;
-        vm.ConfirmRestoreAutosave = _ => { consulted = true; return Task.FromResult<AutosaveGeneration?>(null); };
+        vm.ConfirmRestoreAutosave = _ => { consulted = true; return Task.FromResult(AutosaveDecision.Discard); };
 
         await InvokeLoadProjectAsync(vm, _projectPath);
 

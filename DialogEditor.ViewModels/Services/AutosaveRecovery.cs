@@ -17,6 +17,22 @@ public sealed record AutosaveCheckResult(
 /// per-user fallback folder (issue 37) rather than next to the project.
 public sealed record AutosaveGeneration(string Path, DateTime TimeUtc, bool IsFallback);
 
+/// What the user chose on the crash-recovery offer. Later is the safe default (issue 236): it
+/// is what Esc and closing the window mean, and it keeps every copy. Discard is the only
+/// choice that deletes them, so it is never what a reflexive dismissal produces.
+public abstract record AutosaveDecision
+{
+    private AutosaveDecision() { }
+
+    public static readonly AutosaveDecision Later   = new LaterChoice();
+    public static readonly AutosaveDecision Discard = new DiscardChoice();
+    public static AutosaveDecision Restore(AutosaveGeneration copy) => new RestoreChoice(copy);
+
+    public sealed record RestoreChoice(AutosaveGeneration Copy) : AutosaveDecision;
+    private sealed record LaterChoice : AutosaveDecision;
+    private sealed record DiscardChoice : AutosaveDecision;
+}
+
 /// Pure decisions about the autosave sidecar (`<project>.dialogproject.autosave`):
 /// where it lives, whether it holds newer work than the saved project, and
 /// best-effort deletion. Never throws — IO problems degrade to None + a warning.

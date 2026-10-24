@@ -1015,11 +1015,12 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     /// Seam for the autosave restore offer. Gets every autosave copy, newest first (issue 36;
-    /// each says whether it is the per-user fallback copy, issue 37), and returns the copy to
-    /// restore, or null to discard them. Null in unit tests that don't exercise it — a newer
+    /// each says whether it is the per-user fallback copy, issue 37), and returns the user's
+    /// decision: restore one copy, discard them all, or decide later, which leaves the project
+    /// closed and every copy in place (issue 236). Null in unit tests that don't exercise it — a newer
     /// sidecar is then left untouched (never destroy recovery data because no dialog was
     /// wired) and the saved file loads normally. The View wires AutosaveRestoreDialog.
-    public Func<IReadOnlyList<AutosaveGeneration>, Task<AutosaveGeneration?>>? ConfirmRestoreAutosave { get; set; }
+    public Func<IReadOnlyList<AutosaveGeneration>, Task<AutosaveDecision>>? ConfirmRestoreAutosave { get; set; }
 
     private async Task LoadProjectAsync(string path, bool offerDeferred)
     {
@@ -1037,8 +1038,16 @@ public partial class MainWindowViewModel : ObservableObject
             var generations = AutosaveRecovery.ListGenerations(path);
             if (generations.Count == 0)
                 generations = [new AutosaveGeneration(recovery.SidecarPath, recovery.SidecarTimeUtc!.Value, recovery.IsFallback)];
-            var chosen = await ConfirmRestoreAutosave(generations);
-            if (chosen is not null)
+            var decision = await ConfirmRestoreAutosave(generations);
+            if (decision == AutosaveDecision.Later)
+            {
+                // Issue 236: leave the project closed. Opening the saved file instead would put
+                // the copies at risk: saving deletes them and each autosave tick rotates them.
+                // Nothing is touched, so the next open (or launch) offers them again.
+                StatusText = Loc.Format("Status_AutosaveKeptNotOpened", Path.GetFileName(path));
+                return;
+            }
+            if (decision is AutosaveDecision.RestoreChoice { Copy: var chosen })
             {
                 try
                 {
@@ -1062,7 +1071,7 @@ public partial class MainWindowViewModel : ObservableObject
             }
             else
             {
-                AutosaveRecovery.TryDelete(path);    // user declined — respect it
+                AutosaveRecovery.TryDelete(path);    // confirmed Discard — respect it
             }
         }
 
