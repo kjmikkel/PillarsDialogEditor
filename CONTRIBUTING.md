@@ -100,6 +100,11 @@ cleanup code may ignore failures.
 
 Every new `Window` sets `Icon="avares://DialogEditor.Avalonia/Assets/app.ico"`.
 
+### Keep local paths and private words out
+
+The repository is public. Install the pre-commit guard with `bash tools/privacy/install-hook.sh`;
+see [docs/privacy-guard.md](docs/privacy-guard.md).
+
 ### Changelog
 
 Don't edit `CHANGELOG.md`. Release notes are written when a version is released.
