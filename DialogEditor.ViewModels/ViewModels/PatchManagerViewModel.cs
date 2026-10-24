@@ -75,6 +75,11 @@ public partial class PatchManagerViewModel : ObservableObject
     {
         _folderPicker = folderPicker;
         _filePicker   = filePicker;
+        PrivacyMode.WeakSubscribe(this, vm =>
+        {
+            vm.OnPropertyChanged(nameof(IsPrivacyMode));
+            vm.OnPropertyChanged(nameof(GameFolderDisplay));
+        });
         Entries.CollectionChanged += (_, _) =>
         {
             OnPropertyChanged(nameof(HasEntries));
@@ -426,7 +431,19 @@ public partial class PatchManagerViewModel : ObservableObject
 
     // ── Backup status ─────────────────────────────────────────────────────
 
-    partial void OnGameFolderChanged(string value) => RefreshBackupStatus();
+    partial void OnGameFolderChanged(string value)
+    {
+        OnPropertyChanged(nameof(GameFolderDisplay));
+        RefreshBackupStatus();
+    }
+
+    /// True while privacy mode hides paths (issue #270): the view then shows the read-only
+    /// GameFolderDisplay box instead of the editable GameFolder one.
+    public bool IsPrivacyMode => PrivacyMode.IsOn;
+
+    /// GameFolder masked for display. Display-only — the stored GameFolder (and so the
+    /// saved .patchlist and every install) always keeps the real path.
+    public string GameFolderDisplay => PathDisplay.ForDisplay(GameFolder) ?? string.Empty;
 
     partial void OnStatusTextChanged(string value) => ShowGetLatestPatcher = false;
 

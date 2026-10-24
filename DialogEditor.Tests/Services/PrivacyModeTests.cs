@@ -117,3 +117,48 @@ public class PrivacyModeTests : IDisposable
         Assert.Equal(@"…\b", PathDisplay.ForDisplay(@"D:\a\b"));
     }
 }
+
+public class PrivacyModeWeakSubscribeTests : IDisposable
+{
+    public PrivacyModeWeakSubscribeTests()
+    {
+        AppSettings.SettingsPathOverride = Path.GetTempFileName();
+        PrivacyMode.ResetForTests();
+    }
+
+    public void Dispose()
+    {
+        PrivacyMode.ResetForTests();
+        var path = AppSettings.SettingsPathOverride;
+        AppSettings.SettingsPathOverride = null;
+        if (path is not null) File.Delete(path);
+    }
+
+    private sealed class Owner { public int Calls; }
+
+    [Fact]
+    public void WeakSubscribe_InvokesWithOwner_WhenChanged()
+    {
+        var owner = new Owner();
+        PrivacyMode.WeakSubscribe(owner, o => o.Calls++);
+        PrivacyMode.SetPersisted(true);
+        Assert.Equal(1, owner.Calls);
+        GC.KeepAlive(owner);
+    }
+
+    [Fact]
+    public void WeakSubscribe_DoesNotRootTheOwner()
+    {
+        var weak = Subscribe();
+        for (var i = 0; i < 3; i++) { GC.Collect(); GC.WaitForPendingFinalizers(); }
+        Assert.False(weak.TryGetTarget(out _));
+        PrivacyMode.SetPersisted(true);   // must not throw on the dead subscription
+
+        static WeakReference<Owner> Subscribe()
+        {
+            var o = new Owner();
+            PrivacyMode.WeakSubscribe(o, x => x.Calls++);
+            return new WeakReference<Owner>(o);
+        }
+    }
+}

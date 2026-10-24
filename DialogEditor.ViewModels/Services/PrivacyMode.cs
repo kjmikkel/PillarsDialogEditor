@@ -27,5 +27,20 @@ public static class PrivacyMode
         Changed?.Invoke(null, EventArgs.Empty);
     }
 
+    /// Subscribes without rooting <paramref name="owner"/>: the view-models that mask paths
+    /// have no dispose path, and a plain static-event subscription would keep every one of
+    /// them alive. The handler unhooks itself once the owner has been collected.
+    public static void WeakSubscribe<T>(T owner, Action<T> onChanged) where T : class
+    {
+        var weak = new WeakReference<T>(owner);
+        EventHandler? handler = null;
+        handler = (_, _) =>
+        {
+            if (weak.TryGetTarget(out var target)) onChanged(target);
+            else Changed -= handler;
+        };
+        Changed += handler;
+    }
+
     internal static void ResetForTests() => _sessionForced = false;
 }

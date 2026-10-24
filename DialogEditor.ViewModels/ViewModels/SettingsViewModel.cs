@@ -19,6 +19,12 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private int    _selectedAutosaveInterval;
     [ObservableProperty] private int    _selectedAutosaveGenerations;
 
+    /// What the read-only backup-directory box shows: BackupDirectory, masked while privacy
+    /// mode is on (issue #270). Display-only — BackupDirectory itself is never masked.
+    public string BackupDirectoryDisplay => PathDisplay.ForDisplay(BackupDirectory) ?? string.Empty;
+
+    partial void OnBackupDirectoryChanged(string value) => OnPropertyChanged(nameof(BackupDirectoryDisplay));
+
     /// Preset font-scale multipliers offered in Settings.
     public IReadOnlyList<double> FontScaleOptions { get; } = [1.0, 1.25, 1.5, 1.75, 2.0];
 
@@ -51,6 +57,7 @@ public partial class SettingsViewModel : ObservableObject
         _localizationFormat = AppSettings.DefaultLocalizationFormat;
         _selectedFontScale  = AppSettings.FontScale;
         _autosaveScheduler  = autosaveScheduler ?? new NullAutosaveScheduler();
+        PrivacyMode.WeakSubscribe(this, vm => vm.OnPropertyChanged(nameof(BackupDirectoryDisplay)));
         _selectedAutosaveInterval    = AppSettings.AutosaveIntervalSeconds;
         _selectedAutosaveGenerations = AppSettings.AutosaveGenerations;
     }
