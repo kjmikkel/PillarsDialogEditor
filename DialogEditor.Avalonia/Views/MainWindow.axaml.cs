@@ -169,7 +169,7 @@ public partial class MainWindow : Window
         };
         // Recent Projects: missing-file remove-offer dialog (Task 4/5).
         vm.ConfirmRemoveMissingProject = path =>
-            new RecentProjectMissingDialog(Loc.Format("RecentMissing_Message", path)).ShowDialogAsync(this);
+            new RecentProjectMissingDialog(Loc.Format("RecentMissing_Message", PathDisplay.ForDisplay(path))).ShowDialogAsync(this);
 
         var audioPlayer = new VoAudioPlayer();
         vm.Detail.Player = audioPlayer;
@@ -933,7 +933,7 @@ public partial class MainWindow : Window
         try
         {
             UiStringExportService.Export(streams, path);
-            vm.StatusText = Loc.Format("UiExport_Success", path);
+            vm.StatusText = Loc.Format("UiExport_Success", PathDisplay.ForDisplay(path));
         }
         catch (Exception ex)
         {
@@ -970,7 +970,7 @@ public partial class MainWindow : Window
         try
         {
             UiStringImportService.Import(csvPath, lang, outputDir);
-            vm.StatusText = Loc.Format("UiImport_Success", lang, outputDir);
+            vm.StatusText = Loc.Format("UiImport_Success", lang, PathDisplay.ForDisplay(outputDir));
         }
         catch (Exception ex)
         {
@@ -994,7 +994,7 @@ public partial class MainWindow : Window
         try
         {
             await VoPackExporter.ExportAsync(vm.ProjectPath, outputPath);
-            vm.StatusText = Loc.Format("Status_ExportModBundleSuccess", outputPath);
+            vm.StatusText = Loc.Format("Status_ExportModBundleSuccess", PathDisplay.ForDisplay(outputPath));
         }
         catch (OperationCanceledException)
         {

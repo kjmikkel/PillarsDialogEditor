@@ -303,7 +303,7 @@ public partial class PatchManagerViewModel : ObservableObject
         {
             foreach (var e in loaded) DeleteTempDir(e.TempDir);
             AppLog.Error($"Failed to load load order '{path}'", ex);
-            StatusText = Loc.Format("PatchManager_LoadError", path, ex.Message);
+            StatusText = Loc.Format("PatchManager_LoadError", PathDisplay.ForDisplay(path), ex.Message);
         }
     }
 
@@ -362,15 +362,15 @@ public partial class PatchManagerViewModel : ObservableObject
             foreach (var p in applied.RestoreSkipped)
                 AppLog.Warn($"Left as is (changed outside the patcher): {p}");
             AppLog.Info($"Applied {applied.ConversationsPatched} conversation(s) from {entries.Count} project(s)");
-            StatusText = Loc.FormatCount("PatchManager_ApplySuccess", applied.ConversationsPatched, gameFolder);
+            StatusText = Loc.FormatCount("PatchManager_ApplySuccess", applied.ConversationsPatched, PathDisplay.ForDisplay(gameFolder));
             if (applied.UnreadableStringTables.Count > 0)   // damaged, left untouched (issue 119); logged by TranslationApplier
                 StatusText += " " + Loc.FormatCount("PatchManager_UnreadableStringTables",
-                                                    applied.UnreadableStringTables.Count, applied.UnreadableStringTables[0]);
+                                                    applied.UnreadableStringTables.Count, PathDisplay.ForDisplay(applied.UnreadableStringTables[0]));
         }
         catch (PatcherBackupCorruptException ex)
         {
             AppLog.Error("Patch application refused: backup manifest unreadable", ex);
-            StatusText = Loc.Format("PatchManager_BackupCorrupt", ex.ManifestPath);
+            StatusText = Loc.Format("PatchManager_BackupCorrupt", PathDisplay.ForDisplay(ex.ManifestPath));
         }
         catch (Exception ex)
         {
@@ -412,7 +412,7 @@ public partial class PatchManagerViewModel : ObservableObject
         catch (PatcherBackupCorruptException ex)
         {
             AppLog.Error("Remove all mods refused: backup manifest unreadable", ex);
-            StatusText = Loc.Format("PatchManager_BackupCorrupt", ex.ManifestPath);
+            StatusText = Loc.Format("PatchManager_BackupCorrupt", PathDisplay.ForDisplay(ex.ManifestPath));
         }
         catch (Exception ex)
         {
@@ -500,7 +500,7 @@ public partial class PatchManagerViewModel : ObservableObject
         {
             AppLog.Error("Patch Manager: backup manifest unreadable", ex);
             HasInstalledMods = false;
-            BackupStatusText = Loc.Format("PatchManager_BackupCorrupt", ex.ManifestPath);
+            BackupStatusText = Loc.Format("PatchManager_BackupCorrupt", PathDisplay.ForDisplay(ex.ManifestPath));
         }
     }
 }

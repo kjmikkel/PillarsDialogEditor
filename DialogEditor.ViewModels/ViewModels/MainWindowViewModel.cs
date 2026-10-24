@@ -878,7 +878,7 @@ public partial class MainWindowViewModel : ObservableObject
     private async Task HandleMissingRecentProjectAsync(string path)
     {
         AppLog.Warn($"Recent project not found: {path}");
-        StatusText = Loc.Format("Status_RecentProjectMissing", path);
+        StatusText = Loc.Format("Status_RecentProjectMissing", PathDisplay.ForDisplay(path));
         if (ConfirmRemoveMissingProject is null) return;
         if (await ConfirmRemoveMissingProject(path))
         {
@@ -930,7 +930,7 @@ public partial class MainWindowViewModel : ObservableObject
         if (!File.Exists(path))
         {
             AppLog.Info($"Project file not present on current branch: {path}");
-            CloseProjectCore(Loc.Format("Status_ProjectNotOnBranch", path));
+            CloseProjectCore(Loc.Format("Status_ProjectNotOnBranch", PathDisplay.ForDisplay(path)));
             return;
         }
 
@@ -1087,7 +1087,7 @@ public partial class MainWindowViewModel : ObservableObject
         catch (Exception ex)
         {
             AppLog.Error($"Failed to open project '{path}'", ex);
-            StatusText = Loc.Format("Status_ProjectOpenError", path, ex.Message);
+            StatusText = Loc.Format("Status_ProjectOpenError", PathDisplay.ForDisplay(path), ex.Message);
             ReportError?.Invoke(ex);
         }
     }
@@ -1112,7 +1112,7 @@ public partial class MainWindowViewModel : ObservableObject
         catch (Exception ex)
         {
             AppLog.Warn($"Git-conflicted project '{path}' has unparseable sides: {ex.Message}");
-            StatusText = Loc.Format("Status_ProjectGitConflictUnparseable", path);
+            StatusText = Loc.Format("Status_ProjectGitConflictUnparseable", PathDisplay.ForDisplay(path));
             return;
         }
 
@@ -1125,7 +1125,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         if (ShowGitConflictResolution is null)   // no resolution UI wired — guide the user
         {
-            StatusText = Loc.FormatCount("Status_ProjectGitConflictDetected", conflicts.Count, path);
+            StatusText = Loc.FormatCount("Status_ProjectGitConflictDetected", conflicts.Count, PathDisplay.ForDisplay(path));
             return;
         }
 
@@ -1133,7 +1133,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             _pendingConflictPath        = path;
             HasPendingConflictResolution = true;
-            StatusText = Loc.FormatCount("Status_ProjectGitConflictPending", conflicts.Count, path);
+            StatusText = Loc.FormatCount("Status_ProjectGitConflictPending", conflicts.Count, PathDisplay.ForDisplay(path));
             return;
         }
 
@@ -1438,7 +1438,7 @@ public partial class MainWindowViewModel : ObservableObject
                 if (_autosaveFallbackAnnouncedFor != _projectPath)
                 {
                     _autosaveFallbackAnnouncedFor = _projectPath;
-                    StatusText = Loc.Format("Status_AutosaveFallback", AutosaveRecovery.FallbackRoot);
+                    StatusText = Loc.Format("Status_AutosaveFallback", PathDisplay.ForDisplay(AutosaveRecovery.FallbackRoot));
                 }
             }
             catch (Exception fallbackEx)
@@ -1952,7 +1952,7 @@ public partial class MainWindowViewModel : ObservableObject
         catch (Exception ex)
         {
             AppLog.Error($"Failed to initialise game data from {path}", ex);
-            StatusText = Loc.Format("Status_LoadError", path, ex.Message);
+            StatusText = Loc.Format("Status_LoadError", PathDisplay.ForDisplay(path), ex.Message);
             ReportError?.Invoke(ex);
         }
     }
@@ -2160,7 +2160,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             await RunProviderBackupAsync(backupRoot, _provider!);
             AppLog.Info($"Backup written to {backupRoot}");
-            StatusText = Loc.Format("Status_BackupComplete", backupRoot);
+            StatusText = Loc.Format("Status_BackupComplete", PathDisplay.ForDisplay(backupRoot));
         }
         catch (Exception ex)
         {
@@ -2461,7 +2461,7 @@ public partial class MainWindowViewModel : ObservableObject
             AppLog.Info($"Test: applied {_project.Patches.Count} patch(es) from project '{_project.Name}'");
             if (unreadable.Count > 0)
                 // Damaged stringtables are left untouched (issue 119); that language shows no new text in-game.
-                StatusText = Loc.FormatCount("Status_TestPatchSkippedUnreadable", unreadable.Count, unreadable[0]);
+                StatusText = Loc.FormatCount("Status_TestPatchSkippedUnreadable", unreadable.Count, PathDisplay.ForDisplay(unreadable[0]));
             TestModeEntered?.Invoke();
         }
         catch (PatchConflictException ex)
@@ -2781,7 +2781,7 @@ public partial class MainWindowViewModel : ObservableObject
             if (conversation.Strings.IsUnreadable)
                 // The structure loaded, but this language's text file is damaged (issue 119):
                 // name it, so the text placeholders aren't a mystery. Logged by the parser.
-                StatusText = Loc.Format("Status_StringTableUnreadable", file.Name, conversation.Strings.UnreadablePath!);
+                StatusText = Loc.Format("Status_StringTableUnreadable", file.Name, PathDisplay.ForDisplay(conversation.Strings.UnreadablePath));
             else if (_project is null)
                 StatusText = Loc.Get("Status_NoProjectReadOnly");
             else

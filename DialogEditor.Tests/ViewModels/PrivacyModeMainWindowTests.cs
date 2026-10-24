@@ -10,7 +10,12 @@ public class PrivacyModeMainWindowTests : IDisposable
 {
     private sealed class FormatProvider : IStringProvider
     {
-        public string Get(string key) => key == "Status_FolderLoaded" ? "{0} — {1}" : key;
+        public string Get(string key) => key switch
+        {
+            "Status_FolderLoaded"         => "{0} — {1}",
+            "Status_RecentProjectMissing" => "missing {0}",
+            _                             => key,
+        };
         public bool TryGet(string key, out string value) { value = Get(key); return true; }
     }
 
@@ -91,6 +96,22 @@ public class PrivacyModeMainWindowTests : IDisposable
 
         Assert.DoesNotContain(game.Root, vm.StatusText);
         Assert.Contains(PathDisplay.ForDisplay(game.Root)!, vm.StatusText);
+    }
+
+    [Fact]
+    public void RecentProjectMissing_StatusBar_MasksPath_WhenOn()
+    {
+        const string ghost = @"Z:\Secret Folder\ghost.dialogproject";
+        AppSettings.AddRecentProject(ghost);
+        Loc.Configure(new FormatProvider());
+        PrivacyMode.ForceOnForSession();
+        var vm = Vm();
+
+        vm.OpenRecentProjectCommand.Execute(ghost);
+
+        Assert.DoesNotContain("Secret Folder", vm.StatusText);
+        Assert.Equal(@"missing …\ghost.dialogproject", vm.StatusText);
+        Assert.Contains(Path.GetFullPath(ghost), AppSettings.RecentProjects);
     }
 
     // ── Exception report ──────────────────────────────────────────────────
