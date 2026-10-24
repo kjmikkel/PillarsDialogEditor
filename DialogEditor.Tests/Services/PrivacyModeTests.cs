@@ -75,18 +75,21 @@ public class PrivacyModeTests : IDisposable
         Assert.False(LaunchArgs.HasPrivacyMode([]));
     }
 
+    // A fictional profile, so the privacy guard (issue 271) may let it through.
+    private const string FakeProfile = @"C:\Users\alice"; // privacy-guard: allow
+
     private static CrashReportScrubber Fake() => new(
-        [new ScrubRoot(@"C:\Users\alice", "%USERPROFILE%")],
+        [new ScrubRoot(FakeProfile, "%USERPROFILE%")],
         [new ScrubWord("alice", "%USERNAME%")]);
 
     [Fact]
     public void ForDisplay_Off_ReturnsUnchanged()
-        => Assert.Equal(@"C:\Users\alice\x", PathDisplay.ForDisplay(@"C:\Users\alice\x", Fake(), false));
+        => Assert.Equal($@"{FakeProfile}\x", PathDisplay.ForDisplay($@"{FakeProfile}\x", Fake(), false));
 
     [Fact]
     public void ForDisplay_On_ScrubsProfilePath()
         => Assert.Equal(@"%USERPROFILE%\Games\Deadfire",
-            PathDisplay.ForDisplay(@"C:\Users\alice\Games\Deadfire", Fake(), true));
+            PathDisplay.ForDisplay($@"{FakeProfile}\Games\Deadfire", Fake(), true));
 
     [Fact]
     public void ForDisplay_On_AbsolutePathOutsideRoots_ShowsLastSegmentOnly()
