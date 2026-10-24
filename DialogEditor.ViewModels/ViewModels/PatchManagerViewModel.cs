@@ -437,7 +437,7 @@ public partial class PatchManagerViewModel : ObservableObject
         RefreshBackupStatus();
     }
 
-    /// True while privacy mode hides paths (issue #270): the view then shows the read-only
+    /// True while privacy mode hides paths (issue 270): the view then shows the read-only
     /// GameFolderDisplay box instead of the editable GameFolder one.
     public bool IsPrivacyMode => PrivacyMode.IsOn;
 

@@ -5,7 +5,7 @@ using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.ViewModels;
 
-/// Issue #270 on the main window and the exception report: masked display, real values kept.
+/// Issue 270 on the main window and the exception report: masked display, real values kept.
 public class PrivacyModeMainWindowTests : IDisposable
 {
     private sealed class FormatProvider : IStringProvider
@@ -31,6 +31,7 @@ public class PrivacyModeMainWindowTests : IDisposable
     public void Dispose()
     {
         PrivacyMode.ResetForTests();
+        Loc.Configure(new StubStringProvider());
         AppSettings.SettingsPathOverride = null;
         try { File.Delete(_settingsPath); } catch { /* best-effort */ }
     }

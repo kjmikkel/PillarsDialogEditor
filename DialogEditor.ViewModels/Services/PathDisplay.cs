@@ -3,7 +3,7 @@ using DialogEditor.Core.Diagnostics;
 namespace DialogEditor.ViewModels.Services;
 
 /// <summary>
-/// Display-only path masking for privacy mode (issue #270). Never feed the result back
+/// Display-only path masking for privacy mode (issue 270). Never feed the result back
 /// into settings, the patch list or any model.
 /// </summary>
 public static class PathDisplay

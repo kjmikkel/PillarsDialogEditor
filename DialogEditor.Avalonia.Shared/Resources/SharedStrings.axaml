@@ -119,6 +119,10 @@
     <sys:String x:Key="Settings_AppearanceSection">Appearance</sys:String>
     <sys:String x:Key="Settings_LanguageSection">Language</sys:String>
     <sys:String x:Key="Settings_Close">Close</sys:String>
+    <!-- Privacy mode (issue 270) — standalone Patcher settings checkbox -->
+    <sys:String x:Key="Settings_PrivacySection">Privacy</sys:String>
+    <sys:String x:Key="Settings_PrivacyMode">Hide private paths</sys:String>
+    <sys:String x:Key="Settings_PrivacyModeTooltip">Hides your user name and folder locations wherever a file path is shown, so screenshots and screen shares don't reveal them. Only the display changes; your game folder and load orders keep their real paths. Stays checked for the whole session if the Patcher was started with --privacy-mode.</sys:String>
 
     <!-- ─── First-run theme onboarding (Gaps item 15) — shared by editor and standalone PatchManager ── -->
     <sys:String x:Key="ThemeOnboarding_Title">Choose a Theme</sys:String>

@@ -20,7 +20,7 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private int    _selectedAutosaveGenerations;
 
     /// What the read-only backup-directory box shows: BackupDirectory, masked while privacy
-    /// mode is on (issue #270). Display-only — BackupDirectory itself is never masked.
+    /// mode is on (issue 270). Display-only — BackupDirectory itself is never masked.
     public string BackupDirectoryDisplay => PathDisplay.ForDisplay(BackupDirectory) ?? string.Empty;
 
     partial void OnBackupDirectoryChanged(string value) => OnPropertyChanged(nameof(BackupDirectoryDisplay));

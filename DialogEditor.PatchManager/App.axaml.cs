@@ -26,6 +26,9 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
+            // --privacy-mode: hide private paths for this run only (issue 270); not saved.
+            if (LaunchArgs.HasPrivacyMode(desktop.Args)) PrivacyMode.ForceOnForSession();
+
             // Honour the theme the user picked in the editor (or here) on the previous run,
             // before the first window is built (overrides App.axaml's Dark default).
             new ThemeApplier().Apply(AppSettings.Theme);

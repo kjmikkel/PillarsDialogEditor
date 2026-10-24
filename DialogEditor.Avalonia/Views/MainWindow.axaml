@@ -230,6 +230,12 @@
                                   ToolTip.Tip="{DynamicResource ToolTip_View_ShowTool}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_View_ShowTool}"/>
                         <Separator/>
+                        <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_View_PrivacyMode}"
+                                  AutomationProperties.AutomationId="MenuView_PrivacyMode"
+                                  ToggleType="CheckBox"
+                                  IsChecked="{Binding IsPrivacyModeEnabled, Mode=TwoWay}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_View_PrivacyMode}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_View_PrivacyMode}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_View_ResetLayout}"
                                   AutomationProperties.AutomationId="MenuView_ResetLayout"
                                   Click="ResetLayout_Click"

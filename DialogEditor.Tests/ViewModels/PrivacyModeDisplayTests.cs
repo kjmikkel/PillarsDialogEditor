@@ -6,7 +6,7 @@ using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.ViewModels;
 
-/// Issue #270: masked paths are display-only. Every test that reads a *Display property
+/// Issue 270: masked paths are display-only. Every test that reads a *Display property
 /// also asserts the stored value is untouched.
 public class PrivacyModeDisplayTests : IDisposable
 {

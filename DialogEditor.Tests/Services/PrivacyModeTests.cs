@@ -3,7 +3,7 @@ using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.Services;
 
-/// Issue #270: privacy mode state, launch-arg parsing and path masking.
+/// Issue 270: privacy mode state, launch-arg parsing and path masking.
 public class PrivacyModeTests : IDisposable
 {
     public PrivacyModeTests()

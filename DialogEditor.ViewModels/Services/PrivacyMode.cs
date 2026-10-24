@@ -1,7 +1,7 @@
 namespace DialogEditor.ViewModels.Services;
 
 /// <summary>
-/// Observable "hide private paths" switch (issue #270), shared by the editor and the
+/// Observable "hide private paths" switch (issue 270), shared by the editor and the
 /// Patcher. Effective value = session override (<c>--privacy-mode</c>, never saved) OR the
 /// persisted <see cref="AppSettings.PrivacyMode"/>. Display code subscribes to
 /// <see cref="Changed"/> to refresh masked paths; masking is display-only and must never

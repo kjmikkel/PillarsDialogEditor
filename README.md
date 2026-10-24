@@ -427,6 +427,10 @@ fi
 | Backup directory | The folder chosen during first-time setup where the original game files are stored. Used for full disaster recovery via **Test › Restore Backup** (`Ctrl+Shift+B`). Can be changed here if you want to move the backup to a different location. |
 | Default localization format | File format used by **File › Export for Translation…** — `Csv`, `Json`, or `Xliff`. All three formats are always selectable in the save dialog; this setting controls which is offered first. |
 
+### Privacy mode
+
+**View › Hide private paths** (in the Patcher: its Settings window) hides your user name and folder locations wherever a file path is shown (status bar, Patch Manager game folder, backup directory, recent-project tooltips, error report), so screenshots and screen shares don't reveal them. Only the display changes; your files and settings keep their real paths. Start either app with `--privacy-mode` to turn it on for that run without saving it.
+
 Settings are stored in:
 
 ```

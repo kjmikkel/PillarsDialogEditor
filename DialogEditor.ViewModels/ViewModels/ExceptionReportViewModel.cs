@@ -17,7 +17,7 @@ public sealed class ExceptionReportViewModel
     public string CopyText   { get; }
     public string LogPath    { get; }
 
-    /// LogPath as shown in the window: masked while privacy mode is on (issue #270).
+    /// LogPath as shown in the window: masked while privacy mode is on (issue 270).
     /// LogPath itself stays real — it is only displayed, never fed back anywhere.
     public string LogPathDisplay => PathDisplay.ForDisplay(LogPath) ?? string.Empty;
     public string IssuesUrl  { get; }

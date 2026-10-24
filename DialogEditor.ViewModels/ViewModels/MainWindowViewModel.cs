@@ -474,7 +474,7 @@ public partial class MainWindowViewModel : ObservableObject
         // generated RelayCommands) are only available once the constructor body runs.
         RefreshRecentProjects();
 
-        // Privacy mode (issue #270) changes how paths are displayed: re-mask the recent-
+        // Privacy mode (issue 270) changes how paths are displayed: re-mask the recent-
         // project tooltips and refresh the View-menu toggle.
         PrivacyMode.WeakSubscribe(this, vm =>
         {

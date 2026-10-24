@@ -74,6 +74,8 @@ function Set-CaptureSettings {
     $s.FontScale       = $FontScale
     $s.LastProjectPath = $ProjectPath
     $s.PendingRestores = @()   # never let a capture run write to the game folder
+    # Privacy mode (issue 270): captures must not show the user's name or folders.
+    $s | Add-Member -Force -NotePropertyName PrivacyMode -NotePropertyValue $true
 
     if ($GameDirectory) {
         if (-not $GameDirectory.EndsWith('\')) { $GameDirectory += '\' }
