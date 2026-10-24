@@ -4,6 +4,9 @@ Thanks for wanting to help with Pillars Dialog Editor. This page covers how to b
 the code, and the rules every change has to follow. Everyone taking part in the project is
 expected to follow the [code of conduct](CODE_OF_CONDUCT.md).
 
+Before designing a feature or reviewing a screen, read [who the tools are for](docs/audience.md):
+the Reader and the Modder come first, and the page says what to do when they conflict.
+
 ## Issues first
 
 Everything goes through [GitHub Issues](https://github.com/kjmikkel/PillarsDialogEditor/issues):
