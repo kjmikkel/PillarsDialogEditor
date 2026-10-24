@@ -16,13 +16,19 @@ public class AutosaveRestoreDialogTests
     private static AutosaveGeneration Gen(string name, int minutesAgo, bool fallback = false)
         => new(name, DateTime.UtcNow.AddMinutes(-minutesAgo), fallback);
 
+    private static void Click(Window dialog, string name)
+        => dialog.FindControl<Button>(name)!.RaiseEvent(
+            new global::Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+
+    // Issue 236: closing the window without a choice (title-bar X, Alt+F4) must never delete
+    // the only copy of crashed work, so the default is "decide later", not "discard".
     [AvaloniaFact]
-    public void Constructs_WithOneCopy_DefaultResultIsDiscard()
+    public void Constructs_WithOneCopy_DefaultResultIsLater()
     {
         var dialog = new AutosaveRestoreDialog([Gen("a", 1)]);
         dialog.Show();
         Assert.True(dialog.IsVisible);
-        Assert.Null(dialog.Result); // closing without a choice = discard the offer
+        Assert.Equal(AutosaveDecision.Later, dialog.Result);
         dialog.Close();
     }
 
@@ -64,23 +70,79 @@ public class AutosaveRestoreDialogTests
         Dispatcher.UIThread.RunJobs();
         dialog.FindControl<ListBox>("CopyList")!.SelectedItem = earlier;
 
-        dialog.FindControl<Button>("RestoreButton")!.RaiseEvent(
-            new global::Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+        Click(dialog, "RestoreButton");
 
-        Assert.Same(earlier, dialog.Result);
+        Assert.Equal(AutosaveDecision.Restore(earlier), dialog.Result);
+    }
+
+    // ── Issue 236: Esc is "decide later"; Discard asks first ─────────────────
+
+    [AvaloniaFact]
+    public void Esc_BelongsToDecideLater_NotToDiscard()
+    {
+        var dialog = new AutosaveRestoreDialog([Gen("a", 1)]);
+        Assert.True(dialog.FindControl<Button>("LaterButton")!.IsCancel);
+        Assert.False(dialog.FindControl<Button>("DiscardButton")!.IsCancel);
+        Assert.False(dialog.FindControl<Button>("ConfirmDiscardButton")!.IsCancel);
     }
 
     [AvaloniaFact]
-    public void Discard_ReturnsNoCopy()
+    public void DecideLater_ReturnsLater_AndCloses()
+    {
+        var dialog = new AutosaveRestoreDialog([Gen("a", 1)]);
+        dialog.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        Click(dialog, "LaterButton");
+
+        Assert.Equal(AutosaveDecision.Later, dialog.Result);
+        Assert.False(dialog.IsVisible);
+    }
+
+    [AvaloniaFact]
+    public void Discard_AsksToConfirm_BeforeDecidingAnything()
+    {
+        var dialog = new AutosaveRestoreDialog([Gen("a", 1), Gen("b", 6)]);
+        dialog.Show();
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(dialog.FindControl<Control>("ConfirmDiscardPanel")!.IsVisible);
+
+        Click(dialog, "DiscardButton");
+
+        Assert.True(dialog.IsVisible);
+        Assert.True(dialog.FindControl<Control>("ConfirmDiscardPanel")!.IsVisible);
+        Assert.Equal(AutosaveDecision.Later, dialog.Result);
+        dialog.Close();
+    }
+
+    [AvaloniaFact]
+    public void ConfirmedDiscard_ReturnsDiscard()
     {
         var dialog = new AutosaveRestoreDialog([Gen("a", 1), Gen("b", 6)]);
         dialog.Show();
         Dispatcher.UIThread.RunJobs();
 
-        dialog.FindControl<Button>("DiscardButton")!.RaiseEvent(
-            new global::Avalonia.Interactivity.RoutedEventArgs(Button.ClickEvent));
+        Click(dialog, "DiscardButton");
+        Click(dialog, "ConfirmDiscardButton");
 
-        Assert.Null(dialog.Result);
+        Assert.Equal(AutosaveDecision.Discard, dialog.Result);
+        Assert.False(dialog.IsVisible);
+    }
+
+    [AvaloniaFact]
+    public void KeepThem_WithdrawsTheConfirmation_AndKeepsTheDialogOpen()
+    {
+        var dialog = new AutosaveRestoreDialog([Gen("a", 1)]);
+        dialog.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        Click(dialog, "DiscardButton");
+        Click(dialog, "KeepButton");
+
+        Assert.True(dialog.IsVisible);
+        Assert.False(dialog.FindControl<Control>("ConfirmDiscardPanel")!.IsVisible);
+        Assert.Equal(AutosaveDecision.Later, dialog.Result);
+        dialog.Close();
     }
 
     [AvaloniaFact]

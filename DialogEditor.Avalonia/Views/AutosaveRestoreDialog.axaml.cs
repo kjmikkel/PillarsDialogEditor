@@ -6,11 +6,12 @@ using DialogEditor.ViewModels.Services;
 namespace DialogEditor.Avalonia.Views;
 
 /// Offers to restore a crash-recovery autosave found at project open.
-/// Result: the copy to restore; null (incl. closing the window) = discard the offer,
-/// which deletes the copies per spec 2026-07-12 §4.
+/// Result: restore a copy, discard them all, or decide later. Later is the default, so Esc
+/// and closing the window keep every copy (issue 236); Discard deletes them (spec 2026-07-12
+/// §4) and only after a second, explicit confirmation.
 public partial class AutosaveRestoreDialog : Window
 {
-    public AutosaveGeneration? Result { get; private set; }
+    public AutosaveDecision Result { get; private set; } = AutosaveDecision.Later;
 
     // Parameterless ctor so the XAML compiler embeds the type (avoids AVLN3000).
     public AutosaveRestoreDialog() => InitializeComponent();
@@ -32,8 +33,20 @@ public partial class AutosaveRestoreDialog : Window
         CopyList.SelectedItem = newest;
         EarlierCopies.IsVisible = generations.Count > 1;
 
-        RestoreButton.Click += (_, _) => { Result = CopyList.SelectedItem as AutosaveGeneration ?? newest; Close(); };
-        DiscardButton.Click += (_, _) => { Result = null; Close(); };
+        RestoreButton.Click += (_, _) => { Result = AutosaveDecision.Restore(CopyList.SelectedItem as AutosaveGeneration ?? newest); Close(); };
+        LaterButton.Click   += (_, _) => { Result = AutosaveDecision.Later; Close(); };
+        // Discard only opens the confirmation; focus lands on Keep, so a stray Enter or Space
+        // after the click still can't delete anything.
+        DiscardButton.Click += (_, _) => ShowDiscardConfirmation(true);
+        KeepButton.Click    += (_, _) => ShowDiscardConfirmation(false);
+        ConfirmDiscardButton.Click += (_, _) => { Result = AutosaveDecision.Discard; Close(); };
+    }
+
+    private void ShowDiscardConfirmation(bool show)
+    {
+        ConfirmDiscardPanel.IsVisible = show;
+        DiscardButton.IsEnabled = !show;
+        (show ? KeepButton : DiscardButton).Focus();
     }
 
     private static string Label(AutosaveGeneration g)
@@ -42,8 +55,8 @@ public partial class AutosaveRestoreDialog : Window
         return g.IsFallback ? Loc.Format("AutosaveRestore_CopyInEditorFolder", time) : time;
     }
 
-    /// Shows modally over <paramref name="owner"/>; resolves to the copy to restore, or null.
-    public async System.Threading.Tasks.Task<AutosaveGeneration?> ShowDialogAsync(Window owner)
+    /// Shows modally over <paramref name="owner"/>; resolves to the user's decision.
+    public async System.Threading.Tasks.Task<AutosaveDecision> ShowDialogAsync(Window owner)
     {
         await ShowDialog(owner);
         return Result;

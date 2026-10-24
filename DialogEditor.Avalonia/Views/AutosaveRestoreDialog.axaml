@@ -27,6 +27,11 @@
                AutomationProperties.Name="{DynamicResource AutosaveRestore_EarlierCopies}"
                AutomationProperties.HelpText="{DynamicResource ToolTip_AutosaveRestore_CopyList}"/>
     </Expander>
+    <!-- Issue 236: Esc belongs to "Decide later", never to Discard. Esc is the reflexive way to
+         get a dialog out of the way, and here the only copy of crashed work is at stake, so the
+         reflex must keep it. Later leaves the project closed (opening the saved file would put
+         the copies at risk: a save deletes them, autosave ticks rotate them) and the offer comes
+         back the next time the project is opened. -->
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
       <Button x:Name="RestoreButton"
               Content="{DynamicResource AutosaveRestore_Restore}"
@@ -35,13 +40,43 @@
               IsDefault="True"
               ToolTip.Tip="{DynamicResource ToolTip_AutosaveRestore_Restore}"
               AutomationProperties.HelpText="{DynamicResource ToolTip_AutosaveRestore_Restore}"/>
+      <Button x:Name="LaterButton"
+              Content="{DynamicResource AutosaveRestore_Later}"
+              Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
+              IsCancel="True"
+              ToolTip.Tip="{DynamicResource ToolTip_AutosaveRestore_Later}"
+              AutomationProperties.HelpText="{DynamicResource ToolTip_AutosaveRestore_Later}"/>
       <Button x:Name="DiscardButton"
               Content="{DynamicResource AutosaveRestore_Discard}"
               Background="{DynamicResource Brush.Button.Destructive.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
               Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
-              IsCancel="True"
               ToolTip.Tip="{DynamicResource ToolTip_AutosaveRestore_Discard}"
               AutomationProperties.HelpText="{DynamicResource ToolTip_AutosaveRestore_Discard}"/>
     </StackPanel>
+    <!-- Discard deletes every recovery copy for good, so it asks once more, inline rather than
+         in a second modal window. Keep takes focus when this appears, so a stray keypress
+         after clicking Discard can't confirm it. -->
+    <Border x:Name="ConfirmDiscardPanel" IsVisible="False"
+            BorderBrush="{DynamicResource Brush.Button.Destructive.Background}" BorderThickness="1"
+            CornerRadius="4" Padding="12">
+      <StackPanel Spacing="10">
+        <TextBlock Text="{DynamicResource AutosaveRestore_ConfirmDiscard}"
+                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Body}"
+                   TextWrapping="Wrap"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="6">
+          <Button x:Name="KeepButton"
+                  Content="{DynamicResource AutosaveRestore_Keep}"
+                  Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
+                  ToolTip.Tip="{DynamicResource ToolTip_AutosaveRestore_Keep}"
+                  AutomationProperties.HelpText="{DynamicResource ToolTip_AutosaveRestore_Keep}"/>
+          <Button x:Name="ConfirmDiscardButton"
+                  Content="{DynamicResource AutosaveRestore_ConfirmDiscardYes}"
+                  Background="{DynamicResource Brush.Button.Destructive.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
+                  Padding="16,6" FontSize="{DynamicResource FontSize.Body}"
+                  ToolTip.Tip="{DynamicResource ToolTip_AutosaveRestore_ConfirmDiscardYes}"
+                  AutomationProperties.HelpText="{DynamicResource ToolTip_AutosaveRestore_ConfirmDiscardYes}"/>
+        </StackPanel>
+      </StackPanel>
+    </Border>
   </StackPanel>
 </Window>
