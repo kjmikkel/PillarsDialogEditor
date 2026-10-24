@@ -78,7 +78,7 @@
                            FontSize="{DynamicResource FontSize.Label}"
                            Foreground="{DynamicResource Brush.Text.Muted}"
                            VerticalAlignment="Center"/>
-                <TextBlock Text="{Binding LogPath}"
+                <TextBlock Text="{Binding LogPathDisplay}"
                            FontFamily="Consolas, Courier New, monospace"
                            FontSize="{DynamicResource FontSize.Label}"
                            Foreground="{DynamicResource Brush.Text.Secondary}"
