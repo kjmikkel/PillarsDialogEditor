@@ -473,6 +473,23 @@ public partial class MainWindowViewModel : ObservableObject
         // Must run last: OpenRecentProjectCommand/ClearRecentProjectsCommand (source-
         // generated RelayCommands) are only available once the constructor body runs.
         RefreshRecentProjects();
+
+        // Privacy mode (issue #270) changes how paths are displayed: re-mask the recent-
+        // project tooltips and refresh the View-menu toggle.
+        PrivacyMode.WeakSubscribe(this, vm =>
+        {
+            vm.OnPropertyChanged(nameof(IsPrivacyModeEnabled));
+            vm.RefreshRecentProjects();
+        });
+    }
+
+    /// The View ▸ "Hide private paths" toggle. Reads the effective state (so it shows
+    /// checked when --privacy-mode forced it on for this session); writing persists the
+    /// choice. Re-raised from the PrivacyMode.Changed subscription in the constructor.
+    public bool IsPrivacyModeEnabled
+    {
+        get => PrivacyMode.IsOn;
+        set => PrivacyMode.SetPersisted(value);
     }
 
     /// Re-opens the last project, if any. Must be called by the View after the main
@@ -783,7 +800,7 @@ public partial class MainWindowViewModel : ObservableObject
             RecentProjectsMenuItems.Add(new RecentProjectMenuItem
             {
                 Header = EscapeMenuMnemonic(Path.GetFileNameWithoutExtension(path)),
-                ToolTip = path,
+                ToolTip = PathDisplay.ForDisplay(path),   // display only; CommandParameter keeps the real path
                 Command = OpenRecentProjectCommand,
                 CommandParameter = path,
             });
@@ -1923,7 +1940,7 @@ public partial class MainWindowViewModel : ObservableObject
             SelectedLanguage   = AppSettings.PickLanguage(AvailableLanguages, AppSettings.LastLanguage);
             Browser.Load(provider, _project?.NewConversations);
             AppLog.Info($"Loaded {provider.GameName} from {path}");
-            StatusText = Loc.Format("Status_FolderLoaded", provider.GameName, path);
+            StatusText = Loc.Format("Status_FolderLoaded", provider.GameName, PathDisplay.ForDisplay(path));
             CreateSampleProjectCommand.NotifyCanExecuteChanged();
 
             if (!AppSettings.IsKnownGameDirectory(path))
