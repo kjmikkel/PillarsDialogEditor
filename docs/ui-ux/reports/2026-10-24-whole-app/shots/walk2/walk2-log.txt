@@ -1,0 +1,33 @@
+kbd tab from search ->  [List] id=PART_Input
+kbd after Home ->  [List] id=PART_Input
+kbd after Right ->  [List] id=PART_Input
+kbd after Enter -> DEFAULT / MALE TEXT [Edit] id=DefaultTextBox
+edits on screen: 'Filter conversations…'@5; 'Search nodes…'@555; 'DEFAULT / MALE TEXT'@1470; 'FEMALE TEXT'@1470; ''@1832; 'Target node ID…'@1470
+detail 'DEFAULT / MALE TEXT' enabled=True readonly=False before='Take the scripted path.'
+detail after typing='Take the scripted path. TYPO' title='canonical'
+after Ctrl+S secondary:
+game folder changed after typing/Ctrl+S/F5: False
+settings opened, focused: Settings [Window] id=
+settings tab order:
+  1 Browse… [Button] id=
+  2 Backup directory [Edit] id=
+  3 Default localization format [ComboBox] id=LocalizationFormatComboBox
+  4 Font scale [ComboBox] id=
+  5 Autosave every [ComboBox] id=AutosaveIntervalComboBox
+  6 Recovery copies to keep [ComboBox] id=AutosaveGenerationsComboBox
+  7 Open dictionaries folder [Button] id=
+  8 Get dictionaries (LibreOffice repository) [Button] id=
+  9 Language [ComboBox] id=
+  10 Theme [ComboBox] id=
+  11 Close [Button] id=CloseButton
+  12 Browse… [Button] id=
+  13 Backup directory [Edit] id=
+  14 Default localization format [ComboBox] id=LocalizationFormatComboBox
+  15 Font scale [ComboBox] id=
+  16 Autosave every [ComboBox] id=AutosaveIntervalComboBox
+settings open after Esc: 1
+^h opened 'Find / Replace' focused: Find: [Edit] id=SearchBox
+^h open after Esc: 1
+^+f opened '' focused:  [List] id=Editor
+^+f open after Esc: 0
+restored

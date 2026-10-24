@@ -1,0 +1,19 @@
+narrator windows:
+narrator tab walk (UIA focus = what Narrator reads):
+  1 'Clear filter' [button] help='Clear filter'
+  2 'canonical' [tree view item] help=''
+  3 'Pane options' [button] help=''
+  4 'Pin pane' [button] help=''
+  5 'Close pane' [button] help=''
+  6 'Canvas' [tab item] help='Selected=true; Active=false; CanClose=false; CanFloat=true; DockingState=Document'
+  7 'Fit' [button] help='Fit all nodes into view'
+  8 'Zoom in' [button] help='Zoom in'
+  9 'Zoom out' [button] help='Zoom out'
+  10 'Jump to root node' [button] help='Jump to root node (ID 0)'
+  11 'Search nodes…' [edit] help='Search nodes by ID, dialogue text, or speaker name (Ctrl+F)'
+  12 '' [list view] help=''
+  13 '' [list view] help=''
+  14 '' [list view] help=''
+after Home: '' [list view] help=''
+after Right: '' [list view] help=''
+restored; narrator running now: False

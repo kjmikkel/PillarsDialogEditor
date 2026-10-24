@@ -1,0 +1,28 @@
+patcher tab order:
+  1  [] help=''
+  2  [] help=''
+  3  [] help=''
+  4  [] help=''
+  5  [] help=''
+  6  [] help=''
+  7  [] help=''
+  8  [] help=''
+  9  [] help=''
+  10  [] help=''
+  11  [] help=''
+  12  [] help=''
+  13  [] help=''
+  14  [] help=''
+patcher-1 Settings focused: Settings [Button] help='Open settings to change the colour theme and application language'
+patcher-1 Settings open after Esc: 1
+patcher-1 About focused: About [Button] help='Show the patcher's version, which mod file formats it can install, and where to download a newer version'
+patcher-1 About open after Esc: 1
+patcher-1 Apply enabled=False help='Reset the game to its original files, then apply every patch in load order. Lower entries win on conflict. Removing a mod from the list and applying again uninstalls it.'
+patcher-1 Remove all enabled=False
+patcher-2 Settings focused: Settings [Button] help='Open settings to change the colour theme and application language'
+patcher-2 Settings open after Esc: 1
+patcher-2 About focused: About [Button] help='Show the patcher's version, which mod file formats it can install, and where to download a newer version'
+patcher-2 About open after Esc: 1
+patcher-2 Apply enabled=False help='Reset the game to its original files, then apply every patch in load order. Lower entries win on conflict. Removing a mod from the list and applying again uninstalls it.'
+patcher-2 Remove all enabled=False
+restored
