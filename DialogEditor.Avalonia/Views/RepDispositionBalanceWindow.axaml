@@ -84,6 +84,7 @@
                 </Grid>
                 <ListBox ItemsSource="{Binding DispositionRows}"
                          ToolTip.Tip="{DynamicResource RepBalance_Tip_Table}"
+                         AutomationProperties.HelpText="{DynamicResource RepBalance_Tip_Table}"
                          Background="{DynamicResource Brush.Surface.Card}" BorderThickness="0">
                     <ListBox.ItemTemplate>
                         <DataTemplate>
@@ -115,6 +116,7 @@
                 </Grid>
                 <ListBox ItemsSource="{Binding ReputationRows}"
                          ToolTip.Tip="{DynamicResource RepBalance_Tip_Table}"
+                         AutomationProperties.HelpText="{DynamicResource RepBalance_Tip_Table}"
                          Background="{DynamicResource Brush.Surface.Card}" BorderThickness="0">
                     <ListBox.ItemTemplate>
                         <DataTemplate>

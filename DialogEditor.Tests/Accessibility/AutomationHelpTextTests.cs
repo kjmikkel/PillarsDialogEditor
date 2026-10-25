@@ -62,15 +62,25 @@ public class AutomationHelpTextTests
             foreach (var el in doc.Descendants().Where(e => FocusableElementNames.Contains(e.Name.LocalName)))
             {
                 var tip = el.Attribute("ToolTip.Tip")?.Value;
-                if (tip is null || !tip.StartsWith("{StaticResource ", StringComparison.Ordinal))
-                    continue; // no tooltip, or a non-resource tooltip (none exist today)
+                // A bound tooltip (a per-row hint, e.g. the condition editor's TypeHint) is as
+                // hover-only as a resource one (GitHub issue 253), so it must be mirrored too.
+                if (tip is null || !(tip.StartsWith("{StaticResource ", StringComparison.Ordinal)
+                                     || tip.StartsWith("{DynamicResource ", StringComparison.Ordinal)
+                                     || tip.StartsWith("{Binding ", StringComparison.Ordinal)))
+                    continue; // no tooltip, or a literal (the localisation tests catch those)
+                if (el.Attribute("Focusable")?.Value == "False" || el.Attribute("IsTabStop")?.Value == "False")
+                    continue; // never takes keyboard focus, so HelpText would never be announced
 
+                if (el.Attribute("AutomationProperties.Name")?.Value == tip)
+                    continue; // the name already says it (a colour swatch); help would repeat it
                 var help = el.Attribute("AutomationProperties.HelpText")?.Value;
                 var line = ((IXmlLineInfo)el).HasLineInfo() ? ((IXmlLineInfo)el).LineNumber : 0;
 
                 if (help is null)
                     offenders.Add($"{Path.GetFileName(file)}:{line}: <{el.Name.LocalName}> has ToolTip.Tip={tip} but no AutomationProperties.HelpText");
-                else if (help != tip)
+                // A bound HelpText that says more than the tooltip (Node Details' group summaries)
+                // is deliberate; a different *resource* is a copy slip.
+                else if (help != tip && !help.StartsWith("{Binding ", StringComparison.Ordinal))
                     offenders.Add($"{Path.GetFileName(file)}:{line}: <{el.Name.LocalName}> AutomationProperties.HelpText={help} does not match ToolTip.Tip={tip}");
             }
         }

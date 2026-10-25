@@ -45,10 +45,12 @@
                      Text="{Binding SearchText}"
                      Watermark="{DynamicResource TagRef_SearchWatermark}"
                      ToolTip.Tip="{DynamicResource ToolTip_TagRef_Search}"
+                     AutomationProperties.HelpText="{DynamicResource ToolTip_TagRef_Search}"
                      AutomationProperties.Name="{DynamicResource TagRef_SearchWatermark}"/>
             <ComboBox ItemsSource="{Binding GameOptions}"
                       SelectedItem="{Binding SelectedGame}"
                       ToolTip.Tip="{DynamicResource ToolTip_TagRef_GameSelector}"
+                      AutomationProperties.HelpText="{DynamicResource ToolTip_TagRef_GameSelector}"
                       AutomationProperties.Name="{DynamicResource ToolTip_TagRef_GameSelector}"/>
         </StackPanel>
 
