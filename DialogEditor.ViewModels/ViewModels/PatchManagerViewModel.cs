@@ -255,7 +255,7 @@ public partial class PatchManagerViewModel : ObservableObject
         catch (Exception ex)
         {
             AppLog.Error("Failed to save load order", ex);
-            StatusText = Loc.Format("PatchManager_ApplyError", ex.Message);
+            StatusText = Loc.Format("PatchManager_SaveLoadOrderError", ex.Message);
         }
     }
 
@@ -336,6 +336,8 @@ public partial class PatchManagerViewModel : ObservableObject
         var entries = Entries.Where(e => e.IsLoaded)
                              .Select(e => new InstallEntry(e.Project!, e.VoFolder))
                              .ToList();
+        // Entries that failed to load can't be installed; the status says so (GitHub issue 241).
+        var notLoaded = Entries.Where(e => !e.IsLoaded).Select(e => e.DisplayPath).ToList();
         var gameFolder = GameFolder;
         try
         {
@@ -361,11 +363,10 @@ public partial class PatchManagerViewModel : ObservableObject
                 AppLog.Warn($"Conversation not found for patch: {m}");
             foreach (var p in applied.RestoreSkipped)
                 AppLog.Warn($"Left as is (changed outside the patcher): {p}");
+            foreach (var p in notLoaded)
+                AppLog.Warn($"Not installed (could not be loaded): {p}");
             AppLog.Info($"Applied {applied.ConversationsPatched} conversation(s) from {entries.Count} project(s)");
-            StatusText = Loc.FormatCount("PatchManager_ApplySuccess", applied.ConversationsPatched, PathDisplay.ForDisplay(gameFolder));
-            if (applied.UnreadableStringTables.Count > 0)   // damaged, left untouched (issue 119); logged by TranslationApplier
-                StatusText += " " + Loc.FormatCount("PatchManager_UnreadableStringTables",
-                                                    applied.UnreadableStringTables.Count, PathDisplay.ForDisplay(applied.UnreadableStringTables[0]));
+            StatusText = ApplyStatus(applied, notLoaded, gameFolder);
         }
         catch (PatcherBackupCorruptException ex)
         {
@@ -383,6 +384,28 @@ public partial class PatchManagerViewModel : ObservableObject
             ApplyCommand.NotifyCanExecuteChanged();
             RefreshBackupStatus();
         }
+    }
+
+    /// The status after a finished Apply: plain success, or "installed with warnings" followed by
+    /// one sentence per kind of thing left out — the same warnings the CLI prints (GitHub issue
+    /// 241). Each names the first item; the log has the full list.
+    private static string ApplyStatus(InstallResult.Applied applied, IReadOnlyList<string> notLoaded, string gameFolder)
+    {
+        var warnings = new List<string>();
+        void Warn(string key, IReadOnlyList<string> items, bool isPath)
+        {
+            if (items.Count == 0) return;
+            warnings.Add(Loc.FormatCount(key, items.Count, isPath ? PathDisplay.ForDisplay(items[0]) : items[0]));
+        }
+        Warn("PatchManager_EntriesSkipped",         notLoaded,                     isPath: false);
+        Warn("PatchManager_MissingConversations",   applied.MissingConversations,   isPath: false);
+        Warn("PatchManager_RestoreSkipped",         applied.RestoreSkipped,         isPath: true);
+        // Damaged, left untouched (issue 119); logged by TranslationApplier.
+        Warn("PatchManager_UnreadableStringTables", applied.UnreadableStringTables, isPath: true);
+
+        var headline = Loc.FormatCount(warnings.Count > 0 ? "PatchManager_ApplyWithWarnings" : "PatchManager_ApplySuccess",
+                                       applied.ConversationsPatched, PathDisplay.ForDisplay(gameFolder));
+        return string.Join(" ", [headline, .. warnings]);
     }
 
     private bool CanApply() => !string.IsNullOrEmpty(GameFolder)
