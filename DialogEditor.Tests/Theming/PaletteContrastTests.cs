@@ -38,7 +38,20 @@ public class PaletteContrastTests
         new("Text.Status.Changed / Surface.Card", "Palette.Amber.540", "Palette.Neutral.100", true),
         new("Text.Status.Removed / Surface.Card", "Palette.Red.450",   "Palette.Neutral.100", true),
         new("Text.Caption / Surface.Card",  "Palette.Neutral.600", "Palette.Neutral.100", false),
-        new("Text.Muted / Surface.Card",    "Palette.Neutral.535", "Palette.Neutral.100", false),
+        // Muted is caption *text* (hints, counters, statistics), so it is held to the text bar on
+        // every surface it sits on (GitHub issue 265).
+        new("Text.Muted / Surface.Card",    "Palette.Neutral.535", "Palette.Neutral.100", true),
+        new("Text.Muted / Surface.Window",  "Palette.Neutral.535", "Palette.Neutral.115", true),
+        new("Text.Muted / Surface.Panel",   "Palette.Neutral.535", "Palette.Neutral.145", true),
+        // Node card footers (condition count) and the no-text placeholder (GitHub issue 245).
+        new("Text.OnLight.Muted / Node.Npc.Footer",      "Palette.Ink.Muted", "Palette.Parchment.200", true),
+        new("Text.OnLight.Muted / Node.Player.Footer",   "Palette.Ink.Muted", "Palette.Azure.250",     true),
+        new("Text.OnLight.Muted / Node.Narrator.Footer", "Palette.Ink.Muted", "Palette.Teal.250",      true),
+        new("Text.OnLight.Muted / Node.Script.Footer",   "Palette.Ink.Muted", "Palette.Neutral.785",   true),
+        new("Text.OnLight.Muted / Node.Bark.Footer",     "Palette.Ink.Muted", "Palette.Amber.570",     true),
+        new("Text.OnLight.Muted / Node.Npc.Body",        "Palette.Ink.Muted", "Palette.Parchment.100", true),
+        new("Text.OnLight.Muted / Node.Script.Body",     "Palette.Ink.Muted", "Palette.Neutral.875",   true),
+        new("Text.OnLight.Muted / Node.Bark.Body",       "Palette.Ink.Muted", "Palette.Cream.100",     true),
         // Conversations dock rows (issue 85): folders, conversations and new conversations on the
         // tree background.
         new("Text.Primary / Surface.Subtle",    "Palette.Neutral.910", "Palette.Neutral.175", true),
@@ -95,7 +108,7 @@ public class PaletteContrastTests
         ("Palette.Line.Default", "Palette.Canvas.Base"), // GridSplitter on the canvas backdrop
     };
 
-    // A highlighted connection (Brush.Connection.Highlighted = Palette.White) must stand out
+    // A highlighted connection (Brush.Connection.Highlighted = Palette.Connection.Highlight) must stand out
     // from a resting one (Brush.Connection.Default = Palette.Connection.Base). In HC they
     // collided at pure white (Neutral.665 = white for text), so the highlight was invisible
     // among default links — hence the dedicated Connection.* primitive, dimmed in HC.
@@ -104,7 +117,7 @@ public class PaletteContrastTests
     {
         var dict  = PaletteHarness.Load("Palette.HighContrast");
         var ratio = Wcag.ContrastRatio(
-            PaletteHarness.Color(dict, "Palette.White"),
+            PaletteHarness.Color(dict, "Palette.Connection.Highlight"),
             PaletteHarness.Color(dict, "Palette.Connection.Base"));
         Assert.True(ratio >= 1.8,
             $"highlighted vs resting connection in HC: {ratio:F2}:1 < 1.8:1");
@@ -134,6 +147,24 @@ public class PaletteContrastTests
         var ratio = Wcag.ContrastRatio(PaletteHarness.Color(dict, "Palette.Connection.Base"),
                                        PaletteHarness.Color(dict, "Palette.Canvas.Base"));
         Assert.True(ratio >= 3.0, $"{palette}: resting connection on canvas {ratio:F2}:1 < 3:1");
+    }
+
+    // GitHub issue 244: the selected node's links were white on Light's pale canvas (~1.27:1),
+    // so the branch being followed was the hardest line to see. Visible on every canvas, and
+    // distinct from a resting link.
+    [AvaloniaTheory]
+    [InlineData("Palette.Dark")]
+    [InlineData("Palette.Light")]
+    [InlineData("Palette.HighContrast")]
+    [InlineData("Palette.Colourblind")]
+    public void HighlightedConnection_IsVisibleOnTheCanvas_AndDistinctFromResting(string palette)
+    {
+        var dict = PaletteHarness.Load(palette);
+        var highlight = PaletteHarness.Color(dict, "Palette.Connection.Highlight");
+        var onCanvas  = Wcag.ContrastRatio(highlight, PaletteHarness.Color(dict, "Palette.Canvas.Base"));
+        var vsResting = Wcag.ContrastRatio(highlight, PaletteHarness.Color(dict, "Palette.Connection.Base"));
+        Assert.True(onCanvas >= 3.0,  $"{palette}: highlighted link on canvas {onCanvas:F2}:1 < 3:1");
+        Assert.True(vsResting >= 1.8, $"{palette}: highlighted vs resting link {vsResting:F2}:1 < 1.8:1");
     }
 
     // Spec §6: a Never link is the faintest link, but it must still be visible on the backdrop.

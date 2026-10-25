@@ -161,8 +161,8 @@
     <SolidColorBrush x:Key="Brush.Text.Caption"      Color="{StaticResource Palette.Neutral.600}"/>
     <SolidColorBrush x:Key="Brush.Text.Muted"        Color="{StaticResource Palette.Neutral.535}"/>
     <!-- Hints, empty states and quiet labels (issue 180). They are active text, so they get a
-         colour that passes AA on every surface; Text.Muted does not on Surface.Panel, and
-         Text.Disabled is reserved for controls that really are disabled (it reads as greyed out). -->
+         colour that passes AA on every surface. Text.Muted now does too (GitHub issue 265), but stays
+         the quieter of the two; Text.Disabled is reserved for controls that really are disabled (it reads as greyed out). -->
     <SolidColorBrush x:Key="Brush.Text.Hint"         Color="{StaticResource Palette.Neutral.600}"/>
     <SolidColorBrush x:Key="Brush.Text.Disabled"     Color="{StaticResource Palette.Neutral.400}"/>
     <SolidColorBrush x:Key="Brush.Text.OnAccent"     Color="{StaticResource Palette.White}"/>
@@ -216,7 +216,7 @@
     <SolidColorBrush x:Key="Brush.Connection.Default"            Color="{StaticResource Palette.Connection.Base}"/>
     <SolidColorBrush x:Key="Brush.Connection.Always"            Color="{StaticResource Palette.Amber.500}"/>
     <SolidColorBrush x:Key="Brush.Connection.Never"             Color="{StaticResource Palette.Neutral.335}"/>
-    <SolidColorBrush x:Key="Brush.Connection.Highlighted"        Color="{StaticResource Palette.White}"/>
+    <SolidColorBrush x:Key="Brush.Connection.Highlighted"        Color="{StaticResource Palette.Connection.Highlight}"/>
     <SolidColorBrush x:Key="Brush.Connection.Highlighted.Always" Color="{StaticResource Palette.Amber.520}"/>
     <SolidColorBrush x:Key="Brush.Connection.Highlighted.Never"  Color="{StaticResource Palette.Neutral.735}"/>
 

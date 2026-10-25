@@ -23,7 +23,7 @@
     <Color x:Key="Palette.Neutral.290">#FFB6B6B4</Color>
     <Color x:Key="Palette.Neutral.335">#FF9A9A9A</Color>
     <Color x:Key="Palette.Neutral.400">#FFAFAFAF</Color>
-    <Color x:Key="Palette.Neutral.535">#FF6B6B6B</Color>
+    <Color x:Key="Palette.Neutral.535">#FF666666</Color>
     <Color x:Key="Palette.Neutral.600">#FF595959</Color>
     <Color x:Key="Palette.Neutral.665">#FF4F4F4F</Color>
     <Color x:Key="Palette.Neutral.735">#FF3A3A3A</Color>
@@ -41,7 +41,7 @@
           equal the former Neutral.200/400 so this layer changes nothing on screen. Ink is a named
           role-primitive (defined by use, dark-on-light), not a numeric tone in the neutral ramp. -->
     <Color x:Key="Palette.Ink.Strong">#FF333333</Color>
-    <Color x:Key="Palette.Ink.Muted">#FF666666</Color>
+    <Color x:Key="Palette.Ink.Muted">#FF4D4D4D</Color>  <!-- 4.5:1+ on every node footer and body (GitHub issue 245) -->
 
     <!--  LINE / CONTROL — see spec 2026-06-09-layer1-highcontrast-design.md §3. Light values equal
           Light's existing border/header greys, so it is unchanged on screen. -->
@@ -56,6 +56,7 @@
     <Color x:Key="Palette.Button.Hover">#FFC4C4C2</Color>
     <Color x:Key="Palette.Control.Background">#FFD6D6D4</Color>
     <Color x:Key="Palette.Connection.Base">#FF4F4F4F</Color>  <!-- resting connection stroke (matches Light's old Neutral.665) -->
+    <Color x:Key="Palette.Connection.Highlight">#FF000000</Color>  <!-- the selected node's links: dark on the pale canvas; white was ~1.27:1 (GitHub issue 244) -->
     <Color x:Key="Palette.Canvas.Base">#FFE4E4E0</Color>  <!-- canvas backdrop (issue 82): a step darker than panels (#E9E9E7) -->
 
     <!-- Accents -->
