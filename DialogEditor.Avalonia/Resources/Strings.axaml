@@ -144,7 +144,7 @@
     <!-- Label / content of the "open folder" button -->
     <sys:String x:Key="Button_OpenFolder">Open Game Folder…</sys:String>
     <!-- Label preceding the language selector drop-down -->
-    <sys:String x:Key="Label_Language">Language:</sys:String>
+    <sys:String x:Key="Label_Language">Text language:</sys:String>
 
     <!-- ─── Detail panel — section labels ─────────────────────────────── -->
     <!-- Panel header shown above the detail pane -->
@@ -329,7 +329,7 @@
 
     <!-- ─── Tooltips — toolbar ─────────────────────────────────────────── -->
     <sys:String x:Key="ToolTip_OpenFolder">Open a PoE1 or PoE2 game root folder</sys:String>
-    <sys:String x:Key="ToolTip_Language">Switch the display language for dialogue text</sys:String>
+    <sys:String x:Key="ToolTip_Language">Switch the language the dialogue text is shown and edited in. The app's own language is under Settings → App language.</sys:String>
     <sys:String x:Key="ToolTip_HelpToggle">Show / hide the legend and keyboard reference</sys:String>
 
     <!-- ─── Tooltips — canvas ──────────────────────────────────────────── -->
