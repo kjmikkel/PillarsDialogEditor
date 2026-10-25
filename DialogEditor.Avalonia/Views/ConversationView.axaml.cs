@@ -190,11 +190,19 @@ public partial class ConversationView : UserControl
         return true;
     }
 
-    // Keep the selected node on screen after every keyboard move.
+    // Keep the selected node on screen after every keyboard move, and put focus on it so a
+    // screen reader announces it (GitHub issue 242: focus on the bare editor said nothing).
+    // With no selection, focus goes back to the editor, the canvas's Tab stop.
     private void FollowSelection(ConversationViewModel vm)
     {
-        if (vm.SelectedNode is { } node)
-            Editor.BringIntoView(new global::Avalonia.Point(node.Location.X, node.Location.Y));
+        if (vm.SelectedNode is not { } node)
+        {
+            if (Editor.IsKeyboardFocusWithin) Editor.Focus();
+            return;
+        }
+        Editor.BringIntoView(new global::Avalonia.Point(node.Location.X, node.Location.Y));
+        if (Editor.IsKeyboardFocusWithin)
+            Editor.ContainerFromItem(node)?.Focus(NavigationMethod.Directional);
     }
 
     private void Editor_GotFocus(object? sender, GotFocusEventArgs e)

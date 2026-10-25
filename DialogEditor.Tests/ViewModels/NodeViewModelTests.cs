@@ -351,4 +351,48 @@ public class NodeViewModelTests
         Assert.Single(vm.BarkWarnings);
         Assert.Equal("Bark_Warning_TextTooLong", vm.BarkWarnings[0]);
     }
+
+    // ── AutomationName (GitHub issue 242) ─────────────────────────────────
+    // What a screen reader says when the node is selected: speaker, text, node id.
+
+    private static void UseNameFormats() => Loc.Configure(new EchoStringProvider(new()
+    {
+        ["Node_AutomationName"]       = "{1}: {2} (node {0})",
+        ["Node_AutomationNameNoText"] = "{1} (node {0})",
+        ["Speaker_Narrator"]          = "Narrator",
+        ["Speaker_Unknown"]           = "Unknown",
+        ["Node_NoTextScript"]         = "",
+    }));
+
+    [Fact]
+    public void AutomationName_SaysSpeakerTextAndId()
+    {
+        UseNameFormats();
+        var vm = MakeNode(id: 7, defaultText: "Hello there", speakerCategory: SpeakerCategory.Narrator);
+        Assert.Equal("Narrator: Hello there (node 7)", vm.AutomationName);
+    }
+
+    [Fact]
+    public void AutomationName_WithoutText_SaysSpeakerAndId()
+    {
+        UseNameFormats();
+        var vm = MakeNode(id: 3, defaultText: "", speakerCategory: SpeakerCategory.Narrator);
+        Assert.Equal("Narrator (node 3)", vm.AutomationName);
+    }
+
+    [Theory]
+    [InlineData("text")]
+    [InlineData("category")]
+    public void AutomationName_IsRaised_WhenWhatItSaysChanges(string change)
+    {
+        UseNameFormats();
+        var vm = MakeNode();
+        var raised = false;
+        vm.PropertyChanged += (_, e) => raised |= e.PropertyName == nameof(NodeViewModel.AutomationName);
+
+        if (change == "text") vm.DefaultText = "Changed";
+        else                  vm.SpeakerCategory = SpeakerCategory.Narrator;
+
+        Assert.True(raised);
+    }
 }

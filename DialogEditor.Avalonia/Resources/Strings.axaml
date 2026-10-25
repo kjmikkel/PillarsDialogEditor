@@ -54,6 +54,10 @@
     <!-- Muted display-only hint in the body of a script node that has no text, which is
          normal (script nodes run scripts rather than show dialogue). Never stored as text. -->
     <sys:String x:Key="Node_NoTextScript">(no text — script node)</sys:String>
+    <!-- Screen-reader name of a canvas node, announced when it is selected (GitHub issue 242).
+         {0} node id, {1} speaker, {2} first line of text (or the no-text placeholder). -->
+    <sys:String x:Key="Node_AutomationName">{1}: {2} (node {0})</sys:String>
+    <sys:String x:Key="Node_AutomationNameNoText">{1} (node {0})</sys:String>
     <!-- Appended to the node title for player-choice nodes; includes a leading space -->
     <sys:String x:Key="Node_PlayerChoiceSuffix"> ✦</sys:String>
     <!-- Appended to the node footer when a female text variant exists;
@@ -1638,6 +1642,7 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="AutomationName_RemoveCondition">Remove condition</sys:String>
     <sys:String x:Key="AutomationName_ParameterHelp">Parameter help</sys:String>
     <sys:String x:Key="AutomationName_ZoomIn">Zoom in</sys:String>
+    <sys:String x:Key="AutomationName_Minimap">Canvas overview</sys:String>
     <sys:String x:Key="AutomationName_ZoomOut">Zoom out</sys:String>
     <sys:String x:Key="AutomationName_JumpToRoot">Jump to root node</sys:String>
     <sys:String x:Key="AutomationName_AddAnnotation">Add annotation</sys:String>
