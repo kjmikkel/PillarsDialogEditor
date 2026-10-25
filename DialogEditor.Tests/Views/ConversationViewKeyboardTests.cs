@@ -154,41 +154,28 @@ public class ConversationViewKeyboardTests
         Assert.Same(child, vm.SelectedNode);
     }
 
+    // Issue 238: ports were unnamed, invisible tab stops — two per node, so Tab from the
+    // search box crossed every port in the conversation before leaving the canvas. The
+    // canvas itself is the one stop; arrow keys move between nodes from there.
     [AvaloniaFact]
-    public void TabFocus_OnConnector_PansCameraToConnectorAnchor()
+    public void Tab_FromSearchBox_SkipsConnectorPorts_AndReachesCanvas()
     {
-        // Child is far enough away that its connectors sit outside the
-        // initial 800px-wide viewport, which stays centred on the root.
-        var vm = new ConversationViewModel(new StubDispatcher()) { IsEditable = true };
-        var root  = CanvasNavigationServiceTests.MakeNode(0, 0, 0);
-        var child = CanvasNavigationServiceTests.MakeNode(1, 2000, 0);
-        root.OnSelected  = n => vm.SelectedNode = n;
-        child.OnSelected = n => vm.SelectedNode = n;
-        vm.Nodes.Add(root);
-        vm.Nodes.Add(child);
-        vm.Connections.Add(CanvasNavigationServiceTests.Connect(root, child));
-        vm.SelectNode(root);
+        var (_, view, _, _, _) = Setup();
+        var search = view.FindControl<TextBox>("SearchBox")!;
+        var editor = view.FindControl<Control>("Editor")!;
 
-        var view = new ConversationView { DataContext = vm };
-        var window = new Window { Content = view, Width = 800, Height = 600 };
-        window.Show();
-
-        var editor = (NodifyEditor)view.FindControl<Control>("Editor")!;
-
-        // Simulate Tab moving Avalonia's keyboard focus to the child node's
-        // "in" connector, as Nodify does once Tab order reaches that node.
-        var childInput = ((global::Avalonia.Visual)editor).GetVisualDescendants()
-            .OfType<NodeInput>()
-            .First(i => ReferenceEquals(i.DataContext, child.Input));
-        childInput.RaiseEvent(new GotFocusEventArgs
+        var stops = new List<IInputElement>();
+        IInputElement? current = search;
+        for (var i = 0; i < 50; i++)
         {
-            RoutedEvent = InputElement.GotFocusEvent,
-            NavigationMethod = NavigationMethod.Tab,
-            Source = childInput,
-        });
+            current = KeyboardNavigationHandler.GetNext(current!, NavigationDirection.Next);
+            if (current is null || ReferenceEquals(current, search) || stops.Contains(current)) break;
+            stops.Add(current);
+        }
 
-        var anchor = child.Input.Anchor;
-        Assert.InRange(anchor.X, editor.ViewportLocation.X, editor.ViewportLocation.X + editor.ViewportSize.Width);
+        var chain = string.Join(" → ", stops.Select(s => $"{s.GetType().Name}({(s as ContentControl)?.Content})"));
+        Assert.False(stops.Any(s => s is Connector), $"Tab chain enters a port: {chain}");
+        Assert.True(stops.Contains(editor), $"Tab chain never reaches the canvas: {chain}");
     }
 
     [AvaloniaFact]

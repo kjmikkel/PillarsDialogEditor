@@ -181,6 +181,9 @@
 
         <!-- Canvas -->
         <Grid Grid.Row="2" ClipToBounds="True">
+            <!-- Issue 238: NodifyAvalonia makes the editor itself no tab stop; Tab used to reach the canvas only
+                 through its ports. With the ports non-focusable the editor must be the stop, or Tab skips the
+                 canvas entirely. Editor_GotFocus then restores a selection the arrow keys move from. -->
             <nodify:NodifyEditor x:Name="Editor"
                                  Background="{DynamicResource Brush.Canvas.Background}"
                                  ItemsSource="{Binding Nodes}"
@@ -189,7 +192,8 @@
                                  DoubleTapped="Editor_DoubleTapped"
                                  KeyDown="Editor_KeyDown"
                                  GotFocus="Editor_GotFocus"
-                                 PointerPressed="Editor_PointerPressed">
+                                 PointerPressed="Editor_PointerPressed"
+                                 IsTabStop="True">
                 <nodify:NodifyEditor.ContextMenu>
                     <ContextMenu AutomationProperties.AutomationId="CanvasContextMenu">
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_Canvas_AddNodeHere}"
@@ -286,11 +290,14 @@
                                 </ContextMenu>
                             </nodify:Node.ContextMenu>
 
+                            <!-- Issue 238: ports are pointer-only drag handles. Focusable, they were two unnamed,
+                                 invisible tab stops per node; the canvas is the single keyboard stop and the arrow
+                                 keys move between nodes (Editor_KeyDown). Ctrl+L connects from the keyboard. -->
                             <nodify:Node.InputConnectorTemplate>
                                 <DataTemplate DataType="{x:Type vm:ConnectorViewModel}">
                                     <nodify:NodeInput Anchor="{Binding Anchor, Mode=OneWayToSource,
                                                                   Converter={StaticResource LayoutPointConverter}}"
-                                                      IsConnected="True"/>
+                                                      IsConnected="True" Focusable="False"/>
                                 </DataTemplate>
                             </nodify:Node.InputConnectorTemplate>
 
@@ -298,7 +305,7 @@
                                 <DataTemplate DataType="{x:Type vm:ConnectorViewModel}">
                                     <nodify:NodeOutput Anchor="{Binding Anchor, Mode=OneWayToSource,
                                                                    Converter={StaticResource LayoutPointConverter}}"
-                                                       IsConnected="True"/>
+                                                       IsConnected="True" Focusable="False"/>
                                 </DataTemplate>
                             </nodify:Node.OutputConnectorTemplate>
 
