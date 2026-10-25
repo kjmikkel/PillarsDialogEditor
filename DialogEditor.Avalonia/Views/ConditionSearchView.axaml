@@ -54,7 +54,7 @@
       </StackPanel>
 
       <TextBlock Text="{Binding MatchCountText}" Foreground="{DynamicResource Brush.Text.Muted}"
-                 FontSize="{DynamicResource FontSize.Small}"/>
+                 FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
     </StackPanel>
   </Border>
 </UserControl>
