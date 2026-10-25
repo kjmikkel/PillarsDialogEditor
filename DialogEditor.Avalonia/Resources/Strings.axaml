@@ -2179,6 +2179,9 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="EmptyState_Diff_SameVersion">Both sides are the same version</sys:String>
     <sys:String x:Key="EmptyState_Diff_SameVersionHint">Pick a different Other version at the top. Versions come from the project's Git history, so if the list shows only your copy, the project has no saved Git versions to compare with yet.</sys:String>
     <sys:String x:Key="EmptyState_Diff_NoChanges">No differences</sys:String>
+    <!-- Main window before a game folder is open (GitHub issue 252). -->
+    <sys:String x:Key="EmptyState_Main_NoGame">No game folder open</sys:String>
+    <sys:String x:Key="EmptyState_Main_NoGameHint">Open your Pillars of Eternity or Deadfire install folder. Its conversations are then listed on the left, and you can open any of them to read or edit.</sys:String>
     <sys:String x:Key="EmptyState_Diff_NoChangesHint">Your copy and the other version have the same conversations. Pick another Other version at the top to compare with.</sys:String>
 
 </ResourceDictionary>

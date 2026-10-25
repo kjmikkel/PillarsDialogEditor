@@ -147,7 +147,13 @@ public partial class MainWindowViewModel : ObservableObject
     /// The shell-level docking layout root (an IRootDock, kept as object so this
     /// Dock-free VM project never references Dock.*). Built by MainWindow's code-behind
     /// once a game is loaded and bound to <c>DockControl.Layout</c>.
-    [ObservableProperty] private object? _dockLayout;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowWelcome))]
+    private object? _dockLayout;
+
+    /// The welcome panel fills the work area until the dock layout exists, which is once a
+    /// game folder is open (GitHub issue 252).
+    public bool ShowWelcome => DockLayout is null;
 
     /// The Condition/script-search dock tool's VM. Owned at the shell level (rather than by
     /// Canvas) so EditorDockFactory can host it alongside Browser/Canvas/Detail as its own
