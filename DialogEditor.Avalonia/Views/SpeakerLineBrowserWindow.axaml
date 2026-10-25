@@ -62,7 +62,7 @@
                      row cells share each token and the 8 px column spacing, and the header is inset by the
                      row's 12 px item padding (Fluent's ListBoxItem), so the columns line up. -->
                 <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,Auto,Auto,*" ColumnSpacing="8" Margin="12,0,12,2">
-                    <TextBlock Grid.Column="0" Width="{DynamicResource ColumnWidth.Origin}" Classes="col-header" Text="{DynamicResource SpeakerLines_Origin_Vanilla}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{DynamicResource SpeakerLines_Origin_Vanilla}"/>
+                    <TextBlock Grid.Column="0" Width="{DynamicResource ColumnWidth.Origin}" Classes="col-header" Text="{DynamicResource SpeakerLines_Header_Status}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{DynamicResource SpeakerLines_Header_Status}"/>
                     <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.SpeakerConversation}" Classes="col-header" Text="{DynamicResource FindInProject_ColConversation}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{DynamicResource FindInProject_ColConversation}"/>
                     <TextBlock Grid.Column="2" Width="{DynamicResource ColumnWidth.NodeLabel}" Classes="col-header" Text="{DynamicResource SpeakerLines_Node}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{DynamicResource SpeakerLines_Node}"/>
                     <TextBlock Grid.Column="3" Classes="col-header" Text="{DynamicResource FindInProject_ColSnippet}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{DynamicResource FindInProject_ColSnippet}"/>

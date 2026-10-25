@@ -8,9 +8,9 @@
 
         <!-- Filter box -->
         <Border Grid.Row="0" Background="{DynamicResource Brush.Surface.Panel}" Padding="4" BorderBrush="{DynamicResource Brush.Border.Default}" BorderThickness="0,0,0,1">
-            <Grid>
+            <Grid ColumnDefinitions="*,Auto,Auto">
                 <!-- Min, not fixed, sizes (issue 177): the text follows the font scale. -->
-                <TextBox x:Name="FilterBox"
+                <TextBox x:Name="FilterBox" Grid.Column="0"
                          Text="{Binding FilterText}"
                          Watermark="{DynamicResource Placeholder_FilterConversations}"
                          Background="{DynamicResource Brush.Surface.Header}" Foreground="{DynamicResource Brush.Text.Secondary}" CaretBrush="{DynamicResource Brush.Text.Secondary}"
@@ -21,7 +21,7 @@
                          ToolTip.Tip="{DynamicResource ToolTip_FilterConversations}"
                          AutomationProperties.HelpText="{DynamicResource ToolTip_FilterConversations}"
                          AutomationProperties.Name="{DynamicResource Placeholder_FilterConversations}"/>
-                <Button Command="{Binding ClearFilterCommand}"
+                <Button Grid.Column="0" Command="{Binding ClearFilterCommand}"
                         HorizontalAlignment="Right" MinWidth="24" MinHeight="24"
                         Content="✕" VerticalAlignment="Center"
                         Background="Transparent" BorderThickness="0"
@@ -29,6 +29,20 @@
                         ToolTip.Tip="{DynamicResource ToolTip_ClearFilter}"
                         AutomationProperties.HelpText="{DynamicResource ToolTip_ClearFilter}"
                         AutomationProperties.Name="{DynamicResource AutomationName_ClearFilter}"/>
+                <!-- Expand / collapse every folder, as the Legend describes (GitHub issue 264). The
+                     buttons were lost when the Conversations pane moved into the dock. -->
+                <Button Grid.Column="1" Classes="secondary" Command="{Binding ExpandAllCommand}" Content="⊞"
+                        Margin="4,0,0,0" MinWidth="26" MinHeight="26" VerticalAlignment="Center"
+                        FontSize="{DynamicResource FontSize.Body}"
+                        ToolTip.Tip="{DynamicResource ToolTip_ExpandAll}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_ExpandAll}"
+                        AutomationProperties.Name="{DynamicResource AutomationName_ExpandAllFolders}"/>
+                <Button Grid.Column="2" Classes="secondary" Command="{Binding CollapseAllCommand}" Content="⊟"
+                        Margin="2,0,0,0" MinWidth="26" MinHeight="26" VerticalAlignment="Center"
+                        FontSize="{DynamicResource FontSize.Body}"
+                        ToolTip.Tip="{DynamicResource ToolTip_CollapseAll}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_CollapseAll}"
+                        AutomationProperties.Name="{DynamicResource AutomationName_CollapseAllFolders}"/>
             </Grid>
         </Border>
 

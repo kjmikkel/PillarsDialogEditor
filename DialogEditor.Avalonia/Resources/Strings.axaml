@@ -384,9 +384,9 @@
 
     <!-- ─── Tooltips — browser ─────────────────────────────────────────── -->
     <!-- ⊞ button: expands all conversation folders in the tree -->
-    <sys:String x:Key="ToolTip_ExpandAll">Expand all</sys:String>
+    <sys:String x:Key="ToolTip_ExpandAll">Expand every folder in the conversation list, so all conversations show.</sys:String>
     <!-- ⊟ button: collapses all conversation folders in the tree -->
-    <sys:String x:Key="ToolTip_CollapseAll">Collapse all</sys:String>
+    <sys:String x:Key="ToolTip_CollapseAll">Collapse every folder in the conversation list, leaving only the folder names.</sys:String>
     <sys:String x:Key="ToolTip_FilterConversations">Filter conversations by filename</sys:String>
     <sys:String x:Key="ToolTip_ClearFilter">Clear filter</sys:String>
 
@@ -728,6 +728,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="SpeakerLines_LineCount_One">{0} line</sys:String>
     <sys:String x:Key="SpeakerLines_LineCount_Other">{0} lines</sys:String>
     <sys:String x:Key="SpeakerLines_Node">Node</sys:String>
+    <!-- Column header over Vanilla / Edited / New (GitHub issue 264) -->
+    <sys:String x:Key="SpeakerLines_Header_Status">Status</sys:String>
     <sys:String x:Key="SpeakerLines_Origin_Vanilla">Vanilla</sys:String>
     <sys:String x:Key="SpeakerLines_Origin_Edited">Edited</sys:String>
     <sys:String x:Key="SpeakerLines_Origin_New">New</sys:String>
