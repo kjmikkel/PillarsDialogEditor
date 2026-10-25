@@ -1,4 +1,4 @@
-using DialogEditor.Core.Analytics;
+﻿using DialogEditor.Core.Analytics;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Tests.Helpers;
