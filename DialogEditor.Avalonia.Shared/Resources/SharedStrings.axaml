@@ -91,6 +91,8 @@
     <sys:String x:Key="PatchManager_EntryConflict">⚠ conflicts with another mod</sys:String>
     <sys:String x:Key="PatchManager_EntryConflictDetail">Conflicts with another mod — move lower to override the other, or higher to be overridden</sys:String>
     <sys:String x:Key="PatchManager_EntryLoadError">⚠ could not load</sys:String>
+    <!-- Shown under a load-order entry that failed to load (GitHub issue 259). {0} is the reason. -->
+    <sys:String x:Key="PatchManager_EntryLoadErrorDetail">Could not load this mod, so it won't be installed: {0}</sys:String>
     <sys:String x:Key="ToolTip_PatchManagerOpen">Open the Patch Manager to combine and apply multiple .dialogproject files in a defined load order</sys:String>
 
     <!-- Tooltips -->

@@ -103,7 +103,9 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate DataType="vm:PatchEntryViewModel">
                                 <Border Background="{DynamicResource Brush.Surface.Subtle}" CornerRadius="4"
-                                        Margin="4,2,4,2" Padding="10,8">
+                                        Margin="4,2,4,2" Padding="10,8"
+                                        AutomationProperties.Name="{Binding ProjectName}"
+                                        AutomationProperties.HelpText="{Binding StatusText}">
                                     <Grid ColumnDefinitions="*,28,28,28">
                                         <StackPanel Grid.Column="0" Spacing="2">
                                             <StackPanel Orientation="Horizontal" Spacing="6">
@@ -124,6 +126,12 @@
                                             </StackPanel>
                                             <TextBlock Text="{Binding DisplayPath}"
                                                        Foreground="{DynamicResource Brush.Text.Hint}" FontSize="{DynamicResource FontSize.Small}"/>
+                                            <!-- GitHub issue 259: the reason, as text. The ⚠ glyphs' tooltips were
+                                                 hover-only, and the two glyphs differed only by colour. -->
+                                            <TextBlock Text="{Binding StatusText}"
+                                                       IsVisible="{Binding HasStatus}"
+                                                       TextWrapping="Wrap"
+                                                       Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Small}"/>
                                         </StackPanel>
                                         <Button Grid.Column="1" Content="↑"
                                                 Command="{Binding DataContext.MoveUpCommand,
