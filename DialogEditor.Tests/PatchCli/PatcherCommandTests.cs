@@ -205,4 +205,22 @@ public class PatcherCommandTests : IDisposable
         Assert.Contains("--restore", err);
         Assert.Equal(patched, _game.SnapshotGameData());
     }
+
+    // GitHub issue 249: a damaged mod file is reported in words a Player can act on; the parser
+    // detail only with -v.
+    [Fact]
+    public void DamagedModFile_SaysDownloadItAgain_DetailOnlyWithVerbose()
+    {
+        var bad = Path.Combine(_projDir, "bad.dialogproject");
+        File.WriteAllText(bad, "not json");
+
+        var (code, _, err) = Run(_game.Root, bad);
+        Assert.Equal(2, code);
+        Assert.Contains("damaged or isn't a mod", err);
+        Assert.Contains("Download it again", err);
+        Assert.DoesNotContain("JSON literal", err);
+
+        var (_, _, verboseErr) = Run(_game.Root, bad, "-v");
+        Assert.Contains("JSON literal", verboseErr);
+    }
 }
