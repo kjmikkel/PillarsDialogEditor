@@ -2132,4 +2132,35 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="ToolTabStripItemDockAsDocumentString">Dock as Tabbed Document</sys:String>
     <sys:String x:Key="ToolTabStripItemCloseString">_Close</sys:String>
 
+    <!-- ─── Empty states (GitHub issue 254) ─────────────────────────────────
+         Shown by the shared EmptyState control over a list with nothing in it: the first
+         string of each pair says why it is empty, the …Hint string says what fills it. -->
+    <sys:String x:Key="EmptyState_Find_NotSearched">No search yet</sys:String>
+    <sys:String x:Key="EmptyState_Find_NotSearchedHint">Type a word or phrase above and press Search. Every conversation in the project is searched, with the one you have open included as it is now.</sys:String>
+    <sys:String x:Key="EmptyState_Find_NoMatches">No matches</sys:String>
+    <sys:String x:Key="EmptyState_Find_NoMatchesHint">Check the spelling, turn off Case sensitive, or tick Translations or Node comments to search more places.</sys:String>
+    <sys:String x:Key="EmptyState_BatchReplace_NotPreviewed">Nothing previewed yet</sys:String>
+    <sys:String x:Key="EmptyState_BatchReplace_NotPreviewedHint">Type the text to find and its replacement, choose where to look, then press Preview. Nothing changes until you press Apply.</sys:String>
+    <sys:String x:Key="EmptyState_BatchReplace_NoMatches">No matches</sys:String>
+    <sys:String x:Key="EmptyState_BatchReplace_NoMatchesHint">Check the spelling, turn off Case-sensitive, or tick more places to look.</sys:String>
+    <sys:String x:Key="EmptyState_BatchReplace_Applied">Replacements added to the project</sys:String>
+    <sys:String x:Key="EmptyState_BatchReplace_AppliedHint">Press Preview to search again. The game files change only when you test the patch (F5).</sys:String>
+    <sys:String x:Key="EmptyState_RepBalance_NoDispositions">No disposition checks or changes found</sys:String>
+    <sys:String x:Key="EmptyState_RepBalance_NoReputations">No reputation checks or changes found</sys:String>
+    <sys:String x:Key="EmptyState_RepBalance_Hint">To look further, set Scope to All conversations or Source to On disk + changes, then press Analyze.</sys:String>
+    <sys:String x:Key="EmptyState_VoAlias_NoConversation">No conversation chosen</sys:String>
+    <sys:String x:Key="EmptyState_VoAlias_NoConversationHint">Pick a conversation in the list on the left. Its lines appear here, and you choose the one whose voice-over to use.</sys:String>
+    <sys:String x:Key="EmptyState_VoAlias_NoLines">This conversation has no lines</sys:String>
+    <sys:String x:Key="EmptyState_VoAlias_NoLinesHint">Pick another conversation on the left. If you expected lines here, the conversation may not have loaded: see the log.</sys:String>
+    <sys:String x:Key="EmptyState_VoAlias_NoMatches">No lines match the filter</sys:String>
+    <sys:String x:Key="EmptyState_VoAlias_NoMatchesHint">Clear or change the filter above this list. It matches a line's text or its node number.</sys:String>
+    <sys:String x:Key="EmptyState_Diff_ChooseVersions">Choose two versions to compare</sys:String>
+    <sys:String x:Key="EmptyState_Diff_ChooseVersionsHint">Pick your copy and another version at the top of the window.</sys:String>
+    <sys:String x:Key="EmptyState_Diff_Failed">These versions couldn't be compared</sys:String>
+    <sys:String x:Key="EmptyState_Diff_FailedHint">The reason is in the status line at the bottom of the window. Try another version.</sys:String>
+    <sys:String x:Key="EmptyState_Diff_SameVersion">Both sides are the same version</sys:String>
+    <sys:String x:Key="EmptyState_Diff_SameVersionHint">Pick a different Other version at the top. Versions come from the project's Git history, so if the list shows only your copy, the project has no saved Git versions to compare with yet.</sys:String>
+    <sys:String x:Key="EmptyState_Diff_NoChanges">No differences</sys:String>
+    <sys:String x:Key="EmptyState_Diff_NoChangesHint">Your copy and the other version have the same conversations. Pick another Other version at the top to compare with.</sys:String>
+
 </ResourceDictionary>

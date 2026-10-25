@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Editing;
@@ -91,10 +91,37 @@ public partial class BatchReplaceViewModel : ObservableObject
     public ObservableCollection<BatchReplaceConversationViewModel> Results { get; } = [];
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasResults))]
+    [NotifyPropertyChangedFor(nameof(HasResults), nameof(EmptyMessage), nameof(EmptyHint))]
     private int _resultCount;
 
     public bool HasResults => ResultCount > 0;
+
+    private enum Stage { NotPreviewed, Previewed, Applied }
+
+    private Stage _stage = Stage.NotPreviewed;
+
+    private void SetStage(Stage stage)
+    {
+        _stage = stage;
+        OnPropertyChanged(nameof(EmptyMessage));
+        OnPropertyChanged(nameof(EmptyHint));
+    }
+
+    /// Why the results list is empty, or "" when it has rows (GitHub issue 254).
+    public string EmptyMessage => HasResults ? "" : Loc.Get(_stage switch
+    {
+        Stage.Previewed => "EmptyState_BatchReplace_NoMatches",
+        Stage.Applied   => "EmptyState_BatchReplace_Applied",
+        _               => "EmptyState_BatchReplace_NotPreviewed",
+    });
+
+    /// What to do to fill the results list, or "" when it has rows.
+    public string EmptyHint => HasResults ? "" : Loc.Get(_stage switch
+    {
+        Stage.Previewed => "EmptyState_BatchReplace_NoMatchesHint",
+        Stage.Applied   => "EmptyState_BatchReplace_AppliedHint",
+        _               => "EmptyState_BatchReplace_NotPreviewedHint",
+    });
 
     [ObservableProperty] private string _statusText = string.Empty;
     [ObservableProperty] private bool   _isBusy;
@@ -154,6 +181,7 @@ public partial class BatchReplaceViewModel : ObservableObject
             Results.Add(conv);
         }
 
+        SetStage(Stage.Previewed);
         ResultCount = Results.Count;
         ApplyCommand.NotifyCanExecuteChanged();
 
@@ -183,6 +211,7 @@ public partial class BatchReplaceViewModel : ObservableObject
         var updated = await Task.Run(() => BatchReplaceService.Apply(selected, _provider, project));
         _commitProject(updated);
 
+        SetStage(Stage.Applied);
         Results.Clear();
         ResultCount = 0;
         ApplyCommand.NotifyCanExecuteChanged();

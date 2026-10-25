@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
         xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
@@ -135,72 +135,76 @@
         </StackPanel>
 
         <!-- ── Results tree ──────────────────────────────────────────────── -->
-        <ScrollViewer Grid.Row="1" Margin="0,8,0,8">
-            <ItemsControl ItemsSource="{Binding Results}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate DataType="vm:BatchReplaceConversationViewModel">
-                        <Border Background="{DynamicResource Brush.Surface.Panel}" CornerRadius="3"
-                                Margin="0,0,0,4" Padding="10,7">
-                            <StackPanel Spacing="4">
+        <Panel Grid.Row="1">
+            <ScrollViewer Margin="0,8,0,8">
+                <ItemsControl ItemsSource="{Binding Results}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="vm:BatchReplaceConversationViewModel">
+                            <Border Background="{DynamicResource Brush.Surface.Panel}" CornerRadius="3"
+                                    Margin="0,0,0,4" Padding="10,7">
+                                <StackPanel Spacing="4">
 
-                                <!-- Conversation header -->
-                                <Grid ColumnDefinitions="Auto,*,Auto">
-                                    <CheckBox Grid.Column="0"
-                                              IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                              VerticalAlignment="Center"
-                                              ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_ConvCheckbox}"
-                                              AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_ConvCheckbox}"/>
-                                    <TextBlock Grid.Column="1"
-                                               Text="{Binding Name}"
-                                               Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Medium}"
-                                               FontWeight="SemiBold"
-                                               VerticalAlignment="Center" Margin="6,0,0,0"/>
-                                    <TextBlock Grid.Column="2"
-                                               Text="{Binding MatchCountLabel}"
-                                               Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}"
-                                               VerticalAlignment="Center"/>
-                                </Grid>
+                                    <!-- Conversation header -->
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <CheckBox Grid.Column="0"
+                                                  IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                  VerticalAlignment="Center"
+                                                  ToolTip.Tip="{DynamicResource ToolTip_BatchReplace_ConvCheckbox}"
+                                                  AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace_ConvCheckbox}"/>
+                                        <TextBlock Grid.Column="1"
+                                                   Text="{Binding Name}"
+                                                   Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Medium}"
+                                                   FontWeight="SemiBold"
+                                                   VerticalAlignment="Center" Margin="6,0,0,0"/>
+                                        <TextBlock Grid.Column="2"
+                                                   Text="{Binding MatchCountLabel}"
+                                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}"
+                                                   VerticalAlignment="Center"/>
+                                    </Grid>
 
-                                <!-- Match rows -->
-                                <ItemsControl ItemsSource="{Binding Matches}" Margin="28,2,0,0">
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate DataType="vm:BatchReplaceMatchViewModel">
-                                            <Border Padding="6,4" Margin="0,1">
-                                                <StackPanel Spacing="2">
-                                                    <TextBlock Text="{Binding RowLabel}"
-                                                               Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Label}"/>
-                                                    <Grid ColumnDefinitions="Auto,*">
-                                                        <TextBlock Grid.Column="0"
-                                                                   Text="{DynamicResource BatchReplace_Before}"
-                                                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}"
-                                                                   VerticalAlignment="Top"/>
-                                                        <TextBlock Grid.Column="1"
-                                                                   Text="{Binding Before}"
-                                                                   Foreground="{DynamicResource Brush.Text.Status.Error}" FontSize="{DynamicResource FontSize.Label}"
-                                                                   TextWrapping="Wrap"/>
-                                                    </Grid>
-                                                    <Grid ColumnDefinitions="Auto,*">
-                                                        <TextBlock Grid.Column="0"
-                                                                   Text="{DynamicResource BatchReplace_After}"
-                                                                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}"
-                                                                   VerticalAlignment="Top"/>
-                                                        <TextBlock Grid.Column="1"
-                                                                   Text="{Binding After}"
-                                                                   Foreground="{DynamicResource Brush.Text.Status.Success}" FontSize="{DynamicResource FontSize.Label}"
-                                                                   TextWrapping="Wrap"/>
-                                                    </Grid>
-                                                </StackPanel>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                                    <!-- Match rows -->
+                                    <ItemsControl ItemsSource="{Binding Matches}" Margin="28,2,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate DataType="vm:BatchReplaceMatchViewModel">
+                                                <Border Padding="6,4" Margin="0,1">
+                                                    <StackPanel Spacing="2">
+                                                        <TextBlock Text="{Binding RowLabel}"
+                                                                   Foreground="{DynamicResource Brush.Text.Muted.Light}" FontSize="{DynamicResource FontSize.Label}"/>
+                                                        <Grid ColumnDefinitions="Auto,*">
+                                                            <TextBlock Grid.Column="0"
+                                                                       Text="{DynamicResource BatchReplace_Before}"
+                                                                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}"
+                                                                       VerticalAlignment="Top"/>
+                                                            <TextBlock Grid.Column="1"
+                                                                       Text="{Binding Before}"
+                                                                       Foreground="{DynamicResource Brush.Text.Status.Error}" FontSize="{DynamicResource FontSize.Label}"
+                                                                       TextWrapping="Wrap"/>
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,*">
+                                                            <TextBlock Grid.Column="0"
+                                                                       Text="{DynamicResource BatchReplace_After}"
+                                                                       Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}"
+                                                                       VerticalAlignment="Top"/>
+                                                            <TextBlock Grid.Column="1"
+                                                                       Text="{Binding After}"
+                                                                       Foreground="{DynamicResource Brush.Text.Status.Success}" FontSize="{DynamicResource FontSize.Label}"
+                                                                       TextWrapping="Wrap"/>
+                                                        </Grid>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
 
-                            </StackPanel>
-                        </Border>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </ScrollViewer>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+            <!-- Says why the list is empty and what fills it (GitHub issue 254). -->
+            <shared:EmptyState Message="{Binding EmptyMessage}" Hint="{Binding EmptyHint}"/>
+        </Panel>
 
         <!-- ── Status bar ────────────────────────────────────────────────── -->
         <TextBlock Grid.Row="2"

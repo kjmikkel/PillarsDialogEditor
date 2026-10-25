@@ -82,26 +82,30 @@
                     <TextBlock Grid.Column="2" Width="{DynamicResource ColumnWidth.Share}" Classes="col-header" Text="{DynamicResource RepBalance_Col_Share}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{DynamicResource RepBalance_Col_Share}"/>
                     <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.Flag}" Classes="col-header" Text="{DynamicResource RepBalance_Col_Flag}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{DynamicResource RepBalance_Col_Flag}"/>
                 </Grid>
-                <ListBox ItemsSource="{Binding DispositionRows}"
-                         ToolTip.Tip="{DynamicResource RepBalance_Tip_Table}"
-                         AutomationProperties.HelpText="{DynamicResource RepBalance_Tip_Table}"
-                         Background="{DynamicResource Brush.Surface.Card}" BorderThickness="0">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8" Margin="0,2">
-                                <TextBlock Grid.Column="0" Text="{Binding DisplayValue}" ToolTip.Tip="{Binding DisplayValue}"
-                                           Classes="list-primary" TextTrimming="CharacterEllipsis"/>
-                                <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.Count}" Text="{Binding Count}"
-                                           Classes="list-secondary"/>
-                                <TextBlock Grid.Column="2" Width="{DynamicResource ColumnWidth.Share}" Text="{Binding ShareText}"
-                                           Classes="list-secondary"/>
-                                <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.Flag}" Text="{Binding FlagLabel}" ToolTip.Tip="{Binding FlagLabel}"
-                                           Classes="balance-flag"
-                                           FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                <Panel>
+                    <ListBox ItemsSource="{Binding DispositionRows}"
+                             ToolTip.Tip="{DynamicResource RepBalance_Tip_Table}"
+                             AutomationProperties.HelpText="{DynamicResource RepBalance_Tip_Table}"
+                             Background="{DynamicResource Brush.Surface.Card}" BorderThickness="0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8" Margin="0,2">
+                                    <TextBlock Grid.Column="0" Text="{Binding DisplayValue}" ToolTip.Tip="{Binding DisplayValue}"
+                                               Classes="list-primary" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.Count}" Text="{Binding Count}"
+                                               Classes="list-secondary"/>
+                                    <TextBlock Grid.Column="2" Width="{DynamicResource ColumnWidth.Share}" Text="{Binding ShareText}"
+                                               Classes="list-secondary"/>
+                                    <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.Flag}" Text="{Binding FlagLabel}" ToolTip.Tip="{Binding FlagLabel}"
+                                               Classes="balance-flag"
+                                               FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <!-- Says why the list is empty and what fills it (GitHub issue 254). -->
+                    <shared:EmptyState Message="{Binding DispositionEmptyMessage}" Hint="{Binding EmptyHint}"/>
+                </Panel>
             </DockPanel>
 
             <!-- Reputations -->
@@ -114,26 +118,30 @@
                     <TextBlock Grid.Column="2" Width="{DynamicResource ColumnWidth.Share}" Classes="col-header" Text="{DynamicResource RepBalance_Col_Share}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{DynamicResource RepBalance_Col_Share}"/>
                     <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.Flag}" Classes="col-header" Text="{DynamicResource RepBalance_Col_Flag}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{DynamicResource RepBalance_Col_Flag}"/>
                 </Grid>
-                <ListBox ItemsSource="{Binding ReputationRows}"
-                         ToolTip.Tip="{DynamicResource RepBalance_Tip_Table}"
-                         AutomationProperties.HelpText="{DynamicResource RepBalance_Tip_Table}"
-                         Background="{DynamicResource Brush.Surface.Card}" BorderThickness="0">
-                    <ListBox.ItemTemplate>
-                        <DataTemplate>
-                            <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8" Margin="0,2">
-                                <TextBlock Grid.Column="0" Text="{Binding DisplayValue}" ToolTip.Tip="{Binding DisplayValue}"
-                                           Classes="list-primary" TextTrimming="CharacterEllipsis"/>
-                                <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.Count}" Text="{Binding Count}"
-                                           Classes="list-secondary"/>
-                                <TextBlock Grid.Column="2" Width="{DynamicResource ColumnWidth.Share}" Text="{Binding ShareText}"
-                                           Classes="list-secondary"/>
-                                <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.Flag}" Text="{Binding FlagLabel}" ToolTip.Tip="{Binding FlagLabel}"
-                                           Classes="balance-flag"
-                                           FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
-                            </Grid>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
+                <Panel>
+                    <ListBox ItemsSource="{Binding ReputationRows}"
+                             ToolTip.Tip="{DynamicResource RepBalance_Tip_Table}"
+                             AutomationProperties.HelpText="{DynamicResource RepBalance_Tip_Table}"
+                             Background="{DynamicResource Brush.Surface.Card}" BorderThickness="0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8" Margin="0,2">
+                                    <TextBlock Grid.Column="0" Text="{Binding DisplayValue}" ToolTip.Tip="{Binding DisplayValue}"
+                                               Classes="list-primary" TextTrimming="CharacterEllipsis"/>
+                                    <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.Count}" Text="{Binding Count}"
+                                               Classes="list-secondary"/>
+                                    <TextBlock Grid.Column="2" Width="{DynamicResource ColumnWidth.Share}" Text="{Binding ShareText}"
+                                               Classes="list-secondary"/>
+                                    <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.Flag}" Text="{Binding FlagLabel}" ToolTip.Tip="{Binding FlagLabel}"
+                                               Classes="balance-flag"
+                                               FontWeight="Bold" TextTrimming="CharacterEllipsis"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <!-- Says why the list is empty and what fills it (GitHub issue 254). -->
+                    <shared:EmptyState Message="{Binding ReputationEmptyMessage}" Hint="{Binding EmptyHint}"/>
+                </Panel>
             </DockPanel>
         </Grid>
 
