@@ -34,7 +34,7 @@ public static class PatchInstaller
             var merged  = Merge(loadOrder);
             var missing    = new List<string>();
             var unreadable = new List<string>();
-            var patched    = 0;
+            var patched    = new List<string>();
             foreach (var name in merged.Patches.Keys.Order())
             {
                 var patch = merged.Patches[name];
@@ -61,13 +61,14 @@ public static class PatchInstaller
                 unreadable.AddRange(TranslationApplier.WriteTranslations(file, patch, provider));
 
                 foreach (var t in targets.Where(File.Exists)) store.RecordWritten(t);
-                patched++;
+                patched.Add(name);
             }
 
             var voCopied = CopyVo(provider, gameDir, loadOrder, store, options);
-            return new InstallResult.Applied(patched, missing, restoreSkipped, voCopied)
+            return new InstallResult.Applied(patched.Count, missing, restoreSkipped, voCopied)
             {
                 UnreadableStringTables = unreadable,
+                PatchedConversations   = patched,
             };
         }
         catch (PatchConflictException)

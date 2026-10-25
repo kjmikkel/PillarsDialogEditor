@@ -22,6 +22,10 @@ public abstract record InstallResult
     {
         /// Stringtables left untouched because they aren't readable XML (issue 119).
         public IReadOnlyList<string> UnreadableStringTables { get; init; } = [];
+
+        /// The conversations written, in the order they were patched (GitHub issue 264: for
+        /// dialog-patcher's --verbose).
+        public IReadOnlyList<string> PatchedConversations { get; init; } = [];
     }
 
     /// Nothing was written: these managed files (relative paths) were changed outside the
