@@ -70,8 +70,7 @@ public static class FlowAnalysisService
         foreach (var node in nodes)
         {
             // Statistics
-            if (!string.IsNullOrEmpty(node.DefaultText))
-                wordCount += node.DefaultText.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+            wordCount += WordCount.Of(node.DefaultText);
 
             switch (node.SpeakerCategory)
             {
