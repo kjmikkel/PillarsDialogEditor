@@ -251,6 +251,12 @@
                                   IsChecked="{Binding IsPrivacyModeEnabled, Mode=TwoWay}"
                                   ToolTip.Tip="{DynamicResource ToolTip_View_PrivacyMode}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_View_PrivacyMode}"/>
+                        <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_View_ShowMinimap}"
+                                  AutomationProperties.AutomationId="MenuView_ShowMinimap"
+                                  ToggleType="CheckBox"
+                                  IsChecked="{Binding ShowMinimap, Mode=TwoWay}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_View_ShowMinimap}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_View_ShowMinimap}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_View_ResetLayout}"
                                   AutomationProperties.AutomationId="MenuView_ResetLayout"
                                   Click="ResetLayout_Click"

@@ -383,7 +383,7 @@ public partial class MainWindowViewModel : ObservableObject
         _folderPicker = folderPicker;
         _filePicker   = filePicker;
         Browser = new GameBrowserViewModel(dispatcher);
-        Canvas  = new ConversationViewModel(dispatcher);
+        Canvas  = new ConversationViewModel(dispatcher) { ShowMinimap = AppSettings.ShowMinimap };
 
         Browser.ConversationSelected += OnConversationSelected;
 
@@ -487,6 +487,20 @@ public partial class MainWindowViewModel : ObservableObject
             vm.OnPropertyChanged(nameof(IsPrivacyModeEnabled));
             vm.RefreshRecentProjects();
         });
+    }
+
+    /// The View ▸ Show Minimap toggle (GitHub issue 264): at large text sizes the minimap can
+    /// cover cards, so it can be hidden, and the choice is remembered.
+    public bool ShowMinimap
+    {
+        get => Canvas.ShowMinimap;
+        set
+        {
+            if (Canvas.ShowMinimap == value) return;
+            Canvas.ShowMinimap = value;
+            AppSettings.ShowMinimap = value;
+            OnPropertyChanged();
+        }
     }
 
     /// The View ▸ "Hide private paths" toggle. Reads the effective state (so it shows

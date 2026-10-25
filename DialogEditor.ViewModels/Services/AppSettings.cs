@@ -106,6 +106,8 @@ public static class AppSettings
         // for the same reason as the two above: an upgrading install sees the report it saw
         // before, and only opts in to the larger figures deliberately.
         public bool FollowConversationJumps { get; set; }
+        // View ▸ Show Minimap (GitHub issue 264). On by default, as it always was.
+        public bool ShowMinimap { get; set; } = true;
 
         // ── Autosave knobs (issue #11) ───────────────────────────────────────
         // Seconds between autosave ticks; 0 disables autosave entirely. Defaults to
@@ -138,6 +140,12 @@ public static class AppSettings
     {
         get => Load().BrowserPinned;
         set { var s = Load(); s.BrowserPinned = value; Save(s); }
+    }
+
+    public static bool ShowMinimap
+    {
+        get => Load().ShowMinimap;
+        set { var s = Load(); s.ShowMinimap = value; Save(s); }
     }
 
     public static bool DetailExpanded

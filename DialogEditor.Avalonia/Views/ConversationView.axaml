@@ -523,7 +523,8 @@
             <nodify:Minimap
                 x:Name="Minimap"
                 HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                Margin="8" Width="160" Height="110"
+                Margin="8"
+                IsVisible="{Binding ShowMinimap}"
                 IsReadOnly="False"
                 Background="{DynamicResource Brush.Surface.Info}"
                 ItemsSource="{Binding Nodes}"

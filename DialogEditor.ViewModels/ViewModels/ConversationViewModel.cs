@@ -512,6 +512,10 @@ public partial class ConversationViewModel : ObservableObject
     /// nowhere to start it.
     [ObservableProperty] private bool _hasStartNode = true;
 
+    /// Whether the canvas shows its minimap (GitHub issue 264). MainWindowViewModel.ShowMinimap
+    /// loads and saves it, so a canvas made in a test never touches the settings file.
+    [ObservableProperty] private bool _showMinimap = true;
+
     /// Set by MainWindowViewModel: true for conversations created in this project. Renumbering
     /// a game conversation's node would turn it into a delete plus an add in the patch.
     [ObservableProperty] private bool _canChooseStartNode;

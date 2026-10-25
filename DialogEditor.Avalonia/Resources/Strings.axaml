@@ -385,6 +385,9 @@
     <sys:String x:Key="ToolTip_ResizeAnnotation">Drag to resize the annotation box</sys:String>
     <!-- Minimap overlay in the bottom-right corner of the canvas -->
     <sys:String x:Key="ToolTip_Minimap">Canvas overview — drag to pan</sys:String>
+    <!-- View ▸ Show Minimap (GitHub issue 264) -->
+    <sys:String x:Key="Menu_View_ShowMinimap">Show Minimap</sys:String>
+    <sys:String x:Key="ToolTip_View_ShowMinimap">Show or hide the small overview of the whole conversation in the canvas's bottom-right corner. Hide it if it covers cards, for example at large text sizes. Your choice is remembered.</sys:String>
 
     <!-- ─── Tooltips — browser ─────────────────────────────────────────── -->
     <!-- ⊞ button: expands all conversation folders in the tree -->

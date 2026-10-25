@@ -44,8 +44,34 @@ public partial class ConversationView : UserControl
                 SyncAllAnnotations();
         };
 
+        // Sized from the viewport, not fixed (GitHub issue 264): a fixed 160×110 covered cards at
+        // large text sizes. Set before the first layout too, so it never shows at a default size.
+        Editor.SizeChanged += (_, e) => SizeMinimap(e.NewSize);
+        SizeMinimap(default);
+
         DataContextChanged += (_, _) => ResubscribeAnnotations();
         Loaded += (_, _) => { ResubscribeAnnotations(); SyncAllAnnotations(); };
+    }
+
+    private void SizeMinimap(global::Avalonia.Size viewport)
+    {
+        var size = MinimapSize(viewport);
+        Minimap.Width  = size.Width;
+        Minimap.Height = size.Height;
+    }
+
+    // A share of the canvas width, at the old 160×110 aspect, kept between legible and useful.
+    // It follows the canvas, not the font: the cards it sketches grow with the font, and the
+    // overview stays the same small part of the canvas.
+    private const double MinimapShare     = 0.18;
+    private const double MinimapMinWidth  = 120;
+    private const double MinimapMaxWidth  = 240;
+    private const double MinimapAspect    = 110.0 / 160.0;
+
+    internal static global::Avalonia.Size MinimapSize(global::Avalonia.Size viewport)
+    {
+        var width = Math.Clamp(viewport.Width * MinimapShare, MinimapMinWidth, MinimapMaxWidth);
+        return new global::Avalonia.Size(width, width * MinimapAspect);
     }
 
     private void ResubscribeAnnotations()
@@ -295,7 +321,7 @@ public partial class ConversationView : UserControl
     {
         var extent = Editor.ItemsExtent;
         if (extent.Width <= 0 || Editor.Bounds.Width <= 0) { Editor.FitToScreen(); return; }
-        var reserved = Minimap.Bounds.Width + Minimap.Margin.Left + Minimap.Margin.Right;
+        var reserved = Minimap.IsVisible ? Minimap.Bounds.Width + Minimap.Margin.Left + Minimap.Margin.Right : 0;
         var usable = Math.Max(1, Editor.Bounds.Width - reserved);
         var widened = extent.Width * Editor.Bounds.Width / usable;
         Editor.FitToScreen(new global::Avalonia.Rect(extent.X, extent.Y, widened, extent.Height));
