@@ -1,3 +1,4 @@
+using DialogEditor.Core.Text;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -81,7 +82,7 @@ public partial class BatchVoRowViewModel : ObservableObject
     {
         ConversationName = conversationName;
         NodeId           = nodeId;
-        TextPreview      = textPreview;
+        TextPreview      = TextMarkup.Strip(textPreview);
         VoStatus         = voStatus;
         DestPrimaryPath  = destPrimaryPath;
         DestFemPath      = destFemPath;

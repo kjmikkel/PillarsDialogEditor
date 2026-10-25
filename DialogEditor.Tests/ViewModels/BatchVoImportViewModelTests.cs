@@ -200,4 +200,12 @@ public class BatchVoImportViewModelTests
                 _success ? null : "Stub failure"));
         }
     }
+
+    [Fact] // GitHub issue 258: the row shows the line without its markup tags.
+    public void Row_TextPreview_DropsMarkup()
+    {
+        var row = new BatchVoRowViewModel("conv", 1, "<link=\"glossary://X\">Ahull</link>!",
+            VoPresence.Missing, "p.wem", "f.wem");
+        Assert.Equal("Ahull!", row.TextPreview);
+    }
 }

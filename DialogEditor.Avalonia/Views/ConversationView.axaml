@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:beh="clr-namespace:DialogEditor.Avalonia.Behaviors"
              xmlns:nodify="clr-namespace:Nodify;assembly=Nodify"
              xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
              xmlns:models="clr-namespace:DialogEditor.Core.Models;assembly=DialogEditor.Core"
@@ -453,8 +454,10 @@
                                     <Panel>
                                         <!-- Issue 82: the card grows to fit its line, up to CardMetrics.MaxBodyLines, then ends in "…".
                                              Full text, not TextPreview: TextPreview's 80-character cut stays for one-line summaries
-                                             elsewhere (Node Details' link list, Batch VO Import, VO Validation, the alias picker). -->
-                                        <TextBlock Classes="cardBody" Text="{Binding DefaultText}"
+                                             elsewhere (Node Details' link list, Batch VO Import, VO Validation, the alias picker).
+                                             MarkupText renders the game's <i>/<ispeech> markup as italic instead of showing the
+                                             tags (GitHub issue 258); the edit field in Node Details keeps the raw text. -->
+                                        <TextBlock Classes="cardBody" beh:MarkupText.Source="{Binding DefaultText}"
                                                    IsVisible="{Binding !HasTextPlaceholder}"
                                                    TextWrapping="Wrap" MaxLines="4" TextTrimming="CharacterEllipsis"
                                                    Padding="6,4" FontSize="{DynamicResource Canvas.FontSize.Body}"

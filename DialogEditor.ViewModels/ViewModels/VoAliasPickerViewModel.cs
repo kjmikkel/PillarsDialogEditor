@@ -1,3 +1,4 @@
+using DialogEditor.Core.Text;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DialogEditor.Core.Audio;
@@ -96,7 +97,7 @@ public partial class VoAliasPickerViewModel : ObservableObject
                               && File.Exists(Path.Combine(_voicesRoot, derived + ".wem"));
                     var speaker = SpeakerNameService.FindByGuid(n.SpeakerGuid)?.Name
                                   ?? n.SpeakerCategory.ToString();
-                    var text = conv.Strings.Get(n.NodeId)?.DefaultText ?? string.Empty;
+                    var text = TextMarkup.Strip(conv.Strings.Get(n.NodeId)?.DefaultText ?? string.Empty);
                     // ExpectedRelativePath uses Path.Combine, which yields '\' on
                     // Windows. Shipped PoE2 ExternalVO values — and the alias-index /
                     // shared-count logic that compares alias strings literally — always

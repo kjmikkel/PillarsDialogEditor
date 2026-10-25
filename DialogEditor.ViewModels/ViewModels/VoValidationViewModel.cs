@@ -1,3 +1,4 @@
+using DialogEditor.Core.Text;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -271,7 +272,7 @@ public partial class VoValidationViewModel : ObservableObject
 
     private static string BuildPreview(string text)
     {
-        var trimmed = text.Trim();
+        var trimmed = TextMarkup.Strip(text).Trim();
         return trimmed.Length <= 60 ? trimmed : trimmed[..60] + "…";
     }
 }
