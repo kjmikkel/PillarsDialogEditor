@@ -198,6 +198,33 @@ public partial class NodeViewModel : ObservableObject
 
     public bool HasFemaleText => !string.IsNullOrEmpty(_femaleText);
 
+    /// What a screen reader says for this node's canvas container: speaker, first line, node id
+    /// (GitHub issue 242). Focus follows keyboard selection onto the container, so this is
+    /// announced on every arrow-key move.
+    public string AutomationName
+    {
+        get
+        {
+            var text = TextPreview.Length > 0 ? TextPreview : TextPlaceholder;
+            return text.Length > 0
+                ? Loc.Format("Node_AutomationName", NodeId, SpeakerName, text)
+                : Loc.Format("Node_AutomationNameNoText", NodeId, SpeakerName);
+        }
+    }
+
+    // AutomationName is derived from these; raising it here keeps every setter that changes one
+    // (and the speaker-name refresh) from having to remember it.
+    private static readonly HashSet<string> AutomationNameInputs =
+        [nameof(NodeId), nameof(Title), nameof(SpeakerName), nameof(SpeakerCategory),
+         nameof(TextPreview), nameof(TextPlaceholder)];
+
+    protected override void OnPropertyChanged(System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+        if (e.PropertyName is { } name && AutomationNameInputs.Contains(name))
+            base.OnPropertyChanged(new System.ComponentModel.PropertyChangedEventArgs(nameof(AutomationName)));
+    }
+
     public string FooterText
     {
         get

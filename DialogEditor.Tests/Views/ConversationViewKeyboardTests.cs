@@ -306,4 +306,84 @@ public class ConversationViewKeyboardTests
         Assert.True(root.IsConnectionSource);
         Assert.False(child.IsConnectionSource);
     }
+
+    // ── Screen readers follow keyboard selection (GitHub issue 242) ──────
+    // Focus moves onto the selected node's container, which is named after the node, so a
+    // screen reader announces each keyboard move. Focus on the bare editor said nothing.
+
+    private static IInputElement? Focused(Window window) => window.FocusManager?.GetFocusedElement();
+
+    [AvaloniaFact]
+    public void ArrowKey_MovesFocusToSelectedNode_WhichIsNamedAfterIt()
+    {
+        Loc.Configure(new StubStringProvider());   // AutomationName reads the speaker label
+        var (window, view, vm, root, child) = Setup();
+        view.FocusEditor();
+        vm.SelectNode(root);
+
+        Press(view, Key.Right);
+
+        var editor    = view.FindControl<NodifyEditor>("Editor")!;
+        var container = editor.ContainerFromItem(child);
+        Assert.NotNull(container);
+        Assert.Same(container, Focused(window));
+        Assert.Equal(child.AutomationName,
+                     global::Avalonia.Automation.AutomationProperties.GetName(container!));
+    }
+
+    [AvaloniaFact]
+    public void ArrowKeys_StillNavigate_WhenSentFromTheFocusedNode()
+    {
+        Loc.Configure(new StubStringProvider());
+        var (window, view, vm, root, child) = Setup();
+        view.FocusEditor();
+        vm.SelectNode(root);
+        Press(view, Key.Home);   // focus is now on root's container
+
+        // Real key input starts at the focused element, not at the editor.
+        foreach (var key in new[] { Key.Right, Key.Left, Key.Right })
+            ((Control)Focused(window)!).RaiseEvent(new KeyEventArgs { RoutedEvent = InputElement.KeyDownEvent, Key = key });
+
+        Assert.Same(child, vm.SelectedNode);
+        Assert.Same(view.FindControl<NodifyEditor>("Editor")!.ContainerFromItem(child), Focused(window));
+    }
+
+    [AvaloniaFact]
+    public void Escape_ReturnsFocusToCanvas()
+    {
+        var (window, view, vm, root, _) = Setup();
+        view.FocusEditor();
+        vm.SelectNode(root);
+        Press(view, Key.Home);
+
+        Press(view, Key.Escape);
+
+        Assert.Null(vm.SelectedNode);
+        Assert.Same(view.FindControl<Control>("Editor"), Focused(window));
+    }
+
+    [AvaloniaFact]
+    public void Tab_FromFocusedNode_LeavesTheCanvas()
+    {
+        var (_, view, vm, root, _) = Setup();
+        view.FocusEditor();
+        vm.SelectNode(root);
+        Press(view, Key.Home);
+
+        var editor = view.FindControl<NodifyEditor>("Editor")!;
+        var next   = KeyboardNavigationHandler.GetNext(editor.ContainerFromItem(root)!, NavigationDirection.Next);
+
+        // Nodes are not tab stops: Tab goes on to the next control, not to another node.
+        Assert.False(next is ItemContainer, $"Tab from a node went to another node ({next})");
+        Assert.False(next is global::Avalonia.Visual v && v.GetVisualAncestors().Contains(editor),
+                     $"Tab from a node stayed inside the canvas ({next})");
+    }
+
+    [AvaloniaFact]
+    public void Minimap_HasAName()
+    {
+        var (_, view, _, _, _) = Setup();
+        var minimap = view.FindControl<Control>("Minimap")!;
+        Assert.False(string.IsNullOrEmpty(global::Avalonia.Automation.AutomationProperties.GetName(minimap)));
+    }
 }

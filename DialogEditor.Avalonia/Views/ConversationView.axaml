@@ -239,6 +239,12 @@
                         <Setter Property="Location" Value="{Binding Location, Mode=TwoWay,
                                                    Converter={StaticResource LayoutPointConverter}}"/>
                         <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                        <!-- Issue 242: keyboard selection moves focus here (FollowSelection), so a screen
+                             reader announces the node. Focusable but no tab stop: the editor stays the
+                             canvas's single Tab stop (issue 238). -->
+                        <Setter Property="AutomationProperties.Name" Value="{Binding AutomationName}"/>
+                        <Setter Property="Focusable" Value="True"/>
+                        <Setter Property="IsTabStop" Value="False"/>
                     </ControlTheme>
                 </nodify:NodifyEditor.ItemContainerTheme>
 
@@ -520,7 +526,8 @@
                 ItemsSource="{Binding Nodes}"
                 ViewportLocation="{Binding ViewportLocation, ElementName=Editor, Mode=TwoWay}"
                 ViewportSize="{Binding ViewportSize, ElementName=Editor}"
-                ToolTip.Tip="{DynamicResource ToolTip_Minimap}">
+                ToolTip.Tip="{DynamicResource ToolTip_Minimap}"
+                AutomationProperties.Name="{DynamicResource AutomationName_Minimap}">
                 <nodify:Minimap.ItemContainerTheme>
                     <ControlTheme TargetType="nodify:MinimapItem"
                                   BasedOn="{StaticResource {x:Type nodify:MinimapItem}}">
