@@ -202,7 +202,7 @@ public class ActionToolsGuiTests(EditorSessionFixture fixture) : IClassFixture<E
         // Guards against the false positive found during phase 3: a ComboBox exposes
         // ExpandCollapse and no Invoke, and warning about that would blame the app for
         // correct behaviour.
-        var combo = Resolve(new Selector(Name: "Language:", ControlType: "ComboBox"));
+        var combo = Resolve(new Selector(Name: "Text language:", ControlType: "ComboBox"));
 
         var plan = ActionStrategy.Plan(combo, ActionKind.Activate);
         Assert.Equal("Pattern", plan.Route);

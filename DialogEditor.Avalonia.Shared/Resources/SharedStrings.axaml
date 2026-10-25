@@ -123,7 +123,7 @@
     <sys:String x:Key="Theme_Name_HighContrast">High Contrast</sys:String>
 
     <!-- ─── Language picker — shared by editor and standalone PatchManager ──────── -->
-    <sys:String x:Key="Settings_Language">Language</sys:String>
+    <sys:String x:Key="Settings_Language">App language</sys:String>
     <sys:String x:Key="Settings_LanguageTooltip">Choose the application language. The change is applied immediately and remembered for next time.</sys:String>
     <sys:String x:Key="Settings_Language_English">English</sys:String>
 

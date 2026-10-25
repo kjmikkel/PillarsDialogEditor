@@ -344,7 +344,8 @@
 
                 </Menu>
 
-                <!-- Language selector -->
+                <!-- Dialogue-text language selector. Labelled "Text language" so it is not confused with
+                     Settings' app (UI) language (GitHub issue 251). -->
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal"
                             VerticalAlignment="Center" Margin="4,0,0,0">
                     <TextBlock Text="{DynamicResource Label_Language}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}"
@@ -356,7 +357,14 @@
                               ToolTip.Tip="{DynamicResource ToolTip_Language}"
                               AutomationProperties.HelpText="{DynamicResource ToolTip_Language}"
                               AutomationProperties.Name="{DynamicResource Label_Language}"
-                              IsVisible="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}"/>
+                              IsVisible="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}">
+                        <!-- Names, not codes (GitHub issue 251); the item stays the code. -->
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <TextBlock Text="{Binding Converter={StaticResource LanguageName}}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                 </StackPanel>
             </DockPanel>
         </Border>
