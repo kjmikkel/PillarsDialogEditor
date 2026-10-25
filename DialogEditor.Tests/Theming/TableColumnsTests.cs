@@ -143,7 +143,9 @@ public class TableColumnsTests
         v.GetVisualAncestors().Any(a => a is ListBoxItem || a is ContentPresenter { Parent: ItemsControl or ItemsPresenter });
 
     // A table's header is a Grid beside its ItemsControl in the same panel, with as many columns as
-    // the item's row grid and at least two text cells.
+    // the item's row grid and at least two text cells. The list may sit in a plain Panel of its
+    // own that overlays the EmptyState explanation (GitHub issue 254); the header is then beside
+    // that Panel, one level up.
     private static IEnumerable<(Grid Header, Grid Row)> HeaderRowPairs(Window w)
     {
         foreach (var items in Items(w))
@@ -151,12 +153,16 @@ public class TableColumnsTests
             var row = items.GetVisualDescendants().OfType<Grid>()
                            .FirstOrDefault(g => g.ColumnDefinitions.Count >= 2 && IsInItem(g));
             if (row is null || items.GetVisualParent() is not Panel panel) continue;
-            var header = panel.Children.OfType<Grid>().FirstOrDefault(g =>
-                g.ColumnDefinitions.Count == row.ColumnDefinitions.Count &&
-                g.Children.OfType<TextBlock>().Count() >= 2);
+            var header = Header(panel, row)
+                ?? (panel.GetType() == typeof(Panel) && panel.GetVisualParent() is Panel outer ? Header(outer, row) : null);
             if (header is not null) yield return (header, row);
         }
     }
+
+    private static Grid? Header(Panel panel, Grid row) =>
+        panel.Children.OfType<Grid>().FirstOrDefault(g =>
+            g.ColumnDefinitions.Count == row.ColumnDefinitions.Count &&
+            g.Children.OfType<TextBlock>().Count() >= 2);
 
     private static void WithWindow(string name, double scale, Action<Window> check)
     {

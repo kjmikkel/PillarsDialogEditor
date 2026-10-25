@@ -1,4 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
@@ -44,6 +44,16 @@ public partial class ProjectFindViewModel : ObservableObject
 
     public IReadOnlyList<FindMatchRow> Results { get; private set; } = [];
 
+    private bool _hasSearched;
+
+    /// Why the results list is empty, or "" when it has rows (GitHub issue 254).
+    public string EmptyMessage => Results.Count > 0 ? ""
+        : Loc.Get(_hasSearched ? "EmptyState_Find_NoMatches" : "EmptyState_Find_NotSearched");
+
+    /// What to do to fill the results list, or "" when it has rows.
+    public string EmptyHint => Results.Count > 0 ? ""
+        : Loc.Get(_hasSearched ? "EmptyState_Find_NoMatchesHint" : "EmptyState_Find_NotSearchedHint");
+
     /// Raised with (conversationName, nodeId) when the user activates a result.
     public event Action<string, int>? RequestNavigate;
 
@@ -58,7 +68,10 @@ public partial class ProjectFindViewModel : ObservableObject
         StatusText = Results.Count > 0
             ? Loc.FormatCount("FindInProject_Matches", Results.Count)
             : Loc.Get("FindInProject_NoMatches");
+        _hasSearched = true;
         OnPropertyChanged(nameof(Results));
+        OnPropertyChanged(nameof(EmptyMessage));
+        OnPropertyChanged(nameof(EmptyHint));
     }
 
     public void NavigateTo(FindMatchRow row) => RequestNavigate?.Invoke(row.ConversationName, row.NodeId);

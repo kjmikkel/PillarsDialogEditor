@@ -152,4 +152,46 @@ public class VoAliasPickerViewModelTests : IDisposable
         var vm = new VoAliasPickerViewModel(_provider, _gameRoot, null);
         Assert.Null(vm.ResultAlias);
     }
+
+    // ── Empty state (GitHub issue 254) ────────────────────────────────────
+
+    [Fact]
+    public void EmptyState_NoConversationPicked_SaysToPickOne()
+    {
+        AddConv("some_conv", Node(42, "9c5f12c9-e93d-4952-9f1a-726c9498f8fb"));
+        var vm = new VoAliasPickerViewModel(_provider, _gameRoot, currentAlias: null);
+        Assert.Equal("EmptyState_VoAlias_NoConversation", vm.EmptyMessage);
+        Assert.Equal("EmptyState_VoAlias_NoConversationHint", vm.EmptyHint);
+    }
+
+    [Fact]
+    public void EmptyState_WithLines_IsBlank()
+    {
+        AddConv("some_conv", Node(42, "9c5f12c9-e93d-4952-9f1a-726c9498f8fb"));
+        var vm = new VoAliasPickerViewModel(_provider, _gameRoot, currentAlias: null);
+        vm.SelectedConversation = vm.AllConversations[0];
+        Assert.Equal("", vm.EmptyMessage);
+        Assert.Equal("", vm.EmptyHint);
+    }
+
+    [Fact]
+    public void EmptyState_FilterHidesEveryLine_SaysSo()
+    {
+        AddConv("some_conv", Node(42, "9c5f12c9-e93d-4952-9f1a-726c9498f8fb"));
+        var vm = new VoAliasPickerViewModel(_provider, _gameRoot, currentAlias: null);
+        vm.SelectedConversation = vm.AllConversations[0];
+        vm.NodeFilter = "no such line";
+        Assert.Equal("EmptyState_VoAlias_NoMatches", vm.EmptyMessage);
+        Assert.Equal("EmptyState_VoAlias_NoMatchesHint", vm.EmptyHint);
+    }
+
+    [Fact]
+    public void EmptyState_ConversationWithNoLines_SaysSo()
+    {
+        AddConv("empty_conv");
+        var vm = new VoAliasPickerViewModel(_provider, _gameRoot, currentAlias: null);
+        vm.SelectedConversation = vm.AllConversations[0];
+        Assert.Equal("EmptyState_VoAlias_NoLines", vm.EmptyMessage);
+        Assert.Equal("EmptyState_VoAlias_NoLinesHint", vm.EmptyHint);
+    }
 }

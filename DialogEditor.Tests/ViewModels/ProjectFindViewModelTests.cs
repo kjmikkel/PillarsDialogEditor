@@ -1,4 +1,4 @@
-﻿using DialogEditor.Core.Editing;
+using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
@@ -92,5 +92,40 @@ public class ProjectFindViewModelTests
         var provider = new FakeGameDataProvider("poe2", "en", convObj);
         var project = DialogProject.Empty("P").WithPatch(EmptyPatch(conv));
         return (project, provider);
+    }
+
+    // ── Empty state (GitHub issue 254) ────────────────────────────────────
+
+    [Fact]
+    public void EmptyState_BeforeSearch_SaysToSearch()
+    {
+        var (project, provider) = ProjectWith("c1", 1, "The Watcher");
+        var vm = new ProjectFindViewModel(project, provider, "en", () => (null, null));
+        Assert.Equal("EmptyState_Find_NotSearched", vm.EmptyMessage);
+        Assert.Equal("EmptyState_Find_NotSearchedHint", vm.EmptyHint);
+    }
+
+    [Fact]
+    public void EmptyState_NoMatches_SaysSoAndHowToWiden()
+    {
+        var (project, provider) = ProjectWith("c1", 1, "The Watcher");
+        var vm = new ProjectFindViewModel(project, provider, "en", () => (null, null)) { SearchText = "zzz" };
+        vm.SearchCommand.Execute(null);
+        Assert.Equal("EmptyState_Find_NoMatches", vm.EmptyMessage);
+        Assert.Equal("EmptyState_Find_NoMatchesHint", vm.EmptyHint);
+    }
+
+    [Fact]
+    public void EmptyState_WithResults_IsBlank()
+    {
+        var (project, provider) = ProjectWith("c1", 1, "The Watcher");
+        var vm = new ProjectFindViewModel(project, provider, "en", () => (null, null)) { SearchText = "Watcher" };
+        var raised = new List<string?>();
+        vm.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+        vm.SearchCommand.Execute(null);
+        Assert.Equal("", vm.EmptyMessage);
+        Assert.Equal("", vm.EmptyHint);
+        Assert.Contains(nameof(vm.EmptyMessage), raised);
+        Assert.Contains(nameof(vm.EmptyHint), raised);
     }
 }
