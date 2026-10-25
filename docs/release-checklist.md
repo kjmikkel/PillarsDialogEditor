@@ -155,7 +155,7 @@ as a shared folder.
 - [ ] Deadfire only: VO preview plays a line (uses the bundled `vgmstream-cli.exe`), and there
       is sound.
 - [ ] Text renders in every UI font, with no missing-glyph boxes.
-- [ ] **Test › Test Patch** (F5) and **Test › Restore Conversation** on the sample.
+- [ ] **Test › Test Patch** (F5) and **Test › End Test and Restore Game Files** on the sample.
 - [ ] `%LOCALAPPDATA%\PillarsDialogEditor\app.log` shows no errors from these steps.
 
 ### Patcher zip
