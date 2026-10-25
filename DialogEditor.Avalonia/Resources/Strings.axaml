@@ -2155,7 +2155,7 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="BatchReplace_Close">Close</sys:String>
     <sys:String x:Key="FindInProject_Close">Close</sys:String>
     <sys:String x:Key="ToolTip_CloseToolWindow">Close this window. Nothing is lost, and you can open it again from the menu. (Esc)</sys:String>
-   
+
     <!-- ─── Empty states (GitHub issue 254) ─────────────────────────────────
          Shown by the shared EmptyState control over a list with nothing in it: the first
          string of each pair says why it is empty, the …Hint string says what fills it. -->
