@@ -11,7 +11,8 @@ public class ConversationStatisticsTests
 
     private static NodeViewModel MakeNode(int id, bool isPlayer, string text, string femaleText = "")
     {
-        var node = new ConversationNode(id, isPlayer, SpeakerCategory.Npc,
+        // A player choice is a Player-type node, as SetCategory keeps them (issue 160).
+        var node = new ConversationNode(id, isPlayer, isPlayer ? SpeakerCategory.Player : SpeakerCategory.Npc,
             "", "", [], [], [], "Conversation", "None");
         return new NodeViewModel(node, new StringEntry(id, text, femaleText));
     }
@@ -97,15 +98,16 @@ public class ConversationStatisticsTests
         Assert.Equal(3, canvas.Statistics.FemaleWordCount);
     }
 
+    // Counts go by node type (GitHub issue 256), which the editor changes through SetCategory.
     [Fact]
-    public void Statistics_UpdatesWhenIsPlayerChoiceChanged()
+    public void Statistics_UpdatesWhenNodeTypeChanged()
     {
         var node   = MakeNode(1, false, "Hello");   // NPC
         var canvas = MakeCanvas(node);
         Assert.Equal(1, canvas.Statistics.NpcCount);
         Assert.Equal(0, canvas.Statistics.PlayerCount);
 
-        node.IsPlayerChoice = true;
+        node.SetCategory(SpeakerCategory.Player);
         Assert.Equal(0, canvas.Statistics.NpcCount);
         Assert.Equal(1, canvas.Statistics.PlayerCount);
     }

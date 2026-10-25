@@ -69,10 +69,12 @@
     <sys:String x:Key="Node_ConditionPlural">⚙ {0} conditions</sys:String>
     <!-- Footer text when the node has no conditions -->
     <sys:String x:Key="Node_NoConditions">[ No conditions ]</sys:String>
-    <!-- Canvas toolbar: node count label. {0} = number of nodes loaded -->
-    <sys:String x:Key="Statistics_Summary">{0} nodes  ({1} NPC / {2} player)  ·  {3:N0} words</sys:String>
-    <sys:String x:Key="ToolTip_Statistics">Node and word counts for the current conversation. Female-text word count (if any) is shown in the tooltip.</sys:String>
-    <sys:String x:Key="Statistics_FemaleDetail">Female text: {0:N0} words</sys:String>
+    <!-- Canvas toolbar: node and word counts (GitHub issue 256). {0} = all nodes on the canvas,
+         {1}–{4} = Player / NPC / Narrator / Script nodes (they add up to {0}), {5} = words of default text -->
+    <sys:String x:Key="Statistics_Summary">{0} nodes: {1} player, {2} NPC, {3} narrator, {4} script  ·  {5:N0} words</sys:String>
+    <sys:String x:Key="ToolTip_Statistics">Counts every node in the open conversation, including your unsaved changes, by node type. Flow Analytics and the status bar count the same way. Words are counted in the default text.</sys:String>
+    <!-- {0} = ToolTip_Statistics, {1} = word count of the female text -->
+    <sys:String x:Key="Statistics_FemaleDetail">{0} Female text: {1:N0} words.</sys:String>
 
     <!-- ─── Detail panel — values ──────────────────────────────────────── -->
     <!-- Node type shown in the NODE row of the detail panel -->

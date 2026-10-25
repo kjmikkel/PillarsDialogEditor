@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DialogEditor.Core.Analytics;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Layout;
 using DialogEditor.Core.Models;
@@ -115,7 +116,8 @@ public partial class ConversationViewModel : ObservableObject
     {
         if (e.PropertyName is nameof(NodeViewModel.DefaultText)
                            or nameof(NodeViewModel.FemaleText)
-                           or nameof(NodeViewModel.IsPlayerChoice))
+                           or nameof(NodeViewModel.IsPlayerChoice)
+                           or nameof(NodeViewModel.SpeakerCategory))
             RefreshStatistics();
     }
 
@@ -130,14 +132,22 @@ public partial class ConversationViewModel : ObservableObject
     {
         get
         {
-            int npc = 0, player = 0, words = 0, femaleWords = 0;
+            // By node type, as Flow Analytics counts them (GitHub issue 256): "NPC" used to
+            // mean every non-player node, Narrator and Script included.
+            int player = 0, npc = 0, narrator = 0, script = 0, words = 0, femaleWords = 0;
             foreach (var n in Nodes)
             {
-                if (n.IsPlayerChoice) player++; else npc++;
-                words       += CountWords(n.DefaultText);
-                femaleWords += CountWords(n.FemaleText);
+                switch (n.SpeakerCategory)
+                {
+                    case SpeakerCategory.Player:   player++;   break;
+                    case SpeakerCategory.Npc:      npc++;      break;
+                    case SpeakerCategory.Narrator: narrator++; break;
+                    case SpeakerCategory.Script:   script++;   break;
+                }
+                words       += WordCount.Of(n.DefaultText);
+                femaleWords += WordCount.Of(n.FemaleText);
             }
-            return new ConversationStatistics(Nodes.Count, npc, player, words, femaleWords);
+            return new ConversationStatistics(Nodes.Count, player, npc, narrator, script, words, femaleWords);
         }
     }
 
@@ -146,7 +156,8 @@ public partial class ConversationViewModel : ObservableObject
         get
         {
             var s = Statistics;
-            return Loc.Format("Statistics_Summary", s.NodeCount, s.NpcCount, s.PlayerCount, s.WordCount);
+            return Loc.Format("Statistics_Summary",
+                s.NodeCount, s.PlayerCount, s.NpcCount, s.NarratorCount, s.ScriptCount, s.WordCount);
         }
     }
 
@@ -155,17 +166,13 @@ public partial class ConversationViewModel : ObservableObject
         get
         {
             var s = Statistics;
+            // The explanation of what the totals count stays when the female count is added.
             return s.FemaleWordCount > 0
-                ? Loc.Format("Statistics_FemaleDetail", s.FemaleWordCount)
+                ? Loc.Format("Statistics_FemaleDetail", Loc.Get("ToolTip_Statistics"), s.FemaleWordCount)
                 : Loc.Get("ToolTip_Statistics");
         }
     }
 
-    private static int CountWords(string? text)
-    {
-        if (string.IsNullOrWhiteSpace(text)) return 0;
-        return text.Split((char[]?)null, StringSplitOptions.RemoveEmptyEntries).Length;
-    }
 
     [ObservableProperty]
     private NodeViewModel? _selectedNode;

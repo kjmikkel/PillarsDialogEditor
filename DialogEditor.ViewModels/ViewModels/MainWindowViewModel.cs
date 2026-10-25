@@ -2794,7 +2794,8 @@ public partial class MainWindowViewModel : ObservableObject
             else if (_project is null)
                 StatusText = Loc.Get("Status_NoProjectReadOnly");
             else
-                StatusText = Loc.Format("Status_ConversationLoaded", file.Name, conversation.Nodes.Count);
+                // The canvas, with the project's added nodes, not the game file alone (GitHub issue 256).
+                StatusText = Loc.Format("Status_ConversationLoaded", file.Name, Canvas.Nodes.Count);
 
             // A Find-in-Project navigation may have requested a node in this conversation
             // before it was loaded; select it now that Canvas.Nodes is populated.
