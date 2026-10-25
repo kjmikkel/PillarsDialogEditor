@@ -154,7 +154,8 @@ public partial class PatchManagerViewModel : ObservableObject
             AppLog.Error($"Failed to load '{path}'", ex);
             // An error entry owns no temp dir, so nothing would ever delete it.
             DeleteTempDir(tempDir);
-            return new PatchEntryViewModel(path, ex.Message);
+            // GitHub issue 249: a corrupt download reads as "damaged, download again", not parser text.
+            return new PatchEntryViewModel(path, ModFileErrors.IsDamaged(ex) ? Loc.Get("PatchManager_DamagedMod") : ex.Message);
         }
     }
 
@@ -303,7 +304,8 @@ public partial class PatchManagerViewModel : ObservableObject
         {
             foreach (var e in loaded) DeleteTempDir(e.TempDir);
             AppLog.Error($"Failed to load load order '{path}'", ex);
-            StatusText = Loc.Format("PatchManager_LoadError", PathDisplay.ForDisplay(path), ex.Message);
+            StatusText = Loc.Format("PatchManager_LoadError", PathDisplay.ForDisplay(path),
+                                    ModFileErrors.IsDamaged(ex) ? Loc.Get("PatchManager_DamagedLoadOrder") : ex.Message);
         }
     }
 
