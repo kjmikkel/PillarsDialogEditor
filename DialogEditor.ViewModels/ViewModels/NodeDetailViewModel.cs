@@ -30,6 +30,7 @@ public partial class NodeDetailViewModel : ObservableObject
             if (_activeGameId == value) return;
             _activeGameId = value;
             OnPropertyChanged(nameof(SupportsLinkConditions));
+            OnPropertyChanged(nameof(CanEditLinkConditions));
             OnPropertyChanged(nameof(LinkConditionsToolTip));
             OnPropertyChanged(nameof(ScriptWarnings));
         }
@@ -41,6 +42,9 @@ public partial class NodeDetailViewModel : ObservableObject
     /// PoE1 data gates a choice by putting the condition on the target node instead.
     public bool SupportsLinkConditions =>
         string.Equals(_activeGameId, "poe2", StringComparison.OrdinalIgnoreCase);
+
+    /// The link card's conditions button: the game must support them and the pane must be editable.
+    public bool CanEditLinkConditions => SupportsLinkConditions && IsEditable;
 
     /// The link-conditions button's tooltip. For PoE1 it says where the condition goes.
     public string LinkConditionsToolTip =>
@@ -60,7 +64,43 @@ public partial class NodeDetailViewModel : ObservableObject
     public string GameRoot { get; set; } = string.Empty;
 
     /// Set by MainWindowViewModel when a conversation is loaded.
-    public ConversationViewModel? Canvas { get; set; }
+    public ConversationViewModel? Canvas
+    {
+        get => _canvas;
+        set
+        {
+            if (ReferenceEquals(_canvas, value)) return;
+            if (_canvas is not null) _canvas.PropertyChanged -= OnCanvasPropertyChanged;
+            _canvas = value;
+            if (_canvas is not null) _canvas.PropertyChanged += OnCanvasPropertyChanged;
+            OnEditabilityChanged();
+        }
+    }
+    private ConversationViewModel? _canvas;
+
+    // ── Editability (issue 240) ───────────────────────────────────────────
+    /// The canvas owns editability: MainWindowViewModel.SetProject sets it, and with only a game
+    /// folder open ("Viewing only") it is false, so edits here would dirty a conversation there
+    /// is no project to save to. Without a canvas nothing restricts editing.
+    public bool IsEditable => _canvas?.IsEditable ?? true;
+    public bool IsReadOnly => !IsEditable;
+
+    private void OnCanvasPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ConversationViewModel.IsEditable))
+            OnEditabilityChanged();
+    }
+
+    private void OnEditabilityChanged()
+    {
+        OnPropertyChanged(nameof(IsEditable));
+        OnPropertyChanged(nameof(IsReadOnly));
+        OnPropertyChanged(nameof(CanEditLinkConditions));
+        AddLinkCommand.NotifyCanExecuteChanged();
+        DeleteLinkCommand.NotifyCanExecuteChanged();
+        PickVoAliasCommand.NotifyCanExecuteChanged();
+        ClearVoAliasCommand.NotifyCanExecuteChanged();
+    }
 
     // ── Git attribution (read-only "last edited by") ──────────────────────
     /// Set by MainWindowViewModel: looks up (conversationName, nodeId) → last-touching commit.
@@ -793,7 +833,7 @@ public partial class NodeDetailViewModel : ObservableObject
     /// alias out, null = cancelled).
     public Func<string?, Task<string?>>? ShowAliasPicker { get; set; }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditable))]
     private async Task PickVoAlias()
     {
         if (_node is null || ShowAliasPicker is null) return;
@@ -802,7 +842,7 @@ public partial class NodeDetailViewModel : ObservableObject
             _node.ExternalVO = result;   // undoable via NodeViewModel.Push
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditable))]
     private void ClearVoAlias()
     {
         if (_node is not null)
@@ -816,7 +856,7 @@ public partial class NodeDetailViewModel : ObservableObject
     public event Action<int, int>? AddLinkRequested;    // (fromNodeId, toNodeId)
     public event Action<int>?      DeleteLinkRequested; // (toNodeId)
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditable))]
     private void AddLink()
     {
         if (_node is null || !int.TryParse(AddLinkTargetId.Trim(), out var targetId)) return;
@@ -824,7 +864,7 @@ public partial class NodeDetailViewModel : ObservableObject
         AddLinkTargetId = string.Empty;
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditable))]
     private void DeleteLink(ConnectionViewModel? conn)
     {
         if (conn?.Target.Owner is { } target)
