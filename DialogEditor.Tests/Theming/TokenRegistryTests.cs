@@ -26,7 +26,7 @@ public class TokenRegistryTests
     [InlineData("Brush.Surface.Window",          0xFF, 0x1e, 0x1e, 0x1e)]
     [InlineData("Brush.Border.Default",          0xFF, 0x33, 0x33, 0x33)]
     [InlineData("Brush.Text.Primary",            0xFF, 0xe8, 0xe8, 0xe8)]
-    [InlineData("Brush.Text.Muted",              0xFF, 0x88, 0x88, 0x88)]
+    [InlineData("Brush.Text.Muted",              0xFF, 0x8F, 0x8F, 0x8F)]
     [InlineData("Brush.Text.Hint",               0xFF, 0x99, 0x99, 0x99)] // issue 180 -> Neutral.600
     [InlineData("Brush.Text.Female.Active",      0xFF, 0xe8, 0xe8, 0xe8)]
     [InlineData("Brush.Text.Status.Changed",     0xFF, 0xf0, 0xad, 0x4e)] // #e0a030 absorbed
@@ -36,7 +36,7 @@ public class TokenRegistryTests
     [InlineData("Brush.Diff.Inline.Mine",         0xFF, 0x9c, 0xdc, 0xfe)] // bright blue tint (Sky.250)
     [InlineData("Brush.Diff.Inline.Theirs",       0xFF, 0xff, 0x9c, 0x9c)] // bright red tint (Red.300)
     [InlineData("Brush.Text.OnLight",       0xFF, 0x33, 0x33, 0x33)] // now -> Palette.Ink.Strong
-    [InlineData("Brush.Text.OnLight.Muted", 0xFF, 0x66, 0x66, 0x66)] // now -> Palette.Ink.Muted
+    [InlineData("Brush.Text.OnLight.Muted", 0xFF, 0x4D, 0x4D, 0x4D)] // now -> Palette.Ink.Muted
     [InlineData("Brush.Button.Secondary.Background", 0xFF, 0x33, 0x33, 0x33)] // issue 179 -> Neutral.200
     [InlineData("Brush.Button.Secondary.Foreground", 0xFF, 0xe8, 0xe8, 0xe8)] // -> Neutral.910
     [InlineData("Brush.Button.Secondary.Border",     0xFF, 0x76, 0x76, 0x76)] // -> Palette.Button.Edge

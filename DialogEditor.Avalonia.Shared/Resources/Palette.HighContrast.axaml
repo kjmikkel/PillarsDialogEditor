@@ -50,6 +50,7 @@
     <Color x:Key="Palette.Button.Hover">#FF1F1F1F</Color>
     <Color x:Key="Palette.Control.Background">#FF4D4D4D</Color>
     <Color x:Key="Palette.Connection.Base">#FFAAAAAA</Color>  <!-- resting connection stroke: grey, NOT white, so the white highlighted link stands out (>=1.8:1) while staying visible on the canvas (~5.8:1) -->
+    <Color x:Key="Palette.Connection.Highlight">#FFFFFFFF</Color>  <!-- the selected node's links (Brush.Connection.Highlighted) -->
     <Color x:Key="Palette.Canvas.Base">#FF3A3A3A</Color>  <!-- canvas backdrop (issue 82): unchanged from Neutral.520; dark enough that Line.Default GridSplitters (~4.8:1) and white node cards stay visible -->
 
     <!-- Accents -->
