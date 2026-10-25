@@ -45,6 +45,9 @@
     <sys:String x:Key="PatchManager_GameUpdateHelp_Title">After a game update</sys:String>
     <sys:String x:Key="PatchManager_GameUpdateHelp_Message">A game update can replace or change the files your conversation mods edit. Afterwards those mods may be partly missing, or sit on top of files they no longer match.&#10;&#10;To put things right:&#10;1. Verify / repair the game files in your storefront (Steam, GOG Galaxy or the Epic Games Launcher). This gives you a clean, current install.&#10;2. Come back here and click Apply patches to install your mods again. If you're asked whether to treat changed files as the new originals, choose Treat as new originals.</sys:String>
     <sys:String x:Key="ToolTip_RemoveAllMods">Undo every mod installed into this game folder: restore each game file the patcher changed to its original version and delete the files it added. The load order list is kept.</sys:String>
+    <!-- Next step while Apply is disabled (GitHub issue 248). -->
+    <sys:String x:Key="PatchManager_ApplyHint_NoGameFolder">To install mods, first choose your game folder at the top, then add at least one mod.</sys:String>
+    <sys:String x:Key="PatchManager_ApplyHint_NoMods">Add at least one mod to install.</sys:String>
     <sys:String x:Key="PatchManager_EmptyHint">Add mods (.dialogpack files) above. Lower entries win on conflict.</sys:String>
     <sys:String x:Key="PatchManager_OrderHint">↑ First applied   ↓ Last applied (wins on conflict)</sys:String>
 

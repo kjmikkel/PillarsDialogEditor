@@ -207,6 +207,11 @@
             <!-- Wraps rather than trims: a "newer file format" refusal (issues 62, 79) is a
                  full sentence the player has to read to the end. -->
             <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0">
+                <!-- GitHub issue 248: why Apply is disabled, as the next step to take. -->
+                <TextBlock Text="{Binding ApplyHint}"
+                           IsVisible="{Binding HasApplyHint}"
+                           Foreground="{DynamicResource Brush.Text.Hint}" FontSize="{DynamicResource FontSize.Small}"
+                           TextWrapping="Wrap"/>
                 <TextBlock Text="{Binding StatusText}"
                            Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"
                            TextWrapping="Wrap"
