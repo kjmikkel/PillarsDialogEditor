@@ -5,6 +5,7 @@
         xmlns:dock="using:Dock.Avalonia.Controls"
         xmlns:ctrl="clr-namespace:DialogEditor.Avalonia.Controls"
         xmlns:theming="clr-namespace:DialogEditor.Avalonia.Shared.Theming;assembly=DialogEditor.Avalonia.Shared"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.MainWindow"
         Title="{Binding WindowTitle}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
@@ -401,6 +402,29 @@
              game is loaded, via EditorDockFactory, and assigned to MainWindowViewModel's
              Dock-free DockLayout property. -->
         <dock:DockControl x:Name="Dock" Grid.Row="1" Layout="{Binding DockLayout}"/>
+
+        <!-- Welcome panel (GitHub issue 252): until a game folder is open the dock has no layout
+             and the work area was blank, with only the status bar's small text as guidance. The
+             open-folder action sits here in the middle of the window, not only eighth in the File
+             menu, and the guided tour is one click away. -->
+        <StackPanel Grid.Row="1" IsVisible="{Binding ShowWelcome}"
+                    HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="12" MaxWidth="480">
+            <shared:EmptyState Message="{DynamicResource EmptyState_Main_NoGame}"
+                               Hint="{DynamicResource EmptyState_Main_NoGameHint}"/>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
+                <Button Content="{DynamicResource Button_OpenFolder}"
+                        Command="{Binding OpenFolderCommand}"
+                        AutomationProperties.AutomationId="Welcome_OpenFolder"
+                        ToolTip.Tip="{DynamicResource ToolTip_OpenFolder}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_OpenFolder}"/>
+                <Button Classes="secondary"
+                        Content="{DynamicResource Menu_StartGuidedTour}"
+                        Command="{Binding StartGuidedTourCommand}"
+                        AutomationProperties.AutomationId="Welcome_StartGuidedTour"
+                        ToolTip.Tip="{DynamicResource ToolTip_Menu_StartGuidedTour}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_StartGuidedTour}"/>
+            </StackPanel>
+        </StackPanel>
 
         <!-- Guided tour bar — sits above the status bar; hidden until a tour is active -->
         <controls:GuidedTourBar x:Name="TourBar"
