@@ -16,7 +16,10 @@
             <Setter Property="Foreground"       Value="{DynamicResource Brush.Text.Muted.Light}"/>
             <Setter Property="FontSize"         Value="{DynamicResource FontSize.Label}"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
-            <Setter Property="MinWidth"         Value="140"/>
+            <!-- A font-scaled minimum and a gap (GitHub issue 264): at 200% a fixed 140 px
+                 let the label run into its control. -->
+            <Setter Property="MinWidth"         Value="{DynamicResource ColumnWidth.SettingsLabel}"/>
+            <Setter Property="Margin"           Value="0,0,12,0"/>
         </Style>
         <Style Selector="TextBox.path">
             <Setter Property="Background"   Value="{DynamicResource Brush.Surface.Card}"/>
@@ -45,24 +48,25 @@
             <StackPanel Spacing="12">
 
                 <!-- Backup directory -->
-                <DockPanel ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}">
-                    <TextBlock Classes="label" Text="{DynamicResource Settings_BackupDirectory}"/>
-                    <Button Classes="browse secondary"
-                            DockPanel.Dock="Right"
-                            Content="{DynamicResource Settings_Browse}"
-                            Command="{Binding BrowseBackupDirectoryCommand}"
-                            ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}"
-                            AutomationProperties.HelpText="{DynamicResource Settings_BackupDirectoryTooltip}"/>
+                <!-- A Grid, not a DockPanel (GitHub issue 264): a DockPanel's filling child must come
+                     last, which put Browse… ahead of its field in the tab order. -->
+                <Grid ColumnDefinitions="Auto,*,Auto" ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}">
+                    <TextBlock Grid.Column="0" Classes="label" Text="{DynamicResource Settings_BackupDirectory}"/>
                     <!-- Wraps (GitHub issue 250): a long backup path was cut off, so a Modder
                          couldn't confirm where backups go. -->
-                    <TextBox Classes="path"
+                    <TextBox Grid.Column="1" Classes="path"
                              Text="{Binding BackupDirectoryDisplay, Mode=OneWay}"
                              TextWrapping="Wrap"
                              Watermark="{DynamicResource Settings_PathNotSet}"
                              ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}"
                              AutomationProperties.HelpText="{DynamicResource Settings_BackupDirectoryTooltip}"
                              AutomationProperties.Name="{DynamicResource Settings_BackupDirectory}"/>
-                </DockPanel>
+                    <Button Grid.Column="2" Classes="browse secondary" VerticalAlignment="Top"
+                            Content="{DynamicResource Settings_Browse}"
+                            Command="{Binding BrowseBackupDirectoryCommand}"
+                            ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}"
+                            AutomationProperties.HelpText="{DynamicResource Settings_BackupDirectoryTooltip}"/>
+                </Grid>
 
                 <!-- Default localization format -->
                 <DockPanel ToolTip.Tip="{DynamicResource Settings_LocalizationFormatTooltip}">

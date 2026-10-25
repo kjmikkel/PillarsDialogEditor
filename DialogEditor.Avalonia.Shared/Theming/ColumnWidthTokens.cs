@@ -38,6 +38,7 @@ public static class ColumnWidthTokens
         ["ColumnWidth.Confidence"]           = 70,
         ["ColumnWidth.Tier"]                 = 70,
         ["ColumnWidth.ParameterName"]        = 110,
+        ["ColumnWidth.SettingsLabel"]        = 140,   // GitHub issue 264
         // Minimum width of a Batch VO Import file column: the file name plus its Play, Browse and Clear buttons.
         ["ColumnWidth.BatchVo.FileMin"]      = 150,
         // The Flow Analytics severity badge is square: this is its width and its height.

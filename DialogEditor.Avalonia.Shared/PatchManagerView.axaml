@@ -73,11 +73,13 @@
         <!-- ── Load Order ──────────────────────────────────────────── -->
         <Grid Grid.Row="2" RowDefinitions="Auto,*,Auto">
 
-            <DockPanel Grid.Row="0" Margin="0,0,0,6">
-                <TextBlock Classes="section-label" DockPanel.Dock="Left"
+            <!-- The buttons wrap below the heading when they don't fit beside it (GitHub issue 264):
+                 at 200% in the 640 px Patcher, a DockPanel ran them into "Load Order". -->
+            <Grid Grid.Row="0" Margin="0,0,0,6" ColumnDefinitions="Auto,*">
+                <TextBlock Grid.Column="0" Classes="section-label" Margin="0,0,12,0"
                            VerticalAlignment="Center"
                            Text="{DynamicResource PatchManager_LoadOrder}"/>
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="4">
+                <WrapPanel Grid.Column="1" HorizontalAlignment="Right" ItemSpacing="4" LineSpacing="4">
                     <Button Classes="action-btn"
                             Content="{DynamicResource PatchManager_SaveLoadOrder}"
                             Command="{Binding SaveLoadOrderCommand}"
@@ -93,8 +95,8 @@
                             Command="{Binding AddEntriesCommand}"
                             ToolTip.Tip="{DynamicResource ToolTip_AddProjects}"
                             AutomationProperties.HelpText="{DynamicResource ToolTip_AddProjects}"/>
-                </StackPanel>
-            </DockPanel>
+                </WrapPanel>
+            </Grid>
 
             <!-- Entry list -->
             <Grid Grid.Row="1">
