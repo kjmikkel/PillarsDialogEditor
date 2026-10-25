@@ -519,7 +519,7 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- Accessible name: the visible "Edit…" is shared with Edit Conditions, so UIA needs a distinct one (issue 182) -->
     <sys:String x:Key="AutomationName_EditScripts">Edit scripts…</sys:String>
     <sys:String x:Key="ToolTip_EditScripts">Open the script editor to add, edit, or remove scripts fired when this node is shown, exited, or updated</sys:String>
-    <sys:String x:Key="Placeholder_ScriptPicker">Search catalogue or type a FullName…</sys:String>
+    <sys:String x:Key="Placeholder_ScriptPicker">Search scripts by name…</sys:String>
     <sys:String x:Key="ToolTip_ScriptPicker">Select a known script from the catalogue — parameters and their types will be pre-populated. Or type a C# reflection FullName directly, e.g. Void SetGlobalValue(String, Int32), for scripts not in the catalogue.</sys:String>
     <sys:String x:Key="ToolTip_AddScriptEnter">Add the selected or typed script to the On Enter list</sys:String>
     <sys:String x:Key="ToolTip_AddScriptExit">Add the selected or typed script to the On Exit list</sys:String>
@@ -863,7 +863,15 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- The two literal values the field accepts; leave "true"/"false" as they are -->
     <sys:String x:Key="ConditionHint_Boolean">true or false</sys:String>
     <!-- The six operator names are written verbatim into game data — keep them exactly -->
-    <sys:String x:Key="ConditionHint_Operator">Comparison operator: EqualTo, NotEqualTo, GreaterThan, LessThan, GreaterThanOrEqualTo, LessThanOrEqualTo</sys:String>
+    <sys:String x:Key="ConditionHint_Operator">How to compare the value. The game file stores it as EqualTo, NotEqualTo, GreaterThan, LessThan, GreaterThanOrEqualTo or LessThanOrEqualTo.</sys:String>
+    <!-- Plain labels for the comparison operators (GitHub issue 266). The game stores the enum
+         name in each key's suffix; ConditionHint_Operator names them for Fixers. -->
+    <sys:String x:Key="ConditionOperator_EqualTo">equals</sys:String>
+    <sys:String x:Key="ConditionOperator_NotEqualTo">does not equal</sys:String>
+    <sys:String x:Key="ConditionOperator_GreaterThan">is more than</sys:String>
+    <sys:String x:Key="ConditionOperator_LessThan">is less than</sys:String>
+    <sys:String x:Key="ConditionOperator_GreaterThanOrEqualTo">is at least</sys:String>
+    <sys:String x:Key="ConditionOperator_LessThanOrEqualTo">is at most</sys:String>
     <!-- npc_met_edér is a sample flag name; keep its spelling intact. The suggestions
          come from the game's own global-variable declarations (issue 199). -->
     <sys:String x:Key="ConditionHint_GlobalVariable">Name of a global integer flag (e.g. npc_met_edér). Type to pick from the game's own global variables.</sys:String>
