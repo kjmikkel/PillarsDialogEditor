@@ -591,13 +591,20 @@ public partial class MainWindow : Window
                 break;
 
             case Key.Delete when vm.Canvas.SelectedNode is not null
-                             && e.Source is not TextBox
+                             && DeleteTargetsCanvasNode(e.Source)
                              && vm.Canvas.IsEditable:
                 vm.Canvas.DeleteNodeCmdCommand.Execute(vm.Canvas.SelectedNode);
                 e.Handled = true;
                 break;
         }
     }
+
+    /// Delete removes the selected node only when the key comes from the canvas, never from a
+    /// text field there, nor from Node Details, a combo box or a check box elsewhere (GitHub issue
+    /// 264): those used to delete the node because only TextBox was excluded.
+    internal static bool DeleteTargetsCanvasNode(object? source) =>
+        source is Visual v and not TextBox
+        && (v is ConversationView || v.GetVisualAncestors().Any(a => a is ConversationView));
 
     private void FindReplace_Click(object? sender, RoutedEventArgs e)
     {
