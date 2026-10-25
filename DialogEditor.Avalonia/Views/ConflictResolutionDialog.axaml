@@ -50,7 +50,7 @@
                     Content="{DynamicResource ConflictDialog_Cancel}"
                     ToolTip.Tip="{DynamicResource ConflictDialog_CancelTooltip}"
                     AutomationProperties.HelpText="{DynamicResource ConflictDialog_CancelTooltip}"
-                    Padding="16,6" FontSize="{DynamicResource FontSize.Body}"/>
+                    Padding="16,6" FontSize="{DynamicResource FontSize.Body}" IsCancel="True"/>
             <Button x:Name="ForceButton"
                     Content="{DynamicResource ConflictDialog_Force}"
                     ToolTip.Tip="{DynamicResource ConflictDialog_ForceTooltip}"

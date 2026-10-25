@@ -9,7 +9,8 @@
         ShowInTaskbar="False"
         Background="{DynamicResource Brush.Surface.Window}"
         WindowStartupLocation="CenterOwner"
-        x:CompileBindings="False">
+        x:CompileBindings="False"
+        shared:EscapeCloses.IsEnabled="True">
 
     <Window.Styles>
         <Style Selector="TextBlock.col-header">
@@ -19,7 +20,7 @@
         </Style>
     </Window.Styles>
 
-    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" Margin="14,12,14,12">
+    <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto" Margin="14,12,14,12">
 
         <!-- ── Query row: search box + Search button ─────────────────────── -->
         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,8">
@@ -110,7 +111,14 @@
         </DockPanel>
 
         <!-- Focus hint bar -->
-        <shared:FocusHintBar Grid.Row="4" x:Name="HintBar"/>
+        <!-- A way out for keyboard users who don't know Esc (GitHub issue 260). -->
+        <Button Grid.Row="4" Classes="secondary" HorizontalAlignment="Right" Margin="0,8,0,0"
+                Content="{DynamicResource FindInProject_Close}"
+                ToolTip.Tip="{DynamicResource ToolTip_CloseToolWindow}"
+                AutomationProperties.HelpText="{DynamicResource ToolTip_CloseToolWindow}"
+                Click="Close_Click"/>
+
+        <shared:FocusHintBar Grid.Row="5" x:Name="HintBar"/>
 
     </Grid>
 

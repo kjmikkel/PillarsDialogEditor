@@ -192,7 +192,7 @@
 
         <!-- OK / Cancel -->
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-            <Button Content="{DynamicResource Button_Cancel}" Click="Cancel_Click"/>
+            <Button Content="{DynamicResource Button_Cancel}" Click="Cancel_Click" IsCancel="True"/>
             <Button x:Name="OkButton"
                     Content="{DynamicResource VoImport_ImportButton}"
                     Click="Ok_Click" IsDefault="True" IsEnabled="False"/>

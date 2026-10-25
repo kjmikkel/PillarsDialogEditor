@@ -11,7 +11,8 @@
         Width="820" Height="560" MinWidth="640" MinHeight="420"
         Background="{DynamicResource Brush.Surface.Panel}"
         WindowStartupLocation="CenterOwner"
-        x:CompileBindings="False">
+        x:CompileBindings="False"
+        shared:EscapeCloses.IsEnabled="True">
 
     <Window.Styles>
         <!-- Conversation toggle colour, as a STYLE rather than a local Foreground (issue #94): a

@@ -1,11 +1,13 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.LegendWindow"
         Title="{DynamicResource Legend_WindowTitle}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="360" Height="640" MinWidth="300" MinHeight="300" MaxHeight="840"
         CanResize="True"
-        ShowInTaskbar="False">
+        ShowInTaskbar="False"
+        shared:EscapeCloses.IsEnabled="True">
 
     <Window.Styles>
         <!-- legendRow: makes a legend swatch row a focusable tab stop while keeping

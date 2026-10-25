@@ -1,10 +1,12 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.TagReferenceWindow"
         Title="{DynamicResource TagRef_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="600" Height="680" MinWidth="440" MinHeight="360" CanResize="True"
-        ShowInTaskbar="False">
+        ShowInTaskbar="False"
+        shared:EscapeCloses.IsEnabled="True">
     <Window.Resources>
         <!-- One shared row template for all three sections. -->
         <DataTemplate x:Key="TagRowTemplate">

@@ -8,6 +8,7 @@
         CanResize="True"
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource Brush.Surface.Window}"
-        x:CompileBindings="False">
+        x:CompileBindings="False"
+        shared:EscapeCloses.IsEnabled="True">
     <shared:PatchManagerView/>
 </Window>

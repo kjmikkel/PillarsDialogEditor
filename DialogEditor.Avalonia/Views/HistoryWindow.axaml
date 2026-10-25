@@ -6,7 +6,8 @@
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="720" Height="480" MinWidth="560" MinHeight="360"
         WindowStartupLocation="CenterOwner"
-        Background="{DynamicResource Brush.Surface.Panel}">
+        Background="{DynamicResource Brush.Surface.Panel}"
+        shared:EscapeCloses.IsEnabled="True">
 
     <Grid Margin="16" RowDefinitions="*,Auto,Auto">
 

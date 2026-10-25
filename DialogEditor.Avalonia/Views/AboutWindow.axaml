@@ -5,7 +5,8 @@
         Title="{DynamicResource About_Title}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="420" MinWidth="420" SizeToContent="Height" CanResize="True"
-        ShowInTaskbar="False">
+        ShowInTaskbar="False"
+        shared:EscapeCloses.IsEnabled="True">
     <!-- The body scrolls and Close stays below it (issue 177); see SettingsWindow.axaml. -->
     <Grid RowDefinitions="*,Auto,Auto" Margin="18,16,18,16">
         <ScrollViewer Grid.Row="0">

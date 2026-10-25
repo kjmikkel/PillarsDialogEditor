@@ -289,7 +289,7 @@
                         Content="{DynamicResource ConditionEditor_Cancel}"
                         Command="{Binding CancelCommand}"
                         ToolTip.Tip="{DynamicResource ToolTip_ConditionEditorCancel}"
-                        AutomationProperties.HelpText="{DynamicResource ToolTip_ConditionEditorCancel}"/>
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_ConditionEditorCancel}" IsCancel="True"/>
                 <Button Classes="footer-btn primary"
                         Content="{DynamicResource ConditionEditor_OK}"
                         Command="{Binding ConfirmCommand}"

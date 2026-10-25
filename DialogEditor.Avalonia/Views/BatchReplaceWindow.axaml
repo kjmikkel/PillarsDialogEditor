@@ -10,7 +10,8 @@
         ShowInTaskbar="False"
         Background="{DynamicResource Brush.Surface.Window}"
         WindowStartupLocation="CenterOwner"
-        x:CompileBindings="False">
+        x:CompileBindings="False"
+        shared:EscapeCloses.IsEnabled="True">
 
     <Window.Styles>
         <Style Selector="TextBox.find-box">
@@ -43,7 +44,7 @@
         </Style>
     </Window.Styles>
 
-    <Grid RowDefinitions="Auto,*,Auto,Auto" Margin="14,12,14,12">
+    <Grid RowDefinitions="Auto,*,Auto,Auto,Auto" Margin="14,12,14,12">
 
         <!-- ── Search form ──────────────────────────────────────────────── -->
         <!-- Shared label column (issue 188): each row is its own Grid, so without a shared size group every box started right after its own label and "Find:" left the Find box further left than the Replace box. -->
@@ -213,7 +214,14 @@
                    VerticalAlignment="Center"/>
 
         <!-- Focus hint bar (Gaps item 13) -->
-        <shared:FocusHintBar Grid.Row="3" x:Name="HintBar"/>
+        <!-- A way out for keyboard users who don't know Esc (GitHub issue 260). -->
+        <Button Grid.Row="3" Classes="secondary" HorizontalAlignment="Right" Margin="0,8,0,0"
+                Content="{DynamicResource BatchReplace_Close}"
+                ToolTip.Tip="{DynamicResource ToolTip_CloseToolWindow}"
+                AutomationProperties.HelpText="{DynamicResource ToolTip_CloseToolWindow}"
+                Click="Close_Click"/>
+
+        <shared:FocusHintBar Grid.Row="4" x:Name="HintBar"/>
     </Grid>
 
 </Window>

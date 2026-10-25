@@ -10,7 +10,8 @@
         Width="420" MinWidth="420" SizeToContent="Height" CanResize="True"
         ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner"
-        x:CompileBindings="False">
+        x:CompileBindings="False"
+        shared:EscapeCloses.IsEnabled="True">
     <StackPanel Margin="18,16,18,16" Spacing="8">
         <TextBlock Text="{DynamicResource PatchManagerAbout_AppName}" Foreground="{DynamicResource Brush.Text.Primary}" FontSize="{DynamicResource FontSize.Title}" FontWeight="Bold"/>
         <StackPanel Orientation="Horizontal" Spacing="6">

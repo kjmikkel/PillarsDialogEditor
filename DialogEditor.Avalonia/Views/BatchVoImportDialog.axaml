@@ -64,7 +64,7 @@
                     AutomationProperties.HelpText="{DynamicResource ToolTip_BatchVoImport}"/>
 
             <Button Content="{DynamicResource BatchVoImport_CancelButton}"
-                    Click="Cancel_Click"/>
+                    Click="Cancel_Click" IsCancel="True"/>
 
         </StackPanel>
 
