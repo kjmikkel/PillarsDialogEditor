@@ -37,6 +37,59 @@ public class PatchManagerViewModelInstallTests : IDisposable
         Assert.StartsWith("PatchManager_ApplySuccess", vm.StatusText);
     }
 
+    // GitHub issue 241: a mod that matched nothing, or a list entry that couldn't load, must
+    // not read as a plain success — the Player can't otherwise tell what was installed.
+
+    [Fact]
+    public async Task Apply_Clean_ReportsPlainSuccess()
+    {
+        var vm = MakeVm(FakePoe2Game.ExternalVoMod("A", "a"));
+
+        await vm.ApplyCommand.ExecuteAsync(null);
+
+        Assert.StartsWith("PatchManager_ApplySuccess", vm.StatusText);
+        Assert.DoesNotContain("PatchManager_ApplyWithWarnings", vm.StatusText);
+    }
+
+    [Fact]
+    public async Task Apply_ConversationNotFound_SaysInstalledWithWarnings_AndNamesIt()
+    {
+        var patch = new ConversationPatch("no_such_conv", ConversationPatch.CurrentSchemaVersion, [], [], []);
+        var vm = MakeVm(DialogProject.Empty("M").WithPatch(patch));
+
+        await vm.ApplyCommand.ExecuteAsync(null);
+
+        Assert.StartsWith("PatchManager_ApplyWithWarnings", vm.StatusText);
+        Assert.Contains("PatchManager_MissingConversations", vm.StatusText);
+    }
+
+    [Fact]
+    public async Task Apply_EntryThatFailedToLoad_IsReportedAsNotInstalled()
+    {
+        var vm = MakeVm(FakePoe2Game.ExternalVoMod("A", "a"));
+        vm.Entries.Add(new PatchEntryViewModel("broken.dialogpack", "not a zip"));
+
+        await vm.ApplyCommand.ExecuteAsync(null);
+
+        Assert.Equal("a", _game.ReadExternalVo());   // the good mod is still installed
+        Assert.StartsWith("PatchManager_ApplyWithWarnings", vm.StatusText);
+        Assert.Contains("PatchManager_EntriesSkipped", vm.StatusText);
+    }
+
+    [Fact]
+    public async Task SaveLoadOrder_Failure_HasItsOwnMessage()
+    {
+        // A directory as the target makes the write fail.
+        var vm = new PatchManagerViewModel(new StubFolderPicker(), new StubFilePicker(saveResult: _game.Root))
+        {
+            GameFolder = _game.Root,
+        };
+
+        await vm.SaveLoadOrderCommand.ExecuteAsync(null);
+
+        Assert.StartsWith("PatchManager_SaveLoadOrderError", vm.StatusText);
+    }
+
     [Fact]
     public async Task Apply_WritesTranslations()
     {
