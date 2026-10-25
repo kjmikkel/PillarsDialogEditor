@@ -13,7 +13,7 @@ public class ProjectHistoryService(IGitRunner git)
     {
         var (dir, relative) = GitRepoPath.ResolveRepoRelative(git, projectFilePath);
 
-        var log = git.Run(dir, "log", "--follow", "--date=iso-strict", Format, "--", relative);
+        var log = git.Run(dir, "log", "--follow", "--date=iso-strict", $"--abbrev={CommitInfo.ShortLength}", Format, "--", relative);
         if (!log.Ok)
             throw new DiffException(
                 $"Could not read git history for '{relative}': {log.StdErr.Trim()}", DiffExceptionKind.Unknown);

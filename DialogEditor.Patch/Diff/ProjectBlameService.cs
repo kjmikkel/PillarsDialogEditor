@@ -84,7 +84,7 @@ public class ProjectBlameService(IGitRunner git)
                 contentLines.Add(line[1..]);
                 lineCommits.Add(new CommitInfo(
                     Sha:      sha ?? "",
-                    ShortSha: (sha ?? "").Length >= 8 ? sha![..8] : (sha ?? ""),
+                    ShortSha: (sha ?? "").Length >= CommitInfo.ShortLength ? sha![..CommitInfo.ShortLength] : (sha ?? ""),
                     Author:   author ?? "",
                     Date:     DateTimeOffset.FromUnixTimeSeconds(authorTime).ToOffset(ParseTz(tz)),
                     Subject:  summary ?? ""));
