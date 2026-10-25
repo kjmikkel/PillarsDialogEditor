@@ -538,12 +538,15 @@ public partial class MainWindow : Window
                 e.Handled = true;
                 break;
 
-            case Key.Z when e.KeyModifiers == KeyModifiers.Control:
+            // GitHub issue 243: in a text box Ctrl+Z / Ctrl+Y belong to the text box. Typing only
+            // joins the canvas history when the field loses focus, so canvas undo here would undo
+            // the last graph edit instead of the typing.
+            case Key.Z when e.KeyModifiers == KeyModifiers.Control && e.Source is not TextBox:
                 vm.Canvas.UndoCommand.Execute(null);
                 e.Handled = true;
                 break;
 
-            case Key.Y when e.KeyModifiers == KeyModifiers.Control:
+            case Key.Y when e.KeyModifiers == KeyModifiers.Control && e.Source is not TextBox:
                 vm.Canvas.RedoCommand.Execute(null);
                 e.Handled = true;
                 break;
