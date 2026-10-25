@@ -31,6 +31,35 @@ public class PatcherCommandTests : IDisposable
         return (code, o.ToString(), e.ToString());
     }
 
+    // GitHub issue 264 (F-47): -v promised "each conversation as it is patched" but printed
+    // only a one-line total.
+    [Fact]
+    public void Verbose_NamesEachPatchedConversation()
+    {
+        var a = SaveProject(FakePoe2Game.ExternalVoMod("A", "a"));
+
+        Assert.Contains("  patched test_conv", Run(_game.Root, a, "-v").Out);
+        Assert.DoesNotContain("patched test_conv", Run(_game.Root, a).Out);
+    }
+
+    // GitHub issue 264 (F-46): a missing argument buried its one-line error under ~40 lines
+    // of help. It now prints the error, the usage lines, an example and a pointer to --help.
+    [Theory]
+    [InlineData]
+    [InlineData("--restore")]
+    public void MissingArguments_PrintsShortUsage_NotTheWholeHelp(params string[] args)
+    {
+        var (code, output, err) = Run(args);
+
+        Assert.Equal(2, code);
+        Assert.StartsWith("Error: Missing required argument", err);
+        Assert.Contains("Usage:", err);
+        Assert.Contains("Example:", err);
+        Assert.Contains("dialog-patcher --help", err);
+        Assert.DoesNotContain("Exit codes:", err);
+        Assert.Equal(string.Empty, output);
+    }
+
     [Fact]
     public void Apply_ThenApplyAgain_Succeeds()
     {

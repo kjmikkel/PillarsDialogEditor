@@ -362,6 +362,7 @@ public class NodeViewModelTests
         ["Speaker_Narrator"]          = "Narrator",
         ["Speaker_Unknown"]           = "Unknown",
         ["Node_NoTextScript"]         = "",
+        ["Node_NoText"]               = "",
     }));
 
     [Fact]

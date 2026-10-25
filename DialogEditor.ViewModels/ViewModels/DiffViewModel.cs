@@ -664,5 +664,5 @@ public partial class DiffViewModel : ObservableObject
     // format string would make git emit something unparseable — or nothing at all.
     [NotLocalised("git pretty-format arguments")]
     private GitResult RunGitLog(string dir) =>
-        _git.Run(dir, "log", "-n", "20", "--format=%h %s");
+        _git.Run(dir, "log", "-n", "20", $"--abbrev={CommitInfo.ShortLength}", "--format=%h %s");
 }

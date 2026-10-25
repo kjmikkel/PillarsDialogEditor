@@ -58,6 +58,8 @@
     <x:Double x:Key="ColumnWidth.Confidence">70</x:Double>
     <x:Double x:Key="ColumnWidth.Tier">70</x:Double>
     <x:Double x:Key="ColumnWidth.ParameterName">110</x:Double>
+    <!-- Settings form label column (GitHub issue 264) -->
+    <x:Double x:Key="ColumnWidth.SettingsLabel">140</x:Double>
     <x:Double x:Key="ColumnWidth.BatchVo.FileMin">150</x:Double>
     <x:Double x:Key="ColumnWidth.SeverityBadge">16</x:Double>
 

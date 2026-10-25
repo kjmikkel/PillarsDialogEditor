@@ -46,7 +46,9 @@ public partial class ConditionSearchViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(SearchCommand))]
     private SearchEntryItem? _selectedEntry;
 
-    [ObservableProperty] private string _matchCountText = string.Empty;
+    // Starts as, and returns to, a hint on what to do and where results appear (GitHub issue 264):
+    // the pane used to open with a disabled Search button and a blank line.
+    [ObservableProperty] private string _matchCountText = Loc.Get("CondSearch_Hint");
 
     public ConditionSearchViewModel(
         string gameId,
@@ -99,6 +101,6 @@ public partial class ConditionSearchViewModel : ObservableObject
     private void Clear()
     {
         _clearHighlight();
-        MatchCountText = string.Empty;
+        MatchCountText = Loc.Get("CondSearch_Hint");
     }
 }

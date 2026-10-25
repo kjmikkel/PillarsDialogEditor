@@ -39,12 +39,9 @@
 
         <!-- Results -->
         <ScrollViewer Grid.Row="3" Margin="0,0,0,6">
+            <!-- No second "No text issues found." here (GitHub issue 264): the summary line above
+                 already says it. -->
             <Panel>
-                <TextBlock Text="{DynamicResource TextTagValidation_NoIssues}"
-                           Foreground="{DynamicResource Brush.Text.Hint}"
-                           FontStyle="Italic"
-                           HorizontalAlignment="Center" VerticalAlignment="Center"
-                           IsVisible="{Binding !HasIssues}"/>
 
                 <ItemsControl ItemsSource="{Binding Rows}">
                     <ItemsControl.ItemTemplate>

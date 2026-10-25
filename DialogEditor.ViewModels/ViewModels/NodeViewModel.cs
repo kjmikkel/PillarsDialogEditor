@@ -153,7 +153,8 @@ public partial class NodeViewModel : ObservableObject
     {
         get => _hasVO;
         set => Push(_hasVO, value, "Undo_EditHasVo",
-            v => { _hasVO = v; OnPropertyChanged(nameof(HasVO)); });
+            v => { _hasVO = v; OnPropertyChanged(nameof(HasVO));
+                   OnPropertyChanged(nameof(TextPlaceholder)); OnPropertyChanged(nameof(HasTextPlaceholder)); });
     }
 
     public bool HideSpeaker
@@ -344,7 +345,9 @@ public partial class NodeViewModel : ObservableObject
         _defaultText.Length > 0                     ? string.Empty
         : _stringTableMissing                       ? Loc.Get("Node_TextUnavailable")
         : _speakerCategory == SpeakerCategory.Script ? Loc.Get("Node_NoTextScript")
-        : string.Empty;
+        // Any other empty node says why it is blank (GitHub issue 264): it was a bare box.
+        : _hasVO                                    ? Loc.Get("Node_NoTextVoiced")
+        : Loc.Get("Node_NoText");
 
     public bool HasTextPlaceholder => TextPlaceholder.Length > 0;
 

@@ -64,6 +64,19 @@ public static class PatcherCommand
             Nothing was changed. Update dialog-patcher: {SchemaFormats.PatcherReleasesUrl}
       """;
 
+    // A missing argument shows this, not the whole help (GitHub issue 264): the one-line error
+    // used to be buried under ~40 lines.
+    private const string ShortUsage = """
+      Usage:
+        dialog-patcher <game-dir> <project.dialogproject> [project2.dialogproject ...] [options]
+        dialog-patcher <game-dir> --restore
+
+      Example:
+        dialog-patcher "C:\Games\Pillars of Eternity II" my_mod.dialogproject
+
+      Run 'dialog-patcher --help' for every option and the exit codes.
+      """;
+
     private const string DoubleClickNote = """
       This is dialog-patcher, the command-line tool for scripts and mod installers.
 
@@ -149,7 +162,7 @@ public static class PatcherCommand
                 ? "Missing required argument: <game-dir>"
                 : "Missing required arguments: <game-dir> <project.dialogproject>");
             stderr.WriteLine();
-            stderr.WriteLine(Help);
+            stderr.WriteLine(ShortUsage);
             return 2;
         }
 
@@ -353,6 +366,7 @@ public static class PatcherCommand
                 foreach (var p in a.UnreadableStringTables)
                     stderr.WriteLine($"Warning: text file is damaged (not XML) and was left untouched; that language shows no new text. Use \"verify files\" to repair it: {p}");
                 Verbose($"  restored originals, then applied {entries.Count} project(s)");
+                foreach (var name in a.PatchedConversations) Verbose($"  patched {name}");
                 Info(a.MissingConversations.Count > 0
                     ? $"Done: {a.ConversationsPatched} patched, {a.MissingConversations.Count} skipped (conversation not found)."
                     : $"Done: {a.ConversationsPatched} conversation(s) patched successfully.");
