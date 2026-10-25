@@ -396,7 +396,12 @@ public partial class ConversationViewModel : ObservableObject
             }
         }
         BaseSnapshot = baseSnapshot ?? BuildSnapshot();
+        ConversationLoaded?.Invoke(this, EventArgs.Empty);
     }
+
+    /// Raised at the end of Load, once nodes, layout and links are in place. The canvas view
+    /// frames the new conversation on it (GitHub issue 246).
+    public event EventHandler? ConversationLoaded;
 
     // ── Structural edit methods ───────────────────────────────────────────
     public void AddNode(NodeViewModel node, LayoutPoint position)

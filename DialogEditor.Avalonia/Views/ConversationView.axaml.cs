@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using DialogEditor.Avalonia.Shared.Theming;
 using DialogEditor.Core.Editing;
@@ -51,6 +52,7 @@ public partial class ConversationView : UserControl
     {
         if (_annotationVm is not null)
         {
+            _annotationVm.ConversationLoaded -= OnConversationLoaded;
             _annotationVm.Annotations.CollectionChanged -= OnAnnotationsChanged;
             foreach (var ann in _annotationVm.Annotations)
                 ann.PropertyChanged -= OnAnnotationWorldChanged;
@@ -60,6 +62,7 @@ public partial class ConversationView : UserControl
 
         if (_annotationVm is not null)
         {
+            _annotationVm.ConversationLoaded += OnConversationLoaded;
             _annotationVm.Annotations.CollectionChanged += OnAnnotationsChanged;
             foreach (var ann in _annotationVm.Annotations)
                 ann.PropertyChanged += OnAnnotationWorldChanged;
@@ -296,6 +299,39 @@ public partial class ConversationView : UserControl
         var usable = Math.Max(1, Editor.Bounds.Width - reserved);
         var widened = extent.Width * Editor.Bounds.Width / usable;
         Editor.FitToScreen(new global::Avalonia.Rect(extent.X, extent.Y, widened, extent.Height));
+    }
+
+    /// The lowest zoom (before font scale) a conversation opens at: below it card text is too
+    /// small to read, so a graph that only fits further out opens on its root instead (GitHub issue 246).
+    internal const double MinOpeningZoom = 0.6;
+
+    // Screen pixels between the root card and the canvas's left edge when opening on the root.
+    private const double OpeningRootMargin = 24;
+
+    // The cards only have their sizes (and ItemsExtent its value) after the next layout pass,
+    // so frame once that has run rather than straight away.
+    private void OnConversationLoaded(object? sender, EventArgs e) =>
+        Dispatcher.UIThread.Post(FrameConversation, DispatcherPriority.Background);
+
+    /// GitHub issue 246: open a conversation on the whole graph, clear of the minimap, when that
+    /// fits at a readable zoom; otherwise on the root node at that zoom. The default view
+    /// (origin at the top-left) cut off every card above y = 0, and showed nothing of a big graph.
+    internal void FrameConversation()
+    {
+        if (DataContext is not ConversationViewModel vm || vm.Nodes.Count == 0) return;
+        if (Editor.Bounds.Width <= 0 || Editor.Bounds.Height <= 0) return;
+
+        FitToScreenClearOfMinimap();
+        var minZoom = MinOpeningZoom * FontScaleFactor;
+        if (Editor.ViewportZoom >= minZoom) return;
+
+        var root = vm.Nodes.FirstOrDefault(n => n.NodeId == 0) ?? vm.Nodes[0];
+        var rootHeight = CardMetrics.EstimateHeight(root.DefaultText);
+        Editor.ViewportZoom = minZoom;
+        var visibleHeight = Editor.Bounds.Height / minZoom;
+        Editor.ViewportLocation = new global::Avalonia.Point(
+            root.Location.X - OpeningRootMargin / minZoom,
+            root.Location.Y + rootHeight / 2 - visibleHeight / 2);
     }
 
     private void FitToScreen_Click(object? sender, RoutedEventArgs e) => FitToScreenClearOfMinimap();
