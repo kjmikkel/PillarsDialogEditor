@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using DialogEditor.Core.Localisation;
 using DialogEditor.Core.Models;
@@ -53,6 +53,46 @@ public partial class ParameterValueViewModel : ObservableObject
     public bool IsEnum
         => (Options is { Count: > 0 }) || Type == "Operator" || Type == "Boolean";
 
+    /// A comparison operator: a fixed list of plain labels, never free text (GitHub issue 266).
+    /// A typo there would save an operator the game can't read.
+    public bool IsFixedChoice => IsOperatorType(Type);
+
+    /// Other enums keep the filterable free-text box, as their option lists can be long or
+    /// incomplete.
+    public bool IsFreeEnum => IsEnum && !IsFixedChoice;
+
+    /// The bundled catalogues type operators "Enum:Operator"; "Operator" is the older form.
+    public static bool IsOperatorType(string type) => type is "Operator" or "Enum:Operator";
+
+    /// The operator names the game stores, in the order of its own enum
+    /// (Game.GameData.Operator / Conditionals.Operator).
+    public static IReadOnlyList<string> OperatorNames { get; } =
+        ["EqualTo", "GreaterThan", "LessThan", "NotEqualTo", "GreaterThanOrEqualTo", "LessThanOrEqualTo"];
+
+    /// The plain label for each of <see cref="OperatorNames"/> ("equals", "is at least").
+    public static IReadOnlyList<string> OperatorLabels() =>
+        OperatorNames.Select(n => Loc.Get("ConditionOperator_" + n)).ToList();
+
+    /// The choices to offer and the values to save for a catalogue parameter. An operator is a
+    /// labelled enum built from the game's names, whatever the catalogue lists: the bundled
+    /// catalogues offer "Equals", which isn't one (GitHub issue 266).
+    public static (IReadOnlyList<string>? Options, IReadOnlyList<string>? Values) Choices(ConditionParameter p) =>
+        IsOperatorType(p.Type) ? (OperatorLabels(), OperatorNames) : (p.Options, p.Values);
+
+    /// What to show for a stored value: the label of a labelled enum, else the value itself.
+    /// A stored "Equals" (saved from the old catalogue option) reads as EqualTo, so saving the
+    /// condition again repairs it.
+    public static string Display(string type, string stored,
+        IReadOnlyList<string>? options, IReadOnlyList<string>? values)
+    {
+        if (IsOperatorType(type) && string.Equals(stored, "Equals", StringComparison.OrdinalIgnoreCase))
+            stored = "EqualTo";
+        if (options is not { Count: > 0 } || values is not { Count: > 0 }) return stored;
+        for (var i = 0; i < values.Count && i < options.Count; i++)
+            if (string.Equals(values[i], stored, StringComparison.OrdinalIgnoreCase)) return options[i];
+        return stored;
+    }
+
     public bool HasLookup => LookupKind.Length > 0;
 
     public bool   IsText      => !IsEnum && !HasLookup;
@@ -72,8 +112,7 @@ public partial class ParameterValueViewModel : ObservableObject
             if (Options is { Count: > 0 }) return Options;
             return Type switch
             {
-                "Operator" => ["EqualTo", "NotEqualTo", "GreaterThan", "LessThan",
-                               "GreaterThanOrEqualTo", "LessThanOrEqualTo"],
+                "Operator" => OperatorLabels(),
                 "Boolean"  => ["true", "false"],
                 _ => []
             };
@@ -173,6 +212,7 @@ public partial class ConditionRowViewModel : ObservableObject
                 {
                     var stored     = i < leaf.Parameters.Count ? leaf.Parameters[i] : p.Default;
                     var lookupKind = p.LookupKind ?? string.Empty;
+                    var (options, values) = ParameterValueViewModel.Choices(p);
                     string display;
                     if (lookupKind.Length > 0)
                     {
@@ -182,22 +222,18 @@ public partial class ConditionRowViewModel : ObservableObject
                         display = GameDataNameService.Get(lookupKind)
                             .FirstOrDefault(e => e.StoredValue == stored)?.DisplayName ?? stored;
                     }
-                    else if (p.Values is { Count: > 0 } && p.Options is { Count: > 0 })
-                    {
-                        // For labeled enums, display the label rather than the stored value
-                        display = LookupLabel(stored, p.Options, p.Values) ?? stored;
-                    }
                     else
                     {
-                        display = stored;
+                        // For labeled enums, display the label rather than the stored value
+                        display = ParameterValueViewModel.Display(p.Type, stored, options, values);
                     }
                     return new ParameterValueViewModel
                     {
                         Name        = p.Name,
                         Description = p.Description,
                         Type        = p.Type,
-                        Options     = p.Options,
-                        Values      = p.Values,
+                        Options     = options,
+                        Values      = values,
                         LookupKind  = lookupKind,
                         Value       = display,
                     };
@@ -213,15 +249,6 @@ public partial class ConditionRowViewModel : ObservableObject
 
     public ConditionLeaf ToLeaf() =>
         new(FullName, Parameters.Select(p => p.EffectiveValue).ToList(), Not, Operator);
-
-    private static string? LookupLabel(
-        string stored, IReadOnlyList<string> options, IReadOnlyList<string> values)
-    {
-        for (var i = 0; i < values.Count; i++)
-            if (string.Equals(values[i], stored, StringComparison.OrdinalIgnoreCase) && i < options.Count)
-                return options[i];
-        return null;
-    }
 
     private static string StripReturnType(string fullName)
     {

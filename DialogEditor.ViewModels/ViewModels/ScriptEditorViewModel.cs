@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Models;
@@ -31,16 +31,19 @@ public partial class ScriptRowViewModel : ObservableObject
                 {
                     var stored     = i < call.Parameters.Count ? call.Parameters[i] : p.Default;
                     var lookupKind = p.LookupKind ?? string.Empty;
+                    // Operators get plain labels here too (GitHub issue 266).
+                    var (options, values) = ParameterValueViewModel.Choices(p);
                     var display    = lookupKind.Length > 0
                         ? GameDataNameService.Get(lookupKind)
                               .FirstOrDefault(e => e.StoredValue == stored)?.DisplayName ?? stored
-                        : stored;
+                        : ParameterValueViewModel.Display(p.Type, stored, options, values);
                     return new ParameterValueViewModel
                     {
                         Name        = p.Name,
                         Description = p.Description,
                         Type        = p.Type,
-                        Options     = p.Options,
+                        Options     = options,
+                        Values      = values,
                         LookupKind  = lookupKind,
                         Value       = display,
                     };
