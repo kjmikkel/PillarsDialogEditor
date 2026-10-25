@@ -58,6 +58,7 @@
                             VerticalAlignment="Center"
                             Click="ColorPickerButton_Click"
                             ToolTip.Tip="{DynamicResource ToolTip_AnnotationColorPicker}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_AnnotationColorPicker}"
                             AutomationProperties.Name="{DynamicResource AutomationName_AnnotationColorPicker}">
                         <Button.Background>
                             <MultiBinding Converter="{StaticResource AnnotationColor}" ConverterParameter="Stroke">
