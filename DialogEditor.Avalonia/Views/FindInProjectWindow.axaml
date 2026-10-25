@@ -79,31 +79,35 @@
                 <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.Language}" Classes="col-header" Text="{DynamicResource FindInProject_ColLanguage}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{DynamicResource FindInProject_ColLanguage}"/>
                 <TextBlock Grid.Column="4" Classes="col-header" Text="{DynamicResource FindInProject_ColSnippet}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{DynamicResource FindInProject_ColSnippet}"/>
             </Grid>
-            <ListBox x:Name="ResultsList"
-                     Background="{DynamicResource Brush.Surface.Card}" BorderThickness="0"
-                     KeyDown="ResultsList_KeyDown">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*" ColumnSpacing="8" Margin="0,2"
-                              DoubleTapped="OnResultActivated">
-                            <TextBlock Grid.Column="0" Width="{DynamicResource ColumnWidth.Conversation}" Text="{Binding Row.ConversationName}" ToolTip.Tip="{Binding Row.ConversationName}"
-                                       Classes="list-primary" FontSize="{DynamicResource FontSize.Body}"
-                                       TextTrimming="CharacterEllipsis"/>
-                            <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.NodeId}" Text="{Binding Row.NodeId}"
-                                       Classes="list-secondary" FontSize="{DynamicResource FontSize.Body}"/>
-                            <TextBlock Grid.Column="2" Width="{DynamicResource ColumnWidth.Field}" Text="{Binding Row.FieldLabel}" ToolTip.Tip="{Binding Row.FieldLabel}"
-                                       Classes="list-secondary" FontSize="{DynamicResource FontSize.Body}"
-                                       TextTrimming="CharacterEllipsis"/>
-                            <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.Language}" Text="{Binding LanguageDisplay}" ToolTip.Tip="{Binding LanguageDisplay}"
-                                       Classes="list-muted" FontSize="{DynamicResource FontSize.Body}"
-                                       TextTrimming="CharacterEllipsis"/>
-                            <TextBlock Grid.Column="4" Text="{Binding Row.Snippet}" ToolTip.Tip="{Binding Row.Snippet}"
-                                       Classes="list-secondary" FontSize="{DynamicResource FontSize.Body}"
-                                       TextTrimming="CharacterEllipsis"/>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <Panel>
+                <ListBox x:Name="ResultsList"
+                         Background="{DynamicResource Brush.Surface.Card}" BorderThickness="0"
+                         KeyDown="ResultsList_KeyDown">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*" ColumnSpacing="8" Margin="0,2"
+                                  DoubleTapped="OnResultActivated">
+                                <TextBlock Grid.Column="0" Width="{DynamicResource ColumnWidth.Conversation}" Text="{Binding Row.ConversationName}" ToolTip.Tip="{Binding Row.ConversationName}"
+                                           Classes="list-primary" FontSize="{DynamicResource FontSize.Body}"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.NodeId}" Text="{Binding Row.NodeId}"
+                                           Classes="list-secondary" FontSize="{DynamicResource FontSize.Body}"/>
+                                <TextBlock Grid.Column="2" Width="{DynamicResource ColumnWidth.Field}" Text="{Binding Row.FieldLabel}" ToolTip.Tip="{Binding Row.FieldLabel}"
+                                           Classes="list-secondary" FontSize="{DynamicResource FontSize.Body}"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.Language}" Text="{Binding LanguageDisplay}" ToolTip.Tip="{Binding LanguageDisplay}"
+                                           Classes="list-muted" FontSize="{DynamicResource FontSize.Body}"
+                                           TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Column="4" Text="{Binding Row.Snippet}" ToolTip.Tip="{Binding Row.Snippet}"
+                                           Classes="list-secondary" FontSize="{DynamicResource FontSize.Body}"
+                                           TextTrimming="CharacterEllipsis"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <!-- Says why the list is empty and what fills it (GitHub issue 254). -->
+                <shared:EmptyState Message="{Binding EmptyMessage}" Hint="{Binding EmptyHint}"/>
+            </Panel>
         </DockPanel>
 
         <!-- Focus hint bar -->

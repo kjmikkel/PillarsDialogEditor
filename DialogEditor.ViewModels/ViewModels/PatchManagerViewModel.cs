@@ -83,6 +83,7 @@ public partial class PatchManagerViewModel : ObservableObject
         Entries.CollectionChanged += (_, _) =>
         {
             OnPropertyChanged(nameof(HasEntries));
+            NotifyApplyHint();
             ApplyCommand.NotifyCanExecuteChanged();
             Analyse();
         };
@@ -410,6 +411,21 @@ public partial class PatchManagerViewModel : ObservableObject
         return string.Join(" ", [headline, .. warnings]);
     }
 
+    /// Why Apply is disabled, as the next step to take (GitHub issue 248): the game folder
+    /// comes first, then at least one mod. Empty once Apply can run (or while it is running).
+    public string ApplyHint =>
+        string.IsNullOrEmpty(GameFolder) ? Loc.Get("PatchManager_ApplyHint_NoGameFolder")
+        : Entries.Count == 0             ? Loc.Get("PatchManager_ApplyHint_NoMods")
+        : string.Empty;
+
+    public bool HasApplyHint => ApplyHint.Length > 0;
+
+    private void NotifyApplyHint()
+    {
+        OnPropertyChanged(nameof(ApplyHint));
+        OnPropertyChanged(nameof(HasApplyHint));
+    }
+
     private bool CanApply() => !string.IsNullOrEmpty(GameFolder)
                              && Entries.Count > 0
                              && !IsApplying;
@@ -459,6 +475,7 @@ public partial class PatchManagerViewModel : ObservableObject
     partial void OnGameFolderChanged(string value)
     {
         OnPropertyChanged(nameof(GameFolderDisplay));
+        NotifyApplyHint();
         RefreshBackupStatus();
     }
 

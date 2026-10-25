@@ -303,6 +303,40 @@ public class PatchManagerViewModelTests
         await vm.ShowGameUpdateHelpCommand.ExecuteAsync(null);   // no hook set: must not throw
     }
 
+    // ── ApplyHint (GitHub issue 248) ──────────────────────────────────────
+    // Apply was disabled with no reason given; the hint names the missing piece.
+
+    [Fact]
+    public void ApplyHint_NoGameFolder_AsksForTheFolderFirst()
+    {
+        var vm = MakeVm();
+        vm.Entries.Add(MakeEntry());
+        Assert.Equal("PatchManager_ApplyHint_NoGameFolder", vm.ApplyHint);
+    }
+
+    [Fact]
+    public void ApplyHint_FolderButNoMods_AsksForAMod()
+    {
+        var vm = MakeVm();
+        vm.GameFolder = "/game";
+        Assert.Equal("PatchManager_ApplyHint_NoMods", vm.ApplyHint);
+    }
+
+    [Fact]
+    public void ApplyHint_ReadyToApply_IsEmpty_AndFollowsChanges()
+    {
+        var vm = MakeVm();
+        var raised = 0;
+        vm.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(PatchManagerViewModel.ApplyHint)) raised++; };
+
+        vm.GameFolder = "/game";
+        vm.Entries.Add(MakeEntry());
+
+        Assert.Equal(string.Empty, vm.ApplyHint);
+        Assert.False(vm.HasApplyHint);
+        Assert.True(raised >= 2);
+    }
+
     // GitHub issue 249: a mod that isn't valid JSON (a corrupt download) is reported as damaged,
     // not with the parser's message.
     [Fact]

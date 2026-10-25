@@ -187,49 +187,53 @@
                         BorderBrush="{DynamicResource Brush.Border.Strong}"
                         BorderThickness="1"
                         CornerRadius="4">
-                    <ListBox x:Name="ChangedList"
-                             ItemsSource="{Binding Groups}"
-                             SelectedItem="{Binding SelectedGroup, Mode=TwoWay}"
-                             Background="Transparent"
-                             ToolTip.Tip="{DynamicResource ToolTip_DiffChangedList}"
-                             AutomationProperties.HelpText="{DynamicResource ToolTip_DiffChangedList}">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate DataType="{x:Type vm:ConversationChangeViewModel}">
-                                <StackPanel Orientation="Vertical" Margin="2,2">
-                                    <StackPanel Orientation="Horizontal">
-                                        <CheckBox IsChecked="{Binding IsAllSelected, Mode=TwoWay}" IsThreeState="True"
-                                                  ToolTip.Tip="{DynamicResource ToolTip_Diff_BringIn}"
-                                                  AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_BringIn}"/>
-                                        <!-- TextBlock content, not Content="{Binding Name}": a string Content
-                                             goes through AccessText and loses the first '_' of the
-                                             conversation name (issue 181). The UIA Name is set explicitly because a
-                                             TextBlock child no longer supplies it. -->
-                                        <ToggleButton IsChecked="{Binding IsExpanded, Mode=TwoWay}"
-                                                      Background="Transparent" Classes="diff-conversation" BorderThickness="0" Padding="4,0"
-                                                      AutomationProperties.Name="{Binding Name}"
-                                                      ToolTip.Tip="{DynamicResource ToolTip_Diff_ExpandConversation}"
-                                                      AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_ExpandConversation}">
-                                            <TextBlock Text="{Binding Name}"/>
-                                        </ToggleButton>
+                    <Panel>
+                        <ListBox x:Name="ChangedList"
+                                 ItemsSource="{Binding Groups}"
+                                 SelectedItem="{Binding SelectedGroup, Mode=TwoWay}"
+                                 Background="Transparent"
+                                 ToolTip.Tip="{DynamicResource ToolTip_DiffChangedList}"
+                                 AutomationProperties.HelpText="{DynamicResource ToolTip_DiffChangedList}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate DataType="{x:Type vm:ConversationChangeViewModel}">
+                                    <StackPanel Orientation="Vertical" Margin="2,2">
+                                        <StackPanel Orientation="Horizontal">
+                                            <CheckBox IsChecked="{Binding IsAllSelected, Mode=TwoWay}" IsThreeState="True"
+                                                      ToolTip.Tip="{DynamicResource ToolTip_Diff_BringIn}"
+                                                      AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_BringIn}"/>
+                                            <!-- TextBlock content, not Content="{Binding Name}": a string Content
+                                                 goes through AccessText and loses the first '_' of the
+                                                 conversation name (issue 181). The UIA Name is set explicitly because a
+                                                 TextBlock child no longer supplies it. -->
+                                            <ToggleButton IsChecked="{Binding IsExpanded, Mode=TwoWay}"
+                                                          Background="Transparent" Classes="diff-conversation" BorderThickness="0" Padding="4,0"
+                                                          AutomationProperties.Name="{Binding Name}"
+                                                          ToolTip.Tip="{DynamicResource ToolTip_Diff_ExpandConversation}"
+                                                          AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_ExpandConversation}">
+                                                <TextBlock Text="{Binding Name}"/>
+                                            </ToggleButton>
+                                        </StackPanel>
+                                        <ItemsControl ItemsSource="{Binding Nodes}" IsVisible="{Binding IsExpanded}" Margin="20,0,0,0">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate DataType="{x:Type vm:NodeChangeViewModel}">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6">
+                                                        <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                                                  ToolTip.Tip="{DynamicResource ToolTip_Diff_BringIn}"
+                                                                  AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_BringIn}"/>
+                                                        <Border Width="9" Height="9" VerticalAlignment="Center"
+                                                                Background="{Binding Kind, Converter={StaticResource DiffStatusToBrushConverter}}"/>
+                                                        <TextBlock Text="{Binding NodeId, StringFormat={StaticResource Diff_NodeLine}}" Classes="list-secondary" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
                                     </StackPanel>
-                                    <ItemsControl ItemsSource="{Binding Nodes}" IsVisible="{Binding IsExpanded}" Margin="20,0,0,0">
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate DataType="{x:Type vm:NodeChangeViewModel}">
-                                                <StackPanel Orientation="Horizontal" Spacing="6">
-                                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}"
-                                                              ToolTip.Tip="{DynamicResource ToolTip_Diff_BringIn}"
-                                                              AutomationProperties.HelpText="{DynamicResource ToolTip_Diff_BringIn}"/>
-                                                    <Border Width="9" Height="9" VerticalAlignment="Center"
-                                                            Background="{Binding Kind, Converter={StaticResource DiffStatusToBrushConverter}}"/>
-                                                    <TextBlock Text="{Binding NodeId, StringFormat={StaticResource Diff_NodeLine}}" Classes="list-secondary" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <!-- Says why the list is empty and what fills it (GitHub issue 254). -->
+                        <shared:EmptyState Message="{Binding EmptyMessage}" Hint="{Binding EmptyHint}"/>
+                    </Panel>
                 </Border>
             </Grid>
 
@@ -361,7 +365,7 @@
                                        TextWrapping="Wrap"
                                        TextAlignment="Center"
                                        MaxWidth="260"
-                                       IsVisible="{Binding Selected, Converter={StaticResource IsNull}}"/>
+                                       IsVisible="{Binding ShowSelectHint}"/>
                         </StackPanel>
                     </Border>
                 </Panel>

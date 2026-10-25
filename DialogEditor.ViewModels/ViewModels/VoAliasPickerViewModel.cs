@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using DialogEditor.Core.Audio;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Logging;
+using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.ViewModels;
@@ -38,6 +39,18 @@ public partial class VoAliasPickerViewModel : ObservableObject
     [ObservableProperty] private string _nodeFilter         = string.Empty;
     [ObservableProperty] private ConversationFile? _selectedConversation;
     [ObservableProperty] private VoAliasPickerRow? _selectedRow;
+
+    /// Why the line list is empty, or "" when it has rows (GitHub issue 254).
+    public string EmptyMessage => EmptyKey is { } key ? Loc.Get(key) : "";
+
+    /// What to do to fill the line list, or "" when it has rows.
+    public string EmptyHint => EmptyKey is { } key ? Loc.Get(key + "Hint") : "";
+
+    private string? EmptyKey =>
+        VisibleRows.Count > 0       ? null
+        : SelectedConversation is null ? "EmptyState_VoAlias_NoConversation"
+        : _allRows.Count == 0          ? "EmptyState_VoAlias_NoLines"
+        :                                "EmptyState_VoAlias_NoMatches";
 
     /// The alias the dialog returns; null until a pickable row is selected.
     public string? ResultAlias => SelectedRow?.DerivedAlias;
@@ -121,5 +134,7 @@ public partial class VoAliasPickerViewModel : ObservableObject
                 || r.TextPreview.Contains(NodeFilter, StringComparison.OrdinalIgnoreCase)
                 || r.NodeId.ToString().Contains(NodeFilter, StringComparison.Ordinal))
                 VisibleRows.Add(r);
+        OnPropertyChanged(nameof(EmptyMessage));
+        OnPropertyChanged(nameof(EmptyHint));
     }
 }

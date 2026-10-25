@@ -771,4 +771,76 @@ public class DiffViewModelTests : IDisposable
     {
         public GitResult Run(string workingDirectory, params string[] args) => handler(args);
     }
+
+    // ── Empty state (GitHub issue 254) ────────────────────────────────────
+
+    [Fact]
+    public void EmptyState_IdenticalVersions_SaysThereAreNoChanges()
+    {
+        var project = WithNode(1);
+        var path    = WriteTempProject(project);
+        var dir     = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git     = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(project), branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path);
+
+        Assert.Equal("EmptyState_Diff_NoChanges", vm.EmptyMessage);
+        Assert.Equal("EmptyState_Diff_NoChangesHint", vm.EmptyHint);
+        Assert.False(vm.ShowSelectHint);   // nothing in the list to select
+    }
+
+    [Fact]
+    public void EmptyState_NoOtherVersion_SaysTheProjectNeedsGitHistory()
+    {
+        // No branches or commits: both sides fall back to the working copy.
+        var git  = new FakeGit(_ => new GitResult(128, "", "fatal"));
+        var path = WriteTempProject(WithNode(1));
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path);
+
+        Assert.Equal("EmptyState_Diff_SameVersion", vm.EmptyMessage);
+        Assert.Equal("EmptyState_Diff_SameVersionHint", vm.EmptyHint);
+    }
+
+    [Fact]
+    public void EmptyState_VersionCouldNotBeRead_PointsAtTheStatusLine()
+    {
+        var path = WriteTempProject(Empty());
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: null, branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path);
+
+        Assert.Equal("EmptyState_Diff_Failed", vm.EmptyMessage);
+        Assert.Equal("EmptyState_Diff_FailedHint", vm.EmptyHint);
+    }
+
+    [Fact]
+    public void EmptyState_NoEndpoints_SaysToChooseTwoVersions()
+    {
+        var git  = new FakeGit(_ => new GitResult(128, "", "fatal"));
+        var vm   = new DiffViewModel(git, new StubDispatcher(), WriteTempProject(Empty()));
+        vm.LeftEndpoint = null;
+
+        Assert.Equal("EmptyState_Diff_ChooseVersions", vm.EmptyMessage);
+        Assert.Equal("EmptyState_Diff_ChooseVersionsHint", vm.EmptyHint);
+    }
+
+    [Fact]
+    public void EmptyState_WithChanges_IsBlank_AndSelectHintShowsUntilOneIsPicked()
+    {
+        var refProject = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [Node(1), Node(2)], [], []));
+        var path = WriteTempProject(WithNode(1));
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(refProject), branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path);
+
+        Assert.Equal("", vm.EmptyMessage);
+        Assert.Equal("", vm.EmptyHint);
+        Assert.True(vm.ShowSelectHint);
+        vm.Selected = vm.Changes[0];
+        Assert.False(vm.ShowSelectHint);
+    }
 }

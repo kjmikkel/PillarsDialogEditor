@@ -167,7 +167,11 @@ public partial class DiffViewModel : ObservableObject
     partial void OnLeftEndpointChanged(EndpointOption? value)  => Recompute();
     partial void OnRightEndpointChanged(EndpointOption? value) => Recompute();
 
-    partial void OnSelectedChanged(ConversationChange? value) => BuildDiffCanvas();
+    partial void OnSelectedChanged(ConversationChange? value)
+    {
+        OnPropertyChanged(nameof(ShowSelectHint));
+        BuildDiffCanvas();
+    }
 
     partial void OnSelectedGroupChanged(ConversationChangeViewModel? value)
         => Selected = value is null ? null : Changes.FirstOrDefault(c => c.Name == value.Name);
@@ -239,7 +243,44 @@ public partial class DiffViewModel : ObservableObject
         return options;
     }
 
+    // Set when an endpoint couldn't be loaded; StatusText then holds the reason.
+    private bool _compareFailed;
+
+    /// Why the changed-conversations list is empty, or "" when it has rows (GitHub issue 254).
+    public string EmptyMessage => EmptyKey is { } key ? Loc.Get(key) : "";
+
+    /// What to do about the empty list, or "" when it has rows.
+    public string EmptyHint => EmptyKey is { } key ? Loc.Get(key + "Hint") : "";
+
+    /// "Select a conversation from the list" only makes sense when the list has something in it.
+    public bool ShowSelectHint => Groups.Count > 0 && Selected is null;
+
+    private string? EmptyKey =>
+        Groups.Count > 0                                  ? null
+        : LeftEndpoint is null || RightEndpoint is null   ? "EmptyState_Diff_ChooseVersions"
+        : _compareFailed                                  ? "EmptyState_Diff_Failed"
+        : IsSameVersion(LeftEndpoint, RightEndpoint)      ? "EmptyState_Diff_SameVersion"
+        :                                                   "EmptyState_Diff_NoChanges";
+
+    private static bool IsSameVersion(EndpointOption a, EndpointOption b) =>
+        ReferenceEquals(a, b)
+        || (a.Endpoint, b.Endpoint) switch
+        {
+            (DiffEndpoint.WorkingCopy, DiffEndpoint.WorkingCopy) => true,
+            (DiffEndpoint.GitRef ga, DiffEndpoint.GitRef gb)     => RefsMatch(ga.Ref, gb.Ref),
+            _                                                    => false,
+        };
+
     private void Recompute()
+    {
+        _compareFailed = false;
+        RecomputeChanges();
+        OnPropertyChanged(nameof(EmptyMessage));
+        OnPropertyChanged(nameof(EmptyHint));
+        OnPropertyChanged(nameof(ShowSelectHint));
+    }
+
+    private void RecomputeChanges()
     {
         Changes.Clear();
         Groups.Clear();
@@ -256,6 +297,7 @@ public partial class DiffViewModel : ObservableObject
         catch (DiffException ex)
         {
             AppLog.Warn($"DiffViewModel: diff failed: {ex.Message}");
+            _compareFailed = true;
             StatusText = MapDiffError(ex, LeftEndpoint.Label);
             BuildDiffCanvas();
             return;
@@ -268,6 +310,7 @@ public partial class DiffViewModel : ObservableObject
         catch (DiffException ex)
         {
             AppLog.Warn($"DiffViewModel: diff failed: {ex.Message}");
+            _compareFailed = true;
             StatusText = MapDiffError(ex, RightEndpoint.Label);
             BuildDiffCanvas();
             return;

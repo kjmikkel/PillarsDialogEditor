@@ -1,4 +1,4 @@
-﻿using DialogEditor.Core.Editing;
+using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
@@ -301,5 +301,47 @@ public class BatchReplaceViewModelTests
         await vm.PreviewCommand.ExecuteAsync(null);
 
         Assert.Contains("skip", vm.StatusText, StringComparison.OrdinalIgnoreCase);
+    }
+
+    // ── Empty state (GitHub issue 254) ────────────────────────────────────
+
+    [Fact]
+    public void EmptyState_BeforePreview_SaysToPreview()
+    {
+        var vm = MakeVm();
+        Assert.Equal("EmptyState_BatchReplace_NotPreviewed", vm.EmptyMessage);
+        Assert.Equal("EmptyState_BatchReplace_NotPreviewedHint", vm.EmptyHint);
+    }
+
+    [Fact]
+    public async Task EmptyState_PreviewWithNoMatches_SaysSo()
+    {
+        var vm = MakeVm();
+        vm.SearchText = "xyz";
+        await vm.PreviewCommand.ExecuteAsync(null);
+        Assert.Equal("EmptyState_BatchReplace_NoMatches", vm.EmptyMessage);
+        Assert.Equal("EmptyState_BatchReplace_NoMatchesHint", vm.EmptyHint);
+    }
+
+    [Fact]
+    public async Task EmptyState_WithResults_IsBlank()
+    {
+        var vm = MakeVm();
+        vm.SearchText = "world";
+        await vm.PreviewCommand.ExecuteAsync(null);
+        Assert.Equal("", vm.EmptyMessage);
+        Assert.Equal("", vm.EmptyHint);
+    }
+
+    [Fact]
+    public async Task EmptyState_AfterApply_SaysTheReplacementsAreMade()
+    {
+        var vm = MakeVm();
+        vm.SearchText = "world";
+        vm.ReplaceText = "earth";
+        await vm.PreviewCommand.ExecuteAsync(null);
+        await vm.ApplyCommand.ExecuteAsync(null);
+        Assert.Equal("EmptyState_BatchReplace_Applied", vm.EmptyMessage);
+        Assert.Equal("EmptyState_BatchReplace_AppliedHint", vm.EmptyHint);
     }
 }
