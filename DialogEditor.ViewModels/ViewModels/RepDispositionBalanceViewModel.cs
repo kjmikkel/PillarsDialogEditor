@@ -47,13 +47,31 @@ public partial class RepDispositionBalanceViewModel : ObservableObject
     private readonly Func<(string? Name, ConversationEditSnapshot? Snapshot)> _getOpen;
     private CancellationTokenSource?   _cts;
 
-    [ObservableProperty] private BalanceSource _source = BalanceSource.ProjectChanges;
-    [ObservableProperty] private BalanceScope  _scope  = BalanceScope.Current;
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(EmptyHint))] private BalanceSource _source = BalanceSource.ProjectChanges;
+    [ObservableProperty, NotifyPropertyChangedFor(nameof(EmptyHint))] private BalanceScope  _scope  = BalanceScope.Current;
     [ObservableProperty] private string        _statusText = string.Empty;
     [ObservableProperty] private bool          _isBusy;
 
     public ObservableCollection<BalanceRowViewModel> DispositionRows { get; } = [];
     public ObservableCollection<BalanceRowViewModel> ReputationRows  { get; } = [];
+
+    // Blank until the first analysis finishes: while it runs, the status line says so.
+    private bool _analysed;
+
+    /// Why the Dispositions table is empty, or "" (GitHub issue 254).
+    public string DispositionEmptyMessage =>
+        _analysed && DispositionRows.Count == 0 ? Loc.Get("EmptyState_RepBalance_NoDispositions") : "";
+
+    /// Why the Reputations table is empty, or "" (GitHub issue 254).
+    public string ReputationEmptyMessage =>
+        _analysed && ReputationRows.Count == 0 ? Loc.Get("EmptyState_RepBalance_NoReputations") : "";
+
+    /// How to look further when a table is empty. "" when the search is already as wide as
+    /// it goes (every conversation, on disk plus changes), as there is nowhere further to look.
+    public string EmptyHint =>
+        (DispositionEmptyMessage.Length > 0 || ReputationEmptyMessage.Length > 0)
+        && !(Scope == BalanceScope.All && Source == BalanceSource.OnDiskPlusChanges)
+            ? Loc.Get("EmptyState_RepBalance_Hint") : "";
 
     public RepDispositionBalanceViewModel(
         DialogProject project, IGameDataProvider provider,
@@ -97,6 +115,11 @@ public partial class RepDispositionBalanceViewModel : ObservableObject
             foreach (var r in report.DispositionRows) DispositionRows.Add(new BalanceRowViewModel(r));
             ReputationRows.Clear();
             foreach (var r in report.ReputationRows) ReputationRows.Add(new BalanceRowViewModel(r));
+
+            _analysed = true;
+            OnPropertyChanged(nameof(DispositionEmptyMessage));
+            OnPropertyChanged(nameof(ReputationEmptyMessage));
+            OnPropertyChanged(nameof(EmptyHint));
 
             StatusText = Loc.Format("RepBalance_Summary",
                 report.ConversationsAnalyzed, report.DispositionTotal, report.ReputationTotal);

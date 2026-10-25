@@ -240,7 +240,7 @@ unchanged.
 
 ### 7 — Restore after testing
 
-**Test › Restore Conversation** (`F6`)
+**Test › End Test and Restore Game Files** (`F6`)
 
 Reverts the patched game files to their pre-test state and unlocks the editor.
 New conversations that were written by `F5` are deleted again.
@@ -461,7 +461,7 @@ Legend window can be moved outside the editor (useful on a second monitor).
 | `Ctrl+H` | Find / Replace |
 | `Delete` | Delete selected node |
 | `F5` | Test Patch |
-| `F6` | Restore Conversation |
+| `F6` | End Test and Restore Game Files |
 | `Ctrl+Shift+B` | Restore Backup (all conversations) |
 | `Escape` | Clear search / close browser flyout |
 
@@ -554,7 +554,7 @@ This is checked by an opt-in test against a real install ([docs/game-data-tests.
 run before each release. It has not yet been confirmed by playing through edited conversations
 in-game. If a patched conversation misbehaves in the game, please
 [open an issue](https://github.com/kjmikkel/PillarsDialogEditor/issues). Test Patch always backs up
-the files it changes, so **Restore Conversation (F6)** puts the originals back.
+the files it changes, so **End Test and Restore Game Files (F6)** puts the originals back.
 
 **DLC.** Nothing in the editor or patcher depends on which DLC you own. Pillars of Eternity's
 White March conversations sit in the normal conversations folder, with their text in
@@ -578,11 +578,11 @@ install, with a "conversation not found" warning. Nothing else is written or bro
   replaces a file a mod changed. **Remove all mods / Restore** then leaves that file alone and tells
   you. Reinstalling stops and asks before treating the new file as the original
   (`--accept-current-files`). Your update is never overwritten with an older copy.
-- **Test Patch (F5) / Restore Conversation (F6).** F5 backs up the files it's about to change, so
+- **Test Patch (F5) / End Test and Restore Game Files (F6).** F5 backs up the files it's about to change, so
   the backup is always fresh. Restore with F6 before updating or verifying the game. F6 puts
   every file F5 changed back byte for byte and removes the files it added. A folder F5 had to
   create can be left behind empty ([#125](https://github.com/kjmikkel/PillarsDialogEditor/issues/125)).
-- **Restore Full Backup (Ctrl+Shift+B).** This puts back files from the snapshot taken the first
+- **Restore Backup (Ctrl+Shift+B).** This puts back files from the snapshot taken the first
   time you opened the game folder, but only files the editor itself changed since. A file a game
   update, "verify files" or the Patch Manager changed is left alone and listed in the log, so an
   old snapshot never downgrades an updated game

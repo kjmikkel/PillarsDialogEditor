@@ -336,4 +336,20 @@ public class PatchManagerViewModelTests
         Assert.False(vm.HasApplyHint);
         Assert.True(raised >= 2);
     }
+
+    // GitHub issue 249: a mod that isn't valid JSON (a corrupt download) is reported as damaged,
+    // not with the parser's message.
+    [Fact]
+    public async Task AddEntries_DamagedFile_SaysItIsDamaged()
+    {
+        var bad = Path.Combine(Path.GetTempPath(), $"bad_{Guid.NewGuid():N}.dialogproject");
+        File.WriteAllText(bad, "not json");
+        try
+        {
+            var vm = new PatchManagerViewModel(new StubFolderPicker(), new StubFilePicker(multiResult: [bad]));
+            await vm.AddEntriesCommand.ExecuteAsync(null);
+            Assert.Equal("PatchManager_DamagedMod", vm.Entries.Single().LoadError);
+        }
+        finally { File.Delete(bad); }
+    }
 }

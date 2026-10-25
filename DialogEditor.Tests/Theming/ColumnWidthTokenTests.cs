@@ -23,6 +23,20 @@ public class ColumnWidthTokenTests
             Assert.Equal(value, Resource(key));
     }
 
+    /// <summary>
+    /// GitHub issue 261: Dock.Avalonia sizes its pane buttons (Pane options, Pin, Close) from
+    /// these two keys, and their glyphs fill the button. Left to the theme they stayed 18x16
+    /// at every font scale; scaling them with the column widths makes the glyphs grow too.
+    /// </summary>
+    [Theory]
+    [InlineData("DockChromeButtonWidth", 18)]
+    [InlineData("DockChromeButtonHeight", 16)]
+    public void DockPaneButtonSizes_ScaleWithTheFont(string key, double baseValue)
+    {
+        Assert.True(ColumnWidthTokens.BaseValues.TryGetValue(key, out var value), key);
+        Assert.Equal(baseValue, value);
+    }
+
     [AvaloniaFact]
     public void Apply_ScalesEveryColumnWidth()
     {

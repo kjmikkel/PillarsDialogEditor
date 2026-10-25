@@ -61,6 +61,13 @@
     <x:Double x:Key="ColumnWidth.BatchVo.FileMin">150</x:Double>
     <x:Double x:Key="ColumnWidth.SeverityBadge">16</x:Double>
 
+    <!-- Dock.Avalonia's pane buttons (Pane options, Pin, Close) size from these keys and their
+         glyphs fill the button (GitHub issue 261). The values are the Dock Fluent theme's own;
+         listing them in ColumnWidthTokens.BaseValues makes FontScaleApplier scale them, so the
+         glyphs grow with the text instead of staying 18x16 at every font scale. -->
+    <x:Double x:Key="DockChromeButtonWidth">18</x:Double>
+    <x:Double x:Key="DockChromeButtonHeight">16</x:Double>
+
     <!-- Issue 82: conversation-canvas card sizes, in canvas units. Pinned to
          DialogEditor.Core/Layout/CardMetrics.cs by CanvasTokenTests. Deliberately NOT in
          FontSizeTokens / ColumnWidthTokens, so FontScaleApplier never scales them: on the canvas,

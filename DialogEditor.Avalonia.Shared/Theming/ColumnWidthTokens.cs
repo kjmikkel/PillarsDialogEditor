@@ -42,5 +42,9 @@ public static class ColumnWidthTokens
         ["ColumnWidth.BatchVo.FileMin"]      = 150,
         // The Flow Analytics severity badge is square: this is its width and its height.
         ["ColumnWidth.SeverityBadge"]        = 16,
+        // GitHub issue 261: Dock.Avalonia's pane buttons (Pane options, Pin, Close). Not column
+        // widths, but sizes that must grow with the text in the same way.
+        ["DockChromeButtonWidth"]            = 18,
+        ["DockChromeButtonHeight"]           = 16,
     };
 }

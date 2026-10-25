@@ -242,7 +242,16 @@ public static class PatcherCommand
             catch (Exception ex)
             {
                 AppLog.Error($"dialog-patcher: could not load '{path}'", ex);
-                Error($"Could not load '{path}': {ex.Message}");
+                if (ModFileErrors.IsDamaged(ex))
+                {
+                    // GitHub issue 249: say what to do; the parser detail is for -v and the log.
+                    Error($"Could not load '{path}': this file is damaged or isn't a mod. Download it again.");
+                    if (verbose) stderr.WriteLine($"  Detail: {ex.Message}");
+                }
+                else
+                {
+                    Error($"Could not load '{path}': {ex.Message}");
+                }
                 CleanupTempDirs(tempDirs);
                 return 2;
             }

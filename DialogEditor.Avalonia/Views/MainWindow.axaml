@@ -52,11 +52,15 @@
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_NewProject}"
                                   AutomationProperties.AutomationId="MenuFile_NewProject"
                                   Command="{Binding NewProjectCommand}"
-                                  InputGesture="Ctrl+N"/>
+                                  InputGesture="Ctrl+N"
+                                  ToolTip.Tip="{DynamicResource ToolTip_NewProject}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_NewProject}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_OpenProject}"
                                   AutomationProperties.AutomationId="MenuFile_OpenProject"
                                   Command="{Binding OpenProjectCommand}"
-                                  InputGesture="Ctrl+O"/>
+                                  InputGesture="Ctrl+O"
+                                  ToolTip.Tip="{DynamicResource ToolTip_OpenProject}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_OpenProject}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_RecentProjects}"
                                   AutomationProperties.AutomationId="MenuFile_RecentProjects"
                                   ItemsSource="{Binding RecentProjectsMenuItems}"
@@ -76,7 +80,9 @@
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_SaveProject}"
                                   AutomationProperties.AutomationId="MenuFile_SaveProject"
                                   Command="{Binding SaveProjectCommand}"
-                                  InputGesture="Ctrl+S"/>
+                                  InputGesture="Ctrl+S"
+                                  ToolTip.Tip="{DynamicResource ToolTip_SaveProject}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_SaveProject}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_SaveProjectAs}"
                                   AutomationProperties.AutomationId="MenuFile_SaveProjectAs"
                                   Command="{Binding SaveProjectAsCommand}"
@@ -98,7 +104,9 @@
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Button_OpenFolder}"
                                   AutomationProperties.AutomationId="MenuFile_OpenGameFolder"
                                   Command="{Binding OpenFolderCommand}"
-                                  InputGesture="Ctrl+Shift+O"/>
+                                  InputGesture="Ctrl+Shift+O"
+                                  ToolTip.Tip="{DynamicResource ToolTip_OpenFolder}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_OpenFolder}"/>
                         <Separator/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource PatchManager_Title}"
                                   AutomationProperties.AutomationId="MenuFile_PatchManager"
@@ -138,7 +146,9 @@
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_Settings}"
                                   AutomationProperties.AutomationId="MenuFile_Settings"
                                   Click="SettingsButton_Click"
-                                  InputGesture="Ctrl+,"/>
+                                  InputGesture="Ctrl+,"
+                                  ToolTip.Tip="{DynamicResource ToolTip_Settings}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_Settings}"/>
                     </ctrl:AccessibleMenuItem>
 
                     <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_Edit}" AutomationProperties.AutomationId="MenuEdit">
@@ -146,12 +156,16 @@
                                   AutomationProperties.AutomationId="MenuEdit_Undo"
                                   AutomationProperties.Name="{DynamicResource AutomationName_Undo}"
                                   Command="{Binding Canvas.UndoCommand}"
-                                  InputGesture="Ctrl+Z"/>
+                                  InputGesture="Ctrl+Z"
+                                  ToolTip.Tip="{DynamicResource ToolTip_Undo}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_Undo}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Button_Redo}"
                                   AutomationProperties.AutomationId="MenuEdit_Redo"
                                   AutomationProperties.Name="{DynamicResource AutomationName_Redo}"
                                   Command="{Binding Canvas.RedoCommand}"
-                                  InputGesture="Ctrl+Y"/>
+                                  InputGesture="Ctrl+Y"
+                                  ToolTip.Tip="{DynamicResource ToolTip_Redo}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_Redo}"/>
                         <Separator/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_FindReplace}"
                                   AutomationProperties.AutomationId="MenuEdit_FindReplace"
@@ -247,16 +261,22 @@
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Button_TestPatch}"
                                   AutomationProperties.AutomationId="MenuTest_TestPatch"
                                   Command="{Binding TestPatchCommand}"
-                                  InputGesture="F5"/>
+                                  InputGesture="F5"
+                                  ToolTip.Tip="{DynamicResource ToolTip_TestPatch}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_TestPatch}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource TestMode_Restore}"
                                   AutomationProperties.AutomationId="MenuTest_RestoreConversation"
                                   Command="{Binding RestoreConversationCommand}"
-                                  InputGesture="F6"/>
+                                  InputGesture="F6"
+                                  ToolTip.Tip="{DynamicResource ToolTip_TestMode_Restore}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_TestMode_Restore}"/>
                         <Separator/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Button_RestoreBackup}"
                                   AutomationProperties.AutomationId="MenuTest_RestoreBackup"
                                   Command="{Binding RestoreBackupCommand}"
-                                  InputGesture="Ctrl+Shift+B"/>
+                                  InputGesture="Ctrl+Shift+B"
+                                  ToolTip.Tip="{DynamicResource ToolTip_RestoreBackup}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_RestoreBackup}"/>
                         <Separator/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_ValidateVO}"
                                   AutomationProperties.AutomationId="MenuTest_ValidateVo"
@@ -344,7 +364,8 @@
 
                 </Menu>
 
-                <!-- Language selector -->
+                <!-- Dialogue-text language selector. Labelled "Text language" so it is not confused with
+                     Settings' app (UI) language (GitHub issue 251). -->
                 <StackPanel DockPanel.Dock="Left" Orientation="Horizontal"
                             VerticalAlignment="Center" Margin="4,0,0,0">
                     <TextBlock Text="{DynamicResource Label_Language}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}"
@@ -356,7 +377,14 @@
                               ToolTip.Tip="{DynamicResource ToolTip_Language}"
                               AutomationProperties.HelpText="{DynamicResource ToolTip_Language}"
                               AutomationProperties.Name="{DynamicResource Label_Language}"
-                              IsVisible="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}"/>
+                              IsVisible="{Binding AvailableLanguages.Count, Converter={StaticResource CountToVis}}">
+                        <!-- Names, not codes (GitHub issue 251); the item stays the code. -->
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <TextBlock Text="{Binding Converter={StaticResource LanguageName}}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
                 </StackPanel>
             </DockPanel>
         </Border>

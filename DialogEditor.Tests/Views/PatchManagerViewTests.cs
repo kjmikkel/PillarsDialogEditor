@@ -125,4 +125,19 @@ public class PatchManagerViewTests
         Assert.Equal((Loc.Get("PatchManager_GameUpdateHelp_Title"), Loc.Get("PatchManager_GameUpdateHelp_Message")), shown);
         Assert.DoesNotContain("[", shown!.Value.Message);   // a real string, not a missing-key marker
     }
+
+    // GitHub issue 259: a broken entry's reason is visible text in its row, not only a tooltip.
+    [AvaloniaFact]
+    public void EntryThatFailedToLoad_ShowsTheReasonInItsRow()
+    {
+        var vm = VmWith();
+        vm.Entries.Add(new PatchEntryViewModel("broken.dialogpack", "End of Central Directory record could not be found."));
+        var view   = new PatchManagerView { DataContext = vm };
+        var window = new Window { Content = view };
+        window.Show();
+
+        var texts = view.GetVisualDescendants().OfType<TextBlock>()
+                        .Where(t => t.IsEffectivelyVisible).Select(t => t.Text ?? "").ToList();
+        Assert.Contains(texts, t => t.Contains("End of Central Directory record could not be found."));
+    }
 }

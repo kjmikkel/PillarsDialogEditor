@@ -39,15 +39,23 @@
              Reaching into the third-party template with /template/ is the fix, mirroring how
              the Dock theme styles its own parts. MUST come after the StyleInclude above to
              win, and the dock xmlns is on the root element because this Avalonia version
-             rejects xmlns on non-root elements (AXN0002). -->
+             rejects xmlns on non-root elements (AXN0002).
+             GitHub issue 261: each also gets a tooltip and help text; a stray click on Close
+             pane otherwise gives a new Modder no hint of how to get the pane back. -->
         <Style Selector="dock|ToolChromeControl /template/ Button#PART_MenuButton">
             <Setter Property="AutomationProperties.Name" Value="{DynamicResource AutomationName_PaneMenu}"/>
+            <Setter Property="ToolTip.Tip" Value="{DynamicResource ToolTip_PaneMenu}"/>
+            <Setter Property="AutomationProperties.HelpText" Value="{DynamicResource ToolTip_PaneMenu}"/>
         </Style>
         <Style Selector="dock|ToolChromeControl /template/ Button#PART_PinButton">
             <Setter Property="AutomationProperties.Name" Value="{DynamicResource AutomationName_PanePin}"/>
+            <Setter Property="ToolTip.Tip" Value="{DynamicResource ToolTip_PanePin}"/>
+            <Setter Property="AutomationProperties.HelpText" Value="{DynamicResource ToolTip_PanePin}"/>
         </Style>
         <Style Selector="dock|ToolChromeControl /template/ Button#PART_CloseButton">
             <Setter Property="AutomationProperties.Name" Value="{DynamicResource AutomationName_PaneClose}"/>
+            <Setter Property="ToolTip.Tip" Value="{DynamicResource ToolTip_PaneClose}"/>
+            <Setter Property="AutomationProperties.HelpText" Value="{DynamicResource ToolTip_PaneClose}"/>
         </Style>
     </Application.Styles>
 
@@ -142,6 +150,7 @@
             <converters:WeightDecimalConverter          x:Key="WeightDecimal"/>
             <converters:QTDDisplayConverter             x:Key="QTDDisplay"/>
             <converters:OptionLabelConverter            x:Key="OptionLabel"/>
+            <converters:LanguageNameConverter           x:Key="LanguageName"/>
             <converters:LayoutPointConverter             x:Key="LayoutPointConverter"/>
             <converters:SpeakerCategoryToBrushConverter x:Key="SpeakerCategoryToBrush"/>
             <converters:NodeColorConverter              x:Key="NodeColorConverter"/>

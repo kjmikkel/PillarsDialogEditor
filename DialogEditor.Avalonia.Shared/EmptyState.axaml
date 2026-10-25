@@ -1,0 +1,28 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="DialogEditor.Avalonia.Shared.EmptyState"
+             x:CompileBindings="False"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center"
+             IsHitTestVisible="False"
+             IsVisible="False">
+
+    <!-- GitHub issue 254: placed over an empty list to say why it is empty (Message) and what
+         fills it (Hint). Shows itself only while Message is set, so the window just binds both
+         to its view model. Not hit-testable: it sits on top of the list and must never take a
+         click meant for it. Muted (not Hint) text, because the Hint brush is decorative and
+         this copy has to meet text contrast. -->
+    <StackPanel Spacing="4" MaxWidth="360" Margin="16">
+        <TextBlock x:Name="MessageText"
+                   FontSize="{DynamicResource FontSize.Body}"
+                   FontWeight="SemiBold"
+                   Foreground="{DynamicResource Brush.Text.Secondary}"
+                   TextWrapping="Wrap"
+                   TextAlignment="Center"/>
+        <TextBlock x:Name="HintText"
+                   FontSize="{DynamicResource FontSize.Label}"
+                   Foreground="{DynamicResource Brush.Text.Muted}"
+                   TextWrapping="Wrap"
+                   TextAlignment="Center"/>
+    </StackPanel>
+</UserControl>

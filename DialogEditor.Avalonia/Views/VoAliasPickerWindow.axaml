@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
         x:Class="DialogEditor.Avalonia.Views.VoAliasPickerWindow"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
@@ -69,27 +70,31 @@
                 IsEnabled="{Binding SelectedRow.IsPickable}" binding below is the real
                 enforcement gate either way.
             -->
-            <ListBox ItemsSource="{Binding VisibleRows}"
-                     SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
-                     DoubleTapped="Rows_DoubleTapped"
-                     ToolTip.Tip="{DynamicResource ToolTip_AliasPickerNodeList}"
-                     AutomationProperties.Name="{DynamicResource AliasPicker_NodesHeader}"
-                     AutomationProperties.HelpText="{DynamicResource ToolTip_AliasPickerNodeList}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate x:DataType="vm:VoAliasPickerRow">
-                        <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8" Margin="0,1"
-                              IsEnabled="{Binding IsPickable}">
-                            <TextBlock Grid.Column="0" Width="{DynamicResource ColumnWidth.NodeId}" Text="{Binding NodeId}" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.Speaker}" Text="{Binding SpeakerName}" ToolTip.Tip="{Binding SpeakerName}"
-                                       TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="2" Text="{Binding TextPreview}" ToolTip.Tip="{Binding TextPreview}"
-                                       TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.WemGlyph}" Text="{Binding WemGlyph}"
-                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Grid>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <Panel>
+                <ListBox ItemsSource="{Binding VisibleRows}"
+                         SelectedItem="{Binding SelectedRow, Mode=TwoWay}"
+                         DoubleTapped="Rows_DoubleTapped"
+                         ToolTip.Tip="{DynamicResource ToolTip_AliasPickerNodeList}"
+                         AutomationProperties.Name="{DynamicResource AliasPicker_NodesHeader}"
+                         AutomationProperties.HelpText="{DynamicResource ToolTip_AliasPickerNodeList}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:VoAliasPickerRow">
+                            <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="8" Margin="0,1"
+                                  IsEnabled="{Binding IsPickable}">
+                                <TextBlock Grid.Column="0" Width="{DynamicResource ColumnWidth.NodeId}" Text="{Binding NodeId}" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="1" Width="{DynamicResource ColumnWidth.Speaker}" Text="{Binding SpeakerName}" ToolTip.Tip="{Binding SpeakerName}"
+                                           TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="2" Text="{Binding TextPreview}" ToolTip.Tip="{Binding TextPreview}"
+                                           TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                                <TextBlock Grid.Column="3" Width="{DynamicResource ColumnWidth.WemGlyph}" Text="{Binding WemGlyph}"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+                <!-- Says why the list is empty and what fills it (GitHub issue 254). -->
+                <shared:EmptyState Message="{Binding EmptyMessage}" Hint="{Binding EmptyHint}"/>
+            </Panel>
         </DockPanel>
 
         <!-- Footer -->
