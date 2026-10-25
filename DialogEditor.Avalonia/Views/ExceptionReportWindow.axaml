@@ -93,7 +93,7 @@
                         AutomationProperties.HelpText="{DynamicResource ToolTip_ExceptionReport_Copy}"
                         Click="Copy_Click"/>
                 <Button Content="{DynamicResource ExceptionReport_Close}"
-                        Click="Close_Click"/>
+                        Click="Close_Click" IsCancel="True"/>
             </StackPanel>
 
         </StackPanel>

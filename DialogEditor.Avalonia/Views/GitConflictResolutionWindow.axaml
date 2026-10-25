@@ -114,7 +114,7 @@
                     Content="{DynamicResource GitConflictWindow_Cancel}"
                     ToolTip.Tip="{DynamicResource GitConflictWindow_CancelTooltip}"
                     AutomationProperties.HelpText="{DynamicResource GitConflictWindow_CancelTooltip}"
-                    Padding="16,6" FontSize="{DynamicResource FontSize.Body}"/>
+                    Padding="16,6" FontSize="{DynamicResource FontSize.Body}" IsCancel="True"/>
             <Button x:Name="ApplyButton"
                     Content="{DynamicResource GitConflictWindow_Apply}"
                     Command="{Binding ApplyCommand}"

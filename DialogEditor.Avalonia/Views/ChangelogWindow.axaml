@@ -1,10 +1,12 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.ChangelogWindow"
         Title="{Binding WindowTitle}"
         Icon="avares://DialogEditor.Avalonia/Assets/app.ico"
         Width="460" Height="560" MinHeight="320" CanResize="True"
-        ShowInTaskbar="False">
+        ShowInTaskbar="False"
+        shared:EscapeCloses.IsEnabled="True">
     <DockPanel Margin="14,12,14,12">
         <TextBlock DockPanel.Dock="Top"
                    IsVisible="{Binding ShowHeader}"

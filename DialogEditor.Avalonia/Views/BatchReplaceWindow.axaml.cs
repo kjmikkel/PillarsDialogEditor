@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using DialogEditor.ViewModels;
 
 namespace DialogEditor.Avalonia.Views;
@@ -16,4 +17,6 @@ public partial class BatchReplaceWindow : Window
         DataContext = vm;
         Opened += (_, _) => SearchBox.Focus();
     }
+
+    private void Close_Click(object? sender, RoutedEventArgs e) => Close();
 }

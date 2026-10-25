@@ -80,6 +80,9 @@ public partial class FindInProjectWindow : Window
         }
     }
 
+    private void Close_Click(object? sender, RoutedEventArgs e) => Close();
+
+
     // Wraps a FindMatchRow with its pre-resolved language display label.
     private sealed record FindResultDisplayRow(FindMatchRow Row, string LanguageDisplay);
 }

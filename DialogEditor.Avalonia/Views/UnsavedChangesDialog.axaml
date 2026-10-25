@@ -17,7 +17,7 @@
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
             <Button Classes="secondary" x:Name="CancelButton"
                     Content="{DynamicResource UnsavedChanges_Cancel}"
-                    Padding="16,6" FontSize="{DynamicResource FontSize.Body}"/>
+                    Padding="16,6" FontSize="{DynamicResource FontSize.Body}" IsCancel="True"/>
             <Button Classes="secondary" x:Name="DiscardButton"
                     Content="{DynamicResource UnsavedChanges_Discard}"
                     Padding="16,6" FontSize="{DynamicResource FontSize.Body}"/>

@@ -152,7 +152,7 @@
                 HorizontalAlignment="Right"
                 Background="{DynamicResource Brush.Button.Primary.Background}"
                 Foreground="{DynamicResource Brush.Text.OnAccent}"
-                BorderThickness="0" Padding="16,5" Margin="0,12,0,0"/>
+                BorderThickness="0" Padding="16,5" Margin="0,12,0,0" IsCancel="True"/>
 
         <shared:FocusHintBar Grid.Row="2" x:Name="HintBar"/>
 

@@ -8,7 +8,8 @@
         CanResize="True"
         Background="{DynamicResource Brush.Surface.Window}"
         WindowStartupLocation="CenterOwner"
-        x:CompileBindings="False">
+        x:CompileBindings="False"
+        shared:EscapeCloses.IsEnabled="True">
 
     <Window.Styles>
         <Style Selector="TextBlock.sectionHeader">

@@ -2142,4 +2142,10 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="ToolTabStripItemDockAsDocumentString">Dock as Tabbed Document</sys:String>
     <sys:String x:Key="ToolTabStripItemCloseString">_Close</sys:String>
 
+    <!-- Close buttons on the three tool windows that had none (GitHub issue 260). -->
+    <sys:String x:Key="FindReplace_Close">Close</sys:String>
+    <sys:String x:Key="BatchReplace_Close">Close</sys:String>
+    <sys:String x:Key="FindInProject_Close">Close</sys:String>
+    <sys:String x:Key="ToolTip_CloseToolWindow">Close this window. Nothing is lost, and you can open it again from the menu. (Esc)</sys:String>
+
 </ResourceDictionary>

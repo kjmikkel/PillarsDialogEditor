@@ -1,4 +1,4 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.SettingsWindow"
@@ -8,7 +8,8 @@
         CanResize="True"
         Background="{DynamicResource Brush.Surface.Window}"
         WindowStartupLocation="CenterOwner"
-        x:CompileBindings="False">
+        x:CompileBindings="False"
+        shared:EscapeCloses.IsEnabled="True">
 
     <Window.Styles>
         <Style Selector="TextBlock.label">

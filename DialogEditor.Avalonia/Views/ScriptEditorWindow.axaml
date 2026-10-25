@@ -234,7 +234,7 @@
                 <Button Classes="footer-btn secondary" Content="{DynamicResource ScriptEditor_Cancel}"
                         Command="{Binding CancelCommand}"
                         ToolTip.Tip="{DynamicResource ToolTip_ScriptEditorCancel}"
-                        AutomationProperties.HelpText="{DynamicResource ToolTip_ScriptEditorCancel}"/>
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_ScriptEditorCancel}" IsCancel="True"/>
                 <Button Classes="footer-btn primary" Content="{DynamicResource ScriptEditor_OK}"
                         Command="{Binding ConfirmCommand}"
                         ToolTip.Tip="{DynamicResource ToolTip_ScriptEditorOK}"
