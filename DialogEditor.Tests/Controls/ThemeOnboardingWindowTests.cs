@@ -1,5 +1,7 @@
+using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using DialogEditor.Avalonia.Shared;
@@ -78,5 +80,37 @@ public class ThemeOnboardingWindowTests : IDisposable
         window.FindControl<Button>("ContinueButton")!.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
 
         Assert.True(closed);
+    }
+
+    // Issue 239: a UI/UX pass walk recorded blank 0×0 "stops" here. They were the window
+    // losing the foreground mid-walk, not real stops, but the first window the app shows
+    // must keep a Tab cycle of only visible, named controls.
+    [AvaloniaFact]
+    public void TabCycle_HasOnlyVisibleNamedStops()
+    {
+        var window = new ThemeOnboardingWindow();
+        window.Show();
+
+        var stops = new List<Control>();
+        IInputElement? current = window;
+        for (var i = 0; i < 50; i++)
+        {
+            current = KeyboardNavigationHandler.GetNext(current!, NavigationDirection.Next);
+            if (current is not Control c || stops.Contains(c)) break;
+            stops.Add(c);
+        }
+
+        string Describe(Control c) =>
+            $"{c.GetType().Name}('{ControlAutomationPeer.CreatePeerForElement(c).GetName()}', {c.Bounds.Width:0}x{c.Bounds.Height:0})";
+        var chain = string.Join(" → ", stops.Select(Describe));
+
+        Assert.NotEmpty(stops);
+        Assert.All(stops, c =>
+        {
+            Assert.True(c.IsEffectivelyVisible && c.Bounds.Width > 0 && c.Bounds.Height > 0,
+                $"invisible stop {Describe(c)} in: {chain}");
+            Assert.False(string.IsNullOrWhiteSpace(ControlAutomationPeer.CreatePeerForElement(c).GetName()),
+                $"unnamed stop {Describe(c)} in: {chain}");
+        });
     }
 }
