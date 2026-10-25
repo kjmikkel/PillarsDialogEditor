@@ -52,8 +52,11 @@
                             Command="{Binding BrowseBackupDirectoryCommand}"
                             ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}"
                             AutomationProperties.HelpText="{DynamicResource Settings_BackupDirectoryTooltip}"/>
+                    <!-- Wraps (GitHub issue 250): a long backup path was cut off, so a Modder
+                         couldn't confirm where backups go. -->
                     <TextBox Classes="path"
                              Text="{Binding BackupDirectoryDisplay, Mode=OneWay}"
+                             TextWrapping="Wrap"
                              Watermark="{DynamicResource Settings_PathNotSet}"
                              ToolTip.Tip="{DynamicResource Settings_BackupDirectoryTooltip}"
                              AutomationProperties.HelpText="{DynamicResource Settings_BackupDirectoryTooltip}"

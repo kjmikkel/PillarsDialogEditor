@@ -8,8 +8,10 @@
          Always visible (even when empty) to avoid layout shift on the first Tab press;
          no ToolTip/live-region — see design spec §"Explicitly not included". -->
     <Border Background="{DynamicResource Brush.Surface.Card}" Padding="8,4">
+        <!-- Wraps (GitHub issue 250): a long hint was cut off at the window edge. -->
         <TextBlock x:Name="HintText"
                    Text=""
+                   TextWrapping="Wrap"
                    FontSize="{DynamicResource FontSize.Label}"
                    Foreground="{DynamicResource Brush.Text.Muted}"/>
     </Border>

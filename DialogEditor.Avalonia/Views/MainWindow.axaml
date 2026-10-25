@@ -392,7 +392,10 @@
                 <TextBlock x:Name="StatusLiveRegion" Grid.Column="0" Text="{Binding StatusText}"
                            Width="0" Height="0" Opacity="0" IsHitTestVisible="False" ClipToBounds="True"
                            AutomationProperties.LiveSetting="Polite"/>
-                <TextBlock Grid.Column="0" Text="{Binding DisplayStatusText}"
+                <!-- Wraps (GitHub issue 250): a long focus hint was cut off at the window edge, and
+                     a tooltip would not help the keyboard users these hints are for. -->
+                <TextBlock x:Name="StatusDisplay" Grid.Column="0" Text="{Binding DisplayStatusText}"
+                           TextWrapping="Wrap"
                            Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
                 <Button Grid.Column="1"
                         Content="{DynamicResource MainWindow_ResolveConflictsButton}"
