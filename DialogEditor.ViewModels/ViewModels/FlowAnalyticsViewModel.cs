@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using DialogEditor.Core.Text;
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Analytics;
@@ -430,7 +431,7 @@ public partial class FlowAnalyticsViewModel : ObservableObject
         var conv      = b.Choice.Conversation;
         var elsewhere = conv != rootConversation;
         return new PathBranchRowViewModel(
-            Truncate(b.ChoiceText, 50),
+            Truncate(TextMarkup.Strip(b.ChoiceText), 50),
             Loc.Format("PathStats_BranchContent", WordsTime(b.DefaultContentWords)),
             Loc.Format("PathStats_BranchLongest", WordsTime(b.DefaultLongestWords)),
             Loc.Format("PathStats_BranchContent", WordsTime(b.FemaleContentWords)),

@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:beh="clr-namespace:DialogEditor.Avalonia.Behaviors"
         xmlns:shared="clr-namespace:DialogEditor.Avalonia.Shared;assembly=DialogEditor.Avalonia.Shared"
         x:Class="DialogEditor.Avalonia.Views.SpeakerLineBrowserWindow"
         Title="{DynamicResource SpeakerLines_Title}"
@@ -81,7 +82,8 @@
                                 <TextBlock Grid.Column="2" Width="{DynamicResource ColumnWidth.NodeLabel}" Text="{Binding NodeLabel}" ToolTip.Tip="{Binding NodeLabel}"
                                            Classes="list-secondary" FontSize="{DynamicResource FontSize.Small}"
                                            TextTrimming="CharacterEllipsis" VerticalAlignment="Top"/>
-                                <TextBlock Grid.Column="3" Text="{Binding Row.LineText}"
+                                <!-- The full line, its markup rendered as on a card (GitHub issue 258). -->
+                                <TextBlock Grid.Column="3" beh:MarkupText.Source="{Binding Row.LineText}"
                                            Classes="list-primary" FontSize="{DynamicResource FontSize.Body}"
                                            TextWrapping="Wrap"/>
                             </Grid>

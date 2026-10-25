@@ -300,4 +300,15 @@ public class VoValidationViewModelTests : IDisposable
 
         Assert.Contains(summaries, s => s.Contains("VoValidation_CleanUpPartial"));
     }
+
+    [Fact] // GitHub issue 258: the issue row shows the line without its markup tags.
+    public async Task RunAsync_IssuePreview_DropsMarkup()
+    {
+        var vm = new VoValidationViewModel(
+            [MakeNode(1, hasVO: true, defaultText: "<i>Hush</i> now")], "test_conv", _gameRoot, "poe2");
+
+        await vm.RunAsync();
+
+        Assert.Equal("Hush now", Assert.Single(vm.Results).TextPreview);
+    }
 }

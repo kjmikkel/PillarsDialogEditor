@@ -331,7 +331,7 @@ public class CanvasCardRenderTests
         var (w, card, _) = Render("Tell me about the storm.", new string('W', 55));
         try
         {
-            var title = card.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Text!.StartsWith("Node 1"));
+            var title = card.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Text?.StartsWith("Node 1") == true);   // the body has Inlines, not Text (GitHub issue 258)
             var right = title.TranslatePoint(new Point(title.Bounds.Width, 0), card)!.Value.X;
             Assert.True(right <= card.Bounds.Width + 0.5, $"title right edge {right:0.#} is past the {card.Bounds.Width:0.#} card");
             Assert.Contains(title.TextLayout.TextLines, l => l.HasCollapsed);
@@ -396,5 +396,20 @@ public class CanvasCardRenderTests
             Assert.Equal(at1, at2);
         }
         finally { new FontScaleApplier().Apply(1.0); }
+    }
+
+    // GitHub issue 258: the card renders the game's markup as styling instead of showing the tags.
+    [AvaloniaFact]
+    public void CardBody_RendersMarkupAsStyledRuns()
+    {
+        var (window, _, body) = Render("<ispeech>Show. Them.</ispeech> <link=\"glossary://X\">Ahull</link>");
+        try
+        {
+            var runs = body.Inlines!.OfType<global::Avalonia.Controls.Documents.Run>().ToList();
+            Assert.Equal("Show. Them. Ahull", string.Concat(runs.Select(r => r.Text)));
+            Assert.Equal(FontStyle.Italic, runs.Single(r => r.Text == "Show. Them.").FontStyle);
+            Assert.Equal(FontStyle.Normal, runs.Single(r => r.Text == " Ahull").FontStyle);
+        }
+        finally { window.Close(); }
     }
 }

@@ -586,4 +586,17 @@ public class FlowAnalyticsViewModelTests
         Assert.False(vm.HasNoStartNode);
         Assert.False(vm.PathStatsNoStartNode);
     }
+
+    [Fact] // GitHub issue 258: a branch row is a one-line summary, so markup tags are dropped.
+    public void BranchRow_ChoiceText_DropsMarkup()
+    {
+        var vm = new FlowAnalyticsViewModel(() => new ConversationEditSnapshot([
+            PathNode(0, "start", links: [Link(0, 1)]),
+            PathNode(1, "<i>Lie</i> ahull", isPlayerChoice: true),
+        ]), _ => { });
+
+        vm.RefreshCommand.Execute(null);
+
+        Assert.Equal("Lie ahull", Assert.Single(vm.Branches).ChoiceText);
+    }
 }

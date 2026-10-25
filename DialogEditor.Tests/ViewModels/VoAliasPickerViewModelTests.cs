@@ -194,4 +194,16 @@ public class VoAliasPickerViewModelTests : IDisposable
         Assert.Equal("EmptyState_VoAlias_NoLines", vm.EmptyMessage);
         Assert.Equal("EmptyState_VoAlias_NoLinesHint", vm.EmptyHint);
     }
+
+    [Fact] // GitHub issue 258: the row shows the line without its markup tags.
+    public void RowText_DropsMarkup()
+    {
+        var node = Node(7, "9c5f12c9-e93d-4952-9f1a-726c9498f8fb");
+        _provider.Convs["c"] = new Conversation("c", [node],
+            new StringTable([new StringEntry(7, "<ispeech>Quiet.</ispeech> Loud.", "")]));
+        var vm = new VoAliasPickerViewModel(_provider, _gameRoot, null);
+        vm.SelectedConversation = vm.AllConversations.Single();
+
+        Assert.Equal("Quiet. Loud.", Assert.Single(vm.VisibleRows).TextPreview);
+    }
 }

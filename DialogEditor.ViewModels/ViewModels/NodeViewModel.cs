@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using DialogEditor.Core.Text;
+using CommunityToolkit.Mvvm.ComponentModel;
 using DialogEditor.Core.Analytics;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
@@ -193,8 +194,15 @@ public partial class NodeViewModel : ObservableObject
         Loc.Format("Node_Title", NodeId, SpeakerName,
             _isPlayerChoice ? Loc.Get("Node_PlayerChoiceSuffix") : string.Empty);
 
-    public string TextPreview =>
-        _defaultText.Length > 80 ? _defaultText[..80] + "…" : _defaultText;
+    // Markup tags dropped before the cut, so they never eat into the 80 characters (GitHub issue 258).
+    public string TextPreview
+    {
+        get
+        {
+            var plain = TextMarkup.Strip(_defaultText);
+            return plain.Length > 80 ? plain[..80] + "…" : plain;
+        }
+    }
 
     public bool HasFemaleText => !string.IsNullOrEmpty(_femaleText);
 
