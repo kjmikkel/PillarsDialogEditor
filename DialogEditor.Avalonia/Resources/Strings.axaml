@@ -54,6 +54,10 @@
     <!-- Muted display-only hint in the body of a script node that has no text, which is
          normal (script nodes run scripts rather than show dialogue). Never stored as text. -->
     <sys:String x:Key="Node_NoTextScript">(no text — script node)</sys:String>
+    <!-- The same hint for any other node with no text in the selected language (GitHub issue 264),
+         so the card doesn't show a blank box. The second form is for a node with voice-over. -->
+    <sys:String x:Key="Node_NoText">(no text in this language)</sys:String>
+    <sys:String x:Key="Node_NoTextVoiced">(no text in this language — has voice-over)</sys:String>
     <!-- Screen-reader name of a canvas node, announced when it is selected (GitHub issue 242).
          {0} node id, {1} speaker, {2} first line of text (or the no-text placeholder). -->
     <sys:String x:Key="Node_AutomationName">{1}: {2} (node {0})</sys:String>

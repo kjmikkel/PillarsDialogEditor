@@ -119,13 +119,35 @@ public class TextlessNodePlaceholderTests
         Assert.Equal(string.Empty, script.TextPreview);
     }
 
+    // GitHub issue 264 (F-17): an empty NPC card used to be a blank box that didn't say why.
     [Fact]
-    public void NonScriptNodeWithoutEntry_ShowsNoPlaceholder()
+    public void NonScriptNodeWithoutText_SaysThereIsNoTextInThisLanguage()
     {
         var vm = new NodeViewModel(Node(3, SpeakerCategory.Npc), null);
 
-        Assert.Equal(string.Empty, vm.TextPlaceholder);
-        Assert.False(vm.HasTextPlaceholder);
+        Assert.Equal("Node_NoText", vm.TextPlaceholder);
+        Assert.True(vm.HasTextPlaceholder);
+        Assert.Equal(string.Empty, vm.DefaultText);
+    }
+
+    [Fact]
+    public void VoicedNodeWithoutText_SaysItHasVoiceOver()
+    {
+        var vm = new NodeViewModel(Node(3, SpeakerCategory.Npc), null) { HasVO = true };
+        Assert.Equal("Node_NoTextVoiced", vm.TextPlaceholder);
+    }
+
+    [Fact]
+    public void ChangingHasVO_RaisesPlaceholderChange()
+    {
+        var vm = new NodeViewModel(Node(3, SpeakerCategory.Npc), null);
+        var raised = new List<string?>();
+        vm.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        vm.HasVO = true;
+
+        Assert.Contains(nameof(NodeViewModel.TextPlaceholder), raised);
+        Assert.Contains(nameof(NodeViewModel.AutomationName), raised);
     }
 
     [Fact]
