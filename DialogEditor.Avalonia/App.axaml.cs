@@ -82,18 +82,44 @@ public partial class App : Application
                 onboarding.Closed += (_, _) =>
                 {
                     AppSettings.ThemeOnboardingSeen = true;
-                    var main = new MainWindow();
-                    desktop.MainWindow = main;
-                    main.Show();
+                    ShowChooserThenMain(desktop, explicitShow: true);
                 };
                 onboarding.Show();
             }
             else
             {
-                desktop.MainWindow = new MainWindow();
+                ShowChooserThenMain(desktop, explicitShow: false);
             }
         }
         base.OnFrameworkInitializationCompleted();
+    }
+
+    // Startup order: theme onboarding (if not seen), then the mode chooser (if no mode has been
+    // chosen), then MainWindow. MainWindow, and so MainWindowViewModel, is constructed only
+    // after the chooser has saved the mode (issue 234): the view model reads AppSettings.Mode in
+    // its constructor, and building it earlier would start it in the default mode and start the
+    // wrong tour behind the chooser. explicitShow is true when an earlier window just closed
+    // (the lifetime has already shown its main window, so a new one must be shown by hand).
+    private static void ShowChooserThenMain(IClassicDesktopStyleApplicationLifetime desktop, bool explicitShow)
+    {
+        if (AppSettings.Mode is not null)
+        {
+            ShowMain(desktop, explicitShow);
+            return;
+        }
+        var chooser = new ModeChooserWindow();
+        desktop.MainWindow = chooser;
+        // Closed fires for a pick and for a close without one; both have saved a mode by now
+        // (ModeChooserViewModel), because the view model's handler was attached first.
+        chooser.Closed += (_, _) => ShowMain(desktop, explicitShow: true);
+        if (explicitShow) chooser.Show();
+    }
+
+    private static void ShowMain(IClassicDesktopStyleApplicationLifetime desktop, bool explicitShow)
+    {
+        var main = new MainWindow();
+        desktop.MainWindow = main;
+        if (explicitShow) main.Show();
     }
 
     public void ShowExceptionReport(Exception ex)

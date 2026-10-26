@@ -2226,4 +2226,26 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="EmptyState_Main_NoGameHint">Open your Pillars of Eternity or Deadfire install folder. Its conversations are then listed on the left, and you can open any of them to read or edit.</sys:String>
     <sys:String x:Key="EmptyState_Diff_NoChangesHint">Your copy and the other version have the same conversations. Pick another Other version at the top to compare with.</sys:String>
 
+    <!-- ─── First-launch mode chooser (GitHub issue 234) ─────────────────── -->
+    <sys:String x:Key="ModeChooser_Title">Pillars Dialog Editor</sys:String>
+    <sys:String x:Key="ModeChooser_Heading">How do you want to use the editor?</sys:String>
+    <sys:String x:Key="ModeChooser_Lead">Pick the one that fits you today. You can change your mind at any time.</sys:String>
+    <sys:String x:Key="ModeChooser_Reading_Glyph">📖</sys:String>
+    <sys:String x:Key="ModeChooser_Reading_Title">Reading mode</sys:String>
+    <sys:String x:Key="ModeChooser_Reading_Body">For reading the games' conversations: lore, companion banter, branches you missed.</sys:String>
+    <sys:String x:Key="ModeChooser_Reading_Bullet1">Open a game folder and find a conversation</sys:String>
+    <sys:String x:Key="ModeChooser_Reading_Bullet2">Read it and follow its branches</sys:String>
+    <sys:String x:Key="ModeChooser_Reading_Bullet3">Nothing can be changed, so you can't break your game</sys:String>
+    <sys:String x:Key="ModeChooser_Reading_Button">Start reading</sys:String>
+    <sys:String x:Key="ToolTip_ModeChooser_Reading">Start in Reading mode: a read-only view for reading the games' conversations and following their branches. Nothing can be edited or saved, so your game files and projects stay safe. You can switch to Editing mode later from View › Reading mode.</sys:String>
+    <sys:String x:Key="ModeChooser_Editing_Glyph">✎</sys:String>
+    <sys:String x:Key="ModeChooser_Editing_Title">Editing mode</sys:String>
+    <sys:String x:Key="ModeChooser_Editing_Body">For fixing lines and making mods: every editing tool, projects and packaging.</sys:String>
+    <sys:String x:Key="ModeChooser_Editing_Bullet1">Edit text, conditions, scripts and links</sys:String>
+    <sys:String x:Key="ModeChooser_Editing_Bullet2">Write new conversations in a project</sys:String>
+    <sys:String x:Key="ModeChooser_Editing_Bullet3">Package your changes as a mod</sys:String>
+    <sys:String x:Key="ModeChooser_Editing_Button">Start editing</sys:String>
+    <sys:String x:Key="ToolTip_ModeChooser_Editing">Start in Editing mode: the full editor, with every editing tool, projects and mod packaging. You can switch to Reading mode later from View › Reading mode.</sys:String>
+    <sys:String x:Key="ModeChooser_Footer">This window only appears once. Closing it starts Reading mode. You can switch modes later from View › Reading mode.</sys:String>
+
 </ResourceDictionary>
