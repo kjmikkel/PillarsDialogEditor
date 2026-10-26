@@ -248,6 +248,10 @@
                 <TextBlock Grid.Column="1" Text="{DynamicResource Legend_Shortcut_F5_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Body}"/>
             </Grid>
             <Grid ColumnSpacing="8" ColumnDefinitions="Auto,*" Margin="0,0,0,3">
+                <TextBlock MinWidth="110" Grid.Column="0" Text="{DynamicResource Shortcut_ShiftF5}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"/>
+                <TextBlock Grid.Column="1" Text="{DynamicResource Legend_Shortcut_ShiftF5_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
+            </Grid>
+            <Grid ColumnSpacing="8" ColumnDefinitions="Auto,*" Margin="0,0,0,3">
                 <TextBlock MinWidth="110" Grid.Column="0" Text="{DynamicResource Shortcut_F6}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"/>
                 <TextBlock Grid.Column="1" Text="{DynamicResource Legend_Shortcut_F6_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
             </Grid>

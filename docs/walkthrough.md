@@ -70,7 +70,7 @@ compact diff. The game files are **not** touched — saving only updates your pr
 the game and see your dialogue in context. Before writing anything, the editor backs up the
 affected files.
 
-When you're done, **Test ▸ End Test and Restore Game Files** (`F6`) puts the game files back exactly as
+When you're done, **Test ▸ End Test and Restore Game Files** (`Shift+F5`) puts the game files back exactly as
 they were. Nothing permanent, every time.
 
 ---
