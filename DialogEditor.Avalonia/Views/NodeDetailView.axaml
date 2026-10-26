@@ -109,6 +109,68 @@
                          AutomationProperties.HelpText="{DynamicResource ToolTip_FemaleText}"
                          AutomationProperties.Name="{DynamicResource Label_FemaleText}"/>
 
+                <!-- Warnings about the text itself sit right under the text boxes (issue 320), not
+                     inside a section: Display starts collapsed, so the fixes for a squiggled word
+                     were out of sight, and for a screen reader this list is the spelling channel. -->
+                <Border Background="{DynamicResource Brush.Validation.Background}" BorderBrush="{DynamicResource Brush.Validation.Border}" BorderThickness="1"
+                        CornerRadius="2" Padding="6,4" Margin="0,0,0,4"
+                        IsVisible="{Binding TokenWarnings.Count, Converter={StaticResource CountToVis}}"
+                        ToolTip.Tip="{DynamicResource ToolTip_TokenWarnings}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_TokenWarnings}">
+                    <ItemsControl ItemsSource="{Binding TokenWarnings}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Foreground="{DynamicResource Brush.Validation.Text}"
+                                           FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+
+                <!-- Possible misspellings, each with its quick fixes (issue 9): use the suggested word
+                     (fixes every occurrence, undoable like any edit) or add the word to the personal
+                     dictionary, the same one the Validate Text window adds to. -->
+                <Border Background="{DynamicResource Brush.Validation.Background}" BorderBrush="{DynamicResource Brush.Validation.Border}" BorderThickness="1"
+                        CornerRadius="2" Padding="6,4" Margin="0,0,0,4"
+                        IsVisible="{Binding SpellingIssues.Count, Converter={StaticResource CountToVis}}"
+                        ToolTip.Tip="{DynamicResource ToolTip_SpellingIssues}"
+                        AutomationProperties.HelpText="{DynamicResource ToolTip_SpellingIssues}">
+                    <ItemsControl ItemsSource="{Binding SpellingIssues}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:SpellingIssueViewModel">
+                                <StackPanel Spacing="2" Margin="0,0,0,4">
+                                    <TextBlock Text="{Binding Message}" Foreground="{DynamicResource Brush.Validation.Text}"
+                                               FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
+                                    <WrapPanel>
+                                        <Button Classes="secondary"
+                                                Content="{Binding ApplyLabel}"
+                                                Command="{Binding ApplySuggestionCommand}"
+                                                IsEnabled="{Binding $parent[ItemsControl].DataContext.IsEditable}"
+                                                IsVisible="{Binding CanApplySuggestion}"
+                                                FontSize="{DynamicResource FontSize.Small}" Padding="8,2" Margin="0,0,6,0"
+                                                ToolTip.Tip="{DynamicResource ToolTip_UseSuggestion}"
+                                                AutomationProperties.HelpText="{DynamicResource ToolTip_UseSuggestion}"/>
+                                        <Button Classes="secondary"
+                                                Content="{DynamicResource Button_AddToDictionary}"
+                                                Command="{Binding AddToDictionaryCommand}"
+                                                IsVisible="{Binding CanAddToDictionary}"
+                                                FontSize="{DynamicResource FontSize.Small}" Padding="8,2"
+                                                ToolTip.Tip="{DynamicResource ToolTip_AddToDictionary}"
+                                                AutomationProperties.HelpText="{DynamicResource ToolTip_AddToDictionary}"/>
+                                        <Button Classes="secondary"
+                                                Content="{DynamicResource Button_AddToProjectDictionary}"
+                                                Command="{Binding AddToProjectDictionaryCommand}"
+                                                IsVisible="{Binding CanAddToProjectDictionary}"
+                                                FontSize="{DynamicResource FontSize.Small}" Padding="8,2" Margin="6,0,0,0"
+                                                ToolTip.Tip="{DynamicResource ToolTip_AddToProjectDictionary}"
+                                                AutomationProperties.HelpText="{DynamicResource ToolTip_AddToProjectDictionary}"/>
+                                    </WrapPanel>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+
                 <!-- ── Links (hot: moved above all secondary groups) ───── -->
                 <TextBlock Classes="group-header" Text="{DynamicResource Label_GroupLinks}"/>
                 <ItemsControl ItemsSource="{Binding Links}">
@@ -393,65 +455,6 @@
                             <DataTemplate>
                                 <TextBlock Text="{Binding}" Foreground="{DynamicResource Brush.Validation.Text}"
                                            FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Border>
-
-                <Border Background="{DynamicResource Brush.Validation.Background}" BorderBrush="{DynamicResource Brush.Validation.Border}" BorderThickness="1"
-                        CornerRadius="2" Padding="6,4" Margin="0,0,0,4"
-                        IsVisible="{Binding TokenWarnings.Count, Converter={StaticResource CountToVis}}"
-                        ToolTip.Tip="{DynamicResource ToolTip_TokenWarnings}"
-                        AutomationProperties.HelpText="{DynamicResource ToolTip_TokenWarnings}">
-                    <ItemsControl ItemsSource="{Binding TokenWarnings}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding}" Foreground="{DynamicResource Brush.Validation.Text}"
-                                           FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Border>
-
-                <!-- Possible misspellings, each with its quick fixes (issue 9): use the suggested word
-                     (fixes every occurrence, undoable like any edit) or add the word to the personal
-                     dictionary, the same one the Validate Text window adds to. -->
-                <Border Background="{DynamicResource Brush.Validation.Background}" BorderBrush="{DynamicResource Brush.Validation.Border}" BorderThickness="1"
-                        CornerRadius="2" Padding="6,4" Margin="0,0,0,4"
-                        IsVisible="{Binding SpellingIssues.Count, Converter={StaticResource CountToVis}}"
-                        ToolTip.Tip="{DynamicResource ToolTip_SpellingIssues}"
-                        AutomationProperties.HelpText="{DynamicResource ToolTip_SpellingIssues}">
-                    <ItemsControl ItemsSource="{Binding SpellingIssues}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="vm:SpellingIssueViewModel">
-                                <StackPanel Spacing="2" Margin="0,0,0,4">
-                                    <TextBlock Text="{Binding Message}" Foreground="{DynamicResource Brush.Validation.Text}"
-                                               FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap"/>
-                                    <WrapPanel>
-                                        <Button Classes="secondary"
-                                                Content="{Binding ApplyLabel}"
-                                                Command="{Binding ApplySuggestionCommand}"
-                                                IsEnabled="{Binding $parent[ItemsControl].DataContext.IsEditable}"
-                                                IsVisible="{Binding CanApplySuggestion}"
-                                                FontSize="{DynamicResource FontSize.Small}" Padding="8,2" Margin="0,0,6,0"
-                                                ToolTip.Tip="{DynamicResource ToolTip_UseSuggestion}"
-                                                AutomationProperties.HelpText="{DynamicResource ToolTip_UseSuggestion}"/>
-                                        <Button Classes="secondary"
-                                                Content="{DynamicResource Button_AddToDictionary}"
-                                                Command="{Binding AddToDictionaryCommand}"
-                                                IsVisible="{Binding CanAddToDictionary}"
-                                                FontSize="{DynamicResource FontSize.Small}" Padding="8,2"
-                                                ToolTip.Tip="{DynamicResource ToolTip_AddToDictionary}"
-                                                AutomationProperties.HelpText="{DynamicResource ToolTip_AddToDictionary}"/>
-                                        <Button Classes="secondary"
-                                                Content="{DynamicResource Button_AddToProjectDictionary}"
-                                                Command="{Binding AddToProjectDictionaryCommand}"
-                                                IsVisible="{Binding CanAddToProjectDictionary}"
-                                                FontSize="{DynamicResource FontSize.Small}" Padding="8,2" Margin="6,0,0,0"
-                                                ToolTip.Tip="{DynamicResource ToolTip_AddToProjectDictionary}"
-                                                AutomationProperties.HelpText="{DynamicResource ToolTip_AddToProjectDictionary}"/>
-                                    </WrapPanel>
-                                </StackPanel>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
