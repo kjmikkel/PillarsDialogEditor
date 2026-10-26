@@ -85,6 +85,11 @@ The patcher keeps the original files and its record of what it changed in a fold
 `PillarsDialogPatcher` inside the game folder. Leave it alone while mods are installed;
 without it the patcher can't restore the originals.
 
+## Bigger text
+
+Click **⚙ Settings…** and choose a **Text size** from 100% to 200%. The change applies
+straight away and is remembered. The same window has the colour theme and the language.
+
 ## After a game update
 
 A game update (or your storefront's "verify files") can replace files the patcher had

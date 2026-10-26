@@ -14,6 +14,7 @@ public partial class PatchManagerSettingsWindow : Window
     {
         InitializeComponent();
         ThemePicker.DataContext    = new ThemePickerViewModel(new ThemeApplier());
+        TextSizeCombo.DataContext  = new TextSizePickerViewModel(new FontScaleApplier());
         LanguagePicker.DataContext = new LanguagePickerViewModel(new LanguageApplier(
             "avares://DialogEditor.Avalonia.Shared/Resources/SharedStrings.{0}.axaml",
             "avares://DialogEditor.PatchManager/Resources/Strings.{0}.axaml"));

@@ -13,7 +13,13 @@
     <!-- Settings window -->
     <sys:String x:Key="PatchManager_SettingsTitle">Patch Manager — Settings</sys:String>
     <sys:String x:Key="PatchManager_SettingsButton">⚙ Settings…</sys:String>
-    <sys:String x:Key="PatchManager_SettingsTooltip">Open settings to change the colour theme and application language</sys:String>
+    <sys:String x:Key="PatchManager_SettingsTooltip">Open settings to change the colour theme, the text size and the application language</sys:String>
+    <!-- Text size (GitHub issue 263) -->
+    <sys:String x:Key="Settings_TextSizeSection">Text size</sys:String>
+    <sys:String x:Key="Settings_TextSize">Text size</sys:String>
+    <sys:String x:Key="Settings_TextSizeTooltip">Make all text in the Patcher larger. The change applies straight away and is remembered for next time. The editor has its own setting.</sys:String>
+    <!-- {0} is a whole percentage, e.g. 150 -->
+    <sys:String x:Key="Settings_TextSizePercent">{0}%</sys:String>
     <sys:String x:Key="AutomationName_PatchManagerSettings">Settings</sys:String>
 
     <!-- About window (GitHub issue 79) -->
