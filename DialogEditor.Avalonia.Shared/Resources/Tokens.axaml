@@ -240,6 +240,11 @@
     <!-- Mode badge (issue 234): reuses the Confirm/Caution fills, so white text already passes in every palette. -->
     <SolidColorBrush x:Key="Brush.ModeBadge.Reading.Background"  Color="{StaticResource Palette.Green.600}"/>
     <SolidColorBrush x:Key="Brush.ModeBadge.Editing.Background"  Color="{StaticResource Palette.Burnt.600}"/>
+    <!-- Hover/pressed darken the fill only; the white text stays fully opaque so it keeps its contrast. -->
+    <SolidColorBrush x:Key="Brush.ModeBadge.Reading.Hover"       Color="{StaticResource Palette.Green.700}"/>
+    <SolidColorBrush x:Key="Brush.ModeBadge.Reading.Pressed"     Color="{StaticResource Palette.Green.800}"/>
+    <SolidColorBrush x:Key="Brush.ModeBadge.Editing.Hover"       Color="{StaticResource Palette.Burnt.700}"/>
+    <SolidColorBrush x:Key="Brush.ModeBadge.Editing.Pressed"     Color="{StaticResource Palette.Burnt.800}"/>
     <!-- Secondary (non-primary) buttons, issue 179. Dialogs used to borrow Surface.Header with
          Text.OnAccent (white on light grey in Light, no edge in High Contrast) or a node-header
          colour. Text.Primary on the header grey passes AA in every theme, and the edge passes

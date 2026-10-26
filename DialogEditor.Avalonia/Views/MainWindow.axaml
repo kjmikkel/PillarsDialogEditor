@@ -442,6 +442,19 @@
                                 <Setter Property="AutomationProperties.HelpText" Value="{DynamicResource ToolTip_ModeBadge_Reading}"/>
                                 <Setter Property="AutomationProperties.Name" Value="{DynamicResource AutomationName_ModeBadge_Reading}"/>
                             </Style>
+                            <!-- Hover/pressed change the fill only, never Opacity: that would fade the text too. -->
+                            <Style Selector="Button#ModeBadge:pointerover">
+                                <Setter Property="Background" Value="{DynamicResource Brush.ModeBadge.Editing.Hover}"/>
+                            </Style>
+                            <Style Selector="Button#ModeBadge:pressed">
+                                <Setter Property="Background" Value="{DynamicResource Brush.ModeBadge.Editing.Pressed}"/>
+                            </Style>
+                            <Style Selector="Button#ModeBadge.reading:pointerover">
+                                <Setter Property="Background" Value="{DynamicResource Brush.ModeBadge.Reading.Hover}"/>
+                            </Style>
+                            <Style Selector="Button#ModeBadge.reading:pressed">
+                                <Setter Property="Background" Value="{DynamicResource Brush.ModeBadge.Reading.Pressed}"/>
+                            </Style>
                         </Button.Styles>
                     </Button>
                 </StackPanel>

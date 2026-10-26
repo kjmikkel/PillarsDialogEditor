@@ -6,6 +6,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media;
 using Avalonia.Threading;
@@ -77,7 +78,7 @@ public class ModeBadgeTests : IDisposable
             Assert.DoesNotContain(R("ModeBadge_Editing"), text);
             Assert.Equal(R("AutomationName_ModeBadge_Reading"), AutoName(badge));
             Assert.Equal(R("ToolTip_ModeBadge_Reading"), ToolTip.GetTip(badge));
-            Assert.Equal(R("ToolTip_ModeBadge_Reading"), AutomationProperties.GetHelpText(badge));
+            Assert.Equal(R("ToolTip_ModeBadge_Reading"), ControlAutomationPeer.CreatePeerForElement(badge).GetHelpText());
             Assert.Equal(BrushColor("Brush.ModeBadge.Reading.Background"), ((ISolidColorBrush)badge.Background!).Color);
         }
         finally { window.Close(); }
@@ -96,7 +97,7 @@ public class ModeBadgeTests : IDisposable
             Assert.DoesNotContain(R("ModeBadge_Reading"), text);
             Assert.Equal(R("AutomationName_ModeBadge_Editing"), AutoName(badge));
             Assert.Equal(R("ToolTip_ModeBadge_Editing"), ToolTip.GetTip(badge));
-            Assert.Equal(R("ToolTip_ModeBadge_Editing"), AutomationProperties.GetHelpText(badge));
+            Assert.Equal(R("ToolTip_ModeBadge_Editing"), ControlAutomationPeer.CreatePeerForElement(badge).GetHelpText());
             Assert.Equal(BrushColor("Brush.ModeBadge.Editing.Background"), ((ISolidColorBrush)badge.Background!).Color);
         }
         finally { window.Close(); }
@@ -197,6 +198,55 @@ public class ModeBadgeTests : IDisposable
             Assert.True(badge.IsTabStop);
             Assert.True(badge.IsEffectivelyEnabled);
             Assert.True(badge.Focus());
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaTheory]
+    [InlineData(EditorMode.Editing, "Brush.ModeBadge.Editing.Hover")]
+    [InlineData(EditorMode.Reading, "Brush.ModeBadge.Reading.Hover")]
+    public void HoveringTheBadge_ChangesOnlyTheFill_NeverTheText(EditorMode mode, string hoverKey)
+    {
+        var (window, _) = Show(mode);
+        try
+        {
+            var badge = Badge(window);
+            var at = badge.TranslatePoint(new Point(badge.Bounds.Width / 2, badge.Bounds.Height / 2), window)!.Value;
+            window.MouseMove(at);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(BrushColor(hoverKey), ((ISolidColorBrush)badge.Background!).Color);
+            // Dimming with Opacity would fade the white text too and drop its contrast.
+            Assert.All(badge.GetVisualDescendants().OfType<Visual>().Append(badge), v => Assert.Equal(1.0, v.Opacity));
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Badge_ActivatesFromTheKeyboard()
+    {
+        var (window, vm) = Show(EditorMode.Editing);
+        try
+        {
+            Assert.True(Badge(window).Focus());
+            window.KeyPress(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, null);
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(EditorMode.Reading, vm.Mode);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void Badge_ActivatesFromTheSpaceBar()
+    {
+        var (window, vm) = Show(EditorMode.Editing);
+        try
+        {
+            Assert.True(Badge(window).Focus());
+            window.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
+            // Space clicks on key-up, and KeyPress sends only the key-down.
+            window.KeyRelease(Key.Space, RawInputModifiers.None, PhysicalKey.Space, " ");
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(EditorMode.Reading, vm.Mode);
         }
         finally { window.Close(); }
     }
