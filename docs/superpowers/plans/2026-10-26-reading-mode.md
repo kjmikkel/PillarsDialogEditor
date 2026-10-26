@@ -67,7 +67,7 @@ user switches to editing.
 - Produces: `public enum EditorMode { Reading, Editing }` in `DialogEditor.ViewModels.Services`, marked `[JsonConverter(typeof(JsonStringEnumConverter<EditorMode>))]` so `settings.json` stays hand-readable.
 - Produces: `AppSettings.Mode` (`EditorMode?`, static get/set; `null` = never chosen) and `AppSettings.ReaderTourSeen` (`bool`, static get/set).
 
-- [ ] **Step 1: Write the failing tests** (use `AppSettings.SettingsPathOverride` to a temp file, as `MainWindowViewModelCloseProjectTests` does)
+- [x] **Step 1: Write the failing tests** (use `AppSettings.SettingsPathOverride` to a temp file, as `MainWindowViewModelCloseProjectTests` does)
 
 ```csharp
 [Fact] public void FreshInstall_HasNoMode() => Assert.Null(AppSettings.Mode);           // no settings file
@@ -85,10 +85,10 @@ user switches to editing.
 }
 ```
 
-- [ ] **Step 2: Run them and confirm they fail.** Expected: compile errors, because `EditorMode`, `Mode` and `ReaderTourSeen` don't exist yet.
-- [ ] **Step 3: Implement.** Add `public EditorMode? Mode { get; set; }` to the settings record, and `public bool ReaderTourSeen { get; set; } = true;` with the same "existing installs default true, fresh install false" comment pattern `GuidedTourSeen` uses. Add `ReaderTourSeen = false` to both fresh-install branches of `Load()`. Add the static accessors.
-- [ ] **Step 4: Run the tests.** Expected: PASS.
-- [ ] **Step 5: Commit**: `feat(reading-mode): EditorMode setting (#234)`.
+- [x] **Step 2: Run them and confirm they fail.** Expected: compile errors, because `EditorMode`, `Mode` and `ReaderTourSeen` don't exist yet.
+- [x] **Step 3: Implement.** Add `public EditorMode? Mode { get; set; }` to the settings record, and `public bool ReaderTourSeen { get; set; } = true;` with the same "existing installs default true, fresh install false" comment pattern `GuidedTourSeen` uses. Add `ReaderTourSeen = false` to both fresh-install branches of `Load()`. Add the static accessors.
+- [x] **Step 4: Run the tests.** Expected: PASS.
+- [x] **Step 5: Commit**: `feat(reading-mode): EditorMode setting (#234)`.
 
 ---
 
@@ -109,7 +109,7 @@ user switches to editing.
   - `private Task OnEnteredEditingModeAsync()` is a hook that Task 4 fills (it returns `Task.CompletedTask` until then)
 - Produces on `NodeDetailViewModel`: `[ObservableProperty] bool _isReadingMode`, set by the main VM.
 
-- [ ] **Step 1: Write the failing tests** (build the VM with `MakeVm()` as in `MainWindowViewModelCloseProjectTests`, and load a project via the same reflection helper)
+- [x] **Step 1: Write the failing tests** (build the VM with `MakeVm()` as in `MainWindowViewModelCloseProjectTests`, and load a project via the same reflection helper)
 
 ```csharp
 [Fact] public void NoSavedMode_StartsInEditing() { Assert.Equal(EditorMode.Editing, MakeVm().Mode); }
@@ -143,10 +143,10 @@ than on every keystroke, the view has to flush the focused text box before calli
 `SwitchModeAsync`. In that case, move the last test to the View test in Task 8 and assert
 it there.
 
-- [ ] **Step 2: Run them and confirm they fail.**
-- [ ] **Step 3: Implement.** Replace `Canvas.IsEditable = project is not null;` with a private `UpdateEditable()` that sets `Canvas.IsEditable = _project is not null && IsEditingMode` and `Detail.IsReadingMode = IsReadingMode`, and call it from `SetProject` and `OnModeChanged`. `SwitchModeAsync`: if the target equals `Mode`, return true. If the target is Reading, `await EnsureNoUnsavedEditsAsync()` and return false when it does. Then set `Mode`, write `AppSettings.Mode`, and when the target is Editing, `await OnEnteredEditingModeAsync()`.
-- [ ] **Step 4: Run the tests.** Expected: PASS. Also run `MainWindowViewModel*Tests` to confirm nothing else changed.
-- [ ] **Step 5: Commit**: `feat(reading-mode): mode on the main view model (#234)`.
+- [x] **Step 2: Run them and confirm they fail.**
+- [x] **Step 3: Implement.** Replace `Canvas.IsEditable = project is not null;` with a private `UpdateEditable()` that sets `Canvas.IsEditable = _project is not null && IsEditingMode` and `Detail.IsReadingMode = IsReadingMode`, and call it from `SetProject` and `OnModeChanged`. `SwitchModeAsync`: if the target equals `Mode`, return true. If the target is Reading, `await EnsureNoUnsavedEditsAsync()` and return false when it does. Then set `Mode`, write `AppSettings.Mode`, and when the target is Editing, `await OnEnteredEditingModeAsync()`.
+- [x] **Step 4: Run the tests.** Expected: PASS. Also run `MainWindowViewModel*Tests` to confirm nothing else changed.
+- [x] **Step 5: Commit**: `feat(reading-mode): mode on the main view model (#234)`.
 
 ---
 
@@ -159,7 +159,7 @@ it there.
 **Interfaces:**
 - Consumes: `IsEditingMode` (Task 2).
 
-- [ ] **Step 1: Write the failing theory.** Put a project and a game folder in place so each command would otherwise be enabled where its gate allows. Then switch to reading and assert, by reflection over the generated command property:
+- [x] **Step 1: Write the failing theory.** Put a project and a game folder in place so each command would otherwise be enabled where its gate allows. Then switch to reading and assert, by reflection over the generated command property:
 
 ```csharp
 // Off in reading mode
@@ -188,10 +188,10 @@ Task 5. For a command whose own gate needs state the fixture can't set up (for e
 `ResolveConflictsCommand` needs a pending conflict), set up that state, or assert only the
 false case.
 
-- [ ] **Step 2: Run the theory and confirm it fails.**
-- [ ] **Step 3: Implement.** Give commands that have no `CanExecute` one with `CanExecute = nameof(IsEditingMode)`, and add `&& IsEditingMode` to the existing `Can*` predicates of the commands in the first list. In `OnModeChanged`, call `NotifyCanExecuteChanged()` on every one of them.
-- [ ] **Step 4: Run the tests.** Expected: PASS.
-- [ ] **Step 5: Commit**: `feat(reading-mode): editing commands off in reading mode (#234)`.
+- [x] **Step 2: Run the theory and confirm it fails.**
+- [x] **Step 3: Implement.** Give commands that have no `CanExecute` one with `CanExecute = nameof(IsEditingMode)`, and add `&& IsEditingMode` to the existing `Can*` predicates of the commands in the first list. In `OnModeChanged`, call `NotifyCanExecuteChanged()` on every one of them.
+- [x] **Step 4: Run the tests.** Expected: PASS.
+- [x] **Step 5: Commit**: `feat(reading-mode): editing commands off in reading mode (#234)`.
 
 ---
 
@@ -205,7 +205,7 @@ false case.
 **Interfaces:**
 - Consumes: `IsReadingMode`, `OnEnteredEditingModeAsync` (Task 2).
 
-- [ ] **Step 1: Write the failing tests.** Build sidecars with `AutosaveRecovery`'s helpers, as `MainWindowViewModelAutosaveTests` does.
+- [x] **Step 1: Write the failing tests.** Build sidecars with `AutosaveRecovery`'s helpers, as `MainWindowViewModelAutosaveTests` does.
 
 ```csharp
 [Fact] public async Task Reading_NewerAutosave_OpensTheSavedFile_WithoutAsking()
@@ -224,11 +224,11 @@ false case.
 }
 ```
 
-- [ ] **Step 2: Run them and confirm they fail.**
-- [ ] **Step 3: Implement.** In `LoadProjectAsync`, when `IsReadingMode`, skip the whole autosave branch (no `TryDelete`, no prompt) and remember `_deferredOpenPath = path` when the state was `Newer`. In `LoadConflictedProjectAsync`, when `IsReadingMode` and there are conflicts, `FinishLoad(mine, path)` and set the pending-conflict state, as the `offerDeferred` branch does, without showing the modal. In `OnEnteredEditingModeAsync`: if `_deferredOpenPath` is set, clear it and `await LoadProjectAsync(path, offerDeferred: false)`. Else, if `HasPendingConflictResolution`, `await ResolveConflictsCommand.ExecuteAsync(null)`.
-- [ ] **Step 4: Audit the rest of the open path.** Read `FinishLoad`, `SetProject` and anything they call, for writes to the project folder or game folder (format upgrade, the Git attribution loader, lock files). Writes to `AppSettings` (`LastProjectPath`, recent projects) are allowed. Gate any other write on `IsEditingMode`, and extend the last test if one turns up. Record what was checked in the commit message body.
-- [ ] **Step 5: Run the tests.** Expected: PASS. Also run `MainWindowViewModelAutosaveTests`.
-- [ ] **Step 6: Commit**: `feat(reading-mode): opening a project for reading writes nothing (#234)`.
+- [x] **Step 2: Run them and confirm they fail.**
+- [x] **Step 3: Implement.** In `LoadProjectAsync`, when `IsReadingMode`, skip the whole autosave branch (no `TryDelete`, no prompt) and remember `_deferredOpenPath = path` when the state was `Newer`. In `LoadConflictedProjectAsync`, when `IsReadingMode` and there are conflicts, `FinishLoad(mine, path)` and set the pending-conflict state, as the `offerDeferred` branch does, without showing the modal. In `OnEnteredEditingModeAsync`: if `_deferredOpenPath` is set, clear it and `await LoadProjectAsync(path, offerDeferred: false)`. Else, if `HasPendingConflictResolution`, `await ResolveConflictsCommand.ExecuteAsync(null)`.
+- [x] **Step 4: Audit the rest of the open path.** Read `FinishLoad`, `SetProject` and anything they call, for writes to the project folder or game folder (format upgrade, the Git attribution loader, lock files). Writes to `AppSettings` (`LastProjectPath`, recent projects) are allowed. Gate any other write on `IsEditingMode`, and extend the last test if one turns up. Record what was checked in the commit message body.
+- [x] **Step 5: Run the tests.** Expected: PASS. Also run `MainWindowViewModelAutosaveTests`.
+- [x] **Step 6: Commit**: `feat(reading-mode): opening a project for reading writes nothing (#234)`.
 
 ---
 
@@ -243,7 +243,7 @@ false case.
 **Interfaces:**
 - Produces: `RepDispositionBalanceViewModel(DialogProject project, IGameDataProvider provider, Func<…> getOpenConversation, bool hasProject = true)` plus `public bool HasProject`. With `hasProject: false`, `Source` starts as `BalanceSource.OnDiskPlusChanges` (with an empty project that means "on disk"), and the window hides the source picker (`IsVisible="{Binding HasProject}"`).
 
-- [ ] **Step 1: Write the failing tests** (game folder loaded via `FakeGameDataProvider`, no project)
+- [x] **Step 1: Write the failing tests** (game folder loaded via `FakeGameDataProvider`, no project)
 
 ```csharp
 [Fact] public void Balance_CanOpen_WithOnlyAGameFolder() => Assert.True(vm.ShowRepDispositionBalanceWindowCommand.CanExecute(null));
@@ -257,10 +257,10 @@ false case.
 [Fact] public void Both_StillOpen_InReadingMode() { /* switch to Reading with and without a project: CanExecute true */ }
 ```
 
-- [ ] **Step 2: Run them and confirm they fail.**
-- [ ] **Step 3: Implement.** Drop `_project is not null` from both gates. Pass `_project ?? DialogProject.Empty(string.Empty)` to both view models, and `hasProject: _project is not null` to the balance VM. Notify both commands from `OnFolderLoaded` (wherever `_currentGameDirectory`/`_provider` are set) as well as from `SetProject`.
-- [ ] **Step 4: Run the tests.** Expected: PASS. Also run the existing `RepDispositionBalance*` and `SpeakerLine*` tests.
-- [ ] **Step 5: Commit**: `feat(reading-mode): speaker lines and balance without a project (#234)`.
+- [x] **Step 2: Run them and confirm they fail.**
+- [x] **Step 3: Implement.** Drop `_project is not null` from both gates. Pass `_project ?? DialogProject.Empty(string.Empty)` to both view models, and `hasProject: _project is not null` to the balance VM. Notify both commands from `OnFolderLoaded` (wherever `_currentGameDirectory`/`_provider` are set) as well as from `SetProject`.
+- [x] **Step 4: Run the tests.** Expected: PASS. Also run the existing `RepDispositionBalance*` and `SpeakerLine*` tests.
+- [x] **Step 5: Commit**: `feat(reading-mode): speaker lines and balance without a project (#234)`.
 
 ---
 
@@ -277,7 +277,7 @@ false case.
 **Interfaces:**
 - Produces: `GuidedTourViewModel.ReaderSteps` = `BrowserPanel`, `CanvasView`, `DetailPanel`, `ModeBadge` (with the four keys above), the constructor `GuidedTourViewModel(IReadOnlyList<GuidedTourStep> editingSteps, IReadOnlyList<GuidedTourStep> readerSteps)`, `void Start(EditorMode mode)` (it marks that mode's seen flag), and `static bool HasSeen(EditorMode mode)`. `Start()` with no argument is removed. Update its callers.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```csharp
 [Fact] public void Start_Reading_RunsTheReaderSteps_AndMarksItSeen() { /* CurrentStep.TargetName == "BrowserPanel", step count 4, last is "ModeBadge"; AppSettings.ReaderTourSeen */ }
@@ -287,10 +287,10 @@ false case.
 [Fact] public async Task Switching_DismissesARunningTour() { /* Review Focus 5: Tour.IsVisible false after the switch when the new mode's tour was already seen */ }
 ```
 
-- [ ] **Step 2: Run them and confirm they fail.**
-- [ ] **Step 3: Implement.** `OnOpened` calls `if (!GuidedTourViewModel.HasSeen(vm.Mode)) vm.Tour.Start(vm.Mode);`. `SwitchModeAsync` dismisses a visible tour, then starts the new mode's tour if it hasn't been seen. Add the `ModeBadge` key to `TourTargetResolver`, resolving to the badge from Task 9 (`x:Name="ModeBadge"`).
-- [ ] **Step 4: Run the tests.** Expected: PASS. Also run the existing `GuidedTour*` tests and update them for the new `Start` signature.
-- [ ] **Step 5: Commit**: `feat(reading-mode): a guided tour per mode (#234)`.
+- [x] **Step 2: Run them and confirm they fail.**
+- [x] **Step 3: Implement.** `OnOpened` calls `if (!GuidedTourViewModel.HasSeen(vm.Mode)) vm.Tour.Start(vm.Mode);`. `SwitchModeAsync` dismisses a visible tour, then starts the new mode's tour if it hasn't been seen. Add the `ModeBadge` key to `TourTargetResolver`, resolving to the badge from Task 9 (`x:Name="ModeBadge"`).
+- [x] **Step 4: Run the tests.** Expected: PASS. Also run the existing `GuidedTour*` tests and update them for the new `Start` signature.
+- [x] **Step 5: Commit**: `feat(reading-mode): a guided tour per mode (#234)`.
 
 ---
 
@@ -315,7 +315,7 @@ matching `ModeChooser_Editing_*` keys plus `ToolTip_ModeChooser_Editing`, and
 `ModeChooser_Footer` ("This window only appears once. Closing it starts Reading mode. You
 can switch modes later from View › Reading mode.").
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```csharp
 // VM
@@ -332,10 +332,10 @@ can switch modes later from View › Reading mode.").
 Also add `ModeChooserWindow` to the window list in `EveryWindowIsSizedTests` and in the
 window-icon test, if one enumerates windows.
 
-- [ ] **Step 2: Run them and confirm they fail.**
-- [ ] **Step 3: Implement** the view model and the window. Lay out the window as in `mode-chooser.html` "Side by side": a `Grid` with two star columns that becomes one column below a width threshold (a `Bounds` width check in code-behind, or a container query if one is in use elsewhere in the repo). Closing without a choice calls `OnClosedWithoutChoice()`. Wire the chooser into `App.axaml.cs` after onboarding.
-- [ ] **Step 4: Run the tests.** Expected: PASS.
-- [ ] **Step 5: Commit**: `feat(reading-mode): first-launch mode chooser (#234)`.
+- [x] **Step 2: Run them and confirm they fail.**
+- [x] **Step 3: Implement** the view model and the window. Lay out the window as in `mode-chooser.html` "Side by side": a `Grid` with two star columns that becomes one column below a width threshold (a `Bounds` width check in code-behind, or a container query if one is in use elsewhere in the repo). Closing without a choice calls `OnClosedWithoutChoice()`. Wire the chooser into `App.axaml.cs` after onboarding.
+- [x] **Step 4: Run the tests.** Expected: PASS.
+- [x] **Step 5: Commit**: `feat(reading-mode): first-launch mode chooser (#234)`.
 
 ---
 
@@ -352,7 +352,7 @@ window-icon test, if one enumerates windows.
 **Interfaces:**
 - Produces: `public static bool ReadingModeShortcuts.IsAllowed(Key key, KeyModifiers modifiers)`. True for: unmodified arrows, PageUp, PageDown, Home, Enter, Escape, Apps; F6 and Shift+F6; Shift+F10; Ctrl+Shift+O; Ctrl+O; Ctrl+W; Ctrl+OemComma. False for everything else.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```csharp
 // ReadingModeShortcutsTests: a theory over the allowed list (true), and over
@@ -374,10 +374,10 @@ public void KeptItem_IsVisible_InReadingMode(string headerKey)
 [AvaloniaFact] public void CtrlW_ClosesTheProject_InReadingMode()
 ```
 
-- [ ] **Step 2: Run them and confirm they fail.**
-- [ ] **Step 3: Implement.** Bind each hidden item's `IsVisible` to `IsEditingMode`. The Close Project item keeps its existing `IsProjectOpen`-based state. Add the checkable `Menu_View_ReadingMode` item (`ToggleType="CheckBox"`, `IsChecked="{Binding IsReadingMode, Mode=OneWay}"`, `Command="{Binding ToggleReadingModeCommand}"`). Hide separators that would end up doubled or trailing. At the top of `OnKeyDownTunnel` and the canvas key handler, add `if (vm.IsReadingMode && !ReadingModeShortcuts.IsAllowed(e.Key, e.KeyModifiers)) return;`, which leaves `e.Handled` false so text boxes still receive the key. The welcome screen's tour button already calls `StartGuidedTourCommand` and needs no change.
-- [ ] **Step 4: Run the tests.** Expected: PASS. Also run `MainWindowPaneCycleTests`, `MainWindowTabOrderTests` and `ConversationViewKeyboardTests`.
-- [ ] **Step 5: Commit**: `feat(reading-mode): menus and shortcuts in reading mode (#234)`.
+- [x] **Step 2: Run them and confirm they fail.**
+- [x] **Step 3: Implement.** Bind each hidden item's `IsVisible` to `IsEditingMode`. The Close Project item keeps its existing `IsProjectOpen`-based state. Add the checkable `Menu_View_ReadingMode` item (`ToggleType="CheckBox"`, `IsChecked="{Binding IsReadingMode, Mode=OneWay}"`, `Command="{Binding ToggleReadingModeCommand}"`). Hide separators that would end up doubled or trailing. At the top of `OnKeyDownTunnel` and the canvas key handler, add `if (vm.IsReadingMode && !ReadingModeShortcuts.IsAllowed(e.Key, e.KeyModifiers)) return;`, which leaves `e.Handled` false so text boxes still receive the key. The welcome screen's tour button already calls `StartGuidedTourCommand` and needs no change.
+- [x] **Step 4: Run the tests.** Expected: PASS. Also run `MainWindowPaneCycleTests`, `MainWindowTabOrderTests` and `ConversationViewKeyboardTests`.
+- [x] **Step 5: Commit**: `feat(reading-mode): menus and shortcuts in reading mode (#234)`.
 
 ---
 
@@ -393,7 +393,7 @@ public void KeptItem_IsVisible_InReadingMode(string headerKey)
 **Interfaces:**
 - Produces: a `Button x:Name="ModeBadge"` (Task 6's tour target) with `Command="{Binding ToggleReadingModeCommand}"`.
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 ```csharp
 [AvaloniaFact] public void Badge_SaysReading_InReadingMode()   // visible text, AutomationProperties.Name == AutomationName_ModeBadge_Reading, Background == Brush.ModeBadge.Reading.Background
@@ -403,10 +403,10 @@ public void KeptItem_IsVisible_InReadingMode(string headerKey)
 [AvaloniaFact] public void Badge_HasATooltip_AndIsAFocusableTabStop()
 ```
 
-- [ ] **Step 2: Run them and confirm they fail.**
-- [ ] **Step 3: Implement** the badge as one `Button` whose content (glyph + word), background, `ToolTip.Tip` and `AutomationProperties.Name` switch on `IsReadingMode`. Use two styles keyed on a class toggled by `Classes.reading="{Binding IsReadingMode}"`, or bindings with a bool-to-resource converter if one already exists. Add the contrast pairs.
-- [ ] **Step 4: Run the tests.** Expected: PASS. Also run `PaletteContrastTests`, `PaletteGoldenTests`, `TokenRegistryTests` and `MainWindowTabOrderTests`.
-- [ ] **Step 5: Commit**: `feat(reading-mode): mode badge (#234)`.
+- [x] **Step 2: Run them and confirm they fail.**
+- [x] **Step 3: Implement** the badge as one `Button` whose content (glyph + word), background, `ToolTip.Tip` and `AutomationProperties.Name` switch on `IsReadingMode`. Use two styles keyed on a class toggled by `Classes.reading="{Binding IsReadingMode}"`, or bindings with a bool-to-resource converter if one already exists. Add the contrast pairs.
+- [x] **Step 4: Run the tests.** Expected: PASS. Also run `PaletteContrastTests`, `PaletteGoldenTests`, `TokenRegistryTests` and `MainWindowTabOrderTests`.
+- [x] **Step 5: Commit**: `feat(reading-mode): mode badge (#234)`.
 
 ---
 
@@ -430,7 +430,7 @@ own: reading mode with no project already makes `IsEditable` false, and that is 
 for the canvas. If a test shows that a project-open reading canvas still offers an editing
 route, add a `ConversationViewModel.IsReadingMode` set from `UpdateEditable()` (Task 2).
 
-- [ ] **Step 1: Write the failing tests** (headless, a project open, `vm.SwitchModeAsync(Reading)`)
+- [x] **Step 1: Write the failing tests** (headless, a project open, `vm.SwitchModeAsync(Reading)`)
 
 ```csharp
 [AvaloniaFact] public void NodeContextMenu_OffersOnlyShowAllLinesBySpeaker()
@@ -446,10 +446,10 @@ route, add a `ConversationViewModel.IsReadingMode` set from `UpdateEditable()` (
 [Fact] public void DefaultEditingLayout_IsUnchanged()                         // ConditionSearch in RightPane.VisibleDockables
 ```
 
-- [ ] **Step 2: Run them and confirm they fail.**
-- [ ] **Step 3: Implement** the bindings, and the early return in `Editor_DoubleTapped` (it already checks `IsEditable`, so confirm the test reaches that check).
-- [ ] **Step 4: Run the tests.** Expected: PASS. Also run `NodeDetailViewTextWarningsTests` and `SpellingContextMenuTests`.
-- [ ] **Step 5: Commit**: `feat(reading-mode): canvas and node details in reading mode (#234)`.
+- [x] **Step 2: Run them and confirm they fail.**
+- [x] **Step 3: Implement** the bindings, and the early return in `Editor_DoubleTapped` (it already checks `IsEditable`, so confirm the test reaches that check).
+- [x] **Step 4: Run the tests.** Expected: PASS. Also run `NodeDetailViewTextWarningsTests` and `SpellingContextMenuTests`.
+- [x] **Step 5: Commit**: `feat(reading-mode): canvas and node details in reading mode (#234)`.
 
 ---
 
@@ -461,9 +461,9 @@ route, add a `ConversationViewModel.IsReadingMode` set from `UpdateEditable()` (
 - Modify: `docs/superpowers/specs/2026-10-26-reading-mode-design.md` (only if the code now differs), and this plan's checkboxes plus a `## Handoff — <date>` section
 - Modify: `docs/audience.md`. The "When the Reader and the Modder conflict" section changes from "until that exists" to describe reading mode.
 
-- [ ] **Step 1: Audit.** For each kept window, list every action that writes outside the app's own settings and log folder: a game file, a project file, or an export. Expected findings: none in Settings (it only writes app settings). In the Speaker Line Browser, its jump-to-node navigates and doesn't edit. Hide any write route found behind `IsEditingMode`, with a failing test first.
-- [ ] **Step 2: Run the full headless suite.** `dotnet test DialogEditor.Tests --filter "Category!=Gui"`. Expected: all pass.
-- [ ] **Step 3: GUI verification** with the `running-the-app` skill against a canonical fixture copy, with settings backed up and restored, and the editor stopped before the restore:
+- [x] **Step 1: Audit.** For each kept window, list every action that writes outside the app's own settings and log folder: a game file, a project file, or an export. Expected findings: none in Settings (it only writes app settings). In the Speaker Line Browser, its jump-to-node navigates and doesn't edit. Hide any write route found behind `IsEditingMode`, with a failing test first.
+- [x] **Step 2: Run the full headless suite.** `dotnet test DialogEditor.Tests --filter "Category!=Gui"`. Expected: all pass.
+- [x] **Step 3: GUI verification** with the `running-the-app` skill against a canonical fixture copy, with settings backed up and restored, and the editor stopped before the restore:
   1. Fresh settings: theme onboarding, then the chooser side by side. Close it, and confirm the main window opens in reading mode, the Reader tour starts, and the badge reads "Reading".
   2. Open a conversation and walk a branch with the arrow keys. Check that Test is missing, that Ctrl+S and Delete do nothing, and that the filter box still takes typing.
   3. Click the badge. Editing mode opens, the editing tour starts, and the menus are back.
@@ -471,5 +471,5 @@ route, add a `ConversationViewModel.IsReadingMode` set from `UpdateEditable()` (
   5. Open Rep & Disposition Balance and Browse Speaker Lines with only a game folder open.
   6. At 200 % text size, the chooser stacks.
   Screenshot each step and look at every PNG.
-- [ ] **Step 4: Docs and learnings.** Update `docs/audience.md` and tick this plan's boxes. Use `trail note` for anything that took digging, such as the deferred-prompt flow and why the shortcut gate returns without marking the key handled. Append the handoff section.
-- [ ] **Step 5: Commit and open the PR**: `docs(reading-mode): audience, plan and handoff (#234)`. Run `trail check`, push, then `gh pr create` with "Closes #234". Bind the PR and turn on Auto-fix.
+- [x] **Step 4: Docs and learnings.** Update `docs/audience.md` and tick this plan's boxes. Use `trail note` for anything that took digging, such as the deferred-prompt flow and why the shortcut gate returns without marking the key handled. Append the handoff section.
+- [x] **Step 5: Commit and open the PR**: `docs(reading-mode): audience, plan and handoff (#234)`. Run `trail check`, push, then `gh pr create` with "Closes #234". Bind the PR and turn on Auto-fix.
