@@ -1316,6 +1316,11 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- Resolve Conflicts refused while there are unsaved edits (issue 234): saving them first would
          write this side over the conflicted file and lose the other branch's version. -->
     <sys:String x:Key="Status_ResolveConflictsUnsavedEdits">Undo or discard your unsaved edits before resolving the conflict, so they don't overwrite the other branch's version.</sys:String>
+    <!-- Switching to editing with a project whose git merge conflict is still unresolved (issue 234):
+         editing it would let a save overwrite the other branch's version, so it is closed. -->
+    <sys:String x:Key="Status_ConflictUnresolvedNotOpened">'{0}' was not opened for editing: its git merge conflict is unresolved. Open it again to resolve the conflict.</sys:String>
+    <!-- A save refused because the project file still holds an unresolved git merge conflict (issue 234). -->
+    <sys:String x:Key="Status_SaveRefusedConflictPending">Not saved: '{0}' still has an unresolved git merge conflict, and saving would overwrite the other branch's version. Resolve the conflict first.</sys:String>
     <!-- Startup deferral: {0} = path, {1} = conflict count -->
     <sys:String x:Key="Status_ProjectGitConflictPending_One">'{1}' has 1 unresolved git merge conflict. Click Resolve to fix it.</sys:String>
     <sys:String x:Key="Status_ProjectGitConflictPending_Other">'{1}' has {0} unresolved git merge conflicts. Click Resolve to fix them.</sys:String>

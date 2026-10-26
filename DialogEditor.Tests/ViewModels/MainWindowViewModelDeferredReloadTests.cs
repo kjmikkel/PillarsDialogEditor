@@ -320,20 +320,33 @@ public class MainWindowViewModelDeferredReloadTests : IDisposable
 
     // ── Final review 2, R2/R6: Resolve Conflicts with unsaved edits ───────
 
-    /// Reading opened the conflicted project on the "mine" side; switching to Editing offered the
-    /// merge, the user cancelled it (the conflict stays pending), then edited the canvas.
+    /// Reading opened the conflicted project on the "mine" side; it also had a newer autosave copy,
+    /// which the switch to Editing offered and the user restored. That keeps the conflicted file
+    /// open in Editing with the conflict pending (a cancelled merge closes it instead, R7). Then
+    /// the user edited the canvas.
     private async Task<MainWindowViewModel> EditWhileTheConflictIsPending()
     {
-        WriteConflictedProject();
+        WriteConflictedProjectWithNewerAutosave();
         var provider = Provider();
         var vm = MakeVm(EditorMode.Reading, provider);
         vm.ShowGitConflictResolution = _ => Task.FromResult<DialogProject?>(null);
+        vm.ConfirmRestoreAutosave = gens => Task.FromResult(AutosaveDecision.Restore(gens[0]));
         await LoadProject(vm, ProjectPath);
         SelectGame(vm, provider);
         await vm.SwitchModeAsync(EditorMode.Editing);
+        Assert.True(vm.IsProjectOpen);
         Assert.True(vm.HasPendingConflictResolution);
         Edit(vm, "my edit");
         return vm;
+    }
+
+    private void WriteConflictedProjectWithNewerAutosave()
+    {
+        WriteConflictedProject();
+        var sidecar = AutosaveRecovery.SidecarPath(ProjectPath);
+        DialogProjectSerializer.SaveToFile(sidecar, DialogProject.Empty("C").WithPatch(EditPatch("restored")));
+        File.SetLastWriteTimeUtc(ProjectPath, DateTime.UtcNow.AddMinutes(-10));
+        File.SetLastWriteTimeUtc(sidecar,     DateTime.UtcNow.AddMinutes(-1));
     }
 
     // R6: Save in an unsaved-changes prompt would write "mine" over the conflicted file and lose
@@ -524,5 +537,50 @@ public class MainWindowViewModelDeferredReloadTests : IDisposable
         Assert.Equal("unsaved edit", NodeText(vm));
         Assert.True(vm.IsModified);
         Assert.True(File.Exists(AutosaveRecovery.SidecarPath(ProjectPath)));   // nothing discarded
+    }
+
+    // ── Final review 2, R7: Editing never keeps a conflicted project open ──
+
+    private void AssertBothSidesStillOnDisk()
+    {
+        var text = File.ReadAllText(ProjectPath);
+        Assert.Contains("<<<<<<<", text);
+        Assert.Contains(">>>>>>>", text);
+        Assert.Contains("friend", text);
+        Assert.Contains("traveler", text);
+    }
+
+    [Fact]
+    public async Task SwitchingToEditing_AndCancellingTheDeferredMerge_ClosesTheConflictedProject()
+    {
+        WriteConflictedProject();
+        var provider = Provider();
+        var vm = MakeVm(EditorMode.Reading, provider);
+        vm.ShowGitConflictResolution = _ => Task.FromResult<DialogProject?>(null);
+        await LoadProject(vm, ProjectPath);
+        SelectGame(vm, provider);
+
+        await vm.SwitchModeAsync(EditorMode.Editing);
+
+        Assert.True(vm.IsEditingMode);
+        Assert.False(vm.IsProjectOpen);
+        Assert.Null(vm.CurrentConversationName);
+        Assert.StartsWith("Status_ConflictUnresolvedNotOpened", vm.StatusText);
+        Assert.Equal(ProjectPath, AppSettings.LastProjectPath);   // offered again on the next launch
+        AssertBothSidesStillOnDisk();
+    }
+
+    [Fact]
+    public async Task SaveProject_WhileTheOpenProjectsConflictIsPending_LeavesTheFileAlone()
+    {
+        var vm = await EditWhileTheConflictIsPending();
+        var before = File.ReadAllText(ProjectPath);
+
+        vm.SaveProjectCommand.Execute(null);
+
+        Assert.Equal(before, File.ReadAllText(ProjectPath));
+        AssertBothSidesStillOnDisk();
+        Assert.StartsWith("Status_SaveRefusedConflictPending", vm.StatusText);
+        Assert.True(vm.IsModified);   // a refused save is a failed save: the edits stay unsaved
     }
 }

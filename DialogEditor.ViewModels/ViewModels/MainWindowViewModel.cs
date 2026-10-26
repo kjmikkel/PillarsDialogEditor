@@ -551,11 +551,18 @@ public partial class MainWindowViewModel : ObservableObject
                     CloseProjectCore(Loc.Format("Status_AutosaveKeptNotOpened", Path.GetFileName(openPath)));
                     ClearCanvasAfterClose();
                 }
+                // Discarding the copies re-read the file and offered the merge; cancelled, the
+                // reading-mode "mine" view is still open over the conflicted file.
+                else if (ReferenceEquals(before, _project))
+                    CloseIfConflictStillPending();
             }
         }
         else if (HasPendingConflictResolution)
         {
+            var before = _project;
             await ResolveConflicts();
+            if (ReferenceEquals(before, _project))
+                CloseIfConflictStillPending();
         }
 
         if (_deferredBackupPath is { } backupPath)
@@ -564,6 +571,24 @@ public partial class MainWindowViewModel : ObservableObject
             if (_provider is not null && backupPath == _currentGameDirectory)
                 RunBackupStep(backupPath, _provider);
         }
+    }
+
+    /// True while the open project's own file still holds an unresolved git conflict. Only
+    /// reading mode opens such a file (the "mine" side, issue 234); in Editing any save would
+    /// write that side over the markers and lose the other branch's version.
+    private bool ConflictPendingOnOpenProject =>
+        HasPendingConflictResolution && _projectPath is not null && _projectPath == _pendingConflictPath;
+
+    /// Editing never keeps a conflicted project open (issue 234), as outside reading mode a
+    /// cancelled merge never opens it. LastProjectPath is kept, so the next launch offers the
+    /// resolution again.
+    private void CloseIfConflictStillPending()
+    {
+        if (!IsProjectOpen || !ConflictPendingOnOpenProject) return;
+        var path = _projectPath!;
+        AppLog.Info($"Closed '{path}' on entering editing: its git conflict is unresolved");
+        CloseProjectCore(Loc.Format("Status_ConflictUnresolvedNotOpened", Path.GetFileName(path)));
+        ClearCanvasAfterClose();
     }
 
     [RelayCommand]
@@ -1814,6 +1839,16 @@ public partial class MainWindowViewModel : ObservableObject
     private void SaveProject()
     {
         if (_project is null || _projectPath is null) return;
+        // Defence in depth (issue 234): the open file still holds an unresolved git conflict, so
+        // writing this project over it would lose the other branch's version. Every save path
+        // (Ctrl+S, Save in an unsaved-changes prompt, Save As to the same file) comes through
+        // here, and the edits stay unsaved, so a prompt treats it as a failed save.
+        if (ConflictPendingOnOpenProject)
+        {
+            AppLog.Warn($"Save refused: '{_projectPath}' has an unresolved git conflict");
+            StatusText = Loc.Format("Status_SaveRefusedConflictPending", Path.GetFileName(_projectPath));
+            return;
+        }
         try
         {
             FoldCanvasIntoProject();
