@@ -1655,8 +1655,8 @@ public partial class MainWindowViewModel : ObservableObject
         if (_project is null || _projectPath is null || !IsModified) return;
         try
         {
-            FoldCanvasIntoProject();
-            WriteAutosave(fallback: false);
+            var folded = BuildFoldedProject(consumeRemaps: false) ?? _project;
+            WriteAutosave(folded, fallback: false);
             _autosaveFallbackAnnouncedFor = null;   // the project's folder works (again)
         }
         catch (Exception ex) when (AutosaveRecovery.IsLocationFailure(ex))
@@ -1668,7 +1668,7 @@ public partial class MainWindowViewModel : ObservableObject
             AppLog.Warn($"Autosave next to the project failed ({ex.Message}); using the fallback folder");
             try
             {
-                WriteAutosave(fallback: true);
+                WriteAutosave(BuildFoldedProject(consumeRemaps: false) ?? _project, fallback: true);
                 if (_autosaveFallbackAnnouncedFor != _projectPath)
                 {
                     _autosaveFallbackAnnouncedFor = _projectPath;
@@ -1691,13 +1691,13 @@ public partial class MainWindowViewModel : ObservableObject
     /// on every tick (issue 37).
     private string? _autosaveFallbackAnnouncedFor;
 
-    private void WriteAutosave(bool fallback)
+    private void WriteAutosave(DialogProject project, bool fallback)
     {
         // Rotate first: this frees generation 1 for the write below.
         AutosaveRecovery.Rotate(_projectPath!, AppSettings.AutosaveGenerations, fallback);
         var sidecar = AutosaveRecovery.GenerationPath(_projectPath!, 1, fallback);
         if (fallback) Directory.CreateDirectory(Path.GetDirectoryName(sidecar)!);
-        DialogProjectSerializer.SaveToFile(sidecar, _project!);
+        DialogProjectSerializer.SaveToFile(sidecar, project);
         AppLog.Info($"Autosaved to {sidecar}");
     }
 
@@ -1852,7 +1852,17 @@ public partial class MainWindowViewModel : ObservableObject
     /// in-memory _project is already complete — no-op.
     private void FoldCanvasIntoProject()
     {
-        if (_currentFile is null || Canvas.BaseSnapshot is null) return;
+        if (BuildFoldedProject(consumeRemaps: true) is { } folded) SetProject(folded);
+    }
+
+    /// The project with the canvas edits folded in, without touching _project. Null when there
+    /// is no conversation to fold. Autosave serialises this copy and leaves _project alone
+    /// (issue 234): _project must stay the last *saved* state, or Discard (which reverts by
+    /// reloading the conversation from _project's patch) would re-apply an autosaved edit and
+    /// a later Save would persist it. Only Save/Save As commit the fold into _project.
+    private DialogProject? BuildFoldedProject(bool consumeRemaps)
+    {
+        if (_currentFile is null || Canvas.BaseSnapshot is null) return null;
 
         var current = Canvas.BuildSnapshot();
         var patch   = DiffEngine.Diff(_currentFile.Name, Canvas.BaseSnapshot, current, _provider!.Language);
@@ -1865,7 +1875,8 @@ public partial class MainWindowViewModel : ObservableObject
         // their old IDs; re-key them before carrying them over, or the stale-data filter below
         // drops them.
         var prior  = _project!.Patches.GetValueOrDefault(_currentFile.Name);
-        var remaps = Canvas.TakePendingRemaps();
+        // A peek for autosave: the remaps stay pending for the save that really commits them.
+        var remaps = consumeRemaps ? Canvas.TakePendingRemaps() : Canvas.PeekPendingRemaps();
         if (prior is not null && remaps.Count > 0)
             prior = prior with { Translations = NodeIdRemap.Apply(prior.Translations, remaps) };
         patch = patch.CarryingTranslationsFrom(prior, _provider.Language);
@@ -1897,8 +1908,8 @@ public partial class MainWindowViewModel : ObservableObject
 
         var layout      = Canvas.GetCurrentLayout();
         var annotations = Canvas.GetCurrentAnnotations();
-        SetProject(_project!.WithPatch(patch).WithLayout(_currentFile.Name, layout)
-            .WithAnnotations(_currentFile.Name, annotations));
+        return _project!.WithPatch(patch).WithLayout(_currentFile.Name, layout)
+            .WithAnnotations(_currentFile.Name, annotations);
     }
 
     // ── Apply from diff ───────────────────────────────────────────────────

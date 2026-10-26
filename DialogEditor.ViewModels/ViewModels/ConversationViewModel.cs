@@ -531,6 +531,8 @@ public partial class ConversationViewModel : ObservableObject
     // ID changes not yet folded into the stored patch's translations (NodeIdRemap).
     private readonly List<(int From, int To)> _pendingRemaps = [];
 
+    internal IReadOnlyList<(int From, int To)> PeekPendingRemaps() => _pendingRemaps.ToList();
+
     internal IReadOnlyList<(int From, int To)> TakePendingRemaps()
     {
         var taken = _pendingRemaps.ToList();
