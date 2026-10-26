@@ -309,7 +309,8 @@ public partial class MainWindowViewModel : ObservableObject
     /// _projectPath is required because row destinations live in _vo/ next to
     /// the project file — an unsaved new project cannot batch-import.
     public bool CanBatchImportVoAll =>
-        _project is not null
+        IsEditingMode
+        && _project is not null
         && _provider is not null
         && _projectPath is not null
         && !string.IsNullOrEmpty(_currentGameDirectory)
@@ -324,7 +325,8 @@ public partial class MainWindowViewModel : ObservableObject
     /// (it loads each patched conversation's effective text). Unlike batch VO it is
     /// game-agnostic and needs no saved project path.
     public bool CanFindInProject =>
-        _project is not null
+        IsEditingMode
+        && _project is not null
         && _provider is not null
         && !string.IsNullOrEmpty(_currentGameDirectory);
 
@@ -481,7 +483,33 @@ public partial class MainWindowViewModel : ObservableObject
         => SwitchModeAsync(IsReadingMode ? EditorMode.Editing : EditorMode.Reading);
 
     // ── Partial hooks ─────────────────────────────────────────────────────
-    partial void OnModeChanged(EditorMode value) => UpdateEditable();
+    partial void OnModeChanged(EditorMode value)
+    {
+        UpdateEditable();
+        // Every editing command's gate includes IsEditingMode (issue 234), so re-evaluate them all;
+        // OpenProject, CloseProject, OpenFolder, recents, tour, changelog and About stay on.
+        NewProjectCommand.NotifyCanExecuteChanged();
+        NewConversationCommand.NotifyCanExecuteChanged();
+        ImportConversationCommand.NotifyCanExecuteChanged();
+        ExportConversationsCommand.NotifyCanExecuteChanged();
+        SaveProjectCommand.NotifyCanExecuteChanged();
+        SaveProjectAsCommand.NotifyCanExecuteChanged();
+        UndoApplyCommand.NotifyCanExecuteChanged();
+        MergeProjectsCommand.NotifyCanExecuteChanged();
+        ExportForTranslationCommand.NotifyCanExecuteChanged();
+        ImportTranslationCommand.NotifyCanExecuteChanged();
+        CreateSampleProjectCommand.NotifyCanExecuteChanged();
+        OpenWalkthroughCommand.NotifyCanExecuteChanged();
+        TagReferenceCommand.NotifyCanExecuteChanged();
+        RestoreBackupCommand.NotifyCanExecuteChanged();
+        SaveCommand.NotifyCanExecuteChanged();
+        TestPatchCommand.NotifyCanExecuteChanged();
+        RestoreConversationCommand.NotifyCanExecuteChanged();
+        FindInProjectCommand.NotifyCanExecuteChanged();
+        BatchReplaceCommand.NotifyCanExecuteChanged();
+        BatchImportVoAllCommand.NotifyCanExecuteChanged();
+        ResolveConflictsCommand.NotifyCanExecuteChanged();
+    }
 
     partial void OnCurrentConversationNameChanged(string? value)
         => OnPropertyChanged(nameof(WindowTitle));
@@ -647,7 +675,9 @@ public partial class MainWindowViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(ResolveConflictsCommand))]
     private bool _hasPendingConflictResolution;
 
-    [RelayCommand(CanExecute = nameof(HasPendingConflictResolution))]
+    private bool CanResolveConflicts() => IsEditingMode && HasPendingConflictResolution;
+
+    [RelayCommand(CanExecute = nameof(CanResolveConflicts))]
     private async Task ResolveConflicts()
     {
         var path = _pendingConflictPath;
@@ -953,7 +983,7 @@ public partial class MainWindowViewModel : ObservableObject
         });
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditingMode))]
     private void NewProject()
         => GuardDirtyThen(() => _ = DoNewProject());
 
@@ -1471,9 +1501,9 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    private bool CanCreateConversation() => _provider is not null && _project is not null;
+    private bool CanCreateConversation() => IsEditingMode && _provider is not null && _project is not null;
 
-    [RelayCommand(CanExecute = nameof(IsProjectLoaded))]
+    [RelayCommand(CanExecute = nameof(IsProjectLoadedForEditing))]
     private void ExportConversations()
     {
         if (_provider is null || _project is null) return;
@@ -1643,7 +1673,7 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     private bool CanSaveProject() =>
-        _project is not null && _projectPath is not null && IsModified;
+        IsEditingMode && _project is not null && _projectPath is not null && IsModified;
 
     // ── Save As — rebind to a new file (spec: 2026-07-05-save-project-as) ──
     [RelayCommand(CanExecute = nameof(CanSaveProjectAs))]
@@ -1720,7 +1750,7 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     private bool CanSaveProjectAs() =>
-        _project is not null && _projectPath is not null;
+        IsEditingMode && _project is not null && _projectPath is not null;
 
     /// Copies the _vo/ sidecar folder next to the new project file when the
     /// directory changed (same directory → the folder is already adjacent).
@@ -1881,7 +1911,7 @@ public partial class MainWindowViewModel : ObservableObject
         UndoApplyCommand.NotifyCanExecuteChanged();
     }
 
-    private bool CanUndoApply() => _preApplyProject is not null;
+    private bool CanUndoApply() => IsEditingMode && _preApplyProject is not null;
 
     // ── Merge projects ────────────────────────────────────────────────────
     [RelayCommand(CanExecute = nameof(CanMergeProjects))]
@@ -1926,13 +1956,15 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    private bool CanMergeProjects() => _project is not null && _projectPath is not null;
+    private bool CanMergeProjects() => IsEditingMode && _project is not null && _projectPath is not null;
 
     // ── Export / Import for translation ──────────────────────────────────
 
     private bool IsProjectLoaded() => _project is not null;
 
-    [RelayCommand(CanExecute = nameof(IsProjectLoaded))]
+    private bool IsProjectLoadedForEditing() => IsProjectLoaded() && IsEditingMode;
+
+    [RelayCommand(CanExecute = nameof(IsProjectLoadedForEditing))]
     private async Task ExportForTranslation()
     {
         if (_project is null) return;
@@ -1955,7 +1987,7 @@ public partial class MainWindowViewModel : ObservableObject
         StatusText = Loc.Format("Localization_StatusExported", count, Path.GetFileName(path));
     }
 
-    [RelayCommand(CanExecute = nameof(IsProjectLoaded))]
+    [RelayCommand(CanExecute = nameof(IsProjectLoadedForEditing))]
     private async Task ImportTranslation()
     {
         if (_project is null) return;
@@ -2107,7 +2139,7 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     // ── Create Sample Project (Help menu) ─────────────────────────────────
-    private bool CanCreateSample() => _provider is not null;
+    private bool CanCreateSample() => IsEditingMode && _provider is not null;
 
     [RelayCommand(CanExecute = nameof(CanCreateSample))]
     private async Task CreateSampleProjectAsync()
@@ -2170,7 +2202,7 @@ public partial class MainWindowViewModel : ObservableObject
     /// the first that opens. Defaults to launching via the OS handler.
     public Func<IReadOnlyList<string>, bool>? WalkthroughOpener { get; set; }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditingMode))]
     private void OpenWalkthrough()
     {
         var candidates = new[]
@@ -2290,7 +2322,7 @@ public partial class MainWindowViewModel : ObservableObject
     /// Set by the UI layer to open the dialog-text tag reference window.
     public Action<TagReferenceViewModel>? ShowTagReference { get; set; }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditingMode))]
     private void TagReference()
         => ShowTagReference?.Invoke(new TagReferenceViewModel(_activeGameId));
 
@@ -2379,7 +2411,7 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     // ── Restore backup ────────────────────────────────────────────────────
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditingMode))]
     private async Task RestoreBackup()
     {
         var backupPick = AppSettings.GetBackupPath(_currentGameDirectory);
@@ -2454,7 +2486,7 @@ public partial class MainWindowViewModel : ObservableObject
         SaveProject();
     }
 
-    private bool CanSave() => _provider is not null && _currentFile is not null && IsModified;
+    private bool CanSave() => IsEditingMode && _provider is not null && _currentFile is not null && IsModified;
 
     // ── Events (listened to by the View) ─────────────────────────────────
     public event Action? TestModeEntered;
@@ -2784,10 +2816,10 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    private bool CanTestPatch() => _provider is not null && _project is not null;
+    private bool CanTestPatch() => IsEditingMode && _provider is not null && _project is not null;
 
     // ── Restore Conversations (all entries in project) ────────────────────
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditingMode))]
     private async Task RestoreConversation()
     {
         var entries = AppSettings.GetPendingRestores();
@@ -2973,7 +3005,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     /// Batch Replace adds its changes to the open project, never to the game folder
     /// (issue 124), so it needs a project as well as the game data it searches.
-    public bool CanBatchReplace => _project is not null && _provider is not null;
+    public bool CanBatchReplace => IsEditingMode && _project is not null && _provider is not null;
 
     /// The View shows the (non-modal) Batch Replace window.
     public Func<BatchReplaceViewModel, Task>? ShowBatchReplace { get; set; }
