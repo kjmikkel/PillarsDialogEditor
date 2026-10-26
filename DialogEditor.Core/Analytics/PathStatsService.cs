@@ -77,8 +77,10 @@ public static class PathStatsService
             Math.Abs(femaleTotal - defaultTotal) / (double)defaultTotal > FemaleSignificanceThreshold;
 
         var wordsPerSpeaker = allNodes
-            .GroupBy(n => n.SpeakerGuid)
-            .Select(g => new SpeakerWordCount(g.Key, g.First().SpeakerCategory, g.Sum(Def), g.Sum(Fem)))
+            // A blank GUID says nothing about who speaks, so those nodes split by category:
+            // a blank Player line and a blank Script node are not one speaker.
+            .GroupBy(n => (n.SpeakerGuid, Category: string.IsNullOrEmpty(n.SpeakerGuid) ? n.SpeakerCategory : default))
+            .Select(g => new SpeakerWordCount(g.Key.SpeakerGuid, g.First().SpeakerCategory, g.Sum(Def), g.Sum(Fem)))
             .OrderByDescending(s => s.DefaultWords)
             .ToList();
 

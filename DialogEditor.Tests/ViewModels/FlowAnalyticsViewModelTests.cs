@@ -205,6 +205,29 @@ public class FlowAnalyticsViewModelTests
         Assert.NotEmpty(vm.WordsPerSpeaker);
     }
 
+    private sealed class RowTemplateProvider : DialogEditor.ViewModels.Services.IStringProvider
+    {
+        public string Get(string key) => key == "PathStats_SpeakerRow" ? "{0}: {1}" : key;
+        public bool TryGet(string key, out string value) { value = Get(key); return true; }
+    }
+
+    [Fact] // GitHub issue 257: the Player GUID and a blank-GUID Player node are one speaker.
+    public void Refresh_PlayerGuidAndBlankPlayerNodes_ShareOneRow()
+    {
+        Loc.Configure(new RowTemplateProvider());
+        DialogEditor.ViewModels.Services.SpeakerNameService.Register(new Dictionary<string, string>());
+        var snapshot = new ConversationEditSnapshot([
+            PathNode(0, "aa bb", speaker: "b1a8e901-0000-0000-0000-000000000000",
+                     category: SpeakerCategory.Player, links: [Link(0, 1)]),
+            PathNode(1, "cc", category: SpeakerCategory.Player)
+        ]);
+        var vm = new FlowAnalyticsViewModel(() => snapshot, _ => { });
+
+        vm.RefreshCommand.Execute(null);
+
+        Assert.Equal("PathStats_Cat_Player: 3", Assert.Single(vm.WordsPerSpeaker).Display);
+    }
+
     [Fact]
     public void Refresh_FemaleColumns_GatedBySignificance()
     {
