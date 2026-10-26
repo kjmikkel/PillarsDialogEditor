@@ -401,4 +401,37 @@ public class MainWindowViewModelDeferredReloadTests : IDisposable
         Assert.Null(vm.CurrentConversationName);
         Assert.Empty(vm.Canvas.Nodes);
     }
+
+    // ── Final review 2, R4: the reload's warning survives the open ─────────
+
+    [Fact]
+    public async Task OpeningAProject_KeepsTheUnreadableTextWarning()
+    {
+        DialogProjectSerializer.SaveToFile(ProjectPath, DialogProject.Empty("P"));
+        var provider = new FakeGameDataProvider("poe2", "en",
+            new Conversation("game", [PlainNode(1)], StringTable.Unreadable("damaged.stringtable")));
+        var vm = MakeVm(EditorMode.Reading, provider);
+        SelectGame(vm, provider);
+
+        await LoadProject(vm, ProjectPath);
+
+        Assert.Equal("Status_StringTableUnreadable", vm.StatusText);
+    }
+
+    [Fact]
+    public async Task OpeningAProject_KeepsThePatchBaselineMismatchWarning()
+    {
+        // The patch expects a comment the game file no longer has (a game update changed it).
+        var mismatch = new ConversationPatch("game", ConversationPatch.CurrentSchemaVersion, [], [],
+            [new NodeModification(1,
+                new Dictionary<string, FieldChange> { ["Comments"] = new("\"expected\"", "\"new\"") }, [], [])]);
+        DialogProjectSerializer.SaveToFile(ProjectPath, DialogProject.Empty("P").WithPatch(mismatch));
+        var provider = Provider();
+        var vm = MakeVm(EditorMode.Reading, provider);
+        SelectGame(vm, provider);
+
+        await LoadProject(vm, ProjectPath);
+
+        Assert.Equal("Status_PatchBaselineMismatch", vm.StatusText);
+    }
 }

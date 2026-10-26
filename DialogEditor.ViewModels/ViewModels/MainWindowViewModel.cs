@@ -1475,6 +1475,10 @@ public partial class MainWindowViewModel : ObservableObject
         AppSettings.AddRecentProject(path);
         RefreshRecentProjects();
         CurrentProjectName = loaded.Name;
+        AppLog.Info($"Opened project: {path}");
+        // Before the reload, so a warning it raises (the patch no longer matches the game files,
+        // the text file is damaged) is what stays on screen; it is the only place it is shown.
+        StatusText = Loc.FormatCount("Status_ProjectOpened", loaded.Patches.Count, loaded.Name);
         // A conversation already on the canvas shows the previous project's text (issue 234: opening
         // a project, a deferred autosave Restore and a deferred merge all swap the project under
         // it). Discard clears IsModified, so after the unsaved-edits guard this is dirty only when
@@ -1490,8 +1494,6 @@ public partial class MainWindowViewModel : ObservableObject
             else
                 ClearCanvasAfterClose();
         }
-        AppLog.Info($"Opened project: {path}");
-        StatusText = Loc.FormatCount("Status_ProjectOpened", loaded.Patches.Count, loaded.Name);
     }
 
     /// True when the open project created the conversation, or the game has it (on disk, or
@@ -3083,6 +3085,7 @@ public partial class MainWindowViewModel : ObservableObject
         {
             _currentFile = file;
             var conversation = _provider.LoadConversation(file);
+            var baselineMismatch = false;
 
             // Reapply this conversation's saved patch so the canvas shows the user's
             // edits, not the vanilla game file. BaseSnapshot must stay the *vanilla*
@@ -3104,7 +3107,7 @@ public partial class MainWindowViewModel : ObservableObject
                     // the mismatch; F5 keeps its strict conflict flow for real writes.
                     AppLog.Warn($"Patch for '{file.Name}' no longer matches game data (node {conflict.NodeId}, field '{conflict.FieldName}'); forcing apply for display");
                     patchedSnap = PatchApplier.Apply(vanillaSnap, storedPatch, ignoreConflicts: true);
-                    StatusText = Loc.Format("Status_PatchBaselineMismatch", file.Name);
+                    baselineMismatch = true;
                 }
                 var translations = storedPatch.Translations.GetValueOrDefault(_provider.Language);
                 var patched = ConversationSnapshotBuilder.ToConversation(file.Name, patchedSnap, translations);
@@ -3140,6 +3143,10 @@ public partial class MainWindowViewModel : ObservableObject
                 // The structure loaded, but this language's text file is damaged (issue 119):
                 // name it, so the text placeholders aren't a mystery. Logged by the parser.
                 StatusText = Loc.Format("Status_StringTableUnreadable", file.Name, PathDisplay.ForDisplay(conversation.Strings.UnreadablePath));
+            else if (baselineMismatch)
+                // Set here, not where the conflict is caught: the "loaded" message below used to
+                // replace it at once, so the mismatch was never seen (issue 234).
+                StatusText = Loc.Format("Status_PatchBaselineMismatch", file.Name);
             else if (_project is null && !IsReadingMode)
                 StatusText = Loc.Get("Status_NoProjectReadOnly");
             else
