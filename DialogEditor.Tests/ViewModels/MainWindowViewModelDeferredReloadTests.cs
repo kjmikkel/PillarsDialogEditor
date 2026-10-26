@@ -434,4 +434,92 @@ public class MainWindowViewModelDeferredReloadTests : IDisposable
 
         Assert.Equal("Status_PatchBaselineMismatch", vm.StatusText);
     }
+
+    // ── Final review 2, R5: Discard puts the canvas back to its saved state ──
+
+    /// The saved project's text ("saved text", from the game) is on the canvas, node 1 selected,
+    /// then edited. Discard is the answer to the unsaved-changes prompt.
+    private async Task<MainWindowViewModel> DirtyCanvasThatWillBeDiscarded()
+    {
+        var (vm, _) = await OpenGameInEditing();
+        vm.Canvas.SelectedNode = vm.Canvas.Nodes.Single(n => n.NodeId == 1);
+        Edit(vm, "discarded edit");
+        vm.UnsavedChangesRequested += vm.DiscardAndProceed;
+        return vm;
+    }
+
+    private static void AssertBackToSaved(MainWindowViewModel vm)
+    {
+        Assert.Equal("saved text", NodeText(vm));
+        Assert.False(vm.IsModified);
+        Assert.Equal(1, vm.Canvas.SelectedNode?.NodeId);
+    }
+
+    [Fact]
+    public async Task Discard_ThenCancellingTheOpenPicker_ShowsTheSavedText()
+    {
+        var vm = await DirtyCanvasThatWillBeDiscarded();
+
+        vm.OpenProjectCommand.Execute(null);   // the stub picker returns null: cancelled
+
+        AssertBackToSaved(vm);
+    }
+
+    [Fact]
+    public async Task Discard_ThenLaterOnTheOtherProjectsAutosave_ShowsTheSavedText()
+    {
+        var vm = await DirtyCanvasThatWillBeDiscarded();
+        WriteProjectWithRestorableEdit(OtherProjectPath, "restored text");
+        vm.ConfirmRestoreAutosave = _ => Task.FromResult(AutosaveDecision.Later);
+
+        vm.OpenRecentProjectCommand.Execute(OtherProjectPath);
+
+        AssertBackToSaved(vm);
+    }
+
+    [Fact]
+    public async Task Discard_ThenCancellingTheOtherProjectsMerge_ShowsTheSavedText()
+    {
+        var vm = await DirtyCanvasThatWillBeDiscarded();
+        File.WriteAllText(OtherProjectPath,
+            "<<<<<<< HEAD\n" + DialogProjectSerializer.Serialize(DialogProject.Empty("C").WithPatch(EditPatch("friend")))
+          + "\n=======\n"    + DialogProjectSerializer.Serialize(DialogProject.Empty("C").WithPatch(EditPatch("traveler")))
+          + "\n>>>>>>> branch\n");
+        vm.ShowGitConflictResolution = _ => Task.FromResult<DialogProject?>(null);
+
+        vm.OpenRecentProjectCommand.Execute(OtherProjectPath);
+
+        AssertBackToSaved(vm);
+    }
+
+    [Fact]
+    public async Task Discard_ThenSaveWithoutFurtherEdits_DoesNotPersistTheDiscardedEdit()
+    {
+        var vm = await DirtyCanvasThatWillBeDiscarded();
+        vm.OpenProjectCommand.Execute(null);   // cancelled
+
+        vm.Canvas.Nodes.Single(n => n.NodeId == 1).Comments = "a later, wanted edit";
+        vm.SaveProjectCommand.Execute(null);
+
+        Assert.DoesNotContain("discarded edit", File.ReadAllText(ProjectPath));
+    }
+
+    [Fact]
+    public async Task Discard_WhenTheRevertFails_KeepsTheEditsAndDoesNotProceed()
+    {
+        var (vm, provider) = await OpenGameInEditing();
+        Edit(vm, "unsaved edit");
+        vm.AutosaveTick();
+        provider.Unreadable.Add("game");   // the game file can no longer be read
+        vm.ReportError = _ => { };
+        DialogProjectSerializer.SaveToFile(OtherProjectPath, DialogProject.Empty("Q"));
+        vm.UnsavedChangesRequested += vm.DiscardAndProceed;
+
+        vm.OpenRecentProjectCommand.Execute(OtherProjectPath);
+
+        Assert.Equal("P", vm.CurrentProjectName);        // the open did not go ahead
+        Assert.Equal("unsaved edit", NodeText(vm));
+        Assert.True(vm.IsModified);
+        Assert.True(File.Exists(AutosaveRecovery.SidecarPath(ProjectPath)));   // nothing discarded
+    }
 }

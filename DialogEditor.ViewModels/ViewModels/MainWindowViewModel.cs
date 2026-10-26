@@ -240,13 +240,24 @@ public partial class MainWindowViewModel : ObservableObject
 
     public void DiscardAndProceed()
     {
+        // Put the open conversation back to its saved state first (issue 234). The continuation
+        // may not replace the canvas (a cancelled picker, Later, a cancelled merge), and a canvas
+        // still holding the discarded edits would fold them into the next Save. A conversation
+        // switch loads another conversation anyway, so it is not reverted first.
+        if (_pendingFile is null && !ReloadCurrentConversationView())
+        {
+            // The load reported its own error. Nothing was discarded, so nothing proceeds: the
+            // edits stay on screen and unsaved, and the autosave copy is kept.
+            AppLog.Warn("Discard: the open conversation could not be reverted to its saved state; the action was not carried out");
+            CancelPendingNavigation();
+            return;
+        }
         // The user consciously discarded these edits — the next launch must not
         // resurrect them from the autosave sidecar (spec 2026-07-12 §3).
         if (_projectPath is not null) AutosaveRecovery.TryDelete(_projectPath);
-        // The edits are gone from here on (issue 234). Left dirty, a project swapped in by the
-        // continuation skipped its canvas reload (FinishLoad), and the next Save folded the
-        // discarded canvas over the new work. The canvas flag is cleared too: left set, the next
-        // edit would not change it, and the window would never be marked dirty again.
+        // Left dirty, a project swapped in by the continuation skipped its canvas reload
+        // (FinishLoad). Project-level edits set only the window's flag, so it is cleared here;
+        // the canvas flag is kept in step, or the next edit would not mark the window dirty.
         _guardDiscarded = true;
         Canvas.IsModified = false;
         IsModified = false;
@@ -428,12 +439,12 @@ public partial class MainWindowViewModel : ObservableObject
                 return false;
             if (_guardDiscarded)
             {
-                // Discard cleared the dirty flag but not the canvas: put it back to the saved
-                // state, or stay in Editing rather than show lost edits. A failed revert leaves
-                // the edits on screen, so they are marked unsaved again.
-                if (!await RevertToSavedAsync())
+                // Discard has already put an open conversation back to its saved state (and
+                // reselected its node). With none open the edits were project-level only, and
+                // reverting them means re-reading the project; if that fails, stay in Editing
+                // with them marked unsaved rather than show lost edits.
+                if (_currentFile is null && !await RevertProjectToSavedAsync())
                 {
-                    if (_currentFile is not null) Canvas.IsModified = true;
                     IsModified = true;
                     StatusText = Loc.Get("Status_ModeSwitchRefused");
                     return false;
@@ -462,40 +473,27 @@ public partial class MainWindowViewModel : ObservableObject
         return true;
     }
 
-    /// Puts the open work back to its saved state after Discard. With a conversation open that
-    /// is re-opening it from the game data plus the project's saved patch (the path a switch to
-    /// another conversation takes) and reselecting the same node. With none open (project-level
-    /// edits only) there is no view to lose, so the project is re-read from its file.
-    /// False when there is nothing to re-read or the load did not complete.
-    private async Task<bool> RevertToSavedAsync()
+    /// Puts project-level edits (no conversation open, so no view to lose) back to their saved
+    /// state after Discard by re-reading the project from its file. An open conversation is
+    /// reverted by DiscardAndProceed itself. False when there is nothing to re-read or the load
+    /// did not complete.
+    private async Task<bool> RevertProjectToSavedAsync()
     {
-        if (_currentFile is not { } file || _provider is null)
+        var path = _projectPath;
+        if (path is null || !File.Exists(path))
         {
-            var path = _projectPath;
-            if (path is null || !File.Exists(path))
-            {
-                AppLog.Warn("Reading mode: discard could not be reverted, the project has no saved file to re-read");
-                return false;
-            }
-            var before = _project;
-            await LoadProjectAsync(path, offerDeferred: false);
-            // A completed load swaps in a freshly read project (it does not reset IsModified).
-            if (!IsProjectOpen || ReferenceEquals(before, _project))
-            {
-                AppLog.Warn($"Reading mode: reloading '{path}' to discard its edits did not complete");
-                return false;
-            }
-            IsModified = false;
-            return true;
-        }
-
-        // LoadConversationFile logs and reports its own failures but does not throw. Discard has
-        // already cleared IsModified, so the load's own result says whether it completed.
-        if (!ReloadCurrentConversationView() || CurrentConversationName != file.Name)
-        {
-            AppLog.Warn($"Reading mode: reverting '{file.Name}' to its saved state did not complete");
+            AppLog.Warn("Reading mode: discard could not be reverted, the project has no saved file to re-read");
             return false;
         }
+        var before = _project;
+        await LoadProjectAsync(path, offerDeferred: false);
+        // A completed load swaps in a freshly read project (it does not reset IsModified).
+        if (!IsProjectOpen || ReferenceEquals(before, _project))
+        {
+            AppLog.Warn($"Reading mode: reloading '{path}' to discard its edits did not complete");
+            return false;
+        }
+        IsModified = false;
         return true;
     }
 
