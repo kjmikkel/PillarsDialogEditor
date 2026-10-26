@@ -110,6 +110,31 @@ public class ReadingWithoutProjectTests : IDisposable
         Assert.Contains(shown.Rows, r => r.ConversationName == "vanilla_conv" && r.NodeId == 7);
     }
 
+    [Fact]
+    public async Task SpeakerLines_HasProject_FollowsWhetherAProjectIsOpen()
+    {
+        var vm = FolderOnlyVm();
+        SpeakerLineBrowserViewModel? shown = null;
+        vm.ShowSpeakerLineBrowser = b => { shown = b; return Task.CompletedTask; };
+        await vm.BrowseSpeakerLinesCommand.ExecuteAsync(null);
+        Assert.False(shown!.HasProject);   // the window hides "Only my lines": no project to compare with
+
+        Inject(vm, "_project", DialogProject.Empty("p"));
+        await vm.BrowseSpeakerLinesCommand.ExecuteAsync(null);
+        Assert.True(shown.HasProject);
+    }
+
+    [Theory]
+    [InlineData(true,  "RepBalance_Tip_Scope")]
+    [InlineData(false, "RepBalance_Tip_Scope_NoProject")]
+    public void Balance_ScopeTip_NamesTheSourceOnlyWhenThePickerShows(bool hasProject, string key)
+    {
+        var vm = new RepDispositionBalanceViewModel(
+            DialogProject.Empty("p"), new FakeGameDataProvider("poe2", "en"),
+            () => (null, null), hasProject);
+        Assert.Equal(key, vm.ScopeTooltip);
+    }
+
     [Theory]
     [InlineData(false)]
     [InlineData(true)]

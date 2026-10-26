@@ -517,6 +517,9 @@ public partial class MainWindowViewModel : ObservableObject
     partial void OnModeChanged(EditorMode value)
     {
         UpdateEditable();
+        // The status bar mirrors the focused control's HelpText. The mode badge keeps focus after
+        // its click, so its previous-mode tooltip would linger until focus moved (issue 234).
+        FocusHintText = string.Empty;
         // Every editing command's gate includes IsEditingMode (issue 234), so re-evaluate them all;
         // OpenProject, CloseProject, OpenFolder, recents, tour, changelog and About stay on.
         NewProjectCommand.NotifyCanExecuteChanged();
@@ -3042,8 +3045,12 @@ public partial class MainWindowViewModel : ObservableObject
                 // The structure loaded, but this language's text file is damaged (issue 119):
                 // name it, so the text placeholders aren't a mystery. Logged by the parser.
                 StatusText = Loc.Format("Status_StringTableUnreadable", file.Name, PathDisplay.ForDisplay(conversation.Strings.UnreadablePath));
-            else if (_project is null)
+            else if (_project is null && !IsReadingMode)
                 StatusText = Loc.Get("Status_NoProjectReadOnly");
+            else if (_project is null)
+                // Reading mode hides File > New Project, so the editing hint would point at nothing
+                // (issue 234); report the load like a project would.
+                StatusText = Loc.Format("Status_ConversationLoaded", file.Name, Canvas.Nodes.Count);
             else
                 // The canvas, with the project's added nodes, not the game file alone (GitHub issue 256).
                 StatusText = Loc.Format("Status_ConversationLoaded", file.Name, Canvas.Nodes.Count);
@@ -3168,7 +3175,7 @@ public partial class MainWindowViewModel : ObservableObject
             () => Canvas.Nodes.Count > 0
                 ? (Canvas.ConversationName, Canvas.BuildSnapshot())
                 : (null, (ConversationEditSnapshot?)null),
-            initialSpeakerGuid);
+            initialSpeakerGuid, hasProject: _project is not null);
         vm.RequestNavigate += NavigateToFoundNode;
 
         if (ShowSpeakerLineBrowser is not null)

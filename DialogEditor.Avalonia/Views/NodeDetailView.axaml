@@ -76,7 +76,7 @@
                 <!-- Issue 240: with no project open ("Viewing only") every editor below is read-only or
                      disabled, bound to IsReadOnly / IsEditable, which follow the canvas. Text boxes stay
                      selectable so a Reader can still copy a line. This says why nothing takes edits. -->
-                <TextBlock IsVisible="{Binding IsReadOnly}"
+                <TextBlock IsVisible="{Binding ShowNoProjectHint}"
                            Text="{DynamicResource Status_NoProjectReadOnly}"
                            Foreground="{DynamicResource Brush.Text.Secondary}"
                            FontSize="{DynamicResource FontSize.Small}"
@@ -104,7 +104,7 @@
                          beh:SpellSquiggles.Finder="{Binding SpellSpanFinder}"
                          beh:SpellingContextMenu.Finder="{Binding SpellingMenuFinder}"
                          beh:TokenCompletion.GameId="{Binding ActiveGameId}"
-                         Watermark="{DynamicResource Placeholder_FemaleText}"
+                         Watermark="{Binding FemaleTextPlaceholder}"
                          ToolTip.Tip="{DynamicResource ToolTip_FemaleText}"
                          AutomationProperties.HelpText="{DynamicResource ToolTip_FemaleText}"
                          AutomationProperties.Name="{DynamicResource Label_FemaleText}"/>

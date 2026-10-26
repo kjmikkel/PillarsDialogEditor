@@ -36,7 +36,7 @@
                       AutomationProperties.HelpText="{DynamicResource ToolTip_SpeakerLines_Character}"/>
 
             <CheckBox Grid.Column="3" Content="{DynamicResource SpeakerLines_OnlyMyLines}"
-                      IsChecked="{Binding OnlyMyLines}" VerticalAlignment="Center" Margin="8,0"
+                      IsChecked="{Binding OnlyMyLines}" IsVisible="{Binding HasProject}" VerticalAlignment="Center" Margin="8,0"
                       AutomationProperties.Name="{DynamicResource AutomationName_SpeakerLines_OnlyMyLines}"
                       ToolTip.Tip="{DynamicResource ToolTip_SpeakerLines_OnlyMyLines}"
                       AutomationProperties.HelpText="{DynamicResource ToolTip_SpeakerLines_OnlyMyLines}"/>

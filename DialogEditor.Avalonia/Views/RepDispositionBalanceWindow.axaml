@@ -50,9 +50,9 @@
                       AutomationProperties.HelpText="{DynamicResource RepBalance_Tip_Source}"/>
             <TextBlock Text="{DynamicResource RepBalance_Scope_Label}" VerticalAlignment="Center" Margin="8,0,0,0"/>
             <ComboBox x:Name="ScopeBox"
-                      ToolTip.Tip="{DynamicResource RepBalance_Tip_Scope}"
+                      ToolTip.Tip="{Binding ScopeTooltip}"
                       AutomationProperties.Name="{DynamicResource RepBalance_Scope_Label}"
-                      AutomationProperties.HelpText="{DynamicResource RepBalance_Tip_Scope}"/>
+                      AutomationProperties.HelpText="{Binding ScopeTooltip}"/>
             <Button Content="{DynamicResource RepBalance_Refresh}"
                     Command="{Binding RefreshCommand}"
                     ToolTip.Tip="{DynamicResource RepBalance_Tip_Refresh}"

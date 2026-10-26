@@ -236,4 +236,58 @@ public class MainWindowViewModelReadingModeTests : IDisposable
         await vm.ToggleReadingModeCommand.ExecuteAsync(null);
         Assert.Equal(EditorMode.Editing, vm.Mode);
     }
+
+    // ── Wording (issue 234) ───────────────────────────────────────────────
+
+    [Fact]
+    public async Task Switch_ClearsTheStatusBarsStaleFocusHint()
+    {
+        // The badge keeps focus after a click, so its old HelpText (the previous mode's tooltip)
+        // would otherwise stay in the status bar.
+        var vm = MakeVm();
+        vm.FocusHintText = "You are in Editing mode";
+
+        await vm.SwitchModeAsync(EditorMode.Reading);
+
+        Assert.Equal(string.Empty, vm.FocusHintText);
+    }
+
+    [Fact]
+    public void NoProjectHint_ShowsOnlyInEditingMode()
+    {
+        var vm = MakeVm();
+        vm.Detail.Canvas = vm.Canvas;
+        vm.Canvas.IsEditable = false;   // no project: nothing takes edits
+        Assert.True(vm.Detail.ShowNoProjectHint);
+
+        vm.Detail.IsReadingMode = true;
+        Assert.False(vm.Detail.ShowNoProjectHint);   // File > New Project is hidden there
+    }
+
+    [Fact]
+    public async Task LoadingAConversationWithoutAProject_InReadingMode_DoesNotPointAtNewProject()
+    {
+        AppSettings.Mode = EditorMode.Reading;
+        var vm = MakeVm();
+        var provider = new FakeGameDataProvider("poe2", "en",
+            new Conversation("c", [PlainNode(1)], new StringTable([new StringEntry(1, "t", "")])));
+        typeof(MainWindowViewModel).GetField("_provider",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!.SetValue(vm, provider);
+
+        typeof(MainWindowViewModel).GetMethod("OnConversationSelected",
+            System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+            .Invoke(vm, [provider.BuildNewConversationFile("c")]);
+
+        Assert.NotEqual("Status_NoProjectReadOnly", vm.StatusText);
+    }
+
+    [Fact]
+    public void FemaleTextPlaceholder_DoesNotGiveEditingAdviceInReadingMode()
+    {
+        var vm = MakeVm();
+        Assert.Equal("Placeholder_FemaleText", vm.Detail.FemaleTextPlaceholder);
+
+        vm.Detail.IsReadingMode = true;
+        Assert.Equal("Placeholder_FemaleText_Reading", vm.Detail.FemaleTextPlaceholder);
+    }
 }

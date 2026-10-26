@@ -97,6 +97,9 @@ public partial class RepDispositionBalanceViewModel : ObservableObject
     /// since every source other than the game on disk would be empty.
     public bool HasProject { get; }
 
+    /// Scope tooltip: "the selected source" names a picker that is hidden without a project.
+    public string ScopeTooltip => Loc.Get(HasProject ? "RepBalance_Tip_Scope" : "RepBalance_Tip_Scope_NoProject");
+
     [RelayCommand]
     private async Task Refresh()
     {
