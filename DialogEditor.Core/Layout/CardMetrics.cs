@@ -36,6 +36,12 @@ public static class CardMetrics
     public static double FooterHeight => FooterLineHeight + 2 * FooterPaddingY;
     public static double MaxHeight    => HeightFor(MaxBodyLines);
 
+    /// A zoomed-out card (GitHub issue 221, CardDetail): header and one body line, no footer.
+    /// One border allowance, not two: the template's bottom inset is the footer's margin, so it
+    /// goes with the footer.
+    public static double CompactHeight =>
+        BorderThickness + HeaderHeight + BodyLineHeight + 2 * BodyPaddingY;
+
     public static int EstimateBodyLines(string? text)
     {
         if (string.IsNullOrWhiteSpace(text)) return 1;   // the #84 placeholder is one line

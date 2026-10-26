@@ -152,6 +152,7 @@
             <converters:OptionLabelConverter            x:Key="OptionLabel"/>
             <converters:LanguageNameConverter           x:Key="LanguageName"/>
             <converters:LayoutPointConverter             x:Key="LayoutPointConverter"/>
+            <converters:CardDetailConverter              x:Key="CardDetailConverter"/>
             <converters:SpeakerCategoryToBrushConverter x:Key="SpeakerCategoryToBrush"/>
             <converters:NodeColorConverter              x:Key="NodeColorConverter"/>
             <converters:NodeTypeShapeConverter          x:Key="NodeTypeShape"/>

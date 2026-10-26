@@ -452,14 +452,16 @@
                                         </MultiBinding>
                                     </Border.Background>
                                     <Panel>
-                                        <!-- Issue 82: the card grows to fit its line, up to CardMetrics.MaxBodyLines, then ends in "…".
+                                        <!-- Issue 82: the card grows to fit its line, up to CardMetrics.MaxBodyLines (one line when zoomed
+                                             out, GitHub issue 221), then ends in "…".
                                              Full text, not TextPreview: TextPreview's 80-character cut stays for one-line summaries
                                              elsewhere (Node Details' link list, Batch VO Import, VO Validation, the alias picker).
                                              MarkupText renders the game's <i>/<ispeech> markup as italic instead of showing the
                                              tags (GitHub issue 258); the edit field in Node Details keeps the raw text. -->
                                         <TextBlock Classes="cardBody" beh:MarkupText.Source="{Binding DefaultText}"
                                                    IsVisible="{Binding !HasTextPlaceholder}"
-                                                   TextWrapping="Wrap" MaxLines="4" TextTrimming="CharacterEllipsis"
+                                                   TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
+                                                   MaxLines="{Binding $parent[nodify:NodifyEditor].ViewportZoom, Converter={StaticResource CardDetailConverter}, ConverterParameter=lines}"
                                                    Padding="6,4" FontSize="{DynamicResource Canvas.FontSize.Body}"
                                                    LineHeight="{DynamicResource Canvas.LineHeight.Body}"
                                                    Foreground="{DynamicResource Brush.Text.OnLight}"/>
@@ -468,15 +470,18 @@
                                              matching the footer's secondary styling. -->
                                         <TextBlock Text="{Binding TextPlaceholder}"
                                                    IsVisible="{Binding HasTextPlaceholder}"
-                                                   TextWrapping="Wrap" MaxLines="4" TextTrimming="CharacterEllipsis" FontStyle="Italic"
+                                                   TextWrapping="Wrap" TextTrimming="CharacterEllipsis" FontStyle="Italic"
+                                                   MaxLines="{Binding $parent[nodify:NodifyEditor].ViewportZoom, Converter={StaticResource CardDetailConverter}, ConverterParameter=lines}"
                                                    Padding="6,4" FontSize="{DynamicResource Canvas.FontSize.Body}"
                                                    LineHeight="{DynamicResource Canvas.LineHeight.Body}"
                                                    Foreground="{DynamicResource Brush.Text.OnLight.Muted}"/>
                                     </Panel>
                                 </Border>
 
-                                <!-- Footer -->
-                                <Border Grid.Row="2" Padding="6,2" Margin="1,0,1,1" CornerRadius="0,0,2,2">
+                                <!-- Footer. Hidden when zoomed out, with the body cut to one line (GitHub issue 221,
+                                     CardDetail): a large hub then reads as its shape. -->
+                                <Border Grid.Row="2" Padding="6,2" Margin="1,0,1,1" CornerRadius="0,0,2,2"
+                                        IsVisible="{Binding $parent[nodify:NodifyEditor].ViewportZoom, Converter={StaticResource CardDetailConverter}, ConverterParameter=footer}">
                                     <Border.Background>
                                         <MultiBinding Converter="{StaticResource NodeColorConverter}" ConverterParameter="footer">
                                             <Binding Path="SpeakerCategory"/>

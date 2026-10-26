@@ -195,6 +195,27 @@ public class CanvasCardRenderTests
         finally { w.Close(); }
     }
 
+    // GitHub issue 221: below 75% zoom the card is its header and one line, with no footer.
+    [AvaloniaFact]
+    public void CardRender_ZoomedOut_IsCompact()
+    {
+        var (w, card, body) = Render(string.Concat(Enumerable.Repeat("A long line of dialogue. ", 40)));
+        try
+        {
+            var editor = w.GetVisualDescendants().OfType<Nodify.NodifyEditor>().Single();
+            editor.ViewportZoom = 0.5;
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(1, body.MaxLines);
+            Assert.Equal(CardMetrics.CompactHeight, card.Bounds.Height, 1);
+
+            editor.ViewportZoom = 1.0;
+            Dispatcher.UIThread.RunJobs();
+            Assert.Equal(CardMetrics.MaxBodyLines, body.MaxLines);
+            Assert.Equal(CardMetrics.MaxHeight, card.Bounds.Height, 4);
+        }
+        finally { w.Close(); }
+    }
+
     [AvaloniaFact]
     public void CardRender_EmptyText_MatchesOneLineEstimate()
     {
