@@ -373,4 +373,32 @@ public class MainWindowViewModelDeferredReloadTests : IDisposable
         Assert.Equal("my edit", NodeText(vm));
         Assert.True(vm.IsModified);
     }
+
+    // ── Final review 2, R3: a project-only conversation the new project lacks ──
+
+    [Fact]
+    public async Task OpeningAProject_WithoutTheOpenProjectOnlyConversation_ClearsTheCanvasWithoutAnError()
+    {
+        var created = ConversationSnapshotBuilder.Build(new Conversation("fresh",
+            [PlainNode(1)], new StringTable([new StringEntry(1, "first", "")])));
+        var patch = DiffEngine.Diff("fresh", new ConversationEditSnapshot([]), created, "en");
+        var freshPath = Path.Combine(_dir, "fresh.dialogproject");
+        DialogProjectSerializer.SaveToFile(freshPath,
+            DialogProject.Empty("Fresh").WithNewConversation("fresh").WithPatch(patch));
+        DialogProjectSerializer.SaveToFile(ProjectPath, DialogProject.Empty("P"));
+        var provider = Provider();   // the game has no "fresh"
+        var vm = MakeVm(EditorMode.Editing, provider);
+        var errors = new List<Exception>();
+        vm.ReportError = errors.Add;
+        await LoadProject(vm, freshPath);
+        typeof(MainWindowViewModel).GetMethod("OnConversationSelected", Flags)!
+            .Invoke(vm, [provider.BuildNewConversationFile("fresh")]);
+        Assert.Equal("fresh", vm.CurrentConversationName);
+
+        await LoadProject(vm, ProjectPath);
+
+        Assert.Empty(errors);
+        Assert.Null(vm.CurrentConversationName);
+        Assert.Empty(vm.Canvas.Nodes);
+    }
 }

@@ -1481,10 +1481,34 @@ public partial class MainWindowViewModel : ObservableObject
         // the user chose Save and the save failed (SaveAndProceed proceeds regardless), or when
         // Create Sample Project, which has no guard, swaps a project in: those edits are wanted
         // and the reload would drop them, so they are left on the canvas.
-        if (_currentFile is not null && _provider is not null && !IsModified)
-            ReloadCurrentConversationView();
+        if (_currentFile is { } open && _provider is not null && !IsModified)
+        {
+            // A conversation the previous project created, which this one does not have, has
+            // nothing left to show: clear the canvas as closing does, instead of a load error.
+            if (ConversationExistsFor(open))
+                ReloadCurrentConversationView();
+            else
+                ClearCanvasAfterClose();
+        }
         AppLog.Info($"Opened project: {path}");
         StatusText = Loc.FormatCount("Status_ProjectOpened", loaded.Patches.Count, loaded.Name);
+    }
+
+    /// True when the open project created the conversation, or the game has it (on disk, or
+    /// known to the game data, which the cheap file check misses for some providers).
+    private bool ConversationExistsFor(ConversationFile file)
+    {
+        if (_project?.IsNewConversation(file.Name) == true || File.Exists(file.ConversationPath))
+            return true;
+        try
+        {
+            return _provider?.FindConversation(file.Name) is not null;
+        }
+        catch (Exception ex)
+        {
+            AppLog.Warn($"Could not look up conversation '{file.Name}' in the game data: {ex.Message}");
+            return false;
+        }
     }
 
     // ── New conversation ──────────────────────────────────────────────────
