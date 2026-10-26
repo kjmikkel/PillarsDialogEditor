@@ -59,6 +59,9 @@ public static class AppSettings
         // this only persists the value; FontScaleApplier applies it once at the next
         // launch, so already-open windows are unaffected until restart.
         public double FontScale                      { get; set; } = 1.0;
+        // The Patcher's own text size (GitHub issue 263), apart from the editor's FontScale:
+        // the Patcher is the Player's app and is set from its own Settings window.
+        public double PatcherFontScale               { get; set; } = 1.0;
         // Privacy mode (issue 270): mask user names / folder locations in displayed paths
         // so screenshots and screen shares don't reveal them. Display-only; default off.
         public bool PrivacyMode                      { get; set; }
@@ -289,6 +292,12 @@ public static class AppSettings
     {
         get => Load().FontScale;
         set { var s = Load(); s.FontScale = value; Save(s); }
+    }
+
+    public static double PatcherFontScale
+    {
+        get => Load().PatcherFontScale;
+        set { var s = Load(); s.PatcherFontScale = value; Save(s); }
     }
 
     public static bool PrivacyMode

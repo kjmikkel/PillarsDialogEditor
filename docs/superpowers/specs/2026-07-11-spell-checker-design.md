@@ -33,6 +33,9 @@ A word is correctly spelled if **any** layer accepts it:
    higher standard than vanilla.
 3. **Custom user dictionary.** Starts blank; grows via an "Add to dictionary" action.
    **Global**, not per-project (a modder's invented names span projects).
+   *Update 2026-10-26 (GitHub issue 9):* the global list stays, and a per-project list
+   (`ProjectWords` in the `.dialogproject`) now sits beside it, chosen from Node Details'
+   "Add to project dictionary" so a mod's invented names travel with the project.
 
 Text whose language has **no installed layer-1 dictionary is skipped entirely** — no
 half-checks. This naturally excludes ko/zh (Hunspell-style checking does not fit CJK).

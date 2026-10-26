@@ -539,6 +539,21 @@ public partial class NodeDetailViewModel : ObservableObject
     /// store the Validate Text window uses; null in unit tests, which hides the button.
     public Action<string>? AddWordToDictionary { get; set; }
 
+    private Action<string>? _addWordToProjectDictionary;
+
+    /// Adds a word to the open project's spelling list (issue 9). Null when no project is open,
+    /// which hides the button; changing it refreshes the spelling rows so the button follows.
+    public Action<string>? AddWordToProjectDictionary
+    {
+        get => _addWordToProjectDictionary;
+        set
+        {
+            if (ReferenceEquals(_addWordToProjectDictionary, value)) return;
+            _addWordToProjectDictionary = value;
+            OnPropertyChanged(nameof(SpellingIssues));
+        }
+    }
+
     private void AppendSpellingIssues(string? text, bool female, List<SpellingIssueViewModel> into)
     {
         if (SpellChecker is null || string.IsNullOrEmpty(text)) return;
@@ -552,6 +567,11 @@ public partial class NodeDetailViewModel : ObservableObject
                 addToDictionary: AddWordToDictionary is null ? null : () =>
                 {
                     AddWordToDictionary(issue.Word);
+                    RefreshSpelling();
+                },
+                addToProjectDictionary: AddWordToProjectDictionary is null ? null : () =>
+                {
+                    AddWordToProjectDictionary(issue.Word);
                     RefreshSpelling();
                 }));
         }

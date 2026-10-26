@@ -28,6 +28,19 @@
             <shared:ThemePickerView x:Name="ThemePicker"/>
         </StackPanel>
 
+        <!-- Text size (GitHub issue 263): the Patcher's own, apart from the editor's. -->
+        <StackPanel Spacing="8">
+            <TextBlock Classes="sectionHeader" Text="{DynamicResource Settings_TextSizeSection}"/>
+            <ComboBox x:Name="TextSizeCombo"
+                      ItemsSource="{Binding Options}"
+                      SelectedItem="{Binding Selected, Mode=TwoWay}"
+                      MinWidth="120"
+                      ToolTip.Tip="{DynamicResource Settings_TextSizeTooltip}"
+                      AutomationProperties.HelpText="{DynamicResource Settings_TextSizeTooltip}"
+                      AutomationProperties.AutomationId="Settings_TextSize"
+                      AutomationProperties.Name="{DynamicResource Settings_TextSize}"/>
+        </StackPanel>
+
         <!-- Language -->
         <StackPanel Spacing="8">
             <TextBlock Classes="sectionHeader" Text="{DynamicResource Settings_LanguageSection}"/>

@@ -52,6 +52,10 @@ public static class MergeBuilder
             .Distinct()
             .ToList();
 
+        // Same for the project spelling words (issue 9).
+        var words = (mine.ProjectWords ?? []).Concat(theirs.ProjectWords ?? []).Distinct().ToList();
+        if (words.Count > 0) result = result with { ProjectWords = words };
+
         return newConvs.Count > 0 ? result with { NewConversations = newConvs } : result;
     }
 

@@ -27,6 +27,7 @@ version-3 patches, and each is checked on its own.
 | `NewConversations` | no | Conversations the project creates rather than modifies. |
 | `Annotations` | no | Canvas annotations per conversation (editor metadata, never written to game files). |
 | `IgnoredDuplicates` | no | Duplicate-line allowlist (editor metadata). |
+| `ProjectWords` | no | Words the spell checker accepts in this project (editor metadata). |
 
 ## `ConversationPatch`
 

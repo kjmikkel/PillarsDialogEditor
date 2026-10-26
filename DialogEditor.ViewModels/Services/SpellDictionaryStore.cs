@@ -8,7 +8,9 @@ namespace DialogEditor.ViewModels.Services;
 ///  1. user-supplied Hunspell .aff/.dic pairs in the dictionaries folder
 ///     (filename prefix -> language code, "de_DE" -> "de"; affix-aware);
 ///  2. the generated game lexicon per language (embedded; case-tolerant set);
-///  3. the user's personal word list (persisted; case-tolerant set).
+///  3. the user's personal word list (persisted; case-tolerant set);
+///     alongside it, the open project's own word list (issue 9; saved in the
+///     .dialogproject, supplied via ProjectWords, never written to the user file).
 /// A word is correct if ANY layer accepts it. All IO failures degrade to
 /// "dictionary absent" with an AppLog warning — never a crash.
 public sealed class SpellDictionaryStore
@@ -19,6 +21,13 @@ public sealed class SpellDictionaryStore
     private readonly Dictionary<string, WordList?> _loaded = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, HashSet<string>> _lexicons = new(StringComparer.OrdinalIgnoreCase);
     private HashSet<string>? _userWords;
+    private IReadOnlyList<string>? _projectWordsSource;
+    private HashSet<string>? _projectWordsSet;
+
+    /// Source of the open project's spelling words (issue 9), read on every IsCorrect call
+    /// so startup wiring order can't leave it stale. DialogProject is immutable, so the set
+    /// is rebuilt only when the returned list's reference changes.
+    public Func<IReadOnlyList<string>?>? ProjectWords { get; set; }
 
     public SpellDictionaryStore(string dictionariesDirectory, string userDictionaryPath)
     {
@@ -51,6 +60,7 @@ public sealed class SpellDictionaryStore
     {
         if (SetContains(_lexicons.GetValueOrDefault(lang), word)) return true;
         if (SetContains(UserWords, word)) return true;
+        if (SetContains(CurrentProjectWords(), word)) return true;
         var list = WordListFor(lang);
         return list is not null && list.Check(word);
     }
@@ -154,6 +164,23 @@ public sealed class SpellDictionaryStore
             }
             return _userWords;
         }
+    }
+
+    private HashSet<string>? CurrentProjectWords()
+    {
+        var source = ProjectWords?.Invoke();
+        if (source is null)
+        {
+            _projectWordsSource = null;
+            _projectWordsSet    = null;
+            return null;
+        }
+        if (!ReferenceEquals(source, _projectWordsSource))
+        {
+            _projectWordsSource = source;
+            _projectWordsSet    = new HashSet<string>(source, StringComparer.Ordinal);
+        }
+        return _projectWordsSet;
     }
 
     private static bool SetContains(HashSet<string>? set, string word)

@@ -32,6 +32,8 @@ public partial class App : Application
             // Honour the theme the user picked in the editor (or here) on the previous run,
             // before the first window is built (overrides App.axaml's Dark default).
             new ThemeApplier().Apply(AppSettings.Theme);
+            // The Patcher's own text size (GitHub issue 263), before the first window is built.
+            new FontScaleApplier().Apply(AppSettings.PatcherFontScale);
             // Apply the persisted language before the first window is shown.
             new LanguageApplier(
                 "avares://DialogEditor.Avalonia.Shared/Resources/SharedStrings.{0}.axaml",

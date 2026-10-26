@@ -333,11 +333,29 @@ public partial class MainWindowViewModel : ObservableObject
         && _provider is not null
         && !string.IsNullOrEmpty(_currentGameDirectory);
 
+    /// The open project's spelling words (issue 9); null when none or no project is open.
+    public IReadOnlyList<string>? ProjectWords => _project?.ProjectWords;
+
+    // Metadata-only edit like the ignore-duplicate closures: no SetProject, no undo.
+    private void AddProjectWord(string word)
+    {
+        if (_project is null) return;
+        var next = _project.WithProjectWord(word);
+        if (ReferenceEquals(next, _project)) return;
+        _project = next;
+        IsModified = true;
+    }
+
     private void SetProject(DialogProject? project)
     {
         var prevNew  = _project?.NewConversations;
         var nextNew  = project?.NewConversations;
+        var hadProject = _project is not null;
         _project = project;
+        // Project spelling words (issue 9): only touch Detail when open/closed flips, so the
+        // spelling rows aren't refreshed on every patch save.
+        if (hadProject != (project is not null))
+            Detail.AddWordToProjectDictionary = project is null ? null : AddProjectWord;
         Canvas.IsEditable = project is not null;
         OnPropertyChanged(nameof(IsProjectOpen));
         SaveProjectCommand.NotifyCanExecuteChanged();

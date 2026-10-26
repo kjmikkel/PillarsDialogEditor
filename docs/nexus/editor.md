@@ -28,8 +28,9 @@ section.
   README (#70). Not chosen yet.
 - **Main file:** `PillarsDialogEditor-<ver>.zip` from the matching `v<ver>` GitHub release.
   Upload the same zip, don't rebuild it.
-- **Requirements:** none. The zip includes its own .NET runtime. Git is optional and only
-  needed for the version-control tools.
+- **Requirements:** Windows 10 or 11 (64-bit); there are no macOS or Linux builds. Nothing
+  else: the zip includes its own .NET runtime. Git is optional and only needed for the
+  version-control tools.
 - **Permissions:** match the repository's `LICENSE`.
 
 ## Description
@@ -42,6 +43,8 @@ Paste this into the description editor's BBCode view.
 A conversation editor for [i]Pillars of Eternity[/i] and [i]Pillars of Eternity II: Deadfire[/i]. Open your game folder, pick any conversation, and change what people say, which choices the player gets, and what happens when they pick one.
 
 [b]Your game stays safe.[/b] Edits are saved in a project file, never straight into the game. Before anything touches a game file, the editor backs up the original, and one click puts it back.
+
+[b]Windows only.[/b] Runs on Windows 10 and 11 (64-bit). There are no macOS or Linux versions yet.
 
 [size=4][b]Getting started[/b][/size]
 [list=1]
