@@ -183,4 +183,44 @@ public class NodeDetailViewModelValidationTests : IDisposable
     [Fact]
     public void AddToDictionary_NotWired_CannotAdd()
         => Assert.False(Assert.Single(Checked("captian glows").SpellingIssues).CanAddToDictionary);
+
+    // Issue 9: the same quick fix, into the project's own word list instead.
+    [Fact]
+    public void AddToProjectDictionary_AddsTheWord_AndTheWarningGoes()
+    {
+        var vm = Checked("Harbourmaster glows");
+        // A new list per add, as the immutable DialogProject produces.
+        IReadOnlyList<string> added = [];
+        var store = new SpellDictionaryStore(_spellDir, Path.Combine(_spellDir, "user.txt"));
+        store.ProjectWords = () => added;
+        vm.AddWordToProjectDictionary = w => added = [.. added, w];
+        vm.SpellChecker = new SpellCheckService(store);
+        vm.Load(MakeNode("Harbourmaster glows"));
+        var issue = Assert.Single(vm.SpellingIssues);
+        Assert.True(issue.CanAddToProjectDictionary);
+
+        issue.AddToProjectDictionaryCommand.Execute(null);
+
+        Assert.Equal(["Harbourmaster"], added);
+        Assert.Empty(vm.SpellingIssues);
+    }
+
+    [Fact]
+    public void AddToProjectDictionary_NoProject_CannotAdd()
+        => Assert.False(Assert.Single(Checked("captian glows").SpellingIssues).CanAddToProjectDictionary);
+
+    [Fact]
+    public void AddWordToProjectDictionary_SetLater_RefreshesTheIssues()
+    {
+        // Opening a project while a node is selected must show the button without
+        // re-selecting the node.
+        var vm = Checked("captian glows");
+        var raised = new List<string?>();
+        vm.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        vm.AddWordToProjectDictionary = _ => { };
+
+        Assert.Contains(nameof(NodeDetailViewModel.SpellingIssues), raised);
+        Assert.True(Assert.Single(vm.SpellingIssues).CanAddToProjectDictionary);
+    }
 }
