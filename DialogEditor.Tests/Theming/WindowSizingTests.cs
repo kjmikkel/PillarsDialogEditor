@@ -95,7 +95,19 @@ public class WindowSizingTests
     public void EditorMainWindow_IsClampOnly() =>
         Assert.Equal(WindowSizingMode.ClampOnly, WindowSizing.GetMode(new DialogEditor.Avalonia.Views.MainWindow()));
 
+    // Issue 318: unlike the editor's (maximized, with panes that resize), the Patcher's main
+    // window is a fixed 640×580 form, so as ClampOnly its text outgrew it at 200% and was cut
+    // off mid-word. It scales like a dialog; the screen clamp still keeps it on screen, and
+    // its mod list scrolls if that leaves it short.
     [AvaloniaFact]
-    public void PatchManagerMainWindow_IsClampOnly() =>
-        Assert.Equal(WindowSizingMode.ClampOnly, WindowSizing.GetMode(new DialogEditor.PatchManager.MainWindow()));
+    public void PatchManagerMainWindow_GrowsWithTheTextSize() => Run(null, () =>
+    {
+        var w = new DialogEditor.PatchManager.MainWindow();
+        Assert.Equal(WindowSizingMode.Scale, WindowSizing.GetMode(w));
+        w.Show();
+        new FontScaleApplier().Apply(2.0);
+        Assert.Equal(1280, w.Width);
+        Assert.Equal(1000, w.MinWidth);
+        w.Close();
+    });
 }
