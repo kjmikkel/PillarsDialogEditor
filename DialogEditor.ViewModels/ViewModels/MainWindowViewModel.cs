@@ -330,11 +330,11 @@ public partial class MainWindowViewModel : ObservableObject
         && _provider is not null
         && !string.IsNullOrEmpty(_currentGameDirectory);
 
-    /// Same requirements as Find in Project: an open project, a loaded provider, and a game
-    /// folder (the "on disk" scope enumerates every conversation). Read-only; never writes.
+    /// A loaded provider and a game folder (the "on disk" scope enumerates every conversation).
+    /// No project needed: a Reader browsing a game folder can use it (issue 234). Read-only;
+    /// never writes, so it stays available in both modes.
     public bool CanShowRepDispositionBalance =>
-        _project is not null
-        && _provider is not null
+        _provider is not null
         && !string.IsNullOrEmpty(_currentGameDirectory);
 
     /// The open project's spelling words (issue 9); null when none or no project is open.
@@ -3102,21 +3102,21 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanShowRepDispositionBalance))]
     private async Task ShowRepDispositionBalanceWindow()
     {
-        if (_project is null || _provider is null) return;
+        if (_provider is null) return;
         var vm = new RepDispositionBalanceViewModel(
-            _project, _provider,
+            _project ?? DialogProject.Empty(string.Empty), _provider,
             () => Canvas.Nodes.Count > 0
                 ? (Canvas.ConversationName, (ConversationEditSnapshot?)Canvas.BuildSnapshot())
-                : (null, (ConversationEditSnapshot?)null));
+                : (null, (ConversationEditSnapshot?)null),
+            hasProject: _project is not null);
         if (ShowRepDispositionBalance is not null)
             await ShowRepDispositionBalance(vm);
     }
 
-    /// Same requirements as Find in Project: an open project, a loaded provider, and a
-    /// game folder (the browser scans every vanilla conversation on disk).
+    /// A loaded provider and a game folder (the browser scans every vanilla conversation on
+    /// disk). No project needed: Readers use it too (issue 234).
     public bool CanBrowseSpeakerLines =>
-        _project is not null
-        && _provider is not null
+        _provider is not null
         && !string.IsNullOrEmpty(_currentGameDirectory);
 
     /// The View constructs and shows the browser window (and kicks off ScanAsync).
@@ -3135,7 +3135,7 @@ public partial class MainWindowViewModel : ObservableObject
     /// save still opens, cancelling does not. Reuses NavigateToFoundNode for jump-to-node.
     public async Task OpenSpeakerLineBrowserAsync(string? initialSpeakerGuid = null)
     {
-        if (_project is null || _provider is null) return;
+        if (_provider is null) return;
 
         if (IsModified)
         {
@@ -3147,7 +3147,7 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         var vm = new SpeakerLineBrowserViewModel(
-            _project, _provider, _provider.Language,
+            _project ?? DialogProject.Empty(string.Empty), _provider, _provider.Language,
             () => Canvas.Nodes.Count > 0
                 ? (Canvas.ConversationName, Canvas.BuildSnapshot())
                 : (null, (ConversationEditSnapshot?)null),

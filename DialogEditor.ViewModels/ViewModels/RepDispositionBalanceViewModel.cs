@@ -75,12 +75,21 @@ public partial class RepDispositionBalanceViewModel : ObservableObject
 
     public RepDispositionBalanceViewModel(
         DialogProject project, IGameDataProvider provider,
-        Func<(string? Name, ConversationEditSnapshot? Snapshot)> getOpenConversation)
+        Func<(string? Name, ConversationEditSnapshot? Snapshot)> getOpenConversation,
+        bool hasProject = true)
     {
-        _project  = project;
-        _provider = provider;
-        _getOpen  = getOpenConversation;
+        _project   = project;
+        _provider  = provider;
+        _getOpen   = getOpenConversation;
+        HasProject = hasProject;
+        // Without a project there is nothing to compare "changes" against; with the empty
+        // stand-in project, OnDiskPlusChanges is simply the game on disk (issue 234).
+        if (!hasProject) _source = BalanceSource.OnDiskPlusChanges;
     }
+
+    /// False for a Reader with only a game folder open: the window hides the source picker,
+    /// since every source other than the game on disk would be empty.
+    public bool HasProject { get; }
 
     [RelayCommand]
     private async Task Refresh()
