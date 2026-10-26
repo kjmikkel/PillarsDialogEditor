@@ -403,7 +403,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     /// Switches mode, saving it for the next launch. Entering Reading goes through the unsaved-edits
     /// guard (Reading is read-only, so dirty edits must be saved or discarded first); returns false
-    /// when the user picks Stay Here. The open conversation and selection are left untouched.
+    /// when the user picks Stay Here or a discard cannot be reverted. The open conversation and selected node are kept.
     public async Task<bool> SwitchModeAsync(EditorMode target)
     {
         if (target == Mode) return true;
@@ -411,21 +411,44 @@ public partial class MainWindowViewModel : ObservableObject
         {
             if (!await EnsureNoUnsavedEditsAsync())
                 return false;
-            // Still dirty after the guard agreed means Discard (Save clears IsModified). The
-            // canvas must not keep showing edits that were just thrown away, so re-read the
-            // project from disk; an unsaved new project has nothing to re-read.
-            if (IsModified)
-            {
-                if (_projectPath is not null && File.Exists(_projectPath))
-                    await LoadProjectAsync(_projectPath, offerDeferred: false);
-                IsModified = false;
-            }
+            // Still dirty after the guard agreed means Discard (Save clears IsModified): put the
+            // canvas back to the saved state, or stay in Editing rather than show lost edits.
+            if (IsModified && !RevertOpenConversationToSaved())
+                return false;
         }
 
         Mode = target;
         AppSettings.Mode = target;
         if (target == EditorMode.Editing)
             await OnEnteredEditingModeAsync();
+        return true;
+    }
+
+    /// Re-opens the current conversation from the game data plus the project's saved patch (the
+    /// path a switch to another conversation takes after Discard) and reselects the same node.
+    /// False when there is nothing to re-read or the load did not complete.
+    private bool RevertOpenConversationToSaved()
+    {
+        if (_currentFile is not { } file || _provider is null)
+        {
+            AppLog.Warn("Reading mode: discard could not be reverted, no conversation is open");
+            return false;
+        }
+
+        var selectedId = Canvas.SelectedNode?.NodeId;
+        if (_project?.IsNewConversation(file.Name) == true && !File.Exists(file.ConversationPath))
+            LoadNewConversation(file);
+        else
+            LoadConversationFile(file);
+
+        // LoadConversationFile logs and reports its own failures but does not throw; a
+        // completed load leaves the conversation named and clean.
+        if (IsModified || CurrentConversationName != file.Name)
+        {
+            AppLog.Warn($"Reading mode: reverting '{file.Name}' to its saved state did not complete");
+            return false;
+        }
+        if (selectedId is int id) SelectNodeById(id);
         return true;
     }
 

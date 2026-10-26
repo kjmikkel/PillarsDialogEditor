@@ -1,3 +1,5 @@
+using DialogEditor.Core.Editing;
+using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
 using DialogEditor.Tests.Helpers;
@@ -104,11 +106,40 @@ public class MainWindowViewModelReadingModeTests : IDisposable
         Assert.Equal(EditorMode.Editing, vm.Mode);
     }
 
-    [Fact]
-    public async Task Switch_ToReading_AfterDiscard_KeepsTheProjectOpen()
+    private static ConversationNode PlainNode(int id, params int[] to) =>
+        new(id, false, SpeakerCategory.Npc, "spk", "lst", [.. to.Select(t => new NodeLink(id, t, []))],
+            [], [], "Conversation", "None");
+
+    /// A saved project with one new conversation "fresh" (node 1 -> node 2) open on the canvas.
+    private async Task<MainWindowViewModel> OpenFreshConversation()
     {
-        var vm = await OpenVm();
-        vm.IsModified = true;
+        var provider = new FakeGameDataProvider("poe2", "en");
+        var created = ConversationSnapshotBuilder.Build(new Conversation("fresh",
+            [PlainNode(1, 2), PlainNode(2)],
+            new StringTable([new StringEntry(1, "first", ""), new StringEntry(2, "second", "")])));
+        var patch = DiffEngine.Diff("fresh", new ConversationEditSnapshot([]), created, "en");
+        var path = Path.Combine(_tempDir, "fresh.dialogproject");
+        DialogProjectSerializer.SaveToFile(path,
+            DialogProject.Empty("Fresh").WithNewConversation("fresh").WithPatch(patch));
+
+        var vm = MakeVm();
+        typeof(MainWindowViewModel)
+            .GetField("_provider", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+            .SetValue(vm, provider);
+        await InvokeLoadProjectAsync(vm, path);
+        typeof(MainWindowViewModel)
+            .GetMethod("OnConversationSelected", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
+            .Invoke(vm, [provider.BuildNewConversationFile("fresh")]);
+        return vm;
+    }
+
+    [Fact]
+    public async Task Switch_ToReading_AfterDiscard_DropsTheEditButKeepsConversationAndSelection()
+    {
+        var vm = await OpenFreshConversation();
+        vm.Canvas.SelectedNode = vm.Canvas.Nodes.Single(n => n.NodeId == 2);
+        vm.Canvas.AddNode(MakeNode(3), new LayoutPoint(0, 0));   // a real, unsaved edit
+        Assert.True(vm.IsModified);
         vm.UnsavedChangesRequested += vm.DiscardAndProceed;
 
         Assert.True(await vm.SwitchModeAsync(EditorMode.Reading));
@@ -116,6 +147,22 @@ public class MainWindowViewModelReadingModeTests : IDisposable
         Assert.True(vm.IsReadingMode);
         Assert.True(vm.IsProjectOpen);
         Assert.False(vm.IsModified);
+        Assert.Equal("fresh", vm.CurrentConversationName);
+        Assert.DoesNotContain(vm.Canvas.Nodes, n => n.NodeId == 3);
+        Assert.Equal(2, vm.Canvas.SelectedNode?.NodeId);
+    }
+
+    [Fact]
+    public async Task Switch_ToReading_WhenDiscardCannotBeReverted_StaysInEditing()
+    {
+        // Dirty project with no conversation open: there is nothing to re-read, so the
+        // discard cannot be honoured and the switch must not happen.
+        var vm = await OpenVm();
+        vm.IsModified = true;
+        vm.UnsavedChangesRequested += vm.DiscardAndProceed;
+
+        Assert.False(await vm.SwitchModeAsync(EditorMode.Reading));
+        Assert.Equal(EditorMode.Editing, vm.Mode);
     }
 
     [Fact]
