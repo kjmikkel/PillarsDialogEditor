@@ -899,8 +899,8 @@ public partial class MainWindow : Window
         _startupDone = true;
         var vm = (MainWindowViewModel)DataContext!;
         vm.ReopenLastProjectOnStartup();
-        if (!AppSettings.GuidedTourSeen)
-            vm.Tour.Start();
+        if (!GuidedTourViewModel.HasSeen(vm.Mode))
+            vm.Tour.Start(vm.Mode);
     }
 
     // ── App-close guard ───────────────────────────────────────────────────

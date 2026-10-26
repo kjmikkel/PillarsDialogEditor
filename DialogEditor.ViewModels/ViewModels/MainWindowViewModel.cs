@@ -424,6 +424,10 @@ public partial class MainWindowViewModel : ObservableObject
 
         Mode = target;
         AppSettings.Mode = target;
+        // A running tour describes the mode just left; drop it, then offer the new mode's own
+        // tour if this is the first time it is shown.
+        if (Tour.IsVisible) Tour.DismissCommand.Execute(null);
+        if (!GuidedTourViewModel.HasSeen(target)) Tour.Start(target);
         if (target == EditorMode.Editing)
             await OnEnteredEditingModeAsync();
         return true;
@@ -2292,7 +2296,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     // ── Guided tour (Help menu) ───────────────────────────────────────────
     [RelayCommand]
-    private void StartGuidedTour() => Tour.Start();
+    private void StartGuidedTour() => Tour.Start(Mode);
 
     // ── Changelog (Help menu) ─────────────────────────────────────────────
     private const string ChangelogFileName = "CHANGELOG.md";

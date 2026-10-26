@@ -1882,6 +1882,10 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="Tour_Step2_Text">The canvas shows the node graph for the open conversation. Click a node to select it; double-click empty space to add a new one.</sys:String>
     <sys:String x:Key="Tour_Step3_Text">The detail panel shows the selected node's text, speaker, and conditions. Edit here to change what characters say.</sys:String>
     <sys:String x:Key="Tour_Step4_Text">The ? button shows a hint for whatever you focus. Help ▸ Open Walkthrough has the full beginner guide.</sys:String>
+    <sys:String x:Key="Tour_Reader_Step1_Text">Conversations: find a conversation by name or area and open it.</sys:String>
+    <sys:String x:Key="Tour_Reader_Step2_Text">Canvas: each box is a line. Follow the arrows, or use the arrow keys, to walk a branch.</sys:String>
+    <sys:String x:Key="Tour_Reader_Step3_Text">Node Details: the full line, who says it, and where it can lead next.</sys:String>
+    <sys:String x:Key="Tour_Reader_Step4_Text">The mode badge: this shows whether you are reading or editing. Click it, or use View › Reading mode, when you want to change something.</sys:String>
 
     <!-- ── Diff window first-run intro banner ───────────────────────────── -->
     <sys:String x:Key="DiffIntro_Text">This window shows what's different between two versions of your dialogue. Use the list on the left to see changed conversations — tick what you want to keep, then press Bring in. Nothing in your file changes until you press that button.</sys:String>
