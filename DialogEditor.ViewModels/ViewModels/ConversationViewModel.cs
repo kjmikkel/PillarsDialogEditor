@@ -204,6 +204,8 @@ public partial class ConversationViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(DeleteConnectionCmdCommand))]
     [NotifyCanExecuteChangedFor(nameof(ChooseStartNodeCommand))]
     [NotifyCanExecuteChangedFor(nameof(MakeStartNodeCmdCommand))]
+    [NotifyCanExecuteChangedFor(nameof(UndoCommand))]
+    [NotifyCanExecuteChangedFor(nameof(RedoCommand))]
     [NotifyPropertyChangedFor(nameof(CanMakeStartNode))]
     private bool _isEditable;
 
@@ -219,7 +221,11 @@ public partial class ConversationViewModel : ObservableObject
     public string? UndoDescription => _undoStack.UndoDescription;
     public string? RedoDescription => _undoStack.RedoDescription;
 
-    [RelayCommand(CanExecute = nameof(CanUndo))]
+    // Also gated on IsEditable (issue 234): a read-only canvas must not change through Ctrl+Z / Ctrl+Y.
+    private bool CanRunUndo() => CanUndo && IsEditable;
+    private bool CanRunRedo() => CanRedo && IsEditable;
+
+    [RelayCommand(CanExecute = nameof(CanRunUndo))]
     public void Undo()
     {
         _undoStack.Undo();
@@ -227,7 +233,7 @@ public partial class ConversationViewModel : ObservableObject
         IsModified = _undoStack.CanUndo || Connections.Count > 0 || Nodes.Count > 0;
     }
 
-    [RelayCommand(CanExecute = nameof(CanRedo))]
+    [RelayCommand(CanExecute = nameof(CanRunRedo))]
     public void Redo()
     {
         _undoStack.Redo();

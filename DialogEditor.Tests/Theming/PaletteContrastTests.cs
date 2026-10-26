@@ -32,7 +32,7 @@ public class PaletteContrastTests
         new("Text.OnAccent / ModeBadge.Editing.Pressed", "Palette.White", "Palette.Burnt.800", true),
         // Keyboard focus ring (two-tone, issue 234): the inner white ring sits on the badge fill
         // (covered by the OnAccent pairs above); the outer Text.Primary ring sits on the toolbar.
-        new("ModeBadge.FocusRing.Outer / Control.Background", "Palette.Neutral.910", "Palette.Control.Background", false),
+        new("ModeBadge.FocusRing.Outer / Surface.Panel", "Palette.Neutral.910", "Palette.Neutral.145", false),
         new("Text.OnAccent / Button.Primary",     "Palette.White", "Palette.Azure.600",   true),
         new("Text.OnAccent / Button.Destructive", "Palette.White", "Palette.Crimson.700", true),
         new("Selection.Foreground / Selection.Background", "Palette.White", "Palette.Azure.600", true), // #83

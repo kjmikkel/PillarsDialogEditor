@@ -164,18 +164,22 @@ public static class AppSettings
         set { var s = Load(); s.DetailExpanded = value; Save(s); }
     }
 
+    // Nothing seen yet: a missing or unreadable settings file is treated as a first run.
+    private static SettingsData FreshInstall() =>
+        new() { ThemeOnboardingSeen = false, GuidedTourSeen = false, ReaderTourSeen = false, DiffWindowSeen = false };
+
     private static SettingsData Load()
     {
         try
         {
-            if (!File.Exists(SettingsPath)) return new() { ThemeOnboardingSeen = false, GuidedTourSeen = false, ReaderTourSeen = false, DiffWindowSeen = false };
+            if (!File.Exists(SettingsPath)) return FreshInstall();
             var json = File.ReadAllText(SettingsPath);
             return JsonSerializer.Deserialize<SettingsData>(json) ?? new();
         }
         catch (Exception ex)
         {
             AppLog.Warn($"Failed to load settings from {SettingsPath}: {ex.Message}");
-            return new() { ThemeOnboardingSeen = false, GuidedTourSeen = false, ReaderTourSeen = false, DiffWindowSeen = false };
+            return FreshInstall();
         }
     }
 

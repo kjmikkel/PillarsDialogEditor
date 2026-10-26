@@ -1700,9 +1700,10 @@ public partial class MainWindowViewModel : ObservableObject
     public void AutosaveTick()
     {
         if (_project is null || _projectPath is null || !IsModified) return;
+        DialogProject? folded = null;   // kept for the fallback write, so the canvas is not folded twice
         try
         {
-            var folded = BuildFoldedProject(consumeRemaps: false) ?? _project;
+            folded = BuildFoldedProject(consumeRemaps: false) ?? _project;
             WriteAutosave(folded, fallback: false);
             _autosaveFallbackAnnouncedFor = null;   // the project's folder works (again)
         }
@@ -1715,7 +1716,7 @@ public partial class MainWindowViewModel : ObservableObject
             AppLog.Warn($"Autosave next to the project failed ({ex.Message}); using the fallback folder");
             try
             {
-                WriteAutosave(BuildFoldedProject(consumeRemaps: false) ?? _project, fallback: true);
+                WriteAutosave(folded ?? BuildFoldedProject(consumeRemaps: false) ?? _project, fallback: true);
                 if (_autosaveFallbackAnnouncedFor != _projectPath)
                 {
                     _autosaveFallbackAnnouncedFor = _projectPath;
@@ -3085,12 +3086,10 @@ public partial class MainWindowViewModel : ObservableObject
                 StatusText = Loc.Format("Status_StringTableUnreadable", file.Name, PathDisplay.ForDisplay(conversation.Strings.UnreadablePath));
             else if (_project is null && !IsReadingMode)
                 StatusText = Loc.Get("Status_NoProjectReadOnly");
-            else if (_project is null)
-                // Reading mode hides File > New Project, so the editing hint would point at nothing
-                // (issue 234); report the load like a project would.
-                StatusText = Loc.Format("Status_ConversationLoaded", file.Name, Canvas.Nodes.Count);
             else
-                // The canvas, with the project's added nodes, not the game file alone (GitHub issue 256).
+                // With a project: the canvas, with its added nodes, not the game file alone (GitHub
+                // issue 256). With none in Reading mode: File > New Project is hidden there, so the
+                // editing hint would point at nothing (issue 234); report the load like a project would.
                 StatusText = Loc.Format("Status_ConversationLoaded", file.Name, Canvas.Nodes.Count);
 
             // A Find-in-Project navigation may have requested a node in this conversation

@@ -142,9 +142,9 @@ public partial class ConversationView : UserControl
     {
         if (DataContext is not ConversationViewModel vm) return;
         // Reading mode (issue 234): same allow-list as the main window, so nudge and connect keys do
-        // nothing even though the key reaches the canvas first.
-        if (this.FindAncestorOfType<MainWindow>()?.DataContext is MainWindowViewModel { IsReadingMode: true }
-            && !ReadingModeShortcuts.IsAllowed(e.Key, e.KeyModifiers)) return;
+        // nothing even though the key reaches the canvas first. Read from the canvas's own VM: a
+        // floated canvas has no MainWindow ancestor.
+        if (vm.IsReadingMode && !ReadingModeShortcuts.IsAllowed(e.Key, e.KeyModifiers)) return;
 
         var ctrl  = e.KeyModifiers.HasFlag(KeyModifiers.Control);
         var none  = e.KeyModifiers == KeyModifiers.None;

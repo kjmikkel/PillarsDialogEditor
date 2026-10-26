@@ -678,6 +678,7 @@ public partial class MainWindow : Window
             CommitFocusedTextEdit();
             await vm.ToggleReadingModeCommand.ExecuteAsync(null);
         }
+        catch (OperationCanceledException) { /* deliberate cancellation */ }
         catch (Exception ex)
         {
             AppLog.Error("Switching reading mode failed", ex);

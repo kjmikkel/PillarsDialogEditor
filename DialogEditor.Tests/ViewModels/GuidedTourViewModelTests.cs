@@ -26,7 +26,7 @@ public sealed class GuidedTourViewModelTests
         var vm = TwoStep();
         vm.Start(EditorMode.Editing);
         vm.NextCommand.Execute(null);
-        vm.Start(EditorMode.Editing);                     // restart
+        vm.Start(EditorMode.Editing);  // restart
         Assert.Equal(0, vm.CurrentIndex);
     }
 

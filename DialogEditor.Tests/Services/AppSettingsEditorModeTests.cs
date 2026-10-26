@@ -40,4 +40,26 @@ public class AppSettingsEditorModeTests : IDisposable
         File.WriteAllText(_settingsPath, "{}");
         Assert.True(AppSettings.ReaderTourSeen);
     }
+
+    [Fact]
+    public void ExistingSettingsFile_WithoutMode_LoadsNull_SoTheChooserShowsForEveryone()
+    {
+        File.WriteAllText(_settingsPath, "{}");
+        Assert.Null(AppSettings.Mode);
+    }
+
+    [Fact]
+    public void Mode_Editing_RoundTrips()
+    {
+        AppSettings.Mode = EditorMode.Editing;
+        Assert.Equal(EditorMode.Editing, AppSettings.Mode);
+        Assert.Contains("\"Editing\"", File.ReadAllText(_settingsPath));
+    }
+
+    [Fact]
+    public void CorruptSettingsFile_HasNotSeenTheReaderTour()
+    {
+        File.WriteAllText(_settingsPath, "{ this is not json");
+        Assert.False(AppSettings.ReaderTourSeen);
+    }
 }
