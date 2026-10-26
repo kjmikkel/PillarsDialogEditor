@@ -13,6 +13,7 @@ using DialogEditor.Core.Models;
 using DialogEditor.ViewModels;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.Theming;
 
@@ -27,11 +28,26 @@ namespace DialogEditor.Tests.Theming;
 /// Needs the Skia-backed test host (HeadlessTextMeasurementTests).
 /// Main windows are excluded: their panes are covered by issues 82 and 85.
 /// </summary>
-public class NoClippedTextTests
+public class NoClippedTextTests : IDisposable
 {
     // The real strings: the stub provider returns resource keys, which are longer than any real
     // text and would make text set from code (table cells, issue 178) look clipped when it is not.
-    public NoClippedTextTests() => Loc.Configure(new AvaloniaStringProvider());
+    public NoClippedTextTests()
+    {
+        Loc.Configure(new AvaloniaStringProvider());
+        AppSettings.SettingsPathOverride = _settingsPath;
+    }
+
+    // Closing a ModeChooserWindow without a choice saves Reading mode (issue 234). These tests open
+    // every window type, so without a private settings file that leaked Reading into the run-wide
+    // fallback file and later tests started in Reading mode.
+    private readonly string _settingsPath = Path.Combine(Path.GetTempPath(), $"nctt_{Guid.NewGuid():N}.json");
+
+    public void Dispose()
+    {
+        AppSettings.SettingsPathOverride = null;
+        try { if (File.Exists(_settingsPath)) File.Delete(_settingsPath); } catch (Exception) { /* best-effort */ }
+    }
 
     private static readonly Assembly[] Apps =
     [

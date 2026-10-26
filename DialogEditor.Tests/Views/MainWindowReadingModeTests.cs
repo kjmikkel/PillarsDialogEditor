@@ -61,6 +61,17 @@ public class MainWindowReadingModeTests : IDisposable
         return window.GetLogicalDescendants().OfType<MenuItem>().First(m => Equals(m.Header, header));
     }
 
+    // A keyboard activation through the real menu: open the View submenu, focus the item and
+    // press Enter. Unlike RaiseEvent(ClickEvent) this toggles a checkable item before the Click
+    // event fires, which is what a real click does.
+    private static void RealClick(MainWindow window, MenuItem item)
+    {
+        ((MenuItem)item.Parent!).IsSubMenuOpen = true;
+        Dispatcher.UIThread.RunJobs();
+        Assert.True(item.Focus());
+        window.KeyPress(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, null);
+    }
+
     private static ConversationNode PlainNode() =>
         new(1, false, SpeakerCategory.Npc, "", "", [], [], [], "Conversation", "None");
 
@@ -151,6 +162,39 @@ public class MainWindowReadingModeTests : IDisposable
 
             Assert.True(vm.IsEditingMode);
             Assert.False(item.IsChecked);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public void ReadingModeMenuItem_StaysInStep_WhenTheSwitchIsCancelled()
+    {
+        var window = new MainWindow();
+        var vm = (MainWindowViewModel)window.DataContext!;
+        window.Show();
+        try
+        {
+            var item = FindItem(window, "Menu_View_ReadingMode");
+            Assert.False(item.IsChecked);
+            vm.Canvas.Load(new Conversation("c", [PlainNode()], new StringTable([new StringEntry(1, "hi", "")])));
+            vm.CurrentConversationName = "c";
+            vm.IsModified = true;
+            // Replace the window's modal dialog handler with a Cancel answer.
+            typeof(MainWindowViewModel).GetField(nameof(MainWindowViewModel.UnsavedChangesRequested),
+                    BindingFlags.NonPublic | BindingFlags.Instance)!.SetValue(vm, null);
+            vm.UnsavedChangesRequested += vm.CancelPendingNavigation;
+
+            RealClick(window, item);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(vm.IsEditingMode);
+            Assert.Equal(vm.IsReadingMode, item.IsChecked);
+
+            // The binding must survive: a later successful switch checks the item.
+            vm.IsModified = false;
+            RealClick(window, item);
+            Dispatcher.UIThread.RunJobs();
+            Assert.True(vm.IsReadingMode, $"mode={vm.Mode} status={vm.StatusText} mod={vm.IsModified} checked={item.IsChecked}");
+            Assert.True(item.IsChecked);
         }
         finally { window.Close(); }
     }

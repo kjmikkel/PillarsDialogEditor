@@ -651,10 +651,27 @@ public partial class MainWindow : Window
             focus.ClearFocus();
     }
 
-    private void ReadingMode_Click(object? sender, RoutedEventArgs e)
+    // async void: it is an event handler. The click already flipped the item's check mark, but the
+    // switch can be refused (Stay Here on the unsaved-changes prompt), and then no property change
+    // reaches the one-way binding. So once the switch has finished, put the mark back in step with
+    // the mode. SetCurrentValue keeps the binding, so later mode changes still update the item.
+    private async void ReadingMode_Click(object? sender, RoutedEventArgs e)
     {
-        CommitFocusedTextEdit();
-        ((MainWindowViewModel)DataContext!).ToggleReadingModeCommand.Execute(null);
+        var vm = (MainWindowViewModel)DataContext!;
+        try
+        {
+            CommitFocusedTextEdit();
+            await vm.ToggleReadingModeCommand.ExecuteAsync(null);
+        }
+        catch (Exception ex)
+        {
+            AppLog.Error("Switching reading mode failed", ex);
+        }
+        finally
+        {
+            if (sender is MenuItem item)
+                item.SetCurrentValue(MenuItem.IsCheckedProperty, vm.IsReadingMode);
+        }
     }
 
     /// Delete removes the selected node only when the key comes from the canvas, never from a

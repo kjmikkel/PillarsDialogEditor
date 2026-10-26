@@ -472,8 +472,7 @@
                            Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
                 <!-- Hidden in reading mode (issue 234): there is nothing to resolve while nothing can be edited. -->
                 <Panel Grid.Column="1" IsVisible="{Binding IsEditingMode}">
-                    <Button
-                            Content="{DynamicResource MainWindow_ResolveConflictsButton}"
+                    <Button Content="{DynamicResource MainWindow_ResolveConflictsButton}"
                             Command="{Binding ResolveConflictsCommand}"
                             IsVisible="{Binding HasPendingConflictResolution}"
                             ToolTip.Tip="{DynamicResource MainWindow_ResolveConflictsTooltip}"

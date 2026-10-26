@@ -4,6 +4,7 @@ using Avalonia.Headless.XUnit;
 using DialogEditor.Avalonia.Shared.Theming;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.Theming;
 
@@ -12,9 +13,24 @@ namespace DialogEditor.Tests.Theming;
 /// bypassed it would stay at its XAML pixel size while its text follows the font scale. Opens
 /// each window type with a parameterless constructor at 2.0×.
 /// </summary>
-public class EveryWindowIsSizedTests
+public class EveryWindowIsSizedTests : IDisposable
 {
-    public EveryWindowIsSizedTests() => Loc.Configure(new StubStringProvider());
+    public EveryWindowIsSizedTests()
+    {
+        Loc.Configure(new StubStringProvider());
+        AppSettings.SettingsPathOverride = _settingsPath;
+    }
+
+    // Closing a ModeChooserWindow without a choice saves Reading mode (issue 234). These tests open
+    // every window type, so without a private settings file that leaked Reading into the run-wide
+    // fallback file and later tests started in Reading mode.
+    private readonly string _settingsPath = Path.Combine(Path.GetTempPath(), $"ewis_{Guid.NewGuid():N}.json");
+
+    public void Dispose()
+    {
+        AppSettings.SettingsPathOverride = null;
+        try { if (File.Exists(_settingsPath)) File.Delete(_settingsPath); } catch (Exception) { /* best-effort */ }
+    }
 
     private static readonly Assembly[] Apps =
     [

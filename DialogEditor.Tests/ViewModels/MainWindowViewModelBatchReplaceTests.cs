@@ -5,14 +5,29 @@ using DialogEditor.Patch;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
+using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.ViewModels;
 
 /// Batch Replace edits the open project, not the game folder (#124), so the main window
 /// gates it on a project and takes the edited project back as unsaved changes.
-public class MainWindowViewModelBatchReplaceTests
+public class MainWindowViewModelBatchReplaceTests : IDisposable
 {
-    public MainWindowViewModelBatchReplaceTests() => Loc.Configure(new StubStringProvider());
+    // Pinned to Editing in a private settings file: the gates under test include IsEditingMode, so
+    // they must not depend on whatever mode an earlier test left in the shared fallback file.
+    public MainWindowViewModelBatchReplaceTests()
+    {
+        Loc.Configure(new StubStringProvider());
+        AppSettings.SettingsPathOverride = _settingsPath;
+        AppSettings.Mode = EditorMode.Editing;
+    }
+    private readonly string _settingsPath = Path.Combine(Path.GetTempPath(), $"mwvmbr_{Guid.NewGuid():N}.json");
+
+    public void Dispose()
+    {
+        AppSettings.SettingsPathOverride = null;
+        try { if (File.Exists(_settingsPath)) File.Delete(_settingsPath); } catch (Exception) { /* best-effort */ }
+    }
 
     private static MainWindowViewModel MakeVm() =>
         new(new StubDispatcher(), new StubFolderPicker(), new StubFilePicker());
