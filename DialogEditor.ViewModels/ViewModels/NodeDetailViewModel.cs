@@ -53,12 +53,43 @@ public partial class NodeDetailViewModel : ObservableObject
     /// The provider's text language ("en" etc.) — the language Default/Female text
     /// is written in. Set by MainWindowViewModel alongside ActiveGameId; drives
     /// which spelling dictionary checks this node's text.
-    public string ActiveLanguage { get; set; } = string.Empty;
+    public string ActiveLanguage
+    {
+        get => _activeLanguage;
+        set { _activeLanguage = value; OnPropertyChanged(nameof(SpellSpanFinder)); }
+    }
+    private string _activeLanguage = string.Empty;
 
     /// Spell checker over the three-layer dictionary store. Wired at app startup
     /// (MainWindow) from SpellDictionaryStore.Default; null in unit tests, which
     /// silently disables spelling warnings.
-    public SpellCheckService? SpellChecker { get; set; }
+    public SpellCheckService? SpellChecker
+    {
+        get => _spellChecker;
+        set { _spellChecker = value; OnPropertyChanged(nameof(SpellSpanFinder)); }
+    }
+    private SpellCheckService? _spellChecker;
+
+    /// Finds the misspelt spans in a given text, for the inline squiggles in the Default/Female
+    /// text boxes (issue 9). Null without a checker. A NEW delegate each time the dictionary or
+    /// language changes, so the binding tells the view to re-check. The squiggles are visual
+    /// only; SpellingIssues stays the accessible channel.
+    public Func<string, IReadOnlyList<SpellSpan>>? SpellSpanFinder
+    {
+        get
+        {
+            var checker = SpellChecker;
+            if (checker is null) return null;
+            var lang = ActiveLanguage;
+            return text => checker.FindMisspellings(text ?? "", lang);
+        }
+    }
+
+    private void RefreshSpelling()
+    {
+        OnPropertyChanged(nameof(SpellingIssues));
+        OnPropertyChanged(nameof(SpellSpanFinder));
+    }
 
     /// Set by MainWindowViewModel when a game folder is opened.
     public string GameRoot { get; set; } = string.Empty;
@@ -536,12 +567,12 @@ public partial class NodeDetailViewModel : ObservableObject
                 addToDictionary: AddWordToDictionary is null ? null : () =>
                 {
                     AddWordToDictionary(issue.Word);
-                    OnPropertyChanged(nameof(SpellingIssues));
+                    RefreshSpelling();
                 },
                 addToProjectDictionary: AddWordToProjectDictionary is null ? null : () =>
                 {
                     AddWordToProjectDictionary(issue.Word);
-                    OnPropertyChanged(nameof(SpellingIssues));
+                    RefreshSpelling();
                 }));
         }
     }
@@ -972,7 +1003,7 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(IsListenerGuidBoxVisible));
         OnPropertyChanged(nameof(BarkWarnings));
         OnPropertyChanged(nameof(TokenWarnings));
-        OnPropertyChanged(nameof(SpellingIssues));
+        RefreshSpelling();
         OnPropertyChanged(nameof(ScriptWarnings));
 
         _voCheck = _node is null ? null

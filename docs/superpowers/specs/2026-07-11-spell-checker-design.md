@@ -63,6 +63,11 @@ text**, never a global setting.
   scan with an issue-type label per row. Strings-only rename — C# class names
   (`TextTagValidation*`) stay. (Rejected: a separate Spell Check window — duplicate
   sweep UX; sweep-only — typos invisible until a scan.)
+  - *Update 2026-10-26 (GitHub issue 9):* inline red wavy squiggles now underline
+    misspellings in Node Details' Default and Female text boxes, live while typing
+    (`SpellSquiggles` behaviour, drawn on an adorner). The warning list remains the place
+    for suggestions and add-to-dictionary, and is the accessible channel for screen
+    readers; the squiggles are visual only.
 
 ## Architecture
 

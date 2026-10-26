@@ -1,4 +1,4 @@
-using DialogEditor.ViewModels.Services;
+﻿using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.Services;
 
@@ -79,5 +79,35 @@ public class SpellCheckServiceTests : IDisposable
         Assert.Single(_svc.Check("Xoti", "en"));
         _store.AddWord("Xoti");
         Assert.Empty(_svc.Check("Xoti", "en"));
+    }
+
+    // ── FindMisspellings: positions for the inline squiggles (issue 9) ───────
+
+    [Fact]
+    public void FindMisspellings_ReportsEveryOccurrence()
+        => Assert.Equal([new SpellSpan(0, 7), new SpellSpan(13, 7)],
+                        _svc.FindMisspellings("captian ship captian", "en"));
+
+    [Fact]
+    public void FindMisspellings_StartsAfterALeadingApostrophe()
+        => Assert.Equal([new SpellSpan(1, 7)], _svc.FindMisspellings("'captian glows", "en"));
+
+    [Fact]
+    public void FindMisspellings_SkipsTags()
+        => Assert.Equal([new SpellSpan(14, 7)], _svc.FindMisspellings("[Player Nmae] captian", "en"));
+
+    [Fact]
+    public void FindMisspellings_CorrectText_IsEmpty()
+        => Assert.Empty(_svc.FindMisspellings("cat ships glows adra", "en"));
+
+    [Fact]
+    public void FindMisspellings_NoDictionaryForTheLanguage_IsEmpty()
+        => Assert.Empty(_svc.FindMisspellings("captian", "fr"));
+
+    [Fact]
+    public void FindMisspellings_FollowsTheUserDictionary()
+    {
+        _store.AddWord("Xoti");
+        Assert.Empty(_svc.FindMisspellings("Xoti glows", "en"));
     }
 }
