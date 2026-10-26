@@ -67,17 +67,21 @@ public sealed class SpellDictionaryStore
 
     /// Hunspell's top suggestion for a misspelled word, or null.
     public string? Suggest(string word, string lang)
+        => SuggestMany(word, lang, 1).FirstOrDefault();
+
+    /// Hunspell's first <paramref name="max"/> suggestions for a misspelled word (may be empty).
+    public IReadOnlyList<string> SuggestMany(string word, string lang, int max)
     {
         var list = WordListFor(lang);
-        if (list is null) return null;
+        if (list is null) return [];
         try
         {
-            return list.Suggest(word).FirstOrDefault();
+            return list.Suggest(word).Take(max).ToList();
         }
         catch (Exception ex)
         {
             AppLog.Warn($"Spell suggestion failed for '{word}' ({lang}): {ex.Message}");
-            return null;
+            return [];
         }
     }
 

@@ -67,7 +67,10 @@ text**, never a global setting.
     misspellings in Node Details' Default and Female text boxes, live while typing
     (`SpellSquiggles` behaviour, drawn on an adorner). The warning list remains the place
     for suggestions and add-to-dictionary, and is the accessible channel for screen
-    readers; the squiggles are visual only.
+    readers; the squiggles are visual only. Right-clicking a misspelt word (GitHub issue
+    313; `SpellingContextMenu` behaviour) opens a menu with up to 5 suggestions, Add to
+    dictionary, Add to project dictionary (project open) and Cut/Copy/Paste; elsewhere the
+    TextBox's normal context menu is untouched.
 
 ## Architecture
 
