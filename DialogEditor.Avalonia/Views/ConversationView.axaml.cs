@@ -3,6 +3,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using DialogEditor.Avalonia.Input;
 using DialogEditor.Avalonia.Shared.Theming;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Layout;
@@ -138,6 +139,10 @@ public partial class ConversationView : UserControl
     private void Editor_KeyDown(object? sender, KeyEventArgs e)
     {
         if (DataContext is not ConversationViewModel vm) return;
+        // Reading mode (issue 234): same allow-list as the main window, so nudge and connect keys do
+        // nothing even though the key reaches the canvas first.
+        if (this.FindAncestorOfType<MainWindow>()?.DataContext is MainWindowViewModel { IsReadingMode: true }
+            && !ReadingModeShortcuts.IsAllowed(e.Key, e.KeyModifiers)) return;
 
         var ctrl  = e.KeyModifiers.HasFlag(KeyModifiers.Control);
         var none  = e.KeyModifiers == KeyModifiers.None;

@@ -2137,6 +2137,8 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="Menu_View_Conversations">Conversations</sys:String>
     <sys:String x:Key="Menu_View_Details">Node Details</sys:String>
     <sys:String x:Key="Menu_View_ConditionSearch">Condition search</sys:String>
+    <sys:String x:Key="Menu_View_ReadingMode">Reading mode</sys:String>
+    <sys:String x:Key="ToolTip_Menu_View_ReadingMode">Checked while the editor is in Reading mode: a read-only view for reading conversations and following their branches, with every editing tool hidden. Click it to switch to Editing mode, or to switch back to Reading mode. If you have unsaved changes the editor asks what to do with them before switching to Reading mode.</sys:String>
     <sys:String x:Key="Menu_View_PrivacyMode">Hide private paths</sys:String>
     <sys:String x:Key="ToolTip_View_PrivacyMode">Hides your user name and folder locations wherever the editor shows a file path, so screenshots and screen shares don't reveal them. Only the display changes; your files and settings keep their real paths. Stays checked for the whole session if the editor was started with --privacy-mode.</sys:String>
     <sys:String x:Key="Menu_View_ResetLayout">Reset Layout</sys:String>

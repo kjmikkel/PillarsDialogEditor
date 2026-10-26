@@ -12,6 +12,7 @@ using Avalonia.VisualTree;
 using DialogEditor.Avalonia.Audio;
 using DialogEditor.Avalonia.Controls;
 using DialogEditor.Avalonia.Docking;
+using DialogEditor.Avalonia.Input;
 using DialogEditor.Avalonia.Services;
 using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.Avalonia.Shared.Theming;
@@ -518,6 +519,10 @@ public partial class MainWindow : Window
     {
         var vm = (MainWindowViewModel)DataContext!;
 
+        // Reading mode (issue 234): only the allow-listed shortcuts act. Returning without marking
+        // the key handled leaves it for the focused control, so text boxes keep Delete, Ctrl+Z etc.
+        if (vm.IsReadingMode && !ReadingModeShortcuts.IsAllowed(e.Key, e.KeyModifiers)) return;
+
         switch (e.Key)
         {
             case Key.F when e.KeyModifiers == KeyModifiers.Control:
@@ -635,6 +640,21 @@ public partial class MainWindow : Window
                 e.Handled = true;
                 break;
         }
+    }
+
+    /// View > Reading mode. Node Details text boxes commit on LostFocus, so a half-typed edit is
+    /// committed first (public so the mode badge can do the same): otherwise switching to reading
+    /// would not see it and the unsaved-changes guard would let it be lost.
+    public void CommitFocusedTextEdit()
+    {
+        if (TopLevel.GetTopLevel(this)?.FocusManager is { } focus && focus.GetFocusedElement() is TextBox)
+            focus.ClearFocus();
+    }
+
+    private void ReadingMode_Click(object? sender, RoutedEventArgs e)
+    {
+        CommitFocusedTextEdit();
+        ((MainWindowViewModel)DataContext!).ToggleReadingModeCommand.Execute(null);
     }
 
     /// Delete removes the selected node only when the key comes from the canvas, never from a
