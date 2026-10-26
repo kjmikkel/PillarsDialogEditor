@@ -779,6 +779,10 @@ public partial class MainWindowViewModel : ObservableObject
             ClearPendingConflict();
             return;
         }
+        // The merge replaces the open project, like opening one (issue 234): edits made while
+        // the conflict was pending would otherwise stay on the canvas and be saved over the
+        // merged choices. Stay Here keeps the edits and the conflict pending.
+        if (!await EnsureNoUnsavedEditsAsync()) return;
         await LoadProjectAsync(path, offerDeferred: false);
     }
 

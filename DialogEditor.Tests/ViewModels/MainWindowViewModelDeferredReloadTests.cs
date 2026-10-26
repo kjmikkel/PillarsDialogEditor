@@ -317,4 +317,60 @@ public class MainWindowViewModelDeferredReloadTests : IDisposable
         Assert.True(vm.IsModified);
         Assert.Equal("unsaved edit", NodeText(vm));
     }
+
+    // ── Final review 2, R2: Resolve Conflicts asks about unsaved edits ─────
+
+    /// Reading opened the conflicted project on the "mine" side; switching to Editing offered the
+    /// merge, the user cancelled it (the conflict stays pending), then edited the canvas.
+    private async Task<MainWindowViewModel> EditWhileTheConflictIsPending()
+    {
+        WriteConflictedProject();
+        var provider = Provider();
+        var vm = MakeVm(EditorMode.Reading, provider);
+        vm.ShowGitConflictResolution = _ => Task.FromResult<DialogProject?>(null);
+        await LoadProject(vm, ProjectPath);
+        SelectGame(vm, provider);
+        await vm.SwitchModeAsync(EditorMode.Editing);
+        Assert.True(vm.HasPendingConflictResolution);
+        Edit(vm, "my edit");
+        return vm;
+    }
+
+    [Fact]
+    public async Task ResolveConflicts_WithUnsavedEdits_Discard_ShowsTheMerge_AndSaveKeepsIt()
+    {
+        var vm = await EditWhileTheConflictIsPending();
+        vm.ShowGitConflictResolution = res =>
+        {
+            res.Conflicts[0].Choice = MergeSide.Theirs;
+            res.ApplyCommand.Execute(null);
+            return Task.FromResult(res.Result);
+        };
+        vm.UnsavedChangesRequested += vm.DiscardAndProceed;
+
+        await vm.ResolveConflictsCommand.ExecuteAsync(null);
+
+        Assert.Equal("traveler", NodeText(vm));
+        vm.SaveProjectCommand.Execute(null);
+        var saved = File.ReadAllText(ProjectPath);
+        Assert.Contains("traveler", saved);
+        Assert.DoesNotContain("my edit", saved);
+        Assert.DoesNotContain("friend", saved);
+    }
+
+    [Fact]
+    public async Task ResolveConflicts_WithUnsavedEdits_StayHere_KeepsTheConflictPendingAndTheEdit()
+    {
+        var vm = await EditWhileTheConflictIsPending();
+        var modalShown = false;
+        vm.ShowGitConflictResolution = _ => { modalShown = true; return Task.FromResult<DialogProject?>(null); };
+        vm.UnsavedChangesRequested += vm.CancelPendingNavigation;
+
+        await vm.ResolveConflictsCommand.ExecuteAsync(null);
+
+        Assert.False(modalShown);
+        Assert.True(vm.HasPendingConflictResolution);
+        Assert.Equal("my edit", NodeText(vm));
+        Assert.True(vm.IsModified);
+    }
 }
