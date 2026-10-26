@@ -475,8 +475,31 @@ public partial class MainWindowViewModel : ObservableObject
         return true;
     }
 
-    // Filled in by a later task (issue 234); nothing to do on entering Editing yet.
-    private Task OnEnteredEditingModeAsync() => Task.CompletedTask;
+    // Work that opening in reading mode put off because it would have written (issue 234).
+    private string? _deferredOpenPath;     // project with a newer autosave copy to offer
+    private string? _deferredBackupPath;   // game folder whose backup offer / top-up was skipped
+
+    /// Runs what reading mode deferred, project prompts first: the autosave offer (which also
+    /// covers a conflict, as the reload re-checks it), else the pending conflict, then the backup.
+    private async Task OnEnteredEditingModeAsync()
+    {
+        if (_deferredOpenPath is { } openPath)
+        {
+            _deferredOpenPath = null;
+            await LoadProjectAsync(openPath, offerDeferred: false);
+        }
+        else if (HasPendingConflictResolution)
+        {
+            await ResolveConflicts();
+        }
+
+        if (_deferredBackupPath is { } backupPath)
+        {
+            _deferredBackupPath = null;
+            if (_provider is not null && backupPath == _currentGameDirectory)
+                RunBackupStep(backupPath, _provider);
+        }
+    }
 
     [RelayCommand]
     private Task ToggleReadingMode()
@@ -1196,8 +1219,16 @@ public partial class MainWindowViewModel : ObservableObject
     {
         // Crash recovery (spec 2026-07-12 §4): a sidecar newer than the project file
         // holds work lost to a crash/kill — offer to restore it before loading.
+        _deferredOpenPath = null;   // this open supersedes any earlier deferral
         var recovery = AutosaveRecovery.Check(path);
-        if (recovery.State == AutosaveState.Stale)
+        if (IsReadingMode)
+        {
+            // Reading mode writes nothing (issue 234): no prompt, and no deleting a stale copy.
+            // A newer copy is offered when the user switches to editing.
+            if (recovery.State == AutosaveState.Newer)
+                _deferredOpenPath = path;
+        }
+        else if (recovery.State == AutosaveState.Stale)
         {
             AutosaveRecovery.TryDelete(path); // save happened through another route
         }
@@ -1258,6 +1289,8 @@ public partial class MainWindowViewModel : ObservableObject
             var loaded = DialogProjectSerializer.Deserialize(text);
             FinishLoad(loaded, path);
             ClearPendingConflict();
+            if (_deferredOpenPath is not null)
+                StatusText = Loc.Format("Status_ProjectOpenedReadOnlyDeferred", loaded.Name);
         }
         catch (UnsupportedSchemaVersionException ex)
         {
@@ -1305,6 +1338,17 @@ public partial class MainWindowViewModel : ObservableObject
         if (ShowGitConflictResolution is null)   // no resolution UI wired — guide the user
         {
             StatusText = Loc.FormatCount("Status_ProjectGitConflictDetected", conflicts.Count, PathDisplay.ForDisplay(path));
+            return;
+        }
+
+        if (IsReadingMode)
+        {
+            // Reading mode: the resolved project would be saved back over the file, so open the
+            // local side as it is and offer the modal once the user switches to editing.
+            FinishLoad(mine, path);
+            _pendingConflictPath        = path;
+            HasPendingConflictResolution = true;
+            StatusText = Loc.Format("Status_ProjectOpenedReadOnlyDeferred", mine.Name);
             return;
         }
 
@@ -2124,11 +2168,15 @@ public partial class MainWindowViewModel : ObservableObject
             StatusText = Loc.Format("Status_FolderLoaded", provider.GameName, PathDisplay.ForDisplay(path));
             CreateSampleProjectCommand.NotifyCanExecuteChanged();
 
-            if (!AppSettings.IsKnownGameDirectory(path))
-                _ = OfferBackupAsync(path);
+            // Reading mode writes nothing (issue 234): the backup offer and top-up write to the
+            // backup folder, so they wait for the switch to editing.
+            if (IsReadingMode)
+                _deferredBackupPath = path;
             else
-                _ = TopUpBackupAsync(path, provider);
-            AppSettings.MarkGameDirectoryKnown(path);
+            {
+                _deferredBackupPath = null;
+                RunBackupStep(path, provider);
+            }
         }
         catch (Exception ex)
         {
@@ -2327,6 +2375,15 @@ public partial class MainWindowViewModel : ObservableObject
         => ShowTagReference?.Invoke(new TagReferenceViewModel(_activeGameId));
 
     // ── Backup offer (first time per game folder) ─────────────────────────
+    private void RunBackupStep(string path, IGameDataProvider provider)
+    {
+        if (!AppSettings.IsKnownGameDirectory(path))
+            _ = OfferBackupAsync(path);
+        else
+            _ = TopUpBackupAsync(path, provider);
+        AppSettings.MarkGameDirectoryKnown(path);
+    }
+
     private async Task OfferBackupAsync(string gameDirectory)
     {
         var pick = await _folderPicker.PickFolderAsync(Loc.Get("Dialog_SelectBackupFolder"));
