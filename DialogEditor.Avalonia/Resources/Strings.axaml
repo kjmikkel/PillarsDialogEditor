@@ -1760,7 +1760,9 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="TextIssueType_Tag">Tag</sys:String>
     <sys:String x:Key="TextIssueType_Spelling">Spelling</sys:String>
     <sys:String x:Key="Button_AddToDictionary">Add to dictionary</sys:String>
-    <sys:String x:Key="ToolTip_AddToDictionary">Treat this word as correctly spelled from now on — adds it to your personal dictionary.</sys:String>
+    <sys:String x:Key="ToolTip_AddToDictionary">Treat this word as correctly spelled from now on, in every project — adds it to your personal dictionary on this computer.</sys:String>
+    <sys:String x:Key="Button_AddToProjectDictionary">Add to project dictionary</sys:String>
+    <sys:String x:Key="ToolTip_AddToProjectDictionary">Treat this word as correctly spelled in this project only. It's saved in the project file, so it travels with your mod and anyone else who opens the project gets it too.</sys:String>
     <!-- Summary composes two pre-pluralised fragments (see pluralisation design). -->
     <sys:String x:Key="TextTagValidation_Summary">{0} across {1}</sys:String>
     <sys:String x:Key="TextTagValidation_Issues_One">{0} issue</sys:String>

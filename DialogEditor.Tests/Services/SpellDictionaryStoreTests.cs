@@ -1,4 +1,4 @@
-using DialogEditor.ViewModels.Services;
+﻿using DialogEditor.ViewModels.Services;
 
 namespace DialogEditor.Tests.Services;
 
@@ -104,5 +104,51 @@ public class SpellDictionaryStoreTests : IDisposable
         File.WriteAllText(Path.Combine(_dir, "it_IT.dic"), "1\nciao\n"); // no .aff
         var store = NewStore();
         Assert.False(store.HasDictionary("it"));
+    }
+
+    // ── Project words (GitHub issue 9) ──────────────────────────────────────
+
+    [Fact]
+    public void ProjectWords_FromTheSource_AreCorrect()
+    {
+        InstallFixtureEn();
+        var store = NewStore();
+        IReadOnlyList<string>? words = ["Xoti", "adra"];
+        store.ProjectWords = () => words;
+        Assert.True(store.IsCorrect("Xoti", "en"));
+        Assert.False(store.IsCorrect("Ondra", "en"));
+        // Case-tolerant the same way as the user list: a lowercase entry also accepts the
+        // capitalised form (sentence start), but a proper noun written lowercase is flagged.
+        Assert.True(store.IsCorrect("Adra", "en"));
+        Assert.False(store.IsCorrect("xoti", "en"));
+    }
+
+    [Fact]
+    public void ProjectWords_SourceChanges_StoreFollows()
+    {
+        // The source is read on every check, so closing a project or opening another one
+        // changes the answer without anyone pushing a new list into the store.
+        InstallFixtureEn();
+        var store = NewStore();
+        IReadOnlyList<string>? words = ["Xoti"];
+        store.ProjectWords = () => words;
+        Assert.True(store.IsCorrect("Xoti", "en"));
+
+        words = null;
+        Assert.False(store.IsCorrect("Xoti", "en"));
+
+        words = ["Ondra"];
+        Assert.True(store.IsCorrect("Ondra", "en"));
+    }
+
+    [Fact]
+    public void ProjectWords_NeverWrittenToTheUserDictionary()
+    {
+        InstallFixtureEn();
+        var store = NewStore();
+        store.ProjectWords = () => ["Xoti"];
+        Assert.True(store.IsCorrect("Xoti", "en"));
+        Assert.False(NewStore().IsCorrect("Xoti", "en"));
+        Assert.False(File.Exists(_userDict));
     }
 }

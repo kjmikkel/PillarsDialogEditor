@@ -439,6 +439,13 @@
                                                 FontSize="{DynamicResource FontSize.Small}" Padding="8,2"
                                                 ToolTip.Tip="{DynamicResource ToolTip_AddToDictionary}"
                                                 AutomationProperties.HelpText="{DynamicResource ToolTip_AddToDictionary}"/>
+                                        <Button Classes="secondary"
+                                                Content="{DynamicResource Button_AddToProjectDictionary}"
+                                                Command="{Binding AddToProjectDictionaryCommand}"
+                                                IsVisible="{Binding CanAddToProjectDictionary}"
+                                                FontSize="{DynamicResource FontSize.Small}" Padding="8,2" Margin="6,0,0,0"
+                                                ToolTip.Tip="{DynamicResource ToolTip_AddToProjectDictionary}"
+                                                AutomationProperties.HelpText="{DynamicResource ToolTip_AddToProjectDictionary}"/>
                                     </WrapPanel>
                                 </StackPanel>
                             </DataTemplate>

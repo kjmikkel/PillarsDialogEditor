@@ -18,7 +18,10 @@ public record DialogProject(
     IReadOnlyDictionary<string, IReadOnlyList<AnnotationSnapshot>>? Annotations = null,
     // Duplicate-line ignore allowlist — editor metadata, never in game files.
     // Nullable for back-compat with projects saved before this field existed.
-    IReadOnlyList<IgnoredDuplicate>? IgnoredDuplicates = null)
+    IReadOnlyList<IgnoredDuplicate>? IgnoredDuplicates = null,
+    // Spelling words accepted in this project — editor metadata, never in game files.
+    // Nullable for back-compat with projects saved before this field existed.
+    IReadOnlyList<string>? ProjectWords = null)
 {
     public static readonly int CurrentSchemaVersion = 1;
 
@@ -68,6 +71,9 @@ public record DialogProject(
             .Distinct()
             .ToList();
         result = result with { NewConversations = combined.Count > 0 ? combined : null };
+
+        var words = (ProjectWords ?? []).Concat(other.ProjectWords ?? []).Distinct().ToList();
+        result = result with { ProjectWords = words.Count > 0 ? words : null };
 
         var allAnnotationConvs = (Annotations?.Keys ?? [])
             .Concat(other.Annotations?.Keys ?? [])
@@ -128,6 +134,17 @@ public record DialogProject(
         if (existing.Any(e => e.Kind == entry.Kind && e.Keys.SequenceEqual(entry.Keys)))
             return this;
         return this with { IgnoredDuplicates = [.. existing, entry] };
+    }
+
+    /// Adds a word to the project's spelling list (editor metadata). Trimmed; blank or
+    /// already-present words (ordinal, case-sensitive) are a no-op returning this.
+    public DialogProject WithProjectWord(string word)
+    {
+        word = word.Trim();
+        if (word.Length == 0) return this;
+        var existing = ProjectWords ?? [];
+        if (existing.Contains(word, StringComparer.Ordinal)) return this;
+        return this with { ProjectWords = [.. existing, word] };
     }
 
     /// Removes a matching entry from the ignore allowlist; the list becomes null

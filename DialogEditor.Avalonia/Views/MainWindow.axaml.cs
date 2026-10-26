@@ -110,7 +110,8 @@ public partial class MainWindow : Window
         EmbeddedLexicons.LoadInto(SpellDictionaryStore.Default);
         vm.Detail.SpellChecker = new SpellCheckService(SpellDictionaryStore.Default);
         vm.Detail.AddWordToDictionary = SpellDictionaryStore.Default.AddWord;   // issue 9: from the detail panel
-        vm.SpellStoreFactory   = () => SpellDictionaryStore.Default;
+        SpellDictionaryStore.Default.ProjectWords = () => vm.ProjectWords;   // issue 9: per-project word list
+        vm.SpellStoreFactory   =() => SpellDictionaryStore.Default;
         // Crash recovery: offer to restore a newer autosave sidecar at project open.
         vm.ConfirmRestoreAutosave = generations => new AutosaveRestoreDialog(generations).ShowDialogAsync(this);
         // Autosave: sidecar written while the project has unsaved changes (spec
