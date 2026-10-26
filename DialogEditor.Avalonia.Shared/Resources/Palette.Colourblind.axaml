@@ -59,6 +59,7 @@
     <Color x:Key="Palette.Connection.Base">#FFAAAAAA</Color>  <!-- resting connection stroke (matches Dark; split off Neutral.665) -->
     <Color x:Key="Palette.Connection.Highlight">#FFFFFFFF</Color>  <!-- the selected node's links (Brush.Connection.Highlighted) -->
     <Color x:Key="Palette.Canvas.Base">#FF2B2B2B</Color>  <!-- canvas backdrop (issue 82): matches its base (dark) theme -->
+    <Color x:Key="Palette.Canvas.Grid">#FF3A3A3A</Color>  <!-- faint dots on the canvas backdrop (issue 225): matches its base (dark) theme -->
 
     <!-- Accents -->
     <Color x:Key="Palette.Crimson.700">#FF7B241C</Color>

@@ -58,6 +58,7 @@
     <Color x:Key="Palette.Connection.Base">#FF4F4F4F</Color>  <!-- resting connection stroke (matches Light's old Neutral.665) -->
     <Color x:Key="Palette.Connection.Highlight">#FF000000</Color>  <!-- the selected node's links: dark on the pale canvas; white was ~1.27:1 (GitHub issue 244) -->
     <Color x:Key="Palette.Canvas.Base">#FFE4E4E0</Color>  <!-- canvas backdrop (issue 82): a step darker than panels (#E9E9E7) -->
+    <Color x:Key="Palette.Canvas.Grid">#FFCFCFCA</Color>  <!-- faint dots on the canvas backdrop (issue 225) -->
 
     <!-- Accents -->
     <Color x:Key="Palette.Crimson.700">#FF7B241C</Color>
