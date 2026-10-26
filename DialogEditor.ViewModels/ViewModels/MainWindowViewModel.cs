@@ -486,7 +486,10 @@ public partial class MainWindowViewModel : ObservableObject
         if (_deferredOpenPath is { } openPath)
         {
             _deferredOpenPath = null;
-            await LoadProjectAsync(openPath, offerDeferred: false);
+            // Only if that project is still the open one; a different or closed project means the
+            // deferral is stale and reloading would clobber what is open now.
+            if (_projectPath == openPath)
+                await LoadProjectAsync(openPath, offerDeferred: false);
         }
         else if (HasPendingConflictResolution)
         {
@@ -1140,6 +1143,8 @@ public partial class MainWindowViewModel : ObservableObject
     {
         SetProject(null);
         _projectPath = null;
+        _deferredOpenPath = null;   // reading-mode deferrals belonged to the project just closed
+        ClearPendingConflict();
         Detail.ProjectPath  = null;
         Canvas.ProjectPath  = null;
         OnPropertyChanged(nameof(CanExportModBundle));
