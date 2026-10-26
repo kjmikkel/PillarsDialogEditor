@@ -67,7 +67,8 @@ text**, never a global setting.
     misspellings in Node Details' Default and Female text boxes, live while typing
     (`SpellSquiggles` behaviour, drawn on an adorner). The warning list remains the place
     for suggestions and add-to-dictionary, and is the accessible channel for screen
-    readers; the squiggles are visual only.
+    readers; the squiggles are visual only. Squiggles for newly typed words appear after a
+    500 ms pause; existing ones follow the text (issue 312).
 
 ## Architecture
 

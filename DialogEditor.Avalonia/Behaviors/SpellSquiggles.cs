@@ -16,6 +16,13 @@ namespace DialogEditor.Avalonia.Behaviors;
 /// paints them on a non-hit-testable adorner, so typing, selection and the caret are never
 /// affected. A spelling failure is logged and draws nothing.
 ///
+/// Issue 312: re-running the finder on every keystroke underlined a word before the writer
+/// had finished typing it. Now an edit only SHIFTS the cached spans along with the text
+/// (<see cref="SpellSpanShift"/>; the edited word loses its squiggle at once, squiggles
+/// elsewhere stay put instead of flickering away), and the full re-check runs once the
+/// writer has paused for <see cref="CheckDelay"/>. A finder change still re-checks
+/// immediately; layout and scroll changes only re-position the existing spans.
+///
 /// The squiggles are VISUAL ONLY. The spelling warning list in Node Details remains the
 /// accessible channel (screen readers, suggestions, add-to-dictionary).
 public static class SpellSquiggles
@@ -25,6 +32,15 @@ public static class SpellSquiggles
             "Finder", typeof(SpellSquiggles));
     private static readonly AttachedProperty<Session?> SessionProperty =
         AvaloniaProperty.RegisterAttached<TextBox, Session?>("Session", typeof(SpellSquiggles));
+
+    /// How long the writer must pause before the full spell check re-runs (issue 312).
+    public static TimeSpan CheckDelay { get; } = TimeSpan.FromMilliseconds(500);
+
+    /// Inspection hook (used by tests): a delayed re-check is waiting for the pause to elapse.
+    public static bool HasPendingCheck(TextBox t) => t.GetValue(SessionProperty)?.HasPendingCheck ?? false;
+
+    /// Test hook: run the pending delayed re-check immediately. No-op if none is pending.
+    public static void CheckNow(TextBox t) => t.GetValue(SessionProperty)?.CheckNow();
 
     public static void SetFinder(TextBox t, Func<string, IReadOnlyList<SpellSpan>>? v) => t.SetValue(FinderProperty, v);
     public static Func<string, IReadOnlyList<SpellSpan>>? GetFinder(TextBox t) => t.GetValue(FinderProperty);
@@ -60,6 +76,7 @@ public static class SpellSquiggles
         private IReadOnlyList<SpellSpan>? _spans;      // cached finder result for _spansText
         private string? _spansText;
         private string? _lastKey;
+        private DispatcherTimer? _timer;
 
         public IReadOnlyList<Rect> Rects { get; private set; } = [];
 
@@ -82,13 +99,60 @@ public static class SpellSquiggles
 
         public void InvalidateSpans()
         {
+            StopTimer();
             _spans = null;
             _lastKey = null;
             Recompute();
         }
 
+        public bool HasPendingCheck => _timer?.IsEnabled == true;
+
+        public void CheckNow()
+        {
+            if (!HasPendingCheck) return;
+            OnTimerTick(null, EventArgs.Empty);
+        }
+
+        public void StopTimer()
+        {
+            if (_timer is null) return;
+            _timer.Stop();
+            _timer.Tick -= OnTimerTick;
+            _timer = null;
+        }
+
+        // The pause is over: run the real check against the current text.
+        private void OnTimerTick(object? sender, EventArgs e)
+        {
+            StopTimer();
+            _spans = null;
+            _lastKey = null;
+            Recompute();
+        }
+
+        private void RestartTimer()
+        {
+            StopTimer();
+            _timer = new DispatcherTimer { Interval = CheckDelay };
+            _timer.Tick += OnTimerTick;
+            _timer.Start();
+        }
+
+        // Keep the cached spans aligned with the current text without calling the finder.
+        private void ShiftSpans(string text)
+        {
+            if (_spans is null || _spansText is null || _spansText == text) return;
+            _spans = SpellSpanShift.Apply(_spans, _spansText, text);
+            _spansText = text;
+        }
+
         private void OnTextChanged()
         {
+            if (_spans is not null && GetFinder(_box) is not null)
+            {
+                ShiftSpans(_box.Text ?? "");
+                RestartTimer();
+            }
             Recompute();
             // The presenter may pick the new text up a beat later; settle after layout.
             Dispatcher.UIThread.Post(Recompute, DispatcherPriority.Loaded);
@@ -96,7 +160,11 @@ public static class SpellSquiggles
 
         private void OnLayoutUpdated(object? sender, EventArgs e) => Recompute();
         private void OnScrollChanged(object? sender, ScrollChangedEventArgs e) => Recompute();
-        private void OnDetached(object? sender, VisualTreeAttachmentEventArgs e) => RemoveAdorner();
+        private void OnDetached(object? sender, VisualTreeAttachmentEventArgs e)
+        {
+            StopTimer();
+            RemoveAdorner();
+        }
 
         private void EnsureAdorner()
         {
@@ -132,11 +200,12 @@ public static class SpellSquiggles
                 if (key == _lastKey) return;
                 _lastKey = key;
 
-                if (_spans is null || _spansText != text)
+                if (_spans is null)
                 {
                     _spans = finder(text);
                     _spansText = text;
                 }
+                else ShiftSpans(text);
 
                 var viewport = ViewportInBox(presenter);
                 var layout = presenter.TextLayout;
@@ -179,6 +248,7 @@ public static class SpellSquiggles
 
         public void Dispose()
         {
+            StopTimer();
             _textSub.Dispose();
             _box.LayoutUpdated -= OnLayoutUpdated;
             _box.RemoveHandler(ScrollViewer.ScrollChangedEvent, OnScrollChanged);
