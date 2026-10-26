@@ -42,6 +42,8 @@
     <sys:String x:Key="Speaker_Narrator">Narrator</sys:String>
     <sys:String x:Key="Speaker_Script">Script</sys:String>
     <sys:String x:Key="Speaker_Unknown">Unknown</sys:String>
+    <!-- {0} is the first 8 characters of a speaker GUID the loaded game data doesn't name -->
+    <sys:String x:Key="Speaker_UnknownWithId">Unknown speaker ({0})</sys:String>
 
     <!-- ─── Node canvas card ────────────────────────────────────────────── -->
     <!-- Title line on each node card.

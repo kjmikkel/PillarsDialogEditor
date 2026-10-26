@@ -84,6 +84,19 @@ public class NodeDetailViewModelPaneTests
         Assert.True(_vm.IsListenerGuidBoxVisible);
     }
 
+    [Fact] // GitHub issue 257: an unknown speaker leaves the picker blank, so show the full GUID.
+    public void SpeakerGuidBox_Visible_WhenTheSpeakerIsNotInTheLoadedData()
+    {
+        SpeakerNameService.Register(new Dictionary<string, string> { ["aaaa"] = "Serafen" });
+        LoadNode(speakerGuid: "c0a1c0a1-0000-4000-8000-000000000000");
+        Assert.True(_vm.HasSpeakerData);
+        Assert.True(_vm.IsSpeakerGuidBoxVisible);
+
+        LoadNode(speakerGuid: "aaaa");
+        Assert.False(_vm.IsSpeakerGuidBoxVisible);
+        SpeakerNameService.Register(new Dictionary<string, string>());
+    }
+
     [Fact]
     public void GuidToggle_RaisesVisibilityChange()
     {

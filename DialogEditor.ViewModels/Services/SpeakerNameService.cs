@@ -1,3 +1,6 @@
+using DialogEditor.Core.Models;
+using DialogEditor.ViewModels.Resources;
+
 namespace DialogEditor.ViewModels.Services;
 
 public record SpeakerEntry(string Guid, string Name)
@@ -38,14 +41,31 @@ public static class SpeakerNameService
         _registered = new Dictionary<string, string>(names, StringComparer.OrdinalIgnoreCase);
     }
 
-    // Returns the display name for a GUID, the GUID itself if unknown, or null if empty
+    private const string PlayerGuid   = "b1a8e901-0000-0000-0000-000000000000";
+    private const string NarratorGuid = "00000000-0000-0000-0000-000000000000";
+
+    // Returns the display name for a GUID, a readable "Unknown speaker (c0a1c0a1…)" label if
+    // unknown, or null if empty. Never the bare GUID: a Reader can't tell who that is (GitHub
+    // issue 257); the full GUID stays in Node Details.
     public static string? Resolve(string guid)
     {
         if (string.IsNullOrWhiteSpace(guid)) return null;
         if (_registered.TryGetValue(guid, out var name)) return name;
         if (Defaults.TryGetValue(guid, out name)) return name;
-        return guid;
+        return Loc.Format("Speaker_UnknownWithId", guid.Length > 8 ? guid[..8] + "…" : guid);
     }
+
+    // True when the GUID names a registered or built-in speaker
+    public static bool IsKnown(string? guid) =>
+        !string.IsNullOrWhiteSpace(guid) &&
+        (_registered.ContainsKey(guid) || Defaults.ContainsKey(guid));
+
+    // The category a built-in speaker GUID stands for, so analytics can fold it together with
+    // blank-GUID nodes of the same kind instead of listing "Player" twice (GitHub issue 257).
+    public static SpeakerCategory? BuiltInCategory(string? guid) =>
+        string.Equals(guid, PlayerGuid, StringComparison.OrdinalIgnoreCase)   ? SpeakerCategory.Player :
+        string.Equals(guid, NarratorGuid, StringComparison.OrdinalIgnoreCase) ? SpeakerCategory.Narrator :
+        null;
 
     // Reverse lookup — returns null if the name isn't in the registered set
     public static SpeakerEntry? FindByName(string name) =>

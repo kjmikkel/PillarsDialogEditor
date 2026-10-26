@@ -671,8 +671,12 @@ public partial class NodeDetailViewModel : ObservableObject
         }
     }
 
-    public bool IsSpeakerGuidBoxVisible  => !HasSpeakerData || ShowSpeakerGuidBox;
-    public bool IsListenerGuidBoxVisible => !HasSpeakerData || ShowListenerGuidBox;
+    // An unknown speaker leaves the picker blank, so its full GUID shows without the toggle (GitHub issue 257).
+    public bool IsSpeakerGuidBoxVisible  => !HasSpeakerData || ShowSpeakerGuidBox || IsUnknownGuid(_node?.SpeakerGuid);
+    public bool IsListenerGuidBoxVisible => !HasSpeakerData || ShowListenerGuidBox || IsUnknownGuid(_node?.ListenerGuid);
+
+    private static bool IsUnknownGuid(string? guid) =>
+        !string.IsNullOrWhiteSpace(guid) && !SpeakerNameService.IsKnown(guid);
 
     // ── Expander summaries (collapsed headers still answer most glances) ──
 
@@ -944,6 +948,8 @@ public partial class NodeDetailViewModel : ObservableObject
         _selectedListenerEntry = SpeakerNameService.FindByGuid(_node?.ListenerGuid);
         OnPropertyChanged(nameof(SelectedSpeakerEntry));
         OnPropertyChanged(nameof(SelectedListenerEntry));
+        OnPropertyChanged(nameof(IsSpeakerGuidBoxVisible));
+        OnPropertyChanged(nameof(IsListenerGuidBoxVisible));
         OnPropertyChanged(nameof(BarkWarnings));
         OnPropertyChanged(nameof(TokenWarnings));
         OnPropertyChanged(nameof(SpellingIssues));

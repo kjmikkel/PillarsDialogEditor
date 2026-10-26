@@ -74,6 +74,17 @@ public class PathStatsServiceTests
         Assert.Equal(1, report.WordsPerSpeaker.Single(s => s.SpeakerGuid == "player").DefaultWords);
     }
 
+    [Fact] // GitHub issue 257: blank-GUID nodes of different kinds are different speakers.
+    public void WordsPerSpeaker_BlankGuid_GroupedByCategory()
+    {
+        var report = PathStatsService.Analyze(Snap(
+            Node(0, "aa bb", category: SpeakerCategory.Player, links: [Link(0, 1)]),
+            Node(1, "cc", category: SpeakerCategory.Script)));
+
+        Assert.Equal(2, report.WordsPerSpeaker.Single(s => s.Category == SpeakerCategory.Player).DefaultWords);
+        Assert.Equal(1, report.WordsPerSpeaker.Single(s => s.Category == SpeakerCategory.Script).DefaultWords);
+    }
+
     [Fact]
     public void FemaleGate_NotSignificant_WhenNoFemaleText()
     {

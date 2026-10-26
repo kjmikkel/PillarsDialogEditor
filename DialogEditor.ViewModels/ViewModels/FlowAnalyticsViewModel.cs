@@ -389,7 +389,7 @@ public partial class FlowAnalyticsViewModel : ObservableObject
         TotalContentText        = WordsTimePair(report.DefaultTotalWords,    report.FemaleTotalWords);
 
         WordsPerSpeaker.Clear();
-        foreach (var s in report.WordsPerSpeaker)
+        foreach (var s in MergeBuiltInSpeakers(report.WordsPerSpeaker))
         {
             var name = ResolveSpeakerName(s);
             var display = HasSignificantFemaleVariant
@@ -461,6 +461,18 @@ public partial class FlowAnalyticsViewModel : ObservableObject
         HasSignificantFemaleVariant
             ? Loc.Format("PathStats_DefaultFemale", WordsTime(defaultWords), WordsTime(femaleWords))
             : WordsTime(defaultWords);
+
+    // The Player GUID and blank-GUID Player nodes are the same speaker; listing both gave two
+    // "Player" rows with different counts (GitHub issue 257). Built-ins fold into a blank-GUID
+    // row of their category, which ResolveSpeakerName then names from the category.
+    private static IEnumerable<SpeakerWordCount> MergeBuiltInSpeakers(IReadOnlyList<SpeakerWordCount> rows) =>
+        rows.Select(s => SpeakerNameService.BuiltInCategory(s.SpeakerGuid) is { } cat
+                ? s with { SpeakerGuid = "", Category = cat }
+                : s)
+            .GroupBy(s => (s.SpeakerGuid, Category: s.SpeakerGuid.Length == 0 ? s.Category : default))
+            .Select(g => new SpeakerWordCount(g.Key.SpeakerGuid, g.First().Category,
+                                              g.Sum(s => s.DefaultWords), g.Sum(s => s.FemaleWords)))
+            .OrderByDescending(s => s.DefaultWords);
 
     private static string ResolveSpeakerName(SpeakerWordCount s)
     {
