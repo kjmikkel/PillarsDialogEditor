@@ -66,7 +66,9 @@ public class MainWindowViewModelReadingModeCommandTests : IDisposable
     [InlineData("UndoApplyCommand")] [InlineData("MergeProjectsCommand")] [InlineData("ExportForTranslationCommand")]
     [InlineData("ImportTranslationCommand")] [InlineData("CreateSampleProjectCommand")] [InlineData("OpenWalkthroughCommand")]
     [InlineData("TagReferenceCommand")] [InlineData("RestoreBackupCommand")] [InlineData("SaveCommand")]
-    [InlineData("TestPatchCommand")] [InlineData("RestoreConversationCommand")] [InlineData("FindInProjectCommand")]
+    // RestoreConversationCommand is deliberately absent: it must stay usable in Reading so the test
+    // overlay's "End Test and Restore" works when test mode outlives a mode switch (issue 234).
+    [InlineData("TestPatchCommand")] [InlineData("FindInProjectCommand")]
     [InlineData("BatchReplaceCommand")] [InlineData("BatchImportVoAllCommand")] [InlineData("ResolveConflictsCommand")]
     public async Task EditingCommand_CannotRun_InReadingMode(string name)
     {

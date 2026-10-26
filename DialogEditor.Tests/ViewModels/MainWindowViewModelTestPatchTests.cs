@@ -167,6 +167,21 @@ public class MainWindowViewModelTestPatchTests : IDisposable
         Assert.Contains("vanilla line", st);
     }
 
+    [Fact]
+    public async Task RestoreConversation_StillWorks_InReadingMode()
+    {
+        // Issue 234: test mode can outlive a switch to Reading. The overlay's restore button must
+        // not go dead while the game files stay patched; restoring is the opposite of the risk.
+        var vm = MakeVmWithProjectAndGame();
+        await vm.TestPatchCommand.ExecuteAsync(null);
+
+        vm.Mode = EditorMode.Reading;
+
+        Assert.True(vm.RestoreConversationCommand.CanExecute(null));
+        vm.RestoreConversationCommand.Execute(null);
+        Assert.DoesNotContain("added line", File.ReadAllText(StringTablePath));
+    }
+
     // ── New conversations are registered with the game (issue #162) ───────
 
     private static DialogProject NewConversationProject()

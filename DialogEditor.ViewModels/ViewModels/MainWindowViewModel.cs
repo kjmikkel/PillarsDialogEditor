@@ -573,7 +573,6 @@ public partial class MainWindowViewModel : ObservableObject
         RestoreBackupCommand.NotifyCanExecuteChanged();
         SaveCommand.NotifyCanExecuteChanged();
         TestPatchCommand.NotifyCanExecuteChanged();
-        RestoreConversationCommand.NotifyCanExecuteChanged();
         FindInProjectCommand.NotifyCanExecuteChanged();
         BatchReplaceCommand.NotifyCanExecuteChanged();
         BatchImportVoAllCommand.NotifyCanExecuteChanged();
@@ -2946,7 +2945,11 @@ public partial class MainWindowViewModel : ObservableObject
     private bool CanTestPatch() => IsEditingMode && _provider is not null && _project is not null;
 
     // ── Restore Conversations (all entries in project) ────────────────────
-    [RelayCommand(CanExecute = nameof(IsEditingMode))]
+    // Deliberately not gated on IsEditingMode (issue 234): test mode can outlive a switch to Reading,
+    // and then the test overlay's "End Test and Restore" must still work while the game files are
+    // patched. Restoring the originals is the opposite of the risk reading mode guards against. The
+    // Test menu item stays hidden and Shift+F5 stays blocked in Reading; only this command is open.
+    [RelayCommand]
     private async Task RestoreConversation()
     {
         var entries = AppSettings.GetPendingRestores();
