@@ -113,6 +113,42 @@
                 </Style>
             </ControlTheme>
 
+            <!-- ModeBadgeButton (issue 234): the toolbar mode badge. A filled pill whose Background is
+                 set by MainWindow's styles per mode; hover/press dim it rather than swap the fill, so
+                 the white text keeps its contrast. A focus ring is drawn for keyboard users. -->
+            <ControlTheme x:Key="ModeBadgeButton" TargetType="Button">
+                <Setter Property="Foreground" Value="{DynamicResource Brush.Text.OnAccent}"/>
+                <Setter Property="Padding" Value="10,3"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <Border x:Name="PART_Badge"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="Transparent" BorderThickness="2"
+                                CornerRadius="10"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter x:Name="PART_ContentPresenter"
+                                              Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              Foreground="{TemplateBinding Foreground}"
+                                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter>
+                <Style Selector="^:pointerover /template/ Border#PART_Badge">
+                    <Setter Property="Opacity" Value="0.85"/>
+                </Style>
+                <Style Selector="^:pressed /template/ Border#PART_Badge">
+                    <Setter Property="Opacity" Value="0.7"/>
+                </Style>
+                <Style Selector="^:focus-visible /template/ Border#PART_Badge">
+                    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Border.Focus}"/>
+                </Style>
+            </ControlTheme>
+
             <ControlTheme x:Key="ToolbarPlainToggleButton" TargetType="ToggleButton">
                 <Setter Property="Background" Value="{DynamicResource Brush.Toolbar.Button.Background}"/>
                 <Setter Property="Foreground" Value="{DynamicResource Brush.Toolbar.Button.Foreground}"/>

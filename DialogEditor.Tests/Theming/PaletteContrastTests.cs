@@ -24,6 +24,8 @@ public class PaletteContrastTests
         new("Text.OnAccent / Node.Script.Header",   "Palette.White", "Palette.Slate.700",   true),
         new("Text.OnAccent / Button.Confirm",     "Palette.White", "Palette.Green.600",  true),
         new("Text.OnAccent / Button.Caution",     "Palette.White", "Palette.Burnt.600",  true),
+        new("Text.OnAccent / ModeBadge.Reading",  "Palette.White", "Palette.Green.600",  true),
+        new("Text.OnAccent / ModeBadge.Editing",  "Palette.White", "Palette.Burnt.600",  true),
         new("Text.OnAccent / Button.Primary",     "Palette.White", "Palette.Azure.600",   true),
         new("Text.OnAccent / Button.Destructive", "Palette.White", "Palette.Crimson.700", true),
         new("Selection.Foreground / Selection.Background", "Palette.White", "Palette.Azure.600", true), // #83

@@ -657,6 +657,19 @@ public partial class MainWindow : Window
     // the mode. SetCurrentValue keeps the binding, so later mode changes still update the item.
     private async void ReadingMode_Click(object? sender, RoutedEventArgs e)
     {
+        await SwitchModeAsync();
+        // The switch may have been refused (unsaved-changes prompt), so put the check back in step.
+        if (sender is MenuItem item && DataContext is MainWindowViewModel vm)
+            item.SetCurrentValue(MenuItem.IsCheckedProperty, vm.IsReadingMode);
+    }
+
+    // The badge uses a handler, not a Command binding, so it shares the menu item's path.
+    private async void ModeBadge_Click(object? sender, RoutedEventArgs e) => await SwitchModeAsync();
+
+    /// Shared by View > Reading mode and the toolbar mode badge (issue 234): commit a half-typed
+    /// Node Details edit first so the unsaved-changes guard sees it, then switch (which may be refused).
+    private async Task SwitchModeAsync()
+    {
         var vm = (MainWindowViewModel)DataContext!;
         try
         {
@@ -666,11 +679,6 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             AppLog.Error("Switching reading mode failed", ex);
-        }
-        finally
-        {
-            if (sender is MenuItem item)
-                item.SetCurrentValue(MenuItem.IsCheckedProperty, vm.IsReadingMode);
         }
     }
 

@@ -2250,4 +2250,14 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="ToolTip_ModeChooser_Editing">Start in Editing mode: the full editor, with every editing tool, projects and mod packaging. You can switch to Reading mode later from View › Reading mode.</sys:String>
     <sys:String x:Key="ModeChooser_Footer">This window only appears once. Closing it starts Reading mode. You can switch modes later from View › Reading mode.</sys:String>
 
+    <!-- Mode badge (issue 234): right end of the main toolbar. Glyph and word are both shown so the mode never relies on colour alone. -->
+    <sys:String x:Key="ModeBadge_Reading">Reading</sys:String>
+    <sys:String x:Key="ModeBadge_Editing">Editing</sys:String>
+    <sys:String x:Key="ModeBadge_ReadingGlyph">📖</sys:String>
+    <sys:String x:Key="ModeBadge_EditingGlyph">✎</sys:String>
+    <sys:String x:Key="AutomationName_ModeBadge_Reading">Reading mode: nothing can be changed</sys:String>
+    <sys:String x:Key="AutomationName_ModeBadge_Editing">Editing mode: changes can be made</sys:String>
+    <sys:String x:Key="ToolTip_ModeBadge_Reading">You are in Reading mode: a read-only view where nothing can be changed or saved, so your game files and projects stay safe. Click to switch to Editing mode.</sys:String>
+    <sys:String x:Key="ToolTip_ModeBadge_Editing">You are in Editing mode: the full editor, where conversations, projects and mods can be changed. Click to switch to Reading mode. If you have unsaved changes the editor asks what to do with them first.</sys:String>
+
 </ResourceDictionary>

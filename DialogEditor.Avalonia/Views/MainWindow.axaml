@@ -407,6 +407,43 @@
                                   ToolTip.Tip="{DynamicResource ToolTip_HelpToggle}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_HelpToggle}"
                                   AutomationProperties.Name="{DynamicResource AutomationName_ToggleHelp}"/>
+                    <!-- Mode badge (issue 234): glyph + word, never colour alone. A Click handler rather than
+                         a Command binding so half-typed Node Details text is committed before the switch.
+                         Fill, tooltip and accessible name come from styles (a local value would beat the
+                         "reading" class, which is bound to IsReadingMode); the two content panels swap by
+                         visibility. -->
+                    <Button x:Name="ModeBadge"
+                            Classes.reading="{Binding IsReadingMode}"
+                            Click="ModeBadge_Click"
+                            Theme="{StaticResource ModeBadgeButton}"
+                            Margin="4,0,0,0">
+                        <Panel>
+                            <StackPanel Orientation="Horizontal" Spacing="6"
+                                        IsVisible="{Binding IsReadingMode}">
+                                <TextBlock Text="{DynamicResource ModeBadge_ReadingGlyph}"/>
+                                <TextBlock Text="{DynamicResource ModeBadge_Reading}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="6"
+                                        IsVisible="{Binding IsEditingMode}">
+                                <TextBlock Text="{DynamicResource ModeBadge_EditingGlyph}"/>
+                                <TextBlock Text="{DynamicResource ModeBadge_Editing}"/>
+                            </StackPanel>
+                        </Panel>
+                        <Button.Styles>
+                            <Style Selector="Button#ModeBadge">
+                                <Setter Property="Background" Value="{DynamicResource Brush.ModeBadge.Editing.Background}"/>
+                                <Setter Property="ToolTip.Tip" Value="{DynamicResource ToolTip_ModeBadge_Editing}"/>
+                                <Setter Property="AutomationProperties.HelpText" Value="{DynamicResource ToolTip_ModeBadge_Editing}"/>
+                                <Setter Property="AutomationProperties.Name" Value="{DynamicResource AutomationName_ModeBadge_Editing}"/>
+                            </Style>
+                            <Style Selector="Button#ModeBadge.reading">
+                                <Setter Property="Background" Value="{DynamicResource Brush.ModeBadge.Reading.Background}"/>
+                                <Setter Property="ToolTip.Tip" Value="{DynamicResource ToolTip_ModeBadge_Reading}"/>
+                                <Setter Property="AutomationProperties.HelpText" Value="{DynamicResource ToolTip_ModeBadge_Reading}"/>
+                                <Setter Property="AutomationProperties.Name" Value="{DynamicResource AutomationName_ModeBadge_Reading}"/>
+                            </Style>
+                        </Button.Styles>
+                    </Button>
                 </StackPanel>
             </DockPanel>
         </Border>

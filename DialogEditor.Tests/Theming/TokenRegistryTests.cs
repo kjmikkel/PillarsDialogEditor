@@ -79,6 +79,7 @@ public class TokenRegistryTests
         "Brush.Conflict.Theirs.Background","Brush.Conflict.Theirs.Foreground",
         "Brush.Button.Confirm.Background","Brush.Button.Caution.Background",
         "Brush.Button.Primary.Background","Brush.Button.Destructive.Background",
+        "Brush.ModeBadge.Reading.Background","Brush.ModeBadge.Editing.Background",
         "Brush.Bark.Detail.Background","Brush.Bark.Detail.Border","Brush.Bark.Detail.Text",
         "Brush.Node.Bark.Outline","Brush.Node.Quotidian.Note",
     };
