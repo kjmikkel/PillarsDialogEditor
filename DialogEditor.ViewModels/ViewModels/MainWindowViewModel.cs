@@ -400,6 +400,7 @@ public partial class MainWindowViewModel : ObservableObject
     private void UpdateEditable()
     {
         Canvas.IsEditable = _project is not null && IsEditingMode;
+        Canvas.IsReadingMode = IsReadingMode;
         Detail.IsReadingMode = IsReadingMode;
     }
 
@@ -562,6 +563,7 @@ public partial class MainWindowViewModel : ObservableObject
         Canvas  = new ConversationViewModel(dispatcher) { ShowMinimap = AppSettings.ShowMinimap };
 
         Detail.IsReadingMode = IsReadingMode;
+        Canvas.IsReadingMode = IsReadingMode;
 
         Browser.ConversationSelected += OnConversationSelected;
 

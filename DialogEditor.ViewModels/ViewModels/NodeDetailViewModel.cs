@@ -148,7 +148,14 @@ public partial class NodeDetailViewModel : ObservableObject
     public bool IsReadOnly => !IsEditable;
 
     /// True in Reading mode (issue 234); set by MainWindowViewModel.
-    [ObservableProperty] private bool _isReadingMode;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowImportVoMenuItem))]
+    private bool _isReadingMode;
+
+    /// The node context menu's "Import voice-over" item (and its separator): a node with VO status, but
+    /// never in reading mode, where it would write to the project. A property here because a menu item
+    /// cannot combine two bindings (a MultiBinding in the popup never took effect).
+    public bool ShowImportVoMenuItem => HasVoStatus && !IsReadingMode;
 
     private void OnCanvasPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
@@ -1055,6 +1062,7 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(IsVoImportVisible));
         OnPropertyChanged(nameof(CanImportVo));
         OnPropertyChanged(nameof(HasVoStatus));
+        OnPropertyChanged(nameof(ShowImportVoMenuItem));
         OnPropertyChanged(nameof(VoStatusGlyph));
         OnPropertyChanged(nameof(VoStatusText));
         OnPropertyChanged(nameof(VoStatusIsFound));

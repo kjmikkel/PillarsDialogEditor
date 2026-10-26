@@ -207,6 +207,12 @@ public partial class ConversationViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(CanMakeStartNode))]
     private bool _isEditable;
 
+    /// Reading mode (issue 234), set by MainWindowViewModel alongside IsEditable. IsEditable is false
+    /// in reading mode, but also with no project open, where the editing menu items stay as disabled
+    /// entries; reading mode hides them outright, which needs its own flag.
+    [ObservableProperty]
+    private bool _isReadingMode;
+
     // ── Undo/Redo state ───────────────────────────────────────────────────
     public bool    CanUndo         => _undoStack.CanUndo;
     public bool    CanRedo         => _undoStack.CanRedo;

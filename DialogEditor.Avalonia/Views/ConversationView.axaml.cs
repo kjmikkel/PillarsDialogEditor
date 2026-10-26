@@ -39,6 +39,8 @@ public partial class ConversationView : UserControl
                 connections.ZIndex = -1;
         };
 
+        Editor.AddHandler(ContextRequestedEvent, Editor_ContextRequested, RoutingStrategies.Tunnel);
+
         Editor.PropertyChanged += (_, e) =>
         {
             if (e.Property.Name is nameof(Editor.ViewportZoom) or nameof(Editor.ViewportLocation))
@@ -442,6 +444,19 @@ public partial class ConversationView : UserControl
     {
         if (DataContext is ConversationViewModel vm)
             vm.DeleteAnnotation(annotation);
+    }
+
+    // Issue 234: the empty-space menu (add node, add note) is all edits, so reading mode shows none.
+    // Tunnelled so it runs before the menu's own handler; a request from a node or a link is left to
+    // that item's own menu (a node keeps "Show all lines by this speaker").
+    private void Editor_ContextRequested(object? sender, ContextRequestedEventArgs e)
+    {
+        if (DataContext is not ConversationViewModel { IsReadingMode: true }) return;
+        if (e.Source is global::Avalonia.Visual source
+            && (source.FindAncestorOfType<Nodify.ItemContainer>(includeSelf: true) is not null
+                || source.FindAncestorOfType<Nodify.BaseConnection>(includeSelf: true) is not null))
+            return;
+        e.Handled = true;
     }
 
     private void Editor_DoubleTapped(object? sender, TappedEventArgs e)

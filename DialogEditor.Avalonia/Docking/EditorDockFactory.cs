@@ -53,7 +53,12 @@ public sealed class EditorDockFactory : Factory
         HideToolsOnClose = true;
     }
 
-    public override IRootDock CreateLayout()
+    public override IRootDock CreateLayout() => CreateLayout(EditorMode.Editing);
+
+    /// The default layout for a mode. Reading mode (issue 234) starts with Condition search closed:
+    /// it is hidden, not removed, so View > Condition search restores it into the right pane.
+    /// Only this default differs; BuildDock uses it only when there is no saved layout.
+    public IRootDock CreateLayout(EditorMode mode)
     {
         var canvasDoc = new CanvasDocument(_canvas);
         var documentDock = new DocumentDock
@@ -103,7 +108,28 @@ public sealed class EditorDockFactory : Factory
         root.DefaultDockable = main;
         root.ActiveDockable  = main;
         root.VisibleDockables = CreateList<IDockable>(main);
+
+        if (mode == EditorMode.Reading)
+        {
+            // Same shape Dock's HideDockable leaves behind: out of its dock, listed as hidden, and
+            // remembering its owner so RestoreDockable can put it back.
+            rightDock.VisibleDockables!.Remove(searchTool);
+            searchTool.OriginalOwner = rightDock;
+            root.HiddenDockables = CreateList<IDockable>(searchTool);
+        }
         return root;
+    }
+
+    /// Brings a closed or default-hidden tool back into its original dock. FactoryBase.RestoreDockable(id)
+    /// returned null for a hidden tool when exercised without a live dock control (issue 234 found it
+    /// while testing the reading-mode default), so look the tool up in HiddenDockables and restore it by
+    /// instance. Returns null when the tool is not hidden.
+    public IDockable? RestoreHiddenTool(IRootDock root, string id)
+    {
+        var hidden = root.HiddenDockables?.FirstOrDefault(d => d.Id == id);
+        if (hidden is null) return null;
+        RestoreDockable(hidden);
+        return hidden;
     }
 
     // Registers EditorHostWindow (a themed HostWindow carrying app.ico — Docking Shell Phase 1

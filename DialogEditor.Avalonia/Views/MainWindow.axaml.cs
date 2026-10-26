@@ -356,7 +356,7 @@ public partial class MainWindow : Window
         }
         if (layout is null)
         {
-            layout = factory.CreateLayout();
+            layout = factory.CreateLayout(vm.Mode);
             factory.InitLayout(layout);
         }
         vm.DockLayout = layout;
@@ -478,7 +478,9 @@ public partial class MainWindow : Window
 
         try
         {
-            var tool = _factory.FindDockable(root, d => d.Id == id) ?? _factory.RestoreDockable(id);
+            var tool = _factory.FindDockable(root, d => d.Id == id)
+                    ?? (root as Dock.Model.Controls.IRootDock is { } rootDock ? _factory.RestoreHiddenTool(rootDock, id) : null)
+                    ?? _factory.RestoreDockable(id);
             if (tool is not null)
                 _factory.SetActiveDockable(tool);
             else
