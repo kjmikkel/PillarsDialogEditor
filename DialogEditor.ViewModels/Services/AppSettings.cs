@@ -76,6 +76,13 @@ public static class AppSettings
         // treat the tour as already-seen — only a genuinely fresh install (no settings.json
         // yet, or a load failure) gets false, via Load().
         public bool GuidedTourSeen                   { get; set; } = true;
+        // The editor mode the user last chose; null = never chosen (first launch asks).
+        public EditorMode? Mode                      { get; set; }
+        // Whether the Reading-mode tour has been seen. Same pattern as GuidedTourSeen:
+        // defaults to true so EXISTING installs upgrading to this version (whose
+        // settings.json predates this field) treat it as seen — only a genuinely fresh
+        // install (no settings.json yet, or a load failure) gets false, via Load().
+        public bool ReaderTourSeen                   { get; set; } = true;
         // Defaults to true so existing users upgrading never see the banner;
         // Load() overrides to false for a fresh install (no settings.json).
         public bool DiffWindowSeen                   { get; set; } = true;
@@ -161,14 +168,14 @@ public static class AppSettings
     {
         try
         {
-            if (!File.Exists(SettingsPath)) return new() { ThemeOnboardingSeen = false, GuidedTourSeen = false, DiffWindowSeen = false };
+            if (!File.Exists(SettingsPath)) return new() { ThemeOnboardingSeen = false, GuidedTourSeen = false, ReaderTourSeen = false, DiffWindowSeen = false };
             var json = File.ReadAllText(SettingsPath);
             return JsonSerializer.Deserialize<SettingsData>(json) ?? new();
         }
         catch (Exception ex)
         {
             AppLog.Warn($"Failed to load settings from {SettingsPath}: {ex.Message}");
-            return new() { ThemeOnboardingSeen = false, GuidedTourSeen = false, DiffWindowSeen = false };
+            return new() { ThemeOnboardingSeen = false, GuidedTourSeen = false, ReaderTourSeen = false, DiffWindowSeen = false };
         }
     }
 
@@ -362,6 +369,18 @@ public static class AppSettings
     {
         get => Load().GuidedTourSeen;
         set { var s = Load(); s.GuidedTourSeen = value; Save(s); }
+    }
+
+    public static EditorMode? Mode
+    {
+        get => Load().Mode;
+        set { var s = Load(); s.Mode = value; Save(s); }
+    }
+
+    public static bool ReaderTourSeen
+    {
+        get => Load().ReaderTourSeen;
+        set { var s = Load(); s.ReaderTourSeen = value; Save(s); }
     }
 
     public static bool DiffWindowSeen
