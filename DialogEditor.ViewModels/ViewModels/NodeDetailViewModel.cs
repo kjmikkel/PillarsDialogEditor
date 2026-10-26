@@ -147,6 +147,9 @@ public partial class NodeDetailViewModel : ObservableObject
     public bool IsEditable => _canvas?.IsEditable ?? true;
     public bool IsReadOnly => !IsEditable;
 
+    /// True in Reading mode (issue 234); set by MainWindowViewModel.
+    [ObservableProperty] private bool _isReadingMode;
+
     private void OnCanvasPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(ConversationViewModel.IsEditable))

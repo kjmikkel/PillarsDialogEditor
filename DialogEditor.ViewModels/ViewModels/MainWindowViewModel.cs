@@ -223,10 +223,12 @@ public partial class MainWindowViewModel : ObservableObject
         _unsavedDecision?.TrySetResult(false);
         _pendingFile = null;
 
-        _unsavedDecision = new TaskCompletionSource<bool>();
+        // Held locally: a handler that answers synchronously (Save/Discard/Cancel) clears the field
+        // before Invoke returns.
+        var decision = _unsavedDecision = new TaskCompletionSource<bool>();
         _pendingAction = () => { _unsavedDecision?.TrySetResult(true); _unsavedDecision = null; };
         UnsavedChangesRequested?.Invoke();
-        return _unsavedDecision.Task;
+        return decision.Task;
     }
 
     public void SaveAndProceed()
@@ -356,7 +358,7 @@ public partial class MainWindowViewModel : ObservableObject
         // spelling rows aren't refreshed on every patch save.
         if (hadProject != (project is not null))
             Detail.AddWordToProjectDictionary = project is null ? null : AddProjectWord;
-        Canvas.IsEditable = project is not null;
+        UpdateEditable();
         OnPropertyChanged(nameof(IsProjectOpen));
         SaveProjectCommand.NotifyCanExecuteChanged();
         SaveProjectAsCommand.NotifyCanExecuteChanged();
@@ -382,7 +384,61 @@ public partial class MainWindowViewModel : ObservableObject
             : project.Patches.Where(kv => !kv.Value.IsEmpty).Select(kv => kv.Key).ToHashSet());
     }
 
+    // ── Editor mode (Reading / Editing, issue 234) ─────────────────────────────
+    /// Never-chosen (null) behaves as Editing here; the first-run prompt that asks is a later task.
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsReadingMode))]
+    [NotifyPropertyChangedFor(nameof(IsEditingMode))]
+    private EditorMode _mode = AppSettings.Mode ?? EditorMode.Editing;
+
+    public bool IsReadingMode => Mode == EditorMode.Reading;
+    public bool IsEditingMode => Mode == EditorMode.Editing;
+
+    // The canvas is editable only with a project open AND in Editing mode; Detail mirrors the mode.
+    private void UpdateEditable()
+    {
+        Canvas.IsEditable = _project is not null && IsEditingMode;
+        Detail.IsReadingMode = IsReadingMode;
+    }
+
+    /// Switches mode, saving it for the next launch. Entering Reading goes through the unsaved-edits
+    /// guard (Reading is read-only, so dirty edits must be saved or discarded first); returns false
+    /// when the user picks Stay Here. The open conversation and selection are left untouched.
+    public async Task<bool> SwitchModeAsync(EditorMode target)
+    {
+        if (target == Mode) return true;
+        if (target == EditorMode.Reading)
+        {
+            if (!await EnsureNoUnsavedEditsAsync())
+                return false;
+            // Still dirty after the guard agreed means Discard (Save clears IsModified). The
+            // canvas must not keep showing edits that were just thrown away, so re-read the
+            // project from disk; an unsaved new project has nothing to re-read.
+            if (IsModified)
+            {
+                if (_projectPath is not null && File.Exists(_projectPath))
+                    await LoadProjectAsync(_projectPath, offerDeferred: false);
+                IsModified = false;
+            }
+        }
+
+        Mode = target;
+        AppSettings.Mode = target;
+        if (target == EditorMode.Editing)
+            await OnEnteredEditingModeAsync();
+        return true;
+    }
+
+    // Filled in by a later task (issue 234); nothing to do on entering Editing yet.
+    private Task OnEnteredEditingModeAsync() => Task.CompletedTask;
+
+    [RelayCommand]
+    private Task ToggleReadingMode()
+        => SwitchModeAsync(IsReadingMode ? EditorMode.Editing : EditorMode.Reading);
+
     // ── Partial hooks ─────────────────────────────────────────────────────
+    partial void OnModeChanged(EditorMode value) => UpdateEditable();
+
     partial void OnCurrentConversationNameChanged(string? value)
         => OnPropertyChanged(nameof(WindowTitle));
 
@@ -402,6 +458,8 @@ public partial class MainWindowViewModel : ObservableObject
         _filePicker   = filePicker;
         Browser = new GameBrowserViewModel(dispatcher);
         Canvas  = new ConversationViewModel(dispatcher) { ShowMinimap = AppSettings.ShowMinimap };
+
+        Detail.IsReadingMode = IsReadingMode;
 
         Browser.ConversationSelected += OnConversationSelected;
 
