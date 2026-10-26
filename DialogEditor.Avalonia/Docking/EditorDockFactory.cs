@@ -128,8 +128,45 @@ public sealed class EditorDockFactory : Factory
     {
         var hidden = root.HiddenDockables?.FirstOrDefault(d => d.Id == id);
         if (hidden is null) return null;
+        // A layout read back from disk drops the hidden tool's original owner (ReplaceWrappers swaps in a
+        // fresh wrapper), and Dock has nowhere to put it back without one: use the tool's default home.
+        if (hidden.OriginalOwner is null
+            && FindDockable(root, d => d.Id == DefaultHomeId(id)) is { } home)
+            hidden.OriginalOwner = home;
         RestoreDockable(hidden);
         return hidden;
+    }
+
+    private static string DefaultHomeId(string toolId) => toolId switch
+    {
+        BrowserId => "LeftPane",
+        CanvasId  => DocumentsId,
+        _         => "RightPane",   // Details and Condition search
+    };
+
+    /// Finds a tool by id, restoring it first if it is hidden (closed, or hidden by the reading-mode
+    /// default). Tries the by-instance restore, then Dock's own by-id restore, and checks after each that
+    /// the tool really sits in a visible dock, because a layout read back from disk may have lost the
+    /// hidden tool's original owner. Returns null (after a warning) when the tool cannot be shown.
+    public IDockable? ShowTool(IRootDock root, string id)
+    {
+        if (FindDockable(root, d => d.Id == id) is { } open) return open;
+
+        if (RestoreHiddenTool(root, id) is { } restored && IsInVisibleDock(root, restored))
+            return restored;
+        if (RestoreDockable(id) is { } byId && IsInVisibleDock(root, byId))
+            return byId;
+
+        AppLog.Warn($"EditorDockFactory: could not show dock tool '{id}' (not open, and restoring it failed).");
+        return null;
+    }
+
+    private static bool IsInVisibleDock(IDockable root, IDockable tool)
+    {
+        bool Walk(IDockable d) =>
+            d is IDock dock && dock.VisibleDockables is { } kids
+            && (kids.Any(k => ReferenceEquals(k, tool)) || kids.Any(Walk));
+        return Walk(root);
     }
 
     // Registers EditorHostWindow (a themed HostWindow carrying app.ico — Docking Shell Phase 1

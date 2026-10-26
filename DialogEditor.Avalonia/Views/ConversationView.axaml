@@ -523,6 +523,7 @@
                             <nodify:Connection.ContextMenu>
                                 <ContextMenu AutomationProperties.AutomationId="ConnectionContextMenu">
                                     <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_DeleteConnection}"
+                                              IsVisible="{Binding !$parent[UserControl].DataContext.IsReadingMode}"
                                               AutomationProperties.AutomationId="ConnectionMenu_Delete"
                                               Command="{Binding $parent[UserControl].DataContext.DeleteConnectionCmdCommand}"
                                               CommandParameter="{Binding}"

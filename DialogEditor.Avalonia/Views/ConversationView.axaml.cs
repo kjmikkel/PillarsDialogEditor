@@ -448,13 +448,13 @@ public partial class ConversationView : UserControl
 
     // Issue 234: the empty-space menu (add node, add note) is all edits, so reading mode shows none.
     // Tunnelled so it runs before the menu's own handler; a request from a node or a link is left to
-    // that item's own menu (a node keeps "Show all lines by this speaker").
+    // that item's own menu (a node keeps "Show all lines by this speaker"). A link's menu holds only
+    // Delete, which reading mode hides, so it would pop up empty: it is suppressed too.
     private void Editor_ContextRequested(object? sender, ContextRequestedEventArgs e)
     {
         if (DataContext is not ConversationViewModel { IsReadingMode: true }) return;
         if (e.Source is global::Avalonia.Visual source
-            && (source.FindAncestorOfType<Nodify.ItemContainer>(includeSelf: true) is not null
-                || source.FindAncestorOfType<Nodify.BaseConnection>(includeSelf: true) is not null))
+            && source.FindAncestorOfType<Nodify.ItemContainer>(includeSelf: true) is not null)
             return;
         e.Handled = true;
     }

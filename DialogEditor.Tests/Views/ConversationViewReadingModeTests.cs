@@ -293,4 +293,40 @@ public class ConversationViewReadingModeTests : IDisposable
         }
         finally { window.Close(); }
     }
+
+    [AvaloniaFact]
+    public async Task NodeContextMenu_DoesNotOfferMakeStartNode_InReadingMode()
+    {
+        var (window, view, vm, _) = await ShowAsync(EditorMode.Reading);
+        try
+        {
+            vm.Canvas.CanChooseStartNode = true;   // a node that could become the start node, were this editing
+            var node = FirstNode(view);
+            var headers = OpenAndVisibleItems(node.ContextMenu!, node).Select(i => i.Header).ToList();
+
+            Assert.DoesNotContain(R("Menu_MakeStartNode"), headers);
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaTheory]
+    [InlineData(EditorMode.Reading, false)]
+    [InlineData(EditorMode.Editing, true)]
+    public async Task ConnectionContextMenu_OffersDelete_OnlyInEditingMode(EditorMode mode, bool offered)
+    {
+        var (window, view, vm, root) = await ShowAsync(mode);
+        try
+        {
+            var child = CanvasNavigationServiceTests.MakeNode(2, 500, 100);
+            vm.Canvas.Nodes.Add(child);
+            vm.Canvas.Connections.Add(CanvasNavigationServiceTests.Connect(root, child));
+            Dispatcher.UIThread.RunJobs();
+
+            var connection = view.GetVisualDescendants().OfType<Nodify.Connection>().First();
+            var headers = OpenAndVisibleItems(connection.ContextMenu!, connection).Select(i => i.Header).ToList();
+
+            Assert.Equal(offered, headers.Contains(R("Menu_DeleteConnection")));
+        }
+        finally { window.Close(); }
+    }
 }

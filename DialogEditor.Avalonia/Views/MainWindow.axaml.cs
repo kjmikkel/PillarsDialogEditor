@@ -478,9 +478,9 @@ public partial class MainWindow : Window
 
         try
         {
-            var tool = _factory.FindDockable(root, d => d.Id == id)
-                    ?? (root as Dock.Model.Controls.IRootDock is { } rootDock ? _factory.RestoreHiddenTool(rootDock, id) : null)
-                    ?? _factory.RestoreDockable(id);
+            var tool = root is Dock.Model.Controls.IRootDock rootDock
+                ? _factory.ShowTool(rootDock, id)
+                : _factory.FindDockable(root, d => d.Id == id);
             if (tool is not null)
                 _factory.SetActiveDockable(tool);
             else

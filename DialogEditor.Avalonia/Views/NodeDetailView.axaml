@@ -219,6 +219,19 @@
                                         <!-- Row 1: labelled controls -->
                                         <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" Margin="0,3,0,0">
                                             <!-- Condition editor button — dim when no conditions, accent when present -->
+                                            <!-- Issue 234: reading mode swaps the editor button for plain text with the same face,
+                                                 so a reader still sees which links are conditional. The wrapper carries the mode,
+                                                 the TextBlock the per-link HasConditions (two bindings cannot share one IsVisible). -->
+                                            <StackPanel Grid.Column="0"
+                                                        IsVisible="{Binding $parent[ItemsControl].DataContext.IsReadingMode}">
+                                                <TextBlock Text="{Binding ConditionCountLabel}"
+                                                           IsVisible="{Binding HasConditions}"
+                                                           FontSize="{DynamicResource FontSize.Small}" Padding="3,1" Margin="0,0,8,0"
+                                                           Foreground="{Binding HasConditions, Converter={StaticResource BoolToFemaleTextBrush}}"
+                                                           ToolTip.Tip="{Binding ReadingConditionsToolTip}"
+                                                           AutomationProperties.Name="{DynamicResource AutomationName_LinkConditionsReading}"
+                                                           AutomationProperties.HelpText="{Binding ReadingConditionsToolTip}"/>
+                                            </StackPanel>
                                             <Button Grid.Column="0"
                                                     Content="{Binding ConditionCountLabel}"
                                                     Click="LinkConditions_Click"
