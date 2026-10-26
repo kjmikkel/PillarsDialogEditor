@@ -9,19 +9,19 @@
     <sys:String x:Key="PatchManager_GameFolder">Game folder</sys:String>
     <sys:String x:Key="PatchManager_GameFolderWatermark">(no game folder selected)</sys:String>
     <sys:String x:Key="PatchManager_BrowseGame">Browse…</sys:String>
-    <sys:String x:Key="PatchManager_LoadOrder">Load Order</sys:String>
-    <sys:String x:Key="PatchManager_SaveLoadOrder">Save load order…</sys:String>
-    <sys:String x:Key="PatchManager_LoadLoadOrder">Load load order…</sys:String>
+    <sys:String x:Key="PatchManager_LoadOrder">Mods to install</sys:String>
+    <sys:String x:Key="PatchManager_SaveLoadOrder">Save mod list…</sys:String>
+    <sys:String x:Key="PatchManager_LoadLoadOrder">Open mod list…</sys:String>
     <sys:String x:Key="PatchManager_AddProjects">Add mods…</sys:String>
-    <sys:String x:Key="PatchManager_Apply">Apply patches</sys:String>
-    <sys:String x:Key="PatchManager_Applying">Applying…</sys:String>
+    <sys:String x:Key="PatchManager_Apply">Install mods</sys:String>
+    <sys:String x:Key="PatchManager_Applying">Installing…</sys:String>
     <!-- Remove all mods / backup status (issue #76) -->
     <sys:String x:Key="PatchManager_RemoveAllMods">Remove all mods</sys:String>
     <sys:String x:Key="PatchManager_NoModsInstalled">No mods installed with the Patch Manager or dialog-patcher yet.</sys:String>
-    <sys:String x:Key="PatchManager_ModsInstalled_One">Mods are installed: the patcher manages 1 game file and can put it back as it was.</sys:String>
-    <sys:String x:Key="PatchManager_ModsInstalled_Other">Mods are installed: the patcher manages {0} game files and can put them back as they were.</sys:String>
+    <!-- No count: the backup knows game files, not mods, and a file count next to a list of mods misleads (GitHub issue 267). -->
+    <sys:String x:Key="PatchManager_ModsInstalled">Mods are installed. Remove all mods puts the game's own files back.</sys:String>
     <sys:String x:Key="PatchManager_BackupCorrupt">The patcher's backup record is unreadable ({0}). Nothing was changed. Verify the game files in your storefront, then delete the PillarsDialogPatcher folder.</sys:String>
-    <sys:String x:Key="PatchManager_ApplyCancelledExternal">Apply cancelled — nothing was changed.</sys:String>
+    <sys:String x:Key="PatchManager_ApplyCancelledExternal">Install cancelled — nothing was changed.</sys:String>
     <sys:String x:Key="PatchManager_RemoveAllDone_One">Removed all mods: 1 game file is back as it was.</sys:String>
     <sys:String x:Key="PatchManager_RemoveAllDone_Other">Removed all mods: {0} game files are back as they were.</sys:String>
     <!-- Appended to the apply status. {0} = damaged text files left untouched, {1} = the first one's path (issue 119) -->
@@ -30,49 +30,49 @@
     <sys:String x:Key="PatchManager_RemoveAllPartial">Removed mods: {0} files restored; {1} left as is because something else changed them (see the log).</sys:String>
     <sys:String x:Key="PatchManager_RemoveAllError">Remove all mods failed ({0}). If it keeps failing, verify the game files in your storefront (Steam, GOG Galaxy or the Epic Games Launcher).</sys:String>
     <sys:String x:Key="PatchManager_RemoveAllConfirm_Title">Remove all mods?</sys:String>
-    <sys:String x:Key="PatchManager_RemoveAllConfirm_Message">Every game file the Patch Manager or dialog-patcher changed is put back to its original, and the files they added are deleted. Your load order stays in the list, so you can apply it again later.</sys:String>
+    <sys:String x:Key="PatchManager_RemoveAllConfirm_Message">Every game file the Patch Manager or dialog-patcher changed is put back to its original, and the files they added are deleted. Your mod list stays as it is, so you can install it again later.</sys:String>
     <sys:String x:Key="PatchManager_ExternalChanges_Title">Game files changed outside the Patch Manager</sys:String>
-    <sys:String x:Key="PatchManager_ExternalChanges_Message">These files were changed by something other than the Patch Manager — usually a game update or "verify files", sometimes another mod tool. Treat their current contents as the new originals and apply your load order on top of them?</sys:String>
-    <sys:String x:Key="PatchManager_ExternalChanges_Confirm">Treat as new originals</sys:String>
+    <sys:String x:Key="PatchManager_ExternalChanges_Message">These game files were changed by something other than the Patch Manager — usually a game update or "verify files", sometimes another mod tool. Keep them as they are now and install your mods on top of them?</sys:String>
+    <sys:String x:Key="PatchManager_ExternalChanges_Confirm">Keep them and install</sys:String>
     <sys:String x:Key="PatchManager_ExternalChanges_More">…and {0} more</sys:String>
     <sys:String x:Key="Confirm_Cancel">Cancel</sys:String>
     <!-- "After a game update…" link and its message (issue 147). Keep the message in step
          with README.md's "Game updates and your backups" section, which uses the same
-         verify-then-apply-again wording. "Apply patches" and "Treat as new originals" name
+         verify-then-apply-again wording. "Install mods" and "Keep them and install" name
          the Patch Manager's own buttons (PatchManager_Apply, PatchManager_ExternalChanges_Confirm). -->
     <sys:String x:Key="PatchManager_GameUpdateHelp_Link">After a game update…</sys:String>
     <sys:String x:Key="ToolTip_GameUpdateHelp">What to do after the game updates or you verify its files: how to get a clean install and put your conversation mods back.</sys:String>
     <sys:String x:Key="PatchManager_GameUpdateHelp_Title">After a game update</sys:String>
-    <sys:String x:Key="PatchManager_GameUpdateHelp_Message">A game update can replace or change the files your conversation mods edit. Afterwards those mods may be partly missing, or sit on top of files they no longer match.&#10;&#10;To put things right:&#10;1. Verify / repair the game files in your storefront (Steam, GOG Galaxy or the Epic Games Launcher). This gives you a clean, current install.&#10;2. Come back here and click Apply patches to install your mods again. If you're asked whether to treat changed files as the new originals, choose Treat as new originals.</sys:String>
-    <sys:String x:Key="ToolTip_RemoveAllMods">Undo every mod installed into this game folder: restore each game file the patcher changed to its original version and delete the files it added. The load order list is kept.</sys:String>
+    <sys:String x:Key="PatchManager_GameUpdateHelp_Message">A game update can replace or change the files your conversation mods edit. Afterwards those mods may be partly missing, or sit on top of files they no longer match.&#10;&#10;To put things right:&#10;1. Verify / repair the game files in your storefront (Steam, GOG Galaxy or the Epic Games Launcher). This gives you a clean, current install.&#10;2. Come back here and click Install mods to install your mods again. If you're asked whether to keep the changed files and install on top of them, choose Keep them and install.</sys:String>
+    <sys:String x:Key="ToolTip_RemoveAllMods">Undo every mod installed into this game folder: restore each game file the patcher changed to its original version and delete the files it added. Your mod list is kept.</sys:String>
     <!-- Next step while Apply is disabled (GitHub issue 248). -->
     <sys:String x:Key="PatchManager_ApplyHint_NoGameFolder">To install mods, first choose your game folder at the top, then add at least one mod.</sys:String>
     <sys:String x:Key="PatchManager_ApplyHint_NoMods">Add at least one mod to install.</sys:String>
-    <sys:String x:Key="PatchManager_EmptyHint">Add mods (.dialogpack files) above. Lower entries win on conflict.</sys:String>
-    <sys:String x:Key="PatchManager_OrderHint">↑ First applied   ↓ Last applied (wins on conflict)</sys:String>
+    <sys:String x:Key="PatchManager_EmptyHint">Add mods above. If two mods change the same line, the one lower in the list wins.</sys:String>
+    <sys:String x:Key="PatchManager_OrderHint">↑ Installed first   ↓ Installed last (wins if two mods change the same line)</sys:String>
 
     <!-- Status and error messages (used via Loc.Get/Format) -->
-    <sys:String x:Key="PatchManager_NoConflicts">No conflicts detected.</sys:String>
-    <sys:String x:Key="PatchManager_ConflictsFound_One">1 conflict detected — reorder so the version you want is lowest in the list.</sys:String>
-    <sys:String x:Key="PatchManager_ConflictsFound_Other">{0} conflicts detected — reorder so the version you want is lowest in the list.</sys:String>
-    <sys:String x:Key="PatchManager_ApplySuccess_One">Applied 1 patch to {1}.</sys:String>
-    <sys:String x:Key="PatchManager_ApplySuccess_Other">Applied {0} patches to {1}.</sys:String>
+    <sys:String x:Key="PatchManager_NoConflicts">No two mods change the same line.</sys:String>
+    <sys:String x:Key="PatchManager_ConflictsFound_One">Two mods change the same line in 1 place — move the mod you want lower in the list.</sys:String>
+    <sys:String x:Key="PatchManager_ConflictsFound_Other">Mods change the same line in {0} places — move the mod you want lower in the list.</sys:String>
+    <sys:String x:Key="PatchManager_ApplySuccess_One">Installed 1 mod in {1}.</sys:String>
+    <sys:String x:Key="PatchManager_ApplySuccess_Other">Installed {0} mods in {1}.</sys:String>
     <!-- Apply finished but left something out (GitHub issue 241). The headline replaces
          ApplySuccess and is followed by one or more of the sentences below; {1} in each is
          the first item, the log lists the rest. -->
-    <sys:String x:Key="PatchManager_ApplyWithWarnings_One">Installed with warnings: applied 1 patch to {1}.</sys:String>
-    <sys:String x:Key="PatchManager_ApplyWithWarnings_Other">Installed with warnings: applied {0} patches to {1}.</sys:String>
+    <sys:String x:Key="PatchManager_ApplyWithWarnings_One">Installed 1 mod in {1}, with warnings.</sys:String>
+    <sys:String x:Key="PatchManager_ApplyWithWarnings_Other">Installed {0} mods in {1}, with warnings.</sys:String>
     <sys:String x:Key="PatchManager_EntriesSkipped_One">1 mod in the list couldn't be loaded and was not installed: {1}.</sys:String>
     <sys:String x:Key="PatchManager_EntriesSkipped_Other">{0} mods in the list couldn't be loaded and were not installed (first: {1}).</sys:String>
     <sys:String x:Key="PatchManager_MissingConversations_One">1 conversation a mod changes isn't in this game, so its changes were skipped: {1}.</sys:String>
     <sys:String x:Key="PatchManager_MissingConversations_Other">{0} conversations the mods change aren't in this game, so their changes were skipped (first: {1}).</sys:String>
     <sys:String x:Key="PatchManager_RestoreSkipped_One">1 game file was left as is because something else changed it: {1}.</sys:String>
     <sys:String x:Key="PatchManager_RestoreSkipped_Other">{0} game files were left as is because something else changed them (first: {1}).</sys:String>
-    <sys:String x:Key="PatchManager_ApplyError">Apply failed ({0}). To put the game files back as they were, use Remove all mods.</sys:String>
+    <sys:String x:Key="PatchManager_ApplyError">Install failed ({0}). To put the game files back as they were, use Remove all mods.</sys:String>
     <!-- A mod or load-order file that isn't valid JSON / zip (GitHub issue 249): usually a broken download. -->
     <sys:String x:Key="PatchManager_DamagedMod">This file is damaged or isn't a mod. Download it again.</sys:String>
-    <sys:String x:Key="PatchManager_DamagedLoadOrder">this load order file is damaged. Save your load order again, or add the mods one by one.</sys:String>
-    <sys:String x:Key="PatchManager_SaveLoadOrderError">Could not save the load order: {0}</sys:String>
+    <sys:String x:Key="PatchManager_DamagedLoadOrder">this mod list file is damaged. Save your mod list again, or add the mods one by one.</sys:String>
+    <sys:String x:Key="PatchManager_SaveLoadOrderError">Could not save the mod list: {0}</sys:String>
     <sys:String x:Key="PatchManager_LoadError">Could not load '{0}': {1}</sys:String>
     <!-- One line of the conflict summary list. {0} is the conversation name, {1} the node
          id, {2} the field the patches disagree about (or one of the PatchManager_*Field
@@ -94,8 +94,8 @@
          in the same language, so the later one's text replaces the earlier one's.
          {0} is the language code, e.g. "en" or "fr". Display only. -->
     <sys:String x:Key="PatchManager_TextField">text ({0})</sys:String>
-    <sys:String x:Key="PatchManager_EntryConflict">⚠ conflicts with another mod</sys:String>
-    <sys:String x:Key="PatchManager_EntryConflictDetail">Conflicts with another mod — move lower to override the other, or higher to be overridden</sys:String>
+    <sys:String x:Key="PatchManager_EntryConflict">⚠ changes the same lines as another mod</sys:String>
+    <sys:String x:Key="PatchManager_EntryConflictDetail">Changes some of the same lines as another mod — move it lower to win, or higher to let the other mod win</sys:String>
     <sys:String x:Key="PatchManager_EntryLoadError">⚠ could not load</sys:String>
     <!-- Shown under a load-order entry that failed to load (GitHub issue 259). {0} is the reason. -->
     <sys:String x:Key="PatchManager_EntryLoadErrorDetail">Could not load this mod, so it won't be installed: {0}</sys:String>
@@ -104,22 +104,22 @@
     <!-- Tooltips -->
     <sys:String x:Key="ToolTip_BrowseGameFolder">Select the root folder of your PoE1 or PoE2 installation</sys:String>
     <sys:String x:Key="ToolTip_AddProjects">Add one or more mods to the load order. Mods are .dialogpack files; mod authors can also add .dialogproject files straight from the editor.</sys:String>
-    <sys:String x:Key="ToolTip_SaveLoadOrder">Save the current load order to a .patchlist file for later reuse</sys:String>
-    <sys:String x:Key="ToolTip_LoadLoadOrder">Open a previously saved .patchlist file</sys:String>
-    <sys:String x:Key="ToolTip_MoveEntryUp">Move up — lower index is applied first; lower position wins on conflict</sys:String>
-    <sys:String x:Key="ToolTip_MoveEntryDown">Move down — lower position in the list wins on conflict</sys:String>
-    <sys:String x:Key="ToolTip_RemoveEntry">Remove from load order</sys:String>
-    <sys:String x:Key="ToolTip_ApplyPatches">Reset the game to its original files, then apply every patch in load order. Lower entries win on conflict. Removing a mod from the list and applying again uninstalls it.</sys:String>
+    <sys:String x:Key="ToolTip_SaveLoadOrder">Save this list of mods, in this order, to a .patchlist file so you can open it again later</sys:String>
+    <sys:String x:Key="ToolTip_LoadLoadOrder">Open a mod list (.patchlist file) you saved earlier</sys:String>
+    <sys:String x:Key="ToolTip_MoveEntryUp">Move up: mods are installed top to bottom, so a mod lower in the list wins where two mods change the same line (in modding terms, it is later in the load order)</sys:String>
+    <sys:String x:Key="ToolTip_MoveEntryDown">Move down: a mod lower in the list wins where two mods change the same line (in modding terms, it is later in the load order)</sys:String>
+    <sys:String x:Key="ToolTip_RemoveEntry">Remove this mod from the list. It is uninstalled the next time you click Install mods.</sys:String>
+    <sys:String x:Key="ToolTip_ApplyPatches">Put the game's original files back, then install every mod in the list, top to bottom (the load order). Where two mods change the same line, the lower one wins. To uninstall a mod, remove it from the list and click Install mods again.</sys:String>
 
     <!-- FileType descriptions (used by file pickers) -->
-    <sys:String x:Key="FileType_PatchList">Patch list (*.patchlist)</sys:String>
+    <sys:String x:Key="FileType_PatchList">Mod list (*.patchlist)</sys:String>
     <!-- Shared, not editor-only: the standalone Patch Manager loads only this file and its own (issue #80) -->
     <sys:String x:Key="FileType_DialogProjectOrPack">Mods (*.dialogpack, *.dialogproject)</sys:String>
 
     <!-- ─── Accessibility — screen-reader names for icon-only buttons ─────────── -->
-    <sys:String x:Key="AutomationName_MovePatchUp">Move patch up</sys:String>
-    <sys:String x:Key="AutomationName_MovePatchDown">Move patch down</sys:String>
-    <sys:String x:Key="AutomationName_RemovePatch">Remove patch</sys:String>
+    <sys:String x:Key="AutomationName_MovePatchUp">Move mod up</sys:String>
+    <sys:String x:Key="AutomationName_MovePatchDown">Move mod down</sys:String>
+    <sys:String x:Key="AutomationName_RemovePatch">Remove mod</sys:String>
 
     <!-- ─── Theme picker (Layer 2) — shared by editor and standalone PatchManager ── -->
     <sys:String x:Key="Settings_Theme">Theme</sys:String>

@@ -369,7 +369,7 @@ public partial class PatchManagerViewModel : ObservableObject
             foreach (var p in notLoaded)
                 AppLog.Warn($"Not installed (could not be loaded): {p}");
             AppLog.Info($"Applied {applied.ConversationsPatched} conversation(s) from {entries.Count} project(s)");
-            StatusText = ApplyStatus(applied, notLoaded, gameFolder);
+            StatusText = ApplyStatus(applied, entries.Count, notLoaded, gameFolder);
         }
         catch (PatcherBackupCorruptException ex)
         {
@@ -392,7 +392,8 @@ public partial class PatchManagerViewModel : ObservableObject
     /// The status after a finished Apply: plain success, or "installed with warnings" followed by
     /// one sentence per kind of thing left out — the same warnings the CLI prints (GitHub issue
     /// 241). Each names the first item; the log has the full list.
-    private static string ApplyStatus(InstallResult.Applied applied, IReadOnlyList<string> notLoaded, string gameFolder)
+    /// The headline counts mods, as the list does, not the conversations they patch (GitHub issue 267).
+    private static string ApplyStatus(InstallResult.Applied applied, int modsInstalled, IReadOnlyList<string> notLoaded, string gameFolder)
     {
         var warnings = new List<string>();
         void Warn(string key, IReadOnlyList<string> items, bool isPath)
@@ -407,7 +408,7 @@ public partial class PatchManagerViewModel : ObservableObject
         Warn("PatchManager_UnreadableStringTables", applied.UnreadableStringTables, isPath: true);
 
         var headline = Loc.FormatCount(warnings.Count > 0 ? "PatchManager_ApplyWithWarnings" : "PatchManager_ApplySuccess",
-                                       applied.ConversationsPatched, PathDisplay.ForDisplay(gameFolder));
+                                       modsInstalled, PathDisplay.ForDisplay(gameFolder));
         return string.Join(" ", [headline, .. warnings]);
     }
 
@@ -534,8 +535,7 @@ public partial class PatchManagerViewModel : ObservableObject
         {
             HasInstalledMods = PatchInstaller.HasInstalledMods(GameFolder);
             BackupStatusText = HasInstalledMods
-                ? Loc.FormatCount("PatchManager_ModsInstalled",
-                                  PatcherBackupStore.Open(GameFolder).Entries.Count)
+                ? Loc.Get("PatchManager_ModsInstalled")
                 : Loc.Get("PatchManager_NoModsInstalled");
         }
         catch (PatcherBackupCorruptException ex)

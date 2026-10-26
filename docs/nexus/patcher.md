@@ -49,7 +49,7 @@ Installs conversation mods for [i]Pillars of Eternity[/i] and [i]Pillars of Eter
 [*]Start [b]DialogEditor.PatchManager.exe[/b].
 [*]Next to [b]Game folder[/b], click [b]Browse…[/b] and choose the folder the game is installed in.
 [*]Click [b]Add mods…[/b] and choose the mod's [b].dialogpack[/b] file.
-[*]Click [b]Apply patches[/b] and start the game.
+[*]Click [b]Install mods[/b] and start the game.
 [/list]
 
 [size=4][b]Features[/b][/size]
@@ -57,7 +57,7 @@ Installs conversation mods for [i]Pillars of Eternity[/i] and [i]Pillars of Eter
 [*][b]Several mods at once[/b], in a load order you choose. When two mods change the same line, the one lower in the list wins.
 [*][b]Conflict warnings before anything is installed[/b]: the Patch Manager names the conversation, the line and both mods.
 [*][b]Remove one mod or all of them.[/b] Every apply starts from the original files, and [b]Remove all mods[/b] puts every original back.
-[*][b]Game updates[/b] are detected. The patcher asks before treating updated files as the new originals.
+[*][b]Game updates[/b] are detected. The patcher asks before installing on top of updated files.
 [*][b]Voice-over and translations[/b] that come with a mod are installed too.
 [*][b]Command-line version[/b] ([i]dialog-patcher.exe[/i]) for mod installers and scripts.
 [/list]

@@ -22,6 +22,30 @@ public class PatchManagerViewModelInstallTests : IDisposable
         return vm;
     }
 
+    // GitHub issue 267: the status counts mods, as the list does, not the conversations they
+    // patch. Two mods that change the same conversation are "2 mods", not "1 patch".
+    [Fact]
+    public async Task Apply_StatusCountsMods_NotConversations()
+    {
+        var vm = MakeVm(FakePoe2Game.ExternalVoMod("A", "a"), FakePoe2Game.ExternalVoMod("B", "b"));
+
+        await vm.ApplyCommand.ExecuteAsync(null);
+
+        Assert.StartsWith("PatchManager_ApplySuccess_Other", vm.StatusText);
+    }
+
+    // GitHub issue 267: the installed-state line no longer counts game files, a number that
+    // means nothing next to a list of mods.
+    [Fact]
+    public async Task InstalledState_DoesNotCountGameFiles()
+    {
+        var vm = MakeVm(FakePoe2Game.ExternalVoMod("A", "a"));
+
+        await vm.ApplyCommand.ExecuteAsync(null);
+
+        Assert.Equal("PatchManager_ModsInstalled", vm.BackupStatusText);
+    }
+
     [Fact]
     public async Task Apply_Twice_Succeeds_AndEnablesRemoveAll()
     {
