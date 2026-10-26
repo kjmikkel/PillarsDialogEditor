@@ -256,7 +256,8 @@
     <sys:String x:Key="Legend_Shortcut_Del">Delete</sys:String>
     <sys:String x:Key="Legend_Shortcut_Del_Desc">delete selected node</sys:String>
     <sys:String x:Key="Legend_Shortcut_F5_Desc">test patch</sys:String>
-    <sys:String x:Key="Legend_Shortcut_F6_Desc">end the test and restore the game files</sys:String>
+    <sys:String x:Key="Legend_Shortcut_ShiftF5_Desc">end the test and restore the game files</sys:String>
+    <sys:String x:Key="Legend_Shortcut_F6_Desc">move to the next pane: Conversations, Canvas, Node Details (Shift+F6 goes back)</sys:String>
     <sys:String x:Key="Legend_Shortcut_CtrlShiftB">Ctrl+Shift+B</sys:String>
     <sys:String x:Key="Legend_Shortcut_CtrlShiftB_Desc">restore the backup taken when you first opened the game folder</sys:String>
 
@@ -461,7 +462,7 @@
     <sys:String x:Key="Status_FullRestoreSkipped_One">1 file was left as is because something other than the editor changed it, probably a game update (see the log).</sys:String>
     <sys:String x:Key="Status_FullRestoreSkipped_Other">{0} files were left as is because something other than the editor changed them, probably a game update (see the log).</sys:String>
     <sys:String x:Key="Status_FullRestoreLanguageUnknown">This backup's text files couldn't be matched to an installed language, so only conversations were restored (see the log).</sys:String>
-    <sys:String x:Key="Status_FullRestoreTestActive">A test patch is active. Use Test › End Test and Restore Game Files (F6) first, then restore the backup.</sys:String>
+    <sys:String x:Key="Status_FullRestoreTestActive">A test patch is active. Use Test › End Test and Restore Game Files (Shift+F5) first, then restore the backup.</sys:String>
     <!-- {0} = error message -->
     <sys:String x:Key="Status_RestoreError">Restore failed: {0}</sys:String>
     <sys:String x:Key="Status_NoBackupFound">No backup found for this game folder.</sys:String>
@@ -652,6 +653,7 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Shortcut_CtrlZ">Ctrl+Z</sys:String>
     <sys:String x:Key="Shortcut_CtrlY">Ctrl+Y</sys:String>
     <sys:String x:Key="Shortcut_F5">F5</sys:String>
+    <sys:String x:Key="Shortcut_ShiftF5">Shift+F5</sys:String>
     <sys:String x:Key="Shortcut_F6">F6</sys:String>
 
     <!-- ─── Menu bar ─────────────────────────────────────────────────────── -->
@@ -991,7 +993,7 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="BatchReplace_StatusNoMatches">No matches found</sys:String>
     <sys:String x:Key="BatchReplace_StatusApplied">Added {0} across {1} to the project — save it to keep them, Test Patch (F5) to try them in-game</sys:String>
     <sys:String x:Key="BatchReplace_StatusNoProject">Open a project first — Batch Replace adds its changes to the project</sys:String>
-    <sys:String x:Key="BatchReplace_StatusTestActive">A test is active — restore it (F6) before batch replacing, so the changes are made against the original game files</sys:String>
+    <sys:String x:Key="BatchReplace_StatusTestActive">A test is active — restore it (Shift+F5) before batch replacing, so the changes are made against the original game files</sys:String>
     <sys:String x:Key="BatchReplace_StatusSkipped_One">1 open conversation skipped — save and close it first</sys:String>
     <sys:String x:Key="BatchReplace_StatusSkipped_Other">{0} open conversations skipped — save and close them first</sys:String>
     <sys:String x:Key="ToolTip_BatchReplace_Find">Text to search for across all conversations</sys:String>
@@ -1216,14 +1218,14 @@ Saving records your edits to the open project — game files are not touched unt
 
     <!-- ─── Patch — toolbar buttons ──────────────────────────────────────── -->
     <sys:String x:Key="Button_TestPatch">Test Patch</sys:String>
-    <sys:String x:Key="ToolTip_TestPatch">Write the project's changes into the game files so you can try them in the game. The originals are kept, and Test › End Test and Restore Game Files (F6) puts them back. (F5)</sys:String>
+    <sys:String x:Key="ToolTip_TestPatch">Write the project's changes into the game files so you can try them in the game. The originals are kept, and Test › End Test and Restore Game Files (Shift+F5) puts them back. (F5)</sys:String>
 
     <!-- ─── Test mode overlay ─────────────────────────────────────────────── -->
-    <sys:String x:Key="TestMode_Message">Game files have been patched for testing. Launch the game and test your changes, then choose End Test and Restore Game Files (F6) when you are done.</sys:String>
+    <sys:String x:Key="TestMode_Message">Game files have been patched for testing. Launch the game and test your changes, then choose End Test and Restore Game Files (Shift+F5) when you are done.</sys:String>
     <!-- One name for this action everywhere (GitHub issue 247): it restores every file the test
          patched, not one conversation. Messages that point here quote this text. -->
     <sys:String x:Key="TestMode_Restore">End Test and Restore Game Files</sys:String>
-    <sys:String x:Key="ToolTip_TestMode_Restore">End the test: put back every game file the test patch changed, as it was before you pressed Test Patch, and return to editing. Your project is not changed. (F6)</sys:String>
+    <sys:String x:Key="ToolTip_TestMode_Restore">End the test: put back every game file the test patch changed, as it was before you pressed Test Patch, and return to editing. Your project is not changed. (Shift+F5)</sys:String>
 
     <!-- ─── Patch — status messages ──────────────────────────────────────── -->
     <!-- {0} = conversation name -->
@@ -1261,7 +1263,7 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ConflictDialog_CancelTooltip">Cancel the test and leave game files unchanged.</sys:String>
     <!-- Shown after End Test and Restore Game Files succeeds -->
     <sys:String x:Key="Status_RestoreComplete2">Conversation restored — ready to edit.</sys:String>
-    <!-- End Test and Restore Game Files (F6) when the test's temporary backups were deleted (issue 125). {0} = count, {1} = first game file -->
+    <!-- End Test and Restore Game Files (Shift+F5) when the test's temporary backups were deleted (issue 125). {0} = count, {1} = first game file -->
     <sys:String x:Key="Status_RestoreBackupsMissing_One">Still in test mode: the temporary backup of one file is gone, so it keeps the test's changes: {1}. Everything else was restored. Test › Restore Backup or your storefront's "verify files" can repair it.</sys:String>
     <sys:String x:Key="Status_RestoreBackupsMissing_Other">Still in test mode: the temporary backups of {0} files are gone, so they keep the test's changes (first: {1}). Everything else was restored. Test › Restore Backup or your storefront's "verify files" can repair them.</sys:String>
     <sys:String x:Key="Status_RestoreLeftUnrestored_One">Left test mode, but one file still has the test's changes: {1}. Use Test › Restore Backup or your storefront's "verify files" to repair it.</sys:String>
@@ -1291,7 +1293,7 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- Shown when Test Patch is pressed but project has no patches -->
     <sys:String x:Key="Status_ProjectNoPatch">The project has no patches yet — save a conversation first.</sys:String>
     <!-- Test Patch over patcher-installed mods (issue #76). {0} is a file count. -->
-    <sys:String x:Key="Status_TestPatchAlreadyActive">A test is already in the game folder. Use End Test and Restore Game Files (F6) to put the original files back before testing again.</sys:String>
+    <sys:String x:Key="Status_TestPatchAlreadyActive">A test is already in the game folder. Use End Test and Restore Game Files (Shift+F5) to put the original files back before testing again.</sys:String>
     <sys:String x:Key="Status_TestPatchCancelledPatcherMods">Test cancelled — nothing was changed. Remove the installed mods in the Patch Manager first, then test again.</sys:String>
     <sys:String x:Key="TestOverPatcher_Title">Mods are installed over these files</sys:String>
     <sys:String x:Key="TestOverPatcher_Message">{0} of the files this test writes are managed by mods installed with the Patch Manager or dialog-patcher. Testing now patches the modded versions, and the Patch Manager will ask about these files on its next apply. For a clean test, cancel and use "Remove all mods" in the Patch Manager first.</sys:String>

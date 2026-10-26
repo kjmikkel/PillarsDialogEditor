@@ -257,7 +257,7 @@
                         <ctrl:AccessibleMenuItem Header="{DynamicResource TestMode_Restore}"
                                   AutomationProperties.AutomationId="MenuTest_RestoreConversation"
                                   Command="{Binding RestoreConversationCommand}"
-                                  InputGesture="F6"
+                                  InputGesture="Shift+F5"
                                   ToolTip.Tip="{DynamicResource ToolTip_TestMode_Restore}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_TestMode_Restore}"/>
                         <Separator/>

@@ -102,7 +102,7 @@ Click any conversation in the browser to open it on the canvas. To start a brand
 conversation that doesn't exist yet in the game folder, click the **⊕** button in the
 browser header — a name dialog opens, and the new entry appears in a **(new)** folder
 shown in green. The conversation file is **not** written to disk until you press
-`F5`; `F6` deletes it again, leaving the project entry intact for the next test cycle.
+`F5`; `Shift+F5` deletes it again, leaving the project entry intact for the next test cycle.
 
 | Action | How |
 |--------|-----|
@@ -240,7 +240,7 @@ unchanged.
 
 ### 7 — Restore after testing
 
-**Test › End Test and Restore Game Files** (`F6`)
+**Test › End Test and Restore Game Files** (`Shift+F5`)
 
 Reverts the patched game files to their pre-test state and unlocks the editor.
 New conversations that were written by `F5` are deleted again.
@@ -461,7 +461,8 @@ Legend window can be moved outside the editor (useful on a second monitor).
 | `Ctrl+H` | Find / Replace |
 | `Delete` | Delete selected node |
 | `F5` | Test Patch |
-| `F6` | End Test and Restore Game Files |
+| `Shift+F5` | End Test and Restore Game Files |
+| `F6` / `Shift+F6` | Move to the next / previous pane (Conversations, Canvas, Node Details) |
 | `Ctrl+Shift+B` | Restore Backup (all conversations) |
 | `Escape` | Clear search / close browser flyout |
 
@@ -554,7 +555,7 @@ This is checked by an opt-in test against a real install ([docs/game-data-tests.
 run before each release. It has not yet been confirmed by playing through edited conversations
 in-game. If a patched conversation misbehaves in the game, please
 [open an issue](https://github.com/kjmikkel/PillarsDialogEditor/issues). Test Patch always backs up
-the files it changes, so **End Test and Restore Game Files (F6)** puts the originals back.
+the files it changes, so **End Test and Restore Game Files (Shift+F5)** puts the originals back.
 
 **DLC.** Nothing in the editor or patcher depends on which DLC you own. Pillars of Eternity's
 White March conversations sit in the normal conversations folder, with their text in
@@ -578,8 +579,8 @@ install, with a "conversation not found" warning. Nothing else is written or bro
   replaces a file a mod changed. **Remove all mods / Restore** then leaves that file alone and tells
   you. Reinstalling stops and asks before treating the new file as the original
   (`--accept-current-files`). Your update is never overwritten with an older copy.
-- **Test Patch (F5) / End Test and Restore Game Files (F6).** F5 backs up the files it's about to change, so
-  the backup is always fresh. Restore with F6 before updating or verifying the game. F6 puts
+- **Test Patch (F5) / End Test and Restore Game Files (Shift+F5).** F5 backs up the files it's about to change, so
+  the backup is always fresh. Restore with Shift+F5 before updating or verifying the game. It puts
   every file F5 changed back byte for byte and removes the files it added. A folder F5 had to
   create can be left behind empty ([#125](https://github.com/kjmikkel/PillarsDialogEditor/issues/125)).
 - **Restore Backup (Ctrl+Shift+B).** This puts back files from the snapshot taken the first
@@ -587,9 +588,9 @@ install, with a "conversation not found" warning. Nothing else is written or bro
   update, "verify files" or the Patch Manager changed is left alone and listed in the log, so an
   old snapshot never downgrades an updated game
   ([#118](https://github.com/kjmikkel/PillarsDialogEditor/issues/118)). While a test patch is
-  active, use F6 first. It covers conversations and the text of every installed language, each
+  active, use Shift+F5 first. It covers conversations and the text of every installed language, each
   restored into its own language's folder, and the original of every shipped voice-over line that
-  Test Patch replaced. A voice-over file the editor *added* is removed by F6, not by Restore Full
+  Test Patch replaced. A voice-over file the editor *added* is removed by Shift+F5, not by Restore Full
   Backup. Backups taken before this change cover one language: it's identified automatically, and
   only that language is restored
   ([#123](https://github.com/kjmikkel/PillarsDialogEditor/issues/123)).

@@ -401,6 +401,36 @@ public partial class MainWindow : Window
     /// (not a cached field) — safe to call any time after BuildDock has run.
     private ConversationView? FindCanvasView() => FindDockedView<ConversationView>();
 
+    /// F6 / Shift+F6 (GitHub issue 262): move focus to the next or previous pane in reading
+    /// order. Each pane names the control to land on; a pane that is closed, or whose control
+    /// can't take focus and has no other Tab stop, is skipped.
+    private void CyclePane(bool backwards)
+    {
+        (Control? View, string Target)[] panes =
+        [
+            (FindDockedView<GameBrowserView>(), "FilterBox"),
+            (FindCanvasView(),                  "Editor"),
+            (FindDetailView(),                  "DefaultTextBox"),
+        ];
+        var current = Array.FindIndex(panes, p => p.View?.IsKeyboardFocusWithin == true);
+        for (var step = 1; step <= panes.Length; step++)
+        {
+            var (view, target) = panes[PaneCycle.Next(current, step, panes.Length, backwards)];
+            if (view is not null && FocusPane(view, target)) return;
+        }
+    }
+
+    private static bool FocusPane(Control view, string target)
+    {
+        if (view.FindControl<Control>(target) is { IsEffectivelyVisible: true, IsEffectivelyEnabled: true } preferred
+            && preferred.Focus(NavigationMethod.Tab))
+            return true;
+        // Fall back to the pane's first Tab stop, if it has one inside it.
+        return KeyboardNavigationHandler.GetNext(view, NavigationDirection.Next) is Control first
+            && view.IsVisualAncestorOf(first)
+            && first.Focus(NavigationMethod.Tab);
+    }
+
     /// Locates the live NodeDetailView hosted by the Dock details tool (same caveat as
     /// <see cref="FindCanvasView"/> — it may be null if the tool is closed).
     private NodeDetailView? FindDetailView() => FindDockedView<NodeDetailView>();
@@ -556,8 +586,15 @@ public partial class MainWindow : Window
                 e.Handled = true;
                 break;
 
-            case Key.F6 when e.KeyModifiers == KeyModifiers.None:
+            // GitHub issue 262: F6 is the platform's pane key, so ending a test moved to Shift+F5,
+            // beside F5 (as Visual Studio pairs start and stop debugging).
+            case Key.F5 when e.KeyModifiers == KeyModifiers.Shift:
                 vm.RestoreConversationCommand.Execute(null);
+                e.Handled = true;
+                break;
+
+            case Key.F6 when e.KeyModifiers is KeyModifiers.None or KeyModifiers.Shift:
+                CyclePane(backwards: e.KeyModifiers == KeyModifiers.Shift);
                 e.Handled = true;
                 break;
 
