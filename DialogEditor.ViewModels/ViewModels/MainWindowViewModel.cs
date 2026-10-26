@@ -461,11 +461,7 @@ public partial class MainWindowViewModel : ObservableObject
             return true;
         }
 
-        var selectedId = Canvas.SelectedNode?.NodeId;
-        if (_project?.IsNewConversation(file.Name) == true && !File.Exists(file.ConversationPath))
-            LoadNewConversation(file);
-        else
-            LoadConversationFile(file);
+        ReloadCurrentConversationView();
 
         // LoadConversationFile logs and reports its own failures but does not throw; a
         // completed load leaves the conversation named and clean.
@@ -474,10 +470,31 @@ public partial class MainWindowViewModel : ObservableObject
             AppLog.Warn($"Reading mode: reverting '{file.Name}' to its saved state did not complete");
             return false;
         }
-        // A node the discard removed is simply no longer selected; no "node gone" message.
+        return true;
+    }
+
+    /// Opens a conversation on the canvas from the current project: a conversation the project
+    /// created and that has no game file yet starts from the project's patch alone.
+    private void OpenConversationView(ConversationFile file)
+    {
+        if (_project?.IsNewConversation(file.Name) == true && !File.Exists(file.ConversationPath))
+            LoadNewConversation(file);
+        else
+            LoadConversationFile(file);
+    }
+
+    /// Re-opens the open conversation from the current project and reselects the node that was
+    /// selected. Needed whenever the project is swapped under an open canvas (issue 234): the
+    /// canvas and its BaseSnapshot would otherwise keep the old project's text, and the next Save
+    /// would re-diff that stale canvas over the swapped-in work. A node the new project no longer
+    /// has is simply not selected; no "node gone" message.
+    private void ReloadCurrentConversationView()
+    {
+        if (_currentFile is not { } file) return;
+        var selectedId = Canvas.SelectedNode?.NodeId;
+        OpenConversationView(file);
         var selected = Canvas.Nodes.FirstOrDefault(n => n.NodeId == selectedId);
         if (selected is not null) Canvas.SelectedNode = selected;
-        return true;
     }
 
     // Work that opening in reading mode put off because it would have written (issue 234).
@@ -1408,6 +1425,11 @@ public partial class MainWindowViewModel : ObservableObject
         AppSettings.AddRecentProject(path);
         RefreshRecentProjects();
         CurrentProjectName = loaded.Name;
+        // A conversation already on the canvas shows the previous project's text (issue 234: opening
+        // a project, a deferred autosave Restore and a deferred merge all swap the project under
+        // it). Unsaved canvas edits are left alone: a branch-switch reload can arrive while dirty.
+        if (_currentFile is not null && _provider is not null && !IsModified)
+            ReloadCurrentConversationView();
         AppLog.Info($"Opened project: {path}");
         StatusText = Loc.FormatCount("Status_ProjectOpened", loaded.Patches.Count, loaded.Name);
     }
@@ -2944,15 +2966,8 @@ public partial class MainWindowViewModel : ObservableObject
                 ? Loc.FormatCount("Status_RestoreLeftUnrestored", unrestored.Count, unrestored[0])
                 : Loc.Get("Status_RestoreComplete2");
 
-            if (_currentFile is not null)
-            {
-                // For new conversations, reload as empty canvas (file no longer exists)
-                if (_project?.IsNewConversation(_currentFile.Name) == true
-                    && !File.Exists(_currentFile.ConversationPath))
-                    LoadNewConversation(_currentFile);
-                else
-                    LoadConversationFile(_currentFile);
-            }
+            // For new conversations this reloads as an empty canvas (file no longer exists).
+            ReloadCurrentConversationView();
             TestModeExited?.Invoke();
         }
         catch (Exception ex)
@@ -2975,10 +2990,7 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        if (_project?.IsNewConversation(file.Name) == true && !File.Exists(file.ConversationPath))
-            LoadNewConversation(file);
-        else
-            LoadConversationFile(file);
+        OpenConversationView(file);
     }
 
     private void LoadConversationFile(ConversationFile file)
