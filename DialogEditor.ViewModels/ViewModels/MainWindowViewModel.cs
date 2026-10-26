@@ -777,10 +777,16 @@ public partial class MainWindowViewModel : ObservableObject
             ClearPendingConflict();
             return;
         }
-        // The merge replaces the open project, like opening one (issue 234): edits made while
-        // the conflict was pending would otherwise stay on the canvas and be saved over the
-        // merged choices. Stay Here keeps the edits and the conflict pending.
-        if (!await EnsureNoUnsavedEditsAsync()) return;
+        // The merge replaces the open project (issue 234), so edits made while the conflict was
+        // pending would be saved over the merged choices. The usual Save / Discard / Stay Here
+        // prompt can't be used: Save writes this side over the conflicted file, which removes
+        // the markers and loses the other branch's version. Refuse instead, and say why; the
+        // edits and the pending conflict are left as they are.
+        if (HasUnsavedChanges)
+        {
+            StatusText = Loc.Get("Status_ResolveConflictsUnsavedEdits");
+            return;
+        }
         await LoadProjectAsync(path, offerDeferred: false);
     }
 

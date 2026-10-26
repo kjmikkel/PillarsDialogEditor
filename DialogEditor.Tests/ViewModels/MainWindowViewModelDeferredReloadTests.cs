@@ -318,7 +318,7 @@ public class MainWindowViewModelDeferredReloadTests : IDisposable
         Assert.Equal("unsaved edit", NodeText(vm));
     }
 
-    // ── Final review 2, R2: Resolve Conflicts asks about unsaved edits ─────
+    // ── Final review 2, R2/R6: Resolve Conflicts with unsaved edits ───────
 
     /// Reading opened the conflicted project on the "mine" side; switching to Editing offered the
     /// merge, the user cancelled it (the conflict stays pending), then edited the canvas.
@@ -336,39 +336,42 @@ public class MainWindowViewModelDeferredReloadTests : IDisposable
         return vm;
     }
 
-    [Fact]
-    public async Task ResolveConflicts_WithUnsavedEdits_Discard_ShowsTheMerge_AndSaveKeepsIt()
+    // R6: Save in an unsaved-changes prompt would write "mine" over the conflicted file and lose
+    // the other branch's side, so whatever the user answers, that side must still be on disk.
+    [Theory]
+    [InlineData("save")]
+    [InlineData("discard")]
+    [InlineData("stay")]
+    public async Task ResolveConflicts_WithUnsavedEdits_KeepsTheOtherBranchOnDisk_WhateverTheAnswer(string answer)
     {
         var vm = await EditWhileTheConflictIsPending();
-        vm.ShowGitConflictResolution = res =>
+        vm.ShowGitConflictResolution = _ => Task.FromResult<DialogProject?>(null);
+        vm.UnsavedChangesRequested += answer switch
         {
-            res.Conflicts[0].Choice = MergeSide.Theirs;
-            res.ApplyCommand.Execute(null);
-            return Task.FromResult(res.Result);
+            "save"    => vm.SaveAndProceed,
+            "discard" => vm.DiscardAndProceed,
+            _         => vm.CancelPendingNavigation,
         };
-        vm.UnsavedChangesRequested += vm.DiscardAndProceed;
 
         await vm.ResolveConflictsCommand.ExecuteAsync(null);
 
-        Assert.Equal("traveler", NodeText(vm));
-        vm.SaveProjectCommand.Execute(null);
-        var saved = File.ReadAllText(ProjectPath);
-        Assert.Contains("traveler", saved);
-        Assert.DoesNotContain("my edit", saved);
-        Assert.DoesNotContain("friend", saved);
+        Assert.Contains("traveler", File.ReadAllText(ProjectPath));
     }
 
     [Fact]
-    public async Task ResolveConflicts_WithUnsavedEdits_StayHere_KeepsTheConflictPendingAndTheEdit()
+    public async Task ResolveConflicts_WithUnsavedEdits_IsRefusedWithAReason_AndKeepsTheEditAndTheConflict()
     {
         var vm = await EditWhileTheConflictIsPending();
+        var asked = false;
         var modalShown = false;
+        vm.UnsavedChangesRequested += () => { asked = true; vm.CancelPendingNavigation(); };
         vm.ShowGitConflictResolution = _ => { modalShown = true; return Task.FromResult<DialogProject?>(null); };
-        vm.UnsavedChangesRequested += vm.CancelPendingNavigation;
 
         await vm.ResolveConflictsCommand.ExecuteAsync(null);
 
+        Assert.False(asked);
         Assert.False(modalShown);
+        Assert.Equal("Status_ResolveConflictsUnsavedEdits", vm.StatusText);
         Assert.True(vm.HasPendingConflictResolution);
         Assert.Equal("my edit", NodeText(vm));
         Assert.True(vm.IsModified);
