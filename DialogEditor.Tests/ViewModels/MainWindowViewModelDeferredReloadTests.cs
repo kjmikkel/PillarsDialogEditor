@@ -1,3 +1,4 @@
+using DialogEditor.Core.Editing;
 using DialogEditor.Core.GameData;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
@@ -215,5 +216,105 @@ public class MainWindowViewModelDeferredReloadTests : IDisposable
         await vm.SwitchModeAsync(EditorMode.Editing);
 
         Assert.False(tourVisibleAtPrompt);
+    }
+
+    // ── Final review 2, R1: Discard clears the dirty flag ──────────────────
+
+    private string OtherProjectPath => Path.Combine(_dir, "q.dialogproject");
+
+    /// Writes a saved project at <paramref name="path"/> plus a newer autosave sidecar that edits
+    /// node 1 of "game".
+    private static void WriteProjectWithRestorableEdit(string path, string restoredText)
+    {
+        DialogProjectSerializer.SaveToFile(path, DialogProject.Empty("Q"));
+        var sidecar = AutosaveRecovery.SidecarPath(path);
+        DialogProjectSerializer.SaveToFile(sidecar, DialogProject.Empty("Q").WithPatch(EditPatch(restoredText)));
+        File.SetLastWriteTimeUtc(path,    DateTime.UtcNow.AddMinutes(-10));
+        File.SetLastWriteTimeUtc(sidecar, DateTime.UtcNow.AddMinutes(-1));
+    }
+
+    private static void Edit(MainWindowViewModel vm, string text)
+    {
+        vm.Canvas.Nodes.Single(n => n.NodeId == 1).DefaultText = text;
+        Assert.True(vm.IsModified);
+    }
+
+    /// Editing, a saved project open with "game" on the canvas.
+    private async Task<(MainWindowViewModel Vm, FakeGameDataProvider Provider)> OpenGameInEditing()
+    {
+        DialogProjectSerializer.SaveToFile(ProjectPath, DialogProject.Empty("P"));
+        var provider = Provider();
+        var vm = MakeVm(EditorMode.Editing, provider);
+        await LoadProject(vm, ProjectPath);
+        SelectGame(vm, provider);
+        return (vm, provider);
+    }
+
+    [Fact]
+    public async Task OpeningAnotherProject_AfterDiscard_RestoreShowsTheRestoredText_AndSaveKeepsIt()
+    {
+        var (vm, _) = await OpenGameInEditing();
+        Edit(vm, "discarded edit");
+        WriteProjectWithRestorableEdit(OtherProjectPath, "restored text");
+        vm.UnsavedChangesRequested += vm.DiscardAndProceed;
+        vm.ConfirmRestoreAutosave = gens => Task.FromResult(AutosaveDecision.Restore(gens[0]));
+
+        vm.OpenRecentProjectCommand.Execute(OtherProjectPath);
+
+        Assert.Equal("restored text", NodeText(vm));
+        Assert.True(vm.IsModified);   // restored work is unsaved until Save
+        vm.SaveProjectCommand.Execute(null);
+        var saved = File.ReadAllText(OtherProjectPath);
+        Assert.Contains("restored text", saved);
+        Assert.DoesNotContain("discarded edit", saved);
+    }
+
+    [Fact]
+    public async Task BranchSwitchReload_AfterDiscard_ReloadsTheCanvas_AndIsClean()
+    {
+        var (vm, _) = await OpenGameInEditing();
+        Edit(vm, "discarded edit");
+        vm.UnsavedChangesRequested += vm.DiscardAndProceed;
+
+        Assert.True(await vm.EnsureNoUnsavedEditsAsync());
+        // The branch checkout rewrites the project file, then the Branches window reloads it.
+        DialogProjectSerializer.SaveToFile(ProjectPath, DialogProject.Empty("P").WithPatch(EditPatch("branch text")));
+        vm.ReloadCurrentProjectFromDisk();
+
+        Assert.Equal("branch text", NodeText(vm));
+        Assert.False(vm.IsModified);
+    }
+
+    [Fact]
+    public async Task Discard_ThenAnotherEdit_IsDirtyAgain()
+    {
+        // Discard clears the canvas flag too: left set, the next edit would not change it, and
+        // the window would never be marked dirty again.
+        var (vm, _) = await OpenGameInEditing();
+        Edit(vm, "discarded edit");
+        vm.UnsavedChangesRequested += vm.DiscardAndProceed;
+        Assert.True(await vm.EnsureNoUnsavedEditsAsync());
+        Assert.False(vm.IsModified);
+
+        vm.Canvas.Nodes.Single(n => n.NodeId == 1).DefaultText = "later edit";
+
+        Assert.True(vm.IsModified);
+    }
+
+    [Fact]
+    public async Task Switch_ToReading_WhenSaveFails_StaysInEditingWithTheEdit()
+    {
+        var (vm, _) = await OpenGameInEditing();
+        Edit(vm, "unsaved edit");
+        // A folder where the project file was: the save cannot write it.
+        File.Delete(ProjectPath);
+        Directory.CreateDirectory(ProjectPath);
+        vm.UnsavedChangesRequested += vm.SaveAndProceed;
+
+        Assert.False(await vm.SwitchModeAsync(EditorMode.Reading));
+
+        Assert.Equal(EditorMode.Editing, vm.Mode);
+        Assert.True(vm.IsModified);
+        Assert.Equal("unsaved edit", NodeText(vm));
     }
 }

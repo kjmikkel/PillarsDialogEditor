@@ -214,6 +214,7 @@ public partial class MainWindowViewModel : ObservableObject
     /// UnsavedChangesRequested dialog plumbing.
     public Task<bool> EnsureNoUnsavedEditsAsync()
     {
+        _guardDiscarded = false;
         if (!HasUnsavedChanges)
             return Task.FromResult(true);
 
@@ -242,8 +243,19 @@ public partial class MainWindowViewModel : ObservableObject
         // The user consciously discarded these edits — the next launch must not
         // resurrect them from the autosave sidecar (spec 2026-07-12 §3).
         if (_projectPath is not null) AutosaveRecovery.TryDelete(_projectPath);
+        // The edits are gone from here on (issue 234). Left dirty, a project swapped in by the
+        // continuation skipped its canvas reload (FinishLoad), and the next Save folded the
+        // discarded canvas over the new work. The canvas flag is cleared too: left set, the next
+        // edit would not change it, and the window would never be marked dirty again.
+        _guardDiscarded = true;
+        Canvas.IsModified = false;
+        IsModified = false;
         Proceed();
     }
+
+    /// Set by Discard for the awaiting caller of EnsureNoUnsavedEditsAsync, which can no longer
+    /// tell Discard from Save by IsModified. Reset by each EnsureNoUnsavedEditsAsync call.
+    private bool _guardDiscarded;
 
     public void CancelPendingNavigation()
     {
@@ -414,13 +426,23 @@ public partial class MainWindowViewModel : ObservableObject
         {
             if (!await EnsureNoUnsavedEditsAsync())
                 return false;
-            // Still dirty after the guard agreed means Discard (Save clears IsModified): put the
-            // canvas back to the saved state, or stay in Editing rather than show lost edits.
-            if (IsModified && !await RevertToSavedAsync())
+            if (_guardDiscarded)
             {
-                StatusText = Loc.Get("Status_ModeSwitchRefused");
-                return false;
+                // Discard cleared the dirty flag but not the canvas: put it back to the saved
+                // state, or stay in Editing rather than show lost edits. A failed revert leaves
+                // the edits on screen, so they are marked unsaved again.
+                if (!await RevertToSavedAsync())
+                {
+                    if (_currentFile is not null) Canvas.IsModified = true;
+                    IsModified = true;
+                    StatusText = Loc.Get("Status_ModeSwitchRefused");
+                    return false;
+                }
             }
+            // Still dirty after Save means the save failed (its error is already shown): stay
+            // in Editing with the edits rather than carry them into read-only Reading.
+            else if (HasUnsavedChanges)
+                return false;
         }
 
         Mode = target;
@@ -467,11 +489,9 @@ public partial class MainWindowViewModel : ObservableObject
             return true;
         }
 
-        ReloadCurrentConversationView();
-
-        // LoadConversationFile logs and reports its own failures but does not throw; a
-        // completed load leaves the conversation named and clean.
-        if (IsModified || CurrentConversationName != file.Name)
+        // LoadConversationFile logs and reports its own failures but does not throw. Discard has
+        // already cleared IsModified, so the load's own result says whether it completed.
+        if (!ReloadCurrentConversationView() || CurrentConversationName != file.Name)
         {
             AppLog.Warn($"Reading mode: reverting '{file.Name}' to its saved state did not complete");
             return false;
@@ -481,26 +501,30 @@ public partial class MainWindowViewModel : ObservableObject
 
     /// Opens a conversation on the canvas from the current project: a conversation the project
     /// created and that has no game file yet starts from the project's patch alone.
-    private void OpenConversationView(ConversationFile file)
+    /// False when the load failed (already logged and reported).
+    private bool OpenConversationView(ConversationFile file)
     {
         if (_project?.IsNewConversation(file.Name) == true && !File.Exists(file.ConversationPath))
+        {
             LoadNewConversation(file);
-        else
-            LoadConversationFile(file);
+            return true;
+        }
+        return LoadConversationFile(file);
     }
 
     /// Re-opens the open conversation from the current project and reselects the node that was
     /// selected. Needed whenever the project is swapped under an open canvas (issue 234): the
     /// canvas and its BaseSnapshot would otherwise keep the old project's text, and the next Save
     /// would re-diff that stale canvas over the swapped-in work. A node the new project no longer
-    /// has is simply not selected; no "node gone" message.
-    private void ReloadCurrentConversationView()
+    /// has is simply not selected; no "node gone" message. False when the load failed.
+    private bool ReloadCurrentConversationView()
     {
-        if (_currentFile is not { } file) return;
+        if (_currentFile is not { } file) return true;
         var selectedId = Canvas.SelectedNode?.NodeId;
-        OpenConversationView(file);
+        if (!OpenConversationView(file)) return false;
         var selected = Canvas.Nodes.FirstOrDefault(n => n.NodeId == selectedId);
         if (selected is not null) Canvas.SelectedNode = selected;
+        return true;
     }
 
     // Work that opening in reading mode put off because it would have written (issue 234).
@@ -1449,7 +1473,10 @@ public partial class MainWindowViewModel : ObservableObject
         CurrentProjectName = loaded.Name;
         // A conversation already on the canvas shows the previous project's text (issue 234: opening
         // a project, a deferred autosave Restore and a deferred merge all swap the project under
-        // it). Unsaved canvas edits are left alone: a branch-switch reload can arrive while dirty.
+        // it). Discard clears IsModified, so after the unsaved-edits guard this is dirty only when
+        // the user chose Save and the save failed (SaveAndProceed proceeds regardless), or when
+        // Create Sample Project, which has no guard, swaps a project in: those edits are wanted
+        // and the reload would drop them, so they are left on the canvas.
         if (_currentFile is not null && _provider is not null && !IsModified)
             ReloadCurrentConversationView();
         AppLog.Info($"Opened project: {path}");
@@ -3020,9 +3047,10 @@ public partial class MainWindowViewModel : ObservableObject
         OpenConversationView(file);
     }
 
-    private void LoadConversationFile(ConversationFile file)
+    /// False when nothing was loaded (no game data, or the load failed and was reported).
+    private bool LoadConversationFile(ConversationFile file)
     {
-        if (_provider is null) return;
+        if (_provider is null) return false;
         try
         {
             _currentFile = file;
@@ -3099,12 +3127,14 @@ public partial class MainWindowViewModel : ObservableObject
                 _pendingSelectNodeId = null;
                 SelectNodeById(pending);
             }
+            return true;
         }
         catch (Exception ex)
         {
             AppLog.Error($"Failed to load conversation '{file.Name}'", ex);
             StatusText = Loc.Format("Status_LoadError", file.Name, ex.Message);
             ReportError?.Invoke(ex);
+            return false;
         }
     }
 
