@@ -153,16 +153,35 @@ public class MainWindowViewModelReadingModeTests : IDisposable
     }
 
     [Fact]
-    public async Task Switch_ToReading_WhenDiscardCannotBeReverted_StaysInEditing()
+    public async Task Switch_ToReading_AfterDiscard_ProjectOnlyEdit_ReloadsTheProject()
     {
-        // Dirty project with no conversation open: there is nothing to re-read, so the
-        // discard cannot be honoured and the switch must not happen.
+        // Metadata-only dirt, no conversation open: nothing on screen to lose, so the project
+        // is re-read from its saved file.
+        var vm = await OpenVm();
+        vm.Detail.AddWordToProjectDictionary!("zzword");
+        Assert.True(vm.IsModified);
+        vm.UnsavedChangesRequested += vm.DiscardAndProceed;
+
+        Assert.True(await vm.SwitchModeAsync(EditorMode.Reading));
+
+        Assert.True(vm.IsReadingMode);
+        Assert.True(vm.IsProjectOpen);
+        Assert.False(vm.IsModified);
+        Assert.DoesNotContain("zzword", vm.ProjectWords ?? []);
+    }
+
+    [Fact]
+    public async Task Switch_ToReading_WhenDiscardCannotBeReverted_StaysInEditingAndSaysWhy()
+    {
         var vm = await OpenVm();
         vm.IsModified = true;
+        File.Delete(vm.ProjectPath!);   // nothing left to re-read
         vm.UnsavedChangesRequested += vm.DiscardAndProceed;
 
         Assert.False(await vm.SwitchModeAsync(EditorMode.Reading));
+
         Assert.Equal(EditorMode.Editing, vm.Mode);
+        Assert.Equal("Status_ModeSwitchRefused", vm.StatusText);
     }
 
     [Fact]

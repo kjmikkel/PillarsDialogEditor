@@ -1231,6 +1231,7 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- {0} = conversation name -->
     <sys:String x:Key="Status_PatchSaved">Patch saved: {0}</sys:String>
     <!-- Shown in the status bar when a conversation is loaded but no project is open -->
+    <sys:String x:Key="Status_ModeSwitchRefused">Couldn't switch to reading: the unsaved changes could not be discarded. Save or discard them, then try again.</sys:String>
     <sys:String x:Key="Status_NoProjectReadOnly">Viewing only — open or create a project (File › New Project) to start editing.</sys:String>
     <!-- Shown when trying to save/test but no patch directory is configured -->
     <sys:String x:Key="Status_NoPatchDirectory">Set a patch output directory in Settings before saving.</sys:String>

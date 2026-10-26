@@ -413,8 +413,11 @@ public partial class MainWindowViewModel : ObservableObject
                 return false;
             // Still dirty after the guard agreed means Discard (Save clears IsModified): put the
             // canvas back to the saved state, or stay in Editing rather than show lost edits.
-            if (IsModified && !RevertOpenConversationToSaved())
+            if (IsModified && !await RevertToSavedAsync())
+            {
+                StatusText = Loc.Get("Status_ModeSwitchRefused");
                 return false;
+            }
         }
 
         Mode = target;
@@ -424,15 +427,31 @@ public partial class MainWindowViewModel : ObservableObject
         return true;
     }
 
-    /// Re-opens the current conversation from the game data plus the project's saved patch (the
-    /// path a switch to another conversation takes after Discard) and reselects the same node.
+    /// Puts the open work back to its saved state after Discard. With a conversation open that
+    /// is re-opening it from the game data plus the project's saved patch (the path a switch to
+    /// another conversation takes) and reselecting the same node. With none open (project-level
+    /// edits only) there is no view to lose, so the project is re-read from its file.
     /// False when there is nothing to re-read or the load did not complete.
-    private bool RevertOpenConversationToSaved()
+    private async Task<bool> RevertToSavedAsync()
     {
         if (_currentFile is not { } file || _provider is null)
         {
-            AppLog.Warn("Reading mode: discard could not be reverted, no conversation is open");
-            return false;
+            var path = _projectPath;
+            if (path is null || !File.Exists(path))
+            {
+                AppLog.Warn("Reading mode: discard could not be reverted, the project has no saved file to re-read");
+                return false;
+            }
+            var before = _project;
+            await LoadProjectAsync(path, offerDeferred: false);
+            // A completed load swaps in a freshly read project (it does not reset IsModified).
+            if (!IsProjectOpen || ReferenceEquals(before, _project))
+            {
+                AppLog.Warn($"Reading mode: reloading '{path}' to discard its edits did not complete");
+                return false;
+            }
+            IsModified = false;
+            return true;
         }
 
         var selectedId = Canvas.SelectedNode?.NodeId;
@@ -448,7 +467,9 @@ public partial class MainWindowViewModel : ObservableObject
             AppLog.Warn($"Reading mode: reverting '{file.Name}' to its saved state did not complete");
             return false;
         }
-        if (selectedId is int id) SelectNodeById(id);
+        // A node the discard removed is simply no longer selected; no "node gone" message.
+        var selected = Canvas.Nodes.FirstOrDefault(n => n.NodeId == selectedId);
+        if (selected is not null) Canvas.SelectedNode = selected;
         return true;
     }
 
