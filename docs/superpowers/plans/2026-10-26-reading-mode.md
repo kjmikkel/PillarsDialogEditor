@@ -473,3 +473,31 @@ route, add a `ConversationViewModel.IsReadingMode` set from `UpdateEditable()` (
   Screenshot each step and look at every PNG.
 - [x] **Step 4: Docs and learnings.** Update `docs/audience.md` and tick this plan's boxes. Use `trail note` for anything that took digging, such as the deferred-prompt flow and why the shortcut gate returns without marking the key handled. Append the handoff section.
 - [x] **Step 5: Commit and open the PR**: `docs(reading-mode): audience, plan and handoff (#234)`. Run `trail check`, push, then `gh pr create` with "Closes #234". Bind the PR and turn on Auto-fix.
+
+## Handoff — 2026-10-26
+
+**Done.** All 11 tasks are implemented and each was reviewed. After that came a final whole-branch review (Opus) and three residual fix rounds. PR [#330](https://github.com/kjmikkel/PillarsDialogEditor/pull/330) ("Closes #234") is open on `feat/234-reading-mode`, with Auto-fix on. The full headless suite passes: 4825 passed, 0 failed.
+
+**Changed beyond the plan.** These are behaviour changes; the PR description lists them.
+- Autosave serialises a folded copy, so `_project` stays the last-saved state.
+- Discard reverts the open conversation before it continues.
+- `FinishLoad` reloads the open conversation when the project is swapped.
+- In Editing, cancelling the deferred conflict merge closes the project, and so does answering "Later" to the deferred autosave offer.
+- `SaveProject` refuses to write over a file whose git conflict is still pending.
+- Resolve Conflicts refuses while there are unsaved edits.
+- The test-mode overlay's End Test and Restore button also works in Reading.
+The three `.trail/learnings/2026-10-26-*` notes explain why.
+
+**Remaining.**
+1. Confirm in the running app (running-the-app skill) the fixes made after the first GUI run. A smoke run was blocked because the screensaver owned the desktop. Check:
+   - In Reading with no project, there is no "Viewing only … File › New Project" line, and the female-text placeholder reads "(same as default)".
+   - Browse Speaker Lines has no "Only my lines" control without a project.
+   - The status bar drops the badge's hover hint after a switch.
+   - Discard after an autosave tick (wait about 70 s) restores the saved text.
+   - Stay Here keeps the edit.
+   Back up settings.json **and** layout.json first. A fresh settings.json needs `Mode` and `ReaderTourSeen` set, or the chooser appears.
+2. Watch PR #330 CI and review, then merge.
+
+**Follow-ups filed, not in this PR.** #325 (type-name UIA names), #326 (merge and export ignore unsaved edits), #327 (New Project and Merge Projects leave a stale canvas), #328 (switching to a project-created conversation after the prompt fails), #329 (Apply from diff, Undo apply and Merge Projects can write over a pending conflict), and a plural comment on #264.
+
+**Do not redo.** Any of Tasks 1–11, the final review, or the residual fixes R1–R7.
