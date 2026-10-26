@@ -68,10 +68,16 @@ public partial class RepDispositionBalanceViewModel : ObservableObject
 
     /// How to look further when a table is empty. "" when the search is already as wide as
     /// it goes (every conversation, on disk plus changes), as there is nowhere further to look.
-    public string EmptyHint =>
-        (DispositionEmptyMessage.Length > 0 || ReputationEmptyMessage.Length > 0)
-        && !(Scope == BalanceScope.All && Source == BalanceSource.OnDiskPlusChanges)
-            ? Loc.Get("EmptyState_RepBalance_Hint") : "";
+    public string EmptyHint
+    {
+        get
+        {
+            if (DispositionEmptyMessage.Length == 0 && ReputationEmptyMessage.Length == 0) return "";
+            if (Scope == BalanceScope.All && Source == BalanceSource.OnDiskPlusChanges) return "";
+            // No project: the Source picker is hidden (issue 234), so only Scope can be widened.
+            return Loc.Get(HasProject ? "EmptyState_RepBalance_Hint" : "EmptyState_RepBalance_Hint_NoProject");
+        }
+    }
 
     public RepDispositionBalanceViewModel(
         DialogProject project, IGameDataProvider provider,

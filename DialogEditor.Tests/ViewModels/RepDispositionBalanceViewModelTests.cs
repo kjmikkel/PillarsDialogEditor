@@ -83,4 +83,30 @@ public class RepDispositionBalanceViewModelTests : IDisposable
         Assert.Equal("EmptyState_RepBalance_NoReputations", vm.ReputationEmptyMessage);
         Assert.Equal("", vm.EmptyHint);
     }
+
+    // Without a project the Source picker is hidden (issue 234), so the hint must not tell
+    // the Reader to change a control they cannot see.
+    [Fact]
+    public async Task EmptyState_NoProject_HintOnlyMentionsScope()
+    {
+        var vm = new RepDispositionBalanceViewModel(
+            DialogProject.Empty("p"), new FakeGameDataProvider("poe2", "en"),
+            () => (null, null), hasProject: false) { Scope = BalanceScope.Current };
+
+        await vm.RefreshCommand.ExecuteAsync(null);
+
+        Assert.Equal("EmptyState_RepBalance_Hint_NoProject", vm.EmptyHint);
+    }
+
+    [Fact]
+    public async Task EmptyState_NoProject_WidestScope_HasNoHint()
+    {
+        var vm = new RepDispositionBalanceViewModel(
+            DialogProject.Empty("p"), new FakeGameDataProvider("poe2", "en"),
+            () => (null, null), hasProject: false) { Scope = BalanceScope.All };
+
+        await vm.RefreshCommand.ExecuteAsync(null);
+
+        Assert.Equal("", vm.EmptyHint);
+    }
 }

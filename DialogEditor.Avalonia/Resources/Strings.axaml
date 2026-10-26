@@ -2214,6 +2214,7 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="EmptyState_RepBalance_NoDispositions">No disposition checks or changes found</sys:String>
     <sys:String x:Key="EmptyState_RepBalance_NoReputations">No reputation checks or changes found</sys:String>
     <sys:String x:Key="EmptyState_RepBalance_Hint">To look further, set Scope to All conversations or Source to On disk + changes, then press Analyze.</sys:String>
+    <sys:String x:Key="EmptyState_RepBalance_Hint_NoProject">To look further, set Scope to All conversations, then press Analyze.</sys:String>
     <sys:String x:Key="EmptyState_VoAlias_NoConversation">No conversation chosen</sys:String>
     <sys:String x:Key="EmptyState_VoAlias_NoConversationHint">Pick a conversation in the list on the left. Its lines appear here, and you choose the one whose voice-over to use.</sys:String>
     <sys:String x:Key="EmptyState_VoAlias_NoLines">This conversation has no lines</sys:String>
