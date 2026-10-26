@@ -207,6 +207,11 @@ public sealed class EditorDockFactory : Factory
                 if (DockableLocator is not null && DockableLocator.TryGetValue(id, out var makeFresh)
                     && makeFresh() is { } fresh)
                 {
+                    // Carry over the width Dock recorded when the pane was pinned to the window
+                    // edge (issue 319): without it the fresh wrapper's pop-out sizes to its
+                    // content and opens at Dock's 50 px minimum after every restart.
+                    child.GetPinnedBounds(out var x, out var y, out var width, out var height);
+                    fresh.SetPinnedBounds(x, y, width, height);
                     list[i] = fresh;   // leaf wrapper — no need to recurse into the fresh instance
                     continue;
                 }

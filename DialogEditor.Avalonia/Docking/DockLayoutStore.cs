@@ -19,7 +19,12 @@ public sealed class DockLayoutStore
     // installed 11.3.12.1 package — NOT "SystemTextJsonDockSerializer" as the early brief
     // draft guessed). Parameterless ctor uses ObservableCollection<> as the list type,
     // matching Dock.Model.Mvvm's collection type used by EditorDockFactory.
-    private readonly IDockSerializer _serializer = new DockSerializer();
+    private readonly IDockSerializer _serializer;
+
+    public DockLayoutStore() : this(new DockSerializer()) { }
+
+    /// Lets a test substitute a serializer that fails part-way through a save.
+    internal DockLayoutStore(IDockSerializer serializer) => _serializer = serializer;
 
     public string DefaultPath => Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -50,19 +55,35 @@ public sealed class DockLayoutStore
         // Owner out of the tree for just the duration of Save, then restore the LIVE objects'
         // Owner afterwards (finally) so the running, on-screen layout is completely unaffected.
         var savedOwners = new List<(IDockable Dockable, IDockable? Owner)>();
+        // RootDock.PinnedDock is the transient dock Dock builds while a pinned pane's pop-out is
+        // open. It isn't layout (the pinned pane itself is saved in Left/RightPinnedDockables),
+        // and serializing it drags in its Factory's IDockable-keyed control dictionaries, which
+        // System.Text.Json can't write (issue 319): leave it out, like Owner, for the save only.
+        var openPopOut = layout.PinnedDock;
+        // Write a temporary file and move it over the old one, so a save that fails part-way
+        // keeps the previous layout instead of leaving a truncated, unloadable file (issue 319).
+        var temp = path + ".tmp";
         try
         {
             var dir = Path.GetDirectoryName(path);
             if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
 
             CollectAndClearOwners(layout, savedOwners, new HashSet<IDockable>(ReferenceEqualityComparer.Instance));
+            layout.PinnedDock = null;
 
-            using var s = File.Create(path);
-            _serializer.Save(s, layout);
+            using (var s = File.Create(temp))
+                _serializer.Save(s, layout);
+            File.Move(temp, path, overwrite: true);
         }
-        catch (Exception ex) { AppLog.Warn($"Dock layout save failed: {ex.Message}"); }
+        catch (Exception ex)
+        {
+            AppLog.Warn($"Dock layout save failed: {ex.Message}");
+            try { File.Delete(temp); }
+            catch (Exception cleanup) { AppLog.Warn($"Dock layout save: could not remove {Path.GetFileName(temp)}: {cleanup.Message}"); }
+        }
         finally
         {
+            layout.PinnedDock = openPopOut;
             foreach (var (dockable, owner) in savedOwners) dockable.Owner = owner;
         }
     }
