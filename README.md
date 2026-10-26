@@ -14,6 +14,10 @@ original game files directly, making the workflow safe, reversible, and shareabl
 
 ## Get started
 
+**Windows only.** Version 1.0 runs on Windows 10 and 11 (64-bit). There are no macOS or
+Linux builds yet: if you'd like one, say so on
+[issue #74](https://github.com/kjmikkel/PillarsDialogEditor/issues/74).
+
 <!-- Screenshot of the conversation canvas goes here (#70). -->
 
 1. **Download** the latest `PillarsDialogEditor-<version>.zip` from the
