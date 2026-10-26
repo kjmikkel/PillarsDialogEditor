@@ -36,7 +36,7 @@ need to be inside the game folder.
    In Steam you can also right-click the game and choose *Manage → Browse local files*;
    in GOG Galaxy, *Manage installation → Show folder*.
 3. Click **Add mods…** and choose the mod's `.dialogpack` file. You can pick several at once.
-4. Click **Apply patches**.
+4. Click **Install mods**.
 5. Start the game.
 
 If the Patch Manager says *"Folder not recognised as PoE1 or PoE2 root"*, you picked a
@@ -45,7 +45,7 @@ folder.
 
 ## Using several mods: load order
 
-Every mod you add goes into the **Load Order** list. When you click **Apply patches**, the
+Every mod you add goes into the **Mods to install** list. When you click **Install mods**, the
 patcher puts the original game files back and then applies the mods from the top of the
 list to the bottom.
 
@@ -67,14 +67,14 @@ installs; it just loses on those lines.
 
 ### Keeping your list
 
-The Patch Manager doesn't remember the list when you close it. Click **Save load order…**
-to save it as a `.patchlist` file, and **Load load order…** to get it back next time. You
+The Patch Manager doesn't remember the list when you close it. Click **Save mod list…**
+to save it as a `.patchlist` file, and **Open mod list…** to get it back next time. You
 need the list again to add another mod, remove one, or re-apply after a game update.
 
 ## Removing mods
 
 **One mod:** load your list (or add your mods again), remove the mod with the ✕ button on
-its row, and click **Apply patches**. Because every apply starts from the original game
+its row, and click **Install mods**. Because every apply starts from the original game
 files, the removed mod is gone and the others are installed again.
 
 **Every mod:** click **Remove all mods** and confirm. Every game file the patcher changed
@@ -88,10 +88,10 @@ without it the patcher can't restore the originals.
 ## After a game update
 
 A game update (or your storefront's "verify files") can replace files the patcher had
-modded. The next time you click **Apply patches**, the Patch Manager lists those files and
+modded. The next time you click **Install mods**, the Patch Manager lists those files and
 asks what to do:
 
-- **Treat as new originals** — the updated files become the new originals, and your mods
+- **Keep them and install** — the updated files become the new originals, and your mods
   are applied on top of them. This is usually what you want.
 - **Cancel** — nothing is changed.
 

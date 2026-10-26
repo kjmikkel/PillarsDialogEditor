@@ -21,7 +21,7 @@ Nexus Mods, or from the `patcher-v…` releases at
 steps for installing and removing mods, is the `README.md` in the patcher's folder.
 
 **GUI:** Start `DialogEditor.PatchManager.exe`, click **Add mods…** and pick the
-`.dialogpack` file, choose your game folder, and click **Apply patches**.
+`.dialogpack` file, choose your game folder, and click **Install mods**.
 
 **CLI:**
 ```

@@ -289,8 +289,8 @@ other mods before you release it:
 1. **Add mods…** — pick one or more `.dialogpack` or `.dialogproject` files
 2. **Reorder** with ↑ ↓ — entries lower in the list win on any conflict
 3. The **conflict panel** identifies every contested field before you apply
-4. **Apply patches** — writes every conversation patch to the selected game folder
-5. **Save / Load load order** — persists the list as a `.patchlist` file;
+4. **Install mods** — writes every conversation patch to the selected game folder
+5. **Save mod list… / Open mod list…** — persists the list as a `.patchlist` file;
    double-clicking a `.patchlist` opens the standalone app directly
 
 Players see the same window in the standalone patcher. What it looks like to them is
@@ -570,8 +570,8 @@ install, with a "conversation not found" warning. Nothing else is written or bro
 - **After a game update.** A game update can replace or change the files your conversation mods
   edit. Afterwards those mods may be partly missing, or sit on top of files they no longer match.
   To put things right, verify / repair the game files in your storefront (Steam, GOG Galaxy or the
-  Epic Games Launcher), then apply your mods again. If you're asked whether to treat changed files
-  as the new originals, choose **Treat as new originals**. The Patch Manager's *After a game
+  Epic Games Launcher), then apply your mods again. If you're asked whether to keep the changed files
+  and install on top of them, choose **Keep them and install**. The Patch Manager's *After a game
   update…* link says the same ([#147](https://github.com/kjmikkel/PillarsDialogEditor/issues/147)).
 
 - **Patcher (`dialog-patcher`, Patch Manager).** Suppose the game or the storefront's "verify files"

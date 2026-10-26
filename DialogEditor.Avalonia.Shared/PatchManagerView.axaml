@@ -168,7 +168,9 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </ScrollViewer>
+                <!-- Wraps: the hint is a full sentence in the Player's words (GitHub issue 267). -->
                 <TextBlock Text="{DynamicResource PatchManager_EmptyHint}"
+                           TextWrapping="Wrap" TextAlignment="Center" Margin="12,0"
                            Foreground="{DynamicResource Brush.Text.Hint}" FontSize="{DynamicResource FontSize.Label}"
                            HorizontalAlignment="Center" VerticalAlignment="Center"
                            IsVisible="{Binding HasEntries,
@@ -177,6 +179,7 @@
 
             <TextBlock Grid.Row="2"
                        Text="{DynamicResource PatchManager_OrderHint}"
+                       TextWrapping="Wrap" TextAlignment="Center"
                        Foreground="{DynamicResource Brush.Text.Hint}" FontSize="{DynamicResource FontSize.Caption}"
                        HorizontalAlignment="Center" Margin="0,4,0,0"/>
         </Grid>

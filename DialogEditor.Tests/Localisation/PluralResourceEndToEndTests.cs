@@ -54,8 +54,8 @@ public class PluralResourceEndToEndTests : IDisposable
     // SharedStrings.axaml lives in a different assembly — prove the provider
     // resolves plural keys from the merged shared dictionary too.
     [AvaloniaTheory]
-    [InlineData(1, "Applied 1 patch to Foo.")]
-    [InlineData(2, "Applied 2 patches to Foo.")]
+    [InlineData(1, "Installed 1 mod in Foo.")]
+    [InlineData(2, "Installed 2 mods in Foo.")]
     public void PatchManager_ApplySuccess_UsesRealResources(int count, string expected)
         => Assert.Equal(expected, Loc.FormatCount("PatchManager_ApplySuccess", count, "Foo"));
 }
