@@ -289,4 +289,5 @@
     <SolidColorBrush x:Key="Brush.Text.Info"         Color="{StaticResource Palette.Sky.450}"/>
     <SolidColorBrush x:Key="Brush.Text.Highlight"    Color="{StaticResource Palette.Amber.520}"/>
     <SolidColorBrush x:Key="Brush.Canvas.Background" Color="{StaticResource Palette.Canvas.Base}"/>
+    <SolidColorBrush x:Key="Brush.Canvas.Grid" Color="{StaticResource Palette.Canvas.Grid}"/>
 </ResourceDictionary>

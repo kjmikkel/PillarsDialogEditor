@@ -182,11 +182,17 @@
 
         <!-- Canvas -->
         <Grid Grid.Row="2" ClipToBounds="True">
+            <!-- Backdrop and dot grid (GitHub issue 225), drawn behind a transparent editor so the
+                 dots pan and zoom with it. Transparent still hit-tests, so panning is unchanged. -->
+            <ctrl:CanvasDotGrid Editor="{Binding #Editor}"
+                                Background="{DynamicResource Brush.Canvas.Background}"
+                                DotBrush="{DynamicResource Brush.Canvas.Grid}"
+                                IsHitTestVisible="False"/>
             <!-- Issue 238: NodifyAvalonia makes the editor itself no tab stop; Tab used to reach the canvas only
                  through its ports. With the ports non-focusable the editor must be the stop, or Tab skips the
                  canvas entirely. Editor_GotFocus then restores a selection the arrow keys move from. -->
             <nodify:NodifyEditor x:Name="Editor"
-                                 Background="{DynamicResource Brush.Canvas.Background}"
+                                 Background="Transparent"
                                  ItemsSource="{Binding Nodes}"
                                  Connections="{Binding Connections}"
                                  PendingConnection="{Binding PendingConnection}"
