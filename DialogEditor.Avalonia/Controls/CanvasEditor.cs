@@ -23,29 +23,18 @@ public class CanvasEditor : NodifyEditor
 }
 
 /// <summary>
-/// The editor's peer. Nodify's template wraps the node containers in several peer-less
-/// layers (zoom/pan decorators, panels), which stock <c>ItemsControlAutomationPeer</c> reports
-/// as a chain of <c>NoneAutomationPeer</c>s, so the node peers sit deep in the tree. Flatten
-/// those layers so the nodes are direct children of the canvas, the way a list's items are.
+/// The editor's peer: an items control, so screen readers announce the canvas as a list of
+/// nodes. Nodify's template puts several peer-less layers (zoom/pan decorators, panels)
+/// between it and the node peers; those are <c>NoneAutomationPeer</c>s, which the UIA control
+/// view skips, so the nodes still read as the canvas's items.
+///
+/// Do NOT flatten those layers by overriding <c>GetChildrenCore</c> (tried for issue 311): a
+/// peer's parent is whichever ancestor last listed it, and once a node is added the
+/// <c>NodifyCanvas</c> layer re-lists and re-parents the nodes. The Win32 bridge walks
+/// siblings through <c>GetParent().GetChildren()</c>, so the tree split and no node was
+/// reachable. <c>CanvasNodeAutomationTests</c> walks the tree the way the bridge does.
 /// </summary>
 public class CanvasEditorAutomationPeer : ItemsControlAutomationPeer
 {
     public CanvasEditorAutomationPeer(CanvasEditor owner) : base(owner) { }
-
-    protected override IReadOnlyList<AutomationPeer>? GetChildrenCore()
-    {
-        var result = new List<AutomationPeer>();
-        Flatten(base.GetChildrenCore(), result);
-        return result;
-    }
-
-    private static void Flatten(IReadOnlyList<AutomationPeer>? peers, List<AutomationPeer> into)
-    {
-        if (peers is null) return;
-        foreach (var peer in peers)
-        {
-            if (peer is NoneAutomationPeer) Flatten(peer.GetChildren(), into);
-            else into.Add(peer);
-        }
-    }
 }

@@ -50,13 +50,73 @@ public class CanvasNodeAutomationTests
         Assert.Equal(root.AutomationName, peer.GetName());
     }
 
-    [AvaloniaFact]
-    public void CanvasPeer_HasTheNodesAsChildren()
+    // The Win32 UIA bridge (Avalonia.Win32.Automation.AutomationNode.Navigate) walks the tree
+    // as FirstChild = GetChildren()[0] and NextSibling = the next entry in GetParent()'s
+    // GetChildren(). A peer's parent is whichever ancestor last listed it, and
+    // ControlAutomationPeer.EnsureConnected asks every visual ancestor in turn, so a peer that
+    // lists children it doesn't own (e.g. flattening Nodify's peer-less layers) leaves those
+    // children pointing at a parent that doesn't list them: the walk then never reaches the
+    // nodes. These tests navigate exactly the way the bridge does.
+    private static AutomationPeer? NextSibling(AutomationPeer peer)
     {
-        var (_, editor, root, child) = Setup();
-        var children = ControlAutomationPeer.CreatePeerForElement(editor).GetChildren();
-        Assert.Contains(PeerOf(editor, root), children);
-        Assert.Contains(PeerOf(editor, child), children);
+        var siblings = peer.GetParent()?.GetChildren();
+        if (siblings is null) return null;
+        for (var i = 0; i < siblings.Count - 1; i++)
+            if (siblings[i] == peer) return siblings[i + 1];
+        return null;
+    }
+
+    private static List<AutomationPeer> WalkLikeUia(AutomationPeer root)
+    {
+        var found = new List<AutomationPeer>();
+        void Visit(AutomationPeer p)
+        {
+            found.Add(p);
+            for (var c = p.GetChildren().FirstOrDefault(); c is not null; c = NextSibling(c))
+                Visit(c);
+        }
+        Visit(root);
+        return found;
+    }
+
+    // In the app a UIA client has usually built the peers before a conversation is opened
+    // (or a node is added). Then only the peer that owns the new visual children is
+    // invalidated, so the test adds a node after a first walk, as the GUI run did.
+    private static NodeViewModel AddNodeAfterAWalk(ConversationViewModel vm, NodifyEditor editor)
+    {
+        WalkLikeUia(ControlAutomationPeer.CreatePeerForElement(TopLevel.GetTopLevel(editor)!));
+        var late = CanvasNavigationServiceTests.MakeNode(2, 800, 0);
+        vm.Nodes.Add(late);
+        Dispatcher.UIThread.RunJobs();
+        return late;
+    }
+
+    [AvaloniaFact]
+    public void UiaWalk_FromTheWindow_ReachesEveryNode()
+    {
+        var (vm, editor, root, child) = Setup();
+        var late = AddNodeAfterAWalk(vm, editor);
+        var all = WalkLikeUia(ControlAutomationPeer.CreatePeerForElement(TopLevel.GetTopLevel(editor)!));
+        Assert.Contains(PeerOf(editor, root), all);
+        Assert.Contains(PeerOf(editor, child), all);
+        Assert.Contains(PeerOf(editor, late), all);
+    }
+
+    [AvaloniaFact]
+    public void NodeParentChain_IsConsistent_UpToTheCanvas()
+    {
+        var (vm, editor, _, _) = Setup();
+        var late = AddNodeAfterAWalk(vm, editor);
+        var editorPeer = ControlAutomationPeer.CreatePeerForElement(editor);
+        var peer = PeerOf(editor, late);
+        for (var i = 0; peer != editorPeer; i++)
+        {
+            Assert.True(i < 20, "the node's parent chain never reaches the canvas");
+            var parent = peer.GetParent();
+            Assert.NotNull(parent);
+            Assert.Contains(peer, parent!.GetChildren());
+            peer = parent;
+        }
     }
 
     [AvaloniaFact]
