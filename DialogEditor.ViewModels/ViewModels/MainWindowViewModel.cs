@@ -428,9 +428,15 @@ public partial class MainWindowViewModel : ObservableObject
         // A running tour describes the mode just left; drop it, then offer the new mode's own
         // tour if this is the first time it is shown.
         if (Tour.IsVisible) Tour.DismissCommand.Execute(null);
-        if (!GuidedTourViewModel.HasSeen(target)) Tour.Start(target);
         if (target == EditorMode.Editing)
+        {
+            // The deferred prompts and the canvas reload come first; the tour would otherwise sit
+            // under the autosave and conflict modals, pointing at a canvas about to be replaced.
             await OnEnteredEditingModeAsync();
+            if (!GuidedTourViewModel.HasSeen(target)) Tour.Start(target);
+        }
+        else if (!GuidedTourViewModel.HasSeen(target))
+            Tour.Start(target);
         return true;
     }
 
@@ -511,7 +517,19 @@ public partial class MainWindowViewModel : ObservableObject
             // Only if that project is still the open one; a different or closed project means the
             // deferral is stale and reloading would clobber what is open now.
             if (_projectPath == openPath)
+            {
+                var before = _project;
                 await LoadProjectAsync(openPath, offerDeferred: false);
+                // Later (issue 236) leaves the project that was opened for reading in place, now
+                // in Editing, where Save, autosave rotation and Discard would delete or rotate the
+                // copies Later promised to keep. Close it instead, as Later does outside reading mode.
+                if (ReferenceEquals(before, _project) && IsProjectOpen
+                    && AutosaveRecovery.Check(openPath).State == AutosaveState.Newer)
+                {
+                    CloseProjectCore(Loc.Format("Status_AutosaveKeptNotOpened", Path.GetFileName(openPath)));
+                    ClearCanvasAfterClose();
+                }
+            }
         }
         else if (HasPendingConflictResolution)
         {
@@ -1128,12 +1146,17 @@ public partial class MainWindowViewModel : ObservableObject
         // User-intent extras the branch-switch teardown must not do: the canvas may
         // show patched content that exists nowhere after close, and a deliberate
         // close should stick across restarts (no auto-reopen of this project).
+        ClearCanvasAfterClose();
+        AppSettings.LastProjectPath = null;
+    }
+
+    private void ClearCanvasAfterClose()
+    {
         Canvas.Clear();
         Detail.Clear();
         CurrentConversationName = null;
         _currentFile = null;
         OnPropertyChanged(nameof(CanValidateVO));
-        AppSettings.LastProjectPath = null;
     }
 
     // Explicit opens (File > Open) resolve conflicts immediately; startup re-open

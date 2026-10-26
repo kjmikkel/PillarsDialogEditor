@@ -177,4 +177,43 @@ public class MainWindowViewModelDeferredReloadTests : IDisposable
         Assert.Equal("project text", NodeText(vm));
         Assert.False(vm.IsModified);
     }
+
+    // ── Important 1: Later keeps the sidecar and closes the project ───────
+
+    [Fact]
+    public async Task DeferredOffer_Later_ClosesTheProject_AndKeepsTheSidecar()
+    {
+        WriteProjectWithRestorableEdit("restored text");
+        var provider = Provider();
+        var vm = MakeVm(EditorMode.Reading, provider);
+        await LoadProject(vm, ProjectPath);
+        SelectGame(vm, provider);
+        vm.ConfirmRestoreAutosave = _ => Task.FromResult(AutosaveDecision.Later);
+
+        await vm.SwitchModeAsync(EditorMode.Editing);
+
+        Assert.False(vm.IsProjectOpen);
+        Assert.StartsWith("Status_AutosaveKeptNotOpened", vm.StatusText);
+        Assert.True(File.Exists(AutosaveRecovery.SidecarPath(ProjectPath)));
+    }
+
+    // ── Important 3: the editing tour waits for the deferred prompts ──────
+
+    [Fact]
+    public async Task EditingTour_StartsOnlyAfterTheDeferredPrompt()
+    {
+        WriteProjectWithRestorableEdit("restored text");
+        var vm = MakeVm(EditorMode.Reading);
+        await LoadProject(vm, ProjectPath);
+        var tourVisibleAtPrompt = true;
+        vm.ConfirmRestoreAutosave = gens =>
+        {
+            tourVisibleAtPrompt = vm.Tour.IsVisible;
+            return Task.FromResult(AutosaveDecision.Restore(gens[0]));
+        };
+
+        await vm.SwitchModeAsync(EditorMode.Editing);
+
+        Assert.False(tourVisibleAtPrompt);
+    }
 }
