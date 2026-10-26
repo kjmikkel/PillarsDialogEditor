@@ -57,6 +57,10 @@ public sealed class SpellCheckService
         return spans;
     }
 
+    /// Up to <paramref name="max"/> Hunspell suggestions for one word (right-click menu, issue 313).
+    public IReadOnlyList<string> Suggestions(string word, string languageCode, int max)
+        => _store.SuggestMany(word, languageCode, max);
+
     /// The checkable words (trimmed of edge apostrophes/hyphens) with their real start
     /// index and their raw token index, skipping tags, single letters and tokens with
     /// digits/underscores. Shared by Check and FindMisspellings.

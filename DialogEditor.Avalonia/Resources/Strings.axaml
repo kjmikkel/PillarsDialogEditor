@@ -1763,6 +1763,16 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="ToolTip_AddToDictionary">Treat this word as correctly spelled from now on, in every project — adds it to your personal dictionary on this computer.</sys:String>
     <sys:String x:Key="Button_AddToProjectDictionary">Add to project dictionary</sys:String>
     <sys:String x:Key="ToolTip_AddToProjectDictionary">Treat this word as correctly spelled in this project only. It's saved in the project file, so it travels with your mod and anyone else who opens the project gets it too.</sys:String>
+    <!-- Right-click spelling menu in Node Details (issue 313). -->
+    <sys:String x:Key="SpellMenu_NoSuggestions">No suggestions</sys:String>
+    <sys:String x:Key="ToolTip_SpellMenu_NoSuggestions">The dictionary has no suggestion for this word. You can still add it to a dictionary, or retype it.</sys:String>
+    <sys:String x:Key="ToolTip_SpellMenu_Suggestion">Replace '{0}' with '{1}' in this text.</sys:String>
+    <sys:String x:Key="SpellMenu_Cut">Cut</sys:String>
+    <sys:String x:Key="ToolTip_SpellMenu_Cut">Remove the selected text and put it on the clipboard.</sys:String>
+    <sys:String x:Key="SpellMenu_Copy">Copy</sys:String>
+    <sys:String x:Key="ToolTip_SpellMenu_Copy">Copy the selected text to the clipboard.</sys:String>
+    <sys:String x:Key="SpellMenu_Paste">Paste</sys:String>
+    <sys:String x:Key="ToolTip_SpellMenu_Paste">Insert the clipboard text at the caret, replacing any selected text.</sys:String>
     <!-- Summary composes two pre-pluralised fragments (see pluralisation design). -->
     <sys:String x:Key="TextTagValidation_Summary">{0} across {1}</sys:String>
     <sys:String x:Key="TextTagValidation_Issues_One">{0} issue</sys:String>

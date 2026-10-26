@@ -56,7 +56,7 @@ public partial class NodeDetailViewModel : ObservableObject
     public string ActiveLanguage
     {
         get => _activeLanguage;
-        set { _activeLanguage = value; OnPropertyChanged(nameof(SpellSpanFinder)); }
+        set { _activeLanguage = value; OnPropertyChanged(nameof(SpellSpanFinder)); OnPropertyChanged(nameof(SpellingMenuFinder)); }
     }
     private string _activeLanguage = string.Empty;
 
@@ -66,7 +66,7 @@ public partial class NodeDetailViewModel : ObservableObject
     public SpellCheckService? SpellChecker
     {
         get => _spellChecker;
-        set { _spellChecker = value; OnPropertyChanged(nameof(SpellSpanFinder)); }
+        set { _spellChecker = value; OnPropertyChanged(nameof(SpellSpanFinder)); OnPropertyChanged(nameof(SpellingMenuFinder)); }
     }
     private SpellCheckService? _spellChecker;
 
@@ -85,10 +85,41 @@ public partial class NodeDetailViewModel : ObservableObject
         }
     }
 
+    /// What to offer when the writer right-clicks at a text position (issue 313): the misspelt
+    /// word there (caret touching either end counts), its suggestions and the add-to-dictionary
+    /// actions. Null without a checker; the delegate returns null off a misspelt word. A NEW
+    /// delegate whenever SpellSpanFinder is, so a binding picks up the current dictionary/language.
+    public Func<string, int, SpellingMenu?>? SpellingMenuFinder
+    {
+        get
+        {
+            var checker = SpellChecker;
+            if (checker is null) return null;
+            var lang = ActiveLanguage;
+            return (text, index) =>
+            {
+                text ??= "";
+                foreach (var span in checker.FindMisspellings(text, lang))
+                {
+                    if (index < span.Start || index > span.Start + span.Length) continue;
+                    var word = text.Substring(span.Start, span.Length);
+                    var add = AddWordToDictionary;
+                    var addProject = AddWordToProjectDictionary;
+                    return new SpellingMenu(word, span.Start, span.Length,
+                        checker.Suggestions(word, lang, SpellingMenu.MaxSuggestions),
+                        add is null ? null : () => { add(word); RefreshSpelling(); },
+                        addProject is null ? null : () => { addProject(word); RefreshSpelling(); });
+                }
+                return null;
+            };
+        }
+    }
+
     private void RefreshSpelling()
     {
         OnPropertyChanged(nameof(SpellingIssues));
         OnPropertyChanged(nameof(SpellSpanFinder));
+        OnPropertyChanged(nameof(SpellingMenuFinder));
     }
 
     /// Set by MainWindowViewModel when a game folder is opened.
@@ -551,6 +582,7 @@ public partial class NodeDetailViewModel : ObservableObject
             if (ReferenceEquals(_addWordToProjectDictionary, value)) return;
             _addWordToProjectDictionary = value;
             OnPropertyChanged(nameof(SpellingIssues));
+            OnPropertyChanged(nameof(SpellingMenuFinder));
         }
     }
 
