@@ -19,26 +19,9 @@
 
         <!-- Menu bar + slim toolbar -->
         <Border Grid.Row="0" Background="{DynamicResource Brush.Surface.Panel}" Padding="0">
-            <DockPanel>
-
-                <!-- Right-docked: ? and ⚙ -->
-                <ToggleButton x:Name="HelpToggle"
-                              DockPanel.Dock="Right"
-                              Content="?"
-                              IsChecked="False"
-                              IsCheckedChanged="HelpToggle_IsCheckedChanged"
-                              Theme="{StaticResource ToolbarPlainToggleButton}"
-                              ToolTip.Tip="{DynamicResource ToolTip_HelpToggle}"
-                              AutomationProperties.HelpText="{DynamicResource ToolTip_HelpToggle}"
-                              AutomationProperties.Name="{DynamicResource AutomationName_ToggleHelp}"/>
-                <Button DockPanel.Dock="Right"
-                        x:Name="SettingsButton"
-                        Content="⚙"
-                        Click="SettingsButton_Click"
-                        Theme="{StaticResource ToolbarPlainButton}"
-                        ToolTip.Tip="{DynamicResource ToolTip_Settings}"
-                        AutomationProperties.HelpText="{DynamicResource ToolTip_Settings}"
-                        AutomationProperties.Name="{DynamicResource AutomationName_Settings}"/>
+            <!-- LastChildFill off: the last child is the right-docked button group, which must not
+                 stretch over the row. -->
+            <DockPanel LastChildFill="False">
 
                 <!-- Menu bar -->
                 <Menu DockPanel.Dock="Left"
@@ -392,6 +375,27 @@
                             </DataTemplate>
                         </ComboBox.ItemTemplate>
                     </ComboBox>
+                </StackPanel>
+
+                <!-- Right-docked: ⚙ and ?. Declared after the menu and language picker so Tab
+                     reaches them in reading order (GitHub issue 255); declared first, as they
+                     were, they were the window's first Tab stops. -->
+                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                    <Button x:Name="SettingsButton"
+                            Content="⚙"
+                            Click="SettingsButton_Click"
+                            Theme="{StaticResource ToolbarPlainButton}"
+                            ToolTip.Tip="{DynamicResource ToolTip_Settings}"
+                            AutomationProperties.HelpText="{DynamicResource ToolTip_Settings}"
+                            AutomationProperties.Name="{DynamicResource AutomationName_Settings}"/>
+                    <ToggleButton x:Name="HelpToggle"
+                                  Content="?"
+                                  IsChecked="False"
+                                  IsCheckedChanged="HelpToggle_IsCheckedChanged"
+                                  Theme="{StaticResource ToolbarPlainToggleButton}"
+                                  ToolTip.Tip="{DynamicResource ToolTip_HelpToggle}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_HelpToggle}"
+                                  AutomationProperties.Name="{DynamicResource AutomationName_ToggleHelp}"/>
                 </StackPanel>
             </DockPanel>
         </Border>
