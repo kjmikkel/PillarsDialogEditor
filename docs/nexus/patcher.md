@@ -29,7 +29,8 @@ mod-author section of the main `README.md`, so mod authors can copy them.
   `docs/patcher/images/conflicts.png`.
 - **Main file:** `PillarsDialogPatcher-<ver>.zip` from the matching `patcher-v<ver>`
   GitHub release. Upload the same zip, don't rebuild it.
-- **Requirements:** none. The zip includes its own .NET runtime.
+- **Requirements:** Windows 10 or 11 (64-bit); there are no macOS or Linux builds. Nothing
+  else: the zip includes its own .NET runtime.
 - **Permissions:** match the repository's `LICENSE`.
 
 ## Description
@@ -42,6 +43,8 @@ Paste this into the description editor's BBCode view.
 Installs conversation mods for [i]Pillars of Eternity[/i] and [i]Pillars of Eternity II: Deadfire[/i]. If a mod's page lists this tool as a requirement, this is what you need to install that mod.
 
 [b]Nothing is permanent.[/b] Before the patcher changes a game file, it keeps a copy of the original. You can remove every mod and get the original game files back at any time.
+
+[b]Windows only.[/b] Runs on Windows 10 and 11 (64-bit). There are no macOS or Linux versions yet.
 
 [size=4][b]Installing a mod[/b][/size]
 [list=1]

@@ -2,7 +2,8 @@
 
 The Pillars Dialog Patcher installs conversation mods for *Pillars of Eternity* and
 *Pillars of Eternity II: Deadfire*. Mods come as `.dialogpack` files. You don't need the
-Pillars Dialog Editor, or any other tool, to install them.
+Pillars Dialog Editor, or any other tool, to install them. The patcher runs on Windows 10
+and 11 (64-bit); there are no macOS or Linux builds yet.
 
 **Nothing is permanent.** Before the patcher changes a game file, it keeps a copy of the
 original. You can remove every mod and get the original game files back at any time
