@@ -58,13 +58,62 @@ public class SpellSquigglesBehaviorTests
     }
 
     [AvaloniaFact]
-    public void TypingAMisspelling_AddsASquiggle()
+    public void TypingAMisspelling_SquiggleWaitsForTheDelayedCheck()
     {
+        // Issue 312: a word being typed isn't underlined until the writer pauses.
         var tb = Setup("glows", Captian);
-        Assert.Empty(SpellSquiggles.GetSquiggleRects(tb));
         tb.Text = "glows captian";
         Dispatcher.UIThread.RunJobs();
+        Assert.Empty(SpellSquiggles.GetSquiggleRects(tb));
+        Assert.True(SpellSquiggles.HasPendingCheck(tb));
+
+        SpellSquiggles.CheckNow(tb);
+        Dispatcher.UIThread.RunJobs();
         Assert.Single(SpellSquiggles.GetSquiggleRects(tb));
+        Assert.False(SpellSquiggles.HasPendingCheck(tb));
+    }
+
+    [AvaloniaFact]
+    public void TypingAMisspelling_SquiggleAppearsAfterThePause()
+    {
+        var tb = Setup("glows", Captian);
+        tb.Text = "glows captian";
+        var until = DateTime.UtcNow + SpellSquiggles.CheckDelay + TimeSpan.FromMilliseconds(400);
+        while (DateTime.UtcNow < until && SpellSquiggles.GetSquiggleRects(tb).Count == 0)
+        {
+            // Headless RunJobs() promotes due DispatcherTimers only after it has run a job, so an
+            // empty queue never fires the delay timer: queue a no-op each pass.
+            Dispatcher.UIThread.Post(() => { });
+            Dispatcher.UIThread.RunJobs();
+            Thread.Sleep(20);
+        }
+        Assert.Single(SpellSquiggles.GetSquiggleRects(tb));
+    }
+
+    [AvaloniaFact]
+    public void CheckDelay_IsHalfASecond()
+        => Assert.Equal(TimeSpan.FromMilliseconds(500), SpellSquiggles.CheckDelay);
+
+    [AvaloniaFact]
+    public void TypingElsewhere_KeepsAnExistingSquiggle()
+    {
+        // The squiggle already under "captian" follows the text instead of vanishing until
+        // the re-check: only the word being edited waits.
+        var tb = Setup("The captian glows", Captian);
+        var before = Assert.Single(SpellSquiggles.GetSquiggleRects(tb));
+        tb.Text = "Now The captian glows";
+        Dispatcher.UIThread.RunJobs();
+        var after = Assert.Single(SpellSquiggles.GetSquiggleRects(tb));
+        Assert.True(after.X > before.X);
+    }
+
+    [AvaloniaFact]
+    public void EditingTheMisspeltWord_RemovesItsSquiggleAtOnce()
+    {
+        var tb = Setup("captian glows", Captian);
+        tb.Text = "captians glows";
+        Dispatcher.UIThread.RunJobs();
+        Assert.Empty(SpellSquiggles.GetSquiggleRects(tb));
     }
 
     [AvaloniaFact]
