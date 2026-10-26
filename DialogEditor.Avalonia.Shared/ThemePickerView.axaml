@@ -9,10 +9,13 @@
          Strings use DynamicResource (not StaticResource) so they resolve at runtime
          regardless of which app's resource scope this control is instantiated in. -->
     <DockPanel ToolTip.Tip="{DynamicResource Settings_ThemeTooltip}">
+        <!-- A font-scaled minimum and a gap, as in the Settings window (GitHub issue 264): a fixed
+             Width="140" let the label run under its dropdown at 200%. -->
         <TextBlock Text="{DynamicResource Settings_Theme}"
                    Foreground="{DynamicResource Brush.Text.Muted.Light}"
                    VerticalAlignment="Center"
-                   Width="140"
+                   MinWidth="{DynamicResource ColumnWidth.SettingsLabel}"
+                   Margin="0,0,12,0"
                    FontSize="{DynamicResource FontSize.Label}"/>
         <ComboBox ItemsSource="{Binding AvailableThemes}"
                   SelectedItem="{Binding SelectedTheme, Mode=TwoWay}"

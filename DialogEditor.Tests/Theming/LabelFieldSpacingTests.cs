@@ -86,6 +86,25 @@ public class LabelFieldSpacingTests
         });
     }
 
+    // The theme and language pickers are shared by the editor's Settings, the Patcher's Settings
+    // and theme onboarding. Their labels had a fixed Width="140" and no class, so the test above
+    // never saw them: at 200% "App language" ran under its dropdown (GitHub issue 264).
+    [AvaloniaTheory]
+    [InlineData("theme")]
+    [InlineData("language")]
+    public void SharedPicker_LabelEndsBeforeItsDropdown_AtDoubleSize(string picker)
+    {
+        Control view = picker == "theme" ? new ThemePickerView() : new LanguagePickerView();
+        var w = new Window { Width = 400, SizeToContent = SizeToContent.Height, Content = view };
+        AtDoubleSize(w, () =>
+        {
+            var label = view.GetVisualDescendants().OfType<TextBlock>().First(t => t.GetVisualParent() is Panel);
+            var combo = view.GetVisualDescendants().OfType<ComboBox>().Single();
+            Assert.True(Right(label, w) + Gap <= Left(combo, w) + 0.5,
+                $"\"{label.Text}\" ends at {Right(label, w):0.#}, its dropdown starts at {Left(combo, w):0.#}");
+        });
+    }
+
     [Fact]
     public void Settings_BackupField_ComesBeforeItsBrowseButton()
     {
