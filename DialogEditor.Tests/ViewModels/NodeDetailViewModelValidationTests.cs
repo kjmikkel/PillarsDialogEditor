@@ -1,4 +1,4 @@
-using DialogEditor.Core.Models;
+﻿using DialogEditor.Core.Models;
 using DialogEditor.Tests.Helpers;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
@@ -183,4 +183,46 @@ public class NodeDetailViewModelValidationTests : IDisposable
     [Fact]
     public void AddToDictionary_NotWired_CannotAdd()
         => Assert.False(Assert.Single(Checked("captian glows").SpellingIssues).CanAddToDictionary);
+
+    // ── Inline squiggles (issue 9) ───────────────────────────────────────────
+
+    [Fact]
+    public void SpellSpanFinder_NoChecker_IsNull()
+        => Assert.Null(Loaded("captian glows").SpellSpanFinder);
+
+    [Fact]
+    public void SpellSpanFinder_ChecksTheGivenText()
+    {
+        // The view passes the TextBox's live text, which runs ahead of DefaultText while typing.
+        var finder = Checked("cat").SpellSpanFinder!;
+        Assert.Equal([new SpellSpan(0, 7)], finder("captian glows"));
+    }
+
+    [Fact]
+    public void AddToDictionary_RaisesANewFinder_WithoutTheWord()
+    {
+        var vm = Checked("Harbourmaster glows");
+        var store = new SpellDictionaryStore(_spellDir, Path.Combine(_spellDir, "user.txt"));
+        vm.AddWordToDictionary = store.AddWord;
+        vm.SpellChecker = new SpellCheckService(store);
+        vm.Load(MakeNode("Harbourmaster glows"));
+        var raised = new List<string?>();
+        vm.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        Assert.Single(vm.SpellingIssues).AddToDictionaryCommand.Execute(null);
+
+        Assert.Contains(nameof(NodeDetailViewModel.SpellSpanFinder), raised);
+        Assert.Empty(vm.SpellSpanFinder!("Harbourmaster glows"));
+    }
+
+    [Fact]
+    public void ActiveLanguageChange_RaisesSpellSpanFinder()
+    {
+        var vm = Checked("captian");
+        var raised = new List<string?>();
+        vm.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+        vm.ActiveLanguage = "fr";
+        Assert.Contains(nameof(NodeDetailViewModel.SpellSpanFinder), raised);
+        Assert.Empty(vm.SpellSpanFinder!("captian"));   // no fr dictionary installed
+    }
 }
