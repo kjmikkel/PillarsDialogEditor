@@ -42,8 +42,10 @@ public partial class SpeakerLineBrowserViewModel : ObservableObject
         string primaryLanguage,
         Func<(string? Name, ConversationEditSnapshot? Snapshot)> openConversationAccessor,
         string? initialSpeakerGuid = null,
-        Func<string?, ConversationEditSnapshot?, CancellationToken, IReadOnlyList<SpeakerLineRow>>? scanner = null)
+        Func<string?, ConversationEditSnapshot?, CancellationToken, IReadOnlyList<SpeakerLineRow>>? scanner = null,
+        bool hasProject = true)
     {
+        HasProject          = hasProject;
         _project            = project;
         _provider           = provider;
         _primaryLanguage    = primaryLanguage;
@@ -52,6 +54,10 @@ public partial class SpeakerLineBrowserViewModel : ObservableObject
         _scan = scanner ?? ((name, snap, ct) =>
             SpeakerLineScanner.Scan(_project, _provider, _primaryLanguage, name, snap, ct));
     }
+
+    /// False for a Reader with only a game folder: "Only my lines" compares against the project,
+    /// so the window hides it (issue 234).
+    public bool HasProject { get; }
 
     public ObservableCollection<SpeakerPickerItem> Speakers { get; } = [];
 

@@ -44,7 +44,8 @@ public partial class ConnectionViewModel : ObservableObject
             v => { _conditions = v; OnPropertyChanged(nameof(Conditions));
                    OnPropertyChanged(nameof(HasConditions));
                    OnPropertyChanged(nameof(ConditionCount));
-                   OnPropertyChanged(nameof(ConditionCountLabel)); });
+                   OnPropertyChanged(nameof(ConditionCountLabel));
+                   OnPropertyChanged(nameof(ReadingConditionsToolTip)); });
     }
 
     public bool IsAlways      => _questionNodeTextDisplay == "ShowAlways";
@@ -54,6 +55,9 @@ public partial class ConnectionViewModel : ObservableObject
 
     /// Button face for the link-conditions editor: localised glyph + live count.
     public string ConditionCountLabel => $"{Loc.Get("Link_ConditionGlyph")} {ConditionCount}";
+
+    /// Tooltip for the read-only conditions indicator shown in reading mode (issue 234).
+    public string ReadingConditionsToolTip => Loc.FormatCount("ToolTip_LinkConditionsReading", ConditionCount);
 
     [ObservableProperty] private bool _isHighlighted;
 

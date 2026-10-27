@@ -595,6 +595,7 @@ Saving records your edits to the open project — game files are not touched unt
 
     <!-- ─── Node detail panel — watermarks ──────────────────────────────── -->
     <sys:String x:Key="Placeholder_FemaleText">(same as default — leave blank)</sys:String>
+    <sys:String x:Key="Placeholder_FemaleText_Reading">(same as default)</sys:String>
     <sys:String x:Key="Placeholder_AddLinkTargetId">Target node ID…</sys:String>
 
     <!-- ─── Node detail panel — field tooltips ──────────────────────────── -->
@@ -1230,6 +1231,10 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- ─── Patch — status messages ──────────────────────────────────────── -->
     <!-- {0} = conversation name -->
     <sys:String x:Key="Status_PatchSaved">Patch saved: {0}</sys:String>
+    <!-- Shown when a project is opened in reading mode with autosave work or merge conflicts put off until editing. {0} = project name -->
+    <sys:String x:Key="Status_ProjectOpenedReadOnlyDeferred">Opened '{0}' for reading. It has unsaved autosave work or merge conflicts; switch to editing to deal with them.</sys:String>
+    <!-- Shown when switching to reading mode is refused because the unsaved edits could not be discarded -->
+    <sys:String x:Key="Status_ModeSwitchRefused">Couldn't switch to reading: the unsaved changes could not be discarded. Save or discard them, then try again.</sys:String>
     <!-- Shown in the status bar when a conversation is loaded but no project is open -->
     <sys:String x:Key="Status_NoProjectReadOnly">Viewing only — open or create a project (File › New Project) to start editing.</sys:String>
     <!-- Shown when trying to save/test but no patch directory is configured -->
@@ -1308,6 +1313,14 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- {0} = project name -->
     <sys:String x:Key="Status_ProjectGitConflictResolved">Resolved git conflicts in '{0}'. Review and save to write the merged project to disk.</sys:String>
     <sys:String x:Key="Status_ProjectGitConflictCancelled">Conflict resolution cancelled — project not opened.</sys:String>
+    <!-- Resolve Conflicts refused while there are unsaved edits (issue 234): saving them first would
+         write this side over the conflicted file and lose the other branch's version. -->
+    <sys:String x:Key="Status_ResolveConflictsUnsavedEdits">Undo or discard your unsaved edits before resolving the conflict, so they don't overwrite the other branch's version.</sys:String>
+    <!-- Switching to editing with a project whose git merge conflict is still unresolved (issue 234):
+         editing it would let a save overwrite the other branch's version, so it is closed. -->
+    <sys:String x:Key="Status_ConflictUnresolvedNotOpened">'{0}' was not opened for editing: its git merge conflict is unresolved. Open it again to resolve the conflict.</sys:String>
+    <!-- A save refused because the project file still holds an unresolved git merge conflict (issue 234). -->
+    <sys:String x:Key="Status_SaveRefusedConflictPending">Not saved: '{0}' still has an unresolved git merge conflict, and saving would overwrite the other branch's version. Resolve the conflict first.</sys:String>
     <!-- Startup deferral: {0} = path, {1} = conflict count -->
     <sys:String x:Key="Status_ProjectGitConflictPending_One">'{1}' has 1 unresolved git merge conflict. Click Resolve to fix it.</sys:String>
     <sys:String x:Key="Status_ProjectGitConflictPending_Other">'{1}' has {0} unresolved git merge conflicts. Click Resolve to fix them.</sys:String>
@@ -1879,6 +1892,10 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="Tour_Step2_Text">The canvas shows the node graph for the open conversation. Click a node to select it; double-click empty space to add a new one.</sys:String>
     <sys:String x:Key="Tour_Step3_Text">The detail panel shows the selected node's text, speaker, and conditions. Edit here to change what characters say.</sys:String>
     <sys:String x:Key="Tour_Step4_Text">The ? button shows a hint for whatever you focus. Help ▸ Open Walkthrough has the full beginner guide.</sys:String>
+    <sys:String x:Key="Tour_Reader_Step1_Text">Conversations: find a conversation by name or area and open it.</sys:String>
+    <sys:String x:Key="Tour_Reader_Step2_Text">Canvas: each box is a line. Follow the arrows, or use the arrow keys, to walk a branch.</sys:String>
+    <sys:String x:Key="Tour_Reader_Step3_Text">Node Details: the full line, who says it, and where it can lead next.</sys:String>
+    <sys:String x:Key="Tour_Reader_Step4_Text">The mode badge: this shows whether you are reading or editing. Click it, or use View › Reading mode, when you want to change something.</sys:String>
 
     <!-- ── Diff window first-run intro banner ───────────────────────────── -->
     <sys:String x:Key="DiffIntro_Text">This window shows what's different between two versions of your dialogue. Use the list on the left to see changed conversations — tick what you want to keep, then press Bring in. Nothing in your file changes until you press that button.</sys:String>
@@ -1999,6 +2016,10 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="Link_ConditionGlyph">⚙</sys:String>
     <sys:String x:Key="Link_DisplayLabel">Display</sys:String>
     <sys:String x:Key="AutomationName_LinkConditions">Edit conditions on this link</sys:String>
+    <!-- Issue 234: reading mode shows the link's condition count as plain text instead of the editor button. -->
+    <sys:String x:Key="AutomationName_LinkConditionsReading">Conditions on this link</sys:String>
+    <sys:String x:Key="ToolTip_LinkConditionsReading_One">This link has 1 condition, so the choice only applies when it is met. Switch to editing mode to see or change it.</sys:String>
+    <sys:String x:Key="ToolTip_LinkConditionsReading_Other">This link has {0} conditions, so the choice only applies when they are met. Switch to editing mode to see or change them.</sys:String>
 
     <sys:String x:Key="Menu_ImportVo">Import voice-over…</sys:String>
     <sys:String x:Key="ToolTip_Menu_ImportVo">Import a .wem or .wav voice-over file for the selected node.</sys:String>
@@ -2114,6 +2135,7 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="RepBalance_Error">Analysis failed — see the log for details.</sys:String>
     <sys:String x:Key="RepBalance_Tip_Source">Choose whether to tally only the conversations your project changes, or every conversation on disk with your changes applied.</sys:String>
     <sys:String x:Key="RepBalance_Tip_Scope">Choose whether to tally just the open conversation or every conversation in the selected source.</sys:String>
+    <sys:String x:Key="RepBalance_Tip_Scope_NoProject">Choose whether to tally just the open conversation or every conversation in the game.</sys:String>
     <sys:String x:Key="RepBalance_Tip_Refresh">Run the tally over the selected source and scope.</sys:String>
     <sys:String x:Key="RepBalance_Tip_Cancel">Stop the in-progress all-conversations analysis.</sys:String>
     <sys:String x:Key="RepBalance_Tip_Table">Each value's check count, its share of the even-split expected count, and whether it is over-favoured, under-used, or never checked.</sys:String>
@@ -2130,6 +2152,8 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="Menu_View_Conversations">Conversations</sys:String>
     <sys:String x:Key="Menu_View_Details">Node Details</sys:String>
     <sys:String x:Key="Menu_View_ConditionSearch">Condition search</sys:String>
+    <sys:String x:Key="Menu_View_ReadingMode">Reading mode</sys:String>
+    <sys:String x:Key="ToolTip_Menu_View_ReadingMode">Checked while the editor is in Reading mode: a read-only view for reading conversations and following their branches, with every editing tool hidden. Click it to switch to Editing mode, or to switch back to Reading mode. If you have unsaved changes the editor asks what to do with them before switching to Reading mode.</sys:String>
     <sys:String x:Key="Menu_View_PrivacyMode">Hide private paths</sys:String>
     <sys:String x:Key="ToolTip_View_PrivacyMode">Hides your user name and folder locations wherever the editor shows a file path, so screenshots and screen shares don't reveal them. Only the display changes; your files and settings keep their real paths. Stays checked for the whole session if the editor was started with --privacy-mode.</sys:String>
     <sys:String x:Key="Menu_View_ResetLayout">Reset Layout</sys:String>
@@ -2201,6 +2225,7 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="EmptyState_RepBalance_NoDispositions">No disposition checks or changes found</sys:String>
     <sys:String x:Key="EmptyState_RepBalance_NoReputations">No reputation checks or changes found</sys:String>
     <sys:String x:Key="EmptyState_RepBalance_Hint">To look further, set Scope to All conversations or Source to On disk + changes, then press Analyze.</sys:String>
+    <sys:String x:Key="EmptyState_RepBalance_Hint_NoProject">To look further, set Scope to All conversations, then press Analyze.</sys:String>
     <sys:String x:Key="EmptyState_VoAlias_NoConversation">No conversation chosen</sys:String>
     <sys:String x:Key="EmptyState_VoAlias_NoConversationHint">Pick a conversation in the list on the left. Its lines appear here, and you choose the one whose voice-over to use.</sys:String>
     <sys:String x:Key="EmptyState_VoAlias_NoLines">This conversation has no lines</sys:String>
@@ -2218,5 +2243,37 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="EmptyState_Main_NoGame">No game folder open</sys:String>
     <sys:String x:Key="EmptyState_Main_NoGameHint">Open your Pillars of Eternity or Deadfire install folder. Its conversations are then listed on the left, and you can open any of them to read or edit.</sys:String>
     <sys:String x:Key="EmptyState_Diff_NoChangesHint">Your copy and the other version have the same conversations. Pick another Other version at the top to compare with.</sys:String>
+
+    <!-- ─── First-launch mode chooser (GitHub issue 234) ─────────────────── -->
+    <sys:String x:Key="ModeChooser_Title">Pillars Dialog Editor</sys:String>
+    <sys:String x:Key="ModeChooser_Heading">How do you want to use the editor?</sys:String>
+    <sys:String x:Key="ModeChooser_Lead">Pick the one that fits you today. You can change your mind at any time.</sys:String>
+    <sys:String x:Key="ModeChooser_Reading_Glyph">📖</sys:String>
+    <sys:String x:Key="ModeChooser_Reading_Title">Reading mode</sys:String>
+    <sys:String x:Key="ModeChooser_Reading_Body">For reading the games' conversations: lore, companion banter, branches you missed.</sys:String>
+    <sys:String x:Key="ModeChooser_Reading_Bullet1">Open a game folder and find a conversation</sys:String>
+    <sys:String x:Key="ModeChooser_Reading_Bullet2">Read it and follow its branches</sys:String>
+    <sys:String x:Key="ModeChooser_Reading_Bullet3">Nothing can be changed, so you can't break your game</sys:String>
+    <sys:String x:Key="ModeChooser_Reading_Button">Start reading</sys:String>
+    <sys:String x:Key="ToolTip_ModeChooser_Reading">Start in Reading mode: a read-only view for reading the games' conversations and following their branches. Nothing can be edited or saved, so your game files and projects stay safe. You can switch to Editing mode later from View › Reading mode.</sys:String>
+    <sys:String x:Key="ModeChooser_Editing_Glyph">✎</sys:String>
+    <sys:String x:Key="ModeChooser_Editing_Title">Editing mode</sys:String>
+    <sys:String x:Key="ModeChooser_Editing_Body">For fixing lines and making mods: every editing tool, projects and packaging.</sys:String>
+    <sys:String x:Key="ModeChooser_Editing_Bullet1">Edit text, conditions, scripts and links</sys:String>
+    <sys:String x:Key="ModeChooser_Editing_Bullet2">Write new conversations in a project</sys:String>
+    <sys:String x:Key="ModeChooser_Editing_Bullet3">Package your changes as a mod</sys:String>
+    <sys:String x:Key="ModeChooser_Editing_Button">Start editing</sys:String>
+    <sys:String x:Key="ToolTip_ModeChooser_Editing">Start in Editing mode: the full editor, with every editing tool, projects and mod packaging. You can switch to Reading mode later from View › Reading mode.</sys:String>
+    <sys:String x:Key="ModeChooser_Footer">This window only appears once. Closing it starts Reading mode. You can switch modes later from View › Reading mode.</sys:String>
+
+    <!-- Mode badge (issue 234): right end of the main toolbar. Glyph and word are both shown so the mode never relies on colour alone. -->
+    <sys:String x:Key="ModeBadge_Reading">Reading</sys:String>
+    <sys:String x:Key="ModeBadge_Editing">Editing</sys:String>
+    <sys:String x:Key="ModeBadge_ReadingGlyph">📖</sys:String>
+    <sys:String x:Key="ModeBadge_EditingGlyph">✎</sys:String>
+    <sys:String x:Key="AutomationName_ModeBadge_Reading">Reading mode: nothing can be changed</sys:String>
+    <sys:String x:Key="AutomationName_ModeBadge_Editing">Editing mode: changes can be made</sys:String>
+    <sys:String x:Key="ToolTip_ModeBadge_Reading">You are in Reading mode: a read-only view where nothing can be changed or saved, so your game files and projects stay safe. Click to switch to Editing mode.</sys:String>
+    <sys:String x:Key="ToolTip_ModeBadge_Editing">You are in Editing mode: the full editor, where conversations, projects and mods can be changed. Click to switch to Reading mode. If you have unsaved changes the editor asks what to do with them first.</sys:String>
 
 </ResourceDictionary>

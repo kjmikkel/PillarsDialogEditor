@@ -147,6 +147,28 @@ public partial class NodeDetailViewModel : ObservableObject
     public bool IsEditable => _canvas?.IsEditable ?? true;
     public bool IsReadOnly => !IsEditable;
 
+    /// True in Reading mode (issue 234); set by MainWindowViewModel.
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ShowImportVoMenuItem))]
+    [NotifyPropertyChangedFor(nameof(ShowNoProjectHint))]
+    [NotifyPropertyChangedFor(nameof(FemaleTextPlaceholder))]
+    private bool _isReadingMode;
+
+    /// The "open or create a project" line under the header: only in Editing mode, since in
+    /// Reading mode File > New Project is hidden and the mode badge already says why nothing
+    /// takes edits.
+    public bool ShowNoProjectHint => IsReadOnly && !IsReadingMode;
+
+    /// Watermark of the female-text box; the editing placeholder advises leaving it blank, which
+    /// is meaningless where nothing can be typed.
+    public string FemaleTextPlaceholder =>
+        Loc.Get(IsReadingMode ? "Placeholder_FemaleText_Reading" : "Placeholder_FemaleText");
+
+    /// The node context menu's "Import voice-over" item (and its separator): a node with VO status, but
+    /// never in reading mode, where it would write to the project. A property here because a menu item
+    /// cannot combine two bindings (a MultiBinding in the popup never took effect).
+    public bool ShowImportVoMenuItem => HasVoStatus && !IsReadingMode;
+
     private void OnCanvasPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(ConversationViewModel.IsEditable))
@@ -157,6 +179,7 @@ public partial class NodeDetailViewModel : ObservableObject
     {
         OnPropertyChanged(nameof(IsEditable));
         OnPropertyChanged(nameof(IsReadOnly));
+        OnPropertyChanged(nameof(ShowNoProjectHint));
         OnPropertyChanged(nameof(CanEditLinkConditions));
         AddLinkCommand.NotifyCanExecuteChanged();
         DeleteLinkCommand.NotifyCanExecuteChanged();
@@ -1052,6 +1075,7 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(IsVoImportVisible));
         OnPropertyChanged(nameof(CanImportVo));
         OnPropertyChanged(nameof(HasVoStatus));
+        OnPropertyChanged(nameof(ShowImportVoMenuItem));
         OnPropertyChanged(nameof(VoStatusGlyph));
         OnPropertyChanged(nameof(VoStatusText));
         OnPropertyChanged(nameof(VoStatusIsFound));

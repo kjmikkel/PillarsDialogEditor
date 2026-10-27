@@ -42,12 +42,21 @@ wall or having to relearn the tool.
 
 ### When the Reader and the Modder conflict
 
-The long-term answer is a separate reading mode
-([#234](https://github.com/kjmikkel/PillarsDialogEditor/issues/234)), so each audience gets
-screens built for them.
+Each audience gets screens built for them: a separate **Reading mode**
+([#234](https://github.com/kjmikkel/PillarsDialogEditor/issues/234)), switched with the
+Reading/Editing badge in the toolbar or View > Reading mode.
 
-Until that exists, **the Modder wins on the editing screens**, with two exceptions that
-always count as defects:
+- **Reading mode** is for the Reader. It is read-only by construction: the editing menus,
+  shortcuts and tools are removed or switched off, so nothing a Reader clicks can change
+  a game file, a project or a mod. The Conversations, Canvas and Node Details panes stay, plus
+  the read-only tools a Reader or the Curious can use (Speaker Lines, Reputation & Disposition
+  Balance, Condition search).
+- **Editing mode** is the full editor, and **the Modder wins there**.
+- A first-run chooser asks which one to start in; closing it picks Reading, the safe choice.
+  Someone who moves up the ladder switches with one click, and the editor asks what to do with
+  unsaved changes first.
+
+Two things always count as defects, in either mode:
 
 - A Reader must never be able to change a game file, or their own work, by accident.
 - Nothing a Reader needs (opening a game folder, finding a conversation, reading it and

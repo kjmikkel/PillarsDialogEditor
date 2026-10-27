@@ -25,13 +25,35 @@ public sealed partial class GuidedTourViewModel : ObservableObject
         new("HelpToggle",   "Tour_Step4_Text"),
     ];
 
-    private readonly IReadOnlyList<GuidedTourStep> _steps;
+    // The reading-mode tour (issue 234): what a reader needs, no editing. ModeBadge is the
+    // always-visible mode control; TourTargetResolver finds it by name.
+    public static readonly IReadOnlyList<GuidedTourStep> ReaderSteps =
+    [
+        new("BrowserPanel", "Tour_Reader_Step1_Text"),
+        new("CanvasView",   "Tour_Reader_Step2_Text"),
+        new("DetailPanel",  "Tour_Reader_Step3_Text"),
+        new("ModeBadge",    "Tour_Reader_Step4_Text"),
+    ];
+
+    private readonly IReadOnlyList<GuidedTourStep> _editingSteps;
+    private readonly IReadOnlyList<GuidedTourStep> _readerSteps;
+    // The steps of the tour that is running (or ran last); Start(mode) picks them.
+    private IReadOnlyList<GuidedTourStep> _steps;
 
     // Parameterless constructor for production use (MainWindowViewModel).
-    public GuidedTourViewModel() : this(DefaultSteps) { }
+    public GuidedTourViewModel() : this(DefaultSteps, ReaderSteps) { }
 
-    // Overload for tests — lets tests inject a short step list.
-    public GuidedTourViewModel(IReadOnlyList<GuidedTourStep> steps) => _steps = steps;
+    // Overload for tests — lets tests inject short step lists.
+    public GuidedTourViewModel(IReadOnlyList<GuidedTourStep> editingSteps, IReadOnlyList<GuidedTourStep> readerSteps)
+    {
+        _editingSteps = editingSteps;
+        _readerSteps  = readerSteps;
+        _steps        = editingSteps;
+    }
+
+    /// <summary>Whether the tour for <paramref name="mode"/> has already been shown.</summary>
+    public static bool HasSeen(EditorMode mode) =>
+        mode == EditorMode.Reading ? AppSettings.ReaderTourSeen : AppSettings.GuidedTourSeen;
 
     [ObservableProperty] private bool _isVisible;
     [ObservableProperty] private int  _currentIndex;
@@ -50,14 +72,18 @@ public sealed partial class GuidedTourViewModel : ObservableObject
     public event Action? StepChanged;
 
     /// <summary>
-    /// Resets to step 0, marks the tour as seen in AppSettings so the
-    /// auto-trigger does not fire again, and makes the bar visible.
+    /// Runs the tour for <paramref name="mode"/> from step 0, marks that mode's tour as seen in
+    /// AppSettings so the auto-trigger does not fire again, and makes the bar visible.
     /// Safe to call multiple times — always restarts from step 0.
     /// </summary>
-    public void Start()
+    public void Start(EditorMode mode)
     {
-        AppSettings.GuidedTourSeen = true;
+        if (mode == EditorMode.Reading) AppSettings.ReaderTourSeen = true;
+        else                            AppSettings.GuidedTourSeen = true;
+        _steps = mode == EditorMode.Reading ? _readerSteps : _editingSteps;
         CurrentIndex = 0;   // setter calls OnCurrentIndexChanged which notifies dependents
+        // The step list may have changed under an unchanged index (0 -> 0 raises nothing).
+        OnCurrentIndexChanged(0);
         IsVisible    = true;
         StepChanged?.Invoke();
     }

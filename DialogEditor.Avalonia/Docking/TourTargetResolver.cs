@@ -18,7 +18,7 @@ public sealed record DockedTourTarget(string DockToolId, Type ViewType);
 /// MainWindow's name scope and a name lookup silently returns null — which is how the tour's
 /// Browser/Details steps were lost when the docking shell landed. Those targets are found by
 /// view TYPE instead. Everything else (chrome declared directly in MainWindow.axaml, e.g.
-/// HelpToggle) keeps the classic named lookup.
+/// HelpToggle, and ModeBadge for the reader tour, issue 234) keeps the classic named lookup.
 ///
 /// Kept separate from MainWindow so the mapping, and its agreement with the dock layout and
 /// App.axaml's templates, is unit-testable (TourTargetResolverTests).

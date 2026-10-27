@@ -204,8 +204,16 @@ public partial class ConversationViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(DeleteConnectionCmdCommand))]
     [NotifyCanExecuteChangedFor(nameof(ChooseStartNodeCommand))]
     [NotifyCanExecuteChangedFor(nameof(MakeStartNodeCmdCommand))]
+    [NotifyCanExecuteChangedFor(nameof(UndoCommand))]
+    [NotifyCanExecuteChangedFor(nameof(RedoCommand))]
     [NotifyPropertyChangedFor(nameof(CanMakeStartNode))]
     private bool _isEditable;
+
+    /// Reading mode (issue 234), set by MainWindowViewModel alongside IsEditable. IsEditable is false
+    /// in reading mode, but also with no project open, where the editing menu items stay as disabled
+    /// entries; reading mode hides them outright, which needs its own flag.
+    [ObservableProperty]
+    private bool _isReadingMode;
 
     // ── Undo/Redo state ───────────────────────────────────────────────────
     public bool    CanUndo         => _undoStack.CanUndo;
@@ -213,7 +221,11 @@ public partial class ConversationViewModel : ObservableObject
     public string? UndoDescription => _undoStack.UndoDescription;
     public string? RedoDescription => _undoStack.RedoDescription;
 
-    [RelayCommand(CanExecute = nameof(CanUndo))]
+    // Also gated on IsEditable (issue 234): a read-only canvas must not change through Ctrl+Z / Ctrl+Y.
+    private bool CanRunUndo() => CanUndo && IsEditable;
+    private bool CanRunRedo() => CanRedo && IsEditable;
+
+    [RelayCommand(CanExecute = nameof(CanRunUndo))]
     public void Undo()
     {
         _undoStack.Undo();
@@ -221,7 +233,7 @@ public partial class ConversationViewModel : ObservableObject
         IsModified = _undoStack.CanUndo || Connections.Count > 0 || Nodes.Count > 0;
     }
 
-    [RelayCommand(CanExecute = nameof(CanRedo))]
+    [RelayCommand(CanExecute = nameof(CanRunRedo))]
     public void Redo()
     {
         _undoStack.Redo();
@@ -524,6 +536,8 @@ public partial class ConversationViewModel : ObservableObject
 
     // ID changes not yet folded into the stored patch's translations (NodeIdRemap).
     private readonly List<(int From, int To)> _pendingRemaps = [];
+
+    internal IReadOnlyList<(int From, int To)> PeekPendingRemaps() => _pendingRemaps.ToList();
 
     internal IReadOnlyList<(int From, int To)> TakePendingRemaps()
     {

@@ -83,6 +83,8 @@
     <Color x:Key="Palette.Teal.150">#FFD5F0E8</Color>
     <Color x:Key="Palette.Teal.250">#FFB0E0D5</Color>
     <Color x:Key="Palette.Green.600">#FF2D6A2D</Color>
+    <Color x:Key="Palette.Green.700">#FF245724</Color>
+    <Color x:Key="Palette.Green.800">#FF1B431B</Color>
     <Color x:Key="Palette.Green.550">#FFCDEBD5</Color>
     <Color x:Key="Palette.Green.500">#FF1E7D34</Color>
     <Color x:Key="Palette.Green.400">#FF1A6B35</Color>  <!-- new conversations, added text, script syntax; darkened for 4.5:1 on Surface.Subtle (issue 85) -->
@@ -99,6 +101,8 @@
     <Color x:Key="Palette.Amber.950">#FF2A2000</Color>
     <Color x:Key="Palette.Olive.500">#FF6F6F1E</Color>
     <Color x:Key="Palette.Burnt.600">#FF8E4912</Color>
+    <Color x:Key="Palette.Burnt.700">#FF783D0F</Color>
+    <Color x:Key="Palette.Burnt.800">#FF61310C</Color>
     <Color x:Key="Palette.Parchment.100">#FFF5F0D0</Color>
     <Color x:Key="Palette.Parchment.200">#FFE8E0B0</Color>
     <Color x:Key="Palette.Cream.100">#FFFFF8DC</Color>

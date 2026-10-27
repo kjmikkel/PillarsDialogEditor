@@ -168,6 +168,27 @@ public class TourTargetResolverTests
         Assert.Null(TourTargetResolver.Resolve("NoSuchControl", main, []));
     }
 
+    /// The reader tour's last step targets the mode badge by name (issue 234); it is not docked,
+    /// and while the badge does not exist yet the step resolves to null like any missing target.
+    [AvaloniaFact]
+    public void Resolve_ModeBadge_IsNamedLookup_NullWhenAbsent_FoundWhenPresent()
+    {
+        Assert.Null(TourTargetResolver.DockedTargetFor("ModeBadge"));
+
+        var absent = new Window { Content = new TextBlock() };
+        NameScope.SetNameScope(absent, new NameScope());
+        absent.Show();
+        Assert.Null(TourTargetResolver.Resolve("ModeBadge", absent, []));
+
+        var badge = new Button { Name = "ModeBadge" };
+        var main  = new Window { Content = badge };
+        var scope = new NameScope();
+        scope.Register("ModeBadge", badge);
+        NameScope.SetNameScope(main, scope);
+        main.Show();
+        Assert.Same(badge, TourTargetResolver.Resolve("ModeBadge", main, []));
+    }
+
     // ── helpers ───────────────────────────────────────────────────────────
 
     private static HashSet<string> MainWindowXNames()

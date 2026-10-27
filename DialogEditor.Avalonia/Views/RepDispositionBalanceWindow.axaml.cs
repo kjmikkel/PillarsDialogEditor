@@ -30,7 +30,7 @@ public partial class RepDispositionBalanceWindow : Window
             new(Loc.Get("RepBalance_Source_OnDiskPlusChanges"), BalanceSource.OnDiskPlusChanges),
         };
         SourceBox.DisplayMemberBinding = new Binding("Key");
-        SourceBox.SelectedIndex = 0;
+        SourceBox.SelectedIndex = vm.Source == BalanceSource.ProjectChanges ? 0 : 1;
         SourceBox.SelectionChanged += (_, _) =>
         {
             if (SourceBox.SelectedItem is KeyValuePair<string, BalanceSource> kv)

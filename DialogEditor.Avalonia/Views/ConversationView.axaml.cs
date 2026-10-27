@@ -3,6 +3,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using DialogEditor.Avalonia.Input;
 using DialogEditor.Avalonia.Shared.Theming;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Layout;
@@ -37,6 +38,8 @@ public partial class ConversationView : UserControl
             if (e.NameScope.Find<Control>("PART_ConnectionsHost") is { } connections)
                 connections.ZIndex = -1;
         };
+
+        Editor.AddHandler(ContextRequestedEvent, Editor_ContextRequested, RoutingStrategies.Tunnel);
 
         Editor.PropertyChanged += (_, e) =>
         {
@@ -138,6 +141,10 @@ public partial class ConversationView : UserControl
     private void Editor_KeyDown(object? sender, KeyEventArgs e)
     {
         if (DataContext is not ConversationViewModel vm) return;
+        // Reading mode (issue 234): same allow-list as the main window, so nudge and connect keys do
+        // nothing even though the key reaches the canvas first. Read from the canvas's own VM: a
+        // floated canvas has no MainWindow ancestor.
+        if (vm.IsReadingMode && !ReadingModeShortcuts.IsAllowed(e.Key, e.KeyModifiers)) return;
 
         var ctrl  = e.KeyModifiers.HasFlag(KeyModifiers.Control);
         var none  = e.KeyModifiers == KeyModifiers.None;
@@ -437,6 +444,19 @@ public partial class ConversationView : UserControl
     {
         if (DataContext is ConversationViewModel vm)
             vm.DeleteAnnotation(annotation);
+    }
+
+    // Issue 234: the empty-space menu (add node, add note) is all edits, so reading mode shows none.
+    // Tunnelled so it runs before the menu's own handler; a request from a node or a link is left to
+    // that item's own menu (a node keeps "Show all lines by this speaker"). A link's menu holds only
+    // Delete, which reading mode hides, so it would pop up empty: it is suppressed too.
+    private void Editor_ContextRequested(object? sender, ContextRequestedEventArgs e)
+    {
+        if (DataContext is not ConversationViewModel { IsReadingMode: true }) return;
+        if (e.Source is global::Avalonia.Visual source
+            && source.FindAncestorOfType<Nodify.ItemContainer>(includeSelf: true) is not null)
+            return;
+        e.Handled = true;
     }
 
     private void Editor_DoubleTapped(object? sender, TappedEventArgs e)

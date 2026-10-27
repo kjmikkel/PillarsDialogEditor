@@ -246,6 +246,9 @@
                         <Setter Property="Location" Value="{Binding Location, Mode=TwoWay,
                                                    Converter={StaticResource LayoutPointConverter}}"/>
                         <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}"/>
+                        <!-- Issue 234: no dragging in reading mode (or with no project open: the keyboard nudge
+                             is already gated on IsEditable, so a pointer drag must be too). -->
+                        <Setter Property="IsDraggable" Value="{Binding $parent[UserControl].DataContext.IsEditable}"/>
                         <!-- Issue 242: keyboard selection moves focus here (FollowSelection), so a screen
                              reader announces the node. Focusable but no tab stop: the editor stays the
                              canvas's single Tab stop (issue 238). -->
@@ -263,18 +266,21 @@
                             <nodify:Node.ContextMenu>
                                 <ContextMenu AutomationProperties.AutomationId="NodeContextMenu">
                                     <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_DeleteNode}"
+                                              IsVisible="{Binding !$parent[UserControl].DataContext.IsReadingMode}"
                                               AutomationProperties.AutomationId="NodeMenu_Delete"
                                               Command="{Binding $parent[UserControl].DataContext.DeleteNodeCmdCommand}"
                                               CommandParameter="{Binding}"
                                               ToolTip.Tip="{DynamicResource ToolTip_DeleteNode}"
                                               AutomationProperties.HelpText="{DynamicResource ToolTip_DeleteNode}"/>
                                     <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_AddConnectedNode}"
+                                              IsVisible="{Binding !$parent[UserControl].DataContext.IsReadingMode}"
                                               AutomationProperties.AutomationId="NodeMenu_AddConnectedNode"
                                               Command="{Binding $parent[UserControl].DataContext.AddConnectedNodeCmdCommand}"
                                               CommandParameter="{Binding}"
                                               ToolTip.Tip="{DynamicResource ToolTip_AddConnectedNode}"
                                               AutomationProperties.HelpText="{DynamicResource ToolTip_AddConnectedNode}"/>
                                     <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_ConnectToNode}"
+                                              IsVisible="{Binding !$parent[UserControl].DataContext.IsReadingMode}"
                                               AutomationProperties.AutomationId="NodeMenu_ConnectToNode"
                                               Command="{Binding $parent[UserControl].DataContext.BeginConnectCmdCommand}"
                                               CommandParameter="{Binding}"
@@ -293,12 +299,12 @@
                                               CommandParameter="{Binding}"
                                               ToolTip.Tip="{DynamicResource ToolTip_Canvas_BrowseSpeakerLinesForNode}"
                                               AutomationProperties.HelpText="{DynamicResource ToolTip_Canvas_BrowseSpeakerLinesForNode}"/>
-                                    <Separator IsVisible="{Binding $parent[UserControl].DataContext.Detail.HasVoStatus}"/>
+                                    <Separator IsVisible="{Binding $parent[UserControl].DataContext.Detail.ShowImportVoMenuItem}"/>
                                     <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_ImportVo}"
                                               AutomationProperties.AutomationId="NodeMenu_ImportVo"
                                               Command="{Binding $parent[UserControl].DataContext.Detail.ImportVoCommand}"
-                                              IsVisible="{Binding $parent[UserControl].DataContext.Detail.HasVoStatus}"
                                               ToolTip.Tip="{DynamicResource ToolTip_Menu_ImportVo}"
+                                              IsVisible="{Binding $parent[UserControl].DataContext.Detail.ShowImportVoMenuItem}"
                                               AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_ImportVo}"/>
                                 </ContextMenu>
                             </nodify:Node.ContextMenu>
@@ -517,6 +523,7 @@
                             <nodify:Connection.ContextMenu>
                                 <ContextMenu AutomationProperties.AutomationId="ConnectionContextMenu">
                                     <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_DeleteConnection}"
+                                              IsVisible="{Binding !$parent[UserControl].DataContext.IsReadingMode}"
                                               AutomationProperties.AutomationId="ConnectionMenu_Delete"
                                               Command="{Binding $parent[UserControl].DataContext.DeleteConnectionCmdCommand}"
                                               CommandParameter="{Binding}"

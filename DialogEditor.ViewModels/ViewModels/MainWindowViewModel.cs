@@ -214,6 +214,7 @@ public partial class MainWindowViewModel : ObservableObject
     /// UnsavedChangesRequested dialog plumbing.
     public Task<bool> EnsureNoUnsavedEditsAsync()
     {
+        _guardDiscarded = false;
         if (!HasUnsavedChanges)
             return Task.FromResult(true);
 
@@ -223,10 +224,12 @@ public partial class MainWindowViewModel : ObservableObject
         _unsavedDecision?.TrySetResult(false);
         _pendingFile = null;
 
-        _unsavedDecision = new TaskCompletionSource<bool>();
+        // Held locally: a handler that answers synchronously (Save/Discard/Cancel) clears the field
+        // before Invoke returns.
+        var decision = _unsavedDecision = new TaskCompletionSource<bool>();
         _pendingAction = () => { _unsavedDecision?.TrySetResult(true); _unsavedDecision = null; };
         UnsavedChangesRequested?.Invoke();
-        return _unsavedDecision.Task;
+        return decision.Task;
     }
 
     public void SaveAndProceed()
@@ -237,11 +240,33 @@ public partial class MainWindowViewModel : ObservableObject
 
     public void DiscardAndProceed()
     {
+        // Put the open conversation back to its saved state first (issue 234). The continuation
+        // may not replace the canvas (a cancelled picker, Later, a cancelled merge), and a canvas
+        // still holding the discarded edits would fold them into the next Save. A conversation
+        // switch loads another conversation anyway, so it is not reverted first.
+        if (_pendingFile is null && !ReloadCurrentConversationView())
+        {
+            // The load reported its own error. Nothing was discarded, so nothing proceeds: the
+            // edits stay on screen and unsaved, and the autosave copy is kept.
+            AppLog.Warn("Discard: the open conversation could not be reverted to its saved state; the action was not carried out");
+            CancelPendingNavigation();
+            return;
+        }
         // The user consciously discarded these edits — the next launch must not
         // resurrect them from the autosave sidecar (spec 2026-07-12 §3).
         if (_projectPath is not null) AutosaveRecovery.TryDelete(_projectPath);
+        // Left dirty, a project swapped in by the continuation skipped its canvas reload
+        // (FinishLoad). Project-level edits set only the window's flag, so it is cleared here;
+        // the canvas flag is kept in step, or the next edit would not mark the window dirty.
+        _guardDiscarded = true;
+        Canvas.IsModified = false;
+        IsModified = false;
         Proceed();
     }
+
+    /// Set by Discard for the awaiting caller of EnsureNoUnsavedEditsAsync, which can no longer
+    /// tell Discard from Save by IsModified. Reset by each EnsureNoUnsavedEditsAsync call.
+    private bool _guardDiscarded;
 
     public void CancelPendingNavigation()
     {
@@ -307,7 +332,8 @@ public partial class MainWindowViewModel : ObservableObject
     /// _projectPath is required because row destinations live in _vo/ next to
     /// the project file — an unsaved new project cannot batch-import.
     public bool CanBatchImportVoAll =>
-        _project is not null
+        IsEditingMode
+        && _project is not null
         && _provider is not null
         && _projectPath is not null
         && !string.IsNullOrEmpty(_currentGameDirectory)
@@ -322,15 +348,16 @@ public partial class MainWindowViewModel : ObservableObject
     /// (it loads each patched conversation's effective text). Unlike batch VO it is
     /// game-agnostic and needs no saved project path.
     public bool CanFindInProject =>
-        _project is not null
+        IsEditingMode
+        && _project is not null
         && _provider is not null
         && !string.IsNullOrEmpty(_currentGameDirectory);
 
-    /// Same requirements as Find in Project: an open project, a loaded provider, and a game
-    /// folder (the "on disk" scope enumerates every conversation). Read-only; never writes.
+    /// A loaded provider and a game folder (the "on disk" scope enumerates every conversation).
+    /// No project needed: a Reader browsing a game folder can use it (issue 234). Read-only;
+    /// never writes, so it stays available in both modes.
     public bool CanShowRepDispositionBalance =>
-        _project is not null
-        && _provider is not null
+        _provider is not null
         && !string.IsNullOrEmpty(_currentGameDirectory);
 
     /// The open project's spelling words (issue 9); null when none or no project is open.
@@ -356,7 +383,7 @@ public partial class MainWindowViewModel : ObservableObject
         // spelling rows aren't refreshed on every patch save.
         if (hadProject != (project is not null))
             Detail.AddWordToProjectDictionary = project is null ? null : AddProjectWord;
-        Canvas.IsEditable = project is not null;
+        UpdateEditable();
         OnPropertyChanged(nameof(IsProjectOpen));
         SaveProjectCommand.NotifyCanExecuteChanged();
         SaveProjectAsCommand.NotifyCanExecuteChanged();
@@ -382,7 +409,223 @@ public partial class MainWindowViewModel : ObservableObject
             : project.Patches.Where(kv => !kv.Value.IsEmpty).Select(kv => kv.Key).ToHashSet());
     }
 
+    // ── Editor mode (Reading / Editing, issue 234) ─────────────────────────────
+    /// Never-chosen (null) behaves as Editing here; the first-run prompt that asks is a later task.
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsReadingMode))]
+    [NotifyPropertyChangedFor(nameof(IsEditingMode))]
+    private EditorMode _mode = AppSettings.Mode ?? EditorMode.Editing;
+
+    public bool IsReadingMode => Mode == EditorMode.Reading;
+    public bool IsEditingMode => Mode == EditorMode.Editing;
+
+    // The canvas is editable only with a project open AND in Editing mode; Detail mirrors the mode.
+    private void UpdateEditable()
+    {
+        Canvas.IsEditable = _project is not null && IsEditingMode;
+        Canvas.IsReadingMode = IsReadingMode;
+        Detail.IsReadingMode = IsReadingMode;
+    }
+
+    /// Switches mode, saving it for the next launch. Entering Reading goes through the unsaved-edits
+    /// guard (Reading is read-only, so dirty edits must be saved or discarded first); returns false
+    /// when the user picks Stay Here or a discard cannot be reverted. The open conversation and selected node are kept.
+    public async Task<bool> SwitchModeAsync(EditorMode target)
+    {
+        if (target == Mode) return true;
+        if (target == EditorMode.Reading)
+        {
+            if (!await EnsureNoUnsavedEditsAsync())
+                return false;
+            if (_guardDiscarded)
+            {
+                // Discard has already put an open conversation back to its saved state (and
+                // reselected its node). With none open the edits were project-level only, and
+                // reverting them means re-reading the project; if that fails, stay in Editing
+                // with them marked unsaved rather than show lost edits.
+                if (_currentFile is null && !await RevertProjectToSavedAsync())
+                {
+                    IsModified = true;
+                    StatusText = Loc.Get("Status_ModeSwitchRefused");
+                    return false;
+                }
+            }
+            // Still dirty after Save means the save failed (its error is already shown): stay
+            // in Editing with the edits rather than carry them into read-only Reading.
+            else if (HasUnsavedChanges)
+                return false;
+        }
+
+        Mode = target;
+        AppSettings.Mode = target;
+        // A running tour describes the mode just left; drop it, then offer the new mode's own
+        // tour if this is the first time it is shown.
+        if (Tour.IsVisible) Tour.DismissCommand.Execute(null);
+        if (target == EditorMode.Editing)
+        {
+            // The deferred prompts and the canvas reload come first; the tour would otherwise sit
+            // under the autosave and conflict modals, pointing at a canvas about to be replaced.
+            await OnEnteredEditingModeAsync();
+            if (!GuidedTourViewModel.HasSeen(target)) Tour.Start(target);
+        }
+        else if (!GuidedTourViewModel.HasSeen(target))
+            Tour.Start(target);
+        return true;
+    }
+
+    /// Puts project-level edits (no conversation open, so no view to lose) back to their saved
+    /// state after Discard by re-reading the project from its file. An open conversation is
+    /// reverted by DiscardAndProceed itself. False when there is nothing to re-read or the load
+    /// did not complete.
+    private async Task<bool> RevertProjectToSavedAsync()
+    {
+        var path = _projectPath;
+        if (path is null || !File.Exists(path))
+        {
+            AppLog.Warn("Reading mode: discard could not be reverted, the project has no saved file to re-read");
+            return false;
+        }
+        var before = _project;
+        await LoadProjectAsync(path, offerDeferred: false);
+        // A completed load swaps in a freshly read project (it does not reset IsModified).
+        if (!IsProjectOpen || ReferenceEquals(before, _project))
+        {
+            AppLog.Warn($"Reading mode: reloading '{path}' to discard its edits did not complete");
+            return false;
+        }
+        IsModified = false;
+        return true;
+    }
+
+    /// Opens a conversation on the canvas from the current project: a conversation the project
+    /// created and that has no game file yet starts from the project's patch alone.
+    /// False when the load failed (already logged and reported).
+    private bool OpenConversationView(ConversationFile file)
+    {
+        if (_project?.IsNewConversation(file.Name) == true && !File.Exists(file.ConversationPath))
+        {
+            LoadNewConversation(file);
+            return true;
+        }
+        return LoadConversationFile(file);
+    }
+
+    /// Re-opens the open conversation from the current project and reselects the node that was
+    /// selected. Needed whenever the project is swapped under an open canvas (issue 234): the
+    /// canvas and its BaseSnapshot would otherwise keep the old project's text, and the next Save
+    /// would re-diff that stale canvas over the swapped-in work. A node the new project no longer
+    /// has is simply not selected; no "node gone" message. False when the load failed.
+    private bool ReloadCurrentConversationView()
+    {
+        if (_currentFile is not { } file) return true;
+        var selectedId = Canvas.SelectedNode?.NodeId;
+        if (!OpenConversationView(file)) return false;
+        var selected = Canvas.Nodes.FirstOrDefault(n => n.NodeId == selectedId);
+        if (selected is not null) Canvas.SelectedNode = selected;
+        return true;
+    }
+
+    // Work that opening in reading mode put off because it would have written (issue 234).
+    private string? _deferredOpenPath;     // project with a newer autosave copy to offer
+    private string? _deferredBackupPath;   // game folder whose backup offer / top-up was skipped
+
+    /// Runs what reading mode deferred, project prompts first: the autosave offer (which also
+    /// covers a conflict, as the reload re-checks it), else the pending conflict, then the backup.
+    private async Task OnEnteredEditingModeAsync()
+    {
+        if (_deferredOpenPath is { } openPath)
+        {
+            _deferredOpenPath = null;
+            // Only if that project is still the open one; a different or closed project means the
+            // deferral is stale and reloading would clobber what is open now.
+            if (_projectPath == openPath)
+            {
+                var before = _project;
+                await LoadProjectAsync(openPath, offerDeferred: false);
+                // Later (issue 236) leaves the project that was opened for reading in place, now
+                // in Editing, where Save, autosave rotation and Discard would delete or rotate the
+                // copies Later promised to keep. Close it instead, as Later does outside reading mode.
+                if (ReferenceEquals(before, _project) && IsProjectOpen
+                    && AutosaveRecovery.Check(openPath).State == AutosaveState.Newer)
+                {
+                    CloseProjectCore(Loc.Format("Status_AutosaveKeptNotOpened", Path.GetFileName(openPath)));
+                    ClearCanvasAfterClose();
+                }
+                // Discarding the copies re-read the file and offered the merge; cancelled, the
+                // reading-mode "mine" view is still open over the conflicted file.
+                else if (ReferenceEquals(before, _project))
+                    CloseIfConflictStillPending();
+            }
+        }
+        else if (HasPendingConflictResolution)
+        {
+            var before = _project;
+            await ResolveConflicts();
+            if (ReferenceEquals(before, _project))
+                CloseIfConflictStillPending();
+        }
+
+        if (_deferredBackupPath is { } backupPath)
+        {
+            _deferredBackupPath = null;
+            if (_provider is not null && backupPath == _currentGameDirectory)
+                RunBackupStep(backupPath, _provider);
+        }
+    }
+
+    /// True while the open project's own file still holds an unresolved git conflict. Only
+    /// reading mode opens such a file (the "mine" side, issue 234); in Editing any save would
+    /// write that side over the markers and lose the other branch's version.
+    private bool ConflictPendingOnOpenProject =>
+        HasPendingConflictResolution && _projectPath is not null && _projectPath == _pendingConflictPath;
+
+    /// Editing never keeps a conflicted project open (issue 234), as outside reading mode a
+    /// cancelled merge never opens it. LastProjectPath is kept, so the next launch offers the
+    /// resolution again.
+    private void CloseIfConflictStillPending()
+    {
+        if (!IsProjectOpen || !ConflictPendingOnOpenProject) return;
+        var path = _projectPath!;
+        AppLog.Info($"Closed '{path}' on entering editing: its git conflict is unresolved");
+        CloseProjectCore(Loc.Format("Status_ConflictUnresolvedNotOpened", Path.GetFileName(path)));
+        ClearCanvasAfterClose();
+    }
+
+    [RelayCommand]
+    private Task ToggleReadingMode()
+        => SwitchModeAsync(IsReadingMode ? EditorMode.Editing : EditorMode.Reading);
+
     // ── Partial hooks ─────────────────────────────────────────────────────
+    partial void OnModeChanged(EditorMode value)
+    {
+        UpdateEditable();
+        // The status bar mirrors the focused control's HelpText. The mode badge keeps focus after
+        // its click, so its previous-mode tooltip would linger until focus moved (issue 234).
+        FocusHintText = string.Empty;
+        // Every editing command's gate includes IsEditingMode (issue 234), so re-evaluate them all;
+        // OpenProject, CloseProject, OpenFolder, recents, tour, changelog and About stay on.
+        NewProjectCommand.NotifyCanExecuteChanged();
+        NewConversationCommand.NotifyCanExecuteChanged();
+        ImportConversationCommand.NotifyCanExecuteChanged();
+        ExportConversationsCommand.NotifyCanExecuteChanged();
+        SaveProjectCommand.NotifyCanExecuteChanged();
+        SaveProjectAsCommand.NotifyCanExecuteChanged();
+        UndoApplyCommand.NotifyCanExecuteChanged();
+        MergeProjectsCommand.NotifyCanExecuteChanged();
+        ExportForTranslationCommand.NotifyCanExecuteChanged();
+        ImportTranslationCommand.NotifyCanExecuteChanged();
+        CreateSampleProjectCommand.NotifyCanExecuteChanged();
+        OpenWalkthroughCommand.NotifyCanExecuteChanged();
+        TagReferenceCommand.NotifyCanExecuteChanged();
+        RestoreBackupCommand.NotifyCanExecuteChanged();
+        SaveCommand.NotifyCanExecuteChanged();
+        TestPatchCommand.NotifyCanExecuteChanged();
+        FindInProjectCommand.NotifyCanExecuteChanged();
+        BatchReplaceCommand.NotifyCanExecuteChanged();
+        BatchImportVoAllCommand.NotifyCanExecuteChanged();
+        ResolveConflictsCommand.NotifyCanExecuteChanged();
+    }
+
     partial void OnCurrentConversationNameChanged(string? value)
         => OnPropertyChanged(nameof(WindowTitle));
 
@@ -402,6 +645,9 @@ public partial class MainWindowViewModel : ObservableObject
         _filePicker   = filePicker;
         Browser = new GameBrowserViewModel(dispatcher);
         Canvas  = new ConversationViewModel(dispatcher) { ShowMinimap = AppSettings.ShowMinimap };
+
+        Detail.IsReadingMode = IsReadingMode;
+        Canvas.IsReadingMode = IsReadingMode;
 
         Browser.ConversationSelected += OnConversationSelected;
 
@@ -545,13 +791,25 @@ public partial class MainWindowViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(ResolveConflictsCommand))]
     private bool _hasPendingConflictResolution;
 
-    [RelayCommand(CanExecute = nameof(HasPendingConflictResolution))]
+    private bool CanResolveConflicts() => IsEditingMode && HasPendingConflictResolution;
+
+    [RelayCommand(CanExecute = nameof(CanResolveConflicts))]
     private async Task ResolveConflicts()
     {
         var path = _pendingConflictPath;
         if (path is null || !File.Exists(path))
         {
             ClearPendingConflict();
+            return;
+        }
+        // The merge replaces the open project (issue 234), so edits made while the conflict was
+        // pending would be saved over the merged choices. The usual Save / Discard / Stay Here
+        // prompt can't be used: Save writes this side over the conflicted file, which removes
+        // the markers and loses the other branch's version. Refuse instead, and say why; the
+        // edits and the pending conflict are left as they are.
+        if (HasUnsavedChanges)
+        {
+            StatusText = Loc.Get("Status_ResolveConflictsUnsavedEdits");
             return;
         }
         await LoadProjectAsync(path, offerDeferred: false);
@@ -851,7 +1109,7 @@ public partial class MainWindowViewModel : ObservableObject
         });
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditingMode))]
     private void NewProject()
         => GuardDirtyThen(() => _ = DoNewProject());
 
@@ -944,12 +1202,17 @@ public partial class MainWindowViewModel : ObservableObject
         // User-intent extras the branch-switch teardown must not do: the canvas may
         // show patched content that exists nowhere after close, and a deliberate
         // close should stick across restarts (no auto-reopen of this project).
+        ClearCanvasAfterClose();
+        AppSettings.LastProjectPath = null;
+    }
+
+    private void ClearCanvasAfterClose()
+    {
         Canvas.Clear();
         Detail.Clear();
         CurrentConversationName = null;
         _currentFile = null;
         OnPropertyChanged(nameof(CanValidateVO));
-        AppSettings.LastProjectPath = null;
     }
 
     // Explicit opens (File > Open) resolve conflicts immediately; startup re-open
@@ -985,6 +1248,8 @@ public partial class MainWindowViewModel : ObservableObject
     {
         SetProject(null);
         _projectPath = null;
+        _deferredOpenPath = null;   // reading-mode deferrals belonged to the project just closed
+        ClearPendingConflict();
         Detail.ProjectPath  = null;
         Canvas.ProjectPath  = null;
         OnPropertyChanged(nameof(CanExportModBundle));
@@ -1064,8 +1329,16 @@ public partial class MainWindowViewModel : ObservableObject
     {
         // Crash recovery (spec 2026-07-12 §4): a sidecar newer than the project file
         // holds work lost to a crash/kill — offer to restore it before loading.
+        _deferredOpenPath = null;   // this open supersedes any earlier deferral
         var recovery = AutosaveRecovery.Check(path);
-        if (recovery.State == AutosaveState.Stale)
+        if (IsReadingMode)
+        {
+            // Reading mode writes nothing (issue 234): no prompt, and no deleting a stale copy.
+            // A newer copy is offered when the user switches to editing.
+            if (recovery.State == AutosaveState.Newer)
+                _deferredOpenPath = path;
+        }
+        else if (recovery.State == AutosaveState.Stale)
         {
             AutosaveRecovery.TryDelete(path); // save happened through another route
         }
@@ -1126,6 +1399,8 @@ public partial class MainWindowViewModel : ObservableObject
             var loaded = DialogProjectSerializer.Deserialize(text);
             FinishLoad(loaded, path);
             ClearPendingConflict();
+            if (_deferredOpenPath is not null)
+                StatusText = Loc.Format("Status_ProjectOpenedReadOnlyDeferred", loaded.Name);
         }
         catch (UnsupportedSchemaVersionException ex)
         {
@@ -1176,6 +1451,17 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
+        if (IsReadingMode)
+        {
+            // Reading mode: the resolved project would be saved back over the file, so open the
+            // local side as it is and offer the modal once the user switches to editing.
+            FinishLoad(mine, path);
+            _pendingConflictPath        = path;
+            HasPendingConflictResolution = true;
+            StatusText = Loc.Format("Status_ProjectOpenedReadOnlyDeferred", mine.Name);
+            return;
+        }
+
         if (offerDeferred)   // startup: don't auto-show the modal — offer a Resolve… action
         {
             _pendingConflictPath        = path;
@@ -1219,7 +1505,41 @@ public partial class MainWindowViewModel : ObservableObject
         RefreshRecentProjects();
         CurrentProjectName = loaded.Name;
         AppLog.Info($"Opened project: {path}");
+        // Before the reload, so a warning it raises (the patch no longer matches the game files,
+        // the text file is damaged) is what stays on screen; it is the only place it is shown.
         StatusText = Loc.FormatCount("Status_ProjectOpened", loaded.Patches.Count, loaded.Name);
+        // A conversation already on the canvas shows the previous project's text (issue 234: opening
+        // a project, a deferred autosave Restore and a deferred merge all swap the project under
+        // it). Discard clears IsModified, so after the unsaved-edits guard this is dirty only when
+        // the user chose Save and the save failed (SaveAndProceed proceeds regardless), or when
+        // Create Sample Project, which has no guard, swaps a project in: those edits are wanted
+        // and the reload would drop them, so they are left on the canvas.
+        if (_currentFile is { } open && _provider is not null && !IsModified)
+        {
+            // A conversation the previous project created, which this one does not have, has
+            // nothing left to show: clear the canvas as closing does, instead of a load error.
+            if (ConversationExistsFor(open))
+                ReloadCurrentConversationView();
+            else
+                ClearCanvasAfterClose();
+        }
+    }
+
+    /// True when the open project created the conversation, or the game has it (on disk, or
+    /// known to the game data, which the cheap file check misses for some providers).
+    private bool ConversationExistsFor(ConversationFile file)
+    {
+        if (_project?.IsNewConversation(file.Name) == true || File.Exists(file.ConversationPath))
+            return true;
+        try
+        {
+            return _provider?.FindConversation(file.Name) is not null;
+        }
+        catch (Exception ex)
+        {
+            AppLog.Warn($"Could not look up conversation '{file.Name}' in the game data: {ex.Message}");
+            return false;
+        }
     }
 
     // ── New conversation ──────────────────────────────────────────────────
@@ -1369,9 +1689,9 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    private bool CanCreateConversation() => _provider is not null && _project is not null;
+    private bool CanCreateConversation() => IsEditingMode && _provider is not null && _project is not null;
 
-    [RelayCommand(CanExecute = nameof(IsProjectLoaded))]
+    [RelayCommand(CanExecute = nameof(IsProjectLoadedForEditing))]
     private void ExportConversations()
     {
         if (_provider is null || _project is null) return;
@@ -1466,10 +1786,11 @@ public partial class MainWindowViewModel : ObservableObject
     public void AutosaveTick()
     {
         if (_project is null || _projectPath is null || !IsModified) return;
+        DialogProject? folded = null;   // kept for the fallback write, so the canvas is not folded twice
         try
         {
-            FoldCanvasIntoProject();
-            WriteAutosave(fallback: false);
+            folded = BuildFoldedProject(consumeRemaps: false) ?? _project;
+            WriteAutosave(folded, fallback: false);
             _autosaveFallbackAnnouncedFor = null;   // the project's folder works (again)
         }
         catch (Exception ex) when (AutosaveRecovery.IsLocationFailure(ex))
@@ -1481,7 +1802,7 @@ public partial class MainWindowViewModel : ObservableObject
             AppLog.Warn($"Autosave next to the project failed ({ex.Message}); using the fallback folder");
             try
             {
-                WriteAutosave(fallback: true);
+                WriteAutosave(folded ?? BuildFoldedProject(consumeRemaps: false) ?? _project, fallback: true);
                 if (_autosaveFallbackAnnouncedFor != _projectPath)
                 {
                     _autosaveFallbackAnnouncedFor = _projectPath;
@@ -1504,13 +1825,13 @@ public partial class MainWindowViewModel : ObservableObject
     /// on every tick (issue 37).
     private string? _autosaveFallbackAnnouncedFor;
 
-    private void WriteAutosave(bool fallback)
+    private void WriteAutosave(DialogProject project, bool fallback)
     {
         // Rotate first: this frees generation 1 for the write below.
         AutosaveRecovery.Rotate(_projectPath!, AppSettings.AutosaveGenerations, fallback);
         var sidecar = AutosaveRecovery.GenerationPath(_projectPath!, 1, fallback);
         if (fallback) Directory.CreateDirectory(Path.GetDirectoryName(sidecar)!);
-        DialogProjectSerializer.SaveToFile(sidecar, _project!);
+        DialogProjectSerializer.SaveToFile(sidecar, project);
         AppLog.Info($"Autosaved to {sidecar}");
     }
 
@@ -1518,6 +1839,16 @@ public partial class MainWindowViewModel : ObservableObject
     private void SaveProject()
     {
         if (_project is null || _projectPath is null) return;
+        // Defence in depth (issue 234): the open file still holds an unresolved git conflict, so
+        // writing this project over it would lose the other branch's version. Every save path
+        // (Ctrl+S, Save in an unsaved-changes prompt, Save As to the same file) comes through
+        // here, and the edits stay unsaved, so a prompt treats it as a failed save.
+        if (ConflictPendingOnOpenProject)
+        {
+            AppLog.Warn($"Save refused: '{_projectPath}' has an unresolved git conflict");
+            StatusText = Loc.Format("Status_SaveRefusedConflictPending", Path.GetFileName(_projectPath));
+            return;
+        }
         try
         {
             FoldCanvasIntoProject();
@@ -1541,7 +1872,7 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     private bool CanSaveProject() =>
-        _project is not null && _projectPath is not null && IsModified;
+        IsEditingMode && _project is not null && _projectPath is not null && IsModified;
 
     // ── Save As — rebind to a new file (spec: 2026-07-05-save-project-as) ──
     [RelayCommand(CanExecute = nameof(CanSaveProjectAs))]
@@ -1618,7 +1949,7 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     private bool CanSaveProjectAs() =>
-        _project is not null && _projectPath is not null;
+        IsEditingMode && _project is not null && _projectPath is not null;
 
     /// Copies the _vo/ sidecar folder next to the new project file when the
     /// directory changed (same directory → the folder is already adjacent).
@@ -1665,7 +1996,17 @@ public partial class MainWindowViewModel : ObservableObject
     /// in-memory _project is already complete — no-op.
     private void FoldCanvasIntoProject()
     {
-        if (_currentFile is null || Canvas.BaseSnapshot is null) return;
+        if (BuildFoldedProject(consumeRemaps: true) is { } folded) SetProject(folded);
+    }
+
+    /// The project with the canvas edits folded in, without touching _project. Null when there
+    /// is no conversation to fold. Autosave serialises this copy and leaves _project alone
+    /// (issue 234): _project must stay the last *saved* state, or Discard (which reverts by
+    /// reloading the conversation from _project's patch) would re-apply an autosaved edit and
+    /// a later Save would persist it. Only Save/Save As commit the fold into _project.
+    private DialogProject? BuildFoldedProject(bool consumeRemaps)
+    {
+        if (_currentFile is null || Canvas.BaseSnapshot is null) return null;
 
         var current = Canvas.BuildSnapshot();
         var patch   = DiffEngine.Diff(_currentFile.Name, Canvas.BaseSnapshot, current, _provider!.Language);
@@ -1678,7 +2019,8 @@ public partial class MainWindowViewModel : ObservableObject
         // their old IDs; re-key them before carrying them over, or the stale-data filter below
         // drops them.
         var prior  = _project!.Patches.GetValueOrDefault(_currentFile.Name);
-        var remaps = Canvas.TakePendingRemaps();
+        // A peek for autosave: the remaps stay pending for the save that really commits them.
+        var remaps = consumeRemaps ? Canvas.TakePendingRemaps() : Canvas.PeekPendingRemaps();
         if (prior is not null && remaps.Count > 0)
             prior = prior with { Translations = NodeIdRemap.Apply(prior.Translations, remaps) };
         patch = patch.CarryingTranslationsFrom(prior, _provider.Language);
@@ -1710,8 +2052,8 @@ public partial class MainWindowViewModel : ObservableObject
 
         var layout      = Canvas.GetCurrentLayout();
         var annotations = Canvas.GetCurrentAnnotations();
-        SetProject(_project!.WithPatch(patch).WithLayout(_currentFile.Name, layout)
-            .WithAnnotations(_currentFile.Name, annotations));
+        return _project!.WithPatch(patch).WithLayout(_currentFile.Name, layout)
+            .WithAnnotations(_currentFile.Name, annotations);
     }
 
     // ── Apply from diff ───────────────────────────────────────────────────
@@ -1779,7 +2121,7 @@ public partial class MainWindowViewModel : ObservableObject
         UndoApplyCommand.NotifyCanExecuteChanged();
     }
 
-    private bool CanUndoApply() => _preApplyProject is not null;
+    private bool CanUndoApply() => IsEditingMode && _preApplyProject is not null;
 
     // ── Merge projects ────────────────────────────────────────────────────
     [RelayCommand(CanExecute = nameof(CanMergeProjects))]
@@ -1824,13 +2166,15 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    private bool CanMergeProjects() => _project is not null && _projectPath is not null;
+    private bool CanMergeProjects() => IsEditingMode && _project is not null && _projectPath is not null;
 
     // ── Export / Import for translation ──────────────────────────────────
 
     private bool IsProjectLoaded() => _project is not null;
 
-    [RelayCommand(CanExecute = nameof(IsProjectLoaded))]
+    private bool IsProjectLoadedForEditing() => IsProjectLoaded() && IsEditingMode;
+
+    [RelayCommand(CanExecute = nameof(IsProjectLoadedForEditing))]
     private async Task ExportForTranslation()
     {
         if (_project is null) return;
@@ -1853,7 +2197,7 @@ public partial class MainWindowViewModel : ObservableObject
         StatusText = Loc.Format("Localization_StatusExported", count, Path.GetFileName(path));
     }
 
-    [RelayCommand(CanExecute = nameof(IsProjectLoaded))]
+    [RelayCommand(CanExecute = nameof(IsProjectLoadedForEditing))]
     private async Task ImportTranslation()
     {
         if (_project is null) return;
@@ -1990,11 +2334,15 @@ public partial class MainWindowViewModel : ObservableObject
             StatusText = Loc.Format("Status_FolderLoaded", provider.GameName, PathDisplay.ForDisplay(path));
             CreateSampleProjectCommand.NotifyCanExecuteChanged();
 
-            if (!AppSettings.IsKnownGameDirectory(path))
-                _ = OfferBackupAsync(path);
+            // Reading mode writes nothing (issue 234): the backup offer and top-up write to the
+            // backup folder, so they wait for the switch to editing.
+            if (IsReadingMode)
+                _deferredBackupPath = path;
             else
-                _ = TopUpBackupAsync(path, provider);
-            AppSettings.MarkGameDirectoryKnown(path);
+            {
+                _deferredBackupPath = null;
+                RunBackupStep(path, provider);
+            }
         }
         catch (Exception ex)
         {
@@ -2005,7 +2353,7 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     // ── Create Sample Project (Help menu) ─────────────────────────────────
-    private bool CanCreateSample() => _provider is not null;
+    private bool CanCreateSample() => IsEditingMode && _provider is not null;
 
     [RelayCommand(CanExecute = nameof(CanCreateSample))]
     private async Task CreateSampleProjectAsync()
@@ -2068,7 +2416,7 @@ public partial class MainWindowViewModel : ObservableObject
     /// the first that opens. Defaults to launching via the OS handler.
     public Func<IReadOnlyList<string>, bool>? WalkthroughOpener { get; set; }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditingMode))]
     private void OpenWalkthrough()
     {
         var candidates = new[]
@@ -2105,7 +2453,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     // ── Guided tour (Help menu) ───────────────────────────────────────────
     [RelayCommand]
-    private void StartGuidedTour() => Tour.Start();
+    private void StartGuidedTour() => Tour.Start(Mode);
 
     // ── Changelog (Help menu) ─────────────────────────────────────────────
     private const string ChangelogFileName = "CHANGELOG.md";
@@ -2188,11 +2536,20 @@ public partial class MainWindowViewModel : ObservableObject
     /// Set by the UI layer to open the dialog-text tag reference window.
     public Action<TagReferenceViewModel>? ShowTagReference { get; set; }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditingMode))]
     private void TagReference()
         => ShowTagReference?.Invoke(new TagReferenceViewModel(_activeGameId));
 
     // ── Backup offer (first time per game folder) ─────────────────────────
+    private void RunBackupStep(string path, IGameDataProvider provider)
+    {
+        if (!AppSettings.IsKnownGameDirectory(path))
+            _ = OfferBackupAsync(path);
+        else
+            _ = TopUpBackupAsync(path, provider);
+        AppSettings.MarkGameDirectoryKnown(path);
+    }
+
     private async Task OfferBackupAsync(string gameDirectory)
     {
         var pick = await _folderPicker.PickFolderAsync(Loc.Get("Dialog_SelectBackupFolder"));
@@ -2277,7 +2634,7 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     // ── Restore backup ────────────────────────────────────────────────────
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsEditingMode))]
     private async Task RestoreBackup()
     {
         var backupPick = AppSettings.GetBackupPath(_currentGameDirectory);
@@ -2352,7 +2709,7 @@ public partial class MainWindowViewModel : ObservableObject
         SaveProject();
     }
 
-    private bool CanSave() => _provider is not null && _currentFile is not null && IsModified;
+    private bool CanSave() => IsEditingMode && _provider is not null && _currentFile is not null && IsModified;
 
     // ── Events (listened to by the View) ─────────────────────────────────
     public event Action? TestModeEntered;
@@ -2682,9 +3039,13 @@ public partial class MainWindowViewModel : ObservableObject
         }
     }
 
-    private bool CanTestPatch() => _provider is not null && _project is not null;
+    private bool CanTestPatch() => IsEditingMode && _provider is not null && _project is not null;
 
     // ── Restore Conversations (all entries in project) ────────────────────
+    // Deliberately not gated on IsEditingMode (issue 234): test mode can outlive a switch to Reading,
+    // and then the test overlay's "End Test and Restore" must still work while the game files are
+    // patched. Restoring the originals is the opposite of the risk reading mode guards against. The
+    // Test menu item stays hidden and Shift+F5 stays blocked in Reading; only this command is open.
     [RelayCommand]
     private async Task RestoreConversation()
     {
@@ -2728,15 +3089,8 @@ public partial class MainWindowViewModel : ObservableObject
                 ? Loc.FormatCount("Status_RestoreLeftUnrestored", unrestored.Count, unrestored[0])
                 : Loc.Get("Status_RestoreComplete2");
 
-            if (_currentFile is not null)
-            {
-                // For new conversations, reload as empty canvas (file no longer exists)
-                if (_project?.IsNewConversation(_currentFile.Name) == true
-                    && !File.Exists(_currentFile.ConversationPath))
-                    LoadNewConversation(_currentFile);
-                else
-                    LoadConversationFile(_currentFile);
-            }
+            // For new conversations this reloads as an empty canvas (file no longer exists).
+            ReloadCurrentConversationView();
             TestModeExited?.Invoke();
         }
         catch (Exception ex)
@@ -2759,19 +3113,18 @@ public partial class MainWindowViewModel : ObservableObject
             return;
         }
 
-        if (_project?.IsNewConversation(file.Name) == true && !File.Exists(file.ConversationPath))
-            LoadNewConversation(file);
-        else
-            LoadConversationFile(file);
+        OpenConversationView(file);
     }
 
-    private void LoadConversationFile(ConversationFile file)
+    /// False when nothing was loaded (no game data, or the load failed and was reported).
+    private bool LoadConversationFile(ConversationFile file)
     {
-        if (_provider is null) return;
+        if (_provider is null) return false;
         try
         {
             _currentFile = file;
             var conversation = _provider.LoadConversation(file);
+            var baselineMismatch = false;
 
             // Reapply this conversation's saved patch so the canvas shows the user's
             // edits, not the vanilla game file. BaseSnapshot must stay the *vanilla*
@@ -2793,7 +3146,7 @@ public partial class MainWindowViewModel : ObservableObject
                     // the mismatch; F5 keeps its strict conflict flow for real writes.
                     AppLog.Warn($"Patch for '{file.Name}' no longer matches game data (node {conflict.NodeId}, field '{conflict.FieldName}'); forcing apply for display");
                     patchedSnap = PatchApplier.Apply(vanillaSnap, storedPatch, ignoreConflicts: true);
-                    StatusText = Loc.Format("Status_PatchBaselineMismatch", file.Name);
+                    baselineMismatch = true;
                 }
                 var translations = storedPatch.Translations.GetValueOrDefault(_provider.Language);
                 var patched = ConversationSnapshotBuilder.ToConversation(file.Name, patchedSnap, translations);
@@ -2829,10 +3182,16 @@ public partial class MainWindowViewModel : ObservableObject
                 // The structure loaded, but this language's text file is damaged (issue 119):
                 // name it, so the text placeholders aren't a mystery. Logged by the parser.
                 StatusText = Loc.Format("Status_StringTableUnreadable", file.Name, PathDisplay.ForDisplay(conversation.Strings.UnreadablePath));
-            else if (_project is null)
+            else if (baselineMismatch)
+                // Set here, not where the conflict is caught: the "loaded" message below used to
+                // replace it at once, so the mismatch was never seen (issue 234).
+                StatusText = Loc.Format("Status_PatchBaselineMismatch", file.Name);
+            else if (_project is null && !IsReadingMode)
                 StatusText = Loc.Get("Status_NoProjectReadOnly");
             else
-                // The canvas, with the project's added nodes, not the game file alone (GitHub issue 256).
+                // With a project: the canvas, with its added nodes, not the game file alone (GitHub
+                // issue 256). With none in Reading mode: File > New Project is hidden there, so the
+                // editing hint would point at nothing (issue 234); report the load like a project would.
                 StatusText = Loc.Format("Status_ConversationLoaded", file.Name, Canvas.Nodes.Count);
 
             // A Find-in-Project navigation may have requested a node in this conversation
@@ -2842,12 +3201,14 @@ public partial class MainWindowViewModel : ObservableObject
                 _pendingSelectNodeId = null;
                 SelectNodeById(pending);
             }
+            return true;
         }
         catch (Exception ex)
         {
             AppLog.Error($"Failed to load conversation '{file.Name}'", ex);
             StatusText = Loc.Format("Status_LoadError", file.Name, ex.Message);
             ReportError?.Invoke(ex);
+            return false;
         }
     }
 
@@ -2871,7 +3232,7 @@ public partial class MainWindowViewModel : ObservableObject
 
     /// Batch Replace adds its changes to the open project, never to the game folder
     /// (issue 124), so it needs a project as well as the game data it searches.
-    public bool CanBatchReplace => _project is not null && _provider is not null;
+    public bool CanBatchReplace => IsEditingMode && _project is not null && _provider is not null;
 
     /// The View shows the (non-modal) Batch Replace window.
     public Func<BatchReplaceViewModel, Task>? ShowBatchReplace { get; set; }
@@ -2906,21 +3267,21 @@ public partial class MainWindowViewModel : ObservableObject
     [RelayCommand(CanExecute = nameof(CanShowRepDispositionBalance))]
     private async Task ShowRepDispositionBalanceWindow()
     {
-        if (_project is null || _provider is null) return;
+        if (_provider is null) return;
         var vm = new RepDispositionBalanceViewModel(
-            _project, _provider,
+            _project ?? DialogProject.Empty(string.Empty), _provider,
             () => Canvas.Nodes.Count > 0
                 ? (Canvas.ConversationName, (ConversationEditSnapshot?)Canvas.BuildSnapshot())
-                : (null, (ConversationEditSnapshot?)null));
+                : (null, (ConversationEditSnapshot?)null),
+            hasProject: _project is not null);
         if (ShowRepDispositionBalance is not null)
             await ShowRepDispositionBalance(vm);
     }
 
-    /// Same requirements as Find in Project: an open project, a loaded provider, and a
-    /// game folder (the browser scans every vanilla conversation on disk).
+    /// A loaded provider and a game folder (the browser scans every vanilla conversation on
+    /// disk). No project needed: Readers use it too (issue 234).
     public bool CanBrowseSpeakerLines =>
-        _project is not null
-        && _provider is not null
+        _provider is not null
         && !string.IsNullOrEmpty(_currentGameDirectory);
 
     /// The View constructs and shows the browser window (and kicks off ScanAsync).
@@ -2939,7 +3300,7 @@ public partial class MainWindowViewModel : ObservableObject
     /// save still opens, cancelling does not. Reuses NavigateToFoundNode for jump-to-node.
     public async Task OpenSpeakerLineBrowserAsync(string? initialSpeakerGuid = null)
     {
-        if (_project is null || _provider is null) return;
+        if (_provider is null) return;
 
         if (IsModified)
         {
@@ -2951,11 +3312,11 @@ public partial class MainWindowViewModel : ObservableObject
         }
 
         var vm = new SpeakerLineBrowserViewModel(
-            _project, _provider, _provider.Language,
+            _project ?? DialogProject.Empty(string.Empty), _provider, _provider.Language,
             () => Canvas.Nodes.Count > 0
                 ? (Canvas.ConversationName, Canvas.BuildSnapshot())
                 : (null, (ConversationEditSnapshot?)null),
-            initialSpeakerGuid);
+            initialSpeakerGuid, hasProject: _project is not null);
         vm.RequestNavigate += NavigateToFoundNode;
 
         if (ShowSpeakerLineBrowser is not null)

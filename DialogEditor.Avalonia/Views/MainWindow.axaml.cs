@@ -12,6 +12,7 @@ using Avalonia.VisualTree;
 using DialogEditor.Avalonia.Audio;
 using DialogEditor.Avalonia.Controls;
 using DialogEditor.Avalonia.Docking;
+using DialogEditor.Avalonia.Input;
 using DialogEditor.Avalonia.Services;
 using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.Avalonia.Shared.Theming;
@@ -355,7 +356,7 @@ public partial class MainWindow : Window
         }
         if (layout is null)
         {
-            layout = factory.CreateLayout();
+            layout = factory.CreateLayout(vm.Mode);
             factory.InitLayout(layout);
         }
         vm.DockLayout = layout;
@@ -477,7 +478,9 @@ public partial class MainWindow : Window
 
         try
         {
-            var tool = _factory.FindDockable(root, d => d.Id == id) ?? _factory.RestoreDockable(id);
+            var tool = root is Dock.Model.Controls.IRootDock rootDock
+                ? _factory.ShowTool(rootDock, id)
+                : _factory.FindDockable(root, d => d.Id == id);
             if (tool is not null)
                 _factory.SetActiveDockable(tool);
             else
@@ -517,6 +520,10 @@ public partial class MainWindow : Window
     private void OnKeyDownTunnel(object? sender, KeyEventArgs e)
     {
         var vm = (MainWindowViewModel)DataContext!;
+
+        // Reading mode (issue 234): only the allow-listed shortcuts act. Returning without marking
+        // the key handled leaves it for the focused control, so text boxes keep Delete, Ctrl+Z etc.
+        if (vm.IsReadingMode && !ReadingModeShortcuts.IsAllowed(e.Key, e.KeyModifiers)) return;
 
         switch (e.Key)
         {
@@ -634,6 +641,47 @@ public partial class MainWindow : Window
                 vm.Canvas.DeleteNodeCmdCommand.Execute(vm.Canvas.SelectedNode);
                 e.Handled = true;
                 break;
+        }
+    }
+
+    /// View > Reading mode. Node Details text boxes commit on LostFocus, so a half-typed edit is
+    /// committed first (public so the mode badge can do the same): otherwise switching to reading
+    /// would not see it and the unsaved-changes guard would let it be lost.
+    public void CommitFocusedTextEdit()
+    {
+        if (TopLevel.GetTopLevel(this)?.FocusManager is { } focus && focus.GetFocusedElement() is TextBox)
+            focus.ClearFocus();
+    }
+
+    // async void: it is an event handler. The click already flipped the item's check mark, but the
+    // switch can be refused (Stay Here on the unsaved-changes prompt), and then no property change
+    // reaches the one-way binding. So once the switch has finished, put the mark back in step with
+    // the mode. SetCurrentValue keeps the binding, so later mode changes still update the item.
+    private async void ReadingMode_Click(object? sender, RoutedEventArgs e)
+    {
+        await SwitchModeAsync();
+        // The switch may have been refused (unsaved-changes prompt), so put the check back in step.
+        if (sender is MenuItem item && DataContext is MainWindowViewModel vm)
+            item.SetCurrentValue(MenuItem.IsCheckedProperty, vm.IsReadingMode);
+    }
+
+    // The badge uses a handler, not a Command binding, so it shares the menu item's path.
+    private async void ModeBadge_Click(object? sender, RoutedEventArgs e) => await SwitchModeAsync();
+
+    /// Shared by View > Reading mode and the toolbar mode badge (issue 234): commit a half-typed
+    /// Node Details edit first so the unsaved-changes guard sees it, then switch (which may be refused).
+    private async Task SwitchModeAsync()
+    {
+        var vm = (MainWindowViewModel)DataContext!;
+        try
+        {
+            CommitFocusedTextEdit();
+            await vm.ToggleReadingModeCommand.ExecuteAsync(null);
+        }
+        catch (OperationCanceledException) { /* deliberate cancellation */ }
+        catch (Exception ex)
+        {
+            AppLog.Error("Switching reading mode failed", ex);
         }
     }
 
@@ -899,8 +947,8 @@ public partial class MainWindow : Window
         _startupDone = true;
         var vm = (MainWindowViewModel)DataContext!;
         vm.ReopenLastProjectOnStartup();
-        if (!AppSettings.GuidedTourSeen)
-            vm.Tour.Start();
+        if (!GuidedTourViewModel.HasSeen(vm.Mode))
+            vm.Tour.Start(vm.Mode);
     }
 
     // ── App-close guard ───────────────────────────────────────────────────

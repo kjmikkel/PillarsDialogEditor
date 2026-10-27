@@ -113,6 +113,44 @@
                 </Style>
             </ControlTheme>
 
+            <!-- ModeBadgeButton (issue 234): the toolbar mode badge. A filled pill whose Background
+                 (rest, hover, pressed) is set per mode by MainWindow's styles; the text is never faded,
+                 so its contrast holds in every state. Keyboard focus is a two-tone ring: an inner
+                 Text.OnAccent ring that separates the badge from its own fill, and an outer Text.Primary
+                 ring that separates it from the toolbar (each >= 3:1 against what it touches). -->
+            <ControlTheme x:Key="ModeBadgeButton" TargetType="Button">
+                <Setter Property="Foreground" Value="{DynamicResource Brush.Text.OnAccent}"/>
+                <Setter Property="Padding" Value="10,3"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <Border x:Name="PART_FocusOuter"
+                                BorderBrush="Transparent" BorderThickness="2" CornerRadius="12">
+                            <Border x:Name="PART_Badge"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="Transparent" BorderThickness="2"
+                                    CornerRadius="10"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter x:Name="PART_ContentPresenter"
+                                                  Content="{TemplateBinding Content}"
+                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                  Foreground="{TemplateBinding Foreground}"
+                                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </Border>
+                        </Border>
+                    </ControlTemplate>
+                </Setter>
+                <Style Selector="^:focus-visible /template/ Border#PART_FocusOuter">
+                    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Text.Primary}"/>
+                </Style>
+                <Style Selector="^:focus-visible /template/ Border#PART_Badge">
+                    <Setter Property="BorderBrush" Value="{DynamicResource Brush.Text.OnAccent}"/>
+                </Style>
+            </ControlTheme>
+
             <ControlTheme x:Key="ToolbarPlainToggleButton" TargetType="ToggleButton">
                 <Setter Property="Background" Value="{DynamicResource Brush.Toolbar.Button.Background}"/>
                 <Setter Property="Foreground" Value="{DynamicResource Brush.Toolbar.Button.Foreground}"/>

@@ -41,16 +41,18 @@
 
         <!-- ── Controls row: Source + Scope + Analyze/Cancel ─────────────────── -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="8" Margin="0,0,0,10">
-            <TextBlock Text="{DynamicResource RepBalance_Source_Label}" VerticalAlignment="Center"/>
+            <TextBlock Text="{DynamicResource RepBalance_Source_Label}" VerticalAlignment="Center"
+                       IsVisible="{Binding HasProject}"/>
             <ComboBox x:Name="SourceBox"
+                      IsVisible="{Binding HasProject}"
                       ToolTip.Tip="{DynamicResource RepBalance_Tip_Source}"
                       AutomationProperties.Name="{DynamicResource RepBalance_Source_Label}"
                       AutomationProperties.HelpText="{DynamicResource RepBalance_Tip_Source}"/>
             <TextBlock Text="{DynamicResource RepBalance_Scope_Label}" VerticalAlignment="Center" Margin="8,0,0,0"/>
             <ComboBox x:Name="ScopeBox"
-                      ToolTip.Tip="{DynamicResource RepBalance_Tip_Scope}"
+                      ToolTip.Tip="{Binding ScopeTooltip}"
                       AutomationProperties.Name="{DynamicResource RepBalance_Scope_Label}"
-                      AutomationProperties.HelpText="{DynamicResource RepBalance_Tip_Scope}"/>
+                      AutomationProperties.HelpText="{Binding ScopeTooltip}"/>
             <Button Content="{DynamicResource RepBalance_Refresh}"
                     Command="{Binding RefreshCommand}"
                     ToolTip.Tip="{DynamicResource RepBalance_Tip_Refresh}"

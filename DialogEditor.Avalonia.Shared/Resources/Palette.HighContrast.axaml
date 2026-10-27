@@ -77,6 +77,8 @@
     <Color x:Key="Palette.Teal.150">#FFFFFFFF</Color>     <!-- narrator card body -->
     <Color x:Key="Palette.Teal.250">#FFF0F0F0</Color>     <!-- narrator card footer -->
     <Color x:Key="Palette.Green.600">#FF155018</Color>    <!-- confirm button bg (white >=7) -->
+    <Color x:Key="Palette.Green.700">#FF0F3C11</Color>
+    <Color x:Key="Palette.Green.800">#FF0A2A0C</Color>
     <Color x:Key="Palette.Green.550">#FF5BFF8F</Color>    <!-- diff added fill (bright) -->
     <Color x:Key="Palette.Green.500">#FF5BFF8F</Color>    <!-- success text -->
     <Color x:Key="Palette.Green.400">#FF5BFF8F</Color>    <!-- added/new text; syntax script -->
@@ -93,6 +95,8 @@
     <Color x:Key="Palette.Amber.610">#FFFFD23B</Color>    <!-- diff changed fill -->
     <Color x:Key="Palette.Olive.500">#FFC8C860</Color>    <!-- quotidian note -->
     <Color x:Key="Palette.Burnt.600">#FF6E3A0E</Color>    <!-- caution button (white >=7) -->
+    <Color x:Key="Palette.Burnt.700">#FF5A2F0B</Color>
+    <Color x:Key="Palette.Burnt.800">#FF482509</Color>
     <Color x:Key="Palette.Parchment.100">#FFFFFFFF</Color> <!-- NPC card body -->
     <Color x:Key="Palette.Parchment.200">#FFF0F0F0</Color> <!-- NPC card footer -->
     <Color x:Key="Palette.Cream.100">#FFFFFFFF</Color>     <!-- bark card body -->

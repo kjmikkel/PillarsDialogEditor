@@ -68,19 +68,37 @@ public partial class RepDispositionBalanceViewModel : ObservableObject
 
     /// How to look further when a table is empty. "" when the search is already as wide as
     /// it goes (every conversation, on disk plus changes), as there is nowhere further to look.
-    public string EmptyHint =>
-        (DispositionEmptyMessage.Length > 0 || ReputationEmptyMessage.Length > 0)
-        && !(Scope == BalanceScope.All && Source == BalanceSource.OnDiskPlusChanges)
-            ? Loc.Get("EmptyState_RepBalance_Hint") : "";
+    public string EmptyHint
+    {
+        get
+        {
+            if (DispositionEmptyMessage.Length == 0 && ReputationEmptyMessage.Length == 0) return "";
+            if (Scope == BalanceScope.All && Source == BalanceSource.OnDiskPlusChanges) return "";
+            // No project: the Source picker is hidden (issue 234), so only Scope can be widened.
+            return Loc.Get(HasProject ? "EmptyState_RepBalance_Hint" : "EmptyState_RepBalance_Hint_NoProject");
+        }
+    }
 
     public RepDispositionBalanceViewModel(
         DialogProject project, IGameDataProvider provider,
-        Func<(string? Name, ConversationEditSnapshot? Snapshot)> getOpenConversation)
+        Func<(string? Name, ConversationEditSnapshot? Snapshot)> getOpenConversation,
+        bool hasProject = true)
     {
-        _project  = project;
-        _provider = provider;
-        _getOpen  = getOpenConversation;
+        _project   = project;
+        _provider  = provider;
+        _getOpen   = getOpenConversation;
+        HasProject = hasProject;
+        // Without a project there is nothing to compare "changes" against; with the empty
+        // stand-in project, OnDiskPlusChanges is simply the game on disk (issue 234).
+        if (!hasProject) _source = BalanceSource.OnDiskPlusChanges;
     }
+
+    /// False for a Reader with only a game folder open: the window hides the source picker,
+    /// since every source other than the game on disk would be empty.
+    public bool HasProject { get; }
+
+    /// Scope tooltip: "the selected source" names a picker that is hidden without a project.
+    public string ScopeTooltip => Loc.Get(HasProject ? "RepBalance_Tip_Scope" : "RepBalance_Tip_Scope_NoProject");
 
     [RelayCommand]
     private async Task Refresh()

@@ -53,7 +53,12 @@ public sealed class EditorDockFactory : Factory
         HideToolsOnClose = true;
     }
 
-    public override IRootDock CreateLayout()
+    public override IRootDock CreateLayout() => CreateLayout(EditorMode.Editing);
+
+    /// The default layout for a mode. Reading mode (issue 234) starts with Condition search closed:
+    /// it is hidden, not removed, so View > Condition search restores it into the right pane.
+    /// Only this default differs; BuildDock uses it only when there is no saved layout.
+    public IRootDock CreateLayout(EditorMode mode)
     {
         var canvasDoc = new CanvasDocument(_canvas);
         var documentDock = new DocumentDock
@@ -103,7 +108,65 @@ public sealed class EditorDockFactory : Factory
         root.DefaultDockable = main;
         root.ActiveDockable  = main;
         root.VisibleDockables = CreateList<IDockable>(main);
+
+        if (mode == EditorMode.Reading)
+        {
+            // Same shape Dock's HideDockable leaves behind: out of its dock, listed as hidden, and
+            // remembering its owner so RestoreDockable can put it back.
+            rightDock.VisibleDockables!.Remove(searchTool);
+            searchTool.OriginalOwner = rightDock;
+            root.HiddenDockables = CreateList<IDockable>(searchTool);
+        }
         return root;
+    }
+
+    /// Brings a closed or default-hidden tool back into its original dock. FactoryBase.RestoreDockable(id)
+    /// returned null for a hidden tool when exercised without a live dock control (issue 234 found it
+    /// while testing the reading-mode default), so look the tool up in HiddenDockables and restore it by
+    /// instance. Returns null when the tool is not hidden.
+    public IDockable? RestoreHiddenTool(IRootDock root, string id)
+    {
+        var hidden = root.HiddenDockables?.FirstOrDefault(d => d.Id == id);
+        if (hidden is null) return null;
+        // A layout read back from disk drops the hidden tool's original owner (ReplaceWrappers swaps in a
+        // fresh wrapper), and Dock has nowhere to put it back without one: use the tool's default home.
+        if (hidden.OriginalOwner is null
+            && FindDockable(root, d => d.Id == DefaultHomeId(id)) is { } home)
+            hidden.OriginalOwner = home;
+        RestoreDockable(hidden);
+        return hidden;
+    }
+
+    private static string DefaultHomeId(string toolId) => toolId switch
+    {
+        BrowserId => "LeftPane",
+        CanvasId  => DocumentsId,
+        _         => "RightPane",   // Details and Condition search
+    };
+
+    /// Finds a tool by id, restoring it first if it is hidden (closed, or hidden by the reading-mode
+    /// default). Tries the by-instance restore, then Dock's own by-id restore, and checks after each that
+    /// the tool really sits in a visible dock, because a layout read back from disk may have lost the
+    /// hidden tool's original owner. Returns null (after a warning) when the tool cannot be shown.
+    public IDockable? ShowTool(IRootDock root, string id)
+    {
+        if (FindDockable(root, d => d.Id == id) is { } open) return open;
+
+        if (RestoreHiddenTool(root, id) is { } restored && IsInVisibleDock(root, restored))
+            return restored;
+        if (RestoreDockable(id) is { } byId && IsInVisibleDock(root, byId))
+            return byId;
+
+        AppLog.Warn($"EditorDockFactory: could not show dock tool '{id}' (not open, and restoring it failed).");
+        return null;
+    }
+
+    private static bool IsInVisibleDock(IDockable root, IDockable tool)
+    {
+        bool Walk(IDockable d) =>
+            d is IDock dock && dock.VisibleDockables is { } kids
+            && (kids.Any(k => ReferenceEquals(k, tool)) || kids.Any(Walk));
+        return Walk(root);
     }
 
     // Registers EditorHostWindow (a themed HostWindow carrying app.ico — Docking Shell Phase 1

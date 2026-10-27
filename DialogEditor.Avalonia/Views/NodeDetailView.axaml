@@ -76,7 +76,7 @@
                 <!-- Issue 240: with no project open ("Viewing only") every editor below is read-only or
                      disabled, bound to IsReadOnly / IsEditable, which follow the canvas. Text boxes stay
                      selectable so a Reader can still copy a line. This says why nothing takes edits. -->
-                <TextBlock IsVisible="{Binding IsReadOnly}"
+                <TextBlock IsVisible="{Binding ShowNoProjectHint}"
                            Text="{DynamicResource Status_NoProjectReadOnly}"
                            Foreground="{DynamicResource Brush.Text.Secondary}"
                            FontSize="{DynamicResource FontSize.Small}"
@@ -104,7 +104,7 @@
                          beh:SpellSquiggles.Finder="{Binding SpellSpanFinder}"
                          beh:SpellingContextMenu.Finder="{Binding SpellingMenuFinder}"
                          beh:TokenCompletion.GameId="{Binding ActiveGameId}"
-                         Watermark="{DynamicResource Placeholder_FemaleText}"
+                         Watermark="{Binding FemaleTextPlaceholder}"
                          ToolTip.Tip="{DynamicResource ToolTip_FemaleText}"
                          AutomationProperties.HelpText="{DynamicResource ToolTip_FemaleText}"
                          AutomationProperties.Name="{DynamicResource Label_FemaleText}"/>
@@ -112,6 +112,9 @@
                 <!-- Warnings about the text itself sit right under the text boxes (issue 320), not
                      inside a section: Display starts collapsed, so the fixes for a squiggled word
                      were out of sight, and for a screen reader this list is the spelling channel. -->
+                <!-- Issue 234: the warnings and the dictionary buttons below are editing aids; reading mode
+                     hides them (the wrapper, so a hidden warning leaves no gap). -->
+                <StackPanel IsVisible="{Binding !IsReadingMode}">
                 <Border Background="{DynamicResource Brush.Validation.Background}" BorderBrush="{DynamicResource Brush.Validation.Border}" BorderThickness="1"
                         CornerRadius="2" Padding="6,4" Margin="0,0,0,4"
                         IsVisible="{Binding TokenWarnings.Count, Converter={StaticResource CountToVis}}"
@@ -170,6 +173,7 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </Border>
+                </StackPanel>
 
                 <!-- ── Links (hot: moved above all secondary groups) ───── -->
                 <TextBlock Classes="group-header" Text="{DynamicResource Label_GroupLinks}"/>
@@ -206,6 +210,7 @@
                                                     Command="{Binding DataContext.DeleteLinkCommand,
                                                               RelativeSource={RelativeSource AncestorType=UserControl}}"
                                                     CommandParameter="{Binding}"
+                                                    IsVisible="{Binding !$parent[ItemsControl].DataContext.IsReadingMode}"
                                                     Background="Transparent" BorderThickness="0"
                                                     Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Caption}" Padding="4,1"
                                                     ToolTip.Tip="{DynamicResource ToolTip_DeleteLink}"
@@ -214,6 +219,19 @@
                                         <!-- Row 1: labelled controls -->
                                         <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto" Margin="0,3,0,0">
                                             <!-- Condition editor button — dim when no conditions, accent when present -->
+                                            <!-- Issue 234: reading mode swaps the editor button for plain text with the same face,
+                                                 so a reader still sees which links are conditional. The wrapper carries the mode,
+                                                 the TextBlock the per-link HasConditions (two bindings cannot share one IsVisible). -->
+                                            <StackPanel Grid.Column="0"
+                                                        IsVisible="{Binding $parent[ItemsControl].DataContext.IsReadingMode}">
+                                                <TextBlock Text="{Binding ConditionCountLabel}"
+                                                           IsVisible="{Binding HasConditions}"
+                                                           FontSize="{DynamicResource FontSize.Small}" Padding="3,1" Margin="0,0,8,0"
+                                                           Foreground="{Binding HasConditions, Converter={StaticResource BoolToFemaleTextBrush}}"
+                                                           ToolTip.Tip="{Binding ReadingConditionsToolTip}"
+                                                           AutomationProperties.Name="{DynamicResource AutomationName_LinkConditionsReading}"
+                                                           AutomationProperties.HelpText="{Binding ReadingConditionsToolTip}"/>
+                                            </StackPanel>
                                             <Button Grid.Column="0"
                                                     Content="{Binding ConditionCountLabel}"
                                                     Click="LinkConditions_Click"
@@ -222,6 +240,7 @@
                                                     FontSize="{DynamicResource FontSize.Small}" Padding="3,1" Margin="0,0,8,0"
                                                     Foreground="{Binding HasConditions,
                                                         Converter={StaticResource BoolToFemaleTextBrush}}"
+                                                    IsVisible="{Binding !$parent[ItemsControl].DataContext.IsReadingMode}"
                                                     IsEnabled="{Binding $parent[ItemsControl].DataContext.CanEditLinkConditions}"
                                                     ToolTip.Tip="{Binding $parent[ItemsControl].DataContext.LinkConditionsToolTip}"
                                                     ToolTip.ShowOnDisabled="True"
@@ -275,7 +294,7 @@
                 </ItemsControl>
 
                 <!-- Add link row -->
-                <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0">
+                <Grid ColumnDefinitions="*,Auto" Margin="0,4,0,0" IsVisible="{Binding !IsReadingMode}">
                     <TextBox Grid.Column="0" IsReadOnly="{Binding IsReadOnly}"
                              Text="{Binding AddLinkTargetId, Mode=TwoWay}"
                              Watermark="{DynamicResource Placeholder_AddLinkTargetId}"
@@ -539,7 +558,7 @@
                                FontSize="{DynamicResource FontSize.Caption}"
                                ToolTip.Tip="{DynamicResource ToolTip_AliasShared}"
                                Margin="0,1,0,2"/>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,4" IsVisible="{Binding !IsReadingMode}">
                         <Button Content="{DynamicResource NodeDetail_AliasChange}"
                                 Command="{Binding PickVoAliasCommand}"
                                 Padding="6,2"
@@ -555,12 +574,14 @@
 
                 <!-- Entry point when no alias is set (PoE2 only — hidden on PoE1
                      where ExternalVO is empty on all 40,991 shipped nodes). -->
+                <StackPanel IsVisible="{Binding !IsReadingMode}">
                 <Button Content="{DynamicResource NodeDetail_ReuseVoButton}"
                         Command="{Binding PickVoAliasCommand}"
                         IsVisible="{Binding CanStartVoAliasPick}"
                         Padding="6,2" Margin="0,2,0,4"
                         ToolTip.Tip="{DynamicResource ToolTip_ReuseVo}"
                         AutomationProperties.HelpText="{DynamicResource ToolTip_ReuseVo}"/>
+                </StackPanel>
 
                 <!-- VO file status — PoE2 only; shown when HasVO or ExternalVO set -->
                 <StackPanel Orientation="Horizontal" Margin="0,2,0,4"
@@ -592,6 +613,7 @@
 
                 <!-- Import button — visible for all PoE2 nodes (even before HasVO is set);
                      disabled when the project is unsaved so the tooltip explains why. -->
+                <StackPanel IsVisible="{Binding !IsReadingMode}">
                 <Button Content="🎤"
                         Command="{Binding ImportVoCommand}"
                         IsVisible="{Binding IsVoImportVisible}"
@@ -599,6 +621,7 @@
                         AutomationProperties.Name="{DynamicResource AutomationName_VoImport}"
                         AutomationProperties.HelpText="{Binding ImportVoTooltip}"
                         Margin="0,2,0,4" Padding="8,3"/>
+                </StackPanel>
                     </StackPanel>
                 </Expander>
 
@@ -631,6 +654,7 @@
                     <Button Classes="secondary" Grid.Column="1"
                             Content="{DynamicResource Button_EditScripts}"
                             Click="EditScripts_Click"
+                            IsVisible="{Binding !IsReadingMode}"
                             IsEnabled="{Binding IsEditable}" ToolTip.ShowOnDisabled="True"
                             Padding="8,3" FontSize="{DynamicResource FontSize.Small}"
                             ToolTip.Tip="{DynamicResource ToolTip_EditScripts}"
@@ -650,6 +674,7 @@
                             x:Name="EditConditionsButton"
                             Content="{DynamicResource Button_EditConditions}"
                             Click="EditConditions_Click"
+                            IsVisible="{Binding !IsReadingMode}"
                             IsEnabled="{Binding IsEditable}" ToolTip.ShowOnDisabled="True"
                             Padding="8,3" FontSize="{DynamicResource FontSize.Small}"
                             ToolTip.Tip="{DynamicResource ToolTip_EditConditions}"

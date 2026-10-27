@@ -10,13 +10,13 @@ public sealed class GuidedTourViewModelTests
     [
         new GuidedTourStep("BrowserPanel", "Tour_Step1_Text"),
         new GuidedTourStep("CanvasView",   "Tour_Step2_Text"),
-    ]);
+    ], GuidedTourViewModel.ReaderSteps);
 
     [Fact]
     public void Start_SetsIsVisibleTrue()
     {
         var vm = TwoStep();
-        vm.Start();
+        vm.Start(EditorMode.Editing);
         Assert.True(vm.IsVisible);
     }
 
@@ -24,9 +24,9 @@ public sealed class GuidedTourViewModelTests
     public void Start_ResetsToStep0()
     {
         var vm = TwoStep();
-        vm.Start();
+        vm.Start(EditorMode.Editing);
         vm.NextCommand.Execute(null);
-        vm.Start();                     // restart
+        vm.Start(EditorMode.Editing);  // restart
         Assert.Equal(0, vm.CurrentIndex);
     }
 
@@ -34,7 +34,7 @@ public sealed class GuidedTourViewModelTests
     public void Start_WritesGuidedTourSeen()
     {
         AppSettings.GuidedTourSeen = false;
-        TwoStep().Start();
+        TwoStep().Start(EditorMode.Editing);
         Assert.True(AppSettings.GuidedTourSeen);
     }
 
@@ -44,7 +44,7 @@ public sealed class GuidedTourViewModelTests
         var vm    = TwoStep();
         var fired = false;
         vm.StepChanged += () => fired = true;
-        vm.Start();
+        vm.Start(EditorMode.Editing);
         Assert.True(fired);
     }
 
@@ -52,7 +52,7 @@ public sealed class GuidedTourViewModelTests
     public void Next_AdvancesCurrentIndex()
     {
         var vm = TwoStep();
-        vm.Start();
+        vm.Start(EditorMode.Editing);
         vm.NextCommand.Execute(null);
         Assert.Equal(1, vm.CurrentIndex);
     }
@@ -61,8 +61,8 @@ public sealed class GuidedTourViewModelTests
     public void Next_AtLastStep_Dismisses()
     {
         // Single-step tour: Next on the only step should end the tour.
-        var vm = new GuidedTourViewModel([new GuidedTourStep("A", "K")]);
-        vm.Start();
+        var vm = new GuidedTourViewModel([new GuidedTourStep("A", "K")], GuidedTourViewModel.ReaderSteps);
+        vm.Start(EditorMode.Editing);
         vm.NextCommand.Execute(null);
         Assert.False(vm.IsVisible);
     }
@@ -71,7 +71,7 @@ public sealed class GuidedTourViewModelTests
     public void Next_RaisesStepChanged()
     {
         var vm    = TwoStep();
-        vm.Start();
+        vm.Start(EditorMode.Editing);
         var fired = false;
         vm.StepChanged += () => fired = true;
         vm.NextCommand.Execute(null);
@@ -82,7 +82,7 @@ public sealed class GuidedTourViewModelTests
     public void Back_RetreatsCurrentIndex()
     {
         var vm = TwoStep();
-        vm.Start();
+        vm.Start(EditorMode.Editing);
         vm.NextCommand.Execute(null);
         vm.BackCommand.Execute(null);
         Assert.Equal(0, vm.CurrentIndex);
@@ -92,7 +92,7 @@ public sealed class GuidedTourViewModelTests
     public void Back_AtStep0_IsNoOp()
     {
         var vm = TwoStep();
-        vm.Start();
+        vm.Start(EditorMode.Editing);
         vm.BackCommand.Execute(null);
         Assert.Equal(0, vm.CurrentIndex);
     }
@@ -101,7 +101,7 @@ public sealed class GuidedTourViewModelTests
     public void Back_RaisesStepChanged()
     {
         var vm    = TwoStep();
-        vm.Start();
+        vm.Start(EditorMode.Editing);
         vm.NextCommand.Execute(null);
         var fired = false;
         vm.StepChanged += () => fired = true;
@@ -113,7 +113,7 @@ public sealed class GuidedTourViewModelTests
     public void Dismiss_SetsIsVisibleFalse()
     {
         var vm = TwoStep();
-        vm.Start();
+        vm.Start(EditorMode.Editing);
         vm.DismissCommand.Execute(null);
         Assert.False(vm.IsVisible);
     }
@@ -122,7 +122,7 @@ public sealed class GuidedTourViewModelTests
     public void Dismiss_RaisesStepChanged()
     {
         var vm    = TwoStep();
-        vm.Start();
+        vm.Start(EditorMode.Editing);
         var fired = false;
         vm.StepChanged += () => fired = true;
         vm.DismissCommand.Execute(null);
@@ -133,7 +133,7 @@ public sealed class GuidedTourViewModelTests
     public void IsLastStep_TrueOnlyAtFinalStep()
     {
         var vm = TwoStep();
-        vm.Start();
+        vm.Start(EditorMode.Editing);
         Assert.False(vm.IsLastStep);
         vm.NextCommand.Execute(null);
         Assert.True(vm.IsLastStep);
@@ -143,7 +143,7 @@ public sealed class GuidedTourViewModelTests
     public void CurrentStep_ReflectsCurrentIndex()
     {
         var vm = TwoStep();
-        vm.Start();
+        vm.Start(EditorMode.Editing);
         Assert.Equal("BrowserPanel", vm.CurrentStep.TargetName);
         vm.NextCommand.Execute(null);
         Assert.Equal("CanvasView", vm.CurrentStep.TargetName);

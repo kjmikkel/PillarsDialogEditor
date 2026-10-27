@@ -34,7 +34,7 @@
 
                     <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_File}" AutomationProperties.AutomationId="MenuFile">
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_NewProject}"
-                                  AutomationProperties.AutomationId="MenuFile_NewProject"
+                                  AutomationProperties.AutomationId="MenuFile_NewProject" IsVisible="{Binding IsEditingMode}"
                                   Command="{Binding NewProjectCommand}"
                                   InputGesture="Ctrl+N"
                                   ToolTip.Tip="{DynamicResource ToolTip_NewProject}"
@@ -62,19 +62,19 @@
                           </ctrl:AccessibleMenuItem.ItemContainerTheme>
                         </ctrl:AccessibleMenuItem>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_SaveProject}"
-                                  AutomationProperties.AutomationId="MenuFile_SaveProject"
+                                  AutomationProperties.AutomationId="MenuFile_SaveProject" IsVisible="{Binding IsEditingMode}"
                                   Command="{Binding SaveProjectCommand}"
                                   InputGesture="Ctrl+S"
                                   ToolTip.Tip="{DynamicResource ToolTip_SaveProject}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_SaveProject}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_SaveProjectAs}"
-                                  AutomationProperties.AutomationId="MenuFile_SaveProjectAs"
+                                  AutomationProperties.AutomationId="MenuFile_SaveProjectAs" IsVisible="{Binding IsEditingMode}"
                                   Command="{Binding SaveProjectAsCommand}"
                                   InputGesture="Ctrl+Shift+S"
                                   ToolTip.Tip="{DynamicResource ToolTip_SaveProjectAs}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_SaveProjectAs}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_MergeProjects}"
-                                  AutomationProperties.AutomationId="MenuFile_MergeProjects"
+                                  AutomationProperties.AutomationId="MenuFile_MergeProjects" IsVisible="{Binding IsEditingMode}"
                                   Command="{Binding MergeProjectsCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_MergeProjects}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_MergeProjects}"/>
@@ -91,37 +91,37 @@
                                   InputGesture="Ctrl+Shift+O"
                                   ToolTip.Tip="{DynamicResource ToolTip_OpenFolder}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_OpenFolder}"/>
-                        <Separator/>
+                        <Separator IsVisible="{Binding IsEditingMode}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource PatchManager_Title}"
-                                  AutomationProperties.AutomationId="MenuFile_PatchManager"
+                                  AutomationProperties.AutomationId="MenuFile_PatchManager" IsVisible="{Binding IsEditingMode}"
                                   Click="PatchManager_Click"
                                   ToolTip.Tip="{DynamicResource ToolTip_PatchManagerOpen}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_PatchManagerOpen}"/>
-                        <Separator/>
+                        <Separator IsVisible="{Binding IsEditingMode}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_ImportConversation}"
-                                  AutomationProperties.AutomationId="MenuFile_ImportConversation"
+                                  AutomationProperties.AutomationId="MenuFile_ImportConversation" IsVisible="{Binding IsEditingMode}"
                                   Command="{Binding ImportConversationCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_ImportConversation}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_ImportConversation}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_ExportConversation}"
-                                  AutomationProperties.AutomationId="MenuFile_ExportConversation"
+                                  AutomationProperties.AutomationId="MenuFile_ExportConversation" IsVisible="{Binding IsEditingMode}"
                                   Command="{Binding ExportConversationsCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_ExportConversation}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_ExportConversation}"/>
-                        <Separator/>
+                        <Separator IsVisible="{Binding IsEditingMode}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_ExportForTranslation}"
-                                  AutomationProperties.AutomationId="MenuFile_ExportForTranslation"
+                                  AutomationProperties.AutomationId="MenuFile_ExportForTranslation" IsVisible="{Binding IsEditingMode}"
                                   Command="{Binding ExportForTranslationCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_ExportForTranslation}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_ExportForTranslation}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_ImportTranslation}"
-                                  AutomationProperties.AutomationId="MenuFile_ImportTranslation"
+                                  AutomationProperties.AutomationId="MenuFile_ImportTranslation" IsVisible="{Binding IsEditingMode}"
                                   Command="{Binding ImportTranslationCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_ImportTranslation}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_ImportTranslation}"/>
-                        <Separator/>
+                        <Separator IsVisible="{Binding IsEditingMode}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_ExportModBundle}"
-                                  AutomationProperties.AutomationId="MenuFile_ExportModBundle"
+                                  AutomationProperties.AutomationId="MenuFile_ExportModBundle" IsVisible="{Binding IsEditingMode}"
                                   Click="ExportModBundle_Click"
                                   IsEnabled="{Binding CanExportModBundle}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Menu_ExportModBundle}"
@@ -137,34 +137,34 @@
 
                     <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_Edit}" AutomationProperties.AutomationId="MenuEdit">
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Button_Undo}"
-                                  AutomationProperties.AutomationId="MenuEdit_Undo"
+                                  AutomationProperties.AutomationId="MenuEdit_Undo" IsVisible="{Binding IsEditingMode}"
                                   AutomationProperties.Name="{DynamicResource AutomationName_Undo}"
                                   Command="{Binding Canvas.UndoCommand}"
                                   InputGesture="Ctrl+Z"
                                   ToolTip.Tip="{DynamicResource ToolTip_Undo}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Undo}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Button_Redo}"
-                                  AutomationProperties.AutomationId="MenuEdit_Redo"
+                                  AutomationProperties.AutomationId="MenuEdit_Redo" IsVisible="{Binding IsEditingMode}"
                                   AutomationProperties.Name="{DynamicResource AutomationName_Redo}"
                                   Command="{Binding Canvas.RedoCommand}"
                                   InputGesture="Ctrl+Y"
                                   ToolTip.Tip="{DynamicResource ToolTip_Redo}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Redo}"/>
-                        <Separator/>
+                        <Separator IsVisible="{Binding IsEditingMode}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_FindReplace}"
-                                  AutomationProperties.AutomationId="MenuEdit_FindReplace"
+                                  AutomationProperties.AutomationId="MenuEdit_FindReplace" IsVisible="{Binding IsEditingMode}"
                                   Click="FindReplace_Click"
                                   InputGesture="Ctrl+H"
                                   ToolTip.Tip="{DynamicResource ToolTip_FindReplace}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_FindReplace}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_BatchReplace}"
-                                  AutomationProperties.AutomationId="MenuEdit_BatchReplace"
+                                  AutomationProperties.AutomationId="MenuEdit_BatchReplace" IsVisible="{Binding IsEditingMode}"
                                   Command="{Binding BatchReplaceCommand}"
                                   InputGesture="Ctrl+Shift+H"
                                   ToolTip.Tip="{DynamicResource ToolTip_BatchReplace}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_BatchReplace}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_FindInProject}"
-                                  AutomationProperties.AutomationId="MenuEdit_FindInProject"
+                                  AutomationProperties.AutomationId="MenuEdit_FindInProject" IsVisible="{Binding IsEditingMode}"
                                   Command="{Binding FindInProjectCommand}"
                                   InputGesture="Ctrl+Shift+F"
                                   ToolTip.Tip="{DynamicResource ToolTip_FindInProject}"
@@ -175,7 +175,7 @@
                                   ToolTip.Tip="{DynamicResource ToolTip_BrowseSpeakerLines}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_BrowseSpeakerLines}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_FlowAnalytics}"
-                                  AutomationProperties.AutomationId="MenuEdit_FlowAnalytics"
+                                  AutomationProperties.AutomationId="MenuEdit_FlowAnalytics" IsVisible="{Binding IsEditingMode}"
                                   Click="FlowAnalytics_Click"
                                   InputGesture="F7"
                                   ToolTip.Tip="{DynamicResource ToolTip_FlowAnalytics}"
@@ -186,25 +186,25 @@
                                   ToolTip.Tip="{DynamicResource RepBalance_Tip_Refresh}"
                                   AutomationProperties.HelpText="{DynamicResource RepBalance_Tip_Refresh}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_CompareVersions}"
-                                  AutomationProperties.AutomationId="MenuEdit_CompareVersions"
+                                  AutomationProperties.AutomationId="MenuEdit_CompareVersions" IsVisible="{Binding IsEditingMode}"
                                   Click="CompareVersions_Click"
                                   IsEnabled="{Binding IsProjectOpen}"
                                   ToolTip.Tip="{DynamicResource ToolTip_CompareVersions}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_CompareVersions}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_History}"
-                                  AutomationProperties.AutomationId="MenuEdit_History"
+                                  AutomationProperties.AutomationId="MenuEdit_History" IsVisible="{Binding IsEditingMode}"
                                   Click="History_Click"
                                   IsEnabled="{Binding IsProjectOpen}"
                                   ToolTip.Tip="{DynamicResource ToolTip_History}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_History}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_Attribution}"
-                                  AutomationProperties.AutomationId="MenuEdit_Attribution"
+                                  AutomationProperties.AutomationId="MenuEdit_Attribution" IsVisible="{Binding IsEditingMode}"
                                   Click="Attribution_Click"
                                   IsEnabled="{Binding IsProjectOpen}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Attribution}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Attribution}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_Branches}"
-                                  AutomationProperties.AutomationId="MenuEdit_Branches"
+                                  AutomationProperties.AutomationId="MenuEdit_Branches" IsVisible="{Binding IsEditingMode}"
                                   Click="OnOpenBranches"
                                   IsEnabled="{Binding IsProjectOpen}"
                                   ToolTip.Tip="{DynamicResource Menu_BranchesTip}"
@@ -245,31 +245,42 @@
                                   Click="ResetLayout_Click"
                                   ToolTip.Tip="{DynamicResource ToolTip_View_ResetLayout}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_View_ResetLayout}"/>
+                        <Separator/>
+                        <!-- Reading mode (issue 234). Click rather than Command: the handler first commits a
+                             half-typed Node Details edit, so the unsaved-changes guard sees it. One-way check
+                             state because the view model owns the mode. -->
+                        <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_View_ReadingMode}"
+                                  AutomationProperties.AutomationId="MenuView_ReadingMode"
+                                  ToggleType="CheckBox"
+                                  IsChecked="{Binding IsReadingMode, Mode=OneWay}"
+                                  Click="ReadingMode_Click"
+                                  ToolTip.Tip="{DynamicResource ToolTip_Menu_View_ReadingMode}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_View_ReadingMode}"/>
                     </ctrl:AccessibleMenuItem>
 
-                    <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_Test}" AutomationProperties.AutomationId="MenuTest">
+                    <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_Test}" AutomationProperties.AutomationId="MenuTest" IsVisible="{Binding IsEditingMode}">
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Button_TestPatch}"
-                                  AutomationProperties.AutomationId="MenuTest_TestPatch"
+                                  AutomationProperties.AutomationId="MenuTest_TestPatch" IsVisible="{Binding IsEditingMode}"
                                   Command="{Binding TestPatchCommand}"
                                   InputGesture="F5"
                                   ToolTip.Tip="{DynamicResource ToolTip_TestPatch}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_TestPatch}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource TestMode_Restore}"
-                                  AutomationProperties.AutomationId="MenuTest_RestoreConversation"
+                                  AutomationProperties.AutomationId="MenuTest_RestoreConversation" IsVisible="{Binding IsEditingMode}"
                                   Command="{Binding RestoreConversationCommand}"
                                   InputGesture="Shift+F5"
                                   ToolTip.Tip="{DynamicResource ToolTip_TestMode_Restore}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_TestMode_Restore}"/>
-                        <Separator/>
+                        <Separator IsVisible="{Binding IsEditingMode}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Button_RestoreBackup}"
-                                  AutomationProperties.AutomationId="MenuTest_RestoreBackup"
+                                  AutomationProperties.AutomationId="MenuTest_RestoreBackup" IsVisible="{Binding IsEditingMode}"
                                   Command="{Binding RestoreBackupCommand}"
                                   InputGesture="Ctrl+Shift+B"
                                   ToolTip.Tip="{DynamicResource ToolTip_RestoreBackup}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_RestoreBackup}"/>
-                        <Separator/>
+                        <Separator IsVisible="{Binding IsEditingMode}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_ValidateVO}"
-                                  AutomationProperties.AutomationId="MenuTest_ValidateVo"
+                                  AutomationProperties.AutomationId="MenuTest_ValidateVo" IsVisible="{Binding IsEditingMode}"
                                   Click="ValidateVO_Click"
                                   IsEnabled="{Binding CanValidateVO}"
                                   ToolTip.Tip="{DynamicResource ToolTip_ValidateVO}"
@@ -282,7 +293,7 @@
                              (visible-but-disabled is the discoverability point), and the
                              command gate stays the single source of truth. -->
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_BatchImportVo}"
-                                  AutomationProperties.AutomationId="MenuTest_BatchImportVo"
+                                  AutomationProperties.AutomationId="MenuTest_BatchImportVo" IsVisible="{Binding IsEditingMode}"
                                   Command="{Binding Canvas.BatchImportVoCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Menu_BatchImportVo_Main}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_BatchImportVo_Main}"/>
@@ -291,16 +302,16 @@
                              pattern as its per-conversation sibling above — the
                              MenuItem auto-disables from CanExecuteChanged. -->
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_BatchImportVoAll}"
-                                  AutomationProperties.AutomationId="MenuTest_BatchImportVoAll"
+                                  AutomationProperties.AutomationId="MenuTest_BatchImportVoAll" IsVisible="{Binding IsEditingMode}"
                                   Command="{Binding BatchImportVoAllCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Menu_BatchImportVoAll}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_BatchImportVoAll}"/>
-                        <Separator/>
+                        <Separator IsVisible="{Binding IsEditingMode}"/>
                         <!-- Project-wide text-tag sweep (2026-07-09): scans every patched
                              conversation's saved text in every language. Visible-but-disabled
                              without an open project, for discoverability. -->
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_ValidateTextTags}"
-                                  AutomationProperties.AutomationId="MenuTest_ValidateTextTags"
+                                  AutomationProperties.AutomationId="MenuTest_ValidateTextTags" IsVisible="{Binding IsEditingMode}"
                                   Click="ValidateTextTags_Click"
                                   IsEnabled="{Binding IsProjectOpen}"
                                   ToolTip.Tip="{DynamicResource ToolTip_ValidateTextTags}"
@@ -309,12 +320,12 @@
 
                     <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_Help}" AutomationProperties.AutomationId="MenuHelp">
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_CreateSample}"
-                                  AutomationProperties.AutomationId="MenuHelp_CreateSample"
+                                  AutomationProperties.AutomationId="MenuHelp_CreateSample" IsVisible="{Binding IsEditingMode}"
                                   ToolTip.Tip="{DynamicResource Menu_CreateSampleTip}"
                                   AutomationProperties.HelpText="{DynamicResource Menu_CreateSampleTip}"
                                   Command="{Binding CreateSampleProjectCommand}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_OpenWalkthrough}"
-                                  AutomationProperties.AutomationId="MenuHelp_OpenWalkthrough"
+                                  AutomationProperties.AutomationId="MenuHelp_OpenWalkthrough" IsVisible="{Binding IsEditingMode}"
                                   ToolTip.Tip="{DynamicResource Menu_OpenWalkthroughTip}"
                                   AutomationProperties.HelpText="{DynamicResource Menu_OpenWalkthroughTip}"
                                   Command="{Binding OpenWalkthroughCommand}"/>
@@ -324,18 +335,18 @@
                                   ToolTip.Tip="{DynamicResource ToolTip_Menu_StartGuidedTour}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_StartGuidedTour}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_TagReference}"
-                                  AutomationProperties.AutomationId="MenuHelp_TagReference"
+                                  AutomationProperties.AutomationId="MenuHelp_TagReference" IsVisible="{Binding IsEditingMode}"
                                   Command="{Binding TagReferenceCommand}"
                                   ToolTip.Tip="{DynamicResource ToolTip_Menu_TagReference}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_Menu_TagReference}"/>
-                        <Separator/>
+                        <Separator IsVisible="{Binding IsEditingMode}"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_ExportUiStrings}"
-                                  AutomationProperties.AutomationId="MenuHelp_ExportUiStrings"
+                                  AutomationProperties.AutomationId="MenuHelp_ExportUiStrings" IsVisible="{Binding IsEditingMode}"
                                   ToolTip.Tip="{DynamicResource Menu_ExportUiStringsTip}"
                                   AutomationProperties.HelpText="{DynamicResource Menu_ExportUiStringsTip}"
                                   Click="ExportUiStrings_Click"/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_ImportUiStrings}"
-                                  AutomationProperties.AutomationId="MenuHelp_ImportUiStrings"
+                                  AutomationProperties.AutomationId="MenuHelp_ImportUiStrings" IsVisible="{Binding IsEditingMode}"
                                   ToolTip.Tip="{DynamicResource Menu_ImportUiStringsTip}"
                                   AutomationProperties.HelpText="{DynamicResource Menu_ImportUiStringsTip}"
                                   Click="ImportUiStrings_Click"/>
@@ -396,6 +407,56 @@
                                   ToolTip.Tip="{DynamicResource ToolTip_HelpToggle}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_HelpToggle}"
                                   AutomationProperties.Name="{DynamicResource AutomationName_ToggleHelp}"/>
+                    <!-- Mode badge (issue 234): glyph + word, never colour alone. A Click handler rather than
+                         a Command binding so half-typed Node Details text is committed before the switch.
+                         Fill, tooltip and accessible name come from styles (a local value would beat the
+                         "reading" class, which is bound to IsReadingMode); the two content panels swap by
+                         visibility. -->
+                    <Button x:Name="ModeBadge"
+                            Classes.reading="{Binding IsReadingMode}"
+                            Click="ModeBadge_Click"
+                            Theme="{StaticResource ModeBadgeButton}"
+                            Margin="4,0,0,0">
+                        <Panel>
+                            <StackPanel Orientation="Horizontal" Spacing="6"
+                                        IsVisible="{Binding IsReadingMode}">
+                                <TextBlock Text="{DynamicResource ModeBadge_ReadingGlyph}"/>
+                                <TextBlock Text="{DynamicResource ModeBadge_Reading}"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Spacing="6"
+                                        IsVisible="{Binding IsEditingMode}">
+                                <TextBlock Text="{DynamicResource ModeBadge_EditingGlyph}"/>
+                                <TextBlock Text="{DynamicResource ModeBadge_Editing}"/>
+                            </StackPanel>
+                        </Panel>
+                        <Button.Styles>
+                            <Style Selector="Button#ModeBadge">
+                                <Setter Property="Background" Value="{DynamicResource Brush.ModeBadge.Editing.Background}"/>
+                                <Setter Property="ToolTip.Tip" Value="{DynamicResource ToolTip_ModeBadge_Editing}"/>
+                                <Setter Property="AutomationProperties.HelpText" Value="{DynamicResource ToolTip_ModeBadge_Editing}"/>
+                                <Setter Property="AutomationProperties.Name" Value="{DynamicResource AutomationName_ModeBadge_Editing}"/>
+                            </Style>
+                            <Style Selector="Button#ModeBadge.reading">
+                                <Setter Property="Background" Value="{DynamicResource Brush.ModeBadge.Reading.Background}"/>
+                                <Setter Property="ToolTip.Tip" Value="{DynamicResource ToolTip_ModeBadge_Reading}"/>
+                                <Setter Property="AutomationProperties.HelpText" Value="{DynamicResource ToolTip_ModeBadge_Reading}"/>
+                                <Setter Property="AutomationProperties.Name" Value="{DynamicResource AutomationName_ModeBadge_Reading}"/>
+                            </Style>
+                            <!-- Hover/pressed change the fill only, never Opacity: that would fade the text too. -->
+                            <Style Selector="Button#ModeBadge:pointerover">
+                                <Setter Property="Background" Value="{DynamicResource Brush.ModeBadge.Editing.Hover}"/>
+                            </Style>
+                            <Style Selector="Button#ModeBadge:pressed">
+                                <Setter Property="Background" Value="{DynamicResource Brush.ModeBadge.Editing.Pressed}"/>
+                            </Style>
+                            <Style Selector="Button#ModeBadge.reading:pointerover">
+                                <Setter Property="Background" Value="{DynamicResource Brush.ModeBadge.Reading.Hover}"/>
+                            </Style>
+                            <Style Selector="Button#ModeBadge.reading:pressed">
+                                <Setter Property="Background" Value="{DynamicResource Brush.ModeBadge.Reading.Pressed}"/>
+                            </Style>
+                        </Button.Styles>
+                    </Button>
                 </StackPanel>
             </DockPanel>
         </Border>
@@ -459,14 +520,16 @@
                 <TextBlock x:Name="StatusDisplay" Grid.Column="0" Text="{Binding DisplayStatusText}"
                            TextWrapping="Wrap"
                            Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Label}" VerticalAlignment="Center"/>
-                <Button Grid.Column="1"
-                        Content="{DynamicResource MainWindow_ResolveConflictsButton}"
-                        Command="{Binding ResolveConflictsCommand}"
-                        IsVisible="{Binding HasPendingConflictResolution}"
-                        ToolTip.Tip="{DynamicResource MainWindow_ResolveConflictsTooltip}"
-                        AutomationProperties.HelpText="{DynamicResource MainWindow_ResolveConflictsTooltip}"
-                        Background="{DynamicResource Brush.Button.Caution.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
-                        Padding="12,2" FontSize="{DynamicResource FontSize.Label}"/>
+                <!-- Hidden in reading mode (issue 234): there is nothing to resolve while nothing can be edited. -->
+                <Panel Grid.Column="1" IsVisible="{Binding IsEditingMode}">
+                    <Button Content="{DynamicResource MainWindow_ResolveConflictsButton}"
+                            Command="{Binding ResolveConflictsCommand}"
+                            IsVisible="{Binding HasPendingConflictResolution}"
+                            ToolTip.Tip="{DynamicResource MainWindow_ResolveConflictsTooltip}"
+                            AutomationProperties.HelpText="{DynamicResource MainWindow_ResolveConflictsTooltip}"
+                            Background="{DynamicResource Brush.Button.Caution.Background}" Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
+                            Padding="12,2" FontSize="{DynamicResource FontSize.Label}"/>
+                </Panel>
             </Grid>
         </Border>
     </Grid>
