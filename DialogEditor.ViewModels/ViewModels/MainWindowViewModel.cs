@@ -1139,6 +1139,7 @@ public partial class MainWindowViewModel : ObservableObject
         CurrentProjectName = name;
         AppLog.Info($"New project: {path}");
         StatusText = Loc.Format("Status_ProjectNew", name);
+        ReloadOpenConversationForNewProject();
     }
 
     [RelayCommand]
@@ -1508,12 +1509,18 @@ public partial class MainWindowViewModel : ObservableObject
         // Before the reload, so a warning it raises (the patch no longer matches the game files,
         // the text file is damaged) is what stays on screen; it is the only place it is shown.
         StatusText = Loc.FormatCount("Status_ProjectOpened", loaded.Patches.Count, loaded.Name);
-        // A conversation already on the canvas shows the previous project's text (issue 234: opening
-        // a project, a deferred autosave Restore and a deferred merge all swap the project under
-        // it). Discard clears IsModified, so after the unsaved-edits guard this is dirty only when
-        // the user chose Save and the save failed (SaveAndProceed proceeds regardless), or when
-        // Create Sample Project, which has no guard, swaps a project in: those edits are wanted
-        // and the reload would drop them, so they are left on the canvas.
+        ReloadOpenConversationForNewProject();
+    }
+
+    /// A conversation already on the canvas shows the previous project's text (issue 234: opening
+    /// a project, a deferred autosave Restore and a deferred merge all swap the project under
+    /// it; issue 327: so do New Project and Merge Projects). Discard clears IsModified, so after
+    /// the unsaved-edits guard this is dirty only when the user chose Save and the save failed
+    /// (SaveAndProceed proceeds regardless), or when Create Sample Project, which has no guard,
+    /// swaps a project in: those edits are wanted and the reload would drop them, so they are
+    /// left on the canvas.
+    private void ReloadOpenConversationForNewProject()
+    {
         if (_currentFile is { } open && _provider is not null && !IsModified)
         {
             // A conversation the previous project created, which this one does not have, has
@@ -2129,6 +2136,9 @@ public partial class MainWindowViewModel : ObservableObject
     {
         if (_project is null) return;
 
+        // Save or Discard runs first, so the canvas holds no edits the reload below would drop.
+        if (!await EnsureNoUnsavedEditsAsync()) return;
+
         var paths = await _filePicker.PickOpenFilesAsync(
             Loc.Get("Dialog_MergeProjects"),
             [".dialogproject"],
@@ -2147,11 +2157,12 @@ public partial class MainWindowViewModel : ObservableObject
             }
             SetProject(merged);
             // Save immediately — the merged patches are already computed, no canvas diff needed.
-            // IsModified and Canvas.IsModified are intentionally left unchanged so the user's
-            // open-conversation edit state is preserved.
+            // The canvas is reloaded below (issue 327), or the next Save would re-diff the
+            // pre-merge canvas over the merged patch.
             DialogProjectSerializer.SaveToFile(_projectPath!, merged);
             AppLog.Info($"Merged {paths.Count} project(s) into '{merged.Name}'");
             StatusText = Loc.FormatCount("Status_MergeComplete", paths.Count, merged.Name);
+            ReloadOpenConversationForNewProject();
         }
         catch (UnsupportedSchemaVersionException ex)
         {
