@@ -199,6 +199,37 @@ public class GameBrowserLayoutTests
         });
 
     [AvaloniaFact]
+    public void EditedDot_IsNotUnderTheScrollbar()
+    {
+        // Captures showed the dot half-hidden under the tree's overlay scrollbar, which shares the
+        // rows' right edge. Enough rows to bring the scrollbar up, then the dot must clear it.
+        var items = Enumerable.Range(0, 60).Select(i => MakeItem($"conversation_{i:00}")).ToList();
+        var folder = new ConversationFolderViewModel("companions", items, isExpanded: true);
+        var vm = new GameBrowserViewModel(new StubDispatcher());
+        vm.Folders.Add(folder);
+        vm.SetProjectConversations(new HashSet<string> { items[0].Name });
+        var view = new GameBrowserView { DataContext = vm };
+        var window = new Window { Content = view, Width = 260, Height = 400 };
+        try
+        {
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+            window.UpdateLayout();
+            var tree = view.GetVisualDescendants().OfType<TreeView>().Single();
+            var bar = tree.GetVisualDescendants().OfType<global::Avalonia.Controls.Primitives.ScrollBar>()
+                .Single(b => b.Orientation == Orientation.Vertical);
+            Assert.True(bar.IsEffectivelyVisible, "the scrollbar should be showing");
+
+            var row = Assert.IsAssignableFrom<TreeViewItem>(tree.TreeContainerFromItem(items[0]));
+            var dot = row.GetVisualDescendants().OfType<TextBlock>().Single(t => t.Classes.Contains("editedMark"));
+            var dotRight = global::Avalonia.VisualExtensions.TranslatePoint(dot, new global::Avalonia.Point(dot.Bounds.Width, 0), tree)!.Value.X;
+            var barLeft  = global::Avalonia.VisualExtensions.TranslatePoint(bar, new global::Avalonia.Point(0, 0), tree)!.Value.X;
+            Assert.True(dotRight <= barLeft, $"dot ends at {dotRight:F1}, scrollbar starts at {barLeft:F1}");
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
     public void OnlyProjectCheckbox_ShowsOnlyWithAProjectOpen()
         => WithDock(1.0, d =>
         {
