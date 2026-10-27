@@ -100,6 +100,9 @@ public partial class RepDispositionBalanceViewModel : ObservableObject
     /// Scope tooltip: "the selected source" names a picker that is hidden without a project.
     public string ScopeTooltip => Loc.Get(HasProject ? "RepBalance_Tip_Scope" : "RepBalance_Tip_Scope_NoProject");
 
+    /// Analyze tooltip, for the same reason as ScopeTooltip.
+    public string AnalyzeTooltip => Loc.Get(HasProject ? "RepBalance_Tip_Refresh" : "RepBalance_Tip_Refresh_NoProject");
+
     [RelayCommand]
     private async Task Refresh()
     {

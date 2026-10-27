@@ -136,6 +136,17 @@ public class ReadingWithoutProjectTests : IDisposable
     }
 
     [Theory]
+    [InlineData(true,  "RepBalance_Tip_Refresh")]
+    [InlineData(false, "RepBalance_Tip_Refresh_NoProject")]
+    public void Balance_AnalyzeTip_NamesTheSourceOnlyWhenThePickerShows(bool hasProject, string key)
+    {
+        var vm = new RepDispositionBalanceViewModel(
+            DialogProject.Empty("p"), new FakeGameDataProvider("poe2", "en"),
+            () => (null, null), hasProject);
+        Assert.Equal(key, vm.AnalyzeTooltip);
+    }
+
+    [Theory]
     [InlineData(false)]
     [InlineData(true)]
     public async Task Both_StillOpen_InReadingMode(bool withProject)

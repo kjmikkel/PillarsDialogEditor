@@ -55,8 +55,8 @@
                       AutomationProperties.HelpText="{Binding ScopeTooltip}"/>
             <Button Content="{DynamicResource RepBalance_Refresh}"
                     Command="{Binding RefreshCommand}"
-                    ToolTip.Tip="{DynamicResource RepBalance_Tip_Refresh}"
-                    AutomationProperties.HelpText="{DynamicResource RepBalance_Tip_Refresh}"
+                    ToolTip.Tip="{Binding AnalyzeTooltip}"
+                    AutomationProperties.HelpText="{Binding AnalyzeTooltip}"
                     Background="{DynamicResource Brush.Button.Confirm.Background}"
                     Foreground="{DynamicResource Brush.Text.OnAccent}" BorderThickness="0"
                     Padding="16,6" Margin="8,0,0,0"/>
