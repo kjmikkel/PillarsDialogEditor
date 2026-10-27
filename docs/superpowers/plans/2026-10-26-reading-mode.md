@@ -496,7 +496,7 @@ The three `.trail/learnings/2026-10-26-*` notes explain why.
    - the Rep & Disposition hints drop the source picker;
    - after a badge switch the status bar keeps no stale hover text, Discard after an autosave restores the saved text with no dirty marker, and Stay Here keeps the edit.
    The run found one more stale "selected source" hint, on the Analyze button. That is now fixed.
-2. Watch PR #330 CI and review, then merge.
+2. PR #330 was merged on 2026-10-27. The Analyze tooltip fix follows in its own PR.
 
 **Follow-ups filed, not in this PR.** #325 (type-name UIA names), #326 (merge and export ignore unsaved edits), #327 (New Project and Merge Projects leave a stale canvas), #328 (switching to a project-created conversation after the prompt fails), #329 (Apply from diff, Undo apply and Merge Projects can write over a pending conflict), and a plural comment on #264.
 
