@@ -102,13 +102,25 @@ public class MainWindowViewModelProjectSwapReloadTests : IDisposable
 
     // ── New Project ───────────────────────────────────────────────────────
 
+    // DoNewProject is fire-and-forget. It names the project and reloads the canvas in the same
+    // continuation, so wait for the name rather than a fixed delay that a slow runner can outlast.
+    private async Task WaitForNewProject(MainWindowViewModel vm)
+    {
+        var name = Path.GetFileNameWithoutExtension(NewPath);
+        for (var waited = 0; vm.CurrentProjectName != name; waited += 10)
+        {
+            if (waited > 5000) throw new TimeoutException("New Project never finished");
+            await Task.Delay(10);
+        }
+    }
+
     [Fact]
     public async Task NewProject_ReloadsTheOpenConversation_AndSaveDoesNotInheritTheOldPatch()
     {
         var vm = await OpenAWithGameOpen(new StubFilePicker(saveResult: NewPath));
 
         vm.NewProjectCommand.Execute(null);
-        await Task.Delay(200);   // DoNewProject is fire-and-forget; the stub picker completes at once
+        await WaitForNewProject(vm);
 
         Assert.Equal("vanilla text", NodeText(vm));
         vm.SaveProjectCommand.Execute(null);
@@ -132,7 +144,7 @@ public class MainWindowViewModelProjectSwapReloadTests : IDisposable
         Assert.Equal("fresh", vm.CurrentConversationName);
 
         vm.NewProjectCommand.Execute(null);
-        await Task.Delay(200);
+        await WaitForNewProject(vm);
 
         Assert.Empty(errors);
         Assert.Null(vm.CurrentConversationName);
