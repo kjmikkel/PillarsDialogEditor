@@ -19,6 +19,11 @@
             <Setter Property="FontSize"   Value="{DynamicResource FontSize.Body}"/>   <!-- issue 178: headers at row size -->
             <Setter Property="FontWeight" Value="Bold"/>
         </Style>
+        <!-- Issue 325: a row's UIA name otherwise falls back to its item's ToString(), the
+             DisplayRow record dump, which a screen reader reads aloud. -->
+        <Style Selector="ListBoxItem">
+            <Setter Property="AutomationProperties.Name" Value="{Binding AutomationName}"/>
+        </Style>
     </Window.Styles>
 
     <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="14,12,14,12">

@@ -745,6 +745,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="SpeakerLines_Origin_Vanilla">Vanilla</sys:String>
     <sys:String x:Key="SpeakerLines_Origin_Edited">Edited</sys:String>
     <sys:String x:Key="SpeakerLines_Origin_New">New</sys:String>
+    <!-- Screen-reader name of a result row (issue 325): line text, conversation, node label, status. -->
+    <sys:String x:Key="SpeakerLines_RowAutomationName">{0} — {1}, {2}, {3}</sys:String>
     <sys:String x:Key="SpeakerLines_Variant_Female">Female</sys:String>
     <!-- Browser-specific save-before-browse copy (reuses SaveBeforeScanDialog) -->
     <sys:String x:Key="SaveBeforeBrowse_Message">This project has unsaved changes. Save first so line origins and other conversations reflect your latest work? Your currently-open conversation's unsaved text is included either way — saving only affects how lines are tagged and the other conversations you've edited.</sys:String>
@@ -2130,6 +2132,9 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="RepBalance_Flag_Ignored">Never checked</sys:String>
     <!-- {0} = the value's count divided by its even-split expected count -->
     <sys:String x:Key="RepBalance_Share">{0:0.0}×</sys:String>
+    <!-- Screen-reader name of a table row (issue 325): value, count, share, and the flag if any. -->
+    <sys:String x:Key="RepBalance_RowAutomationName">{0}: count {1}, share {2}</sys:String>
+    <sys:String x:Key="RepBalance_RowAutomationNameFlagged">{0}: count {1}, share {2}, {3}</sys:String>
     <sys:String x:Key="RepBalance_Analyzing">Analyzing…</sys:String>
     <!-- Label-form counts (avoids count-dependent plural noun forms): {0} conversations,
          {1} disposition checks, {2} reputation checks -->
