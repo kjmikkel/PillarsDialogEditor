@@ -45,8 +45,43 @@ public partial class ConnectionViewModel : ObservableObject
                    OnPropertyChanged(nameof(HasConditions));
                    OnPropertyChanged(nameof(ConditionCount));
                    OnPropertyChanged(nameof(ConditionCountLabel));
-                   OnPropertyChanged(nameof(ReadingConditionsToolTip)); });
+                   OnPropertyChanged(nameof(ReadingConditionsToolTip));
+                   RefreshVerdict(); });
     }
+
+    // ── Verdict under the assumed game state (View > Game State) ──────────
+    private DialogEditor.Core.Conditions.GameState? _assumedState;
+    private string _verdictGameId = string.Empty;
+
+    /// Points the verdict at the session's assumed state. Owned by Node Details, which also
+    /// calls <see cref="RefreshVerdict"/> when the state changes; the link itself holds no
+    /// subscription, so a discarded canvas link cannot leak.
+    public void SetVerdictContext(DialogEditor.Core.Conditions.GameState? state, string gameId)
+    {
+        _assumedState = state;
+        _verdictGameId = gameId;
+        RefreshVerdict();
+    }
+
+    public void RefreshVerdict()
+    {
+        OnPropertyChanged(nameof(ShowConditionVerdict));
+        OnPropertyChanged(nameof(ConditionVerdict));
+        OnPropertyChanged(nameof(ConditionVerdictText));
+        OnPropertyChanged(nameof(ConditionVerdictPasses));
+        OnPropertyChanged(nameof(ConditionVerdictFails));
+    }
+
+    /// Shown only once the writer has set a fact and this link has conditions.
+    public bool ShowConditionVerdict => ConditionVerdictFormat.Applies(_assumedState, _conditions);
+
+    public DialogEditor.Core.Conditions.Truth ConditionVerdict
+        => ConditionVerdictFormat.Evaluate(_assumedState, _conditions, _verdictGameId);
+
+    public string ConditionVerdictText => ConditionVerdictFormat.Text(ConditionVerdict);
+
+    public bool ConditionVerdictPasses => ConditionVerdict == DialogEditor.Core.Conditions.Truth.True;
+    public bool ConditionVerdictFails => ConditionVerdict == DialogEditor.Core.Conditions.Truth.False;
 
     public bool IsAlways      => _questionNodeTextDisplay == "ShowAlways";
     public bool IsNever       => _questionNodeTextDisplay == "ShowNever";
