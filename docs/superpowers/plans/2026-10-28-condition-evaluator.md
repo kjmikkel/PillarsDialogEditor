@@ -234,3 +234,28 @@ holds one session-wide `GameState`; Node Details and the new dock tool read it.
   State, set a global and a companion, select a conditioned node, screenshot the verdict changing.
 - [x] Update spec/plan checkboxes, `trail note` for anything that took digging, open the PR, file the §8
   follow-ups as issues (search first), write the Handoff section.
+
+## Handoff — 2026-10-28
+
+**Done** (branch `feat/305-condition-evaluator`, PR for #305): all six tasks. Core evaluator with both games'
+folds (`DialogEditor.Core/Conditions/`), `GameStateViewModel` on `MainWindowViewModel.GameState`, verdict lines in
+Node Details (node and each conditioned link), Game State dock tool (left pane, tabbed with Conversations; View ▸
+Game State adds it to older saved layouts). Verified in the app against the canonical PoE2 fixture: setting
+`canonical_flag_d` to 3 makes node 2 read "passes", 7 makes it "fails", and the panel summary follows.
+
+**Changed after the GUI check:** the tool moved from the right pane (where it hid Node Details) to the left; the
+verdict TextBlocks lost a fixed automation name so screen readers read the verdict; DriveApp's settings
+backup now covers layout.json.
+
+**Filed:** #342 (Node Details CONDITIONS shows "(none)" — pre-existing on main), #343 (headless MainWindow tests
+overwrite the real layout.json), follow-ups #344 (persist state), #345 (global initial values), #346
+(character-dependent conditions); canvas dimming noted on #32.
+
+**Next step:** owner reviews the PR, especially the _(my call)_ items in the spec. After merge, #32 can start
+from `ConditionEvaluator.Evaluate`.
+
+**Open questions for the owner:** quest-state model (NotStarted/Active/Completed/Failed; `IsQuestActive` on a
+failed quest is "can't tell"); session-only state; verdict shown only once a fact is set.
+
+**Don't redo:** the fold transcriptions are checked line by line against the decompiled code (see the trail
+learning on And/Or folds); `trail check` flags 20 word-overlap false positives on this branch.
