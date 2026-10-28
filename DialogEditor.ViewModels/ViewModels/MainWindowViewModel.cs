@@ -243,7 +243,8 @@ public partial class MainWindowViewModel : ObservableObject
         // Put the open conversation back to its saved state first (issue 234). The continuation
         // may not replace the canvas (a cancelled picker, Later, a cancelled merge), and a canvas
         // still holding the discarded edits would fold them into the next Save. A conversation
-        // switch loads another conversation anyway, so it is not reverted first.
+        // switch loads another conversation anyway, so it is not reverted first (and is reopened
+        // as saved if that load fails, issue 328).
         if (_pendingFile is null && !ReloadCurrentConversationView())
         {
             // The load reported its own error. Nothing was discarded, so nothing proceeds: the
@@ -285,8 +286,21 @@ public partial class MainWindowViewModel : ObservableObject
         var action = _pendingAction;
         _pendingFile   = null;
         _pendingAction = null;
-        if (file   is not null) LoadConversationFile(file);
+        if (file   is not null) OpenPendingConversation(file);
         action?.Invoke();
+    }
+
+    /// Opens the conversation a switch was waiting on the way a plain selection does, so one the
+    /// project created opens too (issue 328). If it fails to load, the one that was open is
+    /// reopened as saved: Discard did not revert it, and the failed load has already pointed
+    /// _currentFile at the target, so a later Save would have written its canvas there.
+    private void OpenPendingConversation(ConversationFile file)
+    {
+        var previous = _currentFile;
+        if (OpenConversationView(file) || previous is null) return;
+        _currentFile = previous;
+        if (!ReloadCurrentConversationView())
+            AppLog.Warn($"Switch to '{file.Name}' failed and '{previous.Name}' could not be reopened either");
     }
 
     // ── Project open state ────────────────────────────────────────────────
