@@ -136,7 +136,8 @@ public class NodeDetailViewModelPaneTests
     public void LogicSummary_CountsConditionsAndScripts()
     {
         LoadNode();
-        Assert.Equal($"0 NodeDetail_ConditionsWord{Sep}0 NodeDetail_ScriptsWord", _vm.LogicSummary);
+        // Plural-aware (issue 264): 0 is "Other" in English; the stub echoes the chosen key.
+        Assert.Equal($"NodeDetail_ConditionsCount_Other{Sep}NodeDetail_ScriptsCount_Other", _vm.LogicSummary);
     }
 
     [Fact]

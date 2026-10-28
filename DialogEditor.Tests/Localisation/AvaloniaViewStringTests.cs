@@ -43,6 +43,16 @@ public class AvaloniaViewStringTests
     }
 
     [AvaloniaFact]
+    public void NodeDetailLogicCounts_AreSingularForOne()
+    {
+        // Issue 264: the Logic expander summary read "1 conditions · 0 scripts".
+        Assert.Equal("1 condition",  Loc.FormatCount("NodeDetail_ConditionsCount", 1));
+        Assert.Equal("2 conditions", Loc.FormatCount("NodeDetail_ConditionsCount", 2));
+        Assert.Equal("1 script",     Loc.FormatCount("NodeDetail_ScriptsCount", 1));
+        Assert.Equal("0 scripts",    Loc.FormatCount("NodeDetail_ScriptsCount", 0));
+    }
+
+    [AvaloniaFact]
     public void UnsavedChangesSubjectFallbacks_ComeFromResources()
     {
         // Substituted for the conversation name when the prompt is about the whole
