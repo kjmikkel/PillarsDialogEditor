@@ -579,6 +579,18 @@ public partial class MainWindowViewModel : ObservableObject
     private bool ConflictPendingOnOpenProject =>
         HasPendingConflictResolution && _projectPath is not null && _projectPath == _pendingConflictPath;
 
+    /// True, logged and reported, when the open project's file still holds an unresolved git
+    /// conflict, so the caller must not write it. Shared by SaveProject and the writers that
+    /// bypass it (Apply from diff, Undo apply, Merge Projects; issue 329), which call it before
+    /// they change anything.
+    private bool RefuseWriteWhileConflictPending(string action)
+    {
+        if (!ConflictPendingOnOpenProject) return false;
+        AppLog.Warn($"{action} refused: '{_projectPath}' has an unresolved git conflict");
+        StatusText = Loc.Format("Status_SaveRefusedConflictPending", Path.GetFileName(_projectPath));
+        return true;
+    }
+
     /// Editing never keeps a conflicted project open (issue 234), as outside reading mode a
     /// cancelled merge never opens it. LastProjectPath is kept, so the next launch offers the
     /// resolution again.
@@ -1850,12 +1862,7 @@ public partial class MainWindowViewModel : ObservableObject
         // writing this project over it would lose the other branch's version. Every save path
         // (Ctrl+S, Save in an unsaved-changes prompt, Save As to the same file) comes through
         // here, and the edits stay unsaved, so a prompt treats it as a failed save.
-        if (ConflictPendingOnOpenProject)
-        {
-            AppLog.Warn($"Save refused: '{_projectPath}' has an unresolved git conflict");
-            StatusText = Loc.Format("Status_SaveRefusedConflictPending", Path.GetFileName(_projectPath));
-            return;
-        }
+        if (RefuseWriteWhileConflictPending(nameof(SaveProject))) return;
         try
         {
             FoldCanvasIntoProject();
@@ -2070,6 +2077,8 @@ public partial class MainWindowViewModel : ObservableObject
     public async Task ApplyFromDiff(DialogProject applied)
     {
         if (_projectPath is null) return;
+        // Before the save prompt: its Save would be refused too, and the write below would not.
+        if (RefuseWriteWhileConflictPending(nameof(ApplyFromDiff))) return;
 
         if (IsModified)
         {
@@ -2106,6 +2115,8 @@ public partial class MainWindowViewModel : ObservableObject
     private void UndoApply()
     {
         if (_preApplyProject is null) return;
+        // Before the undo is used up, so it is still there once the conflict is resolved.
+        if (RefuseWriteWhileConflictPending(nameof(UndoApply))) return;
         var previous = _preApplyProject;
         _preApplyProject = null;
         SetProject(previous);
@@ -2135,6 +2146,8 @@ public partial class MainWindowViewModel : ObservableObject
     private async Task MergeProjects()
     {
         if (_project is null) return;
+        // Before the unsaved-changes prompt and the picker, so neither is shown for nothing.
+        if (RefuseWriteWhileConflictPending(nameof(MergeProjects))) return;
 
         // Save or Discard runs first, so the canvas holds no edits the reload below would drop.
         if (!await EnsureNoUnsavedEditsAsync()) return;

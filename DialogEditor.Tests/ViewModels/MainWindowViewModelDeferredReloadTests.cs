@@ -583,4 +583,56 @@ public class MainWindowViewModelDeferredReloadTests : IDisposable
         Assert.StartsWith("Status_SaveRefusedConflictPending", vm.StatusText);
         Assert.True(vm.IsModified);   // a refused save is a failed save: the edits stay unsaved
     }
+
+    // ── Issue 329: the writers that bypass SaveProject refuse too ──────────
+
+    [Fact]
+    public async Task ApplyFromDiff_WhileTheOpenProjectsConflictIsPending_LeavesTheFileAlone()
+    {
+        var vm = await EditWhileTheConflictIsPending();
+        vm.ConfirmSaveBeforeApply = () => Task.FromResult(true);
+        var before = File.ReadAllText(ProjectPath);
+
+        await vm.ApplyFromDiff(DialogProject.Empty("C").WithPatch(EditPatch("applied")));
+
+        Assert.Equal(before, File.ReadAllText(ProjectPath));
+        AssertBothSidesStillOnDisk();
+        Assert.StartsWith("Status_SaveRefusedConflictPending", vm.StatusText);
+        Assert.Equal("my edit", NodeText(vm));   // nothing was swapped in under the canvas
+        Assert.True(vm.IsModified);
+    }
+
+    [Fact]
+    public async Task UndoApply_WhileTheOpenProjectsConflictIsPending_LeavesTheFileAlone_AndKeepsTheUndo()
+    {
+        var vm = await EditWhileTheConflictIsPending();
+        typeof(MainWindowViewModel).GetField("_preApplyProject", Flags)!
+            .SetValue(vm, DialogProject.Empty("C").WithPatch(EditPatch("before apply")));
+        var before = File.ReadAllText(ProjectPath);
+
+        vm.UndoApplyCommand.Execute(null);
+
+        Assert.Equal(before, File.ReadAllText(ProjectPath));
+        AssertBothSidesStillOnDisk();
+        Assert.StartsWith("Status_SaveRefusedConflictPending", vm.StatusText);
+        Assert.True(vm.UndoApplyCommand.CanExecute(null));   // still there once the conflict is resolved
+    }
+
+    [Fact]
+    public async Task MergeProjects_WhileTheOpenProjectsConflictIsPending_LeavesTheFileAlone()
+    {
+        var vm = await EditWhileTheConflictIsPending();
+        var otherPath = Path.Combine(_dir, "other.dialogproject");
+        DialogProjectSerializer.SaveToFile(otherPath, DialogProject.Empty("O").WithPatch(EditPatch("merged")));
+        typeof(MainWindowViewModel).GetField("_filePicker", Flags)!
+            .SetValue(vm, new StubFilePicker(multiResult: [otherPath]));
+        vm.UnsavedChangesRequested += vm.DiscardAndProceed;
+        var before = File.ReadAllText(ProjectPath);
+
+        await vm.MergeProjectsCommand.ExecuteAsync(null);
+
+        Assert.Equal(before, File.ReadAllText(ProjectPath));
+        AssertBothSidesStillOnDisk();
+        Assert.StartsWith("Status_SaveRefusedConflictPending", vm.StatusText);
+    }
 }
