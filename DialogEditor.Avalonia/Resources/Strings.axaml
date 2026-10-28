@@ -2284,4 +2284,21 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="ToolTip_ModeBadge_Reading">You are in Reading mode: a read-only view where nothing can be changed or saved, so your game files and projects stay safe. Click to switch to Editing mode.</sys:String>
     <sys:String x:Key="ToolTip_ModeBadge_Editing">You are in Editing mode: the full editor, where conversations, projects and mods can be changed. Click to switch to Reading mode. If you have unsaved changes the editor asks what to do with them first.</sys:String>
 
+    <!-- Game State panel (issue 305): summary line of the open conversation's conditions under the assumed state. -->
+    <sys:String x:Key="GameState_Summary">In this conversation: {0}, {1}, {2}.</sys:String>
+    <sys:String x:Key="GameState_SummaryNone">This conversation has no conditions to check.</sys:String>
+    <sys:String x:Key="GameState_SummaryPass_One">{0} condition passes</sys:String>
+    <sys:String x:Key="GameState_SummaryPass_Other">{0} conditions pass</sys:String>
+    <sys:String x:Key="GameState_SummaryFail_One">{0} fails</sys:String>
+    <sys:String x:Key="GameState_SummaryFail_Other">{0} fail</sys:String>
+    <sys:String x:Key="GameState_SummaryUnknown_One">{0} can't be told</sys:String>
+    <sys:String x:Key="GameState_SummaryUnknown_Other">{0} can't be told</sys:String>
+
+    <!-- Node Details verdict (issue 305): condition result under the assumed game state. -->
+    <sys:String x:Key="NodeDetail_Verdict_Passes">With the assumed game state: passes</sys:String>
+    <sys:String x:Key="NodeDetail_Verdict_Fails">With the assumed game state: fails</sys:String>
+    <sys:String x:Key="NodeDetail_Verdict_Unknown">With the assumed game state: can't tell</sys:String>
+    <sys:String x:Key="ToolTip_ConditionVerdict">Whether these conditions would be met, judged against the game state you assumed in View &gt; Game State. "Can't tell" means a fact they depend on is not set there, or a condition type the editor cannot evaluate yet.</sys:String>
+    <sys:String x:Key="AutomationName_ConditionVerdict">Condition result under the assumed game state</sys:String>
+
 </ResourceDictionary>
