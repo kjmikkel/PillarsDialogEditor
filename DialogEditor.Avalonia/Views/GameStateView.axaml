@@ -1,0 +1,149 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="clr-namespace:DialogEditor.Avalonia.Converters"
+             x:Class="DialogEditor.Avalonia.Views.GameStateView"
+             x:CompileBindings="False"
+             MinWidth="260">
+  <UserControl.Resources>
+    <!-- ComboBox items are listed in the enum's declaration order, so SelectedIndex maps 1:1. -->
+    <conv:EnumIndexConverter x:Key="EnumIndex"/>
+  </UserControl.Resources>
+  <Border Background="{DynamicResource Brush.Surface.Panel}"
+          BorderBrush="{DynamicResource Brush.Border.Default}" BorderThickness="1,0,0,0">
+    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+      <StackPanel Spacing="8" Margin="10">
+        <TextBlock Text="{DynamicResource GameState_Explanation}" TextWrapping="Wrap"
+                   Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Small}"/>
+        <Button Content="{DynamicResource GameState_ClearAll}" Command="{Binding ClearAllCommand}"
+                HorizontalAlignment="Left" Padding="14,6"
+                AutomationProperties.Name="{DynamicResource GameState_ClearAll}"
+                ToolTip.Tip="{DynamicResource GameState_Tip_ClearAll}"
+                AutomationProperties.HelpText="{DynamicResource GameState_Tip_ClearAll}"/>
+
+        <!-- Global variables: a number each. -->
+        <StackPanel x:Name="GlobalsSection" Spacing="4" IsVisible="{Binding HasGlobals}">
+          <TextBlock Text="{DynamicResource GameState_Heading_Globals}" FontWeight="Bold"
+                     Foreground="{DynamicResource Brush.Text.Primary}"/>
+          <ItemsControl ItemsSource="{Binding Globals}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Grid ColumnDefinitions="*,*" Margin="0,2">
+                  <TextBlock Grid.Column="0" Text="{Binding Name}" VerticalAlignment="Center"
+                             Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"
+                             TextTrimming="CharacterEllipsis"/>
+                  <TextBox Grid.Column="1" Text="{Binding ValueText}"
+                           ToolTip.Tip="{DynamicResource GameState_Tip_Global}"
+                           AutomationProperties.Name="{Binding Name}"
+                           AutomationProperties.HelpText="{DynamicResource GameState_Tip_Global}"/>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+
+        <!-- Companions: in party / not in party (TriState order: Not set, Yes, No). -->
+        <StackPanel x:Name="CompanionsSection" Spacing="4" IsVisible="{Binding HasCompanions}">
+          <TextBlock Text="{DynamicResource GameState_Heading_Companions}" FontWeight="Bold"
+                     Foreground="{DynamicResource Brush.Text.Primary}"/>
+          <CheckBox Content="{DynamicResource GameState_NoCompanions}"
+                    IsChecked="{Binding NoCompanionsInParty}"
+                    ToolTip.Tip="{DynamicResource GameState_Tip_NoCompanions}"
+                    AutomationProperties.Name="{DynamicResource GameState_NoCompanions}"
+                    AutomationProperties.HelpText="{DynamicResource GameState_Tip_NoCompanions}"/>
+          <ItemsControl ItemsSource="{Binding Companions}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Grid ColumnDefinitions="*,*" Margin="0,2">
+                  <TextBlock Grid.Column="0" Text="{Binding DisplayName}" VerticalAlignment="Center"
+                             Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"
+                             TextTrimming="CharacterEllipsis"/>
+                  <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
+                            SelectedIndex="{Binding Choice, Converter={StaticResource EnumIndex}}"
+                            ToolTip.Tip="{DynamicResource GameState_Tip_Companion}"
+                            AutomationProperties.Name="{Binding DisplayName}"
+                            AutomationProperties.HelpText="{DynamicResource GameState_Tip_Companion}">
+                    <ComboBoxItem Content="{DynamicResource GameState_Option_NotSet}"/>
+                    <ComboBoxItem Content="{DynamicResource GameState_Option_InParty}"/>
+                    <ComboBoxItem Content="{DynamicResource GameState_Option_NotInParty}"/>
+                  </ComboBox>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+
+        <!-- Conversation nodes played (TriState order: Not set, Yes, No). -->
+        <StackPanel x:Name="PlayedNodesSection" Spacing="4" IsVisible="{Binding HasPlayedNodes}">
+          <TextBlock Text="{DynamicResource GameState_Heading_PlayedNodes}" FontWeight="Bold"
+                     Foreground="{DynamicResource Brush.Text.Primary}"/>
+          <ItemsControl ItemsSource="{Binding PlayedNodes}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Grid ColumnDefinitions="*,*" Margin="0,2">
+                  <TextBlock Grid.Column="0" Text="{Binding Label}" VerticalAlignment="Center"
+                             Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"
+                             TextTrimming="CharacterEllipsis"/>
+                  <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
+                            SelectedIndex="{Binding Choice, Converter={StaticResource EnumIndex}}"
+                            ToolTip.Tip="{DynamicResource GameState_Tip_PlayedNode}"
+                            AutomationProperties.Name="{Binding Label}"
+                            AutomationProperties.HelpText="{DynamicResource GameState_Tip_PlayedNode}">
+                    <ComboBoxItem Content="{DynamicResource GameState_Option_NotSet}"/>
+                    <ComboBoxItem Content="{DynamicResource GameState_Option_Played}"/>
+                    <ComboBoxItem Content="{DynamicResource GameState_Option_NotPlayed}"/>
+                  </ComboBox>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+
+        <!-- Quests (QuestChoice order: Not set, Not started, Active, Completed, Failed). -->
+        <StackPanel x:Name="QuestsSection" Spacing="4" IsVisible="{Binding HasQuests}">
+          <TextBlock Text="{DynamicResource GameState_Heading_Quests}" FontWeight="Bold"
+                     Foreground="{DynamicResource Brush.Text.Primary}"/>
+          <ItemsControl ItemsSource="{Binding Quests}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate>
+                <Grid ColumnDefinitions="*,*" Margin="0,2">
+                  <TextBlock Grid.Column="0" Text="{Binding DisplayName}" VerticalAlignment="Center"
+                             Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"
+                             TextTrimming="CharacterEllipsis"/>
+                  <ComboBox Grid.Column="1" HorizontalAlignment="Stretch"
+                            SelectedIndex="{Binding Choice, Converter={StaticResource EnumIndex}}"
+                            ToolTip.Tip="{DynamicResource GameState_Tip_Quest}"
+                            AutomationProperties.Name="{Binding DisplayName}"
+                            AutomationProperties.HelpText="{DynamicResource GameState_Tip_Quest}">
+                    <ComboBoxItem Content="{DynamicResource GameState_Option_NotSet}"/>
+                    <ComboBoxItem Content="{DynamicResource GameState_Option_QuestNotStarted}"/>
+                    <ComboBoxItem Content="{DynamicResource GameState_Option_QuestActive}"/>
+                    <ComboBoxItem Content="{DynamicResource GameState_Option_QuestCompleted}"/>
+                    <ComboBoxItem Content="{DynamicResource GameState_Option_QuestFailed}"/>
+                  </ComboBox>
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+
+        <!-- In combat (TriState order: Not set, Yes, No). -->
+        <StackPanel x:Name="CombatSection" Spacing="4" IsVisible="{Binding TestsCombat}">
+          <TextBlock Text="{DynamicResource GameState_Heading_Combat}" FontWeight="Bold"
+                     Foreground="{DynamicResource Brush.Text.Primary}"/>
+          <ComboBox HorizontalAlignment="Stretch"
+                    SelectedIndex="{Binding CombatChoice, Converter={StaticResource EnumIndex}}"
+                    ToolTip.Tip="{DynamicResource GameState_Tip_Combat}"
+                    AutomationProperties.Name="{DynamicResource GameState_Combat_Label}"
+                    AutomationProperties.HelpText="{DynamicResource GameState_Tip_Combat}">
+            <ComboBoxItem Content="{DynamicResource GameState_Option_NotSet}"/>
+            <ComboBoxItem Content="{DynamicResource GameState_Option_Yes}"/>
+            <ComboBoxItem Content="{DynamicResource GameState_Option_No}"/>
+          </ComboBox>
+        </StackPanel>
+
+        <TextBlock Text="{Binding Summary}" TextWrapping="Wrap"
+                   Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Small}"/>
+      </StackPanel>
+    </ScrollViewer>
+  </Border>
+</UserControl>

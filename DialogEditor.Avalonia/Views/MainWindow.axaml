@@ -227,6 +227,11 @@
                                   Click="ShowConditionSearchTool_Click"
                                   ToolTip.Tip="{DynamicResource ToolTip_View_ShowTool}"
                                   AutomationProperties.HelpText="{DynamicResource ToolTip_View_ShowTool}"/>
+                        <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_View_GameState}"
+                                  AutomationProperties.AutomationId="MenuView_GameState"
+                                  Click="ShowGameStateTool_Click"
+                                  ToolTip.Tip="{DynamicResource ToolTip_View_ShowTool}"
+                                  AutomationProperties.HelpText="{DynamicResource ToolTip_View_ShowTool}"/>
                         <Separator/>
                         <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_View_PrivacyMode}"
                                   AutomationProperties.AutomationId="MenuView_PrivacyMode"

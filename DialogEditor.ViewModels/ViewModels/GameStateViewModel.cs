@@ -251,6 +251,9 @@ public sealed class PlayedNodeRowViewModel : GameStateRowViewModel
     public int NodeId { get; }
     public string ConversationDisplayName { get; }
 
+    /// What the row shows: the conversation's display name and the node's id.
+    public string Label => Loc.Format("GameState_PlayedNode_Label", ConversationDisplayName, NodeId);
+
     private TriState Read() => State.PlayedNodes.TryGetValue((Conversation, NodeId), out var b) ? (b ? TriState.Yes : TriState.No) : TriState.NotSet;
 
     /// Yes = the node has been played, No = it has not.

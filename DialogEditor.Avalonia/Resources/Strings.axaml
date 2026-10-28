@@ -2152,6 +2152,7 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="Dock_Tool_Browser">Conversations</sys:String>
     <sys:String x:Key="Dock_Tool_Details">Node Details</sys:String>
     <sys:String x:Key="Dock_Tool_ConditionSearch">Condition search</sys:String>
+    <sys:String x:Key="Dock_Tool_GameState">Game State</sys:String>
     <sys:String x:Key="Dock_Doc_Canvas">Canvas</sys:String>
 
     <!-- View menu — show/focus a docking tool (re-opening it if closed) + reset the
@@ -2160,6 +2161,7 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="Menu_View_Conversations">Conversations</sys:String>
     <sys:String x:Key="Menu_View_Details">Node Details</sys:String>
     <sys:String x:Key="Menu_View_ConditionSearch">Condition search</sys:String>
+    <sys:String x:Key="Menu_View_GameState">Game State</sys:String>
     <sys:String x:Key="Menu_View_ReadingMode">Reading mode</sys:String>
     <sys:String x:Key="ToolTip_Menu_View_ReadingMode">Checked while the editor is in Reading mode: a read-only view for reading conversations and following their branches, with every editing tool hidden. Click it to switch to Editing mode, or to switch back to Reading mode. If you have unsaved changes the editor asks what to do with them before switching to Reading mode.</sys:String>
     <sys:String x:Key="Menu_View_PrivacyMode">Hide private paths</sys:String>
@@ -2283,6 +2285,36 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="AutomationName_ModeBadge_Editing">Editing mode: changes can be made</sys:String>
     <sys:String x:Key="ToolTip_ModeBadge_Reading">You are in Reading mode: a read-only view where nothing can be changed or saved, so your game files and projects stay safe. Click to switch to Editing mode.</sys:String>
     <sys:String x:Key="ToolTip_ModeBadge_Editing">You are in Editing mode: the full editor, where conversations, projects and mods can be changed. Click to switch to Reading mode. If you have unsaved changes the editor asks what to do with them first.</sys:String>
+
+    <!-- Game State panel (issue 305): the assumed game state the condition verdicts are worked out under. -->
+    <sys:String x:Key="GameState_Explanation">Set what you assume about the game and the editor shows which conditions in this conversation would pass. Anything left unset stays unknown.</sys:String>
+    <sys:String x:Key="GameState_ClearAll">Clear all</sys:String>
+    <sys:String x:Key="GameState_Tip_ClearAll">Forgets every value you have set in this panel, so every condition goes back to "can't be told".</sys:String>
+    <sys:String x:Key="GameState_Heading_Globals">Global variables</sys:String>
+    <sys:String x:Key="GameState_Heading_Companions">Companions</sys:String>
+    <sys:String x:Key="GameState_Heading_PlayedNodes">Conversation nodes played</sys:String>
+    <sys:String x:Key="GameState_Heading_Quests">Quests</sys:String>
+    <sys:String x:Key="GameState_Heading_Combat">In combat</sys:String>
+    <sys:String x:Key="GameState_Tip_Global">The number you assume this global variable holds. Leave it empty, or type something that is not a whole number, to leave it unknown.</sys:String>
+    <sys:String x:Key="GameState_Tip_Companion">Whether you assume this companion is in the party. Choose Not set to leave it unknown.</sys:String>
+    <sys:String x:Key="GameState_Tip_PlayedNode">Whether you assume this conversation node has already been played. Choose Not set to leave it unknown.</sys:String>
+    <sys:String x:Key="GameState_Tip_Quest">The state you assume this quest is in. Choose Not set to leave it unknown.</sys:String>
+    <sys:String x:Key="GameState_Tip_Combat">Whether you assume the party is in combat when this conversation starts. Choose Not set to leave it unknown.</sys:String>
+    <sys:String x:Key="GameState_NoCompanions">No companions in party</sys:String>
+    <sys:String x:Key="GameState_Tip_NoCompanions">Check this to assume the player is alone: no companion is in the party at all. Conditions asking whether any companion is active then fail.</sys:String>
+    <sys:String x:Key="GameState_Combat_Label">Party is in combat</sys:String>
+    <sys:String x:Key="GameState_PlayedNode_Label">{0}, node {1}</sys:String>
+    <sys:String x:Key="GameState_Option_NotSet">Not set</sys:String>
+    <sys:String x:Key="GameState_Option_InParty">In party</sys:String>
+    <sys:String x:Key="GameState_Option_NotInParty">Not in party</sys:String>
+    <sys:String x:Key="GameState_Option_Played">Played</sys:String>
+    <sys:String x:Key="GameState_Option_NotPlayed">Not played</sys:String>
+    <sys:String x:Key="GameState_Option_Yes">Yes</sys:String>
+    <sys:String x:Key="GameState_Option_No">No</sys:String>
+    <sys:String x:Key="GameState_Option_QuestNotStarted">Not started</sys:String>
+    <sys:String x:Key="GameState_Option_QuestActive">Active</sys:String>
+    <sys:String x:Key="GameState_Option_QuestCompleted">Completed</sys:String>
+    <sys:String x:Key="GameState_Option_QuestFailed">Failed</sys:String>
 
     <!-- Game State panel (issue 305): summary line of the open conversation's conditions under the assumed state. -->
     <sys:String x:Key="GameState_Summary">In this conversation: {0}, {1}, {2}.</sys:String>

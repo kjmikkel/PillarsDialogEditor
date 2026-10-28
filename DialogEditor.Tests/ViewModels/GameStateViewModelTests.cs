@@ -216,4 +216,12 @@ public class GameStateViewModelTests
         vm.Load(Lists([Companion("guid-x")]), "poe2");
         Assert.Equal("Eder", vm.Companions[0].DisplayName);
     }
+
+    [Fact]
+    public void PlayedNodeRow_Label_NamesTheConversationAndTheNode()
+    {
+        var vm = Make((kind, id) => kind == "Conversation" ? "Hello Convo" : null);
+        vm.Load(Lists([Leaf("Boolean HasConversationNodeBeenPlayed(String, Int32)", "conv", "3")]), "poe2");
+        Assert.Equal("GameState_PlayedNode_Label", vm.PlayedNodes[0].Label);   // stub echoes the key
+    }
 }

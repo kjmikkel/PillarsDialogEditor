@@ -21,6 +21,7 @@ public sealed class EditorDockFactory : Factory
     public const string CanvasId          = "Canvas";
     public const string DetailsId         = "Details";
     public const string ConditionSearchId = "ConditionSearch";
+    public const string GameStateId       = "GameState";
     public const string DocumentsId       = "Documents";
 
     // The four leaf tool/document wrapper ids whose Inner VM is [JsonIgnore] — a deserialized
@@ -29,20 +30,23 @@ public sealed class EditorDockFactory : Factory
     // RestoreLayout before the layout is shown. Structural containers (LeftPane/RightPane/
     // Documents ToolDock/DocumentDock) deserialize fine as-is — they have parameterless
     // constructors and carry no live VM of their own.
-    private static readonly string[] WrapperIds = { BrowserId, CanvasId, DetailsId, ConditionSearchId };
+    private static readonly string[] WrapperIds = { BrowserId, CanvasId, DetailsId, ConditionSearchId, GameStateId };
 
     private readonly GameBrowserViewModel     _browser;
     private readonly ConversationViewModel    _canvas;
     private readonly NodeDetailViewModel      _details;
     private readonly ConditionSearchViewModel _search;
+    private readonly GameStateViewModel       _gameState;
 
     public IDocumentDock? DocumentDock { get; private set; }
 
     public EditorDockFactory(
         GameBrowserViewModel browser, ConversationViewModel canvas,
-        NodeDetailViewModel details, ConditionSearchViewModel search)
+        NodeDetailViewModel details, ConditionSearchViewModel search,
+        GameStateViewModel? gameState = null)
     {
         _browser = browser; _canvas = canvas; _details = details; _search = search;
+        _gameState = gameState ?? new GameStateViewModel(new DialogEditor.Core.Conditions.GameState(), (_, _) => null);
 
         // Closing a tool tab (the little X) defaults to Dock.Model's RemoveDockable,
         // which drops the dockable from the tree entirely with no way back short of
@@ -83,13 +87,14 @@ public sealed class EditorDockFactory : Factory
 
         var detailsTool = new DetailsTool(_details);
         var searchTool  = new ConditionSearchTool(_search);
+        var gameStateTool = new GameStateTool(_gameState);
         var rightDock = new ToolDock
         {
             Id = "RightPane",
             Proportion = 0.24,
             Alignment = Alignment.Right,
             ActiveDockable = detailsTool,
-            VisibleDockables = CreateList<IDockable>(detailsTool, searchTool),
+            VisibleDockables = CreateList<IDockable>(detailsTool, searchTool, gameStateTool),
         };
 
         var main = new ProportionalDock
@@ -157,8 +162,26 @@ public sealed class EditorDockFactory : Factory
         if (RestoreDockable(id) is { } byId && IsInVisibleDock(root, byId))
             return byId;
 
+        // A layout saved before a tool existed has no such dockable at all (neither visible nor hidden):
+        // add a fresh one to its default home instead of leaving the View menu item dead.
+        if (AddMissingTool(root, id) is { } added)
+            return added;
+
         AppLog.Warn($"EditorDockFactory: could not show dock tool '{id}' (not open, and restoring it failed).");
         return null;
+    }
+
+    /// Adds a brand-new tool to its default dock when an older saved layout lacks it entirely
+    /// (issue 305: Game State). Only tools introduced after layouts were first saved qualify.
+    private IDockable? AddMissingTool(IRootDock root, string id)
+    {
+        if (id != GameStateId) return null;
+        if (DockableLocator is null || !DockableLocator.TryGetValue(id, out var make) || make() is not { } tool)
+            return null;
+        if (FindDockable(root, d => d.Id == DefaultHomeId(id)) is not IDock home)
+            return null;
+        AddDockable(home, tool);
+        return IsInVisibleDock(root, tool) ? tool : null;
     }
 
     private static bool IsInVisibleDock(IDockable root, IDockable tool)
@@ -193,6 +216,7 @@ public sealed class EditorDockFactory : Factory
             [CanvasId]          = () => _canvas,
             [DetailsId]         = () => _details,
             [ConditionSearchId] = () => _search,
+            [GameStateId]       = () => _gameState,
         };
         // DockableLocator hands back a FRESH, live-wired wrapper instance per id — this is
         // what RestoreLayout uses (see below) to replace deserialized wrapper instances whose
@@ -203,6 +227,7 @@ public sealed class EditorDockFactory : Factory
             [CanvasId]          = () => new CanvasDocument(_canvas),
             [DetailsId]         = () => new DetailsTool(_details),
             [ConditionSearchId] = () => new ConditionSearchTool(_search),
+            [GameStateId]       = () => new GameStateTool(_gameState),
             [DocumentsId]       = () => DocumentDock,
         };
         HostWindowLocator = new Dictionary<string, Func<IHostWindow?>>

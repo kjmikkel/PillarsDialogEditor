@@ -1,4 +1,4 @@
-using Dock.Model.Controls;
+﻿using Dock.Model.Controls;
 using Dock.Model.Core;
 using DialogEditor.Avalonia.Docking;
 using DialogEditor.Tests.Helpers;
@@ -46,5 +46,44 @@ public class EditorDockFactoryTests
         var ids = rightDock.VisibleDockables!.Select(x => x.Id).ToList();
         Assert.Contains("Details", ids);
         Assert.Contains("ConditionSearch", ids);   // tabbed together
+    }
+
+    [Fact]
+    public void CreateLayout_RightToolDock_IncludesGameState()
+    {
+        var root = MakeFactory().CreateLayout();
+        var rightDock = Descendants(root).OfType<IToolDock>().First(td => td.Id == "RightPane");
+        Assert.Contains("GameState", rightDock.VisibleDockables!.Select(x => x.Id));
+    }
+
+    // Review focus 1: a layout.json saved before the Game State tool existed has no such dockable;
+    // View > Game State must still add it to the right pane and show it.
+    [Fact]
+    public void ShowGameState_WithLayoutLackingTheTool_AddsItToTheRightPane()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"layout-{Guid.NewGuid():N}.json");
+        try
+        {
+            var first = MakeFactory();
+            var layout = first.CreateLayout();
+            first.InitLayout(layout);
+            // Simulate an old save: the tool is gone from the tree entirely.
+            var tool = first.FindDockable(layout, d => d.Id == EditorDockFactory.GameStateId)!;
+            ((IDock)tool.Owner!).VisibleDockables!.Remove(tool);
+            new DockLayoutStore().Save(layout, path);
+
+            var second = MakeFactory();
+            var restored = new DockLayoutStore().Load(path)!;
+            second.RestoreLayout(restored);
+            Assert.Null(second.FindDockable(restored, d => d.Id == EditorDockFactory.GameStateId));
+
+            var shown = second.ShowTool(restored, EditorDockFactory.GameStateId);
+
+            Assert.NotNull(shown);
+            var rightDock = Descendants(restored).OfType<IToolDock>().First(td => td.Id == "RightPane");
+            Assert.Contains(rightDock.VisibleDockables!, d => d.Id == EditorDockFactory.GameStateId);
+            Assert.NotNull(((DialogEditor.Avalonia.Docking.GameStateTool)shown!).Inner);
+        }
+        finally { try { File.Delete(path); } catch (Exception) { /* best-effort */ } }
     }
 }
