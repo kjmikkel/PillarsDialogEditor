@@ -2008,8 +2008,10 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="NodeDetail_VoFoundWithFem">✓ found · M+F</sys:String>
     <sys:String x:Key="NodeDetail_VoMissing">✗ missing</sys:String>
     <sys:String x:Key="NodeDetail_NoneShort">—</sys:String>
-    <sys:String x:Key="NodeDetail_ConditionsWord">conditions</sys:String>
-    <sys:String x:Key="NodeDetail_ScriptsWord">scripts</sys:String>
+    <sys:String x:Key="NodeDetail_ConditionsCount_One">1 condition</sys:String>
+    <sys:String x:Key="NodeDetail_ConditionsCount_Other">{0} conditions</sys:String>
+    <sys:String x:Key="NodeDetail_ScriptsCount_One">1 script</sys:String>
+    <sys:String x:Key="NodeDetail_ScriptsCount_Other">{0} scripts</sys:String>
     <sys:String x:Key="NodeDetail_NotesCount_One">1 note</sys:String>
     <sys:String x:Key="NodeDetail_NotesCount_Other">{0} notes</sys:String>
     <sys:String x:Key="ToolTip_GroupExpander">Expand or collapse this section. The open/closed state is remembered while the app runs.</sys:String>

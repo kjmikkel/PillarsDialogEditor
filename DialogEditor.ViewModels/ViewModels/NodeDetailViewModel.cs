@@ -815,12 +815,12 @@ public partial class NodeDetailViewModel : ObservableObject
         _                                                       => Loc.Get("NodeDetail_VoMissing"),
     };
 
-    /// e.g. "2 conditions · 1 script" (words are localised fragments).
+    /// e.g. "2 conditions · 1 script", each count plural-aware (issue 264: "1 conditions").
     public string LogicSummary => _node is null
         ? string.Empty
-        : $"{_node.Conditions.Count} {Loc.Get("NodeDetail_ConditionsWord")}"
+        : Loc.FormatCount("NodeDetail_ConditionsCount", _node.Conditions.Count)
           + Loc.Get("NodeDetail_HeaderSeparator")
-          + $"{_node.Scripts.Count} {Loc.Get("NodeDetail_ScriptsWord")}";
+          + Loc.FormatCount("NodeDetail_ScriptsCount", _node.Scripts.Count);
 
     /// e.g. "1 note(s)" counting non-empty comment + translator note, "—" when none.
     public string NotesSummary
