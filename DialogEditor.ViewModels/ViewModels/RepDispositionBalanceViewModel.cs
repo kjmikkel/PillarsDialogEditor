@@ -20,6 +20,12 @@ public sealed class BalanceRowViewModel
     public BalanceFlag Flag         { get; }
     public bool        IsUnresolved { get; }
 
+    /// What a screen reader says for the row (issue 325); without it the list item fell back to
+    /// this class's type name.
+    public string AutomationName => FlagLabel.Length == 0
+        ? Loc.Format("RepBalance_RowAutomationName", DisplayValue, Count, ShareText)
+        : Loc.Format("RepBalance_RowAutomationNameFlagged", DisplayValue, Count, ShareText, FlagLabel);
+
     public BalanceRowViewModel(BalanceRow row)
     {
         DisplayValue = row.DisplayValue;

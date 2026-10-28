@@ -35,6 +35,11 @@
         <Style Selector="ListBoxItem:selected TextBlock.balance-flag">
             <Setter Property="Foreground" Value="{DynamicResource Brush.Selection.Foreground}"/>
         </Style>
+        <!-- Issue 325: a row's UIA name otherwise falls back to the item's type name
+             ("DialogEditor.ViewModels.BalanceRowViewModel"), which a screen reader reads aloud. -->
+        <Style Selector="ListBoxItem">
+            <Setter Property="AutomationProperties.Name" Value="{Binding AutomationName}"/>
+        </Style>
     </Window.Styles>
 
     <Grid RowDefinitions="Auto,*,Auto" Margin="14,12,14,12">

@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using DialogEditor.Core.Text;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
 using DialogEditor.ViewModels.Services;
@@ -56,15 +57,20 @@ public partial class SpeakerLineBrowserWindow : Window
     private void RefreshResults()
     {
         if (_vm is null) return;
-        ResultsList.ItemsSource = _vm.Rows.Select(r => new DisplayRow(
-            r,
-            Loc.Get(r.Origin switch
+        ResultsList.ItemsSource = _vm.Rows.Select(r =>
+        {
+            var origin = Loc.Get(r.Origin switch
             {
                 LineOrigin.New    => "SpeakerLines_Origin_New",
                 LineOrigin.Edited => "SpeakerLines_Origin_Edited",
                 _                 => "SpeakerLines_Origin_Vanilla",
-            }),
-            NodeLabelFor(r))).ToList();
+            });
+            var node = NodeLabelFor(r);
+            // Plain text: the markup is rendered on screen, but would be read out as tags.
+            var name = Loc.Format("SpeakerLines_RowAutomationName",
+                TextMarkup.Strip(r.LineText), r.ConversationName, node, origin);
+            return new DisplayRow(r, origin, node, name);
+        }).ToList();
     }
 
     private static string NodeLabelFor(SpeakerLineRow r)
@@ -92,6 +98,7 @@ public partial class SpeakerLineBrowserWindow : Window
         }
     }
 
-    // Wraps a SpeakerLineRow with its pre-resolved origin badge and node/variant label.
-    private sealed record DisplayRow(SpeakerLineRow Row, string OriginLabel, string NodeLabel);
+    // Wraps a SpeakerLineRow with its pre-resolved origin badge, node/variant label and the name a
+    // screen reader says for the row (issue 325: the record's ToString() before).
+    private sealed record DisplayRow(SpeakerLineRow Row, string OriginLabel, string NodeLabel, string AutomationName);
 }

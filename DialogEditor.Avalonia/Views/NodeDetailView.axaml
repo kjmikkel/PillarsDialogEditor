@@ -46,6 +46,13 @@
             <Setter Property="Padding" Value="4"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
         </Style>
+        <!-- Issue 325: the header is a templated ToggleButton whose content is a Grid, so its UIA
+             name fell back to "Avalonia.Controls.Grid". Give it the section title the Expander
+             already carries. -->
+        <Style Selector="Expander.detail-group /template/ ToggleButton">
+            <Setter Property="AutomationProperties.Name"
+                    Value="{Binding $parent[Expander].(AutomationProperties.Name)}"/>
+        </Style>
     </UserControl.Styles>
 
     <Grid>
