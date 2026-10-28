@@ -17,6 +17,9 @@
              Avalonia's XAML compiler in this version rejects xmlns declarations on
              non-root elements (AXN0002), which the element form requires. -->
         <StyleInclude Source="avares://Dock.Avalonia.Themes.Fluent/DockFluentTheme.axaml"/>
+        <!-- Dock tabs whose UIA help text isn't a state dump (GitHub issue 264, F-10). After the
+             Dock theme: these templates replace its DocumentControl and ToolControl ones. -->
+        <StyleInclude Source="avares://DialogEditor.Avalonia/Docking/DockTabTemplates.axaml"/>
 
         <!-- Selected ListBox rows use the tested Brush.Selection.* pair, not Fluent's accent
              brushes (issue #94). After FluentTheme so it overrides the stock selection. -->
