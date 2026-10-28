@@ -2203,6 +2203,9 @@ public partial class MainWindowViewModel : ObservableObject
     private async Task ExportForTranslation()
     {
         if (_project is null) return;
+        // The export reads the project as last saved, so ask about the canvas's unsaved edits
+        // first, or it would silently leave them out (issue 326).
+        if (!await EnsureNoUnsavedEditsAsync() || _project is null) return;
         var fmt = ParseFormat(AppSettings.DefaultLocalizationFormat);
         var ext = FormatExtension(fmt);
         var allTypes = new (string, string)[] { (".csv", "CSV"), (".json", "JSON"), (".xlf", "XLIFF") };
