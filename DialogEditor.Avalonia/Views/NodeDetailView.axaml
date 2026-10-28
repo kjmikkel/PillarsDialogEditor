@@ -1,4 +1,4 @@
-﻿<UserControl xmlns="https://github.com/avaloniaui"
+<UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:DialogEditor.ViewModels;assembly=DialogEditor.ViewModels"
              xmlns:types="clr-namespace:DialogEditor.ViewModels.Services;assembly=DialogEditor.ViewModels"
@@ -309,8 +309,7 @@
                                                    IsVisible="{Binding ShowConditionVerdict}"
                                                    FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap" Margin="0,3,0,0"
                                                    ToolTip.Tip="{DynamicResource ToolTip_ConditionVerdict}"
-                                                   AutomationProperties.HelpText="{DynamicResource ToolTip_ConditionVerdict}"
-                                                   AutomationProperties.Name="{DynamicResource AutomationName_ConditionVerdict}"/>
+                                                   AutomationProperties.HelpText="{DynamicResource ToolTip_ConditionVerdict}"/>
                                     </StackPanel>
                                 </Grid>
                             </Border>
@@ -711,8 +710,7 @@
                            IsVisible="{Binding ShowConditionVerdict}"
                            FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap" Margin="0,2,0,0"
                            ToolTip.Tip="{DynamicResource ToolTip_ConditionVerdict}"
-                           AutomationProperties.HelpText="{DynamicResource ToolTip_ConditionVerdict}"
-                           AutomationProperties.Name="{DynamicResource AutomationName_ConditionVerdict}"/>
+                           AutomationProperties.HelpText="{DynamicResource ToolTip_ConditionVerdict}"/>
                     </StackPanel>
                 </Expander>
 

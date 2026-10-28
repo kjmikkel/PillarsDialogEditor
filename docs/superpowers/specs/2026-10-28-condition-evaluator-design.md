@@ -132,8 +132,9 @@ GUIDs and conversation keys compare case-insensitively.
 ## 5. Game State panel
 
 A new dock tool, **Game State** (Id `"GameState"`, the value is persisted in layout.json and must never change),
-tabbed in the right pane beside Node Details and Condition search, opened from **View ▸ Game State**. Saved
-layouts from before this change lack it; the View menu command must still bring it up in the right pane.
+tabbed in the **left** pane beside Conversations, opened from **View ▸ Game State**. Saved layouts from before this
+change lack it; the View menu command must still bring it up in the left pane. _(My call, changed after the GUI
+check: tabbed with Node Details, the writer could not see the verdict while setting the state.)_
 
 Content, for the open conversation (rebuilt when the conversation changes or its conditions are edited):
 - a one-line explanation and a **Clear all** button;
@@ -142,7 +143,7 @@ Content, for the open conversation (rebuilt when the conversation changes or its
   back to the GUID; a three-way choice: In party / Not in party / Not set), **Conversation nodes played**
   (conversation + node; Played / Not played / Not set), **Quests** (name lookup; Not set / Not started / Active /
   Completed / Failed), **In combat** (Yes / No / Not set);
-- a summary line: "In this conversation, n conditions pass, n fail, n can't tell" (node and link condition
+- a summary line: "In this conversation: n conditions pass, n fail, n unknown" (node and link condition
   lists that are non-empty).
 
 The state lives on the main view model for the session and is shared across conversations (globals are

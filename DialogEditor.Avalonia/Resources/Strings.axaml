@@ -2323,14 +2323,13 @@ Remove it from the recent list?</sys:String>
     <sys:String x:Key="GameState_SummaryPass_Other">{0} conditions pass</sys:String>
     <sys:String x:Key="GameState_SummaryFail_One">{0} fails</sys:String>
     <sys:String x:Key="GameState_SummaryFail_Other">{0} fail</sys:String>
-    <sys:String x:Key="GameState_SummaryUnknown_One">{0} can't be told</sys:String>
-    <sys:String x:Key="GameState_SummaryUnknown_Other">{0} can't be told</sys:String>
+    <sys:String x:Key="GameState_SummaryUnknown_One">{0} unknown</sys:String>
+    <sys:String x:Key="GameState_SummaryUnknown_Other">{0} unknown</sys:String>
 
     <!-- Node Details verdict (issue 305): condition result under the assumed game state. -->
     <sys:String x:Key="NodeDetail_Verdict_Passes">With the assumed game state: passes</sys:String>
     <sys:String x:Key="NodeDetail_Verdict_Fails">With the assumed game state: fails</sys:String>
     <sys:String x:Key="NodeDetail_Verdict_Unknown">With the assumed game state: can't tell</sys:String>
     <sys:String x:Key="ToolTip_ConditionVerdict">Whether these conditions would be met, judged against the game state you assumed in View &gt; Game State. "Can't tell" means a fact they depend on is not set there, or a condition type the editor cannot evaluate yet.</sys:String>
-    <sys:String x:Key="AutomationName_ConditionVerdict">Condition result under the assumed game state</sys:String>
 
 </ResourceDictionary>

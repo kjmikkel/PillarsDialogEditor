@@ -76,25 +76,27 @@ public sealed class EditorDockFactory : Factory
         DocumentDock = documentDock;
 
         var browserTool = new BrowserTool(_browser);
+        // Game State sits with Conversations, not with Node Details: the writer sets the assumed
+        // state and reads the verdict in Node Details at the same time (issue 305).
+        var gameStateTool = new GameStateTool(_gameState);
         var leftDock = new ToolDock
         {
             Id = "LeftPane",
             Proportion = 0.18,
             Alignment = Alignment.Left,
             ActiveDockable = browserTool,
-            VisibleDockables = CreateList<IDockable>(browserTool),
+            VisibleDockables = CreateList<IDockable>(browserTool, gameStateTool),
         };
 
         var detailsTool = new DetailsTool(_details);
         var searchTool  = new ConditionSearchTool(_search);
-        var gameStateTool = new GameStateTool(_gameState);
         var rightDock = new ToolDock
         {
             Id = "RightPane",
             Proportion = 0.24,
             Alignment = Alignment.Right,
             ActiveDockable = detailsTool,
-            VisibleDockables = CreateList<IDockable>(detailsTool, searchTool, gameStateTool),
+            VisibleDockables = CreateList<IDockable>(detailsTool, searchTool),
         };
 
         var main = new ProportionalDock
@@ -144,7 +146,7 @@ public sealed class EditorDockFactory : Factory
 
     private static string DefaultHomeId(string toolId) => toolId switch
     {
-        BrowserId => "LeftPane",
+        BrowserId or GameStateId => "LeftPane",
         CanvasId  => DocumentsId,
         _         => "RightPane",   // Details and Condition search
     };

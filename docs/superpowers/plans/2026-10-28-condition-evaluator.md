@@ -1,6 +1,6 @@
 # Condition evaluator and Game State panel — Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Decide true / false / can't tell for a condition list against an assumed game state, let the writer set
 that state in a Game State dock tool, and show the verdict in Node Details.
@@ -29,7 +29,7 @@ holds one session-wide `GameState`; Node Details and the new dock tool read it.
 ## Review Focus
 
 1. A conversation whose saved layout.json predates this change: View ▸ Game State must still open the tool in
-   the right pane (Task 5 test `ShowGameState_WithLayoutLackingTheTool_AddsItToTheRightPane`).
+   the left pane (Task 5 test `ShowGameState_WithLayoutLackingTheTool_AddsItToTheLeftPane`).
 2. A global box holding non-numeric text or an empty string: treated as "not set", never throws
    (Task 3 test `GlobalRow_NonNumericText_LeavesTheFactUnset`).
 3. Operator strings drifting from the enum (`Equals`, lower case `and`): `Equals` = `EqualTo`; And/Or compared
@@ -64,7 +64,7 @@ holds one session-wide `GameState`; Node Details and the new dock tool read it.
     string gameId); }` plus an internal seam `Func<ConditionLeaf, GameState, Truth> LeafEvaluator` defaulting to
     Task 2's table (Task 1 tests inject a stub keyed by `FullName`).
 
-- [ ] **Step 1: Write failing fold tests** — `ConditionFoldTests`:
+- [x] **Step 1: Write failing fold tests** — `ConditionFoldTests`:
   - `Poe2_AndThenFalse_ReturnsFalse`: `[(true,And),(false,…)]` → false.
   - `Poe2_SingleTrue_ReturnsTrue`; empty handled by evaluator not fold.
   - `Poe1AndPoe2_Disagree_OnAOrBAndC`: components A=false(Or), B=true(And), C=false(last). PoE2: i=0 next=Or,
@@ -72,10 +72,10 @@ holds one session-wide `GameState`; Node Details and the new dock tool read it.
     continue; i=1 middle prev=Or, r=true → **true**. Assert Poe1 true, Poe2 false.
   - `Poe2_TrueOrAnything_ShortCircuitsTrue`: `[(true,Or),(false,And),(false,…)]` → true.
   - `Poe1_Middle_AndFalse_ReturnsFalse`: `[(true,And),(false,Or),(true,…)]` → false.
-- [ ] **Step 2: Run, verify FAIL** — `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~ConditionFold"`.
-- [ ] **Step 3: Implement `ConditionFold`** transcribing spec §2 exactly (keep the decompiled shape; add a comment
+- [x] **Step 2: Run, verify FAIL** — `dotnet test DialogEditor.Tests --filter "FullyQualifiedName~ConditionFold"`.
+- [x] **Step 3: Implement `ConditionFold`** transcribing spec §2 exactly (keep the decompiled shape; add a comment
   naming the game method each mirrors).
-- [ ] **Step 4: Write failing evaluator tests** — `ConditionEvaluatorTests` (stub leaf evaluator by name: `T()`
+- [x] **Step 4: Write failing evaluator tests** — `ConditionEvaluatorTests` (stub leaf evaluator by name: `T()`
   True, `F()` False, `U()` Unknown, `U2()` a second independent Unknown):
   - `EmptyList_IsTrue`.
   - `NotOnLeaf_FlipsTrueAndFalse_LeavesUnknown`.
@@ -92,12 +92,12 @@ holds one session-wide `GameState`; Node Details and the new dock tool read it.
     are evaluated once each, enumeration is over cached values).
   - `Poe1GameId_UsesPoe1Fold`: the A/B/C list from Step 1 with stub values → True for "poe1", False for "poe2".
   - Unknown gameId (`""`) → use Poe2 fold _(decision)_.
-- [ ] **Step 5: Run, verify FAIL.**
-- [ ] **Step 6: Implement `ConditionEvaluator.Evaluate`**: evaluate each distinct leaf once (apply `Not` after),
+- [x] **Step 5: Run, verify FAIL.**
+- [x] **Step 6: Implement `ConditionEvaluator.Evaluate`**: evaluate each distinct leaf once (apply `Not` after),
   collect distinct Unknown variables; if >12 → Unknown; else for each assignment mask build bool results bottom-up
   (branch = fold of its components using the branch's components' operators; a branch component's own
   `Operator` links it to its next sibling) and fold; all true → True, all false → False, else Unknown.
-- [ ] **Step 7: Run, verify PASS; commit** `feat(core): condition folds and three-valued evaluator (#305)`.
+- [x] **Step 7: Run, verify PASS; commit** `feat(core): condition folds and three-valued evaluator (#305)`.
 
 ### Task 2: Supported functions and fact collection
 
@@ -119,12 +119,12 @@ holds one session-wide `GameState`; Node Details and the new dock tool read it.
     — distinct, first-seen order, recursing branches; `CompareGlobals` yields both globals.
   - `ConditionEvaluator`'s default leaf evaluator becomes `SupportedConditions.Evaluate`.
 
-- [ ] **Step 0: Confirm game semantics** in the decompiled code (paths in the `decompiled-game-code-locations`
+- [x] **Step 0: Confirm game semantics** in the decompiled code (paths in the `decompiled-game-code-locations`
   memory / `.trail` learnings): `GlobalVariables.m_data` comparer (both games), and `QuestManager.IsQuestActive /
   IsQuestCompleted / IsQuestFailed / HasQuestStarted` (both games). Adjust the spec §3 mapping if the game
   differs, and note what you found in the spec under §3 (one line each). If a function's meaning can't be
   settled, leave it unsupported.
-- [ ] **Step 1: Failing tests** — one per row of spec §3, e.g.:
+- [x] **Step 1: Failing tests** — one per row of spec §3, e.g.:
   - `IsGlobalValue_EqualTo_MatchesSetValue` (`["g","EqualTo","2"]`, Globals g=2 → True; g=3 → False).
   - `IsGlobalValue_Unset_IsUnknown`; `IsGlobalValue_EqualsAlias_TreatedAsEqualTo`;
     `IsGlobalValue_BadOperator_IsUnknown`; `IsGlobalValue_NonIntValue_IsUnknown`;
@@ -138,10 +138,10 @@ holds one session-wide `GameState`; Node Details and the new dock tool read it.
   - `UnsupportedFunction_IsUnknown` (`Boolean IsSkillValue(Guid, Guid, Operator, Int32)`).
   - `ConditionFactsTests`: `Collect_RecursesBranches_DistinctInOrder`, `Collect_CompareGlobals_YieldsBoth`,
     `Collect_IgnoresUnsupported`, `Collect_IsInCombat_YieldsOneFact`.
-- [ ] **Step 2: Run, verify FAIL.**
-- [ ] **Step 3: Implement** as a `Dictionary<string, Func<IReadOnlyList<string>, GameState, Truth>>`
+- [x] **Step 2: Run, verify FAIL.**
+- [x] **Step 3: Implement** as a `Dictionary<string, Func<IReadOnlyList<string>, GameState, Truth>>`
   (OrdinalIgnoreCase); a wrong parameter count → Unknown.
-- [ ] **Step 4: Run, verify PASS; commit** `feat(core): supported condition functions and fact collection (#305)`.
+- [x] **Step 4: Run, verify PASS; commit** `feat(core): supported condition functions and fact collection (#305)`.
 
 ### Task 3: GameStateViewModel
 
@@ -166,7 +166,7 @@ holds one session-wide `GameState`; Node Details and the new dock tool read it.
   - `public enum TriState { NotSet, Yes, No }`.
   - Editing a row writes straight into `State` and calls `State.NotifyChanged()`; Summary recomputes on Changed.
 
-- [ ] **Step 1: Failing tests**:
+- [x] **Step 1: Failing tests**:
   - `Load_BuildsRowsForTestedFactsOnly` (a list with IsGlobalValue g, IsCompanionActiveInParty X → one global row,
     one companion row, no quest rows, `HasQuests == false`).
   - `GlobalRow_SetText_WritesState`; `GlobalRow_EmptyText_RemovesFact`;
@@ -176,10 +176,10 @@ holds one session-wide `GameState`; Node Details and the new dock tool read it.
   - `SwitchingConversation_KeepsEarlierValues` (set g=1, Load another list without g, Load back → row shows "1").
   - `Summary_CountsPassFailUnknown` — exact text from resources with `Loc.FormatCount` pluralisation.
   - `DisplayName_FallsBackToGuid` when lookup returns null.
-- [ ] **Step 2: Run, verify FAIL.**
-- [ ] **Step 3: Implement.** Wire into `MainWindowViewModel` (find the conversation-selected path; note the trail
+- [x] **Step 2: Run, verify FAIL.**
+- [x] **Step 3: Implement.** Wire into `MainWindowViewModel` (find the conversation-selected path; note the trail
   learning: `conversation` there may be the game file before project edits — use the canvas/edited conditions).
-- [ ] **Step 4: Run all headless tests, verify PASS; commit** `feat: Game State view model (#305)`.
+- [x] **Step 4: Run all headless tests, verify PASS; commit** `feat: Game State view model (#305)`.
 
 ### Task 4: Verdict in Node Details
 
@@ -193,14 +193,14 @@ holds one session-wide `GameState`; Node Details and the new dock tool read it.
 - Produces: on `NodeDetailViewModel`: `bool ShowConditionVerdict`, `string ConditionVerdictText`,
   `Truth ConditionVerdict`; on each outgoing-link row with conditions: the same three properties.
 
-- [ ] **Step 1: Failing tests**: `NoFactsSet_HidesVerdict`; `FactSet_NodeConditionsPass_ShowsPasses`;
+- [x] **Step 1: Failing tests**: `NoFactsSet_HidesVerdict`; `FactSet_NodeConditionsPass_ShowsPasses`;
   `Fails`, `CantTell` texts; `LinkWithConditions_ShowsItsOwnVerdict`; `StateChanged_UpdatesVerdictLive`;
   `NodeWithoutConditions_HidesVerdict`.
-- [ ] **Step 2: Run, verify FAIL.**
-- [ ] **Step 3: Implement**; in XAML a `TextBlock` under the conditions summary and in each link row, bound to
+- [x] **Step 2: Run, verify FAIL.**
+- [x] **Step 3: Implement**; in XAML a `TextBlock` under the conditions summary and in each link row, bound to
   the properties, using existing success/warning/muted brushes, with a ToolTip resource explaining "from View ▸
   Game State". Unsubscribe from `State.Changed` when appropriate (no leaks across Loads).
-- [ ] **Step 4: Run, verify PASS; commit** `feat: Node Details shows the condition verdict (#305)`.
+- [x] **Step 4: Run, verify PASS; commit** `feat: Node Details shows the condition verdict (#305)`.
 
 ### Task 5: Game State dock tool and view
 
@@ -208,7 +208,7 @@ holds one session-wide `GameState`; Node Details and the new dock tool read it.
 - Create: `DialogEditor.Avalonia/Docking/GameStateTool.cs` (copy `ConditionSearchTool` pattern),
   `DialogEditor.Avalonia/Views/GameStateView.axaml(.cs)`
 - Modify: `DialogEditor.Avalonia/Docking/EditorDockFactory.cs` (`GameStateId = "GameState"`, add to
-  `WrapperIds`, right pane tabbed after Condition search, InitLayout locator), `MainWindow.axaml(.cs)` (View ▸
+  `WrapperIds`, left pane tabbed after Conversations, InitLayout locator), `MainWindow.axaml(.cs)` (View ▸
   Game State → `ShowToolById(EditorDockFactory.GameStateId)`), the view's DataTemplate registration (follow how
   ConditionSearchTool maps to ConditionSearchView), UI strings.
 - Test: `DialogEditor.Tests/Docking/EditorDockFactoryTests.cs` (extend), `DialogEditor.Tests/Views/GameStateViewTests.cs`
@@ -216,21 +216,21 @@ holds one session-wide `GameState`; Node Details and the new dock tool read it.
 **Interfaces:**
 - Consumes: `GameStateViewModel` (Task 3), `MainWindowViewModel.GameState`.
 
-- [ ] **Step 1: Failing tests**:
+- [x] **Step 1: Failing tests**:
   - `CreateLayout_RightToolDock_IncludesGameState`.
   - `ShowGameState_WithLayoutLackingTheTool_AddsItToTheRightPane` (restore a layout JSON without the tool, then the
     View command path; assert the tool is visible in RightPane).
   - Headless view test: `GameStateView_EveryInteractiveControlHasATooltip` and `…HasAnAutomationName`;
     `GameStateView_HidesEmptySections`.
-- [ ] **Step 2: Run, verify FAIL.**
-- [ ] **Step 3: Implement.** View: explanation line, Clear all button, sections (ItemsControl per collection;
+- [x] **Step 2: Run, verify FAIL.**
+- [x] **Step 3: Implement.** View: explanation line, Clear all button, sections (ItemsControl per collection;
   global = name label + TextBox; tri-state = ComboBox with localised options), summary line. Scrollable.
-- [ ] **Step 4: Run all headless tests, verify PASS; commit** `feat: Game State dock tool (#305)`.
+- [x] **Step 4: Run all headless tests, verify PASS; commit** `feat: Game State dock tool (#305)`.
 
 ### Task 6: Verification in the real app (orchestrator)
 
-- [ ] Run `dotnet test DialogEditor.Tests --filter "Category!=Gui"` and `--filter "Category=Gui"`.
-- [ ] Launch with the `running-the-app` skill, open the canonical PoE2 fixture conversation, open View ▸ Game
+- [x] Run `dotnet test DialogEditor.Tests --filter "Category!=Gui"` and `--filter "Category=Gui"`.
+- [x] Launch with the `running-the-app` skill, open the canonical PoE2 fixture conversation, open View ▸ Game
   State, set a global and a companion, select a conditioned node, screenshot the verdict changing.
-- [ ] Update spec/plan checkboxes, `trail note` for anything that took digging, open the PR, file the §8
+- [x] Update spec/plan checkboxes, `trail note` for anything that took digging, open the PR, file the §8
   follow-ups as issues (search first), write the Handoff section.

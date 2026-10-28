@@ -1,4 +1,4 @@
-﻿using Dock.Model.Controls;
+using Dock.Model.Controls;
 using Dock.Model.Core;
 using DialogEditor.Avalonia.Docking;
 using DialogEditor.Tests.Helpers;
@@ -49,17 +49,17 @@ public class EditorDockFactoryTests
     }
 
     [Fact]
-    public void CreateLayout_RightToolDock_IncludesGameState()
+    public void CreateLayout_LeftToolDock_IncludesGameState()
     {
         var root = MakeFactory().CreateLayout();
-        var rightDock = Descendants(root).OfType<IToolDock>().First(td => td.Id == "RightPane");
-        Assert.Contains("GameState", rightDock.VisibleDockables!.Select(x => x.Id));
+        var homeDock = Descendants(root).OfType<IToolDock>().First(td => td.Id == "LeftPane");
+        Assert.Contains("GameState", homeDock.VisibleDockables!.Select(x => x.Id));
     }
 
     // Review focus 1: a layout.json saved before the Game State tool existed has no such dockable;
     // View > Game State must still add it to the right pane and show it.
     [Fact]
-    public void ShowGameState_WithLayoutLackingTheTool_AddsItToTheRightPane()
+    public void ShowGameState_WithLayoutLackingTheTool_AddsItToTheLeftPane()
     {
         var path = Path.Combine(Path.GetTempPath(), $"layout-{Guid.NewGuid():N}.json");
         try
@@ -80,8 +80,8 @@ public class EditorDockFactoryTests
             var shown = second.ShowTool(restored, EditorDockFactory.GameStateId);
 
             Assert.NotNull(shown);
-            var rightDock = Descendants(restored).OfType<IToolDock>().First(td => td.Id == "RightPane");
-            Assert.Contains(rightDock.VisibleDockables!, d => d.Id == EditorDockFactory.GameStateId);
+            var homeDock = Descendants(restored).OfType<IToolDock>().First(td => td.Id == "LeftPane");
+            Assert.Contains(homeDock.VisibleDockables!, d => d.Id == EditorDockFactory.GameStateId);
             Assert.NotNull(((DialogEditor.Avalonia.Docking.GameStateTool)shown!).Inner);
         }
         finally { try { File.Delete(path); } catch (Exception) { /* best-effort */ } }
