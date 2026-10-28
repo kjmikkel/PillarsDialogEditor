@@ -101,11 +101,19 @@ learning on #266). Anything else → Unknown. A parameter that should be an int 
 Quest status is one of NotStarted / Active / Completed / Failed _(my call: the editor's simplified model)_:
 - `HasQuestStarted`: true for Active, Completed, Failed;
 - `IsQuestActive`: Active only; `IsQuestCompleted`: Completed only; `IsQuestFailed`: Failed only.
-The builder should check the decompiled `QuestManager` for each of these and narrow the mapping (or drop a
-function to unsupported) where the game's meaning differs.
+Checked against the decompiled `QuestManager` (PoE2; PoE1 keys quests by path name and only exposes
+`IsQuestFailed` as a condition):
+- `HasQuestStarted` -> `Quest.IsStarted()` (state 0 visited): matches "Active, Completed, Failed".
+- `IsQuestActive` -> `ActiveQuests.ContainsKey`; a quest is removed when it ends
+  (`Quest.DetermineIfQuestHasEnded` -> `EndQuest` when `IsComplete()`). Active -> True; NotStarted and Completed
+  -> False. **Changed:** `Failed` -> Unknown, because it is unverified whether a failed quest also leaves `ActiveQuests`.
+- `IsQuestCompleted` -> `IsComplete() && !IsQuestFailed()`: Completed only, as mapped.
+- `IsQuestFailed` -> `QuestTrackers[id].Failed`: Failed only, as mapped.
 
-Keys: global names compare case-insensitively _(my call; the builder confirms against
-`GlobalVariables`' dictionary comparer and uses ordinal if the game does)_. GUIDs compare case-insensitively.
+Keys: **global names compare case-sensitively** (ordinal). **Changed from the draft:** `GlobalVariables.m_data` is a
+default-comparer `Dictionary<string,int>` in PoE2 and a default `Hashtable` in PoE1, so `g` and `G` are different
+variables. (An unset global reads -1 in-game, but a global the writer has not set stays "not set" -> Unknown here.)
+GUIDs and conversation keys compare case-insensitively.
 
 ## 4. Core API (`DialogEditor.Core/Conditions/`)
 

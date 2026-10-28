@@ -12,10 +12,7 @@ public static class ConditionEvaluator
     private const int MaxUnknowns = 12;
 
     public static Truth Evaluate(IReadOnlyList<ConditionNode> list, GameState state, string gameId)
-        => Evaluate(list, state, gameId, DefaultLeaf);
-
-    // Replaced by SupportedConditions.Evaluate in Task 2; until then nothing is supported.
-    private static Truth DefaultLeaf(ConditionLeaf leaf, GameState state) => Truth.Unknown;
+        => Evaluate(list, state, gameId, SupportedConditions.Evaluate);
 
     /// Test seam: lets tests inject the per-leaf evaluator.
     internal static Truth Evaluate(

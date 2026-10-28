@@ -16,7 +16,8 @@ public sealed class GameState
             => HashCode.Combine(StringComparer.OrdinalIgnoreCase.GetHashCode(k.Conversation ?? string.Empty), k.NodeId);
     }
 
-    public IDictionary<string, int> Globals { get; } = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+    // Case-sensitive on purpose: both games key GlobalVariables.m_data with the default ordinal comparer.
+    public IDictionary<string, int> Globals { get; } = new Dictionary<string, int>(StringComparer.Ordinal);
     public IDictionary<string, bool> CompanionsInParty { get; } = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
     public bool NoCompanionsInParty { get; set; }
     public IDictionary<(string Conversation, int NodeId), bool> PlayedNodes { get; }
