@@ -76,6 +76,10 @@ function Set-CaptureSettings {
     $s.PendingRestores = @()   # never let a capture run write to the game folder
     # Privacy mode (issue 270): captures must not show the user's name or folders.
     $s | Add-Member -Force -NotePropertyName PrivacyMode -NotePropertyValue $true
+    # Editing mode (EditorMode.Editing = 1; settings store the enum as a number). With no mode
+    # saved, launch stops at the first-run mode chooser (issue 234) and every capture fails;
+    # Reading mode would hide the editing menus and windows the captures open.
+    $s | Add-Member -Force -NotePropertyName Mode -NotePropertyValue 1
 
     if ($GameDirectory) {
         if (-not $GameDirectory.EndsWith('\')) { $GameDirectory += '\' }

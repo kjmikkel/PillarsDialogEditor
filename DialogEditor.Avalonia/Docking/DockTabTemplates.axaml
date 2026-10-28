@@ -1,0 +1,109 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:dmc="using:Dock.Model.Controls"
+        xmlns:docking="clr-namespace:DialogEditor.Avalonia.Docking">
+
+    <!-- GitHub issue 264 (F-10): Dock's tab peers read a state dump as help text (see
+         AccessibleDockTabs.cs). These are Dock.Avalonia.Themes.Fluent 11.3.12.1's DocumentControl
+         (single-content) and ToolControl templates, unchanged except that the tab strip is our
+         subclass. A Style outranks the theme's ControlTheme setter, so only the template is
+         replaced; the theme's other setters and part styles still apply. Dock is MIT-licensed.
+         When upgrading Dock, re-copy these from its theme, or delete this file and
+         AccessibleDockTabs.cs once wieslawsoltes/Dock issue 1201 is fixed. -->
+
+    <Style Selector="DocumentControl">
+        <Setter Property="Template">
+            <ControlTemplate TargetType="DocumentControl" x:DataType="dmc:IDocumentDock">
+                <DockPanel x:Name="PART_DockPanel"
+                           DockProperties.IsDropArea="True"
+                           DockProperties.IsDockTarget="True"
+                           DockProperties.ShowDockIndicatorOnly="{DynamicResource DockDocumentControlShowDockIndicatorOnly}"
+                           DockProperties.IndicatorDockOperation="{DynamicResource DockDocumentControlIndicatorDockOperation}"
+                           VerticalSpacing="{DynamicResource DockDocumentControlVerticalSpacing}"
+                           Background="Transparent"
+                           ZIndex="1">
+                    <docking:AccessibleDocumentTabStrip x:Name="PART_TabStrip"
+                                      ItemsSource="{Binding VisibleDockables}"
+                                      SelectedItem="{Binding ActiveDockable, Mode=TwoWay}"
+                                      CanCreateItem="{Binding CanCreateDocument}"
+                                      IconTemplate="{TemplateBinding IconTemplate}"
+                                      HeaderTemplate="{TemplateBinding HeaderTemplate}"
+                                      ModifiedTemplate="{TemplateBinding ModifiedTemplate}"
+                                      CloseTemplate="{TemplateBinding CloseTemplate}"
+                                      CloseButtonTheme="{TemplateBinding CloseButtonTheme}"
+                                      IsActive="{TemplateBinding IsActive}"
+                                      Orientation="{Binding TabsLayout, Converter={x:Static DocumentTabOrientationConverter.Instance}}"
+                                      DockPanel.Dock="{Binding TabsLayout, Converter={x:Static DocumentTabDockConverter.Instance}}"
+                                      DockProperties.IsDropArea="True"
+                                      DockProperties.DockAdornerHost="{Binding #PART_DockPanel}">
+                        <docking:AccessibleDocumentTabStrip.Styles>
+                            <Style Selector="DocumentTabStripItem">
+                                <Setter Property="IsActive" Value="{Binding $parent[DocumentTabStrip].IsActive}" />
+                            </Style>
+                        </docking:AccessibleDocumentTabStrip.Styles>
+                    </docking:AccessibleDocumentTabStrip>
+                    <Panel x:Name="PART_DocumentSeperatorHost" IsVisible="{Binding #PART_TabStrip.IsVisible}">
+                        <Panel x:Name="PART_DocumentSeperator"
+                               IsVisible="{DynamicResource DockDocumentTabStripSeparatorVisible}" />
+                    </Panel>
+                    <Border x:Name="PART_Border">
+                        <Grid>
+                            <DockableControl DataContext="{Binding ActiveDockable}"
+                                             TrackingMode="Visible"
+                                             IsVisible="{Binding $parent[DocumentControl].HasVisibleDockables}">
+                                <DeferredContentControl x:Name="PART_ContentPresenter"
+                                                        Content="{Binding}"
+                                                        HorizontalAlignment="Stretch"
+                                                        VerticalAlignment="Stretch">
+                                    <DeferredContentControl.ContentTemplate>
+                                        <ControlRecyclingDataTemplate Parent="{Binding #PART_ContentPresenter}" />
+                                    </DeferredContentControl.ContentTemplate>
+                                </DeferredContentControl>
+                            </DockableControl>
+
+                            <ContentControl x:Name="PART_EmptyContentHost"
+                                            Content="{Binding EmptyContent}"
+                                            ContentTemplate="{Binding $parent[DocumentControl].EmptyContentTemplate}"
+                                            HorizontalContentAlignment="Center"
+                                            VerticalContentAlignment="Center"
+                                            IsVisible="{Binding !$parent[DocumentControl].HasVisibleDockables}" />
+                        </Grid>
+                    </Border>
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <Style Selector="ToolControl">
+        <Setter Property="Template">
+            <ControlTemplate TargetType="ToolControl" x:DataType="dmc:IToolDock">
+                <DockPanel x:Name="PART_DockPanel"
+                           DockProperties.IsDropArea="True"
+                           DockProperties.IsDockTarget="True">
+                    <docking:AccessibleToolTabStrip x:Name="PART_TabStrip"
+                                  ItemsSource="{Binding VisibleDockables}"
+                                  SelectedItem="{Binding ActiveDockable, Mode=TwoWay}"
+                                  IconTemplate="{TemplateBinding IconTemplate}"
+                                  HeaderTemplate="{TemplateBinding HeaderTemplate}"
+                                  ModifiedTemplate="{TemplateBinding ModifiedTemplate}"
+                                  DockPanel.Dock="Bottom"
+                                  DockProperties.IsDropArea="True"
+                                  DockProperties.DockAdornerHost="{Binding #PART_DockPanel}" />
+                    <Border x:Name="PART_Border">
+                        <DockableControl DataContext="{Binding ActiveDockable}"
+                                         TrackingMode="Visible">
+                            <DeferredContentControl x:Name="PART_ContentPresenter"
+                                                    Content="{Binding}"
+                                                    HorizontalAlignment="Stretch"
+                                                    VerticalAlignment="Stretch">
+                                <DeferredContentControl.ContentTemplate>
+                                    <ControlRecyclingDataTemplate Parent="{Binding #PART_ContentPresenter}" />
+                                </DeferredContentControl.ContentTemplate>
+                            </DeferredContentControl>
+                        </DockableControl>
+                    </Border>
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>
