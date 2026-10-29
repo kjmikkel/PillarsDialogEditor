@@ -72,8 +72,9 @@ figures follow from that one filter.
 ## 4. Flow Analytics window
 
 Replacement, not a second column _(my call: a second column doubles every row in an already dense panel)_. When
-the assumed state has a fact, a checkbox **"Use assumed game state"** appears in the Playthrough stats header,
-**checked by default**; unchecking it shows today's upper bound. Not persisted _(my call: the state it refers
+the assumed state has a fact, a checkbox **"Use assumed game state"** appears on its own line under the
+Playthrough stats header, **checked by default** _(placed there after the build: inside the header grid it
+squeezed "PLAYTHROUGH STATS" until `NoClippedTextTests` failed)_; unchecking it shows today's upper bound. Not persisted _(my call: the state it refers
 to is not persisted either)_. While it is checked and links were pruned, one muted line under the header reads
 "{n} links can't fire under the assumed game state and are skipped." The window re-runs the analysis when the
 state changes, so editing Game State with the window open updates the figures.
@@ -97,5 +98,5 @@ The Legend window gains a row in CONNECTIONS for the faded link.
 - Test names and layout (`DialogEditor.Tests/Conditions/LinkFiringTests.cs`, existing analytics/VM test files).
 
 ## 7. Follow-ups (file after merge)
-- First-match shadowing of later NPC links by a link that definitely passes (§2).
-- Persist the assumed state per project (carried over from #305).
+- First-match shadowing of later NPC links by a link that definitely passes (§2): #353.
+- Persist the assumed state per project: in progress separately (PR #352).
