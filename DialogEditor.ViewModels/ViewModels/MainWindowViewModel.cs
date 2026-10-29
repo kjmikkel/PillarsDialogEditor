@@ -2409,6 +2409,8 @@ public partial class MainWindowViewModel : ObservableObject
                 GameDataNameService.Register(kind, namedEntries);
             }
 
+            GameState.SetInitialGlobalValues(provider.LoadGlobalVariableInitialValues());
+
             _activeGameId = provider.GameId;
             Detail.ActiveGameId = provider.GameId;
             Canvas.ActiveGameId = provider.GameId;
