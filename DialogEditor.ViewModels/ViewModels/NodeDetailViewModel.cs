@@ -19,6 +19,20 @@ public partial class NodeDetailViewModel : ObservableObject
     private NodeViewModel? _node;
     public  NodeViewModel? Node => _node;
 
+    public NodeDetailViewModel()
+    {
+        // The PoE1 voice index is built in the background after the game opens; re-read the
+        // selected node's VO status when it lands (or is cleared).
+        Poe1VoiceService.WeakSubscribe(this, static vm => vm.OnPoe1VoiceChanged());
+    }
+
+    private void OnPoe1VoiceChanged()
+    {
+        if (_node is not null && IsPoe1) NotifyAllProxies();
+    }
+
+    private bool IsPoe1 => string.Equals(_activeGameId, "poe1", StringComparison.OrdinalIgnoreCase);
+
     private readonly TokenValidationService _tokenValidator = new();
 
     /// Set by MainWindowViewModel when a game folder is opened.
@@ -213,7 +227,7 @@ public partial class NodeDetailViewModel : ObservableObject
     /// The node context menu's "Import voice-over" item (and its separator): a node with VO status, but
     /// never in reading mode, where it would write to the project. A property here because a menu item
     /// cannot combine two bindings (a MultiBinding in the popup never took effect).
-    public bool ShowImportVoMenuItem => HasVoStatus && !IsReadingMode;
+    public bool ShowImportVoMenuItem => HasVoStatus && !_voIsPoe1 && !IsReadingMode;
 
     private void OnCanvasPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
@@ -349,6 +363,11 @@ public partial class NodeDetailViewModel : ObservableObject
     // ── VO file status (PoE2 only) ────────────────────────────────────
     private VoCheckResult? _voCheck;
 
+    // True when _voCheck came from the PoE1 voice index (issue 4). That result is play-only:
+    // its paths are extracted .fsb cache files, not game .wem files, so everything that treats
+    // a non-null _voCheck as "PoE2 with a game root" (import, aliases) must exclude it.
+    private bool _voIsPoe1;
+
     // ── Audio playback ────────────────────────────────────────────────────
     private enum Playing { None, Primary, Female }
     private Playing _currentlyPlaying = Playing.None;
@@ -405,10 +424,10 @@ public partial class NodeDetailViewModel : ObservableObject
 
     /// True when the VO import button should be visible: PoE2 with a game root and a loaded node.
     /// Independent of HasVO/ExternalVO so the button appears on fresh nodes too.
-    public bool IsVoImportVisible => _voCheck is not null;
+    public bool IsVoImportVisible => _voCheck is not null && !_voIsPoe1;
 
     /// True when a VO import can be initiated: PoE2 node loaded (project save is checked at runtime).
-    public bool CanImportVo => _voCheck is not null;
+    public bool CanImportVo => _voCheck is not null && !_voIsPoe1;
 
     /// Tooltip for the import button.
     public string ImportVoTooltip => Loc.Get("ToolTip_VoImport");
@@ -523,10 +542,14 @@ public partial class NodeDetailViewModel : ObservableObject
         else
         {
             if (_voCheck?.PrimaryWemPath is null || !_player.IsAvailable) return;
-            // LocalPrimaryWemPath is only set when the game copy is absent and the
-            // project's _vo/ staging copy exists — play the file that is really there.
+            // PoE1: the bank is still inside resources.resource; cut it out first.
+            var toPlay = _voIsPoe1 ? ExtractPoe1Clip(female: false)
+                // LocalPrimaryWemPath is only set when the game copy is absent and the
+                // project's _vo/ staging copy exists — play the file that is really there.
+                : _voCheck.LocalPrimaryWemPath ?? _voCheck.PrimaryWemPath;
+            if (toPlay is null) return;
             _player.Stop();
-            _player.Play(_voCheck.LocalPrimaryWemPath ?? _voCheck.PrimaryWemPath);
+            _player.Play(toPlay);
             SetPlaying(Playing.Primary);
         }
     }
@@ -542,10 +565,33 @@ public partial class NodeDetailViewModel : ObservableObject
         else
         {
             if (_voCheck?.FemWemPath is null || !_player.IsAvailable) return;
+            var toPlay = _voIsPoe1 ? ExtractPoe1Clip(female: true) : _voCheck.FemWemPath;
+            if (toPlay is null) return;
             _player.Stop();
-            _player.Play(_voCheck.FemWemPath);
+            _player.Play(toPlay);
             SetPlaying(Playing.Female);
         }
+    }
+
+    /// Extracts the loaded node's PoE1 clip to the cache; null (already logged) when it cannot be.
+    private string? ExtractPoe1Clip(bool female)
+    {
+        var clip = FindPoe1Clip(female);
+        return clip is null ? null : Poe1VoiceService.Extract(clip);
+    }
+
+    private Poe1VoiceClip? FindPoe1Clip(bool female) =>
+        _node is null ? null
+            : Poe1VoiceService.Find(Canvas?.ConversationName ?? "", _node.NodeId, female);
+
+    private VoCheckResult? CheckPoe1Voice()
+    {
+        var primary = FindPoe1Clip(female: false);
+        if (primary is null) return null;
+        var fem = _node!.HasFemaleText ? FindPoe1Clip(female: true) : null;
+        return new VoCheckResult(VoPresence.Found, fem is not null,
+            Poe1VoiceService.CachePathFor(primary),
+            fem is null ? null : Poe1VoiceService.CachePathFor(fem));
     }
 
     private void SetPlaying(Playing p)
@@ -927,7 +973,7 @@ public partial class NodeDetailViewModel : ObservableObject
 
     /// PoE2-gated: _voCheck is null on PoE1/no game root, hiding the alias UI there.
     public bool HasVoAlias =>
-        _voCheck is not null && !string.IsNullOrEmpty(_node?.ExternalVO);
+        _voCheck is not null && !_voIsPoe1 && !string.IsNullOrEmpty(_node?.ExternalVO);
 
     public string VoAliasRawPath => _node?.ExternalVO ?? string.Empty;
 
@@ -983,7 +1029,7 @@ public partial class NodeDetailViewModel : ObservableObject
     };
 
     /// "Reuse another line's VO…" visibility: PoE2 node loaded, no alias yet.
-    public bool CanStartVoAliasPick => _voCheck is not null && !HasVoAlias;
+    public bool CanStartVoAliasPick => _voCheck is not null && !_voIsPoe1 && !HasVoAlias;
 
     /// Set by MainWindow.axaml.cs — opens the picker (current alias in, chosen
     /// alias out, null = cancelled).
@@ -1108,14 +1154,25 @@ public partial class NodeDetailViewModel : ObservableObject
         RefreshSpelling();
         OnPropertyChanged(nameof(ScriptWarnings));
 
-        _voCheck = _node is null ? null
-            : VoPathResolver.Check(
-                _node.SpeakerGuid, _node.HasVO, _node.ExternalVO, _node.HasFemaleText, _node.NodeId,
-                Canvas?.ConversationName ?? "", GameRoot, ActiveGameId);
+        if (IsPoe1)
+        {
+            // PoE1 has no .wem files and no project VO staging: the status comes from the
+            // resources.assets index (null while it builds, or when the node has no clip).
+            _voCheck = _node is null ? null : CheckPoe1Voice();
+            _voIsPoe1 = _voCheck is not null;
+        }
+        else
+        {
+            _voIsPoe1 = false;
+            _voCheck = _node is null ? null
+                : VoPathResolver.Check(
+                    _node.SpeakerGuid, _node.HasVO, _node.ExternalVO, _node.HasFemaleText, _node.NodeId,
+                    Canvas?.ConversationName ?? "", GameRoot, ActiveGameId);
+        }
 
         // If the game file is absent but a _vo/ local copy exists, treat it as Found.
         // This lets the status row flip to ✓ immediately after import without waiting for F5.
-        if (_voCheck is not null && !string.IsNullOrEmpty(GameRoot))
+        if (_voCheck is not null && !_voIsPoe1 && !string.IsNullOrEmpty(GameRoot))
             _voCheck = VoPathResolver.WithLocalVoFallback(_voCheck, ProjectPath, GameRoot,
                 _node?.HasFemaleText ?? false);
 
