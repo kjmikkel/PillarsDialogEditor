@@ -70,7 +70,17 @@ public partial class ConnectionViewModel : ObservableObject
         OnPropertyChanged(nameof(ConditionVerdictText));
         OnPropertyChanged(nameof(ConditionVerdictPasses));
         OnPropertyChanged(nameof(ConditionVerdictFails));
+        OnPropertyChanged(nameof(CannotFire));
+        OnPropertyChanged(nameof(CannotFireToolTip));
     }
+
+    /// True when the assumed game state rules this link out: its own conditions, or those on
+    /// the line it leads to, definitely fail (#32). Drives the faded canvas rendering.
+    public bool CannotFire => _assumedState is not null
+        && DialogEditor.Core.Conditions.LinkFiring.CannotFire(
+            _conditions, Target.Owner?.Conditions ?? [], _assumedState, _verdictGameId);
+
+    public string? CannotFireToolTip => CannotFire ? Loc.Get("ToolTip_LinkCannotFire") : null;
 
     /// Shown only once the writer has set a fact and this link has conditions.
     public bool ShowConditionVerdict => ConditionVerdictFormat.Applies(_assumedState, _conditions);

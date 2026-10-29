@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using DialogEditor.Core.Analytics;
+using DialogEditor.Core.Conditions;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Layout;
 using DialogEditor.Core.Models;
@@ -64,10 +65,47 @@ public partial class ConversationViewModel : ObservableObject
             node.SearchMatchState = SearchMatchState.None;
     }
 
+    // ── Assumed game state (View > Game State) ───────────────────────────
+    private GameState? _assumedState;
+
+    /// The session's assumed game state. Every canvas link judges itself against it and fades
+    /// when it cannot fire (#32). NodeDetail also calls SetVerdictContext on the selected
+    /// node's links with this same state; that is harmless, as both set identical context.
+    public GameState? AssumedState
+    {
+        get => _assumedState;
+        set
+        {
+            if (ReferenceEquals(_assumedState, value)) return;
+            if (_assumedState is not null) _assumedState.Changed -= OnAssumedStateChanged;
+            _assumedState = value;
+            if (_assumedState is not null) _assumedState.Changed += OnAssumedStateChanged;
+            ApplyVerdictContext();
+        }
+    }
+
+    private void OnAssumedStateChanged(object? sender, EventArgs e)
+    {
+        foreach (var c in Connections) c.RefreshVerdict();
+    }
+
+    private void ApplyVerdictContext()
+    {
+        foreach (var c in Connections) c.SetVerdictContext(_assumedState, ActiveGameId);
+    }
+
+    partial void OnActiveGameIdChanged(string value) => ApplyVerdictContext();
+
     private readonly HashSet<NodeViewModel> _subscribedNodes = [];
 
     public ConversationViewModel(IDispatcher dispatcher)
     {
+        Connections.CollectionChanged += (_, args) =>
+        {
+            if (args.NewItems is null) return;
+            foreach (ConnectionViewModel c in args.NewItems)
+                c.SetVerdictContext(_assumedState, ActiveGameId);
+        };
         _dispatcher       = dispatcher;
         PendingConnection = new PendingConnectionViewModel(this);
         // Node field edits from the detail pane reach the stack via NodeViewModel.Push
@@ -114,6 +152,11 @@ public partial class ConversationViewModel : ObservableObject
 
     private void OnNodeTextChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
+        // A node's own conditions gate every link leading to it, so those links re-judge (#32).
+        if (e.PropertyName == nameof(NodeViewModel.Conditions) && sender is NodeViewModel changed)
+            foreach (var c in Connections)
+                if (c.Target.Owner == changed) c.RefreshVerdict();
+
         if (e.PropertyName is nameof(NodeViewModel.DefaultText)
                            or nameof(NodeViewModel.FemaleText)
                            or nameof(NodeViewModel.IsPlayerChoice)
