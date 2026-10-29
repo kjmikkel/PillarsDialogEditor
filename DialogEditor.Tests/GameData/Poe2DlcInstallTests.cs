@@ -60,6 +60,20 @@ public class Poe2DlcInstallTests
         Assert.Contains(vars, v => v.Name == "n_(NPC)_State");   // the base game's first declaration
     }
 
+    // Issue 345: every offered global has a start-of-game value, and the shipped bundles set some
+    // to non-zero.
+    [GameInstallFact(GameInstallFactAttribute.Poe2Variable)]
+    public void GlobalVariableInitialValues_CoverEveryOfferedGlobal()
+    {
+        var provider = Provider();
+
+        var values = provider.LoadGlobalVariableInitialValues();
+
+        Assert.Equal(provider.LoadGameDataNames()["GlobalVariable"].Select(v => v.Name).Order(StringComparer.Ordinal),
+                     values.Keys.Order(StringComparer.Ordinal));
+        Assert.Contains(values.Values, v => v != 0);
+    }
+
     [GameInstallFact(GameInstallFactAttribute.Poe2Variable)]
     public void EveryDlcConversation_LoadsWithItsText()
     {

@@ -115,6 +115,9 @@ public class Poe1GameDataProvider(string rootPath) : IGameDataProvider
         return result;
     }
 
+    public IReadOnlyDictionary<string, int> LoadGlobalVariableInitialValues() =>
+        Poe1GlobalVariablesParser.ParseInitialValuesFile(GlobalVariablesPath);
+
     public (string ConversationsRoot, string StringTablesRoot) GetBackupRoots()
         => (ConversationsRoot, StringTablesRoot);
 

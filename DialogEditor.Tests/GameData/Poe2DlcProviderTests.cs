@@ -148,13 +148,33 @@ public class Poe2DlcProviderTests : IDisposable
     // Issue 199: the game reads every data folder's design/globalvariables/*.globalvariablesbundle
     // (GlobalVariables.LoadMetadata), keyed on Tag, and keeps pillars1's names aside for PoE1 save
     // import only.
-    private void GlobalVariables(string dataFolder, string file, params string[] tags)
+    private void GlobalVariables(string dataFolder, string file, params string[] tags) =>
+        GlobalVariables(dataFolder, file, tags.Select(t => (t, 0)).ToArray());
+
+    private void GlobalVariables(string dataFolder, string file, params (string Tag, int InitialValue)[] vars)
     {
         var dir = Path.Combine(_game.DataRoot, dataFolder, "design", "globalvariables");
         Directory.CreateDirectory(dir);
         File.WriteAllText(Path.Combine(dir, file), "{\"GlobalVariablesSets\":[{\"GlobalVariables\":[" +
-            string.Join(",", tags.Select(t => $"{{\"ID\":\"00000000-0000-0000-0000-000000000000\",\"Tag\":\"{t}\",\"InitialValue\":0}}")) +
+            string.Join(",", vars.Select(v => $"{{\"ID\":\"00000000-0000-0000-0000-000000000000\",\"Tag\":\"{v.Tag}\",\"InitialValue\":{v.InitialValue}}}")) +
             "]}]}");
+    }
+
+    // Issue 345: a later data folder's declaration overrides an earlier one's initial value, as
+    // LoadGlobalVariablesBundle overwrites a tag it has already seen; pillars1 declares nothing.
+    [Fact]
+    public void GlobalVariableInitialValues_LaterFolderWins_WithoutPillars1()
+    {
+        GlobalVariables("exported", "game.globalvariablesbundle", ("b_Met_Eder", 1), ("n_Shared", 2));
+        GlobalVariables("exported", "pillars1.globalvariablesbundle", ("poe1_only", 7));
+        GlobalVariables("lax2_exported", "lax2_game.globalvariablesbundle", ("b_Ice_Carver", -1), ("n_Shared", 5));
+
+        var values = _game.Provider.LoadGlobalVariableInitialValues();
+
+        Assert.Equal(3, values.Count);
+        Assert.Equal(1, values["b_Met_Eder"]);
+        Assert.Equal(-1, values["b_Ice_Carver"]);
+        Assert.Equal(5, values["n_Shared"]);
     }
 
     [Fact]
