@@ -28,6 +28,7 @@ version-3 patches, and each is checked on its own.
 | `Annotations` | no | Canvas annotations per conversation (editor metadata, never written to game files). |
 | `IgnoredDuplicates` | no | Duplicate-line allowlist (editor metadata). |
 | `ProjectWords` | no | Words the spell checker accepts in this project (editor metadata). |
+| `GameState` | no | The Game State panel's assumed state (editor metadata, never written to game files). Every member is optional: `Globals` (name → integer), `CompanionsInParty` (name → true/false), `NoCompanionsInParty`, `PlayedNodes` (a list of `Conversation` / `NodeId` / `Played`), `Quests` (name → `NotStarted`, `Active`, `Completed` or `Failed`, by name; an unknown name leaves that quest unset) and `InCombat` (true, false or absent). |
 
 ## `ConversationPatch`
 

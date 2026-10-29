@@ -683,6 +683,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         GameState = new GameStateViewModel(new DialogEditor.Core.Conditions.GameState(), LookupGameDataName);
         Detail.AssumedState = GameState.State;
+        GameState.State.Changed += (_, _) => OnAssumedStateChanged();
         WireGameStateSources();
 
         Browser.ConversationSelected += OnConversationSelected;
@@ -918,6 +919,32 @@ public partial class MainWindowViewModel : ObservableObject
     private void OnConditionSourceChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(NodeViewModel.Conditions)) ReloadGameState();
+    }
+
+    private bool _restoringAssumedState;
+
+    /// The Game State panel's facts belong to the project (issue 344): opening one replaces
+    /// whatever was set before with what it saved (nothing, for a project saved without any).
+    private void RestoreAssumedState(GameStateSnapshot? saved)
+    {
+        _restoringAssumedState = true;
+        try { GameStateSnapshot.ApplyTo(saved, GameState.State); }
+        finally { _restoringAssumedState = false; }
+        ReloadGameState();   // the rows read their values when they are built
+    }
+
+    // Metadata-only edit like AddProjectWord: no SetProject, no undo. Compared as JSON because the
+    // snapshot's collections don't compare by value, and Clear All on an empty state still
+    // notifies; a notification that changes nothing must not dirty the project. Reading mode
+    // never writes the project, so there the state stays a session-only what-if.
+    private void OnAssumedStateChanged()
+    {
+        if (_project is null || _restoringAssumedState || !IsEditingMode) return;
+        var next = GameStateSnapshot.From(GameState.State);
+        if (System.Text.Json.JsonSerializer.Serialize(next) == System.Text.Json.JsonSerializer.Serialize(_project.GameState))
+            return;
+        _project = _project with { GameState = next };
+        IsModified = true;
     }
 
     private void ReloadGameState()
@@ -1589,6 +1616,7 @@ public partial class MainWindowViewModel : ObservableObject
     private void FinishLoad(DialogProject loaded, string path)
     {
         SetProject(loaded);
+        RestoreAssumedState(loaded.GameState);
         _projectPath = path;
         Detail.ProjectPath  = _projectPath;
         Canvas.ProjectPath  = _projectPath;
