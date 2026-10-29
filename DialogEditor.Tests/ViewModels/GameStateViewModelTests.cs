@@ -160,6 +160,78 @@ public class GameStateViewModelTests
     }
 
     [Fact]
+    public void FillStartOfGame_FillsTestedGlobalsWithKnownInitialValues()
+    {
+        var vm = Make();
+        vm.SetInitialGlobalValues(new Dictionary<string, int> { ["a"] = 3, ["b"] = 0, ["untested"] = 9 });
+        vm.Load(Lists([Global("a", "EqualTo", "3")], [Global("b", "EqualTo", "1")], [Global("noInit", "EqualTo", "1")]), "poe2");
+        var changes = 0;
+        _state.Changed += (_, _) => changes++;
+
+        vm.FillStartOfGameCommand.Execute(null);
+
+        Assert.Equal(3, _state.Globals["a"]);
+        Assert.Equal(0, _state.Globals["b"]);
+        Assert.False(_state.Globals.ContainsKey("noInit"));     // no known start value: left alone
+        Assert.False(_state.Globals.ContainsKey("untested"));   // not tested here: not touched
+        Assert.Equal("3", vm.Globals.Single(r => r.Name == "a").ValueText);
+        Assert.Equal("0", vm.Globals.Single(r => r.Name == "b").ValueText);
+        Assert.Equal("", vm.Globals.Single(r => r.Name == "noInit").ValueText);
+        Assert.Equal(1, changes);
+        Assert.Equal(1, vm.PassCount);   // a = 3 passes; b = 0 fails; noInit can't tell
+        Assert.Equal(1, vm.FailCount);
+        Assert.Equal(1, vm.UnknownCount);
+    }
+
+    [Fact]
+    public void FillStartOfGame_KeepsValuesTheWriterTyped()
+    {
+        var vm = Make();
+        vm.SetInitialGlobalValues(new Dictionary<string, int> { ["a"] = 3, ["b"] = 0 });
+        vm.Load(Lists([Global("a", "EqualTo", "3"), Global("b", "EqualTo", "1")]), "poe2");
+        vm.Globals.Single(r => r.Name == "a").ValueText = "5";
+
+        vm.FillStartOfGameCommand.Execute(null);
+
+        Assert.Equal(5, _state.Globals["a"]);
+        Assert.Equal("5", vm.Globals.Single(r => r.Name == "a").ValueText);
+        Assert.Equal(0, _state.Globals["b"]);
+    }
+
+    [Fact]
+    public void FillStartOfGame_CanExecuteOnlyWhenAnUnsetRowHasAKnownValue()
+    {
+        var vm = Make();
+        vm.Load(Lists([Global("a", "EqualTo", "3")]), "poe2");
+        Assert.False(vm.FillStartOfGameCommand.CanExecute(null));   // no game data yet
+
+        vm.SetInitialGlobalValues(new Dictionary<string, int> { ["a"] = 3 });
+        Assert.True(vm.FillStartOfGameCommand.CanExecute(null));
+
+        vm.FillStartOfGameCommand.Execute(null);
+        Assert.False(vm.FillStartOfGameCommand.CanExecute(null));   // nothing left to fill
+
+        vm.ClearAllCommand.Execute(null);
+        Assert.True(vm.FillStartOfGameCommand.CanExecute(null));
+
+        vm.Load(Lists([Global("other", "EqualTo", "1")]), "poe2");
+        Assert.False(vm.FillStartOfGameCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void FillStartOfGame_NothingToFill_DoesNotRaiseChanged()
+    {
+        var vm = Make();
+        vm.Load(Lists([Global("a", "EqualTo", "3")]), "poe2");
+        var changes = 0;
+        _state.Changed += (_, _) => changes++;
+
+        vm.FillStartOfGameCommand.Execute(null);
+
+        Assert.Equal(0, changes);
+    }
+
+    [Fact]
     public void SwitchingConversation_KeepsEarlierValues()
     {
         var vm = Make();

@@ -25,6 +25,7 @@ public sealed partial class GameStateViewModel : ObservableObject
     private readonly Func<string, string, string?> _nameLookup;
     private IReadOnlyList<IReadOnlyList<ConditionNode>> _lists = [];
     private string _gameId = string.Empty;
+    private IReadOnlyDictionary<string, int> _initialGlobals = new Dictionary<string, int>();
 
     /// <param name="nameLookup">(lookup kind, id) to display name, or null if unknown. Kinds used:
     /// "Speaker" (companions), "Quest", "Conversation".</param>
@@ -32,7 +33,11 @@ public sealed partial class GameStateViewModel : ObservableObject
     {
         State = state;
         _nameLookup = nameLookup;
-        State.Changed += (_, _) => RefreshSummary();
+        State.Changed += (_, _) =>
+        {
+            RefreshSummary();
+            FillStartOfGameCommand.NotifyCanExecuteChanged();
+        };
         _summary = BuildSummary();
     }
 
@@ -126,7 +131,43 @@ public sealed partial class GameStateViewModel : ObservableObject
         OnPropertyChanged(nameof(HasPlayedNodes));
         OnPropertyChanged(nameof(HasQuests));
         RefreshSummary();
+        FillStartOfGameCommand.NotifyCanExecuteChanged();
     }
+
+    /// <summary>
+    /// The open game's start-of-game value for each global (issue 345), from
+    /// <see cref="DialogEditor.Core.GameData.IGameDataProvider.LoadGlobalVariableInitialValues"/>.
+    /// Read once per game folder; "Fill start-of-game values" copies from it.
+    /// </summary>
+    public void SetInitialGlobalValues(IReadOnlyDictionary<string, int> values)
+    {
+        _initialGlobals = values;
+        FillStartOfGameCommand.NotifyCanExecuteChanged();
+    }
+
+    /// <summary>
+    /// Fills every global row that is still "not set" with the game's start-of-game value.
+    /// Values the writer typed are kept: the panel has no undo, so the fill only ever adds
+    /// facts, and "Clear all" then this gives a full reset to the start of the game. Rows whose
+    /// global has no known start value stay unset ("can't tell"), as do globals the open
+    /// conversation does not test.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanFillStartOfGame))]
+    private void FillStartOfGame()
+    {
+        var filled = false;
+        foreach (var row in Globals)
+        {
+            if (State.Globals.ContainsKey(row.Name) || !_initialGlobals.TryGetValue(row.Name, out var v)) continue;
+            State.Globals[row.Name] = v;
+            row.Reload();
+            filled = true;
+        }
+        if (filled) State.NotifyChanged();   // once, however many rows were filled
+    }
+
+    private bool CanFillStartOfGame() =>
+        Globals.Any(r => !State.Globals.ContainsKey(r.Name) && _initialGlobals.ContainsKey(r.Name));
 
     private string Name(string kind, string id) => _nameLookup(kind, id) is { Length: > 0 } n ? n : id;
 
