@@ -1,4 +1,5 @@
-﻿using DialogEditor.Core.Editing;
+﻿using DialogEditor.Core.Conditions;
+using DialogEditor.Core.Editing;
 
 namespace DialogEditor.Core.Analytics;
 
@@ -22,8 +23,15 @@ namespace DialogEditor.Core.Analytics;
 /// branch's content/longest are measured from the choice onward (the root is shared, so it's
 /// excluded for comparison).
 ///
+/// Condition-aware (#32): given an assumed <see cref="GameState"/>, links that definitely
+/// cannot fire (<see cref="LinkFiring.CannotFire"/>) are skipped, so the figures describe
+/// what a player in that state can actually reach. Unknown conditions keep their link; with
+/// no state (or one with no facts) every figure is exactly as before. Handoffs are never
+/// pruned — a StartConversation call is a script action, not a conditioned link.
+///
 /// Specs: docs/superpowers/specs/2026-07-13-path-based-writing-stats-design.md
 ///        docs/superpowers/specs/2026-09-10-cross-conversation-path-stats-design.md
+///        docs/superpowers/specs/2026-10-29-condition-aware-path-stats-design.md
 /// </summary>
 public static class PathStatsService
 {
@@ -39,14 +47,16 @@ public static class PathStatsService
     /// Single-conversation analysis. Wraps into a one-conversation, no-jump graph so there is
     /// exactly one implementation. The conversation name is the empty string: a snapshot
     /// carries no name, and inventing one would be a lie.
-    public static PathStatsReport Analyze(ConversationEditSnapshot snapshot) =>
+    public static PathStatsReport Analyze(
+        ConversationEditSnapshot snapshot, GameState? state = null, string gameId = "") =>
         Analyze(new MultiConversationGraph(
             RootConversation: "",
             Conversations: new Dictionary<string, ConversationEditSnapshot> { [""] = snapshot },
             Jumps: [],
-            Unfollowed: []));
+            Unfollowed: []), state, gameId);
 
-    public static PathStatsReport Analyze(MultiConversationGraph graph)
+    public static PathStatsReport Analyze(
+        MultiConversationGraph graph, GameState? state = null, string gameId = "")
     {
         // Flatten every conversation's nodes into one NodeRef-keyed map.
         var nodeById = new Dictionary<NodeRef, NodeEditSnapshot>();
@@ -56,9 +66,26 @@ public static class PathStatsService
 
         var spanned = graph.Conversations.Count;
 
+        // A link the assumed state rules out (#32). A dangling link has no target to read
+        // conditions from, so it is never "blocked" here; LinksOf drops it separately.
+        // Memoised per link object: LinksOf is called many times per node (fork tree
+        // walks), and re-running the evaluator each time is pure waste.
+        var blockedMemo = new Dictionary<LinkEditSnapshot, bool>(ReferenceEqualityComparer.Instance);
+        bool Blocked(NodeRef from, LinkEditSnapshot l)
+        {
+            if (state is null) return false;
+            if (blockedMemo.TryGetValue(l, out var cached)) return cached;
+            var blocked = nodeById.TryGetValue(new NodeRef(from.Conversation, l.ToNodeId), out var target)
+                && LinkFiring.CannotFire(l.Conditions ?? [], target.Conditions, state, gameId);
+            blockedMemo[l] = blocked;
+            return blocked;
+        }
+
+        var blockedLinkCount = nodeById.Sum(kv => kv.Value.Links.Count(l => Blocked(kv.Key, l)));
+
         if (nodeById.Count == 0)
             return new PathStatsReport(false, 0, 0, 0, 0, 0, 0, [], [], [],
-                                       graph.Unfollowed, spanned);
+                                       graph.Unfollowed, spanned) { BlockedLinkCount = blockedLinkCount };
 
         var allNodes = nodeById.Values.ToList();
         var root     = new NodeRef(graph.RootConversation, StartNode.Id);
@@ -86,7 +113,8 @@ public static class PathStatsService
 
         if (!nodeById.ContainsKey(root))
             return new PathStatsReport(significant, defaultTotal, femaleTotal, 0, 0, 0, 0,
-                wordsPerSpeaker, [], [], graph.Unfollowed, spanned) { HasStartNode = false };
+                wordsPerSpeaker, [], [], graph.Unfollowed, spanned)
+            { HasStartNode = false, BlockedLinkCount = blockedLinkCount };
 
         // ── Out-edges: two SEPARATE sets ──────────────────────────────────
         // Links are ALTERNATIVES (the player takes one); jumps are SPAWNS (they all happen,
@@ -98,6 +126,7 @@ public static class PathStatsService
             .ToDictionary(g => g.Key, g => g.Select(j => j.To).ToList());
 
         List<NodeRef> LinksOf(NodeRef u) => nodeById[u].Links
+            .Where(l => !Blocked(u, l))
             .Select(l => new NodeRef(u.Conversation, l.ToNodeId))
             .Where(nodeById.ContainsKey)          // drop dangling
             .ToList();
@@ -283,8 +312,10 @@ public static class PathStatsService
 
         var endings = dagLinks.Keys
             // No links AND no handoff: a node that hands off is a way the conversation
-            // CONTINUES, not a way it finishes (#14).
-            .Where(id => nodeById[id].Links.Count == 0 && JumpsOf(id).Count == 0)
+            // CONTINUES, not a way it finishes (#14). "No links" means no link that is not
+            // blocked (#32) — dangling links still count as links, exactly as before, so
+            // without a state this is the old Links.Count == 0.
+            .Where(id => !nodeById[id].Links.Any(l => !Blocked(id, l)) && JumpsOf(id).Count == 0)
             .Select(id => new EndingStat(
                 id, nodeById[id].DefaultText ?? "",
                 LongestTo(id, female: false), ShortestTo(id, female: false),
@@ -298,6 +329,6 @@ public static class PathStatsService
             Longest(root, false),  Shortest(root, false),
             Longest(root, true),   Shortest(root, true),
             wordsPerSpeaker, branches, endings,
-            graph.Unfollowed, spanned);
+            graph.Unfollowed, spanned) { BlockedLinkCount = blockedLinkCount };
     }
 }

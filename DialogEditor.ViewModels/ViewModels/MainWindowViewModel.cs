@@ -683,6 +683,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         GameState = new GameStateViewModel(new DialogEditor.Core.Conditions.GameState(), LookupGameDataName);
         Detail.AssumedState = GameState.State;
+        Canvas.AssumedState = GameState.State;
         WireGameStateSources();
 
         Browser.ConversationSelected += OnConversationSelected;

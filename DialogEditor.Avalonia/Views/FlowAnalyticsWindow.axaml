@@ -146,6 +146,28 @@
                             </ComboBox>
                         </Grid>
 
+                        <!-- Assumed game state (#32): like the handoff toggle, it changes the
+                             figures beside it, so it sits right under them (its own line: the header row is
+                             already full at the default window width). Hidden while the
+                             state holds no facts, because then there is nothing to opt out of. -->
+                        <CheckBox x:Name="UseAssumedStateCheckBox"
+                                  VerticalAlignment="Center"
+                                  FontSize="{DynamicResource FontSize.Small}"
+                                  IsVisible="{Binding HasAssumedState}"
+                                  IsChecked="{Binding UseAssumedState, Mode=TwoWay}"
+                                  Content="{DynamicResource PathStats_UseAssumedState}"
+                                  ToolTip.Tip="{DynamicResource PathStats_UseAssumedState_Tip}"
+                                  AutomationProperties.Name="{DynamicResource PathStats_UseAssumedState}"
+                                  AutomationProperties.HelpText="{DynamicResource PathStats_UseAssumedState_Tip}"/>
+                        <!-- Says how many links the assumed state removed, so a smaller figure
+                             is explained at the point it appears rather than looking like a bug. -->
+                        <TextBlock x:Name="PrunedLinksTextBlock"
+                                   Text="{Binding PrunedLinksText}"
+                                   IsVisible="{Binding HasPrunedLinks}"
+                                   FontSize="{DynamicResource FontSize.Small}"
+                                   Foreground="{DynamicResource Brush.Text.Secondary}"
+                                   TextWrapping="Wrap"/>
+
                         <!-- Only when it actually spans: this is what makes a suddenly larger
                              longest playthrough self-explaining rather than alarming. -->
                         <TextBlock Text="{Binding ConversationsSpannedText}"

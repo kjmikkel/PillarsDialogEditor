@@ -168,4 +168,4 @@ conditions shows the same verdict in its row. Updates live when the state change
 - Persist the assumed state per project.
 - Initial values for globals from the game's global-variable definitions.
 - Character-dependent conditions.
-- Canvas: dim links that can't fire (with #32).
+- Canvas: dim links that can't fire (with #32). **Done in #32** (`2026-10-29-condition-aware-path-stats-design.md` §5).

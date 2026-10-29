@@ -622,4 +622,115 @@ public class FlowAnalyticsViewModelTests
 
         Assert.Equal("Lie ahull", Assert.Single(vm.Branches).ChoiceText);
     }
+
+    // ── Assumed game state (#32) ─────────────────────────────────────────────
+    private static IReadOnlyList<ConditionNode> GlobalIs(string name, int value) =>
+        [new ConditionLeaf("Boolean IsGlobalValue(String, Operator, Int32)",
+            [name, "EqualTo", value.ToString()], Not: false, Operator: "And")];
+
+    // Node 0 offers a 1-word line and a 5-word line; the long branch is gated on g == 1.
+    private static ConversationEditSnapshot GatedSnapshot() => new([
+        PathNode(0, "a", links: [Link(0, 1), new LinkEditSnapshot(0, 2, 1, "", true) { Conditions = GlobalIs("g", 1) }]),
+        PathNode(1, "b"),
+        PathNode(2, "one two three four five"),
+    ]);
+
+    private static DialogEditor.Core.Conditions.GameState StateWith(int g)
+    {
+        var s = new DialogEditor.Core.Conditions.GameState();
+        s.Globals["g"] = g;
+        return s;
+    }
+
+    private static FlowAnalyticsViewModel GatedVm(DialogEditor.Core.Conditions.GameState? state)
+    {
+        Loc.Configure(new EchoStringProvider(new() { ["PathStats_WordsTime"] = "{0}w" }));
+        var vm = new FlowAnalyticsViewModel(() => GatedSnapshot(), _ => { }, assumedState: state);
+        vm.RefreshCommand.Execute(null);
+        return vm;
+    }
+
+    [Fact]
+    public void AssumedState_BlockingLink_ShrinksLongest()
+    {
+        Assert.Equal("6w", GatedVm(null).LongestPlaythroughText);
+        Assert.Equal("2w", GatedVm(StateWith(0)).LongestPlaythroughText);
+    }
+
+    [Fact]
+    public void AssumedState_Changed_ReRunsAnalysis()
+    {
+        var state = new DialogEditor.Core.Conditions.GameState();
+        var vm = GatedVm(state);
+        Assert.Equal("6w", vm.LongestPlaythroughText);
+
+        state.Globals["g"] = 0;
+        state.NotifyChanged();
+
+        Assert.Equal("2w", vm.LongestPlaythroughText);
+    }
+
+    [Fact]
+    public void UseAssumedState_False_RestoresUpperBound()
+    {
+        var vm = GatedVm(StateWith(0));
+
+        vm.UseAssumedState = false;
+
+        Assert.Equal("6w", vm.LongestPlaythroughText);
+        Assert.False(vm.HasPrunedLinks);
+    }
+
+    [Fact]
+    public void Detach_StopsReactingToStateChanges()
+    {
+        var state = new DialogEditor.Core.Conditions.GameState();
+        var vm = GatedVm(state);
+        vm.Detach();
+
+        state.Globals["g"] = 0;
+        state.NotifyChanged();
+
+        Assert.Equal("6w", vm.LongestPlaythroughText);
+    }
+
+    [Fact]
+    public void HasAssumedState_FalseForEmptyOrMissingState_TrueWithFacts()
+    {
+        Assert.False(GatedVm(null).HasAssumedState);
+        Assert.False(GatedVm(new DialogEditor.Core.Conditions.GameState()).HasAssumedState);
+        Assert.True(GatedVm(StateWith(0)).HasAssumedState);
+    }
+
+    [Fact]
+    public void HasAssumedState_RaisesPropertyChanged_WhenStateChanges()
+    {
+        var state = new DialogEditor.Core.Conditions.GameState();
+        var vm = GatedVm(state);
+        var raised = new List<string?>();
+        vm.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        state.Globals["g"] = 0;
+        state.NotifyChanged();
+
+        Assert.Contains(nameof(FlowAnalyticsViewModel.HasAssumedState), raised);
+    }
+
+    [Fact]
+    public void PrunedLinks_ReportedWhenStateBlocksLinks()
+    {
+        var vm = GatedVm(StateWith(0));
+
+        Assert.True(vm.HasPrunedLinks);
+        Assert.Equal("PathStats_PrunedLinks_One", vm.PrunedLinksText);
+    }
+
+    [Fact]
+    public void PrunedLinks_HiddenWithoutState()
+    {
+        var vm = GatedVm(null);
+
+        Assert.False(vm.HasPrunedLinks);
+        Assert.Equal(string.Empty, vm.PrunedLinksText);
+    }
 }
