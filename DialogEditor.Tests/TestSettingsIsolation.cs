@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using DialogEditor.Avalonia.Docking;
 using DialogEditor.Core.Logging;
 using DialogEditor.ViewModels.Services;
 
@@ -21,15 +22,22 @@ internal static class TestSettingsIsolation
     internal static readonly string RunLogPath = Path.Combine(
         Path.GetTempPath(), "PillarsDialogEditor.Tests", $"app-{Environment.ProcessId}-{Guid.NewGuid():N}.log");
 
+    // And for the dock layout: MainWindow saves it on close and deletes it on a failed
+    // restore or Reset layout, so every headless test that opened and closed a MainWindow
+    // overwrote the user's real layout.json (issue 343). Guarded by Docking/DockLayoutIsolationTests.
+    internal static readonly string RunLayoutPath = Path.Combine(
+        Path.GetTempPath(), "PillarsDialogEditor.Tests", $"layout-{Environment.ProcessId}-{Guid.NewGuid():N}.json");
+
     [ModuleInitializer]
     internal static void RedirectSettingsToTempFile()
     {
         AppSettings.DefaultSettingsPath = RunSettingsPath;
         AppLog.LogPath = RunLogPath;
+        DockLayoutStore.DefaultPath = RunLayoutPath;
         AppDomain.CurrentDomain.ProcessExit += (_, _) =>
         {
             // AppLog rotates to "<name>.log.old" past 1 MB; sweep that too.
-            foreach (var path in new[] { RunSettingsPath, RunLogPath, Path.ChangeExtension(RunLogPath, ".log.old") })
+            foreach (var path in new[] { RunSettingsPath, RunLogPath, RunLayoutPath, Path.ChangeExtension(RunLogPath, ".log.old") })
                 try { File.Delete(path); } catch { /* best-effort */ }
         };
     }

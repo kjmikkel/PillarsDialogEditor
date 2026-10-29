@@ -26,7 +26,10 @@ public sealed class DockLayoutStore
     /// Lets a test substitute a serializer that fails part-way through a save.
     internal DockLayoutStore(IDockSerializer serializer) => _serializer = serializer;
 
-    public string DefaultPath => Path.Combine(
+    // Process-wide static, same as AppLog.LogPath and AppSettings.DefaultSettingsPath: the test
+    // assembly's module initializer redirects it to a per-run temp file, so headless tests that
+    // open and close a MainWindow never save over (or delete) the user's real layout (issue 343).
+    public static string DefaultPath { get; internal set; } = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "PillarsDialogEditor", "layout.json");
 
