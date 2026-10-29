@@ -326,7 +326,7 @@ public partial class MainWindow : Window
     {
         if (vm.ConditionSearch is null) return;   // needs a loaded game
 
-        var factory = new EditorDockFactory(vm.Browser, vm.Canvas, vm.Detail, vm.ConditionSearch);
+        var factory = new EditorDockFactory(vm.Browser, vm.Canvas, vm.Detail, vm.ConditionSearch, vm.GameState);
 
         Dock.Model.Controls.IRootDock? layout = null;
         if (!_dockRestored)
@@ -463,6 +463,7 @@ public partial class MainWindow : Window
     private void ShowBrowserTool_Click(object? sender, RoutedEventArgs e)         => ShowToolById(EditorDockFactory.BrowserId);
     private void ShowDetailsTool_Click(object? sender, RoutedEventArgs e)         => ShowToolById(EditorDockFactory.DetailsId);
     private void ShowConditionSearchTool_Click(object? sender, RoutedEventArgs e) => ShowToolById(EditorDockFactory.ConditionSearchId);
+    private void ShowGameStateTool_Click(object? sender, RoutedEventArgs e)       => ShowToolById(EditorDockFactory.GameStateId);
 
     /// Shows/focuses a Dock tool by its Id. If the tool is still present in the tree
     /// (open, even if its tab isn't active), this just activates it. If the user closed

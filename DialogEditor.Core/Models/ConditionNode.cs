@@ -27,20 +27,25 @@ public sealed record ConditionLeaf(
     bool Not,
     string Operator) : ConditionNode(Not, Operator)
 {
+    /// Extract the method name: between the first space and the first '('.
+    /// FullName example: "Boolean IsGlobalValue(String, Operator, Int32)".
+    /// A method, not a property, so the JSON serializer does not emit it.
+    public string GetMethodName()
+    {
+        var afterSpace = FullName.Contains(' ')
+            ? FullName[(FullName.IndexOf(' ') + 1)..]
+            : FullName;
+        return afterSpace.Contains('(')
+            ? afterSpace[..afterSpace.IndexOf('(')]
+            : afterSpace;
+    }
+
     public override string Format()
     {
         var paramStr = Parameters.Count == 0
             ? string.Empty
             : string.Join(", ", Parameters);
-        // Extract the method name: between the first space and the first '('
-        // FullName example: "Boolean IsGlobalValue(String, Operator, Int32)"
-        var afterSpace = FullName.Contains(' ')
-            ? FullName[(FullName.IndexOf(' ') + 1)..]
-            : FullName;
-        var name = afterSpace.Contains('(')
-            ? afterSpace[..afterSpace.IndexOf('(')]
-            : afterSpace;
-        var body = $"{name}({paramStr})";
+        var body = $"{GetMethodName()}({paramStr})";
         // Condition_Not carries its own trailing space (see Strings.resx) so a
         // translation can put the negation after the call, or drop the space.
         return Not ? CoreStrings.Condition_Not + body : body;

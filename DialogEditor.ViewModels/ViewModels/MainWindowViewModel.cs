@@ -1,5 +1,6 @@
 ﻿using DialogEditor.Core.Analytics;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -34,6 +35,11 @@ public partial class MainWindowViewModel : ObservableObject
     public ConversationViewModel Canvas  { get; }
     public NodeDetailViewModel   Detail  { get; } = new();
     public GuidedTourViewModel   Tour    { get; } = new();
+
+    /// The writer's assumed game state (View > Game State): one for the whole session, shared
+    /// across conversations because globals are game-wide. Node Details reads the same state
+    /// to show each condition list's verdict.
+    public GameStateViewModel    GameState { get; }
 
     // ── Active project ────────────────────────────────────────────────────
     private DialogProject? _project;
@@ -675,6 +681,10 @@ public partial class MainWindowViewModel : ObservableObject
         Detail.IsReadingMode = IsReadingMode;
         Canvas.IsReadingMode = IsReadingMode;
 
+        GameState = new GameStateViewModel(new DialogEditor.Core.Conditions.GameState(), LookupGameDataName);
+        Detail.AssumedState = GameState.State;
+        WireGameStateSources();
+
         Browser.ConversationSelected += OnConversationSelected;
 
         Detail.AddLinkRequested += (fromId, toId) =>
@@ -857,6 +867,67 @@ public partial class MainWindowViewModel : ObservableObject
     }
 
     // ── Link list sync ────────────────────────────────────────────────────
+    // ── Game State panel feed ─────────────────────────────────────────────
+    private readonly HashSet<INotifyPropertyChanged> _conditionSources = [];
+
+    /// Display name for a game-data id (companion, quest, conversation), without the
+    /// " — id" suffix the pickers append; null when the game data has no such entry.
+    private static string? LookupGameDataName(string kind, string id)
+    {
+        var entry = GameDataNameService.Get(kind)
+            .FirstOrDefault(e => string.Equals(e.StoredValue, id, StringComparison.OrdinalIgnoreCase));
+        if (entry is null) return null;
+        var suffix = " — " + entry.StoredValue;
+        return entry.DisplayName.EndsWith(suffix, StringComparison.Ordinal)
+            ? entry.DisplayName[..^suffix.Length]
+            : entry.DisplayName;
+    }
+
+    /// Reloads the Game State rows whenever the open conversation, or any condition list on its
+    /// canvas, changes. Lists come from the canvas (the edited state), not the game file.
+    private void WireGameStateSources()
+    {
+        Canvas.ConversationLoaded += (_, _) => ReloadGameState();
+        Canvas.Nodes.CollectionChanged += (_, e) => TrackConditionSources(e, Canvas.Nodes.Cast<INotifyPropertyChanged>());
+        Canvas.Connections.CollectionChanged += (_, e) => TrackConditionSources(e, Canvas.Connections.Cast<INotifyPropertyChanged>());
+    }
+
+    private void TrackConditionSources(System.Collections.Specialized.NotifyCollectionChangedEventArgs e,
+                                       IEnumerable<INotifyPropertyChanged> current)
+    {
+        if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+        {
+            // Clear() resets with no OldItems: drop every subscription, then re-add what remains.
+            foreach (var s in _conditionSources) s.PropertyChanged -= OnConditionSourceChanged;
+            _conditionSources.Clear();
+            foreach (var s in current) if (_conditionSources.Add(s)) s.PropertyChanged += OnConditionSourceChanged;
+            ReloadGameState();
+            return;
+        }
+        if (e.OldItems is not null)
+            foreach (INotifyPropertyChanged s in e.OldItems)
+                if (_conditionSources.Remove(s)) s.PropertyChanged -= OnConditionSourceChanged;
+        if (e.NewItems is not null)
+            foreach (INotifyPropertyChanged s in e.NewItems)
+                if (_conditionSources.Add(s)) s.PropertyChanged += OnConditionSourceChanged;
+        // A removed node or link takes its conditions with it; additions arrive empty, and a
+        // whole load is picked up once by ConversationLoaded.
+        if (e.OldItems is not null) ReloadGameState();
+    }
+
+    private void OnConditionSourceChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(NodeViewModel.Conditions)) ReloadGameState();
+    }
+
+    private void ReloadGameState()
+    {
+        var lists = new List<IReadOnlyList<ConditionNode>>();
+        foreach (var n in Canvas.Nodes) lists.Add(n.Conditions);
+        foreach (var c in Canvas.Connections) lists.Add(c.Conditions);
+        GameState.Load(lists, _activeGameId);
+    }
+
     private void RefreshDetailLinks()
     {
         if (Canvas.SelectedNode is null) return;

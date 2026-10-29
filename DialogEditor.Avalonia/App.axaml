@@ -253,6 +253,9 @@
         <DataTemplate DataType="docking:ConditionSearchTool">
             <ContentControl Content="{Binding Inner}"/>
         </DataTemplate>
+        <DataTemplate DataType="docking:GameStateTool">
+            <ContentControl Content="{Binding Inner}"/>
+        </DataTemplate>
         <DataTemplate DataType="docking:CanvasDocument">
             <ContentControl Content="{Binding Inner}"/>
         </DataTemplate>
@@ -264,6 +267,9 @@
         </DataTemplate>
         <DataTemplate DataType="vm:NodeDetailViewModel">
             <views:NodeDetailView/>
+        </DataTemplate>
+        <DataTemplate DataType="vm:GameStateViewModel">
+            <views:GameStateView/>
         </DataTemplate>
         <DataTemplate DataType="vm:ConditionSearchViewModel">
             <views:ConditionSearchView/>

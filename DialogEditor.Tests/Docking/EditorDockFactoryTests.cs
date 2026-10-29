@@ -47,4 +47,43 @@ public class EditorDockFactoryTests
         Assert.Contains("Details", ids);
         Assert.Contains("ConditionSearch", ids);   // tabbed together
     }
+
+    [Fact]
+    public void CreateLayout_LeftToolDock_IncludesGameState()
+    {
+        var root = MakeFactory().CreateLayout();
+        var homeDock = Descendants(root).OfType<IToolDock>().First(td => td.Id == "LeftPane");
+        Assert.Contains("GameState", homeDock.VisibleDockables!.Select(x => x.Id));
+    }
+
+    // Review focus 1: a layout.json saved before the Game State tool existed has no such dockable;
+    // View > Game State must still add it to the right pane and show it.
+    [Fact]
+    public void ShowGameState_WithLayoutLackingTheTool_AddsItToTheLeftPane()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"layout-{Guid.NewGuid():N}.json");
+        try
+        {
+            var first = MakeFactory();
+            var layout = first.CreateLayout();
+            first.InitLayout(layout);
+            // Simulate an old save: the tool is gone from the tree entirely.
+            var tool = first.FindDockable(layout, d => d.Id == EditorDockFactory.GameStateId)!;
+            ((IDock)tool.Owner!).VisibleDockables!.Remove(tool);
+            new DockLayoutStore().Save(layout, path);
+
+            var second = MakeFactory();
+            var restored = new DockLayoutStore().Load(path)!;
+            second.RestoreLayout(restored);
+            Assert.Null(second.FindDockable(restored, d => d.Id == EditorDockFactory.GameStateId));
+
+            var shown = second.ShowTool(restored, EditorDockFactory.GameStateId);
+
+            Assert.NotNull(shown);
+            var homeDock = Descendants(restored).OfType<IToolDock>().First(td => td.Id == "LeftPane");
+            Assert.Contains(homeDock.VisibleDockables!, d => d.Id == EditorDockFactory.GameStateId);
+            Assert.NotNull(((DialogEditor.Avalonia.Docking.GameStateTool)shown!).Inner);
+        }
+        finally { try { File.Delete(path); } catch (Exception) { /* best-effort */ } }
+    }
 }

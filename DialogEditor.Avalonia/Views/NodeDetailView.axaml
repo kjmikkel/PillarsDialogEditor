@@ -13,6 +13,17 @@
             <Setter Property="FontWeight" Value="Bold"/>
             <Setter Property="Margin"     Value="0,10,0,3"/>
         </Style>
+        <!-- Condition verdict under the assumed game state: muted = can't tell, success = passes,
+             warning = fails. Reuses the existing text brushes; no new colour tokens. -->
+        <Style Selector="TextBlock.verdict">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Muted}"/>
+        </Style>
+        <Style Selector="TextBlock.verdict.pass">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Status.Success}"/>
+        </Style>
+        <Style Selector="TextBlock.verdict.fail">
+            <Setter Property="Foreground" Value="{DynamicResource Brush.Severity.Warning}"/>
+        </Style>
         <Style Selector="TextBlock.field-label">
             <Setter Property="Foreground"  Value="{DynamicResource Brush.Text.Caption}"/>
             <Setter Property="FontSize"    Value="{DynamicResource FontSize.Caption}"/>
@@ -293,6 +304,12 @@
                                                            AutomationProperties.HelpText="{DynamicResource ToolTip_LinkWeight}"
                                                            AutomationProperties.Name="{DynamicResource Label_LinkWeight}"/>
                                         </Grid>
+                                        <TextBlock Classes="verdict" Classes.pass="{Binding ConditionVerdictPasses}" Classes.fail="{Binding ConditionVerdictFails}"
+                                                   Text="{Binding ConditionVerdictText}"
+                                                   IsVisible="{Binding ShowConditionVerdict}"
+                                                   FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap" Margin="0,3,0,0"
+                                                   ToolTip.Tip="{DynamicResource ToolTip_ConditionVerdict}"
+                                                   AutomationProperties.HelpText="{DynamicResource ToolTip_ConditionVerdict}"/>
                                     </StackPanel>
                                 </Grid>
                             </Border>
@@ -688,6 +705,12 @@
                             AutomationProperties.HelpText="{DynamicResource ToolTip_EditConditions}"
                             AutomationProperties.Name="{DynamicResource AutomationName_EditConditions}"/>
                 </Grid>
+                <TextBlock Classes="verdict" Classes.pass="{Binding ConditionVerdictPasses}" Classes.fail="{Binding ConditionVerdictFails}"
+                           Text="{Binding ConditionVerdictText}"
+                           IsVisible="{Binding ShowConditionVerdict}"
+                           FontSize="{DynamicResource FontSize.Small}" TextWrapping="Wrap" Margin="0,2,0,0"
+                           ToolTip.Tip="{DynamicResource ToolTip_ConditionVerdict}"
+                           AutomationProperties.HelpText="{DynamicResource ToolTip_ConditionVerdict}"/>
                     </StackPanel>
                 </Expander>
 

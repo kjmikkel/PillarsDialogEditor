@@ -33,9 +33,55 @@ public partial class NodeDetailViewModel : ObservableObject
             OnPropertyChanged(nameof(CanEditLinkConditions));
             OnPropertyChanged(nameof(LinkConditionsToolTip));
             OnPropertyChanged(nameof(ScriptWarnings));
+            RefreshVerdicts();
         }
     }
     private string _activeGameId = string.Empty;
+
+    // ── Condition verdict under the assumed game state (View > Game State) ──
+    private DialogEditor.Core.Conditions.GameState? _assumedState;
+
+    /// The session's assumed game state, owned by MainWindowViewModel. Node Details listens to
+    /// it (and stops listening to a replaced one) to keep the verdict lines live.
+    public DialogEditor.Core.Conditions.GameState? AssumedState
+    {
+        get => _assumedState;
+        set
+        {
+            if (ReferenceEquals(_assumedState, value)) return;
+            if (_assumedState is not null) _assumedState.Changed -= OnAssumedStateChanged;
+            _assumedState = value;
+            if (_assumedState is not null) _assumedState.Changed += OnAssumedStateChanged;
+            RefreshVerdicts();
+        }
+    }
+
+    private void OnAssumedStateChanged(object? sender, EventArgs e) => RefreshVerdicts();
+
+    /// Shown only once the writer has set a fact and the node has conditions.
+    public bool ShowConditionVerdict
+        => ConditionVerdictFormat.Applies(_assumedState, _node?.Conditions ?? []);
+
+    public DialogEditor.Core.Conditions.Truth ConditionVerdict
+        => ConditionVerdictFormat.Evaluate(_assumedState, _node?.Conditions ?? [], _activeGameId);
+
+    public string ConditionVerdictText => ConditionVerdictFormat.Text(ConditionVerdict);
+
+    public bool ConditionVerdictPasses => ConditionVerdict == DialogEditor.Core.Conditions.Truth.True;
+    public bool ConditionVerdictFails => ConditionVerdict == DialogEditor.Core.Conditions.Truth.False;
+
+    private void RefreshVerdicts()
+    {
+        OnPropertyChanged(nameof(ShowConditionVerdict));
+        OnPropertyChanged(nameof(ConditionVerdict));
+        OnPropertyChanged(nameof(ConditionVerdictText));
+        OnPropertyChanged(nameof(ConditionVerdictPasses));
+        OnPropertyChanged(nameof(ConditionVerdictFails));
+        foreach (var link in Links)
+        {
+            link.SetVerdictContext(_assumedState, _activeGameId);
+        }
+    }
 
     /// Only PoE2's FlowChartLink has Conditionals (issue 141). PoE1's game model has none, so
     /// a condition put on a PoE1 link would look saved here yet never fire in game; the shipped
@@ -1015,6 +1061,7 @@ public partial class NodeDetailViewModel : ObservableObject
         {
             OnPropertyChanged(nameof(ConditionSummary));
             OnPropertyChanged(nameof(LogicSummary));
+            RefreshVerdicts();
         }
         if (e.PropertyName == nameof(NodeViewModel.Scripts))
         {
@@ -1096,6 +1143,7 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(VoAliasSharedCount));
         OnPropertyChanged(nameof(VoAliasSharedText));
         OnPropertyChanged(nameof(CanStartVoAliasPick));
+        RefreshVerdicts();
     }
 
     public void Refresh() => NotifyAllProxies();
@@ -1134,6 +1182,7 @@ public partial class NodeDetailViewModel : ObservableObject
     public void RefreshLinks(IEnumerable<ConnectionViewModel> connections)
     {
         Links = connections.ToList();
+        RefreshVerdicts();
         OnPropertyChanged(nameof(BarkWarnings));
         OnPropertyChanged(nameof(ScriptWarnings));
     }

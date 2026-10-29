@@ -42,6 +42,12 @@
 $script:SettingsPath = Join-Path $env:LOCALAPPDATA "PillarsDialogEditor\settings.json"
 $script:SettingsBackup = $null
 $script:SettingsBackupPath = Join-Path $env:TEMP "PillarsDialogEditor.settings.backup.json"
+# The dock layout is user state too: the app rewrites layout.json on exit, so a run that opens
+# or moves a tool (View > Game State, say) would otherwise leave that change in the user's real
+# layout (found in issue 305). Backed up and restored with settings.json, same rules.
+$script:LayoutPath = Join-Path $env:LOCALAPPDATA "PillarsDialogEditor\layout.json"
+$script:LayoutBackupPath = Join-Path $env:TEMP "PillarsDialogEditor.layout.backup.json"
+$script:LayoutAbsentMarker = Join-Path $env:TEMP "PillarsDialogEditor.layout.absent"
 
 function Initialize-DriveApp {
     # Loads the UIA client, WinForms (SendKeys), Drawing (screenshots), and the
@@ -85,6 +91,10 @@ function Backup-EditorSettings {
     #
     # An existing backup is never overwritten: if a previous run died before restoring,
     # the older file is the one holding the user's genuine settings.
+    if (-not (Test-Path $script:LayoutBackupPath) -and -not (Test-Path $script:LayoutAbsentMarker)) {
+        if (Test-Path $script:LayoutPath) { Copy-Item $script:LayoutPath $script:LayoutBackupPath -Force }
+        else { New-Item -ItemType File -Path $script:LayoutAbsentMarker -Force | Out-Null }
+    }
     if (-not (Test-Path $script:SettingsPath)) { return }
     if (-not (Test-Path $script:SettingsBackupPath)) {
         Copy-Item $script:SettingsPath $script:SettingsBackupPath -Force
@@ -99,6 +109,15 @@ function Restore-EditorSettings {
     # the one that called Backup-EditorSettings. Removes the snapshot on success so
     # the next run starts clean; warns loudly if there is nothing to restore, since
     # a silent no-op here is how a run leaks its state into the user's session.
+    if (Test-Path $script:LayoutBackupPath) {
+        Copy-Item $script:LayoutBackupPath $script:LayoutPath -Force
+        Remove-Item $script:LayoutBackupPath -Force
+    }
+    elseif (Test-Path $script:LayoutAbsentMarker) {
+        # The user had no layout before the run: remove the one the run created.
+        if (Test-Path $script:LayoutPath) { Remove-Item $script:LayoutPath -Force }
+        Remove-Item $script:LayoutAbsentMarker -Force
+    }
     if (Test-Path $script:SettingsBackupPath) {
         Copy-Item $script:SettingsBackupPath $script:SettingsPath -Force
         Remove-Item $script:SettingsBackupPath -Force
