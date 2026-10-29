@@ -68,10 +68,18 @@ public static class PathStatsService
 
         // A link the assumed state rules out (#32). A dangling link has no target to read
         // conditions from, so it is never "blocked" here; LinksOf drops it separately.
-        bool Blocked(NodeRef from, LinkEditSnapshot l) =>
-            state is not null
-            && nodeById.TryGetValue(new NodeRef(from.Conversation, l.ToNodeId), out var target)
-            && LinkFiring.CannotFire(l.Conditions ?? [], target.Conditions, state, gameId);
+        // Memoised per link object: LinksOf is called many times per node (fork tree
+        // walks), and re-running the evaluator each time is pure waste.
+        var blockedMemo = new Dictionary<LinkEditSnapshot, bool>(ReferenceEqualityComparer.Instance);
+        bool Blocked(NodeRef from, LinkEditSnapshot l)
+        {
+            if (state is null) return false;
+            if (blockedMemo.TryGetValue(l, out var cached)) return cached;
+            var blocked = nodeById.TryGetValue(new NodeRef(from.Conversation, l.ToNodeId), out var target)
+                && LinkFiring.CannotFire(l.Conditions ?? [], target.Conditions, state, gameId);
+            blockedMemo[l] = blocked;
+            return blocked;
+        }
 
         var blockedLinkCount = nodeById.Sum(kv => kv.Value.Links.Count(l => Blocked(kv.Key, l)));
 
