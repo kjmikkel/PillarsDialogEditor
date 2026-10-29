@@ -32,6 +32,7 @@
     "avalonia" group in .github/dependabot.yml.
   -->
   <ItemGroup Label="Avalonia and Dock">
+    <PackageVersion Include="AssetsTools.NET"                Version="3.0.5" />
     <PackageVersion Include="Avalonia"                       Version="11.3.22" />
     <PackageVersion Include="Avalonia.Desktop"               Version="11.3.22" />
     <PackageVersion Include="Avalonia.Fonts.Inter"           Version="11.3.22" />
