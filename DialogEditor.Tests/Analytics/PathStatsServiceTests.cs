@@ -1,4 +1,5 @@
 ﻿using DialogEditor.Core.Analytics;
+using DialogEditor.Core.Conditions;
 using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 
@@ -466,4 +467,128 @@ public class PathStatsServiceTests
     [Fact]
     public void Empty_HasStartNode() =>
         Assert.True(PathStatsService.Analyze(Snap()).HasStartNode);
+
+    // ── Condition-aware stats (#32) ───────────────────────────────────────
+    // g is 0 in AssumedState(), so "g EqualTo 1" is definitely False and "h EqualTo 1"
+    // (h unset) is Unknown.
+    private static ConditionLeaf GlobalIs(string name, string value) =>
+        new("Boolean IsGlobalValue(String, Operator, Int32)", [name, "EqualTo", value], Not: false, Operator: "And");
+
+    private static readonly IReadOnlyList<ConditionNode> AlwaysFalse = [GlobalIs("g", "1")];
+    private static readonly IReadOnlyList<ConditionNode> UnknownCond = [GlobalIs("h", "1")];
+
+    private static GameState AssumedState()
+    {
+        var s = new GameState();
+        s.Globals["g"] = 0;
+        return s;
+    }
+
+    private static LinkEditSnapshot GatedLink(int from, int to, IReadOnlyList<ConditionNode> c) =>
+        Link(from, to) with { Conditions = c };
+
+    private static ConversationEditSnapshot ForkWithLongBranch(IReadOnlyList<ConditionNode> longLinkConditions) =>
+        Snap(
+            Node(0, "start", links: [GatedLink(0, 1, longLinkConditions), Link(0, 2)]),
+            Node(1, "long", isPlayerChoice: true, links: [Link(1, 3)]),
+            Node(3, "aaa bbb ccc ddd"),
+            Node(2, "short", isPlayerChoice: true));
+
+    [Fact]
+    public void BlockedBranch_DropsOutOfLongestAndShortest()
+    {
+        var report = PathStatsService.Analyze(ForkWithLongBranch(AlwaysFalse), AssumedState(), "poe2");
+
+        Assert.Equal(2, report.DefaultLongestWords);   // start+short; the 6-word path is gone
+        Assert.Equal(2, report.DefaultShortestWords);
+    }
+
+    [Fact]
+    public void BlockedPlayerChoice_LeavesTheForkTree()
+    {
+        var report = PathStatsService.Analyze(ForkWithLongBranch(AlwaysFalse), AssumedState(), "poe2");
+
+        Assert.Equal(2, Assert.Single(report.Branches).Choice.NodeId);
+    }
+
+    [Fact]
+    public void NodeWhoseEveryLinkIsBlocked_BecomesAnEnding()
+    {
+        var snap = Snap(
+            Node(0, "start", links: [GatedLink(0, 1, AlwaysFalse)]),
+            Node(1, "never"));
+
+        var report = PathStatsService.Analyze(snap, AssumedState(), "poe2");
+
+        Assert.Equal(0, Assert.Single(report.Endings).Node.NodeId);
+    }
+
+    [Fact]
+    public void UnknownCondition_KeepsTheLink()
+    {
+        var report = PathStatsService.Analyze(ForkWithLongBranch(UnknownCond), AssumedState(), "poe2");
+
+        Assert.Equal(6, report.DefaultLongestWords);
+        Assert.Equal(2, report.Branches.Count);
+        Assert.Equal(0, report.BlockedLinkCount);
+    }
+
+    [Fact]
+    public void NoFacts_FiguresUnchanged()
+    {
+        var snap = ForkWithLongBranch(AlwaysFalse);
+
+        var without = PathStatsService.Analyze(snap);
+        var withEmptyState = PathStatsService.Analyze(snap, new GameState(), "poe2");
+
+        Assert.Equal(without.DefaultLongestWords, withEmptyState.DefaultLongestWords);
+        Assert.Equal(without.DefaultShortestWords, withEmptyState.DefaultShortestWords);
+        Assert.Equal(without.Branches.Count, withEmptyState.Branches.Count);
+        Assert.Equal(without.Endings.Count, withEmptyState.Endings.Count);
+        Assert.Equal(0, withEmptyState.BlockedLinkCount);
+    }
+
+    [Fact]
+    public void BlockedLinkCount_CountsLinksThatCannotFire()
+    {
+        var snap = Snap(
+            Node(0, "start", links: [GatedLink(0, 1, AlwaysFalse), GatedLink(0, 2, AlwaysFalse), Link(0, 3)]),
+            Node(1, "a"), Node(2, "b"), Node(3, "c"));
+
+        Assert.Equal(2, PathStatsService.Analyze(snap, AssumedState(), "poe2").BlockedLinkCount);
+        Assert.Equal(0, PathStatsService.Analyze(snap).BlockedLinkCount);
+    }
+
+    [Fact]
+    public void FalseTargetNodeConditions_BlockTheLinkIntoIt()
+    {
+        var snap = Snap(
+            Node(0, "start", links: [Link(0, 1), Link(0, 2)]),
+            Node(1, "gated node", isPlayerChoice: true) with { Conditions = AlwaysFalse },
+            Node(2, "open", isPlayerChoice: true));
+
+        var report = PathStatsService.Analyze(snap, AssumedState(), "poe2");
+
+        Assert.Equal(2, Assert.Single(report.Branches).Choice.NodeId);
+        Assert.Equal(1, report.BlockedLinkCount);
+    }
+
+    [Fact]
+    public void Handoff_IsNeverPruned()
+    {
+        var a = Snap(
+            Node(0, "start", links: [GatedLink(0, 1, AlwaysFalse)]),
+            Node(1, "never"));
+        var b = Snap(Node(0, "other conversation"));
+        var graph = new MultiConversationGraph(
+            RootConversation: "A",
+            Conversations: new Dictionary<string, ConversationEditSnapshot> { ["A"] = a, ["B"] = b },
+            Jumps: [new JumpEdge(new NodeRef("A", 0), new NodeRef("B", 0))],
+            Unfollowed: []);
+
+        var report = PathStatsService.Analyze(graph, AssumedState(), "poe2");
+
+        Assert.Equal(3, report.DefaultLongestWords);   // start(1) + handoff target "other conversation"(2)
+        Assert.DoesNotContain(report.Endings, e => e.Node.NodeId == 0 && e.Node.Conversation == "A");
+    }
 }

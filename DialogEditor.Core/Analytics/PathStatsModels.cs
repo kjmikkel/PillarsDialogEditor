@@ -65,4 +65,9 @@ public record PathStatsReport(
     /// False when the root conversation has nodes but no node 0 (issue 172): there is no
     /// playthrough to measure, though the word totals still count every line.
     public bool HasStartNode { get; init; } = true;
+
+    /// Links anywhere in the graph, to a node that exists, that cannot fire under the assumed
+    /// game state (#32). 0 when no state was given. Counted graph-wide, not just on paths
+    /// reachable from the root, so it says how much the assumption pruned.
+    public int BlockedLinkCount { get; init; }
 }
