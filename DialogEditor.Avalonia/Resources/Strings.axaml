@@ -1179,6 +1179,10 @@ Saving records your edits to the open project — game files are not touched unt
     <!-- Cross-conversation path stats (issue #14) -->
     <sys:String x:Key="FlowAnalytics_FollowJumps">Follow conversation jumps</sys:String>
     <sys:String x:Key="FlowAnalytics_FollowJumps_Tip">Counts content reached through Start Conversation handoffs into conversations this project patches. Figures will be larger than the single-conversation reading. Handoffs into conversations the project does not patch are listed but not counted.</sys:String>
+    <sys:String x:Key="PathStats_UseAssumedState">Use assumed game state</sys:String>
+    <sys:String x:Key="PathStats_UseAssumedState_Tip">When checked, the playthrough figures skip links that cannot fire under the game state set in View &gt; Game State. Only links whose conditions definitely fail are skipped; a link the state cannot settle stays in. Uncheck to see the upper bound over every link, whatever the game state.</sys:String>
+    <sys:String x:Key="PathStats_PrunedLinks_One">1 link can't fire under the assumed game state and is skipped.</sys:String>
+    <sys:String x:Key="PathStats_PrunedLinks_Other">{0} links can't fire under the assumed game state and are skipped.</sys:String>
     <sys:String x:Key="FlowAnalytics_SpanningConversations">Spanning {0} conversations</sys:String>
     <sys:String x:Key="FlowAnalytics_InConversation">in {0}</sys:String>
     <sys:String x:Key="FlowAnalytics_UnfollowedHeader">Handoffs not followed</sys:String>

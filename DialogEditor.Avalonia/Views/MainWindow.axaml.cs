@@ -737,7 +737,8 @@ public partial class MainWindow : Window
                 resolveGraph: () => vm.ResolveConversationJumpGraph(),
                 followConversationJumps: AppSettings.FollowConversationJumps,
                 persistFollowJumps: v => AppSettings.FollowConversationJumps = v,
-                navigateToNodeInConversation: vm.NavigateToFoundNode);
+                navigateToNodeInConversation: vm.NavigateToFoundNode,
+                assumedState: vm.GameState.State);
 
             _flowAnalyticsWindow = new FlowAnalyticsWindow(analyticsVm);
 
@@ -746,6 +747,7 @@ public partial class MainWindow : Window
             _flowAnalyticsWindow.Closed += (_, _) =>
             {
                 vm.ConversationSaved -= OnSaved;
+                analyticsVm.Detach();
                 _flowAnalyticsWindow = null;
             };
         }
