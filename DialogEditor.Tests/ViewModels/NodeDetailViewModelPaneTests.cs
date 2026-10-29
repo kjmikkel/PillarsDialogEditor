@@ -140,6 +140,18 @@ public class NodeDetailViewModelPaneTests
         Assert.Equal($"NodeDetail_ConditionsCount_Other{Sep}NodeDetail_ScriptsCount_Other", _vm.LogicSummary);
     }
 
+    [Theory] // GitHub issue 342: selecting another node left the Conditions row on "(none)".
+    [InlineData(nameof(NodeDetailViewModel.ConditionSummary))]
+    [InlineData(nameof(NodeDetailViewModel.ScriptSummary))]
+    public void Load_RaisesLogicRowSummaries(string property)
+    {
+        LoadNode(id: 1);
+        var raised = new List<string?>();
+        _vm.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+        LoadNode(id: 2);
+        Assert.Contains(property, raised);
+    }
+
     [Fact]
     public void NotesSummary_EmptyNotes_ShowsNoneShort()
     {

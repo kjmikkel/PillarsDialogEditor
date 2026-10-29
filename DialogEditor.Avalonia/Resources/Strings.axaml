@@ -550,7 +550,6 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ScriptEditor_OK">OK</sys:String>
 
     <!-- ─── Detail panel — condition editor ─────────────────────────────── -->
-    <sys:String x:Key="Label_GroupConditions">CONDITIONS</sys:String>
     <sys:String x:Key="Button_EditConditions">Edit…</sys:String>
     <sys:String x:Key="AutomationName_EditConditions">Edit conditions…</sys:String>
     <sys:String x:Key="ToolTip_EditConditions">Open the condition editor to add, edit, or remove conditions</sys:String>

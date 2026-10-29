@@ -669,7 +669,7 @@
                             AutomationProperties.Name="{DynamicResource AutomationName_EditScripts}"/>
                 </Grid>
 
-                <TextBlock Classes="field-label" Text="{DynamicResource Label_GroupConditions}"/>
+                <TextBlock Classes="field-label" Text="{DynamicResource PropertyRow_Conditions}"/>
                 <Grid ColumnDefinitions="*,Auto" Margin="0,2,0,0">
                     <!-- Summary: show count + first condition names -->
                     <TextBlock Grid.Column="0"
