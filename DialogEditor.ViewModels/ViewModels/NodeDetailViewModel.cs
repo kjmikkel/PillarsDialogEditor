@@ -1135,6 +1135,8 @@ public partial class NodeDetailViewModel : ObservableObject
         OnPropertyChanged(nameof(DisplaySummary));
         OnPropertyChanged(nameof(VoiceSummary));
         OnPropertyChanged(nameof(LogicSummary));
+        OnPropertyChanged(nameof(ConditionSummary));   // issue 342: the Logic rows must follow the
+        OnPropertyChanged(nameof(ScriptSummary));      // selected node, like the header count does
         OnPropertyChanged(nameof(NotesSummary));
 
         OnPropertyChanged(nameof(HasVoAlias));
