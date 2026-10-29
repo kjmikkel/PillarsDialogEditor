@@ -223,10 +223,7 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
         // as GlobalVariables.LoadMetadata reads them. pillars1's names are only kept aside by the
         // game for importing a PoE1 save, not declared as variables, so they aren't offered
         // (issue 199). Sorted by name, as the suggestions are browsed alphabetically.
-        var vars = Roots.Select(r => Path.Combine(r.Path, "design", "globalvariables"))
-            .Where(Directory.Exists)
-            .SelectMany(d => Directory.EnumerateFiles(d, "*.globalvariablesbundle"))
-            .Where(f => !Path.GetFileNameWithoutExtension(f).Equals("pillars1", StringComparison.OrdinalIgnoreCase))
+        var vars = GlobalVariablesBundles()
             .SelectMany(Poe2GlobalVariablesBundleParser.ParseFile)
             .DistinctBy(v => v.Name, StringComparer.Ordinal)
             .OrderBy(v => v.Name, StringComparer.OrdinalIgnoreCase)
@@ -260,6 +257,25 @@ public class Poe2GameDataProvider(string rootPath) : IGameDataProvider
     // the kinds that store no ID (WeaponType).
     private static IReadOnlyList<GameDataEntry> LastOfEach(IReadOnlyList<GameDataEntry> entries) =>
         entries.Reverse().DistinctBy(e => e.Id.Length > 0 ? "id:" + e.Id : "name:" + e.Name).Reverse().ToList();
+
+    // Every data folder's design/globalvariables/*.globalvariablesbundle, in load order, except
+    // pillars1's, which the game keeps aside for importing a PoE1 save (issue 199).
+    private IEnumerable<string> GlobalVariablesBundles() =>
+        Roots.Select(r => Path.Combine(r.Path, "design", "globalvariables"))
+            .Where(Directory.Exists)
+            .SelectMany(d => Directory.EnumerateFiles(d, "*.globalvariablesbundle"))
+            .Where(f => !Path.GetFileNameWithoutExtension(f).Equals("pillars1", StringComparison.OrdinalIgnoreCase));
+
+    // Issue 345: a later bundle's declaration overrides an earlier one's, as
+    // GlobalVariables.LoadGlobalVariablesBundle overwrites a tag it has already seen.
+    public IReadOnlyDictionary<string, int> LoadGlobalVariableInitialValues()
+    {
+        var values = new Dictionary<string, int>(StringComparer.Ordinal);
+        foreach (var bundle in GlobalVariablesBundles())
+            foreach (var (tag, value) in Poe2GlobalVariablesBundleParser.ParseInitialValuesFile(bundle))
+                values[tag] = value;
+        return values;
+    }
 
     private static bool IsPlayerClassComponent(IReadOnlyList<JsonElement> components) =>
         components.Any(c =>

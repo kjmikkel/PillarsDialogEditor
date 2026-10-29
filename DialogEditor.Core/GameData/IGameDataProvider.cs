@@ -24,6 +24,11 @@ public interface IGameDataProvider
     /// Default returns empty; override in providers that supply game data.
     IReadOnlyDictionary<string, IReadOnlyList<GameDataEntry>> LoadGameDataNames()
         => new Dictionary<string, IReadOnlyList<GameDataEntry>>();
+
+    /// Each global variable's start-of-game value, keyed on the same tag as the
+    /// "GlobalVariable" names in <see cref="LoadGameDataNames"/> (issue 345).
+    /// Default returns empty; override in providers that read the game's declarations.
+    IReadOnlyDictionary<string, int> LoadGlobalVariableInitialValues() => new Dictionary<string, int>();
     void   SaveConversation(ConversationFile file, ConversationEditSnapshot snapshot);
     string GetStringTablePath(ConversationFile file);
     string GetStringTablePath(ConversationFile file, string language);

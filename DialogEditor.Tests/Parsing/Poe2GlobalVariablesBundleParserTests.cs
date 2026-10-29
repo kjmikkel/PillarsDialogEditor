@@ -38,4 +38,51 @@ public class Poe2GlobalVariablesBundleParserTests
     public void ParseFile_MissingFile_ReturnsEmpty()
         => Assert.Empty(Poe2GlobalVariablesBundleParser.ParseFile(
             Path.Combine(Path.GetTempPath(), "does-not-exist.globalvariablesbundle")));
+
+    // Issue 345: InitialValue is a JSON integer (GlobalVariablesData.GlobalVariable.InitialValue
+    // is an int); shipped bundles hold values from -1 to 10.
+    [Fact]
+    public void ParseInitialValues_MapsEachTagToItsInitialValue_SkippingEmptyTags()
+    {
+        var values = Poe2GlobalVariablesBundleParser.ParseInitialValues(Bundle);
+
+        Assert.Equal(2, values.Count);
+        Assert.Equal(0, values["n_(NPC)_State"]);
+        Assert.Equal(1, values["b_Met_Eder"]);
+    }
+
+    [Fact]
+    public void ParseInitialValues_NegativeAndMissingValues()
+    {
+        const string json = """
+            {"GlobalVariablesSets": [ { "GlobalVariables": [
+                { "Tag": "n_Unset", "InitialValue": -1 },
+                { "Tag": "n_NoValue" }
+            ] } ]}
+            """;
+
+        var values = Poe2GlobalVariablesBundleParser.ParseInitialValues(json);
+
+        Assert.Equal(-1, values["n_Unset"]);
+        Assert.Equal(0, values["n_NoValue"]);
+    }
+
+    // GlobalVariables.LoadGlobalVariablesBundle overwrites a tag it has already seen.
+    [Fact]
+    public void ParseInitialValues_RepeatedTag_KeepsTheLastValue()
+    {
+        const string json = """
+            {"GlobalVariablesSets": [
+                { "GlobalVariables": [ { "Tag": "n_Twice", "InitialValue": 2 } ] },
+                { "GlobalVariables": [ { "Tag": "n_Twice", "InitialValue": 5 } ] }
+            ]}
+            """;
+
+        Assert.Equal(5, Poe2GlobalVariablesBundleParser.ParseInitialValues(json)["n_Twice"]);
+    }
+
+    [Fact]
+    public void ParseInitialValuesFile_MissingFile_ReturnsEmpty()
+        => Assert.Empty(Poe2GlobalVariablesBundleParser.ParseInitialValuesFile(
+            Path.Combine(Path.GetTempPath(), "does-not-exist.globalvariablesbundle")));
 }

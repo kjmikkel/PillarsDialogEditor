@@ -73,4 +73,50 @@ public class Poe1GlobalVariablesParserTests
     [Fact]
     public void ParseFile_NonExistentPath_ReturnsEmpty()
         => Assert.Empty(Poe1GlobalVariablesParser.ParseFile(@"C:\does\not\exist.globalvariables"));
+
+    // Issue 345: the Game State panel can start from the game's own start-of-game values.
+    [Fact]
+    public void ParseInitialValues_MapsEachTagToItsInitialValue()
+    {
+        const string xml = """
+            <GlobalVariablesData>
+              <GlobalVariables>
+                <GlobalVariable><Tag>n_Gold_Start</Tag><InitialValue>10</InitialValue></GlobalVariable>
+                <GlobalVariable><Tag>n_Unset</Tag><InitialValue>-1</InitialValue></GlobalVariable>
+                <GlobalVariable><Tag>b_Plain</Tag><InitialValue>0</InitialValue></GlobalVariable>
+              </GlobalVariables>
+            </GlobalVariablesData>
+            """;
+
+        var values = Poe1GlobalVariablesParser.ParseInitialValues(xml);
+
+        Assert.Equal(3, values.Count);
+        Assert.Equal(10, values["n_Gold_Start"]);
+        Assert.Equal(-1, values["n_Unset"]);
+        Assert.Equal(0, values["b_Plain"]);
+    }
+
+    [Fact]
+    public void ParseInitialValues_MissingOrUnreadableValue_IsZero_AndEmptyTagsAreSkipped()
+    {
+        const string xml = """
+            <GlobalVariablesData>
+              <GlobalVariables>
+                <GlobalVariable><Tag>no_value</Tag></GlobalVariable>
+                <GlobalVariable><Tag>junk_value</Tag><InitialValue>abc</InitialValue></GlobalVariable>
+                <GlobalVariable><Tag></Tag><InitialValue>4</InitialValue></GlobalVariable>
+              </GlobalVariables>
+            </GlobalVariablesData>
+            """;
+
+        var values = Poe1GlobalVariablesParser.ParseInitialValues(xml);
+
+        Assert.Equal(2, values.Count);
+        Assert.Equal(0, values["no_value"]);
+        Assert.Equal(0, values["junk_value"]);
+    }
+
+    [Fact]
+    public void ParseInitialValuesFile_NonExistentPath_ReturnsEmpty()
+        => Assert.Empty(Poe1GlobalVariablesParser.ParseInitialValuesFile(@"C:\does\not\exist.globalvariables"));
 }

@@ -325,6 +325,27 @@ public class Poe1GameDataProviderTests : IDisposable
         Assert.Empty(names);
     }
 
+    // Issue 345: the start-of-game values come from the same game.globalvariables file.
+    [Fact]
+    public void LoadGlobalVariableInitialValues_ReadsGameGlobalVariables()
+    {
+        var designDir = Path.Combine(_root, "PillarsOfEternity_Data", "data", "design", "global");
+        Directory.CreateDirectory(designDir);
+        File.WriteAllText(Path.Combine(designDir, "game.globalvariables"),
+            TwoVarXml.Replace("<Tag>npc_met_eder</Tag><FolderGuid>00000000-0000-0000-0000-000000000000</FolderGuid><InitialValue>0",
+                              "<Tag>npc_met_eder</Tag><FolderGuid>00000000-0000-0000-0000-000000000000</FolderGuid><InitialValue>3"));
+
+        var values = _provider.LoadGlobalVariableInitialValues();
+
+        Assert.Equal(2, values.Count);
+        Assert.Equal(0, values["bBanterDisabled"]);
+        Assert.Equal(3, values["npc_met_eder"]);
+    }
+
+    [Fact]
+    public void LoadGlobalVariableInitialValues_NoGlobalVariablesFile_ReturnsEmpty()
+        => Assert.Empty(_provider.LoadGlobalVariableInitialValues());
+
     // Issue 162: PoE1 finds conversations by path; it has no manifest to register in.
     [Fact]
     public void ConversationManifestPath_IsNull() =>
