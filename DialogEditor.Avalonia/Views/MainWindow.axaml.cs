@@ -332,7 +332,7 @@ public partial class MainWindow : Window
         if (!_dockRestored)
         {
             _dockRestored = true;   // only the first build of the session may consult the disk file
-            var restored = _store.Load(_store.DefaultPath);
+            var restored = _store.Load(DockLayoutStore.DefaultPath);
             if (restored is not null)
             {
                 // DockLayoutStore.Load only guards against unparseable JSON; a file that
@@ -349,7 +349,7 @@ public partial class MainWindow : Window
                 catch (Exception ex)
                 {
                     AppLog.Warn($"Dock layout restore failed, using default: {ex.Message}");
-                    _store.Delete(_store.DefaultPath);
+                    _store.Delete(DockLayoutStore.DefaultPath);
                     layout = null;
                 }
             }
@@ -502,7 +502,7 @@ public partial class MainWindow : Window
     private void ResetLayout_Click(object? sender, RoutedEventArgs e)
     {
         if (DataContext is not MainWindowViewModel vm) return;
-        _store.Delete(_store.DefaultPath);
+        _store.Delete(DockLayoutStore.DefaultPath);
         _dockRestored = true;   // bypass the disk file even if this is somehow the first build
         BuildDock(vm);
     }
@@ -970,7 +970,7 @@ public partial class MainWindow : Window
             // dialog already ran and this is the re-entrant confirmed Close()) — save exactly
             // once, here, so a corrupt/interrupted write can never cancel the actual close.
             if (vm.DockLayout is Dock.Model.Controls.IRootDock root)
-                _store.Save(root, _store.DefaultPath);
+                _store.Save(root, DockLayoutStore.DefaultPath);
             base.OnClosing(e);
         }
     }
