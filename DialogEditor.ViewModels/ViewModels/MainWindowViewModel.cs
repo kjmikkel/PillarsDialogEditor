@@ -2464,6 +2464,10 @@ public partial class MainWindowViewModel : ObservableObject
                     }
                 });
             }
+            // PoE1 voice preview (issue 4): index resources.assets in the background.
+            Poe1VoiceService.Clear();
+            if (string.Equals(provider.GameId, "poe1", StringComparison.OrdinalIgnoreCase))
+                _ = Poe1VoiceService.Rebuild(path);   // never throws; failures are logged and leave it not ready
             OnPropertyChanged(nameof(CanValidateVO));
             BatchImportVoAllCommand.NotifyCanExecuteChanged();   // gate depends on game folder + id
             FindInProjectCommand.NotifyCanExecuteChanged();
