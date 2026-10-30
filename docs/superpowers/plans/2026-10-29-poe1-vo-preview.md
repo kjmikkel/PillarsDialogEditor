@@ -71,3 +71,22 @@ ambiguous duplicate names resolve to no voice (spec §2 assumed names were uniqu
 
 **Do not redo:** the AudioClip layout and name mapping are settled (see the trail note); don't read FSB5 bank
 names or the `assetbundles/vo` bundles for lookup.
+
+## Handoff — 2026-10-30 (#355)
+
+**Done** (branch `feat/355-poe1-vo-ambiguous`): `Poe1VoiceIndex` now follows the game's VOAsset route
+(ResourceManager container in `globalgamemanagers` → VOAsset `VOClip.clip` → AudioClip) via new
+`Poe1ResourceContainer`, `Poe1VoAssetRecord`, `Poe1VoiceRoutes`. On the shipped game 77 of the 96 ambiguous names
+resolve; the other 19 have no VOAsset or an empty one (silent in-game too). Lines whose VOAsset reuses another
+conversation's clip (23) now play that clip. Cache files are `<name>.<offset:x>.fsb` so same-name clips no longer
+collide. Spec §2 updated.
+
+**My call:** a VOAsset with an empty or unresolvable clip (13 because of an `Irensî`/`irensi` mismatch in the game
+data, 34 empty with a same-name recording) keeps the name match instead of going silent.
+
+**Not done:** no GUI run; covered by unit tests and the GameData test (`07_cv_deathguard` 29 resolves,
+`px2_00_cv_rabble_rouser` 130 plays `px2_02_cv_final_battle_prep_0183`).
+
+**Decided by the owner (2026-10-30):** empty or unresolvable VOAssets keep the name match (not silent).
+
+**Next step:** owner review of the PR.

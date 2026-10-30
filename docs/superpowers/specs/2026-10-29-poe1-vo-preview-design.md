@@ -23,9 +23,19 @@ PoE1 (they stay PoE2-only); languages other than English (PoE1 ships English voi
 
 `GameResources.GetDialogueAudio(conversationFile, nodeId, female)` looks up
 `<conversation file name without extension>_<nodeId:0000>`, plus `_fem` only when the language is English and
-the female text exists. The `VOAsset` it finds points at an AudioClip of the same name. The editor matches the
-AudioClip name directly _(my call: skips reading VOAssets, which have no type tree in `resources.assets`; names
-matched 1:1 in the investigation)_, case-insensitively.
+the female text exists. The `VOAsset` it finds names the AudioClip to play by Resources path (`VOClip.clip`).
+
+The editor follows the same route (issue [#355](https://github.com/kjmikkel/PillarsDialogEditor/issues/355)):
+the ResourceManager container in `globalgamemanagers` maps
+`audio/vocalization/vo assets/<conversation>/<name>` to the VOAsset (a MonoBehaviour in `resources.assets` with no
+type tree: `Poe1VoAssetRecord` hard-codes its 2019.4 layout), and the VOAsset's clip path, normalised as the game
+does (lower case, every `data/` dropped, extension removed), maps to the AudioClip. When that route reaches a known
+AudioClip it decides the line, including lines that reuse another conversation's clip. Otherwise the editor falls
+back to matching the AudioClip name directly, case-insensitively. A name shared by two different real clips with no
+route resolves to no voice. On the shipped game 96 names are shared; 77 resolve through their VOAsset, and the rest
+(soundset barks, one empty VOAsset) are silent in the game's conversations too. _(my call: VOAssets with an empty
+or unresolvable clip, 13 of them only because of an `Irensî`/`irensi` folder mismatch in the game data, keep the
+name match rather than going silent.)_
 
 Placeholder clips: the game skips clips with frequency 44,100 Hz and exactly 14,976 samples. The editor treats
 those as "no voice" (sample count = round(length × frequency)).
@@ -47,7 +57,7 @@ those as "no voice" (sample count = round(length × frequency)).
   - Internal constructor taking the records and the data folder, for tests.
   - `Poe1VoiceClip? Find(string conversationName, int nodeId, bool female)`; null for placeholders and misses.
   - `string Extract(Poe1VoiceClip clip, string cacheDir)` — copies `[Offset, Offset+Size)` of the clip's source
-    file (resolved next to `resources.assets`) to `<cacheDir>/<name>.fsb`; reuses an existing file of the right
+    file (resolved next to `resources.assets`) to `<cacheDir>/<name>.<offset:x>.fsb` (two clips can share a name); reuses an existing file of the right
     size; throws `InvalidDataException` when the slice does not start with `FSB5` or runs past the file end.
 - Only VO-named clips (`_\d{4}(_fem)?$`) are indexed.
 

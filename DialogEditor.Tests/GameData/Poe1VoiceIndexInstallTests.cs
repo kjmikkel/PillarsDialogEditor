@@ -2,7 +2,7 @@ using DialogEditor.Core.Audio;
 
 namespace DialogEditor.Tests.GameData;
 
-/// Issue 4 against a real PoE1 install (DIALOGEDITOR_POE1_DIR; docs/game-data-tests.md).
+/// Issues 4 and 355 against a real PoE1 install (DIALOGEDITOR_POE1_DIR; docs/game-data-tests.md).
 /// Reads the game folder only; extraction goes to a temp folder.
 [Trait("Category", "GameData")]
 public class Poe1VoiceIndexInstallTests
@@ -19,9 +19,17 @@ public class Poe1VoiceIndexInstallTests
         // copies), leaving 10,995 distinct names; the floor sits just under that.
         Assert.True(index!.Count >= 10900, $"only {index.Count} voice clips indexed");
 
-        // Two different real clips share this name on the shipped game: ambiguous, so no clip.
+        // Two different real clips share this name on the shipped game ("raedric" and "lord raedric
+        // vii" folders). Issue 355: the conversation's VOAsset picks one, so it resolves. Of the 96
+        // shipped ambiguous names, 77 have a VOAsset naming a clip; the rest (soundset barks, one
+        // empty VOAsset) are silent in the game's conversations too.
         Assert.True(index.AmbiguousCount > 0);
-        Assert.Null(index.Find("07_cv_deathguard", 29, false));
+        Assert.True(index.ResolvedAmbiguousCount >= 70, $"only {index.ResolvedAmbiguousCount} ambiguous names resolved");
+        Assert.NotNull(index.Find("07_cv_deathguard", 29, false));
+
+        // This node's VOAsset reuses a line recorded for another conversation: the game plays
+        // that clip, which only the VOAsset route can know.
+        Assert.Equal("px2_02_cv_final_battle_prep_0183", index.Find("px2_00_cv_rabble_rouser", 130, false)?.Name);
 
         var clip = index.Find("00_cv_beodmar", 89, false);
         Assert.NotNull(clip);

@@ -110,7 +110,7 @@ public class Poe1VoiceServiceTests : IDisposable
     {
         var path = Poe1VoiceService.CachePathFor(new Poe1VoiceClip("c_0001", "resources.resource", 0, 8));
 
-        Assert.Equal(Path.Combine(Path.GetTempPath(), "PillarsDialogEditor", "poe1-vo", "c_0001.fsb"), path);
+        Assert.Equal(Path.Combine(Path.GetTempPath(), "PillarsDialogEditor", "poe1-vo", "c_0001.0.fsb"), path);
     }
 
     [Fact]

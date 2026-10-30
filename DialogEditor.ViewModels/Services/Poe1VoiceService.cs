@@ -26,7 +26,7 @@ public static class Poe1VoiceService
     public static event Action? Changed;
 
     /// Where <see cref="Extract"/> writes a clip. Under the temp folder, so the OS may reclaim it.
-    public static string CachePathFor(Poe1VoiceClip clip) => Path.Combine(CacheDir, clip.Name + ".fsb");
+    public static string CachePathFor(Poe1VoiceClip clip) => Path.Combine(CacheDir, clip.CacheFileName);
 
     private static string CacheDir =>
         Path.Combine(Path.GetTempPath(), "PillarsDialogEditor", "poe1-vo");

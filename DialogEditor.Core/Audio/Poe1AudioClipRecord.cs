@@ -14,6 +14,10 @@ public sealed record Poe1AudioClipRecord(
     private const int PlaceholderFrequency = 44100;
     private const int PlaceholderSamples = 14976;
 
+    /// The object's PathId in resources.assets: what the ResourceManager container points at.
+    /// Not part of the object body, so Parse leaves it 0 and Load sets it.
+    public long PathId { get; init; }
+
     public bool IsPlaceholder =>
         Frequency == PlaceholderFrequency
         && (int)Math.Round(Length * Frequency) == PlaceholderSamples;
