@@ -87,4 +87,6 @@ data, 34 empty with a same-name recording) keeps the name match instead of going
 **Not done:** no GUI run; covered by unit tests and the GameData test (`07_cv_deathguard` 29 resolves,
 `px2_00_cv_rabble_rouser` 130 plays `px2_02_cv_final_battle_prep_0183`).
 
-**Next step:** owner review of the PR. Open question: should empty-clip VOAssets go silent, as in the game?
+**Decided by the owner (2026-10-30):** empty or unresolvable VOAssets keep the name match (not silent).
+
+**Next step:** owner review of the PR.
