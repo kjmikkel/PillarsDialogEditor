@@ -311,9 +311,9 @@ SOFTWARE.
 ## AssetsTools.NET
 
 **Used for:** reading the serialized Unity `resources.assets` file of a Pillars of Eternity
-install to locate the voice-over AudioClip records (PoE1 voice preview).  
-**Version:** 3.0.5 (NuGet package, `DialogEditor.Core`)  
-**License:** MIT  
+install to locate the voice-over AudioClip records (PoE1 voice preview).\
+**Version:** 3.0.5 (NuGet package, `DialogEditor.Core`)\
+**License:** MIT\
 **Source:** https://github.com/nesrak1/AssetsTools.NET
 
 ```
