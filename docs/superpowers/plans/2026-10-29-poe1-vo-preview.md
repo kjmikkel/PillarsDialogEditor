@@ -25,7 +25,7 @@ Spec: `docs/superpowers/specs/2026-10-29-poe1-vo-preview-design.md`. Issue #4 (s
 - [x] `Poe1VoiceIndex`: internal ctor (records, data folder); `Find(conv, nodeId, female)`; `Count`;
       `Extract(clip, cacheDir)`; `static Load(gameRoot)` with the 2019.4 version guard. Tests: naming, case,
       `_fem`, placeholder, non-VO skipped, extract slice/reuse/bad magic/past end, missing file → null.
-- [x] GameData test (`[GameInstallFact]` PoE1 variant — see `GameInstallFactAttribute`): ≥ 11,000 clips;
+- [x] GameData test (`[GameInstallFact]` PoE1 variant — see `GameInstallFactAttribute`): ≥ 10,900 distinct names;
       `00_cv_beodmar` node 89 found; its extracted file starts `FSB5`. Writes only under a temp dir.
 
 ## Task 2 — ViewModels
