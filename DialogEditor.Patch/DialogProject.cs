@@ -21,7 +21,10 @@ public record DialogProject(
     IReadOnlyList<IgnoredDuplicate>? IgnoredDuplicates = null,
     // Spelling words accepted in this project — editor metadata, never in game files.
     // Nullable for back-compat with projects saved before this field existed.
-    IReadOnlyList<string>? ProjectWords = null)
+    IReadOnlyList<string>? ProjectWords = null,
+    // The Game State panel's assumed state (issue 344) — editor metadata, never in game files.
+    // Nullable for back-compat; MergeWith keeps this project's, as it's one writer's test setup.
+    GameStateSnapshot? GameState = null)
 {
     public static readonly int CurrentSchemaVersion = 1;
 

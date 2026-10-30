@@ -684,5 +684,6 @@
     "canonical_mod_new": []
   },
   "IgnoredDuplicates": null,
-  "ProjectWords": null
+  "ProjectWords": null,
+  "GameState": null
 }
