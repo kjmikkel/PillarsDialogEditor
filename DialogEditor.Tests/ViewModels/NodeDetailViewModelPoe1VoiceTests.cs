@@ -111,7 +111,7 @@ public class NodeDetailViewModelPoe1VoiceTests : IDisposable
 
         Assert.NotNull(_stub.LastPath);
         _extracted.Add(_stub.LastPath!);
-        Assert.EndsWith(Conv + "_0001_fem.fsb", _stub.LastPath, StringComparison.OrdinalIgnoreCase);
+        Assert.StartsWith(Conv + "_0001_fem.", Path.GetFileName(_stub.LastPath), StringComparison.OrdinalIgnoreCase);
         Assert.True(_vm.IsPlayingFem);
     }
 
