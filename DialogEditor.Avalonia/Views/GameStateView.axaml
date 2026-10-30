@@ -19,6 +19,13 @@
                 AutomationProperties.Name="{DynamicResource GameState_ClearAll}"
                 ToolTip.Tip="{DynamicResource GameState_Tip_ClearAll}"
                 AutomationProperties.HelpText="{DynamicResource GameState_Tip_ClearAll}"/>
+        <!-- Issue 345: fills unset global rows from the game's declared start values; keeps typed ones. -->
+        <Button Content="{DynamicResource GameState_FillStartOfGame}" Command="{Binding FillStartOfGameCommand}"
+                HorizontalAlignment="Left" Padding="14,6"
+                AutomationProperties.Name="{DynamicResource GameState_FillStartOfGame}"
+                ToolTip.Tip="{DynamicResource GameState_Tip_FillStartOfGame}"
+                ToolTip.ShowOnDisabled="True"
+                AutomationProperties.HelpText="{DynamicResource GameState_Tip_FillStartOfGame}"/>
 
         <!-- Global variables: a number each. -->
         <StackPanel x:Name="GlobalsSection" Spacing="4" IsVisible="{Binding HasGlobals}">

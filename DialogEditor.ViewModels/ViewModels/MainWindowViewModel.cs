@@ -683,6 +683,7 @@ public partial class MainWindowViewModel : ObservableObject
 
         GameState = new GameStateViewModel(new DialogEditor.Core.Conditions.GameState(), LookupGameDataName);
         Detail.AssumedState = GameState.State;
+        Canvas.AssumedState = GameState.State;
         GameState.State.Changed += (_, _) => OnAssumedStateChanged();
         WireGameStateSources();
 
@@ -2436,6 +2437,8 @@ public partial class MainWindowViewModel : ObservableObject
                     .ToList();
                 GameDataNameService.Register(kind, namedEntries);
             }
+
+            GameState.SetInitialGlobalValues(provider.LoadGlobalVariableInitialValues());
 
             _activeGameId = provider.GameId;
             Detail.ActiveGameId = provider.GameId;

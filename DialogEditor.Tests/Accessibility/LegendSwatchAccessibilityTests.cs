@@ -4,10 +4,10 @@ using System.Xml.Linq;
 namespace DialogEditor.Tests.Accessibility;
 
 /// <summary>
-/// Gaps.md item 12: the 7 legend swatches in LegendWindow's "Connections" and "Node
+/// Gaps.md item 12: the 8 legend swatches in LegendWindow's "Connections" and "Node
 /// Types" sections are wrapped in focusable Button.legendRow elements so keyboard and
 /// screen-reader users can reach the same explanations sighted mouse users get from
-/// hover. Pins the structural contract: exactly 7 such buttons, each with
+/// hover. Pins the structural contract: exactly 8 such buttons, each with
 /// AutomationProperties.Name / ToolTip.Tip / AutomationProperties.HelpText all set to
 /// the same {StaticResource ...} reference, and each still wrapping a Border +
 /// TextBlock so a future edit can't silently drop the visible swatch/label while
@@ -38,7 +38,7 @@ public class LegendSwatchAccessibilityTests
                         && (e.Attribute("Classes")?.Value ?? "").Split(' ').Contains("legendRow"))
             .ToList();
 
-        Assert.Equal(7, rows.Count);
+        Assert.Equal(8, rows.Count);
 
         foreach (var row in rows)
         {

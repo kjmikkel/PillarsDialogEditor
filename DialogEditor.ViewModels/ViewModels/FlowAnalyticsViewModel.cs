@@ -235,6 +235,34 @@ public partial class FlowAnalyticsViewModel : ObservableObject
     [ObservableProperty] private bool   _hasSpannedConversations;
     [ObservableProperty] private string _conversationsSpannedText = string.Empty;
 
+    // ── Assumed game state (#32) ─────────────────────────────────────────────
+    // The state set in View > Game State. When it holds any fact, the figures skip links
+    // that definitely cannot fire under it; the checkbox lets the writer fall back to the
+    // upper bound over every link. Not persisted: it is a per-look question, and a stale
+    // "off" would silently make the figures look larger than the writer expects.
+    private readonly DialogEditor.Core.Conditions.GameState? _assumedState;
+
+    public bool HasAssumedState => _assumedState is { HasAnyFact: true };
+
+    [ObservableProperty] private bool   _useAssumedState = true;
+    [ObservableProperty] private bool   _hasPrunedLinks;
+    [ObservableProperty] private string _prunedLinksText = string.Empty;
+
+    partial void OnUseAssumedStateChanged(bool value) => Refresh();
+
+    private void OnAssumedStateChanged(object? sender, EventArgs e)
+    {
+        OnPropertyChanged(nameof(HasAssumedState));
+        Refresh();
+    }
+
+    /// Unsubscribes from the game state. The state outlives this window, so without this
+    /// every closed Flow Analytics window would keep re-analysing in the background.
+    public void Detach()
+    {
+        if (_assumedState is not null) _assumedState.Changed -= OnAssumedStateChanged;
+    }
+
     [ObservableProperty] private bool   _hasPathStats;
     [ObservableProperty] private bool   _pathStatsNoStartNode;
     [ObservableProperty] private bool   _hasEndings;
@@ -253,7 +281,8 @@ public partial class FlowAnalyticsViewModel : ObservableObject
         Func<MultiConversationGraph?>?  resolveGraph = null,
         bool                            followConversationJumps = false,
         Action<bool>?                   persistFollowJumps = null,
-        Action<string, int>?            navigateToNodeInConversation = null)
+        Action<string, int>?            navigateToNodeInConversation = null,
+        DialogEditor.Core.Conditions.GameState? assumedState = null)
     {
         _getSnapshot     = getSnapshot;
         _navigateToNode  = navigateToNode;
@@ -272,6 +301,9 @@ public partial class FlowAnalyticsViewModel : ObservableObject
         _persistFollowJumps      = persistFollowJumps;
         _resolveGraph            = resolveGraph;
         _navigateToNodeInConv    = navigateToNodeInConversation;
+
+        _assumedState = assumedState;
+        if (_assumedState is not null) _assumedState.Changed += OnAssumedStateChanged;
     }
 
     /// Mirrors OnWordsPerMinuteChanged: the report's strings are baked at analysis time, so
@@ -355,9 +387,15 @@ public partial class FlowAnalyticsViewModel : ObservableObject
         // Following handoffs is opt-in (issue #14). A null resolver is the safe fallback,
         // so the toggle can never leave the panel broken.
         var graph  = FollowConversationJumps && _resolveGraph is not null ? _resolveGraph() : null;
+        var state  = UseAssumedState && HasAssumedState ? _assumedState : null;
         var report = graph is not null
-            ? PathStatsService.Analyze(graph)
-            : PathStatsService.Analyze(snapshot);
+            ? PathStatsService.Analyze(graph, state, _gameId)
+            : PathStatsService.Analyze(snapshot, state, _gameId);
+
+        HasPrunedLinks = state is not null && report.BlockedLinkCount > 0;
+        PrunedLinksText = HasPrunedLinks
+            ? Loc.FormatCount("PathStats_PrunedLinks", report.BlockedLinkCount)
+            : string.Empty;
         var rootConversation = graph?.RootConversation ?? "";
 
         HasSpannedConversations = report.ConversationsSpanned > 1;

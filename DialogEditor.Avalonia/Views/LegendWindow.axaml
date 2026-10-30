@@ -76,7 +76,7 @@
                     </TextBlock>
                 </Grid>
             </Button>
-            <Button Classes="legendRow" Margin="0,0,0,14"
+            <Button Classes="legendRow" Margin="0,0,0,5"
                     AutomationProperties.Name="{DynamicResource Legend_Never_Help}"
                     ToolTip.Tip="{DynamicResource Legend_Never_Help}"
                     AutomationProperties.HelpText="{DynamicResource Legend_Never_Help}">
@@ -86,6 +86,18 @@
                     <TextBlock FontSize="{DynamicResource FontSize.Body}" VerticalAlignment="Center" TextWrapping="Wrap" Grid.Column="1">
                         <Run FontWeight="Bold" Text="{DynamicResource Legend_Never}" Foreground="{DynamicResource Brush.Text.Secondary}"/>
                         <Run Text="{DynamicResource Legend_Never_Desc}" Foreground="{DynamicResource Brush.Text.Muted}"/>
+                    </TextBlock>
+                </Grid>
+            </Button>
+            <Button Classes="legendRow" Margin="0,0,0,14"
+                    AutomationProperties.Name="{DynamicResource Legend_CannotFire_Help}"
+                    ToolTip.Tip="{DynamicResource Legend_CannotFire_Help}"
+                    AutomationProperties.HelpText="{DynamicResource Legend_CannotFire_Help}">
+                <Grid ColumnDefinitions="Auto,*">
+                    <Border Width="34" Height="2.5" Opacity="0.35" Background="{DynamicResource Brush.Connection.Default}" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <TextBlock FontSize="{DynamicResource FontSize.Body}" VerticalAlignment="Center" TextWrapping="Wrap" Grid.Column="1">
+                        <Run FontWeight="Bold" Text="{DynamicResource Legend_CannotFire}" Foreground="{DynamicResource Brush.Text.Secondary}"/>
+                        <Run Text="{DynamicResource Legend_CannotFire_Desc}" Foreground="{DynamicResource Brush.Text.Muted}"/>
                     </TextBlock>
                 </Grid>
             </Button>

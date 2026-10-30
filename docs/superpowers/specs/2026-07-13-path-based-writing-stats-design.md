@@ -193,5 +193,6 @@ existing `FocusHintBar` and navigation.
     conversation finishes. Consequence: per-ending figures need not reconcile with the
     overall longest, which does stop at DAG terminals — the UI tooltip says so.
 - Condition-aware paths (simulating game state to prune unreachable-by-condition links) —
-  tracked as #32, blocked on #1 (Playtest Mode) settling how assumed game state is
-  represented. Path stats remain over the *possible* graph until then.
+  **done in #32** on top of #305's assumed Game State: with a fact set, links that definitely
+  cannot fire are skipped (spec `2026-10-29-condition-aware-path-stats-design.md`). Without a
+  fact, path stats stay over the *possible* graph.
