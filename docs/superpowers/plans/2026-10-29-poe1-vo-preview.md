@@ -19,22 +19,22 @@ Spec: `docs/superpowers/specs/2026-10-29-poe1-vo-preview-design.md`. Issue #4 (s
 
 ## Task 1 — Core reader (`DialogEditor.Core/Audio/`)
 
-- [ ] Add NuGet `AssetsTools.NET` 3.0.5 to `DialogEditor.Core`; add an entry to `THIRD_PARTY_LICENSES.md` (MIT).
-- [ ] `Poe1AudioClipRecord` + `Parse(AssetsFileReader)` (spec §3), `IsPlaceholder`. Tests build the bytes with
+- [x] Add NuGet `AssetsTools.NET` 3.0.5 to `DialogEditor.Core`; add an entry to `THIRD_PARTY_LICENSES.md` (MIT).
+- [x] `Poe1AudioClipRecord` + `Parse(AssetsFileReader)` (spec §3), `IsPlaceholder`. Tests build the bytes with
       `AssetsFileWriter` over a `MemoryStream`.
-- [ ] `Poe1VoiceIndex`: internal ctor (records, data folder); `Find(conv, nodeId, female)`; `Count`;
+- [x] `Poe1VoiceIndex`: internal ctor (records, data folder); `Find(conv, nodeId, female)`; `Count`;
       `Extract(clip, cacheDir)`; `static Load(gameRoot)` with the 2019.4 version guard. Tests: naming, case,
       `_fem`, placeholder, non-VO skipped, extract slice/reuse/bad magic/past end, missing file → null.
-- [ ] GameData test (`[GameInstallFact]` PoE1 variant — see `GameInstallFactAttribute`): ≥ 11,000 clips;
+- [x] GameData test (`[GameInstallFact]` PoE1 variant — see `GameInstallFactAttribute`): ≥ 11,000 clips;
       `00_cv_beodmar` node 89 found; its extracted file starts `FSB5`. Writes only under a temp dir.
 
 ## Task 2 — ViewModels
 
-- [ ] `Poe1VoiceService` (static, ViewModels/Services) mirroring `VoAliasIndexService`: `Rebuild(gameRoot)`
+- [x] `Poe1VoiceService` (static, ViewModels/Services) mirroring `VoAliasIndexService`: `Rebuild(gameRoot)`
       (background), `IsReady`, `Changed` event (raised on build/clear), `Find`, `Extract(clip)` → cache path or
       null (logged), `RegisterForTests(Poe1VoiceIndex?)`, `Clear()`. Cache dir `<temp>/PillarsDialogEditor/poe1-vo`.
-- [ ] `MainWindowViewModel`: on game activation `Poe1VoiceService.Clear()`; if poe1, `Rebuild(path)`.
-- [ ] `NodeDetailViewModel`:
+- [x] `MainWindowViewModel`: on game activation `Poe1VoiceService.Clear()`; if poe1, `Rebuild(path)`.
+- [x] `NodeDetailViewModel`:
   - PoE1 branch in `NotifyAllProxies` building `VoCheckResult(Found, femFound, primaryCachePath, femCachePath)`
     from the index (paths are where `Extract` will write); `null` when no clip; no `WithLocalVoFallback`.
   - `_voIsPoe1` guard on import and alias getters.
@@ -46,7 +46,28 @@ Spec: `docs/superpowers/specs/2026-10-29-poe1-vo-preview-design.md`. Issue #4 (s
 
 ## Task 3 — verify and ship
 
-- [ ] Full headless suite green.
-- [ ] GUI: open the PoE1 install, open `00_cv_beodmar`, select node 89, see "found", press Play (check the log
+- [x] Full headless suite green.
+- [x] GUI: open the PoE1 install, open `00_cv_beodmar`, select node 89, see "found", press Play (check the log
       for no vgmstream error). Use `Invoke-CaptureMatrix` (backs up settings and layout.json).
-- [ ] Trail note (what took digging: AudioClip layout, names, placeholder rule), handoff below, PR with Auto-fix.
+- [x] Trail note (what took digging: AudioClip layout, names, placeholder rule), handoff below, PR with Auto-fix.
+
+## Handoff — 2026-10-30
+
+**Done** (branch `feat/4-poe1-vo-preview`):
+- `8549a9d1` Core: `Poe1AudioClipRecord`, `Poe1VoiceIndex` (AssetsTools.NET 3.0.5), unit + GameData tests.
+- `04179faf` trail note on the PoE1 clip layout.
+- `bedf49e5` ViewModels: `Poe1VoiceService` (background build, generation guard, weak UI-context
+  subscription), MainWindowViewModel start-up, Node Details PoE1 branch, import/alias gated off for PoE1.
+- Follow-up filed: #355 (96 names shared by two different real clips show no voice; resolve via VOAsset paths).
+- Verified in the app on the real PoE1 install: index logs 10,995 clips / 96 ambiguous; `00_cv_beodmar` node 89
+  shows "VO file found", ▶ M starts playback, the extracted `.fsb` decodes with vgmstream (20.4 s, Vorbis).
+
+**Deviations from the spec:** GameData floor is ≥ 10,900 distinct names (11,267 records include duplicates);
+ambiguous duplicate names resolve to no voice (spec §2 assumed names were unique).
+
+**Remaining:** owner review of the PR. Steps 2–3 of #4 (import/replace PoE1 voice) are a separate decision.
+
+**Next step:** address review comments on the PR, if any.
+
+**Do not redo:** the AudioClip layout and name mapping are settled (see the trail note); don't read FSB5 bank
+names or the `assetbundles/vo` bundles for lookup.
