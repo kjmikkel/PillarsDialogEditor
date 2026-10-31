@@ -79,7 +79,7 @@
         <Style Selector="nodify|Connection.highlighted.never">
             <Setter Property="Stroke" Value="{DynamicResource Brush.Connection.Highlighted.Never}"/>
         </Style>
-        <!-- Links the assumed game state rules out (View > Game State, #32). Opacity rather than
+        <!-- Links the assumed game state rules out (View > Game State, GitHub issue 32), or hidden by an earlier link that always passes (issue 353). Opacity rather than
              a new brush so the fade composes with the always/never/highlighted classes. -->
         <Style Selector="nodify|Connection.cannotFire">
             <Setter Property="Opacity" Value="0.35"/>
@@ -525,8 +525,8 @@
                             Classes.always="{Binding IsAlways}"
                             Classes.never="{Binding IsNever}"
                             Classes.highlighted="{Binding IsHighlighted}"
-                            Classes.cannotFire="{Binding CannotFire}"
-                            ToolTip.Tip="{Binding CannotFireToolTip}">
+                            Classes.cannotFire="{Binding IsFaded}"
+                            ToolTip.Tip="{Binding FadedToolTip}">
                             <nodify:Connection.ContextMenu>
                                 <ContextMenu AutomationProperties.AutomationId="ConnectionContextMenu">
                                     <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_DeleteConnection}"
