@@ -67,7 +67,9 @@ public static class Poe2ConversationParser
             ExternalVO: node["ExternalVO"]?.GetValue<string>() ?? string.Empty,
             HasVO: node["HasVO"]?.GetValue<bool>() ?? false,
             HideSpeaker: node["HideSpeaker"]?.GetValue<bool>() ?? false,
-            ScriptKind: ScriptNodeKinds.FromType(node["$type"]?.GetValue<string>())
+            ScriptKind: ScriptNodeKinds.FromType(node["$type"]?.GetValue<string>()),
+            PlayType: Poe2EnumMaps.PlayTypeName(node["PlayType"]),
+            IsQuestionNode: node["IsQuestionNode"]?.GetValue<bool>() ?? false
         );
     }
 

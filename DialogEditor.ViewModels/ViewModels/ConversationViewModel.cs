@@ -87,24 +87,90 @@ public partial class ConversationViewModel : ObservableObject
     private void OnAssumedStateChanged(object? sender, EventArgs e)
     {
         foreach (var c in Connections) c.RefreshVerdict();
+        RefreshAllShadowing();
     }
 
     private void ApplyVerdictContext()
     {
         foreach (var c in Connections) c.SetVerdictContext(_assumedState, ActiveGameId);
+        RefreshAllShadowing();
+    }
+
+    // ── First-passing-link shadowing (issue 353) ─────────────────────────
+    // Load adds every link one at a time; refreshing per add would be quadratic, so it
+    // suppresses the per-add refresh and calls RefreshAllShadowing once at the end.
+    private bool _suppressShadowing;
+
+    public void RefreshAllShadowing()
+    {
+        // One pass: GroupBy keeps Connections order within each source's group.
+        foreach (var group in Connections.Where(c => c.Source.Owner is not null)
+                                         .GroupBy(c => c.Source.Owner!).ToList())
+            ApplyShadowing(group.Key, group.ToList());
+    }
+
+    /// Recomputes which of the source node's links an earlier link hides. Link order is
+    /// the order in <see cref="Connections"/>, which is what BuildSnapshot saves.
+    public void RefreshShadowing(NodeViewModel source)
+        => ApplyShadowing(source, Connections.Where(c => c.Source.Owner == source).ToList());
+
+    private void ApplyShadowing(NodeViewModel source, IReadOnlyList<ConnectionViewModel> links)
+    {
+        // With no fact set every verdict is Unknown, but a link with no conditions at all still
+        // passes for certain, so the rule applies even before View > Game State is used.
+        var state = _assumedState is { HasAnyFact: true } ? _assumedState : new GameState();
+        var described = links.Select(c => c.Target.Owner is { } t
+            ? LinkShadowing.Describe(c.Conditions,
+                new ShadowTarget(t.IsPlayerChoice, t.ScriptKind, t.IsQuestionNode, t.Persistence, t.Conditions),
+                state, ActiveGameId)
+            : null).ToList();
+        var hiddenBy = LinkShadowing.HiddenBy(source.PlayType, source.ScriptKind, described);
+        for (int i = 0; i < links.Count; i++)
+            links[i].ShadowedByNodeId = hiddenBy[i] is { } h ? links[h].Target.Owner?.NodeId : null;
+    }
+
+    private void OnConnectionChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ConnectionViewModel.Conditions) && sender is ConnectionViewModel { Source.Owner: { } src })
+            RefreshShadowing(src);
     }
 
     partial void OnActiveGameIdChanged(string value) => ApplyVerdictContext();
 
     private readonly HashSet<NodeViewModel> _subscribedNodes = [];
+    private readonly HashSet<ConnectionViewModel> _subscribedConnections = [];
 
     public ConversationViewModel(IDispatcher dispatcher)
     {
         Connections.CollectionChanged += (_, args) =>
         {
-            if (args.NewItems is null) return;
-            foreach (ConnectionViewModel c in args.NewItems)
-                c.SetVerdictContext(_assumedState, ActiveGameId);
+            if (args.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
+            {
+                // Clear() reports no OldItems, so release the tracked set.
+                foreach (var c in _subscribedConnections) c.PropertyChanged -= OnConnectionChanged;
+                _subscribedConnections.Clear();
+                if (!_suppressShadowing) RefreshAllShadowing();
+                return;
+            }
+            var affected = new HashSet<NodeViewModel>();
+            if (args.OldItems is not null)
+                foreach (ConnectionViewModel c in args.OldItems)
+                {
+                    c.PropertyChanged -= OnConnectionChanged;
+                    _subscribedConnections.Remove(c);
+                    c.ShadowedByNodeId = null;
+                    if (c.Source.Owner is { } s) affected.Add(s);
+                }
+            if (args.NewItems is not null)
+                foreach (ConnectionViewModel c in args.NewItems)
+                {
+                    c.SetVerdictContext(_assumedState, ActiveGameId);
+                    c.PropertyChanged += OnConnectionChanged;
+                    _subscribedConnections.Add(c);
+                    if (c.Source.Owner is { } s) affected.Add(s);
+                }
+            if (!_suppressShadowing)
+                foreach (var s in affected) RefreshShadowing(s);
         };
         _dispatcher       = dispatcher;
         PendingConnection = new PendingConnectionViewModel(this);
@@ -156,6 +222,14 @@ public partial class ConversationViewModel : ObservableObject
         if (e.PropertyName == nameof(NodeViewModel.Conditions) && sender is NodeViewModel changed)
             foreach (var c in Connections)
                 if (c.Target.Owner == changed) c.RefreshVerdict();
+
+        // What a link leads to (its conditions, persistence, kind) decides whether it is certain,
+        // so every source with a link into the node re-judges which later links it hides.
+        if (e.PropertyName is nameof(NodeViewModel.Conditions) or nameof(NodeViewModel.Persistence)
+                           or nameof(NodeViewModel.IsPlayerChoice) && sender is NodeViewModel target)
+            foreach (var src in Connections.Where(c => c.Target.Owner == target)
+                                           .Select(c => c.Source.Owner).OfType<NodeViewModel>().Distinct().ToList())
+                RefreshShadowing(src);
 
         if (e.PropertyName is nameof(NodeViewModel.DefaultText)
                            or nameof(NodeViewModel.FemaleText)
@@ -443,20 +517,26 @@ public partial class ConversationViewModel : ObservableObject
                     vm.Location = new LayoutPoint(x, y);
             });
 
-        foreach (var node in conversation.Nodes)
+        _suppressShadowing = true;
+        try
         {
-            foreach (var link in node.Links)
+            foreach (var node in conversation.Nodes)
             {
-                if (nodeMap.TryGetValue(link.FromNodeId, out var src) &&
-                    nodeMap.TryGetValue(link.ToNodeId,   out var tgt))
+                foreach (var link in node.Links)
                 {
-                    var conn = new ConnectionViewModel(src.Output, tgt.Input,
-                        link.QuestionNodeTextDisplay, link.RandomWeight, link.Conditions)
-                        { UndoStack = _undoStack };
-                    Connections.Add(conn);
+                    if (nodeMap.TryGetValue(link.FromNodeId, out var src) &&
+                        nodeMap.TryGetValue(link.ToNodeId,   out var tgt))
+                    {
+                        var conn = new ConnectionViewModel(src.Output, tgt.Input,
+                            link.QuestionNodeTextDisplay, link.RandomWeight, link.Conditions)
+                            { UndoStack = _undoStack };
+                        Connections.Add(conn);
+                    }
                 }
             }
         }
+        finally { _suppressShadowing = false; }
+        RefreshAllShadowing();
         BaseSnapshot = baseSnapshot ?? BuildSnapshot();
         ConversationLoaded?.Invoke(this, EventArgs.Empty);
     }

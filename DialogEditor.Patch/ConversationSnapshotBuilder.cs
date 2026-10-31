@@ -36,7 +36,10 @@ public static class ConversationSnapshotBuilder
             Comments:        n.Comments,
             ExternalVO:      n.ExternalVO,
             HasVO:           n.HasVO,
-            HideSpeaker:     n.HideSpeaker)).ToList();
+            HideSpeaker:     n.HideSpeaker,
+            ScriptKind:      n.ScriptKind,
+            PlayType:        n.PlayType,
+            IsQuestionNode:  n.IsQuestionNode)).ToList();
 
         var strings = new StringTable(snap.Nodes.Select(n =>
         {
@@ -75,6 +78,11 @@ public static class ConversationSnapshotBuilder
                 l.QuestionNodeTextDisplay, l.HasConditions)
                 { Conditions = l.Conditions }).ToList(),
             node.Conditions,
-            node.Scripts);
+            node.Scripts)
+        {
+            ScriptKind     = node.ScriptKind,
+            PlayType       = node.PlayType,
+            IsQuestionNode = node.IsQuestionNode,
+        };
     }
 }

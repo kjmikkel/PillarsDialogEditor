@@ -396,4 +396,18 @@ public class NodeViewModelTests
 
         Assert.True(raised);
     }
+
+    [Fact]
+    public void ToSnapshot_CarriesPlayTypeAndIsQuestionNode()
+    {
+        var vm = new NodeViewModel(
+            new ConversationNode(3, false, SpeakerCategory.Npc, "", "", [], [], [], "Conversation", "None",
+                                 PlayType: "CycleLoop", IsQuestionNode: true),
+            null);
+        Assert.Equal("CycleLoop", vm.PlayType);
+        Assert.True(vm.IsQuestionNode);
+        var snap = vm.ToSnapshot([]);
+        Assert.Equal("CycleLoop", snap.PlayType);
+        Assert.True(snap.IsQuestionNode);
+    }
 }

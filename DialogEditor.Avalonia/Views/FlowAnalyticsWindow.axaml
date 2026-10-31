@@ -167,6 +167,14 @@
                                    FontSize="{DynamicResource FontSize.Small}"
                                    Foreground="{DynamicResource Brush.Text.Secondary}"
                                    TextWrapping="Wrap"/>
+                        <!-- Links the games never reach because an earlier link always passes
+                             (issue 353); shown with or without an assumed state. -->
+                        <TextBlock x:Name="ShadowedLinksTextBlock"
+                                   Text="{Binding ShadowedLinksText}"
+                                   IsVisible="{Binding HasShadowedLinks}"
+                                   FontSize="{DynamicResource FontSize.Small}"
+                                   Foreground="{DynamicResource Brush.Text.Secondary}"
+                                   TextWrapping="Wrap"/>
 
                         <!-- Only when it actually spans: this is what makes a suddenly larger
                              longest playthrough self-explaining rather than alarming. -->

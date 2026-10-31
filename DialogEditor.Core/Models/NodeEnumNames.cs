@@ -12,6 +12,10 @@ public static class NodeEnumNames
     // OEIFormats.FlowCharts.Conversations.DisplayType
     public static IReadOnlyList<string> DisplayTypes { get; } = ["Hidden", "Conversation", "Bark", "Overlay"];
 
+    // OEIFormats.FlowCharts.Conversations.PlayType — how a node picks among its links' text
+    // variants; read-only here, used by the first-passing-link analysis (issue 353).
+    public static IReadOnlyList<string> PlayTypes { get; } = ["Normal", "Random", "CycleLoop", "CycleStop", "CycleRandom"];
+
     // OEIFormats.FlowCharts.PersistenceType
     public static IReadOnlyList<string> Persistences { get; } = ["None", "OnceEver", "OncePerConversation", "MarkAsRead"];
 

@@ -562,4 +562,59 @@ public class FlowAnalysisServiceTests
                      scripts: [Script(ScriptCategory.Exit), Script(ScriptCategory.Update)]),
             MakeNode(1, defaultText: "next")));
     }
+
+    // ── Issue 353: first-passing-link rule ───────────────────────────────
+
+    private static ConditionLeaf UnsetGlobal() =>
+        new("Boolean IsGlobalValue(String, Operator, Int32)", ["g", "EqualTo", "1"], Not: false, Operator: "And");
+
+    [Fact]
+    public void ShadowedLink_ReportedOnSourceNode()
+    {
+        var report = FlowAnalysisService.Analyze(Snapshot(
+            MakeNode(0, links: [Link(0, 1), Link(0, 2)]),
+            MakeNode(1),
+            MakeNode(2)), "poe2");
+
+        var issue = Assert.Single(report.Issues.Where(i => i.Kind == FlowIssueKind.LinkShadowed));
+        Assert.Equal(0, issue.NodeId);
+        Assert.Equal(2, issue.RelatedNodeId);
+        Assert.Equal(1, issue.HiderNodeId);
+    }
+
+    [Fact]
+    public void NodeReachedOnlyThroughShadowedLink_IsUnreachable()
+    {
+        var report = FlowAnalysisService.Analyze(Snapshot(
+            MakeNode(0, links: [Link(0, 1), Link(0, 2)]),
+            MakeNode(1),
+            MakeNode(2)), "poe2");
+
+        Assert.Contains(report.Issues, i => i.Kind == FlowIssueKind.Unreachable && i.NodeId == 2);
+    }
+
+    [Fact]
+    public void ConditionedFirstLink_NoWarning()
+    {
+        var first = Link(0, 1, hasConditions: true) with { Conditions = [UnsetGlobal()] };
+        var report = FlowAnalysisService.Analyze(Snapshot(
+            MakeNode(0, links: [first, Link(0, 2)]),
+            MakeNode(1),
+            MakeNode(2)), "poe2");
+
+        Assert.DoesNotContain(report.Issues, i => i.Kind == FlowIssueKind.LinkShadowed);
+        Assert.DoesNotContain(report.Issues, i => i.Kind == FlowIssueKind.Unreachable);
+    }
+
+    [Fact]
+    public void RandomPlayType_NoWarning()
+    {
+        var report = FlowAnalysisService.Analyze(Snapshot(
+            MakeNode(0, links: [Link(0, 1), Link(0, 2)]) with { PlayType = "Random" },
+            MakeNode(1),
+            MakeNode(2)), "poe2");
+
+        Assert.DoesNotContain(report.Issues, i => i.Kind == FlowIssueKind.LinkShadowed);
+        Assert.DoesNotContain(report.Issues, i => i.Kind == FlowIssueKind.Unreachable);
+    }
 }

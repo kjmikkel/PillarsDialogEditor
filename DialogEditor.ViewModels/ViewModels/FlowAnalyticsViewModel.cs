@@ -17,6 +17,8 @@ public partial class FlowIssueViewModel : ObservableObject
     public int           NodeId      { get; }
     public FlowIssueKind Kind        { get; }
     public string        NodeSnippet { get; }
+    public int?          RelatedNodeId { get; }
+    public int?          HiderNodeId   { get; }
 
     public string KindLabel => Kind switch
     {
@@ -30,6 +32,7 @@ public partial class FlowIssueViewModel : ObservableObject
                                                 => Loc.Get("FlowAnalytics_Issue_ConversationJumpWhileContinuing"),
         FlowIssueKind.ScriptExitNeverRuns       => Loc.Get("FlowAnalytics_Issue_ScriptExitNeverRuns"),
         FlowIssueKind.ScriptUpdateNeverRuns     => Loc.Get("FlowAnalytics_Issue_ScriptUpdateNeverRuns"),
+        FlowIssueKind.LinkShadowed              => Loc.Format("FlowAnalytics_Issue_LinkShadowed", RelatedNodeId ?? 0, HiderNodeId ?? 0),
         _                                       => Kind.ToString()
     };
 
@@ -47,6 +50,8 @@ public partial class FlowIssueViewModel : ObservableObject
     {
         NodeId      = issue.NodeId;
         Kind        = issue.Kind;
+        RelatedNodeId = issue.RelatedNodeId;
+        HiderNodeId   = issue.HiderNodeId;
         NodeSnippet = nodeSnippet;
         _navigate   = navigate;
     }
@@ -247,6 +252,10 @@ public partial class FlowAnalyticsViewModel : ObservableObject
     [ObservableProperty] private bool   _useAssumedState = true;
     [ObservableProperty] private bool   _hasPrunedLinks;
     [ObservableProperty] private string _prunedLinksText = string.Empty;
+    // Links a certain earlier link hides (issue 353). Unlike pruned links this does not
+    // depend on an assumed state, so it is shown whenever the count is non-zero.
+    [ObservableProperty] private bool   _hasShadowedLinks;
+    [ObservableProperty] private string _shadowedLinksText = string.Empty;
 
     partial void OnUseAssumedStateChanged(bool value) => Refresh();
 
@@ -395,6 +404,10 @@ public partial class FlowAnalyticsViewModel : ObservableObject
         HasPrunedLinks = state is not null && report.BlockedLinkCount > 0;
         PrunedLinksText = HasPrunedLinks
             ? Loc.FormatCount("PathStats_PrunedLinks", report.BlockedLinkCount)
+            : string.Empty;
+        HasShadowedLinks = report.ShadowedLinkCount > 0;
+        ShadowedLinksText = HasShadowedLinks
+            ? Loc.FormatCount("PathStats_ShadowedLinks", report.ShadowedLinkCount)
             : string.Empty;
         var rootConversation = graph?.RootConversation ?? "";
 

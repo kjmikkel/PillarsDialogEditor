@@ -55,7 +55,8 @@ public partial class ConnectionViewModel : ObservableObject
 
     /// Points the verdict at the session's assumed state. Owned by Node Details, which also
     /// calls <see cref="RefreshVerdict"/> when the state changes; the link itself holds no
-    /// subscription, so a discarded canvas link cannot leak.
+    /// subscription, so a discarded canvas link cannot leak. (The canvas does subscribe to the
+    /// link's PropertyChanged, for shadowing, and unsubscribes when the link leaves Connections.)
     public void SetVerdictContext(DialogEditor.Core.Conditions.GameState? state, string gameId)
     {
         _assumedState = state;
@@ -72,6 +73,8 @@ public partial class ConnectionViewModel : ObservableObject
         OnPropertyChanged(nameof(ConditionVerdictFails));
         OnPropertyChanged(nameof(CannotFire));
         OnPropertyChanged(nameof(CannotFireToolTip));
+        OnPropertyChanged(nameof(IsFaded));
+        OnPropertyChanged(nameof(FadedToolTip));
     }
 
     /// True when the assumed game state rules this link out: its own conditions, or those on
@@ -81,6 +84,33 @@ public partial class ConnectionViewModel : ObservableObject
             _conditions, Target.Owner?.Conditions ?? [], _assumedState, _verdictGameId);
 
     public string? CannotFireToolTip => CannotFire ? Loc.Get("ToolTip_LinkCannotFire") : null;
+
+    private int? _shadowedByNodeId;
+
+    /// Target node id of the earlier link that always passes and so hides this one (issue 353);
+    /// null when nothing hides it. Set by the canvas, which sees all of a node's links.
+    public int? ShadowedByNodeId
+    {
+        get => _shadowedByNodeId;
+        set
+        {
+            if (_shadowedByNodeId == value) return;
+            _shadowedByNodeId = value;
+            OnPropertyChanged(nameof(ShadowedByNodeId));
+            OnPropertyChanged(nameof(IsShadowed));
+            OnPropertyChanged(nameof(IsFaded));
+            OnPropertyChanged(nameof(FadedToolTip));
+        }
+    }
+
+    public bool IsShadowed => _shadowedByNodeId is not null;
+
+    /// Drives the faded canvas rendering: ruled out by the game state or hidden by an earlier link.
+    public bool IsFaded => CannotFire || IsShadowed;
+
+    /// The game-state reason wins when both apply.
+    public string? FadedToolTip => CannotFireToolTip
+        ?? (IsShadowed ? Loc.Format("ToolTip_LinkShadowed", _shadowedByNodeId) : null);
 
     /// Shown only once the writer has set a fact and this link has conditions.
     public bool ShowConditionVerdict => ConditionVerdictFormat.Applies(_assumedState, _conditions);

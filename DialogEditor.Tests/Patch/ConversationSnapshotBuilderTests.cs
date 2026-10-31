@@ -1,3 +1,4 @@
+using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 using DialogEditor.Patch;
 
@@ -82,5 +83,25 @@ public class ConversationSnapshotBuilderTests
             [MakeNode(1), MakeNode(2), MakeNode(3)], StringTable.Empty);
         var snap = ConversationSnapshotBuilder.Build(conv);
         Assert.Equal(3, snap.Nodes.Count);
+    }
+
+    [Fact]
+    public void SnapshotBuilder_CarriesAnalysisFields()
+    {
+        var node = MakeNode(1) with
+        {
+            ScriptKind = ScriptNodeKind.Bank, PlayType = "Random", IsQuestionNode = true,
+        };
+        var conv = new Conversation("c", [node], new StringTable([]));
+
+        var snapNode = ConversationSnapshotBuilder.Build(conv).Nodes.Single();
+        Assert.Equal(ScriptNodeKind.Bank, snapNode.ScriptKind);
+        Assert.Equal("Random", snapNode.PlayType);
+        Assert.True(snapNode.IsQuestionNode);
+
+        var back = ConversationSnapshotBuilder.ToConversation("c", new ConversationEditSnapshot([snapNode])).Nodes.Single();
+        Assert.Equal(ScriptNodeKind.Bank, back.ScriptKind);
+        Assert.Equal("Random", back.PlayType);
+        Assert.True(back.IsQuestionNode);
     }
 }

@@ -367,6 +367,8 @@ public partial class NodeViewModel : ObservableObject
         _hasVO           = node.HasVO;
         _hideSpeaker     = node.HideSpeaker;
         ScriptKind       = node.ScriptKind;
+        PlayType         = node.PlayType;
+        IsQuestionNode   = node.IsQuestionNode;
         _defaultText     = entry?.DefaultText ?? string.Empty;
         _femaleText      = entry?.FemaleText  ?? string.Empty;
 
@@ -393,6 +395,11 @@ public partial class NodeViewModel : ObservableObject
     /// never converts a bank or trigger node into another kind.
     public ScriptNodeKind ScriptKind { get; }
 
+    /// PlayType name and IsQuestionNode flag (issue 353): read-only inputs to the
+    /// first-passing-link analysis, carried through ToSnapshot unchanged.
+    public string PlayType { get; }
+    public bool IsQuestionNode { get; }
+
     // ── Snapshot helper (links provided by ConversationViewModel) ─────────
     public NodeEditSnapshot ToSnapshot(IReadOnlyList<LinkEditSnapshot> links) =>
         new(NodeId, _isPlayerChoice, _speakerCategory,
@@ -401,5 +408,5 @@ public partial class NodeViewModel : ObservableObject
             _displayType, _persistence,
             _actorDirection, _comments, _externalVO,
             _hasVO, _hideSpeaker, links, _conditions, _scripts)
-        { ScriptKind = ScriptKind };
+        { ScriptKind = ScriptKind, PlayType = PlayType, IsQuestionNode = IsQuestionNode };
 }

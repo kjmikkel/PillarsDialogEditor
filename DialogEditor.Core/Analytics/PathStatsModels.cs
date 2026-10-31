@@ -70,4 +70,8 @@ public record PathStatsReport(
     /// game state (#32). 0 when no state was given. Counted graph-wide, not just on paths
     /// reachable from the root, so it says how much the assumption pruned.
     public int BlockedLinkCount { get; init; }
+
+    /// Links anywhere in the graph that never fire because an earlier link of the same node
+    /// always passes (issue 353). Counted graph-wide, with or without an assumed state.
+    public int ShadowedLinkCount { get; init; }
 }

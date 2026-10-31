@@ -48,7 +48,9 @@ public static class Poe1ConversationParser
             ActorDirection: (string?)node.Element("ActorDirection") ?? string.Empty,
             Comments: (string?)node.Element("Comments") ?? string.Empty,
             ExternalVO: (string?)node.Element("VOFilename") ?? string.Empty,
-            ScriptKind: ScriptNodeKinds.FromType(nodeType)
+            ScriptKind: ScriptNodeKinds.FromType(nodeType),
+            PlayType: (string?)node.Element("PlayType") ?? string.Empty,
+            IsQuestionNode: (bool?)node.Element("IsQuestionNode") ?? false
         );
     }
 

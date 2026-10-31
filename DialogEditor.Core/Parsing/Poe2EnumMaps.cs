@@ -23,11 +23,13 @@ internal static class Poe2EnumMaps
     // Shared with the detail pane's dropdowns (issue 132), so the two can never drift apart.
     private static readonly string[] DisplayTypes = [.. NodeEnumNames.DisplayTypes];
     private static readonly string[] Persistences = [.. NodeEnumNames.Persistences];
+    private static readonly string[] PlayTypes = [.. NodeEnumNames.PlayTypes];
 
     private const string UnknownPrefix = "Unknown(";
 
     public static string DisplayTypeName(JsonNode? value) => Name(DisplayTypes, value);
     public static string PersistenceName(JsonNode? value) => Name(Persistences, value);
+    public static string PlayTypeName(JsonNode? value) => Name(PlayTypes, value);
 
     /// <returns>The value to write, or <c>null</c> to leave the property out.</returns>
     public static int? DisplayTypeValue(string name) => Value(DisplayTypes, name);

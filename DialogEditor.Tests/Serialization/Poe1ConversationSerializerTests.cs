@@ -579,4 +579,23 @@ public class Poe1ConversationSerializerTests
         Assert.Equal("DialogueLink", LinkXsiType(xml, 0, 1));
         Assert.Single(link.Attributes());
     }
+
+    // Issue 353: an edited node must keep its PlayType / IsQuestionNode on save.
+    [Fact]
+    public void Serialize_KeepsPlayTypeAndIsQuestionNode()
+    {
+        // Insert into the first node only (the first <VOFilename/> in the fixture).
+        const string anchor = "<VOFilename/>";
+        var at  = TwoNodeXml.IndexOf(anchor, StringComparison.Ordinal) + anchor.Length;
+        var xml = TwoNodeXml.Insert(at, "<PlayType>CycleStop</PlayType><IsQuestionNode>true</IsQuestionNode>");
+        var parsed = Poe1ConversationParser.ParseXml(xml);
+        Assert.Equal("CycleStop", parsed[0].PlayType);
+
+        var snapshot = new ConversationEditSnapshot([Node(0, "edited") with { PlayType = "CycleStop", IsQuestionNode = true }, Node(1)]);
+        var saved = Poe1ConversationParser.ParseXml(Poe1ConversationSerializer.Serialize(xml, snapshot));
+
+        Assert.Equal("edited", saved[0].SpeakerGuid);
+        Assert.Equal("CycleStop", saved[0].PlayType);
+        Assert.True(saved[0].IsQuestionNode);
+    }
 }

@@ -29,6 +29,12 @@ namespace DialogEditor.Core.Analytics;
 /// no state (or one with no facts) every figure is exactly as before. Handoffs are never
 /// pruned — a StartConversation call is a script action, not a conditioned link.
 ///
+/// First-passing-link rule (issue 353): the games walk a node's links in order and the first
+/// that passes decides, so a link that always passes hides the links after it
+/// (<see cref="LinkShadowing"/>). Hidden links are dropped like blocked ones, with or without
+/// an assumed state; with no state only unconditioned links to unconditioned targets are
+/// certain. Only a link that passes for certain hides anything, so figures stay upper bounds.
+///
 /// Specs: docs/superpowers/specs/2026-07-13-path-based-writing-stats-design.md
 ///        docs/superpowers/specs/2026-09-10-cross-conversation-path-stats-design.md
 ///        docs/superpowers/specs/2026-10-29-condition-aware-path-stats-design.md
@@ -83,9 +89,29 @@ public static class PathStatsService
 
         var blockedLinkCount = nodeById.Sum(kv => kv.Value.Links.Count(l => Blocked(kv.Key, l)));
 
+        // Links a certain earlier link hides (issue 353). Hiding needs a state to evaluate
+        // conditions against, so no state means an empty one: conditioned links are Unknown
+        // and never hide. Targets are looked up within the node's own conversation, and the
+        // result is memoised per node because LinksOf runs many times per node.
+        var shadowState = state ?? new GameState();
+        var hiddenMemo = new Dictionary<NodeRef, IReadOnlyList<int?>>();
+        IReadOnlyList<int?> HiddenOf(NodeRef from)
+        {
+            if (hiddenMemo.TryGetValue(from, out var cached)) return cached;
+            var hidden = LinkShadowing.HiddenBy(
+                nodeById[from],
+                id => nodeById.GetValueOrDefault(new NodeRef(from.Conversation, id)),
+                shadowState, gameId);
+            hiddenMemo[from] = hidden;
+            return hidden;
+        }
+
+        var shadowedLinkCount = nodeById.Keys.Sum(k => HiddenOf(k).Count(h => h is not null));
+
         if (nodeById.Count == 0)
             return new PathStatsReport(false, 0, 0, 0, 0, 0, 0, [], [], [],
-                                       graph.Unfollowed, spanned) { BlockedLinkCount = blockedLinkCount };
+                                       graph.Unfollowed, spanned)
+                { BlockedLinkCount = blockedLinkCount, ShadowedLinkCount = shadowedLinkCount };
 
         var allNodes = nodeById.Values.ToList();
         var root     = new NodeRef(graph.RootConversation, StartNode.Id);
@@ -114,7 +140,7 @@ public static class PathStatsService
         if (!nodeById.ContainsKey(root))
             return new PathStatsReport(significant, defaultTotal, femaleTotal, 0, 0, 0, 0,
                 wordsPerSpeaker, [], [], graph.Unfollowed, spanned)
-            { HasStartNode = false, BlockedLinkCount = blockedLinkCount };
+            { HasStartNode = false, BlockedLinkCount = blockedLinkCount, ShadowedLinkCount = shadowedLinkCount };
 
         // ── Out-edges: two SEPARATE sets ──────────────────────────────────
         // Links are ALTERNATIVES (the player takes one); jumps are SPAWNS (they all happen,
@@ -126,7 +152,7 @@ public static class PathStatsService
             .ToDictionary(g => g.Key, g => g.Select(j => j.To).ToList());
 
         List<NodeRef> LinksOf(NodeRef u) => nodeById[u].Links
-            .Where(l => !Blocked(u, l))
+            .Where((l, i) => !Blocked(u, l) && HiddenOf(u)[i] is null)
             .Select(l => new NodeRef(u.Conversation, l.ToNodeId))
             .Where(nodeById.ContainsKey)          // drop dangling
             .ToList();
@@ -314,7 +340,9 @@ public static class PathStatsService
             // No links AND no handoff: a node that hands off is a way the conversation
             // CONTINUES, not a way it finishes (#14). "No links" means no link that is not
             // blocked (#32) — dangling links still count as links, exactly as before, so
-            // without a state this is the old Links.Count == 0.
+            // without a state this is the old Links.Count == 0. Hidden links (issue 353) need no
+            // test here: a hidden link always has a live, unblocked hider before it, so
+            // "has an unblocked link" is the same answer with or without them.
             .Where(id => !nodeById[id].Links.Any(l => !Blocked(id, l)) && JumpsOf(id).Count == 0)
             .Select(id => new EndingStat(
                 id, nodeById[id].DefaultText ?? "",
@@ -329,6 +357,7 @@ public static class PathStatsService
             Longest(root, false),  Shortest(root, false),
             Longest(root, true),   Shortest(root, true),
             wordsPerSpeaker, branches, endings,
-            graph.Unfollowed, spanned) { BlockedLinkCount = blockedLinkCount };
+            graph.Unfollowed, spanned)
+        { BlockedLinkCount = blockedLinkCount, ShadowedLinkCount = shadowedLinkCount };
     }
 }

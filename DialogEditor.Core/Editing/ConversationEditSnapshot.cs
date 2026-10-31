@@ -40,6 +40,15 @@ public record NodeEditSnapshot(
     /// type NodeTypeFamily preserves, so persisting it would only change the project format.
     [JsonIgnore]
     public ScriptNodeKind ScriptKind { get; init; } = ScriptNodeKind.Script;
+
+    /// The node's PlayType name ("" when the file has none) and IsQuestionNode flag
+    /// (issue 353). Read-only analysis inputs, not saved for the same reason as
+    /// ScriptKind: the game file keeps them and the serializers patch it in place.
+    [JsonIgnore]
+    public string PlayType { get; init; } = "";
+
+    [JsonIgnore]
+    public bool IsQuestionNode { get; init; }
 }
 
 public record ConversationEditSnapshot(IReadOnlyList<NodeEditSnapshot> Nodes);

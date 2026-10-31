@@ -385,7 +385,9 @@ public class PathStatsServiceTests
     [Fact]
     public void Shortest_SumsJumps_BecauseASpawnIsNotOptional()
     {
-        var a = Snap(Node(0, "one", links: [Link(0, 1), Link(0, 2)]),
+        // Link to 1 is conditioned (Unknown) so it is a genuine alternative, not hidden by
+        // an always-passing earlier link (issue 353).
+        var a = Snap(Node(0, "one", links: [GatedLink(0, 1, UnknownCond), Link(0, 2)]),
                      Node(1, "two three four"), Node(2, "five"));
         var b = Snap(Node(0, "six seven"));
 
@@ -590,5 +592,95 @@ public class PathStatsServiceTests
 
         Assert.Equal(3, report.DefaultLongestWords);   // start(1) + handoff target "other conversation"(2)
         Assert.DoesNotContain(report.Endings, e => e.Node.NodeId == 0 && e.Node.Conversation == "A");
+    }
+
+    // ── First-passing-link rule (GitHub issue 353) ────────────────────────
+    // A link that always passes hides the links after it, with or without an assumed state.
+
+    [Fact]
+    public void ShadowedBranch_LeavesLongestAndShortest()
+    {
+        var report = PathStatsService.Analyze(Snap(
+            Node(0, "start", links: [Link(0, 1), Link(0, 2)]),
+            Node(1, "a"),
+            Node(2, "b b b b b")));
+
+        Assert.Equal(2, report.DefaultLongestWords);   // start+a; the long link never fires
+        Assert.Equal(2, report.DefaultShortestWords);
+    }
+
+    [Fact]
+    public void ShadowedChoice_LeavesForkTree()
+    {
+        var report = PathStatsService.Analyze(Snap(
+            Node(0, "start", links: [Link(0, 1), Link(0, 2)]),
+            Node(1, "npc"),
+            Node(2, "choice", isPlayerChoice: true)));
+
+        Assert.Empty(report.Branches);
+    }
+
+    [Fact]
+    public void ShadowedLinkCount_CountsHiddenLinks()
+    {
+        var snap = Snap(
+            Node(0, "start", links: [Link(0, 1), Link(0, 2), Link(0, 3)]),
+            Node(1, "a"), Node(2, "b"), Node(3, "c"));
+
+        Assert.Equal(2, PathStatsService.Analyze(snap).ShadowedLinkCount);
+        Assert.Equal(2, PathStatsService.Analyze(snap, AssumedState(), "poe2").ShadowedLinkCount);
+    }
+
+    [Fact]
+    public void NoHidingLinks_FiguresUnchanged()
+    {
+        // Every link is conditioned on an unset global, so none is certain.
+        var report = PathStatsService.Analyze(Snap(
+            Node(0, "start", links: [GatedLink(0, 1, UnknownCond), GatedLink(0, 2, UnknownCond)]),
+            Node(1, "long", isPlayerChoice: true, links: [Link(1, 3)]),
+            Node(3, "aaa bbb ccc ddd"),
+            Node(2, "short", isPlayerChoice: true)));
+
+        Assert.Equal(0, report.ShadowedLinkCount);
+        Assert.Equal(6, report.DefaultLongestWords);
+        Assert.Equal(2, report.DefaultShortestWords);
+        Assert.Equal(2, report.Branches.Count);
+        Assert.Equal(2, report.Endings.Count);
+    }
+
+    [Fact]
+    public void ShadowingUsesAssumedState()
+    {
+        var snap = Snap(
+            Node(0, "start", links: [GatedLink(0, 1, [GlobalIs("g", "1")]), Link(0, 2)]),
+            Node(1, "a"),
+            Node(2, "b b b b b"));
+        var gIsOne = new GameState();
+        gIsOne.Globals["g"] = 1;
+
+        Assert.Equal(1, PathStatsService.Analyze(snap, gIsOne, "poe2").ShadowedLinkCount);
+        Assert.Equal(0, PathStatsService.Analyze(snap).ShadowedLinkCount);
+        Assert.Equal(2, PathStatsService.Analyze(snap, gIsOne, "poe2").DefaultLongestWords);
+    }
+
+    [Fact]
+    public void CrossConversation_HidingAppliesPerConversation()
+    {
+        // Node 1 of conversation A is OnceEver (never certain); node 1 of B is not. A link
+        // from B must be judged against B's node, so B's second link is hidden.
+        var a = Snap(
+            Node(0, "s"),
+            Node(1, "x") with { Persistence = "OnceEver" },
+            Node(2, "y z w q"));
+        var b = Snap(
+            Node(0, "b", links: [Link(0, 1), Link(0, 2)]),
+            Node(1, "p"),
+            Node(2, "one two three four"));
+
+        var report = PathStatsService.Analyze(Graph("A", Convs(("A", a), ("B", b)),
+            new JumpEdge(new NodeRef("A", 0), new NodeRef("B", 0))));
+
+        Assert.Equal(1, report.ShadowedLinkCount);
+        Assert.Equal(3, report.DefaultLongestWords);   // s + (b + p)
     }
 }
