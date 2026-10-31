@@ -1,0 +1,33 @@
+<!--
+  SPIKE (issue 4, option 3): a BepInEx 5 plugin that lets PoE1 play voice lines from loose files.
+  Not part of DialogEditor.slnx: it compiles against the game's own assemblies and BepInEx, which
+  CI does not have. Build with the game folder (BepInEx installed) in DIALOGEDITOR_POE1_DIR:
+
+    dotnet build tools/poe1-vo-plugin -p:Poe1Dir="<game folder>"
+
+  netstandard2.0 because PoE1 runs Unity 2019.4 Mono, which ships netstandard.dll.
+-->
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>PillarsDialogEditor.Poe1VoOverride</AssemblyName>
+    <RootNamespace>PillarsDialogEditor.Poe1VoOverride</RootNamespace>
+    <ManagePackageVersionsCentrally>false</ManagePackageVersionsCentrally>
+    <Poe1Dir Condition="'$(Poe1Dir)' == ''">$(DIALOGEDITOR_POE1_DIR)</Poe1Dir>
+    <Managed>$(Poe1Dir)\PillarsOfEternity_Data\Managed</Managed>
+    <BepInExCore>$(Poe1Dir)\BepInEx\core</BepInExCore>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="BepInEx" HintPath="$(BepInExCore)\BepInEx.dll" Private="false" />
+    <Reference Include="0Harmony" HintPath="$(BepInExCore)\0Harmony.dll" Private="false" />
+    <Reference Include="Assembly-CSharp" HintPath="$(Managed)\Assembly-CSharp.dll" Private="false" />
+    <Reference Include="OEICommon" HintPath="$(Managed)\OEICommon.dll" Private="false" />
+    <Reference Include="UnityEngine" HintPath="$(Managed)\UnityEngine.dll" Private="false" />
+    <Reference Include="UnityEngine.CoreModule" HintPath="$(Managed)\UnityEngine.CoreModule.dll" Private="false" />
+    <Reference Include="UnityEngine.AudioModule" HintPath="$(Managed)\UnityEngine.AudioModule.dll" Private="false" />
+    <Reference Include="UnityEngine.UnityWebRequestModule" HintPath="$(Managed)\UnityEngine.UnityWebRequestModule.dll" Private="false" />
+    <Reference Include="UnityEngine.UnityWebRequestAudioModule" HintPath="$(Managed)\UnityEngine.UnityWebRequestAudioModule.dll" Private="false" />
+  </ItemGroup>
+</Project>
