@@ -249,4 +249,27 @@ public class PatchApplierTests
         var result   = ApplyChanges(narrator, new() { ["IsPlayerChoice"] = new("true", "false") });
         Assert.Equal(SpeakerCategory.Narrator, result.Nodes[0].SpeakerCategory);
     }
+
+    // ── Link order (issue 359) ────────────────────────────────────────────
+
+    private static NodeEditSnapshot WithLinks(int id, params int[] targets) =>
+        MakeNode(id, links: [.. targets.Select(t => new LinkEditSnapshot(id, t, 1, "", false))]);
+
+    private static ConversationPatch OrderPatch(params int[] order) =>
+        new("conv", ConversationPatch.CurrentSchemaVersion, [], [],
+            [new NodeModification(0, new Dictionary<string, FieldChange>(), [], []) { UpdatedLinkOrder = order }]);
+
+    [Fact]
+    public void Apply_UpdatedLinkOrder_SortsLinks()
+    {
+        var result = PatchApplier.Apply(Snap(WithLinks(0, 1, 2, 3)), OrderPatch(3, 1, 2));
+        Assert.Equal([3, 1, 2], result.Nodes.Single().Links.Select(l => l.ToNodeId));
+    }
+
+    [Fact]
+    public void Apply_OrderWithUnknownAndMissingIds_KeepsEveryLink()
+    {
+        var result = PatchApplier.Apply(Snap(WithLinks(0, 1, 2, 3)), OrderPatch(3, 9, 1));
+        Assert.Equal([3, 1, 2], result.Nodes.Single().Links.Select(l => l.ToNodeId));
+    }
 }

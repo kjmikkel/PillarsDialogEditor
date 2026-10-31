@@ -119,6 +119,16 @@ public static class PatchApplier
             .Concat(mod.AddedLinks)
             .ToList();
 
+        // Stable sort by position in the record. A link the record doesn't name (say, one a game update
+        // or another patch added) goes after the listed ones in its existing order: never drop a link.
+        // Ids with no link are ignored (issue 359).
+        if (mod.UpdatedLinkOrder is { } order)
+        {
+            var rank = new Dictionary<int, int>();
+            foreach (var id in order) rank.TryAdd(id, rank.Count);
+            links = links.OrderBy(l => rank.TryGetValue(l.ToNodeId, out var r) ? r : int.MaxValue).ToList();
+        }
+
         var conditions = mod.UpdatedConditions ?? node.Conditions;
         var scripts    = mod.UpdatedScripts    ?? node.Scripts;
 
