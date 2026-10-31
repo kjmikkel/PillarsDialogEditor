@@ -571,4 +571,33 @@ public class Poe1ConversationParserTests
 
         Assert.Empty(link.Conditions);
     }
+
+    // Issue 353: the first-passing-link analysis needs to know which nodes play a random
+    // or cycling pick, and which are question nodes.
+    private static string Poe1NodeWith(string extra) => """
+        <?xml version="1.0" encoding="utf-8"?>
+        <ConversationData xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <Nodes>
+            <FlowChartNode xsi:type="TalkNode">
+              <NodeID>0</NodeID><Links />
+              <Conditionals><Operator>And</Operator><Components /></Conditionals>
+              <OnEnterScripts /><OnExitScripts /><OnUpdateScripts />
+        """ + extra + """
+            </FlowChartNode>
+          </Nodes>
+        </ConversationData>
+        """;
+
+    [Fact]
+    public void Poe1Parser_ReadsPlayTypeAndIsQuestionNode()
+    {
+        var set = Poe1ConversationParser.ParseXml(
+            Poe1NodeWith("<PlayType>Random</PlayType><IsQuestionNode>true</IsQuestionNode>")).Single();
+        Assert.Equal("Random", set.PlayType);
+        Assert.True(set.IsQuestionNode);
+
+        var absent = Poe1ConversationParser.ParseXml(Poe1NodeWith("")).Single();
+        Assert.Equal("", absent.PlayType);
+        Assert.False(absent.IsQuestionNode);
+    }
 }

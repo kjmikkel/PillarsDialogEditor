@@ -451,4 +451,17 @@ public class Poe2ConversationParserTests
         var nodes = Poe2ConversationParser.ParseJson(json);
         Assert.Equal(expected, nodes[0].Links[0].QuestionNodeTextDisplay);
     }
+
+    [Fact]
+    public void Poe2Parser_ReadsPlayTypeAndIsQuestionNode()
+    {
+        var set = Poe2ConversationParser.ParseJson(
+            OneNodeJson("\"PlayType\": 4, \"IsQuestionNode\": true,")).Single();
+        Assert.Equal("CycleRandom", set.PlayType);
+        Assert.True(set.IsQuestionNode);
+
+        var absent = Poe2ConversationParser.ParseJson(OneNodeJson("")).Single();
+        Assert.Equal("", absent.PlayType);
+        Assert.False(absent.IsQuestionNode);
+    }
 }

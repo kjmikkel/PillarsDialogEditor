@@ -637,4 +637,19 @@ public class Poe2ConversationSerializerTests
         var saved = Assert.Single(node0["OnEnterScripts"]!.AsArray())!;
         Assert.Equal("gui\\endgameslides\\other.png", saved["Data"]!["Parameters"]![0]!.GetValue<string>());
     }
+
+    // Issue 353: an edited node must keep its PlayType / IsQuestionNode on save.
+    [Fact]
+    public void Serialize_KeepsPlayTypeAndIsQuestionNode()
+    {
+        var json = TwoNodeJson.Replace("\"PlayType\": 0", "\"PlayType\": 3").Replace("\"IsQuestionNode\": false", "\"IsQuestionNode\": true");
+        Assert.Equal("CycleStop", Poe2ConversationParser.ParseJson(json)[0].PlayType);
+
+        var snapshot = new ConversationEditSnapshot([Node(0, "edited-0000") with { PlayType = "CycleStop", IsQuestionNode = true }, Node(1)]);
+        var saved = Poe2ConversationParser.ParseJson(Poe2ConversationSerializer.Serialize(json, snapshot));
+
+        Assert.Equal("edited-0000", saved[0].SpeakerGuid);
+        Assert.Equal("CycleStop", saved[0].PlayType);
+        Assert.True(saved[0].IsQuestionNode);
+    }
 }
