@@ -88,9 +88,9 @@ exists) and the hider found so far.
   (the default value); an unrecognised value does not _(my call: the safe side)_.
 - A `False` link is skipped (it is already pruned by #32 when a state is set; it neither hides nor is hidden
   here).
-- The first `True` **Npc** link hides every later link — except later `Response` links when *maybeResponse* is
-  set at that point (an earlier response might pass, which puts the game in response mode, where later
-  responses are collected).
+- The first `True` **Npc** link hides every later link — except later `Response` and `Opaque` links when
+  *maybeResponse* is set at that point (an earlier response might pass, which puts the game in response mode,
+  where later responses — including those a bank or question node yields — are collected).
 - The first `True` **Response** link hides every later `Npc` link; later `Response` / `Opaque` links stay.
 - Only the **first** `True` link (Npc or Response) is a hider. Later `True` links are hidden or kept by the
   two rules above, and never hide anything themselves. The first hider is the link the tooltip and warning
