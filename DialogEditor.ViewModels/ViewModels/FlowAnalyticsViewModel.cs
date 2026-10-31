@@ -247,6 +247,10 @@ public partial class FlowAnalyticsViewModel : ObservableObject
     [ObservableProperty] private bool   _useAssumedState = true;
     [ObservableProperty] private bool   _hasPrunedLinks;
     [ObservableProperty] private string _prunedLinksText = string.Empty;
+    // Links a certain earlier link hides (issue 353). Unlike pruned links this does not
+    // depend on an assumed state, so it is shown whenever the count is non-zero.
+    [ObservableProperty] private bool   _hasShadowedLinks;
+    [ObservableProperty] private string _shadowedLinksText = string.Empty;
 
     partial void OnUseAssumedStateChanged(bool value) => Refresh();
 
@@ -395,6 +399,10 @@ public partial class FlowAnalyticsViewModel : ObservableObject
         HasPrunedLinks = state is not null && report.BlockedLinkCount > 0;
         PrunedLinksText = HasPrunedLinks
             ? Loc.FormatCount("PathStats_PrunedLinks", report.BlockedLinkCount)
+            : string.Empty;
+        HasShadowedLinks = report.ShadowedLinkCount > 0;
+        ShadowedLinksText = HasShadowedLinks
+            ? Loc.FormatCount("PathStats_ShadowedLinks", report.ShadowedLinkCount)
             : string.Empty;
         var rootConversation = graph?.RootConversation ?? "";
 

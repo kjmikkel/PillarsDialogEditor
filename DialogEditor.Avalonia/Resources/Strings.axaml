@@ -1186,6 +1186,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="PathStats_UseAssumedState_Tip">When checked, the playthrough figures skip links that cannot fire under the game state set in View &gt; Game State. Only links whose conditions definitely fail are skipped; a link the state cannot settle stays in. Uncheck to see the upper bound over every link, whatever the game state.</sys:String>
     <sys:String x:Key="PathStats_PrunedLinks_One">1 link can't fire under the assumed game state and is skipped.</sys:String>
     <sys:String x:Key="PathStats_PrunedLinks_Other">{0} links can't fire under the assumed game state and are skipped.</sys:String>
+    <sys:String x:Key="PathStats_ShadowedLinks_One">1 link never fires because an earlier link always passes.</sys:String>
+    <sys:String x:Key="PathStats_ShadowedLinks_Other">{0} links never fire because an earlier link always passes.</sys:String>
     <sys:String x:Key="FlowAnalytics_SpanningConversations">Spanning {0} conversations</sys:String>
     <sys:String x:Key="FlowAnalytics_InConversation">in {0}</sys:String>
     <sys:String x:Key="FlowAnalytics_UnfollowedHeader">Handoffs not followed</sys:String>

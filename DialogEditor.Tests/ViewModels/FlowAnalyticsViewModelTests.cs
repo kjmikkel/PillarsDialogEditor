@@ -630,7 +630,10 @@ public class FlowAnalyticsViewModelTests
 
     // Node 0 offers a 1-word line and a 5-word line; the long branch is gated on g == 1.
     private static ConversationEditSnapshot GatedSnapshot() => new([
-        PathNode(0, "a", links: [Link(0, 1), new LinkEditSnapshot(0, 2, 1, "", true) { Conditions = GlobalIs("g", 1) }]),
+        // Link 0 is conditioned on an unset global (Unknown) so it is a real alternative rather
+        // than an always-passing link that hides link 1 (issue 353).
+        PathNode(0, "a", links: [new LinkEditSnapshot(0, 1, 1, "", true) { Conditions = GlobalIs("h", 1) },
+                                 new LinkEditSnapshot(0, 2, 1, "", true) { Conditions = GlobalIs("g", 1) }]),
         PathNode(1, "b"),
         PathNode(2, "one two three four five"),
     ]);
@@ -732,5 +735,40 @@ public class FlowAnalyticsViewModelTests
 
         Assert.False(vm.HasPrunedLinks);
         Assert.Equal(string.Empty, vm.PrunedLinksText);
+    }
+
+    // ── First-passing-link rule (GitHub issue 353) ───────────────────────────
+    private static FlowAnalyticsViewModel ShadowVm(DialogEditor.Core.Conditions.GameState? state, bool shadowed)
+    {
+        Loc.Configure(new EchoStringProvider(new() { ["PathStats_WordsTime"] = "{0}w" }));
+        var vm = new FlowAnalyticsViewModel(() => shadowed
+            ? new ConversationEditSnapshot([
+                PathNode(0, "a", links: [Link(0, 1), Link(0, 2)]),
+                PathNode(1, "b"), PathNode(2, "c")])
+            : new ConversationEditSnapshot([PathNode(0, "a", links: [Link(0, 1)]), PathNode(1, "b")]),
+            _ => { }, assumedState: state);
+        vm.RefreshCommand.Execute(null);
+        return vm;
+    }
+
+    [Fact]
+    public void ShadowedLinks_ReportedWithAndWithoutState()
+    {
+        foreach (var state in new DialogEditor.Core.Conditions.GameState?[] { null, StateWith(0) })
+        {
+            var vm = ShadowVm(state, shadowed: true);
+
+            Assert.True(vm.HasShadowedLinks);
+            Assert.Equal("PathStats_ShadowedLinks_One", vm.ShadowedLinksText);
+        }
+    }
+
+    [Fact]
+    public void ShadowedLinks_HiddenAtZero()
+    {
+        var vm = ShadowVm(null, shadowed: false);
+
+        Assert.False(vm.HasShadowedLinks);
+        Assert.Equal(string.Empty, vm.ShadowedLinksText);
     }
 }
