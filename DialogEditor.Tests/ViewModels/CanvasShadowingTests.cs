@@ -138,6 +138,24 @@ public class CanvasShadowingTests
     }
 
     [Fact]
+    public void UndoDeleteNode_RestoresLinkOrder()
+    {
+        var (canvas, n) = MakeCanvas();
+        Link(canvas, n, 1);
+        Link(canvas, n, 2);
+        Link(canvas, n, 3);
+        canvas.Connections.Add(new ConnectionViewModel(n[2].Output, n[3].Input));
+        var original = canvas.Connections.ToList();
+
+        canvas.DeleteNode(n[2]);
+        canvas.Undo();
+
+        var order = canvas.BuildSnapshot().Nodes.First(x => x.NodeId == 0).Links.Select(l => l.ToNodeId);
+        Assert.Equal([1, 2, 3], order);
+        Assert.Equal(original, canvas.Connections.ToList());
+    }
+
+    [Fact]
     public void CannotFireTooltipWinsOverShadowed()
     {
         var (canvas, n) = MakeCanvas();
@@ -146,8 +164,11 @@ public class CanvasShadowingTests
         var state = new GameState();
         state.Globals["g"] = 0;
         canvas.AssumedState = state;
+        second.ShadowedByNodeId = 1;
 
+        Assert.True(second.IsShadowed);
         Assert.True(second.CannotFire);
         Assert.Equal(second.CannotFireToolTip, second.FadedToolTip);
+        Assert.NotNull(second.FadedToolTip);
     }
 }

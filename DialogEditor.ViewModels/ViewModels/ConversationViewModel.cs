@@ -97,17 +97,25 @@ public partial class ConversationViewModel : ObservableObject
     }
 
     // ── First-passing-link shadowing (issue 353) ─────────────────────────
+    // Load adds every link one at a time; refreshing per add would be quadratic, so it
+    // suppresses the per-add refresh and calls RefreshAllShadowing once at the end.
+    private bool _suppressShadowing;
+
     public void RefreshAllShadowing()
     {
-        foreach (var source in Connections.Select(c => c.Source.Owner).OfType<NodeViewModel>().Distinct().ToList())
-            RefreshShadowing(source);
+        // One pass: GroupBy keeps Connections order within each source's group.
+        foreach (var group in Connections.Where(c => c.Source.Owner is not null)
+                                         .GroupBy(c => c.Source.Owner!).ToList())
+            ApplyShadowing(group.Key, group.ToList());
     }
 
     /// Recomputes which of the source node's links an earlier link hides. Link order is
     /// the order in <see cref="Connections"/>, which is what BuildSnapshot saves.
     public void RefreshShadowing(NodeViewModel source)
+        => ApplyShadowing(source, Connections.Where(c => c.Source.Owner == source).ToList());
+
+    private void ApplyShadowing(NodeViewModel source, IReadOnlyList<ConnectionViewModel> links)
     {
-        var links = Connections.Where(c => c.Source.Owner == source).ToList();
         // With no fact set every verdict is Unknown, but a link with no conditions at all still
         // passes for certain, so the rule applies even before View > Game State is used.
         var state = _assumedState is { HasAnyFact: true } ? _assumedState : new GameState();
@@ -141,7 +149,7 @@ public partial class ConversationViewModel : ObservableObject
                 // Clear() reports no OldItems, so release the tracked set.
                 foreach (var c in _subscribedConnections) c.PropertyChanged -= OnConnectionChanged;
                 _subscribedConnections.Clear();
-                RefreshAllShadowing();
+                if (!_suppressShadowing) RefreshAllShadowing();
                 return;
             }
             var affected = new HashSet<NodeViewModel>();
@@ -161,7 +169,8 @@ public partial class ConversationViewModel : ObservableObject
                     _subscribedConnections.Add(c);
                     if (c.Source.Owner is { } s) affected.Add(s);
                 }
-            foreach (var s in affected) RefreshShadowing(s);
+            if (!_suppressShadowing)
+                foreach (var s in affected) RefreshShadowing(s);
         };
         _dispatcher       = dispatcher;
         PendingConnection = new PendingConnectionViewModel(this);
@@ -508,6 +517,9 @@ public partial class ConversationViewModel : ObservableObject
                     vm.Location = new LayoutPoint(x, y);
             });
 
+        _suppressShadowing = true;
+        try
+        {
         foreach (var node in conversation.Nodes)
         {
             foreach (var link in node.Links)
@@ -522,6 +534,9 @@ public partial class ConversationViewModel : ObservableObject
                 }
             }
         }
+        }
+        finally { _suppressShadowing = false; }
+        RefreshAllShadowing();
         BaseSnapshot = baseSnapshot ?? BuildSnapshot();
         ConversationLoaded?.Invoke(this, EventArgs.Empty);
     }

@@ -55,7 +55,8 @@ public partial class ConnectionViewModel : ObservableObject
 
     /// Points the verdict at the session's assumed state. Owned by Node Details, which also
     /// calls <see cref="RefreshVerdict"/> when the state changes; the link itself holds no
-    /// subscription, so a discarded canvas link cannot leak.
+    /// subscription, so a discarded canvas link cannot leak. (The canvas does subscribe to the
+    /// link's PropertyChanged, for shadowing, and unsubscribes when the link leaves Connections.)
     public void SetVerdictContext(DialogEditor.Core.Conditions.GameState? state, string gameId)
     {
         _assumedState = state;
