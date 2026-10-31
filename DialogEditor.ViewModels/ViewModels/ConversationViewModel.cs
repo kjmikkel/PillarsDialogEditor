@@ -124,7 +124,7 @@ public partial class ConversationViewModel : ObservableObject
                 new ShadowTarget(t.IsPlayerChoice, t.ScriptKind, t.IsQuestionNode, t.Persistence, t.Conditions),
                 state, ActiveGameId)
             : null).ToList();
-        var hiddenBy = LinkShadowing.HiddenBy(source.PlayType, described);
+        var hiddenBy = LinkShadowing.HiddenBy(source.PlayType, source.ScriptKind, described);
         for (int i = 0; i < links.Count; i++)
             links[i].ShadowedByNodeId = hiddenBy[i] is { } h ? links[h].Target.Owner?.NodeId : null;
     }
@@ -520,20 +520,20 @@ public partial class ConversationViewModel : ObservableObject
         _suppressShadowing = true;
         try
         {
-        foreach (var node in conversation.Nodes)
-        {
-            foreach (var link in node.Links)
+            foreach (var node in conversation.Nodes)
             {
-                if (nodeMap.TryGetValue(link.FromNodeId, out var src) &&
-                    nodeMap.TryGetValue(link.ToNodeId,   out var tgt))
+                foreach (var link in node.Links)
                 {
-                    var conn = new ConnectionViewModel(src.Output, tgt.Input,
-                        link.QuestionNodeTextDisplay, link.RandomWeight, link.Conditions)
-                        { UndoStack = _undoStack };
-                    Connections.Add(conn);
+                    if (nodeMap.TryGetValue(link.FromNodeId, out var src) &&
+                        nodeMap.TryGetValue(link.ToNodeId,   out var tgt))
+                    {
+                        var conn = new ConnectionViewModel(src.Output, tgt.Input,
+                            link.QuestionNodeTextDisplay, link.RandomWeight, link.Conditions)
+                            { UndoStack = _undoStack };
+                        Connections.Add(conn);
+                    }
                 }
             }
-        }
         }
         finally { _suppressShadowing = false; }
         RefreshAllShadowing();

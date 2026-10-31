@@ -42,6 +42,12 @@ public sealed record ShadowTarget(
 /// </summary>
 public static class LinkShadowing
 {
+    /// A bank walks its links using the PlayType of the child that just played, which the editor
+    /// cannot know, so a bank source hides nothing; any other source uses its own PlayType.
+    public static IReadOnlyList<int?> HiddenBy(
+        string sourcePlayType, ScriptNodeKind sourceKind, IReadOnlyList<ShadowLink?> links)
+        => sourceKind == ScriptNodeKind.Bank ? new int?[links.Count] : HiddenBy(sourcePlayType, links);
+
     public static IReadOnlyList<int?> HiddenBy(string sourcePlayType, IReadOnlyList<ShadowLink?> links)
     {
         var hiddenBy = new int?[links.Count];
@@ -63,8 +69,8 @@ public static class LinkShadowing
             if (hider >= 0)
             {
                 // After a certain NPC link only response-capable links (Response, Opaque) can
-                // survive, and only if an earlier response might have passed (response mode). After a certain response only
-                // later NPC links are unreachable.
+                // survive, and only if an earlier response might have passed (response mode).
+                // After a certain response only later NPC links are unreachable.
                 bool hidden = hiderKind == LinkTargetKind.Npc
                     ? link.Kind == LinkTargetKind.Npc || !hiderMaybeResponse
                     : link.Kind == LinkTargetKind.Npc;
@@ -113,6 +119,6 @@ public static class LinkShadowing
             var target = nodeById(link.ToNodeId);
             described[i] = Describe(link.Conditions ?? [], target is null ? null : ShadowTarget.From(target), state, gameId);
         }
-        return HiddenBy(source.PlayType, described);
+        return HiddenBy(source.PlayType, source.ScriptKind, described);
     }
 }

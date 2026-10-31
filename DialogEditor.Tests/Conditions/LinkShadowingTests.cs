@@ -99,6 +99,16 @@ public class LinkShadowingTests
         Assert.Equal(new int?[] { null, null }, result.ToArray());
     }
 
+    [Fact]
+    public void SnapshotOverload_BankSource_HidesNothing()
+    {
+        // A bank walks its links with the PlayType of the child that just played, which the editor cannot know.
+        var nodes = new[] { Node(2), Node(3) }.ToDictionary(n => n.NodeId);
+        var source = Node(1, "Normal", Link(1, 2), Link(1, 3)) with { ScriptKind = ScriptNodeKind.Bank };
+        var result = LinkShadowing.HiddenBy(source, id => nodes.GetValueOrDefault(id), new GameState(), "poe2");
+        Assert.Equal(new int?[] { null, null }, result.ToArray());
+    }
+
     private static ConditionLeaf Global(string name, string value)
         => new("Boolean IsGlobalValue(String, Operator, Int32)", [name, "EqualTo", value], Not: false, Operator: "And");
 

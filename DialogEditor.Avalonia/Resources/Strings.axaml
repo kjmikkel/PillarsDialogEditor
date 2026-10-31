@@ -1187,8 +1187,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="PathStats_UseAssumedState_Tip">When checked, the playthrough figures skip links that cannot fire under the game state set in View &gt; Game State. Only links whose conditions definitely fail are skipped; a link the state cannot settle stays in. Uncheck to see the upper bound over every link, whatever the game state.</sys:String>
     <sys:String x:Key="PathStats_PrunedLinks_One">1 link can't fire under the assumed game state and is skipped.</sys:String>
     <sys:String x:Key="PathStats_PrunedLinks_Other">{0} links can't fire under the assumed game state and are skipped.</sys:String>
-    <sys:String x:Key="PathStats_ShadowedLinks_One">1 link never fires because an earlier link always passes.</sys:String>
-    <sys:String x:Key="PathStats_ShadowedLinks_Other">{0} links never fire because an earlier link always passes.</sys:String>
+    <sys:String x:Key="PathStats_ShadowedLinks_One">1 link is skipped because an earlier link from the same line is sure to pass.</sys:String>
+    <sys:String x:Key="PathStats_ShadowedLinks_Other">{0} links are skipped because an earlier link from the same line is sure to pass.</sys:String>
     <sys:String x:Key="FlowAnalytics_SpanningConversations">Spanning {0} conversations</sys:String>
     <sys:String x:Key="FlowAnalytics_InConversation">in {0}</sys:String>
     <sys:String x:Key="FlowAnalytics_UnfollowedHeader">Handoffs not followed</sys:String>
@@ -2032,7 +2032,7 @@ Remove it from the recent list?</sys:String>
     <!-- Issue 234: reading mode shows the link's condition count as plain text instead of the editor button. -->
     <sys:String x:Key="AutomationName_LinkConditionsReading">Conditions on this link</sys:String>
     <sys:String x:Key="ToolTip_LinkConditionsReading_One">This link has 1 condition, so the choice only applies when it is met. Switch to editing mode to see or change it.</sys:String>
-    <sys:String x:Key="ToolTip_LinkShadowed">This link never fires: the link to node {0} comes before it and always passes. The game takes the first link that passes, in link order.</sys:String>
+    <sys:String x:Key="ToolTip_LinkShadowed">This link never fires: the link to node {0} comes before it and is sure to pass (under the game state assumed in View ▸ Game State, if one is set). The game takes the first link that passes, in link order.</sys:String>
     <sys:String x:Key="ToolTip_LinkCannotFire">This link cannot fire under the game state assumed in View ▸ Game State: its conditions, or those on the line it leads to, definitely fail.</sys:String>
     <sys:String x:Key="ToolTip_LinkConditionsReading_Other">This link has {0} conditions, so the choice only applies when they are met. Switch to editing mode to see or change them.</sys:String>
 

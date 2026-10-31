@@ -156,6 +156,23 @@ public class CanvasShadowingTests
     }
 
     [Fact]
+    public void BankSource_FadesNothing()
+    {
+        var (canvas, n) = MakeCanvas();
+        var bank = new ConversationNode(0, false, SpeakerCategory.Npc, "", "", [], [], [], "Conversation", "None",
+            ScriptKind: ScriptNodeKind.Bank);
+        n[0] = new NodeViewModel(bank, new StringEntry(0, "text", ""));
+        n[0].Input.Owner = n[0];
+        n[0].Output.Owner = n[0];
+        canvas.Nodes[0] = n[0];
+        var first = Link(canvas, n, 1);
+        var second = Link(canvas, n, 2);
+
+        Assert.False(first.IsFaded);
+        Assert.False(second.IsFaded);
+    }
+
+    [Fact]
     public void CannotFireTooltipWinsOverShadowed()
     {
         var (canvas, n) = MakeCanvas();
