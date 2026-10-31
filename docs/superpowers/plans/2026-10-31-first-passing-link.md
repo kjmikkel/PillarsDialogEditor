@@ -60,16 +60,16 @@ source node) all call it. Two new read-only node fields, `PlayType` and `IsQuest
 - `NodeEditSnapshot` init props `[JsonIgnore] string PlayType { get; init; } = ""` and `[JsonIgnore] bool IsQuestionNode { get; init; }`.
 - `NodeViewModel.PlayType` / `NodeViewModel.IsQuestionNode`: get-only, set from the `ConversationNode` in the ctor, written into `ToSnapshot` next to `ScriptKind`.
 
-- [ ] **Step 1: Failing tests.**
+- [x] **Step 1: Failing tests.**
   - `Poe1Parser_ReadsPlayTypeAndIsQuestionNode`: XML node with `<PlayType>Random</PlayType><IsQuestionNode>true</IsQuestionNode>` → `"Random"`, `true`; a node without those elements → `""`, `false`.
   - `Poe2Parser_ReadsPlayTypeAndIsQuestionNode`: JSON `"PlayType": 4, "IsQuestionNode": true` → `"CycleRandom"`, `true`; missing → `""`, `false`.
   - `SnapshotBuilder_CarriesAnalysisFields`: `ConversationSnapshotBuilder.Build` of a conversation whose node has `ScriptKind = Bank`, `PlayType = "Random"`, `IsQuestionNode = true` keeps all three on the snapshot; `ToConversation` keeps all three back on the `ConversationNode`.
   - `NodeViewModel_ToSnapshot_CarriesPlayTypeAndIsQuestionNode`.
   - Round-trip: a PoE1 and a PoE2 file whose node has a non-default `PlayType` / `IsQuestionNode` serialize back with the same values (the serializers already pass these through: confirm with a test, fix only if it fails).
-- [ ] **Step 2: Run, see them fail.** `dotnet test DialogEditor.Tests --filter "Category!=Gui&FullyQualifiedName~Parser|FullyQualifiedName~SnapshotBuilder|FullyQualifiedName~NodeViewModel"` → the new tests fail to compile or fail.
-- [ ] **Step 3: Implement** the fields as listed under Interfaces. PoE1: `(string?)node.Element("PlayType") ?? ""`, `(bool?)node.Element("IsQuestionNode") ?? false`. `ConversationSnapshotBuilder.BuildNode` also sets `ScriptKind` (it drops it today).
-- [ ] **Step 4: Run the full headless suite.** Expected: all green.
-- [ ] **Step 5: Commit** `feat: read PlayType and IsQuestionNode for analysis (#353)`.
+- [x] **Step 2: Run, see them fail.** `dotnet test DialogEditor.Tests --filter "Category!=Gui&FullyQualifiedName~Parser|FullyQualifiedName~SnapshotBuilder|FullyQualifiedName~NodeViewModel"` → the new tests fail to compile or fail.
+- [x] **Step 3: Implement** the fields as listed under Interfaces. PoE1: `(string?)node.Element("PlayType") ?? ""`, `(bool?)node.Element("IsQuestionNode") ?? false`. `ConversationSnapshotBuilder.BuildNode` also sets `ScriptKind` (it drops it today).
+- [x] **Step 4: Run the full headless suite.** Expected: all green.
+- [x] **Step 5: Commit** `feat: read PlayType and IsQuestionNode for analysis (#353)`.
 
 ### Task 2: `LinkShadowing` (Core)
 
@@ -103,7 +103,7 @@ Verdict = `False` if `LinkFiring.CannotFire(...)`; `True` if Kind ≠ Opaque, bo
 entries neither hide nor are hidden; `False` entries are skipped; only the first `True` link hides; non-`Normal`
 and non-empty play type → all null).
 
-- [ ] **Step 1: Failing tests** (`HiddenBy` with hand-built `ShadowLink`s unless noted; `T/U/F` = verdict, `N/R/O` = kind):
+- [x] **Step 1: Failing tests** (`HiddenBy` with hand-built `ShadowLink`s unless noted; `T/U/F` = verdict, `N/R/O` = kind):
   - `CertainNpcFirst_HidesAllLater`: `[T N, U N, U R]` → `[null, 0, 0]`.
   - `CertainResponseFirst_HidesLaterNpcOnly`: `[T R, U N, U R, T N]` → `[null, 0, null, 0]`.
   - `UnknownFirst_HidesNothingBeforeCertain`: `[U N, T N, U N]` → `[null, null, 1]`.
@@ -116,10 +116,10 @@ and non-empty play type → all null).
   - `Describe_NoConditionsNonePersistence_IsTrue`, `Describe_OncePerConversationTarget_IsUnknown`, `Describe_BankTarget_IsOpaqueUnknown`,
     `Describe_QuestionNodeTarget_IsOpaque`, `Describe_FalseUnderState_IsFalse`, `Describe_ConditionUnknownWithEmptyState_IsUnknown`
     (build leaves as `LinkFiringTests` / `ConditionEvaluatorTests` do).
-- [ ] **Step 2: Run, see them fail** (`--filter "FullyQualifiedName~LinkShadowingTests"`).
-- [ ] **Step 3: Implement** `LinkShadowing.cs`, with a class doc comment citing `GetResponseNodes` / `GetNextNode` as in spec §2.
-- [ ] **Step 4: Run, green.**
-- [ ] **Step 5: Commit** `feat: LinkShadowing models the first-passing-link rule (#353)`.
+- [x] **Step 2: Run, see them fail** (`--filter "FullyQualifiedName~LinkShadowingTests"`).
+- [x] **Step 3: Implement** `LinkShadowing.cs`, with a class doc comment citing `GetResponseNodes` / `GetNextNode` as in spec §2.
+- [x] **Step 4: Run, green.**
+- [x] **Step 5: Commit** `feat: LinkShadowing models the first-passing-link rule (#353)`.
 
 ### Task 3: Path stats and the Flow Analytics count line
 
@@ -130,7 +130,7 @@ and non-empty play type → all null).
 **Interfaces — Consumes:** `LinkShadowing.HiddenBy(NodeEditSnapshot, Func<int, NodeEditSnapshot?>, GameState, string)`.
 **Produces:** `PathStatsReport.ShadowedLinkCount` (init, default 0); VM `HasShadowedLinks`, `ShadowedLinksText`.
 
-- [ ] **Step 1: Failing tests.**
+- [x] **Step 1: Failing tests.**
   - `ShadowedBranch_LeavesLongestAndShortest`: root → `[A (no conds), B (long text)]` with no state → longest excludes B.
   - `ShadowedChoice_LeavesForkTree`: root → `[NPC no conds, choice C]` → C not in branches.
   - `ShadowedLinkCount_CountsHiddenLinks` (with and without a state).
@@ -138,15 +138,15 @@ and non-empty play type → all null).
   - `ShadowingUsesAssumedState`: link 0 conditioned on global `g == 1`; with a state setting `g = 1`, link 1 is hidden; without, it isn't.
   - `CrossConversation_HidingAppliesPerConversation`: a target in conversation B is looked up within B (`NodeRef.Conversation`).
   - VM: `ShadowedLinksText` shows `Loc.FormatCount("PathStats_ShadowedLinks", n)` when n > 0 whether or not a state is set; hidden at 0.
-- [ ] **Step 2: Run, see them fail.**
-- [ ] **Step 3: Implement.** In `Analyze`, compute per node (memoised per `NodeRef`) the hidden set with
+- [x] **Step 2: Run, see them fail.**
+- [x] **Step 3: Implement.** In `Analyze`, compute per node (memoised per `NodeRef`) the hidden set with
   `LinkShadowing.HiddenBy(node, id => nodeById.GetValueOrDefault(new NodeRef(conv, id)), state ?? new GameState(), gameId)`;
   `LinksOf` drops a link that is blocked **or** hidden. `ShadowedLinkCount` counts hidden links over all nodes.
   Update the class doc comment (one paragraph, #353). Strings: `PathStats_ShadowedLinks_One` = "1 link never fires because an earlier link always passes.",
   `PathStats_ShadowedLinks_Other` = "{0} links never fire because an earlier link always passes."; muted
   TextBlock under `PrunedLinksTextBlock`, same style, `x:Name="ShadowedLinksTextBlock"`.
-- [ ] **Step 4: Full headless suite green** (including `NoClippedTextTests`).
-- [ ] **Step 5: Commit** `feat: path stats follow the first-passing-link rule (#353)`.
+- [x] **Step 4: Full headless suite green** (including `NoClippedTextTests`).
+- [x] **Step 5: Commit** `feat: path stats follow the first-passing-link rule (#353)`.
 
 ### Task 4: Flow Analytics warning and reachability
 
@@ -158,16 +158,16 @@ plus any exhaustive `FlowIssueKind` switch (`NodeDetailViewModel` line ~644, the
 **Produces:** `FlowIssueKind.LinkShadowed`; `FlowIssue(int NodeId, FlowIssueKind Kind)` gains init props
 `int? RelatedNodeId` (the hidden link's target) and `int? HiderNodeId` (the hiding link's target).
 
-- [ ] **Step 1: Failing tests.**
+- [x] **Step 1: Failing tests.**
   - `ShadowedLink_ReportedOnSourceNode`: node 0 → `[1 (no conds), 2]` → one `LinkShadowed` on node 0, `RelatedNodeId = 2`, `HiderNodeId = 1`.
   - `NodeReachedOnlyThroughShadowedLink_IsUnreachable`: node 2 above → `Unreachable`.
   - `ConditionedFirstLink_NoWarning`: link to 1 conditioned on an unset global → no `LinkShadowed`, node 2 reachable.
   - `RandomPlayType_NoWarning`.
   - VM message: "Link to node 2 never fires: the link to node 1 before it always passes." (`FlowAnalytics_Issue_LinkShadowed`, format `{0}` = related, `{1}` = hider).
-- [ ] **Step 2: Run, see them fail.**
-- [ ] **Step 3: Implement** with `LinkShadowing.HiddenBy(node, nodeById lookup, new GameState(), gameId)`; the BFS skips hidden links (this also changes `MaxDepth`, which is intended). Severity: warning (not `Unreachable`).
-- [ ] **Step 4: Full headless suite green.**
-- [ ] **Step 5: Commit** `feat: warn about links hidden by an earlier link (#353)`.
+- [x] **Step 2: Run, see them fail.**
+- [x] **Step 3: Implement** with `LinkShadowing.HiddenBy(node, nodeById lookup, new GameState(), gameId)`; the BFS skips hidden links (this also changes `MaxDepth`, which is intended). Severity: warning (not `Unreachable`).
+- [x] **Step 4: Full headless suite green.**
+- [x] **Step 5: Commit** `feat: warn about links hidden by an earlier link (#353)`.
 
 ### Task 5: Canvas fades hidden links
 
@@ -180,7 +180,7 @@ tests in `DialogEditor.Tests/ViewModels/`.
   `IsFaded => CannotFire || IsShadowed`, `FadedToolTip => CannotFireToolTip ?? (IsShadowed ? Loc.Format("ToolTip_LinkShadowed", ShadowedByNodeId) : null)`.
 - `ConversationViewModel.RefreshShadowing(NodeViewModel source)` and `RefreshAllShadowing()`.
 
-- [ ] **Step 1: Failing tests.**
+- [x] **Step 1: Failing tests.**
   - `UnconditionalFirstLink_FadesLaterLinks` (no state set).
   - `AddingConditionToFirstLink_UnfadesLaterLinks` (edit the connection's conditions).
   - `TargetPersistenceOncePerConversation_UnfadesLaterLinks` (edit target node's `Persistence`).
@@ -188,8 +188,8 @@ tests in `DialogEditor.Tests/ViewModels/`.
   - `NewLinkAfterCertainLink_IsFadedOnAdd`; `DeletingTheHider_UnfadesTheRest`.
   - `UndoDeleteLink_RestoresLinkOrder`: delete the first of three links, undo → `BuildSnapshot()` link order is the original; fix the undo command to reinsert at the original index if it fails.
   - `CannotFireTooltipWinsOverShadowed`.
-- [ ] **Step 2: Run, see them fail.**
-- [ ] **Step 3: Implement.** Link order for a source = order in `Connections` filtered by `Source.Owner` (as in
+- [x] **Step 2: Run, see them fail.**
+- [x] **Step 3: Implement.** Link order for a source = order in `Connections` filtered by `Source.Owner` (as in
   `BuildSnapshot`). Refresh: a source on `Connections` add/remove (Reset → all); all on `OnAssumedStateChanged`
   and `ApplyVerdictContext`; on a node's `Conditions` / `Persistence` / `IsPlayerChoice` change, every source with
   a link into it; on a connection's `Conditions` change, its source. Verdict state = assumed state if it has a fact, else `new GameState()`.
@@ -197,14 +197,46 @@ tests in `DialogEditor.Tests/ViewModels/`.
   Strings: `ToolTip_LinkShadowed` = "This link never fires: the link to node {0} comes before it and always passes. The game takes the first link that passes, in link order.";
   extend `Legend_CannotFire_Help` with a sentence: "A connection also fades when an earlier link from the same line always passes, because the game takes the first link that passes."
   and `Legend_CannotFire_Desc` to " — ruled out by the game state or an earlier link".
-- [ ] **Step 4: Full headless suite green.**
-- [ ] **Step 5: Commit** `feat: canvas fades links hidden by an earlier link (#353)`.
+- [x] **Step 4: Full headless suite green.**
+- [x] **Step 5: Commit** `feat: canvas fades links hidden by an earlier link (#353)`.
 
 ### Task 6: Verification, docs, PR (orchestrator)
 
-- [ ] Headless suite green; `trail check` clean.
-- [ ] Run the app (`running-the-app`) on a PoE2 conversation with an unconditional first link: faded later link with
+- [x] Headless suite green; `trail check` clean.
+- [x] Run the app (`running-the-app`) on a PoE2 conversation with an unconditional first link: faded later link with
       the tooltip, the warning in Flow Analytics, the shadowed-count line; screenshots.
-- [ ] Spec/plan describe the code as built; `## Handoff` appended; `trail note` for the game-code findings.
-- [ ] Search then file the follow-up issue: a command to reorder a node's links.
-- [ ] Open the PR referencing #353; enable Auto-fix.
+- [x] Spec/plan describe the code as built; `## Handoff` appended; `trail note` for the game-code findings.
+- [x] Search then file the follow-up issue: a command to reorder a node's links.
+- [x] Open the PR referencing #353; enable Auto-fix.
+
+## Handoff — 2026-10-31
+
+**Done** (branch `feat/353-first-passing-link`; the PR closes #353):
+- Spec and plan (`8f5b1850`, `76ac8e78`), plus a spec amendment (`0ee99a08`): a certain NPC link keeps later
+  opaque links when a response may pass. Spec brought up to date with the build (`5ec71d84`).
+- Task 1 (`465ca070`): the node fields `PlayType` / `IsQuestionNode`. `ConversationSnapshotBuilder` now
+  carries `ScriptKind` / `PlayType` / `IsQuestionNode` in both directions (it used to drop `ScriptKind`).
+- Task 2 (`58c65508`, `fcad21b1`): `LinkShadowing` (`Describe`, `HiddenBy`).
+- Task 3 (`34b32764`): path stats skip hidden links. Adds `ShadowedLinkCount` and the Flow Analytics count line.
+- Task 4 (`8492fa25`): the `FlowIssueKind.LinkShadowed` warning. `Unreachable` now skips hidden links (both use
+  an empty state).
+- Task 5 (`04810c2f`, `9cb96677`): the canvas fades hidden links (`IsFaded` / `FadedToolTip`). Undo of link
+  deletion and of node deletion now reinserts connections at their original index. Loading refreshes the hiding once.
+- Final-review fixes (`a5d6c288`): bank *sources* hide nothing; the tooltip and path-stats line say "sure to pass".
+- Trail learning: game-code findings (`edfeb805`). Follow-up issue: #359 (reorder a node's links).
+- Headless suite green (5164 passed). GUI check: on a copy of the canonical PoE2 fixture, with an unconditional
+  NPC link inserted first on node 0, the canvas faded 0→1, 0→2 and 0→3 and drew 0→7 at full strength. Flow
+  Analytics was not opened in the GUI; headless tests cover the warning text and the count line against the real
+  resources.
+
+**Remaining:** review and merge the PR.
+
+**Next step:** review the _(my call)_ items in the spec. The most visible is that path stats now change with no
+game state for conversations that contain a link that is sure to pass. In shipped PoE2 data, 390 nodes hide
+802 links.
+
+**Open questions:** none blocking. Possible follow-up: Flow Analytics' issue-kind column is 110px wide and cuts
+the new warning text short. The node numbers then show only in the tooltip, as with other long issue labels.
+
+**Do not redo:** reading `PlayType` from a bank *source* (a bank has none; the game uses the child that just
+played). Treating question nodes as certain targets (on a revisit they expand to responses).
