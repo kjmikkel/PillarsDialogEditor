@@ -1,4 +1,4 @@
-using DialogEditor.Avalonia.Shared.Services;
+﻿using DialogEditor.Avalonia.Shared.Services;
 using DialogEditor.Core.Analytics;
 using DialogEditor.ViewModels;
 using DialogEditor.ViewModels.Resources;
@@ -32,5 +32,14 @@ public class FlowAnalyticsResourceEndToEndTests
             new TokenIssueRowViewModel(7, "de", "bad tag", _ => { }).DisplayText);
         Assert.Equal("Node 7: bad tag",
             new TokenIssueRowViewModel(7, "", "bad tag", _ => { }).DisplayText);
+    }
+
+    [AvaloniaFact]
+    public void LinkShadowed_KindLabel_UsesRealResources()
+    {
+        var issue = new FlowIssue(0, FlowIssueKind.LinkShadowed) { RelatedNodeId = 2, HiderNodeId = 1 };
+        var vm = new FlowIssueViewModel(issue, "x", _ => { });
+
+        Assert.Equal("Link to node 2 never fires: the link to node 1 before it always passes.", vm.KindLabel);
     }
 }

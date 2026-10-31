@@ -1,4 +1,5 @@
-﻿using DialogEditor.Core.Editing;
+﻿using DialogEditor.Core.Conditions;
+using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 
 namespace DialogEditor.Core.Analytics;
@@ -33,6 +34,14 @@ public static class FlowAnalysisService
             }
         }
 
+        // ── Links an earlier always-passing link hides (issue 353) ────────
+        // Judged against an empty game state, so only links certain to pass count as hiders.
+        // The BFS skips hidden links: a node reachable only through one can never be reached.
+        var hiddenLinks = new Dictionary<int, IReadOnlyList<int?>>();
+        foreach (var node in nodes)
+            hiddenLinks[node.NodeId] = LinkShadowing.HiddenBy(
+                node, id => nodeById.GetValueOrDefault(id), new GameState(), gameId);
+
         // ── BFS from the start node (StartNode.Id) ────────────────────────
         var reachable = new HashSet<int>();
         var depth     = new Dictionary<int, int>();
@@ -49,8 +58,11 @@ public static class FlowAnalysisService
         {
             var current = queue.Dequeue();
             if (!linksByFrom.TryGetValue(current, out var links)) continue;
-            foreach (var link in links)
+            var hidden = hiddenLinks[current];
+            for (int i = 0; i < links.Count; i++)
             {
+                if (hidden[i] is not null) continue;
+                var link = links[i];
                 if (reachable.Add(link.ToNodeId))
                 {
                     depth[link.ToNodeId] = depth[current] + 1;
@@ -101,6 +113,17 @@ public static class FlowAnalysisService
             if (node.Links.Count > 0 &&
                 node.Scripts.Any(sc => ConversationJumpVerbs.IsJump(sc.DisplayName)))
                 issues.Add(new FlowIssue(node.NodeId, FlowIssueKind.ConversationJumpWhileContinuing));
+
+            var hiddenBy = hiddenLinks[node.NodeId];
+            for (int i = 0; i < hiddenBy.Count; i++)
+            {
+                if (hiddenBy[i] is not { } hider) continue;
+                issues.Add(new FlowIssue(node.NodeId, FlowIssueKind.LinkShadowed)
+                {
+                    RelatedNodeId = node.Links[i].ToNodeId,
+                    HiderNodeId   = node.Links[hider].ToNodeId
+                });
+            }
 
             foreach (var kind in ScriptNodeRules.NeverRun(
                          gameId, node.SpeakerCategory, node.ScriptKind, node.Links.Count > 0, node.Scripts))

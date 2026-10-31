@@ -113,6 +113,7 @@ public class FlowAnalyticsViewModelTests
     [InlineData(FlowIssueKind.BarkHasPlayerChoiceChild, "FlowAnalytics_Severity_Warning")]
     [InlineData(FlowIssueKind.ScriptExitNeverRuns,      "FlowAnalytics_Severity_Warning")]
     [InlineData(FlowIssueKind.ScriptUpdateNeverRuns,    "FlowAnalytics_Severity_Warning")]
+    [InlineData(FlowIssueKind.LinkShadowed,             "FlowAnalytics_Severity_Warning")]
     public void SeverityLabel_MapsKindToTierKey(FlowIssueKind kind, string expectedKey)
     {
         var vm = new FlowIssueViewModel(new FlowIssue(1, kind), "snippet", _ => { });

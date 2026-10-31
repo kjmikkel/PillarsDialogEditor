@@ -17,6 +17,8 @@ public partial class FlowIssueViewModel : ObservableObject
     public int           NodeId      { get; }
     public FlowIssueKind Kind        { get; }
     public string        NodeSnippet { get; }
+    public int?          RelatedNodeId { get; }
+    public int?          HiderNodeId   { get; }
 
     public string KindLabel => Kind switch
     {
@@ -30,6 +32,7 @@ public partial class FlowIssueViewModel : ObservableObject
                                                 => Loc.Get("FlowAnalytics_Issue_ConversationJumpWhileContinuing"),
         FlowIssueKind.ScriptExitNeverRuns       => Loc.Get("FlowAnalytics_Issue_ScriptExitNeverRuns"),
         FlowIssueKind.ScriptUpdateNeverRuns     => Loc.Get("FlowAnalytics_Issue_ScriptUpdateNeverRuns"),
+        FlowIssueKind.LinkShadowed              => Loc.Format("FlowAnalytics_Issue_LinkShadowed", RelatedNodeId ?? 0, HiderNodeId ?? 0),
         _                                       => Kind.ToString()
     };
 
@@ -47,6 +50,8 @@ public partial class FlowIssueViewModel : ObservableObject
     {
         NodeId      = issue.NodeId;
         Kind        = issue.Kind;
+        RelatedNodeId = issue.RelatedNodeId;
+        HiderNodeId   = issue.HiderNodeId;
         NodeSnippet = nodeSnippet;
         _navigate   = navigate;
     }

@@ -34,10 +34,22 @@ public enum FlowIssueKind
 
     /// Deadfire only: a ScriptNode with OnUpdate scripts. A script node is never the current
     /// node, and update scripts run only on the current node, so they never run (issue 167).
-    ScriptUpdateNeverRuns
+    ScriptUpdateNeverRuns,
+
+    /// A link that can never fire because an earlier link on the same node always passes
+    /// (the games take the first passing link; issue 353). Reported on the source node, one
+    /// per hidden link.
+    LinkShadowed
 }
 
-public record FlowIssue(int NodeId, FlowIssueKind Kind);
+public record FlowIssue(int NodeId, FlowIssueKind Kind)
+{
+    /// LinkShadowed: the hidden link's target node.
+    public int? RelatedNodeId { get; init; }
+
+    /// LinkShadowed: the target node of the earlier link that hides it.
+    public int? HiderNodeId { get; init; }
+}
 
 public record FlowAnalysisReport(
     FlowStatistics           Statistics,

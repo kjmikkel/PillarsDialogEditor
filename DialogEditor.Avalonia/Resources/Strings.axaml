@@ -1178,6 +1178,7 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="FlowAnalytics_Issue_ConversationJumpWhileContinuing">Starts another conversation while continuing</sys:String>
     <sys:String x:Key="FlowAnalytics_Issue_ScriptExitNeverRuns">Exit scripts on a script node that leads on (Deadfire skips them)</sys:String>
     <sys:String x:Key="FlowAnalytics_Issue_ScriptUpdateNeverRuns">Update scripts on a script node (Deadfire never runs them)</sys:String>
+    <sys:String x:Key="FlowAnalytics_Issue_LinkShadowed">Link to node {0} never fires: the link to node {1} before it always passes.</sys:String>
     <sys:String x:Key="PathStats_UnknownTarget">(unknown target)</sys:String>
     <!-- Cross-conversation path stats (issue #14) -->
     <sys:String x:Key="FlowAnalytics_FollowJumps">Follow conversation jumps</sys:String>
