@@ -1,4 +1,5 @@
 ﻿using DialogEditor.Core.Conditions;
+using DialogEditor.Core.Editing;
 using DialogEditor.Core.Models;
 
 namespace DialogEditor.Tests.Conditions;
@@ -59,6 +60,44 @@ public class LinkShadowingTests
     [InlineData("Normal")]
     public void NormalOrEmptyPlayType_Hides(string playType)
         => Check([null, 0], playType, T(N), U(N));
+
+    [Fact]
+    public void CertainNpcAfterMaybeResponse_KeepsLaterOpaque()
+        => Check([null, null, null], "Normal", U(R), T(N), U(O));
+
+    [Fact]
+    public void FalseResponse_DoesNotSetMaybeResponse()
+        => Check([null, null, 1], "Normal", F(R), T(N), U(R));
+
+    [Fact]
+    public void CertainResponse_KeepsLaterOpaque()
+        => Check([null, null], "Normal", T(R), U(O));
+
+    private static NodeEditSnapshot Node(int id, string playType = "", params LinkEditSnapshot[] links)
+        => new(id, false, SpeakerCategory.Npc, "", "", "", "", "", "None", "", "", "", false, false,
+               links, [], [])
+        { PlayType = playType };
+
+    private static LinkEditSnapshot Link(int from, int to, IReadOnlyList<ConditionNode>? conds = null)
+        => new(from, to, 0, "", false) { Conditions = conds };
+
+    [Fact]
+    public void SnapshotOverload_HandlesDanglingNullConditionsAndCertainNpc()
+    {
+        var nodes = new[] { Node(2), Node(3) }.ToDictionary(n => n.NodeId);
+        var source = Node(1, "Normal", Link(1, 99), Link(1, 2, null), Link(1, 3));
+        var result = LinkShadowing.HiddenBy(source, id => nodes.GetValueOrDefault(id), new GameState(), "poe2");
+        Assert.Equal(new int?[] { null, null, 1 }, result.ToArray());
+    }
+
+    [Fact]
+    public void SnapshotOverload_RandomSource_HidesNothing()
+    {
+        var nodes = new[] { Node(2), Node(3) }.ToDictionary(n => n.NodeId);
+        var source = Node(1, "Random", Link(1, 2), Link(1, 3));
+        var result = LinkShadowing.HiddenBy(source, id => nodes.GetValueOrDefault(id), new GameState(), "poe2");
+        Assert.Equal(new int?[] { null, null }, result.ToArray());
+    }
 
     private static ConditionLeaf Global(string name, string value)
         => new("Boolean IsGlobalValue(String, Operator, Int32)", [name, "EqualTo", value], Not: false, Operator: "And");

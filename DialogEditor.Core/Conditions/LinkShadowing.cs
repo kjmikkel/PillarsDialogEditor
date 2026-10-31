@@ -62,11 +62,11 @@ public static class LinkShadowing
 
             if (hider >= 0)
             {
-                // After a certain NPC link only responses can survive, and only if an earlier
-                // response might have passed (response mode). After a certain response only
+                // After a certain NPC link only response-capable links (Response, Opaque) can
+                // survive, and only if an earlier response might have passed (response mode). After a certain response only
                 // later NPC links are unreachable.
                 bool hidden = hiderKind == LinkTargetKind.Npc
-                    ? link.Kind != LinkTargetKind.Response || !hiderMaybeResponse
+                    ? link.Kind == LinkTargetKind.Npc || !hiderMaybeResponse
                     : link.Kind == LinkTargetKind.Npc;
                 if (hidden) hiddenBy[i] = hider;
             }
