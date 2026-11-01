@@ -133,6 +133,15 @@ public static class ConflictDetector
                             convFields[key] = list = [];
                         list.Add(pi);
                     }
+                    // A link reorder is replace-all too (issue 359): two packs ordering the
+                    // same node's links disagree unless one simply takes effect last.
+                    if (mod.UpdatedLinkOrder is not null)
+                    {
+                        var key = (mod.NodeId, "LinkOrder");
+                        if (!convFields.TryGetValue(key, out var list))
+                            convFields[key] = list = [];
+                        list.Add(pi);
+                    }
                 }
 
                 // Track deletions

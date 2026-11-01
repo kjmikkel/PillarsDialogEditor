@@ -70,4 +70,25 @@ public class ProjectDiffTests
         var change = Assert.Single(ProjectDiff.Diff(WithText("Hi"), WithText("Hello")));
         Assert.Equal([5], change.Modified);
     }
+
+    private static DialogProject WithOrder(int[]? order) =>
+        DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [], [],
+                [new NodeModification(5, new Dictionary<string, FieldChange>(), [], []) { UpdatedLinkOrder = order }]));
+
+    [Fact]
+    public void ReorderOnlyNode_IsListedAsModified()
+    {
+        var change = Assert.Single(ProjectDiff.Diff(WithOrder([1, 2]), WithOrder([2, 1])));
+        Assert.Equal([5], change.Modified);
+    }
+
+    [Fact]
+    public void LinkOrderDiffers_ComparesTheNodesRecordedOrder()
+    {
+        Assert.True(ProjectDiff.LinkOrderDiffers(WithOrder([1, 2]), WithOrder([2, 1]), "greeting", 5));
+        Assert.True(ProjectDiff.LinkOrderDiffers(WithOrder(null), WithOrder([2, 1]), "greeting", 5));
+        Assert.False(ProjectDiff.LinkOrderDiffers(WithOrder([1, 2]), WithOrder([1, 2]), "greeting", 5));
+        Assert.False(ProjectDiff.LinkOrderDiffers(WithOrder(null), WithOrder(null), "greeting", 5));
+    }
 }

@@ -115,4 +115,24 @@ public class NodeDiffDetailViewModelTests
 
         Assert.Equal("Diff_Detail_Header", vm.HeaderText);
     }
+
+    [Fact]
+    public void LinksReordered_ShowsTheLine_AndIsStructuralOnlyWhenTextSame()
+    {
+        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Changed, "en",
+            Map(("en", "a", "")), Map(("en", "a", "")), linksReordered: true);
+
+        Assert.True(vm.LinksReordered);
+        Assert.Equal("Diff_LinksReordered", vm.LinksReorderedText);
+        Assert.True(vm.IsStructuralOnly);
+    }
+
+    [Fact]
+    public void LinksReordered_DefaultsToFalse()
+    {
+        var vm = new NodeDiffDetailViewModel(1, DiffStatus.Changed, "en",
+            Map(("en", "a", "")), Map(("en", "b", "")));
+
+        Assert.False(vm.LinksReordered);
+    }
 }

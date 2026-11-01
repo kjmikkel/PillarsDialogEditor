@@ -1099,7 +1099,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Diff_Detail_FemaleTextLabel">Female text</sys:String>
     <sys:String x:Key="Diff_Detail_NodeAdded">(node added — no previous text)</sys:String>
     <sys:String x:Key="Diff_Detail_NodeRemoved">(node removed)</sys:String>
-    <sys:String x:Key="Diff_Detail_StructuralOnly">No text change — only structural fields (conditions, scripts, or speaker) differ.</sys:String>
+    <sys:String x:Key="Diff_Detail_StructuralOnly">No text change — only structural fields (conditions, scripts, speaker, or link order) differ.</sys:String>
+    <sys:String x:Key="Diff_LinksReordered">Links reordered</sys:String>
     <sys:String x:Key="ToolTip_Diff_Detail">Shows the selected node's text before and after the change. Added or removed text is highlighted; the left value is the version on the left endpoint, the right value the version on the right endpoint.</sys:String>
 
     <!-- Diff detail: language section labels -->
