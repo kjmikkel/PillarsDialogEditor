@@ -598,4 +598,30 @@ public class Poe1ConversationSerializerTests
         Assert.Equal("CycleStop", saved[0].PlayType);
         Assert.True(saved[0].IsQuestionNode);
     }
+
+    // Issue 359: a link moved on the canvas is saved in its new place. Nodes 0..2 on the canvas, so node 2 is
+    // new to the file; node 0 links to 1 then 2, and the move puts 2 first.
+    [Fact]
+    public void ReorderedNode_SavesNewOrder()
+    {
+        var canvas = new DialogEditor.ViewModels.ConversationViewModel(new DialogEditor.Tests.Helpers.StubDispatcher()) { IsEditable = true };
+        var nodes = Enumerable.Range(0, 3).Select(id =>
+        {
+            var vm = new DialogEditor.ViewModels.NodeViewModel(
+                new ConversationNode(id, false, SpeakerCategory.Npc, "aaaa", "", [], [], [], "Conversation", "None"),
+                new StringEntry(id, "text", ""));
+            vm.Input.Owner = vm;
+            vm.Output.Owner = vm;
+            canvas.Nodes.Add(vm);
+            return vm;
+        }).ToArray();
+        canvas.Connections.Add(new DialogEditor.ViewModels.ConnectionViewModel(nodes[0].Output, nodes[1].Input));
+        var second = new DialogEditor.ViewModels.ConnectionViewModel(nodes[0].Output, nodes[2].Input);
+        canvas.Connections.Add(second);
+
+        canvas.MoveLinkEarlierCommand.Execute(second);
+
+        var saved = Poe1ConversationParser.ParseXml(Poe1ConversationSerializer.Serialize(TwoNodeXml, canvas.BuildSnapshot()));
+        Assert.Equal([2, 1], saved.First(n => n.NodeId == 0).Links.Select(l => l.ToNodeId));
+    }
 }

@@ -1,0 +1,68 @@
+{
+  "Name": "LegacyV3",
+  "SchemaVersion": 1,
+  "Patches": {
+    "greeting": {
+      "ConversationName": "greeting",
+      "SchemaVersion": 3,
+      "AddedNodes": [
+        {
+          "NodeId": 50,
+          "IsPlayerChoice": true,
+          "SpeakerCategory": 0,
+          "SpeakerGuid": "b1a8e901-0000-0000-0000-000000000000",
+          "ListenerGuid": "fbeeeff7-ec6a-4a40-a47f-1843eaffc6ae",
+          "DisplayType": "Conversation",
+          "Persistence": "None",
+          "ActorDirection": "",
+          "Comments": "",
+          "ExternalVO": "",
+          "HasVO": false,
+          "HideSpeaker": false,
+          "Links": [
+            {
+              "FromNodeId": 50,
+              "ToNodeId": 1,
+              "RandomWeight": 1,
+              "QuestionNodeTextDisplay": "ShowAlways",
+              "HasConditions": false,
+              "Conditions": null
+            }
+          ],
+          "Conditions": [],
+          "Scripts": []
+        }
+      ],
+      "DeletedNodeIds": [],
+      "ModifiedNodes": [
+        {
+          "UpdatedConditions": null,
+          "UpdatedScripts": null,
+          "NodeId": 0,
+          "FieldChanges": {},
+          "AddedLinks": [
+            {
+              "FromNodeId": 0,
+              "ToNodeId": 50,
+              "RandomWeight": 1,
+              "QuestionNodeTextDisplay": "ShowNever",
+              "HasConditions": false,
+              "Conditions": null
+            }
+          ],
+          "DeletedLinks": [],
+          "ModifiedLinks": [
+            {
+              "ToNodeId": 1,
+              "RandomWeight": 1,
+              "QuestionNodeTextDisplay": "ShowAlways",
+              "Conditions": null
+            }
+          ]
+        }
+      ],
+      "Translations": {},
+      "NodeComments": {}
+    }
+  }
+}

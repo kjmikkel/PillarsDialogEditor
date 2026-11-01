@@ -129,6 +129,23 @@ public partial class ConversationViewModel : ObservableObject
             links[i].ShadowedByNodeId = hiddenBy[i] is { } h ? links[h].Target.Owner?.NodeId : null;
     }
 
+    // ── Link position numbers (issue 359) ──────────────────────────────────
+    // Same triggers as shadowing: the numbers are the links' order in Connections.
+    public void RefreshAllLinkPositions()
+    {
+        foreach (var group in Connections.Where(c => c.Source.Owner is not null)
+                                         .GroupBy(c => c.Source.Owner!).ToList())
+            ApplyLinkPositions(group.ToList());
+    }
+
+    private void RefreshLinkPositions(NodeViewModel source)
+        => ApplyLinkPositions(Connections.Where(c => c.Source.Owner == source).ToList());
+
+    private static void ApplyLinkPositions(IReadOnlyList<ConnectionViewModel> links)
+    {
+        for (int i = 0; i < links.Count; i++) links[i].SetLinkPosition(i + 1, links.Count);
+    }
+
     private void OnConnectionChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(ConnectionViewModel.Conditions) && sender is ConnectionViewModel { Source.Owner: { } src })
@@ -144,12 +161,16 @@ public partial class ConversationViewModel : ObservableObject
     {
         Connections.CollectionChanged += (_, args) =>
         {
+            // Move Earlier/Later depend on a link's place among its siblings (issue 359); the commands are shared by every
+            // menu item, so one raise refreshes them all after any add, delete, undo or move.
+            MoveLinkEarlierCommand.NotifyCanExecuteChanged();
+            MoveLinkLaterCommand.NotifyCanExecuteChanged();
             if (args.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
             {
                 // Clear() reports no OldItems, so release the tracked set.
-                foreach (var c in _subscribedConnections) c.PropertyChanged -= OnConnectionChanged;
+                foreach (var c in _subscribedConnections) { c.PropertyChanged -= OnConnectionChanged; c.DetachAnchors(); }
                 _subscribedConnections.Clear();
-                if (!_suppressShadowing) RefreshAllShadowing();
+                if (!_suppressShadowing) { RefreshAllShadowing(); RefreshAllLinkPositions(); }
                 return;
             }
             var affected = new HashSet<NodeViewModel>();
@@ -157,6 +178,7 @@ public partial class ConversationViewModel : ObservableObject
                 foreach (ConnectionViewModel c in args.OldItems)
                 {
                     c.PropertyChanged -= OnConnectionChanged;
+                    c.DetachAnchors();
                     _subscribedConnections.Remove(c);
                     c.ShadowedByNodeId = null;
                     if (c.Source.Owner is { } s) affected.Add(s);
@@ -166,11 +188,12 @@ public partial class ConversationViewModel : ObservableObject
                 {
                     c.SetVerdictContext(_assumedState, ActiveGameId);
                     c.PropertyChanged += OnConnectionChanged;
+                    c.AttachAnchors();
                     _subscribedConnections.Add(c);
                     if (c.Source.Owner is { } s) affected.Add(s);
                 }
             if (!_suppressShadowing)
-                foreach (var s in affected) RefreshShadowing(s);
+                foreach (var s in affected) { RefreshShadowing(s); RefreshLinkPositions(s); }
         };
         _dispatcher       = dispatcher;
         PendingConnection = new PendingConnectionViewModel(this);
@@ -218,6 +241,11 @@ public partial class ConversationViewModel : ObservableObject
 
     private void OnNodeTextChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
+        // The numbers show only while the link's source is selected (issue 359).
+        if (e.PropertyName == nameof(NodeViewModel.IsSelected) && sender is NodeViewModel picked)
+            foreach (var c in Connections)
+                if (c.Source.Owner == picked) c.NotifySourceSelectionChanged();
+
         // A node's own conditions gate every link leading to it, so those links re-judge (#32).
         if (e.PropertyName == nameof(NodeViewModel.Conditions) && sender is NodeViewModel changed)
             foreach (var c in Connections)
@@ -319,6 +347,8 @@ public partial class ConversationViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(DeleteNodeCmdCommand))]
     [NotifyCanExecuteChangedFor(nameof(AddConnectedNodeCmdCommand))]
     [NotifyCanExecuteChangedFor(nameof(DeleteConnectionCmdCommand))]
+    [NotifyCanExecuteChangedFor(nameof(MoveLinkEarlierCommand))]
+    [NotifyCanExecuteChangedFor(nameof(MoveLinkLaterCommand))]
     [NotifyCanExecuteChangedFor(nameof(ChooseStartNodeCommand))]
     [NotifyCanExecuteChangedFor(nameof(MakeStartNodeCmdCommand))]
     [NotifyCanExecuteChangedFor(nameof(UndoCommand))]
@@ -537,6 +567,7 @@ public partial class ConversationViewModel : ObservableObject
         }
         finally { _suppressShadowing = false; }
         RefreshAllShadowing();
+        RefreshAllLinkPositions();
         BaseSnapshot = baseSnapshot ?? BuildSnapshot();
         ConversationLoaded?.Invoke(this, EventArgs.Empty);
     }
@@ -801,6 +832,38 @@ public partial class ConversationViewModel : ObservableObject
     private void DeleteConnectionCmd(ConnectionViewModel? connection)
     {
         if (connection is not null) DeleteConnection(connection);
+    }
+
+    // ── Link order (issue 359) ────────────────────────────────────────────
+    // A node's link order is the order of its connections in Connections, and the game takes the first
+    // link that passes. A move swaps the link with the neighbouring link of the same node; connections of
+    // other nodes between them keep their indices.
+    public bool CanMoveLinkEarlier(ConnectionViewModel? connection) => IsEditable && SiblingOf(connection, -1) is not null;
+
+    public bool CanMoveLinkLater(ConnectionViewModel? connection) => IsEditable && SiblingOf(connection, +1) is not null;
+
+    private ConnectionViewModel? SiblingOf(ConnectionViewModel? connection, int direction)
+    {
+        if (connection is null || connection.Source.Owner is not { } source) return null;
+        var at = Connections.IndexOf(connection);
+        if (at < 0) return null;
+        for (int i = at + direction; i >= 0 && i < Connections.Count; i += direction)
+            if (Connections[i].Source.Owner == source) return Connections[i];
+        return null;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanMoveLinkEarlier))]
+    private void MoveLinkEarlier(ConnectionViewModel? connection) => MoveLink(connection, -1);
+
+    [RelayCommand(CanExecute = nameof(CanMoveLinkLater))]
+    private void MoveLinkLater(ConnectionViewModel? connection) => MoveLink(connection, +1);
+
+    private void MoveLink(ConnectionViewModel? connection, int direction)
+    {
+        if (SiblingOf(connection, direction) is not { } sibling) return;
+        _undoStack.Execute(new MoveLinkCommand(this, connection!, sibling));
+        IsModified = true;
+        RefreshUndoRedo();
     }
 
     /// Raised with a node's speaker GUID when the user asks to browse that

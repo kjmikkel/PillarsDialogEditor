@@ -116,12 +116,21 @@ public static class DiffEngine
         IReadOnlyList<ScriptCall>? updatedScripts =
             baseScriptJson != currentScriptJson ? current.Scripts : null;
 
+        // The order PatchApplier gives without a record: base links minus deleted, in base order, then
+        // added links in current order. Only a different current order needs writing down (issue 359).
+        var deletedIds = deletedLinks.Select(d => d.ToNodeId).ToHashSet();
+        var appliedOrder = @base.Links.Where(l => !deletedIds.Contains(l.ToNodeId))
+            .Concat(addedLinks).Select(l => l.ToNodeId);
+        var currentOrder = current.Links.Select(l => l.ToNodeId).ToList();
+        IReadOnlyList<int>? updatedLinkOrder = appliedOrder.SequenceEqual(currentOrder) ? null : currentOrder;
+
         if (changes.Count == 0 && addedLinks.Count == 0 && deletedLinks.Count == 0
-            && modifiedLinks.Count == 0 && updatedConditions is null && updatedScripts is null)
+            && modifiedLinks.Count == 0 && updatedConditions is null && updatedScripts is null
+            && updatedLinkOrder is null)
             return null;
 
         return new NodeModification(current.NodeId, changes, addedLinks, deletedLinks, modifiedLinks)
-            { UpdatedConditions = updatedConditions, UpdatedScripts = updatedScripts };
+            { UpdatedConditions = updatedConditions, UpdatedScripts = updatedScripts, UpdatedLinkOrder = updatedLinkOrder };
     }
 
     private static void TryAddChange<T>(

@@ -10,11 +10,11 @@ shipped inside every pack.)
 | File | Format | Current `SchemaVersion` |
 |---|---|---|
 | `.dialogproject` | `DialogProject` | 1 |
-| inside a project's `Patches` | `ConversationPatch`, one per conversation | 3 |
+| inside a project's `Patches` | `ConversationPatch`, one per conversation | 4 |
 | `.patchlist` | `PatchList` (Patch Manager load order) | 1 |
 
 A patch's `SchemaVersion` is independent of its project's. A version-1 project can hold
-version-3 patches, and each is checked on its own.
+version-4 patches, and each is checked on its own.
 
 ## `.dialogproject`
 
@@ -40,7 +40,7 @@ A diff against the game's conversation, keyed by node ID.
 | `SchemaVersion` | yes | Patch format version. |
 | `AddedNodes` | yes | Complete definitions of new nodes. |
 | `DeletedNodeIds` | yes | IDs of removed nodes. |
-| `ModifiedNodes` | yes | Per node: `FieldChanges` (each a JSON-encoded `From` / `To` pair, so a patch can check the game still holds the expected value), `AddedLinks`, `DeletedLinks`, `ModifiedLinks`, and optional replace-all `UpdatedConditions` / `UpdatedScripts`. |
+| `ModifiedNodes` | yes | Per node: `FieldChanges` (each a JSON-encoded `From` / `To` pair, so a patch can check the game still holds the expected value), `AddedLinks`, `DeletedLinks`, `ModifiedLinks`, and optional replace-all `UpdatedConditions` / `UpdatedScripts`, and `UpdatedLinkOrder` (added in v4): the target node IDs of the node's links in their new order, written only when it differs from the order the rest of the patch gives. |
 | `Translations` | no (added in v2) | Node text per language code, e.g. `"fr"`. |
 | `NodeComments` | no (added in v2) | Language-neutral translator notes, keyed by node ID. |
 
@@ -99,7 +99,7 @@ same versions for the build you're running.
 
 | Patcher | Project | Conversation patch | Load order |
 |---|---|---|---|
-| 1.0 | ≤ 1 | ≤ 3 | ≤ 1 |
+| 1.0 | ≤ 1 | ≤ 4 | ≤ 1 |
 
 "Patcher" is the Pillars Dialog Patcher version (`PATCHER_VERSION`, released under
 `patcher-v*` tags), not the editor's: the two are released independently (GitHub issue 77).

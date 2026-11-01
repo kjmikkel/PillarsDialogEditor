@@ -47,15 +47,21 @@ public sealed class NodeDiffDetailViewModel
     public IReadOnlyList<LanguageDiffSection> Sections { get; }
     public bool   IsStructuralOnly { get; }
     public bool   ShowSections => !IsStructuralOnly;
+
+    /// The node's links were put in a different order between the two versions (issue 359).
+    public bool   LinksReordered { get; }
+    public string LinksReorderedText => Loc.Get("Diff_LinksReordered");
     public string HeaderText   => Loc.Format("Diff_Detail_Header", NodeId);
 
     public NodeDiffDetailViewModel(
         int nodeId, DiffStatus kind, string primaryLanguage,
         IReadOnlyDictionary<string, (string Default, string Female)> leftByLang,
-        IReadOnlyDictionary<string, (string Default, string Female)> rightByLang)
+        IReadOnlyDictionary<string, (string Default, string Female)> rightByLang,
+        bool linksReordered = false)
     {
         NodeId = nodeId;
         Kind   = kind;
+        LinksReordered = linksReordered;
 
         var codes = new HashSet<string>(StringComparer.Ordinal) { primaryLanguage };
         foreach (var k in leftByLang.Keys)  codes.Add(k);

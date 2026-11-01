@@ -47,6 +47,20 @@ public static class ProjectDiff
         return changes.OrderBy(c => c.Name, StringComparer.Ordinal).ToList();
     }
 
+    /// True when the node's recorded link order differs between the two versions
+    /// (a missing record counts as "no order"). Lets the diff detail say "Links reordered"
+    /// for a node whose only change is the order (issue 359).
+    public static bool LinkOrderDiffers(DialogProject a, DialogProject b, string conversation, int nodeId)
+    {
+        static IReadOnlyList<int>? OrderOf(DialogProject p, string conv, int id) =>
+            p.Patches.GetValueOrDefault(conv)?.ModifiedNodes.FirstOrDefault(m => m.NodeId == id)?.UpdatedLinkOrder;
+
+        var left  = OrderOf(a, conversation, nodeId);
+        var right = OrderOf(b, conversation, nodeId);
+        if (left is null || right is null) return left is not null || right is not null;
+        return !left.SequenceEqual(right);
+    }
+
     // nodeId -> JSON signature of that node's full contribution to the patch.
     private static Dictionary<int, string> Signatures(ConversationPatch? patch)
     {

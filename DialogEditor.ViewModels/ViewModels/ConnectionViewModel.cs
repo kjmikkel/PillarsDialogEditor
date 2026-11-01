@@ -112,6 +112,64 @@ public partial class ConnectionViewModel : ObservableObject
     public string? FadedToolTip => CannotFireToolTip
         ?? (IsShadowed ? Loc.Format("ToolTip_LinkShadowed", _shadowedByNodeId) : null);
 
+    // ── Link order on the selected node (issue 359) ───────────────────────
+    private int _linkPosition = 1;
+    private int _linkCount = 1;
+
+    /// 1-based place among the source node's links, which is the order the game tries them in.
+    /// Set by the canvas, which sees all of a node's links.
+    public int LinkPosition => _linkPosition;
+
+    /// How many links the source node has.
+    public int LinkCount => _linkCount;
+
+    internal void SetLinkPosition(int position, int count)
+    {
+        if (_linkPosition == position && _linkCount == count) return;
+        _linkPosition = position;
+        _linkCount = count;
+        OnPropertyChanged(nameof(LinkPosition));
+        OnPropertyChanged(nameof(LinkCount));
+        OnPropertyChanged(nameof(LinkPositionHelpText));
+        OnPropertyChanged(nameof(LinkAutomationHelpText));
+        NotifySourceSelectionChanged();
+    }
+
+    /// The canvas calls this when the source node's selection flips; the link holds no
+    /// subscription of its own, so a discarded link cannot leak.
+    internal void NotifySourceSelectionChanged() => OnPropertyChanged(nameof(ShowLinkPosition));
+
+    /// The number is only worth showing on the selected node, and only when there is an order.
+    public bool ShowLinkPosition => _linkCount >= 2 && Source.Owner is { IsSelected: true };
+
+    /// Where the number sits: a point on this link's own curve near the source (see <see cref="LinkLabelGeometry"/>).
+    public LayoutPoint LinkPositionLabelPoint => LinkLabelGeometry.LabelPoint(Source.Anchor, Target.Anchor);
+
+    // The canvas attaches these while the link is in Connections and detaches when it leaves. The
+    // connectors outlive a deleted link, so the link must not subscribe on its own.
+    internal void AttachAnchors()
+    {
+        Source.PropertyChanged += OnAnchorChanged;
+        Target.PropertyChanged += OnAnchorChanged;
+    }
+
+    internal void DetachAnchors()
+    {
+        Source.PropertyChanged -= OnAnchorChanged;
+        Target.PropertyChanged -= OnAnchorChanged;
+    }
+
+    private void OnAnchorChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ConnectorViewModel.Anchor))
+            OnPropertyChanged(nameof(LinkPositionLabelPoint));
+    }
+
+    public string LinkPositionHelpText => Loc.Format("Automation_LinkPosition", _linkPosition, _linkCount);
+
+    /// Help text for the canvas line: the position, but only when the node has an order to speak of.
+    public string? LinkAutomationHelpText => _linkCount >= 2 ? LinkPositionHelpText : null;
+
     /// Shown only once the writer has set a fact and this link has conditions.
     public bool ShowConditionVerdict => ConditionVerdictFormat.Applies(_assumedState, _conditions);
 

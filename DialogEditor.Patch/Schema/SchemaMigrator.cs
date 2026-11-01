@@ -23,6 +23,7 @@ public sealed class SchemaMigrator(
     [
         new ConversationPatchV1ToV2(),
         new ConversationPatchV2ToV3(),
+        new ConversationPatchV3ToV4(),
     ];
 
     public static IReadOnlyDictionary<SchemaFileKind, int> CurrentVersions { get; } =
