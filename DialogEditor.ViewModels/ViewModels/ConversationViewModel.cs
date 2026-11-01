@@ -168,7 +168,7 @@ public partial class ConversationViewModel : ObservableObject
             if (args.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
             {
                 // Clear() reports no OldItems, so release the tracked set.
-                foreach (var c in _subscribedConnections) c.PropertyChanged -= OnConnectionChanged;
+                foreach (var c in _subscribedConnections) { c.PropertyChanged -= OnConnectionChanged; c.DetachAnchors(); }
                 _subscribedConnections.Clear();
                 if (!_suppressShadowing) { RefreshAllShadowing(); RefreshAllLinkPositions(); }
                 return;
@@ -178,6 +178,7 @@ public partial class ConversationViewModel : ObservableObject
                 foreach (ConnectionViewModel c in args.OldItems)
                 {
                     c.PropertyChanged -= OnConnectionChanged;
+                    c.DetachAnchors();
                     _subscribedConnections.Remove(c);
                     c.ShadowedByNodeId = null;
                     if (c.Source.Owner is { } s) affected.Add(s);
@@ -187,6 +188,7 @@ public partial class ConversationViewModel : ObservableObject
                 {
                     c.SetVerdictContext(_assumedState, ActiveGameId);
                     c.PropertyChanged += OnConnectionChanged;
+                    c.AttachAnchors();
                     _subscribedConnections.Add(c);
                     if (c.Source.Owner is { } s) affected.Add(s);
                 }

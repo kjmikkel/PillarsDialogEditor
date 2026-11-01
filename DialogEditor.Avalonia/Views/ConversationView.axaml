@@ -520,7 +520,7 @@
                 <ctrl:CanvasEditor.ConnectionTemplate>
                     <DataTemplate DataType="{x:Type vm:ConnectionViewModel}">
                         <!-- The Grid only lets the position number ride beside the line; the Connection still draws
-                             in graph coordinates, so the label is placed from the source anchor with a transform. -->
+                             in graph coordinates, so the label is placed with a transform from LinkPositionLabelPoint. -->
                         <Grid>
                         <nodify:Connection
                             Source="{Binding Source.Anchor, Converter={StaticResource LayoutPointConverter}}"
@@ -558,18 +558,17 @@
                             </nodify:Connection.ContextMenu>
                         </nodify:Connection>
                         <!-- Position in the node's link order (issue 359), shown while the source node is selected.
-                             Sits just right of the output port and above the line, clear of the card and the arrowhead
-                             (which is at the target end). Not interactive, so it needs no tooltip; the order is
+                             Sits on its own curve a short way from the source (every link of a node leaves the same
+                             port, so a fixed offset would stack the numbers), beside the line and clear of the card and arrowhead. Not interactive, so it needs no tooltip; the order is
                              spoken through the Connection's help text instead. -->
                         <TextBlock Text="{Binding LinkPosition}"
                                    IsVisible="{Binding ShowLinkPosition}"
                                    IsHitTestVisible="False"
                                    HorizontalAlignment="Left" VerticalAlignment="Top"
-                                   Margin="12,-18,0,0"
                                    FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"
                                    Foreground="{DynamicResource Brush.Text.Muted}">
                             <TextBlock.RenderTransform>
-                                <TranslateTransform X="{Binding Source.Anchor.X}" Y="{Binding Source.Anchor.Y}"/>
+                                <TranslateTransform X="{Binding LinkPositionLabelPoint.X}" Y="{Binding LinkPositionLabelPoint.Y}"/>
                             </TextBlock.RenderTransform>
                         </TextBlock>
                         </Grid>

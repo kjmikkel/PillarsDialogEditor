@@ -360,11 +360,11 @@ public class ConversationViewReadingModeTests : IDisposable
             Assert.NotNull(label);
             Assert.True(label!.IsEffectivelyVisible);
 
-            // Just right of the output anchor and above the line, so clear of the card and the arrowhead.
-            var anchor = vm.Canvas.Connections[1].Source.Anchor;
+            // The label sits at its own point on the link's curve (links from one port must not stack).
+            var point = vm.Canvas.Connections[1].LinkPositionLabelPoint;
             var origin = label.TranslatePoint(new Point(0, 0), label.GetVisualParent<Visual>()!)!.Value;
-            Assert.InRange(origin.X - anchor.X, 4, 30);
-            Assert.InRange(anchor.Y - origin.Y, 4, 30);
+            Assert.Equal(point.X, origin.X, 1);
+            Assert.Equal(point.Y, origin.Y, 1);
         }
         finally { window.Close(); }
     }

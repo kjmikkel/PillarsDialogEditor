@@ -142,6 +142,29 @@ public partial class ConnectionViewModel : ObservableObject
     /// The number is only worth showing on the selected node, and only when there is an order.
     public bool ShowLinkPosition => _linkCount >= 2 && Source.Owner is { IsSelected: true };
 
+    /// Where the number sits: a point on this link's own curve near the source (see <see cref="LinkLabelGeometry"/>).
+    public LayoutPoint LinkPositionLabelPoint => LinkLabelGeometry.LabelPoint(Source.Anchor, Target.Anchor);
+
+    // The canvas attaches these while the link is in Connections and detaches when it leaves. The
+    // connectors outlive a deleted link, so the link must not subscribe on its own.
+    internal void AttachAnchors()
+    {
+        Source.PropertyChanged += OnAnchorChanged;
+        Target.PropertyChanged += OnAnchorChanged;
+    }
+
+    internal void DetachAnchors()
+    {
+        Source.PropertyChanged -= OnAnchorChanged;
+        Target.PropertyChanged -= OnAnchorChanged;
+    }
+
+    private void OnAnchorChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ConnectorViewModel.Anchor))
+            OnPropertyChanged(nameof(LinkPositionLabelPoint));
+    }
+
     public string LinkPositionHelpText => Loc.Format("Automation_LinkPosition", _linkPosition, _linkCount);
 
     /// Help text for the canvas line: the position, but only when the node has an order to speak of.
