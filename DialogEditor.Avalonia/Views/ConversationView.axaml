@@ -519,6 +519,9 @@
 
                 <ctrl:CanvasEditor.ConnectionTemplate>
                     <DataTemplate DataType="{x:Type vm:ConnectionViewModel}">
+                        <!-- The Grid only lets the position number ride beside the line; the Connection still draws
+                             in graph coordinates, so the label is placed from the source anchor with a transform. -->
+                        <Grid>
                         <nodify:Connection
                             Source="{Binding Source.Anchor, Converter={StaticResource LayoutPointConverter}}"
                             Target="{Binding Target.Anchor, Converter={StaticResource LayoutPointConverter}}"
@@ -526,6 +529,7 @@
                             Classes.never="{Binding IsNever}"
                             Classes.highlighted="{Binding IsHighlighted}"
                             Classes.cannotFire="{Binding IsFaded}"
+                            AutomationProperties.HelpText="{Binding LinkAutomationHelpText}"
                             ToolTip.Tip="{Binding FadedToolTip}">
                             <nodify:Connection.ContextMenu>
                                 <ContextMenu AutomationProperties.AutomationId="ConnectionContextMenu">
@@ -553,6 +557,22 @@
                                 </ContextMenu>
                             </nodify:Connection.ContextMenu>
                         </nodify:Connection>
+                        <!-- Position in the node's link order (issue 359), shown while the source node is selected.
+                             Sits just right of the output port and above the line, clear of the card and the arrowhead
+                             (which is at the target end). Not interactive, so it needs no tooltip; the order is
+                             spoken through the Connection's help text instead. -->
+                        <TextBlock Text="{Binding LinkPosition}"
+                                   IsVisible="{Binding ShowLinkPosition}"
+                                   IsHitTestVisible="False"
+                                   HorizontalAlignment="Left" VerticalAlignment="Top"
+                                   Margin="12,-18,0,0"
+                                   FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"
+                                   Foreground="{DynamicResource Brush.Text.Muted}">
+                            <TextBlock.RenderTransform>
+                                <TranslateTransform X="{Binding Source.Anchor.X}" Y="{Binding Source.Anchor.Y}"/>
+                            </TextBlock.RenderTransform>
+                        </TextBlock>
+                        </Grid>
                     </DataTemplate>
                 </ctrl:CanvasEditor.ConnectionTemplate>
 

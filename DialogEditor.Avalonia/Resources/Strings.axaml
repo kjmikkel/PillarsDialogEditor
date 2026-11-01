@@ -628,6 +628,7 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_DeleteConnection">Remove the link between these two nodes</sys:String>
     <sys:String x:Key="ToolTip_MoveLinkEarlier">Move this link one place earlier among its line's links. The game takes the first link that passes, in this order, so an earlier link can hide the ones after it.</sys:String>
     <sys:String x:Key="ToolTip_MoveLinkLater">Move this link one place later among its line's links. The game takes the first link that passes, in this order, so an earlier link can hide the ones after it.</sys:String>
+    <sys:String x:Key="Automation_LinkPosition">Link {0} of {1}</sys:String>
 
     <!-- ─── Script editor row buttons ─────────────────────────────────────── -->
     <sys:String x:Key="ToolTip_MoveScriptUp">Move this script up within its section</sys:String>

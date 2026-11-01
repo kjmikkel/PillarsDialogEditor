@@ -129,6 +129,23 @@ public partial class ConversationViewModel : ObservableObject
             links[i].ShadowedByNodeId = hiddenBy[i] is { } h ? links[h].Target.Owner?.NodeId : null;
     }
 
+    // ── Link position numbers (issue 359) ──────────────────────────────────
+    // Same triggers as shadowing: the numbers are the links' order in Connections.
+    public void RefreshAllLinkPositions()
+    {
+        foreach (var group in Connections.Where(c => c.Source.Owner is not null)
+                                         .GroupBy(c => c.Source.Owner!).ToList())
+            ApplyLinkPositions(group.ToList());
+    }
+
+    private void RefreshLinkPositions(NodeViewModel source)
+        => ApplyLinkPositions(Connections.Where(c => c.Source.Owner == source).ToList());
+
+    private static void ApplyLinkPositions(IReadOnlyList<ConnectionViewModel> links)
+    {
+        for (int i = 0; i < links.Count; i++) links[i].SetLinkPosition(i + 1, links.Count);
+    }
+
     private void OnConnectionChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(ConnectionViewModel.Conditions) && sender is ConnectionViewModel { Source.Owner: { } src })
@@ -153,7 +170,7 @@ public partial class ConversationViewModel : ObservableObject
                 // Clear() reports no OldItems, so release the tracked set.
                 foreach (var c in _subscribedConnections) c.PropertyChanged -= OnConnectionChanged;
                 _subscribedConnections.Clear();
-                if (!_suppressShadowing) RefreshAllShadowing();
+                if (!_suppressShadowing) { RefreshAllShadowing(); RefreshAllLinkPositions(); }
                 return;
             }
             var affected = new HashSet<NodeViewModel>();
@@ -174,7 +191,7 @@ public partial class ConversationViewModel : ObservableObject
                     if (c.Source.Owner is { } s) affected.Add(s);
                 }
             if (!_suppressShadowing)
-                foreach (var s in affected) RefreshShadowing(s);
+                foreach (var s in affected) { RefreshShadowing(s); RefreshLinkPositions(s); }
         };
         _dispatcher       = dispatcher;
         PendingConnection = new PendingConnectionViewModel(this);
@@ -222,6 +239,11 @@ public partial class ConversationViewModel : ObservableObject
 
     private void OnNodeTextChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
+        // The numbers show only while the link's source is selected (issue 359).
+        if (e.PropertyName == nameof(NodeViewModel.IsSelected) && sender is NodeViewModel picked)
+            foreach (var c in Connections)
+                if (c.Source.Owner == picked) c.NotifySourceSelectionChanged();
+
         // A node's own conditions gate every link leading to it, so those links re-judge (#32).
         if (e.PropertyName == nameof(NodeViewModel.Conditions) && sender is NodeViewModel changed)
             foreach (var c in Connections)
@@ -543,6 +565,7 @@ public partial class ConversationViewModel : ObservableObject
         }
         finally { _suppressShadowing = false; }
         RefreshAllShadowing();
+        RefreshAllLinkPositions();
         BaseSnapshot = baseSnapshot ?? BuildSnapshot();
         ConversationLoaded?.Invoke(this, EventArgs.Empty);
     }

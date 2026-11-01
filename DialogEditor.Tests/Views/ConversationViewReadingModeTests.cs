@@ -331,4 +331,41 @@ public class ConversationViewReadingModeTests : IDisposable
         }
         finally { window.Close(); }
     }
+
+    [AvaloniaFact]
+    public async Task LinkPositionLabel_ShowsOnlyForSelectedSource_NextToItsAnchor()
+    {
+        var (window, view, vm, root) = await ShowAsync(EditorMode.Editing);
+        try
+        {
+            var a = CanvasNavigationServiceTests.MakeNode(2, 500, 100);
+            var b = CanvasNavigationServiceTests.MakeNode(3, 500, 300);
+            vm.Canvas.Nodes.Add(a);
+            vm.Canvas.Nodes.Add(b);
+            vm.Canvas.Connections.Add(CanvasNavigationServiceTests.Connect(root, a));
+            vm.Canvas.Connections.Add(CanvasNavigationServiceTests.Connect(root, b));
+            Dispatcher.UIThread.RunJobs();
+
+            // The label for position 2 (a TextBlock whose Text is the bound number).
+            TextBlock? Label() => view.GetVisualDescendants().OfType<TextBlock>()
+                .FirstOrDefault(t => t.Text == "2" && t.IsHitTestVisible == false);
+
+            root.IsSelected = false;
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(Label()?.IsEffectivelyVisible ?? false);
+
+            root.IsSelected = true;
+            Dispatcher.UIThread.RunJobs();
+            var label = Label();
+            Assert.NotNull(label);
+            Assert.True(label!.IsEffectivelyVisible);
+
+            // Just right of the output anchor and above the line, so clear of the card and the arrowhead.
+            var anchor = vm.Canvas.Connections[1].Source.Anchor;
+            var origin = label.TranslatePoint(new Point(0, 0), label.GetVisualParent<Visual>()!)!.Value;
+            Assert.InRange(origin.X - anchor.X, 4, 30);
+            Assert.InRange(anchor.Y - origin.Y, 4, 30);
+        }
+        finally { window.Close(); }
+    }
 }
