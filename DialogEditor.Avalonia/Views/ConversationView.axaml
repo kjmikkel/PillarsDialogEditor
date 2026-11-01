@@ -561,16 +561,20 @@
                              Sits on its own curve a short way from the source (every link of a node leaves the same
                              port, so a fixed offset would stack the numbers), beside the line and clear of the card and arrowhead. Not interactive, so it needs no tooltip; the order is
                              spoken through the Connection's help text instead. -->
-                        <TextBlock Text="{Binding LinkPosition}"
-                                   IsVisible="{Binding ShowLinkPosition}"
-                                   IsHitTestVisible="False"
-                                   HorizontalAlignment="Left" VerticalAlignment="Top"
-                                   FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"
-                                   Foreground="{DynamicResource Brush.Text.Muted}">
-                            <TextBlock.RenderTransform>
+                        <!-- The chip fills with the canvas colour so the number stays legible where other links cross it. -->
+                        <Border IsVisible="{Binding ShowLinkPosition}"
+                                IsHitTestVisible="False"
+                                HorizontalAlignment="Left" VerticalAlignment="Top"
+                                Background="{DynamicResource Brush.Canvas.Background}"
+                                CornerRadius="4" Padding="3,0">
+                            <Border.RenderTransform>
                                 <TranslateTransform X="{Binding LinkPositionLabelPoint.X}" Y="{Binding LinkPositionLabelPoint.Y}"/>
-                            </TextBlock.RenderTransform>
-                        </TextBlock>
+                            </Border.RenderTransform>
+                            <!-- Muted text is kept: on the opaque canvas-coloured chip it has the contrast it lacked over grey lines. -->
+                            <TextBlock Text="{Binding LinkPosition}"
+                                       FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"
+                                       Foreground="{DynamicResource Brush.Text.Muted}"/>
+                        </Border>
                         </Grid>
                     </DataTemplate>
                 </ctrl:CanvasEditor.ConnectionTemplate>

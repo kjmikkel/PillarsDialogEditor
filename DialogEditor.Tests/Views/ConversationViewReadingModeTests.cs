@@ -374,9 +374,9 @@ public class ConversationViewReadingModeTests : IDisposable
             vm.Canvas.Connections.Add(CanvasNavigationServiceTests.Connect(root, b));
             Dispatcher.UIThread.RunJobs();
 
-            // The label for position 2 (a TextBlock whose Text is the bound number).
+            // The label for position 2: a TextBlock whose Text is the bound number, on a non-hit-testable chip.
             TextBlock? Label() => view.GetVisualDescendants().OfType<TextBlock>()
-                .FirstOrDefault(t => t.Text == "2" && t.IsHitTestVisible == false);
+                .FirstOrDefault(t => t.Text == "2" && t.GetVisualParent() is Border { IsHitTestVisible: false });
 
             root.IsSelected = false;
             Dispatcher.UIThread.RunJobs();
@@ -390,7 +390,9 @@ public class ConversationViewReadingModeTests : IDisposable
 
             // The label sits at its own point on the link's curve (links from one port must not stack).
             var point = vm.Canvas.Connections[1].LinkPositionLabelPoint;
-            var origin = label.TranslatePoint(new Point(0, 0), label.GetVisualParent<Visual>()!)!.Value;
+            // The chip (the label's Border) carries the transform, so measure the chip's own origin.
+            var chip = label.GetVisualParent<Visual>()!;
+            var origin = chip.TranslatePoint(new Point(0, 0), chip.GetVisualParent<Visual>()!)!.Value;
             Assert.Equal(point.X, origin.X, 1);
             Assert.Equal(point.Y, origin.Y, 1);
         }
