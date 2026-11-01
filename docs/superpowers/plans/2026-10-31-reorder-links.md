@@ -1,6 +1,6 @@
 # Reorder a node's links — Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Writers move a link earlier or later from its right-click menu on the canvas, see link positions on
 the selected node, and the order survives save, reopen, export and merging (#359).
@@ -45,7 +45,7 @@ A `MoveLinkCommand` swaps two connections there. Project patches gain `NodeModif
 **Produces:** `NodeModification.UpdatedLinkOrder` — `IReadOnlyList<int>? { get; init; }`, target node ids in order;
 `ConversationPatch.CurrentSchemaVersion = 4`.
 
-- [ ] **Step 1: Failing tests.**
+- [x] **Step 1: Failing tests.**
   - `Diff_ReorderOnly_WritesUpdatedLinkOrder`: base node 0 links [1,2,3], current [3,1,2] → one `NodeModification` for 0 with `UpdatedLinkOrder = [3,1,2]` and no other changes.
   - `Diff_SameOrder_NoLinkOrder`: identical order → no modification.
   - `Diff_AddedLinkAppended_NoLinkOrder`: base [1,2], current [1,2,4] → `AddedLinks=[4]`, `UpdatedLinkOrder == null`.
@@ -54,10 +54,10 @@ A `MoveLinkCommand` swaps two connections there. Project patches gain `NodeModif
   - `Apply_UpdatedLinkOrder_SortsLinks`; `Apply_OrderWithUnknownAndMissingIds_KeepsEveryLink`: base [1,2,3], order [3,9,1] → [3,1,2].
   - `Diff_ThenApply_RoundTripsOrder` for several shapes above (apply(base, diff(base, current)) has current's order).
   - `V3Patch_AppliesUnchanged` / migrator: a v3 JSON patch migrates to v4 with no other change; a v4 patch with `UpdatedLinkOrder` round-trips through `PatchSerializer`.
-- [ ] **Step 2: Run, see them fail.**
-- [ ] **Step 3: Implement.** Diff: compute the applier's order without a record (base links minus deleted in base order, then added in current order); if `current` order differs, set the record to current's order, and count it in the "no change" check. Applier: stable sort by index in the record; unlisted links after listed ones in their existing relative order. `ConversationPatchV3ToV4`: no-op `Apply`, doc comment saying v4 adds the optional `UpdatedLinkOrder` and why the version gate matters (an older editor would drop it silently). Register it.
-- [ ] **Step 4: Full headless suite green** (existing schema tests may pin "3": update to the constant).
-- [ ] **Step 5: Commit** `feat: project patches record link order (#359)`.
+- [x] **Step 2: Run, see them fail.**
+- [x] **Step 3: Implement.** Diff: compute the applier's order without a record (base links minus deleted in base order, then added in current order); if `current` order differs, set the record to current's order, and count it in the "no change" check. Applier: stable sort by index in the record; unlisted links after listed ones in their existing relative order. `ConversationPatchV3ToV4`: no-op `Apply`, doc comment saying v4 adds the optional `UpdatedLinkOrder` and why the version gate matters (an older editor would drop it silently). Register it.
+- [x] **Step 4: Full headless suite green** (existing schema tests may pin "3": update to the constant).
+- [x] **Step 5: Commit** `feat: project patches record link order (#359)`.
 
 ### Task 2: Merging, conflicts, apply-from-diff, Diff view
 
@@ -68,16 +68,16 @@ tests alongside existing ones.
 
 **Consumes:** `NodeModification.UpdatedLinkOrder` (Task 1).
 
-- [ ] **Step 1: Failing tests.**
+- [x] **Step 1: Failing tests.**
   - `PatchMerger_LaterLinkOrderWins` (and earlier kept when later has none).
   - `ConflictDetector_BothReorderSameNode_ReportsLinkOrderConflict` (field name `"LinkOrder"`); one project reordering → no conflict.
   - `MergeBuilder_PickTheirsLinkOrder` / mine; rebuilding for another field keeps `UpdatedLinkOrder`.
   - Apply-from-diff of a reorder-only node carries the order.
   - Diff view: a reorder-only node is listed as changed, with a "Links reordered" line (string `Diff_LinksReordered` = "Links reordered").
-- [ ] **Step 2: Run, see them fail.**
-- [ ] **Step 3: Implement.**
-- [ ] **Step 4: Full headless suite green.**
-- [ ] **Step 5: Commit** `feat: link order survives merging and git conflicts (#359)`.
+- [x] **Step 2: Run, see them fail.**
+- [x] **Step 3: Implement.**
+- [x] **Step 4: Full headless suite green.**
+- [x] **Step 5: Commit** `feat: link order survives merging and git conflicts (#359)`.
 
 ### Task 3: Move Link Earlier / Later on the canvas
 
@@ -89,16 +89,16 @@ tests alongside existing ones.
 `ConnectionViewModel?` parameter and `CanExecute`), `ConversationViewModel.CanMoveLinkEarlier(ConnectionViewModel?)` /
 `CanMoveLinkLater(…)`.
 
-- [ ] **Step 1: Failing tests.**
+- [x] **Step 1: Failing tests.**
   - `MoveLinkEarlier_SwapsWithPreviousSiblingOnly`: node 0 links [1,2,3] plus node 5's links interleaved in `Connections`; moving 0→3 earlier gives node 0 order [1,3,2]; node 5's links keep their indices.
   - `MoveLinkLater_…` mirror; `CanMove…` false at the ends and for a null parameter.
   - `MoveLink_UndoRedo_RestoresExactOrder` and marks the conversation modified; undo text uses `Undo_MoveLink`.
   - `MoveLink_RefreshesShadowing`: [certain 1, 2] → move 2 earlier → link to 2 no longer faded, link to 1 now hidden.
   - `ReorderedNode_SavesNewOrder_Poe1` / `_Poe2`: build snapshot after a move, serialize with the game serializer, re-parse → new order.
-- [ ] **Step 2: Run, see them fail.**
-- [ ] **Step 3: Implement.** The command swaps the two connections in `Connections` (`ObservableCollection.Move`) and its undo swaps them back; refresh hiding for the source after each. Menu: two `ctrl:AccessibleMenuItem`s above Delete Connection, AutomationIds `ConnectionMenu_MoveEarlier` / `ConnectionMenu_MoveLater`, bound like Delete with `CommandParameter="{Binding}"`, hidden in reading mode the way the canvas hides other edit items. Strings: `Menu_MoveLinkEarlier` = "Move Link Earlier", `Menu_MoveLinkLater` = "Move Link Later", `ToolTip_MoveLinkEarlier` = "Move this link one place earlier among its line's links. The game takes the first link that passes, in this order, so an earlier link can hide the ones after it.", `ToolTip_MoveLinkLater` = "Move this link one place later among its line's links. The game takes the first link that passes, in this order, so an earlier link can hide the ones after it.", `Undo_MoveLink` = "Move link to node {0}".
-- [ ] **Step 4: Full headless suite green.**
-- [ ] **Step 5: Commit** `feat: move a link earlier or later from the canvas (#359)`.
+- [x] **Step 2: Run, see them fail.**
+- [x] **Step 3: Implement.** The command swaps the two connections in `Connections` (`ObservableCollection.Move`) and its undo swaps them back; refresh hiding for the source after each. Menu: two `ctrl:AccessibleMenuItem`s above Delete Connection, AutomationIds `ConnectionMenu_MoveEarlier` / `ConnectionMenu_MoveLater`, bound like Delete with `CommandParameter="{Binding}"`, hidden in reading mode the way the canvas hides other edit items. Strings: `Menu_MoveLinkEarlier` = "Move Link Earlier", `Menu_MoveLinkLater` = "Move Link Later", `ToolTip_MoveLinkEarlier` = "Move this link one place earlier among the links leaving the same node. The game takes the first link that passes, in this order, so an earlier link can hide the ones after it.", `ToolTip_MoveLinkLater` = "Move this link one place later among the links leaving the same node. The game takes the first link that passes, in this order, so an earlier link can hide the ones after it.", `Undo_MoveLink` = "Move link to node {0}".
+- [x] **Step 4: Full headless suite green.**
+- [x] **Step 5: Commit** `feat: move a link earlier or later from the canvas (#359)`.
 
 ### Task 4: Link position numbers on the selected node
 
@@ -106,15 +106,31 @@ tests alongside existing ones.
 
 **Produces:** `ConnectionViewModel.LinkPosition` (`int`, 1-based), `LinkCount` (`int`), `ShowLinkPosition` (`bool`: source selected and count ≥ 2), `LinkPositionHelpText` (`Loc.Format("Automation_LinkPosition", position, count)` = "Link {0} of {1}").
 
-- [ ] **Step 1: Failing tests.** Positions after load, after add / delete / move / undo; `ShowLinkPosition` follows the source node's `IsSelected` and is false with one link; help text.
-- [ ] **Step 2: Run, see them fail.**
-- [ ] **Step 3: Implement.** Recompute positions per source wherever #353's `RefreshShadowing` runs (same triggers) plus on a node's `IsSelected` change. XAML: a small non-interactive label near the connection's source end, visible on `ShowLinkPosition`, using an existing small-font and muted-text token; append `LinkPositionHelpText` to the connection's `AutomationProperties.HelpText`. Placement is your call; it must not cover the arrowhead or node cards at default zoom.
-- [ ] **Step 4: Full headless suite green** (including `NoClippedTextTests`).
-- [ ] **Step 5: Commit** `feat: show link positions on the selected node (#359)`.
+- [x] **Step 1: Failing tests.** Positions after load, after add / delete / move / undo; `ShowLinkPosition` follows the source node's `IsSelected` and is false with one link; help text.
+- [x] **Step 2: Run, see them fail.**
+- [x] **Step 3: Implement.** Recompute positions per source wherever #353's `RefreshShadowing` runs (same triggers) plus on a node's `IsSelected` change. XAML: a small non-interactive label near the connection's source end, visible on `ShowLinkPosition`, using an existing small-font and muted-text token; append `LinkPositionHelpText` to the connection's `AutomationProperties.HelpText`. Placement is your call; it must not cover the arrowhead or node cards at default zoom.
+- [x] **Step 4: Full headless suite green** (including `NoClippedTextTests`).
+- [x] **Step 5: Commit** `feat: show link positions on the selected node (#359)`.
 
 ### Task 5: Verification, docs, PR (orchestrator)
 
-- [ ] Headless suite green; `trail check`.
-- [ ] Run the app on a copy of the canonical PoE2 fixture: select node 0, see 1/2/3; right-click a link → Move Link Earlier; the fade changes; save the project, reopen, order kept; screenshots.
-- [ ] Spec/plan match the code; `## Handoff`; `trail note` if anything took digging.
-- [ ] Open the PR (base `feat/353-first-passing-link` until #360 merges, then main), closing #359; enable Auto-fix.
+- [x] Headless suite green; `trail check`.
+- [x] Run the app on a copy of the canonical PoE2 fixture: select node 0, see 1/2/3; right-click a link → Move Link Earlier; the fade changes; save the project, reopen, order kept; screenshots.
+- [x] Spec/plan match the code; `## Handoff`; `trail note` if anything took digging.
+- [x] Open the PR (base `feat/353-first-passing-link` until #360 merges, then main), closing #359; enable Auto-fix.
+
+## Handoff — 2026-11-01
+
+**Done** (branch `feat/359-reorder-links`, stacked on `feat/353-first-passing-link` / PR #360):
+- b675967a patch format: `NodeModification.UpdatedLinkOrder`, DiffEngine/PatchApplier, schema 3 → 4 (`ConversationPatchV3ToV4`), PROJECT-FORMAT.md, canonical-mod goldens regenerated, v3 fixture.
+- 6c846196, 22a7500e merging: PatchMerger, ConflictDetector ("LinkOrder"), MergeBuilder, GitMergeAnalyzer, Diff view "Links reordered".
+- e438ea89, e1b6f56f Move Link Earlier / Later (MoveLinkCommand, undo, menu state refreshes on every Connections change).
+- 7ec32c06, c7dbfd4f, 67fa6c33 position numbers on the selected node, each on its own curve (`LinkLabelGeometry`), on a readable chip; UIA help text "Link i of n".
+- 29b27f2a found in the GUI run: links never opened their right-click menu (Nodify's `OnPointerReleased` skips Avalonia's base); fixed with `CanvasConnection`. Spec section 2 records it.
+- Verified in the app on the canonical PoE2 mod: select node 0 → numbers 1–4; right-click link → Move Link Earlier → order 2,1,3,12; save → project holds `"UpdatedLinkOrder": [2, 1, 3, 12]`; reopen → same order. Headless suite 5221 passed.
+
+**Remains:** review and merge; rebase onto main once #360 merges. Follow-up #361 (links not reachable by keyboard / UIA).
+
+**Not covered by a test:** export → install → game file with a reorder end to end (the canonical mod fixtures hold no reorder); the "Links reordered" line also shows when a link is merely appended to an already-reordered node (ProjectDiff compares raw order records). Both minor, from the final review.
+
+**Don't redo:** the per-task and whole-branch reviews; the Nodify right-click diagnosis (see the trail learning).

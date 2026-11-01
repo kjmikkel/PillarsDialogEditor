@@ -54,6 +54,18 @@ to show)_. Uses an existing small-text brush and font token; not interactive, so
 connection's UIA help text includes "link {i} of {n}" so the order is reachable without sight _(my call)_.
 Placement on the line is the builder's.
 
+**As built.** Each number sits on a small chip in the canvas background colour, on its own link's curve about a
+third of the way from the node (`LinkLabelGeometry.LabelPoint`, which mirrors Nodify's Bézier control points).
+Every link of a node leaves the same port, so a fixed offset from the port would stack the numbers on top of each
+other. The chip keeps a number readable where it crosses another line.
+
+**Right-click on a link.** Nodify 6.6.0's `BaseConnection.OnPointerReleased` overrides Avalonia's
+`Control.OnPointerReleased` without calling it, and that base method is what raises `ContextRequested` on a
+right-button release. So a link's context menu never opened, which predates this work (Delete Connection was
+unreachable too). The canvas now draws links with `CanvasConnection`, a `Nodify.Connection` subclass that raises
+`ContextRequested` itself; a test pins Nodify's behaviour so an upgrade that fixes it is noticed. Links are still
+not reachable by keyboard or UI Automation: #361.
+
 ## 3. Patch format
 
 `NodeModification` gains `IReadOnlyList<int>? UpdatedLinkOrder` (init, default null): the target node ids of the
@@ -92,4 +104,4 @@ header. Tooltips required on both items.
 - Test names and layout.
 
 ## 6. Follow-ups
-None planned.
+- #361: reach a canvas link (its menu and its "link i of n" text) from the keyboard and through UI Automation.
