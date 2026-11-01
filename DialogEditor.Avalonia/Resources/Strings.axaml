@@ -626,8 +626,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_AddConnectedNode">Create a new node and link it from this one</sys:String>
     <sys:String x:Key="ToolTip_ConnectToNode">Start connecting this node to another one. Use the arrow keys to pick the destination, Enter to confirm, or Escape to cancel. (Shortcut: Ctrl+L)</sys:String>
     <sys:String x:Key="ToolTip_DeleteConnection">Remove the link between these two nodes</sys:String>
-    <sys:String x:Key="ToolTip_MoveLinkEarlier">Move this link one place earlier among its line's links. The game takes the first link that passes, in this order, so an earlier link can hide the ones after it.</sys:String>
-    <sys:String x:Key="ToolTip_MoveLinkLater">Move this link one place later among its line's links. The game takes the first link that passes, in this order, so an earlier link can hide the ones after it.</sys:String>
+    <sys:String x:Key="ToolTip_MoveLinkEarlier">Move this link one place earlier among the links leaving the same node. The game takes the first link that passes, in this order, so an earlier link can hide the ones after it.</sys:String>
+    <sys:String x:Key="ToolTip_MoveLinkLater">Move this link one place later among the links leaving the same node. The game takes the first link that passes, in this order, so an earlier link can hide the ones after it.</sys:String>
     <sys:String x:Key="Automation_LinkPosition">Link {0} of {1}</sys:String>
 
     <!-- ─── Script editor row buttons ─────────────────────────────────────── -->

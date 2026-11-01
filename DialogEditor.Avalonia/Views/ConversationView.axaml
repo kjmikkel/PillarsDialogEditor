@@ -522,7 +522,7 @@
                         <!-- The Grid only lets the position number ride beside the line; the Connection still draws
                              in graph coordinates, so the label is placed with a transform from LinkPositionLabelPoint. -->
                         <Grid>
-                        <nodify:Connection
+                        <ctrl:CanvasConnection
                             Source="{Binding Source.Anchor, Converter={StaticResource LayoutPointConverter}}"
                             Target="{Binding Target.Anchor, Converter={StaticResource LayoutPointConverter}}"
                             Classes.always="{Binding IsAlways}"
@@ -531,7 +531,7 @@
                             Classes.cannotFire="{Binding IsFaded}"
                             AutomationProperties.HelpText="{Binding LinkAutomationHelpText}"
                             ToolTip.Tip="{Binding FadedToolTip}">
-                            <nodify:Connection.ContextMenu>
+                            <ctrl:CanvasConnection.ContextMenu>
                                 <ContextMenu AutomationProperties.AutomationId="ConnectionContextMenu">
                                     <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_MoveLinkEarlier}"
                                               IsVisible="{Binding !$parent[UserControl].DataContext.IsReadingMode}"
@@ -555,8 +555,8 @@
                                               ToolTip.Tip="{DynamicResource ToolTip_DeleteConnection}"
                                               AutomationProperties.HelpText="{DynamicResource ToolTip_DeleteConnection}"/>
                                 </ContextMenu>
-                            </nodify:Connection.ContextMenu>
-                        </nodify:Connection>
+                            </ctrl:CanvasConnection.ContextMenu>
+                        </ctrl:CanvasConnection>
                         <!-- Position in the node's link order (issue 359), shown while the source node is selected.
                              Sits on its own curve a short way from the source (every link of a node leaves the same
                              port, so a fixed offset would stack the numbers), beside the line and clear of the card and arrowhead. Not interactive, so it needs no tooltip; the order is
