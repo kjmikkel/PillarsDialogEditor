@@ -319,6 +319,8 @@ public partial class ConversationViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(DeleteNodeCmdCommand))]
     [NotifyCanExecuteChangedFor(nameof(AddConnectedNodeCmdCommand))]
     [NotifyCanExecuteChangedFor(nameof(DeleteConnectionCmdCommand))]
+    [NotifyCanExecuteChangedFor(nameof(MoveLinkEarlierCommand))]
+    [NotifyCanExecuteChangedFor(nameof(MoveLinkLaterCommand))]
     [NotifyCanExecuteChangedFor(nameof(ChooseStartNodeCommand))]
     [NotifyCanExecuteChangedFor(nameof(MakeStartNodeCmdCommand))]
     [NotifyCanExecuteChangedFor(nameof(UndoCommand))]
@@ -801,6 +803,38 @@ public partial class ConversationViewModel : ObservableObject
     private void DeleteConnectionCmd(ConnectionViewModel? connection)
     {
         if (connection is not null) DeleteConnection(connection);
+    }
+
+    // ── Link order (issue 359) ────────────────────────────────────────────
+    // A node's link order is the order of its connections in Connections, and the game takes the first
+    // link that passes. A move swaps the link with the neighbouring link of the same node; connections of
+    // other nodes between them keep their indices.
+    public bool CanMoveLinkEarlier(ConnectionViewModel? connection) => IsEditable && SiblingOf(connection, -1) is not null;
+
+    public bool CanMoveLinkLater(ConnectionViewModel? connection) => IsEditable && SiblingOf(connection, +1) is not null;
+
+    private ConnectionViewModel? SiblingOf(ConnectionViewModel? connection, int direction)
+    {
+        if (connection is null || connection.Source.Owner is not { } source) return null;
+        var at = Connections.IndexOf(connection);
+        if (at < 0) return null;
+        for (int i = at + direction; i >= 0 && i < Connections.Count; i += direction)
+            if (Connections[i].Source.Owner == source) return Connections[i];
+        return null;
+    }
+
+    [RelayCommand(CanExecute = nameof(CanMoveLinkEarlier))]
+    private void MoveLinkEarlier(ConnectionViewModel? connection) => MoveLink(connection, -1);
+
+    [RelayCommand(CanExecute = nameof(CanMoveLinkLater))]
+    private void MoveLinkLater(ConnectionViewModel? connection) => MoveLink(connection, +1);
+
+    private void MoveLink(ConnectionViewModel? connection, int direction)
+    {
+        if (SiblingOf(connection, direction) is not { } sibling) return;
+        _undoStack.Execute(new MoveLinkCommand(this, connection!, sibling));
+        IsModified = true;
+        RefreshUndoRedo();
     }
 
     /// Raised with a node's speaker GUID when the user asks to browse that

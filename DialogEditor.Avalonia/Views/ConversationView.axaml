@@ -529,6 +529,20 @@
                             ToolTip.Tip="{Binding FadedToolTip}">
                             <nodify:Connection.ContextMenu>
                                 <ContextMenu AutomationProperties.AutomationId="ConnectionContextMenu">
+                                    <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_MoveLinkEarlier}"
+                                              IsVisible="{Binding !$parent[UserControl].DataContext.IsReadingMode}"
+                                              AutomationProperties.AutomationId="ConnectionMenu_MoveEarlier"
+                                              Command="{Binding $parent[UserControl].DataContext.MoveLinkEarlierCommand}"
+                                              CommandParameter="{Binding}"
+                                              ToolTip.Tip="{DynamicResource ToolTip_MoveLinkEarlier}"
+                                              AutomationProperties.HelpText="{DynamicResource ToolTip_MoveLinkEarlier}"/>
+                                    <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_MoveLinkLater}"
+                                              IsVisible="{Binding !$parent[UserControl].DataContext.IsReadingMode}"
+                                              AutomationProperties.AutomationId="ConnectionMenu_MoveLater"
+                                              Command="{Binding $parent[UserControl].DataContext.MoveLinkLaterCommand}"
+                                              CommandParameter="{Binding}"
+                                              ToolTip.Tip="{DynamicResource ToolTip_MoveLinkLater}"
+                                              AutomationProperties.HelpText="{DynamicResource ToolTip_MoveLinkLater}"/>
                                     <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_DeleteConnection}"
                                               IsVisible="{Binding !$parent[UserControl].DataContext.IsReadingMode}"
                                               AutomationProperties.AutomationId="ConnectionMenu_Delete"
