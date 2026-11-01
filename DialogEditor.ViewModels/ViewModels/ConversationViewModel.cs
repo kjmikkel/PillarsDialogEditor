@@ -144,6 +144,10 @@ public partial class ConversationViewModel : ObservableObject
     {
         Connections.CollectionChanged += (_, args) =>
         {
+            // Move Earlier/Later depend on a link's place among its siblings (issue 359); the commands are shared by every
+            // menu item, so one raise refreshes them all after any add, delete, undo or move.
+            MoveLinkEarlierCommand.NotifyCanExecuteChanged();
+            MoveLinkLaterCommand.NotifyCanExecuteChanged();
             if (args.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
             {
                 // Clear() reports no OldItems, so release the tracked set.

@@ -142,4 +142,27 @@ public class CanvasMoveLinkTests
         var order = canvas.BuildSnapshot().Nodes.First(x => x.NodeId == 0).Links.Select(l => l.ToNodeId);
         Assert.Equal([1, 3, 2], order);
     }
+
+    // The commands are shared by every connection's menu item, so a change to the link set or order must
+    // re-query them or a neighbouring link's Earlier/Later stays stale.
+    [Fact]
+    public void CanExecuteChanged_FiresOnMoveAddAndDelete()
+    {
+        var (canvas, n) = MakeCanvas();
+        int raised = 0;
+        canvas.MoveLinkEarlierCommand.CanExecuteChanged += (_, _) => raised++;
+        canvas.MoveLinkLaterCommand.CanExecuteChanged += (_, _) => raised++;
+
+        canvas.MoveLinkEarlierCommand.Execute(Find(canvas, 0, 3));
+        Assert.True(raised >= 2);
+
+        raised = 0;
+        var added = new ConnectionViewModel(n[0].Output, n[4].Input);
+        canvas.Connections.Add(added);
+        Assert.True(raised >= 2);
+
+        raised = 0;
+        canvas.DeleteConnection(added);
+        Assert.True(raised >= 2);
+    }
 }

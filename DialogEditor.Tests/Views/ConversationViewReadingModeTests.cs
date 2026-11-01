@@ -326,6 +326,8 @@ public class ConversationViewReadingModeTests : IDisposable
             var headers = OpenAndVisibleItems(connection.ContextMenu!, connection).Select(i => i.Header).ToList();
 
             Assert.Equal(offered, headers.Contains(R("Menu_DeleteConnection")));
+            Assert.Equal(offered, headers.Contains(R("Menu_MoveLinkEarlier")));
+            Assert.Equal(offered, headers.Contains(R("Menu_MoveLinkLater")));
         }
         finally { window.Close(); }
     }
