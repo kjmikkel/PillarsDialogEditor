@@ -843,4 +843,55 @@ public class DiffViewModelTests : IDisposable
         vm.Selected = vm.Changes[0];
         Assert.False(vm.ShowSelectHint);
     }
+
+    // Issue 359: the wiring from the two endpoint projects to the detail panel's
+    // "Links reordered" line, end to end through the canvas's DiffStatus.
+    private static DialogProject WithMods(params NodeModification[] mods) =>
+        DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [], [], mods));
+
+    private NodeDiffDetailViewModel DetailForNode(DialogProject disk, DialogProject refp, int nodeId)
+    {
+        var file     = new ConversationFile("greeting", "", "/fake/greeting.conversation", "/fake/greeting.stringtable");
+        var provider = new StubProvider(file, new ConversationEditSnapshot([Node(1), Node(2)]));
+        var path = WriteTempProject(disk);
+        var dir  = Path.GetDirectoryName(Path.GetFullPath(path))!;
+        var git  = MakeFakeGit(dir, refContent: DialogProjectSerializer.Serialize(refp), branchOutput: "main\n");
+
+        var vm = new DiffViewModel(git, new StubDispatcher(), path, provider, "en");
+        vm.Selected = vm.Changes.Single(c => c.Name == "greeting");
+        vm.DiffCanvas!.SelectedNode = vm.DiffCanvas.Nodes.First(n => n.NodeId == nodeId);
+        return vm.SelectedNodeDetail!;
+    }
+
+    [Fact]
+    public void ReorderOnlyNode_IsChanged_AndDetailSaysLinksReordered()
+    {
+        var disk = WithMods(new NodeModification(1, new Dictionary<string, FieldChange>(), [], []) { UpdatedLinkOrder = [2, 3] });
+        var refp = WithMods(new NodeModification(1, new Dictionary<string, FieldChange>(), [], []) { UpdatedLinkOrder = [3, 2] });
+
+        var detail = DetailForNode(disk, refp, 1);
+
+        Assert.Equal(DiffStatus.Changed, detail.Kind);
+        Assert.True(detail.LinksReordered);
+        Assert.Equal("Diff_LinksReordered", detail.LinksReorderedText);
+    }
+
+    [Fact]
+    public void ChangedNodeWithSameLinkOrder_DoesNotSayLinksReordered()
+    {
+        // Same order on both sides; the node differs only by its text.
+        DialogProject WithText(string text) => DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [], [],
+                [new NodeModification(2, new Dictionary<string, FieldChange>(), [], []) { UpdatedLinkOrder = [4, 5] }])
+            {
+                Translations = new Dictionary<string, IReadOnlyList<NodeTranslation>>
+                { ["en"] = [new NodeTranslation(2, text, "")] },
+            });
+
+        var detail = DetailForNode(WithText("old"), WithText("new"), 2);
+
+        Assert.Equal(DiffStatus.Changed, detail.Kind);
+        Assert.False(detail.LinksReordered);
+    }
 }
