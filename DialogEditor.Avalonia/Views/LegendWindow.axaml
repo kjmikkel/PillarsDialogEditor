@@ -301,6 +301,10 @@
                 <TextBlock Grid.Column="1" Text="{DynamicResource Legend_Key_CtrlArrows_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
             </Grid>
             <Grid ColumnSpacing="8" ColumnDefinitions="Auto,*" Margin="0,0,0,3">
+                <TextBlock MinWidth="110" Grid.Column="0" Text="{DynamicResource Legend_Key_L}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"/>
+                <TextBlock Grid.Column="1" Text="{DynamicResource Legend_Key_L_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
+            </Grid>
+            <Grid ColumnSpacing="8" ColumnDefinitions="Auto,*" Margin="0,0,0,3">
                 <TextBlock MinWidth="110" Grid.Column="0" Text="{DynamicResource Legend_Key_Enter}" Foreground="{DynamicResource Brush.Text.Secondary}" FontSize="{DynamicResource FontSize.Body}"/>
                 <TextBlock Grid.Column="1" Text="{DynamicResource Legend_Key_Enter_Desc}" Foreground="{DynamicResource Brush.Text.Muted}" FontSize="{DynamicResource FontSize.Body}" TextWrapping="Wrap"/>
             </Grid>
