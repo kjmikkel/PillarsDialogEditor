@@ -4,7 +4,7 @@
   "Patches": {
     "canonical": {
       "ConversationName": "canonical",
-      "SchemaVersion": 3,
+      "SchemaVersion": 4,
       "AddedNodes": [
         {
           "NodeId": 11,
@@ -143,6 +143,7 @@
         {
           "UpdatedConditions": null,
           "UpdatedScripts": [],
+          "UpdatedLinkOrder": null,
           "NodeId": 0,
           "FieldChanges": {},
           "AddedLinks": [
@@ -174,6 +175,7 @@
         {
           "UpdatedConditions": null,
           "UpdatedScripts": null,
+          "UpdatedLinkOrder": null,
           "NodeId": 1,
           "FieldChanges": {},
           "AddedLinks": [],
@@ -202,6 +204,7 @@
         {
           "UpdatedConditions": [],
           "UpdatedScripts": null,
+          "UpdatedLinkOrder": null,
           "NodeId": 2,
           "FieldChanges": {},
           "AddedLinks": [],
@@ -216,6 +219,7 @@
         {
           "UpdatedConditions": null,
           "UpdatedScripts": null,
+          "UpdatedLinkOrder": null,
           "NodeId": 3,
           "FieldChanges": {
             "IsPlayerChoice": {
@@ -283,6 +287,7 @@
               "DisplayName": "SetGlobalValue"
             }
           ],
+          "UpdatedLinkOrder": null,
           "NodeId": 4,
           "FieldChanges": {},
           "AddedLinks": [],
@@ -292,6 +297,7 @@
         {
           "UpdatedConditions": null,
           "UpdatedScripts": null,
+          "UpdatedLinkOrder": null,
           "NodeId": 5,
           "FieldChanges": {
             "Persistence": {
@@ -306,6 +312,7 @@
         {
           "UpdatedConditions": null,
           "UpdatedScripts": null,
+          "UpdatedLinkOrder": null,
           "NodeId": 6,
           "FieldChanges": {
             "Persistence": {
@@ -320,6 +327,7 @@
         {
           "UpdatedConditions": null,
           "UpdatedScripts": null,
+          "UpdatedLinkOrder": null,
           "NodeId": 7,
           "FieldChanges": {
             "HasVO": {
@@ -334,6 +342,7 @@
         {
           "UpdatedConditions": null,
           "UpdatedScripts": null,
+          "UpdatedLinkOrder": null,
           "NodeId": 8,
           "FieldChanges": {
             "DisplayType": {
@@ -348,6 +357,7 @@
         {
           "UpdatedConditions": null,
           "UpdatedScripts": null,
+          "UpdatedLinkOrder": null,
           "NodeId": 10,
           "FieldChanges": {
             "SpeakerGuid": {
@@ -432,7 +442,7 @@
     },
     "canonical_mod_new": {
       "ConversationName": "canonical_mod_new",
-      "SchemaVersion": 3,
+      "SchemaVersion": 4,
       "AddedNodes": [
         {
           "NodeId": 0,

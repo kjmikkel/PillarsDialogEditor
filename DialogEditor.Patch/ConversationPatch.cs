@@ -48,6 +48,10 @@ public sealed class NodeModification
     public IReadOnlyList<ConditionNode>? UpdatedConditions { get; init; }
     public IReadOnlyList<ScriptCall>?    UpdatedScripts    { get; init; }
 
+    // Target node ids of the node's links in their new order (replace-all, issue 359). Written only
+    // when the order differs from what applying the rest of the patch would give.
+    public IReadOnlyList<int>?           UpdatedLinkOrder  { get; init; }
+
     public int                                      NodeId        { get; }
     public IReadOnlyDictionary<string, FieldChange> FieldChanges  { get; }
     public IReadOnlyList<LinkEditSnapshot>          AddedLinks    { get; }
@@ -63,7 +67,8 @@ public record ConversationPatch(
     IReadOnlyList<NodeModification> ModifiedNodes)
 {
     // v3 (issue 139): link display values use the game's names, ShowAlways / ShowNever.
-    public static readonly int CurrentSchemaVersion = 3;
+    // v4 (issue 359): NodeModification may carry UpdatedLinkOrder.
+    public static readonly int CurrentSchemaVersion = 4;
 
     // key = language code e.g. "en", "fr", "de"
     public IReadOnlyDictionary<string, IReadOnlyList<NodeTranslation>> Translations { get; init; }

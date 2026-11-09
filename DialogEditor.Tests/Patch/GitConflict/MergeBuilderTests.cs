@@ -233,4 +233,70 @@ public class MergeBuilderTests
         Assert.DoesNotContain(merged.Patches["greeting"].ModifiedNodes, m => m.NodeId == 4);
         Assert.Contains(4, merged.Patches["greeting"].DeletedNodeIds);
     }
+
+    private static DialogProject ProjectWithReorder(int nodeId, int[] order, string? text = null)
+    {
+        var fields = new Dictionary<string, FieldChange>();
+        if (text is not null) fields["DefaultText"] = new FieldChange("orig", text);
+        var mod = new NodeModification(nodeId, fields, [], []) { UpdatedLinkOrder = order };
+        return DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [], [], [mod]));
+    }
+
+    [Fact]
+    public void LinkOrderResolvedToTheirs_TakesTheirOrder()
+    {
+        var mine   = ProjectWithReorder(4, [1, 2, 3]);
+        var theirs = ProjectWithReorder(4, [3, 2, 1]);
+        var conflict = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
+        Assert.Equal("LinkOrder", conflict.FieldName);
+
+        var merged = MergeBuilder.Build(mine, theirs, [(conflict, MergeSide.Theirs)]);
+
+        Assert.Equal([3, 2, 1], merged.Patches["greeting"].ModifiedNodes.Single(m => m.NodeId == 4).UpdatedLinkOrder);
+    }
+
+    [Fact]
+    public void LinkOrderResolvedToMine_KeepsMyOrder()
+    {
+        var mine   = ProjectWithReorder(4, [1, 2, 3]);
+        var theirs = ProjectWithReorder(4, [3, 2, 1]);
+        var conflict = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
+
+        var merged = MergeBuilder.Build(mine, theirs, [(conflict, MergeSide.Mine)]);
+
+        Assert.Equal([1, 2, 3], merged.Patches["greeting"].ModifiedNodes.Single(m => m.NodeId == 4).UpdatedLinkOrder);
+    }
+
+    [Fact]
+    public void RebuildingForAnotherField_KeepsMyLinkOrder()
+    {
+        var mine   = ProjectWithReorder(4, [1, 2, 3], text: "friend");
+        var theirs = ProjectWithFieldChange(4, "DefaultText", "traveler");
+        var conflict = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
+
+        var merged = MergeBuilder.Build(mine, theirs, [(conflict, MergeSide.Theirs)]);
+
+        var mod = merged.Patches["greeting"].ModifiedNodes.Single(m => m.NodeId == 4);
+        Assert.Equal("traveler", mod.FieldChanges["DefaultText"].To);
+        Assert.Equal([1, 2, 3], mod.UpdatedLinkOrder);
+    }
+
+    [Fact]
+    public void RebuildingForConditions_KeepsMyLinkOrder()
+    {
+        var mineMod = new NodeModification(4, new Dictionary<string, FieldChange>(), [], [])
+            { UpdatedConditions = [], UpdatedLinkOrder = [1, 2] };
+        var theirMod = new NodeModification(4, new Dictionary<string, FieldChange>(), [], [])
+            { UpdatedConditions = [new ConditionLeaf("Boolean Flag()", [], Not: false, Operator: "And")] };
+        var mine   = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [], [], [mineMod]));
+        var theirs = DialogProject.Empty("p").WithPatch(
+            new ConversationPatch("greeting", ConversationPatch.CurrentSchemaVersion, [], [], [theirMod]));
+        var conflict = Assert.Single(GitMergeAnalyzer.Analyze(mine, theirs));
+
+        var merged = MergeBuilder.Build(mine, theirs, [(conflict, MergeSide.Theirs)]);
+
+        Assert.Equal([1, 2], merged.Patches["greeting"].ModifiedNodes.Single().UpdatedLinkOrder);
+    }
 }

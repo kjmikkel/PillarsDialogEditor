@@ -445,6 +445,8 @@
     <sys:String x:Key="Menu_AddConnectedNode">Add connected node</sys:String>
     <sys:String x:Key="Menu_ConnectToNode">Connect to…</sys:String>
     <sys:String x:Key="Menu_DeleteConnection">Delete connection</sys:String>
+    <sys:String x:Key="Menu_MoveLinkEarlier">Move Link Earlier</sys:String>
+    <sys:String x:Key="Menu_MoveLinkLater">Move Link Later</sys:String>
 
     <!-- ─── Editing — status messages ───────────────────────────────────── -->
     <!-- {0} = conversation name -->
@@ -624,6 +626,9 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="ToolTip_AddConnectedNode">Create a new node and link it from this one</sys:String>
     <sys:String x:Key="ToolTip_ConnectToNode">Start connecting this node to another one. Use the arrow keys to pick the destination, Enter to confirm, or Escape to cancel. (Shortcut: Ctrl+L)</sys:String>
     <sys:String x:Key="ToolTip_DeleteConnection">Remove the link between these two nodes</sys:String>
+    <sys:String x:Key="ToolTip_MoveLinkEarlier">Move this link one place earlier among the links leaving the same node. The game takes the first link that passes, in this order, so an earlier link can hide the ones after it.</sys:String>
+    <sys:String x:Key="ToolTip_MoveLinkLater">Move this link one place later among the links leaving the same node. The game takes the first link that passes, in this order, so an earlier link can hide the ones after it.</sys:String>
+    <sys:String x:Key="Automation_LinkPosition">Link {0} of {1}</sys:String>
 
     <!-- ─── Script editor row buttons ─────────────────────────────────────── -->
     <sys:String x:Key="ToolTip_MoveScriptUp">Move this script up within its section</sys:String>
@@ -957,6 +962,7 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Undo_DeleteAnnotation">Delete annotation</sys:String>
     <sys:String x:Key="Undo_AddConnection">Add connection {0} → {1}</sys:String>
     <sys:String x:Key="Undo_DeleteConnection">Delete connection → {0}</sys:String>
+    <sys:String x:Key="Undo_MoveLink">Move link to node {0}</sys:String>
 
     <!-- ─── Batch replace: match preview field labels ──────────────────── -->
     <!--
@@ -1099,7 +1105,8 @@ Saving records your edits to the open project — game files are not touched unt
     <sys:String x:Key="Diff_Detail_FemaleTextLabel">Female text</sys:String>
     <sys:String x:Key="Diff_Detail_NodeAdded">(node added — no previous text)</sys:String>
     <sys:String x:Key="Diff_Detail_NodeRemoved">(node removed)</sys:String>
-    <sys:String x:Key="Diff_Detail_StructuralOnly">No text change — only structural fields (conditions, scripts, or speaker) differ.</sys:String>
+    <sys:String x:Key="Diff_Detail_StructuralOnly">No text change — only structural fields (conditions, scripts, speaker, or link order) differ.</sys:String>
+    <sys:String x:Key="Diff_LinksReordered">Links reordered</sys:String>
     <sys:String x:Key="ToolTip_Diff_Detail">Shows the selected node's text before and after the change. Added or removed text is highlighted; the left value is the version on the left endpoint, the right value the version on the right endpoint.</sys:String>
 
     <!-- Diff detail: language section labels -->

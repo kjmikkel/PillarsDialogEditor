@@ -165,4 +165,17 @@ public class NodeApplyBuilderTests
         Assert.Single(target.Patches["c"].AddedNodes);
         Assert.Single(targetPatch.AddedNodes);
     }
+
+    [Fact]
+    public void Apply_ReorderOnlyNode_CarriesTheOrder()
+    {
+        var reorder = new NodeModification(7, new Dictionary<string, FieldChange>(), [], [])
+            { UpdatedLinkOrder = [3, 1, 2] };
+        var target = Project("c", Patch("c"));
+        var source = Project("c", Patch("c", modified: [reorder]));
+
+        var result = NodeApplyBuilder.Apply(target, source, [new("c", 7)]);
+
+        Assert.Equal([3, 1, 2], Assert.Single(result.Patches["c"].ModifiedNodes).UpdatedLinkOrder);
+    }
 }

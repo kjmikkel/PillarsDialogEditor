@@ -181,7 +181,7 @@ public static class GitMergeAnalyzer
     }
 
     // (nodeId, field) -> comparable value. FieldChanges contribute their `To`
-    // value; the replace-all Conditions/Scripts lists are JSON-encoded so they
+    // value; the replace-all Conditions/Scripts/LinkOrder lists are JSON-encoded so they
     // can be compared as a single pseudo-field (mirrors ConflictDetector).
     private static Dictionary<(int NodeId, string Field), string> BuildFieldMap(ConversationPatch patch)
     {
@@ -195,6 +195,8 @@ public static class GitMergeAnalyzer
                 map[(mod.NodeId, "Conditions")] = JsonSerializer.Serialize(mod.UpdatedConditions);
             if (mod.UpdatedScripts is not null)
                 map[(mod.NodeId, "Scripts")] = JsonSerializer.Serialize(mod.UpdatedScripts);
+            if (mod.UpdatedLinkOrder is not null)
+                map[(mod.NodeId, "LinkOrder")] = JsonSerializer.Serialize(mod.UpdatedLinkOrder);
         }
         return map;
     }
@@ -223,6 +225,7 @@ public static class GitMergeAnalyzer
             var fields = mod.FieldChanges.Keys.ToList();
             if (mod.UpdatedConditions is not null) fields.Add("Conditions");
             if (mod.UpdatedScripts is not null)    fields.Add("Scripts");
+            if (mod.UpdatedLinkOrder is not null)  fields.Add("LinkOrder");
             if (fields.Count > 0) return (string.Join(", ", fields), null);
         }
 

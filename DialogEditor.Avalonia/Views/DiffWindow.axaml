@@ -277,6 +277,10 @@
                                    Text="{DynamicResource Diff_Detail_StructuralOnly}"
                                    Foreground="{DynamicResource Brush.Text.Status.Changed}" FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap"
                                    IsVisible="{Binding IsStructuralOnly}"/>
+                        <TextBlock DockPanel.Dock="Top"
+                                   Text="{Binding LinksReorderedText}"
+                                   Foreground="{DynamicResource Brush.Text.Status.Changed}" FontSize="{DynamicResource FontSize.Label}" TextWrapping="Wrap"
+                                   IsVisible="{Binding LinksReordered}"/>
                         <ScrollViewer MaxHeight="180" IsVisible="{Binding ShowSections}">
                             <ItemsControl x:Name="SectionsList" ItemsSource="{Binding Sections}">
                                 <ItemsControl.ItemTemplate>

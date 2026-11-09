@@ -117,6 +117,7 @@ public static class PatchMerger
             // Later wins for replace-all fields
             UpdatedConditions = later.UpdatedConditions ?? earlier.UpdatedConditions,
             UpdatedScripts    = later.UpdatedScripts    ?? earlier.UpdatedScripts,
+            UpdatedLinkOrder  = later.UpdatedLinkOrder  ?? earlier.UpdatedLinkOrder,
         };
     }
 }

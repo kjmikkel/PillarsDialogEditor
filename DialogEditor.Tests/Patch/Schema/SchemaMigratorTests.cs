@@ -225,7 +225,7 @@ public class SchemaMigratorTests
         SchemaMigrator.Default.Migrate(root, SchemaFileKind.ConversationPatch);
 
         Assert.Equal(["ShowAlways", "ShowNever", "ShowAlways", "ShowNever", "ShowAlways", "ShowNever"], Displays(root));
-        Assert.Equal(3, root["SchemaVersion"]!.GetValue<int>());
+        Assert.Equal(ConversationPatch.CurrentSchemaVersion, root["SchemaVersion"]!.GetValue<int>());
     }
 
     [Fact]
@@ -237,6 +237,22 @@ public class SchemaMigratorTests
         new ConversationPatchV2ToV3().Apply(root);
 
         // Includes a node comment whose text is "Always": only link display values are renamed.
+        Assert.True(JsonNode.DeepEquals(before, root));
+    }
+
+    // ── v3 → v4: link order (issue 359) ──────────────────────────────────
+
+    [Fact]
+    public void RealPatchStep_3To4_ChangesNothingButTheVersion()
+    {
+        var root = PatchWithLinks("ShowAlways", "ShowNever");
+        root["SchemaVersion"] = 3;
+        var before = root.DeepClone();
+
+        SchemaMigrator.Default.Migrate(root, SchemaFileKind.ConversationPatch);
+
+        Assert.Equal(4, root["SchemaVersion"]!.GetValue<int>());
+        root["SchemaVersion"] = 3;
         Assert.True(JsonNode.DeepEquals(before, root));
     }
 }

@@ -163,6 +163,7 @@ public static class MergeBuilder
             {
                 UpdatedConditions = theirMod.UpdatedConditions,
                 UpdatedScripts    = mineMod.UpdatedScripts,
+                UpdatedLinkOrder  = mineMod.UpdatedLinkOrder,
             };
 
         if (field == "Scripts")
@@ -172,6 +173,17 @@ public static class MergeBuilder
             {
                 UpdatedConditions = mineMod.UpdatedConditions,
                 UpdatedScripts    = theirMod.UpdatedScripts,
+                UpdatedLinkOrder  = mineMod.UpdatedLinkOrder,
+            };
+
+        if (field == "LinkOrder")
+            return new NodeModification(
+                mineMod.NodeId, mineMod.FieldChanges,
+                mineMod.AddedLinks, mineMod.DeletedLinks, mineMod.ModifiedLinks)
+            {
+                UpdatedConditions = mineMod.UpdatedConditions,
+                UpdatedScripts    = mineMod.UpdatedScripts,
+                UpdatedLinkOrder  = theirMod.UpdatedLinkOrder,
             };
 
         var fields = new Dictionary<string, FieldChange>(mineMod.FieldChanges)
@@ -184,6 +196,7 @@ public static class MergeBuilder
         {
             UpdatedConditions = mineMod.UpdatedConditions,
             UpdatedScripts    = mineMod.UpdatedScripts,
+            UpdatedLinkOrder  = mineMod.UpdatedLinkOrder,
         };
     }
 }

@@ -326,6 +326,75 @@ public class ConversationViewReadingModeTests : IDisposable
             var headers = OpenAndVisibleItems(connection.ContextMenu!, connection).Select(i => i.Header).ToList();
 
             Assert.Equal(offered, headers.Contains(R("Menu_DeleteConnection")));
+            Assert.Equal(offered, headers.Contains(R("Menu_MoveLinkEarlier")));
+            Assert.Equal(offered, headers.Contains(R("Menu_MoveLinkLater")));
+        }
+        finally { window.Close(); }
+    }
+
+    // A real right-click on the middle of the first link on the canvas (issue 359).
+    private async Task<bool> RightClickOnLinkOpensMenu(EditorMode mode)
+    {
+        var (window, view, vm, root) = await ShowAsync(mode);
+        try
+        {
+            var child = CanvasNavigationServiceTests.MakeNode(2, 500, 100);
+            vm.Canvas.Nodes.Add(child);
+            vm.Canvas.Connections.Add(CanvasNavigationServiceTests.Connect(root, child));
+            Dispatcher.UIThread.RunJobs();
+
+            var connection = view.GetVisualDescendants().OfType<CanvasConnection>().First();
+            var middle = new Point((connection.Source.X + connection.Target.X) / 2,
+                                   (connection.Source.Y + connection.Target.Y) / 2);
+            RightClick(window, connection.TranslatePoint(middle, window)!.Value);
+            return connection.ContextMenu!.IsOpen;
+        }
+        finally { window.Close(); }
+    }
+
+    [AvaloniaFact]
+    public async Task RightClickOnLink_InEditingMode_OpensItsMenu() =>
+        Assert.True(await RightClickOnLinkOpensMenu(EditorMode.Editing));
+
+    [AvaloniaFact]
+    public async Task RightClickOnLink_InReadingMode_OpensNoMenu() =>
+        Assert.False(await RightClickOnLinkOpensMenu(EditorMode.Reading));
+
+    [AvaloniaFact]
+    public async Task LinkPositionLabel_ShowsOnlyForSelectedSource_NextToItsAnchor()
+    {
+        var (window, view, vm, root) = await ShowAsync(EditorMode.Editing);
+        try
+        {
+            var a = CanvasNavigationServiceTests.MakeNode(2, 500, 100);
+            var b = CanvasNavigationServiceTests.MakeNode(3, 500, 300);
+            vm.Canvas.Nodes.Add(a);
+            vm.Canvas.Nodes.Add(b);
+            vm.Canvas.Connections.Add(CanvasNavigationServiceTests.Connect(root, a));
+            vm.Canvas.Connections.Add(CanvasNavigationServiceTests.Connect(root, b));
+            Dispatcher.UIThread.RunJobs();
+
+            // The label for position 2: a TextBlock whose Text is the bound number, on a non-hit-testable chip.
+            TextBlock? Label() => view.GetVisualDescendants().OfType<TextBlock>()
+                .FirstOrDefault(t => t.Text == "2" && t.GetVisualParent() is Border { IsHitTestVisible: false });
+
+            root.IsSelected = false;
+            Dispatcher.UIThread.RunJobs();
+            Assert.False(Label()?.IsEffectivelyVisible ?? false);
+
+            root.IsSelected = true;
+            Dispatcher.UIThread.RunJobs();
+            var label = Label();
+            Assert.NotNull(label);
+            Assert.True(label!.IsEffectivelyVisible);
+
+            // The label sits at its own point on the link's curve (links from one port must not stack).
+            var point = vm.Canvas.Connections[1].LinkPositionLabelPoint;
+            // The chip (the label's Border) carries the transform, so measure the chip's own origin.
+            var chip = label.GetVisualParent<Visual>()!;
+            var origin = chip.TranslatePoint(new Point(0, 0), chip.GetVisualParent<Visual>()!)!.Value;
+            Assert.Equal(point.X, origin.X, 1);
+            Assert.Equal(point.Y, origin.Y, 1);
         }
         finally { window.Close(); }
     }

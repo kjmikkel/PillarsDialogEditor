@@ -121,4 +121,15 @@ public class SerializerSchemaTests
         }
         finally { try { File.Delete(path); } catch (Exception) { /* best-effort */ } }
     }
+
+    [Fact]
+    public void Fixture_V3Patch_OpensAtV4_AndAppliesUnchanged()
+    {
+        // Issue 359: v4 only adds the optional UpdatedLinkOrder, so a v3 patch loads with no content change.
+        var patch = DialogProjectSerializer.Deserialize(Fixture("project-v1-patch-v3.dialogproject")).Patches["greeting"];
+
+        Assert.Equal(4, patch.SchemaVersion);
+        Assert.Equal("ShowAlways", patch.AddedNodes.Single().Links.Single().QuestionNodeTextDisplay);
+        Assert.Null(patch.ModifiedNodes.Single().UpdatedLinkOrder);
+    }
 }

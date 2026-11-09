@@ -317,6 +317,31 @@ public class ConflictDetectorTests
         Assert.True(c.IsDeletion);
         Assert.Equal((1, 0), (c.FirstPatchIndex, c.SecondPatchIndex));
     }
+
+    // Issue 359: a link reorder is a replace-all record, so it clashes like Conditions does.
+    private static (string, IReadOnlyDictionary<string, ConversationPatch>) Reorder(string name, params int[] order) =>
+        (name, new Dictionary<string, ConversationPatch>
+        {
+            ["conv1"] = new ConversationPatch("conv1", 4, [], [],
+                [new NodeModification(5, new Dictionary<string, FieldChange>(), [], []) { UpdatedLinkOrder = order }]),
+        });
+
+    [Fact]
+    public void Detect_BothReorderSameNode_ReportsLinkOrderConflict()
+    {
+        var c = Assert.Single(ConflictDetector.Detect([Reorder("ModA", 1, 2), Reorder("ModB", 2, 1)]));
+        Assert.Equal("LinkOrder", c.FieldName);
+        Assert.Equal(5, c.NodeId);
+    }
+
+    [Fact]
+    public void Detect_OnlyOneProjectReorders_NoConflict()
+    {
+        var plain = ("ModB", (IReadOnlyDictionary<string, ConversationPatch>)new Dictionary<string, ConversationPatch>
+            { ["conv1"] = new ConversationPatch("conv1", 4, [], [], []) });
+
+        Assert.Empty(ConflictDetector.Detect([Reorder("ModA", 1, 2), plain]));
+    }
 }
 
 public class PatchMergerTests
@@ -451,5 +476,29 @@ public class PatchMergerTests
         var merged = PatchMerger.Merge("conv", [patch1, patch2]);
 
         Assert.Equal(new Dictionary<int, string> { [1] = "A1", [2] = "B2" }, merged.NodeComments);
+    }
+
+    [Fact]
+    public void Merge_LaterLinkOrderWins()
+    {
+        ConversationPatch Order(params int[] o) => new("conv", 4, [], [],
+            [new NodeModification(5, new Dictionary<string, FieldChange>(), [], []) { UpdatedLinkOrder = o }]);
+
+        var merged = PatchMerger.Merge("conv", [Order(1, 2, 3), Order(3, 2, 1)]);
+
+        Assert.Equal([3, 2, 1], Assert.Single(merged.ModifiedNodes).UpdatedLinkOrder);
+    }
+
+    [Fact]
+    public void Merge_EarlierLinkOrderKept_WhenLaterHasNone()
+    {
+        var earlier = new ConversationPatch("conv", 4, [], [],
+            [new NodeModification(5, new Dictionary<string, FieldChange>(), [], []) { UpdatedLinkOrder = [2, 1] }]);
+        var later = new ConversationPatch("conv", 4, [], [],
+            [new NodeModification(5, new Dictionary<string, FieldChange> { ["Speaker"] = new("a", "b") }, [], [])]);
+
+        var merged = PatchMerger.Merge("conv", [earlier, later]);
+
+        Assert.Equal([2, 1], Assert.Single(merged.ModifiedNodes).UpdatedLinkOrder);
     }
 }

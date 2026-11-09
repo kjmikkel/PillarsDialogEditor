@@ -519,16 +519,34 @@
 
                 <ctrl:CanvasEditor.ConnectionTemplate>
                     <DataTemplate DataType="{x:Type vm:ConnectionViewModel}">
-                        <nodify:Connection
+                        <!-- The Grid only lets the position number ride beside the line; the Connection still draws
+                             in graph coordinates, so the label is placed with a transform from LinkPositionLabelPoint. -->
+                        <Grid>
+                        <ctrl:CanvasConnection
                             Source="{Binding Source.Anchor, Converter={StaticResource LayoutPointConverter}}"
                             Target="{Binding Target.Anchor, Converter={StaticResource LayoutPointConverter}}"
                             Classes.always="{Binding IsAlways}"
                             Classes.never="{Binding IsNever}"
                             Classes.highlighted="{Binding IsHighlighted}"
                             Classes.cannotFire="{Binding IsFaded}"
+                            AutomationProperties.HelpText="{Binding LinkAutomationHelpText}"
                             ToolTip.Tip="{Binding FadedToolTip}">
-                            <nodify:Connection.ContextMenu>
+                            <ctrl:CanvasConnection.ContextMenu>
                                 <ContextMenu AutomationProperties.AutomationId="ConnectionContextMenu">
+                                    <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_MoveLinkEarlier}"
+                                              IsVisible="{Binding !$parent[UserControl].DataContext.IsReadingMode}"
+                                              AutomationProperties.AutomationId="ConnectionMenu_MoveEarlier"
+                                              Command="{Binding $parent[UserControl].DataContext.MoveLinkEarlierCommand}"
+                                              CommandParameter="{Binding}"
+                                              ToolTip.Tip="{DynamicResource ToolTip_MoveLinkEarlier}"
+                                              AutomationProperties.HelpText="{DynamicResource ToolTip_MoveLinkEarlier}"/>
+                                    <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_MoveLinkLater}"
+                                              IsVisible="{Binding !$parent[UserControl].DataContext.IsReadingMode}"
+                                              AutomationProperties.AutomationId="ConnectionMenu_MoveLater"
+                                              Command="{Binding $parent[UserControl].DataContext.MoveLinkLaterCommand}"
+                                              CommandParameter="{Binding}"
+                                              ToolTip.Tip="{DynamicResource ToolTip_MoveLinkLater}"
+                                              AutomationProperties.HelpText="{DynamicResource ToolTip_MoveLinkLater}"/>
                                     <ctrl:AccessibleMenuItem Header="{DynamicResource Menu_DeleteConnection}"
                                               IsVisible="{Binding !$parent[UserControl].DataContext.IsReadingMode}"
                                               AutomationProperties.AutomationId="ConnectionMenu_Delete"
@@ -537,8 +555,27 @@
                                               ToolTip.Tip="{DynamicResource ToolTip_DeleteConnection}"
                                               AutomationProperties.HelpText="{DynamicResource ToolTip_DeleteConnection}"/>
                                 </ContextMenu>
-                            </nodify:Connection.ContextMenu>
-                        </nodify:Connection>
+                            </ctrl:CanvasConnection.ContextMenu>
+                        </ctrl:CanvasConnection>
+                        <!-- Position in the node's link order (issue 359), shown while the source node is selected.
+                             Sits on its own curve a short way from the source (every link of a node leaves the same
+                             port, so a fixed offset would stack the numbers), beside the line and clear of the card and arrowhead. Not interactive, so it needs no tooltip; the order is
+                             spoken through the Connection's help text instead. -->
+                        <!-- The chip fills with the canvas colour so the number stays legible where other links cross it. -->
+                        <Border IsVisible="{Binding ShowLinkPosition}"
+                                IsHitTestVisible="False"
+                                HorizontalAlignment="Left" VerticalAlignment="Top"
+                                Background="{DynamicResource Brush.Canvas.Background}"
+                                CornerRadius="4" Padding="3,0">
+                            <Border.RenderTransform>
+                                <TranslateTransform X="{Binding LinkPositionLabelPoint.X}" Y="{Binding LinkPositionLabelPoint.Y}"/>
+                            </Border.RenderTransform>
+                            <!-- Muted text is kept: on the opaque canvas-coloured chip it has the contrast it lacked over grey lines. -->
+                            <TextBlock Text="{Binding LinkPosition}"
+                                       FontSize="{DynamicResource FontSize.Small}" FontWeight="Bold"
+                                       Foreground="{DynamicResource Brush.Text.Muted}"/>
+                        </Border>
+                        </Grid>
                     </DataTemplate>
                 </ctrl:CanvasEditor.ConnectionTemplate>
 

@@ -413,7 +413,10 @@ public partial class DiffViewModel : ObservableObject
         var leftByLang  = _leftTextById.GetValueOrDefault(node.NodeId)  ?? EmptyLangMap;
         var rightByLang = _rightTextById.GetValueOrDefault(node.NodeId) ?? EmptyLangMap;
         SelectedNodeDetail = new NodeDiffDetailViewModel(
-            node.NodeId, node.DiffStatus, _language, leftByLang, rightByLang);
+            node.NodeId, node.DiffStatus, _language, leftByLang, rightByLang,
+            linksReordered: node.DiffStatus == DiffStatus.Changed && Selected is not null
+                && _leftProject is not null && _rightProject is not null
+                && ProjectDiff.LinkOrderDiffers(_leftProject, _rightProject, Selected.Name, node.NodeId));
     }
 
     private void BuildDiffCanvas()

@@ -211,4 +211,68 @@ public class DiffEngineTests
 
         Assert.Equal(new FieldChange("\"Player\"", "\"Npc\""), mod.FieldChanges["SpeakerCategory"]);
     }
+
+    // ── Link order (issue 359) ────────────────────────────────────────────
+
+    private static NodeEditSnapshot WithLinks(int id, params int[] targets) =>
+        MakeNode(id, links: [.. targets.Select(t => new LinkEditSnapshot(id, t, 1, "", false))]);
+
+    [Fact]
+    public void Diff_ReorderOnly_WritesUpdatedLinkOrder()
+    {
+        var patch = DiffEngine.Diff("conv", Snap(WithLinks(0, 1, 2, 3)), Snap(WithLinks(0, 3, 1, 2)), "en");
+
+        var mod = Assert.Single(patch.ModifiedNodes);
+        Assert.Equal(0, mod.NodeId);
+        Assert.Equal([3, 1, 2], mod.UpdatedLinkOrder);
+        Assert.Empty(mod.FieldChanges);
+        Assert.Empty(mod.AddedLinks);
+        Assert.Empty(mod.DeletedLinks);
+        Assert.Empty(mod.ModifiedLinks);
+    }
+
+    [Fact]
+    public void Diff_SameOrder_NoLinkOrder()
+        => Assert.Empty(DiffEngine.Diff("conv", Snap(WithLinks(0, 1, 2, 3)), Snap(WithLinks(0, 1, 2, 3)), "en").ModifiedNodes);
+
+    [Fact]
+    public void Diff_AddedLinkAppended_NoLinkOrder()
+    {
+        var mod = Assert.Single(DiffEngine.Diff("conv", Snap(WithLinks(0, 1, 2)), Snap(WithLinks(0, 1, 2, 4)), "en").ModifiedNodes);
+        Assert.Equal([4], mod.AddedLinks.Select(l => l.ToNodeId));
+        Assert.Null(mod.UpdatedLinkOrder);
+    }
+
+    [Fact]
+    public void Diff_AddedLinkFirst_WritesOrder()
+    {
+        var mod = Assert.Single(DiffEngine.Diff("conv", Snap(WithLinks(0, 1, 2)), Snap(WithLinks(0, 4, 1, 2)), "en").ModifiedNodes);
+        Assert.Equal([4, 1, 2], mod.UpdatedLinkOrder);
+    }
+
+    [Fact]
+    public void Diff_DeletedLink_OrderOfRestUnchanged_NoLinkOrder()
+    {
+        var mod = Assert.Single(DiffEngine.Diff("conv", Snap(WithLinks(0, 1, 2, 3)), Snap(WithLinks(0, 1, 3)), "en").ModifiedNodes);
+        Assert.Equal([2], mod.DeletedLinks.Select(l => l.ToNodeId));
+        Assert.Null(mod.UpdatedLinkOrder);
+    }
+
+    [Theory]
+    [InlineData(new[] { 1, 2, 3 }, new[] { 3, 1, 2 })]
+    [InlineData(new[] { 1, 2, 3 }, new[] { 3, 2, 1 })]
+    [InlineData(new[] { 1, 2 },    new[] { 4, 1, 2 })]
+    [InlineData(new[] { 1, 2 },    new[] { 1, 2, 4 })]
+    [InlineData(new[] { 1, 2, 3 }, new[] { 3, 1 })]
+    [InlineData(new[] { 1, 2, 3 }, new[] { 3, 4, 1 })]
+    public void Diff_ThenApply_RoundTripsOrder(int[] baseOrder, int[] currentOrder)
+    {
+        var baseSnap    = Snap(WithLinks(0, baseOrder));
+        var currentSnap = Snap(WithLinks(0, currentOrder));
+
+        var patch  = DiffEngine.Diff("conv", baseSnap, currentSnap, "en");
+        var result = PatchApplier.Apply(baseSnap, patch);
+
+        Assert.Equal(currentOrder, result.Nodes.Single().Links.Select(l => l.ToNodeId));
+    }
 }

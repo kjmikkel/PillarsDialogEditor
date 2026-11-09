@@ -145,4 +145,15 @@ public class PatchSerializerTests
         };
         Assert.False(patch.IsEmpty);
     }
+
+    [Fact]
+    public void Serialize_UpdatedLinkOrder_RoundTrips()
+    {
+        var mod   = new NodeModification(0, new Dictionary<string, FieldChange>(), [], []) { UpdatedLinkOrder = [3, 1, 2] };
+        var patch = new ConversationPatch("c", ConversationPatch.CurrentSchemaVersion, [], [], [mod]);
+
+        var back = PatchSerializer.Deserialize(PatchSerializer.Serialize(patch));
+
+        Assert.Equal([3, 1, 2], back.ModifiedNodes.Single().UpdatedLinkOrder);
+    }
 }
