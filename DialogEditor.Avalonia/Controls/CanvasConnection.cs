@@ -1,3 +1,4 @@
+using Avalonia.Automation.Peers;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
@@ -18,6 +19,20 @@ public class CanvasConnection : Nodify.Connection
     /// subclass would match none of them (same trap as CanvasEditor).
     /// </summary>
     protected override Type StyleKeyOverride => typeof(Nodify.Connection);
+
+    /// <summary>
+    /// Issue 361: a link must be reachable from the keyboard and by UI Automation. Focusable so
+    /// L / Shift+L can put focus on it (then the Menu key opens its menu), but not a tab stop, so
+    /// the editor stays the canvas's single Tab stop (same pattern as the node containers). A
+    /// control peer makes it a control element with a name, so a screen reader announces it.
+    /// </summary>
+    public CanvasConnection()
+    {
+        Focusable = true;
+        IsTabStop = false;
+    }
+
+    protected override AutomationPeer OnCreateAutomationPeer() => new ControlAutomationPeer(this);
 
     protected override void OnPointerReleased(PointerReleasedEventArgs e)
     {

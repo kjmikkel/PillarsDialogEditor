@@ -14,6 +14,7 @@ public static class ReadingModeShortcuts
         (Key.Enter or Key.Escape or Key.Apps, KeyModifiers.None)         => true,
         (Key.F6, KeyModifiers.None or KeyModifiers.Shift)                => true,
         (Key.F10, KeyModifiers.Shift)                                    => true,
+        (Key.L, KeyModifiers.None or KeyModifiers.Shift)                 => true,
         (Key.O, KeyModifiers.Control)                                    => true,
         (Key.O, KeyModifiers.Control | KeyModifiers.Shift)               => true,
         (Key.W, KeyModifiers.Control)                                    => true,

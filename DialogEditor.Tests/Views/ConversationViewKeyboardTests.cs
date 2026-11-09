@@ -1,5 +1,6 @@
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.VisualTree;
@@ -35,13 +36,11 @@ public class ConversationViewKeyboardTests
 
     private static void Press(ConversationView view, Key key, KeyModifiers modifiers = KeyModifiers.None)
     {
+        // A whole keystroke, down then up: the menu keys act on key-up (issue 361), as Avalonia's own
+        // context-menu handling does.
         var editor = view.FindControl<Control>("Editor")!;
-        editor.RaiseEvent(new KeyEventArgs
-        {
-            RoutedEvent = InputElement.KeyDownEvent,
-            Key = key,
-            KeyModifiers = modifiers,
-        });
+        foreach (var routed in new[] { InputElement.KeyDownEvent, InputElement.KeyUpEvent })
+            editor.RaiseEvent(new KeyEventArgs { RoutedEvent = routed, Key = key, KeyModifiers = modifiers });
     }
 
     [AvaloniaFact]
@@ -195,6 +194,30 @@ public class ConversationViewKeyboardTests
             .FirstOrDefault(m => m is not null);
         Assert.NotNull(menu);
         Assert.True(menu!.IsOpen);
+    }
+
+    // Issue 361: real key input, press AND release. A menu opened on key-down is closed again by
+    // Avalonia's ContextMenu.PopupKeyUp when the same key is released.
+    [AvaloniaTheory]
+    [InlineData(Key.Apps, RawInputModifiers.None)]
+    [InlineData(Key.F10, RawInputModifiers.Shift)]
+    public void MenuKey_RealKeyboard_LeavesSelectedNodeContextMenuOpen(Key key, RawInputModifiers modifiers)
+    {
+        var (window, view, vm, root, _) = Setup();
+        try
+        {
+            view.FocusEditor();
+            vm.SelectNode(root);
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            window.KeyPress(key, modifiers, PhysicalKey.None, null);
+            window.KeyRelease(key, modifiers, PhysicalKey.None, null);
+            global::Avalonia.Threading.Dispatcher.UIThread.RunJobs();
+
+            var menu = view.GetVisualDescendants().OfType<Nodify.Node>().Select(n => n.ContextMenu).First(m => m is not null);
+            Assert.True(menu!.IsOpen);
+        }
+        finally { window.Close(); }
     }
 
     [AvaloniaFact]
