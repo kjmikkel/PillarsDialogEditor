@@ -3,6 +3,7 @@ using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using DialogEditor.Avalonia.Controls;
 using DialogEditor.Avalonia.Input;
 using DialogEditor.Avalonia.Shared.Theming;
 using DialogEditor.Core.Editing;
@@ -83,6 +84,7 @@ public partial class ConversationView : UserControl
         {
             _annotationVm.ConversationLoaded -= OnConversationLoaded;
             _annotationVm.Annotations.CollectionChanged -= OnAnnotationsChanged;
+            _annotationVm.Connections.CollectionChanged -= OnConnectionsMoved;
             foreach (var ann in _annotationVm.Annotations)
                 ann.PropertyChanged -= OnAnnotationWorldChanged;
         }
@@ -93,6 +95,7 @@ public partial class ConversationView : UserControl
         {
             _annotationVm.ConversationLoaded += OnConversationLoaded;
             _annotationVm.Annotations.CollectionChanged += OnAnnotationsChanged;
+            _annotationVm.Connections.CollectionChanged += OnConnectionsMoved;
             foreach (var ann in _annotationVm.Annotations)
                 ann.PropertyChanged += OnAnnotationWorldChanged;
         }
@@ -157,6 +160,9 @@ public partial class ConversationView : UserControl
             Key.Up    when ctrl => vm.NudgeSelected(0, -step),
             Key.Down  when ctrl => vm.NudgeSelected(0, step),
             Key.L     when ctrl => vm.TryBeginConnect(),
+            // Issue 361: step focus through the selected node's links (Ctrl+L above is connect mode).
+            Key.L     when none => vm.TryFocusLink(forward: true),
+            Key.L     when e.KeyModifiers == KeyModifiers.Shift => vm.TryFocusLink(forward: false),
 
             Key.Right when none => vm.TryNavigate(CanvasNavDirection.Child),
             Key.Left  when none => vm.TryNavigate(CanvasNavDirection.Parent),
@@ -173,11 +179,9 @@ public partial class ConversationView : UserControl
             Key.Enter when none && vm.IsConnecting => vm.TryConfirmConnection(),
             Key.Enter when none && vm.SelectedNode is not null => RaiseFocusDetail(),
 
-            Key.Apps                                          => OpenSelectedNodeContextMenu(vm),
-            Key.F10 when e.KeyModifiers == KeyModifiers.Shift => OpenSelectedNodeContextMenu(vm),
-
             Key.Escape when none && vm.IsChoosingStartNode => CancelChoosingStartNode(vm),
             Key.Escape when none && vm.IsConnecting => vm.CancelConnect(),
+            Key.Escape when none && vm.FocusedLink is not null => vm.ClearFocusedLink(),
             Key.Escape when none                    => vm.Deselect(),
 
             _ => false,
@@ -186,6 +190,18 @@ public partial class ConversationView : UserControl
         if (!handled) return;
         FollowSelection(vm);
         e.Handled = true;
+    }
+
+    // The Menu key and Shift+F10 open a menu on key-UP, as Avalonia's own context-menu handling
+    // does. Opened on key-down, the menu was closed again at once: ContextMenu.PopupKeyUp closes an
+    // open menu when the context-menu key is released (issue 361; the node menu had the same bug).
+    private void Editor_KeyUp(object? sender, KeyEventArgs e)
+    {
+        if (e.Handled || DataContext is not ConversationViewModel vm) return;
+        if (vm.IsReadingMode && !ReadingModeShortcuts.IsAllowed(e.Key, e.KeyModifiers)) return;
+        var menuKey = e.Key == Key.Apps
+            || (e.Key == Key.F10 && e.KeyModifiers == KeyModifiers.Shift);
+        if (menuKey && OpenSelectedNodeContextMenu(vm)) e.Handled = true;
     }
 
     // Issue 172: in pick mode a click on a node confirms it as the start node. Selection
@@ -212,6 +228,15 @@ public partial class ConversationView : UserControl
 
     private bool OpenSelectedNodeContextMenu(ConversationViewModel vm)
     {
+        // Issue 361: with a link focused the Menu key opens the link's menu, not the node's. Checks
+        // real focus, not just FocusedLink: clicking the same node again leaves the selection (and so
+        // FocusedLink) unchanged while focus has moved back to the node.
+        if (vm.FocusedLink is { } link && LinkControl(link) is { IsKeyboardFocusWithin: true } linkControl
+            && linkControl.ContextMenu is { } linkMenu)
+        {
+            linkMenu.Open(linkControl);
+            return true;
+        }
         if (vm.SelectedNode is null) return false;
 
         // The ContextMenu lives on the nodify:Node inside the item template, not
@@ -236,9 +261,33 @@ public partial class ConversationView : UserControl
             if (Editor.IsKeyboardFocusWithin) Editor.Focus();
             return;
         }
-        Editor.BringIntoView(new global::Avalonia.Point(node.Location.X, node.Location.Y));
-        if (Editor.IsKeyboardFocusWithin)
+        // Issue 361: a focused link takes focus instead of its node; bring the node it points to
+        // into view so the far end of the link is on screen too.
+        var target = vm.FocusedLink is { } focused
+            ? vm.Nodes.FirstOrDefault(n => n.Input == focused.Target) ?? node
+            : node;
+        Editor.BringIntoView(new global::Avalonia.Point(target.Location.X, target.Location.Y));
+        if (!Editor.IsKeyboardFocusWithin) return;
+        if (vm.FocusedLink is { } link && LinkControl(link) is { } linkControl)
+            linkControl.Focus(NavigationMethod.Directional);
+        else
             Editor.ContainerFromItem(node)?.Focus(NavigationMethod.Directional);
+    }
+
+    private CanvasConnection? LinkControl(ConnectionViewModel link) =>
+        Editor.GetVisualDescendants().OfType<CanvasConnection>().FirstOrDefault(c => c.DataContext == link);
+
+    // Moving a link (Move Earlier/Later) reorders Connections, so the ItemsControl may re-realize
+    // its line and drop focus; put it back on the still-focused link (issue 361).
+    private void OnConnectionsMoved(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (e.Action != NotifyCollectionChangedAction.Move || DataContext is not ConversationViewModel vm) return;
+        if (vm.FocusedLink is null) return;
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (vm.FocusedLink is { } link && Editor.IsKeyboardFocusWithin && LinkControl(link) is { } c && !c.IsFocused)
+                c.Focus(NavigationMethod.Directional);
+        });
     }
 
     private void Editor_GotFocus(object? sender, GotFocusEventArgs e)

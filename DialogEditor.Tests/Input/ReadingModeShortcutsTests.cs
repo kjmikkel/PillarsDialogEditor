@@ -19,6 +19,9 @@ public class ReadingModeShortcutsTests
         { Key.O, KeyModifiers.Control | KeyModifiers.Shift },
         { Key.O, KeyModifiers.Control }, { Key.W, KeyModifiers.Control },
         { Key.OemComma, KeyModifiers.Control },
+        // Issue 361: stepping through a node's links only reads them; the edit items in a link's menu
+        // are already hidden in reading mode.
+        { Key.L, KeyModifiers.None }, { Key.L, KeyModifiers.Shift },
     };
 
     public static TheoryData<Key, KeyModifiers> Blocked => new()

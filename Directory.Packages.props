@@ -33,11 +33,11 @@
   -->
   <ItemGroup Label="Avalonia and Dock">
     <PackageVersion Include="AssetsTools.NET"                Version="3.0.5" />
-    <PackageVersion Include="Avalonia"                       Version="11.3.22" />
-    <PackageVersion Include="Avalonia.Desktop"               Version="11.3.22" />
-    <PackageVersion Include="Avalonia.Fonts.Inter"           Version="11.3.22" />
-    <PackageVersion Include="Avalonia.Themes.Fluent"         Version="11.3.22" />
-    <PackageVersion Include="Avalonia.Headless.XUnit"        Version="11.3.22" />
+    <PackageVersion Include="Avalonia"                       Version="11.3.23" />
+    <PackageVersion Include="Avalonia.Desktop"               Version="11.3.23" />
+    <PackageVersion Include="Avalonia.Fonts.Inter"           Version="11.3.23" />
+    <PackageVersion Include="Avalonia.Themes.Fluent"         Version="11.3.23" />
+    <PackageVersion Include="Avalonia.Headless.XUnit"        Version="11.3.23" />
     <PackageVersion Include="Dock.Avalonia"                  Version="11.3.12.1" />
     <PackageVersion Include="Dock.Avalonia.Themes.Fluent"    Version="11.3.12.1" />
     <PackageVersion Include="Dock.Model.Mvvm"                Version="11.3.12.1" />
@@ -62,14 +62,14 @@
   </ItemGroup>
 
   <ItemGroup Label="UI automation tooling (tools/DialogEditor.UiaMcp*)">
-    <PackageVersion Include="Microsoft.Extensions.Hosting"   Version="10.0.14" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting"   Version="11.0.0" />
     <PackageVersion Include="ModelContextProtocol"           Version="2.3.1" />
   </ItemGroup>
 
   <!-- xunit stays on v2: Avalonia.Headless.XUnit targets it. -->
   <ItemGroup Label="Tests">
     <PackageVersion Include="coverlet.collector"             Version="10.1.1" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp"  Version="5.9.0" />
+    <PackageVersion Include="Microsoft.CodeAnalysis.CSharp"  Version="5.12.0" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk"         Version="18.12.0" />
     <PackageVersion Include="xunit"                          Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio"      Version="2.8.2" />

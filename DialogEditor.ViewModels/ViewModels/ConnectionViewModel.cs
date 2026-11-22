@@ -165,6 +165,9 @@ public partial class ConnectionViewModel : ObservableObject
             OnPropertyChanged(nameof(LinkPositionLabelPoint));
     }
 
+    /// Screen-reader name of the link: its two ends, so a writer can tell the links of a node apart (issue 361).
+    public string AutomationName => Loc.Format("Automation_LinkName", Source.Owner?.NodeId ?? -1, Target.Owner?.NodeId ?? -1);
+
     public string LinkPositionHelpText => Loc.Format("Automation_LinkPosition", _linkPosition, _linkCount);
 
     /// Help text for the canvas line: the position, but only when the node has an order to speak of.

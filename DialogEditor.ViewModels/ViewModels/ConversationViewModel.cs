@@ -165,6 +165,9 @@ public partial class ConversationViewModel : ObservableObject
             // menu item, so one raise refreshes them all after any add, delete, undo or move.
             MoveLinkEarlierCommand.NotifyCanExecuteChanged();
             MoveLinkLaterCommand.NotifyCanExecuteChanged();
+            // A moved link raises Move with itself in OldItems but stays in the collection, so it keeps
+            // focus; only a link that is really gone loses it (issue 361).
+            if (FocusedLink is { } focused && !Connections.Contains(focused)) FocusedLink = null;
             if (args.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
             {
                 // Clear() reports no OldItems, so release the tracked set.
@@ -398,6 +401,36 @@ public partial class ConversationViewModel : ObservableObject
         RedoCommand.NotifyCanExecuteChanged();
     }
 
+    // ── Link keyboard focus (issue 361) ───────────────────────────────────
+    /// <summary>The link that holds keyboard focus (reached with L / Shift+L), or null when focus is on a node.</summary>
+    [ObservableProperty] private ConnectionViewModel? _focusedLink;
+
+    /// <summary>
+    /// Steps focus through the selected node's outgoing links in the game's order, wrapping at
+    /// the ends. Returns false (and changes nothing) with no selection or no links.
+    /// </summary>
+    public bool TryFocusLink(bool forward)
+    {
+        if (SelectedNode is null) return false;
+        var links = Connections.Where(c => c.Source == SelectedNode.Output).ToList();
+        if (links.Count == 0) return false;
+
+        var index = FocusedLink is null ? -1 : links.IndexOf(FocusedLink);
+        var next = index < 0
+            ? (forward ? 0 : links.Count - 1)
+            : (index + (forward ? 1 : -1) + links.Count) % links.Count;
+        FocusedLink = links[next];
+        return true;
+    }
+
+    /// <summary>Drops link focus (the node stays selected). Returns whether a link had it.</summary>
+    public bool ClearFocusedLink()
+    {
+        if (FocusedLink is null) return false;
+        FocusedLink = null;
+        return true;
+    }
+
     // ── Search ────────────────────────────────────────────────────────────
     private CancellationTokenSource? _searchCts;
 
@@ -406,6 +439,7 @@ public partial class ConversationViewModel : ObservableObject
         // Remember the last real selection (mouse or keyboard) so keyboard focus
         // can resume where the user left off (spec: entry = restore last selection).
         if (value is not null) _lastSelection = value;
+        FocusedLink = null;
 
         foreach (var connection in Connections)
         {

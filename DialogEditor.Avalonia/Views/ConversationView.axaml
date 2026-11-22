@@ -79,6 +79,12 @@
         <Style Selector="nodify|Connection.highlighted.never">
             <Setter Property="Stroke" Value="{DynamicResource Brush.Connection.Highlighted.Never}"/>
         </Style>
+        <!-- Keyboard focus on a link (L / Shift+L, issue 361): thicker still than the highlighted stroke, in the highlight
+             colour, so the focused link is the obvious one among its node's links. -->
+        <Style Selector="nodify|Connection:focus-visible">
+            <Setter Property="Stroke" Value="{DynamicResource Brush.Connection.Highlighted}"/>
+            <Setter Property="StrokeThickness" Value="4.5"/>
+        </Style>
         <!-- Links the assumed game state rules out (View > Game State, GitHub issue 32), or hidden by an earlier link that always passes (issue 353). Opacity rather than
              a new brush so the fade composes with the always/never/highlighted classes. -->
         <Style Selector="nodify|Connection.cannotFire">
@@ -203,6 +209,7 @@
                                  PendingConnection="{Binding PendingConnection}"
                                  DoubleTapped="Editor_DoubleTapped"
                                  KeyDown="Editor_KeyDown"
+                                 KeyUp="Editor_KeyUp"
                                  GotFocus="Editor_GotFocus"
                                  PointerPressed="Editor_PointerPressed"
                                  IsTabStop="True">
@@ -529,6 +536,7 @@
                             Classes.never="{Binding IsNever}"
                             Classes.highlighted="{Binding IsHighlighted}"
                             Classes.cannotFire="{Binding IsFaded}"
+                            AutomationProperties.Name="{Binding AutomationName}"
                             AutomationProperties.HelpText="{Binding LinkAutomationHelpText}"
                             ToolTip.Tip="{Binding FadedToolTip}">
                             <ctrl:CanvasConnection.ContextMenu>
