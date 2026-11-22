@@ -33,11 +33,11 @@
   -->
   <ItemGroup Label="Avalonia and Dock">
     <PackageVersion Include="AssetsTools.NET"                Version="3.0.5" />
-    <PackageVersion Include="Avalonia"                       Version="11.3.22" />
-    <PackageVersion Include="Avalonia.Desktop"               Version="11.3.22" />
-    <PackageVersion Include="Avalonia.Fonts.Inter"           Version="11.3.22" />
-    <PackageVersion Include="Avalonia.Themes.Fluent"         Version="11.3.22" />
-    <PackageVersion Include="Avalonia.Headless.XUnit"        Version="11.3.22" />
+    <PackageVersion Include="Avalonia"                       Version="11.3.23" />
+    <PackageVersion Include="Avalonia.Desktop"               Version="11.3.23" />
+    <PackageVersion Include="Avalonia.Fonts.Inter"           Version="11.3.23" />
+    <PackageVersion Include="Avalonia.Themes.Fluent"         Version="11.3.23" />
+    <PackageVersion Include="Avalonia.Headless.XUnit"        Version="11.3.23" />
     <PackageVersion Include="Dock.Avalonia"                  Version="11.3.12.1" />
     <PackageVersion Include="Dock.Avalonia.Themes.Fluent"    Version="11.3.12.1" />
     <PackageVersion Include="Dock.Model.Mvvm"                Version="11.3.12.1" />
